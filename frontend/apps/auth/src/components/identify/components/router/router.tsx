@@ -3,11 +3,10 @@ import { StepHeader } from '@onefootprint/idv';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { DoneArgs, HeaderProps } from '@/src/types';
-
 import Notification from '../../../notification';
 import type { IdentifyMachineContext, IdentifyMachineHook } from '../../state';
 import { useIdentifyMachine } from '../../state';
+import type { DoneArgs, HeaderProps } from '../../types';
 import getLeftNavButton from '../../utils/nav-left-btn';
 import ChallengeSelectOrPasskey from '../challenge-select-or-passkey';
 import EmailChallenge from '../email-challenge';

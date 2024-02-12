@@ -2,7 +2,7 @@ import { Button, RadioSelect, Stack } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
 import React from 'react';
 
-import type { HeaderProps } from '@/src/types';
+import type { HeaderProps } from '../../types';
 
 type RadioProps = ComponentProps<typeof RadioSelect>;
 type TComponentProps = {

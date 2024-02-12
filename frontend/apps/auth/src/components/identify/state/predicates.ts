@@ -2,8 +2,7 @@ import { shouldChallengeEmail } from '@onefootprint/idv';
 import { ChallengeKind } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 
-import type { EmailAndOrPhone } from '@/src/types';
-
+import type { EmailAndOrPhone } from '../types';
 import {
   type IdentifiedEvent,
   type IdentifyMachineContext,

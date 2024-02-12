@@ -2,9 +2,8 @@ import { validateBootstrapData } from '@onefootprint/idv';
 import partial from 'lodash/fp/partial';
 import React, { useMemo } from 'react';
 
-import { useEffectOnceStrict } from '@/src/hooks';
-import { useIdentify } from '@/src/queries';
-
+import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
+import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import Loading from '../loading';
 import { identify, identifyMutationCaller } from './utils';

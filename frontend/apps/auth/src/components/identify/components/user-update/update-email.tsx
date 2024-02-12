@@ -3,8 +3,7 @@ import { Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { HeaderProps } from '@/src/types';
-
+import type { HeaderProps } from '../../types';
 import UpdateVerifyEmail from './update-verify-email';
 
 type UpdateEmailProps = {

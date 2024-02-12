@@ -6,8 +6,7 @@ import { useToast } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useIdentifyVerify, useLoginChallenge } from '@/src/queries';
-
+import { useIdentifyVerify, useLoginChallenge } from '../../../queries';
 import { useIdentifyMachine } from '../../../state';
 
 type UseRunPasskeyArgs = {

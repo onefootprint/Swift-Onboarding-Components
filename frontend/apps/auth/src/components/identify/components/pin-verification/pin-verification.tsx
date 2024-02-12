@@ -12,15 +12,14 @@ import type {
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useEffectOnceStrict } from '@/src/hooks';
+import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import {
   useIdentifyVerify,
   useLoginChallenge,
   useSignupChallenge,
-} from '@/src/queries';
-import { shouldRequestNewChallenge } from '@/src/utils';
-
+} from '../../queries';
 import { useIdentifyMachine } from '../../state';
+import shouldRequestNewChallenge from '../../utils/should-request-challenge';
 import PinForm from '../pin-form';
 
 type PinVerificationProps = {

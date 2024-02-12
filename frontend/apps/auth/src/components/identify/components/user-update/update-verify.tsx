@@ -5,13 +5,13 @@ import noop from 'lodash/fp/noop';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useEffectOnceStrict } from '@/src/hooks';
-import type { UserChallengeBody, UserChallengeResponse } from '@/src/queries';
-import { useUserChallenge, useUserChallengeVerify } from '@/src/queries';
-import type { HeaderProps } from '@/src/types';
-import { getErrorToastVariant, shouldRequestNewChallenge } from '@/src/utils';
-
-import PinForm from '../identify/components/pin-form';
+import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
+import type { UserChallengeBody, UserChallengeResponse } from '../../queries';
+import { useUserChallenge, useUserChallengeVerify } from '../../queries';
+import type { HeaderProps } from '../../types';
+import shouldRequestNewChallenge from '../../utils/should-request-challenge';
+import getErrorToastVariant from '../../utils/toast-error-variant';
+import PinForm from '../pin-form';
 
 type PartialPayload = 'kind' | 'email' | 'phoneNumber' | 'authToken';
 type UpdateVerifyProps = {

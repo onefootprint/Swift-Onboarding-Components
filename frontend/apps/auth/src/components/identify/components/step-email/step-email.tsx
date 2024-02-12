@@ -4,10 +4,9 @@ import noop from 'lodash/fp/noop';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useIdentify } from '@/src/queries';
-import type { HeaderProps } from '@/src/types';
-
+import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
+import type { HeaderProps } from '../../types';
 
 type StepEmailProps = {
   children?: JSX.Element | null;

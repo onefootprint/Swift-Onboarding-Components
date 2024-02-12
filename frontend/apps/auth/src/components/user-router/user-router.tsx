@@ -11,10 +11,10 @@ import { getUserLeftNavButton } from '@/src/utils';
 
 import Loading from '../../app/user/loading';
 import Identify from '../identify';
+import { UpdateEmail, UpdatePhone } from '../identify/components/user-update';
 import { IdentifyVariant } from '../identify/state/types';
 import Notification from '../notification';
 import UserDashboard from '../user-dashboard';
-import { UpdateEmail, UpdatePhone } from '../user-update';
 
 type UserRouterProps = { onDone: React.MouseEventHandler<HTMLButtonElement> };
 

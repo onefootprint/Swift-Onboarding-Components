@@ -4,8 +4,7 @@ import { Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { HeaderProps } from '@/src/types';
-
+import type { HeaderProps } from '../../types';
 import UpdateVerifyPhone from './update-verify-phone';
 
 type UpdatePhoneProps = {

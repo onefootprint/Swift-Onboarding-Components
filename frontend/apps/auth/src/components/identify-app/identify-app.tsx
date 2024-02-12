@@ -16,9 +16,10 @@ import { isAuth, isSdkUrlAllowed } from '@/src/utils';
 
 import { useFootprintProvider } from '../../provider-footprint';
 import useProps from '../../provider-footprint/hooks/use-props';
-import type { DoneArgs, Variant } from '../../types';
+import type { Variant } from '../../types';
 import Identify from '../identify';
 import { IdentifyVariant } from '../identify/state/types';
+import type { DoneArgs } from '../identify/types';
 import Layout from '../layout';
 import type { NotificationProps } from '../notification';
 import Notification from '../notification';

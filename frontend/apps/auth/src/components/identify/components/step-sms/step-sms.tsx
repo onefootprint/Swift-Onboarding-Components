@@ -6,10 +6,9 @@ import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { HeaderProps } from '@/src/types';
-
 import useGetHeaderText from '../../hooks/use-get-header-text';
 import { useIdentifyMachine } from '../../state';
+import type { HeaderProps } from '../../types';
 import PinVerification from '../pin-verification';
 
 type StepPhoneProps = {

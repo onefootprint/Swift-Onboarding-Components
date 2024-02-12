@@ -12,15 +12,14 @@ import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { DoneArgs, ObKeyHeader } from '@/src/types';
-import { sandboxIdEditRules } from '@/src/utils';
-
 import DashedLine from './components/dashed-line';
 import Router from './components/router';
 import SandboxInput from './components/sandbox-input';
 import SandboxOutcomeFooter from './components/sandbox-outcome-footer';
 import { IdentifyMachineProvider } from './state';
 import type { IdentifyVariant, LogoConfig } from './state/types';
+import type { DoneArgs, ObKeyHeader } from './types';
+import sandboxIdEditRules from './utils/editable-sandbox-rules';
 
 const voidObj: Record<string, never> = {};
 const initialDevice = {

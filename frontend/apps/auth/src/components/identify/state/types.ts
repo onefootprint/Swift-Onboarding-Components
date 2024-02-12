@@ -10,7 +10,7 @@ import type {
 } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 
-import type { EmailAndOrPhone } from '@/src/types';
+import type { EmailAndOrPhone } from '../types';
 
 export type IdentifyMachineContext = {
   /// Optionally, the identified token used to start the flow

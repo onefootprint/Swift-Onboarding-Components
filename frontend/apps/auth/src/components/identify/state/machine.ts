@@ -4,8 +4,6 @@ import { ChallengeKind } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
-import { isEmail, isSms } from '@/src/utils';
-
 import {
   hasBootstrapTruthyValue,
   hasEmailAndPhoneNumber,
@@ -37,6 +35,10 @@ export type IdentifyMachineArgs = {
 type Ignore = unknown;
 type KindPayload = { payload: ChallengeKind };
 const getKindPayload = (_: Ignore, { payload }: KindPayload) => payload;
+const isEmail = (x: unknown): x is typeof ChallengeKind.email =>
+  x === ChallengeKind.email;
+const isSms = (x: unknown): x is typeof ChallengeKind.sms =>
+  x === ChallengeKind.sms;
 const isPayloadEmail = compose(isEmail, getKindPayload);
 const isPayloadSms = compose(isSms, getKindPayload);
 

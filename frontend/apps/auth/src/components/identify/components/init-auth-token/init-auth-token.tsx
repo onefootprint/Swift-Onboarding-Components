@@ -1,9 +1,8 @@
 import { getLogger } from '@onefootprint/idv';
 import React from 'react';
 
-import { useEffectOnceStrict } from '@/src/hooks';
-import { useIdentify } from '@/src/queries';
-
+import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
+import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import Loading from '../loading';
 

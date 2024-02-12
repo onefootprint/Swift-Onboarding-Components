@@ -94,6 +94,9 @@ const nextConfig = {
 
   compiler: { styledComponents: true },
   eslint: { ignoreDuringBuilds: true },
+  env: {
+    npm_package_name: process.env.npm_package_name,
+  },
   transpilePackages: [
     '@onefootprint/design-tokens',
     '@onefootprint/global-constants',
