@@ -29,7 +29,7 @@
     "@onefootprint/ui": "*",
     "@rive-app/react-canvas": "^3.0.35",
     "framer-motion": "^9.0.7",
-    "next": "^14.1.0",
+    "next": "14.1.0",
     "react": "18.2.0",
     "react-player": "^2.14.1",
     "react-wrap-balancer": "^1.1.0"
