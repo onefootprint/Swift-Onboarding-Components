@@ -107,9 +107,9 @@ pub async fn post_inner(
         user_id: cip.kyc.id,
         checked_data: ApexCheckedKycData {
             tax_id: vd.remove(&Id(Ssn9)),
-            customer_name: to_ascii(cip.kyc.applicant_name),
-            address: to_ascii(cip.kyc.address),
-            date_of_birth: cip.kyc.date_of_birth.clone(),
+            customer_name: to_ascii(cip.kyc.applicant_name.into_inner()),
+            address: to_ascii(cip.kyc.address.into_inner()),
+            date_of_birth: cip.kyc.date_of_birth.clone().into_inner(),
         },
         self_reported,
         kyc_completed_at: cip.kyc.kyc_completed_at,
@@ -118,7 +118,7 @@ pub async fn post_inner(
         approved_reason: cip.kyc.approved_reason,
         approved_at: cip.kyc.approved_at,
         approved_by: cip.kyc.approved_by,
-        ip_address: cip.kyc.ip_address,
+        ip_address: cip.kyc.ip_address.into_inner(),
 
         result: cip.identity.result.into(),
         matched_address: cip.identity.matched_address.into(),

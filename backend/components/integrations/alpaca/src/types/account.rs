@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use newtypes::{Declaration, PiiJsonValue, PiiString};
+use newtypes::{AlpacaPiiString, Declaration, PiiJsonValue};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -22,52 +22,52 @@ pub struct CreateAccountRequest {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Contact {
-    pub email_address: PiiString, //"cool_alpaca@example.com",
+    pub email_address: AlpacaPiiString, //"cool_alpaca@example.com",
     /// Phone number should include the country code, format: “+15555555555”
-    pub phone_number: PiiString, //"555-666-7788",
+    pub phone_number: AlpacaPiiString, //"555-666-7788",
     /// Maximum of 3 objects in array
-    pub street_address: Vec<PiiString>, //["20 N San Mateo Dr"],
+    pub street_address: Vec<AlpacaPiiString>, //["20 N San Mateo Dr"],
     /// The specific apartment number if applicable
-    pub unit: Option<PiiString>, //"Apt 1A",
-    pub city: PiiString,          //"San Mateo",
+    pub unit: Option<AlpacaPiiString>, //"Apt 1A",
+    pub city: AlpacaPiiString,          //"San Mateo",
     /// required if country_of_tax_residence in identity model (below) is ‘USA’
-    pub state: Option<PiiString>, //"CA",
-    pub postal_code: PiiString,   // "94401",
-    pub country: PiiString,       // "USA"
+    pub state: Option<AlpacaPiiString>, //"CA",
+    pub postal_code: AlpacaPiiString,   // "94401",
+    pub country: AlpacaPiiString,       // "USA"
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Identity {
-    pub given_name: PiiString,          //"John",
-    pub middle_name: Option<PiiString>, //"Smith",
-    pub family_name: PiiString,         //"Doe",
+    pub given_name: AlpacaPiiString,          //"John",
+    pub middle_name: Option<AlpacaPiiString>, //"Smith",
+    pub family_name: AlpacaPiiString,         //"Doe",
     /// Format: YYYY-MM-DD
-    pub date_of_birth: PiiString, //"1990-01-01",
+    pub date_of_birth: AlpacaPiiString, //"1990-01-01",
     /// Required if tax_id_type is set.
-    pub tax_id: Option<PiiString>, //"666-55-4321",
+    pub tax_id: Option<AlpacaPiiString>, //"666-55-4321",
     /// Required if tax_id is set.
     pub tax_id_type: Option<TaxIdType>, //"USA_SSN",
     /// 3 letter country code acceptable
-    pub country_of_citizenship: Option<PiiString>, //"USA",
+    pub country_of_citizenship: Option<AlpacaPiiString>, //"USA",
     /// 3 letter country code acceptable
-    pub country_of_birth: Option<PiiString>, //"USA",
+    pub country_of_birth: Option<AlpacaPiiString>, //"USA",
     /// 3 letter country code acceptable
-    pub country_of_tax_residence: PiiString, //"USA",
+    pub country_of_tax_residence: AlpacaPiiString, //"USA",
     /// Only used to collect visa types for users residing in the USA.
     pub visa_type: Option<VisaType>,
     /// Required if visa_type is set.
-    pub visa_expiration_date: Option<PiiString>,
+    pub visa_expiration_date: Option<AlpacaPiiString>,
     /// Required if visa_type = B1 or B2
-    pub date_of_departure_from_usa: Option<PiiString>,
+    pub date_of_departure_from_usa: Option<AlpacaPiiString>,
     /// Only used to collect permanent residence status in the USA.
     pub permanent_resident: Option<bool>,
-    pub funding_source: Vec<FundingSource>,      //["employment_income"]
-    pub annual_income_min: Option<PiiString>,    //	string/number
-    pub annual_income_max: Option<PiiString>,    //	string/number
-    pub liquid_net_worth_min: Option<PiiString>, //	string/number
-    pub liquid_net_worth_max: Option<PiiString>, //	string/number
-    pub total_net_worth_min: Option<PiiString>,  //	string/number
-    pub total_net_worth_max: Option<PiiString>,  //	string/number
+    pub funding_source: Vec<FundingSource>, //["employment_income"]
+    pub annual_income_min: Option<AlpacaPiiString>, //	string/number
+    pub annual_income_max: Option<AlpacaPiiString>, //	string/number
+    pub liquid_net_worth_min: Option<AlpacaPiiString>, //	string/number
+    pub liquid_net_worth_max: Option<AlpacaPiiString>, //	string/number
+    pub total_net_worth_min: Option<AlpacaPiiString>, //	string/number
+    pub total_net_worth_max: Option<AlpacaPiiString>, //	string/number
     /// Any additional information used for KYC purposes
     pub extra: Option<PiiJsonValue>, //	object
 }
@@ -84,9 +84,9 @@ pub struct Disclosures {
     /// Information relevant to the user’s disclosure selection should be sent through this object.
     pub context: Option<Vec<DisclosureContext>>,
     pub employment_status: Option<EmploymentStatus>,
-    pub employer_name: Option<PiiString>,
-    pub employer_address: Option<PiiString>,
-    pub employment_position: Option<PiiString>,
+    pub employer_name: Option<AlpacaPiiString>,
+    pub employer_address: Option<AlpacaPiiString>,
+    pub employment_position: Option<AlpacaPiiString>,
 }
 
 impl Disclosures {
@@ -110,21 +110,21 @@ impl Disclosures {
 pub struct DisclosureContext {
     pub context_type: ContextType, // "AFFILIATE_FIRM",
     /// Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM
-    pub company_name: PiiString, // "Finra",
+    pub company_name: AlpacaPiiString, // "Finra",
     /// Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM
-    pub company_street_address: Vec<PiiString>, // ["1735 K Street, NW"],
+    pub company_street_address: Vec<AlpacaPiiString>, // ["1735 K Street, NW"],
     /// Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM
-    pub company_city: PiiString, // "Washington",
+    pub company_city: AlpacaPiiString, // "Washington",
     /// Required if company_country = USA
-    pub company_state: PiiString, // "DC",
+    pub company_state: AlpacaPiiString, // "DC",
     /// Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM
-    pub company_country: PiiString, // "USA",
+    pub company_country: AlpacaPiiString, // "USA",
     /// Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM
-    pub company_compliance_email: PiiString, // "compliance@finra.org"
+    pub company_compliance_email: AlpacaPiiString, // "compliance@finra.org"
     /// Required if context_type = IMMEDIATE_FAMILY_EXPOSED
-    pub given_name: PiiString,
+    pub given_name: AlpacaPiiString,
     /// Required if context_type = IMMEDIATE_FAMILY_EXPOSED
-    pub family_name: PiiString,
+    pub family_name: AlpacaPiiString,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -133,8 +133,8 @@ pub struct Agreement {
     pub agreement: Agreements,
     /// string (timestamp)
     pub signed_at: DateTime<Utc>, //"2020-09-11T18:13:44Z",
-    pub ip_address: PiiString,    //"185.13.21.99"
-    pub revision: Option<String>, //"19.2022.02"
+    pub ip_address: AlpacaPiiString, //"185.13.21.99"
+    pub revision: Option<String>,    //"19.2022.02"
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -143,23 +143,23 @@ pub struct Document {
     pub document_type: DocumentType,
     pub document_sub_type: Option<String>, // "passport",
     /// base64 string
-    pub content: PiiString,
+    pub content: AlpacaPiiString,
     pub mime_type: String, // "image/jpeg"
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 /// This model input is optional. However, the client should make reasonable effort to obtain the trusted contact information. See more details in FINRA Notice 17-11
 pub struct TrustedContact {
-    pub given_name: PiiString,  //"Jane",
-    pub family_name: PiiString, // "Doe",
+    pub given_name: AlpacaPiiString,  //"Jane",
+    pub family_name: AlpacaPiiString, // "Doe",
     /// In addition, only one of the following is required:
-    pub email_address: Option<PiiString>, // "jane.doe@example.com"
-    pub phone_number: Option<PiiString>,
-    pub street_address: Option<PiiString>,
-    pub city: Option<PiiString>,        //If street_address is chosen
-    pub state: Option<PiiString>,       //If street_address is chosen
-    pub postal_code: Option<PiiString>, //If street_address is chosen
-    pub country: Option<PiiString>,     //If street_address is chosen
+    pub email_address: Option<AlpacaPiiString>, // "jane.doe@example.com"
+    pub phone_number: Option<AlpacaPiiString>,
+    pub street_address: Option<AlpacaPiiString>,
+    pub city: Option<AlpacaPiiString>,        //If street_address is chosen
+    pub state: Option<AlpacaPiiString>,       //If street_address is chosen
+    pub postal_code: Option<AlpacaPiiString>, //If street_address is chosen
+    pub country: Option<AlpacaPiiString>,     //If street_address is chosen
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]

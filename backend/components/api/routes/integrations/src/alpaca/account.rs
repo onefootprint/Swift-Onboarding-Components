@@ -187,7 +187,7 @@ async fn create_create_account_request(
             .di_pairs
             .into_iter()
             .map(|(latest_doc_di, mime_di)| -> ApiResult<Document> {
-                let content = decrypted.rm_di(latest_doc_di)?;
+                let content = decrypted.rm_di(latest_doc_di)?.into();
                 let mime_type = decrypted.rm_di(mime_di)?;
                 Ok(Document {
                     document_type: DocumentType::IdentityVerification,
@@ -205,25 +205,27 @@ async fn create_create_account_request(
     Ok(CreateAccountRequest {
         enabled_assets: req.enabled_assets,
         contact: Contact {
-            email_address: Email::from_str(decrypted.rm_di(IDK::Email)?.leak())?.email,
-            phone_number: PhoneNumber::parse(decrypted.rm_di(IDK::PhoneNumber)?)?.e164(),
-            street_address: vec![decrypted.rm_di(IDK::AddressLine1)?],
-            unit: decrypted.rm_di(IDK::AddressLine2).ok(),
-            city: decrypted.rm_di(IDK::City)?,
-            state: Some(decrypted.rm_di(IDK::State)?), // required if country_of_tax_residence is USA which currently our users are
-            postal_code: decrypted.rm_di(IDK::Zip)?,
-            country: decrypted.rm_di(IDK::Country)?,
+            email_address: Email::from_str(decrypted.rm_di(IDK::Email)?.leak())?.email.into(),
+            phone_number: PhoneNumber::parse(decrypted.rm_di(IDK::PhoneNumber)?)?
+                .e164()
+                .into(),
+            street_address: vec![decrypted.rm_di(IDK::AddressLine1)?.into()],
+            unit: decrypted.rm_di(IDK::AddressLine2).ok().map(|a| a.into()),
+            city: decrypted.rm_di(IDK::City)?.into(),
+            state: Some(decrypted.rm_di(IDK::State)?.into()), // required if country_of_tax_residence is USA which currently our users are
+            postal_code: decrypted.rm_di(IDK::Zip)?.into(),
+            country: decrypted.rm_di(IDK::Country)?.into(),
         },
         identity: Identity {
-            given_name: decrypted.rm_di(IDK::FirstName)?,
+            given_name: decrypted.rm_di(IDK::FirstName)?.into(),
             middle_name: None,
-            family_name: decrypted.rm_di(IDK::LastName)?,
-            date_of_birth: decrypted.rm_di(IDK::Dob)?,
-            tax_id: Some(decrypted.rm_di(IDK::Ssn9)?),
+            family_name: decrypted.rm_di(IDK::LastName)?.into(),
+            date_of_birth: decrypted.rm_di(IDK::Dob)?.into(),
+            tax_id: Some(decrypted.rm_di(IDK::Ssn9)?.into()),
             tax_id_type: Some(TaxIdType::USA_SSN),
             country_of_citizenship: None,
             country_of_birth: None,
-            country_of_tax_residence: PiiString::from("USA"), // hardcoded for now
+            country_of_tax_residence: PiiString::from("USA").into(), // hardcoded for now
             visa_type: None,
             visa_expiration_date: None,
             date_of_departure_from_usa: None,

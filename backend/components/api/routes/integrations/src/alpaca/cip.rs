@@ -44,7 +44,7 @@ use db::{
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
-    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, DocumentRequestKind,
+    format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentKind, DocumentRequestKind,
     ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind, IdentityDataKind,
     MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
 };
@@ -450,18 +450,18 @@ fn kyc(
         .map(|s| s.leak_to_string())
         .join(" ")
         .into(),
-        email_address: decrypted_data.get_di(Email)?,
-        nationality,
-        date_of_birth: decrypted_data.get_di(Dob)?,
+        email_address: decrypted_data.get_di(Email)?.into(),
+        nationality: nationality.map(|n| n.into()),
+        date_of_birth: decrypted_data.get_di(Dob)?.into(),
         address: if let Ok(address2) = decrypted_data.get_di(AddressLine2) {
-            format_pii!("{} {}", decrypted_data.get_di(AddressLine1)?, address2)
+            format_pii!("{} {}", decrypted_data.get_di(AddressLine1)?, address2).into()
         } else {
-            decrypted_data.get_di(AddressLine1)?
+            decrypted_data.get_di(AddressLine1)?.into()
         },
-        postal_code: decrypted_data.get_di(Zip)?,
-        country_of_residency: decrypted_data.get_di(Country)?,
+        postal_code: decrypted_data.get_di(Zip)?.into(),
+        country_of_residency: decrypted_data.get_di(Country)?.into(),
         kyc_completed_at: Some(decision.created_at),
-        ip_address: pii!(insight.and_then(|ie| ie.ip_address).unwrap_or("0.0.0.0".into())),
+        ip_address: pii!(insight.and_then(|ie| ie.ip_address).unwrap_or("0.0.0.0".into())).into(),
         check_initiated_at: wf.authorized_at,
         check_completed_at: Some(decision.created_at),
         approval_status: alpaca::ApprovalStatus::Approved,
@@ -470,7 +470,7 @@ fn kyc(
 
         approved_reason: Some(approved_reason),
 
-        id_number,
+        id_number: id_number.map(|i| i.into()),
     };
     Ok(kyc)
 }
@@ -677,16 +677,26 @@ fn document_and_photo(
         result: CipResult::Clear,
         status: alpaca::CipStatus::Complete,
         created_at: check_started_at,
-        first_name: ocr_name.first_name.as_ref().map(|p| PiiString::from(p.clone())),
-        last_name: ocr_name.paternal_last_name.as_ref().map(|p| (**p).clone()),
-        gender: ocr_response.gender.as_ref().map(|p| (**p).clone()),
-        date_of_birth: dob,
-        date_of_expiry: ocr_response.expiration_date().ok().map(PiiString::from),
-        issuing_country: ocr_response.issuing_country.as_ref().map(|p| (*p).clone().into()),
+        first_name: ocr_name
+            .first_name
+            .as_ref()
+            .map(|p| AlpacaPiiString::from(p.leak())),
+        last_name: ocr_name
+            .paternal_last_name
+            .as_ref()
+            .map(|p| (**p).clone())
+            .map(|a| a.into()),
+        gender: ocr_response.gender.as_ref().map(|p| (**p).leak().into()),
+        date_of_birth: dob.map(|d| d.into()),
+        date_of_expiry: ocr_response
+            .expiration_date()
+            .ok()
+            .map(|a| AlpacaPiiString::from(a.leak())),
+        issuing_country: ocr_response.issuing_country.as_ref().map(|p| (*p).leak().into()),
         document_numbers: ocr_response
             .document_number
             .as_ref()
-            .map(|p| (*p).clone().into())
+            .map(|p| (*p).leak().into())
             .map(|d| vec![d]),
         document_type,
         age_validation: CipResult::clear(over_18_check),

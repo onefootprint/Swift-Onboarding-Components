@@ -1,5 +1,5 @@
 use chrono::Utc;
-use newtypes::{macros::pii, AlpacaDocumentType, FpId, PiiJsonValue, PiiString, Vendor};
+use newtypes::{macros::pii, AlpacaDocumentType, AlpacaPiiString, FpId, PiiJsonValue, PiiString, Vendor};
 /// Represents a request to upload CIP information for an alpaca Account
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CipRequest {
@@ -34,22 +34,22 @@ pub enum Provider {
 pub struct Kyc {
     pub id: FpId,
 
-    pub applicant_name: PiiString,
-    pub email_address: PiiString,
-    pub nationality: Option<PiiString>,
+    pub applicant_name: AlpacaPiiString,
+    pub email_address: AlpacaPiiString,
+    pub nationality: Option<AlpacaPiiString>,
 
     /// Government issued ID number of applicant
-    pub id_number: Option<PiiString>,
+    pub id_number: Option<AlpacaPiiString>,
 
     /// Format in YYYY-MM-DD
-    pub date_of_birth: PiiString,
-    pub address: PiiString,
-    pub postal_code: PiiString,
-    pub country_of_residency: PiiString,
+    pub date_of_birth: AlpacaPiiString,
+    pub address: AlpacaPiiString,
+    pub postal_code: AlpacaPiiString,
+    pub country_of_residency: AlpacaPiiString,
 
     /// This would be the final time that your team finished the KYC check. If this user was subject to EDD, then this timestamp would likely be hours or days after the check_completed_at field
     pub kyc_completed_at: Option<chrono::DateTime<Utc>>,
-    pub ip_address: PiiString,
+    pub ip_address: AlpacaPiiString,
     pub check_initiated_at: Option<chrono::DateTime<Utc>>,
     pub check_completed_at: Option<chrono::DateTime<Utc>>,
 
@@ -109,13 +109,13 @@ pub struct DocumentPhotoId {
 
     pub created_at: chrono::DateTime<Utc>,
 
-    pub first_name: Option<PiiString>,
-    pub last_name: Option<PiiString>,
-    pub gender: Option<PiiString>,
-    pub date_of_birth: Option<PiiString>,
-    pub date_of_expiry: Option<PiiString>,
-    pub issuing_country: Option<PiiString>,
-    pub document_numbers: Option<Vec<PiiString>>,
+    pub first_name: Option<AlpacaPiiString>,
+    pub last_name: Option<AlpacaPiiString>,
+    pub gender: Option<AlpacaPiiString>,
+    pub date_of_birth: Option<AlpacaPiiString>,
+    pub date_of_expiry: Option<AlpacaPiiString>,
+    pub issuing_country: Option<AlpacaPiiString>,
+    pub document_numbers: Option<Vec<AlpacaPiiString>>,
     pub document_type: Option<AlpacaDocumentType>,
 
     /// Checks whether the age calculated from the document’s date of birth data point is greater than or equal to the minimum accepted age. Unless otherwise discussed with Alpaca, users must be 18 years old to open an account.
@@ -279,16 +279,16 @@ pub mod fixtures {
                 provider_name: vec![Provider::Footprint],
                 kyc: Kyc {
                     id: fp_id_test(),
-                    applicant_name: pii!("Carl Cassanova"),
-                    email_address: pii!("carl.casanova@gmail.com"),
-                    nationality: Some(pii!("american")),
+                    applicant_name: pii!("Carl Cassanova").into(),
+                    email_address: pii!("carl.casanova@gmail.com").into(),
+                    nationality: Some(pii!("american").into()),
                     id_number: None,
-                    date_of_birth: pii!("1992-02-02"),
-                    address: pii!("1 Penguin Place, Philadelphia PA"),
-                    postal_code: pii!("10012"),
-                    country_of_residency: pii!("USA"),
+                    date_of_birth: pii!("1992-02-02").into(),
+                    address: pii!("1 Penguin Place, Philadelphia PA").into(),
+                    postal_code: pii!("10012").into(),
+                    country_of_residency: pii!("USA").into(),
                     kyc_completed_at: Some(Utc::now()),
-                    ip_address: pii!("127.0.0.1"),
+                    ip_address: pii!("127.0.0.1").into(),
                     check_initiated_at: Some(Utc::now() - Duration::seconds(10)),
                     check_completed_at: Some(Utc::now() - Duration::seconds(7)),
                     approval_status: ApprovalStatus::Approved,
@@ -301,13 +301,13 @@ pub mod fixtures {
                     status: CipStatus::Complete,
                     result: CipResult::Clear,
                     created_at: Utc::now(),
-                    first_name: Some(pii!("Carl")),
-                    last_name: Some(pii!("Casanova")),
-                    gender: Some(pii!("Male")),
-                    date_of_birth: Some(pii!("1992-02-02")),
-                    date_of_expiry: Some(pii!("2025-02-02")),
-                    issuing_country: Some(pii!("USA")),
-                    document_numbers: Some(vec![pii!("12121212")]),
+                    first_name: Some(pii!("Carl").into()),
+                    last_name: Some(pii!("Casanova").into()),
+                    gender: Some(pii!("Male").into()),
+                    date_of_birth: Some(pii!("1992-02-02").into()),
+                    date_of_expiry: Some(pii!("2025-02-02").into()),
+                    issuing_country: Some(pii!("USA").into()),
+                    document_numbers: Some(vec![pii!("12121212").into()]),
                     document_type: Some(AlpacaDocumentType::DriversLicense),
                     age_validation: CipResult::Clear,
                     data_comparison: CipResult::Clear,

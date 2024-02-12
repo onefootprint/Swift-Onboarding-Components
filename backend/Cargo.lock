@@ -5221,6 +5221,7 @@ dependencies = [
  "chrono",
  "crypto",
  "derive_more",
+ "deunicode",
  "diesel",
  "diesel-derive-newtype",
  "diesel_as_jsonb",
