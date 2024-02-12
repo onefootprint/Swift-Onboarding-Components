@@ -43,7 +43,7 @@ const ContentSecurityPolicy = `
   frame-src 'self' vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net cdn.jsdelivr.net;
   media-src 'self' https;
-  script-src 'self' 'unsafe-eval' blob: vercel.live vitals.vercel-insights.com maps.googleapis.com fpnpmcdn.net js.dvnfo.com blob: https://cdn.jsdelivr.net docs.opencv.org elements.stytch.com ${LOG_ROCKET_SCRIPT_SRC} ${SENTRY_SCRIPT_SRC};
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: vercel.live vitals.vercel-insights.com maps.googleapis.com fpnpmcdn.net js.dvnfo.com blob: https://cdn.jsdelivr.net docs.opencv.org elements.stytch.com ${LOG_ROCKET_SCRIPT_SRC} ${SENTRY_SCRIPT_SRC};
   style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;
