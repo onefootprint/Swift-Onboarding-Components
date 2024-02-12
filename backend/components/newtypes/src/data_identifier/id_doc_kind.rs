@@ -31,6 +31,7 @@ pub enum IdDocKind {
     IdCard,
     DriversLicense,
     Passport,
+    PassportCard,
     Permit,
     Visa,
     ResidenceDocument,
@@ -65,6 +66,7 @@ impl From<IdDocKind> for DocKind {
             IdDocKind::IdCard => Self::Identity,
             IdDocKind::DriversLicense => Self::Identity,
             IdDocKind::Passport => Self::Identity,
+            IdDocKind::PassportCard => Self::Identity,
             IdDocKind::Permit => Self::Identity,
             IdDocKind::Visa => Self::Identity,
             IdDocKind::ResidenceDocument => Self::Identity,
@@ -93,6 +95,7 @@ impl IdDocKind {
             Self::DriversLicense => vec![DocumentSide::Front, DocumentSide::Back],
             Self::IdCard => vec![DocumentSide::Front, DocumentSide::Back],
             Self::Passport => vec![DocumentSide::Front],
+            Self::PassportCard => vec![DocumentSide::Front, DocumentSide::Back],
             // Incode guidance for permit/visa/residence card
             // https://onefootprint.slack.com/archives/C0514LEFUCS/p1692216160166659?thread_ts=1692213991.014079&cid=C0514LEFUCS
             Self::Permit => vec![DocumentSide::Front, DocumentSide::Back],
@@ -133,6 +136,7 @@ impl IdDocKind {
                 ODK::ExpiresAt,
             ], // TODO: should Gender, IssuedAt be here too? These seem less "critical" but are still present
             IdDocKind::Passport => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passports out there and stuff like DOB is def not ubiquitous
+            IdDocKind::PassportCard => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passport cards out there and stuff like DOB is def not ubiquitous
             IdDocKind::Permit => vec![
                 ODK::FullName,
                 ODK::Dob,
@@ -169,6 +173,7 @@ impl TryFrom<IdDocKind> for AlpacaDocumentType {
             IdDocKind::IdCard => Ok(AlpacaDocumentType::NationalId),
             IdDocKind::DriversLicense => Ok(AlpacaDocumentType::DriversLicense),
             IdDocKind::Passport => Ok(AlpacaDocumentType::Passport),
+            IdDocKind::PassportCard => Err(crate::Error::Custom(msg.into())), //idk if alpaca supports these 
             IdDocKind::Visa => Ok(AlpacaDocumentType::Visa),
             IdDocKind::Permit => Err(crate::Error::Custom(msg.into())),
             IdDocKind::ResidenceDocument => Err(crate::Error::Custom(msg.into())),

@@ -347,21 +347,22 @@ pub enum IncodeDocumentType {
     NonParsableDocType(String),
 }
 
-impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
+impl<'a> TryFrom<(&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>)> for IdDocKind {
     type Error = crate::Error;
 
-    fn try_from(value: &'a IncodeDocumentType) -> Result<Self, Self::Error> {
-        match value {
-            IncodeDocumentType::Passport => Ok(Self::Passport),
-            IncodeDocumentType::DriversLicense => Ok(Self::DriversLicense),
-            IncodeDocumentType::IdentificationCard => Ok(Self::IdCard),
-            IncodeDocumentType::Permit => Ok(Self::Permit),
-            IncodeDocumentType::Visa => Ok(Self::Visa),
-            IncodeDocumentType::ResidenceDocument => Ok(Self::ResidenceDocument),
-            IncodeDocumentType::VoterIdentification => Ok(Self::VoterIdentification),
+    fn try_from((doc_type, doc_sub_type): (&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>)) -> Result<Self, Self::Error> {
+        match (doc_type, doc_sub_type) {
+            (IncodeDocumentType::Passport, _) => Ok(Self::Passport),
+            (IncodeDocumentType::TravelDocument, Some(IncodeDocumentSubType::PassportCardAllages)) => Ok(Self::PassportCard),
+            (IncodeDocumentType::DriversLicense, _) => Ok(Self::DriversLicense),
+            (IncodeDocumentType::IdentificationCard, _) => Ok(Self::IdCard),
+            (IncodeDocumentType::Permit, _) => Ok(Self::Permit),
+            (IncodeDocumentType::Visa, _) => Ok(Self::Visa),
+            (IncodeDocumentType::ResidenceDocument, _) => Ok(Self::ResidenceDocument),
+            (IncodeDocumentType::VoterIdentification, _) => Ok(Self::VoterIdentification),
             _ => Err(crate::Error::Custom(format!(
                 "Incode document type {} not supported",
-                value
+                doc_type
             ))),
         }
     }
@@ -374,19 +375,76 @@ pub enum IncodeDocumentRestriction {
     ConservativeSharpness,
 }
 
+
+#[derive(
+    Display, Debug, Clone, EnumString, Eq, PartialEq, Hash, DeserializeFromStr, SerializeDisplay, EnumIter,
+)]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
+pub enum IncodeDocumentSubType {
+    CedulaDeIdentificacionFiscal,
+    ConsularCard,
+    ConsularIdentificationCard,
+    DriverLicense,
+    DriverLicenseUnder21,
+    DriversLicense,
+    DriversLicenseUnder21,
+    EmploymentAuthorizationCard,
+    EnhancedDriverLicense,
+    EnhancedDriversLicense,
+    EnhancedDriversLicenseUnder21,
+    EnhancedIdentificationCard,
+    EnhancedIdentificationCardUnder21,
+    EnhancedLearnersPermitUnder21,
+    EnhancedProvisionalDriversLicenseUnder21,
+    GlobalEntry,
+    GovernmentIdentificationCard,
+    IdentificationCard,
+    IdentificationCardAllages,
+    IdentificationCardUnder21,
+    IntermediateDriversLicenseUnder21,
+    InternationalDrivingPermit,
+    JuniorDriversLicense,
+    JuniorOperatorsLicenseUnder21,
+    LearnersPermit,
+    LearnersPermitUnder21,
+    MatriculaConsular,
+    MedicalCard,
+    NationalIdentificationCard,
+    NationalPassport,
+    PassportCardAllages,
+    PermanentResidenceCard,
+    PermanentResidentCardAllages,
+    ProvisionalDriversLicense,
+    ProvisionalDriversLicenseUnder21,
+    ResidencePermit,
+    SocialSecurityCard,
+    TemporaryDriversLicense,
+    TemporaryResidenceCard,
+    TribalIdentificationCard,
+    UmidCard,
+    VeteranIdentificationCard,
+    VisaAllages,
+    VisaB1B2,
+    VoterIdentificationCard,    
+}
+
+
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
     use strum::IntoEnumIterator;
 
     use crate::IdDocKind;
 
-    use super::IncodeDocumentType;
+    use super::{IncodeDocumentSubType, IncodeDocumentType};
 
     #[test]
     fn test_we_added_incode_kind_to_id_doc_kind_mapping() {
-        let incode_doc_types_mapped_to_our_doc_types: Vec<IdDocKind> = IncodeDocumentType::iter()
-            .filter_map(|dt| IdDocKind::try_from(&dt).ok())
+        let mut incode_doc_types_mapped_to_our_doc_types: Vec<IdDocKind> = IncodeDocumentType::iter()
+            .filter_map(|dt| IdDocKind::try_from((&dt, None)).ok())
             .collect();
+        incode_doc_types_mapped_to_our_doc_types.push(IdDocKind::try_from((&IncodeDocumentType::TravelDocument, Some(&IncodeDocumentSubType::PassportCardAllages))).unwrap());
         IdDocKind::identity_docs().iter().for_each(|doc_kind| {
             assert!(
                 incode_doc_types_mapped_to_our_doc_types.contains(doc_kind),
@@ -397,5 +455,10 @@ mod tests {
                 )
             )
         })
+    }
+
+    #[test]
+    fn scream_like_a_snake() {
+        assert_eq!(IncodeDocumentSubType::EnhancedDriversLicenseUnder21 , IncodeDocumentSubType::from_str("ENHANCED_DRIVERS_LICENSE_UNDER21").unwrap());
     }
 }

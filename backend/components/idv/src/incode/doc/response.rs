@@ -7,7 +7,7 @@ use crate::{
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use itertools::Itertools;
 use newtypes::{
-    incode::{IncodeDocumentRestriction, IncodeDocumentType, IncodeStatus, IncodeTest},
+    incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType, IncodeStatus, IncodeTest},
     IdDocKind, IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
     Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiInt, ScrubbedPiiLong,
     ScrubbedPiiString, DATE_FORMAT,
@@ -37,7 +37,7 @@ pub struct AddSideResponse {
 // https://onefootprint.slack.com/archives/C0514LEFUCS/p1692735019118229
 // Only for US atm
 // No documentation for these enum values
-const DRIVERS_LICENSE_PERMIT_IDENTIFIERS: [&str; 9] = [
+const DRIVERS_LICENSE_PERMIT_IDENTIFIERS: [&str; 9] = [ // TODO: replace with IncodeDocumentSubType
     "LEARNERS_PERMIT",
     "LEARNERS_PERMIT_UNDER21",
     "PROVISIONAL_DRIVERS_LICENSE_UNDER21",
@@ -88,6 +88,12 @@ impl AddSideResponse {
                 .any(|i| issue_name.contains(i))
         })
     }
+
+    pub fn document_sub_type(&self) -> Option<IncodeDocumentSubType> {
+        // note: DL's will have this last token be the state and not really a document subtype which is kinda annoying
+        self.issue_name.as_ref().and_then(|i| i.split(' ').last()).and_then(|s| IncodeDocumentSubType::from_str(s).ok())
+    }
+
 }
 
 impl APIResponseToIncodeError for AddSideResponse {
@@ -503,6 +509,11 @@ impl FetchOCRResponse {
         Self::format_date(self.issued_at.as_ref())
     }
 
+    pub fn document_sub_type(&self) -> Option<IncodeDocumentSubType> {
+        // maybe error or alert or something fancier if they arent the same??
+        self.document_front_subtype.as_ref().and_then(|s| IncodeDocumentSubType::from_str(s.leak()).ok()).or(self.document_back_subtype.as_ref().and_then(|s| IncodeDocumentSubType::from_str(s.leak()).ok()))
+    }
+
     // From https://onefootprint.slack.com/archives/C0514LEFUCS/p1692979980826089
     fn normalize_issuing_state(raw_state: String) -> String {
         let state = raw_state.to_uppercase();
@@ -548,10 +559,11 @@ impl FetchOCRResponse {
             self.normalized_issuing_state(),
             self.normalized_class(),
             self.type_of_id.as_ref(),
+            self.document_sub_type().as_ref(),
         ) {
-            (Some(state), Some(class), Some(doc_type)) => {
+            (Some(state), Some(class), Some(doc_type), doc_sub_type) => {
                 // Only apply these to DLs
-                let is_dl = IdDocKind::try_from(doc_type)
+                let is_dl = IdDocKind::try_from((doc_type, doc_sub_type))
                     .ok()
                     .map(|dk| dk == IdDocKind::DriversLicense)
                     .is_some_and(|is_dl| is_dl);
@@ -563,7 +575,7 @@ impl FetchOCRResponse {
                     None
                 }
             }
-            (None, _, _) | (_, None, _) | (_, _, None) => None,
+            (None, _, _, _) | (_, None, _, _) | (_, _, None, _) => None,
         }
     }
 

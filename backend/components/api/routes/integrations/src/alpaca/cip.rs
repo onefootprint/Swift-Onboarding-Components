@@ -652,7 +652,7 @@ fn document_and_photo(
     let type_of_id = ocr_response.type_of_id.as_ref().ok_or_else(|| {
         idv::Error::IncodeError(idv::incode::error::Error::OcrError("Missing type_of_id".into()))
     })?;
-    let dk = IdDocKind::try_from(type_of_id)?;
+    let dk = IdDocKind::try_from((type_of_id, ocr_response.document_sub_type().as_ref()))?;
     let document_type = Some(dk.try_into()?);
     let dob = ocr_response.dob().map(PiiString::from).ok();
     let over_18_check = ocr_response.age().ok().map(|a| a >= 18).unwrap_or(true); // If age wasn't OCR'd properly, we assume the reviewer confirmed they are over 18

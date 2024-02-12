@@ -125,7 +125,7 @@ impl IncodeStateTransition for FetchScores {
 
         let type_of_id = ocr_response.type_of_id.as_ref();
         let country_code = ocr_response.issuing_country.as_ref();
-        let dk = match super::parse_type_of_id(ctx, type_of_id, country_code)? {
+        let dk = match super::parse_type_of_id(ctx, type_of_id, ocr_response.document_sub_type().as_ref(), country_code)? {
             Ok(dk) => dk,
             Err(_) => {
                 // We had an error parsing the document kind from incode - just use the document

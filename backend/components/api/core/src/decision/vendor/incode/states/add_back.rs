@@ -52,10 +52,11 @@ impl IncodeStateTransition for AddBack {
         // TODO: fix this
         let response = request_result.map_err(map_to_api_err)?.result;
 
-        let (type_of_id, country_code, failure_reasons_from_response, failure_reasons_from_api_error) =
+        let (type_of_id, document_subtype, country_code, failure_reasons_from_response, failure_reasons_from_api_error) =
             match response.safe_into_success() {
                 Either::Left(response) => (
                     response.type_of_id.clone(),
+                    response.document_sub_type().clone(),
                     response.country_code.clone(),
                     // TODO: add restrictions from OBC
                     response.failure_reasons(AddSideResponseHelper::get_restrictions(
@@ -68,6 +69,7 @@ impl IncodeStateTransition for AddBack {
                 Either::Right(failure_reasons) => (
                     None,
                     None,
+                    None,
                     vec![],
                     failure_reasons.unwrap_or(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
                 ),
@@ -76,6 +78,7 @@ impl IncodeStateTransition for AddBack {
         Ok(Some(Self {
             add_side_response_helper: AddSideResponseHelper {
                 type_of_id,
+                document_subtype,
                 country_code,
                 failure_reasons_from_response,
                 failure_reasons_from_api_error,
@@ -96,12 +99,13 @@ impl IncodeStateTransition for AddBack {
         // to require them to go back to AddFront, but we'll assume that having a front and back from different documents will
         // fail upon processing, and this state is just about collecting documents to produce a score, so I think it's ok
         let type_of_id = self.add_side_response_helper.type_of_id.as_ref();
+        let document_subtype = self.add_side_response_helper.document_subtype.as_ref();
         let country_code = self.add_side_response_helper.country_code.as_ref();
 
         let mismatch_reason = if self.add_side_response_helper.has_api_error() {
             None
         } else {
-            super::parse_type_of_id(ctx, type_of_id, country_code)?.err()
+            super::parse_type_of_id(ctx, type_of_id, document_subtype, country_code)?.err()
         };
         let mut failure_reasons = self.add_side_response_helper.failure_reasons();
         if let Some(reason) = mismatch_reason {

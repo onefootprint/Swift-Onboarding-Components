@@ -11,7 +11,7 @@ mod start_onboarding;
 
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
-use newtypes::incode::{IncodeDocumentRestriction, IncodeDocumentType};
+use newtypes::incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType};
 pub use start_onboarding::*;
 
 mod add_front;
@@ -293,6 +293,7 @@ pub async fn save_incode_fixtures(
 fn parse_type_of_id(
     ctx: &IncodeContext,
     type_of_id: Option<&IncodeDocumentType>,
+    document_sub_type: Option<&IncodeDocumentSubType>,
     country_code: Option<&ScrubbedPiiString>,
 ) -> ApiResult<Result<IdDocKind, IncodeFailureReason>> {
     // Validate the doc type matches what the client told us (and what we validated against the
@@ -313,7 +314,7 @@ fn parse_type_of_id(
     let Some(type_of_id) = type_of_id else {
         return Ok(Err(IncodeFailureReason::UnknownDocumentType));
     };
-    let Ok(id_doc_kind) = IdDocKind::try_from(type_of_id) else {
+    let Ok(id_doc_kind) = IdDocKind::try_from((type_of_id, document_sub_type)) else {
         return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
     };
     if id_doc_kind != expected_doc_type
@@ -342,6 +343,7 @@ fn parse_type_of_id(
 
 pub struct AddSideResponseHelper {
     pub type_of_id: Option<IncodeDocumentType>,
+    pub document_subtype: Option<IncodeDocumentSubType>,
     pub country_code: Option<ScrubbedPiiString>,
     pub failure_reasons_from_response: Vec<IncodeFailureReason>,
     pub failure_reasons_from_api_error: Vec<IncodeFailureReason>,
