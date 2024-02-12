@@ -5,7 +5,9 @@ import type { ComponentProps, FormEvent } from 'react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useGetHeaderText from '../../hooks/use-get-header-text';
 import { useIdentifyMachine } from '../../state';
+import { IdentifyVariant } from '../../state/types';
 import Component from './component';
 import useRunPasskey from './hooks/run-passkey';
 
@@ -32,7 +34,7 @@ const ChallengeSelectOrPasskey = ({
   Header,
 }: ChallengeSelectProps) => {
   const [state, send] = useIdentifyMachine();
-  const { identify } = state.context;
+  const { identify, variant } = state.context;
   const { t } = useTranslation('common', {
     keyPrefix: 'challenge-select-or-biometric',
   });
@@ -44,6 +46,11 @@ const ChallengeSelectOrPasskey = ({
       send({ type: 'challengeSucceeded', payload: { authToken } });
     },
   });
+  const headerTitle = useGetHeaderText();
+  const headerSubtitle =
+    variant !== IdentifyVariant.updateLoginMethods
+      ? t('log-in-options')
+      : t('log-in-to-modify-details');
 
   const sortedAvailableAuthMethods = (
     identify.user?.availableChallengeKinds || []
@@ -97,8 +104,8 @@ const ChallengeSelectOrPasskey = ({
       onSubmit={handleSubmit}
       texts={{
         cta: t('continue'),
-        headerSubtitle: t('log-in-options'),
-        headerTitle: t('welcome-back-title'),
+        headerSubtitle,
+        headerTitle,
       }}
     >
       {children}

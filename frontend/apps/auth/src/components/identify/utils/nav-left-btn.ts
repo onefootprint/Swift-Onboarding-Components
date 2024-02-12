@@ -1,6 +1,7 @@
 import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
 
 import type { IdentifyMachineHook } from '../state';
+import { shouldShowChallengeSelector } from '../state/predicates';
 
 const getLeftNavButton = (
   state: IdentifyMachineHook[0],
@@ -11,17 +12,36 @@ const getLeftNavButton = (
   const CLOSE = { variant: 'close' } as const;
   const BACK = { variant: 'back', onBack } as const;
 
+  // If true, we've been given information with which to identify the user, so we generally don't
+  // want to allow going back to the email/phone input screens
+  const identifyStartedWithBootstrapOrAuthToken =
+    bootstrapData?.email ||
+    bootstrapData?.phoneNumber ||
+    state.context.initialAuthToken;
+
+  // When true, there is a challenge selector screen before the SMS and email challenge screens
+  const hasChallengeSelector = shouldShowChallengeSelector(
+    state.context,
+    state.context.identify.user,
+  );
+
   if (state.matches('smsChallenge')) {
-    return bootstrapData?.email || bootstrapData?.phoneNumber ? CLOSE : BACK;
+    if (hasChallengeSelector) {
+      return BACK;
+    }
+    return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
   }
   if (state.matches('emailChallenge')) {
-    return bootstrapData?.email ? CLOSE : BACK;
+    if (hasChallengeSelector) {
+      return BACK;
+    }
+    return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
   }
   if (state.matches('challengeSelectOrPasskey')) {
-    return bootstrapData?.email || bootstrapData?.phoneNumber ? CLOSE : BACK;
+    return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
   }
   if (state.matches('phoneIdentification')) {
-    return bootstrapData?.email || bootstrapData?.phoneNumber ? BACK : CLOSE;
+    return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
   }
   if (state.matches('emailIdentification')) {
     return CLOSE;

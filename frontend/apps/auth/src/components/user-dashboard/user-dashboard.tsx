@@ -1,3 +1,4 @@
+import { getLogger } from '@onefootprint/idv';
 import { IdDI } from '@onefootprint/types';
 import type { NextToast } from '@onefootprint/ui';
 import { useToast } from '@onefootprint/ui';
@@ -11,7 +12,6 @@ import type { UserAuthMethodsResponse } from '@/src/queries';
 import { useDecryptUser, useUserAuthMethods } from '@/src/queries';
 import { useUserMachine } from '@/src/state';
 import type { UserChallengeKind } from '@/src/types';
-import { getLogger } from '@/src/utils';
 
 import Component from './component';
 
@@ -45,7 +45,7 @@ const getAuthAddFlowTexts = (t: T): Texts => ({
 const getEditFlowTexts = (t: T): Texts => ({
   add: t('add'),
   addDevice: t('add-device'),
-  cta: t('close'),
+  cta: t('finish'),
   deviceAdded: t('device-added'),
   edit: t('edit'),
   headerSubtitle: t('edit-details-in-account'),

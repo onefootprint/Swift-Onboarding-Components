@@ -1,14 +1,17 @@
 import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
 import { StepHeader } from '@onefootprint/idv';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { DoneArgs, HeaderProps } from '@/src/types';
 
+import Notification from '../../../notification';
 import type { IdentifyMachineContext, IdentifyMachineHook } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import getLeftNavButton from '../../utils/nav-left-btn';
 import ChallengeSelectOrPasskey from '../challenge-select-or-passkey';
 import EmailChallenge from '../email-challenge';
+import InitAuthToken from '../init-auth-token';
 import Loading from '../loading';
 import StepBootstrap from '../step-bootstrap';
 import StepEmail from '../step-email';
@@ -29,9 +32,9 @@ const getHeader = (
     return (
       <StepHeader
         leftButton={leftButton}
-        logoUrl={ctx.config.logoUrl ?? undefined}
-        orgName={ctx.config.orgName}
-        showLogo={ctx.showLogo}
+        logoUrl={ctx.logoConfig?.logoUrl}
+        orgName={ctx.logoConfig?.orgName}
+        showLogo={!!ctx.logoConfig}
         subtitle={subtitle}
         title={title}
       />
@@ -41,7 +44,10 @@ const getHeader = (
 const Router = ({ onDone, children }: RouterProps): JSX.Element | null => {
   const [state, send] = useIdentifyMachine();
   const isDone = state.matches('success');
+  const { t } = useTranslation('common');
   const Header = getHeader(state.context, getLeftNavButton(state, send));
+
+  const { initialAuthToken } = state.context;
 
   useEffect(() => {
     if (isDone && state.context.challenge.authToken) {
@@ -56,6 +62,13 @@ const Router = ({ onDone, children }: RouterProps): JSX.Element | null => {
   }
   if (state.matches('initBootstrap')) {
     return <StepBootstrap>{children?.('initBootstrap', send)}</StepBootstrap>;
+  }
+  if (state.matches('initAuthToken') && initialAuthToken) {
+    return (
+      <InitAuthToken authToken={initialAuthToken}>
+        {children?.('initBootstrap', send)}
+      </InitAuthToken>
+    );
   }
   if (state.matches('emailIdentification')) {
     return (
@@ -84,6 +97,14 @@ const Router = ({ onDone, children }: RouterProps): JSX.Element | null => {
       <EmailChallenge Header={Header}>
         {children?.('emailChallenge', send)}
       </EmailChallenge>
+    );
+  }
+  if (state.matches('authTokenInvalid')) {
+    return (
+      <Notification
+        title={t('notification.404-user-title')}
+        subtitle={t('notification.404-user-description')}
+      />
     );
   }
 

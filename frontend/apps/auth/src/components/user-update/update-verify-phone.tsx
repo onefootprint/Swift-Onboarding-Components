@@ -1,9 +1,10 @@
+import { getLogger } from '@onefootprint/idv';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
-import { getLogger, isString } from '@/src/utils';
+import { isString } from '@/src/utils';
 
 import UpdateVerify from './update-verify';
 

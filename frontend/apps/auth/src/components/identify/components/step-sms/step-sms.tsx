@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
+import useGetHeaderText from '../../hooks/use-get-header-text';
 import { useIdentifyMachine } from '../../state';
 import PinVerification from '../pin-verification';
 
@@ -28,6 +29,7 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
   const { phoneNumber = '', successfulIdentifier } = identify;
   const { t } = useTranslation('common');
   const toast = useToast();
+  const headerTitle = useGetHeaderText();
 
   const getFormTitle = (): string => {
     const scrubbedPhoneNumber = getScrubbedPhoneNumber({
@@ -42,16 +44,6 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
       ? t('sms-step.prompt-with-phone', { scrubbedPhoneNumber })
       : t('sms-step.prompt-without-phone');
   };
-
-  const getStepTitle = (): string => {
-    const shouldShowWelcomeBack =
-      !!identify.user && !identify.user?.isUnverified;
-    return shouldShowWelcomeBack
-      ? t('sms-step.welcome-back-title')
-      : t('sms-step.title');
-  };
-
-  const headerTitle = getStepTitle();
   const formTitle = getFormTitle();
 
   const handleChallengeSucceed = (authToken: string) => {
@@ -69,12 +61,13 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
 
   return (
     <Container>
-      <Header data-private title={headerTitle} subtitle={formTitle} />
+      <Header data-private title={headerTitle} />
       <PinVerification
         identifier={successfulIdentifier ?? { phoneNumber }}
         onChallengeSucceed={handleChallengeSucceed}
         onNewChallengeRequested={handleNewChallengeRequested}
         preferredChallengeKind={ChallengeKind.sms}
+        title={formTitle}
       />
       {children}
     </Container>

@@ -56,6 +56,7 @@ export {
   getBiometricChallengeResponse,
   getCanChallengeBiometrics,
   getIdentifyBootstrapData,
+  getLogger,
   getRandomID,
   getScrubbedPhoneNumber,
   getSdkArgsToken,

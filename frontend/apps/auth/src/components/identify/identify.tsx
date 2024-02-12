@@ -20,6 +20,7 @@ import Router from './components/router';
 import SandboxInput from './components/sandbox-input';
 import SandboxOutcomeFooter from './components/sandbox-outcome-footer';
 import { IdentifyMachineProvider } from './state';
+import type { IdentifyVariant, LogoConfig } from './state/types';
 
 const voidObj: Record<string, never> = {};
 const initialDevice = {
@@ -35,19 +36,24 @@ const getOnboardConfigurationKey = (key?: string): ObKeyHeader | undefined =>
 
 type IdentifyProps = {
   publicKey?: string;
-  authToken?: string;
-  config: PublicOnboardingConfig;
+  initialAuthToken?: string;
+  config?: PublicOnboardingConfig;
+  isLive: boolean;
   userData?: Pick<FootprintUserData, 'id.email' | 'id.phone_number'>;
-  showLogo?: boolean;
+  logoConfig?: LogoConfig;
+  variant: IdentifyVariant;
   onDone: (args: DoneArgs) => void;
+  // TODO eventually include the requested scope
 };
 
 const Identify = ({
   publicKey,
-  authToken,
+  initialAuthToken,
   config,
+  isLive,
   userData,
-  showLogo,
+  logoConfig,
+  variant,
   onDone,
 }: IdentifyProps): JSX.Element | null => {
   const [device, setDevice] = useState<DeviceInfo>(initialDevice);
@@ -55,7 +61,6 @@ const Identify = ({
 
   const { t } = useTranslation('common');
   const obConfigAuth = getOnboardConfigurationKey(publicKey);
-  const isSandbox = !config?.isLive;
 
   useDeviceInfo(setDevice);
 
@@ -67,17 +72,19 @@ const Identify = ({
   return (
     <IdentifyMachineProvider
       args={{
-        authToken,
+        initialAuthToken,
         bootstrapData: getIdentifyBootstrapData(userData),
         config,
+        isLive,
         device,
         obConfigAuth,
         sandboxId,
-        showLogo,
+        logoConfig,
+        variant,
       }}
     >
       <Router onDone={onDone}>
-        {isSandbox
+        {!isLive
           ? (state, send) =>
               isSandboxEditable(state) ? (
                 <>

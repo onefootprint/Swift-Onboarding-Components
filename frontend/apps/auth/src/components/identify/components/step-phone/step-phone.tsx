@@ -1,7 +1,11 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { checkIsPhoneValid, EmailPreview, PhoneForm } from '@onefootprint/idv';
-import { getErrorMessage } from '@onefootprint/request';
+import {
+  checkIsPhoneValid,
+  EmailPreview,
+  getLogger,
+  PhoneForm,
+} from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import noop from 'lodash/fp/noop';
 import React from 'react';
@@ -17,12 +21,14 @@ type StepPhoneProps = {
   Header: (props: HeaderProps) => JSX.Element;
 };
 
+const { logError } = getLogger('auth-phone-identification');
+
 const StepPhone = ({ children, Header }: StepPhoneProps) => {
   const [state, send] = useIdentifyMachine();
   const {
     identify: { phoneNumber, email, sandboxId },
     obConfigAuth,
-    config: { isLive },
+    config,
   } = state.context;
   const { t } = useTranslation('common');
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
@@ -31,7 +37,7 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
   const options = COUNTRIES;
 
   const handlePhoneValidation = (phone: string) =>
-    checkIsPhoneValid(phone, !isLive);
+    checkIsPhoneValid(phone, config?.isLive === false);
 
   const handleChangeEmail = () => {
     send({ type: 'identifyReset' });
@@ -43,11 +49,9 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
       { identifier: { phoneNumber: phoneFromForm } },
       {
         onError: error => {
-          console.error(
-            `Error while identify user on phone-identification page: ${getErrorMessage(
-              error,
-            )}`,
-            'auth-phone-identification',
+          logError(
+            'Error while identify user on phone-identification page:',
+            error,
           );
           showRequestErrorToast(error);
         },

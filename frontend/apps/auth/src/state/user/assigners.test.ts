@@ -1,19 +1,12 @@
-import { ChallengeKind } from '@onefootprint/types';
-import { AuthMethodKind } from '@onefootprint/types/src/data';
 import { describe, expect, it } from 'bun:test';
 
 import {
   assignDecryptedData,
   assignEmail,
-  assignEmailChallenge,
   assignEmailReplaceChallenge,
-  assignKindToChallenge,
-  assignPasskeyChallenge,
-  assignPhoneChallenge,
   assignPhoneNumber,
   assignPhoneReplaceChallenge,
   assignUserDashboard,
-  assignUserFound,
   assignVerifyToken,
 } from './assigners';
 import type { UserMachineContext } from './types';
@@ -80,37 +73,6 @@ describe('should pass the entire payload', () => {
     expect(phoneReplaceChallenge).toEqual(ctx.phoneReplaceChallenge!);
   });
 
-  it('assignEmailChallenge', () => {
-    type Meta = Parameters<typeof assignEmailChallenge>['2'];
-    const ctx = {} as UserMachineContext;
-    const data = {
-      challengeToken: 'token',
-      challengeKind: ChallengeKind.email,
-      scrubbedPhoneNumber: 'string',
-      biometricChallengeJson: '',
-      timeBeforeRetryS: 1,
-    };
-    const meta = {} as Meta;
-
-    const result = assignEmailChallenge(
-      ctx,
-      {
-        type: 'setEmailChallenge',
-        payload: {
-          biometricChallengeJson: '',
-          challengeKind: ChallengeKind.email,
-          challengeToken: 'token',
-          scrubbedPhoneNumber: 'string',
-          timeBeforeRetryS: 1,
-        },
-      },
-      meta,
-    );
-
-    expect(result.emailChallenge).toEqual(data);
-    expect(result.emailChallenge).toEqual(ctx.emailChallenge!);
-  });
-
   it('assignEmailReplaceChallenge', () => {
     type Meta = Parameters<typeof assignEmailReplaceChallenge>['2'];
     const ctx = {} as UserMachineContext;
@@ -140,43 +102,6 @@ describe('should pass the entire payload', () => {
     expect(emailReplaceChallenge).toEqual(ctx.emailReplaceChallenge!);
   });
 
-  it('assignKindToChallenge', () => {
-    type Meta = Parameters<typeof assignKindToChallenge>['2'];
-    const ctx = {} as UserMachineContext;
-    const meta = {} as Meta;
-
-    const result = assignKindToChallenge(
-      ctx,
-      { type: 'setChallengeKind', payload: ChallengeKind.sms },
-      meta,
-    );
-
-    expect(result.kindToChallenge).toEqual(ChallengeKind.sms);
-    expect(result.kindToChallenge).toEqual(ctx.kindToChallenge!);
-  });
-
-  it('assignPasskeyChallenge', () => {
-    type Meta = Parameters<typeof assignPasskeyChallenge>['2'];
-    const ctx = {} as UserMachineContext;
-    const data = {
-      biometricChallengeJson: 'biometricChallengeJson',
-      challengeKind: ChallengeKind.biometric,
-      challengeToken: 'token',
-      scrubbedPhoneNumber: '',
-      timeBeforeRetryS: 1,
-    };
-    const meta = {} as Meta;
-
-    const result = assignPasskeyChallenge(
-      ctx,
-      { type: 'setPasskeyChallenge', payload: data },
-      meta,
-    );
-
-    expect(result.passkeyChallenge).toEqual(data);
-    expect(result.passkeyChallenge).toEqual(ctx.passkeyChallenge!);
-  });
-
   it('assignVerifyToken', () => {
     type Meta = Parameters<typeof assignVerifyToken>['2'];
     const ctx = {} as UserMachineContext;
@@ -194,43 +119,6 @@ describe('should pass the entire payload', () => {
 });
 
 describe('machine assigners', () => {
-  it('should assign payload and replace asterisks to bullet: assignPhoneChallenge', () => {
-    type Meta = Parameters<typeof assignPhoneChallenge>['2'];
-    const ctx = {
-      userDashboard: {
-        email: { status: 'empty' },
-        phone: { status: 'empty' },
-        passkey: { status: 'empty' },
-      },
-    } as UserMachineContext;
-    const meta = {} as Meta;
-
-    const result = assignPhoneChallenge(
-      ctx,
-      {
-        type: 'setPhoneChallenge',
-        payload: {
-          biometricChallengeJson: '',
-          challengeKind: ChallengeKind.sms,
-          challengeToken: 'token',
-          scrubbedPhoneNumber: '1***',
-          timeBeforeRetryS: 1,
-        },
-      },
-      meta,
-    );
-
-    expect(result.phoneChallenge).toEqual({
-      biometricChallengeJson: '',
-      challengeKind: ChallengeKind.sms,
-      challengeToken: 'token',
-      scrubbedPhoneNumber: '1•••',
-      timeBeforeRetryS: 1,
-    });
-    expect(result.phoneChallenge).toEqual(ctx.phoneChallenge!);
-    expect(result.userDashboard?.phone?.label).toEqual('1•••');
-  });
-
   it('should update dashboard entry: assignUserDashboard', () => {
     type Meta = Parameters<typeof assignUserDashboard>['2'];
     const ctx = {
@@ -285,121 +173,6 @@ describe('machine assigners', () => {
       email: { label: 'sandbox@onefootprint.com', status: 'set' },
       passkey: { status: 'empty' },
       phone: { label: '+15555550100', status: 'set' },
-    });
-  });
-
-  describe('assignUserFound', () => {
-    it('should handle user not found', () => {
-      type Meta = Parameters<typeof assignUserFound>['2'];
-      const ctx = {
-        userDashboard: {
-          email: { status: 'empty' },
-          phone: { status: 'empty' },
-          passkey: { status: 'empty' },
-        },
-      } as UserMachineContext;
-      const meta = {} as Meta;
-
-      const result = assignUserFound(
-        ctx,
-        {
-          type: 'identifyUserDone',
-          payload: {
-            user: undefined,
-          },
-        },
-        meta,
-      );
-
-      expect(result.userFound).toEqual({
-        user: undefined,
-      });
-      expect(result.userFound).toEqual(ctx.userFound!);
-    });
-
-    it('should set values for kind, user dashboard', () => {
-      type Meta = Parameters<typeof assignUserFound>['2'];
-      const ctx = {
-        userDashboard: {
-          email: { status: 'empty' },
-          phone: { status: 'empty' },
-          passkey: { status: 'empty' },
-        },
-      } as UserMachineContext;
-      const meta = {} as Meta;
-      const result = assignUserFound(
-        ctx,
-        {
-          type: 'identifyUserDone',
-          payload: {
-            user: {
-              isUnverified: false,
-              hasSyncablePasskey: false,
-              availableChallengeKinds: [
-                ChallengeKind.sms,
-                ChallengeKind.email,
-                ChallengeKind.biometric,
-              ],
-              authMethods: [
-                { kind: AuthMethodKind.phone, isVerified: true },
-                { kind: AuthMethodKind.email, isVerified: false },
-                { kind: AuthMethodKind.passkey, isVerified: true },
-              ],
-              scrubbedEmail: 'a*.g*.com',
-              scrubbedPhone: '+49**',
-            },
-          },
-        },
-        meta,
-      );
-      expect(result.kindToChallenge).toEqual(ChallengeKind.sms);
-      expect(result.userDashboard?.email).toEqual({
-        status: 'set',
-        label: 'a•.g•.com',
-      });
-      expect(result.userDashboard?.phone).toEqual({
-        status: 'set',
-        label: '+49••',
-      });
-      expect(result.userDashboard?.passkey).toEqual({ status: 'set' });
-    });
-
-    it('should not assign phone when challenge is not available', () => {
-      type Meta = Parameters<typeof assignUserFound>['2'];
-
-      const ctx = {
-        userDashboard: {
-          email: { status: 'empty' },
-          phone: { status: 'empty' },
-          passkey: { status: 'empty' },
-        },
-      } as UserMachineContext;
-      const meta = {} as Meta;
-
-      const result = assignUserFound(
-        ctx,
-        {
-          type: 'identifyUserDone',
-          payload: {
-            user: {
-              isUnverified: false,
-              hasSyncablePasskey: false,
-              availableChallengeKinds: [ChallengeKind.email],
-              authMethods: [{ kind: AuthMethodKind.email, isVerified: true }],
-              scrubbedEmail: 'a*.g*.com',
-              scrubbedPhone: '+49**',
-            },
-          },
-        },
-        meta,
-      );
-
-      expect(result.kindToChallenge).toEqual(ChallengeKind.email);
-      expect(result.userDashboard?.email).toEqual({
-        status: 'set',
-        label: 'a•.g•.com',
-      });
-      expect(result.userDashboard?.phone).toEqual({ status: 'empty' });
     });
   });
 });

@@ -1,12 +1,6 @@
 import type { Assigner } from 'xstate';
 
-import {
-  isBiometricOrPasskey,
-  isEmail,
-  isObject,
-  isSmsOrPhone,
-  isString,
-} from '@/src/utils';
+import { isObject, isString } from '@/src/utils';
 
 import type { UserMachineContext, UserMachineEvents as Events } from './types';
 
@@ -17,20 +11,12 @@ type MEvent<T, U> = T extends { type: U; payload: infer P }
   : never;
 
 type DecryptUserDone = MCtx<MEvent<Events, 'decryptUserDone'>>;
-type IdentifyUserDone = MCtx<MEvent<Events, 'identifyUserDone'>>;
-type SetChallengeKind = MCtx<MEvent<Events, 'setChallengeKind'>>;
 type SetEmail = MCtx<MEvent<Events, 'setEmail'>>;
-type SetEmailChallenge = MCtx<MEvent<Events, 'setEmailChallenge'>>;
 type SetEmailRepChallenge = MCtx<MEvent<Events, 'setEmailReplaceChallenge'>>;
-type SetPasskeyChallenge = MCtx<MEvent<Events, 'setPasskeyChallenge'>>;
-type SetPhoneChallenge = MCtx<MEvent<Events, 'setPhoneChallenge'>>;
 type SetPhoneNumber = MCtx<MEvent<Events, 'setPhoneNumber'>>;
 type SetSmsReplaceChallenge = MCtx<MEvent<Events, 'setSmsReplaceChallenge'>>;
 type SetVerifyToken = MCtx<MEvent<Events, 'setVerifyToken'>>;
 type UpdateUserDashboard = MCtx<MEvent<Events, 'updateUserDashboard'>>;
-
-const asterisksToBullet = (str?: string): string =>
-  (str || '').replace(/\*/g, '•');
 
 const getIdValue = (key: string, obj: Obj): string | undefined =>
   isObject(obj) &&
@@ -44,11 +30,6 @@ const assignEmail: SetEmail = (ctx, { payload }) => {
   return ctx;
 };
 
-const assignEmailChallenge: SetEmailChallenge = (ctx, { payload }) => {
-  ctx.emailChallenge = payload;
-  return ctx;
-};
-
 const assignEmailReplaceChallenge: SetEmailRepChallenge = (
   ctx,
   { payload },
@@ -56,17 +37,6 @@ const assignEmailReplaceChallenge: SetEmailRepChallenge = (
   ctx.emailReplaceChallenge = payload;
   return ctx;
 };
-
-const assignKindToChallenge: SetChallengeKind = (ctx, { payload }) => {
-  ctx.kindToChallenge = payload;
-  return ctx;
-};
-
-const assignPasskeyChallenge: SetPasskeyChallenge = (ctx, { payload }) => {
-  ctx.passkeyChallenge = payload;
-  return ctx;
-};
-
 const assignPhoneNumber: SetPhoneNumber = (ctx, { payload }) => {
   ctx.phoneNumber = payload;
   return ctx;
@@ -77,50 +47,6 @@ const assignPhoneReplaceChallenge: SetSmsReplaceChallenge = (
   { payload },
 ) => {
   ctx.phoneReplaceChallenge = payload;
-  return ctx;
-};
-
-const assignPhoneChallenge: SetPhoneChallenge = (ctx, { payload }) => {
-  const phoneNumber = asterisksToBullet(payload.scrubbedPhoneNumber);
-
-  if (ctx.userDashboard.phone) {
-    ctx.userDashboard = {
-      ...ctx.userDashboard,
-      phone: {
-        ...ctx.userDashboard.phone,
-        label: phoneNumber,
-      },
-    };
-  }
-
-  ctx.phoneChallenge = {
-    ...payload,
-    scrubbedPhoneNumber: phoneNumber,
-  };
-
-  return ctx;
-};
-
-const assignUserFound: IdentifyUserDone = (ctx, { payload }) => {
-  const dashboard = { ...ctx.userDashboard };
-  const kinds = payload.user?.availableChallengeKinds;
-  const scrubbedEmail = asterisksToBullet(payload.user?.scrubbedEmail);
-  const scrubbedPhone = asterisksToBullet(payload.user?.scrubbedPhone);
-
-  if (kinds?.some(isSmsOrPhone)) {
-    dashboard.phone = { status: 'set', label: scrubbedPhone };
-  }
-  if (kinds?.some(isEmail)) {
-    dashboard.email = { status: 'set', label: scrubbedEmail };
-  }
-  if (kinds?.some(isBiometricOrPasskey)) {
-    dashboard.passkey = { ...dashboard.passkey, status: 'set' };
-  }
-
-  ctx.kindToChallenge = kinds?.at(0);
-  ctx.userDashboard = dashboard;
-  ctx.userFound = { ...payload };
-
   return ctx;
 };
 
@@ -162,14 +88,9 @@ const assignDecryptedData: DecryptUserDone = (ctx, { payload }) => {
 export {
   assignDecryptedData,
   assignEmail,
-  assignEmailChallenge,
   assignEmailReplaceChallenge,
-  assignKindToChallenge,
-  assignPasskeyChallenge,
-  assignPhoneChallenge,
   assignPhoneNumber,
   assignPhoneReplaceChallenge,
   assignUserDashboard,
-  assignUserFound,
   assignVerifyToken,
 };

@@ -1,40 +1,17 @@
-import type { ChallengeKind, IdentifyResponse } from '@onefootprint/types';
-import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
-
-import { isBiometric, isEmail, isSms } from '@/src/utils';
 
 import {
   assignDecryptedData,
   assignEmail,
-  assignEmailChallenge,
   assignEmailReplaceChallenge,
-  assignKindToChallenge,
-  assignPasskeyChallenge,
-  assignPhoneChallenge,
   assignPhoneNumber,
   assignPhoneReplaceChallenge,
   assignUserDashboard,
-  assignUserFound,
   assignVerifyToken,
 } from './assigners';
 import type { UserMachineContext, UserMachineEvents } from './types';
 
-type Ignore = unknown;
-type KindPayload = { payload: ChallengeKind };
-type IdentifyPayload = { payload: IdentifyResponse };
-
 export type UserMachineArgs = { authToken: string };
-
-const hasVerifyToken = (ctx: UserMachineContext) => Boolean(ctx.verifyToken);
-
-const getKindPayload = (_: Ignore, { payload }: KindPayload) => payload;
-const isPayloadEmail = compose(isEmail, getKindPayload);
-const isPayloadSms = compose(isSms, getKindPayload);
-const isPayloadPasskey = compose(isBiometric, getKindPayload);
-
-const userOrChallengesNotFound = (_: Ignore, { payload }: IdentifyPayload) =>
-  !payload.user || !payload.user?.availableChallengeKinds?.length;
 
 const createUserMachine = (args: UserMachineArgs) =>
   createMachine(
@@ -71,10 +48,6 @@ const createUserMachine = (args: UserMachineArgs) =>
         decryptUserDone: {
           actions: ['assignDecryptedData'],
         },
-        setVerifyToken: {
-          target: 'dashboard',
-          actions: ['assignVerifyToken'],
-        },
         updateUserDashboard: {
           target: 'dashboard',
           actions: ['assignUserDashboard'],
@@ -82,51 +55,14 @@ const createUserMachine = (args: UserMachineArgs) =>
       },
       states: {
         init: {
-          always: [
-            { cond: hasVerifyToken, target: 'dashboard' },
-            { target: 'identifyUser' },
-          ],
+          always: [{ target: 'identify' }],
         },
-        identifyUser: {
+        identify: {
           on: {
-            identifyUserFailed: { target: 'notFoundUser' },
-            identifyUserDone: [
-              { cond: userOrChallengesNotFound, target: 'notFoundChallenge' },
-              { target: 'userFound', actions: ['assignUserFound'] },
-            ],
-          },
-        },
-        userFound: {
-          on: {
-            goToChallenge: [
-              { cond: isPayloadEmail, target: 'emailChallenge' },
-              { cond: isPayloadSms, target: 'phoneChallenge' },
-              { cond: isPayloadPasskey, target: 'passkeyChallenge' },
-            ],
-            setChallengeKind: { actions: ['assignKindToChallenge'] },
-          },
-        },
-        emailChallenge: {
-          on: {
-            goToBack: { target: 'userFound' },
-            setEmailChallenge: { actions: ['assignEmailChallenge'] },
-          },
-        },
-        phoneChallenge: {
-          on: {
-            goToBack: { target: 'userFound' },
-            setPhoneChallenge: { actions: ['assignPhoneChallenge'] },
-          },
-        },
-        passkeyChallenge: {
-          on: {
-            goToBack: { target: 'userFound' },
-            goToChallenge: {
-              cond: isPayloadSms,
-              target: 'phoneChallenge',
-              actions: ['assignKindToChallenge'],
+            setVerifyToken: {
+              target: 'dashboard',
+              actions: ['assignVerifyToken'],
             },
-            setPasskeyChallenge: { actions: ['assignPasskeyChallenge'] },
           },
         },
         dashboard: {
@@ -176,7 +112,6 @@ const createUserMachine = (args: UserMachineArgs) =>
           },
         },
         notFoundChallenge: { type: 'final' },
-        notFoundUser: { type: 'final' },
         success: { type: 'final' },
       },
     },
@@ -184,15 +119,10 @@ const createUserMachine = (args: UserMachineArgs) =>
       actions: {
         assignDecryptedData: assign(assignDecryptedData),
         assignEmail: assign(assignEmail),
-        assignEmailChallenge: assign(assignEmailChallenge),
         assignEmailReplaceChallenge: assign(assignEmailReplaceChallenge),
-        assignKindToChallenge: assign(assignKindToChallenge),
-        assignPasskeyChallenge: assign(assignPasskeyChallenge),
-        assignPhoneChallenge: assign(assignPhoneChallenge),
         assignPhoneNumber: assign(assignPhoneNumber),
         assignPhoneReplaceChallenge: assign(assignPhoneReplaceChallenge),
         assignUserDashboard: assign(assignUserDashboard),
-        assignUserFound: assign(assignUserFound),
         assignVerifyToken: assign(assignVerifyToken),
         // assignPasskeyReplaceChallenge: assign((ctx, { payload }) => {
         //   ctx.passkeyReplaceChallenge = payload;

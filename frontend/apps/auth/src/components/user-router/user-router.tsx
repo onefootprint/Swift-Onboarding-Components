@@ -9,14 +9,9 @@ import type { HeaderProps } from '@/src/types';
 import { getUserLeftNavButton } from '@/src/utils';
 
 import Loading from '../../app/user/loading';
-import {
-  ChallengeSelect,
-  ChallengeVerifyEmail,
-  ChallengeVerifyPasskey,
-  ChallengeVerifyPhone,
-} from '../challenge-select';
+import Identify from '../identify';
+import { IdentifyVariant } from '../identify/state/types';
 import Notification from '../notification';
-import IdentifyUser from '../user-container/identify';
 import UserDashboard from '../user-dashboard';
 import {
   UpdateEmail,
@@ -48,35 +43,18 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
   if (state.matches('init')) {
     return <Loading />;
   }
-  if (state.matches('identifyUser')) {
+  if (state.matches('identify')) {
     return (
-      <IdentifyUser
-        authToken={state.context.authToken}
-        onError={() => send({ type: 'identifyUserFailed' })}
-        onSuccess={payload => send({ type: 'identifyUserDone', payload })}
-      />
-    );
-  }
-  if (state.matches('userFound')) {
-    return <ChallengeSelect Header={Header} />;
-  }
-  if (state.matches('emailChallenge')) {
-    return <ChallengeVerifyEmail Header={Header} />;
-  }
-  if (state.matches('phoneChallenge')) {
-    return <ChallengeVerifyPhone Header={Header} />;
-  }
-  if (state.matches('passkeyChallenge')) {
-    return (
-      <ChallengeVerifyPasskey
-        Header={Header}
-        onChallengeVerificationSuccess={res =>
-          send({ type: 'setVerifyToken', payload: res.authToken })
+      <Identify
+        variant={IdentifyVariant.updateLoginMethods}
+        initialAuthToken={state.context.authToken}
+        onDone={({ authToken }) =>
+          send({ type: 'setVerifyToken', payload: authToken })
         }
-        onLoginChallengeSuccess={payload =>
-          send({ type: 'setPasskeyChallenge', payload })
-        }
-        onSmsButtonClick={payload => send({ type: 'goToChallenge', payload })}
+        // Since we don't have a playbook for this flow, always treat it as live
+        // TODO would be more correct to fetch whether the user defined by the auth token is
+        // live or sandbox
+        isLive
       />
     );
   }
@@ -110,14 +88,6 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
       <Header
         title="Feature in Progress"
         subtitle="This functionality is currently undergoing the design phase and development is in progress."
-      />
-    );
-  }
-  if (state.matches('notFoundUser')) {
-    return (
-      <Notification
-        title={t('notification.404-user-title')}
-        subtitle={t('notification.404-user-description')}
       />
     );
   }

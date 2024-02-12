@@ -10,7 +10,7 @@ import type { EmailAndOrPhone } from '../types';
 import calculateRetryTime from './get-retry-time';
 
 type ToIgnore = 'identifier' | 'preferredChallengeKind';
-type PayloadPartKey = 'obConfigAuth' | 'sandboxId';
+type PayloadPartKey = 'obConfigAuth' | 'sandboxId' | 'authToken';
 
 type Payload = Omit<LoginChallengeRequest, ToIgnore> & {
   authToken?: string;

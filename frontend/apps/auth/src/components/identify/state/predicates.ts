@@ -1,16 +1,20 @@
 import { shouldChallengeEmail } from '@onefootprint/idv';
-import type { ChallengeKind } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 
 import type { EmailAndOrPhone } from '@/src/types';
 
-import type { IdentifiedEvent, IdentifyMachineContext } from './types';
+import {
+  type IdentifiedEvent,
+  type IdentifyMachineContext,
+  IdentifyVariant,
+} from './types';
 
 export const hasBootstrapTruthyValue = (c: IdentifyMachineContext): boolean =>
   Object.values(c.bootstrapData).some(Boolean);
 
 export const isNoPhoneFlow = (c: IdentifyMachineContext): boolean =>
-  Boolean(c.config.isNoPhoneFlow);
+  Boolean(c.config?.isNoPhoneFlow);
 
 export const hasEmailAndPhoneNumber = (x: EmailAndOrPhone): boolean =>
   !!x.email && !!x.phoneNumber;
@@ -18,9 +22,17 @@ export const hasEmailAndPhoneNumber = (x: EmailAndOrPhone): boolean =>
 export const isUserFound = (user: IdentifiedUser | undefined): boolean =>
   !!user;
 
-export const isUserFoundWithMultipleChallenges = (
+export const shouldShowChallengeSelector = (
+  c: IdentifyMachineContext,
   user: IdentifiedUser | undefined,
-): boolean => !!user && user?.availableChallengeKinds?.length > 1;
+) => {
+  const hasMultipleChallenges =
+    !!user && user?.availableChallengeKinds?.length > 1;
+  const hasPasskeyChallenge =
+    !!user && user?.availableChallengeKinds?.includes(ChallengeKind.biometric);
+  const isUpdateLoginMethods = c.variant === IdentifyVariant.updateLoginMethods;
+  return hasMultipleChallenges || hasPasskeyChallenge || isUpdateLoginMethods;
+};
 
 export const isUserFoundWithSingleChallenge = (
   user: IdentifiedUser | undefined,

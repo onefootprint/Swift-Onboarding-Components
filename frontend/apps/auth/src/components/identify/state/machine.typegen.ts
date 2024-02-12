@@ -27,10 +27,12 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'authTokenInvalid'
     | 'challengeSelectOrPasskey'
     | 'emailChallenge'
     | 'emailIdentification'
     | 'init'
+    | 'initAuthToken'
     | 'initBootstrap'
     | 'phoneIdentification'
     | 'smsChallenge'

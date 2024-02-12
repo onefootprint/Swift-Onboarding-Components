@@ -2,6 +2,7 @@ import type { DeviceInfo } from '@onefootprint/idv';
 import type {
   ChallengeData,
   ChallengeKind,
+  Identifier,
   IdentifyBootstrapData,
   ObConfigAuth,
   OverallOutcome,
@@ -12,20 +13,38 @@ import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 import type { EmailAndOrPhone } from '@/src/types';
 
 export type IdentifyMachineContext = {
+  /// Optionally, the identified token used to start the flow
+  initialAuthToken?: string;
+  /// The autheticated token we yield at the end of the flow
   authToken?: string;
   bootstrapData: IdentifyBootstrapData;
   challenge: MachineChallengeContext;
-  config: PublicOnboardingConfig;
+  /// The identify flow may have no config if we're logging into a non-onboarding flow, like
+  /// "update login methods."
+  config?: PublicOnboardingConfig;
+  /// Use isLive - config isn't always provided
+  isLive: boolean;
   device: DeviceInfo;
   identify: IdentifyResult;
   obConfigAuth?: ObConfigAuth;
   overallOutcome?: OverallOutcome;
-  showLogo?: boolean;
+  logoConfig?: LogoConfig;
+  variant: IdentifyVariant;
+};
+
+export enum IdentifyVariant {
+  updateLoginMethods,
+  auth,
+}
+
+export type LogoConfig = {
+  orgName: string;
+  logoUrl?: string;
 };
 
 export type IdentifyResult = {
   user?: IdentifiedUser;
-  successfulIdentifier?: EmailAndOrPhone;
+  successfulIdentifier?: Identifier;
   sandboxId?: string;
   email?: string;
   phoneNumber?: string;

@@ -14,6 +14,7 @@ import { AuthMethodKind } from '@onefootprint/types/src/data';
 import { interpret } from 'xstate';
 
 import createIdentifyMachine from './machine';
+import { IdentifyVariant } from './types';
 
 const challengeKindToAuthMethod: Record<ChallengeKind, AuthMethodKind> = {
   [ChallengeKind.biometric]: AuthMethodKind.passkey,
@@ -38,47 +39,65 @@ const getFixtureUser = (
   hasSyncablePasskey: true,
 });
 
+const getOnboardingConfig = (
+  isLive = true,
+  isNoPhoneFlow = false,
+): PublicOnboardingConfig => ({
+  isLive,
+  logoUrl: 'url',
+  privacyPolicyUrl: 'url',
+  name: 'tenant',
+  orgName: 'tenantOrg',
+  orgId: 'orgId',
+  status: OnboardingConfigStatus.enabled,
+  isAppClipEnabled: false,
+  isInstantAppEnabled: false,
+  appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
+  isNoPhoneFlow,
+  requiresIdDoc: false,
+  key: 'key',
+  isKyb: false,
+  allowInternationalResidents: false,
+});
+
+const getDevice = (): DeviceInfo => ({
+  type: 'mobile',
+  hasSupportForWebauthn: true,
+  osName: 'iOS',
+});
+
+const createMachine = ({
+  bootstrapData,
+  initialAuthToken,
+  config,
+  variant = IdentifyVariant.auth,
+}: {
+  bootstrapData?: IdentifyBootstrapData;
+  initialAuthToken?: string;
+  config?: PublicOnboardingConfig;
+  variant?: IdentifyVariant;
+}) => {
+  const machine = interpret(
+    createIdentifyMachine({
+      bootstrapData,
+      initialAuthToken,
+      config,
+      obConfigAuth: config && { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
+      device: getDevice(),
+      isLive: config?.isLive || true,
+      variant,
+    }),
+  );
+  machine.start();
+  return machine;
+};
+
 describe('Identify Machine Tests', () => {
-  const getOnboardingConfig = (isLive = true): PublicOnboardingConfig => ({
-    isLive,
-    logoUrl: 'url',
-    privacyPolicyUrl: 'url',
-    name: 'tenant',
-    orgName: 'tenantOrg',
-    orgId: 'orgId',
-    status: OnboardingConfigStatus.enabled,
-    isAppClipEnabled: false,
-    isInstantAppEnabled: false,
-    appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
-    isNoPhoneFlow: false,
-    requiresIdDoc: false,
-    key: 'key',
-    isKyb: false,
-    allowInternationalResidents: false,
-  });
-
-  const getDevice = (): DeviceInfo => ({
-    type: 'mobile',
-    hasSupportForWebauthn: true,
-    osName: 'iOS',
-  });
-
-  const createMachine = (bootstrapData?: IdentifyBootstrapData) => {
-    const machine = interpret(
-      createIdentifyMachine({
-        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
-        bootstrapData,
-        device: getDevice(),
-        config: getOnboardingConfig(),
-      }),
-    );
-    machine.start();
-    return machine;
-  };
-
   describe('with existing account', () => {
     it('successfully ids the user from email', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -105,7 +124,9 @@ describe('Identify Machine Tests', () => {
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts sms challenge', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -147,7 +168,9 @@ describe('Identify Machine Tests', () => {
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts biometric challenge', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -202,7 +225,9 @@ describe('Identify Machine Tests', () => {
 
   describe('with new user', () => {
     it('registers new phone', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -258,7 +283,9 @@ describe('Identify Machine Tests', () => {
     });
 
     it('editing email while registering phone', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
 
       let { state } = machine;
       expect(state.value).toEqual('emailIdentification');
@@ -292,9 +319,242 @@ describe('Identify Machine Tests', () => {
     });
   });
 
+  describe('with bootstrap data', () => {
+    it('invalid bootstrap data goes to emailIdentification', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        bootstrapData: {
+          phoneNumber: '+15555550100',
+          email: 'sandbox@onefootprint.com',
+        },
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initBootstrap');
+
+      state = machine.send({
+        type: 'bootstrapDataInvalid',
+      });
+      expect(state.context.identify).toEqual({
+        email: undefined,
+        phoneNumber: undefined,
+        successfulIdentifier: undefined,
+        user: undefined,
+      });
+      expect(state.value).toEqual('emailIdentification');
+    });
+
+    it('identify failed sends collects remaining phone number', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        bootstrapData: {
+          email: 'sandbox@onefootprint.com',
+        },
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initBootstrap');
+
+      state = machine.send({
+        type: 'identifyFailed',
+        payload: {
+          email: 'sandbox@onefootprint.com',
+        },
+      });
+      expect(state.context.identify).toEqual({
+        email: 'sandbox@onefootprint.com',
+        phoneNumber: undefined,
+        successfulIdentifier: undefined,
+        user: undefined,
+      });
+      expect(state.value).toEqual('phoneIdentification');
+    });
+
+    it('identify failed sends collects remaining email', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        bootstrapData: {
+          phoneNumber: '+15555550100',
+        },
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initBootstrap');
+
+      state = machine.send({
+        type: 'identifyFailed',
+        payload: {
+          phoneNumber: '+15555550100',
+        },
+      });
+      expect(state.context.identify).toEqual({
+        email: undefined,
+        phoneNumber: '+15555550100',
+        successfulIdentifier: undefined,
+        user: undefined,
+      });
+      expect(state.value).toEqual('emailIdentification');
+    });
+
+    it('identify failed with phone and email goes straight to sms signup challenge', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        bootstrapData: {
+          email: 'sandbox@onefootprint.com',
+          phoneNumber: '+15555550100',
+        },
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initBootstrap');
+
+      state = machine.send({
+        type: 'identifyFailed',
+        payload: {
+          email: 'sandbox@onefootprint.com',
+          phoneNumber: '+15555550100',
+        },
+      });
+      expect(state.context.identify).toEqual({
+        email: 'sandbox@onefootprint.com',
+        phoneNumber: '+15555550100',
+        successfulIdentifier: undefined,
+        user: undefined,
+      });
+      expect(state.value).toEqual('smsChallenge');
+    });
+
+    it('identify failed with phone and email goes straight to email signup challenge when in no phone', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(true, true),
+        bootstrapData: {
+          email: 'sandbox@onefootprint.com',
+          phoneNumber: '+15555550100',
+        },
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initBootstrap');
+
+      state = machine.send({
+        type: 'identifyFailed',
+        payload: {
+          email: 'sandbox@onefootprint.com',
+          phoneNumber: '+15555550100',
+        },
+      });
+      expect(state.context.identify).toEqual({
+        email: 'sandbox@onefootprint.com',
+        phoneNumber: '+15555550100',
+        successfulIdentifier: undefined,
+        user: undefined,
+      });
+      expect(state.value).toEqual('emailChallenge');
+    });
+
+    it('identify succeeded with only SMS available goes to sms challenge', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        bootstrapData: {
+          email: 'sandbox@onefootprint.com',
+          phoneNumber: '+15555550100',
+        },
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initBootstrap');
+
+      state = machine.send({
+        type: 'identified',
+        payload: {
+          successfulIdentifier: { email: 'sandbox@onefootprint.com' },
+          user: getFixtureUser([ChallengeKind.sms]),
+        },
+      });
+      expect(state.context.identify).toEqual({
+        successfulIdentifier: { email: 'sandbox@onefootprint.com' },
+        user: getFixtureUser([ChallengeKind.sms]),
+      });
+      expect(state.value).toEqual('smsChallenge');
+    });
+
+    it('identify succeeded with multi challenge goes to challenge selector', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        bootstrapData: {
+          email: 'sandbox@onefootprint.com',
+          phoneNumber: '+15555550100',
+        },
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initBootstrap');
+
+      state = machine.send({
+        type: 'identified',
+        payload: {
+          successfulIdentifier: { email: 'sandbox@onefootprint.com' },
+          user: getFixtureUser([ChallengeKind.sms, ChallengeKind.biometric]),
+        },
+      });
+      expect(state.context.identify).toEqual({
+        successfulIdentifier: { email: 'sandbox@onefootprint.com' },
+        user: getFixtureUser([ChallengeKind.sms, ChallengeKind.biometric]),
+      });
+      expect(state.value).toEqual('challengeSelectOrPasskey');
+    });
+  });
+
   describe('challenge navigation', () => {
+    it('init with an auth token', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        initialAuthToken: 'utok_xxx',
+      });
+      expect(machine.state.value).toEqual('initAuthToken');
+      expect(machine.state.context.initialAuthToken).toBeTruthy();
+
+      // When the user is identified, we should always go to the challenge select screen, even if
+      // there's only one available challenge
+      let state = machine.send({
+        type: 'identified',
+        payload: {
+          successfulIdentifier: { authToken: 'utok_xxx' },
+          user: getFixtureUser([ChallengeKind.sms]),
+        },
+      });
+      expect(state.context.identify).toEqual({
+        user: getFixtureUser([ChallengeKind.sms]),
+        successfulIdentifier: { authToken: 'utok_xxx' },
+      });
+      expect(state.value).toEqual('smsChallenge');
+
+      // Receive challenge data from the backend
+      state = machine.send({
+        type: 'challengeReceived',
+        payload: CHALLENGE_DATA,
+      });
+      expect(state.context.challenge.challengeData).toEqual(CHALLENGE_DATA);
+      expect(state.value).toEqual('smsChallenge');
+
+      // Complete the challenge
+      state = machine.send({
+        type: 'challengeSucceeded',
+        payload: {
+          authToken: 'authToken',
+        },
+      });
+      expect(state.context.challenge).toEqual({
+        challengeData: CHALLENGE_DATA,
+        authToken: 'authToken',
+      });
+      expect(state.value).toEqual('success');
+    });
+
     it('properly goes to SMS when only SMS challenge available', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
       let state = machine.send({
         type: 'identified',
         payload: {
@@ -392,7 +652,9 @@ describe('Identify Machine Tests', () => {
     });
 
     it('properly goes to email when only email challenge available', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
       let state = machine.send({
         type: 'identified',
         payload: {
@@ -452,7 +714,9 @@ describe('Identify Machine Tests', () => {
     });
 
     it('goes to challenge selector when there are multiple challenge options', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
       const identifiedPayload = {
         email: 'belce@onefootprint.com',
         successfulIdentifier: { email: 'belce@onefootprint.com' },
@@ -521,7 +785,9 @@ describe('Identify Machine Tests', () => {
     });
 
     it('clears challenge data when phone/email change', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
       let state = machine.send({
         type: 'identified',
         payload: {
@@ -620,7 +886,9 @@ describe('Identify Machine Tests', () => {
     });
 
     it('complex navigation back and forth', () => {
-      const machine = createMachine();
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
       const user = getFixtureUser([
         ChallengeKind.biometric,
         ChallengeKind.sms,
@@ -753,6 +1021,76 @@ describe('Identify Machine Tests', () => {
         payload: ChallengeKind.email,
       });
       expect(state.value).toEqual('emailChallenge');
+
+      state = machine.send({
+        type: 'challengeSucceeded',
+        payload: {
+          authToken: 'authToken',
+        },
+      });
+      expect(state.context.challenge).toEqual({
+        authToken: 'authToken',
+      });
+      expect(state.value).toEqual('success');
+    });
+  });
+
+  describe('IdentifyVariant.updateLoginMethods', () => {
+    it('invalid auth token', () => {
+      const machine = createMachine({
+        initialAuthToken: 'utok_',
+        variant: IdentifyVariant.updateLoginMethods,
+      });
+
+      expect(machine.state.value).toEqual('initAuthToken');
+      expect(machine.state.context.initialAuthToken).toBeTruthy();
+
+      const state = machine.send({
+        type: 'authTokenInvalid',
+      });
+      expect(state.value).toEqual('authTokenInvalid');
+    });
+
+    it('valid auth token', () => {
+      const machine = createMachine({
+        initialAuthToken: 'utok_',
+        variant: IdentifyVariant.updateLoginMethods,
+      });
+
+      expect(machine.state.value).toEqual('initAuthToken');
+
+      // When the user is identified, we should always go to the challenge select screen, even if
+      // there's only one available challenge
+      let state = machine.send({
+        type: 'identified',
+        payload: {
+          successfulIdentifier: { authToken: 'utok_xxx' },
+          user: getFixtureUser([ChallengeKind.sms]),
+        },
+      });
+      expect(state.context.identify).toEqual({
+        email: undefined,
+        phoneNumber: undefined,
+        successfulIdentifier: { authToken: 'utok_xxx' },
+        user: getFixtureUser([ChallengeKind.sms]),
+      });
+      expect(state.value).toEqual('challengeSelectOrPasskey');
+
+      // Choose SMS challenge and then go back
+      state = machine.send({
+        type: 'goToChallenge',
+        payload: ChallengeKind.sms,
+      });
+      expect(state.value).toEqual('smsChallenge');
+      state = machine.send({ type: 'navigatedToPrevPage' });
+      expect(state.value).toEqual('challengeSelectOrPasskey');
+
+      // Then finally finish SMS challenge
+      state = machine.send({
+        type: 'goToChallenge',
+        payload: ChallengeKind.sms,
+      });
+      expect(state.value).toEqual('smsChallenge');
 
       state = machine.send({
         type: 'challengeSucceeded',

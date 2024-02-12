@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { getBiometricChallengeResponse } from '@onefootprint/idv';
-import { getErrorMessage } from '@onefootprint/request';
+import { getBiometricChallengeResponse, getLogger } from '@onefootprint/idv';
 import type { LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
@@ -15,25 +14,33 @@ type UseRunPasskeyArgs = {
   onSuccess: (_: { authToken: string }) => void;
 };
 
+const { logError } = getLogger('run-passkey');
+
 const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
   const [state] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier, sandboxId },
     obConfigAuth,
+    initialAuthToken,
   } = state.context;
   const { t } = useTranslation('common', {
     keyPrefix: 'passkey-challenge',
   });
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();
-  const mutLoginChallenge = useLoginChallenge({ obConfigAuth, sandboxId });
-  const mutIdentifyVerify = useIdentifyVerify({ obConfigAuth, sandboxId });
+  const commonMutationProps = {
+    authToken: initialAuthToken,
+    obConfigAuth,
+    sandboxId,
+  };
+  const mutLoginChallenge = useLoginChallenge(commonMutationProps);
+  const mutIdentifyVerify = useIdentifyVerify(commonMutationProps);
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
   const isWaiting = isRunningWebauthn || mutIdentifyVerify.isLoading;
 
   const initiatePasskeyChallenge = () => {
     if (!successfulIdentifier) {
-      console.error(
+      logError(
         'No successful identifier found while initiating login biometric challenge',
       );
       return;
@@ -43,18 +50,19 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       return;
     }
 
+    // We'll be able to simplify this soon with the token-based login challenges
+    const loginIdentifier =
+      'email' in successfulIdentifier || 'phoneNumber' in successfulIdentifier
+        ? successfulIdentifier
+        : undefined;
     mutLoginChallenge.mutate(
       {
-        identifier: successfulIdentifier,
+        identifier: loginIdentifier,
         preferredChallengeKind: ChallengeKind.biometric,
       },
       {
         onError: error => {
-          console.error(
-            `Error while requesting login biometric challenge: ${getErrorMessage(
-              error,
-            )}`,
-          );
+          logError('Error while requesting login biometric challenge:', error);
           showRequestErrorToast(error);
         },
         onSuccess: handleRequestChallengeSuccess,
@@ -69,7 +77,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       payload.challengeData || {};
 
     if (challengeKind !== ChallengeKind.biometric) {
-      console.error(
+      logError(
         'Received sms challenge after requesting login biometric challenge',
       );
       return;
@@ -85,7 +93,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
         biometricChallengeJson,
       );
     } catch (e) {
-      console.error(
+      logError(
         `Unable to generate biometric challenge response ${
           typeof e === 'string' ? e : JSON.stringify(e)
         }`,
@@ -114,11 +122,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       {
         onSuccess,
         onError: (error: unknown) => {
-          console.error(
-            `Error while verifying biometric challenge: ${getErrorMessage(
-              error,
-            )}`,
-          );
+          logError('Error while verifying biometric challenge:', error);
         },
         onSettled: () => {
           setIsRunningWebauthn(false);

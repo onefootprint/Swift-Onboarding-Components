@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { EmailForm, LegalFooter } from '@onefootprint/idv';
-import { getErrorMessage } from '@onefootprint/request';
+import { EmailForm, getLogger, LegalFooter } from '@onefootprint/idv';
 import noop from 'lodash/fp/noop';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +13,8 @@ type StepEmailProps = {
   children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
 };
+
+const { logError } = getLogger('step-email');
 
 const StepEmail = ({ children, Header }: StepEmailProps) => {
   const [state, send] = useIdentifyMachine();
@@ -31,10 +32,9 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
       { identifier: { email: emailFromForm } },
       {
         onError: error => {
-          console.error(
-            `Error while identifying user on email-identification page: ${getErrorMessage(
-              error,
-            )}`,
+          logError(
+            'Error while identifying user on email-identification page:',
+            error,
           );
           showRequestErrorToast(error);
         },

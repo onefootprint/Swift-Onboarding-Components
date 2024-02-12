@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
+import useGetHeaderText from '../../hooks/use-get-header-text';
 import { useIdentifyMachine } from '../../state';
 import PinVerification from '../pin-verification';
 
@@ -22,12 +23,9 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
   const [state, send] = useIdentifyMachine();
   const toast = useToast();
   const {
-    identify: { email = '', successfulIdentifier, user },
+    identify: { email = '', successfulIdentifier },
   } = state.context;
-  const shouldShowWelcomeBack = !!user && !user?.isUnverified;
-  const title = shouldShowWelcomeBack
-    ? t('email-challenge.welcome-back-title')
-    : t('email-challenge.title');
+  const headerTitle = useGetHeaderText();
 
   // If we enter the email challenge via an auth token identifier, we won't have an email to display
   const formTitle = email
@@ -49,7 +47,7 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
 
   return (
     <Container>
-      <Header title={title} />
+      <Header title={headerTitle} />
       <PinVerification
         identifier={successfulIdentifier ?? { email }}
         onChallengeSucceed={handleChallengeSucceed}

@@ -4,6 +4,7 @@
   "additional-verifications": "Additional verifications",
   "change": "Change",
   "close": "Close",
+  "finish": "Finish",
   "confirm-close-description": "Your changes may not be saved.",
   "confirm-close-title": "Are you sure?",
   "continue": "Continue",
@@ -20,7 +21,6 @@
   "fail-to-decrypt": "Failed to decrypt",
   "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings.",
   "invalid-kind-title": "Invalid configuration",
-  "log-in-to-modify-details": "Log in to modify your account details",
   "no": "No",
   "passkey-update-success": "passkey update success",
   "passkey": "Passkey",
@@ -42,8 +42,8 @@
     "404-challenge-title": "Challenges not found",
     "404-token-description": "Please verify the provided token and try again.",
     "404-token-title": "Token not found",
-    "404-user-description": "The user was not found or the provided token has expired. Please check your credentials and try again.",
-    "404-user-title": "User not found / URL expired",
+    "404-user-description": "The user was not found or the provided token has expired. Please contact the business that sent you this link.",
+    "404-user-title": "The link you opened is invalid",
     "invalid-config-subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this product.",
     "invalid-config-title": "Integration incorrectly configured",
     "invalid-domain-description": "Sorry, you don't have permission to access this application. It seems that the domain associated with your account is not authorized. If you need assistance, feel free to contact technical support.",
@@ -90,6 +90,7 @@
   },
   "challenge-select-or-biometric": {
     "welcome-back-title": "Welcome back! 🎉",
+    "log-in-to-modify-details": "Log in to modify your account details",
     "log-in-options": "Log in using one of the options below",
     "continue": "Continue",
     "send-code-to": "Send code to",
@@ -101,7 +102,7 @@
     "label": "SMS",
     "prompt-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
     "prompt-without-phone": "Enter the 6-digit code sent to your phone.",
-    "title": "Verify your phone number",
+    "verify-title": "Verify your phone number",
     "welcome-back-title": "Welcome back! 🎉"
   },
   "pin-verification": {
@@ -113,12 +114,6 @@
     "verifying": "Verifying..."
   },
   "passkey-challenge": {
-    "cta": "Login with passkey",
-    "label": "Passkey",
-    "loading": "Waiting...",
-    "login-with-sms": "Login with SMS",
-    "success": "Success!",
-    "title": "Welcome back! 🎉",
     "error": {
       "title": "Something went wrong",
       "description": "This might be because of your device permissions. Please try logging in with SMS instead."
@@ -127,7 +122,7 @@
   "email-challenge": {
     "prompt-with-email": "Enter the 6-digit code sent to {{email}}.",
     "prompt-without-email": "Enter the 6-digit code sent to your email.",
-    "title": "Verify your email address",
+    "verify-title": "Verify your email address",
     "welcome-back-title": "Welcome back! 🎉"
   }
 }

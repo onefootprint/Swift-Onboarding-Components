@@ -18,6 +18,7 @@ import { useFootprintProvider } from '../../provider-footprint';
 import useProps from '../../provider-footprint/hooks/use-props';
 import type { DoneArgs, Variant } from '../../types';
 import Identify from '../identify';
+import { IdentifyVariant } from '../identify/state/types';
 import Layout from '../layout';
 import type { NotificationProps } from '../notification';
 import Notification from '../notification';
@@ -156,11 +157,20 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
       variant={paramVariant}
     >
       <Identify
+        variant={IdentifyVariant.auth}
         publicKey={publicKey}
-        authToken={authToken}
+        initialAuthToken={authToken}
         config={config}
+        isLive={config.isLive}
         userData={userData}
-        showLogo={options.showLogo}
+        logoConfig={
+          options.showLogo
+            ? {
+                logoUrl: config.logoUrl ?? undefined,
+                orgName: config.orgName,
+              }
+            : undefined
+        }
         onDone={handlers.complete}
       />
     </Layout>

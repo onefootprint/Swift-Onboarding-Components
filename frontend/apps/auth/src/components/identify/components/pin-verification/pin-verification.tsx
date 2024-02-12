@@ -1,8 +1,10 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { getErrorMessage, useRequestError } from '@onefootprint/request';
+import { getLogger } from '@onefootprint/idv';
+import { useRequestError } from '@onefootprint/request';
 import type {
   ChallengeData,
   ChallengeKind,
+  Identifier,
   IdentifyVerifyResponse,
   LoginChallengeResponse,
   SignupChallengeResponse,
@@ -16,19 +18,20 @@ import {
   useLoginChallenge,
   useSignupChallenge,
 } from '@/src/queries';
-import type { EmailAndOrPhone } from '@/src/types';
 import { shouldRequestNewChallenge } from '@/src/utils';
 
 import { useIdentifyMachine } from '../../state';
 import PinForm from '../pin-form';
 
 type PinVerificationProps = {
-  identifier: EmailAndOrPhone;
+  identifier: Identifier;
   onChallengeSucceed: (authToken: string) => void;
   onNewChallengeRequested: () => void;
   preferredChallengeKind: ChallengeKind;
   title?: string;
 };
+
+const { logError } = getLogger('pin-verification');
 
 const PinVerification = ({
   identifier,
@@ -44,7 +47,7 @@ const PinVerification = ({
     obConfigAuth,
   } = state.context;
   const commonMutationProps = {
-    authToken: state.context.authToken,
+    authToken: state.context.initialAuthToken,
     obConfigAuth,
     sandboxId,
   };
@@ -69,19 +72,12 @@ const PinVerification = ({
   const handlePinValidationSucceeded = ({
     authToken,
   }: IdentifyVerifyResponse) => {
-    if (!authToken) {
-      console.error(
-        'Received empty auth token from successful challenge pin verification.',
-      );
-      return;
-    }
-
     onChallengeSucceed(authToken);
   };
 
   const verifyPin = (pin: string) => {
     if (!challengeData) {
-      console.error('No challenge data found after completing pin');
+      logError('No challenge data found after completing pin');
       return;
     }
 
@@ -94,7 +90,7 @@ const PinVerification = ({
       { challengeResponse: pin, challengeToken },
       {
         onError: error => {
-          console.warn(`Failed to verify pin: ${getErrorMessage(error)}`);
+          logError('Failed to verify pin: ', error);
           showRequestErrorToast(error);
         },
         onSuccess: handlePinValidationSucceeded,
@@ -113,7 +109,7 @@ const PinVerification = ({
     }
 
     if (payload.challengeData.challengeKind !== preferredChallengeKind) {
-      console.error('Received incorrect login challenge kind');
+      logError('Received incorrect login challenge kind');
       return;
     }
 
@@ -122,7 +118,7 @@ const PinVerification = ({
 
   const initiateSignupChallenge = () => {
     if (!obConfigAuth) {
-      console.error(
+      logError(
         'Cannot initiate signup challenge challenge without obConfigAuth',
       );
       return;
@@ -134,20 +130,20 @@ const PinVerification = ({
     mutSignupChallenge.mutate(
       {
         email,
-        phoneNumber: identifier?.phoneNumber || phoneNumber,
+        phoneNumber:
+          ('phoneNumber' in identifier ? identifier.phoneNumber : undefined) ||
+          phoneNumber,
       },
       {
         onError: (error: unknown) => {
           if (requestError.getErrorCode(error) === 'E120') {
-            console.error(
+            logError(
               'Entered signup challenge when the user already has a vault. Initiating login challenge',
             );
             initiateLoginChallenge();
             return;
           }
-          console.error(
-            `Failed to initiate signup challenge: ${getErrorMessage(error)}`,
-          );
+          logError('Failed to initiate signup challenge: ', error);
           showRequestErrorToast(error);
         },
         onSuccess: handleRequestChallengeSuccess,
@@ -160,17 +156,20 @@ const PinVerification = ({
       return;
     }
 
+    // We'll be able to simplify this soon with the token-based login challenges
+    const loginIdentifier =
+      'email' in identifier || 'phoneNumber' in identifier
+        ? identifier
+        : undefined;
     mutLoginChallenge.mutate(
       {
-        identifier,
+        identifier: loginIdentifier,
         isResend: !!challengeData, // Check whether is resend, but isResend state might not have updated yet
         preferredChallengeKind,
       },
       {
         onError: error => {
-          console.error(
-            `Failed to initiate login challenge: ${getErrorMessage(error)}`,
-          );
+          logError('Failed to initiate login challenge:', error);
           showRequestErrorToast(error);
         },
         onSuccess: handleRequestChallengeSuccess,
@@ -180,7 +179,7 @@ const PinVerification = ({
 
   const initiateChallenge = () => {
     if (!identifier) {
-      console.error('No identifier found while initiating challenge');
+      logError('No identifier found while initiating challenge');
       return;
     }
 

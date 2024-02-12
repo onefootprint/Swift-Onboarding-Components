@@ -4,6 +4,7 @@
   "additional-verifications": "Additional verifications",
   "change": "Change",
   "close": "Close",
+  "finish": "Finish",
   "confirm-close-description": "Your changes may not be saved.",
   "confirm-close-title": "Are you sure?",
   "continue": "Continue",
@@ -20,7 +21,6 @@
   "fail-to-decrypt": "Failed to decrypt",
   "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings.",
   "invalid-kind-title": "Invalid configuration",
-  "log-in-to-modify-details": "Log in to modify your account details",
   "no": "No",
   "passkey-update-success": "passkey update success",
   "passkey": "Passkey",
@@ -90,6 +90,7 @@
   },
   "challenge-select-or-biometric": {
     "welcome-back-title": "Welcome back! 🎉",
+    "log-in-to-modify-details": "Log in to modify your account details",
     "log-in-options": "Log in using one of the options below",
     "continue": "Continue",
     "send-code-to": "Send code to",
@@ -113,12 +114,6 @@
     "verifying": "Verifying..."
   },
   "passkey-challenge": {
-    "cta": "Login with passkey",
-    "label": "Passkey",
-    "loading": "Waiting...",
-    "login-with-sms": "Login with SMS",
-    "success": "Success!",
-    "title": "Welcome back! 🎉",
     "error": {
       "title": "Something went wrong",
       "description": "This might be because of your device permissions. Please try logging in with SMS instead."

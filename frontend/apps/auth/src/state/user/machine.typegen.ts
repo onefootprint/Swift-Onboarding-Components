@@ -15,15 +15,10 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignDecryptedData: 'decryptUserDone';
     assignEmail: 'setEmail';
-    assignEmailChallenge: 'setEmailChallenge';
     assignEmailReplaceChallenge: 'setEmailReplaceChallenge';
-    assignKindToChallenge: 'goToChallenge' | 'setChallengeKind';
-    assignPasskeyChallenge: 'setPasskeyChallenge';
-    assignPhoneChallenge: 'setPhoneChallenge';
     assignPhoneNumber: 'setPhoneNumber';
     assignPhoneReplaceChallenge: 'setSmsReplaceChallenge';
     assignUserDashboard: 'updateUserDashboard';
-    assignUserFound: 'identifyUserDone';
     assignVerifyToken: 'setVerifyToken';
   };
   eventsCausingDelays: {};
@@ -31,19 +26,14 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'dashboard'
-    | 'emailChallenge'
-    | 'identifyUser'
+    | 'identify'
     | 'init'
     | 'notFoundChallenge'
-    | 'notFoundUser'
-    | 'passkeyChallenge'
-    | 'phoneChallenge'
     | 'success'
     | 'updateEmail'
     | 'updateEmailVerify'
     | 'updatePasskey'
     | 'updatePhone'
-    | 'updatePhoneVerify'
-    | 'userFound';
+    | 'updatePhoneVerify';
   tags: never;
 }

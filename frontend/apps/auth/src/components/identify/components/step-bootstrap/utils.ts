@@ -1,4 +1,4 @@
-import { getErrorMessage } from '@onefootprint/request';
+import { getLogger } from '@onefootprint/idv';
 import type {
   EmailOrPhoneIdentifier,
   IdentifyRequest,
@@ -9,6 +9,8 @@ import type { UseMutationResult } from '@tanstack/react-query';
 export type IdentifyResult = IdentifyResponse & {
   successfulIdentifier: EmailOrPhoneIdentifier;
 };
+
+const { logError } = getLogger('auth-init-bootstrap');
 
 export const identifyMutationCaller = async (
   mutation: UseMutationResult<
@@ -23,12 +25,7 @@ export const identifyMutationCaller = async (
     .mutateAsync({ identifier })
     .then(res => ({ ...res, successfulIdentifier: identifier }))
     .catch((error: unknown): undefined => {
-      console.error(
-        `Identifying user by auth token failed in in identify ${getErrorMessage(
-          error,
-        )}`,
-        'auth-init-bootstrap',
-      );
+      logError('Identifying user by auth token failed in in identify', error);
       return undefined;
     });
 

@@ -10,23 +10,28 @@ import {
   hasBootstrapTruthyValue,
   hasEmailAndPhoneNumber,
   isNoPhoneFlow,
-  isUserFoundWithMultipleChallenges,
   isUserFoundWithSingleChallenge,
+  shouldShowChallengeSelector,
 } from './predicates';
 import type {
   IdentifiedEvent,
   IdentifyMachineContext,
   IdentifyMachineEvents,
+  IdentifyVariant,
+  LogoConfig,
 } from './types';
 
 export type IdentifyMachineArgs = {
-  authToken?: string;
+  initialAuthToken?: string;
   bootstrapData?: { email?: string; phoneNumber?: string };
-  config: PublicOnboardingConfig;
+  config?: PublicOnboardingConfig;
+  isLive: boolean;
   device: DeviceInfo;
   obConfigAuth?: ObConfigAuth;
   sandboxId?: string;
-  showLogo?: boolean;
+  /// When provided, will render the logo
+  logoConfig?: LogoConfig;
+  variant: IdentifyVariant;
 };
 
 type Ignore = unknown;
@@ -36,6 +41,15 @@ const isPayloadEmail = compose(isEmail, getKindPayload);
 const isPayloadSms = compose(isSms, getKindPayload);
 
 const CHALLENGE_SELECTION_TRANSITIONS = [
+  // If there are multiple available challenge kinds OR there's only biometric OR the IdentifyVariant
+  // always requires the challenge selector screen
+  {
+    cond: (c: IdentifyMachineContext, event: IdentifiedEvent) =>
+      shouldShowChallengeSelector(c, event.payload.user),
+    target: 'challengeSelectOrPasskey',
+    actions: ['assignIdentifySuccessResult'],
+  },
+  // Otherwise, go directly to the SMS or phone screen
   {
     cond: (_: IdentifyMachineContext, event: IdentifiedEvent) =>
       isUserFoundWithSingleChallenge(event.payload.user, ChallengeKind.email),
@@ -48,36 +62,57 @@ const CHALLENGE_SELECTION_TRANSITIONS = [
     target: 'smsChallenge',
     actions: ['assignIdentifySuccessResult'],
   },
-  // If there are multiple available challenge kinds or there's only biometric, go to the selector screen
+];
+
+/// The set of transitions used to return from the SMS or Email challenge screens
+const BACK_FROM_CHALLENGE_TRANSITIONS = [
+  // If we showed the challenge selector, return to it
   {
-    cond: (_: IdentifyMachineContext, event: IdentifiedEvent) =>
-      isUserFoundWithMultipleChallenges(event.payload.user),
+    cond: (c: IdentifyMachineContext) =>
+      shouldShowChallengeSelector(c, c.identify.user),
     target: 'challengeSelectOrPasskey',
-    actions: ['assignIdentifySuccessResult'],
+  },
+  // If we didn't show the challenge selector screen, go back to the respective identification screen
+  // If they were identified by email, go back to the email screen
+  {
+    cond: (c: IdentifyMachineContext) =>
+      'email' in (c.identify.successfulIdentifier || {}),
+    target: 'emailIdentification',
+    actions: ['resetIdentifyState'],
+  },
+  // If the user had only one available challenge kind, go back to the phone input screen
+  {
+    cond: (c: IdentifyMachineContext) =>
+      'phoneNumber' in (c.identify.successfulIdentifier || {}),
+    target: 'phoneIdentification',
+    actions: ['resetIdentifyState'],
   },
 ];
 
 export const getMachineArgs = ({
-  authToken,
+  initialAuthToken,
   bootstrapData,
   config,
+  isLive,
   device,
   obConfigAuth,
   sandboxId,
-  showLogo,
-}: IdentifyMachineArgs): IdentifyMachineContext =>
-  obConfigAuth
-    ? {
-        authToken,
-        bootstrapData: bootstrapData ?? {},
-        challenge: {},
-        config,
-        device,
-        identify: { sandboxId: !config.isLive ? sandboxId : undefined },
-        obConfigAuth,
-        showLogo,
-      }
-    : ({} as IdentifyMachineContext);
+  logoConfig,
+  variant,
+}: IdentifyMachineArgs): IdentifyMachineContext => ({
+  initialAuthToken,
+  bootstrapData: bootstrapData ?? {},
+  challenge: {},
+  config,
+  isLive,
+  device,
+  identify: {
+    sandboxId: config?.isLive === false ? sandboxId : undefined,
+  },
+  obConfigAuth,
+  logoConfig,
+  variant,
+});
 
 // TODO these "back" transitions are super error prone. Would be much better to maintain a history
 // of states
@@ -97,6 +132,10 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
       states: {
         init: {
           always: [
+            {
+              target: 'initAuthToken',
+              cond: context => !!context.initialAuthToken,
+            },
             {
               cond: hasBootstrapTruthyValue,
               target: 'initBootstrap',
@@ -132,6 +171,14 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
                 actions: ['assignEmail'],
               },
             ],
+            identified: CHALLENGE_SELECTION_TRANSITIONS,
+          },
+        },
+        initAuthToken: {
+          on: {
+            authTokenInvalid: {
+              target: 'authTokenInvalid',
+            },
             identified: CHALLENGE_SELECTION_TRANSITIONS,
           },
         },
@@ -185,7 +232,8 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             navigatedToPrevPage: [
               // User was identified via email, so go back to the email page
               {
-                cond: ctx => !!ctx.identify.successfulIdentifier?.email,
+                cond: ctx =>
+                  'email' in (ctx.identify.successfulIdentifier || {}),
                 target: 'emailIdentification',
                 actions: ['resetIdentifyState'],
               },
@@ -222,32 +270,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               actions: ['reset'],
             },
             navigatedToPrevPage: [
-              // If the user had only one available challenge kind, we should go back to the identification screen.
-              // If they were identified by email, go back to the email screen
-              {
-                cond: c =>
-                  isUserFoundWithSingleChallenge(
-                    c.identify.user,
-                    ChallengeKind.sms,
-                  ) && 'email' in (c.identify.successfulIdentifier || {}),
-                target: 'emailIdentification',
-                actions: ['resetIdentifyState'],
-              },
-              // If the user had only one available challenge kind, go back to the phone input screen
-              {
-                cond: c =>
-                  isUserFoundWithSingleChallenge(
-                    c.identify.user,
-                    ChallengeKind.sms,
-                  ) && 'phoneNumber' in (c.identify.successfulIdentifier || {}),
-                target: 'phoneIdentification',
-                actions: ['resetIdentifyState'],
-              },
-              // If we were logging into an existing user and had multiple challenge kinds, go to the challenge select screen
-              {
-                cond: c => !!c.identify.user,
-                target: 'challengeSelectOrPasskey',
-              },
+              ...BACK_FROM_CHALLENGE_TRANSITIONS,
               // Otherwise, we were making a new vault. Just go back to the phone input screen
               {
                 target: 'phoneIdentification',
@@ -270,28 +293,17 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               actions: ['reset'],
             },
             navigatedToPrevPage: [
-              // If the user had only email as an available challenge kind, go back to the email input screen
-              {
-                cond: c =>
-                  isUserFoundWithSingleChallenge(
-                    c.identify.user,
-                    ChallengeKind.email,
-                  ),
-                target: 'emailIdentification',
-                actions: ['resetIdentifyState'],
-              },
-              // If we were logging into an existing user and had multiple challenge kinds, go to the challenge select screen
-              {
-                cond: c => !!c.identify.user,
-                target: 'challengeSelectOrPasskey',
-              },
-              // Otherwise, go back to email input
+              ...BACK_FROM_CHALLENGE_TRANSITIONS,
+              // Otherwise, we were making a new vault. Just go back to the phone input screen
               {
                 target: 'emailIdentification',
                 actions: ['resetIdentifyState'],
               },
             ],
           },
+        },
+        authTokenInvalid: {
+          type: 'final',
         },
         success: {
           type: 'final',

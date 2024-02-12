@@ -2,7 +2,7 @@
 
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import type { CustomChildAPI } from '@onefootprint/idv';
-import { getSdkArgsToken } from '@onefootprint/idv';
+import { getLogger, getSdkArgsToken } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -14,7 +14,7 @@ import { useFootprintProvider } from '@/src/provider-footprint';
 import useProps from '@/src/provider-footprint/hooks/use-props';
 import { UserMachineProvider } from '@/src/state';
 import type { Variant } from '@/src/types';
-import { getLogger, getWindowUrl, isEmbeddedInIframe } from '@/src/utils';
+import { getWindowUrl, isEmbeddedInIframe } from '@/src/utils';
 
 import Layout from '../layout';
 import type { NotificationProps } from '../notification';
