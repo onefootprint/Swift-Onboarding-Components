@@ -10,7 +10,8 @@ import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
 type UseEntityRuleSetResultProps = {
-  id: string;
+  entityId: string;
+  ruleSetResultId?: string;
 };
 
 const getRuleSetResult = async (
@@ -20,18 +21,22 @@ const getRuleSetResult = async (
   const { data: response } = await request<GetEntityRuleSetResultResponse>({
     headers: authHeaders,
     method: 'GET',
-    url: `/entities/${payload.id}/rule_set_result`,
+    url: `/entities/${payload.entityId}/rule_set_result/${payload.ruleSetResultId}`,
   });
   return response;
 };
 
-const useEntityRuleSetResult = ({ id }: UseEntityRuleSetResultProps) => {
+const useEntityRuleSetResult = ({
+  entityId,
+  ruleSetResultId,
+}: UseEntityRuleSetResultProps) => {
   const { authHeaders } = useSession();
 
   const ruleSetResultQuery = useQuery(
-    ['entity', id, 'rule_set_result'],
-    () => getRuleSetResult({ id }, authHeaders),
+    ['entity', entityId, 'rule_set_result', ruleSetResultId],
+    () => getRuleSetResult({ entityId, ruleSetResultId }, authHeaders),
     {
+      enabled: !!ruleSetResultId,
       select: response => {
         if (!response) {
           return {

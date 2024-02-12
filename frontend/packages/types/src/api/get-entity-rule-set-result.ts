@@ -1,7 +1,8 @@
 import type { RuleAction, RuleResult } from '../data';
 
 export type GetEntityRuleSetResultRequest = {
-  id: string;
+  entityId: string;
+  ruleSetResultId?: string;
 };
 
 export type GetEntityRuleSetResultResponse = {

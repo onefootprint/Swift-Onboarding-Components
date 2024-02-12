@@ -10,6 +10,7 @@ export type OnboardingDecision = {
   source: Actor;
   obConfiguration: TimelinePlaybook;
   vendors: Vendor[];
+  ruleSetResultId?: string;
 };
 
 export type TimelinePlaybook = {

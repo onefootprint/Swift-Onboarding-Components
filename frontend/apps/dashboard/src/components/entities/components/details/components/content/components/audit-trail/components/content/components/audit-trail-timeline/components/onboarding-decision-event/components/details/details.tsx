@@ -9,13 +9,17 @@ import FieldValidations from './components/field-validations';
 import Rules from './components/rules';
 import useEntityRuleSetResult from './hooks/use-entity-rule-set-result';
 
-const Details = () => {
+type DetailsProps = {
+  ruleSetResultId?: string;
+};
+
+const Details = ({ ruleSetResultId }: DetailsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix:
       'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details',
   });
   const { isLive } = useSession();
-  const id = useEntityId();
+  const entityId = useEntityId();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const options = [
     { value: 'rules', label: t('drawer.tabs.rules') },
@@ -23,7 +27,8 @@ const Details = () => {
   ];
   const [tab, setTab] = useState(options[0].value);
   const { data, errorMessage, isLoading } = useEntityRuleSetResult({
-    id,
+    entityId,
+    ruleSetResultId,
   });
   const showRulesTab = isLive && data && data.hasRuleResults;
 
@@ -73,10 +78,12 @@ const Details = () => {
                 isLoading={isLoading}
               />
             )}
-            {tab === 'field-validations' && <FieldValidations entityId={id} />}
+            {tab === 'field-validations' && (
+              <FieldValidations entityId={entityId} />
+            )}
           </Stack>
         ) : (
-          <FieldValidations entityId={id} />
+          <FieldValidations entityId={entityId} />
         )}
       </Drawer>
     </>

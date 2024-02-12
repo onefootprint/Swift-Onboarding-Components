@@ -20,7 +20,7 @@ const OnboardingDecisionEventHeader = ({
     keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
   });
   const {
-    decision: { source, status, obConfiguration: playbook },
+    decision: { source, status, obConfiguration: playbook, ruleSetResultId },
   } = data;
   const isVerified = status === DecisionStatus.pass;
   const color = isVerified ? 'success' : 'error';
@@ -58,7 +58,7 @@ const OnboardingDecisionEventHeader = ({
       >
         {text}
       </Typography>
-      {isFootprintActor && <Details />}
+      {isFootprintActor && <Details ruleSetResultId={ruleSetResultId} />}
     </Stack>
   );
 };
