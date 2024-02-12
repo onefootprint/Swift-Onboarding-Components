@@ -4,43 +4,49 @@ import { SupportedIdDocTypes } from '@onefootprint/types';
 // Given a primary DI (i.e. document.drivers_license.front.latest_upload)
 // return the DocumentType (i.e. drivers_license)
 const getDocumentType = (di: DocumentDI) => {
-  if (di.includes(SupportedIdDocTypes.driversLicense)) {
+  const diArray = di.split('.');
+  if (diArray.length < 2) {
+    return undefined;
+  }
+  const docTypeString = diArray[1];
+
+  if (docTypeString === SupportedIdDocTypes.driversLicense) {
     return SupportedIdDocTypes.driversLicense;
   }
-  if (di.includes(SupportedIdDocTypes.idCard)) {
+  if (docTypeString === SupportedIdDocTypes.idCard) {
     return SupportedIdDocTypes.idCard;
   }
-  if (di.includes(SupportedIdDocTypes.passport)) {
+  if (docTypeString === SupportedIdDocTypes.passport) {
     return SupportedIdDocTypes.passport;
   }
-  if (di.includes(SupportedIdDocTypes.visa)) {
+  if (docTypeString === SupportedIdDocTypes.visa) {
     return SupportedIdDocTypes.visa;
   }
-  if (di.includes(SupportedIdDocTypes.residenceDocument)) {
+  if (docTypeString === SupportedIdDocTypes.residenceDocument) {
     return SupportedIdDocTypes.residenceDocument;
   }
-  if (di.includes(SupportedIdDocTypes.workPermit)) {
+  if (docTypeString === SupportedIdDocTypes.workPermit) {
     return SupportedIdDocTypes.workPermit;
   }
-  if (di.includes(SupportedIdDocTypes.voterIdentification)) {
+  if (docTypeString === SupportedIdDocTypes.voterIdentification) {
     return SupportedIdDocTypes.voterIdentification;
   }
-  if (di.includes(SupportedIdDocTypes.ssnCard)) {
+  if (docTypeString === SupportedIdDocTypes.ssnCard) {
     return SupportedIdDocTypes.ssnCard;
   }
-  if (di.includes(SupportedIdDocTypes.lease)) {
+  if (docTypeString === SupportedIdDocTypes.lease) {
     return SupportedIdDocTypes.lease;
   }
-  if (di.includes(SupportedIdDocTypes.bankStatement)) {
+  if (docTypeString === SupportedIdDocTypes.bankStatement) {
     return SupportedIdDocTypes.bankStatement;
   }
-  if (di.includes(SupportedIdDocTypes.utilityBill)) {
+  if (docTypeString === SupportedIdDocTypes.utilityBill) {
     return SupportedIdDocTypes.utilityBill;
   }
-  if (di.includes(SupportedIdDocTypes.proofOfAddress)) {
+  if (docTypeString === SupportedIdDocTypes.proofOfAddress) {
     return SupportedIdDocTypes.proofOfAddress;
   }
-  if (di.includes(SupportedIdDocTypes.passportCard)) {
+  if (docTypeString === SupportedIdDocTypes.passportCard) {
     return SupportedIdDocTypes.passportCard;
   }
   return undefined;
