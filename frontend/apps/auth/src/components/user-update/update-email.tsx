@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
-type ManagePhoneProps = {
+type UpdateEmailProps = {
   children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
   onSubmit: (props: string) => void;
 };
 
-const UpdateEmail = ({ children, Header, onSubmit }: ManagePhoneProps) => {
+const UpdateEmail = ({ children, Header, onSubmit }: UpdateEmailProps) => {
   const { t } = useTranslation('common');
 
   const handleFormSubmit = (formData: { email: string }) => {

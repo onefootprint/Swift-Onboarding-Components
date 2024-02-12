@@ -3,15 +3,11 @@ import { describe, expect, it } from 'bun:test';
 import {
   assignDecryptedData,
   assignEmail,
-  assignEmailReplaceChallenge,
   assignPhoneNumber,
-  assignPhoneReplaceChallenge,
   assignUserDashboard,
   assignVerifyToken,
 } from './assigners';
 import type { UserMachineContext } from './types';
-
-const anyDate = new Date();
 
 describe('should pass the entire payload', () => {
   it('assignEmail', () => {
@@ -42,64 +38,6 @@ describe('should pass the entire payload', () => {
 
     expect(result.phoneNumber).toEqual('phone');
     expect(result.phoneNumber).toEqual(ctx.phoneNumber!);
-  });
-
-  it('assignPhoneReplaceChallenge', () => {
-    type Meta = Parameters<typeof assignPhoneReplaceChallenge>['2'];
-    const ctx = {} as UserMachineContext;
-    const data = {
-      biometricChallengeJson: '',
-      challengeToken: 'token',
-      timeBeforeRetryS: 1,
-    };
-    const meta = {} as Meta;
-
-    const { phoneReplaceChallenge } = assignPhoneReplaceChallenge(
-      ctx,
-      {
-        type: 'setSmsReplaceChallenge',
-        payload: { ...data, retryDisabledUntil: anyDate },
-      },
-      meta,
-    );
-
-    expect(phoneReplaceChallenge?.biometricChallengeJson).toEqual(
-      data.biometricChallengeJson,
-    );
-    expect(phoneReplaceChallenge?.challengeToken).toEqual(data.challengeToken);
-    expect(phoneReplaceChallenge?.timeBeforeRetryS).toEqual(
-      data.timeBeforeRetryS,
-    );
-    expect(phoneReplaceChallenge).toEqual(ctx.phoneReplaceChallenge!);
-  });
-
-  it('assignEmailReplaceChallenge', () => {
-    type Meta = Parameters<typeof assignEmailReplaceChallenge>['2'];
-    const ctx = {} as UserMachineContext;
-    const data = {
-      biometricChallengeJson: '',
-      challengeToken: 'token',
-      timeBeforeRetryS: 1,
-    };
-    const meta = {} as Meta;
-
-    const { emailReplaceChallenge } = assignEmailReplaceChallenge(
-      ctx,
-      {
-        type: 'setEmailReplaceChallenge',
-        payload: { ...data, retryDisabledUntil: anyDate },
-      },
-      meta,
-    );
-
-    expect(emailReplaceChallenge?.biometricChallengeJson).toEqual(
-      data.biometricChallengeJson,
-    );
-    expect(emailReplaceChallenge?.challengeToken).toEqual(data.challengeToken);
-    expect(emailReplaceChallenge?.timeBeforeRetryS).toEqual(
-      data.timeBeforeRetryS,
-    );
-    expect(emailReplaceChallenge).toEqual(ctx.emailReplaceChallenge!);
   });
 
   it('assignVerifyToken', () => {

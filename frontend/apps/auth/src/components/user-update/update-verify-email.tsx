@@ -19,7 +19,7 @@ const { logWarn, logError } = getLogger('update-verify-email');
 const UpdateVerifyEmail = ({ children, Header }: UpdateVerifyEmailProps) => {
   const { t } = useTranslation('common');
   const [state, send] = useUserMachine();
-  const { email, emailReplaceChallenge, verifyToken } = state.context;
+  const { email, verifyToken } = state.context;
   const headerTitle = email
     ? t('email-challenge.prompt-with-email', { email })
     : t('email-challenge.prompt-without-email');
@@ -34,7 +34,6 @@ const UpdateVerifyEmail = ({ children, Header }: UpdateVerifyEmailProps) => {
 
   return (
     <UpdateVerify
-      challenge={emailReplaceChallenge}
       challengePayload={{
         authToken: verifyToken,
         kind: 'email',
@@ -44,9 +43,6 @@ const UpdateVerifyEmail = ({ children, Header }: UpdateVerifyEmailProps) => {
       headerTitle={headerTitle}
       logError={logError}
       logWarn={logWarn}
-      onChallengeSuccess={payload =>
-        send({ type: 'setEmailReplaceChallenge', payload })
-      }
       onChallengeVerificationSuccess={() =>
         send({
           type: 'updateUserDashboard',

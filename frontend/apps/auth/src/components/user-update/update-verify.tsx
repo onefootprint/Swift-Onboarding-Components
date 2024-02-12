@@ -1,7 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
 import noop from 'lodash/fp/noop';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useEffectOnceStrict } from '@/src/hooks';
@@ -14,14 +14,12 @@ import PinForm from '../identify/components/pin-form';
 
 type PartialPayload = 'kind' | 'email' | 'phoneNumber' | 'authToken';
 type UpdateVerifyProps = {
-  challenge: UserChallengeResponse | undefined;
   challengePayload: Pick<UserChallengeBody, PartialPayload>;
   children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
   headerTitle: string;
   logError: (str: string, err?: unknown) => void;
   logWarn: (str: string, err?: unknown) => void;
-  onChallengeSuccess: (data: UserChallengeResponse) => void;
   onChallengeVerificationSuccess: () => void;
 };
 
@@ -29,14 +27,12 @@ const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
 const UpdateVerify = ({
-  challenge,
   challengePayload,
   children,
   Header,
   headerTitle,
   logError,
   logWarn,
-  onChallengeSuccess,
   onChallengeVerificationSuccess,
 }: UpdateVerifyProps) => {
   const { authToken } = challengePayload;
@@ -44,7 +40,10 @@ const UpdateVerify = ({
   const toast = useToast();
   const mutUserChallenge = useUserChallenge({});
   const mutUserChallengeVerify = useUserChallengeVerify({});
-  const isChallengePending = mutUserChallenge.isLoading || !challenge;
+  const [challengeData, setChallengeData] = useState<
+    UserChallengeResponse | undefined
+  >(undefined);
+  const isChallengePending = mutUserChallenge.isLoading || !challengeData;
 
   const handleRequestReplace = (payload: UserChallengeBody) => {
     if (!payload.kind) {
@@ -61,7 +60,7 @@ const UpdateVerify = ({
         logError(`Failed to initiate sms login challenge`, err);
         toast.show(getErrorToastVariant(err));
       },
-      onSuccess: onChallengeSuccess,
+      onSuccess: setChallengeData,
     });
   };
 
@@ -70,7 +69,7 @@ const UpdateVerify = ({
       logWarn('The PIN field cannot be left blank.');
       return;
     }
-    if (!challenge) {
+    if (!challengeData) {
       logWarn('No challenge data found after completing pin');
       return;
     }
@@ -82,7 +81,7 @@ const UpdateVerify = ({
     mutUserChallengeVerify.mutate(
       {
         authToken,
-        challengeToken: challenge.challengeToken,
+        challengeToken: challengeData.challengeToken,
         challengeResponse: formPin,
       },
       {
@@ -103,7 +102,7 @@ const UpdateVerify = ({
 
   const handleOnResendClick = () => {
     const shouldResend = shouldRequestNewChallenge(
-      challenge,
+      challengeData,
       challengePayload.kind,
     );
     if (shouldResend) {
@@ -128,7 +127,7 @@ const UpdateVerify = ({
           mutUserChallengeVerify.isLoading ? noop : handleOnPinInputCompletion
         }
         onResend={handleOnResendClick}
-        resendDisabledUntil={challenge?.retryDisabledUntil}
+        resendDisabledUntil={challengeData?.retryDisabledUntil}
         texts={{
           codeError: t('pin-verification.incorrect-code'),
           resendCountDown: t('pin-verification.resend-countdown'),

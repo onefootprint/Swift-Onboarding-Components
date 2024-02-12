@@ -12,9 +12,7 @@ type MEvent<T, U> = T extends { type: U; payload: infer P }
 
 type DecryptUserDone = MCtx<MEvent<Events, 'decryptUserDone'>>;
 type SetEmail = MCtx<MEvent<Events, 'setEmail'>>;
-type SetEmailRepChallenge = MCtx<MEvent<Events, 'setEmailReplaceChallenge'>>;
 type SetPhoneNumber = MCtx<MEvent<Events, 'setPhoneNumber'>>;
-type SetSmsReplaceChallenge = MCtx<MEvent<Events, 'setSmsReplaceChallenge'>>;
 type SetVerifyToken = MCtx<MEvent<Events, 'setVerifyToken'>>;
 type UpdateUserDashboard = MCtx<MEvent<Events, 'updateUserDashboard'>>;
 
@@ -30,23 +28,8 @@ const assignEmail: SetEmail = (ctx, { payload }) => {
   return ctx;
 };
 
-const assignEmailReplaceChallenge: SetEmailRepChallenge = (
-  ctx,
-  { payload },
-) => {
-  ctx.emailReplaceChallenge = payload;
-  return ctx;
-};
 const assignPhoneNumber: SetPhoneNumber = (ctx, { payload }) => {
   ctx.phoneNumber = payload;
-  return ctx;
-};
-
-const assignPhoneReplaceChallenge: SetSmsReplaceChallenge = (
-  ctx,
-  { payload },
-) => {
-  ctx.phoneReplaceChallenge = payload;
   return ctx;
 };
 
@@ -88,9 +71,7 @@ const assignDecryptedData: DecryptUserDone = (ctx, { payload }) => {
 export {
   assignDecryptedData,
   assignEmail,
-  assignEmailReplaceChallenge,
   assignPhoneNumber,
-  assignPhoneReplaceChallenge,
   assignUserDashboard,
   assignVerifyToken,
 };

@@ -3,9 +3,7 @@ import { assign, createMachine } from 'xstate';
 import {
   assignDecryptedData,
   assignEmail,
-  assignEmailReplaceChallenge,
   assignPhoneNumber,
-  assignPhoneReplaceChallenge,
   assignUserDashboard,
   assignVerifyToken,
 } from './assigners';
@@ -28,20 +26,12 @@ const createUserMachine = (args: UserMachineArgs) =>
       context: {
         authToken: args.authToken,
         email: undefined,
-        emailChallenge: undefined,
-        emailReplaceChallenge: undefined,
-        kindToChallenge: undefined,
-        passkeyChallenge: undefined,
-        passkeyReplaceChallenge: undefined, // Feature in Progress
-        phoneChallenge: undefined,
         phoneNumber: undefined,
-        phoneReplaceChallenge: undefined,
         userDashboard: {
           email: { status: 'empty' },
           phone: { status: 'empty' },
           passkey: { status: 'empty' },
         },
-        userFound: undefined,
         verifyToken: undefined,
       },
       on: {
@@ -84,9 +74,6 @@ const createUserMachine = (args: UserMachineArgs) =>
         updateEmailVerify: {
           on: {
             goToBack: { target: 'dashboard' },
-            setEmailReplaceChallenge: {
-              actions: ['assignEmailReplaceChallenge'],
-            },
           },
         },
         updatePhone: {
@@ -101,9 +88,6 @@ const createUserMachine = (args: UserMachineArgs) =>
         updatePhoneVerify: {
           on: {
             goToBack: { target: 'dashboard' },
-            setSmsReplaceChallenge: {
-              actions: ['assignPhoneReplaceChallenge'],
-            },
           },
         },
         updatePasskey: {
@@ -119,9 +103,7 @@ const createUserMachine = (args: UserMachineArgs) =>
       actions: {
         assignDecryptedData: assign(assignDecryptedData),
         assignEmail: assign(assignEmail),
-        assignEmailReplaceChallenge: assign(assignEmailReplaceChallenge),
         assignPhoneNumber: assign(assignPhoneNumber),
-        assignPhoneReplaceChallenge: assign(assignPhoneReplaceChallenge),
         assignUserDashboard: assign(assignUserDashboard),
         assignVerifyToken: assign(assignVerifyToken),
         // assignPasskeyReplaceChallenge: assign((ctx, { payload }) => {

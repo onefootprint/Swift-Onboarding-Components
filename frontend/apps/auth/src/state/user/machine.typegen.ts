@@ -15,9 +15,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignDecryptedData: 'decryptUserDone';
     assignEmail: 'setEmail';
-    assignEmailReplaceChallenge: 'setEmailReplaceChallenge';
     assignPhoneNumber: 'setPhoneNumber';
-    assignPhoneReplaceChallenge: 'setSmsReplaceChallenge';
     assignUserDashboard: 'updateUserDashboard';
     assignVerifyToken: 'setVerifyToken';
   };

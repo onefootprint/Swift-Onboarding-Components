@@ -18,7 +18,7 @@ const { logWarn, logError } = getLogger('update-verify-phone');
 const UpdateVerifyPhone = ({ children, Header }: UpdateVerifyPhoneProps) => {
   const { t } = useTranslation('common');
   const [state, send] = useUserMachine();
-  const { phoneNumber, phoneReplaceChallenge, verifyToken } = state.context;
+  const { phoneNumber, verifyToken } = state.context;
   const headerTitle = phoneNumber
     ? t('sms-step.prompt-with-phone', { scrubbedPhoneNumber: phoneNumber })
     : t('sms-step.prompt-without-phone');
@@ -33,7 +33,6 @@ const UpdateVerifyPhone = ({ children, Header }: UpdateVerifyPhoneProps) => {
 
   return (
     <UpdateVerify
-      challenge={phoneReplaceChallenge}
       challengePayload={{
         authToken: verifyToken,
         kind: 'phone',
@@ -43,9 +42,6 @@ const UpdateVerifyPhone = ({ children, Header }: UpdateVerifyPhoneProps) => {
       headerTitle={headerTitle}
       logError={logError}
       logWarn={logWarn}
-      onChallengeSuccess={payload =>
-        send({ type: 'setSmsReplaceChallenge', payload })
-      }
       onChallengeVerificationSuccess={() =>
         send({
           type: 'updateUserDashboard',
