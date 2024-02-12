@@ -11,8 +11,6 @@ type MEvent<T, U> = T extends { type: U; payload: infer P }
   : never;
 
 type DecryptUserDone = MCtx<MEvent<Events, 'decryptUserDone'>>;
-type SetEmail = MCtx<MEvent<Events, 'setEmail'>>;
-type SetPhoneNumber = MCtx<MEvent<Events, 'setPhoneNumber'>>;
 type SetVerifyToken = MCtx<MEvent<Events, 'setVerifyToken'>>;
 type UpdateUserDashboard = MCtx<MEvent<Events, 'updateUserDashboard'>>;
 
@@ -22,16 +20,6 @@ const getIdValue = (key: string, obj: Obj): string | undefined =>
   isString(obj[key])
     ? (obj[key] as string)
     : undefined;
-
-const assignEmail: SetEmail = (ctx, { payload }) => {
-  ctx.email = payload;
-  return ctx;
-};
-
-const assignPhoneNumber: SetPhoneNumber = (ctx, { payload }) => {
-  ctx.phoneNumber = payload;
-  return ctx;
-};
 
 const assignVerifyToken: SetVerifyToken = (ctx, { payload }) => {
   ctx.verifyToken = payload;
@@ -68,10 +56,4 @@ const assignDecryptedData: DecryptUserDone = (ctx, { payload }) => {
   return ctx;
 };
 
-export {
-  assignDecryptedData,
-  assignEmail,
-  assignPhoneNumber,
-  assignUserDashboard,
-  assignVerifyToken,
-};
+export { assignDecryptedData, assignUserDashboard, assignVerifyToken };

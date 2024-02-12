@@ -213,6 +213,7 @@ export type {
   Annotation,
   AnnotationSource,
   ApiKey,
+  AuthMethodKind,
   AuthTokenIdentifier,
   BasicRoleScope,
   BasicRoleScopeKind,

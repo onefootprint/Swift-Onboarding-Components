@@ -1,59 +1,45 @@
 import { getLogger } from '@onefootprint/idv';
+import { AuthMethodKind } from '@onefootprint/types/src/data';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
-import { isString } from '@/src/utils';
 
 import UpdateVerify from './update-verify';
 
 type UpdateVerifyPhoneProps = {
-  children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
+  authToken: string;
+  phoneNumber: string;
+  onSuccess: (newPhone: string) => void;
 };
 
 const { logWarn, logError } = getLogger('update-verify-phone');
 
-const UpdateVerifyPhone = ({ children, Header }: UpdateVerifyPhoneProps) => {
+const UpdateVerifyPhone = ({
+  Header,
+  authToken,
+  phoneNumber,
+  onSuccess,
+}: UpdateVerifyPhoneProps) => {
   const { t } = useTranslation('common');
-  const [state, send] = useUserMachine();
-  const { phoneNumber, verifyToken } = state.context;
   const headerTitle = phoneNumber
     ? t('sms-step.prompt-with-phone', { scrubbedPhoneNumber: phoneNumber })
     : t('sms-step.prompt-without-phone');
 
-  if (!isString(phoneNumber) || !isString(verifyToken))
-    return (
-      <Header
-        title={t('notification.missing-args-title')}
-        subtitle={t('notification.missing-args-description')}
-      />
-    );
-
   return (
     <UpdateVerify
       challengePayload={{
-        authToken: verifyToken,
-        kind: 'phone',
+        authToken,
+        kind: AuthMethodKind.phone,
         phoneNumber: phoneNumber.replace(/[()\s-]/g, ''),
       }}
       Header={Header}
       headerTitle={headerTitle}
       logError={logError}
       logWarn={logWarn}
-      onChallengeVerificationSuccess={() =>
-        send({
-          type: 'updateUserDashboard',
-          payload: {
-            kind: 'phone',
-            entry: { label: phoneNumber, status: 'set' },
-          },
-        })
-      }
-    >
-      {children}
-    </UpdateVerify>
+      onChallengeVerificationSuccess={() => onSuccess(phoneNumber)}
+    />
   );
 };
 

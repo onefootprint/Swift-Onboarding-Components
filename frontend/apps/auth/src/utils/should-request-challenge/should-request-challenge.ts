@@ -1,12 +1,14 @@
-import type { ChallengeData, ChallengeKind } from '@onefootprint/types';
-
-import type { UserChallengeKind } from '@/src/types';
+import type {
+  AuthMethodKind,
+  ChallengeData,
+  ChallengeKind,
+} from '@onefootprint/types';
 
 type Data = Pick<ChallengeData, 'challengeKind' | 'retryDisabledUntil'>;
 
 const shouldRequestNewChallenge = (
   data: Partial<Data> | undefined,
-  kind: `${ChallengeKind}` | `${UserChallengeKind}`,
+  kind: `${ChallengeKind}` | `${AuthMethodKind}`,
 ) => {
   const hasPreferredChallengeKind = data?.challengeKind === kind;
   if (!hasPreferredChallengeKind) {

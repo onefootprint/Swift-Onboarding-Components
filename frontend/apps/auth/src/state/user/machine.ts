@@ -2,8 +2,6 @@ import { assign, createMachine } from 'xstate';
 
 import {
   assignDecryptedData,
-  assignEmail,
-  assignPhoneNumber,
   assignUserDashboard,
   assignVerifyToken,
 } from './assigners';
@@ -25,8 +23,6 @@ const createUserMachine = (args: UserMachineArgs) =>
       initial: 'init',
       context: {
         authToken: args.authToken,
-        email: undefined,
-        phoneNumber: undefined,
         userDashboard: {
           email: { status: 'empty' },
           phone: { status: 'empty' },
@@ -65,27 +61,9 @@ const createUserMachine = (args: UserMachineArgs) =>
         updateEmail: {
           on: {
             goToBack: { target: 'dashboard' },
-            setEmail: {
-              target: 'updateEmailVerify',
-              actions: ['assignEmail'],
-            },
-          },
-        },
-        updateEmailVerify: {
-          on: {
-            goToBack: { target: 'dashboard' },
           },
         },
         updatePhone: {
-          on: {
-            goToBack: { target: 'dashboard' },
-            setPhoneNumber: {
-              target: 'updatePhoneVerify',
-              actions: ['assignPhoneNumber'],
-            },
-          },
-        },
-        updatePhoneVerify: {
           on: {
             goToBack: { target: 'dashboard' },
           },
@@ -102,8 +80,6 @@ const createUserMachine = (args: UserMachineArgs) =>
     {
       actions: {
         assignDecryptedData: assign(assignDecryptedData),
-        assignEmail: assign(assignEmail),
-        assignPhoneNumber: assign(assignPhoneNumber),
         assignUserDashboard: assign(assignUserDashboard),
         assignVerifyToken: assign(assignVerifyToken),
         // assignPasskeyReplaceChallenge: assign((ctx, { payload }) => {

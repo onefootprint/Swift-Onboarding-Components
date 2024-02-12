@@ -1,5 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import noop from 'lodash/fp/noop';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +16,6 @@ import PinForm from '../identify/components/pin-form';
 type PartialPayload = 'kind' | 'email' | 'phoneNumber' | 'authToken';
 type UpdateVerifyProps = {
   challengePayload: Pick<UserChallengeBody, PartialPayload>;
-  children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
   headerTitle: string;
   logError: (str: string, err?: unknown) => void;
@@ -28,7 +28,6 @@ const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
 const UpdateVerify = ({
   challengePayload,
-  children,
   Header,
   headerTitle,
   logError,
@@ -92,7 +91,9 @@ const UpdateVerify = ({
         onSuccess: () => {
           toast.show({
             title: t('success'),
-            description: t(`${challengePayload.kind}-update-success`),
+            description: t(
+              `${challengePayload.kind}-update-success` as ParseKeys<'common'>,
+            ),
           });
           setTimeout(onChallengeVerificationSuccess, SUCCESS_EVENT_DELAY_MS);
         },
@@ -136,7 +137,6 @@ const UpdateVerify = ({
           verifying: t('pin-verification.verifying'),
         }}
       />
-      {children}
     </Container>
   );
 };

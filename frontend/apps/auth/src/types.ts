@@ -3,7 +3,6 @@ import type {
   FootprintVariant,
 } from '@onefootprint/footprint-js';
 
-export type UserChallengeKind = 'email' | 'phone' | 'passkey';
 export type EmailAndOrPhone = { email?: string; phoneNumber?: string };
 export type DoneArgs = { authToken: string };
 export type Variant = FootprintVariant;

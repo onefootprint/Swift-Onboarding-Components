@@ -1,60 +1,45 @@
 import { getLogger } from '@onefootprint/idv';
-import { ChallengeKind } from '@onefootprint/types';
+import { AuthMethodKind } from '@onefootprint/types/src/data';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
-import { isString } from '@/src/utils';
 
 import UpdateVerify from './update-verify';
 
 type UpdateVerifyEmailProps = {
-  children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
+  authToken: string;
+  email: string;
+  onSuccess: (newEmail: string) => void;
 };
 
 const { logWarn, logError } = getLogger('update-verify-email');
 
-const UpdateVerifyEmail = ({ children, Header }: UpdateVerifyEmailProps) => {
+const UpdateVerifyEmail = ({
+  Header,
+  authToken,
+  email,
+  onSuccess,
+}: UpdateVerifyEmailProps) => {
   const { t } = useTranslation('common');
-  const [state, send] = useUserMachine();
-  const { email, verifyToken } = state.context;
   const headerTitle = email
     ? t('email-challenge.prompt-with-email', { email })
     : t('email-challenge.prompt-without-email');
 
-  if (!isString(email) || !isString(verifyToken))
-    return (
-      <Header
-        title={t('notification.missing-args-title')}
-        subtitle={t('notification.missing-args-description')}
-      />
-    );
-
   return (
     <UpdateVerify
       challengePayload={{
-        authToken: verifyToken,
-        kind: 'email',
+        authToken,
+        kind: AuthMethodKind.email,
         email,
       }}
       Header={Header}
       headerTitle={headerTitle}
       logError={logError}
       logWarn={logWarn}
-      onChallengeVerificationSuccess={() =>
-        send({
-          type: 'updateUserDashboard',
-          payload: {
-            kind: ChallengeKind.email,
-            entry: { label: email, status: 'set' },
-          },
-        })
-      }
-    >
-      {children}
-    </UpdateVerify>
+      onChallengeVerificationSuccess={() => onSuccess(email)}
+    />
   );
 };
 

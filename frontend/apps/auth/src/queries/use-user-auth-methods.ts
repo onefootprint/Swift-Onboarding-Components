@@ -1,15 +1,15 @@
 import { isValidTokenFormat } from '@onefootprint/idv';
 import request from '@onefootprint/request';
+import type { AuthMethodKind } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import type { UserChallengeKind } from '@/src/types';
 import { isString } from '@/src/utils';
 
 export type UserAuthMethodsResponse = {
   canUpdate: boolean;
   isVerified: boolean;
-  kind: UserChallengeKind;
+  kind: AuthMethodKind;
 }[];
 
 const FIVE_MINUTES = 1000 * 60 * 5;

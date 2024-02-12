@@ -1,5 +1,6 @@
 import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
 import { StepHeader } from '@onefootprint/idv';
+import { AuthMethodKind } from '@onefootprint/types/src/data';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,12 +14,7 @@ import Identify from '../identify';
 import { IdentifyVariant } from '../identify/state/types';
 import Notification from '../notification';
 import UserDashboard from '../user-dashboard';
-import {
-  UpdateEmail,
-  UpdatePhone,
-  UpdateVerifyEmail,
-  UpdateVerifyPhone,
-} from '../user-update';
+import { UpdateEmail, UpdatePhone } from '../user-update';
 
 type UserRouterProps = { onDone: React.MouseEventHandler<HTMLButtonElement> };
 
@@ -61,27 +57,39 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
   if (state.matches('dashboard')) {
     return <UserDashboard Header={Header} onDone={onDone} isEditing />;
   }
-  if (state.matches('updateEmail')) {
+  if (state.matches('updateEmail') && state.context.verifyToken) {
     return (
       <UpdateEmail
         Header={Header}
-        onSubmit={payload => send({ type: 'setEmail', payload })}
+        authToken={state.context.verifyToken}
+        onSuccess={newEmail => {
+          send({
+            type: 'updateUserDashboard',
+            payload: {
+              kind: AuthMethodKind.email,
+              entry: { label: newEmail, status: 'set' },
+            },
+          });
+        }}
       />
     );
   }
-  if (state.matches('updateEmailVerify')) {
-    return <UpdateVerifyEmail Header={Header} />;
-  }
-  if (state.matches('updatePhone')) {
+  if (state.matches('updatePhone') && state.context.verifyToken) {
     return (
       <UpdatePhone
         Header={Header}
-        onSubmit={payload => send({ type: 'setPhoneNumber', payload })}
+        authToken={state.context.verifyToken}
+        onSuccess={newPhoneNumber => {
+          send({
+            type: 'updateUserDashboard',
+            payload: {
+              kind: AuthMethodKind.phone,
+              entry: { label: newPhoneNumber, status: 'set' },
+            },
+          });
+        }}
       />
     );
-  }
-  if (state.matches('updatePhoneVerify')) {
-    return <UpdateVerifyPhone Header={Header} />;
   }
   if (state.matches('updatePasskey')) {
     return (

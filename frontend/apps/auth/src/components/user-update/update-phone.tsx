@@ -1,16 +1,17 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { checkIsPhoneValid, PhoneForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
-type FormData = { phoneNumber: string };
+import UpdateVerifyPhone from './update-verify-phone';
+
 type UpdatePhoneProps = {
-  children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
-  onSubmit: (props: string) => void;
+  authToken: string;
+  onSuccess: (newPhone: string) => void;
 };
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -18,20 +19,18 @@ const isTest = process.env.NODE_ENV === 'test';
 const isSandbox = isTest || !isProd;
 const handlePhoneValidation = (s: string) => checkIsPhoneValid(s, isSandbox);
 
-const UpdatePhone = ({ children, Header, onSubmit }: UpdatePhoneProps) => {
+const UpdatePhone = ({ Header, authToken, onSuccess }: UpdatePhoneProps) => {
   const { t } = useTranslation('common');
-  const handleFormSubmit = (formData: FormData) => {
-    onSubmit(formData.phoneNumber);
-  };
+  const [phone, setPhone] = useState<string>('');
 
-  return (
-    <>
+  if (!phone) {
+    return (
       <Stack direction="column" gap={7}>
         <Header title={t('enter-phone')} />
         <PhoneForm
           defaultPhone={undefined}
           isLoading={false}
-          onSubmit={handleFormSubmit}
+          onSubmit={({ phoneNumber }) => setPhone(phoneNumber)}
           options={COUNTRIES}
           validator={handlePhoneValidation}
           texts={{
@@ -42,8 +41,15 @@ const UpdatePhone = ({ children, Header, onSubmit }: UpdatePhoneProps) => {
           }}
         />
       </Stack>
-      {children}
-    </>
+    );
+  }
+  return (
+    <UpdateVerifyPhone
+      Header={Header}
+      phoneNumber={phone}
+      authToken={authToken}
+      onSuccess={onSuccess}
+    />
   );
 };
 

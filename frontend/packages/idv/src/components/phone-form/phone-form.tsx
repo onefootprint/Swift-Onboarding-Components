@@ -5,12 +5,12 @@ import { Button, Grid, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-type EmailFormData = { phoneNumber: string };
+type PhoneFormData = { phoneNumber: string };
 type PhoneFormProps = {
   defaultPhone?: string;
   isLoading?: boolean;
   l10n?: L10n;
-  onSubmit: (formData: EmailFormData) => void;
+  onSubmit: (formData: PhoneFormData) => void;
   options?: CountryRecord[];
   validator?: (phone: string) => boolean;
   texts: {
@@ -36,11 +36,11 @@ const PhoneForm = ({
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<EmailFormData>({ defaultValues: { phoneNumber: defaultPhone } });
+  } = useForm<PhoneFormData>({ defaultValues: { phoneNumber: defaultPhone } });
   const hasError = !!errors.phoneNumber;
   const hint = hasError ? errors.phoneNumber?.message : undefined;
 
-  const handleBeforeSubmit = (formData: EmailFormData) => {
+  const handleBeforeSubmit = (formData: PhoneFormData) => {
     if (validator && !validator(formData.phoneNumber)) {
       setError(
         'phoneNumber',

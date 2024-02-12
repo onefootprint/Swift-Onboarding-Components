@@ -1,4 +1,5 @@
 import { getLogger } from '@onefootprint/idv';
+import type { AuthMethodKind } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import type { NextToast } from '@onefootprint/ui';
 import { useToast } from '@onefootprint/ui';
@@ -11,12 +12,11 @@ import { useEffectOnceStrict } from '@/src/hooks';
 import type { UserAuthMethodsResponse } from '@/src/queries';
 import { useDecryptUser, useUserAuthMethods } from '@/src/queries';
 import { useUserMachine } from '@/src/state';
-import type { UserChallengeKind } from '@/src/types';
 
 import Component from './component';
 
 type MethodsMap = Record<
-  Partial<UserChallengeKind>,
+  AuthMethodKind,
   Pick<UserAuthMethodsResponse[0], 'isVerified'>
 >;
 type T = TFunction<'common', 'auth'>;

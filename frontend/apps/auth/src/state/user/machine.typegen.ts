@@ -14,8 +14,6 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignDecryptedData: 'decryptUserDone';
-    assignEmail: 'setEmail';
-    assignPhoneNumber: 'setPhoneNumber';
     assignUserDashboard: 'updateUserDashboard';
     assignVerifyToken: 'setVerifyToken';
   };
@@ -29,9 +27,7 @@ export interface Typegen0 {
     | 'notFoundChallenge'
     | 'success'
     | 'updateEmail'
-    | 'updateEmailVerify'
     | 'updatePasskey'
-    | 'updatePhone'
-    | 'updatePhoneVerify';
+    | 'updatePhone';
   tags: never;
 }

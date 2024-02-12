@@ -1,31 +1,30 @@
 import { EmailForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
+import UpdateVerifyEmail from './update-verify-email';
+
 type UpdateEmailProps = {
-  children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
-  onSubmit: (props: string) => void;
+  authToken: string;
+  onSuccess: (newEmail: string) => void;
 };
 
-const UpdateEmail = ({ children, Header, onSubmit }: UpdateEmailProps) => {
+const UpdateEmail = ({ Header, authToken, onSuccess }: UpdateEmailProps) => {
   const { t } = useTranslation('common');
+  const [email, setEmail] = useState<string>('');
 
-  const handleFormSubmit = (formData: { email: string }) => {
-    onSubmit(formData.email);
-  };
-
-  return (
-    <>
+  if (!email) {
+    return (
       <Stack direction="column" gap={7}>
         <Header title={t('enter-email')} />
         <EmailForm
           defaultEmail={undefined}
           isLoading={false}
-          onSubmit={handleFormSubmit}
+          onSubmit={({ email: newEmail }) => setEmail(newEmail)}
           texts={{
             cta: t('continue'),
             emailIsRequired: t('email-step.form.input-required'),
@@ -34,8 +33,15 @@ const UpdateEmail = ({ children, Header, onSubmit }: UpdateEmailProps) => {
           }}
         />
       </Stack>
-      {children}
-    </>
+    );
+  }
+  return (
+    <UpdateVerifyEmail
+      Header={Header}
+      email={email}
+      authToken={authToken}
+      onSuccess={onSuccess}
+    />
   );
 };
 
