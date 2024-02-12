@@ -1,10 +1,7 @@
 {
-    "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
-    "moderate": false,
-    "high": true,
-    "report-type": "summary",
-    "package-manager": "yarn",
-    "allowlist": [
-    ]
-  }
-  
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  "critical": true,
+  "report-type": "summary",
+  "package-manager": "yarn",
+  "allowlist": []
+}
