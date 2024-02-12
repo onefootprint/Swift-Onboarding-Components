@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Stack } from '@onefootprint/ui';
+import { Grid, Stack } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 
@@ -28,9 +28,11 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => (
       <SandboxBanner />
       <TopMenuBar />
     </Stack>
-    <Content direction="row">
+    <Content>
       <SideNav />
-      <Main>{children}</Main>
+      <Main>
+        <Inner>{children}</Inner>
+      </Main>
     </Content>
   </DefaultLayoutContainer>
 );
@@ -41,32 +43,29 @@ const DefaultLayoutContainer = styled(motion.div)`
   height: 100vh;
 `;
 
-const Content = styled(Stack)`
-  flex: 1;
-  width: 100%;
-  max-width: 100%;
-  overflow: auto;
+const Content = styled(Grid.Container)`
+  grid-template-columns: var(--side-nav-width) 1fr;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
 `;
 
 const Main = styled.main`
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  align-items: start;
+  flex-grow: 1;
+  min-height: 100%;
+  overflow: auto;
+`;
+
+const Inner = styled.div`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
+    max-width: var(--main-content-max-width);
     width: 100%;
-    min-height: 100%;
-    overflow: auto;
     padding: ${theme.spacing[8]};
-    max-width: 1600px;
     margin: 0 auto;
-    /* hiding scrollbar */
-    -ms-overflow-style: none;
-    /* IE 10+ */
-    scrollbar-width: none;
-    /* Firefox */
-    ::-webkit-scrollbar {
-      /* Safari and Chrome */
-      display: none;
-    }
   `}
 `;
 

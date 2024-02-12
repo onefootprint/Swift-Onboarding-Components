@@ -94,7 +94,7 @@ const Nav = () => {
 
 const NavContainer = styled(NavigationMenu.Root)`
   ${({ theme }) => css`
-    min-width: 240px;
+    width: var(--side-nav-width);
     max-height: 100%;
     overflow: auto;
     display: flex;

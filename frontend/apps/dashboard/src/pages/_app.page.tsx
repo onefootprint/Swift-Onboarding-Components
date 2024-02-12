@@ -45,6 +45,11 @@ const App = ({ Component, pageProps }: AppProps) => {
 
 const GlobalStyle = createGlobalStyle<{ hasMinWidth: boolean }>`
   ${({ theme, hasMinWidth }) => css`
+    :root {
+      --side-nav-width: 240px;
+      --main-content-max-width: 1600px;
+    }
+
     #__next {
       display: flex;
       flex-direction: column;
