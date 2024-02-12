@@ -7,7 +7,7 @@ use newtypes::{
     VerificationResultId,
 };
 
-use super::{experian, idology_expectid::IDologyFeatures, lexis};
+use super::{experian, idology_expectid, lexis};
 use crate::{
     decision::vendor::vendor_result::VendorResult, errors::ApiResult, utils::vault_wrapper::VaultWrapper,
     ApiError,
@@ -103,7 +103,7 @@ fn parse_reason_codes(vendor_result: VendorResult, vw: &VaultWrapper) -> Vec<Foo
     let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
     match vendor_result.response.response {
         ParsedResponse::IDologyExpectID(r) => {
-            IDologyFeatures::footprint_reason_codes(r, dob_submitted, ssn_submitted)
+            idology_expectid::footprint_reason_codes(r, dob_submitted, ssn_submitted)
         }
         ParsedResponse::ExperianPreciseID(r) => experian::footprint_reason_codes(r),
         ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, ssn_submitted)

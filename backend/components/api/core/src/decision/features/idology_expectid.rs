@@ -6,159 +6,150 @@ use idv::idology::{
     expectid::response::{ExpectIDResponse, PaWatchlistHit},
 };
 use itertools::Itertools;
-use newtypes::{idology_match_codes, FootprintReasonCode, IDologyReasonCode, VerificationResultId};
+use newtypes::{idology_match_codes, FootprintReasonCode, IDologyReasonCode};
 
-/// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IDologyFeatures {
-    pub footprint_reason_codes: Vec<FootprintReasonCode>,
-    pub verification_result_id: VerificationResultId,
+pub fn footprint_reason_codes(
+    resp: ExpectIDResponse,
+    dob_submitted: bool,
+    ssn_submitted: bool,
+) -> Vec<FootprintReasonCode> {
+    let id_located = resp.response.id_located();
+
+    //
+    // first we compute all reason codes directly from the response
+    //
+    let mut reason_codes: Vec<FootprintReasonCode> =
+        qualifier_reason_codes(resp.response.qualifiers.as_ref());
+
+    // watchlist
+    let restriction_reason_codes = resp
+        .response
+        .restriction
+        .as_ref()
+        .map(|r| PaWatchlistHit::to_footprint_reason_codes(r.watchlists()))
+        .unwrap_or_default();
+
+    reason_codes = reason_codes.into_iter().chain(restriction_reason_codes).collect();
+    //
+    // Construct final set of codes
+    //
+    // Idology considers this a "restricted match" and doesn't return additional qualifiers so
+    // we shouldn't infer anything about other codes here
+    let out = if reason_codes.contains(&FootprintReasonCode::DobLocatedCoppaAlert) {
+        reason_codes
+    } else if !id_located {
+        // Important Note: When Idology does not locate an id, they do not provide additional match related signals specifying how identity attributes match.
+        reason_codes
+            .into_iter()
+            .chain(vec![FootprintReasonCode::IdNotLocated])
+            .collect()
+    } else {
+        // If ID was located, continue with the logic to add in match codes
+        add_top_level_match_reason_codes(reason_codes, dob_submitted, ssn_submitted)
+    };
+
+    out.into_iter().unique().collect()
 }
 
-impl IDologyFeatures {
-    pub fn footprint_reason_codes(
-        resp: ExpectIDResponse,
-        dob_submitted: bool,
-        ssn_submitted: bool,
-    ) -> Vec<FootprintReasonCode> {
-        let id_located = resp.response.id_located();
+fn add_top_level_match_reason_codes(
+    mut footprint_reason_codes: Vec<FootprintReasonCode>,
+    dob_submitted: bool,
+    ssn_submitted: bool,
+) -> Vec<FootprintReasonCode> {
+    // construct helpers
+    let address_does_not_match = idology_match_codes::ADDRESS_DOES_NOT_MATCH_CODES
+        .iter()
+        .any(|r| footprint_reason_codes.contains(r));
+    let address_partially_matches = idology_match_codes::ADDRESS_PARTIALLY_MATCHES_CODES
+        .iter()
+        .any(|r| footprint_reason_codes.contains(r));
 
-        //
-        // first we compute all reason codes directly from the response
-        //
-        let mut reason_codes: Vec<FootprintReasonCode> =
-            Self::qualifier_reason_codes(resp.response.qualifiers.as_ref());
+    let yob_does_not_match = idology_match_codes::DOB_YOB_CODES
+        .iter()
+        .any(|r| footprint_reason_codes.contains(r));
+    let mob_does_not_match = idology_match_codes::DOB_MOB_CODES
+        .iter()
+        .any(|r| footprint_reason_codes.contains(r));
+    let dob_does_not_match = yob_does_not_match && mob_does_not_match;
+    let dob_partially_matches = (yob_does_not_match || mob_does_not_match) && !dob_does_not_match;
+    let dob_could_not_match = footprint_reason_codes.contains(&FootprintReasonCode::DobCouldNotMatch);
 
-        // watchlist
-        let restriction_reason_codes = resp
-            .response
-            .restriction
-            .as_ref()
-            .map(|r| PaWatchlistHit::to_footprint_reason_codes(r.watchlists()))
-            .unwrap_or_default();
+    let ssn_does_not_match = idology_match_codes::SSN_DOES_NOT_MATCH_CODES
+        .iter()
+        .any(|r| footprint_reason_codes.contains(r));
+    let ssn_partially_matches = idology_match_codes::SSN_PARTIALLY_MATCHES_CODES
+        .iter()
+        .any(|r| footprint_reason_codes.contains(r));
+    let name_does_not_match = idology_match_codes::NAME_DOES_NOT_MATCH_CODES
+        .iter()
+        .all(|r| footprint_reason_codes.contains(r));
+    let name_partially_matches = idology_match_codes::NAME_DOES_NOT_MATCH_CODES
+        .iter()
+        .any(|r| footprint_reason_codes.contains(r));
 
-        reason_codes = reason_codes.into_iter().chain(restriction_reason_codes).collect();
-        //
-        // Construct final set of codes
-        //
-        // Idology considers this a "restricted match" and doesn't return additional qualifiers so
-        // we shouldn't infer anything about other codes here
-        let out = if reason_codes.contains(&FootprintReasonCode::DobLocatedCoppaAlert) {
-            reason_codes
-        } else if !id_located {
-            // Important Note: When Idology does not locate an id, they do not provide additional match related signals specifying how identity attributes match.
-            reason_codes
-                .into_iter()
-                .chain(vec![FootprintReasonCode::IdNotLocated])
-                .collect()
-        } else {
-            // If ID was located, continue with the logic to add in match codes
-            Self::add_top_level_match_reason_codes(reason_codes, dob_submitted, ssn_submitted)
+    //
+    // add in summary reason codes. Some of these may be duplicates, but we .unique() later
+    //
+    if address_does_not_match {
+        footprint_reason_codes.push(FootprintReasonCode::AddressDoesNotMatch);
+    } else if address_partially_matches {
+        footprint_reason_codes.push(FootprintReasonCode::AddressPartiallyMatches);
+    } else {
+        // address is always sent to Idology
+        footprint_reason_codes.push(FootprintReasonCode::AddressMatches);
+    };
+
+    if !dob_could_not_match {
+        if dob_does_not_match {
+            footprint_reason_codes.push(FootprintReasonCode::DobDoesNotMatch);
+        } else if dob_partially_matches {
+            footprint_reason_codes.push(FootprintReasonCode::DobPartialMatch);
+        } else if dob_submitted {
+            footprint_reason_codes.push(FootprintReasonCode::DobMatches);
         };
-
-        out.into_iter().unique().collect()
     }
 
-    fn add_top_level_match_reason_codes(
-        mut footprint_reason_codes: Vec<FootprintReasonCode>,
-        dob_submitted: bool,
-        ssn_submitted: bool,
-    ) -> Vec<FootprintReasonCode> {
-        // construct helpers
-        let address_does_not_match = idology_match_codes::ADDRESS_DOES_NOT_MATCH_CODES
-            .iter()
-            .any(|r| footprint_reason_codes.contains(r));
-        let address_partially_matches = idology_match_codes::ADDRESS_PARTIALLY_MATCHES_CODES
-            .iter()
-            .any(|r| footprint_reason_codes.contains(r));
+    if ssn_does_not_match {
+        footprint_reason_codes.push(FootprintReasonCode::SsnDoesNotMatch);
+    } else if ssn_partially_matches {
+        footprint_reason_codes.push(FootprintReasonCode::SsnPartiallyMatches);
+    } else if ssn_submitted {
+        footprint_reason_codes.push(FootprintReasonCode::SsnMatches);
+    };
 
-        let yob_does_not_match = idology_match_codes::DOB_YOB_CODES
-            .iter()
-            .any(|r| footprint_reason_codes.contains(r));
-        let mob_does_not_match = idology_match_codes::DOB_MOB_CODES
-            .iter()
-            .any(|r| footprint_reason_codes.contains(r));
-        let dob_does_not_match = yob_does_not_match && mob_does_not_match;
-        let dob_partially_matches = (yob_does_not_match || mob_does_not_match) && !dob_does_not_match;
-        let dob_could_not_match = footprint_reason_codes.contains(&FootprintReasonCode::DobCouldNotMatch);
+    if name_does_not_match {
+        footprint_reason_codes.push(FootprintReasonCode::NameDoesNotMatch);
+    } else if name_partially_matches {
+        footprint_reason_codes.push(FootprintReasonCode::NamePartiallyMatches);
+    } else {
+        // name is always sent to Idology
+        footprint_reason_codes.push(FootprintReasonCode::NameMatches);
+    };
 
-        let ssn_does_not_match = idology_match_codes::SSN_DOES_NOT_MATCH_CODES
-            .iter()
-            .any(|r| footprint_reason_codes.contains(r));
-        let ssn_partially_matches = idology_match_codes::SSN_PARTIALLY_MATCHES_CODES
-            .iter()
-            .any(|r| footprint_reason_codes.contains(r));
-        let name_does_not_match = idology_match_codes::NAME_DOES_NOT_MATCH_CODES
-            .iter()
-            .all(|r| footprint_reason_codes.contains(r));
-        let name_partially_matches = idology_match_codes::NAME_DOES_NOT_MATCH_CODES
-            .iter()
-            .any(|r| footprint_reason_codes.contains(r));
+    footprint_reason_codes.into_iter().unique().collect()
+}
 
-        //
-        // add in summary reason codes. Some of these may be duplicates, but we .unique() later
-        //
-        if address_does_not_match {
-            footprint_reason_codes.push(FootprintReasonCode::AddressDoesNotMatch);
-        } else if address_partially_matches {
-            footprint_reason_codes.push(FootprintReasonCode::AddressPartiallyMatches);
-        } else {
-            // address is always sent to Idology
-            footprint_reason_codes.push(FootprintReasonCode::AddressMatches);
-        };
-
-        if !dob_could_not_match {
-            if dob_does_not_match {
-                footprint_reason_codes.push(FootprintReasonCode::DobDoesNotMatch);
-            } else if dob_partially_matches {
-                footprint_reason_codes.push(FootprintReasonCode::DobPartialMatch);
-            } else if dob_submitted {
-                footprint_reason_codes.push(FootprintReasonCode::DobMatches);
-            };
-        }
-
-        if ssn_does_not_match {
-            footprint_reason_codes.push(FootprintReasonCode::SsnDoesNotMatch);
-        } else if ssn_partially_matches {
-            footprint_reason_codes.push(FootprintReasonCode::SsnPartiallyMatches);
-        } else if ssn_submitted {
-            footprint_reason_codes.push(FootprintReasonCode::SsnMatches);
-        };
-
-        if name_does_not_match {
-            footprint_reason_codes.push(FootprintReasonCode::NameDoesNotMatch);
-        } else if name_partially_matches {
-            footprint_reason_codes.push(FootprintReasonCode::NamePartiallyMatches);
-        } else {
-            // name is always sent to Idology
-            footprint_reason_codes.push(FootprintReasonCode::NameMatches);
-        };
-
-        footprint_reason_codes.into_iter().unique().collect()
-    }
-
-    fn qualifier_reason_codes(qualifiers: Option<&IDologyQualifiers>) -> Vec<FootprintReasonCode> {
-        if let Some(qualifiers) = qualifiers {
-            qualifiers
-                .parse_qualifiers()
-                .into_iter()
-                .flat_map(|q| match q.1 {
-                    IDologyReasonCode::WarmInputAddressAlert => {
-                        q.0.warm_address_list
-                            .and_then(|s| WarmAddressType::from_str(s.as_str()).ok())
-                            .map(|t| t.to_input_address_footprint_reason_code())
-                    }
-                    IDologyReasonCode::WarmAddressAlert => {
-                        q.0.warm_address_list
-                            .and_then(|s| WarmAddressType::from_str(s.as_str()).ok())
-                            .map(|t| t.to_located_address_footprint_reason_code())
-                    }
-                    _ => Into::<Option<FootprintReasonCode>>::into(&q.1),
-                })
-                .collect()
-        } else {
-            vec![]
-        }
+fn qualifier_reason_codes(qualifiers: Option<&IDologyQualifiers>) -> Vec<FootprintReasonCode> {
+    if let Some(qualifiers) = qualifiers {
+        qualifiers
+            .parse_qualifiers()
+            .into_iter()
+            .flat_map(|q| match q.1 {
+                IDologyReasonCode::WarmInputAddressAlert => {
+                    q.0.warm_address_list
+                        .and_then(|s| WarmAddressType::from_str(s.as_str()).ok())
+                        .map(|t| t.to_input_address_footprint_reason_code())
+                }
+                IDologyReasonCode::WarmAddressAlert => {
+                    q.0.warm_address_list
+                        .and_then(|s| WarmAddressType::from_str(s.as_str()).ok())
+                        .map(|t| t.to_located_address_footprint_reason_code())
+                }
+                _ => Into::<Option<FootprintReasonCode>>::into(&q.1),
+            })
+            .collect()
+    } else {
+        vec![]
     }
 }
 
@@ -172,7 +163,7 @@ mod test {
     use serde_json::json;
     use test_case::test_case;
 
-    use super::IDologyFeatures;
+    use super::*;
 
     #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop])]
     #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "hospital"}) => vec![AddressLocatedIsNotStandardHospital])]
@@ -201,7 +192,7 @@ mod test {
     ) -> Vec<FootprintReasonCode> {
         let resp = test_idology_response("result.does_not_matter", false, qualifier);
 
-        IDologyFeatures::qualifier_reason_codes(resp.response.qualifiers.as_ref())
+        qualifier_reason_codes(resp.response.qualifiers.as_ref())
     }
 
     #[test_case("result.no.match", false, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, IdNotLocated])]
@@ -219,7 +210,7 @@ mod test {
     ) -> Vec<FootprintReasonCode> {
         let resp = test_idology_response(result_key, include_watchlist, qualifier);
 
-        IDologyFeatures::footprint_reason_codes(resp, true, true)
+        footprint_reason_codes(resp, true, true)
     }
 
     #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), true, true => vec![AddressMatches, DobMatches, SsnMatches, NameMatches])]
@@ -235,7 +226,7 @@ mod test {
     ) -> Vec<FootprintReasonCode> {
         let resp = test_idology_response(result_key, false, qualifier);
 
-        IDologyFeatures::footprint_reason_codes(resp, dob_submitted, ssn_submitted)
+        footprint_reason_codes(resp, dob_submitted, ssn_submitted)
     }
 
     fn test_idology_response(
