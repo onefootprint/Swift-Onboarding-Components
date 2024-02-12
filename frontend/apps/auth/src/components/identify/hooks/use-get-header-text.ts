@@ -6,7 +6,7 @@ import { shouldShowChallengeSelector } from '../state/predicates';
 
 const useGetHeaderText = (): string => {
   const [state] = useIdentifyMachine();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
 
   const hasChallengeSelector = shouldShowChallengeSelector(
     state.context,
@@ -30,7 +30,7 @@ const useGetHeaderText = (): string => {
   }
 
   // We won't use this on any other page, but in case we do
-  return t(`${state.value}.title` as ParseKeys<'common'>);
+  return t(`${state.value}.title` as ParseKeys<'identify'>);
 };
 
 export default useGetHeaderText;

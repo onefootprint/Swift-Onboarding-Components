@@ -35,7 +35,7 @@ const UpdateVerify = ({
   onChallengeVerificationSuccess,
 }: UpdateVerifyProps) => {
   const { authToken } = challengePayload;
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const toast = useToast();
   const mutUserChallenge = useUserChallenge({});
   const mutUserChallengeVerify = useUserChallengeVerify({});
@@ -92,7 +92,7 @@ const UpdateVerify = ({
           toast.show({
             title: t('success'),
             description: t(
-              `${challengePayload.kind}-update-success` as ParseKeys<'common'>,
+              `${challengePayload.kind}-update-success` as ParseKeys<'identify'>,
             ),
           });
           setTimeout(onChallengeVerificationSuccess, SUCCESS_EVENT_DELAY_MS);

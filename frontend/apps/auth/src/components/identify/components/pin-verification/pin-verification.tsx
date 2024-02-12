@@ -51,7 +51,7 @@ const PinVerification = ({
     sandboxId,
   };
   const requestError = useRequestError();
-  const { t } = useTranslation('common', {
+  const { t } = useTranslation('identify', {
     keyPrefix: 'pin-verification',
   });
   const showRequestErrorToast = useRequestErrorToast();

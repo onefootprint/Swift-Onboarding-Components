@@ -35,7 +35,7 @@ const ChallengeSelectOrPasskey = ({
 }: ChallengeSelectProps) => {
   const [state, send] = useIdentifyMachine();
   const { identify, variant } = state.context;
-  const { t } = useTranslation('common', {
+  const { t } = useTranslation('identify', {
     keyPrefix: 'challenge-select-or-biometric',
   });
   const [selectedChallenge, setSelectedChallenge] = useState<

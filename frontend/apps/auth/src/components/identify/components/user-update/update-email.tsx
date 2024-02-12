@@ -13,7 +13,7 @@ type UpdateEmailProps = {
 };
 
 const UpdateEmail = ({ Header, authToken, onSuccess }: UpdateEmailProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const [email, setEmail] = useState<string>('');
 
   if (!email) {

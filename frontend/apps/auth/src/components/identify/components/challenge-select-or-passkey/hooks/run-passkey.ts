@@ -22,7 +22,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
     obConfigAuth,
     initialAuthToken,
   } = state.context;
-  const { t } = useTranslation('common', {
+  const { t } = useTranslation('identify', {
     keyPrefix: 'passkey-challenge',
   });
   const showRequestErrorToast = useRequestErrorToast();

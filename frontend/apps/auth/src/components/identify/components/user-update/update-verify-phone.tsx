@@ -21,7 +21,7 @@ const UpdateVerifyPhone = ({
   phoneNumber,
   onSuccess,
 }: UpdateVerifyPhoneProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const headerTitle = phoneNumber
     ? t('sms-step.prompt-with-phone', { scrubbedPhoneNumber: phoneNumber })
     : t('sms-step.prompt-without-phone');

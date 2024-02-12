@@ -13,7 +13,7 @@ const configureI18n = () => {
     .init({
       debug: false,
       defaultNS: 'common',
-      ns: ['common', 'ui', 'idv', 'request'],
+      ns: ['common', 'ui', 'idv', 'request', 'identify'],
       interpolation: { escapeValue: false },
       fallbackLng: 'en',
       supportedLngs: ['en', 'es'],

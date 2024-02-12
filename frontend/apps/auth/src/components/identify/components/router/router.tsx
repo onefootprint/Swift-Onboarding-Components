@@ -3,7 +3,6 @@ import { StepHeader } from '@onefootprint/idv';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import Notification from '../../../notification';
 import type { IdentifyMachineContext, IdentifyMachineHook } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import type { DoneArgs, HeaderProps } from '../../types';
@@ -12,6 +11,7 @@ import ChallengeSelectOrPasskey from '../challenge-select-or-passkey';
 import EmailChallenge from '../email-challenge';
 import InitAuthToken from '../init-auth-token';
 import Loading from '../loading';
+import Notification from '../notification';
 import StepBootstrap from '../step-bootstrap';
 import StepEmail from '../step-email';
 import StepPhone from '../step-phone';
@@ -43,7 +43,7 @@ const getHeader = (
 const Router = ({ onDone, children }: RouterProps): JSX.Element | null => {
   const [state, send] = useIdentifyMachine();
   const isDone = state.matches('success');
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const Header = getHeader(state.context, getLeftNavButton(state, send));
 
   const { initialAuthToken } = state.context;

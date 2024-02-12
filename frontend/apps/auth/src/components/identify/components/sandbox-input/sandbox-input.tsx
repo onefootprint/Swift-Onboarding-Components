@@ -15,7 +15,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import InlineButton from '../../../inline-button';
+import InlineButton from './components/inline-button';
 
 type SandboxInputProps = {
   label: string;

@@ -18,7 +18,7 @@ type EmailChallengeProps = {
 };
 
 const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const [state, send] = useIdentifyMachine();
   const toast = useToast();
   const {

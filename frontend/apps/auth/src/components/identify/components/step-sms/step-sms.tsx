@@ -26,7 +26,7 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
     identify,
   } = state.context;
   const { phoneNumber = '', successfulIdentifier } = identify;
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const toast = useToast();
   const headerTitle = useGetHeaderText();
 

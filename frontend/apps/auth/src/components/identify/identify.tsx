@@ -58,7 +58,7 @@ const Identify = ({
   const [device, setDevice] = useState<DeviceInfo>(initialDevice);
   const [sandboxId, setSandboxId] = useState<string>(() => getRandomID(13));
 
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const obConfigAuth = getOnboardConfigurationKey(publicKey);
 
   useDeviceInfo(setDevice);

@@ -19,7 +19,7 @@ type MethodsMap = Record<
   AuthMethodKind,
   Pick<UserAuthMethodsResponse[0], 'isVerified'>
 >;
-type T = TFunction<'common', 'auth'>;
+type T = TFunction<'common', undefined>;
 type TComponentProps = ComponentProps<typeof Component>;
 type Texts = TComponentProps['texts'];
 type UserDashboardProps = Pick<TComponentProps, 'children' | 'Header'> & {

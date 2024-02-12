@@ -29,7 +29,7 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
     obConfigAuth,
     config,
   } = state.context;
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
   const showRequestErrorToast = useRequestErrorToast();
 

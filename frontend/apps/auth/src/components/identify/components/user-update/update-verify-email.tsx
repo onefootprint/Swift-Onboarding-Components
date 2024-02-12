@@ -21,7 +21,7 @@ const UpdateVerifyEmail = ({
   email,
   onSuccess,
 }: UpdateVerifyEmailProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const headerTitle = email
     ? t('email-challenge.prompt-with-email', { email })
     : t('email-challenge.prompt-without-email');

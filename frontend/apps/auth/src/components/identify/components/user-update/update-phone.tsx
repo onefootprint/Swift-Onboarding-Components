@@ -19,7 +19,7 @@ const isSandbox = isTest || !isProd;
 const handlePhoneValidation = (s: string) => checkIsPhoneValid(s, isSandbox);
 
 const UpdatePhone = ({ Header, authToken, onSuccess }: UpdatePhoneProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('identify');
   const [phone, setPhone] = useState<string>('');
 
   if (!phone) {
