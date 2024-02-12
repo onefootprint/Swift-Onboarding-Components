@@ -36,7 +36,9 @@ const DeskTopProcessing = () => {
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
-  const slowConnectionTimer = useRef<NodeJS.Timer | null>(null); // we only time the doc upload
+  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  ); // we only time the doc upload
 
   const {
     idDoc: { type, country },

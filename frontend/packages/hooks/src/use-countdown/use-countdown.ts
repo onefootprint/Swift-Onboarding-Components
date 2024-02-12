@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-let interval: NodeJS.Timer | null = null;
+let interval: ReturnType<typeof setTimeout> | null = null;
 const MILLISECONDS_IN_SECOND = 1000;
 
 const useCountdown = (
