@@ -51,6 +51,8 @@ export {
   createReceivedDeviceResponseJsonPayload,
   DesignSystemProvider,
   FPCustomEvents,
+  getAddressComponent,
+  getAutoCompleteCity,
   getBiometricChallengeResponse,
   getCanChallengeBiometrics,
   getIdentifyBootstrapData,

@@ -4,8 +4,8 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { getAddressComponent } from '../../../../../../utils';
 import type { FormData } from '../../types';
-import getAddressComponent from '../../utils/get-address-components';
 
 const AddressLines = () => {
   const {

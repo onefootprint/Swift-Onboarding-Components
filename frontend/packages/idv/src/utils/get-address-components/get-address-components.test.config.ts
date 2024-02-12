@@ -25,6 +25,7 @@ export const withGoogleMapsError = () => {
 
 export const UsaAddressFixture1 = {
   mainText: '21030 Pacific City Circle',
+  secondaryText: 'Huntington Beach, CA, EUA',
   addressComponents: [
     {
       long_name: '21030',
@@ -66,6 +67,7 @@ export const UsaAddressFixture1 = {
 
 export const UsaAddressFixture2 = {
   mainText: '413 Mississippi Street',
+  secondaryText: 'San Francisco, CA, EUA',
   addressComponents: [
     {
       long_name: '413',
@@ -117,6 +119,7 @@ export const UsaAddressFixture2 = {
 
 export const UsaAddressFixture3 = {
   mainText: '345 Harrison Avenue',
+  secondaryText: 'Boston, MA, EUA',
   addressComponents: [
     {
       long_name: '345',
@@ -166,8 +169,48 @@ export const UsaAddressFixture3 = {
   ],
 };
 
+export const UsaAddressFixture4 = {
+  mainText: '373 Wythe Avenue',
+  secondaryText: 'Brooklyn, NY, EUA',
+  addressComponents: [
+    { long_name: '11249', short_name: '11249', types: ['postal_code'] },
+    { long_name: '373', short_name: '373', types: ['street_number'] },
+    {
+      long_name: 'Wythe Avenue',
+      short_name: 'Wythe Ave',
+      types: ['route'],
+    },
+    {
+      long_name: 'Williamsburg',
+      short_name: 'Williamsburg',
+      types: ['neighborhood', 'political'],
+    },
+    {
+      long_name: 'Brooklyn',
+      short_name: 'Brooklyn',
+      types: ['sublocality_level_1', 'sublocality', 'political'],
+    },
+    {
+      long_name: 'Kings County',
+      short_name: 'Kings County',
+      types: ['administrative_area_level_2', 'political'],
+    },
+    {
+      long_name: 'New York',
+      short_name: 'NY',
+      types: ['administrative_area_level_1', 'political'],
+    },
+    {
+      long_name: 'Estados Unidos',
+      short_name: 'US',
+      types: ['country', 'political'],
+    },
+  ],
+};
+
 export const MexicoAddressFixture1 = {
   mainText: 'VILLA PATRICIA',
+  secondaryText: 'Mismaloya, Jalisco, Mexico',
   addressComponents: [
     {
       long_name: 'Mismaloya',
@@ -194,6 +237,8 @@ export const MexicoAddressFixture1 = {
 
 export const MexicoAddressFixture2 = {
   mainText: '16 de Septiembre 79',
+  secondaryText:
+    'Centro Histórico de la Ciudad de México, Centro, Ciudad de México, Distrito Federal, México',
   addressComponents: [
     {
       long_name: '79',
@@ -240,6 +285,7 @@ export const MexicoAddressFixture2 = {
 
 export const MexicoAddressFixture3 = {
   mainText: 'C. Cuauhtémoc 835',
+  secondaryText: 'Pueblo Nuevo, La Paz, Baja California Sur, México',
   addressComponents: [
     {
       long_name: '835',
@@ -281,6 +327,7 @@ export const MexicoAddressFixture3 = {
 
 export const BrazilAddressFixture1 = {
   mainText: "Av. Júlio D'Acia Barreto",
+  secondaryText: 'Carvoeira, Florianópolis - SC, Brasil',
   addressComponents: [
     {
       long_name: "Avenida Júlio D'Acia Barreto",
@@ -317,6 +364,7 @@ export const BrazilAddressFixture1 = {
 
 export const BrazilAddressFixture2 = {
   mainText: 'SQNW 310, Bloco D - 310 Lotus',
+  secondaryText: 'SHCNW SQNW - Noroeste, Brasília - DF, Brasil',
   addressComponents: [
     {
       long_name: 'Bloco D',
@@ -358,6 +406,7 @@ export const BrazilAddressFixture2 = {
 
 export const ArgentinaAddressFixture1 = {
   mainText: 'Avenida Pedro Goyena',
+  secondaryText: 'Cidade Autônoma de Buenos Aires, Argentina',
   addressComponents: [
     {
       long_name: 'Avenida Pedro Goyena',
@@ -384,6 +433,7 @@ export const ArgentinaAddressFixture1 = {
 
 export const ArgentinaAddressFixture2 = {
   mainText: 'Centenario 133',
+  secondaryText: 'Cidade Autônoma de Buenos Aires, Argentina',
   addressComponents: [
     {
       long_name: '133',
@@ -435,6 +485,7 @@ export const ArgentinaAddressFixture2 = {
 
 export const HongKongAddressFixture1 = {
   mainText: '33 Hip Wo Street',
+  secondaryText: ' Kwun Tong, Hong Kong',
   addressComponents: [
     {
       long_name: '33',
@@ -466,6 +517,7 @@ export const HongKongAddressFixture1 = {
 
 export const HongKongAddressFixture2 = {
   mainText: 'Li Po Chun United World College',
+  secondaryText: 'Sai Sha Road, Ma On Shan, Hong Kong',
   addressComponents: [
     {
       long_name: '10號',
@@ -497,6 +549,7 @@ export const HongKongAddressFixture2 = {
 
 export const ChinaAddressFixture1 = {
   mainText: 'Yunjian Greenland Villa',
+  secondaryText: 'Jinxiu Rd (E), Pudong, Xangai, China',
   addressComponents: [
     {
       long_name: 'Jin Xiu Dong Lu',
@@ -528,6 +581,7 @@ export const ChinaAddressFixture1 = {
 
 export const CanadaAddressFixture1 = {
   mainText: '72 Ave NW',
+  secondaryText: 'Edmonton, AB, Canadá',
   addressComponents: [
     {
       long_name: '72 Avenue Northwest',
@@ -564,6 +618,7 @@ export const CanadaAddressFixture1 = {
 
 export const TurkeyAddressFixture1 = {
   mainText: 'Hisar Park Konutları',
+  secondaryText: 'Orhangazi, Küme Sokak, Odunpazarı/Eskişehir, Turquia',
   addressComponents: [
     {
       long_name: 'Küme Sokak',

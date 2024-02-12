@@ -1,6 +1,7 @@
 import fixtures from './__fixtures__';
 import getAddressComponents, {
   getAddressParts,
+  getAutoCompleteCity,
 } from './get-address-components';
 import {
   ArgentinaAddressFixture1,
@@ -18,6 +19,7 @@ import {
   UsaAddressFixture1,
   UsaAddressFixture2,
   UsaAddressFixture3,
+  UsaAddressFixture4,
   withGoogleMaps,
   withGoogleMapsError,
 } from './get-address-components.test.config';
@@ -74,6 +76,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           UsaAddressFixture1.mainText,
           UsaAddressFixture1.addressComponents,
+          UsaAddressFixture1.secondaryText,
         ),
       ).toEqual({
         addressLine1: '21030 Pacific City Circle',
@@ -87,6 +90,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           UsaAddressFixture2.mainText,
           UsaAddressFixture2.addressComponents,
+          UsaAddressFixture2.secondaryText,
         ),
       ).toEqual({
         addressLine1: '413 Mississippi Street',
@@ -100,6 +104,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           UsaAddressFixture3.mainText,
           UsaAddressFixture3.addressComponents,
+          UsaAddressFixture3.secondaryText,
         ),
       ).toEqual({
         addressLine1: '345 Harrison Avenue',
@@ -115,6 +120,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           MexicoAddressFixture1.mainText,
           MexicoAddressFixture1.addressComponents,
+          MexicoAddressFixture1.secondaryText,
         ),
       ).toEqual({
         addressLine1: 'VILLA PATRICIA',
@@ -128,6 +134,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           MexicoAddressFixture2.mainText,
           MexicoAddressFixture2.addressComponents,
+          MexicoAddressFixture2.secondaryText,
         ),
       ).toEqual({
         addressLine1: '16 de Septiembre 79',
@@ -141,6 +148,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           MexicoAddressFixture3.mainText,
           MexicoAddressFixture3.addressComponents,
+          MexicoAddressFixture3.secondaryText,
         ),
       ).toEqual({
         addressLine1: 'C. Cuauhtémoc 835, Calle Cuauhtémoc',
@@ -156,6 +164,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           TurkeyAddressFixture1.mainText,
           TurkeyAddressFixture1.addressComponents,
+          TurkeyAddressFixture1.secondaryText,
         ),
       ).toEqual({
         addressLine1: 'Hisar Park Konutları, Küme Sokak',
@@ -171,6 +180,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           CanadaAddressFixture1.mainText,
           CanadaAddressFixture1.addressComponents,
+          CanadaAddressFixture1.secondaryText,
         ),
       ).toEqual({
         addressLine1: '72 Ave NW, 72 Avenue Northwest',
@@ -186,11 +196,12 @@ describe('getAddressComponents', () => {
         getAddressParts(
           ChinaAddressFixture1.mainText,
           ChinaAddressFixture1.addressComponents,
+          ChinaAddressFixture1.secondaryText,
         ),
       ).toEqual({
         addressLine1: 'Yunjian Greenland Villa, Jin Xiu Dong Lu',
         addressLine2: 'Pu Dong Xin Qu',
-        city: undefined,
+        city: 'Pu Dong Xin Qu',
         state: 'Shang Hai Shi',
         zip: '200135',
       });
@@ -201,6 +212,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           HongKongAddressFixture1.mainText,
           HongKongAddressFixture1.addressComponents,
+          HongKongAddressFixture1.secondaryText,
         ),
       ).toEqual({
         addressLine1: '33 Hip Wo Street',
@@ -214,6 +226,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           HongKongAddressFixture2.mainText,
           HongKongAddressFixture2.addressComponents,
+          HongKongAddressFixture2.secondaryText,
         ),
       ).toEqual({
         addressLine1: 'Li Po Chun United World College, Sai Sha Road',
@@ -229,6 +242,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           BrazilAddressFixture1.mainText,
           BrazilAddressFixture1.addressComponents,
+          BrazilAddressFixture1.secondaryText,
         ),
       ).toEqual({
         addressLine1: "Av. Júlio D'Acia Barreto, Avenida Júlio D'Acia Barreto",
@@ -242,6 +256,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           BrazilAddressFixture2.mainText,
           BrazilAddressFixture2.addressComponents,
+          BrazilAddressFixture2.secondaryText,
         ),
       ).toEqual({
         addressLine1: 'SQNW 310, Bloco D - 310 Lotus',
@@ -257,6 +272,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           ArgentinaAddressFixture1.mainText,
           ArgentinaAddressFixture1.addressComponents,
+          ArgentinaAddressFixture1.secondaryText,
         ),
       ).toEqual({
         addressLine1: 'Avenida Pedro Goyena',
@@ -270,6 +286,7 @@ describe('getAddressComponents', () => {
         getAddressParts(
           ArgentinaAddressFixture2.mainText,
           ArgentinaAddressFixture2.addressComponents,
+          ArgentinaAddressFixture2.secondaryText,
         ),
       ).toEqual({
         addressLine1: 'Centenario 133',
@@ -279,5 +296,46 @@ describe('getAddressComponents', () => {
         zip: 'C1405',
       });
     });
+
+    it('can extract Brooklyn address correctly', () => {
+      expect(
+        getAddressParts(
+          UsaAddressFixture4.mainText,
+          UsaAddressFixture4.addressComponents,
+          UsaAddressFixture4.secondaryText,
+        ),
+      ).toEqual({
+        addressLine1: '373 Wythe Avenue',
+        addressLine2: undefined,
+        city: 'Brooklyn',
+        state: 'New York',
+        zip: '11249',
+      });
+    });
+  });
+});
+
+describe('getAutoCompleteCity', () => {
+  it.each([
+    { obj: ArgentinaAddressFixture1, x: 'Buenos Aires' },
+    { obj: ArgentinaAddressFixture2, x: 'Buenos Aires' },
+    { obj: BrazilAddressFixture1, x: 'Florianópolis' },
+    { obj: BrazilAddressFixture2, x: 'Brasília' },
+    { obj: CanadaAddressFixture1, x: 'Edmonton' },
+    { obj: ChinaAddressFixture1, x: 'Pu Dong Xin Qu' },
+    { obj: HongKongAddressFixture1, x: 'Kowloon' },
+    { obj: HongKongAddressFixture2, x: 'New Territories' },
+    { obj: MexicoAddressFixture1, x: 'Mismaloya' },
+    { obj: MexicoAddressFixture2, x: 'Ciudad de México' },
+    { obj: MexicoAddressFixture3, x: 'La Paz' },
+    { obj: TurkeyAddressFixture1, x: 'Odunpazarı' },
+    { obj: UsaAddressFixture1, x: 'Huntington Beach' },
+    { obj: UsaAddressFixture2, x: 'San Francisco' },
+    { obj: UsaAddressFixture3, x: 'Boston' },
+    { obj: UsaAddressFixture4, x: 'Brooklyn' },
+  ])('case %#', ({ obj, x }) => {
+    const { addressComponents } = obj;
+    const { secondaryText } = obj;
+    expect(getAutoCompleteCity(addressComponents, secondaryText)).toEqual(x);
   });
 });

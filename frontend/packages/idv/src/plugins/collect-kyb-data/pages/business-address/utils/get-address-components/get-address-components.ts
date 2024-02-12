@@ -1,12 +1,12 @@
 import { getDetails } from 'use-places-autocomplete';
 
-const getValue = (
+import { getAutoCompleteCity } from '../../../../../../utils';
+
+const getLongName = (
   key: string,
   addressComponent: google.maps.GeocoderAddressComponent[],
 ) => {
-  const part = addressComponent.find(component =>
-    component.types.includes(key),
-  );
+  const part = addressComponent.find(c => c.types.includes(key));
   return part ? part.long_name : null;
 };
 
@@ -17,12 +17,14 @@ const getAddressComponent = async (
     const result = await getDetails({ placeId: prediction.place_id });
     if (typeof result === 'object' && result.address_components) {
       const addressComponents = result.address_components;
+
       return {
-        city:
-          getValue('locality', addressComponents) ||
-          getValue('administrative_area_level_2', addressComponents),
-        state: getValue('administrative_area_level_1', addressComponents),
-        zip: getValue('postal_code', addressComponents),
+        city: getAutoCompleteCity(
+          addressComponents,
+          prediction?.structured_formatting?.secondary_text,
+        ),
+        state: getLongName('administrative_area_level_1', addressComponents),
+        zip: getLongName('postal_code', addressComponents),
       };
     }
   } catch (_) {
