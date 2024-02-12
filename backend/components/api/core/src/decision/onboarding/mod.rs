@@ -1,8 +1,7 @@
 use std::cmp::Ordering;
 
-use newtypes::{DecisionStatus, FootprintReasonCode, RuleAction, VendorAPI};
+use newtypes::{DecisionStatus, RuleAction};
 use serde::Serialize;
-
 
 
 #[derive(PartialEq, Eq, Debug, Clone, Serialize)]
@@ -13,10 +12,6 @@ pub struct Decision {
     pub action: Option<RuleAction>,
 }
 
-pub trait FeatureSet {
-    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode>;
-    fn vendor_apis(&self) -> Vec<VendorAPI>;
-}
 
 // Note: follows the same convention as DecisionStatus, which has more egregious things as Ordering::Less
 // This is tested

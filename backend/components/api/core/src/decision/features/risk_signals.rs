@@ -2,19 +2,14 @@ use std::collections::HashMap;
 
 use db::models::risk_signal::{IncludeHidden, NewRiskSignalInfo, RiskSignal};
 use idv::ParsedResponse;
-use itertools::Itertools;
 use newtypes::{
     FootprintReasonCode, IdentityDataKind, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
     VerificationResultId,
 };
 
-use super::{
-    experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures, lexis,
-};
+use super::{experian, idology_expectid::IDologyFeatures, lexis};
 use crate::{
-    decision::{onboarding::FeatureSet, vendor::vendor_result::VendorResult},
-    errors::ApiResult,
-    utils::vault_wrapper::VaultWrapper,
+    decision::vendor::vendor_result::VendorResult, errors::ApiResult, utils::vault_wrapper::VaultWrapper,
     ApiError,
 };
 use derive_more::Display;
@@ -108,22 +103,9 @@ fn parse_reason_codes(vendor_result: VendorResult, vw: &VaultWrapper) -> Vec<Foo
     let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
     match vendor_result.response.response {
         ParsedResponse::IDologyExpectID(r) => {
-            IDologyFeatures::from(
-                r,
-                vendor_result.verification_result_id, // TODO remove this param later
-                dob_submitted,
-                ssn_submitted,
-            )
-            .footprint_reason_codes()
-            .into_iter()
-            .collect()
+            IDologyFeatures::footprint_reason_codes(r, dob_submitted, ssn_submitted)
         }
-        ParsedResponse::ExperianPreciseID(r) => {
-            ExperianFeatures::from(r, vendor_result.verification_result_id)
-                .footprint_reason_codes()
-                .into_iter()
-                .collect()
-        }
+        ParsedResponse::ExperianPreciseID(r) => experian::footprint_reason_codes(r),
         ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, ssn_submitted)
             .into_iter()
             .collect(),
@@ -219,27 +201,6 @@ where
         })
 }
 
-impl<T> FeatureSet for RiskSignalGroupStruct<T>
-where
-    T: Into<WrappedRiskSignalGroupKind> + Clone,
-{
-    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
-        self.footprint_reason_codes
-            .iter()
-            .map(|(frc, _, _)| frc.clone())
-            .collect()
-    }
-
-    fn vendor_apis(&self) -> Vec<VendorAPI> {
-        self.footprint_reason_codes
-            .iter()
-            .map(|(_, v, _)| v)
-            .unique()
-            .cloned()
-            .collect()
-    }
-}
-
 // RiskSignalGroupKind is defined in `newtypes` with all the other
 /// db types, we have another "Wrapped" enum here so we can implement extra functionality that is
 /// helpful for working with RiskSignals in application code
@@ -282,106 +243,6 @@ impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
     }
 }
 
-impl TryFrom<RiskSignalsForDecision> for IDologyFeatures {
-    type Error = crate::decision::Error;
-
-    fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
-        let kyc_reason_codes = signals.kyc.map(|s| s.footprint_reason_codes).unwrap_or_default();
-        let aml_reason_codes = signals.aml.map(|s| s.footprint_reason_codes).unwrap_or_default();
-
-        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = kyc_reason_codes
-            .into_iter()
-            .chain(aml_reason_codes)
-            .filter_map(|(frc, vendor_api, verification_result_id)| {
-                if vendor_api == VendorAPI::IdologyExpectId {
-                    Some((frc, verification_result_id))
-                } else {
-                    None
-                }
-            })
-            .unzip();
-
-        if footprint_reason_codes.is_empty() {
-            Err(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::IdologyExpectId,
-            ))
-        } else {
-            Ok(Self {
-                footprint_reason_codes,
-                verification_result_id: verification_result_ids.pop().ok_or(
-                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::IdologyExpectId),
-                )?,
-            })
-        }
-    }
-}
-
-impl TryFrom<RiskSignalsForDecision> for ExperianFeatures {
-    type Error = crate::decision::Error;
-
-    fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
-        let kyc_reason_codes = signals.kyc.map(|s| s.footprint_reason_codes).unwrap_or_default();
-        let aml_reason_codes = signals.aml.map(|s| s.footprint_reason_codes).unwrap_or_default();
-
-        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = kyc_reason_codes
-            .into_iter()
-            .chain(aml_reason_codes)
-            .filter_map(|(frc, vendor_api, verification_result_id)| {
-                if vendor_api == VendorAPI::ExperianPreciseId {
-                    Some((frc, verification_result_id))
-                } else {
-                    None
-                }
-            })
-            .unzip();
-
-        if footprint_reason_codes.is_empty() {
-            Err(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::ExperianPreciseId,
-            ))
-        } else {
-            Ok(Self {
-                footprint_reason_codes,
-                verification_result_id: verification_result_ids.pop().ok_or(
-                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::ExperianPreciseId),
-                )?,
-            })
-        }
-    }
-}
-
-impl TryFrom<RiskSignalsForDecision> for IncodeDocumentFeatures {
-    type Error = crate::decision::Error;
-
-    fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
-        let doc_reason_codes = signals.doc.map(|s| s.footprint_reason_codes).unwrap_or_default();
-        let apis = [VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr];
-
-        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = doc_reason_codes
-            .into_iter()
-            .filter_map(|(frc, vendor_api, verification_result_id)| {
-                if apis.contains(&vendor_api) {
-                    Some((frc, verification_result_id))
-                } else {
-                    None
-                }
-            })
-            .unzip();
-
-        if footprint_reason_codes.is_empty() {
-            Err(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::IncodeFetchScores,
-            ))
-        } else {
-            Ok(Self {
-                footprint_reason_codes,
-                verification_result_id: verification_result_ids.pop().ok_or(
-                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::IncodeFetchScores),
-                )?,
-            })
-        }
-    }
-}
 
 #[derive(Clone, Default)]
 pub struct RiskSignalsForDecision {

@@ -1,36 +1,10 @@
-use crate::decision::onboarding::FeatureSet;
 use idv::experian::{cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore};
 use itertools::Itertools;
-use newtypes::{FootprintReasonCode, VendorAPI, VerificationResultId};
+use newtypes::FootprintReasonCode;
 
 const SCORE_THRESHOLD: i32 = 500;
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ExperianFeatures {
-    pub footprint_reason_codes: Vec<FootprintReasonCode>,
-    pub verification_result_id: VerificationResultId,
-}
-
-impl ExperianFeatures {
-    pub fn from(resp: CrossCoreAPIResponse, verification_result_id: VerificationResultId) -> Self {
-        Self {
-            footprint_reason_codes: footprint_reason_codes(resp),
-            verification_result_id,
-        }
-    }
-}
-
-impl FeatureSet for ExperianFeatures {
-    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
-        self.footprint_reason_codes.clone()
-    }
-
-    fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
-        vec![VendorAPI::ExperianPreciseId]
-    }
-}
-
 fn score_to_reason_code(score: PreciseIDParsedScore) -> Option<FootprintReasonCode> {
     match score {
         PreciseIDParsedScore::Deceased => Some(FootprintReasonCode::SubjectDeceased),
@@ -45,7 +19,7 @@ fn score_to_reason_code(score: PreciseIDParsedScore) -> Option<FootprintReasonCo
     }
 }
 
-fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode> {
+pub fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode> {
     let fraud_shield_reason_codes: Vec<FootprintReasonCode> = resp
         .fraud_shield_reason_codes()
         .ok()

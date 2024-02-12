@@ -1,14 +1,12 @@
 use std::str::FromStr;
 
-use crate::decision::onboarding::FeatureSet;
+
 use idv::idology::{
     common::response::{IDologyQualifiers, WarmAddressType},
     expectid::response::{ExpectIDResponse, PaWatchlistHit},
 };
 use itertools::Itertools;
-use newtypes::{
-    idology_match_codes, FootprintReasonCode, IDologyReasonCode, VendorAPI, VerificationResultId,
-};
+use newtypes::{idology_match_codes, FootprintReasonCode, IDologyReasonCode, VerificationResultId};
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -17,32 +15,7 @@ pub struct IDologyFeatures {
     pub verification_result_id: VerificationResultId,
 }
 
-impl FeatureSet for IDologyFeatures {
-    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
-        self.footprint_reason_codes.clone()
-    }
-
-    fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
-        vec![VendorAPI::IdologyExpectId]
-    }
-}
-
 impl IDologyFeatures {
-    pub fn from(
-        resp: ExpectIDResponse,
-        verification_result_id: VerificationResultId, // TODO: rm or just rm IDologyFeatures in general
-        dob_submitted: bool,
-        ssn_submitted: bool,
-    ) -> Self {
-        let footprint_reason_codes: Vec<FootprintReasonCode> =
-            Self::footprint_reason_codes(resp, dob_submitted, ssn_submitted);
-
-        Self {
-            footprint_reason_codes,
-            verification_result_id,
-        }
-    }
-
     pub fn footprint_reason_codes(
         resp: ExpectIDResponse,
         dob_submitted: bool,

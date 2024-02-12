@@ -1,5 +1,5 @@
 use crate::{
-    decision::{features::incode_utils::*, onboarding::FeatureSet},
+    decision::features::incode_utils::*,
     enclave_client::EnclaveClient,
     errors::ApiResult,
     utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper},
@@ -8,7 +8,7 @@ use chrono::{NaiveDateTime, Utc};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    DataIdentifier, FootprintReasonCode, IdDocKind, IdentityDataKind, PiiString, VendorAPI,
+    DataIdentifier, FootprintReasonCode, IdDocKind, IdentityDataKind, PiiString, 
     VerificationResultId,
 };
 
@@ -86,17 +86,6 @@ pub struct IncodeDocumentFeatures {
     pub verification_result_id: VerificationResultId,
 }
 
-impl FeatureSet for IncodeDocumentFeatures {
-    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
-        self.footprint_reason_codes.clone()
-    }
-
-    fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
-        // TODO: Not quite right, but that's fine since this won't be used.
-        // eventually should move this to some sort of vendor api struct
-        vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr]
-    }
-}
 
 // Once we move RiskSignals to being computed at the time are handling the VRes, we can use this method.
 pub fn footprint_reason_codes(
