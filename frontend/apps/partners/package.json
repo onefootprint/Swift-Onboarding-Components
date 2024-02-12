@@ -5,9 +5,12 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev -p 3012",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint:ci": "eslint src",
     "lint": "eslint src --fix",
-    "start": "next start -p 3012"
+    "start": "next start -p 3012",
+    "typecheck": "yarn tsc --noEmit",
+    "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },
   "dependencies": {
     "react": "^18",
