@@ -48,7 +48,7 @@
     "i18next-locales-sync": "^2.0.1",
     "react-i18next": "^14.0.0",
     "tsconfig": "*",
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

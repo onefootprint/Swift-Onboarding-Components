@@ -34,7 +34,7 @@
     "react-dom": "^18",
     "tsconfig": "*",
     "tsup": "^6.5.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   },
   "peerDependencies": {
     "@onefootprint/footprint-js": "3.x",

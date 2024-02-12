@@ -18,7 +18,7 @@
     "@onefootprint/jest-presets": "*",
     "eslint-config-footprint": "*",
     "tsconfig": "*",
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

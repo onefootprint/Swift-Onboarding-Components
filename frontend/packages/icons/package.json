@@ -35,7 +35,7 @@
     "react": "^18",
     "react-dom": "^18",
     "tsconfig": "*",
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

@@ -28,6 +28,6 @@
   "devDependencies": {
     "@types/node": "^20.4.4",
     "eslint-config-footprint": "*",
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   }
 }

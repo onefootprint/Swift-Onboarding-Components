@@ -72,7 +72,7 @@
     "next-transpile-modules": "9.0.0",
     "react-i18next": "^14.0.0",
     "tsconfig": "*",
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

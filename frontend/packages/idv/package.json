@@ -85,7 +85,7 @@
     "react-dom": "^18",
     "react-i18next": "^14.0.0",
     "tsconfig": "*",
-    "typescript": "^5.3.3",
+    "typescript": "^5",
     "webpack": "*"
   },
   "peerDependencies": {
