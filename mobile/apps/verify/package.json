@@ -55,7 +55,6 @@
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
     "@onefootprint/test-utils": "*",
-    "metro-react-native-babel-preset": "0.73.10",
     "@types/jest": "^29.5.11",
     "@types/lodash": "^4.14.194",
     "@types/react": "^18.2.8",
@@ -65,11 +64,12 @@
     "csstype": "^3.1.2",
     "eslint-config-footprint": "*",
     "jest-expo": "^48.0.2",
+    "metro-react-native-babel-preset": "0.73.10",
     "module-resolver": "^1.0.0",
     "react-native-bundle-visualizer": "^3.1.3",
     "react-native-dotenv": "^3.4.8",
     "tsconfig": "*",
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   },
   "jest": {
     "testTimeout": 30000,

@@ -18,7 +18,7 @@
   "devDependencies": {
     "@onefootprint/styled": "*",
     "@onefootprint/test-utils": "*",
-    "@types/react-dom": "^18.0.10",
+    "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
     "@types/uuid": "^9.0.0",
     "bun-types": "^1.0.25",

@@ -9,7 +9,7 @@
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
   },
   "devDependencies": {
-    "@types/react-dom": "^18.0.10",
+    "@types/react-dom": "^18",
     "tsconfig": "*",
     "typescript": "^5"
   },

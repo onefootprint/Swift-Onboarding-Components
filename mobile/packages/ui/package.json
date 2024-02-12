@@ -21,7 +21,7 @@
     "jest-expo": "^48.0.2",
     "tsconfig": "*",
     "tsup": "^6.5.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   },
   "dependencies": {
     "@onefootprint/design-tokens": "*",

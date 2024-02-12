@@ -17,11 +17,11 @@
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
-    "@types/react-dom": "^18.0.10",
+    "@types/react-dom": "^18",
     "eslint-config-footprint": "*",
-    "react": "^18",
     "react-dom": "^18",
     "react-i18next": "^14.0.0",
+    "react": "^18",
     "tsconfig": "*",
     "typescript": "^5"
   },
