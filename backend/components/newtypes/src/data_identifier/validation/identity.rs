@@ -25,9 +25,9 @@ impl Validate for IDK {
             IDK::LastName => validate_name(value.as_string()?, args.for_bifrost)?,
             IDK::Dob => clean_and_validate_dob(value.as_string()?, args.for_bifrost)?,
             IDK::Ssn4 => clean_and_validate_ssn4(value.as_string()?)?,
-            IDK::AddressLine1 => validate_address(value.as_string()?, args.for_bifrost)?,
-            IDK::AddressLine2 => validate_address(value.as_string()?, args.for_bifrost)?,
-            IDK::City => value.as_string()?,
+            IDK::AddressLine1 => validate_address_line1(value.as_string()?, args.for_bifrost)?,
+            IDK::AddressLine2 => validate_address_line2(value.as_string()?, args.for_bifrost)?,
+            IDK::City => validate_city(value.as_string()?, args.for_bifrost)?,
             IDK::State => validate_state(value.as_string()?, all_data.get(&IDK::Country.into()))?,
             IDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
             IDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
@@ -97,15 +97,50 @@ fn validate_name(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
     Ok(input)
 }
 
-fn validate_address(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
+fn validate_po_box(input: &PiiString) -> VResult<()> {
+    if PO_BOX.is_match(input.leak()) {
+        return Err(Error::AddressIsPOBox);
+    }
+
+    Ok(())
+}
+
+fn validate_address_line1(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
+    let address = input.leak();
+    if for_bifrost {
+        if address.len() > 1000 || address.is_empty() {
+            return Err(Error::InvalidLength);
+        }
+
+        validate_po_box(&input)?;
+
+        if address.chars().all(|c| c.is_ascii_digit()) {
+            return Err(Error::InvalidAddressAllDigits);
+        }
+    }
+
+    Ok(input)
+}
+
+fn validate_city(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
+    let city = input.leak();
+    if for_bifrost && city.chars().all(|c| c.is_ascii_digit()) {
+        return Err(Error::InvalidAddressAllDigits);
+    }
+
+    Ok(input)
+}
+
+fn validate_address_line2(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
     if for_bifrost && input.leak().len() > 1000 {
         return Err(Error::InvalidLength);
     }
 
     // eventually should maybe use a address verification/resolution service for this
-    if for_bifrost && PO_BOX.is_match(input.leak()) {
-        return Err(Error::AddressIsPOBox);
+    if for_bifrost {
+        validate_po_box(&input)?;
     }
+
 
     Ok(input)
 }
@@ -213,6 +248,9 @@ mod test {
     #[test_case(FirstName, "" => None)]
     #[test_case(LastName, "" => None)]
     #[test_case(AddressLine1, "" => None)]
+    #[test_case(AddressLine1, "100111112" => None)]
+    #[test_case(City, "100111112" => None)]
+    #[test_case(City, "Waffleton" => Some("Waffleton".to_owned()))]
     #[test_case(FirstName, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
     #[test_case(LastName, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]
     #[test_case(AddressLine1, (0..1001).map(|_| "X").collect::<String>().as_str() => None)]

@@ -39,6 +39,8 @@ pub enum Error {
     InvalidCharacter,
     #[error("Invalid character: can only provide ascii digits")]
     NonDigitCharacter,
+    #[error("Invalid address: must not be all digits")]
+    InvalidAddressAllDigits,
     #[error("Invalid character: can only provide alphanumeric with `-` or ` `")]
     InvalidZipCharacter,
     #[error("Invalid country code: must provide two-digit ISO 3166 country code")]
