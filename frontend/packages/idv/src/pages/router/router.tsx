@@ -14,7 +14,7 @@ import {
 } from '../../utils/state-machine/utils/custom-listener';
 import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
-import Identify from '../identify';
+import IdentifyDeprecated from '../identify-deprecated';
 import Init from '../init';
 import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
@@ -127,7 +127,7 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
       {state.matches('init') && <Init />}
       {state.matches('sandboxOutcome') && <SandboxOutcome />}
       {state.matches('identify') && config && device && (
-        <Identify
+        <IdentifyDeprecated
           config={config}
           device={device}
           sandboxId={sandboxId}

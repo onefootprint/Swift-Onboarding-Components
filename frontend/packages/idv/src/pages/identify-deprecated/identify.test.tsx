@@ -12,7 +12,7 @@ import { ChallengeKind, CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import * as React from 'react';
 
 import { Layout } from '../../components/layout';
-import Identify from './identify';
+import IdentifyDeprecated from './identify';
 import {
   bootstrapExistingUser,
   bootstrapExistingUserWithPasskey,
@@ -64,7 +64,7 @@ describe('<Identify />', () => {
     customRender(
       <ObserveCollectorProvider appName="bifrost">
         <Layout onClose={() => {}}>
-          <Identify
+          <IdentifyDeprecated
             config={config}
             device={{
               type: 'mobile',
