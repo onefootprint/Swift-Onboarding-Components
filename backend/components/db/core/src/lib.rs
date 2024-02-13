@@ -23,7 +23,7 @@ use std::time::Duration;
 pub use crate::errors::DbError;
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::Runtime;
-use diesel::{pg::PgConnection as DieselPgConnection, prelude::*};
+use diesel::{connection::SimpleConnection, pg::PgConnection as DieselPgConnection, prelude::*};
 use errors::TransactionError;
 
 pub mod access_event;
@@ -176,6 +176,11 @@ pub fn run_migrations(url: &str) -> Result<(), DbError> {
     use crate::diesel_migrations::MigrationHarness;
     let mut conn = DieselPgConnection::establish(url)?;
     log::info!("Running migrations");
+
+    // Cap how long migrations can take. Avoids mistakes like accidentally taking a table lock in a
+    // long migration transaction.
+    conn.batch_execute("SET statement_timeout = '3s'")?;
+
     conn.run_pending_migrations(db_schema::MIGRATIONS)
         .map_err(DbError::MigrationFailed)?;
     log::info!("Migrations finished");
