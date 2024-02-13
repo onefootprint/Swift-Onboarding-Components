@@ -104,7 +104,9 @@ impl Task {
             SET status = $1, num_attempts = num_attempts + 1, last_leased_at = $3
             WHERE id IN (
                 SELECT id FROM task
-                WHERE status = $2 AND scheduled_for < $3{}
+                WHERE 
+                    (status = $2 AND scheduled_for < $3{})
+                    or (status = $1 AND now() > last_leased_at + max_lease_duration_s * interval '1 second')
                 ORDER BY scheduled_for ASC
                 FOR UPDATE SKIP LOCKED
                 LIMIT $4
@@ -147,16 +149,14 @@ impl Task {
     }
 
     #[tracing::instrument("Task::update", skip_all)]
-    pub fn update(
+    pub fn update_running_task(
         conn: &mut TxnPgConn,
         id: &TaskId,
         status: TaskStatus,
         task_execution_id: &TaskExecutionId,
         task_execution_update: TaskExecutionUpdate,
     ) -> DbResult<Self> {
-        let _updated_task_execution =
-            TaskExecution::update(conn.conn(), task_execution_id, task_execution_update)?;
-
+        TaskExecution::update(conn.conn(), task_execution_id, task_execution_update)?;
         let task_update = TaskUpdate { status };
         let result = diesel::update(task::table)
             .filter(task::id.eq(id))
@@ -307,5 +307,58 @@ mod tests {
             })
             .await
             .unwrap();
+    }    
+
+    #[test_db_pool]
+    async fn poll_over_leased(db_pool: TestDbPool) {
+        let tasks = db_pool
+            .db_transaction(move |conn| -> DbResult<_> {
+                let task1 = Task::create(conn, Utc::now(), task_data())?;
+                let task2 = Task::create(conn, Utc::now(), task_data())?;
+
+                let tasks = Task::poll(conn, 2, None)?;
+                assert!(have_same_elements(
+                    vec![
+                        (&task1.id, TaskStatus::Running, 1, &task1.id, 1),
+                        (&task2.id, TaskStatus::Running, 1, &task2.id, 1),
+                    ],
+                    tasks
+                        .iter()
+                        .map(|(t, te)| (&t.id, t.status, t.num_attempts, &te.task_id, te.attempt_num))
+                        .collect(),
+                ));
+
+                assert!(Task::poll(conn, 2, None).unwrap().is_empty());
+                Ok(tasks)
+            })
+            .await
+            .unwrap();
+
+            std::thread::sleep(std::time::Duration::from_secs(3));
+            db_pool
+                .db_transaction(move |conn| -> DbResult<()> {
+                // tasks now past their max lease duration and should be polled again, num_attempts incremented, and new task_execution's written
+                let repolled_tasks = Task::poll(conn, 2, None)?;
+                assert!(have_same_elements(
+                    vec![
+                        (&tasks[0].0.id, TaskStatus::Running, 2, &tasks[0].0.id, 2),
+                        (&tasks[1].0.id, TaskStatus::Running, 2, &tasks[1].0.id, 2),
+                    ],
+                    repolled_tasks
+                        .iter()
+                        .map(|(t, te)| (&t.id, t.status, t.num_attempts, &te.task_id, te.attempt_num))
+                        .collect(),
+                ));
+                assert_ne!(repolled_tasks[0].1.id, tasks[0].1.id);
+                assert_ne!(repolled_tasks[1].1.id, tasks[1].1.id);
+
+                assert!(Task::poll(conn, 2, None).unwrap().is_empty());
+                Ok(())
+            })
+            .await
+            .unwrap();
     }
+
+
 }
+

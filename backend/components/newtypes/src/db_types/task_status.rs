@@ -79,7 +79,7 @@ impl TaskKind {
 
     pub fn max_lease_duration(&self) -> Duration {
         match self {
-            TaskKind::LogMessage => Duration::seconds(60),
+            TaskKind::LogMessage => Duration::seconds(3),
             TaskKind::LogNumTenantApiKeys => Duration::seconds(60),
             TaskKind::WatchlistCheck => Duration::minutes(15),
             TaskKind::FireWebhook => Duration::seconds(30),
