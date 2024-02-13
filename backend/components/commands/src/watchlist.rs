@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use api_core::{config::Config, State};
-use chrono::Utc;
+use chrono::{DateTime, Duration, Utc};
 use clap::Parser;
 use db::{
     models::{
@@ -35,11 +35,12 @@ impl CreateOverdueWatchlistCheckTasks {
             .db_pool
             .db_query(move |conn| -> Result<_, DbError> {
                 let overdue_svs = WatchlistCheck::get_overdue_scoped_vaults(conn, tenant_id, limit)?;
-                let now = Utc::now();
+                let cnt = overdue_svs.len();
                 let task_args: Vec<TaskCreateArgs> = overdue_svs
                     .into_iter()
-                    .map(|sv| TaskCreateArgs {
-                        scheduled_for: now,
+                    .zip(distribute_timestamps(cnt, Utc::now(), Duration::hours(2)))
+                    .map(|(sv, dt)| TaskCreateArgs {
+                        scheduled_for: dt,
                         task_data: TaskData::WatchlistCheck(WatchlistCheckArgs { scoped_vault_id: sv }),
                     })
                     .collect();
@@ -58,3 +59,39 @@ impl CreateOverdueWatchlistCheckTasks {
         Ok(())
     }
 }
+
+fn distribute_timestamps(length: usize, start: DateTime<Utc>, duration: Duration) -> impl Iterator<Item = DateTime<Utc>> {
+    let interval = if length > 1 {
+        duration / (length as i32 - 1)
+    } else {
+        duration
+    };
+    (0..length).map(move |idx| {
+        if idx == 0 {
+            start
+        } else {
+            start + interval * (idx as i32)
+        }
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use chrono::{DateTime, Duration, Utc};
+    use super::distribute_timestamps;
+    use test_case::test_case;
+
+    fn dt(s: &str) -> DateTime<Utc> {
+        DateTime::parse_from_rfc3339(s).unwrap().with_timezone(&Utc)
+    }
+
+    #[test_case(0, dt("2020-04-04T17:00:00+00:00"), Duration::hours(1) => Vec::<DateTime<Utc>>::new())]
+    #[test_case(1, dt("2020-04-04T17:00:00+00:00"), Duration::hours(1) => vec![dt("2020-04-04T17:00:00Z")])]
+    #[test_case(2, dt("2020-04-04T17:00:00+00:00"), Duration::hours(1) => vec![dt("2020-04-04T17:00:00Z"), dt("2020-04-04T18:00:00Z")])]
+    #[test_case(4, dt("2020-04-04T17:00:00+00:00"), Duration::hours(1) => vec![dt("2020-04-04T17:00:00Z"), dt("2020-04-04T17:20:00Z"), dt("2020-04-04T17:40:00Z"), dt("2020-04-04T18:00:00Z")])]
+    fn test_distribute_timestamps(len: usize, start: DateTime<Utc>, duration: Duration) -> Vec<DateTime<Utc>>{
+        distribute_timestamps(len, start, duration).collect::<Vec<_>>()
+    }
+}
+
+

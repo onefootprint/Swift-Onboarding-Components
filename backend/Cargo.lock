@@ -2767,6 +2767,7 @@ dependencies = [
  "db_schema",
  "futures",
  "newtypes",
+ "test-case",
  "tokio",
  "tracing",
 ]
