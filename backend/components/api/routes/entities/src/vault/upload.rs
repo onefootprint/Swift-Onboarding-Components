@@ -192,7 +192,7 @@ async fn post_upload_inner(
             NewAuditEvent {
                 id: aeid,
                 tenant_id: scoped_vault.tenant_id,
-                principal_actor: Some(principal),
+                principal_actor: principal,
                 insight_event_id,
                 detail: AuditEventDetail::UpdateUserData {
                     is_live: scoped_vault.is_live,

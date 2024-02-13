@@ -6,6 +6,7 @@ use crate::utils::db2api::DbToApi;
 impl DbToApi<SaturatedActor> for Actor {
     fn from_db(actor: SaturatedActor) -> Self {
         match actor {
+            SaturatedActor::User(sv) => Actor::User { id: sv.fp_id },
             SaturatedActor::TenantUser(tenant_user) => {
                 let name = match (tenant_user.first_name, tenant_user.last_name) {
                     (None, None) => None,

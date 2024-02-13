@@ -18,7 +18,7 @@ pub struct AuditEvent {
     pub timestamp: DateTime<Utc>,
     pub tenant_id: TenantId,
     pub name: AuditEventName,
-    pub principal_actor: Option<DbActor>,
+    pub principal_actor: DbActor,
     pub insight_event_id: InsightEventId,
 
     pub metadata: AuditEventMetadata,
@@ -39,7 +39,7 @@ struct NewAuditEventRow {
     timestamp: DateTime<Utc>,
     tenant_id: TenantId,
     name: AuditEventName,
-    principal_actor: Option<DbActor>,
+    principal_actor: DbActor,
     insight_event_id: InsightEventId,
 
     metadata: AuditEventMetadata,
@@ -69,7 +69,7 @@ pub struct AuditEventRowDetailFields {
 pub struct NewAuditEvent {
     pub id: AuditEventId,
     pub tenant_id: TenantId,
-    pub principal_actor: Option<DbActor>,
+    pub principal_actor: DbActor,
     pub insight_event_id: InsightEventId,
     pub detail: AuditEventDetail,
 }
@@ -153,7 +153,7 @@ mod tests {
         NewAuditEvent {
             id: AuditEventId::generate(),
             tenant_id: tenant.id.clone(),
-            principal_actor: Some(DbActor::Footprint),
+            principal_actor: DbActor::Footprint,
             insight_event_id: insight_event.id,
             detail: AuditEventDetail::CreateUser {
                 is_live: true,

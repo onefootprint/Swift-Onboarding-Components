@@ -1,20 +1,20 @@
-use std::collections::HashMap;
-
-use crate::{models::ob_configuration::ObConfiguration, PgConn};
-use newtypes::{DbActor, TenantApiKeyId, TenantUserId};
-use tracing::instrument;
-
 use crate::{
     models::{
-        access_event::AccessEvent, annotation::Annotation, onboarding_decision::OnboardingDecision,
-        tenant_api_key::TenantApiKey, tenant_user::TenantUser,
+        access_event::AccessEvent, annotation::Annotation, ob_configuration::ObConfiguration,
+        onboarding_decision::OnboardingDecision, scoped_vault::ScopedVault, tenant_api_key::TenantApiKey,
+        tenant_user::TenantUser,
     },
-    DbError, DbResult,
+    DbError, DbResult, PgConn,
 };
-use db_schema::schema::{tenant_api_key, tenant_user};
+use db_schema::schema::{scoped_vault, tenant_api_key, tenant_user};
 use diesel::prelude::*;
+use newtypes::{DbActor, ScopedVaultId, TenantApiKeyId, TenantUserId};
+use std::collections::HashMap;
+use tracing::instrument;
+
 #[derive(Clone, Debug)]
 pub enum SaturatedActor {
+    User(ScopedVault),
     TenantUser(TenantUser),
     TenantApiKey(TenantApiKey),
     Footprint,
@@ -77,6 +77,11 @@ where
 {
     let actors: Vec<DbActor> = has_actors.iter().filter_map(|ha| ha.actor()).collect();
 
+    let scoped_vault_ids = actors.iter().flat_map(|a| match a {
+        DbActor::User { id } => Some(id),
+        _ => None,
+    });
+
     let tenant_user_ids = actors.iter().flat_map(|a| match a {
         DbActor::TenantUser { id } => Some(id),
         DbActor::FirmEmployee { id } => Some(id),
@@ -87,6 +92,13 @@ where
         DbActor::TenantApiKey { id } => Some(id),
         _ => None,
     });
+
+    let scoped_vault_map: HashMap<ScopedVaultId, ScopedVault> = scoped_vault::table
+        .filter(scoped_vault::id.eq_any(scoped_vault_ids))
+        .get_results::<ScopedVault>(conn)?
+        .into_iter()
+        .map(|t| (t.id.clone(), t))
+        .collect();
 
     let tenant_users_map: HashMap<TenantUserId, TenantUser> = tenant_user::table
         .filter(tenant_user::id.eq_any(tenant_user_ids))
@@ -106,6 +118,12 @@ where
         .into_iter()
         .map(|ha| {
             let saturated_actor = match ha.actor() {
+                Some(DbActor::User { id }) => Some(SaturatedActor::User(
+                    scoped_vault_map
+                        .get(&id)
+                        .ok_or(DbError::RelatedObjectNotFound)?
+                        .clone(),
+                )),
                 Some(DbActor::TenantUser { id }) => Some(SaturatedActor::TenantUser(
                     tenant_users_map
                         .get(&id)

@@ -207,6 +207,7 @@ export type {
   ActorFirmEmployee,
   ActorFootprint,
   ActorOrganization,
+  ActorUser,
   AmlDetail,
   AmlHit,
   AmlHitMedia,

@@ -233,7 +233,7 @@ pub async fn decrypt_aml_hits(
             NewAuditEvent {
                 id: aeid,
                 tenant_id,
-                principal_actor: Some(principal),
+                principal_actor: principal,
                 insight_event_id,
                 detail: AuditEventDetail::DecryptUserData {
                     is_live,

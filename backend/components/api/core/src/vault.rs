@@ -131,7 +131,7 @@ pub async fn create_non_portable_vault(
                 NewAuditEvent {
                     id: aeid,
                     tenant_id: su.tenant_id.clone(),
-                    principal_actor: Some(db_actor),
+                    principal_actor: db_actor,
                     insight_event_id,
                     detail: AuditEventDetail::UpdateUserData {
                         is_live: su.is_live,

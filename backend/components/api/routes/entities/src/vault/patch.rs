@@ -176,7 +176,7 @@ async fn patch_inner(
                 NewAuditEvent {
                     id: aeid,
                     tenant_id: scoped_vault.tenant_id.clone(),
-                    principal_actor: Some(principal.clone()),
+                    principal_actor: principal.clone(),
                     insight_event_id: insight_event_id.clone(),
                     detail: AuditEventDetail::UpdateUserData {
                         is_live: scoped_vault.is_live,
@@ -205,7 +205,7 @@ async fn patch_inner(
                 NewAuditEvent {
                     id: aeid,
                     tenant_id: scoped_vault.tenant_id,
-                    principal_actor: Some(principal),
+                    principal_actor: principal,
                     insight_event_id,
                     detail: AuditEventDetail::DeleteUserData {
                         is_live: scoped_vault.is_live,

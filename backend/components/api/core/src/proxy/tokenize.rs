@@ -163,7 +163,7 @@ pub async fn vault_pii(
                 NewAuditEvent {
                     id: aeid,
                     tenant_id,
-                    principal_actor: Some(principal),
+                    principal_actor: principal,
                     insight_event_id,
                     detail: AuditEventDetail::UpdateUserData {
                         is_live: scoped_vault.is_live,

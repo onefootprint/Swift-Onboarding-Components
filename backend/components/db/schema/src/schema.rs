@@ -85,7 +85,7 @@ diesel::table! {
         timestamp -> Timestamptz,
         tenant_id -> Text,
         name -> Text,
-        principal_actor -> Nullable<Jsonb>,
+        principal_actor -> Jsonb,
         insight_event_id -> Text,
         metadata -> Jsonb,
         scoped_vault_id -> Nullable<Text>,

@@ -388,7 +388,8 @@ fn kyc(
     let approved_by = actor
         .and_then(|a| match a {
             db::actor::SaturatedActor::TenantUser(user) => user.name(),
-            db::actor::SaturatedActor::TenantApiKey(_)
+            db::actor::SaturatedActor::User(_)
+            | db::actor::SaturatedActor::TenantApiKey(_)
             | db::actor::SaturatedActor::FirmEmployee(_)
             | db::actor::SaturatedActor::Footprint => None,
         })

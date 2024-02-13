@@ -148,7 +148,7 @@ where
                         let audit_event = NewAuditEvent {
                             id: aeid,
                             tenant_id: sv.tenant_id,
-                            principal_actor: Some(principal.clone()),
+                            principal_actor: principal.clone(),
                             insight_event_id: insight.id.clone(),
                             detail: AuditEventDetail::DecryptUserData {
                                 is_live: sv.is_live,

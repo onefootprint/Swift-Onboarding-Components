@@ -1,7 +1,7 @@
 import styled from '@onefootprint/styled';
 import type { Actor as TActor } from '@onefootprint/types';
 import { ActorKind } from '@onefootprint/types';
-import { createFontStyles } from '@onefootprint/ui';
+import { CodeInline, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +14,11 @@ const Actor = ({ actor }: ActorProps) => {
 
   return (
     <Container>
+      {actor.kind === ActorKind.user && (
+        <span>
+          <CodeInline isPrivate>{actor.fpId}</CodeInline>
+        </span>
+      )}
       {actor.kind === ActorKind.footprint && t('footprint')}
       {actor.kind === ActorKind.firmEmployee && t('firm-employee')}
       {/* TODO deeplink these one day */}

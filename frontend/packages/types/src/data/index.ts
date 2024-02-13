@@ -8,6 +8,7 @@ export type {
   ActorFirmEmployee,
   ActorFootprint,
   ActorOrganization,
+  ActorUser,
 } from './actor';
 export { ActorKind } from './actor';
 export type { AmlDetail, AmlHit, AmlHitMedia } from './aml-detail';

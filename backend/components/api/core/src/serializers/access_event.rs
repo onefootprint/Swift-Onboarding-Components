@@ -7,6 +7,7 @@ use crate::utils::db2api::DbToApi;
 
 fn saturated_actor_to_principal_string(saturated_actor: &SaturatedActor) -> String {
     match saturated_actor {
+        db::actor::SaturatedActor::User(_) => "Data Owner".to_string(), // The access_event table doesn't actually use this variant.
         db::actor::SaturatedActor::TenantUser(tu) => tu.email.0.clone(),
         db::actor::SaturatedActor::TenantApiKey(tak) => tak.name.clone(),
         db::actor::SaturatedActor::Footprint => "Footprint".to_owned(),

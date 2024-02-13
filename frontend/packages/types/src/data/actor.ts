@@ -1,9 +1,15 @@
 export enum ActorKind {
+  user = 'user',
   footprint = 'footprint',
   firmEmployee = 'firm_employee',
   organization = 'organization',
   apiKey = 'api_key',
 }
+
+export type ActorUser = {
+  kind: ActorKind.user;
+  fpId: string;
+};
 
 export type ActorFootprint = {
   kind: ActorKind.footprint;
@@ -25,6 +31,7 @@ export type ActorApiKey = {
 };
 
 export type Actor =
+  | ActorUser
   | ActorFootprint
   | ActorFirmEmployee
   | ActorOrganization

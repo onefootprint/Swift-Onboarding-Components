@@ -99,7 +99,7 @@ pub async fn delete(
             NewAuditEvent {
                 id: aeid,
                 tenant_id: scoped_vault.tenant_id,
-                principal_actor: Some(actor),
+                principal_actor: actor,
                 insight_event_id,
                 detail: AuditEventDetail::DeleteUserData {
                     is_live: scoped_vault.is_live,
