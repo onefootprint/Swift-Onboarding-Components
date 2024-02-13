@@ -36,7 +36,7 @@
     "testflight": {
       "distribution": "store",
       "ios": {
-        "resourceClass": "m-medium"
+        "image": "latest"
       },
       "env": {
         "API_BASE_URL": "https://api.dev.onefootprint.com"
@@ -45,7 +45,7 @@
     "production": {
       "distribution": "store",
       "ios": {
-        "resourceClass": "m-medium"
+        "image": "latest"
       },
       "env": {
         "API_BASE_URL": "https://api.onefootprint.com"
