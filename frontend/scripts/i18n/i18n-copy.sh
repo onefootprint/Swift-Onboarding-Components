@@ -26,7 +26,7 @@ get_external_package_sources() {
 
     for dep in "${deps[@]}"; do
         if [ -n "$dep" ]; then
-            for ns_file in ../../packages/"${dep}"/src/config/locales/"${language}"/"${dep}".json; do
+            for ns_file in ../../packages/"${dep}"/src/config/locales/"${language}"/*.json; do
                 if [ -f "$ns_file" ]; then
                     sources+=("$ns_file")
                 fi

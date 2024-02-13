@@ -1,10 +1,10 @@
+import { useIdentify } from '@onefootprint/idv/src/components/identify/queries';
 import type { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
 import { useEffectOnceStrict } from '@/src/hooks';
 
 import Loading from '../../app/user/loading';
-import { useIdentify } from '../identify/queries';
 
 type IdentifyUserProps = {
   authToken: string;

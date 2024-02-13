@@ -1,6 +1,7 @@
 import type { enRequestJson as requestResource } from '@onefootprint/request';
 import type { enUiJson as uiResource } from '@onefootprint/ui';
 
+import type identifyResource from '../config/locales/en/identify.json';
 import type idvResource from '../config/locales/en/idv.json';
 
 declare module 'i18next' {
@@ -11,6 +12,7 @@ declare module 'i18next' {
       idv: typeof idvResource;
       ui: typeof uiResource;
       request: typeof requestResource;
+      identify: typeof identifyResource;
     };
   }
 }

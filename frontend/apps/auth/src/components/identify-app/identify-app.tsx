@@ -5,6 +5,11 @@ import {
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import { Logger } from '@onefootprint/idv';
+import type { DoneArgs } from '@onefootprint/idv/src/components/identify';
+import {
+  Identify,
+  IdentifyVariant,
+} from '@onefootprint/idv/src/components/identify';
 import { getErrorMessage } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
@@ -17,9 +22,6 @@ import { isAuth, isSdkUrlAllowed } from '@/src/utils';
 import { useFootprintProvider } from '../../provider-footprint';
 import useProps from '../../provider-footprint/hooks/use-props';
 import type { Variant } from '../../types';
-import Identify from '../identify';
-import { IdentifyVariant } from '../identify/state/types';
-import type { DoneArgs } from '../identify/types';
 import Layout from '../layout';
 import type { NotificationProps } from '../notification';
 import Notification from '../notification';

@@ -1,0 +1,89 @@
+{
+  "continue": "Continuar",
+  "email": "Correo electrónico",
+  "change": "Cambiar",
+  "phone-number": "Número de teléfono",
+  "enter-email": "Introduce tu correo electrónico",
+  "enter-phone": "Introduce tu número de teléfono",
+  "success": "Éxito",
+  "email-update-success": "Has actualizado tu dirección de correo electrónico exitosamente.",
+  "passkey-update-success": "Has actualizado tu Passkey exitosamente.",
+  "phone-update-success": "Has actualizado tu número de teléfono exitosamente.",
+  "notification": {
+    "404-token-title": "Token no encontrado",
+    "404-user-description": "No hemos encontrado un usuario con estos datos, o el token proporcionado ha expirado. Por favor, contacta a quienes te enviaron este enlace e inténtalo de nuevo.",
+    "404-user-title": "El enlace es inválido"
+  },
+  "sandbox": {
+    "description": "Puedes iniciar sesión con un usuario de sandbox previamente creado usando su mismo ID.",
+    "hint": "No use caracteres especiales ni espacios.",
+    "label": "ID para pruebas",
+    "placeholder": "Ingrese ID para pruebas",
+    "errors": {
+      "required": "ID de prueba es un campo requerido",
+      "invalid": "ID de prueba inválido. Por favor, no use espacios ni caracteres especiales."
+    },
+    "button": {
+      "edit": "Editar",
+      "save": "Guardar",
+      "copy": "Copiar",
+      "copy-confirmation": "Copiado",
+      "reset": "Reiniciar"
+    }
+  },
+  "email-step": {
+    "header": {
+      "title": "¡Hola! 👋",
+      "subtitle": "Introduce tu correo electrónico para empezar."
+    },
+    "form": {
+      "input-placeholder": "jane.doe@acme.com",
+      "input-required": "Correo electrónico es un campo requerido"
+    }
+  },
+  "phone-step": {
+    "subtitle": "Ingresa tu número de teléfono para continuar.",
+    "title": "¡Hola! 👋",
+    "form": {
+      "input-invalid": "Número de teléfono inválido",
+      "input-required": "No se puede dejar el número de teléfono en blanco"
+    }
+  },
+  "challenge-select-or-biometric": {
+    "welcome-back-title": "¡Bienvenido nuevamente! 🎉",
+    "log-in-to-modify-details": "Inicia sesión para modificar los detalles de tu cuenta",
+    "log-in-options": "Inicia sesión usando una de las siguientes opciones",
+    "continue": "Continuar",
+    "send-code-to": "Enviar código a",
+    "send-code-via-sms": "Enviar código por SMS",
+    "send-code-via-email": "Enviar código por correo electrónico",
+    "passkey": "Iniciar sesión con Passkeys"
+  },
+  "sms-step": {
+    "label": "SMS",
+    "prompt-with-phone": "Introduce el código de 6 dígitos que enviamos a {{scrubbedPhoneNumber}}.",
+    "prompt-without-phone": "Introduce el código de 6 dígitos que enviamos a tu teléfono.",
+    "verify-title": "Verifica tu número de teléfono",
+    "welcome-back-title": "¡Bienvenido nuevamente! 🎉"
+  },
+  "pin-verification": {
+    "incorrect-code": "Código incorrecto",
+    "new-code-sent-description": "Te hemos enviado un nuevo código.",
+    "resend-countdown": "Por favor, espera {{seconds}} segundos...",
+    "resend-cta": "Reenviar código",
+    "success": "¡Éxito!",
+    "verifying": "Verificando..."
+  },
+  "passkey-challenge": {
+    "error": {
+      "title": "Algo salió mal",
+      "description": "Esto puede deberse a que no tiene los permisos necesarios en este dispositivo. Por favor, intenta iniciar sesión con otro método."
+    }
+  },
+  "email-challenge": {
+    "prompt-with-email": "Introduce el código de 6 dígitos que enviamos a {{email}}.",
+    "prompt-without-email": "Introduce el código de 6 dígitos que enviamos a tu correo electrónico.",
+    "verify-title": "Verifica tu correo electrónico",
+    "welcome-back-title": "¡Bienvenido nuevamente! 🎉"
+  }
+}

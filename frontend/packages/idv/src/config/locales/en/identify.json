@@ -7,7 +7,7 @@
   "enter-phone": "Enter your new phone number",
   "success": "Success",
   "email-update-success": "You've updated your email address successfully.",
-  "passkey-update-success": "passkey update success",
+  "passkey-update-success": "Passkey update successful",
   "phone-update-success": "You've updated your phone number successfully.",
   "notification": {
     "404-token-title": "Token not found",
@@ -77,7 +77,7 @@
   "passkey-challenge": {
     "error": {
       "title": "Something went wrong",
-      "description": "This might be because of your device permissions. Please try logging in with SMS instead."
+      "description": "This might be because of your device permissions. Please try logging in with another method."
     }
   },
   "email-challenge": {

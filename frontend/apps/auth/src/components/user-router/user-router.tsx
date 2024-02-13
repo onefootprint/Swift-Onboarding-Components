@@ -1,5 +1,13 @@
 import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
 import { StepHeader } from '@onefootprint/idv';
+import {
+  Identify,
+  IdentifyVariant,
+} from '@onefootprint/idv/src/components/identify';
+import {
+  UpdateEmail,
+  UpdatePhone,
+} from '@onefootprint/idv/src/components/identify/components/user-update';
 import { AuthMethodKind } from '@onefootprint/types/src/data';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,9 +18,6 @@ import type { HeaderProps } from '@/src/types';
 import { getUserLeftNavButton } from '@/src/utils';
 
 import Loading from '../../app/user/loading';
-import Identify from '../identify';
-import { UpdateEmail, UpdatePhone } from '../identify/components/user-update';
-import { IdentifyVariant } from '../identify/state/types';
 import Notification from '../notification';
 import UserDashboard from '../user-dashboard';
 
