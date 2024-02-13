@@ -1,9 +1,11 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { EmailForm, getLogger, LegalFooter } from '@onefootprint/idv';
 import noop from 'lodash/fp/noop';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { getLogger } from '../../../../utils';
+import EmailForm from '../../../email-form';
+import LegalFooter from '../../../legal-footer';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';

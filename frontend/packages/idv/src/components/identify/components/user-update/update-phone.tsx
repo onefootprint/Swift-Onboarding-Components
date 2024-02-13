@@ -1,9 +1,10 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { checkIsPhoneValid, PhoneForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { checkIsPhoneValid } from '../../../../utils';
+import PhoneForm from '../../../phone-form';
 import type { HeaderProps } from '../../types';
 import UpdateVerifyPhone from './update-verify-phone';
 

@@ -1,5 +1,6 @@
-import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
 import React from 'react';
+
+import { HeaderTitle, NavigationHeader } from '../../../layout';
 
 export type NotificationProps = {
   subtitle?: string;

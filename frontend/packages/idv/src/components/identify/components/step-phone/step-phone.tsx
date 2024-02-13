@@ -1,16 +1,13 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import {
-  checkIsPhoneValid,
-  EmailPreview,
-  getLogger,
-  PhoneForm,
-} from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import noop from 'lodash/fp/noop';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { checkIsPhoneValid, getLogger } from '../../../../utils';
+import EmailPreview from '../../../email-preview';
+import PhoneForm from '../../../phone-form';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';

@@ -1,11 +1,11 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { getBiometricChallengeResponse, getLogger } from '@onefootprint/idv';
 import type { LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { getBiometricChallengeResponse, getLogger } from '../../../../../utils';
 import { useIdentifyVerify, useLoginChallenge } from '../../../queries';
 import { useIdentifyMachine } from '../../../state';
 

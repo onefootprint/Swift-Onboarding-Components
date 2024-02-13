@@ -1,9 +1,9 @@
-import type { DeviceInfo } from '@onefootprint/idv';
 import type { ObConfigAuth, PublicOnboardingConfig } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
+import type { DeviceInfo } from '../../../hooks';
 import {
   hasBootstrapTruthyValue,
   hasEmailAndPhoneNumber,

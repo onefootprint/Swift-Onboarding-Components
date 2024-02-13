@@ -1,4 +1,3 @@
-import { getScrubbedPhoneNumber } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import type { Identifier as IdvIdentifier } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
@@ -6,6 +5,7 @@ import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { getScrubbedPhoneNumber } from '../../../../utils';
 import useGetHeaderText from '../../hooks/use-get-header-text';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';

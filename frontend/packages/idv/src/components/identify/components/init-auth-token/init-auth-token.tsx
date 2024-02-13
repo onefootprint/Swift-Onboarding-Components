@@ -1,6 +1,6 @@
-import { getLogger } from '@onefootprint/idv';
 import React from 'react';
 
+import { getLogger } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';

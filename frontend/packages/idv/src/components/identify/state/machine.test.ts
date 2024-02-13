@@ -1,4 +1,3 @@
-import type { DeviceInfo } from '@onefootprint/idv';
 import type {
   ChallengeData,
   IdentifyBootstrapData,
@@ -13,6 +12,7 @@ import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 import { AuthMethodKind } from '@onefootprint/types/src/data';
 import { interpret } from 'xstate';
 
+import type { DeviceInfo } from '../../../hooks';
 import createIdentifyMachine from './machine';
 import { IdentifyVariant } from './types';
 

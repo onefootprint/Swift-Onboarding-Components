@@ -1,5 +1,4 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { getLogger } from '@onefootprint/idv';
 import { useRequestError } from '@onefootprint/request';
 import type {
   ChallengeData,
@@ -12,6 +11,7 @@ import type {
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { getLogger } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import {
   useIdentifyVerify,

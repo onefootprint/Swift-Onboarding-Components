@@ -1,8 +1,8 @@
-import { EmailForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import EmailForm from '../../../email-form';
 import type { HeaderProps } from '../../types';
 import UpdateVerifyEmail from './update-verify-email';
 

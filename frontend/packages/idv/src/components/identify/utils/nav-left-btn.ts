@@ -1,5 +1,4 @@
-import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
-
+import type { NavigationHeaderLeftButtonProps } from '../../layout';
 import type { IdentifyMachineHook } from '../state';
 import { shouldShowChallengeSelector } from '../state/predicates';
 

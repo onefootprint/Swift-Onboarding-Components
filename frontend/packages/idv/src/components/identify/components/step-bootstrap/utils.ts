@@ -1,10 +1,11 @@
-import { getLogger } from '@onefootprint/idv';
 import type {
   EmailOrPhoneIdentifier,
   IdentifyRequest,
   IdentifyResponse,
 } from '@onefootprint/types';
 import type { UseMutationResult } from '@tanstack/react-query';
+
+import { getLogger } from '../../../../utils';
 
 export type IdentifyResult = IdentifyResponse & {
   successfulIdentifier: EmailOrPhoneIdentifier;

@@ -1,4 +1,3 @@
-import type { DeviceInfo } from '@onefootprint/idv';
 import type {
   ChallengeData,
   ChallengeKind,
@@ -10,6 +9,7 @@ import type {
 } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 
+import type { DeviceInfo } from '../../../hooks';
 import type { EmailAndOrPhone } from '../types';
 
 export type IdentifyMachineContext = {

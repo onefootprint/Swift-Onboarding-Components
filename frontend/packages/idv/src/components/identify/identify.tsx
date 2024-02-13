@@ -1,17 +1,14 @@
 'use client';
 
 import type { FootprintUserData } from '@onefootprint/footprint-js';
-import type { DeviceInfo } from '@onefootprint/idv';
-import {
-  getIdentifyBootstrapData,
-  getRandomID,
-  useDeviceInfo,
-} from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { DeviceInfo } from '../../hooks';
+import { useDeviceInfo } from '../../hooks';
+import { getIdentifyBootstrapData, getRandomID } from '../../utils';
 import DashedLine from './components/dashed-line';
 import Router from './components/router';
 import SandboxInput from './components/sandbox-input';

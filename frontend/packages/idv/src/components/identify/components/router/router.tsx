@@ -1,8 +1,8 @@
-import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
-import { StepHeader } from '@onefootprint/idv';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { NavigationHeaderLeftButtonProps } from '../../../layout';
+import StepHeader from '../../../step-header';
 import type { IdentifyMachineContext, IdentifyMachineHook } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import type { DoneArgs, HeaderProps } from '../../types';
