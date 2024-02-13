@@ -863,6 +863,8 @@ diesel::table! {
         task_data -> Jsonb,
         status -> Text,
         num_attempts -> Int4,
+        max_lease_duration_s -> Nullable<Int4>,
+        last_leased_at -> Nullable<Timestamptz>,
     }
 }
 

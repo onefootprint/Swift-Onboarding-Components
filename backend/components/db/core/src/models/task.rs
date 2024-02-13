@@ -4,9 +4,7 @@ use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::task;
 use diesel::{
-    prelude::*,
-    sql_query,
-    sql_types::{BigInt, Text, Timestamptz},
+    prelude::*, sql_query, sql_types::{BigInt, Text, Timestamptz}
 };
 use newtypes::{Locked, TaskData, TaskExecutionId, TaskId, TaskKind, TaskStatus};
 
@@ -23,6 +21,8 @@ pub struct Task {
     pub task_data: TaskData,
     pub status: TaskStatus,
     pub num_attempts: i32,
+    pub max_lease_duration_s: Option<i32>,
+    pub last_leased_at: Option<DateTime<Utc>>
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -33,6 +33,8 @@ pub struct NewTask {
     pub task_data: TaskData,
     pub status: TaskStatus,
     pub num_attempts: i32,
+    pub max_lease_duration_s: Option<i32>,
+    pub last_leased_at: Option<DateTime<Utc>>
 }
 
 pub struct TaskCreateArgs {
@@ -56,9 +58,11 @@ impl Task {
         let new_task = NewTask {
             created_at: Utc::now(),
             scheduled_for,
-            task_data,
+            task_data: task_data.clone(),
             status: TaskStatus::Pending,
             num_attempts: 0,
+            max_lease_duration_s: Some(TaskKind::from(task_data).max_lease_duration().num_seconds() as i32),
+            last_leased_at: None
         };
         let result = diesel::insert_into(task::table)
             .values(new_task)
@@ -73,9 +77,11 @@ impl Task {
             .map(|a| NewTask {
                 created_at: Utc::now(),
                 scheduled_for: a.scheduled_for,
-                task_data: a.task_data,
+                task_data: a.task_data.clone(),
                 status: TaskStatus::Pending,
                 num_attempts: 0,
+                max_lease_duration_s: Some(TaskKind::from(a.task_data).max_lease_duration().num_seconds() as i32),
+                last_leased_at: None
             })
             .collect();
         let res = diesel::insert_into(task::table)
@@ -90,11 +96,12 @@ impl Task {
         limit: u32,
         kind: Option<TaskKind>,
     ) -> DbResult<Vec<(Task, TaskExecution)>> {
+        let now = Utc::now();
         // TODO: cannot for the life of me get this to compile in diesel
         let tasks = sql_query(format!(
             "
             UPDATE task
-            SET status = $1, num_attempts = num_attempts + 1
+            SET status = $1, num_attempts = num_attempts + 1, last_leased_at = $3
             WHERE id IN (
                 SELECT id FROM task
                 WHERE status = $2 AND scheduled_for < $3{}
@@ -109,7 +116,7 @@ impl Task {
         ))
         .bind::<Text, _>(TaskStatus::Running)
         .bind::<Text, _>(TaskStatus::Pending)
-        .bind::<Timestamptz, _>(Utc::now())
+        .bind::<Timestamptz, _>(now)
         .bind::<BigInt, _>(i64::from(limit))
         .get_results::<Task>(conn.conn())?;
 
@@ -120,7 +127,7 @@ impl Task {
                 attempt_num: t.num_attempts,
             })
             .collect();
-        let task_executions = TaskExecution::bulk_create(conn.conn(), task_execution_args)?;
+        let task_executions = TaskExecution::bulk_create(conn.conn(), task_execution_args, now)?;
         let task_id_to_task_execution: HashMap<TaskId, TaskExecution> = task_executions
             .into_iter()
             .map(|te| (te.task_id.clone(), te))

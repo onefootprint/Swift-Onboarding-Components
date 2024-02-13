@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -74,6 +74,16 @@ impl TaskKind {
             TaskKind::WatchlistCheck => 1, // errors here are unexpected and the task is not time sensitive so we'd rather investigate a failure as soon as it happens
             TaskKind::FireWebhook => 3,
             TaskKind::RunIncodeStuckWorkflow => 3,
+        }
+    }
+
+    pub fn max_lease_duration(&self) -> Duration {
+        match self {
+            TaskKind::LogMessage => Duration::seconds(60),
+            TaskKind::LogNumTenantApiKeys => Duration::seconds(60),
+            TaskKind::WatchlistCheck => Duration::minutes(15),
+            TaskKind::FireWebhook => Duration::seconds(30),
+            TaskKind::RunIncodeStuckWorkflow => Duration::minutes(5),
         }
     }
 }

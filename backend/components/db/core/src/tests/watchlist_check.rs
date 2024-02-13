@@ -285,6 +285,8 @@ fn make_vault(
                 }),
                 status: TaskStatus::Pending,
                 num_attempts: 0,
+                max_lease_duration_s: None,
+                last_leased_at: None,
             },
         )
         .unwrap();
