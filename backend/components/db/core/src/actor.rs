@@ -1,8 +1,8 @@
 use crate::{
     models::{
-        access_event::AccessEvent, annotation::Annotation, ob_configuration::ObConfiguration,
-        onboarding_decision::OnboardingDecision, scoped_vault::ScopedVault, tenant_api_key::TenantApiKey,
-        tenant_user::TenantUser,
+        access_event::AccessEvent, annotation::Annotation, audit_event::AuditEvent,
+        ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision,
+        scoped_vault::ScopedVault, tenant_api_key::TenantApiKey, tenant_user::TenantUser,
     },
     DbError, DbResult, PgConn,
 };
@@ -46,6 +46,12 @@ impl HasActor for ObConfiguration {
 impl HasActor for AccessEvent {
     fn actor(&self) -> Option<DbActor> {
         Some(self.principal.clone())
+    }
+}
+
+impl HasActor for AuditEvent {
+    fn actor(&self) -> Option<DbActor> {
+        Some(self.principal_actor.clone())
     }
 }
 

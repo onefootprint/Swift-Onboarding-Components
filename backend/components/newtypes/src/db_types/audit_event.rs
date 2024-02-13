@@ -161,7 +161,6 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
     }
 }
 
-/// Represents the jsonb metadata column type in the audit_event table.
 #[derive(
     Display,
     Debug,
@@ -195,7 +194,11 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
     strum(serialize_all = "snake_case"),
     diesel(sql_type = Text)
 )]
+/// Represents the jsonb metadata column type in the audit_event table.
 pub enum AuditEventMetadata {
+    // The names of these fields are used in jsonb queries. The compiler
+    // won't be able to check that they are properly used in filters, since diesel doesn't support
+    // filtering on nested jsonb values without dropping into SQL.
     CreateUser {
         fields: Vec<DataIdentifier>,
     },
