@@ -6,8 +6,8 @@ const COUNTDOWN_SECONDS = 4;
 const TICK_INTERVAL = 850;
 const NOT_DETECTED_TOLERANCE = 150;
 
-let timerId: NodeJS.Timeout = null;
-let notDetectedTimerId: NodeJS.Timeout = null;
+let timerId: ReturnType<typeof setTimeout> | null = null;
+let notDetectedTimerId: ReturnType<typeof setTimeout> | null = null;
 
 const useCameraCountdown = (props: {
   object: any;

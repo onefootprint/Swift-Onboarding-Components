@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 const ANIMATION_DURATION = 2000;
 
-let timeout: NodeJS.Timeout;
+let timeout: ReturnType<typeof setTimeout>;
 let startedTime: number;
 
 const useTrackAnimationDuration = () => {

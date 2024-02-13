@@ -8,9 +8,12 @@
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint:ci": "eslint src",
     "lint": "eslint src --fix",
+    "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3012",
-    "typecheck": "yarn tsc --noEmit",
-    "set:dot-env": "sh ../../scripts/set-dot-env.sh"
+    "test:ci:bun": "bun test --bail",
+    "test:watch": "bun test --watch",
+    "test": "bun test",
+    "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
     "react": "^18",
@@ -18,9 +21,10 @@
     "next": "14.1.0"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
+    "@types/react-dom": "^18",
     "@types/react": "^18",
-    "@types/react-dom": "^18"
+    "bun-types": "^1",
+    "typescript": "^5"
   }
 }

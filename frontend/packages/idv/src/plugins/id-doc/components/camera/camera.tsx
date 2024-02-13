@@ -173,7 +173,7 @@ const Camera = ({
   const canvasAutoCaptureRef = useRef<HTMLCanvasElement>();
   const canvasImageCaptureRef = useRef<HTMLCanvasElement>();
   const videoRef: VideoRef = useRef<HTMLVideoElement>(null);
-  const autocaptureRestartTimeoutRef = useRef<NodeJS.Timeout>();
+  const autocaptureRestartTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const [isImageProcessing, setIsImageProcessing] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);

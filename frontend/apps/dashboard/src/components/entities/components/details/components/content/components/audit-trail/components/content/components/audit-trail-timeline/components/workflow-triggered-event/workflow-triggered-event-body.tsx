@@ -19,7 +19,7 @@ type WorkflowTriggeredEventBodyProps = {
 
 const HIDE_TIMEOUT = 1000;
 
-let confirmationTimeout: null | NodeJS.Timeout = null;
+let confirmationTimeout: null | ReturnType<typeof setTimeout> = null;
 
 const WorkflowTriggeredEventBody = ({
   data,

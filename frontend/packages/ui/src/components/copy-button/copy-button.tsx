@@ -19,7 +19,7 @@ export type CopyButtonProps = {
 
 const HIDE_TIMEOUT = 600;
 
-let confirmationTimeout: null | NodeJS.Timeout = null;
+let confirmationTimeout: null | ReturnType<typeof setTimeout> = null;
 
 const CopyButton = ({
   ariaLabel,

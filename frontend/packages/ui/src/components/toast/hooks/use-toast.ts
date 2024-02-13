@@ -5,7 +5,7 @@ import type { NextToast, ToastProps } from '../toast.types';
 const HIDE_TIMEOUT = 8000;
 const LEAVING_ANIMATION_DURATION = 200;
 
-const timeoutManager: Record<string, NodeJS.Timeout> = {};
+const timeoutManager: Record<string, ReturnType<typeof setTimeout>> = {};
 
 const createRandomId = () => Math.random().toString(36).substring(2, 15);
 

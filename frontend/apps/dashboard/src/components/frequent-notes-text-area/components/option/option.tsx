@@ -33,7 +33,8 @@ const Option = ({
   const isHovered = useHover(hoverRef);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const [hideCheckTimeout, setHideCheckTimeout] = useState<NodeJS.Timeout>();
+  const [hideCheckTimeout, setHideCheckTimeout] =
+    useState<ReturnType<typeof setTimeout>>();
 
   const handleOnClick = () => {
     if (isEdit) {

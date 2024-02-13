@@ -27,7 +27,7 @@ const useProps = <T extends Obj>(
   const sdkArgsToken = getSdkArgsToken(router.asPath.split('#')[1] ?? '');
   const sdkArgsQuery = useGetSdkArgs<T>(sdkArgsToken, fpProvider);
   const isSdkArgsLoading = sdkArgsQuery.isLoading && sdkArgsQuery.isFetching; // `isLoading` is true right from the start; `isFetching` is controlled by `enabled` property
-  const timerId = useRef<NodeJS.Timeout | undefined>();
+  const timerId = useRef<ReturnType<typeof setTimeout>>();
 
   const complete = (props: T, config?: PublicOnboardingConfig) => {
     // If already received props, ignore

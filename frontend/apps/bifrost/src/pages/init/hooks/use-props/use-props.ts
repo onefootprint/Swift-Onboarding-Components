@@ -45,7 +45,7 @@ const useProps = (
     onSuccess(props);
   };
 
-  const timerId = useRef<NodeJS.Timeout | undefined>();
+  const timerId = useRef<ReturnType<typeof setTimeout>>();
 
   useEffectOnce(() => {
     fpProvider.load().then(() => {
