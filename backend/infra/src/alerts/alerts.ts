@@ -271,6 +271,21 @@ const staticAlerts: Alert[] = [
           op: '>=',
           value: 500,
         },
+        {
+          column: 'cs_uri_stem',
+          op: 'does-not-contain',
+          value: '/upload/front',
+        },
+        {
+          column: 'cs_uri_stem',
+          op: 'does-not-contain',
+          value: '/upload/back',
+        },
+        {
+          column: 'cs_uri_stem',
+          op: 'does-not-contain',
+          value: '/upload/selfie',
+        },
       ],
       filter_combination: 'AND',
     },
