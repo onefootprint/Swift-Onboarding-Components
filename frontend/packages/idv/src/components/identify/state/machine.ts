@@ -4,6 +4,7 @@ import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
+import { getRandomID } from '../../../utils';
 import {
   hasBootstrapTruthyValue,
   hasEmailAndPhoneNumber,
@@ -109,7 +110,8 @@ export const getMachineArgs = ({
   isLive,
   device,
   identify: {
-    sandboxId: config?.isLive === false ? sandboxId : undefined,
+    sandboxId:
+      config?.isLive === false ? sandboxId || getRandomID(13) : undefined,
   },
   obConfigAuth,
   logoConfig,

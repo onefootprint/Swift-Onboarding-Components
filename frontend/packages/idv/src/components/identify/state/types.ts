@@ -35,6 +35,7 @@ export type IdentifyMachineContext = {
 export enum IdentifyVariant {
   updateLoginMethods,
   auth,
+  verify,
 }
 
 export type LogoConfig = {

@@ -2,12 +2,9 @@ import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-type SandboxOutcomeFooterProps = { label: string; sandboxId?: string };
+type ContentProps = { label: string; sandboxId?: string };
 
-const SandboxOutcomeFooter = ({
-  label,
-  sandboxId,
-}: SandboxOutcomeFooterProps) =>
+const Content = ({ label, sandboxId }: ContentProps) =>
   sandboxId ? (
     <Container>
       <Inner>
@@ -51,4 +48,4 @@ const Column = styled.div`
   `}
 `;
 
-export default SandboxOutcomeFooter;
+export default Content;

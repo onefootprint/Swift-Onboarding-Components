@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { NavigationHeaderLeftButtonProps } from '../../../layout';
 import StepHeader from '../../../step-header';
-import type { IdentifyMachineContext, IdentifyMachineHook } from '../../state';
+import type { IdentifyMachineContext } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import type { DoneArgs, HeaderProps } from '../../types';
 import getLeftNavButton from '../../utils/nav-left-btn';
@@ -17,9 +17,7 @@ import StepEmail from '../step-email';
 import StepPhone from '../step-phone';
 import StepSms from '../step-sms';
 
-type Send = IdentifyMachineHook[1];
 type RouterProps = {
-  children?: (state: string, send: Send) => JSX.Element | null;
   onDone: (payload: DoneArgs) => void;
 };
 
@@ -40,7 +38,7 @@ const getHeader = (
     );
   };
 
-const Router = ({ onDone, children }: RouterProps): JSX.Element | null => {
+const Router = ({ onDone }: RouterProps): JSX.Element | null => {
   const [state, send] = useIdentifyMachine();
   const isDone = state.matches('success');
   const { t } = useTranslation('identify');
@@ -57,46 +55,28 @@ const Router = ({ onDone, children }: RouterProps): JSX.Element | null => {
   if (isDone) return null;
 
   if (state.matches('init')) {
-    return <Loading>{children?.('init', send)}</Loading>;
+    return <Loading />;
   }
   if (state.matches('initBootstrap')) {
-    return <StepBootstrap>{children?.('initBootstrap', send)}</StepBootstrap>;
+    return <StepBootstrap />;
   }
   if (state.matches('initAuthToken') && initialAuthToken) {
-    return (
-      <InitAuthToken authToken={initialAuthToken}>
-        {children?.('initBootstrap', send)}
-      </InitAuthToken>
-    );
+    return <InitAuthToken authToken={initialAuthToken} />;
   }
   if (state.matches('emailIdentification')) {
-    return (
-      <StepEmail Header={Header}>
-        {children?.('emailIdentification', send)}
-      </StepEmail>
-    );
+    return <StepEmail Header={Header} />;
   }
   if (state.matches('phoneIdentification')) {
-    return (
-      <StepPhone Header={Header}>
-        {children?.('phoneIdentification', send)}
-      </StepPhone>
-    );
+    return <StepPhone Header={Header} />;
   }
   if (state.matches('challengeSelectOrPasskey')) {
     return <ChallengeSelectOrPasskey Header={Header} />;
   }
   if (state.matches('smsChallenge')) {
-    return (
-      <StepSms Header={Header}>{children?.('smsChallenge', send)}</StepSms>
-    );
+    return <StepSms Header={Header} />;
   }
   if (state.matches('emailChallenge')) {
-    return (
-      <EmailChallenge Header={Header}>
-        {children?.('emailChallenge', send)}
-      </EmailChallenge>
-    );
+    return <EmailChallenge Header={Header} />;
   }
   if (state.matches('authTokenInvalid')) {
     return (

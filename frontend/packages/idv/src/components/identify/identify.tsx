@@ -3,29 +3,22 @@
 import type { FootprintUserData } from '@onefootprint/footprint-js';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
-import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
 
 import type { DeviceInfo } from '../../hooks';
 import { useDeviceInfo } from '../../hooks';
-import { getIdentifyBootstrapData, getRandomID } from '../../utils';
-import DashedLine from './components/dashed-line';
+import { getIdentifyBootstrapData } from '../../utils';
 import Router from './components/router';
-import SandboxInput from './components/sandbox-input';
-import SandboxOutcomeFooter from './components/sandbox-outcome-footer';
+import SandboxFooter from './components/sandbox-footer';
 import { IdentifyMachineProvider } from './state';
 import type { IdentifyVariant, LogoConfig } from './state/types';
 import type { DoneArgs, ObKeyHeader } from './types';
-import sandboxIdEditRules from './utils/editable-sandbox-rules';
 
-const voidObj: Record<string, never> = {};
 const initialDevice = {
   hasSupportForWebauthn: false,
   type: 'unknown',
   osName: 'unknown',
 };
-
-const RenderNull = (): null => null;
 
 const getOnboardConfigurationKey = (key?: string): ObKeyHeader | undefined =>
   key ? { [CLIENT_PUBLIC_KEY_HEADER]: key } : undefined;
@@ -53,17 +46,10 @@ const Identify = ({
   onDone,
 }: IdentifyProps): JSX.Element | null => {
   const [device, setDevice] = useState<DeviceInfo>(initialDevice);
-  const [sandboxId, setSandboxId] = useState<string>(() => getRandomID(13));
 
-  const { t } = useTranslation('identify');
   const obConfigAuth = getOnboardConfigurationKey(publicKey);
 
   useDeviceInfo(setDevice);
-
-  const isSandboxEditable = useMemo(
-    () => sandboxIdEditRules(userData || voidObj),
-    [userData],
-  );
 
   return (
     <IdentifyMachineProvider
@@ -74,46 +60,12 @@ const Identify = ({
         isLive,
         device,
         obConfigAuth,
-        sandboxId,
         logoConfig,
         variant,
       }}
     >
-      <Router onDone={onDone}>
-        {!isLive
-          ? (state, send) =>
-              isSandboxEditable(state) ? (
-                <>
-                  <DashedLine variant="secondary" />
-                  <SandboxInput
-                    label={t('sandbox.label')}
-                    placeholder={t('sandbox.placeholder')}
-                    value={sandboxId}
-                    setValue={value => {
-                      setSandboxId(value);
-                      send({
-                        type: 'sandboxIdChanged',
-                        payload: { sandboxId: value },
-                      });
-                    }}
-                    texts={{
-                      copy: t('sandbox.button.copy'),
-                      copyConfirmation: t('sandbox.button.copy-confirmation'),
-                      description: t('sandbox.description'),
-                      edit: t('sandbox.button.edit'),
-                      reset: t('sandbox.button.reset'),
-                      save: t('sandbox.button.save'),
-                    }}
-                  />
-                </>
-              ) : (
-                <SandboxOutcomeFooter
-                  label={t('sandbox.label')}
-                  sandboxId={sandboxId}
-                />
-              )
-          : RenderNull}
-      </Router>
+      <Router onDone={onDone} />
+      <SandboxFooter />
     </IdentifyMachineProvider>
   );
 };
