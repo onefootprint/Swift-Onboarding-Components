@@ -16,6 +16,7 @@ async fn test_attest_ios() {
         vec![
             "5F264K8AG4.com.onefootprint.my",
             "5F264K8AG4.com.onefootprint.my.Clip",
+            "5F264K8AG4.com.onefootprint.demo-swift",
         ],
         "-----BEGIN PRIVATE KEY-----
 MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg5dQK1vD+J6BPctWQ
@@ -42,6 +43,7 @@ async fn test_attest_ios_2() {
         vec![
             "5F264K8AG4.com.onefootprint.my",
             "5F264K8AG4.com.onefootprint.my.Clip",
+            "5F264K8AG4.com.onefootprint.demo-swift",
         ],
         "-----BEGIN PRIVATE KEY-----
 MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg5dQK1vD+J6BPctWQ

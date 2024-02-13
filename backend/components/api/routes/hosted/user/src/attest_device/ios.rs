@@ -46,6 +46,7 @@ pub(super) async fn attest(
         vec![
             "5F264K8AG4.com.onefootprint.my",
             "5F264K8AG4.com.onefootprint.my.Clip",
+            "5F264K8AG4.com.onefootprint.demo-swift",
         ],
         &state.config.apple_config.apple_device_check_private_key_pem,
         &state.config.apple_config.apple_device_check_key_id,

@@ -135,6 +135,7 @@ async fn test_fetch_receipt() {
         vec![
             "5F264K8AG4.com.onefootprint.my",
             "5F264K8AG4.com.onefootprint.my.Clip",
+            "5F264K8AG4.com.onefootprint.demo-swift",
         ],
         "-----BEGIN PRIVATE KEY-----
 MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg5dQK1vD+J6BPctWQ
@@ -171,6 +172,7 @@ async fn test_fetch_bits() {
         vec![
             "5F264K8AG4.com.onefootprint.my",
             "5F264K8AG4.com.onefootprint.my.Clip",
+            "5F264K8AG4.com.onefootprint.demo-swift",
         ],
         "-----BEGIN PRIVATE KEY-----
 MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg5dQK1vD+J6BPctWQ
