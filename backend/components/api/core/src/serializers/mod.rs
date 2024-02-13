@@ -1,6 +1,7 @@
 mod access_event;
 mod actor;
 mod annotation;
+mod audit_event;
 mod auth_event;
 mod authorized_org;
 mod business_owner;

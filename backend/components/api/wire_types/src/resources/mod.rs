@@ -16,6 +16,9 @@ pub use sdk_args::*;
 mod access_event;
 pub use self::access_event::*;
 
+mod audit_event;
+pub use self::audit_event::*;
+
 mod entity;
 pub use self::entity::*;
 
