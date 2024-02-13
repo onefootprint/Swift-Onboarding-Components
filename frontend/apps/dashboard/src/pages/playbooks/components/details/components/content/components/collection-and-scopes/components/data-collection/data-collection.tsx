@@ -104,7 +104,11 @@ const DataCollection = ({
               options={{
                 ssn: {
                   active: requiresSSN || optionalSSN,
-                  kind: mustCollectData.includes('ssn9') ? 'ssn9' : 'ssn4',
+                  kind:
+                    mustCollectData.includes('ssn9') ||
+                    optionalData.includes('ssn9')
+                      ? 'ssn9'
+                      : 'ssn4',
                   optional: optionalSSN,
                 },
                 usLegalStatus: mustCollectData.includes('us_legal_status'),
