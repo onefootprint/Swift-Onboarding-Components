@@ -95,7 +95,6 @@ describe('Onboarding Requirements Machine Tests', () => {
             hasSupportForWebauthn: true,
             osName: 'unknown',
           },
-          userFound: true,
           authToken: 'token',
           config: TestOnboardingConfig,
           bootstrapData: {
@@ -117,7 +116,6 @@ describe('Onboarding Requirements Machine Tests', () => {
           hasSupportForWebauthn: true,
           osName: 'unknown',
         },
-        userFound: true,
         authToken: 'token',
         config: TestOnboardingConfig,
         bootstrapData: {
@@ -142,7 +140,6 @@ describe('Onboarding Requirements Machine Tests', () => {
             hasSupportForWebauthn: true,
             osName: 'unknown',
           },
-          userFound: false,
           authToken: 'token',
           config: TestOnboardingConfig,
         }),
@@ -214,7 +211,6 @@ describe('Onboarding Requirements Machine Tests', () => {
             hasSupportForWebauthn: true,
             osName: 'unknown',
           },
-          userFound: false,
           authToken: 'token',
           config: NoPhoneOnboardingConfig,
         }),

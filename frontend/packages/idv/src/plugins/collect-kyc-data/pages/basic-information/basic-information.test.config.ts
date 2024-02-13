@@ -35,7 +35,6 @@ export const getInitialContext = (data: KycData): MachineContext => ({
     allowInternationalResidents: false,
     supportedCountries: [],
   },
-  userFound: true,
   requirement: {
     kind: OnboardingRequirementKind.collectKycData,
     isMet: false,

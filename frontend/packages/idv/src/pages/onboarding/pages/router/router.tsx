@@ -18,7 +18,6 @@ const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingMachine();
   useLogStateMachine('onboarding', state);
   const {
-    userFound,
     device,
     config,
     authToken,
@@ -45,7 +44,6 @@ const Router = ({ onDone }: RouterProps) => {
     <>
       {state.matches('requirements') && (
         <Requirements
-          userFound={!!userFound}
           device={device}
           config={config}
           authToken={authToken}

@@ -38,7 +38,6 @@ describe('Collect KYC Data Machine Tests', () => {
     deviceType?: string,
   ) => {
     const initialContext: MachineContext = {
-      userFound: true,
       authToken: 'authToken',
       requirement: {
         kind: OnboardingRequirementKind.collectKycData,

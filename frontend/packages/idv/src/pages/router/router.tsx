@@ -29,7 +29,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     device,
     authToken,
     bootstrapData,
-    userFound,
     isTransfer,
     showCompletionPage,
     showLogo,
@@ -144,7 +143,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
           config={config}
           device={device}
           authToken={authToken}
-          userFound={userFound}
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
           overallOutcome={overallOutcome}

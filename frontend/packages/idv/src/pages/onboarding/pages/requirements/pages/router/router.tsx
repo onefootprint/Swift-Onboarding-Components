@@ -26,7 +26,6 @@ const Router = ({ onDone }: RouterProps) => {
   const {
     onboardingContext: {
       authToken,
-      userFound,
       bootstrapData,
       config,
       device,
@@ -79,7 +78,6 @@ const Router = ({ onDone }: RouterProps) => {
             kybRequirement: kyb,
             kycRequirement: kyc,
             kycBootstrapData,
-            userFound,
             config,
           },
         }}
@@ -96,7 +94,6 @@ const Router = ({ onDone }: RouterProps) => {
           customData: {
             requirement: kyc,
             bootstrapData: kycBootstrapData,
-            userFound,
             config,
           },
         }}

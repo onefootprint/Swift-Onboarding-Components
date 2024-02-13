@@ -10,7 +10,6 @@ import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
   onboardingContext: {
-    userFound: boolean;
     config: PublicOnboardingConfig;
     device: DeviceInfo;
     authToken: string;

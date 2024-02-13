@@ -11,7 +11,6 @@ export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
   config: PublicOnboardingConfig;
-  userFound: boolean;
   requirement: CollectKycDataRequirement;
   // Machine-generated
   data: KycData; // combines bootstrapData, disabledFields and fieldsToDecrypt after decrypting the values

@@ -44,7 +44,6 @@ describe('Collect KYB Data Machine Tests', () => {
     const initialContext: MachineContext = {
       authToken: 'authToken',
       device,
-      userFound: true,
       config: { ...TestOnboardingConfig },
       kybRequirement: {
         kind: OnboardingRequirementKind.collectKybData,

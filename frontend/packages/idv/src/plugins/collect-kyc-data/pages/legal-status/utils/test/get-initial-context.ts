@@ -24,7 +24,6 @@ const getInitialContext = ({
     osName: 'iOS',
   },
   config: getOnboardingConfig(),
-  userFound: true,
   requirement:
     requirement ??
     ({

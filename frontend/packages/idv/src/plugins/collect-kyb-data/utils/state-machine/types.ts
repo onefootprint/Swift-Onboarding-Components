@@ -44,7 +44,6 @@ export type MachineContext = {
   device?: DeviceInfo;
   authToken?: string;
   config?: PublicOnboardingConfig;
-  userFound?: boolean;
   // Machine generated
   data: BusinessDIData;
 };

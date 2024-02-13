@@ -116,7 +116,6 @@ describe('<CollectKycData />', () => {
       bootstrapData: {
         [IdDI.email]: 'piip@onefootprint.com',
       },
-      userFound: true,
       config: onboardingConfig,
     },
     device: {

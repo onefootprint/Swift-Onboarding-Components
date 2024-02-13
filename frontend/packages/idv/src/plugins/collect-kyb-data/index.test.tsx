@@ -108,7 +108,6 @@ describe.skip('<CollectKybData />', () => {
       kycBootstrapData: {
         [IdDI.email]: 'piip@onefootprint.com',
       },
-      userFound: true,
     },
     device: {
       type: 'mobile',

@@ -102,7 +102,6 @@ const createIdvMachine = (args: IdvMachineArgs) =>
                 target: 'onboarding',
                 actions: [
                   'assignAuthToken',
-                  'assignUserFound',
                   'assignEmail',
                   'assignPhoneNumber',
                 ],
@@ -158,10 +157,6 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           idDocOutcome: event.payload.idDocOutcome,
           sandboxId: event.payload.sandboxId,
           overallOutcome: event.payload.overallOutcome,
-        })),
-        assignUserFound: assign((context, event) => ({
-          ...context,
-          userFound: event.payload.userFound,
         })),
         assignEmail: assign((context, event) => {
           context.bootstrapData = context.bootstrapData || {};

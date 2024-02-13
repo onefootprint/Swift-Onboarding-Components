@@ -14,7 +14,6 @@ import {
 import type { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
-  userFound: boolean;
   config: PublicOnboardingConfig;
   device: DeviceInfo;
   authToken: string;
@@ -26,7 +25,6 @@ export type OnboardingRequirementsMachineArgs = {
 };
 
 const createOnboardingRequirementsMachine = ({
-  userFound,
   config,
   device,
   authToken,
@@ -49,7 +47,6 @@ const createOnboardingRequirementsMachine = ({
       initial: 'checkRequirements',
       context: {
         onboardingContext: {
-          userFound,
           config,
           device,
           authToken,

@@ -12,7 +12,6 @@ export type MachineContext = {
   device: DeviceInfo;
   authToken: string;
   bootstrapData: IdDIData; // TODO: generalize this more in the next iteration
-  userFound?: boolean;
   isTransfer?: boolean;
   validationToken?: string;
   idDocOutcome?: IdDocOutcome;

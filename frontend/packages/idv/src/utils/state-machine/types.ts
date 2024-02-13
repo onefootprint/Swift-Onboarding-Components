@@ -28,7 +28,6 @@ export type MachineContext = {
   isTransfer?: boolean;
   obConfigAuth?: ObConfigAuth;
   validationToken?: string;
-  userFound?: boolean;
   showCompletionPage?: boolean;
   showLogo?: boolean;
   idDocOutcome?: IdDocOutcome;
@@ -62,7 +61,6 @@ export type MachineEvents =
       type: 'identifyCompleted';
       payload: {
         authToken: string;
-        userFound: boolean;
         email?: string;
         phoneNumber?: string;
       };

@@ -46,7 +46,6 @@ const getInitialContext = ({
     allowInternationalResidents,
     supportedCountries,
   },
-  userFound: true,
   requirement: {
     kind: OnboardingRequirementKind.collectKycData,
     isMet: false,

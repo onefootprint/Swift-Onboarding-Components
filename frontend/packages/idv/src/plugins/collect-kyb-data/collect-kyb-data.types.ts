@@ -12,7 +12,6 @@ export type CollectKybDataContext = {
   kybRequirement: CollectKybDataRequirement;
   kycRequirement?: CollectKycDataRequirement;
   kycBootstrapData?: KycBootstrapData;
-  userFound: boolean;
 };
 
 export type CollectKybDataProps = BasePluginProps<CollectKybDataContext>;

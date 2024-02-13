@@ -16,7 +16,6 @@ export type OnboardingMachineArgs = {
   device: DeviceInfo;
   authToken: string;
   bootstrapData?: IdDIData; // TODO: generalize this more in the next iteration
-  userFound?: boolean;
   isTransfer?: boolean;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
@@ -29,7 +28,6 @@ const createOnboardingMachine = (
     device,
     authToken,
     bootstrapData = {},
-    userFound,
     isTransfer,
     idDocOutcome,
     overallOutcome,
@@ -53,7 +51,6 @@ const createOnboardingMachine = (
         device,
         authToken,
         bootstrapData: validateBootstrapData(bootstrapData, l10n?.locale),
-        userFound,
         isTransfer,
         idDocOutcome,
         overallOutcome,

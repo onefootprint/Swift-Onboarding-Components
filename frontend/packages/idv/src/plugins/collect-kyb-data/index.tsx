@@ -13,7 +13,6 @@ const App = ({ context, onDone }: CollectKybDataProps) => {
 
   const {
     config,
-    userFound,
     kybRequirement,
     // TODO: add support for kyb bootstrap data in the future
     kycRequirement,
@@ -23,7 +22,6 @@ const App = ({ context, onDone }: CollectKybDataProps) => {
     device,
     authToken,
     config,
-    userFound,
     kybRequirement,
     kycRequirement,
     kycBootstrapData,

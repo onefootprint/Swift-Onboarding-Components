@@ -13,15 +13,13 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
     return null;
   }
 
-  const { config, userFound, requirement, bootstrapData, disabledFields } =
-    customData;
+  const { config, requirement, bootstrapData, disabledFields } = customData;
   const cdos = allAttributes(requirement);
   const initData = getInitData(cdos, bootstrapData, disabledFields);
   const initContext: MachineContext = {
     authToken,
     device,
     config,
-    userFound,
     requirement,
     data: initData,
     initialData: {},
