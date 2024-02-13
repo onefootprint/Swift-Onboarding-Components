@@ -247,6 +247,7 @@ const Preview = ({ isDemo, isDebug }: PreviewProps) => {
                     SupportedIdDocTypes.visa,
                     SupportedIdDocTypes.residenceDocument,
                     SupportedIdDocTypes.voterIdentification,
+                    SupportedIdDocTypes.passportCard,
                   ],
                   UM: [
                     SupportedIdDocTypes.idCard,

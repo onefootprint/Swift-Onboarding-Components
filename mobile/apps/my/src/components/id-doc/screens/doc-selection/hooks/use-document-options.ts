@@ -4,6 +4,7 @@ import {
   IcoGreenCard24,
   IcoIdCard24,
   IcoPassport24,
+  IcoPassportCard24,
   IcoVisaPassport24,
   IcoVoter24,
   IcoWork24,
@@ -58,6 +59,11 @@ const useDocumentOptions = (
       title: t('options.voter-identification'),
       value: SupportedIdDocTypes.voterIdentification,
       IconComponent: IcoVoter24,
+    },
+    [SupportedIdDocTypes.passportCard]: {
+      title: t('options.passport-card'),
+      value: SupportedIdDocTypes.passportCard,
+      IconComponent: IcoPassportCard24,
     },
   };
   return availableDocTypes.map(type => options[type]).filter(option => option);

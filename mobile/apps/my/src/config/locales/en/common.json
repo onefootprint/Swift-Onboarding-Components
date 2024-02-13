@@ -25,7 +25,9 @@
     "passport": "Passport",
     "visa": "Visa",
     "permit": "Work permit / EAD card",
-    "residence_document": "Residence card / Green card"
+    "residence_document": "Residence card / Green card",
+    "voter_identification": "Voter Identification",
+    "passport_card": "Passport card"
   },
   "cdo": {
     "name": "Full name",
@@ -83,7 +85,8 @@
         "residence-document": "Residence card / Green card",
         "voter-identification": "Voter Identification",
         "permit": "Work permit / EAD card",
-        "visa": "Visa"
+        "visa": "Visa",
+        "passport-card": "Passport card"
       },
       "permissions-dialog": {
         "title": "Allow access to your camera",
@@ -235,6 +238,16 @@
       "instructions": {
         "title-front": "Place front of your visa here",
         "title-back": "Place back of your visa here",
+        "description": "We'll scan it automatically"
+      }
+    },
+    "passport-card": {
+      "name": "Passport Card",
+      "title-front": "Passport Card - Front",
+      "title-back": "Passport Card - Back",
+      "instructions": {
+        "title-front": "Place front of your passport card here",
+        "title-back": "Place back of your passport card here",
         "description": "We'll scan it automatically"
       }
     },

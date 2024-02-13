@@ -31,6 +31,8 @@ export { default as IcoInfo16 } from './ico-info-16';
 export { default as IcoInfo24 } from './ico-info-24';
 export { default as IcoLayer24 } from './ico-layer-24';
 export { default as IcoPassport24 } from './ico-passport-24';
+export { default as IcoPassportCard16 } from './ico-passport-card-16';
+export { default as IcoPassportCard24 } from './ico-passport-card-24';
 export { default as IcoPencil24 } from './ico-pencil-24';
 export { default as IcoPhone24 } from './ico-phone-24';
 export { default as IcoRepeat40 } from './ico-repeat-40';

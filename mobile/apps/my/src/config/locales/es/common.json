@@ -25,7 +25,9 @@
     "passport": "Pasaporte",
     "visa": "Visa",
     "permit": "Permiso de trabajo / Tarjeta EAD",
-    "residence_document": "Tarjeta de residencia / Green card"
+    "residence_document": "Tarjeta de residencia / Green card",
+    "voter_identification": "Identificación de votante",
+    "passport_card": "Tarjeta de pasaporte"
   },
   "cdo": {
     "name": "Nombre completo",
@@ -235,6 +237,16 @@
       "instructions": {
         "title-front": "Coloca el frente de tu visa aquí",
         "title-back": "Coloca el dorso de tu visa aquí",
+        "description": "La escanearemos automáticamente"
+      }
+    },
+    "passport-card": {
+      "name": "Tarjeta de pasaporte",
+      "title-front": "Tarjeta de pasaporte - Frente",
+      "title-back": "Tarjeta de pasaporte - Dorso",
+      "instructions": {
+        "title-front": "Coloque la parte frontal de su tarjeta de pasaporte aquí.",
+        "title-back": "Coloque la parte posterior de su tarjeta de pasaporte aquí.",
         "description": "La escanearemos automáticamente"
       }
     },
