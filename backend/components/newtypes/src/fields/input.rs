@@ -21,6 +21,15 @@ impl<T: DeserializeOwned> IntoIterator for Csv<T> {
     }
 }
 
+impl<T> From<Csv<T>> for Vec<T>
+where
+    T: DeserializeOwned,
+{
+    fn from(value: Csv<T>) -> Self {
+        value.0
+    }
+}
+
 string_api_data_type_alias!(Csv<DataIdentifier>);
 string_api_data_type_alias!(Csv<TenantRoleId>);
 string_api_data_type_alias!(Csv<TenantScope>);

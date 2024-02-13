@@ -1,3 +1,6 @@
+pub mod audit_event;
+pub use self::audit_event::*;
+
 pub mod search_entities_request;
 pub use self::search_entities_request::*;
 

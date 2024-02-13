@@ -1,5 +1,6 @@
 mod access_events;
 mod api_keys;
+mod audit_events;
 mod authn;
 mod client_security_config;
 mod frequent_notes;
@@ -37,6 +38,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(roles::deactivate)
         .service(risk_signals::get)
         .service(access_events::get)
+        .service(audit_events::get)
         .service(logo::put)
         .service(metrics_api::get)
         .service(webhook_portal::get)

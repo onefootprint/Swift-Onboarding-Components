@@ -1,9 +1,10 @@
 use actix_web::Responder;
+use newtypes::Base64Data;
 use paperclip::{
     actix::{web::Json, Apiv2Schema},
     v2::{models::DataType, schema::TypedData},
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::errors::ApiResult;
 
@@ -213,5 +214,84 @@ impl<T> OffsetPaginatedResponse<T> {
             data,
             meta: OffsetPaginatedResponseMeta { next_page, count },
         }
+    }
+}
+
+/// Wraps a rich cursor type so it's serialized as an base64 string.
+/// Facilitates multi-field cursors.
+#[derive(Debug, PartialEq)]
+pub struct Base64Cursor<T>(T);
+
+impl<T> Base64Cursor<T>
+where
+    T: Serialize + for<'de> Deserialize<'de>,
+{
+    pub fn new(t: T) -> Base64Cursor<T> {
+        Base64Cursor(t)
+    }
+
+    pub fn inner(&self) -> &T {
+        &self.0
+    }
+}
+
+impl<T> Serialize for Base64Cursor<T>
+where
+    T: Serialize,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let j = serde_cbor::to_vec(&self.0).map_err(serde::ser::Error::custom)?;
+        Base64Data(j).serialize(serializer)
+    }
+}
+
+impl<'de, T> Deserialize<'de> for Base64Cursor<T>
+where
+    T: for<'tde> Deserialize<'tde>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let b = Base64Data::deserialize(deserializer)?.0;
+        let val = serde_cbor::from_slice(&b).map_err(serde::de::Error::custom)?;
+
+        Ok(Base64Cursor(val))
+    }
+}
+
+impl<T> TypedData for Base64Cursor<T> {
+    fn data_type() -> paperclip::v2::models::DataType {
+        paperclip::v2::models::DataType::String
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Debug, PartialEq, Serialize, Deserialize)]
+    struct TestCursor {
+        a: i32,
+        b: String,
+        c: Vec<i32>,
+    }
+
+    #[test]
+    fn test_base_64_cursor() {
+        let c = Base64Cursor(TestCursor {
+            a: 10,
+            b: "frogs".to_owned(),
+            c: vec![2, 4, 6, 8],
+        });
+
+        let cursor_str = serde_json::to_string(&c).unwrap();
+        assert_eq!(cursor_str, "\"o2FhCmFiZWZyb2dzYWOEAgQGCA\"");
+
+        let decoded_c = serde_json::from_str(&cursor_str).unwrap();
+        assert_eq!(c, decoded_c);
     }
 }

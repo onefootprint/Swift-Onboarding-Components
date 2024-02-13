@@ -158,6 +158,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -715,6 +734,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -1529,6 +1567,54 @@
                 ]
             }
         },
+        "/entities/{fp_id}/rule_set_result/{rule_set_result_id}": {
+            "get": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private",
+                    "Rules"
+                ],
+                "description": "Retrieves the RuleSetResult for the given fp_id,rule_set_result_id",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "rule_set_result_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RuleSetResult"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/timeline": {
             "get": {
                 "tags": [
@@ -2113,6 +2199,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -2561,6 +2666,25 @@
                                     "document.passport.nationality",
                                     "document.passport.curp",
                                     "document.passport.classified_document_type",
+                                    "document.passport_card.front.image",
+                                    "document.passport_card.front.mime_type",
+                                    "document.passport_card.back.image",
+                                    "document.passport_card.back.mime_type",
+                                    "document.passport_card.selfie.image",
+                                    "document.passport_card.selfie.mime_type",
+                                    "document.passport_card.full_name",
+                                    "document.passport_card.dob",
+                                    "document.passport_card.gender",
+                                    "document.passport_card.full_address",
+                                    "document.passport_card.document_number",
+                                    "document.passport_card.expires_at",
+                                    "document.passport_card.issued_at",
+                                    "document.passport_card.issuing_state",
+                                    "document.passport_card.issuing_country",
+                                    "document.passport_card.ref_number",
+                                    "document.passport_card.nationality",
+                                    "document.passport_card.curp",
+                                    "document.passport_card.classified_document_type",
                                     "document.permit.front.image",
                                     "document.permit.front.mime_type",
                                     "document.permit.back.image",
@@ -3002,6 +3126,147 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SecretApiKey"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/audit_events": {
+            "get": {
+                "tags": [
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Query audit events, in descending order of timestamp.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "CreateUser",
+                                "UpdateUserData",
+                                "DeleteUserData",
+                                "DecryptUserData",
+                                "CreateUserAnnotation",
+                                "CompleteUserCheckLiveness",
+                                "CompleteUserCheckWatchlist",
+                                "RequestUserData",
+                                "StartUserVerification",
+                                "CompleteUserVerification",
+                                "CollectUserDocument",
+                                "CreateOrgApiKey",
+                                "DecryptOrgApiKey",
+                                "UpdateOrgApiKey",
+                                "InviteOrgMember",
+                                "UpdateOrgMember",
+                                "LoginOrgMember",
+                                "RemoveOrgMember",
+                                "CreateOrg",
+                                "UpdateOrgSettings",
+                                "CreateOrgRole",
+                                "UpdateOrgRole"
+                            ]
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "targets",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "timestamp_gte",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "timestamp_lte",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "cursor",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "",
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/AuditEvent"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Metadata required for a cursor-paginated response.",
+                                            "type": "object",
+                                            "properties": {
+                                                "count": {
+                                                    "example": 10000,
+                                                    "description": "The total number of results.",
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "next": {
+                                                    "example": 1234,
+                                                    "description": "The `cursor` parameter to provide in order to request the next page of results.",
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
                                 }
                             }
                         }
@@ -4818,6 +5083,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -5257,6 +5541,135 @@
                     "user"
                 ]
             },
+            "AuditEvent": {
+                "description": "Describes an event relevant to security as seen by tenants.",
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "type": "string",
+                        "enum": [
+                            "create_user_annotation",
+                            "complete_user_check_liveness",
+                            "complete_user_check_watchlist",
+                            "request_user_data",
+                            "start_user_verification",
+                            "complete_user_verification",
+                            "collect_user_document",
+                            "create_org_api_key",
+                            "decrypt_org_api_key",
+                            "update_org_api_key",
+                            "invite_org_member",
+                            "update_org_member",
+                            "login_org_member",
+                            "remove_org_member",
+                            "create_org",
+                            "update_org_settings",
+                            "create_org_role",
+                            "update_org_role"
+                        ]
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "insight_event": {
+                        "description": "Describes a device insight event with locations and IP of the event",
+                        "type": "object",
+                        "properties": {
+                            "city": {
+                                "type": "string"
+                            },
+                            "country": {
+                                "type": "string"
+                            },
+                            "ip_address": {
+                                "type": "string"
+                            },
+                            "latitude": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "longitude": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "metro_code": {
+                                "type": "string"
+                            },
+                            "postal_code": {
+                                "type": "string"
+                            },
+                            "region": {
+                                "type": "string"
+                            },
+                            "region_name": {
+                                "type": "string"
+                            },
+                            "time_zone": {
+                                "type": "string"
+                            },
+                            "timestamp": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "user_agent": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "timestamp"
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "enum": [
+                            "CreateUser",
+                            "UpdateUserData",
+                            "DeleteUserData",
+                            "DecryptUserData",
+                            "CreateUserAnnotation",
+                            "CompleteUserCheckLiveness",
+                            "CompleteUserCheckWatchlist",
+                            "RequestUserData",
+                            "StartUserVerification",
+                            "CompleteUserVerification",
+                            "CollectUserDocument",
+                            "CreateOrgApiKey",
+                            "DecryptOrgApiKey",
+                            "UpdateOrgApiKey",
+                            "InviteOrgMember",
+                            "UpdateOrgMember",
+                            "LoginOrgMember",
+                            "RemoveOrgMember",
+                            "CreateOrg",
+                            "UpdateOrgSettings",
+                            "CreateOrgRole",
+                            "UpdateOrgRole"
+                        ]
+                    },
+                    "principal": {
+                        "type": "string",
+                        "enum": [
+                            "footprint",
+                            "firm_employee"
+                        ]
+                    },
+                    "tenant_id": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "detail",
+                    "id",
+                    "name",
+                    "principal",
+                    "tenant_id",
+                    "timestamp"
+                ]
+            },
             "AuthEvent": {
                 "type": "object",
                 "properties": {
@@ -5643,6 +6056,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -6522,6 +6954,25 @@
                                                 "document.passport.nationality",
                                                 "document.passport.curp",
                                                 "document.passport.classified_document_type",
+                                                "document.passport_card.front.image",
+                                                "document.passport_card.front.mime_type",
+                                                "document.passport_card.back.image",
+                                                "document.passport_card.back.mime_type",
+                                                "document.passport_card.selfie.image",
+                                                "document.passport_card.selfie.mime_type",
+                                                "document.passport_card.full_name",
+                                                "document.passport_card.dob",
+                                                "document.passport_card.gender",
+                                                "document.passport_card.full_address",
+                                                "document.passport_card.document_number",
+                                                "document.passport_card.expires_at",
+                                                "document.passport_card.issued_at",
+                                                "document.passport_card.issuing_state",
+                                                "document.passport_card.issuing_country",
+                                                "document.passport_card.ref_number",
+                                                "document.passport_card.nationality",
+                                                "document.passport_card.curp",
+                                                "document.passport_card.classified_document_type",
                                                 "document.permit.front.image",
                                                 "document.permit.front.mime_type",
                                                 "document.permit.back.image",
@@ -6985,6 +7436,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -7256,6 +7726,25 @@
                             "document.passport.nationality",
                             "document.passport.curp",
                             "document.passport.classified_document_type",
+                            "document.passport_card.front.image",
+                            "document.passport_card.front.mime_type",
+                            "document.passport_card.back.image",
+                            "document.passport_card.back.mime_type",
+                            "document.passport_card.selfie.image",
+                            "document.passport_card.selfie.mime_type",
+                            "document.passport_card.full_name",
+                            "document.passport_card.dob",
+                            "document.passport_card.gender",
+                            "document.passport_card.full_address",
+                            "document.passport_card.document_number",
+                            "document.passport_card.expires_at",
+                            "document.passport_card.issued_at",
+                            "document.passport_card.issuing_state",
+                            "document.passport_card.issuing_country",
+                            "document.passport_card.ref_number",
+                            "document.passport_card.nationality",
+                            "document.passport_card.curp",
+                            "document.passport_card.classified_document_type",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -7505,6 +7994,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -7753,6 +8261,25 @@
                             "document.passport.nationality",
                             "document.passport.curp",
                             "document.passport.classified_document_type",
+                            "document.passport_card.front.image",
+                            "document.passport_card.front.mime_type",
+                            "document.passport_card.back.image",
+                            "document.passport_card.back.mime_type",
+                            "document.passport_card.selfie.image",
+                            "document.passport_card.selfie.mime_type",
+                            "document.passport_card.full_name",
+                            "document.passport_card.dob",
+                            "document.passport_card.gender",
+                            "document.passport_card.full_address",
+                            "document.passport_card.document_number",
+                            "document.passport_card.expires_at",
+                            "document.passport_card.issued_at",
+                            "document.passport_card.issuing_state",
+                            "document.passport_card.issuing_country",
+                            "document.passport_card.ref_number",
+                            "document.passport_card.nationality",
+                            "document.passport_card.curp",
+                            "document.passport_card.classified_document_type",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -7907,6 +8434,7 @@
                             "id_card",
                             "drivers_license",
                             "passport",
+                            "passport_card",
                             "permit",
                             "visa",
                             "residence_document",
@@ -8168,6 +8696,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -8411,6 +8958,25 @@
                                         "document.passport.nationality",
                                         "document.passport.curp",
                                         "document.passport.classified_document_type",
+                                        "document.passport_card.front.image",
+                                        "document.passport_card.front.mime_type",
+                                        "document.passport_card.back.image",
+                                        "document.passport_card.back.mime_type",
+                                        "document.passport_card.selfie.image",
+                                        "document.passport_card.selfie.mime_type",
+                                        "document.passport_card.full_name",
+                                        "document.passport_card.dob",
+                                        "document.passport_card.gender",
+                                        "document.passport_card.full_address",
+                                        "document.passport_card.document_number",
+                                        "document.passport_card.expires_at",
+                                        "document.passport_card.issued_at",
+                                        "document.passport_card.issuing_state",
+                                        "document.passport_card.issuing_country",
+                                        "document.passport_card.ref_number",
+                                        "document.passport_card.nationality",
+                                        "document.passport_card.curp",
+                                        "document.passport_card.classified_document_type",
                                         "document.permit.front.image",
                                         "document.permit.front.mime_type",
                                         "document.permit.back.image",
@@ -8679,6 +9245,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -9410,6 +9995,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -14397,6 +15001,25 @@
                             "document.passport.nationality",
                             "document.passport.curp",
                             "document.passport.classified_document_type",
+                            "document.passport_card.front.image",
+                            "document.passport_card.front.mime_type",
+                            "document.passport_card.back.image",
+                            "document.passport_card.back.mime_type",
+                            "document.passport_card.selfie.image",
+                            "document.passport_card.selfie.mime_type",
+                            "document.passport_card.full_name",
+                            "document.passport_card.dob",
+                            "document.passport_card.gender",
+                            "document.passport_card.full_address",
+                            "document.passport_card.document_number",
+                            "document.passport_card.expires_at",
+                            "document.passport_card.issued_at",
+                            "document.passport_card.issuing_state",
+                            "document.passport_card.issuing_country",
+                            "document.passport_card.ref_number",
+                            "document.passport_card.nationality",
+                            "document.passport_card.curp",
+                            "document.passport_card.classified_document_type",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -14646,6 +15269,25 @@
                                 "document.passport.nationality",
                                 "document.passport.curp",
                                 "document.passport.classified_document_type",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
                                 "document.permit.front.image",
                                 "document.permit.front.mime_type",
                                 "document.permit.back.image",
@@ -14898,6 +15540,25 @@
                             "document.passport.nationality",
                             "document.passport.curp",
                             "document.passport.classified_document_type",
+                            "document.passport_card.front.image",
+                            "document.passport_card.front.mime_type",
+                            "document.passport_card.back.image",
+                            "document.passport_card.back.mime_type",
+                            "document.passport_card.selfie.image",
+                            "document.passport_card.selfie.mime_type",
+                            "document.passport_card.full_name",
+                            "document.passport_card.dob",
+                            "document.passport_card.gender",
+                            "document.passport_card.full_address",
+                            "document.passport_card.document_number",
+                            "document.passport_card.expires_at",
+                            "document.passport_card.issued_at",
+                            "document.passport_card.issuing_state",
+                            "document.passport_card.issuing_country",
+                            "document.passport_card.ref_number",
+                            "document.passport_card.nationality",
+                            "document.passport_card.curp",
+                            "document.passport_card.classified_document_type",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
@@ -17369,6 +18030,25 @@
                                                 "document.passport.nationality",
                                                 "document.passport.curp",
                                                 "document.passport.classified_document_type",
+                                                "document.passport_card.front.image",
+                                                "document.passport_card.front.mime_type",
+                                                "document.passport_card.back.image",
+                                                "document.passport_card.back.mime_type",
+                                                "document.passport_card.selfie.image",
+                                                "document.passport_card.selfie.mime_type",
+                                                "document.passport_card.full_name",
+                                                "document.passport_card.dob",
+                                                "document.passport_card.gender",
+                                                "document.passport_card.full_address",
+                                                "document.passport_card.document_number",
+                                                "document.passport_card.expires_at",
+                                                "document.passport_card.issued_at",
+                                                "document.passport_card.issuing_state",
+                                                "document.passport_card.issuing_country",
+                                                "document.passport_card.ref_number",
+                                                "document.passport_card.nationality",
+                                                "document.passport_card.curp",
+                                                "document.passport_card.classified_document_type",
                                                 "document.permit.front.image",
                                                 "document.permit.front.mime_type",
                                                 "document.permit.back.image",
@@ -17753,6 +18433,25 @@
                                         "document.passport.nationality",
                                         "document.passport.curp",
                                         "document.passport.classified_document_type",
+                                        "document.passport_card.front.image",
+                                        "document.passport_card.front.mime_type",
+                                        "document.passport_card.back.image",
+                                        "document.passport_card.back.mime_type",
+                                        "document.passport_card.selfie.image",
+                                        "document.passport_card.selfie.mime_type",
+                                        "document.passport_card.full_name",
+                                        "document.passport_card.dob",
+                                        "document.passport_card.gender",
+                                        "document.passport_card.full_address",
+                                        "document.passport_card.document_number",
+                                        "document.passport_card.expires_at",
+                                        "document.passport_card.issued_at",
+                                        "document.passport_card.issuing_state",
+                                        "document.passport_card.issuing_country",
+                                        "document.passport_card.ref_number",
+                                        "document.passport_card.nationality",
+                                        "document.passport_card.curp",
+                                        "document.passport_card.classified_document_type",
                                         "document.permit.front.image",
                                         "document.permit.front.mime_type",
                                         "document.permit.back.image",
@@ -18067,6 +18766,25 @@
                             "document.passport.nationality",
                             "document.passport.curp",
                             "document.passport.classified_document_type",
+                            "document.passport_card.front.image",
+                            "document.passport_card.front.mime_type",
+                            "document.passport_card.back.image",
+                            "document.passport_card.back.mime_type",
+                            "document.passport_card.selfie.image",
+                            "document.passport_card.selfie.mime_type",
+                            "document.passport_card.full_name",
+                            "document.passport_card.dob",
+                            "document.passport_card.gender",
+                            "document.passport_card.full_address",
+                            "document.passport_card.document_number",
+                            "document.passport_card.expires_at",
+                            "document.passport_card.issued_at",
+                            "document.passport_card.issuing_state",
+                            "document.passport_card.issuing_country",
+                            "document.passport_card.ref_number",
+                            "document.passport_card.nationality",
+                            "document.passport_card.curp",
+                            "document.passport_card.classified_document_type",
                             "document.permit.front.image",
                             "document.permit.front.mime_type",
                             "document.permit.back.image",
