@@ -12,18 +12,19 @@ const useGetHeaderText = (): string => {
     state.context,
     state.context.identify.user,
   );
+  const isLoginChallenge = !!state.context.identify.user;
 
   if (state.matches('smsChallenge')) {
-    // We always show the "welcome back" message on challenge selector, so don't need it on sms screen
-    return hasChallengeSelector
-      ? t('sms-step.verify-title')
-      : t('sms-step.welcome-back-title');
+    // If we showed the challenge selector screen, we already displayed "Welcome back" text
+    return isLoginChallenge && !hasChallengeSelector
+      ? t('sms-step.welcome-back-title')
+      : t('sms-step.verify-title');
   }
   if (state.matches('emailChallenge')) {
-    // We always show the "welcome back" message on challenge selector, so don't need it on email screen
-    return hasChallengeSelector
-      ? t('email-challenge.verify-title')
-      : t('email-challenge.welcome-back-title');
+    // If we showed the challenge selector screen, we already displayed "Welcome back" text
+    return isLoginChallenge && !hasChallengeSelector
+      ? t('email-challenge.welcome-back-title')
+      : t('email-challenge.verify-title');
   }
   if (state.matches('challengeSelectOrPasskey')) {
     return t('challenge-select-or-biometric.welcome-back-title');
