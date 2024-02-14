@@ -59,7 +59,7 @@ pub async fn post(
                 &obc.key,
                 session_id.as_ref(),
             );
-            tracing::info!(%use_new_identify_machine, ?session_id, "Creating new onboarding");
+            tracing::info!(%use_new_identify_machine, ?session_id, "Finished onboarding");
         }
 
         let wf = user_wf_auth.workflow().clone();
