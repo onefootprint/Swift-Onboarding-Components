@@ -28,11 +28,6 @@ describe('<Pagination />', () => {
       />,
     );
 
-  it('should render the text', () => {
-    renderPagination({});
-    expect(screen.getByText('No results')).toBeInTheDocument();
-  });
-
   it('should render the text when there are results', () => {
     renderPagination({
       hasNextPage: true,

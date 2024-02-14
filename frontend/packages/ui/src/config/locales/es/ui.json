@@ -275,7 +275,11 @@
       "empty-state-text-default": "No se encontraron resultados",
       "placeholder-default": "Buscar..."
     },
-    "pagination": {},
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "showing": "Mostrando {{lowerBoundShownResults}} a {{upperBoundShownResults}} resultados de {{totalNumResults}} totales"
+    },
     "search-input": {
       "clear-button-aria-label-default": "Restablecer",
       "placeholder-default": "Buscar..."
