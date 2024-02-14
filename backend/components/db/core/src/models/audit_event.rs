@@ -99,7 +99,7 @@ impl NewAuditEvent {
 
 #[derive(Debug)]
 pub struct FilterQueryParams {
-    pub id_lt: Option<AuditEventId>,
+    pub cursor: Option<(DateTime<Utc>, AuditEventId)>,
     pub tenant_id: TenantId,
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,
@@ -209,15 +209,20 @@ impl AuditEvent {
                     .left_join(tenant_user::table)
                     .left_join(tenant_role::table)
                     .order_by(audit_event::timestamp.desc())
-                    // Secondary sort by ID to supp.
-                    .then_order_by(audit_event::id.asc())
+                    // Secondary sort by ID to support (timestamp, id) cursor.
+                    .then_order_by(audit_event::id.desc())
                     .filter(audit_event::tenant_id.eq(params.tenant_id))
                     .filter(audit_event::is_live.eq(params.is_live))
                     .limit(page_size)
                     .into_boxed();
 
-        if let Some(id_lt) = params.id_lt {
-            results = results.filter(audit_event::id.lt(id_lt))
+        if let Some((cursor_ts, cursor_id)) = params.cursor {
+            // Filter on (row_ts, row_id) <= (cursor_ts, cursor_id)
+            results = results.filter(
+                audit_event::timestamp.lt(cursor_ts).or(audit_event::timestamp
+                    .eq(cursor_ts)
+                    .and(audit_event::id.le(cursor_id))),
+            );
         }
 
         if let Some(timestamp_lte) = params.timestamp_lte {
@@ -380,7 +385,7 @@ mod tests {
         let events = AuditEvent::filter(
             conn,
             FilterQueryParams {
-                id_lt: None,
+                cursor: None,
                 tenant_id: tenant.id.clone(),
                 search: None,
                 timestamp_lte: None,
@@ -444,11 +449,39 @@ mod tests {
         )
         .unwrap();
 
+        let events = AuditEvent::filter(
+            conn,
+            FilterQueryParams {
+                cursor: None,
+                tenant_id: tenant.id.clone(),
+                search: None,
+                timestamp_lte: None,
+                timestamp_gte: None,
+                name: None,
+                targets: vec![],
+                is_live: true,
+            },
+            100,
+        )
+        .unwrap();
+        assert_eq!(events.len(), 2);
+
+        let first_cursor = events
+            .get(0)
+            .map(|event| (event.audit_event.timestamp, event.audit_event.id.clone()))
+            .unwrap();
+        let first_id = first_cursor.1.clone();
+        let second_cursor = events
+            .get(1)
+            .map(|event| (event.audit_event.timestamp, event.audit_event.id.clone()))
+            .unwrap();
+        let second_id = second_cursor.1.clone();
+
         let tests = vec![
             (
-                "filter by id cursor bound",
+                "filter by cursor bound, two results",
                 FilterQueryParams {
-                    id_lt: Some((&id1).max(&id2).clone()),
+                    cursor: Some(first_cursor.clone()),
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -457,12 +490,29 @@ mod tests {
                     targets: vec![],
                     is_live: true,
                 },
-                vec![(&id1).min(&id2).clone()],
+                vec![first_id.clone(), second_id.clone()],
+            ),
+            (
+                "filter by id cursor bound, one result",
+                FilterQueryParams {
+                    cursor: Some(second_cursor.clone()),
+                    tenant_id: tenant.id.clone(),
+                    search: None,
+                    timestamp_lte: None,
+                    timestamp_gte: None,
+                    name: None,
+                    targets: vec![],
+                    is_live: true,
+                },
+                vec![second_id.clone()],
             ),
             (
                 "filter by id cursor bound, no results",
                 FilterQueryParams {
-                    id_lt: Some((&id1).min(&id2).clone()),
+                    cursor: Some((
+                        DateTime::<Utc>::from_timestamp(0, 0).unwrap(),
+                        AuditEventId::from("ae_00000".to_owned()),
+                    )),
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -476,7 +526,7 @@ mod tests {
             (
                 "search by fp_id",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: Some(scoped_vault_1.fp_id.to_string()),
                     timestamp_lte: None,
@@ -490,7 +540,7 @@ mod tests {
             (
                 "search by partial tenant name",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: Some(tenant.name[..tenant.name.len() - 3].to_owned()),
                     timestamp_lte: None,
@@ -504,7 +554,7 @@ mod tests {
             (
                 "search by decryption reason",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: Some("investigating".to_owned()),
                     timestamp_lte: None,
@@ -518,7 +568,7 @@ mod tests {
             (
                 "search by fields",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: Some("id.zip".to_owned()),
                     timestamp_lte: None,
@@ -532,7 +582,7 @@ mod tests {
             (
                 "timestamp <= 0",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: Some(DateTime::<Utc>::from_timestamp(0, 0).unwrap()),
@@ -546,7 +596,7 @@ mod tests {
             (
                 "timestamp <= far future",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: Some(DateTime::<Utc>::from_timestamp(9000000000, 0).unwrap()),
@@ -560,7 +610,7 @@ mod tests {
             (
                 "timestamp >= 0",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -574,7 +624,7 @@ mod tests {
             (
                 "timestamp >= far future",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -588,7 +638,7 @@ mod tests {
             (
                 "name = CreateUser",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -602,7 +652,7 @@ mod tests {
             (
                 "target fields overlap",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -619,7 +669,7 @@ mod tests {
             (
                 "target fields don't overlap",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -633,7 +683,7 @@ mod tests {
             (
                 "live = true",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -647,7 +697,7 @@ mod tests {
             (
                 "live = true, tenant with no events",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: other_tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -661,7 +711,7 @@ mod tests {
             (
                 "live = false",
                 FilterQueryParams {
-                    id_lt: None,
+                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -688,7 +738,7 @@ mod tests {
         let events = AuditEvent::filter(
             conn,
             FilterQueryParams {
-                id_lt: None,
+                cursor: None,
                 tenant_id: other_tenant.id,
                 search: None,
                 timestamp_lte: None,

@@ -11,7 +11,6 @@ use api_core::{
 use api_wire_types::{AuditEvent, AuditEventRequest};
 use chrono::{DateTime, Utc};
 use db::{models::audit_event::FilterQueryParams, DbResult};
-use itertools::chain;
 use newtypes::{AuditEventId, DataIdentifier};
 use paperclip::actix::{api_v2_operation, get, web};
 use serde::{Deserialize, Serialize};
@@ -31,10 +30,6 @@ async fn get(
 
     let page_size = pagination.page_size(&state);
     let cursor = pagination.cursor.as_ref().map(|co| co.inner());
-    let (cursor_id, cursor_ts) = match cursor {
-        Some(AuditEventCursor { id, timestamp }) => (Some(id.clone()), Some(timestamp)),
-        None => (None, None),
-    };
 
     let AuditEventRequest {
         name,
@@ -46,10 +41,10 @@ async fn get(
     let tenant = auth.tenant();
 
     let params = FilterQueryParams {
-        id_lt: cursor_id,
+        cursor: cursor.map(|c| (c.timestamp, c.id.clone())),
         tenant_id: tenant.id.clone(),
         search,
-        timestamp_lte: chain!(timestamp_lte, cursor_ts.copied()).min(),
+        timestamp_lte,
         timestamp_gte,
         name,
         targets: targets.map(Vec::<DataIdentifier>::from).unwrap_or_default(),
