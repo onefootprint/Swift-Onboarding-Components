@@ -9,7 +9,7 @@ use api_core::{
     },
     errors::ApiResult,
     telemetry::RootSpan,
-    utils::{db2api::DbToApi, large_json::LargeJson, session::AuthSession},
+    utils::{db2api::DbToApi, headers::TelemetryHeaders, large_json::LargeJson, session::AuthSession},
 };
 use api_wire_types::{CreateSdkArgsTokenResponse, PublicOnboardingConfiguration};
 use chrono::Duration;
@@ -84,6 +84,7 @@ async fn get(
     state: web::Data<State>,
     session: SdkArgsContext,
     root_span: RootSpan,
+    telemetry: TelemetryHeaders,
 ) -> JsonApiResponse<GetSdkArgsTokenResponse> {
     let SdkArgsData {
         e_private_key,
@@ -106,8 +107,9 @@ async fn get(
         root_span.record("is_live", obc.is_live.to_string());
     }
 
+    let ff_client = state.feature_flag_client.clone();
     let ob_config = obc.map(|(obc, t, tcc, a)| {
-        PublicOnboardingConfiguration::from_db((obc, t, tcc, a, state.feature_flag_client.clone()))
+        PublicOnboardingConfiguration::from_db((obc, t, tcc, a, ff_client, telemetry.session_id))
     });
     let result = GetSdkArgsTokenResponse { args, ob_config };
     ResponseData::ok(result).json()

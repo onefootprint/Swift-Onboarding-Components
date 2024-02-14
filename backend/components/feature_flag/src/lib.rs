@@ -66,9 +66,12 @@ impl LaunchDarklyFeatureFlagClient {
 
     fn get_bool_flag<'a>(&self, flag: &'a BoolFlag<'a>) -> Result<bool, Error> {
         let key = flag.key().unwrap_or_else(|| Uuid::new_v4().to_string());
-        let context = ContextBuilder::new(key)
-            .build()
-            .map_err(Error::ContextBuilderError)?;
+        let mut context = ContextBuilder::new(key);
+        if let Some(metadata) = flag.metadata() {
+            // Any optional metadata that can be used in LaunchDarkly to evaluate a flag
+            context.set_string("metadata", metadata);
+        }
+        let context = context.build().map_err(Error::ContextBuilderError)?;
 
         let client = &self.unwrap_client()?.inner;
         let detail = client.bool_variation_detail(&context, &flag.flag_name(), flag.default());

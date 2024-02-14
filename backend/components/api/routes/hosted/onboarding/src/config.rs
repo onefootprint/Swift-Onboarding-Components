@@ -8,6 +8,7 @@ use api_core::{
     auth::{user::UserAuthContext, Any},
     errors::onboarding::OnboardingError,
     types::JsonApiResponse,
+    utils::headers::TelemetryHeaders,
 };
 use db::{
     models::{appearance::Appearance, tenant_client_config::TenantClientConfig},
@@ -29,6 +30,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 pub fn get(
     state: web::Data<State>,
     auth: Either<ObConfigAuth, UserAuthContext>,
+    telemetry: TelemetryHeaders,
 ) -> JsonApiResponse<api_wire_types::PublicOnboardingConfiguration> {
     let (tenant, ob_config) = match auth {
         Either::Left(ob_pk_auth) => {
@@ -74,6 +76,7 @@ pub fn get(
         client_config,
         appearance,
         ff_client,
+        telemetry.session_id,
     ));
     ResponseData::ok(response).json()
 }

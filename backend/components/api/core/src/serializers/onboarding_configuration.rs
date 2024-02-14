@@ -9,7 +9,7 @@ use db::{
     },
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::DataIdentifierDiscriminant;
+use newtypes::{DataIdentifierDiscriminant, ObConfigurationKey, SessionId};
 
 use crate::utils::db2api::DbToApi;
 
@@ -19,10 +19,24 @@ pub type ObConfigInfo = (
     Option<TenantClientConfig>,
     Option<Appearance>,
     Arc<dyn FeatureFlagClient>,
+    Option<SessionId>,
 );
 
+/// Only temporary, will rm soon
+pub fn should_use_new_identify_machine(
+    ff_client: Arc<dyn FeatureFlagClient>,
+    key: &ObConfigurationKey,
+    session_id: Option<&SessionId>,
+) -> bool {
+    let use_new_identify_machine = ff_client.flag(BoolFlag::UseNewIdentifyMachine(key, session_id));
+    tracing::info!(%use_new_identify_machine, ?session_id, "Evaluating whether to use new identify machine");
+    use_new_identify_machine
+}
+
 impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
-    fn from_db((ob_config, tenant, tenant_client_config, appearance, ff_client): ObConfigInfo) -> Self {
+    fn from_db(
+        (ob_config, tenant, tenant_client_config, appearance, ff_client, session_id): ObConfigInfo,
+    ) -> Self {
         let supported_countries = ob_config.supported_countries_for_residential_address();
         let is_stepup_enabled = ob_config.is_stepup_enabled();
 
@@ -64,8 +78,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Document);
 
-        let use_new_identify_machine = ff_client.flag(BoolFlag::UseNewIdentifyMachine(&key));
-        tracing::info!(%use_new_identify_machine, "Evaluating whether to use new identify machine");
+        let use_new_identify_machine = should_use_new_identify_machine(ff_client, &key, session_id.as_ref());
 
         Self {
             name,
