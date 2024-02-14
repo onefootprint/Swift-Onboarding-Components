@@ -8,8 +8,13 @@ export type IdentifyVerifyRequest = {
   // We discard the identifier if it's anything but an authToken, but this is useful to have
   // typescript enforce that we always pass in an identifier
   identifier: Identifier;
-  scope?: 'auth' | 'onboarding';
+  scope: IdentifyTokenScope;
 };
+
+export enum IdentifyTokenScope {
+  auth = 'auth',
+  onboarding = 'onboarding',
+}
 
 export type IdentifyVerifyResponse = {
   authToken: string;

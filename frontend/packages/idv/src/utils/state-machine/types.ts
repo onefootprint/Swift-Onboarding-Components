@@ -61,6 +61,8 @@ export type MachineEvents =
       type: 'identifyCompleted';
       payload: {
         authToken: string;
+        // TODO do we really need these? They are passed in as bootstrap data to the collect KYC
+        // data machine, which doesn't really make sense
         email?: string;
         phoneNumber?: string;
       };

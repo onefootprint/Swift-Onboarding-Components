@@ -4,14 +4,19 @@ import {
   type FootprintAuthDataProps,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
-import { Logger } from '@onefootprint/idv';
+import type { DeviceInfo } from '@onefootprint/idv';
+import { Logger, useDeviceInfo } from '@onefootprint/idv';
 import type { DoneArgs } from '@onefootprint/idv/src/components/identify';
 import {
   Identify,
   IdentifyVariant,
 } from '@onefootprint/idv/src/components/identify';
+import type { ObKeyHeader } from '@onefootprint/idv/src/components/identify/types';
 import { getErrorMessage } from '@onefootprint/request';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
+import {
+  CLIENT_PUBLIC_KEY_HEADER,
+  type PublicOnboardingConfig,
+} from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +41,9 @@ const onValidationTokenError = (error: unknown) => {
   console.error('Error while validating auth token', getErrorMessage(error));
 };
 
+const getOnboardConfigurationKey = (key?: string): ObKeyHeader | undefined =>
+  key ? { [CLIENT_PUBLIC_KEY_HEADER]: key } : undefined;
+
 type IdentifyAppProps = {
   variant?: Variant;
   fallback: JSX.Element;
@@ -53,6 +61,8 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
   const [props, setProps] = useState<AuthDataPropsWithToken>();
   const [config, setConfig] = useState<PublicOnboardingConfig | undefined>();
   const { t } = useTranslation('common');
+  const [device, setDevice] = useState<DeviceInfo>();
+  useDeviceInfo(setDevice);
 
   useProps<AuthDataPropsWithToken>(
     (authProps, authConfig) => {
@@ -148,7 +158,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
     );
   }
 
-  if (!config) {
+  if (!config || !device) {
     return fallback;
   }
 
@@ -161,7 +171,8 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
     >
       <Identify
         variant={IdentifyVariant.auth}
-        publicKey={publicKey}
+        device={device}
+        obConfigAuth={getOnboardConfigurationKey(publicKey)}
         initialAuthToken={authToken}
         config={config}
         isLive={config.isLive}

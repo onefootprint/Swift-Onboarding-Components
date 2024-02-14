@@ -17,7 +17,17 @@
   "sandbox": {
     "description": "You can log into a previously created sandbox user by using the Test ID from that corresponding session.",
     "hint": "Do not use special characters or spaces.",
-    "label": "Test ID",
+    "label": "Test ID:",
+    "outcome": {
+      "label": "Test outcome:",
+      "options": {
+        "success": "Success",
+        "fail": "Failure",
+        "manual-review": "Manual Review",
+        "document-decision": "ID Doc Decision",
+        "step-up": "ID Doc Decision"
+      }
+    },
     "placeholder": "Enter test ID",
     "errors": {
       "required": "Test ID is required",

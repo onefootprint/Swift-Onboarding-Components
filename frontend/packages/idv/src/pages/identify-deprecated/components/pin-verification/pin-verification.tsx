@@ -8,6 +8,7 @@ import type {
   PhoneIdentifier,
   SignupChallengeResponse,
 } from '@onefootprint/types';
+import { IdentifyTokenScope } from '@onefootprint/types/src/api/identify-verify';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -107,6 +108,7 @@ const PinVerification = ({
         obConfigAuth,
         sandboxId,
         identifier,
+        scope: IdentifyTokenScope.onboarding,
       },
       {
         onSuccess: handlePinValidationSucceeded,

@@ -2,6 +2,7 @@ import { IcoFaceid24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import type { Identifier, LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
+import { IdentifyTokenScope } from '@onefootprint/types/src/api/identify-verify';
 import { Button, Typography, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -121,6 +122,7 @@ const Biometric = () => {
         obConfigAuth,
         sandboxId,
         identifier,
+        scope: IdentifyTokenScope.onboarding,
       },
       {
         onSuccess: ({ authToken }) => {

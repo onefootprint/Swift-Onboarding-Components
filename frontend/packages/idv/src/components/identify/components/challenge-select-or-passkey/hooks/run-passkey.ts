@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { getBiometricChallengeResponse, getLogger } from '../../../../../utils';
 import { useIdentifyVerify, useLoginChallenge } from '../../../queries';
 import { useIdentifyMachine } from '../../../state';
+import getTokenScope from '../../../utils/token-scope';
 
 type UseRunPasskeyArgs = {
   onSuccess: (_: { authToken: string }) => void;
@@ -21,6 +22,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
     identify: { successfulIdentifier, sandboxId },
     obConfigAuth,
     initialAuthToken,
+    variant,
   } = state.context;
   const { t } = useTranslation('identify', {
     keyPrefix: 'passkey-challenge',
@@ -31,6 +33,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
     authToken: initialAuthToken,
     obConfigAuth,
     sandboxId,
+    scope: getTokenScope(variant),
   };
   const mutLoginChallenge = useLoginChallenge(commonMutationProps);
   const mutIdentifyVerify = useIdentifyVerify(commonMutationProps);

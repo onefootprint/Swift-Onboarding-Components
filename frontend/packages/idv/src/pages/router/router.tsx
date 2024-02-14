@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { AppErrorBoundary, SessionExpired } from '../../components';
+import { Identify, IdentifyVariant } from '../../components/identify';
 import { useIdvMachine, useLogStateMachine } from '../../hooks';
 import useValidateSession from '../../hooks/ui/use-validate-session';
 import { FPCustomEvents, getIdentifyBootstrapData, Logger } from '../../utils';
@@ -125,19 +126,46 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
       {state.matches('init') && <Init />}
       {state.matches('sandboxOutcome') && <SandboxOutcome />}
-      {state.matches('identify') && config && device && (
-        <IdentifyDeprecated
-          config={config}
-          device={device}
-          sandboxId={sandboxId}
-          overallOutcome={overallOutcome}
-          initialAuthToken={authToken}
-          obConfigAuth={obConfigAuth}
-          bootstrapData={getIdentifyBootstrapData(bootstrapData)}
-          showLogo={showLogo}
-          onDone={payload => send({ type: 'identifyCompleted', payload })}
-        />
-      )}
+      {state.matches('identify') &&
+        config &&
+        device &&
+        !config.useNewIdentifyMachine && (
+          <IdentifyDeprecated
+            config={config}
+            device={device}
+            sandboxId={sandboxId}
+            overallOutcome={overallOutcome}
+            initialAuthToken={authToken}
+            obConfigAuth={obConfigAuth}
+            bootstrapData={getIdentifyBootstrapData(bootstrapData)}
+            showLogo={showLogo}
+            onDone={payload => send({ type: 'identifyCompleted', payload })}
+          />
+        )}
+      {state.matches('identify') &&
+        config &&
+        device &&
+        config.useNewIdentifyMachine && (
+          <Identify
+            variant={IdentifyVariant.verify}
+            device={device}
+            config={config}
+            isLive={config.isLive}
+            overallOutcome={overallOutcome}
+            sandboxId={sandboxId}
+            initialAuthToken={authToken}
+            obConfigAuth={obConfigAuth}
+            userData={bootstrapData}
+            logoConfig={
+              (showLogo && {
+                orgName: config.orgName,
+                logoUrl: config.logoUrl || undefined,
+              }) ||
+              undefined
+            }
+            onDone={payload => send({ type: 'identifyCompleted', payload })}
+          />
+        )}
       {state.matches('onboarding') && authToken && config && device && (
         <Onboarding
           config={config}

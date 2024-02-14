@@ -40,6 +40,7 @@ export type PublicOnboardingConfig = {
   supportEmail?: string;
   supportPhone?: string;
   supportWebsite?: string;
+  useNewIdentifyMachine?: boolean;
 };
 
 // Used in the dashboard context

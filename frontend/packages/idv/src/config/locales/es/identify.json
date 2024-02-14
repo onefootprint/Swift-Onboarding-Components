@@ -17,7 +17,17 @@
   "sandbox": {
     "description": "Puedes iniciar sesión con un usuario de sandbox previamente creado usando su mismo ID.",
     "hint": "No use caracteres especiales ni espacios.",
-    "label": "ID para pruebas",
+    "label": "ID para pruebas:",
+    "outcome": {
+      "label": "Resultado de la prueba:",
+      "options": {
+        "success": "Éxito",
+        "fail": "Fracaso",
+        "manual-review": "Revisión manual",
+        "document-decision": "Decisión sobre el documento de identificación",
+        "step-up": "Decisión sobre el documento de identificación"
+      }
+    },
     "placeholder": "Ingrese ID para pruebas",
     "errors": {
       "required": "ID de prueba es un campo requerido",
@@ -43,7 +53,7 @@
     "legal-footer": "Al continuar, acepto los <termsLink>Términos de servicio</termsLink> y reconozco la <privacyPolicyLink>Política de privacidad</privacyPolicyLink>."
   },
   "phone-step": {
-    "subtitle": "Ingresa tu número de teléfono para continuar.",
+    "subtitle": "Introduce tu número de teléfono para continuar.",
     "title": "¡Hola! 👋",
     "verify-with-sms": "Verificar enviando un SMS",
     "form": {
@@ -59,7 +69,7 @@
     "send-code-to": "Enviar código a",
     "send-code-via-sms": "Enviar código por SMS",
     "send-code-via-email": "Enviar código por correo electrónico",
-    "passkey": "Iniciar sesión con Passkeys"
+    "passkey": "Iniciar sesión con Passkey"
   },
   "sms-step": {
     "label": "SMS",

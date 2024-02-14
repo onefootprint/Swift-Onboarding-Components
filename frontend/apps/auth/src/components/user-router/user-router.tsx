@@ -1,5 +1,8 @@
-import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
-import { StepHeader } from '@onefootprint/idv';
+import type {
+  DeviceInfo,
+  NavigationHeaderLeftButtonProps,
+} from '@onefootprint/idv';
+import { StepHeader, useDeviceInfo } from '@onefootprint/idv';
 import {
   Identify,
   IdentifyVariant,
@@ -9,7 +12,7 @@ import {
   UpdatePhone,
 } from '@onefootprint/idv/src/components/identify/components/user-update';
 import { AuthMethodKind } from '@onefootprint/types/src/data';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { UserMachineContext } from '@/src/state';
@@ -38,16 +41,19 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
   const { t } = useTranslation('common');
   const isDone = state.matches('success');
   const Header = getHeader(state.context, getUserLeftNavButton(state, send));
+  const [device, setDevice] = useState<DeviceInfo>();
+  useDeviceInfo(setDevice);
 
   if (isDone) return null;
 
   if (state.matches('init')) {
     return <Loading />;
   }
-  if (state.matches('identify')) {
+  if (state.matches('identify') && device) {
     return (
       <Identify
         variant={IdentifyVariant.updateLoginMethods}
+        device={device}
         initialAuthToken={state.context.authToken}
         onDone={({ authToken }) =>
           send({ type: 'setVerifyToken', payload: authToken })

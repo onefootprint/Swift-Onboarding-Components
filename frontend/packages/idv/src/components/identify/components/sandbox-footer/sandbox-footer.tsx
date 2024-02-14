@@ -13,6 +13,7 @@ const voidObj: Record<string, never> = {};
 const SandboxFooter = (): JSX.Element | null => {
   const { t } = useTranslation('identify');
   const [state, send] = useIdentifyMachine();
+  const { overallOutcome } = state.context;
   const [sandboxId, setSandboxId] = useState<string>(
     state.context.identify.sandboxId || '',
   );
@@ -53,7 +54,13 @@ const SandboxFooter = (): JSX.Element | null => {
       </>
     );
   }
-  return <Content label={t('sandbox.label')} sandboxId={sandboxId} />;
+  return (
+    <Content
+      label={t('sandbox.label')}
+      sandboxId={sandboxId}
+      overallOutcome={overallOutcome}
+    />
+  );
 };
 
 export default SandboxFooter;

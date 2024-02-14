@@ -20,6 +20,7 @@ import {
 } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import shouldRequestNewChallenge from '../../utils/should-request-challenge';
+import getTokenScope from '../../utils/token-scope';
 import PinForm from '../pin-form';
 
 type PinVerificationProps = {
@@ -43,12 +44,14 @@ const PinVerification = ({
   const {
     challenge: { challengeData: data },
     identify: { email, phoneNumber, sandboxId, user },
+    variant,
     obConfigAuth,
   } = state.context;
   const commonMutationProps = {
     authToken: state.context.initialAuthToken,
     obConfigAuth,
     sandboxId,
+    scope: getTokenScope(variant),
   };
   const requestError = useRequestError();
   const { t } = useTranslation('identify', {

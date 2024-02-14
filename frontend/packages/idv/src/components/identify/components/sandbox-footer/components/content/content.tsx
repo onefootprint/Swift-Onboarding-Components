@@ -1,11 +1,27 @@
 import styled, { css } from '@onefootprint/styled';
+import { OverallOutcome } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-type ContentProps = { label: string; sandboxId?: string };
+type ContentProps = {
+  label: string;
+  sandboxId?: string;
+  overallOutcome?: OverallOutcome;
+};
 
-const Content = ({ label, sandboxId }: ContentProps) =>
-  sandboxId ? (
+const Content = ({ label, sandboxId, overallOutcome }: ContentProps) => {
+  const { t } = useTranslation('identify', {
+    keyPrefix: 'sandbox.outcome',
+  });
+  const outcomeLabels: Record<OverallOutcome, string> = {
+    [OverallOutcome.success]: t('options.success'),
+    [OverallOutcome.manualReview]: t('options.manual-review'),
+    [OverallOutcome.fail]: t('options.fail'),
+    [OverallOutcome.documentDecision]: t('options.document-decision'),
+    [OverallOutcome.stepUp]: t('options.step-up'),
+  };
+  return sandboxId ? (
     <Container>
       <Inner>
         <Column>
@@ -16,10 +32,22 @@ const Content = ({ label, sandboxId }: ContentProps) =>
             {sandboxId}
           </Typography>
         </Column>
-        <Column />
+        {overallOutcome ? (
+          <Column>
+            <Typography variant="label-4" color="tertiary">
+              {t('label')}
+            </Typography>
+            <Typography variant="label-4" color="secondary">
+              {outcomeLabels[overallOutcome]}
+            </Typography>
+          </Column>
+        ) : (
+          <Column />
+        )}
       </Inner>
     </Container>
   ) : null;
+};
 
 const Container = styled.footer`
   ${({ theme }) => css`

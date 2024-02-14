@@ -34,7 +34,7 @@ const ChallengeSelectOrPasskey = ({
   Header,
 }: ChallengeSelectProps) => {
   const [state, send] = useIdentifyMachine();
-  const { identify, variant } = state.context;
+  const { identify, variant, device } = state.context;
   const { t } = useTranslation('identify', {
     keyPrefix: 'challenge-select-or-biometric',
   });
@@ -54,7 +54,20 @@ const ChallengeSelectOrPasskey = ({
 
   const sortedAvailableAuthMethods = (
     identify.user?.availableChallengeKinds || []
-  ).sort((a, b) => challengePriority[a] - challengePriority[b]);
+  )
+    .sort((a, b) => challengePriority[a] - challengePriority[b])
+    .filter(kind => {
+      if (kind === ChallengeKind.biometric) {
+        // Some special rules on whether we should show biometric challenges
+        if (device.type === 'mobile') {
+          return device.hasSupportForWebauthn;
+        }
+        return (
+          device.hasSupportForWebauthn && !!identify.user?.hasSyncablePasskey
+        );
+      }
+      return true;
+    });
   useEffect(() => {
     if (sortedAvailableAuthMethods.length && !selectedChallenge) {
       setSelectedChallenge(sortedAvailableAuthMethods[0]);

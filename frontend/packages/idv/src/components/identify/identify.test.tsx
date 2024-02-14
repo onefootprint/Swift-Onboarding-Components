@@ -7,7 +7,11 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { ChallengeKind, IdDI } from '@onefootprint/types';
+import {
+  ChallengeKind,
+  CLIENT_PUBLIC_KEY_HEADER,
+  IdDI,
+} from '@onefootprint/types';
 import * as React from 'react';
 
 import { Layout } from '../layout';
@@ -53,13 +57,14 @@ describe('<Identify />', () => {
     bootstrapPhone,
     initialAuthToken,
     config,
+    device,
     onDone,
   }: {
     bootstrapEmail?: string;
     bootstrapPhone?: string;
     initialAuthToken?: string;
-    obConfigAuth?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     config: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    device?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     onDone?: () => void;
   }) => {
     const userData: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -75,9 +80,16 @@ describe('<Identify />', () => {
           variant={IdentifyVariant.verify}
           config={config}
           isLive={config.isLive}
-          publicKey="pk"
+          obConfigAuth={{ [CLIENT_PUBLIC_KEY_HEADER]: 'pk' }}
           userData={bootstrapEmail || bootstrapPhone ? userData : undefined}
           initialAuthToken={initialAuthToken}
+          device={
+            device || {
+              type: 'mobile',
+              hasSupportForWebauthn: true,
+              osName: 'iOS',
+            }
+          }
           onDone={onDone ?? (() => {})}
         />
       </Layout>,
@@ -656,6 +668,35 @@ describe('<Identify />', () => {
       });
       await userEvent.click(screen.getByText('Log in with passkey'));
       await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
+    });
+
+    it('passkey is hidden on unsupported device', async () => {
+      withLoginChallenge(ChallengeKind.sms);
+      const onDone = jest.fn();
+      renderIdentify({
+        config: noPhoneOnboardingConfigFixture,
+        device: {
+          type: 'desktop',
+          hasSupportForWebauthn: false,
+          osName: 'windows vista',
+        },
+        onDone,
+      });
+
+      await fillIdentifyEmail();
+      await waitFor(() => {
+        expect(
+          screen.getByText('Log in using one of the options below'),
+        ).toBeInTheDocument();
+      });
+      expect(screen.queryByText('Log in with passkey')).not.toBeInTheDocument();
+      await userEvent.click(screen.getByText('Send code via SMS'));
+      await userEvent.click(screen.getByText('Continue'));
+      await fillChallengePin();
 
       await waitFor(() => {
         expect(onDone).toHaveBeenCalled();

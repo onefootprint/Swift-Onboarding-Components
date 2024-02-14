@@ -13,7 +13,7 @@ const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
     challengeToken,
     sandboxId,
     identifier,
-    scope = 'onboarding',
+    scope,
   } = payload;
   const headers: Record<string, string> = { ...obConfigAuth };
   if (sandboxId) {

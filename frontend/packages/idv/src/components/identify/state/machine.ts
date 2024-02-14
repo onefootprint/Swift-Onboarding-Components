@@ -1,4 +1,8 @@
-import type { ObConfigAuth, PublicOnboardingConfig } from '@onefootprint/types';
+import type {
+  ObConfigAuth,
+  OverallOutcome,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
@@ -28,6 +32,7 @@ export type IdentifyMachineArgs = {
   device: DeviceInfo;
   obConfigAuth?: ObConfigAuth;
   sandboxId?: string;
+  overallOutcome?: OverallOutcome;
   /// When provided, will render the logo
   logoConfig?: LogoConfig;
   variant: IdentifyVariant;
@@ -100,6 +105,7 @@ export const getMachineArgs = ({
   device,
   obConfigAuth,
   sandboxId,
+  overallOutcome,
   logoConfig,
   variant,
 }: IdentifyMachineArgs): IdentifyMachineContext => ({
@@ -113,6 +119,7 @@ export const getMachineArgs = ({
     sandboxId:
       config?.isLive === false ? sandboxId || getRandomID(13) : undefined,
   },
+  overallOutcome,
   obConfigAuth,
   logoConfig,
   variant,

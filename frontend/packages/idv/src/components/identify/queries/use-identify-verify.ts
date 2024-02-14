@@ -6,10 +6,9 @@ import type {
 import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-type PayloadPartKey = 'obConfigAuth' | 'sandboxId' | 'authToken';
-type Payload = Omit<IdentifyVerifyRequest, 'identifier' | 'scope'> & {
+type PayloadPartKey = 'obConfigAuth' | 'sandboxId' | 'authToken' | 'scope';
+type Payload = Omit<IdentifyVerifyRequest, 'identifier'> & {
   authToken?: string;
-  scope?: 'auth';
 };
 
 const requestFn = async (payload: Payload) => {
@@ -19,7 +18,7 @@ const requestFn = async (payload: Payload) => {
     authToken,
     obConfigAuth,
     sandboxId,
-    scope = 'auth',
+    scope,
   } = payload;
   const headers: Record<string, string> = { ...obConfigAuth };
   if (sandboxId) {

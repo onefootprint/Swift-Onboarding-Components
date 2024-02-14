@@ -48,7 +48,11 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
 
   useEffect(() => {
     if (isDone && state.context.challenge.authToken) {
-      onDone({ authToken: state.context.challenge.authToken });
+      onDone({
+        authToken: state.context.challenge.authToken,
+        phoneNumber: state.context.identify.phoneNumber,
+        email: state.context.identify.email,
+      });
     }
   }, [isDone, onDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
