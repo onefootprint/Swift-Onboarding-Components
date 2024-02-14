@@ -51,6 +51,8 @@ pub async fn post(
             let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
             return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
         }
+        let wf = user_wf_auth.workflow().clone();
+        let sv_id = user_wf_auth.scoped_user.id.clone();
 
         if let Ok(obc) = user_wf_auth.ob_config() {
             let session_id = telemetry.session_id;
@@ -59,11 +61,8 @@ pub async fn post(
                 &obc.key,
                 session_id.as_ref(),
             );
-            tracing::info!(%use_new_identify_machine, ?session_id, "Finished onboarding");
+            tracing::info!(%use_new_identify_machine, ?session_id, status=?wf.status, "Finished onboarding");
         }
-
-        let wf = user_wf_auth.workflow().clone();
-        let sv_id = user_wf_auth.scoped_user.id.clone();
         (Some(wf), sv_id, user_wf_auth.data.user_session)
     } else {
         // Token from auth
