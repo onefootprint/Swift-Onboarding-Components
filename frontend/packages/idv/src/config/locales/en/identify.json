@@ -39,11 +39,13 @@
     "form": {
       "input-placeholder": "jane.doe@acme.com",
       "input-required": "Email is required"
-    }
+    },
+    "legal-footer": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
   },
   "phone-step": {
     "subtitle": "Enter your phone number to proceed.",
     "title": "Hey there! 👋",
+    "verify-with-sms": "Verify with SMS",
     "form": {
       "input-invalid": "Phone number is invalid",
       "input-required": "Phone number cannot be empty"

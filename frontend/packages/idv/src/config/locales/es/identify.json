@@ -39,11 +39,13 @@
     "form": {
       "input-placeholder": "jane.doe@acme.com",
       "input-required": "Correo electrónico es un campo requerido"
-    }
+    },
+    "legal-footer": "Al continuar, acepto los <termsLink>Términos de servicio</termsLink> y reconozco la <privacyPolicyLink>Política de privacidad</privacyPolicyLink>."
   },
   "phone-step": {
     "subtitle": "Ingresa tu número de teléfono para continuar.",
     "title": "¡Hola! 👋",
+    "verify-with-sms": "Verificar enviando un SMS",
     "form": {
       "input-invalid": "Número de teléfono inválido",
       "input-required": "No se puede dejar el número de teléfono en blanco"

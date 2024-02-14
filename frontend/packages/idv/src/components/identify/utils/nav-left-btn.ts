@@ -40,7 +40,7 @@ const getLeftNavButton = (
     return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
   }
   if (state.matches('phoneIdentification')) {
-    return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
+    return BACK;
   }
   if (state.matches('emailIdentification')) {
     return CLOSE;

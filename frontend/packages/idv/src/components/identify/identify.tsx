@@ -35,6 +35,7 @@ type IdentifyProps = {
   // TODO eventually include the requested scope
 };
 
+// Should we move this to its own package?
 const Identify = ({
   publicKey,
   initialAuthToken,

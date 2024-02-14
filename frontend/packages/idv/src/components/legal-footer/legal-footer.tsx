@@ -4,14 +4,11 @@ import Link from 'next/link';
 import React from 'react';
 import { Trans } from 'react-i18next';
 
-type LegalFooterProps = { descriptionKey: string };
-
-const LegalFooter = ({ descriptionKey }: LegalFooterProps) => (
+const LegalFooter = () => (
   <StyledTypography>
     <Trans
-      ns="idv"
-      // @ts-ignore:next-line
-      i18nKey={descriptionKey}
+      ns="identify"
+      i18nKey="email-step.legal-footer"
       components={{
         termsLink: (
           <Link

@@ -84,7 +84,7 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
           options={options}
           validator={handlePhoneValidation}
           texts={{
-            cta: t('continue'),
+            cta: t('phone-step.verify-with-sms'),
             phoneInvalid: t('phone-step.form.input-invalid'),
             phoneLabel: t('phone-number'),
             phoneRequired: t('phone-step.form.input-required'),

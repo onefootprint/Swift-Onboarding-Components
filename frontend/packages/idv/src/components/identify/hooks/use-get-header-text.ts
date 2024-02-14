@@ -12,17 +12,19 @@ const useGetHeaderText = (): string => {
     state.context,
     state.context.identify.user,
   );
-  const isLoginChallenge = !!state.context.identify.user;
+  // Show welcome back if we're doing a login challenge and the user is _not_ unverified
+  const shouldShowWelcomeBack =
+    !!state.context.identify.user && !state.context.identify.user.isUnverified;
 
   if (state.matches('smsChallenge')) {
     // If we showed the challenge selector screen, we already displayed "Welcome back" text
-    return isLoginChallenge && !hasChallengeSelector
+    return shouldShowWelcomeBack && !hasChallengeSelector
       ? t('sms-step.welcome-back-title')
       : t('sms-step.verify-title');
   }
   if (state.matches('emailChallenge')) {
     // If we showed the challenge selector screen, we already displayed "Welcome back" text
-    return isLoginChallenge && !hasChallengeSelector
+    return shouldShowWelcomeBack && !hasChallengeSelector
       ? t('email-challenge.welcome-back-title')
       : t('email-challenge.verify-title');
   }

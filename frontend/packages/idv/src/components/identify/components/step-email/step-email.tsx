@@ -70,7 +70,7 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
           emailPlaceholder: t('email-step.form.input-placeholder'),
         }}
       />
-      <LegalFooter descriptionKey="common:email-legal-footer" />
+      <LegalFooter />
       {children}
     </>
   );

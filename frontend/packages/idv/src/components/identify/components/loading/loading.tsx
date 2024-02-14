@@ -5,7 +5,7 @@ import React from 'react';
 type LoadingProps = { children?: JSX.Element | null };
 
 const Loading = ({ children }: LoadingProps): JSX.Element => (
-  <Box testID="auth-init-shimmer">
+  <Box testID="identify-init-shimmer">
     <NavHeader />
     <TitleContainer>
       <Shimmer sx={{ width: '120px', height: '28px', marginBottom: 3 }} />
