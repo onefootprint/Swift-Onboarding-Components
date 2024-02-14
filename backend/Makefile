@@ -138,8 +138,7 @@ set-dot-env:
 	@rm /tmp/e_key.age
 	@rm /tmp/key.age
 
-	@echo "created .env:"
-	@cat .env
+	@echo "created .env"
 
 open-api:
 	@MONOREPO_DIR=../ python3 ci/scripts/update_open_api.py
