@@ -80,6 +80,8 @@ pub enum BoolFlag<'a> {
     IsRulesProductEnabled(&'a TenantId),
     #[strum(to_string = "MakeLexisCall")]
     MakeLexisCall(&'a TenantId),
+    #[strum(to_string = "UseNewIdentifyMachine")]
+    UseNewIdentifyMachine(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -127,6 +129,7 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
             Self::IsRulesProductEnabled(k) => Some(k.to_string()),
             Self::MakeLexisCall(k) => Some(k.to_string()),
+            Self::UseNewIdentifyMachine(k) => Some(k.to_string()),
         }
     }
 
@@ -170,6 +173,7 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(_) => false,
             Self::IsRulesProductEnabled(_) => false,
             Self::MakeLexisCall(_) => false,
+            Self::UseNewIdentifyMachine(_) => false,
         }
     }
 }

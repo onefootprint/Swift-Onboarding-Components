@@ -3573,6 +3573,10 @@
                                         "AX"
                                     ]
                                 }
+                            },
+                            "use_new_identify_machine": {
+                                "description": "Will remove this after identify machine rollout",
+                                "type": "boolean"
                             }
                         },
                         "required": [
@@ -3592,7 +3596,8 @@
                             "org_name",
                             "requires_id_doc",
                             "status",
-                            "supported_countries"
+                            "supported_countries",
+                            "use_new_identify_machine"
                         ]
                     }
                 },
@@ -4242,6 +4247,10 @@
                                         "AX"
                                     ]
                                 }
+                            },
+                            "use_new_identify_machine": {
+                                "description": "Will remove this after identify machine rollout",
+                                "type": "boolean"
                             }
                         },
                         "required": [
@@ -4261,7 +4270,8 @@
                             "org_name",
                             "requires_id_doc",
                             "status",
-                            "supported_countries"
+                            "supported_countries",
+                            "use_new_identify_machine"
                         ]
                     }
                 },
@@ -4633,6 +4643,10 @@
                                         "AX"
                                     ]
                                 }
+                            },
+                            "use_new_identify_machine": {
+                                "description": "Will remove this after identify machine rollout",
+                                "type": "boolean"
                             }
                         },
                         "required": [
@@ -4652,7 +4666,8 @@
                             "org_name",
                             "requires_id_doc",
                             "status",
-                            "supported_countries"
+                            "supported_countries",
+                            "use_new_identify_machine"
                         ]
                     }
                 },
@@ -5023,6 +5038,10 @@
                                 "AX"
                             ]
                         }
+                    },
+                    "use_new_identify_machine": {
+                        "description": "Will remove this after identify machine rollout",
+                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -5042,7 +5061,8 @@
                     "org_name",
                     "requires_id_doc",
                     "status",
-                    "supported_countries"
+                    "supported_countries",
+                    "use_new_identify_machine"
                 ]
             },
             "RawDataRequest": {

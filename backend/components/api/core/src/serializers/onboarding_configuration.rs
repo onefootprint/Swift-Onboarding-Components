@@ -64,6 +64,9 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Document);
 
+        let use_new_identify_machine = ff_client.flag(BoolFlag::UseNewIdentifyMachine(&key));
+        tracing::info!(%use_new_identify_machine, "Evaluating whether to use new identify machine");
+
         Self {
             name,
             key,
@@ -90,6 +93,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             support_email,
             support_phone,
             support_website,
+            use_new_identify_machine,
         }
     }
 }

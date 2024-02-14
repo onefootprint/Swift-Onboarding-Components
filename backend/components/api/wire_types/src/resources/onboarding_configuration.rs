@@ -69,4 +69,7 @@ pub struct PublicOnboardingConfiguration {
     pub support_email: Option<String>,
     pub support_phone: Option<String>,
     pub support_website: Option<String>,
+
+    /// Will remove this after identify machine rollout
+    pub use_new_identify_machine: bool,
 }
