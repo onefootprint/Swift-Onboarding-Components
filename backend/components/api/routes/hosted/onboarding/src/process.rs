@@ -5,7 +5,7 @@ use crate::{
 use api_core::{
     auth::user::{CheckUserWfAuthContext, UserWfAuthContext},
     decision::state::{
-        actions::WorkflowActions, alpaca_kyc::AlpacaKycState, document::DocumentState, kyc::KycState,
+        actions::WorkflowActions, document::DocumentState, kyc::KycState,
         DocCollected, RunIncodeMachineAndWorkflowResult, WorkflowKind, WorkflowWrapper,
     },
     errors::{workflow::WorkflowError, ApiResult},
@@ -75,13 +75,11 @@ pub async fn post(
     // in order to make it proceed
     // First run the Authorize action since this generates a requirement for Bifrost.
     let (ww, _) = match ww.state {
-        WorkflowKind::Kyc(KycState::DataCollection(_))
-        | WorkflowKind::AlpacaKyc(AlpacaKycState::DataCollection(_)) => {
+        WorkflowKind::Kyc(KycState::DataCollection(_)) => {
             ww.action(&state, WorkflowActions::Authorize(Authorize {}))
                 .await?
         }
         WorkflowKind::Kyc(KycState::DocCollection(_))
-        | WorkflowKind::AlpacaKyc(AlpacaKycState::DocCollection(_))
         | WorkflowKind::Document(DocumentState::DataCollection(_)) => {
             ww.action(&state, WorkflowActions::DocCollected(DocCollected {}))
                 .await?

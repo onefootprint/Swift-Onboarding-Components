@@ -6,7 +6,7 @@ use enum_dispatch::enum_dispatch;
 use newtypes::{Locked, WorkflowId};
 
 // These are needed for enum_dispatch to work properly
-use super::{alpaca_kyc::*, document::*, kyb::*, kyc::*};
+use super::{document::*, kyb::*, kyc::*};
 
 #[enum_dispatch]
 /// Provides basic functionality that all WorkflowStates should have

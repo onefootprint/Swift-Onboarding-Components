@@ -9,7 +9,6 @@ use self::kyb::KybState;
 
 pub mod actions;
 pub use actions::*;
-pub mod alpaca_kyc;
 pub mod common;
 pub mod document;
 pub mod kyb;
@@ -36,7 +35,6 @@ pub enum StateError {
     WorkflowActionsConversionError(WorkflowActionsKind),
 }
 
-use alpaca_kyc::AlpacaKycState;
 use document::DocumentState;
 use kyc::KycState;
 
@@ -46,7 +44,6 @@ use super::vendor::incode::IncodeStateMachine;
 #[derive(Clone)]
 pub enum WorkflowKind {
     Kyc(KycState),
-    AlpacaKyc(AlpacaKycState),
     Document(DocumentState),
     Kyb(KybState),
 }
@@ -61,7 +58,6 @@ impl From<&WorkflowKind> for newtypes::WorkflowState {
     fn from(value: &WorkflowKind) -> Self {
         match value {
             WorkflowKind::Kyc(s) => s.name(),
-            WorkflowKind::AlpacaKyc(s) => s.name(),
             WorkflowKind::Document(s) => s.name(),
             WorkflowKind::Kyb(s) => s.name(),
         }
@@ -82,7 +78,7 @@ impl WorkflowWrapper {
         let workflow_id = workflow.id.clone();
         let s = match workflow.state {
             newtypes::WorkflowState::Kyc(_) => KycState::init(state, workflow).await?.into(),
-            newtypes::WorkflowState::AlpacaKyc(_) => AlpacaKycState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::AlpacaKyc(_) => todo!(), //throw an error
             newtypes::WorkflowState::Document(_) => DocumentState::init(state, workflow).await?.into(),
             newtypes::WorkflowState::Kyb(_) => KybState::init(state, workflow).await?.into(),
         };
