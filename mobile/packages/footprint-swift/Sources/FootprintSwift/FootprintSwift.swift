@@ -7,27 +7,27 @@ public class Footprint: NSObject {
     // Hold a strong reference to managers so that the auth session & api call state don't get garbage cleaned
     private var sdkArgsManager: FootprintSdkArgsManager?
     private var authSessionManager: FootprintAuthSessionManager?
-    private var errorManager: FootprintErrorManager?
+    private var logger: FootprintLogger?
     private var hasActiveSession: Bool = false
     
     private override init() {}
     
     public static func initialize(with configuration: FootprintConfiguration) {
         Task {
-            let errorManager = FootprintErrorManager(configuration: configuration)
-            let sdkArgsManager = FootprintSdkArgsManager(configuration: configuration, errorManager: errorManager)
-            let authSessionManager = FootprintAuthSessionManager(configuration: configuration, errorManager: errorManager)
+            let logger = FootprintLogger(configuration: configuration)
+            let sdkArgsManager = FootprintSdkArgsManager(configuration: configuration, logger: logger)
+            let authSessionManager = FootprintAuthSessionManager(configuration: configuration, logger: logger)
             
             if let existingInstance = instance {
                 existingInstance.configuration = configuration
-                existingInstance.errorManager = errorManager
+                existingInstance.logger = logger
                 existingInstance.sdkArgsManager = sdkArgsManager
                 existingInstance.authSessionManager = authSessionManager
                 await existingInstance.render()
             } else {
                 let footprint = Footprint()
                 footprint.configuration = configuration
-                footprint.errorManager = errorManager
+                footprint.logger = logger
                 footprint.sdkArgsManager = sdkArgsManager
                 footprint.authSessionManager = authSessionManager
                 await footprint.render()
@@ -38,7 +38,7 @@ public class Footprint: NSObject {
     
     private func render() async {
         guard let configuration = self.configuration else {
-            self.errorManager?.log(error: "No configuration found.")
+            self.logger?.logError(error: "No configuration found.")
             return
         }
         
@@ -46,16 +46,16 @@ public class Footprint: NSObject {
         if (self.hasActiveSession) {
             return
         }
-        
+
         do {
             self.hasActiveSession = true
             let token = try await self.sdkArgsManager!.sendArgs()
-            try self.authSessionManager!.startSession(token: token, onComplete: {
+            try self.authSessionManager?.startSession(token: token, onComplete: {
                 self.hasActiveSession = false
             })
         } catch {
             self.hasActiveSession = false
-            self.errorManager?.log(error: "Could not initialize auth session.")
+            self.logger?.logError(error: "Could not initialize auth session.")
         }
     }
     

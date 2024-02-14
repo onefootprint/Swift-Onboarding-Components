@@ -28,7 +28,6 @@ struct ContentView: View {
                 )
                 
                 let options = FootprintOptions(
-                    showCompletionPage: true,
                     showLogo: true
                 )
                 
@@ -53,7 +52,9 @@ struct ContentView: View {
                     },
                     onError: { error in
                         print("Tenant received error: \(error)")
-                    }
+                    },
+                    bundleIdentifier: "com.onefootprint.demo-swift",
+                    teamIdentifier: "5F264K8AG4"
                 )
                 
                 Footprint.initialize(with: config)

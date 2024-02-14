@@ -1,7 +1,7 @@
 import Foundation
 
 @available(iOS 13.0, *)
-public class FootprintErrorManager {
+public class FootprintLogger {
     private var configuration: FootprintConfiguration?
     private let debugMode = false // Enable this for local development
     
@@ -9,16 +9,16 @@ public class FootprintErrorManager {
         self.configuration = configuration
     }
     
-    private func getErrorMsg(error: String) -> String {
-        return "@onefootprint/footprint-swift: \(error)"
+    private func getMessage(raw: String) -> String {
+        return "@onefootprint/footprint-swift: \(raw)"
     }
     
-    public func log(error: String, shouldCancel: Bool? = nil) {
-        let errorMsg = self.getErrorMsg(error: error)
+    public func logError(error: String, shouldCancel: Bool? = nil) {
+        let errorMsg = self.getMessage(raw: error)
         if debugMode {
             print(errorMsg)
         } else {
-            sendErrorLog(error: error)
+            sendLog(message: error, level: "error")
         }
         if let onError = self.configuration?.onError {
             onError(errorMsg)
@@ -28,7 +28,16 @@ public class FootprintErrorManager {
         }
     }
     
-    public func sendErrorLog(error: String) {
+    public func logWarn(warning: String) {
+        let warningMessage = self.getMessage(raw: warning)
+        if debugMode {
+            print(warningMessage)
+        } else {
+            sendLog(message: warning, level: "warning")
+        }
+    }
+    
+    public func sendLog(message: String, level: String) {
         Task { () in
             do {
                 var request = URLRequest(url: URL(string: "\(FootprintSdkMetadata.apiBaseUrl)/org/sdk_telemetry")!)
@@ -41,8 +50,8 @@ public class FootprintErrorManager {
                     sdkKind: FootprintSdkMetadata.kind,
                     sdkName: FootprintSdkMetadata.name,
                     sdkVersion: FootprintSdkMetadata.version,
-                    logLevel: "error",
-                    logMessage: error
+                    logLevel: level,
+                    logMessage: message
                 )
                 let encodedConfiguration = try encoder.encode(telemetry)
                 let configurationJSON = try? JSONSerialization.jsonObject(with: encodedConfiguration, options: [])

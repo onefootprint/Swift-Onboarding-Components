@@ -5,12 +5,14 @@ import AuthenticationServices
 class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationContextProviding {
     public var authSession: ASWebAuthenticationSession?
     private var configuration: FootprintConfiguration
-    private var errorManager: FootprintErrorManager?
+    private var logger: FootprintLogger?
+    private var attestationManager: FootprintAttestationManager?
     
-    init(configuration: FootprintConfiguration, errorManager: FootprintErrorManager?) {
+    init(configuration: FootprintConfiguration, logger: FootprintLogger?) {
         self.configuration = configuration
-        self.errorManager = errorManager
+        self.logger = logger
         self.authSession = nil
+        self.attestationManager = FootprintAttestationManager(logger: logger)
     }
     
     private func getURL(token: String) throws -> URL {
@@ -46,7 +48,7 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
         if self.authSession != nil {
             return
         }
-
+        
         let url = try self.getURL(token: token)
         self.authSession = ASWebAuthenticationSession(
             url: url,
@@ -62,38 +64,55 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
                         self?.configuration.onCancel?()
                         return
                     case .presentationContextNotProvided:
-                        self?.errorManager?.log(error: "Presentation context not provided.", shouldCancel: true)
+                        self?.logger?.logError(error: "Presentation context not provided.", shouldCancel: true)
                         return
                     case .presentationContextInvalid:
-                        self?.errorManager?.log(error: "Invalid presentation context.", shouldCancel: true)
+                        self?.logger?.logError(error: "Invalid presentation context.", shouldCancel: true)
                         return
                     default:
-                        self?.errorManager?.log(error:"Authentication session failed: \(error.localizedDescription)", shouldCancel: true)
+                        self?.logger?.logError(error:"Authentication session failed: \(error.localizedDescription)", shouldCancel: true)
                         return
                     }
                 } else {
-                    self?.errorManager?.log(error: "An unexpected error occurred during auth: \(error.localizedDescription)", shouldCancel: true)
+                    self?.logger?.logError(error: "An unexpected error occurred during auth: \(error.localizedDescription)", shouldCancel: true)
                 }
                 return
             }
             
             guard let callbackURL = callbackURL else {
-                self?.errorManager?.log(error: "Missing callbackURL from auth session", shouldCancel: true)
+                self?.logger?.logError(error: "Missing callbackURL from auth session", shouldCancel: true)
                 return
             }
             
-            do {
-                let urlComponents = URLComponents(url: callbackURL, resolvingAgainstBaseURL: true)
-                let queryItems = urlComponents!.queryItems
+            let urlComponents = URLComponents(url: callbackURL, resolvingAgainstBaseURL: true)
+            let service = (self?.configuration.bundleIdentifier)! as String
+            let accessGroup = "\((self?.configuration.teamIdentifier)! as String).\((self?.configuration.bundleIdentifier)! as String)"
+            if let queryItems = urlComponents?.queryItems {
+                if let deviceResponseJson = queryItems.first(where: {$0.name == "device_response" })?.value {
+                    if let authToken = queryItems.first(where: {$0.name == "auth_token" })?.value {
+                        Task {
+                            do {
+                                try await self?.attestationManager?.getAttestation(
+                                    authToken: authToken,
+                                    deviceResponseJson: deviceResponseJson,
+                                    service: service,
+                                    accessGroup: accessGroup
+                                )
+                            } catch {
+                                self?.logger?.logWarn(warning: "Attestation failed")
+                            }
+                        }
+                    }
+                }
                 
-                if let canceledValue = queryItems!.first(where: { $0.name == "canceled" })?.value,
+                if let canceledValue = queryItems.first(where: { $0.name == "canceled" })?.value,
                    canceledValue == "true" {
                     self?.configuration.onCancel?()
-                } else if let validationToken = queryItems!.first(where: { $0.name == "validation_token" })?.value {
+                } else if let validationToken = queryItems.first(where: { $0.name == "validation_token" })?.value {
                     self?.configuration.onComplete?(validationToken)
                 }
-            } catch {
-                self?.errorManager?.log(error: "Encountered error when redirecting after verification is complete.", shouldCancel: true)
+            } else {
+                self?.logger?.logError(error: "Encountered error when redirecting after verification is complete.", shouldCancel: true)
             }
         }
         
