@@ -1,4 +1,9 @@
-import { enIdvJson, esIdvJson } from '@onefootprint/idv';
+import {
+  enIdentifyJson,
+  enIdvJson,
+  esIdentifyJson,
+  esIdvJson,
+} from '@onefootprint/idv';
 import { enRequestJson, esRequestJson } from '@onefootprint/request';
 import { enUiJson, esUiJson } from '@onefootprint/ui';
 import i18next from 'i18next';
@@ -19,12 +24,14 @@ const configureI18n = () => {
           idv: enIdvJson,
           ui: enUiJson,
           request: enRequestJson,
+          identify: enIdentifyJson,
         },
         es: {
           common: esCommonJson,
           idv: esIdvJson,
           ui: esUiJson,
           request: esRequestJson,
+          identify: esIdentifyJson,
         },
       },
       debug: false,

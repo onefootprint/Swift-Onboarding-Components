@@ -1,4 +1,7 @@
-import { enIdvJson as idv } from '@onefootprint/idv';
+import {
+  enIdentifyJson as identify,
+  enIdvJson as idv,
+} from '@onefootprint/idv';
 import { enUiJson as ui } from '@onefootprint/ui';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -10,13 +13,14 @@ const resources = {
     common: en,
     idv,
     ui,
+    identify,
   },
 };
 const I18NOptions = {
   resources,
   lng: 'en',
   defaultNS: 'common',
-  ns: ['common', 'idv', 'ui', 'request'],
+  ns: ['common', 'idv', 'ui', 'request', 'identify'],
   returnNull: false,
   interpolation: {
     escapeValue: false,

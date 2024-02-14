@@ -1,4 +1,7 @@
-import type { enIdvJson as idvResource } from '@onefootprint/idv';
+import type {
+  enIdentifyJson as identifyResource,
+  enIdvJson as idvResource,
+} from '@onefootprint/idv';
 import type { enRequestJson as requestResource } from '@onefootprint/request';
 import type { enUiJson as uiResource } from '@onefootprint/ui';
 
@@ -13,6 +16,7 @@ declare module 'i18next' {
       idv: typeof idvResource;
       common: typeof commonResource;
       request: typeof requestResource;
+      identify: typeof identifyResource;
     };
   }
 }
