@@ -108,14 +108,25 @@ impl Client {
         let message: Message = decode_response(response).await?;
         tracing::info!(sid=%message.sid, "Sent twilio message");
 
-        // fatal delivery here, abort
-        if matches!(message.status, Status::Undelivered | Status::Failed) {
-            return Err(Error::DeliveryFailed(message.status, message.error_code));
+        let result = if matches!(message.status, Status::Undelivered | Status::Failed) {
+            // fatal delivery here, instantly abort
+            tracing::info!(status=%message.status, "Twilio SMS status");
+            Err(Error::DeliveryFailed(message.status, message.error_code))
+        } else {
+            // Wait for ~5s for the message to be delivered. If it doesn't deliver, error
+            self.check_status(message.uri.clone()).await
+        };
+        let status = match &result {
+            Ok(message) => Some(message.status),
+            Err(Error::DeliveryFailed(status, _)) => Some(*status),
+            Err(Error::NotDeliveredAfterTimeout(status, _)) => Some(*status),
+            _ => None,
+        };
+        if let Some(status) = status {
+            // Log for aggregate metrics on twilio performance
+            tracing::info!(%status, "Twilio SMS with status");
         }
-
-        // Wait for 5s for the message to be delivered. If it doesn't deliver, error
-        self.check_status(message.uri.clone()).await?;
-        Ok(message)
+        result
     }
 
     async fn check_status(&self, message_uri: String) -> crate::response::Result<Message> {
