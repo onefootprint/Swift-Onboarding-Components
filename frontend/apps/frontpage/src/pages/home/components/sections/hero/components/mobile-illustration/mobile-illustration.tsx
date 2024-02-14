@@ -43,7 +43,7 @@ const MobileIllustration = () => {
       <StyledBackground />
       <ImageContainer animate={mockupControls}>
         <Image
-          src="/home/hero/phone-hero.png"
+          src="/home/hero/home-mobile-new.png"
           height={280}
           width={560}
           alt={t('desktop-img-alt')}

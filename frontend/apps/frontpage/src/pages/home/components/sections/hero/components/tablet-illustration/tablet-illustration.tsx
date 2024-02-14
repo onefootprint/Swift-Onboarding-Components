@@ -60,7 +60,7 @@ const TabletIllustration = () => {
       <StyledBackground />
       <MockupContainer animate={containerControls}>
         <StyledImage
-          src="/home/hero/hero.png"
+          src="/home/hero/hero-new.png"
           height={682}
           width={1024}
           alt={t('desktop-img-alt')}

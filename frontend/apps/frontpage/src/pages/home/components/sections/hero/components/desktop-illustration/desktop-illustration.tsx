@@ -100,9 +100,9 @@ const ImageContainer = styled(motion.div)`
       left: 0;
       height: 100%;
       width: 100%;
-      background-image: url('/home/hero/hero.png');
-      background-size: cover;
-      background-position: center;
+      background-image: url('/home/hero/hero-new.png');
+      background-size: contain;
+      background-position: top center;
       background-repeat: no-repeat;
       z-index: 3;
     }
