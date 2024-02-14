@@ -106,7 +106,7 @@ If the `requires_additional_info` field is non-null, there is an outstanding req
 
 The `update_auth_methods` token is used to allow a user to update their login methods using the Footprint Auth component. They will first be asked to log in using an existing login method on their account, and then they will be able to update their phone and/or email.
 
-If you'd like to limit which auth methods are allowed to be updated, you can pass the list of desired methods when creating the token. For example, if you'd only like the user to be allowed to update their phone number, you can create a token like so:
+If you'd like to limit which auth methods are allowed to be updated, you can pass the list of desired methods in `limit_auth_methods` when creating the token. For example, if you'd only like the user to be allowed to update their phone number, you can create a token like so:
 
 #### Example request
 
