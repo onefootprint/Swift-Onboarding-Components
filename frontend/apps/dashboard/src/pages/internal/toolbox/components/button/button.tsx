@@ -1,0 +1,65 @@
+import type { Icon } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
+import { Stack, Typography } from '@onefootprint/ui';
+import React from 'react';
+
+type ButtonProps = {
+  onClick?: () => void;
+  title: string;
+  subtitle: string;
+  icon: Icon;
+};
+
+const Button = ({ onClick, title, subtitle, icon: Icon }: ButtonProps) => (
+  <Container onClick={onClick}>
+    <IconContainer align="center" justify="center">
+      <Icon />
+    </IconContainer>
+    <Stack direction="column" gap={2}>
+      <Typography variant="heading-3" color="primary" as="h2">
+        {title}
+      </Typography>
+      <Typography variant="body-3" color="secondary" as="p">
+        {subtitle}
+      </Typography>
+    </Stack>
+  </Container>
+);
+
+const Container = styled.button`
+  ${({ theme }) => css`
+    all: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: ${theme.spacing[3]};
+    cursor: pointer;
+    max-width: 320px;
+    border-radius: ${theme.borderRadius.default};
+    background-color: ${theme.backgroundColor.primary};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    padding: ${theme.spacing[5]};
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+      box-shadow: ${theme.elevation[2]};
+
+      ${IconContainer} {
+        background-color: ${theme.backgroundColor.senary};
+      }
+    }
+  `}
+`;
+
+const IconContainer = styled(Stack)`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[3]};
+    width: ${theme.spacing[9]};
+    height: ${theme.spacing[9]};
+    border-radius: 50%;
+    background-color: ${theme.backgroundColor.secondary};
+    transition: all 0.2s ease-in-out;
+  `}
+`;
+export default Button;

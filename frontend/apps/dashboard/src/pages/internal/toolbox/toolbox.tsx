@@ -1,5 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
-import { Dialog, Grid, Stack, Typography, useToast } from '@onefootprint/ui';
+import type { Icon } from '@onefootprint/icons';
+import { IcoDatabase24, IcoStore24, IcoUser24 } from '@onefootprint/icons';
+import { Dialog, Stack, Typography, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -7,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { DEFAULT_PRIVATE_ROUTE } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
 
+import Button from './components/button';
 import CleanUpUserForm from './components/clean-up-user-form';
 import CreateSandboxTenantForm from './components/create-sandbox-tenant-form';
 
@@ -17,6 +19,7 @@ type Tool = {
   dialogComponent?: React.ReactNode;
   // When specified, selecting this tool performs the provided operation
   onClick?: () => void;
+  icon: Icon;
 };
 
 const Tenants = () => {
@@ -41,6 +44,7 @@ const Tenants = () => {
     {
       title: 'Copy auth token',
       subtitle: 'Copy your dashboard auth token to the clipboard',
+      icon: IcoUser24,
       onClick: () => {
         navigator.clipboard.writeText(auth || '');
         toast.show({
@@ -52,6 +56,7 @@ const Tenants = () => {
     {
       title: 'Clean up user',
       subtitle: 'Delete a vault belonging to an employee and all its data',
+      icon: IcoDatabase24,
       dialogComponent: (
         <CleanUpUserForm formId="tool-form" onClose={handleDialogClose} />
       ),
@@ -59,6 +64,7 @@ const Tenants = () => {
     {
       title: 'Create sandbox tenant',
       subtitle: `Before a sales demo, pre-create a tenant for the target customer's company`,
+      icon: IcoStore24,
       dialogComponent: (
         <CreateSandboxTenantForm
           formId="tool-form"
@@ -81,26 +87,23 @@ const Tenants = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Container>
-        <Stack gap={2} marginBottom={7} direction="column">
-          <Typography variant="heading-2">{t('title')}</Typography>
-          <Typography variant="body-2" color="secondary">
-            {t('subtitle')}
-          </Typography>
-        </Stack>
-        <Grid.Container gap={5} columns={['repeat(3, 1fr)']}>
-          {tools.map(tool => (
-            <Grid.Item gridArea={tool.title} onClick={handleSelectTool(tool)}>
-              <ItemBox>
-                <Stack direction="column" gap={7}>
-                  <Typography variant="display-3">{tool.title}</Typography>
-                  <Typography variant="body-3">{tool.subtitle}</Typography>
-                </Stack>
-              </ItemBox>
-            </Grid.Item>
-          ))}
-        </Grid.Container>
-      </Container>
+      <Stack gap={2} marginBottom={7} direction="column">
+        <Typography variant="heading-2">{t('title')}</Typography>
+        <Typography variant="body-2" color="secondary">
+          {t('subtitle')}
+        </Typography>
+      </Stack>
+      <Stack direction="row" flexWrap="wrap" gap={5} width="100%">
+        {tools.map(tool => (
+          <Button
+            key={tool.title}
+            onClick={handleSelectTool(tool)}
+            title={tool.title}
+            subtitle={tool.subtitle}
+            icon={tool.icon}
+          />
+        ))}
+      </Stack>
       {selectedTool && (
         <Dialog
           size="compact"
@@ -119,25 +122,5 @@ const Tenants = () => {
     </>
   );
 };
-
-const ItemBox = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[5]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    cursor: pointer;
-    width: 100%;
-
-    :hover {
-      background-color: ${theme.backgroundColor.secondary};
-    }
-  `}
-`;
-
-const Container = styled.div`
-  max-width: 1600px;
-  margin-right: auto;
-  margin-left: auto;
-`;
 
 export default Tenants;
