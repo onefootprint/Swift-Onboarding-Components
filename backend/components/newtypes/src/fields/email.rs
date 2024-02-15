@@ -100,8 +100,8 @@ impl std::str::FromStr for Email {
         let s = s.trim().to_lowercase();
         // todo, do we want to try to strip out + variations for gmail accounts / standardize further?
 
-        if !email_address::EmailAddress::is_valid(&s) {
-            return Err(crate::Error::InvalidEmail);
+        if let Err(e) = email_address::EmailAddress::from_str(&s) {
+            return Err(crate::Error::InvalidEmail(e));
         }
 
         Ok(Email {

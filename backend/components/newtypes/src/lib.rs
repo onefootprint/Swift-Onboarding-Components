@@ -87,8 +87,8 @@ pub use tenant_business_info::*;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("Invalid email address")]
-    InvalidEmail,
+    #[error("Invalid email address: {0}")]
+    InvalidEmail(email_address::Error),
     #[error("{0}")]
     PhoneNumber(#[from] fields::phone_number::Error),
     #[error("Invalid sandbox suffix. Suffix must be non-empty, alphanumeric string")]
