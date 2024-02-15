@@ -19,8 +19,8 @@ const useGetHeaderText = (): string => {
   if (state.matches('smsChallenge')) {
     // If we showed the challenge selector screen, we already displayed "Welcome back" text
     return shouldShowWelcomeBack && !hasChallengeSelector
-      ? t('sms-step.welcome-back-title')
-      : t('sms-step.verify-title');
+      ? t('sms-challenge.welcome-back-title')
+      : t('sms-challenge.verify-title');
   }
   if (state.matches('emailChallenge')) {
     // If we showed the challenge selector screen, we already displayed "Welcome back" text

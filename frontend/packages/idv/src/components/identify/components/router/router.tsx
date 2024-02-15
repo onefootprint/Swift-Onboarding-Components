@@ -12,10 +12,10 @@ import EmailChallenge from '../email-challenge';
 import InitAuthToken from '../init-auth-token';
 import Loading from '../loading';
 import Notification from '../notification';
+import SmsChallenge from '../sms-challenge';
 import StepBootstrap from '../step-bootstrap';
 import StepEmail from '../step-email';
 import StepPhone from '../step-phone';
-import StepSms from '../step-sms';
 
 type RouterProps = {
   onDone: (payload: DoneArgs) => void;
@@ -77,7 +77,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
     return <ChallengeSelectOrPasskey Header={Header} />;
   }
   if (state.matches('smsChallenge')) {
-    return <StepSms Header={Header} />;
+    return <SmsChallenge Header={Header} />;
   }
   if (state.matches('emailChallenge')) {
     return <EmailChallenge Header={Header} />;

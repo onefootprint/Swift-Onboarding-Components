@@ -11,7 +11,7 @@ import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';
 import PinVerification from '../pin-verification';
 
-type StepPhoneProps = {
+type SmsChallengeProps = {
   children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
 };
@@ -19,7 +19,7 @@ type StepPhoneProps = {
 const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
-const StepSms = ({ children, Header }: StepPhoneProps) => {
+const SmsChallenge = ({ children, Header }: SmsChallengeProps) => {
   const [state, send] = useIdentifyMachine();
   const {
     challenge: { challengeData },
@@ -40,8 +40,8 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
     });
 
     return scrubbedPhoneNumber
-      ? t('sms-step.prompt-with-phone', { scrubbedPhoneNumber })
-      : t('sms-step.prompt-without-phone');
+      ? t('sms-challenge.prompt-with-phone', { scrubbedPhoneNumber })
+      : t('sms-challenge.prompt-without-phone');
   };
   const formTitle = getFormTitle();
 
@@ -82,4 +82,4 @@ const Container = styled.div`
   `}
 `;
 
-export default StepSms;
+export default SmsChallenge;

@@ -71,7 +71,7 @@
     "send-code-via-email": "Enviar código por correo electrónico",
     "passkey": "Iniciar sesión con Passkey"
   },
-  "sms-step": {
+  "sms-challenge": {
     "label": "SMS",
     "prompt-with-phone": "Introduce el código de 6 dígitos que enviamos a {{scrubbedPhoneNumber}}.",
     "prompt-without-phone": "Introduce el código de 6 dígitos que enviamos a tu teléfono.",
