@@ -199,6 +199,7 @@ const Dot = styled.div`
 const DotNext = styled(Dot)`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.tertiary};
+    color: ${theme.color.quinary};
   `};
 `;
 
