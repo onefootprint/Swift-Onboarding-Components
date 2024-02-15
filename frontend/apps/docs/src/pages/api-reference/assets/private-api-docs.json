@@ -3148,33 +3148,9 @@
                 "parameters": [
                     {
                         "in": "query",
-                        "name": "name",
+                        "name": "names",
                         "schema": {
-                            "type": "string",
-                            "enum": [
-                                "CreateUser",
-                                "UpdateUserData",
-                                "DeleteUserData",
-                                "DecryptUserData",
-                                "CreateUserAnnotation",
-                                "CompleteUserCheckLiveness",
-                                "CompleteUserCheckWatchlist",
-                                "RequestUserData",
-                                "StartUserVerification",
-                                "CompleteUserVerification",
-                                "CollectUserDocument",
-                                "CreateOrgApiKey",
-                                "DecryptOrgApiKey",
-                                "UpdateOrgApiKey",
-                                "InviteOrgMember",
-                                "UpdateOrgMember",
-                                "LoginOrgMember",
-                                "RemoveOrgMember",
-                                "CreateOrg",
-                                "UpdateOrgSettings",
-                                "CreateOrgRole",
-                                "UpdateOrgRole"
-                            ]
+                            "type": "string"
                         },
                         "style": "form"
                     },

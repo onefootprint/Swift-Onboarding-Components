@@ -11,7 +11,7 @@ use api_core::{
 use api_wire_types::{AuditEvent, AuditEventRequest};
 use chrono::{DateTime, Utc};
 use db::{models::audit_event::FilterQueryParams, DbResult};
-use newtypes::{AuditEventId, DataIdentifier};
+use newtypes::{AuditEventId, AuditEventName, DataIdentifier};
 use paperclip::actix::{api_v2_operation, get, web};
 use serde::{Deserialize, Serialize};
 
@@ -32,7 +32,7 @@ async fn get(
     let cursor = pagination.cursor.as_ref().map(|co| co.inner());
 
     let AuditEventRequest {
-        name,
+        names,
         targets,
         search,
         timestamp_lte,
@@ -46,7 +46,7 @@ async fn get(
         search,
         timestamp_lte,
         timestamp_gte,
-        name,
+        names: names.map(Vec::<AuditEventName>::from).unwrap_or_default(),
         targets: targets.map(Vec::<DataIdentifier>::from).unwrap_or_default(),
         is_live: auth.is_live()?,
     };

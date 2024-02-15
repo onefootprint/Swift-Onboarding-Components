@@ -33,7 +33,7 @@ def test_audit_events(sandbox_user):
     got_reasons = []
     for exp_num_results in exp_num_results_by_page:
         resp = get(f"org/audit_events", {
-            "name": "decrypt_user_data",
+            "names": "decrypt_user_data",
             "page_size": num_events - 2,
             "search": sandbox_user.fp_id,
             "cursor": cursor,

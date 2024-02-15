@@ -5,7 +5,7 @@ use crate::*;
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct AuditEventRequest {
-    pub name: Option<AuditEventName>,
+    pub names: Option<Csv<AuditEventName>>,
     pub targets: Option<Csv<DataIdentifier>>,
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,

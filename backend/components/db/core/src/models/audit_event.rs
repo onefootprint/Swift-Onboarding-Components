@@ -104,7 +104,7 @@ pub struct FilterQueryParams {
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
-    pub name: Option<AuditEventName>,
+    pub names: Vec<AuditEventName>,
     pub targets: Vec<DataIdentifier>,
     pub is_live: bool,
 }
@@ -233,8 +233,8 @@ impl AuditEvent {
             results = results.filter(audit_event::timestamp.ge(timestamp_gte))
         }
 
-        if let Some(name) = params.name {
-            results = results.filter(audit_event::name.eq(name))
+        if !params.names.is_empty() {
+            results = results.filter(audit_event::name.eq_any(params.names))
         }
 
         if !params.targets.is_empty() {
@@ -244,8 +244,8 @@ impl AuditEvent {
             )
         }
 
-        if let Some(search) = params.search {
-            let exact_match_fp_id = scoped_vault::fp_id.eq(search.clone());
+        if let Some(search) = params.search.as_ref() {
+            let exact_match_fp_id = scoped_vault::fp_id.eq(search);
             let substr_match_tenant_name = tenant::name.ilike(format!("%{}%", search));
             let substr_match_decrypt_reason = audit_event::name.eq(AuditEventName::DecryptUserData).and(
                 sql::<Bool>("metadata -> 'data' ->> 'reason' ILIKE ")
@@ -390,7 +390,7 @@ mod tests {
                 search: None,
                 timestamp_lte: None,
                 timestamp_gte: None,
-                name: None,
+                names: vec![],
                 targets: vec![],
                 is_live: true,
             },
@@ -457,7 +457,7 @@ mod tests {
                 search: None,
                 timestamp_lte: None,
                 timestamp_gte: None,
-                name: None,
+                names: vec![],
                 targets: vec![],
                 is_live: true,
             },
@@ -486,7 +486,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -500,7 +500,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -517,7 +517,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -531,7 +531,7 @@ mod tests {
                     search: Some(scoped_vault_1.fp_id.to_string()),
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -545,7 +545,7 @@ mod tests {
                     search: Some(tenant.name[..tenant.name.len() - 3].to_owned()),
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -559,7 +559,7 @@ mod tests {
                     search: Some("investigating".to_owned()),
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -573,7 +573,7 @@ mod tests {
                     search: Some("id.zip".to_owned()),
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -587,7 +587,7 @@ mod tests {
                     search: None,
                     timestamp_lte: Some(DateTime::<Utc>::from_timestamp(0, 0).unwrap()),
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -601,7 +601,7 @@ mod tests {
                     search: None,
                     timestamp_lte: Some(DateTime::<Utc>::from_timestamp(9000000000, 0).unwrap()),
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -615,7 +615,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: Some(DateTime::<Utc>::from_timestamp(0, 0).unwrap()),
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -629,7 +629,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: Some(DateTime::<Utc>::from_timestamp(9000000000, 0).unwrap()),
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -643,11 +643,25 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: Some(AuditEventName::CreateUser),
+                    names: vec![AuditEventName::CreateUser],
                     targets: vec![],
                     is_live: true,
                 },
                 vec![id1.clone()],
+            ),
+            (
+                "name = CreateUser or DecryptUserData",
+                FilterQueryParams {
+                    cursor: None,
+                    tenant_id: tenant.id.clone(),
+                    search: None,
+                    timestamp_lte: None,
+                    timestamp_gte: None,
+                    names: vec![AuditEventName::CreateUser, AuditEventName::DecryptUserData],
+                    targets: vec![],
+                    is_live: true,
+                },
+                vec![id1.clone(), id2.clone()],
             ),
             (
                 "target fields overlap",
@@ -657,7 +671,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![
                         DataIdentifier::Id(newtypes::IdentityDataKind::Ssn9),
                         DataIdentifier::Id(newtypes::IdentityDataKind::Email),
@@ -674,7 +688,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![DataIdentifier::Id(newtypes::IdentityDataKind::Email)],
                     is_live: false,
                 },
@@ -688,7 +702,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -702,7 +716,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: true,
                 },
@@ -716,7 +730,7 @@ mod tests {
                     search: None,
                     timestamp_lte: None,
                     timestamp_gte: None,
-                    name: None,
+                    names: vec![],
                     targets: vec![],
                     is_live: false,
                 },
@@ -743,7 +757,7 @@ mod tests {
                 search: None,
                 timestamp_lte: None,
                 timestamp_gte: None,
-                name: None,
+                names: vec![],
                 targets: vec![],
                 is_live: true,
             },
