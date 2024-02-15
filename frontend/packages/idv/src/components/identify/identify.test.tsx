@@ -693,7 +693,7 @@ describe('<Identify />', () => {
       withLoginChallenge(ChallengeKind.sms);
       const onDone = jest.fn();
       renderIdentify({
-        config: noPhoneOnboardingConfigFixture,
+        config: liveOnboardingConfigFixture,
         onDone,
       });
 
@@ -716,7 +716,7 @@ describe('<Identify />', () => {
       withLoginChallenge(ChallengeKind.email);
       const onDone = jest.fn();
       renderIdentify({
-        config: noPhoneOnboardingConfigFixture,
+        config: liveOnboardingConfigFixture,
         onDone,
       });
 
@@ -740,7 +740,7 @@ describe('<Identify />', () => {
       withLoginChallenge(ChallengeKind.biometric);
       const onDone = jest.fn();
       renderIdentify({
-        config: noPhoneOnboardingConfigFixture,
+        config: liveOnboardingConfigFixture,
         onDone,
       });
 
@@ -762,7 +762,7 @@ describe('<Identify />', () => {
       withLoginChallenge(ChallengeKind.sms);
       const onDone = jest.fn();
       renderIdentify({
-        config: noPhoneOnboardingConfigFixture,
+        config: liveOnboardingConfigFixture,
         device: {
           type: 'desktop',
           hasSupportForWebauthn: false,
@@ -780,6 +780,66 @@ describe('<Identify />', () => {
       expect(screen.queryByText('Log in with passkey')).not.toBeInTheDocument();
       await userEvent.click(screen.getByText('Send code via SMS'));
       await userEvent.click(screen.getByText('Continue'));
+      await fillChallengePin();
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('when bootstrap data is invalid', () => {
+    beforeEach(() => {
+      withIdentify(false);
+      withSignupChallenge(ChallengeKind.sms);
+      withIdentifyVerify();
+    });
+
+    it('invalid bootstrap email, email is recollected', async () => {
+      const onDone = jest.fn();
+      renderIdentify({
+        bootstrapEmail: 'flarp',
+        config: liveOnboardingConfigFixture,
+        onDone,
+      });
+
+      await fillIdentifyEmail();
+      await fillIdentifyPhone();
+      await fillChallengePin();
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
+    });
+
+    it('invalid bootstrap phone, phone is recollected', async () => {
+      const onDone = jest.fn();
+      renderIdentify({
+        bootstrapEmail: 'piip@onefootprint.com',
+        bootstrapPhone: 'flarp',
+        config: liveOnboardingConfigFixture,
+        onDone,
+      });
+
+      await fillIdentifyPhone();
+      await fillChallengePin();
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
+    });
+
+    it('invalid bootstrap email and phone, both recollected', async () => {
+      const onDone = jest.fn();
+      renderIdentify({
+        bootstrapEmail: 'flarp',
+        bootstrapPhone: 'flarp',
+        config: liveOnboardingConfigFixture,
+        onDone,
+      });
+
+      await fillIdentifyEmail();
+      await fillIdentifyPhone();
       await fillChallengePin();
 
       await waitFor(() => {
