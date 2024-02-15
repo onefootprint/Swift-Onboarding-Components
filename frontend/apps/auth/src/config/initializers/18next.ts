@@ -1,32 +1,45 @@
+import {
+  enIdentifyJson,
+  enIdvJson,
+  esIdentifyJson,
+  esIdvJson,
+} from '@onefootprint/idv';
+import { enRequestJson, esRequestJson } from '@onefootprint/request';
+import { enUiJson, esUiJson } from '@onefootprint/ui';
 import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import HttpBackend from 'i18next-http-backend';
 import { initReactI18next } from 'react-i18next';
 
-const IS_BROWSER = typeof window !== 'undefined';
+import enCommonJson from '../locales/en/common.json';
+import esCommonJson from '../locales/es/common.json';
 
 const configureI18n = () => {
   i18next
-    .use(HttpBackend)
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
+      resources: {
+        en: {
+          common: enCommonJson,
+          identify: enIdentifyJson,
+          idv: enIdvJson,
+          request: enRequestJson,
+          ui: enUiJson,
+        },
+        es: {
+          common: esCommonJson,
+          identify: esIdentifyJson,
+          idv: esIdvJson,
+          request: esRequestJson,
+          ui: esUiJson,
+        },
+      },
       debug: false,
       defaultNS: 'common',
       ns: ['common', 'ui', 'idv', 'request', 'identify'],
       interpolation: { escapeValue: false },
       fallbackLng: 'en',
       supportedLngs: ['en', 'es'],
-      backend: IS_BROWSER
-        ? {
-            loadPath: `/locales/{{lng}}/{{ns}}.json`,
-            requestOptions: {
-              cache: 'default',
-              credentials: 'same-origin',
-              mode: 'no-cors',
-            },
-          }
-        : undefined,
       detection: {
         order: ['querystring', 'navigator'],
         lookupQuerystring: 'lng',
