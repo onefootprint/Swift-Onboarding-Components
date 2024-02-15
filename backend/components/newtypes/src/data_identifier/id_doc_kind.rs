@@ -173,7 +173,7 @@ impl TryFrom<IdDocKind> for AlpacaDocumentType {
             IdDocKind::IdCard => Ok(AlpacaDocumentType::NationalId),
             IdDocKind::DriversLicense => Ok(AlpacaDocumentType::DriversLicense),
             IdDocKind::Passport => Ok(AlpacaDocumentType::Passport),
-            IdDocKind::PassportCard => Err(crate::Error::Custom(msg.into())), //idk if alpaca supports these 
+            IdDocKind::PassportCard => Ok(AlpacaDocumentType::NationalId),
             IdDocKind::Visa => Ok(AlpacaDocumentType::Visa),
             IdDocKind::Permit => Err(crate::Error::Custom(msg.into())),
             IdDocKind::ResidenceDocument => Err(crate::Error::Custom(msg.into())),
