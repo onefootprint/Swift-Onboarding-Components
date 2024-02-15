@@ -8,6 +8,7 @@ mod index;
 mod logo;
 mod member;
 mod members;
+mod tenant_app_meta;
 // Weird module name, but there's a metrics module inside api_core too...
 mod metrics_api;
 mod onboarding_configs;
@@ -49,7 +50,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(client_security_config::patch)
         .service(frequent_notes::get)
         .service(frequent_notes::post)
-        .service(frequent_notes::delete);
+        .service(frequent_notes::delete)
+        .service(tenant_app_meta::get)
+        .service(tenant_app_meta::post)
+        .service(tenant_app_meta::delete);
 
     onboarding_configs::routes(config);
     authn::routes(config);

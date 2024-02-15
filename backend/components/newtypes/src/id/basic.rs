@@ -252,6 +252,11 @@ define_newtype_id!(
     "Identifier for a tenant frequent note"
 );
 define_newtype_id!(
+    TenantAppMetaId,
+    String,
+    "Identifier for a tenant app metadata for generating attestations"
+);
+define_newtype_id!(
     TenantBusinessInfoId,
     String,
     "Identifier for a a tenant_business_info"

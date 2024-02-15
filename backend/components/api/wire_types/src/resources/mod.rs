@@ -106,6 +106,9 @@ pub use org_client_security_config::*;
 mod org_frequent_note;
 pub use org_frequent_note::*;
 
+mod tenant_app_meta;
+pub use tenant_app_meta::*;
+
 mod device_insight;
 pub use device_insight::*;
 

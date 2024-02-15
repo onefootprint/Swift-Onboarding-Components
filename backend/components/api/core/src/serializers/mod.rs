@@ -23,6 +23,7 @@ mod proxy_config;
 mod risk_signal;
 mod rule;
 mod secret_api_key;
+mod tenant_app_meta;
 mod user;
 mod user_tag;
 mod user_timeline;

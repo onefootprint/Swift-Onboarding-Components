@@ -940,6 +940,25 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    tenant_app_meta (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_id -> Text,
+        kind -> Text,
+        name -> Text,
+        ios_app_bundle_id -> Nullable<Text>,
+        ios_team_id -> Nullable<Text>,
+        android_package_name -> Nullable<Text>,
+        android_apk_cert_sha256 -> Nullable<Text>,
+        deactivated_at -> Nullable<Timestamptz>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     tenant_business_info (id) {
         id -> Text,
         created_at -> Timestamptz,
@@ -1348,6 +1367,7 @@ diesel::joinable!(stytch_fingerprint_event -> verification_result (verification_
 diesel::joinable!(task_execution -> task (task_id));
 diesel::joinable!(tenant_api_key -> tenant (tenant_id));
 diesel::joinable!(tenant_api_key -> tenant_role (role_id));
+diesel::joinable!(tenant_app_meta -> tenant (tenant_id));
 diesel::joinable!(tenant_business_info -> tenant (tenant_id));
 diesel::joinable!(tenant_client_config -> tenant (tenant_id));
 diesel::joinable!(tenant_frequent_note -> tenant (tenant_id));
@@ -1431,6 +1451,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     task_execution,
     tenant,
     tenant_api_key,
+    tenant_app_meta,
     tenant_business_info,
     tenant_client_config,
     tenant_frequent_note,
