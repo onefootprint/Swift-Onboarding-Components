@@ -8,6 +8,7 @@ import { useIdentifyMachine } from '../../state';
 import type { DoneArgs, HeaderProps } from '../../types';
 import getLeftNavButton from '../../utils/nav-left-btn';
 import ChallengeSelectOrPasskey from '../challenge-select-or-passkey';
+import DifferentAccountOption from '../different-account-option';
 import EmailChallenge from '../email-challenge';
 import InitAuthToken from '../init-auth-token';
 import Loading from '../loading';
@@ -74,13 +75,28 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
     return <StepPhone Header={Header} />;
   }
   if (state.matches('challengeSelectOrPasskey')) {
-    return <ChallengeSelectOrPasskey Header={Header} />;
+    return (
+      <>
+        <ChallengeSelectOrPasskey Header={Header} />
+        <DifferentAccountOption />
+      </>
+    );
   }
   if (state.matches('smsChallenge')) {
-    return <SmsChallenge Header={Header} />;
+    return (
+      <>
+        <SmsChallenge Header={Header} />
+        <DifferentAccountOption />
+      </>
+    );
   }
   if (state.matches('emailChallenge')) {
-    return <EmailChallenge Header={Header} />;
+    return (
+      <>
+        <EmailChallenge Header={Header} />
+        <DifferentAccountOption />
+      </>
+    );
   }
   if (state.matches('authTokenInvalid')) {
     return (

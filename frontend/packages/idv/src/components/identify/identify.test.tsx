@@ -200,7 +200,20 @@ describe('<Identify />', () => {
         });
 
         await expectShimmer();
-        await bootstrapNewUser(false);
+        await waitFor(() => {
+          expect(
+            screen.getByText('Verify your phone number'),
+          ).toBeInTheDocument();
+        });
+        expect(screen.queryByText('Welcome back! 🎉')).toBeNull();
+        expect(
+          screen.getByTestId('navigation-close-button'),
+        ).toBeInTheDocument();
+        expect(
+          screen.queryByText('Log in with a different account'),
+        ).not.toBeInTheDocument();
+
+        await fillChallengePin();
         await waitFor(() => {
           expect(onDone).toHaveBeenCalled();
         });
@@ -400,6 +413,69 @@ describe('<Identify />', () => {
         });
       });
     });
+
+    describe('when the user vault is new', () => {
+      beforeEach(() => {
+        withIdentify(false, []);
+        withSignupChallenge(ChallengeKind.sms);
+        withIdentifyVerify();
+      });
+
+      it('shows sms challenge page', async () => {
+        const onDone = jest.fn();
+        renderIdentify({
+          config: liveOnboardingConfigFixture,
+          onDone,
+        });
+
+        await fillIdentifyEmail();
+        await fillIdentifyPhone();
+        await waitFor(() => {
+          expect(
+            screen.getByText('Verify your phone number'),
+          ).toBeInTheDocument();
+        });
+        expect(
+          screen.queryByText('Log in with a different account'),
+        ).not.toBeInTheDocument();
+        expect(
+          screen.getByTestId('navigation-back-button'),
+        ).toBeInTheDocument();
+
+        await fillChallengePin();
+        await waitFor(() => {
+          expect(screen.getByText('Success!')).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+
+      it('can resend sms challenge', async () => {
+        const onDone = jest.fn();
+        renderIdentify({
+          config: liveOnboardingConfigFixture,
+          onDone,
+        });
+
+        await fillIdentifyEmail();
+        await fillIdentifyPhone();
+
+        // Wait until the login challenge request succeeds
+        await waitFor(() => {
+          expect(screen.getByRole('presentation')).toHaveAttribute(
+            'data-pending',
+            'false',
+          );
+        });
+        await userEvent.click(screen.getByText('Resend code'));
+        await waitFor(() => {
+          expect(
+            screen.getByText('We sent you a new code.'),
+          ).toBeInTheDocument();
+        });
+      });
+    });
   });
 
   describe('when running a no phone onboarding config', () => {
@@ -545,6 +621,14 @@ describe('<Identify />', () => {
         });
 
         await fillIdentifyEmail();
+        await waitFor(() => {
+          expect(
+            screen.getByText('Verify your email address'),
+          ).toBeInTheDocument();
+        });
+        expect(
+          screen.queryByText('Log in with a different account'),
+        ).not.toBeInTheDocument();
         await fillChallengePin();
         await waitFor(() => {
           expect(screen.getByText('Success!')).toBeInTheDocument();

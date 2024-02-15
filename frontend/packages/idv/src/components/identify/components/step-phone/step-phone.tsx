@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { checkIsPhoneValid, getLogger } from '../../../../utils';
 import EmailPreview from '../../../email-preview';
+import { useL10nContext } from '../../../l10n-provider';
 import PhoneForm from '../../../phone-form';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
@@ -29,6 +30,7 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
   const { t } = useTranslation('identify');
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
   const showRequestErrorToast = useRequestErrorToast();
+  const l10n = useL10nContext();
 
   const options = COUNTRIES;
 
@@ -83,6 +85,7 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
           onSubmit={mutIdentify.isLoading ? noop : handleSubmit}
           options={options}
           validator={handlePhoneValidation}
+          l10n={l10n}
           texts={{
             cta: t('phone-step.verify-with-sms'),
             phoneInvalid: t('phone-step.form.input-invalid'),

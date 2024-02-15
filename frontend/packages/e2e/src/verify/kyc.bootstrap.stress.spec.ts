@@ -41,7 +41,7 @@ for (let i = 0; i < numberOfTests; i++) {
     await page.waitForLoadState();
 
     await expect(
-      frame.getByText('Login with a different account'),
+      frame.getByText('Log in with a different account'),
     ).toBeAttached();
   });
 }

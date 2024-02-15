@@ -15,6 +15,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import debounce from 'lodash/debounce';
+import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -26,7 +27,7 @@ type FormData = {
   name?: string;
 };
 
-const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY ?? '';
+const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY ?? '';
 
 type FormProps = {
   html: string;
@@ -34,6 +35,9 @@ type FormProps = {
 };
 
 const Form = ({ html, onSuccess }: FormProps) => {
+  const router = useRouter();
+  const { ob_key: obKey } = router.query;
+  const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
   const { control, register, getValues } = useForm<FormData>();
 
   const handleFootprintCompleted = (validationToken: string) => {

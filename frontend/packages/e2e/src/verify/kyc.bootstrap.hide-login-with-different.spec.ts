@@ -34,9 +34,9 @@ test('E2E.Bootstrap #ci', async ({ browserName, page }) => {
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  // Check that "Login with a different account" is not visible
+  // Check that "Log in with a different account" is not visible
   await expect(
-    frame.getByText('Login with a different account'),
+    frame.getByText('Log in with a different account'),
   ).not.toBeAttached();
 
   return expect(1).toBe(1);

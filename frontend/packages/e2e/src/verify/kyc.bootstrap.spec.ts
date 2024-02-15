@@ -59,9 +59,9 @@ test('E2E.Bootstrap #ci', async ({ browserName, page }) => {
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  // Check that "Login with a different account" is visible
+  // Check that "Log in with a different account" is visible
   await expect(
-    frame.getByText('Login with a different account'),
+    frame.getByText('Log in with a different account'),
   ).toBeAttached();
   await verifyPhoneNumber({ frame, page });
 

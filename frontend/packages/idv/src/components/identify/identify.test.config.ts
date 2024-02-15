@@ -181,12 +181,11 @@ export const bootstrapNewUser = async (isNoPhone: boolean) => {
       ),
     ).toBeInTheDocument();
   });
-  await waitFor(() => {
-    expect(screen.queryByText('Welcome back! 🎉')).toBeNull();
-  });
-  await waitFor(() => {
-    expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
-  });
+  expect(screen.queryByText('Welcome back! 🎉')).toBeNull();
+  expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
+  expect(
+    screen.getByText('Log in with a different account'),
+  ).toBeInTheDocument();
   await fillChallengePin();
 };
 
@@ -194,9 +193,10 @@ export const bootstrapExistingUser = async () => {
   await waitFor(() => {
     expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
   });
-  await waitFor(() => {
-    expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
-  });
+  expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
+  expect(
+    screen.getByText('Log in with a different account'),
+  ).toBeInTheDocument();
   await fillChallengePin();
 };
 
@@ -204,12 +204,8 @@ export const bootstrapExistingUserWithPasskey = async () => {
   await waitFor(() => {
     expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
   });
-  await waitFor(() => {
-    expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
-  });
-  await waitFor(() => {
-    expect(screen.getByText('Log in with passkey')).toBeInTheDocument();
-  });
+  expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
+  expect(screen.getByText('Log in with passkey')).toBeInTheDocument();
   await userEvent.click(screen.getByText('Continue'));
 };
 

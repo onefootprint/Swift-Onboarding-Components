@@ -71,6 +71,10 @@
     "send-code-via-email": "Enviar código por correo electrónico",
     "passkey": "Iniciar sesión con Passkey"
   },
+  "log-in-different-account": {
+    "or": "o",
+    "label": "Iniciar sesión con otra cuenta"
+  },
   "sms-challenge": {
     "label": "SMS",
     "prompt-with-phone": "Introduce el código de 6 dígitos que enviamos a {{scrubbedPhoneNumber}}.",
