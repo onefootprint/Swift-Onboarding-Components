@@ -234,6 +234,7 @@ def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     user = body["user"]
     token = FpAuth(user["token"])
+    assert not user["token_scopes"]
     assert all(i["is_verified"] for i in user["auth_methods"] if i["kind"] == "phone")
     assert all(
         not i["is_verified"] for i in user["auth_methods"] if i["kind"] == "email"
@@ -245,6 +246,10 @@ def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
 
     # Now, we don't use the phone as an identifier - we just use the token that was given to us
     auth_token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+
+    # Make sure the token has scopes
+    body = post("/hosted/identify", dict(identifier=None), auth_token)
+    assert set(body["user"]["token_scopes"]) >= {"sign_up"}
 
     # Finish onboarding onto this playbook using the auth token issued from the new flow
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)

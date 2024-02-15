@@ -3297,6 +3297,18 @@
                             "privacy_policy_url": {
                                 "type": "string"
                             },
+                            "required_auth_methods": {
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook.\n Null does not mean that no auth is required - it just means the playbook doesn't care\n which method is used.",
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "phone",
+                                        "passkey",
+                                        "email"
+                                    ]
+                                }
+                            },
                             "requires_id_doc": {
                                 "type": "boolean"
                             },
@@ -3744,6 +3756,22 @@
                             "token": {
                                 "description": "An cryptographically generated auth token to authenticate a session",
                                 "type": "string"
+                            },
+                            "token_scopes": {
+                                "description": "The scopes of the returned token",
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "SignUp",
+                                        "Auth",
+                                        "BasicProfile",
+                                        "SensitiveProfile",
+                                        "Handoff",
+                                        "ExplicitAuth",
+                                        "Never"
+                                    ]
+                                }
                             }
                         },
                         "required": [
@@ -3752,7 +3780,8 @@
                             "can_initiate_signup_challenge",
                             "has_syncable_passkey",
                             "is_unverified",
-                            "token"
+                            "token",
+                            "token_scopes"
                         ]
                     }
                 }
@@ -3970,6 +3999,18 @@
                             },
                             "privacy_policy_url": {
                                 "type": "string"
+                            },
+                            "required_auth_methods": {
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook.\n Null does not mean that no auth is required - it just means the playbook doesn't care\n which method is used.",
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "phone",
+                                        "passkey",
+                                        "email"
+                                    ]
+                                }
                             },
                             "requires_id_doc": {
                                 "type": "boolean"
@@ -4367,6 +4408,18 @@
                             "privacy_policy_url": {
                                 "type": "string"
                             },
+                            "required_auth_methods": {
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook.\n Null does not mean that no auth is required - it just means the playbook doesn't care\n which method is used.",
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "phone",
+                                        "passkey",
+                                        "email"
+                                    ]
+                                }
+                            },
                             "requires_id_doc": {
                                 "type": "boolean"
                             },
@@ -4761,6 +4814,18 @@
                     },
                     "privacy_policy_url": {
                         "type": "string"
+                    },
+                    "required_auth_methods": {
+                        "description": "When non-null, the provided auth methods are required to be verified by the playbook.\n Null does not mean that no auth is required - it just means the playbook doesn't care\n which method is used.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "phone",
+                                "passkey",
+                                "email"
+                            ]
+                        }
                     },
                     "requires_id_doc": {
                         "type": "boolean"

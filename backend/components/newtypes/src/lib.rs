@@ -13,6 +13,9 @@ pub use idv::*;
 pub mod docv;
 pub use docv::*;
 
+mod user_auth_scope;
+pub use user_auth_scope::*;
+
 pub mod decision;
 pub use decision::*;
 

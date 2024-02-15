@@ -1,6 +1,6 @@
 use crate::{
     auth::{
-        user::{UserAuthContext, UserAuthGuard, UserAuthScope},
+        user::{UserAuthContext, UserAuthGuard},
         AuthError,
     },
     errors::ApiError,
@@ -14,7 +14,7 @@ use api_core::{
 };
 use api_wire_types::{D2pGenerateRequest, D2pGenerateResponse};
 use chrono::{Duration, Utc};
-use newtypes::D2pSessionStatus;
+use newtypes::{D2pSessionStatus, UserAuthScope};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(

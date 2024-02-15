@@ -1,10 +1,7 @@
 use super::session::AuthSession;
 use crate::{
-    auth::{
-        session::user::{
-            AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, UserSession, UserSessionPurpose,
-        },
-        user::UserAuthScope,
+    auth::session::user::{
+        AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, UserSession, UserSessionPurpose,
     },
     errors::{onboarding::OnboardingError, ApiResult, ValidationError},
 };
@@ -18,7 +15,7 @@ use db::{
     },
     TxnPgConn,
 };
-use newtypes::{AuthMethodKind, ObConfigurationKey, SessionAuthToken, VaultKind};
+use newtypes::{AuthMethodKind, ObConfigurationKey, SessionAuthToken, UserAuthScope, VaultKind};
 
 pub struct CreateTokenArgs {
     pub sv: ScopedVault,

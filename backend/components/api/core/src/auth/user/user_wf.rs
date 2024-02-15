@@ -24,7 +24,8 @@ use crate::{
     ApiError,
 };
 
-use super::{ParsedUserSessionContext, UserAuthScope, UserSessionContext};
+use super::{ParsedUserSessionContext, UserSessionContext};
+use newtypes::UserAuthScope;
 
 /// A wrapper around UserSession that can only be extracted when the auth token is for an active
 /// onboarding session linked to a scoped user.

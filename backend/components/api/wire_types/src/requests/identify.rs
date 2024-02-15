@@ -1,6 +1,6 @@
 use newtypes::{
     email::Email, AuthMethodKind, ChallengeKind, ChallengeToken, IdentifyScope, PhoneNumber, PiiString,
-    SessionAuthToken,
+    SessionAuthToken, UserAuthGuard,
 };
 
 use crate::*;
@@ -59,6 +59,8 @@ pub struct IdentifiedUser {
     // TODO make this non-optional when the client starts providing `scope` in the request
     #[openapi(required)]
     pub token: Option<SessionAuthToken>,
+    /// The scopes of the returned token
+    pub token_scopes: Vec<UserAuthGuard>,
     pub available_challenge_kinds: Vec<ChallengeKind>,
     pub auth_methods: Vec<IdentifyAuthMethod>,
     /// signals that one or more biometric credentials

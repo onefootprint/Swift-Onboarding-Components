@@ -14,7 +14,6 @@ use newtypes::{
 };
 use paperclip::actix::Apiv2Security;
 
-use super::UserAuthScope;
 use crate::{
     auth::{
         session::{
@@ -30,6 +29,7 @@ use crate::{
     errors::{ApiError, ApiResult},
 };
 use feature_flag::FeatureFlagClient;
+use newtypes::UserAuthScope;
 
 #[derive(Debug, Clone)]
 pub struct UserSessionContext {

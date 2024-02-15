@@ -38,12 +38,11 @@ pub async fn post(
 ) -> JsonApiResponse<IdentifyResponse> {
     let IdentifyRequest { identifier, scope } = request.into_inner();
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
-    let provided_token = user_auth.as_ref().map(|ua| ua.auth_token.clone());
     let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.purpose.is_from_api());
 
     // Look up existing user vault by identifier
     let args = GetIdentifyChallengeArgs {
-        user_auth,
+        user_auth: user_auth.clone(),
         identifiers: identifier.into_iter().collect(),
         sandbox_id: sandbox_id.0,
         obc: ob_context.clone(),
@@ -69,9 +68,9 @@ pub async fn post(
     } = ctx;
 
     let v_id = vw.vault.id.clone();
-    let token = if let Some(token) = provided_token {
+    let token = if let Some(user_auth) = user_auth {
         // Don't issue a new identified token
-        Some(token)
+        Some((user_auth.auth_token, user_auth.data.scopes))
     } else if let Some(scope) = scope {
         // In a newer verision of this API, we're going to start issuing an "identified" but
         // unauthed token as soon as the user is located.
@@ -80,6 +79,7 @@ pub async fn post(
         let token = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
+                let scopes = vec![];
                 let context = NewUserSessionContext {
                     su_id: sv.map(|sv| sv.id),
                     obc_id: ob_context.map(|obc| obc.ob_config().id.clone()),
@@ -89,19 +89,25 @@ pub async fn post(
                     user_vault_id: v_id,
                     purpose: scope.into(),
                     context,
-                    scopes: vec![],
+                    scopes: scopes.clone(),
                     auth_events: vec![],
                 };
                 let data = UserSession::make(args)?;
                 let duration = scope.token_ttl();
                 let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-                Ok(token)
+                Ok((token, scopes))
             })
             .await?;
         Some(token)
     } else {
         None
     };
+    let (token, token_scopes) = token.unzip();
+    let token_scopes = token_scopes
+        .unwrap_or_default()
+        .into_iter()
+        .map(|x| x.into())
+        .collect();
 
     let dis = vec![
         DataIdentifier::Id(IDK::PhoneNumber),
@@ -134,6 +140,7 @@ pub async fn post(
     let has_syncable_passkey = webauthn_creds.iter().any(|cred| cred.backup_state);
     let user = IdentifiedUser {
         token,
+        token_scopes,
         available_challenge_kinds,
         auth_methods,
         has_syncable_passkey,

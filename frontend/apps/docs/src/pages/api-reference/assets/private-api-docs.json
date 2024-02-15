@@ -3138,6 +3138,124 @@
                 ]
             }
         },
+        "/org/app_meta": {
+            "get": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns a list of tenant apps' metadata.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "kind",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "ios",
+                                "android"
+                            ]
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TenantAppMeta"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Creates a tenant app metadata entry for the organization.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTenantAppMetaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TenantAppMeta"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/{app_meta_id}": {
+            "delete": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Delete a tenant app metadata for the organization.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "app_meta_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/audit_events": {
             "get": {
                 "tags": [
@@ -7164,6 +7282,37 @@
                 "required": [
                     "action",
                     "rule_expression"
+                ]
+            },
+            "CreateTenantAppMetaRequest": {
+                "type": "object",
+                "properties": {
+                    "android_apk_cert_sha256": {
+                        "type": "string"
+                    },
+                    "android_package_name": {
+                        "type": "string"
+                    },
+                    "ios_app_bundle_id": {
+                        "type": "string"
+                    },
+                    "ios_team_id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "ios",
+                            "android"
+                        ]
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "kind",
+                    "name"
                 ]
             },
             "CreateTenantRoleRequest": {
@@ -19966,6 +20115,42 @@
                     "name",
                     "role",
                     "status"
+                ]
+            },
+            "TenantAppMeta": {
+                "description": "Frequently used note for an Org",
+                "type": "object",
+                "properties": {
+                    "android_apk_cert_sha256": {
+                        "type": "string"
+                    },
+                    "android_package_name": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "ios_app_bundle_id": {
+                        "type": "string"
+                    },
+                    "ios_team_id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "ios",
+                            "android"
+                        ]
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "kind",
+                    "name"
                 ]
             },
             "TriggerRequest": {
