@@ -3,8 +3,6 @@
   "email": "Email",
   "change": "Change",
   "phone-number": "Phone number",
-  "enter-email": "Enter your email address",
-  "enter-phone": "Enter your new phone number",
   "success": "Success",
   "email-update-success": "You've updated your email address successfully.",
   "passkey-update-success": "Passkey update successful",
@@ -42,10 +40,11 @@
     }
   },
   "email-step": {
-    "header": {
-      "title": "Hey there! 👋",
-      "subtitle": "Enter your email to get started."
-    },
+    "title": "Hey there! 👋",
+    "subtitle": "Enter your email to get started.",
+    "replace-title": "Update your email",
+    "add-primary-title": "Add an email address",
+    "update-subtitle": "Enter your email to continue.",
     "form": {
       "input-placeholder": "jane.doe@acme.com",
       "input-required": "Email is required"
@@ -53,8 +52,10 @@
     "legal-footer": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
   },
   "phone-step": {
-    "subtitle": "Enter your phone number to proceed.",
     "title": "Hey there! 👋",
+    "subtitle": "Enter your phone number to proceed.",
+    "replace-title": "Update your phone number",
+    "add-primary-title": "Add a phone number",
     "verify-with-sms": "Verify with SMS",
     "form": {
       "input-invalid": "Phone number is invalid",

@@ -5,12 +5,14 @@ import { useTranslation } from 'react-i18next';
 
 import { checkIsPhoneValid } from '../../../../utils';
 import PhoneForm from '../../../phone-form';
+import { ActionKind } from '../../queries/use-user-challenge';
 import type { HeaderProps } from '../../types';
 import UpdateVerifyPhone from './update-verify-phone';
 
 type UpdatePhoneProps = {
   Header: (props: HeaderProps) => JSX.Element;
   authToken: string;
+  actionKind: ActionKind;
   onSuccess: (newPhone: string) => void;
 };
 
@@ -19,18 +21,39 @@ const isTest = process.env.NODE_ENV === 'test';
 const isSandbox = isTest || !isProd;
 const handlePhoneValidation = (s: string) => checkIsPhoneValid(s, isSandbox);
 
-const UpdatePhone = ({ Header, authToken, onSuccess }: UpdatePhoneProps) => {
+enum Screen {
+  collect,
+  verify,
+}
+
+const UpdatePhone = ({
+  Header,
+  authToken,
+  actionKind,
+  onSuccess,
+}: UpdatePhoneProps) => {
   const { t } = useTranslation('identify');
+  const [screen, setScreen] = useState<Screen>(Screen.collect);
   const [phone, setPhone] = useState<string>('');
 
-  if (!phone) {
+  const actionKindToHeader: Record<ActionKind, string> = {
+    // Maybe add some information that the company requires primary phone?
+    [ActionKind.addPrimary]: t('phone-step.add-primary-title'),
+    [ActionKind.replace]: t('phone-step.replace-title'),
+  };
+  const title = actionKindToHeader[actionKind];
+
+  if (screen === Screen.collect || !phone) {
     return (
       <Stack direction="column" gap={7}>
-        <Header title={t('enter-phone')} />
+        <Header title={title} subtitle={t('phone-step.subtitle')} />
         <PhoneForm
-          defaultPhone={undefined}
+          defaultPhone={phone}
           isLoading={false}
-          onSubmit={({ phoneNumber }) => setPhone(phoneNumber)}
+          onSubmit={({ phoneNumber }) => {
+            setPhone(phoneNumber);
+            setScreen(Screen.verify);
+          }}
           options={COUNTRIES}
           validator={handlePhoneValidation}
           texts={{
@@ -48,7 +71,11 @@ const UpdatePhone = ({ Header, authToken, onSuccess }: UpdatePhoneProps) => {
       Header={Header}
       phoneNumber={phone}
       authToken={authToken}
-      onSuccess={onSuccess}
+      actionKind={actionKind}
+      onChallengeVerificationSuccess={() => onSuccess(phone)}
+      onBack={() => {
+        setScreen(Screen.collect);
+      }}
     />
   );
 };

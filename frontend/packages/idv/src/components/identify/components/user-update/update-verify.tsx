@@ -8,16 +8,23 @@ import { useTranslation } from 'react-i18next';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import type { UserChallengeBody, UserChallengeResponse } from '../../queries';
 import { useUserChallenge, useUserChallengeVerify } from '../../queries';
+import type { ActionKind } from '../../queries/use-user-challenge';
 import type { HeaderProps } from '../../types';
 import shouldRequestNewChallenge from '../../utils/should-request-challenge';
 import getErrorToastVariant from '../../utils/toast-error-variant';
 import PinForm from '../pin-form';
 
 type PartialPayload = 'kind' | 'email' | 'phoneNumber' | 'authToken';
-type UpdateVerifyProps = {
-  challengePayload: Pick<UserChallengeBody, PartialPayload>;
+export type UpdateVerifyGenericProps = {
   Header: (props: HeaderProps) => JSX.Element;
+  actionKind: ActionKind;
+  onBack: () => void;
+  onChallengeVerificationSuccess: () => void;
+};
+type UpdateVerifyProps = UpdateVerifyGenericProps & {
+  challengePayload: Pick<UserChallengeBody, PartialPayload>;
   headerTitle: string;
+  subtitle: string;
   logError: (str: string, err?: unknown) => void;
   logWarn: (str: string, err?: unknown) => void;
   onChallengeVerificationSuccess: () => void;
@@ -30,9 +37,12 @@ const UpdateVerify = ({
   challengePayload,
   Header,
   headerTitle,
+  subtitle,
   logError,
   logWarn,
   onChallengeVerificationSuccess,
+  onBack,
+  actionKind,
 }: UpdateVerifyProps) => {
   const { authToken } = challengePayload;
   const { t } = useTranslation('identify');
@@ -107,17 +117,25 @@ const UpdateVerify = ({
       challengePayload.kind,
     );
     if (shouldResend) {
-      handleRequestReplace({ ...challengePayload, actionKind: 'replace' });
+      handleRequestReplace({ ...challengePayload, actionKind });
     }
   };
 
   useEffectOnceStrict(() => {
-    handleRequestReplace({ ...challengePayload, actionKind: 'replace' });
+    handleRequestReplace({ ...challengePayload, actionKind });
   });
+
+  // We want to take control of the header's back button and override any state machine navigation
+  const overrideLeftButton = { variant: 'back', onBack } as const;
 
   return (
     <Container>
-      <Header data-private title={headerTitle} />
+      <Header
+        data-private
+        title={headerTitle}
+        subtitle={subtitle}
+        overrideLeftButton={overrideLeftButton}
+      />
       <PinForm
         hasError={mutUserChallengeVerify.isError}
         isPending={isChallengePending}

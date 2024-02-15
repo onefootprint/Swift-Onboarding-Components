@@ -16,7 +16,6 @@ export type IdentifyMachineContext = {
   /// Optionally, the identified token used to start the flow
   initialAuthToken?: string;
   /// The autheticated token we yield at the end of the flow
-  authToken?: string;
   bootstrapData: IdentifyBootstrapData;
   challenge: MachineChallengeContext;
   /// The identify flow may have no config if we're logging into a non-onboarding flow, like
@@ -56,6 +55,13 @@ export type MachineChallengeContext = {
   challengeData?: ChallengeData;
 };
 
+export type ChallengeSucceededEvent = {
+  type: 'challengeSucceeded';
+  payload: {
+    authToken: string;
+  };
+};
+
 export type IdentifiedEvent = {
   type: 'identified';
   payload: IdentifyResult;
@@ -63,14 +69,13 @@ export type IdentifiedEvent = {
 
 export type IdentifyMachineEvents =
   | IdentifiedEvent
+  | ChallengeSucceededEvent
   | { type: 'goToChallenge'; payload: ChallengeKind }
   | { type: 'authTokenInvalid' }
   | { type: 'bootstrapDataInvalid' }
   | { type: 'challengeReceived'; payload: ChallengeData }
-  | { type: 'challengeSucceeded'; payload: { authToken: string } }
-  | { type: 'changeChallengeToSms' }
-  | { type: 'hasSufficientScopes'; payload: { authToken: string } }
   | { type: 'identifyFailed'; payload: EmailAndOrPhone }
   | { type: 'identifyReset' }
   | { type: 'navigatedToPrevPage' }
+  | { type: 'phoneAdded'; payload: { phoneNumber: string } }
   | { type: 'sandboxIdChanged'; payload: { sandboxId: string } };

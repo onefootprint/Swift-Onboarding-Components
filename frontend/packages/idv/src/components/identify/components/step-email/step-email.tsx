@@ -56,8 +56,8 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
   return (
     <>
       <Header
-        subtitle={t('email-step.header.subtitle')}
-        title={t('email-step.header.title')}
+        subtitle={t('email-step.subtitle')}
+        title={t('email-step.title')}
       />
       <EmailForm
         defaultEmail={email}

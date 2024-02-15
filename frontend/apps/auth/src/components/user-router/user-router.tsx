@@ -11,6 +11,7 @@ import {
   UpdateEmail,
   UpdatePhone,
 } from '@onefootprint/idv/src/components/identify/components/user-update';
+import { ActionKind } from '@onefootprint/idv/src/components/identify/queries/use-user-challenge';
 import { AuthMethodKind } from '@onefootprint/types/src/data';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,9 +31,13 @@ const getHeader = (
   ctx: UserMachineContext,
   leftButton: NavigationHeaderLeftButtonProps,
 ): ((props: HeaderProps) => JSX.Element) =>
-  function Header({ title, subtitle }): JSX.Element {
+  function Header({ title, subtitle, overrideLeftButton }): JSX.Element {
     return (
-      <StepHeader leftButton={leftButton} subtitle={subtitle} title={title} />
+      <StepHeader
+        leftButton={overrideLeftButton || leftButton}
+        subtitle={subtitle}
+        title={title}
+      />
     );
   };
 
@@ -69,10 +74,12 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
     return <UserDashboard Header={Header} onDone={onDone} isEditing />;
   }
   if (state.matches('updateEmail') && state.context.verifyToken) {
+    // TODO use proper actionKind here
     return (
       <UpdateEmail
         Header={Header}
         authToken={state.context.verifyToken}
+        actionKind={ActionKind.replace}
         onSuccess={newEmail => {
           send({
             type: 'updateUserDashboard',
@@ -86,10 +93,12 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
     );
   }
   if (state.matches('updatePhone') && state.context.verifyToken) {
+    // TODO use proper actionKind here
     return (
       <UpdatePhone
         Header={Header}
         authToken={state.context.verifyToken}
+        actionKind={ActionKind.replace}
         onSuccess={newPhoneNumber => {
           send({
             type: 'updateUserDashboard',

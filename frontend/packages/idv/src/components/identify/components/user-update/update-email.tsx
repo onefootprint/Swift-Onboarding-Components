@@ -3,27 +3,49 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import EmailForm from '../../../email-form';
+import { ActionKind } from '../../queries/use-user-challenge';
 import type { HeaderProps } from '../../types';
 import UpdateVerifyEmail from './update-verify-email';
 
 type UpdateEmailProps = {
   Header: (props: HeaderProps) => JSX.Element;
   authToken: string;
+  actionKind: ActionKind;
   onSuccess: (newEmail: string) => void;
 };
 
-const UpdateEmail = ({ Header, authToken, onSuccess }: UpdateEmailProps) => {
+enum Screen {
+  collect,
+  verify,
+}
+
+const UpdateEmail = ({
+  Header,
+  authToken,
+  onSuccess,
+  actionKind,
+}: UpdateEmailProps) => {
   const { t } = useTranslation('identify');
+  const [screen, setScreen] = useState<Screen>(Screen.collect);
   const [email, setEmail] = useState<string>('');
 
-  if (!email) {
+  const actionKindToHeader: Record<ActionKind, string> = {
+    [ActionKind.addPrimary]: t('email-step.add-primary-title'),
+    [ActionKind.replace]: t('email-step.replace-title'),
+  };
+  const title = actionKindToHeader[actionKind];
+
+  if (screen === Screen.collect || !email) {
     return (
       <Stack direction="column" gap={7}>
-        <Header title={t('enter-email')} />
+        <Header title={title} subtitle={t('email-step.update-subtitle')} />
         <EmailForm
-          defaultEmail={undefined}
+          defaultEmail={email}
           isLoading={false}
-          onSubmit={({ email: newEmail }) => setEmail(newEmail)}
+          onSubmit={({ email: newEmail }) => {
+            setEmail(newEmail);
+            setScreen(Screen.verify);
+          }}
           texts={{
             cta: t('continue'),
             emailIsRequired: t('email-step.form.input-required'),
@@ -39,7 +61,11 @@ const UpdateEmail = ({ Header, authToken, onSuccess }: UpdateEmailProps) => {
       Header={Header}
       email={email}
       authToken={authToken}
-      onSuccess={onSuccess}
+      actionKind={actionKind}
+      onChallengeVerificationSuccess={() => onSuccess(email)}
+      onBack={() => {
+        setScreen(Screen.collect);
+      }}
     />
   );
 };

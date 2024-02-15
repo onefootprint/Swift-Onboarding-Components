@@ -3,26 +3,26 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../utils';
-import type { HeaderProps } from '../../types';
+import type { UpdateVerifyGenericProps } from './update-verify';
 import UpdateVerify from './update-verify';
 
-type UpdateVerifyPhoneProps = {
-  Header: (props: HeaderProps) => JSX.Element;
+type UpdateVerifyPhoneProps = UpdateVerifyGenericProps & {
   authToken: string;
   phoneNumber: string;
-  onSuccess: (newPhone: string) => void;
 };
 
 const { logWarn, logError } = getLogger('update-verify-phone');
 
 const UpdateVerifyPhone = ({
   Header,
+  actionKind,
+  onBack,
+  onChallengeVerificationSuccess,
   authToken,
   phoneNumber,
-  onSuccess,
 }: UpdateVerifyPhoneProps) => {
   const { t } = useTranslation('identify');
-  const headerTitle = phoneNumber
+  const subtitle = phoneNumber
     ? t('sms-challenge.prompt-with-phone', { scrubbedPhoneNumber: phoneNumber })
     : t('sms-challenge.prompt-without-phone');
 
@@ -34,10 +34,13 @@ const UpdateVerifyPhone = ({
         phoneNumber: phoneNumber.replace(/[()\s-]/g, ''),
       }}
       Header={Header}
-      headerTitle={headerTitle}
+      actionKind={actionKind}
+      onBack={onBack}
+      onChallengeVerificationSuccess={onChallengeVerificationSuccess}
+      headerTitle={t('sms-challenge.verify-title')}
+      subtitle={subtitle}
       logError={logError}
       logWarn={logWarn}
-      onChallengeVerificationSuccess={() => onSuccess(phoneNumber)}
     />
   );
 };

@@ -3,8 +3,6 @@
   "email": "Correo electrónico",
   "change": "Cambiar",
   "phone-number": "Número de teléfono",
-  "enter-email": "Introduce tu correo electrónico",
-  "enter-phone": "Introduce tu número de teléfono",
   "success": "Éxito",
   "email-update-success": "Has actualizado tu dirección de correo electrónico exitosamente.",
   "passkey-update-success": "Has actualizado tu Passkey exitosamente.",
@@ -42,10 +40,11 @@
     }
   },
   "email-step": {
-    "header": {
-      "title": "¡Hola! 👋",
-      "subtitle": "Introduce tu correo electrónico para empezar."
-    },
+    "title": "¡Hola! 👋",
+    "subtitle": "Introduce tu correo electrónico para empezar.",
+    "replace-title": "Acutalizar tu correo electrónico",
+    "add-primary-title": "Agregar un correo electrónico",
+    "update-subtitle": "Introduce tu correo electrónico para continuar.",
     "form": {
       "input-placeholder": "jane.doe@acme.com",
       "input-required": "Correo electrónico es un campo requerido"
@@ -53,8 +52,10 @@
     "legal-footer": "Al continuar, acepto los <termsLink>Términos de servicio</termsLink> y reconozco la <privacyPolicyLink>Política de privacidad</privacyPolicyLink>."
   },
   "phone-step": {
-    "subtitle": "Introduce tu número de teléfono para continuar.",
     "title": "¡Hola! 👋",
+    "subtitle": "Introduce tu número de teléfono para continuar.",
+    "replace-title": "Actualizar tu número de teléfono",
+    "add-primary-title": "Agregar un número de teléfono",
     "verify-with-sms": "Verificar enviando un SMS",
     "form": {
       "input-invalid": "Número de teléfono inválido",

@@ -3,26 +3,26 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../utils';
-import type { HeaderProps } from '../../types';
+import type { UpdateVerifyGenericProps } from './update-verify';
 import UpdateVerify from './update-verify';
 
-type UpdateVerifyEmailProps = {
-  Header: (props: HeaderProps) => JSX.Element;
+type UpdateVerifyEmailProps = UpdateVerifyGenericProps & {
   authToken: string;
   email: string;
-  onSuccess: (newEmail: string) => void;
 };
 
 const { logWarn, logError } = getLogger('update-verify-email');
 
 const UpdateVerifyEmail = ({
   Header,
+  actionKind,
+  onBack,
+  onChallengeVerificationSuccess,
   authToken,
   email,
-  onSuccess,
 }: UpdateVerifyEmailProps) => {
   const { t } = useTranslation('identify');
-  const headerTitle = email
+  const subtitle = email
     ? t('email-challenge.prompt-with-email', { email })
     : t('email-challenge.prompt-without-email');
 
@@ -34,10 +34,13 @@ const UpdateVerifyEmail = ({
         email,
       }}
       Header={Header}
-      headerTitle={headerTitle}
+      actionKind={actionKind}
+      onBack={onBack}
+      onChallengeVerificationSuccess={onChallengeVerificationSuccess}
+      headerTitle={t('email-challenge.verify-title')}
+      subtitle={subtitle}
       logError={logError}
       logWarn={logWarn}
-      onChallengeVerificationSuccess={() => onSuccess(email)}
     />
   );
 };
