@@ -49,10 +49,8 @@ pub async fn post(
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth))?;
-    if !user_auth.data.purpose.is_from_api() {
-        return ValidationError("Can only update auth methods using auth issued via API").into();
-    }
+    let user_auth = user_auth
+        .check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth.or(UserAuthGuard::SignUp)))?;
     let sv_id = user_auth
         .scoped_user_id()
         .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;
@@ -69,6 +67,9 @@ pub async fn post(
         action_kind,
         is_register_challenge,
     } = Challenge::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
+    if action_kind == ActionKind::Replace && !user_auth.data.purpose.is_from_api() {
+        return ValidationError("Can only replace auth methods using auth issued via API").into();
+    }
     if !is_register_challenge {
         return ValidationError("Invalid challenge token").into();
     }

@@ -28,16 +28,17 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<UserChallengeResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth))?;
-    if !user_auth.data.purpose.is_from_api() {
-        return ValidationError("Can only update auth methods using auth issued via API").into();
-    }
+    let user_auth = user_auth
+        .check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth.or(UserAuthGuard::SignUp)))?;
     let UserChallengeRequest {
         phone_number,
         email,
         kind,
         action_kind,
     } = request.into_inner();
+    if action_kind == ActionKind::Replace && !user_auth.data.purpose.is_from_api() {
+        return ValidationError("Can only replace auth methods using auth issued via API").into();
+    }
 
     let auth_events = user_auth.auth_events.clone();
     let auth_events = state

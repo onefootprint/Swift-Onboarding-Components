@@ -42,13 +42,6 @@ def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
         body = post("hosted/user/challenge", data, token, status_code=status_code)
         assert body["error"]["message"] == error_message
 
-    # Make sure we can't use the onboarding token (not created via API) to update auth
-    assert_cant_use_token(
-        user.client.auth_token,
-        401,
-        "Not allowed: required permission is missing: And<explicit_auth,auth>",
-    )
-
     # Also test that a playbook with the auth scopes can't be used
     token_for_auth = IdentifyClient.from_user(
         user,
@@ -56,7 +49,7 @@ def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
     ).inherit(scope="auth")
 
     assert_cant_use_token(
-        token_for_auth, 400, "Can only update auth methods using auth issued via API"
+        token_for_auth, 400, "Can only replace auth methods using auth issued via API"
     )
 
     # Create a new auth token via API that _can_ initiate a challenge, after step up
@@ -70,7 +63,7 @@ def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
     assert_cant_use_token(
         auth_token,
         401,
-        "Not allowed: required permission is missing: And<explicit_auth,auth>",
+        "Not allowed: required permission is missing: And<explicit_auth,Or<auth,sign_up>>",
     )
 
     # Finally, step up the token so it can be used to initiate a challenge
@@ -171,6 +164,49 @@ def test_add_phone(skip_phone_obc):
     )
 
     # Replace the contact info with a challenge
+    data = dict(
+        kind="phone", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
+    )
+    body = post("hosted/user/challenge", data, auth_token)
+    challenge_token = body["challenge_token"]
+    data = dict(challenge_token=challenge_token, challenge_response="000000")
+    body = post("hosted/user/challenge/verify", data, auth_token)
+
+    # Make sure the contact info has been updated
+    data = dict(fields=["id.phone_number"])
+    body = post(f"hosted/user/vault/decrypt", data, auth_token)
+    assert body["id.phone_number"] == FIXTURE_PHONE_NUMBER2
+
+
+def test_add_phone_bifrost(skip_phone_obc):
+    """
+    Make sure we can add a piece of contact info using a token from the onboarding flow.
+    """
+    sandbox_id = _gen_random_sandbox_id()
+    headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
+
+    # Create a user on a skip_phone OBC so they don't have a phone
+    data = dict(email=FIXTURE_EMAIL)
+    res = post("hosted/identify/signup_challenge", data, *headers)
+    challenge_token = res["challenge_data"]["challenge_token"]
+
+    data = dict(
+        challenge_response=FIXTURE_EMAIL_OTP_PIN,
+        challenge_token=challenge_token,
+        scope="onboarding",
+    )
+    body = post("hosted/identify/verify", data, *headers)
+    auth_token = FpAuth(body["auth_token"])
+
+    # Make sure we can't _replace_ contact info using this auth token
+    data = dict(kind="email", email=FIXTURE_EMAIL2, action_kind="replace")
+    body = post("hosted/user/challenge", data, auth_token, status_code=400)
+    assert (
+        body["error"]["message"]
+        == "Can only replace auth methods using auth issued via API"
+    )
+
+    # But, we can add a new phone
     data = dict(
         kind="phone", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
     )
@@ -310,7 +346,7 @@ def test_add_passkey(sandbox_tenant, auth_playbook):
     IdentifyClient.from_user(user, webauthn=webauthn_device).inherit(kind="biometric")
 
 
-def test_restrict_adding_email(sandbox_user, sandbox_tenant, auth_playbook):
+def test_restrict_adding_email(sandbox_user, auth_playbook):
     _, auth_token = get_auth_token_for_ci_update(
         sandbox_user, auth_playbook, limit_auth_methods=["email"]
     )

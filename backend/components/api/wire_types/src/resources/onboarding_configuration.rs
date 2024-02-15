@@ -1,7 +1,7 @@
 use crate::*;
 use newtypes::{
-    ApiKeyStatus, AppClipExperienceId, CollectedDataOption, EnhancedAml, Iso3166TwoDigitCountryCode,
-    ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId,
+    ApiKeyStatus, AppClipExperienceId, AuthMethodKind, CollectedDataOption, EnhancedAml,
+    Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId,
 };
 
 /// OnboardingConfiguration that was created
@@ -69,6 +69,11 @@ pub struct PublicOnboardingConfiguration {
     pub support_email: Option<String>,
     pub support_phone: Option<String>,
     pub support_website: Option<String>,
+
+    /// When non-null, the provided auth methods are required to be verified by the playbook.
+    /// Null does not mean that no auth is required - it just means the playbook doesn't care
+    /// which method is used.
+    pub required_auth_methods: Option<Vec<AuthMethodKind>>,
 
     /// Will remove this after identify machine rollout
     pub use_new_identify_machine: bool,

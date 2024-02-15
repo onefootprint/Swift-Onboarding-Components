@@ -9,7 +9,9 @@ use db::{
     },
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::{DataIdentifierDiscriminant, ObConfigurationKey, SessionId};
+use newtypes::{
+    AuthMethodKind, DataIdentifierDiscriminant, ObConfigurationKey, ObConfigurationKind, SessionId,
+};
 
 use crate::utils::db2api::DbToApi;
 
@@ -80,6 +82,16 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
 
         let use_new_identify_machine = should_use_new_identify_machine(ff_client, &key, session_id.as_ref());
 
+        let required_auth_methods = match kind {
+            // Auth and Document playbooks don't (yet) have an opinion on which login method is used
+            ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
+            ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if is_no_phone_flow {
+                vec![AuthMethodKind::Email]
+            } else {
+                vec![AuthMethodKind::Phone]
+            }),
+        };
+
         Self {
             name,
             key,
@@ -107,6 +119,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             support_phone,
             support_website,
             use_new_identify_machine,
+            required_auth_methods,
         }
     }
 }
