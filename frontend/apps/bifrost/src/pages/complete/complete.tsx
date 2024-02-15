@@ -5,6 +5,8 @@ import {
   NavigationHeader,
   useFootprintProvider,
 } from '@onefootprint/idv';
+import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
+import checkIsMobile from '@onefootprint/idv/src/utils/check-is-mobile';
 import styled from '@onefootprint/styled';
 import { Box, LinkButton } from '@onefootprint/ui';
 import React from 'react';
@@ -18,6 +20,7 @@ const Complete = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.complete' });
   const fpProvider = useFootprintProvider();
   const [state] = useBifrostMachine();
+  const isWebview = !checkIsIframe() && checkIsMobile();
   const { config, idvCompletePayload } = state.context;
   const isKyb = config?.isKyb;
 
@@ -36,7 +39,7 @@ const Complete = () => {
   };
 
   useEffectOnce(() => {
-    handleComplete(AUTO_CLOSE_DELAY);
+    if (!isWebview) handleComplete(AUTO_CLOSE_DELAY);
   });
 
   return (
@@ -51,7 +54,7 @@ const Complete = () => {
       />
       <Box />
       <LinkButton sx={{ marginTop: 7 }} onClick={() => handleComplete()}>
-        {t('cta')}
+        {isWebview ? t('cta.webview') : t('cta.browser')}
       </LinkButton>
     </Container>
   );

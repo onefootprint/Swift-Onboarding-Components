@@ -1,4 +1,5 @@
 export { default as checkIsInIframe } from './check-is-in-iframe';
+export * from './check-is-mobile';
 export { default as checkIsPhoneValid } from './check-is-phone-valid';
 export { default as checkIsSocialMediaBrowser } from './check-is-social-media-browser';
 export { FPCustomEvents, isCustomEvent, sendCustomEvent } from './custom-event';

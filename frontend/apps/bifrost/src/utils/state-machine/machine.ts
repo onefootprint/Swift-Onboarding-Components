@@ -45,10 +45,6 @@ export const createBifrostMachine = () =>
               {
                 target: 'complete',
                 actions: ['assignIdvCompletePayload'],
-                cond: context => !!context.showCompletionPage,
-              },
-              {
-                actions: ['assignIdvCompletePayload'],
               },
             ],
           },

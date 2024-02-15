@@ -9,6 +9,8 @@ import Idv, {
   useFootprintProvider,
   useLogStateMachine,
 } from '@onefootprint/idv';
+import { checkIsAndroid } from '@onefootprint/idv/src/utils';
+import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import * as LogRocket from 'logrocket';
@@ -41,6 +43,9 @@ const Root = ({ variant }: RootProps) => {
     ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey }
     : undefined;
 
+  const isAndroidWebview = !checkIsIframe() && checkIsAndroid();
+  const shouldShowCompletionPage = showCompletionPage || isAndroidWebview;
+
   const observeCollector = useObserveCollector();
   useLogStateMachine('bifrost', state);
   useEffectOnce(() => {
@@ -60,6 +65,15 @@ const Root = ({ variant }: RootProps) => {
       'IDV flow is complete, sending validation token back to the tenant',
     );
     if (validationToken) {
+      if (!shouldShowCompletionPage) {
+        fpProvider.complete({
+          validationToken,
+          deviceResponseJson,
+          authToken: idvAuthToken,
+        });
+        return;
+      }
+
       send({
         type: 'idvComplete',
         payload: {
@@ -68,14 +82,6 @@ const Root = ({ variant }: RootProps) => {
           authToken: idvAuthToken,
         },
       });
-
-      if (!showCompletionPage) {
-        fpProvider.complete({
-          validationToken,
-          deviceResponseJson,
-          authToken: idvAuthToken,
-        });
-      }
     }
   };
 
