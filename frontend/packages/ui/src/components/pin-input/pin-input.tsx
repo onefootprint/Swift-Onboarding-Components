@@ -98,6 +98,7 @@ const PinInput = ({
           return (
             <Pin
               /** Do not change/remove these classes */
+              autoComplete="one-time-code"
               className="fp-pin-input fp-custom-appearance"
               hasError={hasError}
               inputMode="numeric"
