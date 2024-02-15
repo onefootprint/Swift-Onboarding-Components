@@ -3,6 +3,12 @@
     "init-error": {
       "invalid-config-title": "Integración configurada incorrectamente",
       "invalid-config-description": "Parece que la integración con Footprint está utilizando una clave inválida o caducada. Por favor, contacta al propietario y asegúrate de que la clave usada sea la correcta."
+    },
+    "complete": {
+      "title": "Datos enviados!",
+      "subtitle-with-kyb": "Gracias por usar Footprint para verificar su negocio y su identidad.",
+      "subtitle": "Gracias por usar Footprint para verificar su identidad.",
+      "cta": "Regresar al sitio"
     }
   }
 }

@@ -24,4 +24,5 @@ export type MachineEvents =
         onboardingConfig?: PublicOnboardingConfig;
       };
     }
-  | { type: 'introductionCompleted' };
+  | { type: 'introductionCompleted' }
+  | { type: 'idvCompleted' };

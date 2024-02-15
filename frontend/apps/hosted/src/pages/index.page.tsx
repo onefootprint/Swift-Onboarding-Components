@@ -1,7 +1,7 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
-import Idv, { AppErrorBoundary } from '@onefootprint/idv';
+import Idv, { AppErrorBoundary, Logger } from '@onefootprint/idv';
 import { IdDI } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import * as LogRocket from 'logrocket';
@@ -11,6 +11,7 @@ import Layout from 'src/components/layout';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import { useEffectOnce } from 'usehooks-ts';
 
+import Complete from './complete';
 import Expired from './expired';
 import Init from './init';
 import Intro from './intro';
@@ -35,6 +36,13 @@ const Root = ({ variant }: RootProps) => {
     });
   });
 
+  const handleComplete = () => {
+    Logger.info('IDV flow is completed on hosted');
+    send({
+      type: 'idvCompleted',
+    });
+  };
+
   return (
     <Layout variant={variant}>
       <AppErrorBoundary
@@ -54,10 +62,11 @@ const Root = ({ variant }: RootProps) => {
             }}
             authToken={authToken}
             obConfigAuth={obConfigAuth}
-            showCompletionPage
+            onComplete={handleComplete}
             showLogo
           />
         )}
+        {state.matches('complete') && <Complete />}
       </AppErrorBoundary>
     </Layout>
   );

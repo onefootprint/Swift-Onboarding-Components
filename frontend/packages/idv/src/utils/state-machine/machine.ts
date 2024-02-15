@@ -16,7 +16,6 @@ export type IdvMachineArgs = {
   obConfigAuth?: ObConfigAuth;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
-  showCompletionPage?: boolean;
   idDocOutcome?: IdDocOutcome;
   showLogo?: boolean;
   onClose?: () => void;

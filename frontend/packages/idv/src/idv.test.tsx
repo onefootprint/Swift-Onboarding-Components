@@ -30,7 +30,6 @@ import { Layout } from './components';
 import Idv from './idv';
 import {
   authorizeData,
-  checkComplete,
   confirmKycData,
   getKycOnboardingConfig,
   TestAuthorizeRequirement,
@@ -82,7 +81,6 @@ describe('<Idv />', () => {
     onComplete = jest.fn(),
     onClose = jest.fn(),
     authToken,
-    showCompletionPage,
   }: Partial<IdvProps>) =>
     render(
       <React.StrictMode>
@@ -98,7 +96,6 @@ describe('<Idv />', () => {
                     bootstrapData={bootstrapData}
                     onComplete={onComplete}
                     onClose={onClose}
-                    showCompletionPage={showCompletionPage}
                   />
                 </Layout>
               </ToastProvider>
@@ -111,7 +108,6 @@ describe('<Idv />', () => {
   describe('When onboarding with an existing user vault', () => {
     const config = getKycOnboardingConfig(true);
     const validationToken = 'validation-token';
-    const delay = 6000;
 
     beforeEach(() => {
       withOnboarding(config);
@@ -133,7 +129,6 @@ describe('<Idv />', () => {
           renderIdv({
             obConfigAuth: defaultObConfigAuth,
             authToken: 'token',
-            showCompletionPage: true,
             onComplete,
             onClose,
           });
@@ -141,17 +136,10 @@ describe('<Idv />', () => {
           await waitFor(() => {
             expect(onComplete).toHaveBeenCalledWith({
               validationToken,
-              delay,
               deviceResponseJson: undefined,
               authToken: 'token',
             });
           });
-          await checkComplete();
-
-          const linkButton = screen.getByText('Return to site');
-          expect(linkButton).toBeInTheDocument();
-          await userEvent.click(linkButton);
-          expect(onClose).toHaveBeenCalled();
         });
       });
     });
@@ -168,7 +156,6 @@ describe('<Idv />', () => {
       it('starts flow on sandbox outcome page', async () => {
         renderIdv({
           obConfigAuth: defaultObConfigAuth,
-          showCompletionPage: true,
         });
 
         await waitFor(() => {
@@ -195,7 +182,6 @@ describe('<Idv />', () => {
 
       renderIdv({
         authToken: 'token',
-        showCompletionPage: true,
       });
 
       await waitFor(() => {
@@ -250,7 +236,6 @@ describe('<Idv />', () => {
         renderIdv({
           obConfigAuth: defaultObConfigAuth,
           authToken: 'token',
-          showCompletionPage: true,
           bootstrapData: {
             [IdDI.firstName]: 'Piip',
             [IdDI.lastName]: 'Foot',
@@ -307,7 +292,6 @@ describe('<Idv />', () => {
         renderIdv({
           obConfigAuth: defaultObConfigAuth,
           authToken: 'token',
-          showCompletionPage: true,
           bootstrapData: {
             [IdDI.firstName]: 'Piip',
             [IdDI.lastName]: 'Foot',
@@ -328,7 +312,6 @@ describe('<Idv />', () => {
         renderIdv({
           obConfigAuth: defaultObConfigAuth,
           authToken: 'token',
-          showCompletionPage: true,
           bootstrapData: {
             [IdDI.dob]: '05/23/1996',
           },
@@ -376,7 +359,6 @@ describe('<Idv />', () => {
       renderIdv({
         obConfigAuth: defaultObConfigAuth,
         authToken: 'token',
-        showCompletionPage: true,
         onComplete,
         onClose,
       });
@@ -459,7 +441,6 @@ describe('<Idv />', () => {
       renderIdv({
         obConfigAuth: defaultObConfigAuth,
         authToken: 'token',
-        showCompletionPage: true,
       });
 
       await waitFor(() => {

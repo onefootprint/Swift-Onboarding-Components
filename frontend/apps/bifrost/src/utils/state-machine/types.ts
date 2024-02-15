@@ -1,4 +1,5 @@
 import type { L10n } from '@onefootprint/footprint-js';
+import type { IdvCompletePayload } from '@onefootprint/idv';
 import type {
   IdvBootstrapData,
   PublicOnboardingConfig,
@@ -13,6 +14,7 @@ export type MachineContext = {
   showCompletionPage?: boolean;
   showLogo?: boolean;
   l10n?: L10n;
+  idvCompletePayload?: IdvCompletePayload;
 };
 
 export type MachineEvents =
@@ -30,4 +32,5 @@ export type MachineEvents =
     }
   | { type: 'configRequestFailed' }
   | { type: 'initError' }
-  | { type: 'reset' };
+  | { type: 'reset' }
+  | { type: 'idvComplete'; payload: IdvCompletePayload };

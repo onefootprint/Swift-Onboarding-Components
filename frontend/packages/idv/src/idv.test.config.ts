@@ -398,12 +398,3 @@ export const authorizeData = async () => {
   });
   await userEvent.click(authorizeButton);
 };
-
-export const checkComplete = async () => {
-  await waitFor(() => {
-    expect(screen.getByText('Submission completed!')).toBeInTheDocument();
-  });
-  expect(
-    screen.getByText('Thanks for using Footprint to verify your identity.'),
-  ).toBeInTheDocument();
-};

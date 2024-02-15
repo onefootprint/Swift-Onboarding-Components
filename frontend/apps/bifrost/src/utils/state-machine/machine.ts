@@ -39,8 +39,22 @@ export const createBifrostMachine = () =>
             ],
           },
         },
+        idv: {
+          on: {
+            idvComplete: [
+              {
+                target: 'complete',
+                actions: ['assignIdvCompletePayload'],
+                cond: context => !!context.showCompletionPage,
+              },
+              {
+                actions: ['assignIdvCompletePayload'],
+              },
+            ],
+          },
+        },
         initError: { type: 'final' },
-        idv: { type: 'final' },
+        complete: { type: 'final' },
       },
     },
     {
@@ -80,6 +94,10 @@ export const createBifrostMachine = () =>
             ? context.publicKey
             : publicKey;
 
+          return context;
+        }),
+        assignIdvCompletePayload: assign((context, event) => {
+          context.idvCompletePayload = event.payload;
           return context;
         }),
       },

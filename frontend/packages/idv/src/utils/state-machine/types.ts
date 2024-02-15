@@ -14,7 +14,6 @@ import type {
 
 export type CompletePayload = {
   validationToken?: string;
-  delay?: number;
   authToken?: string; // auth token used for onboarding flow
   deviceResponseJson?: string; // from passkey registration
 };
@@ -28,7 +27,6 @@ export type MachineContext = {
   isTransfer?: boolean;
   obConfigAuth?: ObConfigAuth;
   validationToken?: string;
-  showCompletionPage?: boolean;
   showLogo?: boolean;
   idDocOutcome?: IdDocOutcome;
   sandboxId?: string;

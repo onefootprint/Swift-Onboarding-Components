@@ -18,6 +18,7 @@ import Layout from 'src/components/layout';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useEffectOnce } from 'usehooks-ts';
 
+import Complete from '../complete';
 import Init from '../init';
 import InitError from '../init-error';
 
@@ -52,7 +53,6 @@ const Root = ({ variant }: RootProps) => {
 
   const handleComplete = ({
     validationToken,
-    delay,
     authToken: idvAuthToken,
     deviceResponseJson,
   }: IdvCompletePayload) => {
@@ -60,12 +60,22 @@ const Root = ({ variant }: RootProps) => {
       'IDV flow is complete, sending validation token back to the tenant',
     );
     if (validationToken) {
-      fpProvider.complete({
-        validationToken,
-        deviceResponseJson,
-        authToken: idvAuthToken,
-        delay,
+      send({
+        type: 'idvComplete',
+        payload: {
+          validationToken,
+          deviceResponseJson,
+          authToken: idvAuthToken,
+        },
       });
+
+      if (!showCompletionPage) {
+        fpProvider.complete({
+          validationToken,
+          deviceResponseJson,
+          authToken: idvAuthToken,
+        });
+      }
     }
   };
 
@@ -87,11 +97,11 @@ const Root = ({ variant }: RootProps) => {
             bootstrapData={bootstrapData}
             onComplete={handleComplete}
             onClose={handleClose}
-            showCompletionPage={showCompletionPage}
             showLogo={showLogo}
             l10n={l10n}
           />
         )}
+        {state.matches('complete') && <Complete />}
       </AppErrorBoundary>
     </Layout>
   );

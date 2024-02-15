@@ -19,6 +19,12 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'expired' | 'idv' | 'init' | 'intro' | 'invalidUrl';
+  matchesStates:
+    | 'complete'
+    | 'expired'
+    | 'idv'
+    | 'init'
+    | 'intro'
+    | 'invalidUrl';
   tags: never;
 }

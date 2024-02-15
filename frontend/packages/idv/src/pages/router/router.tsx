@@ -13,14 +13,11 @@ import {
   createAuthTokenChangedPayload,
   createReceivedDeviceResponseJsonPayload,
 } from '../../utils/state-machine/utils/custom-listener';
-import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
 import IdentifyDeprecated from '../identify-deprecated';
 import Init from '../init';
 import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
-
-const AUTO_CLOSE_DELAY = 6000;
 
 const Router = ({ l10n }: { l10n?: L10n }) => {
   const [state, send] = useIdvMachine();
@@ -31,7 +28,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     authToken,
     bootstrapData,
     isTransfer,
-    showCompletionPage,
     showLogo,
     validationToken,
     obConfigAuth,
@@ -43,8 +39,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     deviceResponseJson,
   } = state.context;
   const isDone = state.matches('complete');
-  const shouldShowComplete =
-    state.matches('complete') && !isTransfer && showCompletionPage;
 
   useValidateSession(
     { authToken },
@@ -74,16 +68,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
 
     if (isTransfer) {
       onComplete?.({});
-      return;
-    }
-
-    if (showCompletionPage) {
-      onComplete?.({
-        validationToken,
-        delay: AUTO_CLOSE_DELAY,
-        authToken,
-        deviceResponseJson,
-      });
       return;
     }
 
@@ -188,7 +172,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
         />
       )}
       {state.matches('configInvalid') && <ConfigInvalid />}
-      {shouldShowComplete && <Complete />}
     </AppErrorBoundary>
   );
 };

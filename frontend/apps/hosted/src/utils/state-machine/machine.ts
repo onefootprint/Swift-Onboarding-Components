@@ -1,6 +1,5 @@
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 
@@ -13,7 +12,8 @@ export const createHostedMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {},
       on: {
@@ -59,6 +59,13 @@ export const createHostedMachine = () =>
           },
         },
         idv: {
+          on: {
+            idvCompleted: {
+              target: 'complete',
+            },
+          },
+        },
+        complete: {
           type: 'final',
         },
         invalidUrl: {

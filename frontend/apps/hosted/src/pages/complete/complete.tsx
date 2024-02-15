@@ -1,0 +1,40 @@
+import { IcoCheckCircle40 } from '@onefootprint/icons';
+import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
+import styled from '@onefootprint/styled';
+import { Box } from '@onefootprint/ui';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useHostedMachine } from 'src/components/hosted-machine-provider';
+
+const Complete = () => {
+  const { t } = useTranslation('common', { keyPrefix: 'pages.complete' });
+  const [state] = useHostedMachine();
+  const { onboardingConfig } = state.context;
+  const isKyb = onboardingConfig?.isKyb;
+
+  return (
+    <Container>
+      <NavigationHeader />
+      <IcoCheckCircle40 color="success" />
+      <Box marginBottom={4} />
+      <HeaderTitle
+        sx={{ display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3 }}
+        title={t('title')}
+        subtitle={isKyb ? t('subtitle-with-kyb') : t('subtitle')}
+      />
+      <Box />
+    </Container>
+  );
+};
+
+const Container = styled.div`
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  position: relative;
+`;
+
+export default Complete;

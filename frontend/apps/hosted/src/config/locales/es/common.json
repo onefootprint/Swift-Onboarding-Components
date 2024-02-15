@@ -67,8 +67,7 @@
     "complete": {
       "title": "¡Verificación finalizada!",
       "subtitle-with-kyb": "Gracias por usar Footprint.",
-      "subtitle": "Gracias por usar Footprint.",
-      "cta": "Volver al sitio"
+      "subtitle": "Gracias por usar Footprint."
     },
     "expired": {
       "title": "Sesión expirada",

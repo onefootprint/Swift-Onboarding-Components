@@ -153,12 +153,6 @@
           }
         },
         "cta": "Continue"
-      },
-      "complete": {
-        "title": "Submission completed!",
-        "subtitle-with-kyb": "Thanks for using Footprint to verify your business and your identity.",
-        "subtitle": "Thanks for using Footprint to verify your identity.",
-        "cta": "Return to site"
       }
     }
   },
