@@ -5,6 +5,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import { OnboardingConfigStatus } from '@onefootprint/types';
+import { AuthMethodKind, ChallengeKind } from '@onefootprint/types/src/data';
 
 import * as getBiometricChallengeResponse from '../../utils/get-biometric-challenge-response';
 
@@ -42,6 +43,7 @@ export const getOnboardingConfig = (isLive?: boolean, noPhone?: boolean) => ({
   requiresIdDoc: false,
   isKyb: false,
   allowInternationalResidents: false,
+  requiredAuthMethods: [noPhone ? AuthMethodKind.email : AuthMethodKind.phone],
 });
 
 export const liveOnboardingConfigFixture = getOnboardingConfig(true);
@@ -65,24 +67,33 @@ export const withIdentifyError = () =>
 
 export const withIdentify = (
   userFound?: boolean,
-  availableChallengeKinds?: string[],
+  challengeKinds?: string[],
   isUnverified?: boolean,
-) =>
-  mockRequest({
+) => {
+  const availableChallengeKinds = challengeKinds ?? ['sms', 'biometric'];
+  const authMethodKind: Record<string, string> = {
+    [ChallengeKind.biometric]: AuthMethodKind.passkey,
+    [ChallengeKind.sms]: AuthMethodKind.phone,
+    [ChallengeKind.email]: AuthMethodKind.email,
+  };
+  const authMethods = availableChallengeKinds.map(k => ({
+    kind: authMethodKind[k],
+    isVerified: true,
+  }));
+  return mockRequest({
     method: 'post',
     path: '/hosted/identify',
     response: {
       user: userFound && {
         isUnverified: isUnverified ?? false,
-        availableChallengeKinds: availableChallengeKinds ?? [
-          'sms',
-          'biometric',
-        ],
+        availableChallengeKinds,
+        authMethods,
         hasSyncablePasskey: true,
         scrubbedPhoneNumber: '+1 (•••) •••-••99',
       },
     },
   });
+};
 
 export const withLoginChallenge = (challengeKind: string) =>
   mockRequest({
@@ -120,6 +131,23 @@ export const withIdentifyVerify = () =>
     },
   });
 
+export const withUserChallenge = () =>
+  mockRequest({
+    method: 'post',
+    path: '/hosted/user/challenge',
+    response: {
+      challengeToken: 'token',
+      timeBeforeRetryS: 1,
+    },
+  });
+
+export const withUserChallengeVerify = () =>
+  mockRequest({
+    method: 'post',
+    path: '/hosted/user/challenge/verify',
+    response: {},
+  });
+
 export const withUserVault = () =>
   mockRequest({
     method: 'patch',
@@ -140,13 +168,15 @@ export const fillIdentifyEmail = async () => {
   await userEvent.click(screen.getByText('Continue'));
 };
 
-export const fillIdentifyPhone = async () => {
+export const fillIdentifyPhone = async (
+  continueButtonText: string = 'Verify with SMS',
+) => {
   await waitFor(() => {
     expect(screen.getByText('Phone number')).toBeInTheDocument();
   });
   const inputPhone = screen.getByText('Phone number');
   await userEvent.type(inputPhone, '6504600799');
-  await userEvent.click(screen.getByText('Verify with SMS'));
+  await userEvent.click(screen.getByText(continueButtonText));
 };
 
 export const fillChallengePin = async () => {
@@ -157,6 +187,7 @@ export const fillChallengePin = async () => {
       'false',
     );
   });
+  // expect(screen.getByTestId('navigation-back-button')).toBeInTheDocument();
   const firstInput = document.getElementsByTagName('input')[0];
   expect(firstInput).toBeInTheDocument();
   await waitFor(() => {
@@ -186,6 +217,17 @@ export const bootstrapNewUser = async (isNoPhone: boolean) => {
   expect(
     screen.getByText('Log in with a different account'),
   ).toBeInTheDocument();
+  await fillChallengePin();
+};
+
+export const fillChallengePinExistingUser = async () => {
+  await waitFor(() => {
+    expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
+  });
+  expect(screen.getByTestId('navigation-back-button')).toBeInTheDocument();
+  expect(
+    screen.queryByText('Log in with a different account'),
+  ).not.toBeInTheDocument();
   await fillChallengePin();
 };
 

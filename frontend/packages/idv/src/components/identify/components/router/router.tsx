@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { NavigationHeaderLeftButtonProps } from '../../../layout';
 import StepHeader from '../../../step-header';
+import { ActionKind } from '../../queries/use-user-challenge';
 import type { IdentifyMachineContext } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import type { DoneArgs, HeaderProps } from '../../types';
@@ -17,6 +18,7 @@ import SmsChallenge from '../sms-challenge';
 import StepBootstrap from '../step-bootstrap';
 import StepEmail from '../step-email';
 import StepPhone from '../step-phone';
+import { UpdatePhone } from '../user-update';
 
 type RouterProps = {
   onDone: (payload: DoneArgs) => void;
@@ -26,10 +28,10 @@ const getHeader = (
   ctx: IdentifyMachineContext,
   leftButton: NavigationHeaderLeftButtonProps,
 ): ((props: HeaderProps) => JSX.Element) =>
-  function Header({ title, subtitle }): JSX.Element {
+  function Header({ title, subtitle, overrideLeftButton }): JSX.Element {
     return (
       <StepHeader
-        leftButton={leftButton}
+        leftButton={overrideLeftButton || leftButton}
         logoUrl={ctx.logoConfig?.logoUrl}
         orgName={ctx.logoConfig?.orgName}
         showLogo={!!ctx.logoConfig}
@@ -96,6 +98,18 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
         <EmailChallenge Header={Header} />
         <DifferentAccountOption />
       </>
+    );
+  }
+  if (state.matches('addPhone') && state.context.challenge.authToken) {
+    return (
+      <UpdatePhone
+        Header={Header}
+        authToken={state.context.challenge.authToken}
+        actionKind={ActionKind.addPrimary}
+        onSuccess={phoneNumber => {
+          send({ type: 'phoneAdded', payload: { phoneNumber } });
+        }}
+      />
     );
   }
   if (state.matches('authTokenInvalid')) {

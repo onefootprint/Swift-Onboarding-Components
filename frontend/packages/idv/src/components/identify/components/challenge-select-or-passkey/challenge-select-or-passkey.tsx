@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoEmail16, IcoFaceid16, IcoSmartphone16 } from '@onefootprint/icons';
-import { ChallengeKind } from '@onefootprint/types';
+import { AuthMethodKind, ChallengeKind } from '@onefootprint/types/src/data';
 import type { ComponentProps, FormEvent } from 'react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +43,10 @@ const ChallengeSelectOrPasskey = ({
   >(undefined);
   const runPasskey = useRunPasskey({
     onSuccess: ({ authToken }) => {
-      send({ type: 'challengeSucceeded', payload: { authToken } });
+      send({
+        type: 'challengeSucceeded',
+        payload: { kind: AuthMethodKind.passkey, authToken },
+      });
     },
   });
   const headerTitle = useGetHeaderText();

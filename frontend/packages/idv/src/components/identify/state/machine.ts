@@ -4,6 +4,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
+import { AuthMethodKind } from '@onefootprint/types/src/data';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
@@ -17,6 +18,7 @@ import {
   shouldShowChallengeSelector,
 } from './predicates';
 import type {
+  ChallengeSucceededEvent,
   IdentifiedEvent,
   IdentifyMachineContext,
   IdentifyMachineEvents,
@@ -97,6 +99,32 @@ const BACK_FROM_CHALLENGE_TRANSITIONS = [
   },
 ];
 
+const SUCCESS_TRANSITIONS = [
+  // If the playbook requires phone and the user doesn't have a phone, add it
+  {
+    cond: (c: IdentifyMachineContext, event: ChallengeSucceededEvent) => {
+      const playbookRequiresPhone = c.config?.requiredAuthMethods?.includes(
+        AuthMethodKind.phone,
+      );
+      const userHadPhone = c.identify.user?.authMethods
+        ?.filter(m => m.isVerified)
+        .map(m => m.kind)
+        .includes(AuthMethodKind.phone);
+      const userJustRegisteredPhone =
+        event.payload.kind === AuthMethodKind.phone;
+      return (
+        !!playbookRequiresPhone && !userHadPhone && !userJustRegisteredPhone
+      );
+    },
+    target: 'addPhone',
+    actions: ['assignAuthToken'],
+  },
+  {
+    target: 'success',
+    actions: ['assignAuthToken'],
+  },
+];
+
 export const getMachineArgs = ({
   initialAuthToken,
   bootstrapData,
@@ -125,8 +153,6 @@ export const getMachineArgs = ({
   variant,
 });
 
-// TODO these "back" transitions are super error prone. Would be much better to maintain a history
-// of states
 const createIdentifyMachine = (args: IdentifyMachineArgs) =>
   createMachine(
     {
@@ -261,10 +287,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               { cond: isPayloadEmail, target: 'emailChallenge' },
               { cond: isPayloadSms, target: 'smsChallenge' },
             ],
-            challengeSucceeded: {
-              target: 'success',
-              actions: ['assignAuthToken'],
-            },
+            challengeSucceeded: SUCCESS_TRANSITIONS,
           },
         },
         smsChallenge: {
@@ -272,10 +295,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             challengeReceived: {
               actions: ['assignChallengeData'],
             },
-            challengeSucceeded: {
-              target: 'success',
-              actions: ['assignAuthToken'],
-            },
+            challengeSucceeded: SUCCESS_TRANSITIONS,
             identifyReset: {
               target: 'emailIdentification',
               actions: ['reset'],
@@ -295,10 +315,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             challengeReceived: {
               actions: ['assignChallengeData'],
             },
-            challengeSucceeded: {
-              target: 'success',
-              actions: ['assignAuthToken'],
-            },
+            challengeSucceeded: SUCCESS_TRANSITIONS,
             identifyReset: {
               target: 'emailIdentification',
               actions: ['reset'],
@@ -313,11 +330,31 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             ],
           },
         },
+        addPhone: {
+          on: {
+            phoneAdded: {
+              target: 'success',
+              actions: ['assignPhone'],
+            },
+          },
+        },
         authTokenInvalid: {
           type: 'final',
         },
         success: {
           type: 'final',
+        },
+
+        // This state is never used. But the machine typechecking doesn't properly explore
+        // transitions that are defined as a const, like BACK_FROM_CHALLENGE_TRANSITIONS and
+        // SUCCESS_TRANSITIONS. So we need this to tell the typechecker that the
+        // assignAuthToken action is used
+        never: {
+          on: {
+            challengeSucceeded: {
+              actions: ['assignAuthToken'],
+            },
+          },
         },
       },
     },
@@ -380,7 +417,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           }
           return context;
         }),
-        assignAuthToken: assign((context, event) => {
+        assignAuthToken: assign((context, event: ChallengeSucceededEvent) => {
           context.challenge.authToken = event.payload.authToken;
           return context;
         }),

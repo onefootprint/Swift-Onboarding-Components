@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { ChallengeKind } from '@onefootprint/types';
+import { AuthMethodKind, ChallengeKind } from '@onefootprint/types/src/data';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,10 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
 
   const handleChallengeSucceed = (authToken: string) => {
     setTimeout(() => {
-      send({ type: 'challengeSucceeded', payload: { authToken } });
+      send({
+        type: 'challengeSucceeded',
+        payload: { kind: AuthMethodKind.email, authToken },
+      });
     }, SUCCESS_EVENT_DELAY_MS);
   };
 
@@ -64,7 +67,7 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[7]};
   `}
 `;
 

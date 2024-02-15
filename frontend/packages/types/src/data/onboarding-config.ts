@@ -1,3 +1,4 @@
+import type AuthMethodKind from './auth-method';
 import type { CollectedDataOption } from './collected-data-option';
 import type { CountryCode } from './countries';
 import type { FootprintAppearance } from './footprint-appearance';
@@ -40,6 +41,7 @@ export type PublicOnboardingConfig = {
   supportEmail?: string;
   supportPhone?: string;
   supportWebsite?: string;
+  requiredAuthMethods?: AuthMethodKind[];
   useNewIdentifyMachine?: boolean;
 };
 

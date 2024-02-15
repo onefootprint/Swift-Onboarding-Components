@@ -45,6 +45,9 @@ const getLeftNavButton = (
   if (state.matches('emailIdentification')) {
     return CLOSE;
   }
+  if (state.matches('addPhone')) {
+    return CLOSE;
+  }
 
   return BACK;
 };

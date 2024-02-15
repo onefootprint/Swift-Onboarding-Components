@@ -1,4 +1,5 @@
 import type {
+  AuthMethodKind,
   ChallengeData,
   ChallengeKind,
   Identifier,
@@ -58,6 +59,7 @@ export type MachineChallengeContext = {
 export type ChallengeSucceededEvent = {
   type: 'challengeSucceeded';
   payload: {
+    kind: AuthMethodKind;
     authToken: string;
   };
 };

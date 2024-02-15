@@ -58,6 +58,9 @@ const getOnboardingConfig = (
   key: 'key',
   isKyb: false,
   allowInternationalResidents: false,
+  requiredAuthMethods: [
+    isNoPhoneFlow ? AuthMethodKind.email : AuthMethodKind.phone,
+  ],
 });
 
 const getDevice = (): DeviceInfo => ({
@@ -213,6 +216,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'challengeSucceeded',
         payload: {
+          kind: AuthMethodKind.passkey,
           authToken: 'token',
         },
       });
@@ -541,6 +545,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'challengeSucceeded',
         payload: {
+          kind: AuthMethodKind.phone,
           authToken: 'authToken',
         },
       });
@@ -642,6 +647,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'challengeSucceeded',
         payload: {
+          kind: AuthMethodKind.phone,
           authToken: 'authToken',
         },
       });
@@ -653,7 +659,7 @@ describe('Identify Machine Tests', () => {
 
     it('properly goes to email when only email challenge available', () => {
       const machine = createMachine({
-        config: getOnboardingConfig(),
+        config: getOnboardingConfig(true, true),
       });
       let state = machine.send({
         type: 'identified',
@@ -703,12 +709,70 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'challengeSucceeded',
         payload: {
+          kind: AuthMethodKind.email,
           authToken: 'authToken',
         },
       });
       expect(state.context.challenge).toEqual({
         challengeData: CHALLENGE_DATA,
         authToken: 'authToken',
+      });
+      expect(state.value).toEqual('success');
+    });
+
+    it('requests adding phone when user doesnt have phone and playbook requires', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+      });
+      let state = machine.send({
+        type: 'identified',
+        payload: {
+          email: 'hayes@valley.com',
+          successfulIdentifier: { email: 'hayes@valley.com' },
+          user: getFixtureUser([ChallengeKind.email]),
+        },
+      });
+      expect(state.context.identify).toEqual({
+        email: 'hayes@valley.com',
+        user: getFixtureUser([ChallengeKind.email]),
+        successfulIdentifier: { email: 'hayes@valley.com' },
+      });
+      expect(state.value).toEqual('emailChallenge');
+
+      // Receive challenge data from the backend
+      state = machine.send({
+        type: 'challengeReceived',
+        payload: CHALLENGE_DATA,
+      });
+      expect(state.context.challenge.challengeData).toEqual(CHALLENGE_DATA);
+      expect(state.value).toEqual('emailChallenge');
+
+      // Complete the challenge. We are then asked to provide the phone
+      state = machine.send({
+        type: 'challengeSucceeded',
+        payload: {
+          kind: AuthMethodKind.email,
+          authToken: 'authToken',
+        },
+      });
+      expect(state.context.challenge).toEqual({
+        challengeData: CHALLENGE_DATA,
+        authToken: 'authToken',
+      });
+      expect(state.value).toEqual('addPhone');
+
+      // Complete challenge to add phone
+      state = machine.send({
+        type: 'phoneAdded',
+        payload: {
+          phoneNumber: '+15555550100',
+        },
+      });
+      expect(state.context.identify).toEqual({
+        email: 'hayes@valley.com',
+        phoneNumber: '+15555550100',
+        user: getFixtureUser([ChallengeKind.email]),
+        successfulIdentifier: { email: 'hayes@valley.com' },
       });
       expect(state.value).toEqual('success');
     });
@@ -774,6 +838,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'challengeSucceeded',
         payload: {
+          kind: AuthMethodKind.phone,
           authToken: 'authToken',
         },
       });
@@ -875,6 +940,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'challengeSucceeded',
         payload: {
+          kind: AuthMethodKind.phone,
           authToken: 'authToken',
         },
       });
@@ -1025,6 +1091,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'challengeSucceeded',
         payload: {
+          kind: AuthMethodKind.email,
           authToken: 'authToken',
         },
       });
@@ -1095,6 +1162,7 @@ describe('Identify Machine Tests', () => {
       state = machine.send({
         type: 'challengeSucceeded',
         payload: {
+          kind: AuthMethodKind.phone,
           authToken: 'authToken',
         },
       });

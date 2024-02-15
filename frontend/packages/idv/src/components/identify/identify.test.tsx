@@ -22,6 +22,7 @@ import {
   bootstrapNewUser,
   expectShimmer,
   fillChallengePin,
+  fillChallengePinExistingUser,
   fillIdentifyEmail,
   fillIdentifyPhone,
   liveOnboardingConfigFixture,
@@ -33,6 +34,8 @@ import {
   withIdentifyVerify,
   withLoginChallenge,
   withSignupChallenge,
+  withUserChallenge,
+  withUserChallengeVerify,
   withUserVault,
 } from './identify.test.config';
 import { IdentifyVariant } from './state/types';
@@ -444,9 +447,6 @@ describe('<Identify />', () => {
 
         await fillChallengePin();
         await waitFor(() => {
-          expect(screen.getByText('Success!')).toBeInTheDocument();
-        });
-        await waitFor(() => {
           expect(onDone).toHaveBeenCalled();
         });
       });
@@ -473,6 +473,44 @@ describe('<Identify />', () => {
           expect(
             screen.getByText('We sent you a new code.'),
           ).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when the user is missing a phone auth method', () => {
+      beforeEach(() => {
+        withIdentify(true, [ChallengeKind.email]);
+        withLoginChallenge(ChallengeKind.email);
+        withIdentifyVerify();
+        withUserChallenge();
+        withUserChallengeVerify();
+      });
+
+      it('requires registering phone number', async () => {
+        const onDone = jest.fn();
+        renderIdentify({
+          config: liveOnboardingConfigFixture,
+          onDone,
+        });
+
+        await fillIdentifyEmail();
+        await fillChallengePinExistingUser();
+
+        await waitFor(() => {
+          expect(screen.getByText('Add a phone number')).toBeInTheDocument();
+        });
+        expect(
+          screen.getByText('Enter your phone number to proceed.'),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByTestId('navigation-close-button'),
+        ).toBeInTheDocument();
+
+        await fillIdentifyPhone('Continue');
+        await fillChallengePin();
+
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
         });
       });
     });
@@ -630,9 +668,6 @@ describe('<Identify />', () => {
           screen.queryByText('Log in with a different account'),
         ).not.toBeInTheDocument();
         await fillChallengePin();
-        await waitFor(() => {
-          expect(screen.getByText('Success!')).toBeInTheDocument();
-        });
         await waitFor(() => {
           expect(onDone).toHaveBeenCalled();
         });

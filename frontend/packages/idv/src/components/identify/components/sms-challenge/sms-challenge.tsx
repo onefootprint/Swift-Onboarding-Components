@@ -1,6 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
 import type { Identifier as IdvIdentifier } from '@onefootprint/types';
-import { ChallengeKind } from '@onefootprint/types';
+import { AuthMethodKind, ChallengeKind } from '@onefootprint/types/src/data';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +47,10 @@ const SmsChallenge = ({ children, Header }: SmsChallengeProps) => {
 
   const handleChallengeSucceed = (authToken: string) => {
     setTimeout(() => {
-      send({ type: 'challengeSucceeded', payload: { authToken } });
+      send({
+        type: 'challengeSucceeded',
+        payload: { kind: AuthMethodKind.phone, authToken },
+      });
     }, SUCCESS_EVENT_DELAY_MS);
   };
 

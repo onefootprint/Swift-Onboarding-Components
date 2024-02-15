@@ -17,7 +17,7 @@ export interface Typegen0 {
     assignChallengeData: 'challengeReceived';
     assignEmail: 'identifyFailed';
     assignIdentifySuccessResult: 'identified';
-    assignPhone: 'identifyFailed';
+    assignPhone: 'identifyFailed' | 'phoneAdded';
     assignSandboxId: 'sandboxIdChanged';
     reset: 'bootstrapDataInvalid' | 'identifyReset';
     resetIdentifyState: 'navigatedToPrevPage';
@@ -27,6 +27,7 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'addPhone'
     | 'authTokenInvalid'
     | 'challengeSelectOrPasskey'
     | 'emailChallenge'
@@ -34,6 +35,7 @@ export interface Typegen0 {
     | 'init'
     | 'initAuthToken'
     | 'initBootstrap'
+    | 'never'
     | 'phoneIdentification'
     | 'smsChallenge'
     | 'success';
