@@ -10,8 +10,8 @@
 	</array>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>appclips:handoff.preview.onefootprint.com/appclips</string>
-		<string>appclips:handoff.onefootprint.com/appclip</string>
+		<string>appclips:handoff.preview.onefootprint.com</string>
+		<string>appclips:handoff.onefootprint.com</string>
 		<string>webcredentials:onefootprint.com</string>
 	</array>
 	<key>com.apple.developer.devicecheck.appattest-environment</key>
