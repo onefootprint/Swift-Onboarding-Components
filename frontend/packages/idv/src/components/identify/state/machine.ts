@@ -4,6 +4,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
+import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 import { AuthMethodKind } from '@onefootprint/types/src/data';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
@@ -99,25 +100,31 @@ const BACK_FROM_CHALLENGE_TRANSITIONS = [
   },
 ];
 
+const requiresAddingPhone = (
+  config?: PublicOnboardingConfig,
+  user?: IdentifiedUser,
+  completedAuthMethod?: AuthMethodKind,
+) => {
+  const playbookRequiresPhone = config?.requiredAuthMethods?.includes(
+    AuthMethodKind.phone,
+  );
+  const userHadPhone = user?.authMethods
+    ?.filter(m => m.isVerified)
+    .map(m => m.kind)
+    .includes(AuthMethodKind.phone);
+  const userJustRegisteredPhone = completedAuthMethod === AuthMethodKind.phone;
+  return !!playbookRequiresPhone && !userHadPhone && !userJustRegisteredPhone;
+};
+
 const SUCCESS_TRANSITIONS = [
   // If the playbook requires phone and the user doesn't have a phone, add it
   {
-    cond: (c: IdentifyMachineContext, event: ChallengeSucceededEvent) => {
-      const playbookRequiresPhone = c.config?.requiredAuthMethods?.includes(
-        AuthMethodKind.phone,
-      );
-      const userHadPhone = c.identify.user?.authMethods
-        ?.filter(m => m.isVerified)
-        .map(m => m.kind)
-        .includes(AuthMethodKind.phone);
-      const userJustRegisteredPhone =
-        event.payload.kind === AuthMethodKind.phone;
-      return (
-        !!playbookRequiresPhone && !userHadPhone && !userJustRegisteredPhone
-      );
-    },
+    cond: (c: IdentifyMachineContext, event: ChallengeSucceededEvent) =>
+      requiresAddingPhone(c.config, c.identify.user, event.payload.kind),
     target: 'addPhone',
     actions: ['assignAuthToken'],
+    description:
+      'Register phone as a login method when it is required by the playbook',
   },
   {
     target: 'success',
@@ -216,6 +223,12 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             authTokenInvalid: {
               target: 'authTokenInvalid',
             },
+            identifiedWithSufficientScopes: [
+              {
+                target: 'success',
+                actions: ['assignAuthToken'],
+              },
+            ],
             identified: CHALLENGE_SELECTION_TRANSITIONS,
           },
         },

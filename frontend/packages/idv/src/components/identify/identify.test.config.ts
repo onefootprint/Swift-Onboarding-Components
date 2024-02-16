@@ -69,6 +69,7 @@ export const withIdentify = (
   userFound?: boolean,
   challengeKinds?: string[],
   isUnverified?: boolean,
+  tokenScopes?: string[],
 ) => {
   const availableChallengeKinds = challengeKinds ?? ['sms', 'biometric'];
   const authMethodKind: Record<string, string> = {
@@ -90,6 +91,7 @@ export const withIdentify = (
         authMethods,
         hasSyncablePasskey: true,
         scrubbedPhoneNumber: '+1 (•••) •••-••99',
+        tokenScopes: tokenScopes ?? [],
       },
     },
   });

@@ -13,7 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignAuthToken: 'challengeSucceeded';
+    assignAuthToken: 'challengeSucceeded' | 'identifiedWithSufficientScopes';
     assignChallengeData: 'challengeReceived';
     assignEmail: 'identifyFailed';
     assignIdentifySuccessResult: 'identified';

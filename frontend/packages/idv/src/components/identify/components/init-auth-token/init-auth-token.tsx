@@ -36,13 +36,21 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
         },
         onSuccess: res => {
           if (res.user) {
-            send({
-              type: 'identified',
-              payload: {
-                user: res.user,
-                successfulIdentifier: identifier,
-              },
-            });
+            const needsAuth = !res.user.tokenScopes.length;
+            if (!needsAuth) {
+              send({
+                type: 'identifiedWithSufficientScopes',
+                payload: { authToken },
+              });
+            } else {
+              send({
+                type: 'identified',
+                payload: {
+                  user: res.user,
+                  successfulIdentifier: identifier,
+                },
+              });
+            }
           } else {
             // We should never have a case where the auth token doesn't uniquely identify a user
             send({ type: 'authTokenInvalid' });
@@ -52,7 +60,6 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
     );
   };
 
-  // One day, we may want to first check if the token has sufficient scopes or not
   useEffectOnceStrict(() => {
     identifyViaToken();
   });

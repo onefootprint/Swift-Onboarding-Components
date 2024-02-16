@@ -2,6 +2,7 @@ import type {
   ChallengeData,
   IdentifyBootstrapData,
   PublicOnboardingConfig,
+  UserTokenScope,
 } from '@onefootprint/types';
 import {
   ChallengeKind,
@@ -29,6 +30,7 @@ const CHALLENGE_DATA: ChallengeData = {
 
 const getFixtureUser = (
   availableChallengeKinds: ChallengeKind[],
+  tokenScopes?: UserTokenScope[],
 ): IdentifiedUser => ({
   isUnverified: false,
   availableChallengeKinds,
@@ -37,6 +39,7 @@ const getFixtureUser = (
     isVerified: true,
   })),
   hasSyncablePasskey: true,
+  tokenScopes: tokenScopes ?? [],
 });
 
 const getOnboardingConfig = (
@@ -223,6 +226,50 @@ describe('Identify Machine Tests', () => {
       expect(state.context.challenge).toEqual({
         authToken: 'token',
       });
+      expect(state.value).toEqual('success');
+    });
+
+    it('successfully ids the user from an auth token', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        initialAuthToken: 'utok_xxx',
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initAuthToken');
+
+      state = machine.send({
+        type: 'identified',
+        payload: {
+          successfulIdentifier: { authToken: 'utok_xxx' },
+          user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
+        },
+      });
+      expect(state.context.identify).toEqual({
+        successfulIdentifier: { authToken: 'utok_xxx' },
+        user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
+      });
+      expect(state.value).toEqual('challengeSelectOrPasskey');
+      expect(state.context.challenge.authToken).toBeFalsy();
+    });
+
+    it('skips to success after identifying from auth token with sufficient scopes', () => {
+      const machine = createMachine({
+        config: getOnboardingConfig(),
+        initialAuthToken: 'utok_xxx',
+      });
+
+      let { state } = machine;
+      expect(state.value).toEqual('initAuthToken');
+
+      state = machine.send({
+        type: 'identifiedWithSufficientScopes',
+        payload: {
+          authToken: 'utok_xxx',
+        },
+      });
+      expect(state.context.identify).toEqual({});
+      expect(state.context.challenge.authToken).toEqual('utok_xxx');
       expect(state.value).toEqual('success');
     });
   });

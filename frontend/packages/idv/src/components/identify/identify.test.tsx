@@ -11,6 +11,7 @@ import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
   IdDI,
+  UserTokenScope,
 } from '@onefootprint/types';
 import * as React from 'react';
 
@@ -120,6 +121,25 @@ describe('<Identify />', () => {
   });
 
   describe('When there is an initial auth token', () => {
+    describe('When sufficient scopes', () => {
+      beforeEach(() => {
+        withIdentify(true, [ChallengeKind.sms], false, [UserTokenScope.signup]);
+      });
+
+      it('identify machine finishes without challenge', async () => {
+        const onDone = jest.fn();
+        renderIdentify({
+          initialAuthToken: 'token',
+          onDone,
+          config: sandboxOnboardingConfigFixture,
+        });
+
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+    });
+
     describe('When user not found', () => {
       beforeEach(() => {
         withIdentify(false);
@@ -158,7 +178,7 @@ describe('<Identify />', () => {
       });
     });
 
-    describe('When user found', () => {
+    describe('When user found with insufficient scopes', () => {
       beforeEach(() => {
         mockGetBiometricChallengeResponse();
         withIdentify(true);

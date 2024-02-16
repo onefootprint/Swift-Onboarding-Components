@@ -72,6 +72,12 @@ export type IdentifiedEvent = {
 export type IdentifyMachineEvents =
   | IdentifiedEvent
   | ChallengeSucceededEvent
+  | {
+      type: 'identifiedWithSufficientScopes';
+      payload: {
+        authToken: string;
+      };
+    }
   | { type: 'goToChallenge'; payload: ChallengeKind }
   | { type: 'authTokenInvalid' }
   | { type: 'bootstrapDataInvalid' }

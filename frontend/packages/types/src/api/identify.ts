@@ -4,6 +4,7 @@ import type {
   Identifier,
   ObConfigAuth,
 } from '../data';
+import type { UserTokenScope } from './user-token';
 
 export const SANDBOX_ID_HEADER = 'X-Sandbox-id';
 export const AUTH_HEADER = 'X-Fp-Authorization';
@@ -24,6 +25,7 @@ export type IdentifiedAuthMethod = {
 
 export type IdentifiedUser = {
   token?: string;
+  tokenScopes: UserTokenScope[];
   authMethods: IdentifiedAuthMethod[];
   /// Should deprecate this soon in favor of authMethods
   availableChallengeKinds: ChallengeKind[];
