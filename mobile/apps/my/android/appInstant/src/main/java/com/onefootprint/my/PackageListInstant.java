@@ -3,6 +3,8 @@ package com.onefootprint.my;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+
+import com.example.documentdetection.DocumentDetectionPluginPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainPackageConfig;
@@ -11,10 +13,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 // Manual package linking
+import com.ibitcy.react_native_hole_view.RNHoleViewPackage;
 import com.mixpanel.reactnative.MixpanelReactNativePackage;
 import com.mrousavy.camera.CameraPackage;
-//import com.visioncameraplugindocument.VisionCameraPluginDocumentPackage;
-//import com.visioncamerafacedetection.VisionCameraFaceDetectionPackage;
+import com.onefootprint.barcodedetection.BarcodeDetectionPluginPackage;
+import com.onefootprint.facedetection.FaceDetectionPluginPackage;
 import com.shopify.reactnative.flash_list.ReactNativeFlashListPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
@@ -24,6 +27,7 @@ import org.reactnative.maskedview.RNCMaskedViewPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.worklets.WorkletsPackage;
+
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -71,8 +75,6 @@ public class PackageListInstant {
         return new ArrayList<>(Arrays.<ReactPackage>asList(
                 new MainReactPackage(mConfig),
                 new CameraPackage(),
-//                new VisionCameraPluginDocumentPackage(),
-//                new VisionCameraFaceDetectionPackage(),
                 new ReactNativeFlashListPackage(),
                 new SafeAreaContextPackage(),
                 new RNScreensPackage(),
@@ -83,7 +85,11 @@ public class PackageListInstant {
                 new ReanimatedPackage(),
                 new SplashScreenReactPackage(),
                 new WorkletsPackage(),
-                new MixpanelReactNativePackage()
+                new MixpanelReactNativePackage(),
+                new RNHoleViewPackage(),
+                new DocumentDetectionPluginPackage(),
+                new FaceDetectionPluginPackage(),
+                new BarcodeDetectionPluginPackage()
         ));
     }
 }

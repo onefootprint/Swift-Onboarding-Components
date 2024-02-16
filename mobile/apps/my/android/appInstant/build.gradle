@@ -174,10 +174,11 @@ dependencies {
     implementation("com.google.android.gms:play-services-instantapps:18.0.1")
 
     // Instant app manual linking
-//    implementation project(':vision-camera-plugin-document')
-//    implementation project(':vision-camera-plugin-face-detection')
-    implementation project(':shopify_flash-list')
     implementation project(':react-native-vision-camera')
+    implementation project(':barcodedetection')
+    implementation project(':documentdetection')
+    implementation project(':facedetection')
+    implementation project(':shopify_flash-list')
     implementation project(':react-native-worklets-core')
     implementation project(':react-native-svg')
     implementation project(':react-native-screens')
