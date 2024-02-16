@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import EmailForm from '../../../email-form';
 import { ActionKind } from '../../queries/use-user-challenge';
+import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import UpdateVerifyEmail from './update-verify-email';
 
@@ -11,6 +12,7 @@ type UpdateEmailProps = {
   Header: (props: HeaderProps) => JSX.Element;
   authToken: string;
   actionKind: ActionKind;
+  identifyVariant: IdentifyVariant;
   onSuccess: (newEmail: string) => void;
 };
 
@@ -24,6 +26,7 @@ const UpdateEmail = ({
   authToken,
   onSuccess,
   actionKind,
+  identifyVariant,
 }: UpdateEmailProps) => {
   const { t } = useTranslation('identify');
   const [screen, setScreen] = useState<Screen>(Screen.collect);
@@ -62,6 +65,7 @@ const UpdateEmail = ({
       email={email}
       authToken={authToken}
       actionKind={actionKind}
+      identifyVariant={identifyVariant}
       onChallengeVerificationSuccess={() => onSuccess(email)}
       onBack={() => {
         setScreen(Screen.collect);

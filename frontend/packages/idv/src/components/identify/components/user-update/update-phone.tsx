@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { checkIsPhoneValid } from '../../../../utils';
 import PhoneForm from '../../../phone-form';
 import { ActionKind } from '../../queries/use-user-challenge';
+import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import UpdateVerifyPhone from './update-verify-phone';
 
@@ -13,6 +14,7 @@ type UpdatePhoneProps = {
   Header: (props: HeaderProps) => JSX.Element;
   authToken: string;
   actionKind: ActionKind;
+  identifyVariant: IdentifyVariant;
   onSuccess: (newPhone: string) => void;
 };
 
@@ -31,6 +33,7 @@ const UpdatePhone = ({
   authToken,
   actionKind,
   onSuccess,
+  identifyVariant,
 }: UpdatePhoneProps) => {
   const { t } = useTranslation('identify');
   const [screen, setScreen] = useState<Screen>(Screen.collect);
@@ -72,6 +75,7 @@ const UpdatePhone = ({
       phoneNumber={phone}
       authToken={authToken}
       actionKind={actionKind}
+      identifyVariant={identifyVariant}
       onChallengeVerificationSuccess={() => onSuccess(phone)}
       onBack={() => {
         setScreen(Screen.collect);

@@ -47,7 +47,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
   const { t } = useTranslation('identify');
   const Header = getHeader(state.context, getLeftNavButton(state, send));
 
-  const { initialAuthToken } = state.context;
+  const { initialAuthToken, variant } = state.context;
 
   useEffect(() => {
     if (isDone && state.context.challenge.authToken) {
@@ -106,6 +106,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
         Header={Header}
         authToken={state.context.challenge.authToken}
         actionKind={ActionKind.addPrimary}
+        identifyVariant={variant}
         onSuccess={phoneNumber => {
           send({ type: 'phoneAdded', payload: { phoneNumber } });
         }}

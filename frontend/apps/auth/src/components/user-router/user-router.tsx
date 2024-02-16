@@ -80,6 +80,7 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
         Header={Header}
         authToken={state.context.verifyToken}
         actionKind={ActionKind.replace}
+        identifyVariant={IdentifyVariant.updateLoginMethods}
         onSuccess={newEmail => {
           send({
             type: 'updateUserDashboard',
@@ -99,6 +100,7 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
         Header={Header}
         authToken={state.context.verifyToken}
         actionKind={ActionKind.replace}
+        identifyVariant={IdentifyVariant.updateLoginMethods}
         onSuccess={newPhoneNumber => {
           send({
             type: 'updateUserDashboard',

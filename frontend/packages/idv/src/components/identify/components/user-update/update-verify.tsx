@@ -9,19 +9,22 @@ import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import type { UserChallengeBody, UserChallengeResponse } from '../../queries';
 import { useUserChallenge, useUserChallengeVerify } from '../../queries';
 import type { ActionKind } from '../../queries/use-user-challenge';
+import { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import shouldRequestNewChallenge from '../../utils/should-request-challenge';
 import getErrorToastVariant from '../../utils/toast-error-variant';
 import PinForm from '../pin-form';
 
 type PartialPayload = 'kind' | 'email' | 'phoneNumber' | 'authToken';
-export type UpdateVerifyGenericProps = {
+export type UpdateVerifyBaseProps = {
   Header: (props: HeaderProps) => JSX.Element;
   actionKind: ActionKind;
+  identifyVariant: IdentifyVariant;
   onBack: () => void;
   onChallengeVerificationSuccess: () => void;
 };
-type UpdateVerifyProps = UpdateVerifyGenericProps & {
+
+type UpdateVerifyProps = UpdateVerifyBaseProps & {
   challengePayload: Pick<UserChallengeBody, PartialPayload>;
   headerTitle: string;
   subtitle: string;
@@ -43,6 +46,7 @@ const UpdateVerify = ({
   onChallengeVerificationSuccess,
   onBack,
   actionKind,
+  identifyVariant,
 }: UpdateVerifyProps) => {
   const { authToken } = challengePayload;
   const { t } = useTranslation('identify');
@@ -99,12 +103,14 @@ const UpdateVerify = ({
           toast.show(getErrorToastVariant(error));
         },
         onSuccess: () => {
-          toast.show({
-            title: t('success'),
-            description: t(
-              `${challengePayload.kind}-update-success` as ParseKeys<'identify'>,
-            ),
-          });
+          if (identifyVariant === IdentifyVariant.updateLoginMethods) {
+            toast.show({
+              title: t('success'),
+              description: t(
+                `${challengePayload.kind}-update-success` as ParseKeys<'identify'>,
+              ),
+            });
+          }
           setTimeout(onChallengeVerificationSuccess, SUCCESS_EVENT_DELAY_MS);
         },
       },

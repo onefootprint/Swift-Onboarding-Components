@@ -3,10 +3,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../utils';
-import type { UpdateVerifyGenericProps } from './update-verify';
+import type { UpdateVerifyBaseProps } from './update-verify';
 import UpdateVerify from './update-verify';
 
-type UpdateVerifyEmailProps = UpdateVerifyGenericProps & {
+type UpdateVerifyEmailProps = UpdateVerifyBaseProps & {
   authToken: string;
   email: string;
 };
@@ -16,6 +16,7 @@ const { logWarn, logError } = getLogger('update-verify-email');
 const UpdateVerifyEmail = ({
   Header,
   actionKind,
+  identifyVariant,
   onBack,
   onChallengeVerificationSuccess,
   authToken,
@@ -35,6 +36,7 @@ const UpdateVerifyEmail = ({
       }}
       Header={Header}
       actionKind={actionKind}
+      identifyVariant={identifyVariant}
       onBack={onBack}
       onChallengeVerificationSuccess={onChallengeVerificationSuccess}
       headerTitle={t('email-challenge.verify-title')}
