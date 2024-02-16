@@ -1,14 +1,8 @@
 use crate::{
     auth::user::UserAuthGuard, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi, State,
 };
-use api_core::{
-    auth::user::UserWfAuthContext,
-    utils::{headers::TelemetryHeaders, requirements::GetRequirementsArgs},
-};
-use api_wire_types::{
-    hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse},
-    PublicOnboardingConfiguration,
-};
+use api_core::{auth::user::UserWfAuthContext, utils::requirements::GetRequirementsArgs};
+use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse};
 use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -20,7 +14,6 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
-    telemetry: TelemetryHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
@@ -39,9 +32,8 @@ pub async fn get(
     let ob_config = user_auth.ob_config()?.clone();
     let tenant = user_auth.tenant().clone();
     let ff_client = state.feature_flag_client.clone();
-    let session_id = telemetry.session_id;
     let ob_config =
-        PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client, session_id));
+        api_wire_types::PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
 
     ResponseData::ok(OnboardingStatusResponse {
         all_requirements,

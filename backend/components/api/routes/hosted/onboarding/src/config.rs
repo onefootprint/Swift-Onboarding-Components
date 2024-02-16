@@ -1,5 +1,6 @@
 use crate::{
     auth::{ob_config::ObConfigAuth, Either},
+    errors::ApiError,
     types::response::ResponseData,
     utils::db2api::DbToApi,
     State,
@@ -7,15 +8,13 @@ use crate::{
 use api_core::{
     auth::{user::UserAuthContext, Any},
     errors::onboarding::OnboardingError,
-    types::JsonApiResponse,
-    utils::headers::TelemetryHeaders,
 };
 use db::{
     models::{appearance::Appearance, tenant_client_config::TenantClientConfig},
     DbResult,
 };
 use macros::route_alias;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[route_alias(get(
     "/org/onboarding_config",
@@ -30,8 +29,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 pub fn get(
     state: web::Data<State>,
     auth: Either<ObConfigAuth, UserAuthContext>,
-    telemetry: TelemetryHeaders,
-) -> JsonApiResponse<api_wire_types::PublicOnboardingConfiguration> {
+) -> actix_web::Result<Json<ResponseData<api_wire_types::PublicOnboardingConfiguration>>, ApiError> {
     let (tenant, ob_config) = match auth {
         Either::Left(ob_pk_auth) => {
             // Support auth that identifies an ob config
@@ -70,13 +68,13 @@ pub fn get(
 
     let ff_client = state.feature_flag_client.clone();
 
-    let response = api_wire_types::PublicOnboardingConfiguration::from_db((
-        ob_config,
-        tenant,
-        client_config,
-        appearance,
-        ff_client,
-        telemetry.session_id,
-    ));
-    ResponseData::ok(response).json()
+    Ok(Json(ResponseData::ok(
+        api_wire_types::PublicOnboardingConfiguration::from_db((
+            ob_config,
+            tenant,
+            client_config,
+            appearance,
+            ff_client,
+        )),
+    )))
 }

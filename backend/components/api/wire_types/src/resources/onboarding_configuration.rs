@@ -74,7 +74,4 @@ pub struct PublicOnboardingConfiguration {
     /// Null does not mean that no auth is required - it just means the playbook doesn't care
     /// which method is used.
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
-
-    /// Will remove this after identify machine rollout
-    pub use_new_identify_machine: bool,
 }

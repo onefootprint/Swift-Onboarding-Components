@@ -8,10 +8,8 @@ use api_core::{
         Any,
     },
     errors::{ApiResult, AssertionError},
-    serializers::should_use_new_identify_machine,
     types::JsonApiResponse,
     utils::{
-        headers::TelemetryHeaders,
         requirements::{
             get_data_collection_progress, get_requirements_for_person_and_maybe_business,
             DecryptUncheckedResultForReqs, GetRequirementsArgs,
@@ -37,7 +35,6 @@ pub async fn post(
     // We should build some better consolidation for accepting these two auths
     user_auth: UserAuthContext,
     user_wf_auth: Option<UserWfAuthContext>,
-    telemetry: TelemetryHeaders,
 ) -> JsonApiResponse<HostedValidateResponse> {
     let (wf, sv_id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
         // Token from onboarding
@@ -51,18 +48,9 @@ pub async fn post(
             let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
             return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
         }
+
         let wf = user_wf_auth.workflow().clone();
         let sv_id = user_wf_auth.scoped_user.id.clone();
-
-        if let Ok(obc) = user_wf_auth.ob_config() {
-            let session_id = telemetry.session_id;
-            let use_new_identify_machine = should_use_new_identify_machine(
-                state.feature_flag_client.clone(),
-                &obc.key,
-                session_id.as_ref(),
-            );
-            tracing::info!(%use_new_identify_machine, ?session_id, status=?wf.status, "Finished onboarding");
-        }
         (Some(wf), sv_id, user_wf_auth.data.user_session)
     } else {
         // Token from auth

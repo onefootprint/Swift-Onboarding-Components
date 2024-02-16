@@ -1,4 +1,4 @@
-use newtypes::{ObConfigurationKey, OrgMemberEmail, PiiString, SessionId, TenantId};
+use newtypes::{ObConfigurationKey, OrgMemberEmail, PiiString, TenantId};
 use serde_json::json;
 
 #[derive(Debug, Eq, PartialEq, strum::Display)]
@@ -80,8 +80,6 @@ pub enum BoolFlag<'a> {
     IsRulesProductEnabled(&'a TenantId),
     #[strum(to_string = "MakeLexisCall")]
     MakeLexisCall(&'a TenantId),
-    #[strum(to_string = "UseNewIdentifyMachine")]
-    UseNewIdentifyMachine(&'a ObConfigurationKey, Option<&'a SessionId>),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -129,14 +127,6 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
             Self::IsRulesProductEnabled(k) => Some(k.to_string()),
             Self::MakeLexisCall(k) => Some(k.to_string()),
-            Self::UseNewIdentifyMachine(k, _) => Some(k.to_string()),
-        }
-    }
-
-    pub fn metadata(&self) -> Option<String> {
-        match self {
-            Self::UseNewIdentifyMachine(_, session_id) => session_id.map(|id| id.to_string()),
-            _ => None,
         }
     }
 
@@ -180,7 +170,6 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(_) => false,
             Self::IsRulesProductEnabled(_) => false,
             Self::MakeLexisCall(_) => false,
-            Self::UseNewIdentifyMachine(_, _) => false,
         }
     }
 }

@@ -11,16 +11,14 @@ use crate::{
 };
 use api_core::{
     auth::{ob_config::ObConfigAuth, session::user::NewUserSessionContext},
-    serializers::should_use_new_identify_machine,
     types::JsonApiResponse,
     utils::{
         db2api::DbToApi,
-        headers::TelemetryHeaders,
         onboarding::{NewBusinessVaultArgs, NewOnboardingArgs},
         vault_wrapper::{Any, VaultWrapper},
     },
 };
-use api_wire_types::{hosted::onboarding::OnboardingResponse, PublicOnboardingConfiguration};
+use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::{
     insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, scoped_vault::ScopedVault,
 };
@@ -37,7 +35,6 @@ pub async fn post(
     user_auth: UserAuthContext,
     ob_pk_auth: Option<ObConfigAuth>,
     insights: InsightHeaders,
-    telemetry: TelemetryHeaders,
 ) -> JsonApiResponse<OnboardingResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
@@ -119,12 +116,8 @@ pub async fn post(
         .await?;
 
     let ff_client = state.feature_flag_client.clone();
-    let session_id = telemetry.session_id;
-    let use_new_identify_machine =
-        should_use_new_identify_machine(ff_client.clone(), &ob_config.key, session_id.as_ref());
-    tracing::info!(%use_new_identify_machine, ?session_id, "Creating new onboarding");
     let onboarding_config =
-        PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client, session_id));
+        api_wire_types::PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
     ResponseData::ok(OnboardingResponse {
         // Omit appearance serialization here
         onboarding_config,

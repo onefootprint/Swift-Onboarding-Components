@@ -3585,10 +3585,6 @@
                                         "AX"
                                     ]
                                 }
-                            },
-                            "use_new_identify_machine": {
-                                "description": "Will remove this after identify machine rollout",
-                                "type": "boolean"
                             }
                         },
                         "required": [
@@ -3608,8 +3604,7 @@
                             "org_name",
                             "requires_id_doc",
                             "status",
-                            "supported_countries",
-                            "use_new_identify_machine"
+                            "supported_countries"
                         ]
                     }
                 },
@@ -3761,6 +3756,7 @@
                                 "description": "The scopes of the returned token",
                                 "type": "array",
                                 "items": {
+                                    "description": "Auto-generated discriminant enum variants",
                                     "type": "string",
                                     "enum": [
                                         "SignUp",
@@ -4288,10 +4284,6 @@
                                         "AX"
                                     ]
                                 }
-                            },
-                            "use_new_identify_machine": {
-                                "description": "Will remove this after identify machine rollout",
-                                "type": "boolean"
                             }
                         },
                         "required": [
@@ -4311,8 +4303,7 @@
                             "org_name",
                             "requires_id_doc",
                             "status",
-                            "supported_countries",
-                            "use_new_identify_machine"
+                            "supported_countries"
                         ]
                     }
                 },
@@ -4696,10 +4687,6 @@
                                         "AX"
                                     ]
                                 }
-                            },
-                            "use_new_identify_machine": {
-                                "description": "Will remove this after identify machine rollout",
-                                "type": "boolean"
                             }
                         },
                         "required": [
@@ -4719,8 +4706,7 @@
                             "org_name",
                             "requires_id_doc",
                             "status",
-                            "supported_countries",
-                            "use_new_identify_machine"
+                            "supported_countries"
                         ]
                     }
                 },
@@ -5103,10 +5089,6 @@
                                 "AX"
                             ]
                         }
-                    },
-                    "use_new_identify_machine": {
-                        "description": "Will remove this after identify machine rollout",
-                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -5126,8 +5108,7 @@
                     "org_name",
                     "requires_id_doc",
                     "status",
-                    "supported_countries",
-                    "use_new_identify_machine"
+                    "supported_countries"
                 ]
             },
             "RawDataRequest": {

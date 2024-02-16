@@ -30,7 +30,6 @@ mod user_timeline;
 mod validate;
 mod watchlist_check;
 mod workflow_request;
-pub use onboarding_configuration::should_use_new_identify_machine;
 
 pub use business_owner::BusinessOwnerInfo;
 pub use organization::*;
