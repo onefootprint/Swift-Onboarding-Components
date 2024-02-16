@@ -50,6 +50,7 @@ describe('Collect KYC Data Machine Tests', () => {
         type: deviceType ?? 'desktop',
         hasSupportForWebauthn: false,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       },
       config: { ...TestOnboardingConfig },
       data,

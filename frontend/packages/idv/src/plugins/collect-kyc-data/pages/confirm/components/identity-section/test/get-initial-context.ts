@@ -25,6 +25,7 @@ const getInitialContext = ({
     type: 'mobile',
     hasSupportForWebauthn: true,
     osName: 'iOS',
+    browser: 'Mobile Safari',
   },
   config: getOnboardingConfig(),
   requirement: requirement ?? {

@@ -13,6 +13,7 @@ const contextWithSelfieErrors: MachineContext = {
     type: 'mobile',
     hasSupportForWebauthn: true,
     osName: 'iOS',
+    browser: 'Mobile Safari',
   },
   currSide: IdDocImageTypes.front,
   requirement: {

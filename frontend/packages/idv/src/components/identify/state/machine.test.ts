@@ -70,6 +70,7 @@ const getDevice = (): DeviceInfo => ({
   type: 'mobile',
   hasSupportForWebauthn: true,
   osName: 'iOS',
+  browser: 'Mobile Safari',
 });
 
 const createMachine = ({
@@ -111,6 +112,7 @@ describe('Identify Machine Tests', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       });
 
       state = machine.send({
@@ -140,6 +142,7 @@ describe('Identify Machine Tests', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       });
 
       state = machine.send({
@@ -184,6 +187,7 @@ describe('Identify Machine Tests', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       });
 
       state = machine.send({
@@ -286,6 +290,7 @@ describe('Identify Machine Tests', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       });
 
       state = machine.send({
@@ -344,6 +349,7 @@ describe('Identify Machine Tests', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       });
 
       state = machine.send({

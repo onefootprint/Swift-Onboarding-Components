@@ -33,6 +33,7 @@ describe('Onboarding Machine Tests', () => {
     type: 'mobile',
     hasSupportForWebauthn: true,
     osName: 'iOS',
+    browser: 'Mobile Safari',
   };
 
   const createMachine = ({

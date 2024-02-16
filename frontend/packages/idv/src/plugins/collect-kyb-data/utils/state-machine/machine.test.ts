@@ -39,6 +39,7 @@ describe('Collect KYB Data Machine Tests', () => {
       type: 'desktop',
       hasSupportForWebauthn: false,
       osName: 'Windows',
+      browser: 'Chrome',
     },
   ) => {
     const initialContext: MachineContext = {

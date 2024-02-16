@@ -19,6 +19,7 @@ export const getInitialContext = (
     type: 'mobile',
     hasSupportForWebauthn: true,
     osName: 'iOS',
+    browser: 'Mobile Safari',
   },
   config: {
     isLive: true,

@@ -1098,7 +1098,8 @@
         "title": "Solicitud de acceso a la cámara del dispositivo",
         "subtitle": "Necesitaremos que tomes fotos de tu documento para verificar tu identidad correctamente, y para ellos, necesitamos que le permitas el uso de tu cámara de fotos en este dispositivo.",
         "cta": "Abre Ajustes para otorgar permisos permisos para usar la cámara",
-        "cta-ios": "Abre Ajustes para otorgar permisos de cámara a tu navegador móvil.",
+        "cta-safari": "Abre la configuración de Safari para otorgar permisos de cámara y actualiza la página.",
+        "cta-ios": "Abre Ajustes para otorgar permisos de cámara a tu navegador móvil. Si estás utilizando Safari, actualiza la página después de otorgar el permiso de la cámara.",
         "cta-android": "Otorga permisos de cámara a través de los ajustes de tu navegador y/o dispositivo.",
         "cta-mobile": "Abre los ajustes de tu dispositivo y/o navegador para otorgar permisos de cámara.",
         "cta-desktop": "Abre los ajustes de tu navegador para otorgar permisos de cámara."

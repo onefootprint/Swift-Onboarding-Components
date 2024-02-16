@@ -61,6 +61,7 @@ describe('<InvestorProfile />', () => {
       type: 'mobile',
       hasSupportForWebauthn: true,
       osName: 'iOS',
+      browser: 'Mobile Safari',
     },
   });
 

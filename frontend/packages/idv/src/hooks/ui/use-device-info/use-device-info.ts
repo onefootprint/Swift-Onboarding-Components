@@ -5,6 +5,7 @@ export type DeviceInfo = {
   hasSupportForWebauthn: boolean;
   type: string;
   osName: string;
+  browser: string;
 };
 
 // UAParser device type can have an undefined type, because
@@ -12,11 +13,13 @@ export type DeviceInfo = {
 // device, just to avoid to make a lot of ifs
 const DEFAULT_DEVICE_TYPE = 'unknown';
 const DEFAULT_OS_TYPE = 'unknown';
+const DEFAULT_BROWSER_TYPE = 'unknown';
 
 export const checkDeviceInfo = async () => {
   const uaParser = new UAParser();
   const device = uaParser.getDevice();
   const os = uaParser.getOS();
+  const browser = uaParser.getBrowser();
   let hasSupportForWebauthn = false;
   if (window.PublicKeyCredential) {
     hasSupportForWebauthn =
@@ -26,6 +29,7 @@ export const checkDeviceInfo = async () => {
     hasSupportForWebauthn,
     type: device.type || DEFAULT_DEVICE_TYPE,
     osName: os.name || DEFAULT_OS_TYPE,
+    browser: browser.name || DEFAULT_BROWSER_TYPE,
   };
   return info;
 };

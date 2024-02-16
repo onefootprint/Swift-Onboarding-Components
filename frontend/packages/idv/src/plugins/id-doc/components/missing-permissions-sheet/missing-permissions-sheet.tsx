@@ -21,11 +21,14 @@ const MissingPermissionsSheet = ({
   const [state] = useIdDocMachine();
   const {
     context: {
-      device: { osName, type: deviceType },
+      device: { osName, type: deviceType, browser },
     },
   } = state;
 
   const getTranslation = () => {
+    if (browser.includes('Safari')) {
+      return t('cta-safari');
+    }
     if (deviceType === 'mobile') {
       if (osName === 'iOS') {
         return t('cta-ios');

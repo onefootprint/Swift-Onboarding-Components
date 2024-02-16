@@ -113,6 +113,7 @@ describe.skip('<CollectKybData />', () => {
       type: 'mobile',
       hasSupportForWebauthn: true,
       osName: 'iOS',
+      browser: 'Mobile Safari',
     },
   });
 

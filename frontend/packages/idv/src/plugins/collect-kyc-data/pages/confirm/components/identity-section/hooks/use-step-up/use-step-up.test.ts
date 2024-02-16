@@ -30,6 +30,7 @@ describe.skip('useStepUp', () => {
       type: 'mobile',
       hasSupportForWebauthn: true,
       osName: 'iOS',
+      browser: 'Mobile Safari',
     };
     const authToken = 'token';
     const onSuccess = jest.fn();
@@ -68,6 +69,7 @@ describe.skip('useStepUp', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -90,6 +92,7 @@ describe.skip('useStepUp', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -113,6 +116,7 @@ describe.skip('useStepUp', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -139,6 +143,7 @@ describe.skip('useStepUp', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -166,6 +171,7 @@ describe.skip('useStepUp', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -188,6 +194,7 @@ describe.skip('useStepUp', () => {
         type: 'desktop',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -210,6 +217,7 @@ describe.skip('useStepUp', () => {
         type: 'desktop',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -238,6 +246,7 @@ describe.skip('useStepUp', () => {
         type: 'desktop',
         hasSupportForWebauthn: false,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -266,6 +275,7 @@ describe.skip('useStepUp', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -294,6 +304,7 @@ describe.skip('useStepUp', () => {
         type: 'mobile',
         hasSupportForWebauthn: true,
         osName: 'iOS',
+        browser: 'Mobile Safari',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();

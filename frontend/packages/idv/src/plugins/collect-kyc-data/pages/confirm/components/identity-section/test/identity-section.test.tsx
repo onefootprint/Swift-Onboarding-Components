@@ -273,6 +273,7 @@ describe('IdentitySection', () => {
       type: 'mobile',
       hasSupportForWebauthn: false,
       osName: 'iOS',
+      browser: 'Mobile Safari',
     };
     const initialContext = getInitialContext({ device });
     renderIdentitySection(initialContext);
