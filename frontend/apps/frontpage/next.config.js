@@ -15,13 +15,14 @@ const withMDX = require('@next/mdx')({
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
   connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live usefathom.com *.usefathom.com *.ingest.sentry.io www.youtube.com api.onefootprint.com getform.io cdn.unifygtm.com *.unifygtm.com; 
-  default-src 'self' vitals.vercel-insights.com;
+  default-src 'self' vitals.vercel-insights.com;  
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
   frame-src 'self' localhost:3000 *.onefootprint.com vercel.live www.youtube.com form.typeform.com; 
   img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com usefathom.com *.usefathom.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net cdn.unifygtm.com *.unifygtm.com cdn.jsdelivr.net;
   media-src 'self' https footprint-blog.ghost.io;
+  object-src 'self' data:;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' usefathom.com *.usefathom.com vercel.live vitals.vercel-insights.com tagmanager.google.com www.googletagmanager.com platform.twitter.com www.youtube.com static.ads-twitter.com connect.facebook.net www.facebook.com cdn.unifygtm.com *.unifygtm.com;
   style-src 'self' 'unsafe-inline' tagmanager.google.com fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;

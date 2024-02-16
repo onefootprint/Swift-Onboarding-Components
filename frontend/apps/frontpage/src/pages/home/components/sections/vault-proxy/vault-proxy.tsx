@@ -34,7 +34,7 @@ const VaultProxy = () => {
         subtitle={t('subtitle')}
         cta={t('cta')}
         iconSrc="/home/vault-proxy/ico-illustrated-servers-40.svg"
-        isOnDarkSection
+        $isOnDarkSection
         href="/vaulting"
       />
       <IllustrationContainer>

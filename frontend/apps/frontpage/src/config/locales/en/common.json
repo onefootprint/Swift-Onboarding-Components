@@ -200,70 +200,68 @@
         "href": "https://www.linkedin.com/company/onefootprint/",
         "text": "Linkedin"
       },
-      "links": {
-        "product": {
-          "title": "Product",
-          "compare": {
-            "text": "Compare",
-            "href": "/compare"
-          },
-          "pricing": {
-            "text": "Pricing",
-            "href": "/pricing"
-          }
+      "product": {
+        "title": "Product",
+        "compare": {
+          "text": "Compare",
+          "href": "/compare"
         },
-        "company": {
-          "title": "Company",
-          "about": {
-            "text": "About us",
-            "href": "/company"
-          },
-          "blog": {
-            "text": "Blog",
-            "href": "/blog"
-          },
-          "investor-updates": {
-            "text": "Investor Updates",
-            "href": "/investor-updates"
-          }
+        "pricing": {
+          "text": "Pricing",
+          "href": "/pricing"
+        }
+      },
+      "company": {
+        "title": "Company",
+        "about": {
+          "text": "About us",
+          "href": "/company"
         },
-        "resources": {
-          "title": "Resources",
-          "terms-of-service": {
-            "href": "/terms-of-service",
-            "text": "Terms"
-          },
-          "privacy-policy": {
-            "href": "/privacy-policy",
-            "text": "Privacy"
-          },
-          "faq": {
-            "text": "FAQ",
-            "href": "/faq"
-          },
-          "supported-id-documents": {
-            "text": "Supported ID Documents",
-            "href": "/supported-id-documents"
-          },
-          "security-disclosure": {
-            "href": "/security-disclosure",
-            "text": "Security Disclosure"
-          },
-          "idv-privacy": {
-            "href": "idv-privacy",
-            "text": "IDV Privacy"
-          }
+        "blog": {
+          "text": "Blog",
+          "href": "/blog"
         },
-        "developers": {
-          "title": "Developers",
-          "docs": {
-            "href": "https://docs.onefootprint.com/",
-            "text": "Docs"
-          },
-          "status": {
-            "href": "https://status.onefootprint.com/",
-            "text": "Status"
-          }
+        "investor-updates": {
+          "text": "Investor Updates",
+          "href": "/investor-updates"
+        }
+      },
+      "resources": {
+        "title": "Resources",
+        "terms-of-service": {
+          "href": "/terms-of-service",
+          "text": "Terms"
+        },
+        "privacy-policy": {
+          "href": "/privacy-policy",
+          "text": "Privacy"
+        },
+        "faq": {
+          "text": "FAQ",
+          "href": "/faq"
+        },
+        "supported-id-documents": {
+          "text": "Supported ID Documents",
+          "href": "/supported-id-documents"
+        },
+        "security-disclosure": {
+          "href": "/security-disclosure",
+          "text": "Security Disclosure"
+        },
+        "idv-privacy": {
+          "href": "idv-privacy",
+          "text": "IDV Privacy"
+        }
+      },
+      "developers": {
+        "title": "Developers",
+        "docs": {
+          "href": "https://docs.onefootprint.com/",
+          "text": "Docs"
+        },
+        "status": {
+          "href": "https://status.onefootprint.com/",
+          "text": "Status"
         }
       }
     },
@@ -1127,7 +1125,7 @@
         },
         "phishing-resistant": {
           "title": "Phishing resistant",
-          "subtitle": "Underlying passkeys are public-private key pairs. Each public-key is uniquely bound to a specific “Relying Party” — or in simple terms a website like acmebank.com. This is great for both people and businesses. \n If you have a Acme Bank account, and then someone tries to phish your account, your keys for the real Acme Bank won’t surface on the fake Acme Bank."
+          "subtitle": "Underlying passkeys are public-private key pairs. Each public-key is uniquely bound to a specific “Relying Party” — or in simple terms a website like acmebank.com. This is great for both people and businesses. If you have a Acme Bank account, and then someone tries to phish your account, your keys for the real Acme Bank won’t surface on the fake Acme Bank."
         },
         "secure-enclaves": {
           "title": "Secure enclaves",

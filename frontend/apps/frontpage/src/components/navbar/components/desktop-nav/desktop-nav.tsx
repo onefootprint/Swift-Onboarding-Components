@@ -16,23 +16,23 @@ import LogoCopyAssets from './components/logo-copy-assets';
 
 type DesktopNavProps = {
   entries: NavEntry[];
-  isOnDarkSection?: boolean;
+  $isOnDarkSection?: boolean;
 };
 
-const DesktopNav = ({ entries, isOnDarkSection }: DesktopNavProps) => {
+const DesktopNav = ({ entries, $isOnDarkSection }: DesktopNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
 
   return (
     <Container delayDuration={0}>
       <MainNav>
-        <LogoCopyAssets isOnDarkSection={isOnDarkSection} />
+        <LogoCopyAssets $isOnDarkSection={$isOnDarkSection} />
         {entries.map(entry => {
           if (isNavLink(entry)) {
             return (
               <DesktopNavLink
                 link={entry}
                 key={entry.text}
-                isOnDarkSection={isOnDarkSection}
+                $isOnDarkSection={$isOnDarkSection}
               />
             );
           }
@@ -41,7 +41,7 @@ const DesktopNav = ({ entries, isOnDarkSection }: DesktopNavProps) => {
               <DesktopNavMenu
                 menu={entry}
                 key={entry.text}
-                isOnDarkSection={isOnDarkSection}
+                $isOnDarkSection={$isOnDarkSection}
               />
             );
           }
@@ -51,14 +51,14 @@ const DesktopNav = ({ entries, isOnDarkSection }: DesktopNavProps) => {
       <SecondaryNav>
         <Login
           href={`${DASHBOARD_BASE_URL}/login`}
-          isOnDarkSection={isOnDarkSection}
+          $isOnDarkSection={$isOnDarkSection}
         >
           {t('login')}
         </Login>
         <StyledLinkButton
           href={`${DASHBOARD_BASE_URL}/sign-up`}
           size="compact"
-          data-is-dark={isOnDarkSection}
+          data-is-dark={$isOnDarkSection}
         >
           {t('sign-up')}
         </StyledLinkButton>
@@ -117,10 +117,10 @@ const SecondaryNav = styled(NavigationMenu.List)`
   `}
 `;
 
-const Login = styled(Link)<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const Login = styled(Link)<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     ${createFontStyles('label-3')};
-    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+    color: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
     text-decoration: none;
     transition: color 0.2s ease-in-out;
     padding: ${theme.spacing[3]} ${theme.spacing[4]};

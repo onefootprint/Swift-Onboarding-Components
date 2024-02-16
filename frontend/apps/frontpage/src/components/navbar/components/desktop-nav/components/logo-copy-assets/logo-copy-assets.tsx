@@ -22,12 +22,12 @@ const assetsToCopy = [
 
 type LogoCopyAssetsProps = {
   href?: string;
-  isOnDarkSection?: boolean;
+  $isOnDarkSection?: boolean;
 };
 
 const LogoCopyAssets = ({
   href = FRONTPAGE_BASE_URL,
-  isOnDarkSection,
+  $isOnDarkSection,
 }: LogoCopyAssetsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.navbar.save-assets',
@@ -72,7 +72,7 @@ const LogoCopyAssets = ({
         <Trigger
           onClick={handleButtonClick}
           onContextMenu={handleButtonContextMenu}
-          isOnDarkSection={isOnDarkSection}
+          $isOnDarkSection={$isOnDarkSection}
         >
           <ThemedLogoFpCompact />
         </Trigger>
@@ -97,8 +97,8 @@ const LogoCopyAssets = ({
   );
 };
 
-const Trigger = styled.button<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const Trigger = styled.button<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     display: flex;
     align-items: center;
     min-width: fit-content;
@@ -121,7 +121,7 @@ const Trigger = styled.button<{ isOnDarkSection?: boolean }>`
       svg {
         path {
            {
-            fill: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+            fill: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
           }
         }
       }

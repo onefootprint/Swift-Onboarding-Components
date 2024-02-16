@@ -8,20 +8,20 @@ import type { NavLink } from '../../../../types';
 
 type DesktopNavLinkProps = {
   link: NavLink;
-  isOnDarkSection?: boolean;
+  $isOnDarkSection?: boolean;
 };
-const DesktopNavLink = ({ link, isOnDarkSection }: DesktopNavLinkProps) => (
+const DesktopNavLink = ({ link, $isOnDarkSection }: DesktopNavLinkProps) => (
   <NavigationMenu.Item asChild>
-    <StyledLink asChild isOnDarkSection={isOnDarkSection}>
+    <StyledLink asChild $isOnDarkSection={$isOnDarkSection}>
       <Link href={link.href}>{link.text}</Link>
     </StyledLink>
   </NavigationMenu.Item>
 );
 
-const StyledLink = styled(NavigationMenu.Link)<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const StyledLink = styled(NavigationMenu.Link)<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     position: relative;
-    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+    color: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
     text-decoration: none;
     display: flex;
     padding: ${theme.spacing[3]} ${theme.spacing[4]};

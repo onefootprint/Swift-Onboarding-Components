@@ -108,15 +108,17 @@ const Title = styled.span<{ size: 'compact' | 'default' }>`
     color: ${theme.color.primary};
     position: relative;
 
-    &::before {
-      content: '';
-      position: absolute;
-      left: calc(-1 * ${theme.spacing[9]});
-      top: 0;
-      height: 100%;
-      width: ${theme.borderWidth[1]};
-      background: ${theme.color.accent};
-    }
+    ${media.greaterThan('md')`
+      &::before {
+        content: '';
+        position: absolute;
+        left: calc(-1 * ${theme.spacing[9]});
+        top: 0;
+        height: 100%;
+        width: ${theme.borderWidth[1]};
+        background: ${theme.color.accent};
+      }
+    `}
   `}
 `;
 

@@ -107,7 +107,7 @@ const Navbar = () => {
   return (
     <Header
       isFloating={hasScroll && isFloatingEnabled}
-      isOnDarkSection={isOnDarkSection}
+      $isOnDarkSection={isOnDarkSection}
     >
       <Container>
         <Inner id="navbar">
@@ -115,9 +115,9 @@ const Navbar = () => {
             onOpen={disableFloating}
             onClose={enableFloating}
             entries={entries}
-            isOnDarkSection={isOnDarkSection}
+            $isOnDarkSection={isOnDarkSection}
           />
-          <DesktopNav entries={entries} isOnDarkSection={isOnDarkSection} />
+          <DesktopNav entries={entries} $isOnDarkSection={isOnDarkSection} />
         </Inner>
       </Container>
     </Header>
@@ -126,9 +126,9 @@ const Navbar = () => {
 
 const Header = styled.header<{
   isFloating: boolean;
-  isOnDarkSection?: boolean;
+  $isOnDarkSection?: boolean;
 }>`
-  ${({ theme, isFloating, isOnDarkSection }) => css`
+  ${({ theme, isFloating, $isOnDarkSection }) => css`
     left: 0;
     position: fixed;
     right: 0;
@@ -140,11 +140,11 @@ const Header = styled.header<{
     css`
       backdrop-filter: blur(15px) saturate(125%);
       background-color: rgba(
-        ${isOnDarkSection ? primitives.Gray0 : theme.backgroundColor.primary}
+        ${$isOnDarkSection ? primitives.Gray0 : theme.backgroundColor.primary}
           0.75
       );
       border-bottom: ${theme.borderWidth[1]} solid
-        ${isOnDarkSection ? primitives.Gray700 : theme.borderColor.primary};
+        ${$isOnDarkSection ? primitives.Gray700 : theme.borderColor.primary};
     `}
   `}
 `;

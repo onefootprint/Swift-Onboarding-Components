@@ -8,18 +8,18 @@ import type { NavMenuItem } from '../../../../types';
 
 type DesktopNavMenuItemProps = {
   item: NavMenuItem;
-  isOnDarkSection?: boolean;
+  $isOnDarkSection?: boolean;
 };
 
 const DesktopNavMenuItem = ({
   item,
-  isOnDarkSection,
+  $isOnDarkSection,
 }: DesktopNavMenuItemProps) => (
-  <StyledLink href={item.href} isOnDarkSection={isOnDarkSection}>
+  <StyledLink href={item.href} $isOnDarkSection={$isOnDarkSection}>
     <item.iconComponent />
     <ItemText>
-      <Title isOnDarkSection={isOnDarkSection}>{item.text}</Title>
-      <Subtitle isOnDarkSection={isOnDarkSection}>{item.subtext}</Subtitle>
+      <Title $isOnDarkSection={$isOnDarkSection}>{item.text}</Title>
+      <Subtitle $isOnDarkSection={$isOnDarkSection}>{item.subtext}</Subtitle>
     </ItemText>
   </StyledLink>
 );
@@ -33,26 +33,26 @@ const ItemText = styled.div`
   `}
 `;
 
-const Title = styled.p<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const Title = styled.p<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     ${createFontStyles('label-3')}
-    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+    color: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
     text-decoration: none;
     display: flex;
   `}
 `;
 
-const Subtitle = styled.p<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const Subtitle = styled.p<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     ${createFontStyles('body-3')}
-    color: ${isOnDarkSection ? primitives.Gray200 : theme.color.tertiary};
+    color: ${$isOnDarkSection ? primitives.Gray200 : theme.color.tertiary};
     text-decoration: none;
     display: flex;
   `}
 `;
 
-const StyledLink = styled(NavigationMenu.Link)<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const StyledLink = styled(NavigationMenu.Link)<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -66,13 +66,15 @@ const StyledLink = styled(NavigationMenu.Link)<{ isOnDarkSection?: boolean }>`
     @media (hover: hover) {
       :hover {
         background-color: ${
-          isOnDarkSection ? primitives.Gray800 : theme.backgroundColor.secondary
+          $isOnDarkSection
+            ? primitives.Gray800
+            : theme.backgroundColor.secondary
         };
       }
     }
     :focus {
       background-color: ${
-        isOnDarkSection ? primitives.Gray800 : theme.backgroundColor.secondary
+        $isOnDarkSection ? primitives.Gray800 : theme.backgroundColor.secondary
       };
     }
 
@@ -83,7 +85,7 @@ const StyledLink = styled(NavigationMenu.Link)<{ isOnDarkSection?: boolean }>`
     && {
       svg {
         path {
-          fill: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+          fill: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
         }
       }
     }

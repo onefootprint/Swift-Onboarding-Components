@@ -23,14 +23,14 @@ type MobileNavProps = {
   onOpen: () => void;
   onClose: () => void;
   entries: NavEntry[];
-  isOnDarkSection?: boolean;
+  $isOnDarkSection?: boolean;
 };
 
 const MobileNav = ({
   onOpen,
   onClose,
   entries,
-  isOnDarkSection,
+  $isOnDarkSection,
 }: MobileNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
@@ -113,7 +113,7 @@ const MobileNav = ({
         <Container>
           <Logo href="/" onClick={handleLinkClick}>
             <ThemedLogoFpDefault
-              color={isOnDarkSection ? 'quinary' : 'primary'}
+              color={$isOnDarkSection ? 'quinary' : 'primary'}
             />
           </Logo>
           <NavTriggerButton
@@ -121,7 +121,7 @@ const MobileNav = ({
             onClick={handleToggle}
             type="button"
           >
-            <IcoMenu24 color={isOnDarkSection ? 'quinary' : 'primary'} />
+            <IcoMenu24 color={$isOnDarkSection ? 'quinary' : 'primary'} />
           </NavTriggerButton>
         </Container>
       )}

@@ -27,7 +27,7 @@ const VaultPii = () => {
         subtitle={t('subtitle')}
         cta={t('cta')}
         iconSrc="/home/vault-pii/ico-illustrated-safe-40.svg"
-        isOnDarkSection
+        $isOnDarkSection
         href="/vaulting"
       />
       <Container>

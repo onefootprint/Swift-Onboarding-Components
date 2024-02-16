@@ -16,7 +16,7 @@ type SectionTitleProps = {
   iconSrc?: string;
   cta?: string;
   href?: string;
-  isOnDarkSection?: boolean;
+  $isOnDarkSection?: boolean;
 };
 
 const SectionTitle = ({
@@ -25,14 +25,14 @@ const SectionTitle = ({
   iconSrc,
   cta,
   href,
-  isOnDarkSection,
+  $isOnDarkSection,
 }: SectionTitleProps) => (
   <Container>
-    <TitleContainer isOnDarkSection={isOnDarkSection}>
+    <TitleContainer $isOnDarkSection={$isOnDarkSection}>
       {iconSrc && <Image src={iconSrc} alt="" width={80} height={80} />}
       <TextContainer>
-        <Title isOnDarkSection={isOnDarkSection}>{title}</Title>
-        <Subtitle isOnDarkSection={isOnDarkSection}>{subtitle}</Subtitle>
+        <Title $isOnDarkSection={$isOnDarkSection}>{title}</Title>
+        <Subtitle $isOnDarkSection={$isOnDarkSection}>{subtitle}</Subtitle>
       </TextContainer>
       {cta && (
         <LinkButton
@@ -47,10 +47,10 @@ const SectionTitle = ({
   </Container>
 );
 
-const Title = styled.div<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const Title = styled.div<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     ${createFontStyles('display-3')}
-    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+    color: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
 
     ${media.greaterThan('md')`
       ${createFontStyles('display-2')}
@@ -58,22 +58,22 @@ const Title = styled.div<{ isOnDarkSection?: boolean }>`
   `}
 `;
 
-const Subtitle = styled.div<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const Subtitle = styled.div<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     ${createFontStyles('display-4')}
-    color: ${isOnDarkSection ? primitives.Gray100 : theme.color.secondary};
+    color: ${$isOnDarkSection ? primitives.Gray100 : theme.color.secondary};
   `}
 `;
 
-const TitleContainer = styled.div<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const TitleContainer = styled.div<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
     gap: ${theme.spacing[8]};
 
-    ${isOnDarkSection &&
+    ${$isOnDarkSection &&
     css`
       img {
         filter: invert(100%);
@@ -86,7 +86,10 @@ const TitleContainer = styled.div<{ isOnDarkSection?: boolean }>`
 
       button,
       a {
-        color: ${isOnDarkSection ? primitives.Purple300 : theme.color.accent};
+        svg path {
+          fill: ${$isOnDarkSection ? primitives.Purple300 : theme.color.accent};
+        }
+        color: ${$isOnDarkSection ? primitives.Purple300 : theme.color.accent};
       }
     }
   `}

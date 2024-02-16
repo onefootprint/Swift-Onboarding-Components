@@ -10,27 +10,27 @@ import DesktopNavMenuItem from '../desktop-nav-menu-item';
 
 type DesktopNavbarMenuProps = {
   menu: NavMenu;
-  isOnDarkSection?: boolean;
+  $isOnDarkSection?: boolean;
 };
 
-const DesktopNavMenu = ({ menu, isOnDarkSection }: DesktopNavbarMenuProps) => {
+const DesktopNavMenu = ({ menu, $isOnDarkSection }: DesktopNavbarMenuProps) => {
   const items = menu.items.map(item => (
     <DesktopNavMenuItem
       item={item}
       key={item.text}
-      isOnDarkSection={isOnDarkSection}
+      $isOnDarkSection={$isOnDarkSection}
     />
   ));
 
   return (
     <ItemContainer>
       <StyledTrigger>
-        <Title isOnDarkSection={isOnDarkSection}>{menu.text}</Title>
-        <IconContainer isOnDarkSection={isOnDarkSection}>
+        <Title $isOnDarkSection={$isOnDarkSection}>{menu.text}</Title>
+        <IconContainer $isOnDarkSection={$isOnDarkSection}>
           <IcoChevronDown16 />
         </IconContainer>
       </StyledTrigger>
-      <Content isOnDarkSection={isOnDarkSection}>{items}</Content>
+      <Content $isOnDarkSection={$isOnDarkSection}>{items}</Content>
     </ItemContainer>
   );
 };
@@ -40,10 +40,10 @@ const ItemContainer = styled(NavigationMenu.Item)`
   display: flex;
 `;
 
-const Title = styled.p<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const Title = styled.p<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     ${createFontStyles('label-3')}
-    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+    color: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
     text-decoration: none;
     display: flex;
   `}
@@ -69,8 +69,8 @@ const StyledTrigger = styled(NavigationMenu.Trigger)`
   `}
 `;
 
-const IconContainer = styled.div<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const IconContainer = styled.div<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     min-width: 16px;
     height: 20px;
     display: flex;
@@ -83,15 +83,15 @@ const IconContainer = styled.div<{ isOnDarkSection?: boolean }>`
     && {
       svg {
         path {
-          fill: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+          fill: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
         }
       }
     }
   `}
 `;
 
-const Content = styled(NavigationMenu.Content)<{ isOnDarkSection?: boolean }>`
-  ${({ theme, isOnDarkSection }) => css`
+const Content = styled(NavigationMenu.Content)<{ $isOnDarkSection?: boolean }>`
+  ${({ theme, $isOnDarkSection }) => css`
     position: absolute;
     left: 0;
     top: 100%;
@@ -100,12 +100,12 @@ const Content = styled(NavigationMenu.Content)<{ isOnDarkSection?: boolean }>`
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
     box-shadow: ${theme.elevation[2]};
-    background-color: ${isOnDarkSection
+    background-color: ${$isOnDarkSection
       ? primitives.Gray875
       : theme.backgroundColor.primary};
     padding: ${theme.spacing[3]};
     border: ${theme.borderWidth[1]} solid
-      ${isOnDarkSection ? primitives.Gray700 : theme.borderColor.tertiary};
+      ${$isOnDarkSection ? primitives.Gray700 : theme.borderColor.tertiary};
     z-index: 1;
 
     &[data-state='open'] {
