@@ -1,10 +1,6 @@
 use crate::State;
 use api_core::{
-    auth::{
-        session::user::NewUserSessionContext,
-        user::{UserAuth, UserAuthContext},
-        Any,
-    },
+    auth::{session::user::NewUserSessionContext, user::UserAuthContext, Any},
     errors::{ApiResult, ValidationError},
     types::{JsonApiResponse, ResponseData},
     utils::{
@@ -41,16 +37,11 @@ pub async fn post(
         return ValidationError(&format!("KBA not allowed for {}", k)).into();
     }
 
-    let sv_id = user_auth.scoped_user_id();
-    let v_id = user_auth.user_vault_id().clone();
+    let id = user_auth.user_identifier();
     let vw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let args = if let Some(sv_id) = sv_id.as_ref() {
-                VwArgs::Tenant(sv_id)
-            } else {
-                VwArgs::Vault(&v_id)
-            };
+            let args = VwArgs::from(&id);
             let vw = VaultWrapper::<Any>::build(conn, args)?;
             Ok(vw)
         })

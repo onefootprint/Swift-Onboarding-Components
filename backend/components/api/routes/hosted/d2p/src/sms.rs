@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuth, UserAuthContext},
+    auth::user::UserAuthContext,
     errors::{ApiError, ApiResult},
     types::response::ResponseData,
     utils::vault_wrapper::{VaultWrapper, VwArgs},
@@ -37,16 +37,8 @@ pub async fn handler(
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let su_id = user_auth.scoped_user_id();
-            let args = if let Some(su_id) = su_id.as_ref() {
-                // If the auth token is during an onboarding session, create a UVW that sees all
-                // speculative data for the tenant in order to see a speculative phone number
-                // that was added by this tenant.
-                VwArgs::Tenant(su_id)
-            } else {
-                // Otherwise, create a UVW that only sees portable data
-                VwArgs::Vault(user_auth.user_vault_id())
-            };
+            let id = user_auth.user_identifier();
+            let args = VwArgs::from(&id);
             let uvw = VaultWrapper::<Person>::build(conn, args)?;
             Ok(uvw)
         })

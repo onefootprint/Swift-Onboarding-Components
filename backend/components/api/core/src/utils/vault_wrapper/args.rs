@@ -1,4 +1,4 @@
-use crate::errors::ApiResult;
+use crate::{auth::user::UserIdentifier, errors::ApiResult};
 use db::{
     models::{data_lifetime::DataLifetime, vault::Vault},
     PgConn,
@@ -25,6 +25,15 @@ pub enum VwArgs<'a> {
     /// Allows reconstructing a VaultWrapper from the view of a given tenant at a historical point
     /// in time.
     Historical(&'a ScopedVaultId, DataLifetimeSeqno),
+}
+
+impl<'a> From<&'a UserIdentifier> for VwArgs<'a> {
+    fn from(value: &'a UserIdentifier) -> Self {
+        match value {
+            UserIdentifier::ScopedVault(sv_id) => Self::Tenant(sv_id),
+            UserIdentifier::Vault(sv_id) => Self::Vault(sv_id),
+        }
+    }
 }
 
 type Args = (Vault, Option<ScopedVaultId>, DataLifetimeSeqno);

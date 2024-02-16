@@ -8,9 +8,10 @@ use db_schema::schema::{ob_configuration, ob_configuration::BoxedQuery, tenant};
 use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    ApiKeyStatus, AppearanceId, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant, DbActor,
-    DocumentCdoInfo, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId,
-    ObConfigurationKey, ObConfigurationKind, ScopedVaultId, TenantId, WorkflowId,
+    ApiKeyStatus, AppearanceId, AuthMethodKind, CipKind, CollectedDataOption as CDO,
+    DataIdentifierDiscriminant, DbActor, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
+    Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
+    TenantId, WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -673,6 +674,19 @@ impl ObConfiguration {
         self.must_collect_data
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == di_kind)
+    }
+
+    /// Returns the list of auth methods that are required to be registered by this playbook, if any
+    pub fn required_auth_methods(&self) -> Option<Vec<AuthMethodKind>> {
+        match self.kind {
+            // Auth and Document playbooks don't (yet) have an opinion on which login method is used
+            ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
+            ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if self.is_no_phone_flow {
+                vec![AuthMethodKind::Email]
+            } else {
+                vec![AuthMethodKind::Phone]
+            }),
+        }
     }
 }
 

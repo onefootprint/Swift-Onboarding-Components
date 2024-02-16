@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::CheckedUserAuthContext,
+    auth::user::{CheckedUserAuthContext, UserIdentifier},
     errors::ApiResult,
     utils::vault_wrapper::{VaultWrapper, VwArgs},
     State,
@@ -8,7 +8,6 @@ use db::models::{contact_info::ContactInfo, webauthn_credential::WebauthnCredent
 use itertools::Itertools;
 use newtypes::{
     AuthMethodKind, ChallengeKind, ContactInfoKind, DataIdentifier as DI, IdentityDataKind as IDK,
-    ScopedVaultId, VaultId,
 };
 
 use super::vault_wrapper::Person;
@@ -32,22 +31,13 @@ pub struct AuthMethod {
 /// Determine what challenge kinds are available for the given user
 pub async fn get_user_challenge_context(
     state: &State,
-    v_id: VaultId,
-    sv_id: Option<ScopedVaultId>,
+    identifier: UserIdentifier,
     user_auth: Option<CheckedUserAuthContext>,
 ) -> ApiResult<UserChallengeContext> {
     let (uvw, passkeys, cis) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let args = if let Some(sv_id) = sv_id.as_ref() {
-                // If we have already identified a specific SV, create a UVW that sees all
-                // speculative data for the tenant in order to see a speculative phone number
-                // that was added by this tenant.
-                VwArgs::Tenant(sv_id)
-            } else {
-                // Otherwise, create a UVW that only sees portable data
-                VwArgs::Vault(&v_id)
-            };
+            let args = VwArgs::from(&identifier);
             let uvw = VaultWrapper::build(conn, args)?;
 
             let passkeys = WebauthnCredential::list(conn, &uvw.vault.id)?;

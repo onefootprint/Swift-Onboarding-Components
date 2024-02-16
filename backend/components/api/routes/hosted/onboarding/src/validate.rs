@@ -10,6 +10,7 @@ use api_core::{
     errors::{ApiResult, AssertionError},
     types::JsonApiResponse,
     utils::{
+        identify::get_user_challenge_context,
         requirements::{
             get_data_collection_progress, get_requirements_for_person_and_maybe_business,
             DecryptUncheckedResultForReqs, GetRequirementsArgs,
@@ -36,7 +37,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     user_wf_auth: Option<UserWfAuthContext>,
 ) -> JsonApiResponse<HostedValidateResponse> {
-    let (wf, sv_id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
+    let (wf, sv_id, id, obc, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
         // Token from onboarding
         let user_wf_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp)?;
 
@@ -49,16 +50,19 @@ pub async fn post(
             return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
         }
 
+        let obc = user_wf_auth.ob_config().ok().cloned();
         let wf = user_wf_auth.workflow().clone();
         let sv_id = user_wf_auth.scoped_user.id.clone();
-        (Some(wf), sv_id, user_wf_auth.data.user_session)
+        let id = user_wf_auth.data.user_session.user_identifier();
+        (Some(wf), sv_id, id, obc, user_wf_auth.data.user_session)
     } else {
         // Token from auth
         let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
-        let ob_config = user_auth
+        let obc = user_auth
             .ob_config()
-            .ok_or(OnboardingError::ObConfigKindNotAuth)?;
-        if ob_config.kind != ObConfigurationKind::Auth {
+            .ok_or(OnboardingError::ObConfigKindNotAuth)?
+            .clone();
+        if obc.kind != ObConfigurationKind::Auth {
             return Err(OnboardingError::ObConfigKindNotAuth.into());
         }
         let sv_id = user_auth
@@ -71,12 +75,37 @@ pub async fn post(
             .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv_id2)))
             .await?;
         let args = DecryptUncheckedResultForReqs::for_auth();
-        let progress = get_data_collection_progress(&vw, ob_config, DataIdentifierDiscriminant::Id, &args);
+        let progress = get_data_collection_progress(&vw, &obc, DataIdentifierDiscriminant::Id, &args);
         if !progress.missing_attributes.is_empty() {
             return Err(OnboardingError::MissingAttributes(Csv(progress.missing_attributes)).into());
         }
-        (None, sv_id, user_auth.data)
+        let id = user_auth.user_identifier();
+        (None, sv_id, id, Some(obc), user_auth.data)
     };
+
+    if let Some(obc) = obc {
+        if let Some(required_auth_methods) = obc.required_auth_methods() {
+            let ctx = get_user_challenge_context(&state, id, None).await?;
+            let verified_auth_methods = ctx
+                .auth_methods
+                .into_iter()
+                .filter(|m| m.is_verified)
+                .map(|m| m.kind)
+                .collect_vec();
+            if let Some(missing_method) = required_auth_methods
+                .iter()
+                .find(|m| !verified_auth_methods.contains(m))
+            {
+                tracing::info!(%missing_method, "Missing required auth method");
+            } else {
+                tracing::info!("All auth methods provided");
+            }
+        }
+    } else {
+        // Don't expect this to happen, but going to add soft error before making this a hard error
+        tracing::info!("Validate call with no obc");
+    };
+
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool

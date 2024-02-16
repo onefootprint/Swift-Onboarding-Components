@@ -134,6 +134,20 @@ impl UserSessionContext {
     pub fn tenant(&self) -> Option<&Tenant> {
         self.tenant.as_ref()
     }
+
+    /// Returns the most specific identifier for this auth session - either the sv_id or v_id
+    pub fn user_identifier(&self) -> UserIdentifier {
+        if let Some(sv_id) = self.scoped_user_id() {
+            UserIdentifier::ScopedVault(sv_id)
+        } else {
+            UserIdentifier::Vault(self.user_vault_id().clone())
+        }
+    }
+}
+
+pub enum UserIdentifier {
+    Vault(VaultId),
+    ScopedVault(ScopedVaultId),
 }
 
 /// Nests a private UserSession and implements traits required to extract this session from an

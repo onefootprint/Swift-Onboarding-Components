@@ -1,7 +1,10 @@
 #![recursion_limit = "256"]
 
 use api_core::{
-    auth::{ob_config::ObConfigAuth, user::CheckedUserAuthContext},
+    auth::{
+        ob_config::ObConfigAuth,
+        user::{CheckedUserAuthContext, UserIdentifier},
+    },
     errors::{error_with_code::ErrorWithCode, ApiResult},
     telemetry::RootSpan,
     utils::{
@@ -145,8 +148,12 @@ async fn get_identify_challenge_context(
             Ok((tenant, sv))
         })
         .await?;
-    let sv_id = sv.as_ref().map(|sv| sv.id.clone());
-    let ctx = get_user_challenge_context(state, existing_user_id, sv_id, user_auth).await?;
+    let identifier = if let Some(sv) = sv.as_ref() {
+        UserIdentifier::ScopedVault(sv.id.clone())
+    } else {
+        UserIdentifier::Vault(existing_user_id)
+    };
+    let ctx = get_user_challenge_context(state, identifier, user_auth).await?;
     let can_initiate_signup_challenge = tenant.is_some() && sv.is_none();
     let ctx = IdentifyChallengeContext {
         ctx,

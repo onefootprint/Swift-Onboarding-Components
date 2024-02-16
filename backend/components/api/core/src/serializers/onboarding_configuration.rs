@@ -9,7 +9,7 @@ use db::{
     },
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::{AuthMethodKind, DataIdentifierDiscriminant, ObConfigurationKind};
+use newtypes::DataIdentifierDiscriminant;
 
 use crate::utils::db2api::DbToApi;
 
@@ -25,6 +25,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
     fn from_db((ob_config, tenant, tenant_client_config, appearance, ff_client): ObConfigInfo) -> Self {
         let supported_countries = ob_config.supported_countries_for_residential_address();
         let is_stepup_enabled = ob_config.is_stepup_enabled();
+        let required_auth_methods = ob_config.required_auth_methods();
 
         let ObConfiguration {
             name,
@@ -64,16 +65,6 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Document);
 
-
-        let required_auth_methods = match kind {
-            // Auth and Document playbooks don't (yet) have an opinion on which login method is used
-            ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
-            ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if is_no_phone_flow {
-                vec![AuthMethodKind::Email]
-            } else {
-                vec![AuthMethodKind::Phone]
-            }),
-        };
 
         Self {
             name,
