@@ -92,10 +92,17 @@ impl Client {
         let account_sid = self.account_sid.clone();
         let url = format!("https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json");
 
+        // temporary workaround to support UK numbers with Alphanumeric Sender ID
+        let from = if destination.leak().starts_with("+44") {
+            "Footprint".to_string()
+        } else {
+            self.from_number.to_string()
+        };
+
         let params = SendMessage {
             body: body.leak_to_string(),
             to: destination.leak_to_string(),
-            from: self.from_number.to_string(),
+            from,
             validity_period: VALIDITY_PERIOD_SECS as u64, // dont send the message after TTL
         };
 
