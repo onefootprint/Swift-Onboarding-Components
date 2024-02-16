@@ -22,7 +22,7 @@ const SOCIAL_MEDIA_BROWSER_USER_AGENTS = [
 
 for (const { label, userAgent } of SOCIAL_MEDIA_BROWSER_USER_AGENTS) {
   test.use({ userAgent, isMobile: true });
-  test(`reverse-doc.social-media-browser.${label}`, async ({
+  test(`reverse-doc.social-media-browser.${label} #ci`, async ({
     browserName,
     browser,
     page,

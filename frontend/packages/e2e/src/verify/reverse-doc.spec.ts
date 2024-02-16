@@ -10,7 +10,7 @@ import {
   waitForVerifyButton,
 } from './utils/commands';
 
-test('reverse-doc', async ({ browserName, browser, page, isMobile }) => {
+test('reverse-doc #ci', async ({ browserName, browser, page, isMobile }) => {
   // eslint-disable-next-line playwright/no-conditional-in-test
   if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
   test.setTimeout(120000);
