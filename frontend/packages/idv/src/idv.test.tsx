@@ -46,8 +46,6 @@ import {
   withOnboardingConfig,
   withOnboardingValidate,
   withRequirements,
-  withUserToken,
-  withUserTokenInsufficientScopes,
   withUserVault,
   withUserVaultValidate,
 } from './idv.test.config';
@@ -122,7 +120,7 @@ describe('<Idv />', () => {
         });
 
         it('can one-click when given an auth token', async () => {
-          withUserToken();
+          withIdentify(true, true);
           const onComplete = jest.fn();
           const onClose = jest.fn();
 
@@ -177,7 +175,7 @@ describe('<Idv />', () => {
     });
 
     it('skips identify flow when provided an auth token with proper scope', async () => {
-      withUserToken();
+      withIdentify(true, true);
       withRequirements();
 
       renderIdv({
@@ -190,7 +188,6 @@ describe('<Idv />', () => {
     });
 
     it('goes through identify flow when provided an auth token with insufficient scopes', async () => {
-      withUserTokenInsufficientScopes();
       withIdentify(true);
       withLoginChallenge(ChallengeKind.sms);
       withIdentifyVerify();
@@ -199,7 +196,7 @@ describe('<Idv />', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/Enter the 6-digit code sent to/i),
+          screen.getByText(/Log in using one of the options below/i),
         ).toBeInTheDocument();
       });
     });
@@ -228,8 +225,7 @@ describe('<Idv />', () => {
           },
           TestAuthorizeRequirement,
         ]);
-        withUserToken();
-        withIdentify(true);
+        withIdentify(true, true);
         withUserVaultValidate();
         withUserVault();
 
@@ -264,8 +260,7 @@ describe('<Idv />', () => {
         const config = getKycOnboardingConfig(true);
         withOnboarding(config);
         withOnboardingConfig(config);
-        withUserToken();
-        withIdentify(true);
+        withIdentify(true, true);
         withUserVaultValidate();
         withUserVault();
         withRequirements([
@@ -344,8 +339,7 @@ describe('<Idv />', () => {
       const config = getKycOnboardingConfig(true);
       withOnboarding(config);
       withOnboardingConfig(config);
-      withUserToken();
-      withIdentify(true);
+      withIdentify(true, true);
       withRequirements([TestAuthorizeRequirement]);
       withD2PGenerate();
       withOnboardingValidate('validation-token');
@@ -409,7 +403,7 @@ describe('<Idv />', () => {
       withOnboardingConfig(config);
       withD2PGenerate();
       withD2PStatus(D2PStatus.waiting);
-      withUserToken();
+      withIdentify(true, true);
     });
 
     it('transfers when there is an id doc requirement', async () => {

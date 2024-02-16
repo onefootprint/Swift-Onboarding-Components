@@ -33,9 +33,6 @@ const Init = () => {
         observeCollector.setAppContext({
           config,
         });
-        Logger.info(
-          `Using new identify machine: ${!!config.useNewIdentifyMachine}`,
-        );
         send({
           type: 'initContextUpdated',
           payload: {

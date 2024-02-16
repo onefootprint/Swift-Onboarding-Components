@@ -42,7 +42,6 @@ export type PublicOnboardingConfig = {
   supportPhone?: string;
   supportWebsite?: string;
   requiredAuthMethods?: AuthMethodKind[];
-  useNewIdentifyMachine?: boolean;
 };
 
 // Used in the dashboard context

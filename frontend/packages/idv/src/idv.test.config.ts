@@ -16,6 +16,7 @@ import {
   SessionStatus,
   UserTokenScope,
 } from '@onefootprint/types';
+import { AuthMethodKind } from '@onefootprint/types/src/data';
 
 // These tests take so long that a lot of them time out - this does a blanket replace on waitFor
 // to allow each step of the tests to run for a little longer
@@ -115,36 +116,39 @@ export const withDecrypt = (
     response: data,
   });
 
-export const withUserToken = () =>
-  mockRequest({
-    method: 'get',
-    path: '/hosted/user/token',
-    response: {
-      scopes: [UserTokenScope.signup, UserTokenScope.sensitiveProfile],
-    },
-  });
-
-export const withUserTokenInsufficientScopes = () =>
-  mockRequest({
-    method: 'get',
-    path: '/hosted/user/token',
-    response: {
-      scopes: [],
-    },
-  });
-
-export const withIdentify = (userFound?: boolean) =>
+export const withIdentify = (
+  userFound?: boolean,
+  sufficientScopes?: boolean,
+) => {
+  const tokenScopes = sufficientScopes
+    ? [UserTokenScope.signup, UserTokenScope.sensitiveProfile]
+    : [];
   mockRequest({
     method: 'post',
     path: '/hosted/identify',
     response: {
       user: userFound && {
         isUnverified: false,
-        availableChallengeKinds: [ChallengeKind.biometric],
+        availableChallengeKinds: [ChallengeKind.biometric, ChallengeKind.sms],
+        authMethods: [
+          { kind: AuthMethodKind.passkey, isVerified: true },
+          { kind: AuthMethodKind.phone, isVerified: true },
+        ],
         hasSyncablePasskey: true,
+        scrubbedPhoneNumber: '+1 (•••) •••-••99',
+        tokenScopes,
       },
     },
   });
+
+  mockRequest({
+    method: 'get',
+    path: '/hosted/user/token',
+    response: {
+      scopes: tokenScopes,
+    },
+  });
+};
 
 export const withLoginChallenge = (challengeKind: ChallengeKind) =>
   mockRequest({

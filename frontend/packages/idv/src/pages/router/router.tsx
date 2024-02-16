@@ -9,13 +9,12 @@ import { Identify, IdentifyVariant } from '../../components/identify';
 import { L10nContextProvider } from '../../components/l10n-provider';
 import { useIdvMachine, useLogStateMachine } from '../../hooks';
 import useValidateSession from '../../hooks/ui/use-validate-session';
-import { FPCustomEvents, getIdentifyBootstrapData, Logger } from '../../utils';
+import { FPCustomEvents, Logger } from '../../utils';
 import {
   createAuthTokenChangedPayload,
   createReceivedDeviceResponseJsonPayload,
 } from '../../utils/state-machine/utils/custom-listener';
 import ConfigInvalid from '../config-invalid';
-import IdentifyDeprecated from '../identify-deprecated';
 import Init from '../init';
 import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
@@ -111,50 +110,29 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
       {state.matches('init') && <Init />}
       {state.matches('sandboxOutcome') && <SandboxOutcome />}
-      {state.matches('identify') &&
-        config &&
-        device &&
-        !config.useNewIdentifyMachine && (
-          <L10nContextProvider l10n={l10n}>
-            <IdentifyDeprecated
-              config={config}
-              device={device}
-              sandboxId={sandboxId}
-              overallOutcome={overallOutcome}
-              initialAuthToken={authToken}
-              obConfigAuth={obConfigAuth}
-              bootstrapData={getIdentifyBootstrapData(bootstrapData)}
-              showLogo={showLogo}
-              onDone={payload => send({ type: 'identifyCompleted', payload })}
-            />
-          </L10nContextProvider>
-        )}
-      {state.matches('identify') &&
-        config &&
-        device &&
-        config.useNewIdentifyMachine && (
-          <L10nContextProvider l10n={l10n}>
-            <Identify
-              variant={IdentifyVariant.verify}
-              device={device}
-              config={config}
-              isLive={config.isLive}
-              overallOutcome={overallOutcome}
-              sandboxId={sandboxId}
-              initialAuthToken={authToken}
-              obConfigAuth={obConfigAuth}
-              userData={bootstrapData}
-              logoConfig={
-                (showLogo && {
-                  orgName: config.orgName,
-                  logoUrl: config.logoUrl || undefined,
-                }) ||
-                undefined
-              }
-              onDone={payload => send({ type: 'identifyCompleted', payload })}
-            />
-          </L10nContextProvider>
-        )}
+      {state.matches('identify') && config && device && (
+        <L10nContextProvider l10n={l10n}>
+          <Identify
+            variant={IdentifyVariant.verify}
+            device={device}
+            config={config}
+            isLive={config.isLive}
+            overallOutcome={overallOutcome}
+            sandboxId={sandboxId}
+            initialAuthToken={authToken}
+            obConfigAuth={obConfigAuth}
+            userData={bootstrapData}
+            logoConfig={
+              (showLogo && {
+                orgName: config.orgName,
+                logoUrl: config.logoUrl || undefined,
+              }) ||
+              undefined
+            }
+            onDone={payload => send({ type: 'identifyCompleted', payload })}
+          />
+        </L10nContextProvider>
+      )}
       {state.matches('onboarding') && authToken && config && device && (
         <Onboarding
           config={config}
