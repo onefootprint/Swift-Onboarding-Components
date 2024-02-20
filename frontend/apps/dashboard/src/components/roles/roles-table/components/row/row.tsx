@@ -27,7 +27,7 @@ const Row = ({ role }: RowProps) => {
       ) : (
         <td>{numActiveApiKeys}</td>
       )}
-      <td>
+      <td aria-label="scopes">
         <Scopes scopes={scopes} />
       </td>
       <td>{createdAt}</td>

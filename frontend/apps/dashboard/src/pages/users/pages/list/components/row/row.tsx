@@ -57,7 +57,7 @@ const Row = ({ entity }: RowProps) => (
         {entity.id}
       </CodeInline>
     </td>
-    <td>
+    <td aria-label="status badge">
       <StatusBadge
         status={entity.status}
         requiresManualReview={entity.requiresManualReview}
@@ -82,7 +82,7 @@ const Row = ({ entity }: RowProps) => (
         })}
       </Typography>
     </td>
-    <td>
+    <td aria-label="tags">
       <Tags entity={entity} />
     </td>
   </>

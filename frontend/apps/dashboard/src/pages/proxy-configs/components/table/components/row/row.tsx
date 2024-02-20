@@ -32,7 +32,7 @@ const Row = ({ proxyConfig }: RowProps) => {
           <Badge variant="error">{t('status.disabled')}</Badge>
         )}
       </td>
-      <td>
+      <td aria-label="actions">
         <Actions proxyConfig={proxyConfig} />
       </td>
     </>

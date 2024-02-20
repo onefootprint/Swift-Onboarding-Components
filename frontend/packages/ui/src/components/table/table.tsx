@@ -121,7 +121,7 @@ const Table = <T,>({
             {times(2).map(() => (
               <tr key={Math.random()}>
                 {times(columnsCount).map(() => (
-                  <td key={Math.random()}>
+                  <td key={Math.random()} aria-label="shimmer">
                     <Shimmer
                       aria-hidden
                       sx={{ height: '24px', width: '100%' }}

@@ -66,7 +66,7 @@ const Row = ({ playbook }: RowProps) => {
         )}
       </td>
       <td>{formatDateWithTime(new Date(createdAt))}</td>
-      <td>
+      <td aria-label="actions">
         <Actions playbook={playbook} />
       </td>
     </>

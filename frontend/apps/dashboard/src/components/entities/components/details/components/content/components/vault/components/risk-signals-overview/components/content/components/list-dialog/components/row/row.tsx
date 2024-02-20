@@ -42,7 +42,7 @@ const Row = ({ riskSignal }: RowProps) => {
           <IcoInfo16 />
         </Tooltip>
       </Stack>
-      <td>
+      <td aria-label="icon">
         <Stack justify="flex-end">
           <IcoChevronRight24 />
         </Stack>

@@ -45,8 +45,8 @@ describe('<Table />', () => {
         searchPlaceholder={searchPlaceholder}
         renderTr={() => (
           <>
-            <td />
-            <td />
+            <td aria-label="test 1" />
+            <td aria-label="test 2" />
           </>
         )}
       />,

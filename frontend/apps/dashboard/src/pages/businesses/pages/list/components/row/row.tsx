@@ -12,7 +12,7 @@ type RowProps = {
 
 const Row = ({ entity }: RowProps) => (
   <>
-    <td>
+    <td aria-label="field or placeholder">
       <FieldOrPlaceholder data={entity.decryptedAttributes[BusinessDI.name]} />
     </td>
     <td>
@@ -20,7 +20,7 @@ const Row = ({ entity }: RowProps) => (
         {entity.id}
       </CodeInline>
     </td>
-    <td>
+    <td aria-label="status badge">
       <StatusBadge status={entity.status} />
     </td>
     <td>
@@ -42,7 +42,7 @@ const Row = ({ entity }: RowProps) => (
         })}
       </Typography>
     </td>
-    <td>
+    <td aria-label="tags">
       <Tags
         onWatchlist={entity.watchlistCheck?.status === 'fail'}
         onManualReview={entity.requiresManualReview}

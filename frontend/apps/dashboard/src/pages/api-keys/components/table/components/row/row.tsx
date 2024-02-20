@@ -26,7 +26,7 @@ const Row = ({ apiKey }: RowProps) => {
   return (
     <>
       <td>{apiKey.name}</td>
-      <td>
+      <td aria-label="cell">
         <KeyCell isLoading={reveal.mutation.isLoading} value={apiKey.key} />
       </td>
       <td>{apiKey.lastUsedAt || '--'}</td>

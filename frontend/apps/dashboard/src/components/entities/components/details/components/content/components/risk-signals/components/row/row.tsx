@@ -22,7 +22,7 @@ const Row = ({ riskSignal }: RowProps) => {
 
   return (
     <>
-      <td>
+      <td aria-label="badge">
         <SeverityBadge severity={riskSignal.severity} />
       </td>
       <td>{createCapitalStringList(scopesList)}</td>
