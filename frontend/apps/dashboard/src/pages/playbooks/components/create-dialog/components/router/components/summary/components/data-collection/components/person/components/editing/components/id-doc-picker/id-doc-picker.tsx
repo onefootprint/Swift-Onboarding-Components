@@ -34,6 +34,11 @@ const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
           {...register('personal.idDocKind')}
         />
         <Checkbox
+          value={SupportedIdDocTypes.passportCard}
+          label={t('id-doc.passport_card')}
+          {...register('personal.idDocKind')}
+        />
+        <Checkbox
           value={SupportedIdDocTypes.visa}
           label={t('id-doc.visa')}
           {...register('personal.idDocKind')}
