@@ -1,12 +1,23 @@
 {
-  "continue": "Continue",
-  "email": "Email",
+  "before-email-code-confirmation": "Before we can send a code to your email, please confirm your full phone number ending in {{number}}",
   "change": "Change",
-  "phone-number": "Phone number",
-  "success": "Success",
+  "confirm-phone-number": "Confirm your phone number on file",
+  "continue": "Continue",
+  "email-is-required": "Email is required",
+  "email-placeholder": "jane.doe@acme.com",
   "email-update-success": "You've updated your email address successfully.",
+  "email": "Email",
+  "enter-email": "Enter your email address",
+  "enter-phone": "Enter your new phone number",
+  "no-access-methods-label": "Need another way?",
+  "no-access-phone-label": "Don't have access to this phone number?",
   "passkey-update-success": "Passkey update successful",
+  "phone-challenge-error-no-token": "Unable to challenge phone number without user token",
+  "phone-incorrect": "Incorrect phone",
+  "phone-number": "Phone number",
   "phone-update-success": "You've updated your phone number successfully.",
+  "send-code-to-email": "Send code to email instead",
+  "success": "Success",
   "notification": {
     "404-token-title": "Token not found",
     "404-user-description": "The user was not found or the provided token has expired. Please contact the business that sent you this link.",
@@ -45,10 +56,6 @@
     "replace-title": "Update your email",
     "add-primary-title": "Add an email address",
     "update-subtitle": "Enter your email to continue.",
-    "form": {
-      "input-placeholder": "jane.doe@acme.com",
-      "input-required": "Email is required"
-    },
     "legal-footer": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
   },
   "phone-step": {
@@ -63,14 +70,16 @@
     }
   },
   "challenge-select-or-biometric": {
-    "welcome-back-title": "Welcome back! 🎉",
-    "log-in-to-modify-details": "Log in to modify your account details",
-    "log-in-options": "Log in using one of the options below",
     "continue": "Continue",
+    "log-in-options": "Log in using one of the options below",
+    "log-in-to-modify-details": "Log in to modify your account details",
+    "log-in-with-email": "Log in with Email",
+    "log-in-with-sms": "Log in with SMS",
+    "passkey": "Log in with passkey",
     "send-code-to": "Send code to",
-    "send-code-via-sms": "Send code via SMS",
     "send-code-via-email": "Send code via email",
-    "passkey": "Log in with passkey"
+    "send-code-via-sms": "Send code via SMS",
+    "welcome-back-title": "Welcome back! 🎉"
   },
   "log-in-different-account": {
     "or": "or",

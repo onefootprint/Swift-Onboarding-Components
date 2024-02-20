@@ -10,8 +10,9 @@ import type { EmailAndOrPhone } from '../types';
 import calculateRetryTime from './get-retry-time';
 
 type ToIgnore = 'identifier' | 'preferredChallengeKind';
-type PayloadPartKey = 'obConfigAuth' | 'sandboxId' | 'authToken';
-
+type PayloadPartial = 'obConfigAuth' | 'sandboxId' | 'authToken';
+type BasePayload = Pick<Payload, PayloadPartial>;
+type RestOfPayload = Omit<Payload, PayloadPartial>;
 type Payload = Omit<LoginChallengeRequest, ToIgnore> & {
   authToken?: string;
   identifier?: EmailAndOrPhone;
@@ -64,14 +65,14 @@ const requestFn = async ({
   };
 };
 
-const useLoginChallenge = (basePayload: Pick<Payload, PayloadPartKey>) => {
+const useLoginChallenge = (basePayload: BasePayload) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({
       isResend,
       ...restOfPayload
-    }: Omit<Payload, PayloadPartKey>) => {
+    }: Partial<BasePayload> & RestOfPayload) => {
       const payload = { ...basePayload, ...restOfPayload };
       const queryKey = getQueryKeyForPayload(payload);
       const queryState =

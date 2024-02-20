@@ -17,44 +17,44 @@ import type { IdentifyVariant, LogoConfig } from './state/types';
 import type { DoneArgs } from './types';
 
 type IdentifyProps = {
-  obConfigAuth?: ObConfigAuth;
-  initialAuthToken?: string;
   config?: PublicOnboardingConfig;
   device: DeviceInfo;
+  initialAuthToken?: string;
   isLive: boolean;
-  sandboxId?: string;
-  overallOutcome?: OverallOutcome;
-  userData?: Pick<FootprintUserData, 'id.email' | 'id.phone_number'>;
   logoConfig?: LogoConfig;
-  variant: IdentifyVariant;
+  obConfigAuth?: ObConfigAuth;
   onDone: (args: DoneArgs) => void;
+  overallOutcome?: OverallOutcome;
+  sandboxId?: string;
+  userData?: Pick<FootprintUserData, 'id.email' | 'id.phone_number'>;
+  variant: IdentifyVariant;
 };
 
 // Should we move this to its own package?
 const Identify = ({
-  obConfigAuth,
-  initialAuthToken,
   config,
   device,
+  initialAuthToken,
   isLive,
-  sandboxId,
-  overallOutcome,
-  userData,
   logoConfig,
-  variant,
+  obConfigAuth,
   onDone,
+  overallOutcome,
+  sandboxId,
+  userData,
+  variant,
 }: IdentifyProps): JSX.Element | null => (
   <IdentifyMachineProvider
     args={{
-      initialAuthToken,
       bootstrapData: getIdentifyBootstrapData(userData),
       config,
-      isLive,
-      sandboxId,
-      overallOutcome,
       device,
-      obConfigAuth,
+      initialAuthToken,
+      isLive,
       logoConfig,
+      obConfigAuth,
+      overallOutcome,
+      sandboxId,
       variant,
     }}
   >

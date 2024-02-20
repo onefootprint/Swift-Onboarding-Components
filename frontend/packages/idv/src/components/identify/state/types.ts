@@ -9,33 +9,38 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
+import type { StateValue } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
 import type { EmailAndOrPhone } from '../types';
 
 export type IdentifyMachineContext = {
-  /// Optionally, the identified token used to start the flow
-  initialAuthToken?: string;
-  /// The autheticated token we yield at the end of the flow
   bootstrapData: IdentifyBootstrapData;
   challenge: MachineChallengeContext;
-  /// The identify flow may have no config if we're logging into a non-onboarding flow, like
-  /// "update login methods."
+  /** config -
+   * The identify flow may have no config if we're logging into a non-onboarding flow, like
+   * "update login methods."
+   */
   config?: PublicOnboardingConfig;
-  /// Use isLive - config isn't always provided
-  isLive: boolean;
   device: DeviceInfo;
-  identify: IdentifyResult;
+  identify: IdentifyResult & { identifyToken?: string };
+  /** initialAuthToken -
+   * Optionally, the identified token used to start the flow
+   * The authenticated token we yield at the end of the flow
+   */
+  initialAuthToken?: string;
+  /** Use isLive - config isn't always provided */
+  isLive: boolean;
+  logoConfig?: LogoConfig;
   obConfigAuth?: ObConfigAuth;
   overallOutcome?: OverallOutcome;
-  logoConfig?: LogoConfig;
   variant: IdentifyVariant;
 };
 
 export enum IdentifyVariant {
-  updateLoginMethods,
-  auth,
-  verify,
+  auth = 'auth',
+  updateLoginMethods = 'updateLoginMethods',
+  verify = 'verify',
 }
 
 export type LogoConfig = {
@@ -56,34 +61,30 @@ export type MachineChallengeContext = {
   challengeData?: ChallengeData;
 };
 
+export type NavigatedToPrevPage = {
+  type: 'navigatedToPrevPage';
+  payload?: { prev?: StateValue; curr?: StateValue };
+};
+
 export type ChallengeSucceededEvent = {
   type: 'challengeSucceeded';
-  payload: {
-    kind: AuthMethodKind;
-    authToken: string;
-  };
+  payload: { kind: AuthMethodKind; authToken: string };
 };
 
-export type IdentifiedEvent = {
-  type: 'identified';
-  payload: IdentifyResult;
-};
+export type IdentifiedEvent = { type: 'identified'; payload: IdentifyResult };
 
 export type IdentifyMachineEvents =
-  | IdentifiedEvent
   | ChallengeSucceededEvent
-  | {
-      type: 'identifiedWithSufficientScopes';
-      payload: {
-        authToken: string;
-      };
-    }
-  | { type: 'goToChallenge'; payload: ChallengeKind }
+  | IdentifiedEvent
+  | NavigatedToPrevPage
   | { type: 'authTokenInvalid' }
   | { type: 'bootstrapDataInvalid' }
   | { type: 'challengeReceived'; payload: ChallengeData }
+  | { type: 'goToChallenge'; payload: ChallengeKind }
+  | { type: 'identifiedWithSufficientScopes'; payload: { authToken: string } }
   | { type: 'identifyFailed'; payload: EmailAndOrPhone }
   | { type: 'identifyReset' }
-  | { type: 'navigatedToPrevPage' }
+  | { type: 'kbaSucceeded'; payload: { identifyToken: string } }
   | { type: 'phoneAdded'; payload: { phoneNumber: string } }
-  | { type: 'sandboxIdChanged'; payload: { sandboxId: string } };
+  | { type: 'sandboxIdChanged'; payload: { sandboxId: string } }
+  | { type: 'tryAnotherWay'; payload: ChallengeKind };

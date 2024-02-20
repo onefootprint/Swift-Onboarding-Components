@@ -17,6 +17,7 @@ export interface Typegen0 {
     assignChallengeData: 'challengeReceived';
     assignEmail: 'identifyFailed';
     assignIdentifySuccessResult: 'identified';
+    assignIdentifyToken: 'kbaSucceeded';
     assignPhone: 'identifyFailed' | 'phoneAdded';
     assignSandboxId: 'sandboxIdChanged';
     reset: 'bootstrapDataInvalid' | 'identifyReset';
@@ -37,6 +38,7 @@ export interface Typegen0 {
     | 'initBootstrap'
     | 'never'
     | 'phoneIdentification'
+    | 'phoneKbaChallenge'
     | 'smsChallenge'
     | 'success';
   tags: never;

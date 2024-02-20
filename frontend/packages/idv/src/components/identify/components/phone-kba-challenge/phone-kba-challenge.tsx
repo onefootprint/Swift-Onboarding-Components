@@ -6,53 +6,46 @@ import { useTranslation } from 'react-i18next';
 
 import { checkIsPhoneValid, getLogger } from '../../../../utils';
 import { useL10nContext } from '../../../l10n-provider';
-import { useIdentify } from '../../queries';
+import { useIdentifyKba } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';
-import getTokenScope from '../../utils/token-scope';
 import PhonePageStructure from '../phone-page-structure';
 
-type StepPhoneProps = { Header: (props: HeaderProps) => JSX.Element };
+type PhoneKbaChallengeProps = { Header: (props: HeaderProps) => JSX.Element };
 
-const { logError } = getLogger('step-phone');
+const { logError } = getLogger('phone-kba-challenge');
 
-const StepPhone = ({ Header }: StepPhoneProps) => {
+const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { phoneNumber, email, sandboxId },
-    obConfigAuth,
+    identify: { phoneNumber, user },
     config,
   } = state.context;
   const { t } = useTranslation('identify');
-  const scope = getTokenScope(state.context.variant);
-  const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
+  const mutIdentifyKba = useIdentifyKba();
   const showRequestErrorToast = useRequestErrorToast();
   const l10n = useL10nContext();
-
   const options = COUNTRIES;
 
   const handlePhoneValidation = (phone: string) =>
     checkIsPhoneValid(phone, config?.isLive === false);
 
-  const handleChangeEmail = () => send({ type: 'identifyReset' });
-
   const handleSubmit = (phoneFromForm: string) => {
-    mutIdentify.mutate(
-      { identifier: { phoneNumber: phoneFromForm } },
+    if (!user?.token) {
+      logError('Unable to challenge phone number without user token');
+      showRequestErrorToast(t('phone-challenge-error-no-token'));
+      return;
+    }
+
+    mutIdentifyKba.mutate(
+      { authToken: user.token, 'id.phone_number': phoneFromForm },
       {
-        onError: error => {
-          logError('Error while identify user on step-phone page:', error);
-          showRequestErrorToast(error);
+        onError: err => {
+          logError('Error while identify user on phone-kba-challenge', err);
+          showRequestErrorToast(t('phone-incorrect'));
         },
         onSuccess: res => {
-          send({
-            type: 'identified',
-            payload: {
-              user: res.user,
-              phoneNumber: phoneFromForm,
-              successfulIdentifier: { phoneNumber: phoneFromForm },
-            },
-          });
+          send({ type: 'kbaSucceeded', payload: { identifyToken: res.token } });
         },
       },
     );
@@ -62,17 +55,17 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
     <PhonePageStructure
       countries={options}
       defaultPhone={phoneNumber}
-      email={email}
       Header={Header}
-      isLoading={mutIdentify.isLoading}
+      isLoading={mutIdentifyKba.isLoading}
       l10n={l10n}
-      onChangeEmailClick={handleChangeEmail}
-      onSubmit={mutIdentify.isLoading ? noop : handleSubmit}
+      onSubmit={mutIdentifyKba.isLoading ? noop : handleSubmit}
       phoneValidator={handlePhoneValidation}
       texts={{
-        headerTitle: t('phone-step.title'),
-        headerSubtitle: t('phone-step.subtitle'),
-        cta: t('phone-step.verify-with-sms'),
+        headerTitle: t('confirm-phone-number'),
+        headerSubtitle: t('before-email-code-confirmation', {
+          number: user?.scrubbedPhone!.slice(-4),
+        }),
+        cta: t('continue'),
         emailChangeCta: t('change'),
         phoneInvalid: t('phone-step.form.input-invalid'),
         phoneLabel: t('phone-number'),
@@ -82,4 +75,4 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
   );
 };
 
-export default StepPhone;
+export default PhoneKbaChallenge;

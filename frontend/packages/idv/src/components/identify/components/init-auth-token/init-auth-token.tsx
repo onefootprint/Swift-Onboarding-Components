@@ -4,6 +4,7 @@ import { getLogger } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
+import getTokenScope from '../../utils/token-scope';
 import Loading from '../loading';
 
 type InitAuthTokenProps = {
@@ -19,7 +20,8 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
     obConfigAuth,
     identify: { sandboxId },
   } = state.context;
-  const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
+  const scope = getTokenScope(state.context.variant);
+  const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
 
   const identifyViaToken = async () => {
     // Identify the user via auth token and then move to the login challenge

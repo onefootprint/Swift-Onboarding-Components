@@ -5,6 +5,7 @@ import { validateBootstrapData } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
+import getTokenScope from '../../utils/token-scope';
 import Loading from '../loading';
 import { identify, identifyMutationCaller } from './utils';
 
@@ -17,8 +18,8 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
     obConfigAuth,
     identify: { sandboxId },
   } = state.context;
-
-  const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
+  const scope = getTokenScope(state.context.variant);
+  const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
   const memo = useMemo(
     () => {
       const identifyCaller = partial(identifyMutationCaller, [mutIdentify]);

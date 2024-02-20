@@ -14,15 +14,14 @@ import EmailChallenge from '../email-challenge';
 import InitAuthToken from '../init-auth-token';
 import Loading from '../loading';
 import Notification from '../notification';
+import PhoneKbaChallenge from '../phone-kba-challenge';
 import SmsChallenge from '../sms-challenge';
 import StepBootstrap from '../step-bootstrap';
 import StepEmail from '../step-email';
 import StepPhone from '../step-phone';
 import { UpdatePhone } from '../user-update';
 
-type RouterProps = {
-  onDone: (payload: DoneArgs) => void;
-};
+type RouterProps = { onDone: (payload: DoneArgs) => void };
 
 const getHeader = (
   ctx: IdentifyMachineContext,
@@ -43,40 +42,46 @@ const getHeader = (
 
 const Router = ({ onDone }: RouterProps): JSX.Element | null => {
   const [state, send] = useIdentifyMachine();
-  const isDone = state.matches('success');
+  const { context, matches } = state;
+  const { initialAuthToken, variant } = context;
+  const isDone = matches('success');
   const { t } = useTranslation('identify');
-  const Header = getHeader(state.context, getLeftNavButton(state, send));
-
-  const { initialAuthToken, variant } = state.context;
+  const Header = getHeader(context, getLeftNavButton(state, send));
 
   useEffect(() => {
-    if (isDone && state.context.challenge.authToken) {
+    if (isDone && context.challenge.authToken) {
       onDone({
-        authToken: state.context.challenge.authToken,
-        phoneNumber: state.context.identify.phoneNumber,
-        email: state.context.identify.email,
+        authToken: context.challenge.authToken,
+        phoneNumber: context.identify.phoneNumber,
+        email: context.identify.email,
       });
     }
-  }, [isDone, onDone]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    isDone,
+    onDone,
+    context.challenge.authToken,
+    context.identify.email,
+    context.identify.phoneNumber,
+  ]);
 
   if (isDone) return null;
 
-  if (state.matches('init')) {
+  if (matches('init')) {
     return <Loading />;
   }
-  if (state.matches('initBootstrap')) {
+  if (matches('initBootstrap')) {
     return <StepBootstrap />;
   }
-  if (state.matches('initAuthToken') && initialAuthToken) {
+  if (matches('initAuthToken') && initialAuthToken) {
     return <InitAuthToken authToken={initialAuthToken} />;
   }
-  if (state.matches('emailIdentification')) {
+  if (matches('emailIdentification')) {
     return <StepEmail Header={Header} />;
   }
-  if (state.matches('phoneIdentification')) {
+  if (matches('phoneIdentification')) {
     return <StepPhone Header={Header} />;
   }
-  if (state.matches('challengeSelectOrPasskey')) {
+  if (matches('challengeSelectOrPasskey')) {
     return (
       <>
         <ChallengeSelectOrPasskey Header={Header} />
@@ -84,7 +89,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
       </>
     );
   }
-  if (state.matches('smsChallenge')) {
+  if (matches('smsChallenge')) {
     return (
       <>
         <SmsChallenge Header={Header} />
@@ -92,7 +97,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
       </>
     );
   }
-  if (state.matches('emailChallenge')) {
+  if (matches('emailChallenge')) {
     return (
       <>
         <EmailChallenge Header={Header} />
@@ -100,7 +105,10 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
       </>
     );
   }
-  if (state.matches('addPhone') && state.context.challenge.authToken) {
+  if (matches('phoneKbaChallenge')) {
+    return <PhoneKbaChallenge Header={Header} />;
+  }
+  if (matches('addPhone') && state.context.challenge.authToken) {
     return (
       <UpdatePhone
         Header={Header}
@@ -113,7 +121,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
       />
     );
   }
-  if (state.matches('authTokenInvalid')) {
+  if (matches('authTokenInvalid')) {
     return (
       <Notification
         title={t('notification.404-user-title')}

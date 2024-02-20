@@ -24,8 +24,8 @@ type TComponentProps = {
 const Component = ({
   children,
   Header,
-  isLoading,
   isCtaDisabled,
+  isLoading,
   methodOptions,
   methodSelected,
   onMethodChange,
@@ -49,8 +49,8 @@ const Component = ({
       >
         {texts.cta}
       </Button>
+      {children}
     </Stack>
-    {children}
   </form>
 );
 

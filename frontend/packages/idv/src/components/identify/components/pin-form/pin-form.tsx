@@ -1,12 +1,15 @@
 import styled, { css } from '@onefootprint/styled';
 import { PinInput, Typography } from '@onefootprint/ui';
+import type { ComponentProps } from 'react';
 import React from 'react';
 
+import InlineAction from '../inline-action';
 import type { ResendButtonProps } from './components/resend-button';
 import ResendButton from './components/resend-button';
 import Success from './components/success';
 import Verifying from './components/verifying';
 
+type InlineActionProps = ComponentProps<typeof InlineAction>;
 export type PinFormProps = Omit<ResendButtonProps, 'texts'> & {
   hasError?: boolean;
   isPending?: boolean;
@@ -19,6 +22,7 @@ export type PinFormProps = Omit<ResendButtonProps, 'texts'> & {
     success: string;
     verifying: string;
   };
+  tryOtherAction?: InlineActionProps;
 };
 
 const PinForm = ({
@@ -32,6 +36,7 @@ const PinForm = ({
   resendDisabledUntil,
   texts,
   title,
+  tryOtherAction,
 }: PinFormProps) => {
   if (isSuccess) return <Success text={texts.success} />;
   if (isVerifying) return <Verifying text={texts.verifying} />;
@@ -64,6 +69,14 @@ const PinForm = ({
           resendCta: texts.resendCta,
         }}
       />
+      {tryOtherAction ? (
+        <InlineAction
+          isDisabled={tryOtherAction.isDisabled}
+          label={tryOtherAction.label}
+          labelCta={tryOtherAction.labelCta}
+          onClick={tryOtherAction.onClick}
+        />
+      ) : null}
     </StyledForm>
   );
 };
@@ -72,7 +85,7 @@ const StyledForm = styled.form`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[7]};
+    gap: ${theme.spacing[5]};
     justify-content: center;
     align-items: center;
     text-align: center;

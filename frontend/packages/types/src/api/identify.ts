@@ -16,6 +16,7 @@ export type IdentifyRequest = {
   obConfigAuth?: ObConfigAuth;
   // Sandbox IDs uniquely distinguish different users even though same email/phone
   sandboxId?: string;
+  scope?: string; // Allowed values: my1fp, onboarding, auth
 };
 
 export type IdentifiedAuthMethod = {

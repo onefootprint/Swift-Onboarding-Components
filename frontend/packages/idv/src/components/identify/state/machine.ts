@@ -3,7 +3,7 @@ import type {
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
-import { ChallengeKind } from '@onefootprint/types';
+import { ChallengeKind as Kind } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 import { AuthMethodKind } from '@onefootprint/types/src/data';
 import compose from 'lodash/fp/compose';
@@ -14,7 +14,12 @@ import { getRandomID } from '../../../utils';
 import {
   hasBootstrapTruthyValue,
   hasEmailAndPhoneNumber,
+  isEmail,
+  isEmailIdentifier,
   isNoPhoneFlow,
+  isPhoneIdentifier,
+  isPrevSmsChallenge,
+  isSms,
   isUserFoundWithSingleChallenge,
   shouldShowChallengeSelector,
 } from './predicates';
@@ -41,13 +46,7 @@ export type IdentifyMachineArgs = {
   variant: IdentifyVariant;
 };
 
-type Ignore = unknown;
-type KindPayload = { payload: ChallengeKind };
-const getKindPayload = (_: Ignore, { payload }: KindPayload) => payload;
-const isEmail = (x: unknown): x is typeof ChallengeKind.email =>
-  x === ChallengeKind.email;
-const isSms = (x: unknown): x is typeof ChallengeKind.sms =>
-  x === ChallengeKind.sms;
+const getKindPayload = (_: unknown, { payload }: { payload: Kind }) => payload;
 const isPayloadEmail = compose(isEmail, getKindPayload);
 const isPayloadSms = compose(isSms, getKindPayload);
 
@@ -63,13 +62,13 @@ const CHALLENGE_SELECTION_TRANSITIONS = [
   // Otherwise, go directly to the SMS or phone screen
   {
     cond: (_: IdentifyMachineContext, event: IdentifiedEvent) =>
-      isUserFoundWithSingleChallenge(event.payload.user, ChallengeKind.email),
+      isUserFoundWithSingleChallenge(event.payload.user, Kind.email),
     target: 'emailChallenge',
     actions: ['assignIdentifySuccessResult'],
   },
   {
     cond: (_: IdentifyMachineContext, event: IdentifiedEvent) =>
-      isUserFoundWithSingleChallenge(event.payload.user, ChallengeKind.sms),
+      isUserFoundWithSingleChallenge(event.payload.user, Kind.sms),
     target: 'smsChallenge',
     actions: ['assignIdentifySuccessResult'],
   },
@@ -87,14 +86,14 @@ const BACK_FROM_CHALLENGE_TRANSITIONS = [
   // If they were identified by email, go back to the email screen
   {
     cond: (c: IdentifyMachineContext) =>
-      'email' in (c.identify.successfulIdentifier || {}),
+      isEmailIdentifier(c.identify.successfulIdentifier),
     target: 'emailIdentification',
     actions: ['resetIdentifyState'],
   },
   // If the user had only one available challenge kind, go back to the phone input screen
   {
     cond: (c: IdentifyMachineContext) =>
-      'phoneNumber' in (c.identify.successfulIdentifier || {}),
+      isPhoneIdentifier(c.identify.successfulIdentifier),
     target: 'phoneIdentification',
     actions: ['resetIdentifyState'],
   },
@@ -173,6 +172,9 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
       tsTypes: {} as import('./machine.typegen').Typegen0, // eslint-disable-line @typescript-eslint/consistent-type-imports
       initial: 'init',
       context: getMachineArgs(args),
+      on: {
+        tryAnotherWay: [{ cond: isPayloadEmail, target: 'phoneKbaChallenge' }],
+      },
       states: {
         init: {
           always: [
@@ -277,13 +279,29 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             ],
           },
         },
+        phoneKbaChallenge: {
+          on: {
+            navigatedToPrevPage: [
+              { cond: isPrevSmsChallenge, target: 'smsChallenge' },
+              {
+                cond: c => shouldShowChallengeSelector(c, c.identify.user),
+                target: 'challengeSelectOrPasskey',
+              },
+              { target: 'emailIdentification' },
+            ],
+            kbaSucceeded: {
+              target: 'emailChallenge',
+              actions: ['assignIdentifyToken'],
+            },
+          },
+        },
         challengeSelectOrPasskey: {
           on: {
             navigatedToPrevPage: [
               // User was identified via email, so go back to the email page
               {
                 cond: ctx =>
-                  'email' in (ctx.identify.successfulIdentifier || {}),
+                  isEmailIdentifier(ctx.identify.successfulIdentifier),
                 target: 'emailIdentification',
                 actions: ['resetIdentifyState'],
               },
@@ -432,6 +450,10 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
         }),
         assignAuthToken: assign((context, event: ChallengeSucceededEvent) => {
           context.challenge.authToken = event.payload.authToken;
+          return context;
+        }),
+        assignIdentifyToken: assign((context, event) => {
+          context.identify.identifyToken = event.payload.identifyToken;
           return context;
         }),
         assignChallengeData: assign((context, event) => {

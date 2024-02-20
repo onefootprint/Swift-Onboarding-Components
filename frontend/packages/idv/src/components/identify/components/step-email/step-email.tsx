@@ -4,11 +4,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../utils';
-import EmailForm from '../../../email-form';
 import LegalFooter from '../../../legal-footer';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';
+import getTokenScope from '../../utils/token-scope';
+import EmailPageStructure from '../email-page-structure';
 
 type StepEmailProps = {
   children?: JSX.Element | null;
@@ -24,11 +25,11 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
     obConfigAuth,
   } = state.context;
   const { t } = useTranslation('identify');
-  const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
+  const scope = getTokenScope(state.context.variant);
+  const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
   const showRequestErrorToast = useRequestErrorToast();
 
-  const handleSubmit = (formData: { email: string }) => {
-    const { email: emailFromForm } = formData;
+  const handleSubmit = (emailFromForm: string) => {
     mutIdentify.mutate(
       { identifier: { email: emailFromForm } },
       {
@@ -54,25 +55,23 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
   };
 
   return (
-    <>
-      <Header
-        subtitle={t('email-step.subtitle')}
-        title={t('email-step.title')}
-      />
-      <EmailForm
-        defaultEmail={email}
-        isLoading={mutIdentify.isLoading}
-        onSubmit={mutIdentify.isLoading ? noop : handleSubmit}
-        texts={{
-          cta: t('continue'),
-          emailIsRequired: t('email-step.form.input-required'),
-          emailLabel: t('email'),
-          emailPlaceholder: t('email-step.form.input-placeholder'),
-        }}
-      />
-      <LegalFooter />
+    <EmailPageStructure
+      Header={Header}
+      Footer={<LegalFooter />}
+      onSubmit={mutIdentify.isLoading ? noop : handleSubmit}
+      defaultEmail={email}
+      isLoading={mutIdentify.isLoading}
+      texts={{
+        headerTitle: t('email-step.title'),
+        headerSubtitle: t('email-step.subtitle'),
+        cta: t('continue'),
+        emailIsRequired: t('email-is-required'),
+        emailLabel: t('email'),
+        emailPlaceholder: t('email-placeholder'),
+      }}
+    >
       {children}
-    </>
+    </EmailPageStructure>
   );
 };
 

@@ -78,7 +78,7 @@ describe('<Identify />', () => {
     if (bootstrapPhone) {
       userData[IdDI.phoneNumber] = bootstrapPhone;
     }
-    customRender(
+    return customRender(
       <Layout onClose={() => {}}>
         <Identify
           variant={IdentifyVariant.verify}
@@ -781,7 +781,9 @@ describe('<Identify />', () => {
           screen.getByText('Log in using one of the options below'),
         ).toBeInTheDocument();
       });
-      await userEvent.click(screen.getByText('Send code via email'));
+      await userEvent.click(
+        screen.getByText('Send code to piip@onefootprint.com'),
+      );
       await userEvent.click(screen.getByText('Continue'));
       await fillChallengePin();
 

@@ -4,10 +4,10 @@ import type {
   ChallengeData,
   ChallengeKind,
   Identifier,
-  IdentifyVerifyResponse,
   LoginChallengeResponse,
   SignupChallengeResponse,
 } from '@onefootprint/types';
+import type { ComponentProps } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -19,19 +19,25 @@ import {
   useSignupChallenge,
 } from '../../queries';
 import { useIdentifyMachine } from '../../state';
+import {
+  isEmailOrPhoneIdentifier,
+  isPhoneIdentifier,
+  isString,
+} from '../../state/predicates';
 import shouldRequestNewChallenge from '../../utils/should-request-challenge';
 import getTokenScope from '../../utils/token-scope';
 import PinForm from '../pin-form';
 
+type PinFormProps = Pick<ComponentProps<typeof PinForm>, 'tryOtherAction'>;
 type PinVerificationProps = {
   identifier: Identifier;
   onChallengeSucceed: (authToken: string) => void;
   onNewChallengeRequested: () => void;
   preferredChallengeKind: ChallengeKind;
   title?: string;
-};
+} & PinFormProps;
 
-const { logError } = getLogger('pin-verification');
+const { logError, logWarn } = getLogger('pin-verification');
 
 const PinVerification = ({
   identifier,
@@ -39,11 +45,12 @@ const PinVerification = ({
   onNewChallengeRequested,
   preferredChallengeKind,
   title,
+  tryOtherAction,
 }: PinVerificationProps) => {
   const [state, send] = useIdentifyMachine();
   const {
     challenge: { challengeData: data },
-    identify: { email, phoneNumber, sandboxId, user },
+    identify: { email, identifyToken, phoneNumber, sandboxId, user },
     variant,
     obConfigAuth,
   } = state.context;
@@ -54,9 +61,7 @@ const PinVerification = ({
     scope: getTokenScope(variant),
   };
   const requestError = useRequestError();
-  const { t } = useTranslation('identify', {
-    keyPrefix: 'pin-verification',
-  });
+  const { t } = useTranslation('identify', { keyPrefix: 'pin-verification' });
   const showRequestErrorToast = useRequestErrorToast();
   const mutLoginChallenge = useLoginChallenge(commonMutationProps);
   const mutSignupChallenge = useSignupChallenge(commonMutationProps);
@@ -70,12 +75,6 @@ const PinVerification = ({
   const isLoading = mutLoginChallenge.isLoading || mutSignupChallenge.isLoading;
   const isPending = isLoading || !challengeData;
   const isVerifying = mutIdentifyVerify.isLoading;
-
-  const handlePinValidationSucceeded = ({
-    authToken,
-  }: IdentifyVerifyResponse) => {
-    onChallengeSucceed(authToken);
-  };
 
   const verifyPin = (pin: string) => {
     if (!challengeData) {
@@ -92,10 +91,12 @@ const PinVerification = ({
       { challengeResponse: pin, challengeToken },
       {
         onError: error => {
-          logError('Failed to verify pin: ', error);
+          logWarn('Failed to verify pin: ', error);
           showRequestErrorToast(error);
         },
-        onSuccess: handlePinValidationSucceeded,
+        onSuccess: ({ authToken }) => {
+          onChallengeSucceed(authToken);
+        },
       },
     );
   };
@@ -133,8 +134,9 @@ const PinVerification = ({
       {
         email,
         phoneNumber:
-          ('phoneNumber' in identifier ? identifier.phoneNumber : undefined) ||
-          phoneNumber,
+          (isPhoneIdentifier(identifier)
+            ? identifier.phoneNumber
+            : undefined) || phoneNumber,
       },
       {
         onError: (error: unknown) => {
@@ -142,7 +144,7 @@ const PinVerification = ({
             logError(
               'Entered signup challenge when the user already has a vault. Initiating login challenge',
             );
-            initiateLoginChallenge();
+            initiatePhoneOrEmailLoginChallenge();
             return;
           }
           logError('Failed to initiate signup challenge: ', error);
@@ -153,19 +155,23 @@ const PinVerification = ({
     );
   };
 
-  const initiateLoginChallenge = () => {
+  const initiatePhoneOrEmailLoginChallenge = () => {
     if (mutLoginChallenge.isLoading) {
       return;
     }
 
     // We'll be able to simplify this soon with the token-based login challenges
-    const loginIdentifier =
-      'email' in identifier || 'phoneNumber' in identifier
-        ? identifier
-        : undefined;
+    const conditionalPayload = isString(identifyToken)
+      ? { authToken: identifyToken }
+      : {
+          identifier: isEmailOrPhoneIdentifier(identifier)
+            ? identifier
+            : undefined,
+        };
+
     mutLoginChallenge.mutate(
       {
-        identifier: loginIdentifier,
+        ...conditionalPayload,
         isResend: !!challengeData, // Check whether is resend, but isResend state might not have updated yet
         preferredChallengeKind,
       },
@@ -179,38 +185,27 @@ const PinVerification = ({
     );
   };
 
-  const initiateChallenge = () => {
+  const handleRequestChallenge = () => {
+    const canSendNewRequest = shouldRequestNewChallenge(
+      challengeData,
+      preferredChallengeKind,
+    );
+    if (!canSendNewRequest) return;
+
     if (!identifier) {
       logError('No identifier found while initiating challenge');
       return;
     }
 
     if (user) {
-      initiateLoginChallenge();
+      initiatePhoneOrEmailLoginChallenge();
     } else {
       initiateSignupChallenge();
     }
   };
 
-  const handleResend = () => {
-    const shouldResend = shouldRequestNewChallenge(
-      challengeData,
-      preferredChallengeKind,
-    );
-    if (shouldResend) {
-      initiateChallenge();
-    }
-  };
-
   useEffectOnceStrict(() => {
-    // Initiate a challenge if there is no challenge data or it is stale
-    const shouldInitiateChallenge = shouldRequestNewChallenge(
-      challengeData,
-      preferredChallengeKind,
-    );
-    if (shouldInitiateChallenge) {
-      initiateChallenge();
-    }
+    handleRequestChallenge();
   });
 
   return (
@@ -221,9 +216,10 @@ const PinVerification = ({
       isSuccess={mutIdentifyVerify.isSuccess}
       isVerifying={isVerifying}
       onComplete={verifyPin}
-      onResend={handleResend}
+      onResend={handleRequestChallenge}
       resendDisabledUntil={challengeData?.retryDisabledUntil}
       title={title}
+      tryOtherAction={tryOtherAction}
       texts={{
         codeError: t('incorrect-code'),
         resendCountDown: t('resend-countdown'),

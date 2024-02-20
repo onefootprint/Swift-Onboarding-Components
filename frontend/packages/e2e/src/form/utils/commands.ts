@@ -45,7 +45,9 @@ export const waitForFormLoad = async ({
   await page.waitForLoadState();
 
   const header = frame.getByText('Card information').first();
-  await header.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
+  await header
+    .waitFor({ state: 'attached', timeout: 15000 })
+    .catch(() => false);
 
   return frame;
 };

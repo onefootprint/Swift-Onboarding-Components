@@ -129,6 +129,18 @@ describe('Identify Machine Tests', () => {
         user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
+
+      state = machine.send({
+        type: 'tryAnotherWay',
+        payload: ChallengeKind.email,
+      });
+      expect(state.value).toEqual('phoneKbaChallenge');
+
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+        payload: { prev: 'challengeSelectOrPasskey' },
+      });
+      expect(state.value).toEqual('challengeSelectOrPasskey');
     });
 
     it('successfully ids the user using phone number, after email mismatch, starts sms challenge', () => {
@@ -477,6 +489,18 @@ describe('Identify Machine Tests', () => {
         phoneNumber: '+15555550100',
         successfulIdentifier: undefined,
         user: undefined,
+      });
+      expect(state.value).toEqual('smsChallenge');
+
+      state = machine.send({
+        type: 'tryAnotherWay',
+        payload: ChallengeKind.email,
+      });
+      expect(state.value).toEqual('phoneKbaChallenge');
+
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+        payload: { prev: 'smsChallenge' },
       });
       expect(state.value).toEqual('smsChallenge');
     });

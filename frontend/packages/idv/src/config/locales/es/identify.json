@@ -1,12 +1,23 @@
 {
-  "continue": "Continuar",
-  "email": "Correo electrónico",
+  "before-email-code-confirmation": "Antes de que podamos enviar un código a su correo electrónico, confirme su número de teléfono completo terminado en {{number}}",
   "change": "Cambiar",
-  "phone-number": "Número de teléfono",
-  "success": "Éxito",
+  "confirm-phone-number": "Confirme su número de teléfono registrado",
+  "continue": "Continuar",
+  "email-is-required": "Correo electrónico es un campo requerido",
+  "email-placeholder": "jane.doe@acme.com",
   "email-update-success": "Has actualizado tu dirección de correo electrónico exitosamente.",
+  "email": "Correo electrónico",
+  "enter-email": "Introduce tu correo electrónico",
+  "enter-phone": "Introduce tu número de teléfono",
+  "no-access-methods-label": "¿Necesita otra manera?",
+  "no-access-phone-label": "¿No tienes acceso a este número de teléfono?",
   "passkey-update-success": "Has actualizado tu Passkey exitosamente.",
+  "phone-challenge-error-no-token": "No se puede desafiar el número de teléfono sin un token de usuario",
+  "phone-incorrect": "Teléfono incorrecto",
+  "phone-number": "Número de teléfono",
   "phone-update-success": "Has actualizado tu número de teléfono exitosamente.",
+  "send-code-to-email": "Enviar código al correo electrónico",
+  "success": "Éxito",
   "notification": {
     "404-token-title": "Token no encontrado",
     "404-user-description": "No hemos encontrado un usuario con estos datos, o el token proporcionado ha expirado. Por favor, contacta a quienes te enviaron este enlace e inténtalo de nuevo.",
@@ -45,10 +56,6 @@
     "replace-title": "Acutalizar tu correo electrónico",
     "add-primary-title": "Agregar un correo electrónico",
     "update-subtitle": "Introduce tu correo electrónico para continuar.",
-    "form": {
-      "input-placeholder": "jane.doe@acme.com",
-      "input-required": "Correo electrónico es un campo requerido"
-    },
     "legal-footer": "Al continuar, acepto los <termsLink>Términos de servicio</termsLink> y reconozco la <privacyPolicyLink>Política de privacidad</privacyPolicyLink>."
   },
   "phone-step": {
@@ -63,14 +70,16 @@
     }
   },
   "challenge-select-or-biometric": {
-    "welcome-back-title": "¡Bienvenido nuevamente! 🎉",
-    "log-in-to-modify-details": "Inicia sesión para modificar los detalles de tu cuenta",
-    "log-in-options": "Inicia sesión usando una de las siguientes opciones",
     "continue": "Continuar",
+    "log-in-options": "Inicia sesión usando una de las siguientes opciones",
+    "log-in-to-modify-details": "Inicia sesión para modificar los detalles de tu cuenta",
+    "log-in-with-email": "Iniciar sesión con correo electrónico",
+    "log-in-with-sms": "Iniciar sesión con SMS",
+    "passkey": "Iniciar sesión con Passkeys",
     "send-code-to": "Enviar código a",
-    "send-code-via-sms": "Enviar código por SMS",
     "send-code-via-email": "Enviar código por correo electrónico",
-    "passkey": "Iniciar sesión con Passkey"
+    "send-code-via-sms": "Enviar código por SMS",
+    "welcome-back-title": "¡Bienvenido nuevamente! 🎉"
   },
   "log-in-different-account": {
     "or": "o",

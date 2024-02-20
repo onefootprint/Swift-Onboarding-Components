@@ -1,0 +1,27 @@
+import { ChallengeKind as Kind } from '@onefootprint/types';
+import type { TFunction } from 'i18next';
+import { useMemo } from 'react';
+
+import { useIdentifyMachine } from '../state';
+import { hasEmailMethodUnVerified } from '../state/predicates';
+
+const useTryAnotherWay = (t: TFunction<'identify'>) => {
+  const [state, send] = useIdentifyMachine();
+  const { user } = state.context.identify;
+
+  const action = useMemo(
+    () =>
+      hasEmailMethodUnVerified(user)
+        ? {
+            label: t('no-access-methods-label'),
+            labelCta: t('send-code-to-email'),
+            onClick: () => send({ type: 'tryAnotherWay', payload: Kind.email }),
+          }
+        : undefined,
+    [send, user, t],
+  );
+
+  return action;
+};
+
+export default useTryAnotherWay;

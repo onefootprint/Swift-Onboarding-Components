@@ -51,9 +51,9 @@ const UpdateEmail = ({
           }}
           texts={{
             cta: t('continue'),
-            emailIsRequired: t('email-step.form.input-required'),
+            emailIsRequired: t('email-is-required'),
             emailLabel: t('email'),
-            emailPlaceholder: t('email-step.form.input-placeholder'),
+            emailPlaceholder: t('email-placeholder'),
           }}
         />
       </Stack>

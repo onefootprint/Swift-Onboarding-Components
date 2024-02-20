@@ -3,14 +3,18 @@ import type { IdentifyRequest, IdentifyResponse } from '@onefootprint/types';
 import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-type PayloadPartKey = 'obConfigAuth' | 'sandboxId';
+type PayloadPartial = 'obConfigAuth' | 'sandboxId' | 'scope';
+type BasePayload = Pick<IdentifyRequest, PayloadPartial>;
+type RestOfPayload = Omit<IdentifyRequest, PayloadPartial>;
+
 const requestFn = async ({
   identifier,
   obConfigAuth,
   sandboxId,
+  scope,
 }: IdentifyRequest) => {
   const headers: Record<string, string> = { ...obConfigAuth };
-  const data: Partial<IdentifyRequest> = {};
+  const data: Partial<IdentifyRequest> = { scope };
 
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
@@ -40,9 +44,9 @@ const requestFn = async ({
   return response.data;
 };
 
-const useIdentify = (basePayload: Pick<IdentifyRequest, PayloadPartKey>) =>
+const useIdentify = (basePayload: BasePayload) =>
   useMutation({
-    mutationFn: (restOfPayload: Omit<IdentifyRequest, PayloadPartKey>) =>
+    mutationFn: (restOfPayload: Partial<BasePayload> & RestOfPayload) =>
       requestFn({ ...basePayload, ...restOfPayload }),
   });
 

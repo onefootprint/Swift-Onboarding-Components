@@ -8,7 +8,10 @@
       "title": "Datos enviados!",
       "subtitle-with-kyb": "Gracias por usar Footprint para verificar su negocio y su identidad.",
       "subtitle": "Gracias por usar Footprint para verificar su identidad.",
-      "cta": "Regresar al sitio"
+      "cta": {
+        "browser": "Volver al sitio",
+        "webview": "Continuar en la aplicación"
+      }
     }
   }
 }

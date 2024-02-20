@@ -6,8 +6,16 @@ const getLeftNavButton = (
   state: IdentifyMachineHook[0],
   send: IdentifyMachineHook[1],
 ): NavigationHeaderLeftButtonProps => {
-  const { bootstrapData } = state.context;
-  const onBack = () => send({ type: 'navigatedToPrevPage' });
+  const { context, history, matches } = state;
+  const { bootstrapData } = context;
+  const onBack = () =>
+    send({
+      type: 'navigatedToPrevPage',
+      payload: {
+        prev: history?.value,
+        curr: state.value,
+      },
+    });
   const CLOSE = { variant: 'close' } as const;
   const BACK = { variant: 'back', onBack } as const;
 
@@ -16,36 +24,36 @@ const getLeftNavButton = (
   const identifyStartedWithBootstrapOrAuthToken =
     bootstrapData?.email ||
     bootstrapData?.phoneNumber ||
-    state.context.initialAuthToken;
+    context.initialAuthToken;
 
   // When true, there is a challenge selector screen before the SMS and email challenge screens
   const hasChallengeSelector = shouldShowChallengeSelector(
-    state.context,
-    state.context.identify.user,
+    context,
+    context.identify.user,
   );
 
-  if (state.matches('smsChallenge')) {
+  if (matches('smsChallenge')) {
     if (hasChallengeSelector) {
       return BACK;
     }
     return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
   }
-  if (state.matches('emailChallenge')) {
+  if (matches('emailChallenge')) {
     if (hasChallengeSelector) {
       return BACK;
     }
     return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
   }
-  if (state.matches('challengeSelectOrPasskey')) {
+  if (matches('challengeSelectOrPasskey')) {
     return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
   }
-  if (state.matches('phoneIdentification')) {
+  if (matches('phoneIdentification')) {
     return BACK;
   }
-  if (state.matches('emailIdentification')) {
+  if (matches('emailIdentification')) {
     return CLOSE;
   }
-  if (state.matches('addPhone')) {
+  if (matches('addPhone')) {
     return CLOSE;
   }
 

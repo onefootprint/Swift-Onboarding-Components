@@ -1,25 +1,47 @@
 import styled, { css } from '@onefootprint/styled';
-import type { Identifier as IdvIdentifier } from '@onefootprint/types';
-import { AuthMethodKind, ChallengeKind } from '@onefootprint/types/src/data';
+import type {
+  ChallengeData,
+  Identifier as IdvIdentifier,
+} from '@onefootprint/types';
+import { ChallengeKind as Kind } from '@onefootprint/types';
+import { AuthMethodKind } from '@onefootprint/types/src/data';
 import { useToast } from '@onefootprint/ui';
+import type { TFunction } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getScrubbedPhoneNumber } from '../../../../utils';
 import useGetHeaderText from '../../hooks/use-get-header-text';
+import useTryAnotherWay from '../../hooks/use-try-another-way';
+import type { IdentifyResult } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';
 import PinVerification from '../pin-verification';
 
-type SmsChallengeProps = {
-  children?: JSX.Element | null;
-  Header: (props: HeaderProps) => JSX.Element;
-};
+type SmsChallengeProps = { Header: (props: HeaderProps) => JSX.Element };
 
 const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
-const SmsChallenge = ({ children, Header }: SmsChallengeProps) => {
+const getFormTitle = (
+  t: TFunction<'identify'>,
+  challengeData: ChallengeData | undefined,
+  identify: IdentifyResult,
+): string => {
+  const scrubbedPhoneNumber = getScrubbedPhoneNumber({
+    challengeData,
+    phoneNumber: identify.phoneNumber,
+    successfulIdentifier: identify.successfulIdentifier as
+      | IdvIdentifier
+      | undefined,
+  });
+
+  return scrubbedPhoneNumber
+    ? t('sms-challenge.prompt-with-phone', { scrubbedPhoneNumber })
+    : t('sms-challenge.prompt-without-phone');
+};
+
+const SmsChallenge = ({ Header }: SmsChallengeProps) => {
   const [state, send] = useIdentifyMachine();
   const {
     challenge: { challengeData },
@@ -27,23 +49,10 @@ const SmsChallenge = ({ children, Header }: SmsChallengeProps) => {
   } = state.context;
   const { phoneNumber = '', successfulIdentifier } = identify;
   const { t } = useTranslation('identify');
+  const tryAnotherWay = useTryAnotherWay(t);
   const toast = useToast();
   const headerTitle = useGetHeaderText();
-
-  const getFormTitle = (): string => {
-    const scrubbedPhoneNumber = getScrubbedPhoneNumber({
-      challengeData,
-      phoneNumber: identify.phoneNumber,
-      successfulIdentifier: identify.successfulIdentifier as
-        | IdvIdentifier
-        | undefined,
-    });
-
-    return scrubbedPhoneNumber
-      ? t('sms-challenge.prompt-with-phone', { scrubbedPhoneNumber })
-      : t('sms-challenge.prompt-without-phone');
-  };
-  const formTitle = getFormTitle();
+  const formTitle = getFormTitle(t, challengeData, identify);
 
   const handleChallengeSucceed = (authToken: string) => {
     setTimeout(() => {
@@ -68,9 +77,9 @@ const SmsChallenge = ({ children, Header }: SmsChallengeProps) => {
         identifier={successfulIdentifier ?? { phoneNumber }}
         onChallengeSucceed={handleChallengeSucceed}
         onNewChallengeRequested={handleNewChallengeRequested}
-        preferredChallengeKind={ChallengeKind.sms}
+        preferredChallengeKind={Kind.sms}
+        tryOtherAction={tryAnotherWay}
       />
-      {children}
     </Container>
   );
 };
@@ -81,7 +90,9 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: ${theme.spacing[7]};
+    > :first-child /* Header */ {
+      margin-bottom: ${theme.spacing[8]};
+    }
   `}
 `;
 
