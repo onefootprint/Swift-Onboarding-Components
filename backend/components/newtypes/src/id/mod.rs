@@ -24,11 +24,36 @@ macro_rules! define_newtype_id {
             serde::Serialize,
             serde::Deserialize,
             Default,
-            DieselNewType,
             derive_more::Deref,
+            diesel::expression::AsExpression,
+            diesel::deserialize::FromSqlRow,
         )]
         #[serde(transparent)]
+        #[diesel(sql_type = diesel::sql_types::Text)]
         pub struct $name(pub(in crate::id) $type);
+
+        impl<DB> diesel::serialize::ToSql<diesel::sql_types::Text, DB> for $name
+        where
+            DB: diesel::backend::Backend,
+            $type: diesel::serialize::ToSql<diesel::sql_types::Text, DB>,
+        {
+            fn to_sql<'b>(
+                &'b self,
+                out: &mut diesel::serialize::Output<'b, '_, DB>,
+            ) -> diesel::serialize::Result {
+                self.0.to_sql(out)
+            }
+        }
+
+        impl<DB> diesel::deserialize::FromSql<diesel::sql_types::Text, DB> for $name
+        where
+            DB: diesel::backend::Backend,
+            $type: diesel::deserialize::FromSql<diesel::sql_types::Text, DB>,
+        {
+            fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+                Ok(Self::from(<$type>::from_sql(bytes)?))
+            }
+        }
 
         impl paperclip::v2::schema::TypedData for $name {
             fn data_type() -> paperclip::v2::models::DataType {
@@ -87,6 +112,7 @@ use impl_verified_prefix_for_nt_id;
 
 #[cfg(test)]
 mod tests {
+    use diesel::prelude::*;
     use std::str::FromStr;
 
     use super::*;
@@ -119,5 +145,26 @@ mod tests {
         let _ = TestId::parse_with_prefix("abcd_ab_a2112@@$$dfdf").expect_err("failed to fail id");
         let _ = TestId::parse_with_prefix("abcd_ab_a2112@@$$dfdf").expect_err("failed to fail id");
         let _ = TestId::parse_with_prefix("abcd_ab_").expect_err("failed to fail id");
+    }
+
+    #[test]
+    fn test_refs() {
+        define_newtype_id!(TestId, String, "");
+
+        table! {
+            gadget {
+                id -> Text,
+                val -> Text,
+            }
+        }
+
+        #[derive(Debug, Hash, PartialEq, Eq, Clone, Insertable)]
+        #[diesel(table_name = gadget)]
+        struct NewGadget<'a> {
+            pub id: &'a TestId,
+            pub val: &'a str,
+        }
+
+        // Just check that it compiles.
     }
 }
