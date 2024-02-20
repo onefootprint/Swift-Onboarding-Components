@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 
+import { isUndefined } from '../../../../../utils/type-guards';
 import useHandleCameraError from '../../../hooks/use-handle-camera-error';
 import type { CameraKind } from '../utils/get-camera-options';
 import getCameraOptions from '../utils/get-camera-options';
-
-const isUndefined = (x: unknown): x is 'undefined' => typeof x === 'undefined';
 
 const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
   const onCameraError = useHandleCameraError();

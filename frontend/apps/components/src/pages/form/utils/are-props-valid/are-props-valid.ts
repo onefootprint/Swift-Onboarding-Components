@@ -1,7 +1,5 @@
 import type { FootprintFormDataProps } from '@onefootprint/footprint-js';
-import { Logger } from '@onefootprint/idv';
-
-const isObject = (obj: unknown) => typeof obj === 'object';
+import { isObject, Logger } from '@onefootprint/idv';
 
 const arePropsValid = (
   props?: Record<string, unknown>,

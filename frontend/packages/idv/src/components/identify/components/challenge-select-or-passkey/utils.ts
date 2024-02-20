@@ -4,7 +4,11 @@ import { ChallengeKind } from '@onefootprint/types';
 import type { TFunction } from 'i18next';
 
 import type { DeviceInfo } from '../../../../hooks';
-import { isEmailIdentifier, isPhoneIdentifier } from '../../state/predicates';
+import {
+  isBiometric,
+  isEmailIdentifier,
+  isPhoneIdentifier,
+} from '../../../../utils';
 import type { IdentifyResult } from '../../state/types';
 import { IdentifyVariant } from '../../state/types';
 
@@ -21,9 +25,6 @@ const challengePriority: Record<ChallengeKind, number> = {
   [ChallengeKind.sms]: 1,
   [ChallengeKind.email]: 2,
 };
-
-export const isBiometric = (x: unknown): x is ChallengeKind.biometric =>
-  x === ChallengeKind.biometric;
 
 const sortChallenges = (a: ChallengeKind, b: ChallengeKind) =>
   challengePriority[a] - challengePriority[b];

@@ -4,18 +4,14 @@ import type { ComponentProps, FormEvent } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isBiometric } from '../../../../utils';
 import useGetHeaderText from '../../hooks/use-get-header-text';
 import useTryAnotherWay from '../../hooks/use-try-another-way';
 import { useIdentifyMachine } from '../../state';
 import InlineAction from '../inline-action';
 import Component from './component';
 import useRunPasskey from './hooks/run-passkey';
-import {
-  getChallengeTitleByKind,
-  getMethods,
-  getSubTitle,
-  isBiometric,
-} from './utils';
+import { getChallengeTitleByKind, getMethods, getSubTitle } from './utils';
 
 type InnerComponentProps = ComponentProps<typeof Component>;
 type ChallengeSelectOrPasskeyProps = Pick<InnerComponentProps, 'Header'>;

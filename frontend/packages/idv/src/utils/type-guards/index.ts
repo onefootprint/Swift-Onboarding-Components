@@ -1,0 +1,16 @@
+export {
+  hasEmailAndPhoneNumber,
+  isAuth,
+  isBiometric,
+  isEmail,
+  isEmailIdentifier,
+  isEmailOrPhoneIdentifier,
+  isError,
+  isFunction,
+  isObject,
+  isPhoneIdentifier,
+  isSms,
+  isString,
+  isStringValid,
+  isUndefined,
+} from './type-guards';

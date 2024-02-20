@@ -1,10 +1,8 @@
-import { isValidTokenFormat } from '@onefootprint/idv';
+import { isString, isValidTokenFormat } from '@onefootprint/idv';
 import request from '@onefootprint/request';
 import type { AuthMethodKind } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-
-import { isString } from '@/src/utils';
 
 export type UserAuthMethodsResponse = {
   canUpdate: boolean;

@@ -10,16 +10,18 @@ import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
-import { getRandomID } from '../../../utils';
 import {
-  hasBootstrapTruthyValue,
+  getRandomID,
   hasEmailAndPhoneNumber,
   isEmail,
   isEmailIdentifier,
-  isNoPhoneFlow,
   isPhoneIdentifier,
-  isPrevSmsChallenge,
   isSms,
+} from '../../../utils';
+import {
+  hasBootstrapTruthyValue,
+  isNoPhoneFlow,
+  isPrevSmsChallenge,
   isUserFoundWithSingleChallenge,
   shouldShowChallengeSelector,
 } from './predicates';

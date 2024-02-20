@@ -14,10 +14,10 @@ import {
   fromUSDateToISO8601Format,
   strInputToUSDate,
 } from '../../../../../../utils/string';
+import { isString } from '../../../../../../utils/type-guards';
 import allAttributes from '../../../../utils/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 
-const isString = (x: unknown): x is string => typeof x === 'string';
 const isDate = (di: string) =>
   di === IdDI.dob || di === IdDI.visaExpirationDate;
 

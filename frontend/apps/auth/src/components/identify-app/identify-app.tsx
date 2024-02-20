@@ -5,7 +5,7 @@ import {
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import type { DeviceInfo } from '@onefootprint/idv';
-import { Logger, useDeviceInfo } from '@onefootprint/idv';
+import { isAuth, Logger, useDeviceInfo } from '@onefootprint/idv';
 import type { DoneArgs } from '@onefootprint/idv/src/components/identify';
 import {
   Identify,
@@ -22,7 +22,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useOnboardingValidate } from '@/src/queries';
-import { isAuth, isSdkUrlAllowed } from '@/src/utils';
+import { isSdkUrlAllowed } from '@/src/utils';
 
 import { useFootprintProvider } from '../../provider-footprint';
 import useProps from '../../provider-footprint/hooks/use-props';

@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
 
 import type { FootprintRenderDataProps } from '@onefootprint/footprint-js';
+import { isObject, isString, isStringValid } from '@onefootprint/idv';
 
 import isValidDI from '../is-valid-di';
-
-const isObject = (obj: unknown) => typeof obj === 'object';
 
 const arePropsValid = (
   props?: Record<string, unknown>,
@@ -17,15 +16,14 @@ const arePropsValid = (
   const { authToken, id, label, canCopy, defaultHidden, showHiddenToggle } =
     props;
 
-  const isAuthTokenValid = typeof authToken === 'string' && !!authToken;
+  const isAuthTokenValid = isStringValid(authToken);
   if (!isAuthTokenValid) console.error('Valid auth token is required.');
 
-  const isIdValid = typeof id === 'string' && !!id && isValidDI(id);
+  const isIdValid = isStringValid(id) && isValidDI(id);
   if (!isIdValid)
     console.error('Id has to be a valid data identifier, received: ', id);
 
-  const isLabelValid =
-    typeof label === 'string' || typeof label === 'undefined';
+  const isLabelValid = isString(label) || typeof label === 'undefined';
   if (!isLabelValid) console.error('Label must be a string or undefined.');
 
   const isCanCopyValid =

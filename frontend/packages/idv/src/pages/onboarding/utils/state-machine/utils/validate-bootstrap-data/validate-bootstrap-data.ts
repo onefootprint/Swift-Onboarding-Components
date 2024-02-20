@@ -11,18 +11,15 @@ import { isFuture } from 'date-fns';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import { validate as isEmail } from 'isemail';
 
+import { isObject, isStringValid } from '../../../../../../utils';
 import Logger from '../../../../../../utils/logger';
 import {
   fromUSDateToISO8601Format,
   strInputToUSDate,
 } from '../../../../../../utils/string';
 
-const isObject = (obj: unknown): obj is Object =>
-  typeof obj === 'object' && !!obj;
-const isValidString = (x: unknown): boolean =>
-  typeof x === 'string' && x.length > 0;
 const getIsoDateString = (dateStr: string, locale: SupportedLocale) => {
-  if (!isValidString(dateStr)) {
+  if (!isStringValid(dateStr)) {
     return undefined;
   }
   let isoDate;
@@ -43,10 +40,10 @@ const validateUserData = (
   }
 
   const isEmailValid = (email: string) =>
-    isValidString(email) && isEmail(email);
+    isStringValid(email) && isEmail(email);
 
   const isPhoneValid = (phoneNumber: string) => {
-    if (!isValidString(phoneNumber)) {
+    if (!isStringValid(phoneNumber)) {
       return false;
     }
     const phoneUtils = PhoneNumberUtil.getInstance();
@@ -94,35 +91,35 @@ const validateUserData = (
   const isSsn9Valid = (ssn9: string) => {
     const ssn9Regex =
       /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/;
-    return isValidString(ssn9) && ssn9Regex.test(ssn9);
+    return isStringValid(ssn9) && ssn9Regex.test(ssn9);
   };
 
   const isSsn4Valid = (ssn4: string) => {
     const ssn4Regex = /^((?!(0000))\d{4})$/;
-    return isValidString(ssn4) && ssn4Regex.test(ssn4);
+    return isStringValid(ssn4) && ssn4Regex.test(ssn4);
   };
 
   const isAddressLine1Valid = (addressLine1: string) => {
     const addressLine1Regex = /^(?!p\.?o\.?\s*?(?:box)?\s*?[0-9]+?).*$/i;
-    return isValidString(addressLine1) && addressLine1Regex.test(addressLine1);
+    return isStringValid(addressLine1) && addressLine1Regex.test(addressLine1);
   };
 
   const isStateValid = (state: string, country?: string): boolean => {
     if (country === 'US') {
       return STATES.some(elem => elem.value === state);
     }
-    return isValidString(state);
+    return isStringValid(state);
   };
 
   const isCitizenshipsValid = (citizenships: string) =>
     Array.isArray(citizenships) && citizenships.every(c => isCountryCode(c));
 
   const isVisaKindValid = (visaKind: string) =>
-    isValidString(visaKind) &&
+    isStringValid(visaKind) &&
     Object.values(VisaKind).includes(visaKind as VisaKind);
 
   const isUsLegalStatusValid = (status: string) =>
-    isValidString(status) &&
+    isStringValid(status) &&
     Object.values(UsLegalStatus).includes(status as UsLegalStatus);
 
   const isVisaExpirationDateValid = (dateStr: string) => {
@@ -144,12 +141,12 @@ const validateUserData = (
     [IdDI.ssn9]: isSsn9Valid,
     [IdDI.ssn4]: isSsn4Valid,
     [IdDI.addressLine1]: isAddressLine1Valid,
-    [IdDI.addressLine2]: isValidString,
-    [IdDI.city]: isValidString,
+    [IdDI.addressLine2]: isStringValid,
+    [IdDI.city]: isStringValid,
     [IdDI.state]: (state: string, country?: string) =>
       isStateValid(state, country),
     [IdDI.country]: isCountryCode,
-    [IdDI.zip]: isValidString,
+    [IdDI.zip]: isStringValid,
     [IdDI.usLegalStatus]: isUsLegalStatusValid,
     [IdDI.citizenships]: isCitizenshipsValid,
     [IdDI.nationality]: isCountryCode,

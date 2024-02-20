@@ -1,6 +1,5 @@
 import {
   hasEmailMethodUnVerified,
-  isEmailOrPhoneIdentifier,
   shouldShowChallengeSelector,
 } from './predicates';
 
@@ -34,21 +33,5 @@ describe('hasEmailMethodUnVerified', () => {
     { user: { authMethods: [{ kind: 'email', isVerified: false }] }, x: true },
   ])('case %#', ({ user, x }) => {
     expect(hasEmailMethodUnVerified(user as unknown as User)).toEqual(x);
-  });
-});
-
-describe('isEmailOrPhoneIdentifier', () => {
-  type Args = Parameters<typeof isEmailOrPhoneIdentifier>;
-  type Ctx = Args[0];
-
-  it.each([
-    { o: { email: undefined }, x: false },
-    { o: { email: '' }, x: false },
-    { o: { email: 'string' }, x: true },
-    { o: { phoneNumber: undefined }, x: false },
-    { o: { phoneNumber: '' }, x: false },
-    { o: { phoneNumber: 'string' }, x: true },
-  ])('case %#', ({ o, x }) => {
-    expect(isEmailOrPhoneIdentifier(o as Ctx)).toEqual(x);
   });
 });

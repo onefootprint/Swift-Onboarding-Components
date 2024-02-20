@@ -11,7 +11,12 @@ import type { ComponentProps } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getLogger } from '../../../../utils';
+import {
+  getLogger,
+  isEmailOrPhoneIdentifier,
+  isPhoneIdentifier,
+  isStringValid,
+} from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import {
   useIdentifyVerify,
@@ -19,11 +24,6 @@ import {
   useSignupChallenge,
 } from '../../queries';
 import { useIdentifyMachine } from '../../state';
-import {
-  isEmailOrPhoneIdentifier,
-  isPhoneIdentifier,
-  isString,
-} from '../../state/predicates';
 import shouldRequestNewChallenge from '../../utils/should-request-challenge';
 import getTokenScope from '../../utils/token-scope';
 import PinForm from '../pin-form';
@@ -161,7 +161,7 @@ const PinVerification = ({
     }
 
     // We'll be able to simplify this soon with the token-based login challenges
-    const conditionalPayload = isString(identifyToken)
+    const conditionalPayload = isStringValid(identifyToken)
       ? { authToken: identifyToken }
       : {
           identifier: isEmailOrPhoneIdentifier(identifier)

@@ -1,11 +1,12 @@
 import type { BiometricLoginChallengeJson } from '@onefootprint/types';
 import base64url from 'base64url';
 
-type Obj = Record<string, unknown>;
+import {
+  isError,
+  isObject,
+  isString,
+} from '../../../../../../../../../../utils';
 
-const isError = (x: unknown): x is Error => x instanceof Error;
-const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
-const isString = (x: unknown): x is string => typeof x === 'string';
 const isWebAuthApiSupported = (): boolean =>
   typeof PublicKeyCredential !== 'undefined' &&
   typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable ===

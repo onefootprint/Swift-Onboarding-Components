@@ -1,6 +1,5 @@
+import { isObject, isString } from '@onefootprint/idv';
 import type { Assigner } from 'xstate';
-
-import { isObject, isString } from '@/src/utils';
 
 import type { UserMachineContext, UserMachineEvents as Events } from './types';
 
