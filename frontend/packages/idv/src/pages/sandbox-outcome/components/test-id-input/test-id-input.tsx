@@ -18,8 +18,8 @@ import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import InlineButton from '../inline-button';
-import InlineButtonsLayout from '../inline-buttons-layout';
+import InlineButton from './components/inline-button';
+import InlineButtonsLayout from './components/inline-buttons-layout';
 
 const TestIdInput = () => {
   const { t } = useTranslation('idv', {

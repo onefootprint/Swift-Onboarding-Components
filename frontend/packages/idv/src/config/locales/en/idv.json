@@ -169,7 +169,7 @@
             "step-up": "ID Doc Decision"
           }
         },
-        "testID": "Test ID:"
+        "testID": "Test ID"
       },
       "legal-footer": {
         "label": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."

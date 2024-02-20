@@ -169,7 +169,7 @@
             "step-up": "Decisión sobre el documento de identificación"
           }
         },
-        "testID": "ID de prueba:"
+        "testID": "ID de prueba"
       },
       "legal-footer": {
         "label": "Al continuar, acepto los <termsLink>Términos de servicio</termsLink> y reconozco la <privacyPolicyLink>Política de privacidad</privacyPolicyLink>."

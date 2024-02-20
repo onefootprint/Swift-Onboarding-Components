@@ -9,6 +9,7 @@ import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   CopyButton,
+  Stack,
   TextInput,
   Tooltip,
   Typography,
@@ -54,7 +55,7 @@ const SandboxInput = ({
   };
 
   return (
-    <InputContainer>
+    <Stack direction="column" gap={2}>
       <InputTitle>
         <Typography variant="label-2">{label}</Typography>
         <Tooltip text={texts.description} alignment="start" position="top">
@@ -110,7 +111,7 @@ const SandboxInput = ({
           </InlineButtonsLayout>
         )}
       </InputControls>
-    </InputContainer>
+    </Stack>
   );
 };
 
@@ -121,13 +122,6 @@ const InlineButtonsLayout = styled.div`
     justify-content: flex-start;
     margin-left: ${theme.spacing[3]};
   `}
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-bottom: -17px;
 `;
 
 const InputControls = styled.div`

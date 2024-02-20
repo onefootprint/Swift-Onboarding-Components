@@ -26,7 +26,7 @@
   "sandbox": {
     "description": "Puedes iniciar sesión con un usuario de sandbox previamente creado usando su mismo ID.",
     "hint": "No use caracteres especiales ni espacios.",
-    "label": "ID para pruebas:",
+    "label": "",
     "outcome": {
       "label": "Resultado de la prueba:",
       "options": {
