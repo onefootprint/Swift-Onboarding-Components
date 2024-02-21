@@ -122,6 +122,7 @@ const Camera = ({
           isActive={!disabled}
           photo
           ref={camera}
+          pixelFormat="yuv"
         />
       )}
       {children?.(showCountdown ? cameraDetection.countdown : null)}
