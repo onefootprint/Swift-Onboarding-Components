@@ -93,6 +93,16 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/auth/:path*',
+        destination: 'https://auth.onefootprint.com/:path*',
+        permanent: true,
+        basePath: false,
+      },
+    ];
+  },
   transpilePackages: [
     '@onefootprint/ui',
     '@onefootprint/styled',
