@@ -956,44 +956,6 @@
                 ]
             }
         },
-        "/entities/{fp_id}": {
-            "delete": {
-                "tags": [
-                    "Vault",
-                    "Entities",
-                    "Private"
-                ],
-                "description": "Deletes an entity. Works for either person or business entities.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
         "/entities/{fp_id}/annotations": {
             "get": {
                 "tags": [

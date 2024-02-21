@@ -916,6 +916,43 @@
                 ]
             }
         },
+        "/users/{fp_id}": {
+            "delete": {
+                "tags": [
+                    "Users",
+                    "PublicApi"
+                ],
+                "description": "Deletes a user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/client_token": {
             "post": {
                 "tags": [
