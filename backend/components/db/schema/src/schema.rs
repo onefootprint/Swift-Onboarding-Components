@@ -191,7 +191,7 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         submission_id -> Text,
-        reviewed_by_tenant_user_id -> Nullable<Text>,
+        reviewed_by_tenant_user_id -> Text,
         decision -> Text,
         note -> Text,
     }
@@ -203,7 +203,7 @@ diesel::table! {
     compliance_doc_spec (id) {
         id -> Text,
         created_at -> Timestamptz,
-        updated_at -> Timestamptz,
+        updated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
@@ -223,7 +223,7 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         request_id -> Text,
-        submitted_by_tenant_user_id -> Nullable<Text>,
+        submitted_by_tenant_user_id -> Text,
         s3_url -> Text,
         e_data_key -> Bytea,
     }
@@ -847,6 +847,7 @@ diesel::table! {
         snapshot_seqno -> Int8,
         external_id -> Nullable<Text>,
         last_activity_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

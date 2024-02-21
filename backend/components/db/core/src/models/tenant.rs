@@ -148,6 +148,7 @@ impl Tenant {
             TenantIdentifier::ScopedVaultId(scoped_vault_id) => {
                 let tenant_id = scoped_vault::table
                     .filter(scoped_vault::id.eq(scoped_vault_id))
+                    .filter(scoped_vault::deactivated_at.is_null())
                     .select(scoped_vault::tenant_id);
                 tenant::table.filter(tenant::id.eq_any(tenant_id)).into_boxed()
             }
@@ -215,6 +216,7 @@ impl Tenant {
     /// Count the number of vaults that exist for each tenant
     pub fn private_user_counts(conn: &mut PgConn) -> DbResult<HashMap<TenantId, UserCounts>> {
         let results: Vec<((TenantId, bool), i64)> = scoped_vault::table
+            .filter(scoped_vault::deactivated_at.is_null())
             .group_by((scoped_vault::tenant_id, scoped_vault::is_live))
             .select(((scoped_vault::tenant_id, scoped_vault::is_live), count_star()))
             .get_results(conn)?;
@@ -285,6 +287,7 @@ impl Tenant {
     #[tracing::instrument("Tenant::list_by_user_vault_id", skip_all)]
     pub fn list_by_user_vault_id(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<Tenant>> {
         let res = scoped_vault::table
+            .filter(scoped_vault::deactivated_at.is_null())
             .filter(scoped_vault::vault_id.eq(vault_id))
             .inner_join(tenant::table)
             .select(tenant::all_columns)

@@ -164,6 +164,7 @@ impl WatchlistCheck {
             .inner_join(scoped_vault::table)
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(true))
+            // Include deactivated scoped vaults.
             // Only want to bill for material watchlist checks that made vendor requests
             .filter(watchlist_check::status.eq_any(vec![WatchlistCheckStatusKind::Pass, WatchlistCheckStatusKind::Fail]))
             // Filter for watchlist checks that completed during this billing period
@@ -210,6 +211,7 @@ impl WatchlistCheck {
 
         let res = scoped_vault::table
             .filter(scoped_vault::is_live.eq(true))
+            .filter(scoped_vault::deactivated_at.is_null()) // Ignore deactivated scoped vaults.
             .inner_join(vault::table)
             .filter(vault::kind.eq(VaultKind::Person))
             .filter(not(scoped_vault::tenant_id.eq_any(vec!["org_e2FHVfOM5Hd3Ce492o5Aat", "org_hyZP3ksCvsT0AlLqMZsgrI"]))) // footprint live + acme

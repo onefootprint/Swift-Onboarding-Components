@@ -49,7 +49,7 @@ struct NewRuleSetResult {
     pub workflow_id: Option<WorkflowId>,
     pub kind: RuleSetResultKind,
     pub action_triggered: Option<RuleAction>,
-    pub allowed_actions: Option<Vec<RuleAction>>
+    pub allowed_actions: Option<Vec<RuleAction>>,
 }
 
 #[derive(Debug, Clone)]
@@ -61,7 +61,7 @@ pub struct NewRuleSetResultArgs<'a> {
     pub action_triggered: Option<RuleAction>,
     pub rule_results: Vec<NewRuleResultArgs<'a>>,
     pub risk_signal_ids: Vec<&'a RiskSignalId>,
-    pub allowed_actions: Vec<RuleAction>
+    pub allowed_actions: Vec<RuleAction>,
 }
 
 #[derive(Debug, Clone)]
@@ -91,7 +91,7 @@ impl RuleSetResult {
             workflow_id: args.workflow_id.cloned(),
             kind: args.kind,
             action_triggered: args.action_triggered,
-            allowed_actions: Some(args.allowed_actions)
+            allowed_actions: Some(args.allowed_actions),
         };
 
         let rule_set_result = diesel::insert_into(rule_set_result::table)
@@ -151,7 +151,10 @@ impl RuleSetResult {
     }
 
     #[tracing::instrument("RuleSetResult::get", skip_all)]
-    pub fn get(conn: &mut PgConn, rsr_id: &RuleSetResultId) -> DbResult<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
+    pub fn get(
+        conn: &mut PgConn,
+        rsr_id: &RuleSetResultId,
+    ) -> DbResult<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
         let rsr: RuleSetResult = rule_set_result::table
             .filter(rule_set_result::id.eq(rsr_id))
             .get_result(conn)?;
@@ -173,6 +176,7 @@ impl RuleSetResult {
         let res: Vec<(ScopedVault, RuleSetResult)> = workflow::table
             .inner_join(scoped_vault::table)
             .inner_join(rule_set_result::table)
+            .filter(scoped_vault::deactivated_at.is_null())
             .filter(workflow::ob_configuration_id.eq(obc_id))
             .filter(not(workflow::completed_at.is_null()))
             .filter(workflow::completed_at.gt(Utc::now() - Duration::weeks(8)))
@@ -321,7 +325,7 @@ mod tests {
                     },
                 ],
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
-                allowed_actions: RuleAction::all_rule_actions()
+                allowed_actions: RuleAction::all_rule_actions(),
             },
         )
         .unwrap();
@@ -428,7 +432,7 @@ mod tests {
                 action_triggered: Some(RuleAction::Fail),
                 rule_results: vec![],
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
-                allowed_actions: RuleAction::all_rule_actions()
+                allowed_actions: RuleAction::all_rule_actions(),
             },
         )
         .unwrap();

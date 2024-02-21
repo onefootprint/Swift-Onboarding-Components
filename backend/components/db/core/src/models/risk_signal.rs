@@ -120,6 +120,7 @@ impl RiskSignal {
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
+            .filter(scoped_vault::deactivated_at.is_null())
             .select(risk_signal_group::id);
         risk_signal::table
             .filter(risk_signal::risk_signal_group_id.eq_any(risk_signal_group_ids))

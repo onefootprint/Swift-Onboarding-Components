@@ -9,7 +9,9 @@ use db_schema::schema::{
 };
 use diesel::{dsl::not, prelude::*, Insertable, Queryable};
 use newtypes::{
-    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, FpId, OnboardingDecisionId, OnboardingDecisionInfo, ReviewReason, RuleSetResultId, ScopedVaultId, TenantId, VaultId, VerificationResultId, WorkflowId
+    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, FpId, OnboardingDecisionId,
+    OnboardingDecisionInfo, ReviewReason, RuleSetResultId, ScopedVaultId, TenantId, VaultId,
+    VerificationResultId, WorkflowId,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -27,8 +29,8 @@ pub struct OnboardingDecision {
     pub seqno: Option<DataLifetimeSeqno>,
     pub workflow_id: WorkflowId,
     // If this is an OBD from a workflow, this will be the corresponding rule result making that decision
-    // Note: this is NOT currently backfilled so will be null for historical workflows 
-    pub rule_set_result_id: Option<RuleSetResultId>, 
+    // Note: this is NOT currently backfilled so will be null for historical workflows
+    pub rule_set_result_id: Option<RuleSetResultId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -40,7 +42,7 @@ struct NewOnboardingDecisionRow {
     actor: DbActor,
     seqno: Option<DataLifetimeSeqno>,
     workflow_id: WorkflowId,
-    rule_set_result_id: Option<RuleSetResultId>, 
+    rule_set_result_id: Option<RuleSetResultId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -89,7 +91,7 @@ impl OnboardingDecision {
             actor: args.actor,
             seqno: args.seqno,
             workflow_id: wf.id.clone(),
-            rule_set_result_id: args.rule_set_result_id
+            rule_set_result_id: args.rule_set_result_id,
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)
@@ -177,6 +179,7 @@ impl OnboardingDecision {
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
+            .filter(scoped_vault::deactivated_at.is_null())
             .order_by(onboarding_decision::created_at.desc())
             .select(onboarding_decision::all_columns)
             .first(conn)
@@ -197,6 +200,7 @@ impl OnboardingDecision {
                     .on(manual_review::completed_by_decision_id.eq(onboarding_decision::id.nullable())),
             )
             .filter(scoped_vault::id.eq(sv_id))
+            .filter(scoped_vault::deactivated_at.is_null())
             .order_by(onboarding_decision::created_at.desc())
             .select((
                 onboarding_decision::all_columns,

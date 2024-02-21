@@ -266,6 +266,7 @@ impl IdentityDocument {
             // Basic filters
             .filter(scoped_vault::is_live.eq(true))
             .filter(scoped_vault::tenant_id.eq(t_id))
+            // Include deactivated scoped vaults.
             // Only completed docs
             .filter(incode_verification_session::state.eq(IncodeVerificationSessionState::Complete))
             // Filter for id docs that happened during this time

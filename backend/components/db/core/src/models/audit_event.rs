@@ -211,6 +211,7 @@ impl AuditEvent {
                     .order_by(audit_event::timestamp.desc())
                     // Secondary sort by ID to support (timestamp, id) cursor.
                     .then_order_by(audit_event::id.desc())
+                    // Include deactivated scoped vaults so deleting doesn't break old audit logs.
                     .filter(audit_event::tenant_id.eq(params.tenant_id))
                     .filter(audit_event::is_live.eq(params.is_live))
                     .limit(page_size)

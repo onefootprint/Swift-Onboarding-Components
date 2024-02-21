@@ -114,6 +114,7 @@ macro_rules! list_query {
             .inner_join(vault::table)
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
             .filter(scoped_vault::is_live.eq($params.is_live))
+            .filter(scoped_vault::deactivated_at.is_null())
             .into_boxed();
 
         if $params.only_visible {
@@ -280,6 +281,7 @@ fn vaults_matching_search(
             .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
             .filter(data_lifetime::deactivated_seqno.is_null())
             .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::deactivated_at.is_null())
             // Matching filter
             .filter(vault_data::p_data.ilike(&plaintext_search))
             .select(scoped_vault::id)
@@ -298,6 +300,7 @@ fn vaults_matching_search(
             .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
             .filter(data_lifetime::deactivated_seqno.is_null())
             .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::deactivated_at.is_null())
             // Matching filter
             .filter(fingerprint::sh_data.eq_any(all_fps.clone()))
             .filter(fingerprint::is_hidden.eq(false))

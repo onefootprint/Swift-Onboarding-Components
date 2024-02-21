@@ -3,6 +3,7 @@ use paperclip::actix::web;
 
 mod auth_events;
 mod decisions;
+mod delete;
 mod detail;
 mod documents;
 mod kyc;
@@ -21,6 +22,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(post::post)
         .service(list::get)
         .service(list::post_search)
+        .service(delete::delete)
         .service(documents::get)
         .service(risk_signals::get)
         .service(match_signals::get)

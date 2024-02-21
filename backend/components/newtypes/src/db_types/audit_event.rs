@@ -35,6 +35,10 @@ pub enum AuditEventDetail {
         reason: String,
         decrypted_fields: Vec<DataIdentifier>,
     },
+    DeleteUser {
+        is_live: bool,
+        scoped_vault_id: ScopedVaultId,
+    },
     CreateUserAnnotation,
     CompleteUserCheckLiveness,
     CompleteUserCheckWatchlist,
@@ -139,6 +143,19 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 tenant_role_id: None,
                 is_live: Some(is_live),
             },
+            AuditEventDetail::DeleteUser {
+                is_live,
+                scoped_vault_id,
+            } => Self {
+                metadata: AuditEventMetadata::DeleteUser,
+                scoped_vault_id: Some(scoped_vault_id),
+                ob_configuration_id: None,
+                document_data_id: None,
+                tenant_api_key_id: None,
+                tenant_user_id: None,
+                tenant_role_id: None,
+                is_live: Some(is_live),
+            },
             AuditEventDetail::CreateUserAnnotation => todo!(),
             AuditEventDetail::CompleteUserCheckLiveness => todo!(),
             AuditEventDetail::CompleteUserCheckWatchlist => todo!(),
@@ -196,6 +213,8 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
 )]
 /// Represents the jsonb metadata column type in the audit_event table.
 pub enum AuditEventMetadata {
+    // TODO: distinguish between users and businesses.
+    //
     // The names of these fields are used in jsonb queries. The compiler
     // won't be able to check that they are properly used in filters, since diesel doesn't support
     // filtering on nested jsonb values without dropping into SQL.
@@ -212,6 +231,7 @@ pub enum AuditEventMetadata {
         reason: String,
         fields: Vec<DataIdentifier>,
     },
+    DeleteUser,
     CreateUserAnnotation,
     CompleteUserCheckLiveness,
     CompleteUserCheckWatchlist,

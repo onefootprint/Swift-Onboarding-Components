@@ -63,6 +63,8 @@ pub struct ScopedVault {
     /// Right now, we'll update this to the current timestamp when vaults are (1) created and (2)
     /// have a workflow complete
     pub last_activity_at: DateTime<Utc>,
+    /// When the scoped vault was deactivated, if it has been deactivated.
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -176,6 +178,7 @@ impl ScopedVault {
         let scoped_vault = scoped_vault::table
             .filter(scoped_vault::vault_id.eq(&uv.id))
             .filter(scoped_vault::tenant_id.eq(&ob_config.tenant_id))
+            .filter(scoped_vault::deactivated_at.is_null())
             .first(conn.conn())
             .optional()?;
         if let Some(scoped_vault) = scoped_vault {
@@ -257,6 +260,7 @@ impl ScopedVault {
             scoped_vault::table
                 .filter(scoped_vault::vault_id.eq(&uv.id))
                 .filter(scoped_vault::tenant_id.eq(&tenant_id))
+                .filter(scoped_vault::deactivated_at.is_null())
                 .get_result(conn.conn())?
         };
         Ok((su, uv.into_inner()))
@@ -264,7 +268,9 @@ impl ScopedVault {
 
     #[tracing::instrument("ScopedVault::get", skip_all)]
     pub fn get<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedVault> {
-        let mut query = scoped_vault::table.into_boxed();
+        let mut query = scoped_vault::table
+            .filter(scoped_vault::deactivated_at.is_null())
+            .into_boxed();
 
         match id.into() {
             ScopedVaultIdentifier::Id { id } => query = query.filter(scoped_vault::id.eq(id)),
@@ -284,12 +290,12 @@ impl ScopedVault {
                 query = query
                     .filter(scoped_vault::fp_id.eq(fp_id))
                     .filter(scoped_vault::tenant_id.eq(t_id))
-                    .filter(scoped_vault::is_live.eq(is_live));
+                    .filter(scoped_vault::is_live.eq(is_live))
             }
             ScopedVaultIdentifier::Tenant { v_id, t_id } => {
                 query = query
                     .filter(scoped_vault::vault_id.eq(v_id))
-                    .filter(scoped_vault::tenant_id.eq(t_id));
+                    .filter(scoped_vault::tenant_id.eq(t_id))
             }
             ScopedVaultIdentifier::SuperAdminView { identifier } => {
                 query = query.filter(
@@ -315,6 +321,7 @@ impl ScopedVault {
             .filter(scoped_vault::fp_id.eq_any(fp_ids))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
+            .filter(scoped_vault::deactivated_at.is_null())
             .inner_join(vault::table)
             .get_results(conn)?;
         Ok(results)
@@ -352,6 +359,7 @@ impl ScopedVault {
                     .and(scoped_vault_label::deactivated_at.is_null())),
             )
             .filter(scoped_vault::id.eq_any(&ids))
+            .filter(scoped_vault::deactivated_at.is_null())
             .load(conn)?;
 
         // Fetch manual reviews separately since there may be multiple for one scoped vault
@@ -407,12 +415,25 @@ impl ScopedVault {
             // No-op if the update is empty
             let existing_sv = scoped_vault::table
                 .filter(scoped_vault::id.eq(id))
+                .filter(scoped_vault::deactivated_at.is_null())
                 .get_result(conn.conn())?;
             return Ok(existing_sv);
         }
         let updated_sv = diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(id))
+            .filter(scoped_vault::deactivated_at.is_null())
             .set(update)
+            .get_result(conn.conn())?;
+        Ok(updated_sv)
+    }
+
+    #[tracing::instrument("ScopedVault::deactivate", skip_all)]
+    pub fn deactivate(conn: &mut TxnPgConn, id: &ScopedVaultId) -> DbResult<Self> {
+        let now = Utc::now();
+        let updated_sv = diesel::update(scoped_vault::table)
+            .filter(scoped_vault::id.eq(id))
+            .filter(scoped_vault::deactivated_at.is_null())
+            .set(scoped_vault::deactivated_at.eq(now))
             .get_result(conn.conn())?;
         Ok(updated_sv)
     }
@@ -438,6 +459,7 @@ impl ScopedVault {
         }
         diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(&wf.scoped_vault_id))
+            .filter(scoped_vault::deactivated_at.is_null())
             .set(scoped_vault::status.eq(Option::<OnboardingStatus>::None))
             .execute(conn.conn())?;
         Ok(())
@@ -466,6 +488,7 @@ impl ScopedVault {
             .inner_join(scoped_vault::table)
             .inner_join(ob_configuration::table)
             .inner_join(tenant::table.on(tenant::id.eq(ob_configuration::tenant_id)))
+            .filter(scoped_vault::deactivated_at.is_null())
             .filter(scoped_vault::vault_id.eq(v_id))
             .filter(not(workflow::authorized_at.is_null()))
             .order_by(workflow::created_at.desc())
@@ -512,11 +535,13 @@ impl ScopedVault {
             .filter(scoped_vault::is_billable.eq(true))
             // Only bill for users that have data in them
             .filter(scoped_vault::id.eq_any(sv_with_data))
-            // Only bill for vaults that existed by the end of the bililng period
+            // Only bill for vaults that existed by the end of the billng period
             // NOTE: We'll miss a handful of vaults that were created but not authorized before end_date.
             // And, this calculation won't be stable if we re-run it for a historical period. But
             // it will only change by very small amounts
             .filter(scoped_vault::start_timestamp.lt(end_date))
+            // Only bill for vaults that were not deactivated by the end of the billing period.
+            .filter(scoped_vault::deactivated_at.is_null())
             .select(count_distinct(scoped_vault::id))
             .get_result(conn)?;
         Ok(count)

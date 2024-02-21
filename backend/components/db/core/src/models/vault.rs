@@ -93,6 +93,7 @@ impl Vault {
             VaultIdentifier::ScopedVaultId(scoped_user_id) => {
                 let uv_ids = scoped_vault::table
                     .filter(scoped_vault::id.eq(scoped_user_id))
+                    .filter(scoped_vault::deactivated_at.is_null())
                     .select(scoped_vault::vault_id);
                 vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
@@ -105,6 +106,7 @@ impl Vault {
                     .filter(scoped_vault::fp_id.eq(fp_id))
                     .filter(scoped_vault::tenant_id.eq(tenant_id))
                     .filter(scoped_vault::is_live.eq(is_live))
+                    .filter(scoped_vault::deactivated_at.is_null())
                     .select(scoped_vault::vault_id);
                 vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
@@ -139,15 +141,6 @@ impl Vault {
             .for_no_key_update()
             .first(conn.conn())?;
         Ok(Locked::new(user))
-    }
-
-    #[tracing::instrument("Vault::multi_get", skip_all)]
-    pub fn multi_get(conn: &mut PgConn, ids: Vec<&ScopedVaultId>) -> DbResult<Vec<Self>> {
-        let uv_ids = scoped_vault::table
-            .filter(scoped_vault::id.eq_any(ids))
-            .select(scoped_vault::vault_id);
-        let users = vault::table.filter(vault::id.eq_any(uv_ids)).load::<Self>(conn)?;
-        Ok(users)
     }
 
     #[tracing::instrument("Vault::create", skip_all)]
@@ -349,6 +342,7 @@ impl Vault {
                 .filter(data_lifetime::deactivated_seqno.is_null())
                 // Un-verified vaults owned by this tenant
                 .filter(scoped_vault::tenant_id.eq(tenant_id))
+                .filter(scoped_vault::deactivated_at.is_null())
                 .filter(vault::is_verified.eq(false))
                 .filter(vault::is_identifiable.eq(false))
                 .filter(vault::is_hidden.eq(false))

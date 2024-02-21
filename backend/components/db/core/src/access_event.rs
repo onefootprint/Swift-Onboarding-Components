@@ -126,6 +126,7 @@ impl AccessEventListItemForUser {
                     )
                     .order_by(schema::access_event::timestamp.desc())
                     .filter(schema::scoped_vault::vault_id.eq(vault_id))
+                    // Include deactivated scoped vaults.
                     .load(conn)?;
 
                 // Saturate the actors on the access events

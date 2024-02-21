@@ -47,6 +47,9 @@ pub enum AuditEventDetail {
         reason: String,
         decrypted_fields: Vec<DataIdentifier>,
     },
+    DeleteUser {
+        fp_id: FpId,
+    },
     CreateUserAnnotation,
     CompleteUserCheckLiveness,
     CompleteUserCheckWatchlist,

@@ -1,11 +1,26 @@
 use super::WriteableVw;
 use crate::errors::ApiResult;
-use db::{models::data_lifetime::DataLifetime, TxnPgConn};
+use db::{
+    models::{data_lifetime::DataLifetime, scoped_vault::ScopedVault},
+    TxnPgConn,
+};
 use newtypes::{output::Csv, DataIdentifier};
 
 impl<Type> WriteableVw<Type> {
-    /// soft "delete" vault data by deactivating the data-lifetimes to prevent access
+    /// soft "delete" an entire scoped vault, but not the corresponding data lifetimes.
     #[tracing::instrument("WriteableVw::soft_delete_vault", skip_all)]
+    pub fn soft_delete_vault(self, conn: &mut TxnPgConn) -> ApiResult<()> {
+        tracing::info!(
+            scoped_vault_id = ?self.scoped_vault_id,
+            "Deactivating entire scoped vault"
+        );
+        let _ = ScopedVault::deactivate(conn, &self.scoped_vault_id)?;
+
+        Ok(())
+    }
+
+    /// soft "delete" vault data by deactivating the data-lifetimes to prevent access
+    #[tracing::instrument("WriteableVw::soft_delete_vault_data", skip_all)]
     pub fn soft_delete_vault_data(
         // NOTE: VW becomes stale after this operation
         &self,
@@ -15,7 +30,7 @@ impl<Type> WriteableVw<Type> {
         if dis.is_empty() {
             return Ok(dis);
         }
-        tracing::info!(dis=%Csv::from(dis.clone()), "Deleting DIs");
+        tracing::info!(dis=%Csv::from(dis.clone()), "Deactivating DIs");
         let (dis, dls) = dis
             .into_iter()
             .flat_map(|di| self.data(&di).map(|d| (di, d)))
@@ -28,5 +43,76 @@ impl<Type> WriteableVw<Type> {
         let _ = DataLifetime::bulk_deactivate(conn.conn(), dls, seqno)?;
 
         Ok(dis)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::utils::vault_wrapper::{Person, VaultWrapper};
+
+    use super::*;
+    use db::{
+        models::vault_data::{NewVaultData, VaultData},
+        tests::prelude::*,
+    };
+    use macros::db_test;
+    use newtypes::{DataLifetimeSource, IdentityDataKind, SealedVaultBytes, VaultDataFormat};
+
+    #[db_test]
+    fn test_soft_deletion(conn: &mut TestPgConn) {
+        let tenant = fixtures::tenant::create(conn);
+        let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
+
+        let scoped_vaults: Vec<_> = (0..=1)
+            .map(|_| {
+                let uv = fixtures::vault::create_person(conn, true).into_inner();
+                let sv = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+
+                let data = vec![
+                    NewVaultData {
+                        kind: IdentityDataKind::FirstName.into(),
+                        e_data: SealedVaultBytes(vec![1]),
+                        p_data: None,
+                        format: VaultDataFormat::String,
+                        origin_id: None,
+                    },
+                    NewVaultData {
+                        kind: IdentityDataKind::Ssn4.into(),
+                        e_data: SealedVaultBytes(vec![3]),
+                        p_data: None,
+                        format: VaultDataFormat::String,
+                        origin_id: None,
+                    },
+                ];
+                let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+                let source = DataLifetimeSource::Unknown;
+                VaultData::bulk_create(conn, &uv.id, &sv.id, data, seqno, source, None).unwrap();
+                sv
+            })
+            .collect();
+
+        let vw1: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[1].id).unwrap();
+
+        // Delete a single field.
+        assert!(vw1.get(IdentityDataKind::Ssn4).is_some());
+        vw1.soft_delete_vault_data(conn, vec![IdentityDataKind::Ssn4.into()])
+            .unwrap();
+        // Refetch since the VW is stale.
+        let vw1: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[1].id).unwrap();
+        assert!(vw1.get(IdentityDataKind::FirstName).is_some());
+        assert!(vw1.get(IdentityDataKind::Ssn4).is_none());
+        // The other scoped vault still works properly.
+        let vw0: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[0].id).unwrap();
+        assert!(vw0.get(IdentityDataKind::FirstName).is_some());
+        assert!(vw0.get(IdentityDataKind::Ssn4).is_some());
+
+        // Delete the entire scoped vault.
+        vw1.soft_delete_vault(conn).unwrap();
+        // Refetch since the VW is consumed.
+        assert!(VaultWrapper::<Person>::lock_for_onboarding(conn, &scoped_vaults[1].id).is_err());
+        // The other scoped vault still works properly.
+        let vw0: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[0].id).unwrap();
+        assert!(vw0.get(IdentityDataKind::FirstName).is_some());
+        assert!(vw0.get(IdentityDataKind::Ssn4).is_some());
     }
 }
