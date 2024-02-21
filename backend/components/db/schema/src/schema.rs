@@ -1116,6 +1116,23 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    tenant_ios_app_meta (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_id -> Text,
+        team_id -> Text,
+        app_bundle_ids -> Array<Nullable<Text>>,
+        device_check_key_id -> Text,
+        e_device_check_private_key -> Bytea,
+        deactivated_at -> Nullable<Timestamptz>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     tenant_role (id) {
         id -> Text,
         tenant_id -> Text,
@@ -1489,6 +1506,7 @@ diesel::joinable!(tenant_client_config -> tenant (tenant_id));
 diesel::joinable!(tenant_compliance_partnership -> partner_tenant (partner_tenant_id));
 diesel::joinable!(tenant_compliance_partnership -> tenant (tenant_id));
 diesel::joinable!(tenant_frequent_note -> tenant (tenant_id));
+diesel::joinable!(tenant_ios_app_meta -> tenant (tenant_id));
 diesel::joinable!(tenant_role -> tenant (tenant_id));
 diesel::joinable!(tenant_rolebinding -> tenant (tenant_id));
 diesel::joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
@@ -1580,6 +1598,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     tenant_client_config,
     tenant_compliance_partnership,
     tenant_frequent_note,
+    tenant_ios_app_meta,
     tenant_role,
     tenant_rolebinding,
     tenant_user,

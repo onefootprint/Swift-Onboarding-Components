@@ -112,6 +112,9 @@ pub use tenant_app_meta::*;
 mod tenant_android_app_meta;
 pub use tenant_android_app_meta::*;
 
+mod tenant_ios_app_meta;
+pub use tenant_ios_app_meta::*;
+
 mod device_insight;
 pub use device_insight::*;
 

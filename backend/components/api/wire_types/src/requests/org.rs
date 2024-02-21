@@ -77,3 +77,20 @@ pub struct UpdateTenantAndroidAppMetaRequest {
     pub integrity_verification_key: Option<String>,
     pub integrity_decryption_key: Option<String>,
 }
+
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct CreateTenantIosAppMetaRequest {
+    pub team_id: String,
+    pub app_bundle_ids: Vec<String>,
+    pub device_check_key_id: String,
+    pub device_check_private_key: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct UpdateTenantIosAppMetaRequest {
+    pub team_id: Option<String>,
+    pub app_bundle_ids: Option<Vec<String>>,
+    pub device_check_key_id: Option<String>,
+    pub device_check_private_key: Option<String>,
+}
