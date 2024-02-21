@@ -55,7 +55,8 @@ const App = ({ Component, pageProps }: AppProps) => {
         </QueryClientProvider>
       </ObserveCollectorProvider>
       <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&callback=Function.prototype`}
+        async
+        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&loading=async&libraries=places&callback=Function.prototype`}
         strategy="lazyOnload"
       />
     </>
