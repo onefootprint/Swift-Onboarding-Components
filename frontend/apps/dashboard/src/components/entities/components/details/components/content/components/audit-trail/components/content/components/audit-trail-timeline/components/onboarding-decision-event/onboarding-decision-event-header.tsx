@@ -32,20 +32,20 @@ const OnboardingDecisionEventHeader = ({
   let text;
   if (isFootprintActor) {
     text = (
-      <>
+      <Stack align="center">
         {isVerified ? t('verified-by') : t('not-verified-by')}
         &nbsp;
         <PlaybookLink playbook={playbook} />
-      </>
+      </Stack>
     );
   } else {
     const decision = t(`decision-status.${status}` as ParseKeys<'common'>);
     text = (
-      <>
+      <Stack align="center">
         {t('org-overwrite.title', { decision })}
         &nbsp;
         <Actor actor={source} />
-      </>
+      </Stack>
     );
   }
 
