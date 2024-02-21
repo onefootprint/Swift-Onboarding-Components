@@ -1,9 +1,10 @@
 package com.footprint.android
 
-import FootprintErrorManager
+import FootprintLogger
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import okhttp3.OkHttpClient
 import java.lang.Exception
 
@@ -22,7 +23,8 @@ internal object FootprintSdkMetadata {
 class FootprintAndroid private constructor() {
     private var config: FootprintConfiguration? = null
     private var context: Context? = null
-    private var errorManager: FootprintErrorManager? = null
+    private var logger: FootprintLogger? = null
+    private var attestationManager: FootprintAttestationManager? = null
     private var sdkArgsManager: FootprintSdkArgsManager? = null
     private var hasActiveSession = false
     companion object {
@@ -32,8 +34,12 @@ class FootprintAndroid private constructor() {
             instance.apply {
                 this.config = config
                 this.context = context
-                this.errorManager = FootprintErrorManager(config)
+                val logger = FootprintLogger(config)
+                this.logger = logger
                 this.sdkArgsManager = FootprintSdkArgsManager(config)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.attestationManager = FootprintAttestationManager(logger, context)
+                }
             }.start()
         }
     }
@@ -42,8 +48,12 @@ class FootprintAndroid private constructor() {
         return this.config
     }
 
-    internal fun getErrorManager(): FootprintErrorManager? {
-        return this.errorManager
+    internal fun getLogger(): FootprintLogger? {
+        return this.logger
+    }
+
+    internal fun getAttestationManager(): FootprintAttestationManager? {
+        return this.attestationManager
     }
 
     internal fun setHasActiveSession(isActive: Boolean) {
@@ -60,12 +70,12 @@ class FootprintAndroid private constructor() {
                 missingParams.add("redirectActivityName")
             }
             if (missingParams.isNotEmpty()) {
-                errorManager?.log("Missing params: ${missingParams.joinToString(" and ")}")
+                logger?.logError("Missing params: ${missingParams.joinToString(" and ")}")
                 return false
             }
             return true
         } ?: run {
-            errorManager?.log("No configuration found.")
+            logger?.logError("No configuration found.")
             return false
         }
     }
@@ -85,7 +95,7 @@ class FootprintAndroid private constructor() {
             builder.fragment(token)
             return builder.build()
         } catch (error: Exception) {
-            errorManager?.log("Encountered error while building URL: $error")
+            logger?.logError("Encountered error while building URL: $error")
             return null
         }
     }
@@ -99,7 +109,7 @@ class FootprintAndroid private constructor() {
                 context?.startActivity(intent)
             }
         } ?: run {
-            errorManager?.log("No SDK args token found while generating URL.")
+            logger?.logError("No SDK args token found while generating URL.")
         }
     }
 
@@ -110,7 +120,7 @@ class FootprintAndroid private constructor() {
         setHasActiveSession(true)
 
         sdkArgsManager?.sendArgs(::handleSdkArgsToken) { error ->
-            errorManager?.log(error)
+            logger?.logError(error)
         }
     }
 }

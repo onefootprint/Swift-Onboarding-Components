@@ -1,4 +1,4 @@
-package com.example.footprint_android
+package com.onefootprint.demo_android
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -44,10 +44,10 @@ class MainActivity : AppCompatActivity() {
                 visaExpirationDate = "05/12/2024"
             )
             val config = FootprintConfiguration(
-                redirectActivityName = "com.example.footprint_android.MainActivity",
+                redirectActivityName = "com.onefootprint.demo_android.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 userData = userData,
-                options = FootprintOptions(showLogo = true, showCompletionPage = true),
+                options = FootprintOptions(showLogo = true),
                 l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
                 appearance = FootprintAppearance(
                     theme = FootprintAppearanceTheme.DARK,

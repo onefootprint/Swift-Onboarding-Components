@@ -14,5 +14,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "FootprintAndroid"
-include(":app")
+include(":demo-android")
 include(":footprint-android")

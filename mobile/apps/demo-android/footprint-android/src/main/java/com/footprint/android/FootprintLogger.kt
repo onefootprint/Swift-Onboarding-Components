@@ -25,32 +25,41 @@ internal data class FootprintSdkTelemetry(
     @SerialName("session_id") val sessionId: String? = null,
 )
 
-class FootprintErrorManager(private val configuration: FootprintConfiguration) {
+internal class FootprintLogger(private val configuration: FootprintConfiguration) {
     private val debugMode = false // Enable this for local development
 
-    private fun getErrorMsg(error: String): String {
-        return "@onefootprint/footprint-android: $error"
+    private fun getMessage(raw: String): String {
+        return "@onefootprint/footprint-android: $raw"
     }
 
-    fun log(error: String) {
-        val errorMsg = getErrorMsg(error)
+    fun logError(error: String) {
+        val errorMsg = getMessage(error)
         if (debugMode) {
             Log.d("FootprintAndroidDebug", errorMsg)
         } else {
-            sendErrorLog(error)
+            sendLog(error, "error")
         }
         configuration.onError?.invoke(errorMsg)
     }
 
-    private fun sendErrorLog(error: String) {
+    fun logWarn(warn: String) {
+        val warnMsg = getMessage(warn)
+        if (debugMode) {
+            Log.d("FootprintAndroidDebug", warnMsg)
+        } else {
+            sendLog(warnMsg, "warn")
+        }
+    }
+
+    private fun sendLog(message: String, level: String) {
         try {
             val requestBody = FootprintSdkTelemetry(
                 tenantDomain = configuration.redirectActivityName,
                 sdkKind = FootprintSdkMetadata.kind,
                 sdkName = FootprintSdkMetadata.name,
                 sdkVersion = FootprintSdkMetadata.version,
-                logLevel = "error",
-                logMessage = error,
+                logLevel = level,
+                logMessage = message,
             )
             val request = Request.Builder()
                 .url("${FootprintSdkMetadata.apiBaseUrl}/org/sdk_telemetry")

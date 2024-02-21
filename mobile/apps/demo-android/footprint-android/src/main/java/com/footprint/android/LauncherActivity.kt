@@ -1,15 +1,21 @@
 package com.footprint.android
-import FootprintErrorManager
+import FootprintLogger
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import java.lang.Exception
 
 sealed class SessionResult {
     object Canceled : SessionResult()
-    class Complete(val validationToken: String) : SessionResult()
+    class Complete(
+        val validationToken: String,
+        val deviceResponse: String? = null,
+        val authToken: String? = null
+    ) : SessionResult()
     object Error : SessionResult()
 }
 
@@ -20,13 +26,15 @@ internal class LauncherActivity : AppCompatActivity() {
     private var appPaused = false
     private var sdkArgsManager: FootprintSdkArgsManager? = null
     private var config: FootprintConfiguration? = null
-    private var errorManager: FootprintErrorManager? = null
+    private var logger: FootprintLogger? = null
+    private var attestationManager: FootprintAttestationManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         footprint.setHasActiveSession(true)
         config = footprint.getConfig()
-        errorManager = footprint.getErrorManager()
+        logger = footprint.getLogger()
+        attestationManager = footprint.getAttestationManager()
         sdkArgsManager = config?.let { FootprintSdkArgsManager(it) }
         appPaused = false
         intent.data?.let { resultUrl ->
@@ -66,27 +74,45 @@ internal class LauncherActivity : AppCompatActivity() {
     }
 
     private fun handleResultFromUrl(url: String) {
-        val result = parseResultFromUrl(url)
-        when (result) {
-            is SessionResult.Canceled -> config?.onCancel?.invoke()
-            is SessionResult.Complete -> config?.onComplete?.invoke(result.validationToken)
-            is SessionResult.Error -> handleError("Error parsing redirect URL.")
+        when (val result = parseResultFromUrl(url)) {
+            is SessionResult.Error -> {
+                handleError("Error parsing redirect URL.")
+                startDestinationActivity(result)
+            }
+            is SessionResult.Canceled -> {
+                config?.onCancel?.invoke()
+                startDestinationActivity(result)
+            }
+            is SessionResult.Complete -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.attestationManager?.getAttestation(result) {
+                        config?.onComplete?.invoke(result.validationToken)
+                        startDestinationActivity(result)
+                    }
+                } else {
+                    config?.onComplete?.invoke(result.validationToken)
+                    startDestinationActivity(result)
+                }
+            }
         }
-        startDestinationActivity(result)
     }
 
     private fun parseResultFromUrl(url: String): SessionResult {
         try {
             val query = Uri.parse(url).query ?: return SessionResult.Error
             val queryParams = query.split("&")
-            for (param in queryParams) {
-                val (key, value) = param.split("=").let {
-                    if (it.size >= 2) it[0] to it[1] else it[0] to ""
-                }
-                when (key) {
-                    "canceled" -> return SessionResult.Canceled
-                    "validation_token" -> return SessionResult.Complete(value)
-                }
+                .map { param -> param.split("=") }
+                .associate { it[0] to it[1] }
+
+            if (queryParams.containsKey("canceled")) {
+                return SessionResult.Canceled
+            }
+            val validationToken = queryParams["validation_token"]
+            Log.d("Footprint", "$validationToken")
+            if (validationToken?.isNotEmpty() == true) {
+                val deviceResponse = queryParams["device_response"]
+                val authToken = queryParams["auth_token"]
+                return SessionResult.Complete(validationToken, deviceResponse, authToken)
             }
             return SessionResult.Error
         } catch (e: Exception) {
@@ -94,13 +120,13 @@ internal class LauncherActivity : AppCompatActivity() {
         }
     }
     private fun handleError(error: String, shouldRedirect: Boolean = false) {
-        errorManager?.log(error)
+        logger?.logError(error)
         if (shouldRedirect) startDestinationActivity(SessionResult.Error)
     }
 
     private fun startDestinationActivity(verificationResult: SessionResult) {
         config?.redirectActivityName?.let { redirectActivityName ->
-            var intent: Intent? = null
+            lateinit var intent: Intent
             try {
                 intent = Intent(
                     this,

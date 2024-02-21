@@ -13,18 +13,18 @@ import okhttp3.Response
 import java.lang.Exception
 
 @Serializable
-internal data class FootprintSdkRequestData(
+private data class FootprintSdkRequestData(
     val kind: String,
     val data: FootprintConfiguration
 )
 
 @Serializable
-internal data class FootprintSdkTokenResponse(
+private data class FootprintSdkTokenResponse(
     val token: String,
     @SerialName("expires_at") val expiresAt: String
 )
 
-class FootprintSdkArgsManager(private val config: FootprintConfiguration) {
+internal class FootprintSdkArgsManager(private val config: FootprintConfiguration) {
     fun sendArgs(onSuccess: (String?) -> Unit, onError: (String) -> Unit) {
         val sdkRequest = buildSdkRequest()
         FootprintHttpClient.client.newCall(sdkRequest).enqueue(object : Callback {
@@ -40,12 +40,12 @@ class FootprintSdkArgsManager(private val config: FootprintConfiguration) {
                     }
                     try {
                         val responseBody = it.body?.string() ?: ""
-                        val responseObject = Json.decodeFromString<FootprintSdkTokenResponse>(responseBody)
+                        val responseObject =
+                            Json.decodeFromString<FootprintSdkTokenResponse>(responseBody)
                         onSuccess(responseObject.token)
                     } catch (e: Exception) {
                         onError("Parsing SDK Args response failed. $e")
                     }
-
                 }
             }
         })
@@ -58,7 +58,10 @@ class FootprintSdkArgsManager(private val config: FootprintConfiguration) {
         )
         return Request.Builder()
             .url("${FootprintSdkMetadata.apiBaseUrl}/org/sdk_args")
-            .header("x-fp-client-version", "${FootprintSdkMetadata.name} ${FootprintSdkMetadata.version}")
+            .header(
+                "x-fp-client-version",
+                "${FootprintSdkMetadata.name} ${FootprintSdkMetadata.version}"
+            )
             .header("Content-Type", "application/json")
             .post(Json.encodeToString(requestBody).toRequestBody())
             .build()
