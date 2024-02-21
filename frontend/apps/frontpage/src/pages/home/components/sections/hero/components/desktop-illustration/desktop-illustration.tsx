@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import { motion, useAnimation, useInView } from 'framer-motion';
+import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 
 import Background from '../background';
@@ -10,9 +11,6 @@ const DesktopIllustration = () => {
   const isInView = useInView(ref, { once: true });
   const mockupControls = useAnimation();
   const containerControls = useAnimation();
-
-  const MOCKUP_WIDTH = 1240;
-  const MOCKUP_HEIGHT = 800;
 
   const mockupVariants = {
     hidden: {
@@ -58,13 +56,15 @@ const DesktopIllustration = () => {
   return (
     <IllustrationContainer ref={ref}>
       <StyledBackground />
-      <MockupContainer
-        animate={containerControls}
-        width={MOCKUP_WIDTH}
-        height={MOCKUP_HEIGHT}
-      >
-        <ImageContainer animate={mockupControls} />
-      </MockupContainer>
+      <Frame animate={containerControls}>
+        <Mockup
+          animate={mockupControls}
+          src="/home/hero/hero-new.png"
+          width={1440}
+          height={900}
+          alt="hero"
+        />
+      </Frame>
     </IllustrationContainer>
   );
 };
@@ -83,7 +83,7 @@ const IllustrationContainer = styled.div`
   `}
 `;
 
-const ImageContainer = styled(motion.div)`
+const Mockup = styled(motion(Image))`
   ${({ theme }) => css`
     position: relative;
     z-index: 2;
@@ -91,21 +91,6 @@ const ImageContainer = styled(motion.div)`
     opacity: 0;
     background-color: ${theme.backgroundColor.primary};
     border-radius: 15px 15px 0 0;
-    overflow: hidden;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 6px;
-      left: 0;
-      height: 100%;
-      width: 100%;
-      background-image: url('/home/hero/hero-new.png');
-      background-size: contain;
-      background-position: top center;
-      background-repeat: no-repeat;
-      z-index: 3;
-    }
 
     ${media.greaterThan('md')`
       height: 100%;
@@ -114,31 +99,16 @@ const ImageContainer = styled(motion.div)`
   `}
 `;
 
-const MockupContainer = styled(motion(Container))<{
-  width: number;
-  height: number;
-}>`
-  ${({ theme, width, height }) => css`
-    width: ${width}px;
-    height: ${height}px;
+const Frame = styled(motion(Container))`
+  ${({ theme }) => css`
     position: relative;
     padding: ${theme.spacing[2]};
     padding-bottom: ${theme.spacing[1]}};
     border-radius: ${theme.borderRadius.default};
+    background-color: ${theme.borderColor.tertiary};
     isolation: isolate;
     overflow: hidden;
     opacity: 0;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: calc(100% + ${theme.spacing[2]});
-      height: calc(100% + ${theme.spacing[2]});
-      background: ${theme.backgroundColor.senary};
-      z-index: 1;
-    }
 
     ${media.greaterThan('md')`
       bottom: -${theme.spacing[9]};
