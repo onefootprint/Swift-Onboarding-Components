@@ -192,7 +192,9 @@ const getResidency = (residencyForm?: ResidencyFormData) => {
   }
   return {
     allowUsResidents,
-    allowUsTerritories,
+    allowUsTerritories: allowInternationalResidents
+      ? false
+      : allowUsTerritories,
     allowInternationalResidents,
     internationalCountryRestrictions: null,
   };

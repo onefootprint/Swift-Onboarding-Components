@@ -823,5 +823,32 @@ describe('processPlaybook', () => {
         expect(internationalCountryRestrictions).toEqual(['CL']);
       });
     });
+
+    describe('when "All countries" and "Allow residentes from US" are selected', () => {
+      it('should set allowUsTerritories to false', () => {
+        const {
+          allowUsResidents,
+          allowUsTerritories,
+          allowInternationalResidents,
+          internationalCountryRestrictions,
+        } = processPlaybook({
+          playbook: defaultPlaybookValuesKYC,
+          kind: PlaybookKind.Kyc,
+          authorizedScopes: defaultAuthorizedScopesValues,
+          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+          residencyForm: {
+            allowUsResidents: true,
+            allowUsTerritories: false,
+            allowInternationalResidents: true,
+            restrictCountries: CountryRestriction.all,
+          },
+        });
+
+        expect(allowUsResidents).toBeTruthy();
+        expect(allowUsTerritories).toBeFalsy();
+        expect(allowInternationalResidents).toBeTruthy();
+        expect(internationalCountryRestrictions).toBeNull();
+      });
+    });
   });
 });
