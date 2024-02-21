@@ -61,3 +61,19 @@ pub struct CreateTenantAppMetaRequest {
     pub android_package_name: Option<String>,    // Only set for Android
     pub android_apk_cert_sha256: Option<String>, // Only set for Android
 }
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct CreateTenantAndroidAppMetaRequest {
+    pub package_names: Vec<String>,
+    pub apk_cert_sha256s: Vec<String>,
+    pub integrity_verification_key: String,
+    pub integrity_decryption_key: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct UpdateTenantAndroidAppMetaRequest {
+    pub package_names: Option<Vec<String>>,
+    pub apk_cert_sha256s: Option<Vec<String>>,
+    pub integrity_verification_key: Option<String>,
+    pub integrity_decryption_key: Option<String>,
+}

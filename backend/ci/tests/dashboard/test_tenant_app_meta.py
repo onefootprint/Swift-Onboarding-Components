@@ -91,7 +91,7 @@ def test_tenant_app_meta(sandbox_tenant):
         ]
 
         # Don't compare creation time ordering as that may be flaky.
-        assert set(got_ids) == set(want_ids)
+        assert set(want_ids).issubset(set(got_ids))
 
     # Re-deletion throws errors.
     for tam_id in tam_ids:

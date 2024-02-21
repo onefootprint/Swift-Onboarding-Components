@@ -42,6 +42,7 @@ pub mod stytch_fingerprint_event;
 pub mod task;
 pub mod task_execution;
 pub mod tenant;
+pub mod tenant_android_app_meta;
 pub mod tenant_api_key;
 pub mod tenant_app_meta;
 pub mod tenant_business_info;

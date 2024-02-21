@@ -1,5 +1,6 @@
 mod access_events;
 mod api_keys;
+mod app_meta;
 mod audit_events;
 mod authn;
 mod client_security_config;
@@ -58,6 +59,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     onboarding_configs::routes(config);
     authn::routes(config);
     api_keys::routes(config);
+    app_meta::routes(config);
     proxy_configs::routes(config);
     rules::routes(config);
 }
