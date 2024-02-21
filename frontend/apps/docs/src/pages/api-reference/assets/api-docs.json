@@ -64,6 +64,43 @@
                 ]
             }
         },
+        "/businesses/{fp_bid}": {
+            "delete": {
+                "tags": [
+                    "Businesses",
+                    "PublicApi"
+                ],
+                "description": "Deletes a business.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/businesses/{fp_bid}/vault": {
             "get": {
                 "tags": [

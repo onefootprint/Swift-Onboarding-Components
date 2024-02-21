@@ -38,4 +38,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(tags::get)
         .service(tags::post)
         .service(tags::delete);
+
+    delete::configure_delete_aliases(config);
 }

@@ -14,10 +14,16 @@ use api_core::{
     },
 };
 use db::models::{audit_event::NewAuditEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault};
+use macros::route_alias;
 use newtypes::{AuditEventDetail, AuditEventId, DbActor};
 use paperclip::actix::{self, api_v2_operation, web};
 
 
+#[route_alias(actix::delete(
+    "/businesses/{fp_bid}",
+    tags(Businesses, PublicApi),
+    description = "Deletes a business."
+))]
 #[api_v2_operation(description = "Deletes a user.", tags(Users, PublicApi))]
 #[actix::delete("/users/{fp_id}")]
 pub async fn delete(
