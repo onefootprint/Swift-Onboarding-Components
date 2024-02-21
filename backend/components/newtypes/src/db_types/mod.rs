@@ -40,7 +40,6 @@ mod rules;
 mod sealed_bytes;
 mod session_kind;
 mod task_status;
-mod tenant_app_meta;
 mod tenant_frequent_notes;
 mod tenant_role_kind;
 mod tenant_scope;
@@ -66,8 +65,8 @@ pub use self::{
     identity_document_status::*, incode::*, label::*, liveness_source::*, manual_review::*,
     middesk_request_state::*, ob_config::*, onboarding_status::*, org_member_email::*, preview_api::*,
     proxy_ingress_kind::*, risk_signal_group::*, rule_expression::*, rules::*, sealed_bytes::*,
-    session_kind::*, task_status::*, tenant_app_meta::*, tenant_frequent_notes::*, tenant_role_kind::*,
-    tenant_scope::*, user_timeline_event::*, vault_data_format::*, vault_key_pair::*, vault_kind::*,
+    session_kind::*, task_status::*, tenant_frequent_notes::*, tenant_role_kind::*, tenant_scope::*,
+    user_timeline_event::*, vault_data_format::*, vault_key_pair::*, vault_kind::*,
     vault_proxy_permission::*, vendor::*, watchlist_check::*, workflow::*, workflow_fixture_result::*,
     workflow_request::*, workflow_source::*, workos_auth_method::*,
 };

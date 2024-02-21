@@ -44,7 +44,6 @@ pub mod task_execution;
 pub mod tenant;
 pub mod tenant_android_app_meta;
 pub mod tenant_api_key;
-pub mod tenant_app_meta;
 pub mod tenant_business_info;
 pub mod tenant_client_config;
 pub mod tenant_frequent_note;

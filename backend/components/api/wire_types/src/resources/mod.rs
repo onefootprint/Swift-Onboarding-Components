@@ -106,9 +106,6 @@ pub use org_client_security_config::*;
 mod org_frequent_note;
 pub use org_frequent_note::*;
 
-mod tenant_app_meta;
-pub use tenant_app_meta::*;
-
 mod tenant_android_app_meta;
 pub use tenant_android_app_meta::*;
 

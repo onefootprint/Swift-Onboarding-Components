@@ -1,6 +1,4 @@
-use newtypes::{
-    input::Csv, CompanySize, TenantAppKind, TenantFrequentNoteKind, TenantRoleId, TenantRoleKindDiscriminant,
-};
+use newtypes::{input::Csv, CompanySize, TenantFrequentNoteKind, TenantRoleId, TenantRoleKindDiscriminant};
 
 use crate::*;
 
@@ -45,21 +43,6 @@ pub struct GetOrgFrequentNotes {
 pub struct CreateOrgFrequentNoteRequest {
     pub kind: TenantFrequentNoteKind,
     pub content: String,
-}
-
-#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
-pub struct GetTenantAppMetaRequest {
-    pub kind: TenantAppKind,
-}
-
-#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
-pub struct CreateTenantAppMetaRequest {
-    pub kind: TenantAppKind,
-    pub name: String,
-    pub ios_app_bundle_id: Option<String>,       // Only set for iOS
-    pub ios_team_id: Option<String>,             // Only set for iOS
-    pub android_package_name: Option<String>,    // Only set for Android
-    pub android_apk_cert_sha256: Option<String>, // Only set for Android
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
