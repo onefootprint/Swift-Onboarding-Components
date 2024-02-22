@@ -113,6 +113,11 @@ pub enum ScopedVaultIdentifier<'a> {
         v_id: &'a VaultId,
         t_id: &'a TenantId,
     },
+    ExternalId {
+        e_id: &'a ExternalId,
+        t_id: &'a TenantId,
+        is_live: IsLive,
+    },
     /// Only used in firm-employee-authed GET /private/entities API
     SuperAdminView {
         /// Either an fp id or a scoped vault id
@@ -221,17 +226,36 @@ impl ScopedVault {
         external_id: Option<ExternalId>,
         actor: DbActor,
     ) -> DbResult<(Self, Vault)> {
-        // Since the idempotency id is stored on the vault, concatenate it with the tenant ID to
-        // make sure they are scoped per tenant
-        // if there is no idempotency id provided, but an external id is provided use that instead
-        let idempotency_id = idempotency_id
-            .or(external_id.as_ref().map(|e| e.to_string()))
-            .map(|id| IdempotencyId::from(format!("{}.{}", tenant_id, id)));
+        // Since the idempotency id and external ID are stored on the vault, concatenate them with
+        // the tenant ID to make sure they are scoped per tenant.
+        let idempotency_id = idempotency_id.map(|id| IdempotencyId::from(format!("{}.{}", tenant_id, id)));
+        let idempotency_id_given = idempotency_id.is_some();
 
-        let (uv, is_new_vault) = Vault::insert(conn, new_user, idempotency_id)?;
+        let (uv, is_new_vault) = match &external_id {
+            // Get the existing vault if an active scoped vault already exists with the given
+            // external ID. Otherwise, create a new vault.
+            Some(external_id) => {
+                let svr = ScopedVault::get(
+                    conn,
+                    ScopedVaultIdentifier::ExternalId {
+                        e_id: external_id,
+                        t_id: &tenant_id,
+                        is_live: new_user.is_live,
+                    },
+                );
+                match svr {
+                    Ok(sv) => Ok((Vault::lock(conn, &sv.vault_id)?, false)),
+                    Err(err) if err.is_not_found() => Ok(Vault::insert(conn, new_user, idempotency_id)?),
+                    Err(err) => Err(err),
+                }?
+            }
+            None => Vault::insert(conn, new_user, idempotency_id)?,
+        };
+
         if !uv.is_created_via_api {
             return Err(DbError::CannotCreatedScopedUser);
         }
+
         let su = if is_new_vault {
             let start_timestamp = Utc::now();
             let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -261,7 +285,13 @@ impl ScopedVault {
                 .filter(scoped_vault::vault_id.eq(&uv.id))
                 .filter(scoped_vault::tenant_id.eq(&tenant_id))
                 .filter(scoped_vault::deactivated_at.is_null())
-                .get_result(conn.conn())?
+                .get_result(conn.conn())
+                .map_err(|e| match e {
+                    diesel::result::Error::NotFound if idempotency_id_given => DbError::ValidationError(
+                        "Vault previously created with given idempotency key has been deleted".to_owned(),
+                    ),
+                    e => e.into(),
+                })?
         };
         Ok((su, uv.into_inner()))
     }
@@ -296,6 +326,12 @@ impl ScopedVault {
                 query = query
                     .filter(scoped_vault::vault_id.eq(v_id))
                     .filter(scoped_vault::tenant_id.eq(t_id))
+            }
+            ScopedVaultIdentifier::ExternalId { e_id, t_id, is_live } => {
+                query = query
+                    .filter(scoped_vault::external_id.eq(e_id))
+                    .filter(scoped_vault::tenant_id.eq(t_id))
+                    .filter(scoped_vault::is_live.eq(is_live))
             }
             ScopedVaultIdentifier::SuperAdminView { identifier } => {
                 query = query.filter(
@@ -555,4 +591,305 @@ pub enum ScopedVaultPiiFilters {
     NonPci,
     /// Select scoped vaults that have `card.*` or `custom.*` data
     PciOrCustom,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::{fixtures, prelude::*};
+    use macros::db_test;
+
+    #[db_test]
+    fn test_create_scoped_vault_idempotency(conn: &mut TestPgConn) {
+        let tenant = fixtures::tenant::create(conn);
+
+        let nva = NewVaultArgs {
+            e_private_key: vec![].into(),
+            public_key: vec![].into(),
+            is_live: false,
+            kind: VaultKind::Person,
+            is_fixture: true,
+            sandbox_id: None,
+            is_created_via_api: true,
+            duplicate_of_id: None,
+        };
+
+        struct Create<'a> {
+            idempotency_id: Option<&'a str>,
+            external_id: Option<&'a str>,
+        }
+        struct Test<'a> {
+            name: &'a str,
+            create_1: Create<'a>,
+            create_2: Create<'a>,
+            expect_same_fp_ids: bool,
+            expect_external_ids: (Option<&'a str>, Option<&'a str>),
+        }
+
+        let tests = [
+            Test {
+                name: "Create with no idempotency ID and no external ID.",
+                create_1: Create {
+                    idempotency_id: None,
+                    external_id: None,
+                },
+                create_2: Create {
+                    idempotency_id: None,
+                    external_id: None,
+                },
+                expect_same_fp_ids: false,
+                expect_external_ids: (None, None),
+            },
+            Test {
+                name: "Create with same idempotency ID and no external ID.",
+                create_1: Create {
+                    idempotency_id: Some("idempotency-id-1"),
+                    external_id: None,
+                },
+                create_2: Create {
+                    idempotency_id: Some("idempotency-id-1"),
+                    external_id: None,
+                },
+                expect_same_fp_ids: true,
+                expect_external_ids: (None, None),
+            },
+            Test {
+                name: "Create with different idempotency ID and no external ID.",
+                create_1: Create {
+                    idempotency_id: Some("idempotency-id-2"),
+                    external_id: None,
+                },
+                create_2: Create {
+                    idempotency_id: Some("idempotency-id-3"),
+                    external_id: None,
+                },
+                expect_same_fp_ids: false,
+                expect_external_ids: (None, None),
+            },
+            Test {
+                name: "Create with no idempotency ID and same external ID.",
+                create_1: Create {
+                    idempotency_id: None,
+                    external_id: Some("external-id-1"),
+                },
+                create_2: Create {
+                    idempotency_id: None,
+                    external_id: Some("external-id-1"),
+                },
+                expect_same_fp_ids: true,
+                expect_external_ids: (Some("external-id-1"), Some("external-id-1")),
+            },
+            Test {
+                name: "Create with no idempotency ID and different external ID.",
+                create_1: Create {
+                    idempotency_id: None,
+                    external_id: Some("external-id-2"),
+                },
+                create_2: Create {
+                    idempotency_id: None,
+                    external_id: Some("external-id-3"),
+                },
+                expect_same_fp_ids: false,
+                expect_external_ids: (Some("external-id-2"), Some("external-id-3")),
+            },
+            Test {
+                name: "Create with same idempotency ID and same external ID.",
+                create_1: Create {
+                    idempotency_id: Some("idempotency-id-4"),
+                    external_id: Some("external-id-4"),
+                },
+                create_2: Create {
+                    idempotency_id: Some("idempotency-id-4"),
+                    external_id: Some("external-id-4"),
+                },
+                expect_same_fp_ids: true,
+                expect_external_ids: (Some("external-id-4"), Some("external-id-4")),
+            },
+            Test {
+                name: "Create with same idempotency ID and different external ID.",
+                create_1: Create {
+                    idempotency_id: Some("idempotency-id-5"),
+                    external_id: Some("external-id-5"),
+                },
+                create_2: Create {
+                    idempotency_id: Some("idempotency-id-5"),
+                    external_id: Some("external-id-6"),
+                },
+                expect_same_fp_ids: true,
+                expect_external_ids: (Some("external-id-5"), Some("external-id-5")),
+            },
+            Test {
+                name: "Create with different idempotency ID and same external ID.",
+                create_1: Create {
+                    idempotency_id: Some("idempotency-id-6"),
+                    external_id: Some("external-id-7"),
+                },
+                create_2: Create {
+                    idempotency_id: Some("idempotency-id-7"),
+                    external_id: Some("external-id-7"),
+                },
+                expect_same_fp_ids: true,
+                expect_external_ids: (Some("external-id-7"), Some("external-id-7")),
+            },
+            Test {
+                name: "Create with different idempotency ID and different external ID.",
+                create_1: Create {
+                    idempotency_id: Some("idempotency-id-8"),
+                    external_id: Some("external-id-8"),
+                },
+                create_2: Create {
+                    idempotency_id: Some("idempotency-id-9"),
+                    external_id: Some("external-id-9"),
+                },
+                expect_same_fp_ids: false,
+                expect_external_ids: (Some("external-id-8"), Some("external-id-9")),
+            },
+        ];
+
+        for test in tests {
+            let (sv0, _) = ScopedVault::get_or_create_non_portable(
+                conn,
+                nva.clone(),
+                tenant.id.clone(),
+                test.create_1.idempotency_id.map(|s| s.into()),
+                test.create_1.external_id.map(|s| s.to_owned().into()),
+                DbActor::Footprint,
+            )
+            .unwrap_or_else(|e| panic!("{}: create 1 failed with error: {}", test.name, e,));
+            let (sv1, _) = ScopedVault::get_or_create_non_portable(
+                conn,
+                nva.clone(),
+                tenant.id.clone(),
+                test.create_2.idempotency_id.map(|s| s.into()),
+                test.create_2.external_id.map(|s| s.to_owned().into()),
+                DbActor::Footprint,
+            )
+            .unwrap_or_else(|e| panic!("{}: create 2 failed with error: {}", test.name, e,));
+            if test.expect_same_fp_ids {
+                assert_eq!(sv0.fp_id, sv1.fp_id, "{}", test.name);
+            } else {
+                assert_ne!(sv0.fp_id, sv1.fp_id, "{}", test.name);
+            }
+            assert_eq!(
+                sv0.external_id,
+                test.expect_external_ids.0.map(|s| s.to_owned().into()),
+                "{}",
+                test.name
+            );
+            assert_eq!(
+                sv1.external_id,
+                test.expect_external_ids.1.map(|s| s.to_owned().into()),
+                "{}",
+                test.name
+            );
+        }
+    }
+
+    #[db_test]
+    fn test_create_scoped_vault_after_deactivate(conn: &mut TestPgConn) {
+        let tenant = fixtures::tenant::create(conn);
+
+        let nva = NewVaultArgs {
+            e_private_key: vec![].into(),
+            public_key: vec![].into(),
+            is_live: false,
+            kind: VaultKind::Person,
+            is_fixture: true,
+            sandbox_id: None,
+            is_created_via_api: true,
+            duplicate_of_id: None,
+        };
+
+        // Test first using an idempotency ID.
+        let (sv0, _) = ScopedVault::get_or_create_non_portable(
+            conn,
+            nva.clone(),
+            tenant.id.clone(),
+            Some("idempotency-id-1".into()),
+            Some("external-id-1".to_owned().into()),
+            DbActor::Footprint,
+        )
+        .unwrap();
+        assert_eq!(
+            sv0.external_id.map(|e| e.to_string()),
+            Some("external-id-1".to_owned())
+        );
+
+        ScopedVault::deactivate(conn, &sv0.id).unwrap();
+
+        let err = ScopedVault::get_or_create_non_portable(
+            conn,
+            nva.clone(),
+            tenant.id.clone(),
+            Some("idempotency-id-1".into()),
+            Some("external-id-1".to_owned().into()),
+            DbActor::Footprint,
+        )
+        .unwrap_err();
+        assert!(matches!(err, DbError::ValidationError(_)));
+
+
+        let (sv1, _) = ScopedVault::get_or_create_non_portable(
+            conn,
+            nva.clone(),
+            tenant.id.clone(),
+            Some("idempotency-id-2".into()),
+            Some("external-id-1".to_owned().into()),
+            DbActor::Footprint,
+        )
+        .unwrap();
+        assert_eq!(
+            sv1.external_id.map(|e| e.to_string()),
+            Some("external-id-1".to_owned())
+        );
+
+        assert_ne!(sv0.fp_id, sv1.fp_id);
+
+        // Test next without an idempotency ID.
+        let (sv2, _) = ScopedVault::get_or_create_non_portable(
+            conn,
+            nva.clone(),
+            tenant.id.clone(),
+            None,
+            Some("external-id-1".to_owned().into()),
+            DbActor::Footprint,
+        )
+        .unwrap();
+        assert_eq!(
+            sv2.external_id.map(|e| e.to_string()),
+            Some("external-id-1".to_owned())
+        );
+
+        let (sv3, _) = ScopedVault::get_or_create_non_portable(
+            conn,
+            nva.clone(),
+            tenant.id.clone(),
+            None,
+            Some("external-id-1".to_owned().into()),
+            DbActor::Footprint,
+        )
+        .unwrap();
+        assert_eq!(sv2.fp_id, sv3.fp_id);
+        assert_eq!(
+            sv3.external_id.map(|e| e.to_string()),
+            Some("external-id-1".to_owned())
+        );
+
+        ScopedVault::deactivate(conn, &sv2.id).unwrap();
+
+        let (sv4, _) = ScopedVault::get_or_create_non_portable(
+            conn,
+            nva.clone(),
+            tenant.id.clone(),
+            None,
+            Some("external-id-1".to_owned().into()),
+            DbActor::Footprint,
+        )
+        .unwrap();
+        assert_ne!(sv3.fp_id, sv4.fp_id);
+        assert_eq!(
+            sv4.external_id.map(|e| e.to_string()),
+            Some("external-id-1".to_owned())
+        );
+    }
 }

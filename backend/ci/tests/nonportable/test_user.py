@@ -3,6 +3,7 @@ from tests.headers import ExternalId, IdempotencyId
 from tests.utils import (
     _gen_random_sandbox_id,
     post,
+    delete,
     get,
     create_ob_config,
     _gen_random_ssn,
@@ -11,8 +12,7 @@ from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA
 
 
 def test_idempotency_id(tenant, sandbox_tenant):
-    # Can't create the user inline with invalid data
-    idempotency_id = IdempotencyId("1234567890Aa._-")
+    idempotency_id = IdempotencyId(f"1234567890Aa._-{_gen_random_sandbox_id()}")
     body = post("users/", None, tenant.sk.key, idempotency_id)
     fp_id = body["id"]
 
@@ -20,7 +20,7 @@ def test_idempotency_id(tenant, sandbox_tenant):
     body = post("users/", None, tenant.sk.key, idempotency_id)
     assert body["id"] == fp_id
 
-    # Cannot provide data alongisde idempotency ID since result would be undefined
+    # Cannot provide data alongside idempotency ID since result would be undefined
     data = {"id.dob": "1998-12-25"}
     post("users/", data, tenant.sk.key, idempotency_id, status_code=400)
 
@@ -63,6 +63,30 @@ def test_external_id(tenant, sandbox_tenant):
     invalid_id_too_short = ExternalId("1234")
     post("users/", None, sandbox_tenant.sk.key, invalid_id_too_short, status_code=400)
 
+
+def test_create_with_external_id_after_deactivate(tenant, sandbox_tenant):
+    idempotency_id = f"idempotency_id_{_gen_random_sandbox_id()}"
+    external_id = f"my_cus_id_{_gen_random_sandbox_id()}"
+    body_1 = post("users/", None, tenant.sk.key, IdempotencyId(idempotency_id), ExternalId(external_id))
+    body_2 = post("users/", None, tenant.sk.key, IdempotencyId(idempotency_id), ExternalId(external_id))
+
+    assert body_1["id"] == body_2["id"]
+    assert body_1["external_id"] == body_2["external_id"] == external_id
+
+    fp_id = body_1["id"]
+    delete(f"users/{fp_id}", None, tenant.sk.key)
+
+    # Reusing the same idempotency ID results in a 400 error.
+    post("users/", None, tenant.sk.key, IdempotencyId(idempotency_id), ExternalId(external_id), status_code=400)
+
+    # Using a new idempotency ID works.
+    idempotency_id = f"idempotency_id_{_gen_random_sandbox_id()}"
+    body_1 = post("users/", None, tenant.sk.key, IdempotencyId(idempotency_id), ExternalId(external_id))
+
+    # Using no idempotency ID works.
+    body_2 = post("users/", None, tenant.sk.key, ExternalId(external_id))
+    assert body_1["id"] == body_2["id"]
+    assert body_1["external_id"] == body_2["external_id"] == external_id
 
 @pytest.mark.parametrize(
     "missing_can_access_data,missing_vault_data,expected_error",

@@ -434,6 +434,7 @@ struct NewVaultRow {
     duplicate_of_id: Option<VaultId>,
 }
 
+#[derive(Debug, Clone)]
 pub struct NewVaultArgs {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,

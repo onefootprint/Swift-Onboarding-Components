@@ -6,7 +6,7 @@ use crate::{
     State,
 };
 use api_core::{
-    types::ResponseData,
+    types::{EmptyResponse, ResponseData},
     utils::{
         fp_id_path::FpIdPath,
         headers::InsightHeaders,
@@ -31,7 +31,7 @@ pub async fn delete(
     path: FpIdPath,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-) -> JsonApiResponse<()> {
+) -> JsonApiResponse<EmptyResponse> {
     let fp_id = path.into_inner();
 
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
@@ -68,5 +68,5 @@ pub async fn delete(
         })
         .await?;
 
-    ResponseData::ok(()).json()
+    ResponseData::ok(EmptyResponse {}).json()
 }
