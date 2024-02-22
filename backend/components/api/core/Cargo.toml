@@ -134,7 +134,6 @@ diesel = { workspace = true, features = [
     "postgres",
     "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
-diesel-derive-newtype = { workspace = true }
 diesel_migrations = { workspace = true }
 db_schema = { path = "../../db/schema" }
 

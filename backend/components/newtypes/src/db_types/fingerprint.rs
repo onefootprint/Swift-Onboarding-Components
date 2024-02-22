@@ -1,9 +1,18 @@
 use derive_more::{From, Into};
-
+use diesel::{
+    backend::Backend,
+    deserialize::{FromSql, FromSqlRow},
+    expression::AsExpression,
+    serialize::ToSql,
+    sql_types::Binary,
+};
 use serde::{Deserialize, Serialize};
 
-#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(
+    Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, AsExpression, FromSqlRow,
+)]
 #[serde(transparent)]
+#[diesel(sql_type = Binary)]
 pub struct Fingerprint(pub Vec<u8>);
 
 impl std::fmt::Debug for Fingerprint {
@@ -21,5 +30,25 @@ impl std::fmt::Display for Fingerprint {
 impl AsRef<[u8]> for Fingerprint {
     fn as_ref(&self) -> &[u8] {
         &self.0
+    }
+}
+
+impl<DB> ToSql<Binary, DB> for Fingerprint
+where
+    DB: Backend,
+    Vec<u8>: ToSql<Binary, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Binary, DB> for Fingerprint
+where
+    DB: Backend,
+    Vec<u8>: FromSql<Binary, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
     }
 }

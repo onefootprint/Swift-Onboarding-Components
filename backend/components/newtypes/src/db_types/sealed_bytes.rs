@@ -1,13 +1,21 @@
+use crate::SealedVaultDataKey;
 use crypto::aead::AeadSealedBytes;
 use derive_more::{From, Into};
-
+use diesel::{
+    backend::Backend,
+    deserialize::{FromSql, FromSqlRow},
+    expression::AsExpression,
+    serialize::ToSql,
+    sql_types::Binary,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::SealedVaultDataKey;
-
 /// Symmetric key sealed bytes (for session data)
-#[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(
+    Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, AsExpression, FromSqlRow,
+)]
 #[serde(transparent)]
+#[diesel(sql_type = Binary)]
 pub struct SealedSessionBytes(pub Vec<u8>);
 
 impl From<AeadSealedBytes> for SealedSessionBytes {
@@ -28,9 +36,32 @@ impl AsRef<[u8]> for SealedSessionBytes {
     }
 }
 
+impl<DB> ToSql<Binary, DB> for SealedSessionBytes
+where
+    DB: Backend,
+    Vec<u8>: ToSql<Binary, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Binary, DB> for SealedSessionBytes
+where
+    DB: Backend,
+    Vec<u8>: FromSql<Binary, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
+    }
+}
+
 /// Asymmetric (vault public key, sealed bytes)
-#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(
+    Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, AsExpression, FromSqlRow,
+)]
 #[serde(transparent)]
+#[diesel(sql_type = Binary)]
 pub struct SealedVaultBytes(pub Vec<u8>);
 
 impl std::fmt::Debug for SealedVaultBytes {
@@ -48,5 +79,25 @@ impl AsRef<[u8]> for SealedVaultBytes {
 impl From<SealedVaultDataKey> for SealedVaultBytes {
     fn from(key: SealedVaultDataKey) -> Self {
         Self(key.0)
+    }
+}
+
+impl<DB> ToSql<Binary, DB> for SealedVaultBytes
+where
+    DB: Backend,
+    Vec<u8>: ToSql<Binary, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Binary, DB> for SealedVaultBytes
+where
+    DB: Backend,
+    Vec<u8>: FromSql<Binary, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
     }
 }

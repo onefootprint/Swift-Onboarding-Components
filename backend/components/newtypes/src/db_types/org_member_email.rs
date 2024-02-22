@@ -1,9 +1,14 @@
+use crate::email::Email;
+use diesel::{
+    backend::Backend,
+    deserialize::{FromSql, FromSqlRow},
+    expression::AsExpression,
+    serialize::ToSql,
+    sql_types::Text,
+};
 use paperclip::v2::schema::TypedData;
-
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
-
-use crate::email::Email;
 
 // TODO just use Email
 #[derive(
@@ -11,13 +16,15 @@ use crate::email::Email;
     Clone,
     DeserializeFromStr,
     SerializeDisplay,
-    DieselNewType,
     Default,
     Eq,
     PartialEq,
     macros::SerdeAttr,
+    AsExpression,
+    FromSqlRow,
 )]
 #[serde(transparent)]
+#[diesel(sql_type = Text)]
 pub struct OrgMemberEmail(pub String);
 
 impl OrgMemberEmail {
@@ -59,5 +66,25 @@ impl std::fmt::Display for OrgMemberEmail {
 impl TypedData for OrgMemberEmail {
     fn data_type() -> paperclip::v2::models::DataType {
         paperclip::v2::models::DataType::String
+    }
+}
+
+impl<DB> ToSql<Text, DB> for OrgMemberEmail
+where
+    DB: Backend,
+    String: ToSql<Text, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Text, DB> for OrgMemberEmail
+where
+    DB: Backend,
+    String: FromSql<Text, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from_str(&String::from_sql(bytes)?)?)
     }
 }

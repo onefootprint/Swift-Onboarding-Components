@@ -1,12 +1,21 @@
+use crate::{PiiString, SealedVaultBytes};
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use derive_more::{From, Into};
+use diesel::{
+    backend::Backend,
+    deserialize::{FromSql, FromSqlRow},
+    expression::AsExpression,
+    serialize::ToSql,
+    sql_types::Binary,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::{PiiString, SealedVaultBytes};
-
 /// Bytes of a vault public key
-#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(
+    Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, AsExpression, FromSqlRow,
+)]
 #[serde(transparent)]
+#[diesel(sql_type = Binary)]
 pub struct VaultPublicKey(Vec<u8>);
 
 impl std::fmt::Debug for VaultPublicKey {
@@ -53,9 +62,32 @@ impl VaultPublicKey {
     }
 }
 
+impl<DB> ToSql<Binary, DB> for VaultPublicKey
+where
+    DB: Backend,
+    Vec<u8>: ToSql<Binary, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Binary, DB> for VaultPublicKey
+where
+    DB: Backend,
+    Vec<u8>: FromSql<Binary, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
+    }
+}
+
 /// Bytes of a sealed vault private key
-#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(
+    Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, AsExpression, FromSqlRow,
+)]
 #[serde(transparent)]
+#[diesel(sql_type = Binary)]
 pub struct EncryptedVaultPrivateKey(pub Vec<u8>);
 
 impl std::fmt::Debug for EncryptedVaultPrivateKey {
@@ -64,9 +96,32 @@ impl std::fmt::Debug for EncryptedVaultPrivateKey {
     }
 }
 
+impl<DB> ToSql<Binary, DB> for EncryptedVaultPrivateKey
+where
+    DB: Backend,
+    Vec<u8>: ToSql<Binary, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Binary, DB> for EncryptedVaultPrivateKey
+where
+    DB: Backend,
+    Vec<u8>: FromSql<Binary, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
+    }
+}
+
 /// Bytes of a sealed vault private key
-#[derive(DieselNewType, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
+#[derive(
+    Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, AsExpression, FromSqlRow,
+)]
 #[serde(transparent)]
+#[diesel(sql_type = Binary)]
 pub struct SealedVaultDataKey(pub Vec<u8>);
 
 impl std::fmt::Debug for SealedVaultDataKey {
@@ -80,5 +135,25 @@ impl TryFrom<EciesP256Sha256AesGcmSealed> for SealedVaultDataKey {
 
     fn try_from(value: EciesP256Sha256AesGcmSealed) -> Result<Self, Self::Error> {
         Ok(Self(value.to_vec()?))
+    }
+}
+
+impl<DB> ToSql<Binary, DB> for SealedVaultDataKey
+where
+    DB: Backend,
+    Vec<u8>: ToSql<Binary, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Binary, DB> for SealedVaultDataKey
+where
+    DB: Backend,
+    Vec<u8>: FromSql<Binary, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
     }
 }

@@ -1,3 +1,10 @@
+use diesel::{
+    backend::Backend,
+    deserialize::{FromSql, FromSqlRow},
+    expression::AsExpression,
+    serialize::ToSql,
+    sql_types::BigInt,
+};
 use paperclip::actix::Apiv2Schema;
 
 #[doc = "Sequence number used to order DataLifetimes"]
@@ -16,10 +23,32 @@ use paperclip::actix::Apiv2Schema;
     serde::Serialize,
     serde::Deserialize,
     Default,
-    DieselNewType,
     Apiv2Schema,
     // This is implemented separately because we need to derive Copy...
     Copy,
+    AsExpression,
+    FromSqlRow,
 )]
 #[serde(transparent)]
+#[diesel(sql_type = BigInt)]
 pub struct DataLifetimeSeqno(i64);
+
+impl<DB> ToSql<BigInt, DB> for DataLifetimeSeqno
+where
+    DB: Backend,
+    i64: ToSql<BigInt, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<BigInt, DB> for DataLifetimeSeqno
+where
+    DB: Backend,
+    i64: FromSql<BigInt, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(i64::from_sql(bytes)?))
+    }
+}

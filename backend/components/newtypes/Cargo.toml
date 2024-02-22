@@ -36,7 +36,6 @@ tracing = { workspace = true }
 macros = { path = "../macros" }
 # diesel
 diesel = { workspace = true }
-diesel-derive-newtype = { workspace = true }
 
 diesel_as_jsonb = "1.0.0"
 phonenumber = "0.3.3"

@@ -1,4 +1,11 @@
 use crate::data_identifier::ValidationError;
+use diesel::{
+    backend::Backend,
+    deserialize::{FromSql, FromSqlRow},
+    expression::AsExpression,
+    serialize::ToSql,
+    sql_types::Text,
+};
 use regex::Regex;
 use std::str::FromStr;
 
@@ -21,12 +28,14 @@ lazy_static! {
     derive_more::Into,
     serde::Serialize,
     Default,
-    DieselNewType,
     derive_more::Deref,
     // This is the unique part - use FromStr to validate the alias
     serde_with::DeserializeFromStr,
+    AsExpression,
+    FromSqlRow,
 )]
 #[serde(transparent)]
+#[diesel(sql_type = Text)]
 pub struct KvDataKey(pub(in crate::id) String);
 
 impl FromStr for KvDataKey {
@@ -65,6 +74,26 @@ impl KvDataKey {
     }
 }
 
+impl<DB> ToSql<Text, DB> for KvDataKey
+where
+    DB: Backend,
+    String: ToSql<Text, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Text, DB> for KvDataKey
+where
+    DB: Backend,
+    String: FromSql<Text, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(String::from_sql(bytes)?))
+    }
+}
+
 #[doc = "Alias for a piece of custom data"]
 #[derive(
     Debug,
@@ -79,12 +108,14 @@ impl KvDataKey {
     derive_more::Into,
     serde::Serialize,
     Default,
-    DieselNewType,
     derive_more::Deref,
     // This is the unique part - use FromStr to validate the alias
     serde_with::DeserializeFromStr,
+    AsExpression,
+    FromSqlRow,
 )]
 #[serde(transparent)]
+#[diesel(sql_type = Text)]
 pub struct AliasId(pub(in crate::id) String);
 
 impl FromStr for AliasId {
@@ -114,6 +145,26 @@ impl paperclip::v2::schema::TypedData for AliasId {
 
     fn format() -> Option<paperclip::v2::models::DataTypeFormat> {
         None
+    }
+}
+
+impl<DB> ToSql<Text, DB> for AliasId
+where
+    DB: Backend,
+    String: ToSql<Text, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        self.0.to_sql(out)
+    }
+}
+
+impl<DB> FromSql<Text, DB> for AliasId
+where
+    DB: Backend,
+    String: FromSql<Text, DB>,
+{
+    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+        Ok(Self::from(String::from_sql(bytes)?))
     }
 }
 
