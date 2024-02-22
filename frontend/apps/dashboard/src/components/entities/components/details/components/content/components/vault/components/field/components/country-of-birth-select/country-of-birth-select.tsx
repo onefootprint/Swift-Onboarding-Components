@@ -1,11 +1,11 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import { IdDI, type VaultValue } from '@onefootprint/types';
 import { NativeSelect } from '@onefootprint/ui';
 import Hint from '@onefootprint/ui/src/components/internal/hint';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import EMPTY_SELECT_VALUE from '../../../../constants';
 import editFormFieldName from '../utils/edit-form-field-name';

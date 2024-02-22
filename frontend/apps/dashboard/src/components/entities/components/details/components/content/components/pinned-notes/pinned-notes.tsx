@@ -1,10 +1,10 @@
 import { IcoArrowDown16, IcoPin24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { ActorKind } from '@onefootprint/types';
 import { createFontStyles, Divider, Stack, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 import useCurrentEntityAnnotations from '@/entity/hooks/use-current-entity-annotations';

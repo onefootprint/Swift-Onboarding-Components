@@ -1,8 +1,8 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type SectionTextProps = {
   title: string;

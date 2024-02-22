@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import RiveComponent from '@rive-app/react-canvas';
 import { motion } from 'framer-motion';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const containerAnimationVariants = {
   initial: {

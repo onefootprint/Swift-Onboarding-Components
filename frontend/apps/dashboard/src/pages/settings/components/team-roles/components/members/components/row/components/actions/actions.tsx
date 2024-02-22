@@ -1,4 +1,3 @@
-import styled from '@onefootprint/styled';
 import type { Member } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import {
@@ -13,6 +12,7 @@ import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import OverflowButton from 'src/components/overflow-button';
 import PermissionGate from 'src/components/permission-gate';
+import styled from 'styled-components';
 
 import useRemoveMember from './hooks/use-remove-org-member';
 

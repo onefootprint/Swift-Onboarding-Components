@@ -1,4 +1,4 @@
-import styled from '@onefootprint/styled';
+import styled from 'styled-components';
 
 const Background = styled.div`
   background-image: url('/auth/grid/map.png');

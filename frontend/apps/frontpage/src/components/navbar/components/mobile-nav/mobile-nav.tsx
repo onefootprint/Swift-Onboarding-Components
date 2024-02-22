@@ -4,7 +4,6 @@ import {
   IcoMenu24,
   ThemedLogoFpDefault,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -12,6 +11,7 @@ import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import LinkButton from 'src/components/linking-button';
+import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
 import type { NavEntry } from '../../types';

@@ -1,6 +1,6 @@
 import type { Theme } from '@onefootprint/design-tokens';
-import { createGlobalStyle, css, ThemeProvider } from '@onefootprint/styled';
 import React from 'react';
+import { createGlobalStyle, css, ThemeProvider } from 'styled-components';
 
 import ToastProvider from '../../components/toast/toast-provider';
 import ConfirmationDialogProvider from '../confirmation-dialog-provider';

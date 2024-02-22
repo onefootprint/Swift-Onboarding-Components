@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { AuthMethodKind, ChallengeKind } from '@onefootprint/types/src/data';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import useGetHeaderText from '../../hooks/use-get-header-text';
 import { useIdentifyMachine } from '../../state';

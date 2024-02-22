@@ -6,8 +6,8 @@ import type {
   Overlay,
   Typography,
 } from '@onefootprint/design-tokens';
-import { css } from '@onefootprint/styled';
 import type * as CSS from 'csstype';
+import { css } from 'styled-components';
 
 export const createFontStyles = (
   variant: FontVariant,

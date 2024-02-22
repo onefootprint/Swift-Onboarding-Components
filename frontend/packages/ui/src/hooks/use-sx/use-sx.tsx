@@ -1,6 +1,6 @@
-import { useTheme } from '@onefootprint/styled';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
+import { useTheme } from 'styled-components';
 
 import {
   customPropNativeMapper,

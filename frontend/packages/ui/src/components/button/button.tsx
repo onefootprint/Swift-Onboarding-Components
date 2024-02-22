@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { ButtonHTMLAttributes } from 'react';
 import React, { forwardRef } from 'react';
+import styled, { css } from 'styled-components';
 
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';

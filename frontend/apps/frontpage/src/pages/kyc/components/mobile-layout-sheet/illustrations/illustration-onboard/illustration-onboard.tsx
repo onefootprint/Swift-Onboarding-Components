@@ -1,7 +1,7 @@
 import { IcoBolt24, IcoUser24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import Image from 'next/image';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const IllustrationOnboard = () => {
   const PHONE_WIDTH = 235;

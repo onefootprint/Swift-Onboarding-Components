@@ -1,8 +1,8 @@
 import { primitives } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const PaymentCardData = () => (
   <Container>

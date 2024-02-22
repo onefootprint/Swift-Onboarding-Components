@@ -1,10 +1,10 @@
-import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { Grid, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createCapitalStringList } from 'src/utils/create-string-list';
+import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import SeverityBadge from '../../../../../severity-badge';

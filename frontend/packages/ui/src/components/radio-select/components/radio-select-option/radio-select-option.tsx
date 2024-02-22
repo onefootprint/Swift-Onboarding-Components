@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import React, { useRef } from 'react';
+import styled from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 import Tooltip from '../../../tooltip';

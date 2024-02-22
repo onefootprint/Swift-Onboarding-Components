@@ -1,12 +1,12 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import LinkButton from 'src/components/linking-button';
+import styled, { css } from 'styled-components';
 
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';

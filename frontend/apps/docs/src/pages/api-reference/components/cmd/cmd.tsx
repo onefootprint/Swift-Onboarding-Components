@@ -1,9 +1,9 @@
 import { IcoClose16, IcoSearch24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Grid, IconButton, Overlay } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import type { PageNavProps } from '../page-nav/page-nav';
 import TypeBadge from '../type-badge';

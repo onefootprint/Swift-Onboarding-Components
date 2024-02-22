@@ -1,10 +1,10 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoShield40 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { type Entity, IdDI } from '@onefootprint/types';
 import { Button, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 type ProtectedDetailsProps = {
   entity: Entity;

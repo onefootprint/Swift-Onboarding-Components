@@ -1,5 +1,4 @@
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import type { OrgAuthMagicLinkRequest } from '@onefootprint/types';
 import { Button, Grid, Stack, TextInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -7,6 +6,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import BackButton from '../../components/back-button';
 import useLoginEmail from './hooks/use-login-email';

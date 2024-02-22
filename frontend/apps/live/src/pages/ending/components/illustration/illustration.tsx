@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { FootprintButton } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import AnimationDialog from '../animation-dialog';
 

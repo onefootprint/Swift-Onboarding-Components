@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import React, { useRef } from 'react';
+import styled, { css } from 'styled-components';
 
 const IllustrationOnboardingExperience = () => {
   const ref = useRef(null);

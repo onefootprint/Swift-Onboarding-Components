@@ -1,9 +1,9 @@
 import { getErrorMessage } from '@onefootprint/request';
-import styled from '@onefootprint/styled';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 import { OnboardingRequirementKind } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useGetOnboardingStatus } from '../../../../../../hooks/api';

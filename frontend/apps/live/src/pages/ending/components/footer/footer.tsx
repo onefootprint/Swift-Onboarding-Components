@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 const TWITTER_URL = 'https://twitter.com/Footprint_HQ';
 const LINKEDIN_URL = 'https://www.linkedin.com/company/onefootprint';

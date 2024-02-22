@@ -5,12 +5,12 @@ import {
   IcoHelp24,
   IcoImages24,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Container } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import IconFeatureCard from '../../components/icon-feature-card';
 import Title from './components/title';

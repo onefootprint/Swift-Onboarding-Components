@@ -1,5 +1,5 @@
 import { primitives } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
+import styled, { css } from 'styled-components';
 
 type RectangleProps = {
   left: number;

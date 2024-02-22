@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container, media, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 const MoreAbout = () => {
   const { t } = useTranslation('common', {

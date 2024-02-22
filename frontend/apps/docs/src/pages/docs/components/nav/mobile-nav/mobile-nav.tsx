@@ -1,8 +1,8 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import styled, { css } from '@onefootprint/styled';
 import { Box, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import type { PageNavigation } from 'src/types/page';
+import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
 import MobileHeader from '../../app-header/components/mobile-header';

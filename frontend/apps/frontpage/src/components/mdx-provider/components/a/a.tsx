@@ -1,4 +1,4 @@
-import styled, { css } from '@onefootprint/styled';
+import styled, { css } from 'styled-components';
 
 const a = styled.a`
   ${({ theme }) => css`

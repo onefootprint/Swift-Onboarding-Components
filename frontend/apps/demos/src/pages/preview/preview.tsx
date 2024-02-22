@@ -1,9 +1,9 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfigKind } from '@onefootprint/types';
 import { Box, FootprintButton, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 type PreviewProps = {
   obConfig: {

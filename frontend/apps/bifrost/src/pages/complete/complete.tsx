@@ -7,11 +7,11 @@ import {
 } from '@onefootprint/idv';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
 import checkIsMobile from '@onefootprint/idv/src/utils/check-is-mobile';
-import styled from '@onefootprint/styled';
 import { Box, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
+import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 const AUTO_CLOSE_DELAY = 6000;

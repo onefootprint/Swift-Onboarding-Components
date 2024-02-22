@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import type { PageNavigation } from 'src/types/page';
+import styled, { css } from 'styled-components';
 
 import MobileNav from '../nav/mobile-nav';
 import DesktopHeader from './components/desktop-header';

@@ -33,7 +33,7 @@
     "@onefootprint/idv": "*",
     "@onefootprint/postmate": "2.1.0",
     "@onefootprint/request": "*",
-    "@onefootprint/styled": "*",
+    "styled-components": "^6",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "i18next": "^23.7.16",

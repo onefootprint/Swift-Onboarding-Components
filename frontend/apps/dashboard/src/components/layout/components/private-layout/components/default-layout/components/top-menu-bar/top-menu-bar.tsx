@@ -1,5 +1,4 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Stack, Toggle, Tooltip } from '@onefootprint/ui';
 import { omit } from 'lodash';
 import Link from 'next/link';
@@ -8,6 +7,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useOrgSession from 'src/hooks/use-org-session';
+import styled, { css } from 'styled-components';
 
 const TopMenuBar = () => {
   const { t } = useTranslation('common', {

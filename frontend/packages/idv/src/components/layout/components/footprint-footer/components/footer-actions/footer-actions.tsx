@@ -1,10 +1,10 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { createOverlayBackground, Dropdown } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import LanguagesSubmenu from './components/languages-submenu';
 import SupportSubmenu from './components/support-submenu';

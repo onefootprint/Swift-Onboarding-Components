@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, Portal, Shimmer } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const Loading = () => (
   <Container aria-busy data-testid="onboarding-company-data-loading">

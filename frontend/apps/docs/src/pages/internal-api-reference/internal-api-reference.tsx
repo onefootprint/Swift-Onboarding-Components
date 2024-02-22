@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import hostedApiData from '../api-reference/assets/hosted-api-docs.json';
 import privateApiData from '../api-reference/assets/private-api-docs.json';

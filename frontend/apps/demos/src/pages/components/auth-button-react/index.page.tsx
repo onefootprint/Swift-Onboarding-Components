@@ -1,8 +1,8 @@
 import { FootprintAuthButton } from '@onefootprint/footprint-react';
-import styled, { css } from '@onefootprint/styled';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type RouterReturn = ReturnType<typeof useRouter>;
 

@@ -1,5 +1,4 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Container,
   LinkButton,
@@ -12,6 +11,7 @@ import {
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 const DeveloperExperience = () => {
   const { t } = useTranslation('common', {

@@ -1,10 +1,10 @@
-import styled from '@onefootprint/styled';
 import { Container } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
+import styled from 'styled-components';
 
 import Form from './components/form';
 import Header from './components/header';

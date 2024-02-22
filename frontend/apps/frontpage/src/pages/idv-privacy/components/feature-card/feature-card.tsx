@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Trans } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 type FeatureCardProps = {
   title: string;

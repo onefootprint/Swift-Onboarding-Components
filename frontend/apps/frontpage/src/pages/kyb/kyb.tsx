@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PenguinBanner from 'src/components/penguin-banner';
+import styled, { css } from 'styled-components';
 
 import DeveloperExperience from '../../components/developer-experience';
 import SEO from '../../components/seo';

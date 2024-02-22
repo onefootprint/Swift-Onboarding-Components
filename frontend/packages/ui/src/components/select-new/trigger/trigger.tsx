@@ -1,7 +1,7 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import * as Select from '@radix-ui/react-select';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../utils';
 import type { SelectNewProps, TriggerProps } from '../select-new.types';

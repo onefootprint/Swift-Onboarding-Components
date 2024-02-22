@@ -1,7 +1,7 @@
 import type { L10n } from '@onefootprint/footprint-js';
-import { createGlobalStyle } from '@onefootprint/styled';
 import Script from 'next/script';
 import React from 'react';
+import { createGlobalStyle } from 'styled-components';
 
 import { L10nContextProvider } from './components/l10n-provider';
 import { MachineProvider } from './components/machine-provider';

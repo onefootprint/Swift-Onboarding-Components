@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import type { Variants } from 'framer-motion';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
+import styled, { css } from 'styled-components';
 
 type BifrostImageProps = {
   src: string;

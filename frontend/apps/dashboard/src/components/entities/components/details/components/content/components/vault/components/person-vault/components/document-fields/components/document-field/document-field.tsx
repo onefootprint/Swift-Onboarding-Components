@@ -1,5 +1,4 @@
 import { useToggle } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type {
   Document,
   EntityVault,
@@ -9,6 +8,7 @@ import { Drawer, LinkButton, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { useEditControls } from '../../../../../vault-actions';
 import { getDocumentStatus, getDocumentVersion } from '../../utils';

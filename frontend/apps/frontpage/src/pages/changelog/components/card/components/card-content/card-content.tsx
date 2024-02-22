@@ -1,11 +1,11 @@
 import { useIntl } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import { CopyButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PostDetails } from 'src/utils/ghost/types';
+import styled, { css } from 'styled-components';
 
 import HtmlContent from '../../../html-content';
 import Author from '../author';

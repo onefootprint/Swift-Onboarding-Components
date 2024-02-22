@@ -1,10 +1,10 @@
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Button, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 const LinkSent = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.link-sent' });

@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Button, media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import WelcomeIllustration from './componens/welcome-illustration';
 

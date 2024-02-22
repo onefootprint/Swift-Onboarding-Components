@@ -1,9 +1,9 @@
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import type { CountrySelectOption } from '@onefootprint/ui';
 import { media } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import styled, { css } from 'styled-components';
 
 import CountryField from '../country-field';
 import ZipField from '../zip-field';

@@ -4,10 +4,10 @@ import type {
   FontVariant,
 } from '@onefootprint/design-tokens';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Stack } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type NavigationLinkProps = {
   children: string;

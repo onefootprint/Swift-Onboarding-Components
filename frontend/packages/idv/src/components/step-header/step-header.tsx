@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../layout/components/header-title';
 import NavigationHeader from '../layout/components/navigation-header';

@@ -1,8 +1,8 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoSpinner16, IcoSpinner24 } from '@onefootprint/icons';
-import styled, { keyframes } from '@onefootprint/styled';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { keyframes } from 'styled-components';
 
 export type LoadingIndicatorProps = {
   'aria-label'?: string;

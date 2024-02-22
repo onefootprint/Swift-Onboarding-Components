@@ -1,11 +1,11 @@
 import { IcoClose16 } from '@onefootprint/icons';
 import { WhatsThisContent } from '@onefootprint/idv';
-import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { createFontStyles, IconButton, Stack } from '@onefootprint/ui';
 import * as Popover from '@radix-ui/react-popover';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 type WhatsThisPopoverProps = {
   config?: PublicOnboardingConfig;

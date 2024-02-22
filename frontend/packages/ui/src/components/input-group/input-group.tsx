@@ -1,4 +1,4 @@
-import styled from '@onefootprint/styled';
+import styled from 'styled-components';
 
 const InputGroup = styled.div`
   width: 100%;

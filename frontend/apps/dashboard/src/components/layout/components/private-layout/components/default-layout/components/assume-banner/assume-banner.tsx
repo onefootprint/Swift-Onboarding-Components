@@ -1,10 +1,10 @@
 import { IcoInfo16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Banner, Stack, Tooltip } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 
 const AssumeBanner = () => {
   const { t } = useTranslation('common', {

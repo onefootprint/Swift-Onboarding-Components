@@ -1,6 +1,6 @@
 import { primitives } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
+import styled, { css } from 'styled-components';
 
 const Tag = styled.p`
   ${({ theme }) => css`

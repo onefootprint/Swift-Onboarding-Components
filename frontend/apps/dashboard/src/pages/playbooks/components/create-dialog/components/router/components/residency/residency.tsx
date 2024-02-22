@@ -1,5 +1,4 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import {
   Button,
   Checkbox,
@@ -11,6 +10,7 @@ import {
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import {
   CountryRestriction,

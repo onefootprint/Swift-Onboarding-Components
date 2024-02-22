@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, Dialog, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
+import styled, { css } from 'styled-components';
 
 type AboutAppClipAndInstantAppProps = {
   kind: 'app-clip' | 'instant-app';

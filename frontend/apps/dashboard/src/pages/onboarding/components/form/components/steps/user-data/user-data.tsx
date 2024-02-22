@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, Button, Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useUserSession from 'src/hooks/use-user-session';
+import styled, { css } from 'styled-components';
 
 import Header from '../header';
 

@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Editing from './components/editing';
 import Preview from './components/preview';

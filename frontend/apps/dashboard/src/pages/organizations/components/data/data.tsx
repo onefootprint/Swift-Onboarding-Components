@@ -1,5 +1,4 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import styled from '@onefootprint/styled';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
@@ -8,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useAssumeAuthRole from 'src/hooks/use-assume-auth-role';
 import useSession from 'src/hooks/use-session';
+import styled from 'styled-components';
 
 import ButtonGroup from '../button-group';
 

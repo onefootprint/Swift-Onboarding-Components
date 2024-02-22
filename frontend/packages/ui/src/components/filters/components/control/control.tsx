@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import styled, { css } from '@onefootprint/styled';
 import React, { useId, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Box from '../../../box';
 import Fade from '../../../fade';

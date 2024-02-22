@@ -1,8 +1,8 @@
 import { IcoCheck24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 

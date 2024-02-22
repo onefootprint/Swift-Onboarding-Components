@@ -1,10 +1,10 @@
 import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { CollectedInvestorProfileDataOption } from '@onefootprint/types';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 const InvestorProfile = () => {
   const { t } = useTranslation('common', {

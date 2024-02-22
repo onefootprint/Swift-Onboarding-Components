@@ -1,6 +1,6 @@
-import styled from '@onefootprint/styled';
 import Image from 'next/image';
 import React from 'react';
+import styled from 'styled-components';
 
 const screens = [
   {

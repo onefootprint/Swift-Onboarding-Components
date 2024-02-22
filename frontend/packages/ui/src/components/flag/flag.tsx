@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 export type FlagProps = {
   className?: string;

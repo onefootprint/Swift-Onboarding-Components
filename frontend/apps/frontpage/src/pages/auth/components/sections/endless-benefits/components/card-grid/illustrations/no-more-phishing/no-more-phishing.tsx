@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Grid, Stack } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import IllustrationContainer from '../illustration-container';
 import randomNumbersArray from './random-numbers-array';

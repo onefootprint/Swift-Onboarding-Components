@@ -1,9 +1,9 @@
 import type { L10n } from '@onefootprint/footprint-js';
-import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Grid, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import Email from './components/email';
 import Header from './components/header';

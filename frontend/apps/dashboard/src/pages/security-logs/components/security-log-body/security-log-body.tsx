@@ -1,10 +1,10 @@
-import styled, { css } from '@onefootprint/styled';
 import type { AccessEvent } from '@onefootprint/types';
 import { Box, CodeInline, Grid, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent } from 'src/utils/user-agent';
+import styled, { css } from 'styled-components';
 
 type SecurityLogBodyProps = {
   accessEvent: AccessEvent;

@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 type PdfThumbnailProps = {
   src: string;

@@ -1,7 +1,7 @@
 import { IcoDotsHorizontal16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Dropdown } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type OverFlowButtonProps = {
   ariaLabel: string;

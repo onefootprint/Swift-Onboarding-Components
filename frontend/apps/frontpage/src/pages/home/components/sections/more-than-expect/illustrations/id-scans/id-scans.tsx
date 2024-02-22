@@ -1,7 +1,7 @@
-import styled from '@onefootprint/styled';
 import Image from 'next/image';
 import React from 'react';
 import BaseIllustration from 'src/pages/home/components/base-illustration';
+import styled from 'styled-components';
 
 const IdScans = () => (
   <Container>

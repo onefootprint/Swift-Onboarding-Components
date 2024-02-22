@@ -1,5 +1,5 @@
-import { createGlobalStyle, css } from '@onefootprint/styled';
 import React from 'react';
+import { createGlobalStyle, css } from 'styled-components';
 
 export type LoadRulesProps = {
   rules?: string | null;

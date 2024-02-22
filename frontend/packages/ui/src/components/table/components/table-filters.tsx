@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import React, { useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 import { useDebounce, useUpdateEffect } from 'usehooks-ts';
 
 import SearchInput from '../../search-input';

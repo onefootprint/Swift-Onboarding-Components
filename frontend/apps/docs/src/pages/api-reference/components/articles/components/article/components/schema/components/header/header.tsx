@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import {
   CodeInline,
   createFontStyles,
@@ -9,6 +8,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ContentSchema } from 'src/pages/api-reference/api-reference.types';
 import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
+import styled, { css } from 'styled-components';
 
 type HeaderProps = {
   title: string;

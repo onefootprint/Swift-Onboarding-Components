@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Portal from '../portal';
 import { BOTTOM_ACTION_BOX_PORTAL_SELECTOR } from './constants';

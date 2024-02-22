@@ -1,9 +1,9 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { Layout as AppLayout } from '@onefootprint/idv';
-import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
+import styled from 'styled-components';
 
 import Footer from './components/footer';
 import SandboxBanner from './components/sandbox-banner';

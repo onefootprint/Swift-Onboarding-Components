@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import type { MarkdownToJSX } from 'markdown-to-jsx';
 import Markdown from 'markdown-to-jsx';
 import React from 'react';
 import SEO from 'src/components/seo';
+import styled, { css } from 'styled-components';
 
 import type { Article } from '../../types/article';
 import Banner from '../introduction/banner';

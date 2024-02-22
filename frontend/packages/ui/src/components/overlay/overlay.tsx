@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { forwardRef } from 'react';
+import styled, { css } from 'styled-components';
 
 type OverlayProps = {
   isVisible?: boolean;

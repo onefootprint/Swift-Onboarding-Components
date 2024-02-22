@@ -1,6 +1,5 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Container,
   LinkButton,
@@ -14,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import PostContent from 'src/components/post-content';
 import SEO from 'src/components/seo';
 import WritingLayout from 'src/components/writing-layout';
+import styled, { css } from 'styled-components';
 
 import DesktopSharePost from '../../../../components/desktop-share-post';
 import PostInfo from '../../../../components/post-info';

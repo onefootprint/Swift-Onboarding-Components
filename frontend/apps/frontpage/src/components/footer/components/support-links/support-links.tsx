@@ -3,13 +3,13 @@ import {
   IcoTwitter24,
   ThemedLogoFpCompact,
 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import { media, Stack, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const SUPPORT_EMAIL_ADDRESS = 'support@onefootprint.com';
 

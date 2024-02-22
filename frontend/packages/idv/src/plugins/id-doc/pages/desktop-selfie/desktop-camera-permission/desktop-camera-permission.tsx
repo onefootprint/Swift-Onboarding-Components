@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { HeaderTitle, NavigationHeader } from '../../../../../components';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../../constants/desktop-interaction-box.constants';

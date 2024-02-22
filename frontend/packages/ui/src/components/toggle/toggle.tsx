@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
 import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
+import styled, { css } from 'styled-components';
 
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';

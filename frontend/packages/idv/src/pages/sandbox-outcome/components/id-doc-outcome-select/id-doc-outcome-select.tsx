@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import RealOutcome from './components/real-outcome';
 import SimulatedOutcomes from './components/simulated-outcomes';

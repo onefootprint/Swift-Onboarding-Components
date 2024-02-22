@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
+import styled, { css } from 'styled-components';
 
 const NavigationLink = styled(Link).attrs(({ href }) => ({
   href,

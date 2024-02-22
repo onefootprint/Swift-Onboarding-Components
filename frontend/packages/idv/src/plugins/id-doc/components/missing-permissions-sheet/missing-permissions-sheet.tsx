@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { BottomSheet, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import { useIdDocMachine } from '../machine-provider';

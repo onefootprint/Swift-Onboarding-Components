@@ -1,7 +1,7 @@
-import styled from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
+import styled from 'styled-components';
 
 type FooterLinkProps = {
   text: string;

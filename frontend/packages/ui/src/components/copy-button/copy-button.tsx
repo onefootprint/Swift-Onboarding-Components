@@ -1,8 +1,8 @@
 import { IcoCopy24 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import type { TooltipProps } from '../tooltip';
 import Tooltip from '../tooltip';

@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 export type FieldsetProps = {
   children: React.ReactNode;

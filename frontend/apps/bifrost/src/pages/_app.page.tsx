@@ -5,13 +5,13 @@ import {
   FootprintProvider,
   Logger,
 } from '@onefootprint/idv';
-import { createGlobalStyle } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { createGlobalStyle } from 'styled-components';
 
 import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
 import { GOOGLE_MAPS_KEY } from '../config/constants';

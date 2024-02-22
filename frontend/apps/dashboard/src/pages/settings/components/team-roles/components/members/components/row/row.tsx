@@ -1,4 +1,3 @@
-import styled from '@onefootprint/styled';
 import type { Member } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Badge, Typography } from '@onefootprint/ui';
@@ -6,6 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
 import useUserSession from 'src/hooks/use-user-session';
+import styled from 'styled-components';
 
 import Actions from './components/actions';
 import EditRole from './components/edit-role';

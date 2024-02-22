@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const Illustration = () => {
   const containerVariants = {

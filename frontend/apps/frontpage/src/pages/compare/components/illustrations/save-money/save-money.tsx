@@ -4,10 +4,10 @@ import {
   IcoFootprint40,
   IcoUsers24,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const SaveMoney = () => (
   <Container>

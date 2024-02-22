@@ -1,9 +1,9 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { IcoMoon16, IcoSun16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
 import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 

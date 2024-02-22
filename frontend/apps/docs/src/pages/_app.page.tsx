@@ -1,10 +1,10 @@
-import { createGlobalStyle, css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { createGlobalStyle, css } from 'styled-components';
 
 import CustomDesignSystemProvider from '../components/custom-design-system-provider';
 import {

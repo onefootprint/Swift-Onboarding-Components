@@ -1,10 +1,10 @@
 import { IcoIdGeneric40 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import { NavigationHeader } from '../../../../components';
 import FadeInContainer from '../../components/fade-in-container';

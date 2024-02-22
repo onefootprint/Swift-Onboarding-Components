@@ -1,9 +1,9 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoInfo16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { Property } from 'csstype';
 import times from 'lodash/times';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils';
 import type { LabelTooltipProps } from '../label';

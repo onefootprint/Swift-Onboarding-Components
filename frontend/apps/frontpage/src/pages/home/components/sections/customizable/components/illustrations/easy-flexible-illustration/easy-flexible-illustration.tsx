@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import { motion, useAnimationControls } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect } from 'react';
 import BaseIllustration from 'src/pages/home/components/base-illustration';
+import styled, { css } from 'styled-components';
 
 type EasyFlexibleIllustrationProps = {
   isHover?: boolean;

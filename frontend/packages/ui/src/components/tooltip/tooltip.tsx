@@ -1,6 +1,6 @@
-import styled, { css, keyframes } from '@onefootprint/styled';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import React, { useState } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 

@@ -1,7 +1,7 @@
-import styled from '@onefootprint/styled';
 import { Stack } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import styled from 'styled-components';
 
 import IllustrationContainer from '../illustration-container';
 import CloudIcon from './components/cloud-icon';

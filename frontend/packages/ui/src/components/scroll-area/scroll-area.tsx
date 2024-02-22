@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
 import React, { useEffect, useRef, useState } from 'react';
+import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import type { SXStyleProps, SXStyles } from '../../hooks';

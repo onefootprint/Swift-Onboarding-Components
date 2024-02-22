@@ -1,10 +1,10 @@
 import { IcoShield24, IcoStore24, IcoUsers24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Button, RadioSelect, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 

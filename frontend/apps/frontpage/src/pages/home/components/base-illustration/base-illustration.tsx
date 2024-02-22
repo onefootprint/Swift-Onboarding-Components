@@ -1,5 +1,5 @@
-import styled from '@onefootprint/styled';
 import React from 'react';
+import styled from 'styled-components';
 
 type BaseIllustrationProps = {
   className?: string;

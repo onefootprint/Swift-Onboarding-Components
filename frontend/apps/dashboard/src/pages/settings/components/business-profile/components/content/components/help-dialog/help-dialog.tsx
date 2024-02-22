@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Dialog, Stack, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 export type HelpDialogProps = {
   open: boolean;

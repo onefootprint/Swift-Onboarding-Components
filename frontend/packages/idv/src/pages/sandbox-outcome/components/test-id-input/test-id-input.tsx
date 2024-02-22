@@ -5,7 +5,6 @@ import {
   IcoInfo16,
   IcoPencil24,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   CopyButton,
@@ -17,6 +16,7 @@ import Hint from '@onefootprint/ui/src/components/internal/hint';
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import InlineButton from './components/inline-button';
 import InlineButtonsLayout from './components/inline-buttons-layout';

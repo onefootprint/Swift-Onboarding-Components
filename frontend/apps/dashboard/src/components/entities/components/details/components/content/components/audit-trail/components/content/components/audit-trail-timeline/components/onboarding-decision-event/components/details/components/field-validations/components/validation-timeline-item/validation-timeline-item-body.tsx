@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import type { SignalShortInfoType } from '../../../../hooks/use-entity-match-signals/utils/transform-response';
 

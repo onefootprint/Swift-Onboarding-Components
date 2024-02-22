@@ -1,12 +1,12 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { createGlobalStyle, css } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { createGlobalStyle, css } from 'styled-components';
 
 import CustomDesignSystemProvider from '../components/custom-design-system-provider';
 import Layout from '../components/layout';

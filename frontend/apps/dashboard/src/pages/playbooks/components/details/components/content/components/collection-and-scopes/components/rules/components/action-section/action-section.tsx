@@ -1,5 +1,4 @@
 import type { Color } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import type { Rule, RuleAction } from '@onefootprint/types';
 import { Button, Stack, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
@@ -7,6 +6,7 @@ import kebabCase from 'lodash/kebabCase';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RulesActionRow from 'src/components/rules-action-row';
+import styled, { css } from 'styled-components';
 
 import EmptyActionRow from '../empty-action-row';
 

@@ -1,8 +1,8 @@
 'use client';
 
-import styled from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 
 const Hello = () => (
   <div>

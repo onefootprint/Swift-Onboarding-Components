@@ -1,5 +1,4 @@
 import { IcoLogOut16, LogoFpCompact } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Container,
   createFontStyles,
@@ -9,6 +8,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 export type HeaderProps = {
   userEmail: string;

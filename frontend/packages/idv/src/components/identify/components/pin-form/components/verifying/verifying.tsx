@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const Verifying = ({ text }: { text: string }) => (
   <Container>

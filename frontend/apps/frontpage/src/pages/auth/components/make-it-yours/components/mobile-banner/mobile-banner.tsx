@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Header from '../header';
 import BifrostModals from './components/bifrost-modals';

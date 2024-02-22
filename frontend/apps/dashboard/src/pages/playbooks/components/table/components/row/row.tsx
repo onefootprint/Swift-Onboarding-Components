@@ -1,13 +1,13 @@
 import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useIntl } from '@onefootprint/hooks';
 import { IcoArrowTopRight24 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
+import styled from 'styled-components';
 
 import Actions from './components/actions';
 

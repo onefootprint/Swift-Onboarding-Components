@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -6,6 +5,7 @@ import NavigationFooter from 'src/components/navigation-footer';
 import NavigationLink from 'src/components/navigation-link';
 import NavigationSectionTitle from 'src/components/navigation-section-title';
 import type { PageNavigation } from 'src/types/page';
+import styled, { css } from 'styled-components';
 
 type PageNavProps = {
   navigation: PageNavigation;

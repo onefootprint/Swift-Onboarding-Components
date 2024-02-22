@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, ThemeToggle, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTheme } from 'next-themes';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import BusinessProfile from './components/business-profile';
 import TeamRoles from './components/team-roles';

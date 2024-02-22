@@ -1,7 +1,7 @@
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
 import Typography from '../../../typography';
 

@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container, createFontStyles, media, Stack } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import ContactButtons from '../contact-buttons';
 import SectionVerticalSpacer from '../section-vertical-spacer';

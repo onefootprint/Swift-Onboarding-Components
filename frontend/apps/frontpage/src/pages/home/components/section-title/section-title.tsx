@@ -1,6 +1,5 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Container,
   createFontStyles,
@@ -9,6 +8,7 @@ import {
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type SectionTitleProps = {
   title: string;

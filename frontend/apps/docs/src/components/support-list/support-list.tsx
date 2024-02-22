@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import NeedHelp from './components/need-help';
 import SendFeedback from './components/send-feedback';

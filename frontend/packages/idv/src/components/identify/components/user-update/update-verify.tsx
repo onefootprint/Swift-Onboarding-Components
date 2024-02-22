@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import noop from 'lodash/fp/noop';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import type { UserChallengeBody, UserChallengeResponse } from '../../queries';

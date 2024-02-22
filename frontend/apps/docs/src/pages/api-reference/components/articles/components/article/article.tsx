@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, media, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
+import styled, { css } from 'styled-components';
 
 import type {
   Article as ApiReferenceArticle,

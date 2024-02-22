@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
+import styled, { css } from 'styled-components';
 
 import Background from '../background';
 

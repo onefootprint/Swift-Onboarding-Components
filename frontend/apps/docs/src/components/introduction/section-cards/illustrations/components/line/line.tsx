@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { useTheme } from 'next-themes';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type LineProps = {
   lightColor: string;

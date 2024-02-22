@@ -1,8 +1,8 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { IcoCreditcard16, IcoIdCard16, IcoPin16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import HorizontalBeam from '../../../../../horizontal-beam';
 import Grid from '../components/grid';

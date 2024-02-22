@@ -1,9 +1,9 @@
 import type { Color, FontVariant } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import { Stack, Typography } from '@onefootprint/ui';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import Image from 'next/image';
 import React, { useRef } from 'react';
+import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 type TriggerVariantsProps = {

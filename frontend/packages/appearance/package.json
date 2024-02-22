@@ -19,7 +19,7 @@
   "dependencies": {
     "@onefootprint/design-tokens": "*",
     "@onefootprint/footprint-js": "*",
-    "@onefootprint/styled": "*",
+    "styled-components": "^6",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*"
   },

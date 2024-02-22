@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { CodeBlock, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Iframe from './components/iframe';
 import Option from './components/option';

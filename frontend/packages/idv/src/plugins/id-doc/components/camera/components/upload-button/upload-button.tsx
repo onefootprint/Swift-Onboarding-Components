@@ -1,7 +1,7 @@
 import { IcoImages24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Logger from '../../../../../../utils/logger';
 import useProcessImage from '../../../../hooks/use-process-image';

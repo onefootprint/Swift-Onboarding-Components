@@ -1,8 +1,8 @@
 import { IcoSearch16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import type { ControlProps } from 'react-select';
 import { components } from 'react-select';
+import styled, { css } from 'styled-components';
 
 const Control = ({ children, ...props }: ControlProps) => (
   <Container>

@@ -1,10 +1,10 @@
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
+import styled, { css } from 'styled-components';
 
 import FeatureCard from '../../../../../components/feature-card';
 import SectionTitle from '../../section-title';

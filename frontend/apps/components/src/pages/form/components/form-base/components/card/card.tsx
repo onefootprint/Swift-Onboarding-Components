@@ -1,11 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import styled from '@onefootprint/styled';
 import { Grid } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import CardCvc, { CvcLength } from './components/card-cvc';
 import CardExpDateInput from './components/card-exp-date-input';

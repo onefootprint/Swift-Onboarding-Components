@@ -1,9 +1,9 @@
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type SectionCardProps = {
   title: string;

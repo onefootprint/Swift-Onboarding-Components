@@ -5,7 +5,6 @@ import {
   IcoInfo16,
   IcoPencil24,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   CopyButton,
@@ -15,6 +14,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import InlineButton from './components/inline-button';
 

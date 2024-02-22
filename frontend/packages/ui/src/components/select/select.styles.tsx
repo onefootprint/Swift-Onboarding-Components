@@ -1,4 +1,4 @@
-import styled, { css } from '@onefootprint/styled';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 

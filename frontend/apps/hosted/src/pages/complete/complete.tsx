@@ -1,10 +1,10 @@
 import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
-import styled from '@onefootprint/styled';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHostedMachine } from 'src/components/hosted-machine-provider';
+import styled from 'styled-components';
 
 const Complete = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.complete' });

@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import type { MotionValue } from 'framer-motion';
 import { motion, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type IllustrationOnboardingExperienceProps = {
   scroll: MotionValue;

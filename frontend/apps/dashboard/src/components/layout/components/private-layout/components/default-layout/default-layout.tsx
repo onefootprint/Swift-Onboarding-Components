@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Grid, Stack } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import AssumeBanner from './components/assume-banner';
 import SandboxBanner from './components/sandbox-banner';

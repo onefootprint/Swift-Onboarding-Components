@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Grid, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type FooterProps = {
   authors: { id: string; avatarImgUrl: string; name: string }[];

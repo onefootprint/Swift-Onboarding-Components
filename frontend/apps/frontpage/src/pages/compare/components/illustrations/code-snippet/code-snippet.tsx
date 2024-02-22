@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
+import styled, { css } from 'styled-components';
 
 const snippet = `
   <div

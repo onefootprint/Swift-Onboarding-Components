@@ -32,7 +32,7 @@
     "@onefootprint/icons": "*",
     "@onefootprint/postmate": "2.1.0",
     "@onefootprint/request": "*",
-    "@onefootprint/styled": "*",
+    "styled-components": "^6",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@radix-ui/react-select": "^2.0.0",

@@ -4,11 +4,11 @@ import {
   IcoFaceid16,
   IcoSparkles16,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
+import styled, { css } from 'styled-components';
 
 import FeatureCard from '../../../../../components/feature-card/feature-card';
 import MicroFeatureCard from '../../micro-feature-card/micro-feature-card';

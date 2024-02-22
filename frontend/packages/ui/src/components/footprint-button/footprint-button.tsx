@@ -1,7 +1,7 @@
 import { IcoFootprint24 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import type { ButtonProps } from '../button';
 import Button from '../button';

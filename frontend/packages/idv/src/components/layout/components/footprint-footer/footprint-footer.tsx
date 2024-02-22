@@ -1,9 +1,9 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { media, Stack, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 import useResizeObserver from 'use-resize-observer';
 
 import { FOOTPRINT_FOOTER_ID } from '../../constants';

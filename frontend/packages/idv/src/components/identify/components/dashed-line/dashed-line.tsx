@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import { Divider } from '@onefootprint/ui';
+import styled, { css } from 'styled-components';
 
 const DashedLine = styled(Divider)`
   ${({ theme }) => css`

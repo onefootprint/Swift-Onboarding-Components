@@ -1,8 +1,8 @@
 import { primitives } from '@onefootprint/design-tokens';
-import styled from '@onefootprint/styled';
 import { Grid, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import styled from 'styled-components';
 
 const IdDataIllustration = () => (
   <>

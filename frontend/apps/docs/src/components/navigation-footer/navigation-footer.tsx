@@ -1,10 +1,10 @@
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { LinkButton, media, ThemeToggle } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
+import styled, { css } from 'styled-components';
 
 import SupportList from '../support-list';
 

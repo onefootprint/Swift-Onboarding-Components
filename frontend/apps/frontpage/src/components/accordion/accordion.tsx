@@ -1,9 +1,9 @@
 import { IcoChevronDown24 } from '@onefootprint/icons';
-import styled, { css, keyframes } from '@onefootprint/styled';
 import { createFontStyles, media, Typography } from '@onefootprint/ui';
 import * as AccordionRadix from '@radix-ui/react-accordion';
 import { motion } from 'framer-motion';
 import React from 'react';
+import styled, { css, keyframes } from 'styled-components';
 
 type AccordionItemProps = {
   title: string;

@@ -1,10 +1,10 @@
-import styled from '@onefootprint/styled';
 import type { ProxyConfig } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
 import useUpdateProxyConfigs from 'src/pages/proxy-configs/hooks/use-update-proxy-configs';
+import styled from 'styled-components';
 
 export type StatusHandler = {
   toggle: () => void;

@@ -1,10 +1,10 @@
 import { primitives } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import type { Period } from '../../plans-table-types';
 import { Periods } from '../../plans-table-types';

@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import constate from 'constate';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Portal from '../portal';
 import useLocalToast from './hooks/use-toast';

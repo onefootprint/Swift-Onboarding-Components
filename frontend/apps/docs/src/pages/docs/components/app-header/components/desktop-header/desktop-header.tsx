@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { media, ThemeToggle } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React from 'react';
 import NavigationLogo from 'src/components/navigation-logo/navigation-logo';
+import styled, { css } from 'styled-components';
 
 const DesktopHeader = () => {
   const { theme, setTheme } = useTheme();

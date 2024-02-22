@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { media, Stack } from '@onefootprint/ui';
 import React, { useCallback, useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { LAYOUT_CONTAINER_ID } from '../../constants';
 import FootprintFooter from '../footprint-footer';

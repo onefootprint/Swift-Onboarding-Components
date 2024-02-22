@@ -1,11 +1,11 @@
 import { useQueryState } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import { Tab, Tabs } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import DomainAccess from 'src/components/domain-access';
 import SectionHeader from 'src/components/section-header';
 import useOrg from 'src/hooks/use-org';
+import styled, { css } from 'styled-components';
 
 import Members from './components/members';
 import Roles from './components/roles';

@@ -1,7 +1,7 @@
-import styled from '@onefootprint/styled';
 import { Stack } from '@onefootprint/ui';
 import { uniqueId } from 'lodash';
 import React from 'react';
+import styled from 'styled-components';
 
 const Grid = () => {
   const COLS = 10;

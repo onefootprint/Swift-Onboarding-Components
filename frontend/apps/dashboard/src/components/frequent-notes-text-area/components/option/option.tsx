@@ -4,11 +4,11 @@ import {
   IcoPlusSmall16,
   IcoTrash16,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Button, createFontStyles, Stack, Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 type OptionProps = {

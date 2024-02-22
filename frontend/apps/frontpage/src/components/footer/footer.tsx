@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import {
   Container,
   Divider,
@@ -10,6 +9,7 @@ import {
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import FooterLink from './components/footer-link';
 import SupportLinks from './components/support-links';

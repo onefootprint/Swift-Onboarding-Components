@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { TextInput, Typography, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 
 import useCreateSandboxTenant from './hooks/use-create-sandbox-tenant';
 

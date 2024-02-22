@@ -1,6 +1,5 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { AmlHitMedia } from '@onefootprint/types';
 import {
   createFontStyles,
@@ -11,6 +10,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';

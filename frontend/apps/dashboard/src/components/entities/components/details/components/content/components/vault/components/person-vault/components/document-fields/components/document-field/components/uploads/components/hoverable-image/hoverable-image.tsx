@@ -4,12 +4,12 @@ import {
   IcoMaximize24,
   IcoMinimize24,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Stack } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import PdfThumbnail from './components/pdf-thumbnail';
 import PdfViewer from './components/pdf-viewer';

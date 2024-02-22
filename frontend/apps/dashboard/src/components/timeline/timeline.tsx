@@ -1,5 +1,4 @@
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   Grid,
@@ -9,6 +8,7 @@ import {
 } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import type { TimelineItemTimeData } from './components/timeline-item-time';
 import TimelineItemTime from './components/timeline-item-time';

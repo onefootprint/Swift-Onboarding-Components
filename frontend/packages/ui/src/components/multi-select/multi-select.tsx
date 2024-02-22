@@ -1,4 +1,3 @@
-import { useTheme } from '@onefootprint/styled';
 import React, { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -9,6 +8,7 @@ import type {
   PropsValue,
 } from 'react-select';
 import Select from 'react-select';
+import { useTheme } from 'styled-components';
 
 import { createTypography } from '../../utils';
 import Box from '../box';

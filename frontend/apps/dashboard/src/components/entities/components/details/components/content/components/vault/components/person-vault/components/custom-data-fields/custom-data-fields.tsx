@@ -1,5 +1,4 @@
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   CodeInline,
@@ -11,6 +10,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import { getCustomDIs } from 'src/components/entities/utils/get-dis';
+import styled, { css } from 'styled-components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 

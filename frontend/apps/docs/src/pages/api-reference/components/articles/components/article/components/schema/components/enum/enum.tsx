@@ -1,5 +1,4 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   CodeInline,
   createFontStyles,
@@ -8,6 +7,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 export type EnumProps = {
   enums: string[];

@@ -1,10 +1,10 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
+import styled, { css } from 'styled-components';
 
 import LogoCopyAssets from './components/logo-copy-assets';
 

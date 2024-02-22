@@ -1,8 +1,8 @@
 import { IcoDollar40, IcoUser40 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import GenericTransition from '../../../../components/animations/generic-transition';
 import Logger from '../../../../utils/logger';

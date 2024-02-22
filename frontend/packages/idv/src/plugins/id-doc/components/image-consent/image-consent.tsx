@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Checkbox, Divider, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 

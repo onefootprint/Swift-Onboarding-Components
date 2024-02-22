@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import {
   DocumentDI,
   InvestorProfileDI,
@@ -12,6 +11,7 @@ import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-enti
 import createStringList, {
   createCapitalStringList,
 } from 'src/utils/create-string-list';
+import styled, { css } from 'styled-components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 

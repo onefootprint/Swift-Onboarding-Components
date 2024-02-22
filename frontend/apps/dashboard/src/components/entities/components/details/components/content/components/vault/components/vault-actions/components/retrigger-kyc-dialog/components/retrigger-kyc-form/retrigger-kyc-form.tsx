@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import { IdDI, OrgFrequentNoteKind, TriggerKind } from '@onefootprint/types';
 import {
   Checkbox,
@@ -13,6 +12,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import AnimatedContainer from 'src/components/animated-container';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
+import styled, { css } from 'styled-components';
 
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';

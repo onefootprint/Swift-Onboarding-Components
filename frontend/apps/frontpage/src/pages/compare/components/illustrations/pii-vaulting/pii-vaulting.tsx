@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import Image from 'next/image';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const PiiVaulting = () => (
   <ImageContainer>

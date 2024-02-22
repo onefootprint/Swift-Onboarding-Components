@@ -1,5 +1,4 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import styled from '@onefootprint/styled';
 import { IdDI, TokenKind } from '@onefootprint/types';
 import {
   Dialog,
@@ -12,6 +11,7 @@ import {
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useEntity from 'src/components/entities/components/details/hooks/use-entity';
+import styled from 'styled-components';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 

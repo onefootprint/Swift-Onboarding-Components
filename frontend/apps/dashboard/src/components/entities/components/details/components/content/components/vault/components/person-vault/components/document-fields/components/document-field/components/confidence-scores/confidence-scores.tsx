@@ -1,9 +1,9 @@
 import { IcoSpeedometer24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { Document } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import ConfidenceScore from './components/confidence-score';
 

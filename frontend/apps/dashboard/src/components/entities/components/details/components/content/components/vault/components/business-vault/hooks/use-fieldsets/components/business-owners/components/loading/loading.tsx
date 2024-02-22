@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, Grid, Shimmer } from '@onefootprint/ui';
 import times from 'lodash/times';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const Loading = () => (
   <Grid.Container gap={4} data-testid="business-owners-loading">

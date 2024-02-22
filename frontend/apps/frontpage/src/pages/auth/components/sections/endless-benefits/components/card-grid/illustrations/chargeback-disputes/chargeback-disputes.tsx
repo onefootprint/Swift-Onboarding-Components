@@ -1,5 +1,5 @@
-import styled from '@onefootprint/styled';
 import React from 'react';
+import styled from 'styled-components';
 
 import IllustrationContainer from '../illustration-container';
 import BackgroundScreen from './components/background-screen';

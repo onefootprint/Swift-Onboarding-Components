@@ -1,9 +1,9 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoClose24 } from '@onefootprint/icons';
-import styled, { css, keyframes } from '@onefootprint/styled';
 import * as DrawerPrimitive from '@radix-ui/react-dialog';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css, keyframes } from 'styled-components';
 
 import type { SXStyles } from '../../hooks';
 import { media } from '../../utils';

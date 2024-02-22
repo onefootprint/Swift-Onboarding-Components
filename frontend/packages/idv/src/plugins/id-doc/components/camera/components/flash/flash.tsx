@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from '@onefootprint/styled';
+import styled, { css, keyframes } from 'styled-components';
 
 const flashAnimation = keyframes`
   from {

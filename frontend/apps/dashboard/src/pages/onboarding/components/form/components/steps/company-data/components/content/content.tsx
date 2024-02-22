@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import type { Organization, OrganizationSize } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Button, Select, TextInput } from '@onefootprint/ui';
@@ -6,6 +5,7 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useUpdateOrg from 'src/hooks/use-update-org';
+import styled, { css } from 'styled-components';
 
 import SIZE_OPTIONS from './content.constants';
 

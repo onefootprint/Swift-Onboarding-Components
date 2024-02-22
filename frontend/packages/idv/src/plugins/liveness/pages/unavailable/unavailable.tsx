@@ -1,7 +1,7 @@
 import { getErrorMessage } from '@onefootprint/request';
-import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { NavigationHeader } from '../../../../components';

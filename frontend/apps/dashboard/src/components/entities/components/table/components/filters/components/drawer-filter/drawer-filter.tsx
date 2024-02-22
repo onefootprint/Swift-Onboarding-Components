@@ -1,5 +1,4 @@
 import { IcoFilter16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { EntityLabel } from '@onefootprint/types';
 import {
   Button,
@@ -15,6 +14,7 @@ import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 
 import useFilters from '../../../../../../hooks/use-filters';
 import { FiltersDateRange, type FormData } from './drawer-filter.type';

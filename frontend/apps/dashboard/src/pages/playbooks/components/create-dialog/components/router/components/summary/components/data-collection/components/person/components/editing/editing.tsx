@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import { CollectedKycDataOption } from '@onefootprint/types';
 import {
   Box,
@@ -13,6 +12,7 @@ import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';

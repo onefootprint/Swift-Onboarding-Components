@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import {
   type DataIdentifier,
   type Entity,
@@ -8,6 +7,7 @@ import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import useField from '../../hooks/use-field';
 import { useDecryptControls } from '../vault-actions';

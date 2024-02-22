@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import type { BusinessOwner, Entity } from '@onefootprint/types';
 import {
   BusinessDI,
@@ -13,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
 import StatusBadge from 'src/components/status-badge';
 import getFullName from 'src/utils/get-full-name';
+import styled, { css } from 'styled-components';
 
 import useField from '../../../../../../../../hooks/use-field';
 import Field from '../../../../../../../field';

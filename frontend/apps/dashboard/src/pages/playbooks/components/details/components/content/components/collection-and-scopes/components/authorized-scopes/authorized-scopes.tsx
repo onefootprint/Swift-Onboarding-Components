@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import {
   CollectedKycDataOption,
   type OnboardingConfig,
@@ -9,6 +8,7 @@ import {
   basicInformationFields,
   usResidentDisplayScopes,
 } from 'src/pages/playbooks/utils/machine/types';
+import styled, { css } from 'styled-components';
 
 import Section from './components/section';
 

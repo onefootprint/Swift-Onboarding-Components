@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';

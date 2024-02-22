@@ -1,8 +1,8 @@
-import styled, { css, keyframes } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import SectionTitle from 'src/pages/vaulting/components/section-title';
+import styled, { css, keyframes } from 'styled-components';
 
 import Sparkles from './components/sparkles';
 

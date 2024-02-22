@@ -1,9 +1,9 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import { Dropdown, Stack } from '@onefootprint/ui';
 import i18n from 'i18next';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const LanguagesSubmenu = () => {
   const [submenuOpen, setSubmenuOpen] = useState(false);

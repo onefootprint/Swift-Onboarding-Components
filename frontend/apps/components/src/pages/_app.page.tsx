@@ -1,12 +1,12 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
 import { Logger } from '@onefootprint/idv';
-import { createGlobalStyle } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Script from 'next/script';
 import React from 'react';
 import FootprintProvider from 'src/components/footprint-provider';
 import configureFootprint from 'src/components/footprint-provider/adapters';
+import { createGlobalStyle } from 'styled-components';
 
 import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';

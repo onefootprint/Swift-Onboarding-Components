@@ -1,7 +1,7 @@
 import { useCountdown } from '@onefootprint/hooks';
-import styled from '@onefootprint/styled';
 import { LinkButton, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 
 export type ResendButtonProps = {
   isResendLoading?: boolean;

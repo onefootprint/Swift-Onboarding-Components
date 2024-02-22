@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import React, { Children } from 'react';
 import type { MenuListProps } from 'react-select';
 import { FixedSizeList as List } from 'react-window';
+import styled, { css } from 'styled-components';
 
 const OPTION_HEIGHT = 36;
 const ROWS = 6;

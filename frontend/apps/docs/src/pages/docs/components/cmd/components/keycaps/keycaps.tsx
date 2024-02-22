@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 const Keycaps = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.cmd' });

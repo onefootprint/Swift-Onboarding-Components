@@ -1,5 +1,4 @@
 import { IcoArrowRightSmall16, IcoCopy16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
 import {
   CopyButton,
@@ -11,6 +10,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import HitItem from './components/hit-item';
 import HitsShimmer from './components/hits-shimmer';

@@ -1,7 +1,7 @@
 import { IcoFootprint40 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import { motion } from 'framer-motion';
 import React from 'react';
+import styled from 'styled-components';
 
 const Loading = () => (
   <Container>

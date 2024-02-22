@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import IllustrationContainer from '../../../../components/illustration-section-title/container';
 import Rectangle from '../../../../components/illustration-section-title/rectangle/rectangle';

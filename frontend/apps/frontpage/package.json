@@ -27,7 +27,7 @@
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/request": "*",
-    "@onefootprint/styled": "*",
+    "styled-components": "^6",
     "@onefootprint/ui": "*",
     "@radix-ui/react-accordion": "^1.1.1",
     "@radix-ui/react-navigation-menu": "^1.0.0",

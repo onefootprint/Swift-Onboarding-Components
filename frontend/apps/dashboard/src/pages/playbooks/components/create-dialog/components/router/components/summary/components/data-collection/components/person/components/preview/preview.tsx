@@ -1,10 +1,10 @@
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import { Checkbox, LinkButton, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';

@@ -1,5 +1,4 @@
 import { IcoPencil16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { CodeInline, LinkButton, Typography } from '@onefootprint/ui';
@@ -7,6 +6,7 @@ import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
+import styled, { css } from 'styled-components';
 
 import EditName from './components/edit-name';
 

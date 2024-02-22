@@ -1,6 +1,5 @@
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { LogoFpDefault } from '@onefootprint/icons';
-import styled, { css, useTheme } from '@onefootprint/styled';
 import { media, Stack, Typography } from '@onefootprint/ui';
 import { easeIn, motion } from 'framer-motion';
 import Link from 'next/link';
@@ -8,6 +7,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Balancer from 'react-wrap-balancer';
+import styled, { css, useTheme } from 'styled-components';
 
 import SEO from '../../components/seo';
 import FooterLinks from './components/footer-links';

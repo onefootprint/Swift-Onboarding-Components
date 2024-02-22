@@ -1,6 +1,6 @@
 const template = ({ componentName, jsx, exports }, { tpl }) => tpl`
 import React from 'react';
-import { useTheme } from '@onefootprint/styled';
+import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 

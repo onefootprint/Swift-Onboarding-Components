@@ -1,7 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import styled, { css } from '@onefootprint/styled';
 import type { Organization } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Divider, Toggle, Tooltip, Typography } from '@onefootprint/ui';
@@ -10,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import useUpdateOrg from 'src/hooks/use-update-org';
 import createStringList from 'src/utils/create-string-list';
+import styled, { css } from 'styled-components';
 
 export type DomainAccessProps = {
   org: Organization;

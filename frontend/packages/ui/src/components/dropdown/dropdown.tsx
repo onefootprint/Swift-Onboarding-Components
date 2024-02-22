@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles, createOverlayBackground } from '../../utils';
 import Divider from '../divider';

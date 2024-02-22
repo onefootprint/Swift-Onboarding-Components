@@ -1,10 +1,10 @@
-import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome } from '@onefootprint/types';
 import { Button, Grid, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { getRandomID } from '../../../../utils';

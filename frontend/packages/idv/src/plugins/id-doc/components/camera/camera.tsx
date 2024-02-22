@@ -1,10 +1,10 @@
 import { useCountdownCustom } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
 import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';

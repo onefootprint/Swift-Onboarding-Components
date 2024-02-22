@@ -1,10 +1,10 @@
-import styled, { css } from '@onefootprint/styled';
 import { Button, TextInput, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 
 import type { NameFormData } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';

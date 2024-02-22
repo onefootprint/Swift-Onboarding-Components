@@ -1,5 +1,4 @@
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
-import styled, { css } from '@onefootprint/styled';
 import {
   Button,
   CodeBlock,
@@ -10,6 +9,7 @@ import {
 } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import {
   getAuthTokenRequest,

@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import styled, { css } from '@onefootprint/styled';
 import { type OrgFrequentNoteKind, RoleScopeKind } from '@onefootprint/types';
 import {
   Box,
@@ -16,6 +15,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
+import styled, { css } from 'styled-components';
 
 import Error from './components/error';
 import Option from './components/option';

@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import TimelineLayout from '../../components/timeline-layout';
 import TimelineTitle from '../../components/timeline-title';

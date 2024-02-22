@@ -1,7 +1,6 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { getErrorMessage } from '@onefootprint/request';
-import styled, { css } from '@onefootprint/styled';
 import type { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import type {
@@ -17,6 +16,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { useL10nContext } from '../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../components/layout/components/header-title';

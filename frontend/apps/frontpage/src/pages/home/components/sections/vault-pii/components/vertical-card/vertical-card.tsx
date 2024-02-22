@@ -1,8 +1,8 @@
 import { primitives } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type VerticalCardProps = {
   title: string;

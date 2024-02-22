@@ -1,7 +1,7 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, LinkButton, media, Stack } from '@onefootprint/ui/';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type TimelineTitleProps = {
   title: string;

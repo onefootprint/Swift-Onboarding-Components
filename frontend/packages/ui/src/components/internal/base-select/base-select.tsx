@@ -1,9 +1,9 @@
-import styled, { useTheme } from '@onefootprint/styled';
 import React, { useCallback, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePopper } from 'react-popper';
 import type { OptionProps } from 'react-select';
 import ReactSelect from 'react-select';
+import styled, { useTheme } from 'styled-components';
 
 import { useOnClickOutside } from '../../../hooks';
 import { createTypography } from '../../../utils/mixins';

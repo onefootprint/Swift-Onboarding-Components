@@ -1,9 +1,9 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import type { CountryCode, SupportedLocale } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { getCountryCodeFromLocale } from '../../utils';
 import Flag from '../flag';

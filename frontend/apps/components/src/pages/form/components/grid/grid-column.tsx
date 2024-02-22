@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
+import styled, { css } from 'styled-components';
 
 export type ColumnSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 

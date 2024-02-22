@@ -1,8 +1,8 @@
 import { getErrorMessage } from '@onefootprint/request';
-import styled from '@onefootprint/styled';
 import { Button, Grid } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';

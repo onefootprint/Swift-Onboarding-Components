@@ -1,8 +1,8 @@
 import { primitives } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import { Stack } from '@onefootprint/ui';
 import { uniqueId } from 'lodash';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Line from '../components/line';
 import Background from './components/background';

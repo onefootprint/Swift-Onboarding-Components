@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
 import Cmd from 'src/pages/docs/components/cmd/cmd';
 import type { Article } from 'src/types/article';
 import type { PageNavigation } from 'src/types/page';
+import styled, { css } from 'styled-components';
 
 import Page404 from '../404/404';
 import AppHeader from './components/app-header';

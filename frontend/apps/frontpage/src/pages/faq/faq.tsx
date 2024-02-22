@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Button, Grid, media, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Accordion from 'src/components/accordion';
+import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 

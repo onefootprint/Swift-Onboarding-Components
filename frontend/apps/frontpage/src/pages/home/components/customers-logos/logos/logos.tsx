@@ -1,6 +1,6 @@
-import styled, { css, useTheme } from '@onefootprint/styled';
 import { media, Stack } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css, useTheme } from 'styled-components';
 
 import BloomLogo from './companies/bloom/bloom';
 import CobaLogo from './companies/coba/coba';

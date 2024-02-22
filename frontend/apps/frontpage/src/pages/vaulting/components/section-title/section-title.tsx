@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type SectionTitleProps = {
   variant: 'display-1' | 'display-2' | 'display-3';

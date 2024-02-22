@@ -1,6 +1,6 @@
 import type { Theme } from '@onefootprint/design-tokens';
-import { createGlobalStyle, ThemeProvider } from '@onefootprint/styled';
 import React from 'react';
+import { createGlobalStyle, ThemeProvider } from 'styled-components';
 
 import media from '../media';
 

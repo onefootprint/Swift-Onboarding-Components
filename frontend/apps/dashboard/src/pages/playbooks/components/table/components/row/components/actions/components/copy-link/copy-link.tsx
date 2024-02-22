@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Box, Button, Dialog, TextInput, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import getPermanentLink from '../../utils/get-permanent-link';
 

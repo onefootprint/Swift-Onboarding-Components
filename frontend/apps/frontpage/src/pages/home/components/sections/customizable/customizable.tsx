@@ -4,11 +4,11 @@ import {
   IcoHeart16,
   IcoLayer0116,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
+import styled, { css } from 'styled-components';
 
 import SectionTitle from '../../section-title/section-title';
 import Card from './components/card';

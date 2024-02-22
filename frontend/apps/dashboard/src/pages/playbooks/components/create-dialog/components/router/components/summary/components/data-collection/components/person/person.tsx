@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import type { SummaryMeta } from '@/playbooks/utils/machine/types';
 

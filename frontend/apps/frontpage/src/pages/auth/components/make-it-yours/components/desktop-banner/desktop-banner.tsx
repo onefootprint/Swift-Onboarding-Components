@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container, media, Stack } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Heather from '../header';
 import Screen from '../screen';

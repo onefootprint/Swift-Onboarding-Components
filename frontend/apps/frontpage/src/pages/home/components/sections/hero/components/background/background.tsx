@@ -1,9 +1,9 @@
-import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import times from 'lodash/times';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import HorizontalBeam from 'src/pages/home/components/horizontal-beam/horizontal-beam';
+import styled from 'styled-components';
 
 import VerticalBeam from '../../../../vertical-beam';
 

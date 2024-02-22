@@ -1,8 +1,8 @@
 import { useIntl } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import type { PostDetails } from 'src/utils/ghost/types';
+import styled, { css } from 'styled-components';
 
 import CardContent from './components/card-content';
 import Progress from './components/progress';

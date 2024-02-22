@@ -3,7 +3,6 @@ import {
   IcoChevronRight24,
   IcoClose16,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   IconButton,
@@ -17,6 +16,7 @@ import dynamic from 'next/dynamic';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 type PdfViewerProps = {
   src: string;

@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import Grid from '../grid';

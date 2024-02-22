@@ -1,11 +1,11 @@
 import { IcoClose16, IcoSearch24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, IconButton, Overlay } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PageNavigation } from 'src/types/page';
+import styled, { css } from 'styled-components';
 
 import Footer from './components/footer/footer';
 import Keycaps from './components/keycaps/keycaps';

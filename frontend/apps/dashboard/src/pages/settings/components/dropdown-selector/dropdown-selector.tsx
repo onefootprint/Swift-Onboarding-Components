@@ -1,8 +1,8 @@
 import { IcoCheck16, IcoChevronDown16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import * as Select from '@radix-ui/react-select';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 export type Option<T> = {
   id: string;

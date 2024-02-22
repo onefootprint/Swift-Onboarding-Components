@@ -1,4 +1,3 @@
-import styled from '@onefootprint/styled';
 import type { Tenant } from '@onefootprint/types';
 import { Pagination, Stack, Table, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -7,6 +6,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useAssumeTenant from 'src/hooks/use-assume-tenant';
 import useSession from 'src/hooks/use-session';
+import styled from 'styled-components';
 
 import Row from './components/row';
 import useFilters from './hooks/use-filters';

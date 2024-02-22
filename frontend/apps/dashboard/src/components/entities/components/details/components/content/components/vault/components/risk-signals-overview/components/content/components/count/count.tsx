@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 export type CountProps = {
   high?: RiskSignal[];

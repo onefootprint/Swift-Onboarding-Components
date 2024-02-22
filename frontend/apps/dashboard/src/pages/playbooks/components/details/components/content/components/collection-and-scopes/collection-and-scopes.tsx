@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import {
   type OnboardingConfig,
   OnboardingConfigKind,
@@ -6,6 +5,7 @@ import {
 import { Tab, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import AmlMonitoring from './components/aml-monitoring';
 import AuthorizedScopes from './components/authorized-scopes';

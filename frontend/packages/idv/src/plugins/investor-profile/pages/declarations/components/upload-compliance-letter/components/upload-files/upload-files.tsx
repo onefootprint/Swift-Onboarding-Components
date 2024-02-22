@@ -1,7 +1,7 @@
-import styled from '@onefootprint/styled';
 import { Box, Button, Divider, Grid } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import FileEntry from '../file-entry';
 

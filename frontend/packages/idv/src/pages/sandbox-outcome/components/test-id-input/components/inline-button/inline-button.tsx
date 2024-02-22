@@ -1,7 +1,7 @@
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Tooltip } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type InlineButtonProps = {
   icon?: Icon;

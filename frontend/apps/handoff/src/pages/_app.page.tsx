@@ -1,12 +1,12 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { Logger } from '@onefootprint/idv';
-import { createGlobalStyle, css } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { createGlobalStyle, css } from 'styled-components';
 
 import MachineProvider from '../components/machine-provider';
 import configureI18n from '../config/initializers/i18next';

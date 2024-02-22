@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import type { D2PGenerateResponse } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { useL10nContext } from '../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../components/layout/components/header-title';

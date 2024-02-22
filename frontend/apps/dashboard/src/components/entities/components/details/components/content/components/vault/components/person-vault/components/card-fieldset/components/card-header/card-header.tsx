@@ -1,8 +1,8 @@
 import { IcoCheck24, IcoChevronDown24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { EntityCard } from '@onefootprint/types';
 import { Dropdown, media, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import CardIcon from '../card-icon';
 

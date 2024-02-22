@@ -1,5 +1,4 @@
 import { IcoBolt24, IcoUser24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { MotionValue } from 'framer-motion';
 import {
   motion,
@@ -9,6 +8,7 @@ import {
 } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import MobileDemoVideo from 'src/components/mobile-demo-video';
+import styled, { css } from 'styled-components';
 
 type IllustrationOnboardProps = {
   scroll: MotionValue;

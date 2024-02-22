@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import {
   Container,
   createFontStyles,
@@ -12,6 +11,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ContactButtons from 'src/components/contact-buttons/contact-buttons';
 import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
+import styled, { css } from 'styled-components';
 
 const PenguinBannerAuth = () => {
   const { t } = useTranslation('common', {

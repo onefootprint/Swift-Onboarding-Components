@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Button, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 

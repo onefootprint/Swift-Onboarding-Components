@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const DEFAULT_OUTER_RADIUS = 72;
 const DEFAULT_INNER_RADIUS = 56;

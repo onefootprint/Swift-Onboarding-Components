@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import type { InsightEvent } from '@onefootprint/types';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import FloatingBox from '../floating-box';
 import Map from '../map';

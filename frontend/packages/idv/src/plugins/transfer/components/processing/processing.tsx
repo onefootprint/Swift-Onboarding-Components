@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';

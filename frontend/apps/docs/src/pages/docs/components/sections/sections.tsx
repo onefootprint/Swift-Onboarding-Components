@@ -1,9 +1,9 @@
 import { IcoFileText16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Box, createFontStyles, media, Stack } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ArticleSection } from 'src/types/article';
+import styled, { css } from 'styled-components';
 
 type SectionsProps = {
   sections: ArticleSection[];

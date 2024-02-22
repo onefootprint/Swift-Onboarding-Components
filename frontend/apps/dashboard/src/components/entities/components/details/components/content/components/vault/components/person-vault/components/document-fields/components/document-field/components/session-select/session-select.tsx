@@ -1,9 +1,9 @@
 import { useIntl } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type { Document } from '@onefootprint/types';
 import { Box, Select, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { getDocumentVersion } from '../../../../utils';
 

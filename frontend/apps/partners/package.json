@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@onefootprint/design-tokens": "*",
-    "@onefootprint/styled": "*",
+    "styled-components": "^6",
     "@onefootprint/ui": "*",
     "next": "14.1.0",
     "react-dom": "^18",

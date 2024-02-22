@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, Shimmer } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type LoadingProps = { children?: JSX.Element | null };
 

@@ -1,5 +1,4 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import { Button, Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -7,6 +6,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 /* eslint-disable import/no-extraneous-dependencies */
 import ContactDialog from 'src/components/contact-dialog';
+import styled, { css } from 'styled-components';
 
 import Illustration from './components/illustration/illustration';
 

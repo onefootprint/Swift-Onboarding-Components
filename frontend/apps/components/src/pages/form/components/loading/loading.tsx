@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { ScrollArea, Shimmer } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Container from '../container';
 import Grid from '../grid';

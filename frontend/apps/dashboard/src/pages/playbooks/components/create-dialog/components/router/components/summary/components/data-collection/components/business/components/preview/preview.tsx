@@ -1,10 +1,10 @@
 import { IcoPencil16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import type { BusinessInformation } from '@/playbooks/utils/machine/types';
 

@@ -1,6 +1,6 @@
-import styled from '@onefootprint/styled';
 import { Grid } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';

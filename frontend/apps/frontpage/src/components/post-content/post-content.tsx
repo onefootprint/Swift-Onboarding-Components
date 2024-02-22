@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import React, { useEffect, useRef } from 'react';
+import styled, { css } from 'styled-components';
 
 type PostContentProps = {
   html: string;

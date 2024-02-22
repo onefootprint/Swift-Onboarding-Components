@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { InlineAlert } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { isAuth, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
+import styled, { css } from 'styled-components';
 
 import type { SummaryMeta } from '@/playbooks/utils/machine/types';
 

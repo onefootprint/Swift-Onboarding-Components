@@ -5,7 +5,6 @@ import {
   ComboboxProvider,
 } from '@ariakit/react';
 import { IcoChevronDown16, IcoTrash16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   createFontStyles,
@@ -24,6 +23,7 @@ import {
   CellMeasurerCache,
   List,
 } from 'react-virtualized';
+import styled, { css } from 'styled-components';
 
 import useRiskSignals from './hooks/use-risk-signals';
 

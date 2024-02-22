@@ -1,8 +1,8 @@
-import styled from '@onefootprint/styled';
 import { motion, useAnimationControls } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect } from 'react';
 import BaseIllustration from 'src/pages/home/components/base-illustration/base-illustration';
+import styled from 'styled-components';
 
 type CustomizableIllustrationProps = {
   isHover?: boolean;

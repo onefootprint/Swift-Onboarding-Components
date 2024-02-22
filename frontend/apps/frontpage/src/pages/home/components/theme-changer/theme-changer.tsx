@@ -1,4 +1,3 @@
-import styled from '@onefootprint/styled';
 import {
   motion,
   useMotionValueEvent,
@@ -7,6 +6,7 @@ import {
 } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import React, { useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 
 type ThemeChangerProps = {
   children: React.ReactNode;

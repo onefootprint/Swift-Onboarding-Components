@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Box, Shimmer } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const Loading = () => (
   <Box testID="proxy-configs-details-loading" aria-busy>

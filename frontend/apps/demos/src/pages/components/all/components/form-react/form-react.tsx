@@ -1,8 +1,8 @@
 import { FootprintForm } from '@onefootprint/footprint-react';
-import styled from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { DEMO_FORM_AUTH_TOKEN } from 'src/config/constants';
+import styled from 'styled-components';
 
 const FormReactIntegration = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);

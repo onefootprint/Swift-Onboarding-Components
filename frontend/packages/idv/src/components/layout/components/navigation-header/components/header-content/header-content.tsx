@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
+import styled, { css } from 'styled-components';
 
 const HeaderContent = styled.div`
   ${({ theme }) => css`

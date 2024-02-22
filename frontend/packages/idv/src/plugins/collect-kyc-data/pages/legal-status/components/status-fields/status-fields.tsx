@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { UsLegalStatus } from '@onefootprint/types';
 import { Grid, media, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 type StatusFieldsProps = {
   handleStatusChange: (newStatus: UsLegalStatus) => void;

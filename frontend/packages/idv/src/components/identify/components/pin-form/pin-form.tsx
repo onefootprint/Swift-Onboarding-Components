@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { PinInput, Typography } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import InlineAction from '../inline-action';
 import type { ResendButtonProps } from './components/resend-button';

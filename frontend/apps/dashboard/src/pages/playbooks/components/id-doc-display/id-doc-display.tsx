@@ -1,13 +1,13 @@
 // TODO: Deprecate this file
 
 import { IcoCloseSmall24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 export type IdDocDisplayProps = {
   idDocKind: SupportedIdDocTypes[];

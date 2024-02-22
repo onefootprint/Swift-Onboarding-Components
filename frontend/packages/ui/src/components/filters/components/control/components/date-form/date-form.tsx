@@ -1,7 +1,7 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import styled, { css } from 'styled-components';
 
 import DateRangeInput from '../../../../../date-range-input';
 import Radio from '../../../../../radio';

@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
 import type { SegmentedControlOptionFields } from './components/segmented-control-option';
 import SegmentedControlOption from './components/segmented-control-option';

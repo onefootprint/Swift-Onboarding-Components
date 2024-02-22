@@ -1,7 +1,7 @@
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Typography } from '@onefootprint/ui';
 import React, { useRef } from 'react';
+import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 type CardProps = {

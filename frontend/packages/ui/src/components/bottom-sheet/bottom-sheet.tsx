@@ -1,7 +1,7 @@
-import styled, { css, keyframes } from '@onefootprint/styled';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css, keyframes } from 'styled-components';
 
 import { media } from '../../utils';
 import Overlay from '../overlay';

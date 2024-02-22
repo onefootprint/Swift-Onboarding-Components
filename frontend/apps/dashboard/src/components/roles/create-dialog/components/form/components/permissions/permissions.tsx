@@ -1,5 +1,4 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import styled, { css } from '@onefootprint/styled';
 import type { RoleKind } from '@onefootprint/types';
 import { RoleScopeKind, supportedRoleKinds } from '@onefootprint/types';
 import {
@@ -13,6 +12,7 @@ import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useDecryptOptions, useVaultProxyOptions } from 'src/components/roles';
+import styled, { css } from 'styled-components';
 
 export type PermissionsProps = {
   kind: RoleKind;

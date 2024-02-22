@@ -1,7 +1,7 @@
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
-import styled, { css } from '@onefootprint/styled';
 import Head from 'next/head';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 // Acme bank tenant
 // With id doc

@@ -1,10 +1,10 @@
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
-import styled from '@onefootprint/styled';
 import { CodeBlock, CodeInline, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
+import styled from 'styled-components';
 
 type CustomizationProps = {
   appearance: FootprintAppearance;

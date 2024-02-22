@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Grid, media, Typography } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type SectionProps = {
   title: string;

@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { Link } from 'react-scroll';
+import styled, { css } from 'styled-components';
 
 type NavigationScrollLinkProps = {
   id: string;

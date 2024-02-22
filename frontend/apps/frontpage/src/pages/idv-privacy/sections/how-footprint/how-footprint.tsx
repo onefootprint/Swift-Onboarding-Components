@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container, createFontStyles, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import FeatureCard from '../../components/feature-card';
 

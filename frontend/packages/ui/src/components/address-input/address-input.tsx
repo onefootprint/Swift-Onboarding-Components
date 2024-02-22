@@ -1,12 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import { useCombobox } from 'downshift';
 import noop from 'lodash/noop';
 import take from 'lodash/take';
 import React, { forwardRef, useEffect, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
+import styled, { css } from 'styled-components';
 import usePlacesAutocomplete from 'use-places-autocomplete';
 
 import Box from '../box';

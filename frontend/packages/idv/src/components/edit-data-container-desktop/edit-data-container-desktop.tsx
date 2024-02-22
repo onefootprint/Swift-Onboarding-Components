@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Divider } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { NavigationHeader } from '../layout';
 

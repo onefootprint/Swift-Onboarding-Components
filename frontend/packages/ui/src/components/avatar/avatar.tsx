@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
-import styled, { css } from '@onefootprint/styled';
 import type * as CSS from 'csstype';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils';
 import type { LoadingIndicatorProps } from '../loading-indicator';

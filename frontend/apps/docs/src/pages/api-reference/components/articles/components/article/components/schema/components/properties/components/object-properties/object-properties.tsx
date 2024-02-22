@@ -1,5 +1,4 @@
 import { IcoChevronRight16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   CodeInline,
@@ -9,6 +8,7 @@ import {
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
+import styled, { css } from 'styled-components';
 
 import type { ContentSchema } from '@/api-reference/api-reference.types';
 

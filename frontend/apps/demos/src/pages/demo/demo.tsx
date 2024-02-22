@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Form from './components/form';
 import Success from './components/success';

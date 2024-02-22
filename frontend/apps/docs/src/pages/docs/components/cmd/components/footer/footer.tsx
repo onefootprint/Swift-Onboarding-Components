@@ -1,8 +1,8 @@
 import { IcoFootprint16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 const Footer = () => {
   const { t } = useTranslation('common', {

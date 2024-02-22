@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { media, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import ContactDialog from '../../../../components/contact-dialog';
 import PlanColumn from './components/plan-column';

@@ -1,5 +1,4 @@
 import { IcoCopy16 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import type { AmlHitMedia } from '@onefootprint/types';
 import {
   Box,
@@ -11,6 +10,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import toReadableString from './utils/to-readable-string';
 

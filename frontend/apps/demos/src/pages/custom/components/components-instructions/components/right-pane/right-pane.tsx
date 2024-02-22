@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Button, media } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type RightPaneProps = {
   onLaunch: () => void;

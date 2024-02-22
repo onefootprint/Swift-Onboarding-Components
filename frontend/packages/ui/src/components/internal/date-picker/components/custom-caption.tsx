@@ -1,9 +1,9 @@
 import { IcoChevronLeft24, IcoChevronRight24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import type { CaptionProps } from 'react-day-picker';
 import { useNavigation } from 'react-day-picker';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import IconButton from '../../../icon-button';
 import Typograhy from '../../../typography';

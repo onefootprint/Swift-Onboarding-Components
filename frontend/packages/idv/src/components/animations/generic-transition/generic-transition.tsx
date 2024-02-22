@@ -1,8 +1,8 @@
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Stack, Typography } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import {

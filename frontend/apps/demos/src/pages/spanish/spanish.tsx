@@ -1,9 +1,9 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import footprint from '@onefootprint/footprint-react';
-import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const publicKey = process.env.NEXT_PUBLIC_DEFAULT_TENANT_PK as string;
 

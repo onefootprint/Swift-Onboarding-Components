@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import { Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 const Loading = () => (
   <Stack testID="onboarding-configs-details-loading" aria-busy>

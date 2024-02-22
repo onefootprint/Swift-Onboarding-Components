@@ -1,12 +1,12 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoDownload16, ThemedLogoFpCompact } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 const assetsToCopy = [
   {

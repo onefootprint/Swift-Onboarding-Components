@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import Image from 'next/image';
 import React from 'react';
 import BaseIllustration from 'src/pages/home/components/base-illustration';
+import styled, { css } from 'styled-components';
 
 const Auth = () => (
   <StyledBaseIllustration>

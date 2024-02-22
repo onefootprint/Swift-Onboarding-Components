@@ -1,8 +1,8 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import styled, { css, useTheme } from '@onefootprint/styled';
 import React from 'react';
 import Highlighter from 'react-highlight-words';
 import type { CommonPropsAndClassName, GroupBase } from 'react-select';
+import styled, { css, useTheme } from 'styled-components';
 
 import {
   createFontStyles,

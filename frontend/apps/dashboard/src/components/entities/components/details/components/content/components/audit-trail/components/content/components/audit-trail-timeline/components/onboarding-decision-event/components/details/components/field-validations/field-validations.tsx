@@ -1,8 +1,8 @@
-import styled from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
+import styled from 'styled-components';
 
 import useEntityMatchSignals from '../../hooks/use-entity-match-signals';
 import Error from './components/error';

@@ -6,13 +6,13 @@ import {
   IcoInfo16,
   IcoWarning16,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { WatchlistCheckEventData } from '@onefootprint/types';
 import { WatchlistCheckStatus } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import EventBodyEntry from '../event-body-entry';
 

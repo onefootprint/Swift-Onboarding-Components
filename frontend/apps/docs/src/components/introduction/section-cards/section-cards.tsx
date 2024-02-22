@@ -6,10 +6,10 @@ import {
   IcoLayer0124,
   IcoStore24,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
 
 // import AuthIllustration from './illustrations/auth-illustration';

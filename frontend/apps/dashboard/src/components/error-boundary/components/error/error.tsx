@@ -1,9 +1,9 @@
-import styled from '@onefootprint/styled';
 import { Container, EmptyState } from '@onefootprint/ui';
 import Head from 'next/head';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 type ErrorProps = {
   resetErrorBoundary: () => void;

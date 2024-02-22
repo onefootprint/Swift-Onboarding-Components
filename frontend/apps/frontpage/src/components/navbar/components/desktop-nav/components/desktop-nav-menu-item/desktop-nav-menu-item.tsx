@@ -1,8 +1,8 @@
 import { primitives } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import type { NavMenuItem } from '../../../../types';
 

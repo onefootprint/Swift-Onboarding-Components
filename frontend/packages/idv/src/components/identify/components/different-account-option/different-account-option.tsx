@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Divider, LinkButton, Stack } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import LegalFooter from '../../../legal-footer';
 import { useIdentifyMachine } from '../../state';

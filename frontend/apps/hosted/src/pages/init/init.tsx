@@ -2,12 +2,12 @@ import { useObserveCollector } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { Logger, useGetOnboardingConfig } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
-import styled, { css } from '@onefootprint/styled';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
 import { media, Shimmer } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
+import styled, { css } from 'styled-components';
 
 import useGetBusiness from './hooks/use-get-business';
 import useParseUrl from './hooks/use-url-params';

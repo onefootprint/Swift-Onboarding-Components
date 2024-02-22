@@ -1,5 +1,4 @@
 import { IcoWarning16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Badge,
   Button,
@@ -11,6 +10,7 @@ import {
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import type { AMLFormData } from '@/playbooks/utils/machine/types';
 

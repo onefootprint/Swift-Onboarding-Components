@@ -1,6 +1,5 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoIdFront16, IcoInfo16, IcoUpload24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type {
   DataIdentifier,
   Document,
@@ -12,6 +11,7 @@ import { createFontStyles, Tooltip, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import HoverableImage from './components/hoverable-image';
 import getMimeType from './utils/get-mime-type';

@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import type { CleaveOptions } from 'cleave.js/options';
 import Cleave from 'cleave.js/react';
 import type React from 'react';
+import styled, { css } from 'styled-components';
 
 import { createTypography } from '../../../utils/mixins';
 

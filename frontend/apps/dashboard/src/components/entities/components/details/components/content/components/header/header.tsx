@@ -1,4 +1,3 @@
-import styled, { css, useTheme } from '@onefootprint/styled';
 import { CodeInline, Stack, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
@@ -6,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Tags from 'src/components/entities/components/tags';
 import StatusBadge from 'src/components/status-badge';
 import useSession from 'src/hooks/use-session';
+import styled, { css, useTheme } from 'styled-components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';

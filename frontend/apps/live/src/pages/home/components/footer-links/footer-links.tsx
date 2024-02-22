@@ -1,8 +1,8 @@
-import styled from '@onefootprint/styled';
 import { Stack, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 const FooterLinks = () => {
   const { t } = useTranslation('common', { keyPrefix: 'home.legal-documents' });

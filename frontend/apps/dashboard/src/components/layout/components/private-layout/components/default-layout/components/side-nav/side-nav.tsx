@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoUserCircle16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Divider, Stack } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useRouter } from 'next/router';
@@ -8,6 +7,7 @@ import React from 'react';
 import useAssumeAuthRole from 'src/hooks/use-assume-auth-role';
 import useAuthRoles from 'src/hooks/use-auth-roles';
 import useSession from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 
 import NavDropdown from './components/nav-dropdown';
 import NavLink from './components/nav-link';

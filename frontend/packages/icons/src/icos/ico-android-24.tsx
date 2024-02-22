@@ -1,5 +1,5 @@
-import { useTheme } from '@onefootprint/styled';
 import React from 'react';
+import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 

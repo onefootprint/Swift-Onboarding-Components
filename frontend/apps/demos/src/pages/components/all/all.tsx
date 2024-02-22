@@ -1,7 +1,7 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import styled, { css } from '@onefootprint/styled';
 import { Tab, Tabs, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import FormJsIntegration from './components/form-js';
 import FormReactIntegration from './components/form-react';

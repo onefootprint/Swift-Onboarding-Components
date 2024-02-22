@@ -1,9 +1,9 @@
-import styled, { css } from '@onefootprint/styled';
 import { motion, useAnimationControls, useInView } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import Tag from './components/tag';
 import { tagKeys } from './constants';

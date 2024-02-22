@@ -1,4 +1,3 @@
-import styled, { css, useTheme } from '@onefootprint/styled';
 import FocusTrap from 'focus-trap-react';
 import type { Ref } from 'react';
 import React, {
@@ -9,6 +8,7 @@ import React, {
 } from 'react';
 import mergeRefs from 'react-merge-refs';
 import { usePopper } from 'react-popper';
+import styled, { css, useTheme } from 'styled-components';
 
 import { useOnClickOutside } from '../../../../hooks';
 import {

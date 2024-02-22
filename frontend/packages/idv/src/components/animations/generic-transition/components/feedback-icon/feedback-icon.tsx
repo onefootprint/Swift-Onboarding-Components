@@ -1,7 +1,7 @@
 import type { Theme } from '@onefootprint/design-tokens';
 import { IcoCheck16, IcoSpinner16, IcoWarning16 } from '@onefootprint/icons';
-import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
+import styled, { css, keyframes } from 'styled-components';
 
 type FeedbackIconProps = {
   variant: 'success' | 'error' | 'loading';

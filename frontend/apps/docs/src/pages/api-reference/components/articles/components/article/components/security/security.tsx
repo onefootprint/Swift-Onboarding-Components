@@ -1,8 +1,8 @@
 import { IcoChevronDown16, IcoShield16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { CodeInline, createFontStyles, Divider } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import type { SecurityProps } from '@/api-reference/api-reference.types';
 import staticData from '@/api-reference/assets/api-docs.json';

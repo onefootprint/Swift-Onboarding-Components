@@ -1,11 +1,11 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import { getAuthFixedPayload, isAuth } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';

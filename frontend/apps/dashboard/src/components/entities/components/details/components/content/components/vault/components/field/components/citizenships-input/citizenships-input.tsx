@@ -1,9 +1,9 @@
-import styled from '@onefootprint/styled';
 import { IdDI } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import editFormFieldName from '../utils/edit-form-field-name';
 import validateCitizenships, {

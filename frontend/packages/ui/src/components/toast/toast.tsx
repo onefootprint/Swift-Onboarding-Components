@@ -1,8 +1,8 @@
 import { IcoCloseSmall16, IcoInfo16 } from '@onefootprint/icons';
-import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
+import styled, { css, keyframes } from 'styled-components';
 
 import LinkButton from '../link-button';
 import Stack from '../stack';

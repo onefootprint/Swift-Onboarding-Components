@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import type { PageNavSection } from '../page-nav/page-nav';
 import Article from './components/article';

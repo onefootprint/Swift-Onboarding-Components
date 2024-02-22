@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import IllustrationContainer from '../../components/illustration-section-title/container';
 import Rectangle from '../../components/illustration-section-title/rectangle/rectangle';

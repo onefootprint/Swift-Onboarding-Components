@@ -1,6 +1,6 @@
-import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 
 import Footer from '../footer';
 import Navbar from '../navbar';

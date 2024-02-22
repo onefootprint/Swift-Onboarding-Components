@@ -1,10 +1,10 @@
-import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import type { ComponentProps } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import type { Option } from './collected-information.types';
 import DisplayValue from './components/display-value';

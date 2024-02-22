@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import type { Entity } from '@onefootprint/types';
 import {
   hasEntityCards,
@@ -8,6 +7,7 @@ import {
   hasEntityUsLegalStatus,
 } from '@onefootprint/types';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';

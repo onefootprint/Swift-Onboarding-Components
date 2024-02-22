@@ -1,8 +1,8 @@
-import styled from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Dropdown, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 type SupportSubmenuProps = {
   config?: PublicOnboardingConfig;

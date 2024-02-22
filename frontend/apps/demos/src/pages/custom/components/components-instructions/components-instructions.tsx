@@ -1,10 +1,10 @@
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import styled from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
+import styled from 'styled-components';
 
 import LeftPane from './components/left-pane';
 import RightPane from './components/right-pane';

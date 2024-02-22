@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
+import styled, { css } from 'styled-components';
 
 import type { ContentSchema } from '@/api-reference/api-reference.types';
 

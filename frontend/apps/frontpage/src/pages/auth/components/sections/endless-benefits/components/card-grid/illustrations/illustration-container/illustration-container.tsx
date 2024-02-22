@@ -1,4 +1,4 @@
-import styled from '@onefootprint/styled';
+import styled from 'styled-components';
 
 const IllustrationContainer = styled.div<{ className?: string }>`
   position: relative;

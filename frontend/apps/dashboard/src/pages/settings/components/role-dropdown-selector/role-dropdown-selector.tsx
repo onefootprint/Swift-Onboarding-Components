@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import type { RoleScope } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import type { DropdownSelectorProps, Option } from '../dropdown-selector';
 import DropdownSelector from '../dropdown-selector';

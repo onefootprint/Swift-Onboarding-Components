@@ -1,9 +1,9 @@
 import { IcoCheckSmall16, IcoLang16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Stack, Typography } from '@onefootprint/ui';
 import * as Select from '@radix-ui/react-select';
 import i18n from 'i18next';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type SupportedLanguage = 'en' | 'es';
 const LanguageLabels: Record<SupportedLanguage, string> = {

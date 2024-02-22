@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
+import styled, { css } from 'styled-components';
 
 const NavigationSectionTitle = styled.header`
   ${({ theme }) => css`

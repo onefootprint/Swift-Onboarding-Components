@@ -1,11 +1,11 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { IcoCirclePlay24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import ReactPlayer from 'react-player';
+import styled, { css } from 'styled-components';
 
 type MobileDemoVideoProps = {
   videoUrl: string;

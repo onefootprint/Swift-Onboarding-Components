@@ -9,9 +9,9 @@ import {
   IcoVisa24,
   IcoVisaelectron24,
 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 type CardIconProps = {
   issuer?: string;

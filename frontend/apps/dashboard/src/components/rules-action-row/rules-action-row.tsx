@@ -1,9 +1,9 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { type Rule, type RuleField, RuleOp } from '@onefootprint/types';
 import { Badge, createFontStyles, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import OpBadge from './components/op-badge';
 import RiskSignalSelect from './components/risk-signal-select';

@@ -1,6 +1,6 @@
-import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css, keyframes } from 'styled-components';
 
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
