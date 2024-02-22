@@ -1,9 +1,15 @@
 'use client';
 
+import styled from '@onefootprint/styled';
+import { Button } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
-const Hello = () => <Title>hello</Title>;
+const Hello = () => (
+  <div>
+    <Title>hello</Title>
+    <Button>hello</Button>
+  </div>
+);
 
 const Title = styled.h1`
   color: red;

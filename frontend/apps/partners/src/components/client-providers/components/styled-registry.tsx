@@ -1,6 +1,6 @@
+import { ServerStyleSheet, StyleSheetManager } from '@onefootprint/styled';
 import { useServerInsertedHTML } from 'next/navigation';
 import React, { useState } from 'react';
-import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 
 const StyledComponentsRegistry = ({ children }: React.PropsWithChildren) => {
   // Only create stylesheet once with lazy initial state

@@ -16,10 +16,12 @@
     "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
+    "@onefootprint/design-tokens": "*",
+    "@onefootprint/styled": "*",
+    "@onefootprint/ui": "*",
     "next": "14.1.0",
-    "styled-components": "^6"
+    "react-dom": "^18",
+    "react": "^18"
   },
   "devDependencies": {
     "@types/node": "^20",
