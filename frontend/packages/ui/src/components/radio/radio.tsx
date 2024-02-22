@@ -1,3 +1,5 @@
+'use client';
+
 import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';

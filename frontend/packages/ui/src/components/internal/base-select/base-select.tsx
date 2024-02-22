@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useCallback, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePopper } from 'react-popper';

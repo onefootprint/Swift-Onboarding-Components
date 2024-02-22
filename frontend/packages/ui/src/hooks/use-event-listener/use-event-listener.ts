@@ -1,3 +1,5 @@
+'use client';
+
 // Copied from https://github.com/juliencrn/usehooks-ts/blob/master/packages/usehooks-ts/src/useEventListener/useEventListener.ts
 import type { RefObject } from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { IcoCopy24 } from '@onefootprint/icons';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';

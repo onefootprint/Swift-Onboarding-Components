@@ -1,3 +1,5 @@
+'use client';
+
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';

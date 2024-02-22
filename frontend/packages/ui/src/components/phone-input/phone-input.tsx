@@ -1,3 +1,5 @@
+'use client';
+
 import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';

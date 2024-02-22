@@ -1,3 +1,5 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';

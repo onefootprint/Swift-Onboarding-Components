@@ -1,3 +1,5 @@
+'use client';
+
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';

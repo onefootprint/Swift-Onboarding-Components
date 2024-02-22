@@ -1,3 +1,5 @@
+'use client';
+
 import { primitives } from '@onefootprint/design-tokens';
 import { IcoMoon16, IcoSun16 } from '@onefootprint/icons';
 import { motion } from 'framer-motion';

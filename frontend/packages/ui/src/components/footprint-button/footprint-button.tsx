@@ -1,3 +1,5 @@
+'use client';
+
 import { IcoFootprint24 } from '@onefootprint/icons';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';

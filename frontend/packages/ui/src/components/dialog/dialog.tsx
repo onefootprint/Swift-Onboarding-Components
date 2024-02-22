@@ -1,3 +1,5 @@
+'use client';
+
 import { IcoClose24 } from '@onefootprint/icons';
 import FocusTrap from 'focus-trap-react';
 import React, { useRef } from 'react';

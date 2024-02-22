@@ -1,3 +1,5 @@
+'use client';
+
 import type { Icon } from '@onefootprint/icons';
 import React, { useRef } from 'react';
 import styled from 'styled-components';

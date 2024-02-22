@@ -1,3 +1,5 @@
+'use client';
+
 /* eslint-disable react/jsx-props-no-spreading */
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';

@@ -1,3 +1,5 @@
+'use client';
+
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
