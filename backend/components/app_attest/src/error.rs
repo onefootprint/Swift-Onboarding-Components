@@ -4,6 +4,9 @@ pub type Result<T> = std::result::Result<T, AttestationError>;
 
 #[derive(Debug, Error)]
 pub enum AttestationError {
+    #[error("Missing tenant")]
+    MissingTenant,
+
     #[error("CBOR encoding invalid: '{0}'")]
     CborEncoding(#[from] serde_cbor::Error),
 

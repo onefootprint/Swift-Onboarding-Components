@@ -1,14 +1,15 @@
 use crate::{
     auth::user::{UserAuthContext, UserAuthGuard},
+    errors::ApiError,
     types::{EmptyResponse, JsonApiResponse},
     State,
 };
 use actix_web::web::Json;
-
 use api_core::{
     decision::vendor::fp_device_attestation::AttestationResult, errors::ApiResult, types::ResponseData,
     utils::challenge::Challenge,
 };
+use app_attest::error::AttestationError::MissingTenant;
 
 use api_core::{decision::vendor, utils::headers::InsightHeaders};
 use api_wire_types::hosted::device_attestation::{
@@ -34,6 +35,8 @@ pub enum ChallengeState {
     /// Specifically namespace this challenge as to not conflict with other challenge types
     DeviceAttestationChallenge {
         device_type: DeviceAttestationType,
+        ios_bundle_id: Option<String>,
+        android_package_name: Option<String>,
         attestation_challenge: String,
     },
 }
@@ -47,11 +50,17 @@ pub async fn post_challenge(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<DeviceAttestationChallengeResponse> {
     let _ = user_auth.check_guard(UserAuthGuard::SignUp)?;
-    let GetDeviceAttestationChallengeRequest { device_type } = request.into_inner();
+    let GetDeviceAttestationChallengeRequest {
+        device_type,
+        ios_bundle_id,
+        android_package_name,
+    } = request.into_inner();
 
     // we need the server to generate a one-time use challenge
     let attestation_challenge = crypto::base64::encode(crypto::random::gen_rand_bytes(32));
     let challenge_state = ChallengeState::DeviceAttestationChallenge {
+        ios_bundle_id,
+        android_package_name,
         device_type,
         attestation_challenge: attestation_challenge.clone(),
     };
@@ -83,6 +92,7 @@ pub async fn post_attestation(
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+
     let CreateDeviceAttestationRequest {
         attestation,
         state: sealed_state,
@@ -92,7 +102,13 @@ pub async fn post_attestation(
     let ChallengeState::DeviceAttestationChallenge {
         attestation_challenge: challenge,
         device_type,
+        ios_bundle_id,
+        android_package_name,
     } = Challenge::unseal_string(&state.challenge_sealing_key, sealed_state)?.data;
+
+    let Some(tenant) = auth.tenant() else {
+        return Err(ApiError::from(MissingTenant));
+    };
 
     let vault_id = auth.user.id.clone();
     let scoped_vault_id = auth.scoped_user_id();
@@ -102,7 +118,15 @@ pub async fn post_attestation(
 
     match device_type {
         DeviceAttestationType::Ios => {
-            let new_attestation = ios::attest(&state, vault_id.clone(), challenge, attestation).await?;
+            let new_attestation = ios::attest(
+                &state,
+                tenant,
+                vault_id.clone(),
+                challenge,
+                attestation,
+                ios_bundle_id,
+            )
+            .await?;
 
             state
                 .db_pool
@@ -151,7 +175,15 @@ pub async fn post_attestation(
                 .await?;
         }
         DeviceAttestationType::Android => {
-            let new_attestation = android::attest(&state, vault_id.clone(), challenge, attestation).await?;
+            let new_attestation = android::attest(
+                &state,
+                tenant,
+                vault_id.clone(),
+                challenge,
+                attestation,
+                android_package_name,
+            )
+            .await?;
 
             state
                 .db_pool

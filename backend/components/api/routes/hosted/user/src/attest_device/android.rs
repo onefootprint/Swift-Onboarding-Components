@@ -8,9 +8,14 @@ use app_attest::{
 };
 use chrono::Utc;
 use crypto::base64;
-use db::models::{
-    google_device_attest::{GoogleDeviceMetadata, NewGoogleDeviceAttestation},
-    webauthn_credential::WebauthnCredential,
+use db::{
+    models::{
+        google_device_attest::{GoogleDeviceMetadata, NewGoogleDeviceAttestation},
+        tenant::Tenant,
+        tenant_android_app_meta::{TenantAndroidAppFilters, TenantAndroidAppMeta},
+        webauthn_credential::WebauthnCredential,
+    },
+    DbResult,
 };
 use newtypes::{AndroidAppLicense, AndroidAppRecognition, AndroidDeviceIntegrityLevel, VaultId};
 
@@ -45,21 +50,59 @@ struct AttestedMetadata {
 #[tracing::instrument(skip_all)]
 pub(super) async fn attest(
     state: &State,
+    tenant: &Tenant,
     vault_id: VaultId,
     challenge: String,
     attestation: String,
+    package_name: Option<String>,
 ) -> ApiResult<NewGoogleDeviceAttestation> {
-    let verifier = GoogleAppAttestationVerifier::new(app_attest::google::Config {
-        allowed_apk_package_names: vec!["com.onefootprint.my".into()],
-        allowed_apk_cert_sha256_values: vec!["iaC6-3GYhfKZE9MD30e246TYy2bIXtXJYziWKIhmSUE".into()],
-        allowed_token_ttl_ms: app_attest::google::TtlEnforcement::FiveMinutes,
-        token_decryption_key_base64: state.config.google_config.play_integrity_decryptiong_key.clone(),
-        token_verification_key_base64: state
-            .config
-            .google_config
-            .play_integrity_verificiation_key
-            .clone(),
-    });
+    // If package name is provided, fetch the tenant android app metadata
+    // Otherwise assume we are running against footprint verifier
+    let meta: Option<TenantAndroidAppMeta> = if package_name.is_some() {
+        let filters = TenantAndroidAppFilters {
+            tenant_id: tenant.id.clone(),
+            package_name,
+        };
+        let metas = state
+            .db_pool
+            .db_query(move |conn| -> DbResult<_> { TenantAndroidAppMeta::list(conn, filters) })
+            .await?;
+        metas.into_iter().next()
+    } else {
+        None
+    };
+
+    let verifier = if let Some(meta) = meta {
+        let decrypted_decryption_key = state
+            .enclave_client
+            .decrypt_to_piistring(&meta.e_integrity_decryption_key, &tenant.e_private_key)
+            .await?
+            .leak_to_string();
+        let decrypted_verification_key = state
+            .enclave_client
+            .decrypt_to_piistring(&meta.e_integrity_verification_key, &tenant.e_private_key)
+            .await?
+            .leak_to_string();
+        GoogleAppAttestationVerifier::new(app_attest::google::Config {
+            allowed_apk_package_names: meta.package_names,
+            allowed_apk_cert_sha256_values: meta.apk_cert_sha256s,
+            allowed_token_ttl_ms: app_attest::google::TtlEnforcement::FiveMinutes,
+            token_decryption_key_base64: decrypted_decryption_key,
+            token_verification_key_base64: decrypted_verification_key,
+        })
+    } else {
+        GoogleAppAttestationVerifier::new(app_attest::google::Config {
+            allowed_apk_package_names: vec!["com.onefootprint.my".into()],
+            allowed_apk_cert_sha256_values: vec!["iaC6-3GYhfKZE9MD30e246TYy2bIXtXJYziWKIhmSUE".into()],
+            allowed_token_ttl_ms: app_attest::google::TtlEnforcement::FiveMinutes,
+            token_decryption_key_base64: state.config.google_config.play_integrity_decryptiong_key.clone(),
+            token_verification_key_base64: state
+                .config
+                .google_config
+                .play_integrity_verificiation_key
+                .clone(),
+        })
+    };
 
     let vault_id_copy = vault_id.clone();
     let creds = state

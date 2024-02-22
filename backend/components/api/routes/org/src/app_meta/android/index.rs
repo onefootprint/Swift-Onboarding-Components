@@ -6,7 +6,10 @@ use crate::{
 };
 use api_core::types::JsonApiResponse;
 use api_wire_types::UpdateTenantAndroidAppMetaRequest;
-use db::{models::tenant_android_app_meta::TenantAndroidAppMeta, DbResult};
+use db::{
+    models::tenant_android_app_meta::{TenantAndroidAppFilters, TenantAndroidAppMeta},
+    DbResult,
+};
 use newtypes::{SealedVaultBytes, TenantAndroidAppMetaId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -21,10 +24,16 @@ pub async fn get(
 ) -> JsonApiResponse<Vec<api_wire_types::TenantAndroidAppMeta>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
-
     let list = state
         .db_pool
-        .db_query(move |conn| -> DbResult<_> { TenantAndroidAppMeta::list(conn, &tenant_id) })
+        .db_query(move |conn| -> DbResult<_> {
+            let filters = TenantAndroidAppFilters {
+                tenant_id,
+                package_name: None,
+            };
+            let res = TenantAndroidAppMeta::list(conn, filters)?;
+            Ok(res)
+        })
         .await?
         .into_iter()
         .map(|partial_meta| (partial_meta, None, None))

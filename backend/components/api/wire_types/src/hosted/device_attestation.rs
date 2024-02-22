@@ -3,6 +3,10 @@ use crate::*;
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct GetDeviceAttestationChallengeRequest {
     pub device_type: DeviceAttestationType,
+    /// required if running footprint sdk in ios
+    pub ios_bundle_id: Option<String>,
+    /// required if running footprint sdk in android
+    pub android_package_name: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]

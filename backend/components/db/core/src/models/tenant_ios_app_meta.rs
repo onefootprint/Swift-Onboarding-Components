@@ -40,6 +40,11 @@ pub struct TenantIosAppMetaUpdate {
     pub e_device_check_private_key: Option<SealedVaultBytes>,
 }
 
+pub struct TenantIosAppFilters {
+    pub tenant_id: TenantId,
+    pub app_bundle_id: Option<String>,
+}
+
 impl TenantIosAppMeta {
     #[tracing::instrument("TenantIosAppMeta::create", skip_all)]
     #[allow(clippy::too_many_arguments)]
@@ -100,9 +105,16 @@ impl TenantIosAppMeta {
     }
 
     #[tracing::instrument("TenantIosAppMeta::list", skip_all)]
-    pub fn list(conn: &mut PgConn, tenant_id: &TenantId) -> DbResult<Vec<TenantIosAppMeta>> {
-        let result = tenant_ios_app_meta::table
-            .filter(tenant_ios_app_meta::tenant_id.eq(tenant_id))
+    pub fn list(conn: &mut PgConn, filters: TenantIosAppFilters) -> DbResult<Vec<Self>> {
+        let mut query = tenant_ios_app_meta::table
+            .filter(tenant_ios_app_meta::tenant_id.eq(filters.tenant_id))
+            .into_boxed();
+
+        if let Some(app_bundle_id) = filters.app_bundle_id {
+            query = query.filter(tenant_ios_app_meta::app_bundle_ids.contains(vec![app_bundle_id]))
+        };
+
+        let result = query
             .filter(tenant_ios_app_meta::deactivated_at.is_null())
             .order_by(tenant_ios_app_meta::created_at.asc())
             .get_results(conn)?;

@@ -1,14 +1,17 @@
 use crate::State;
-
 use api_core::errors::ApiResult;
 
 use app_attest::apple::AppleAppAttestationVerifier;
-
 use crypto::base64;
 
-use db::models::{
-    apple_device_attest::{AppleDeviceMetadata, NewAppleDeviceAttestation},
-    webauthn_credential::WebauthnCredential,
+use db::{
+    models::{
+        apple_device_attest::{AppleDeviceMetadata, NewAppleDeviceAttestation},
+        tenant::Tenant,
+        tenant_ios_app_meta::{TenantIosAppFilters, TenantIosAppMeta},
+        webauthn_credential::WebauthnCredential,
+    },
+    DbResult,
 };
 use newtypes::VaultId;
 
@@ -38,20 +41,51 @@ struct AttestedMetadata {
 #[tracing::instrument(skip_all)]
 pub(super) async fn attest(
     state: &State,
+    tenant: &Tenant,
     vault_id: VaultId,
     challenge: String,
     attestation: String,
+    app_bundle_id: Option<String>,
 ) -> ApiResult<NewAppleDeviceAttestation> {
-    let verifier: AppleAppAttestationVerifier = AppleAppAttestationVerifier::new_default_ca(
-        vec![
-            "5F264K8AG4.com.onefootprint.my",
-            "5F264K8AG4.com.onefootprint.my.Clip",
-            "5F264K8AG4.com.onefootprint.demo-swift",
-        ],
-        &state.config.apple_config.apple_device_check_private_key_pem,
-        &state.config.apple_config.apple_device_check_key_id,
-        "5F264K8AG4",
-    )?;
+    // If app bundle id is provided, fetch the tenant ios app metadata
+    // Otherwise assume we are running inside app clip and use footprint verifier info
+    let meta: Option<TenantIosAppMeta> = if app_bundle_id.is_some() {
+        let filters = TenantIosAppFilters {
+            tenant_id: tenant.id.clone(),
+            app_bundle_id,
+        };
+        let metas = state
+            .db_pool
+            .db_query(move |conn| -> DbResult<_> { TenantIosAppMeta::list(conn, filters) })
+            .await?;
+        metas.into_iter().next()
+    } else {
+        None
+    };
+
+    let verifier = if let Some(meta) = meta {
+        let decrypted_private_key = state
+            .enclave_client
+            .decrypt_to_piistring(&meta.e_device_check_private_key, &tenant.e_private_key)
+            .await?
+            .leak_to_string();
+        AppleAppAttestationVerifier::new_default_ca(
+            meta.app_bundle_ids,
+            &decrypted_private_key,
+            &meta.device_check_key_id,
+            &meta.team_id,
+        )?
+    } else {
+        AppleAppAttestationVerifier::new_default_ca(
+            vec![
+                "5F264K8AG4.com.onefootprint.my",
+                "5F264K8AG4.com.onefootprint.my.Clip",
+            ],
+            &state.config.apple_config.apple_device_check_private_key_pem,
+            &state.config.apple_config.apple_device_check_key_id,
+            "5F264K8AG4",
+        )?
+    };
 
     let vault_id_copy = vault_id.clone();
     let creds = state

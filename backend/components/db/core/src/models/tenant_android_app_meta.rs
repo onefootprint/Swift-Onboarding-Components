@@ -41,6 +41,11 @@ pub struct TenantAndroidAppMetaUpdate {
     pub e_integrity_decryption_key: Option<SealedVaultBytes>,
 }
 
+pub struct TenantAndroidAppFilters {
+    pub tenant_id: TenantId,
+    pub package_name: Option<String>,
+}
+
 impl TenantAndroidAppMeta {
     #[tracing::instrument("TenantAndroidAppMeta::create", skip_all)]
     #[allow(clippy::too_many_arguments)]
@@ -101,9 +106,16 @@ impl TenantAndroidAppMeta {
     }
 
     #[tracing::instrument("TenantAndroidAppMeta::list", skip_all)]
-    pub fn list(conn: &mut PgConn, tenant_id: &TenantId) -> DbResult<Vec<Self>> {
-        let result = tenant_android_app_meta::table
-            .filter(tenant_android_app_meta::tenant_id.eq(tenant_id))
+    pub fn list(conn: &mut PgConn, filters: TenantAndroidAppFilters) -> DbResult<Vec<Self>> {
+        let mut query = tenant_android_app_meta::table
+            .filter(tenant_android_app_meta::tenant_id.eq(filters.tenant_id))
+            .into_boxed();
+
+        if let Some(package_name) = filters.package_name {
+            query = query.filter(tenant_android_app_meta::package_names.contains(vec![package_name]))
+        };
+
+        let result = query
             .filter(tenant_android_app_meta::deactivated_at.is_null())
             .order_by(tenant_android_app_meta::created_at.asc())
             .get_results(conn)?;

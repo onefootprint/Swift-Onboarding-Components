@@ -6,7 +6,10 @@ use crate::{
 };
 use api_core::types::JsonApiResponse;
 use api_wire_types::UpdateTenantIosAppMetaRequest;
-use db::{models::tenant_ios_app_meta::TenantIosAppMeta, DbResult};
+use db::{
+    models::tenant_ios_app_meta::{TenantIosAppFilters, TenantIosAppMeta},
+    DbResult,
+};
 use newtypes::{SealedVaultBytes, TenantIosAppMetaId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -24,7 +27,14 @@ pub async fn get(
 
     let list = state
         .db_pool
-        .db_query(move |conn| -> DbResult<_> { TenantIosAppMeta::list(conn, &tenant_id) })
+        .db_query(move |conn| -> DbResult<_> {
+            let filters = TenantIosAppFilters {
+                tenant_id,
+                app_bundle_id: None,
+            };
+            let res = TenantIosAppMeta::list(conn, filters)?;
+            Ok(res)
+        })
         .await?
         .into_iter()
         .map(|partial_meta| (partial_meta, None))
