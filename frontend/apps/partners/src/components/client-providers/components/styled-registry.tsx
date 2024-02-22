@@ -9,7 +9,6 @@ const StyledComponentsRegistry = ({ children }: React.PropsWithChildren) => {
 
   useServerInsertedHTML(() => {
     const styles = styledComponentsStyleSheet.getStyleElement();
-    // @ts-ignore remove once we update to styled-components v6
     styledComponentsStyleSheet.instance.clearTag();
     // eslint-disable-next-line
     return <>{styles}</>;
