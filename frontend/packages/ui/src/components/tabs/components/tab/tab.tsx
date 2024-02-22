@@ -11,7 +11,8 @@ export type TabProps = {
   as?: React.ComponentType<TabContainerProps> | string;
   children: React.ReactNode;
   href?: string;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onClick?: React.MouseEventHandler<any>;
   selected?: boolean;
 };
 
@@ -21,8 +22,10 @@ const Tab = forwardRef<HTMLAnchorElement, TabProps>(
       aria-selected={selected}
       as={as}
       data-selected={!!selected}
+      /** @ts-ignore */
       href={href}
       onClick={onClick}
+      /** @ts-ignore */
       ref={ref}
       role="tab"
       tabIndex={0}

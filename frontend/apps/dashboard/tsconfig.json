@@ -11,7 +11,8 @@
       "@/entities/*": ["./src/components/entities/*"],
       "@/entity/*": ["./src/components/entities/components/details/*"],
       "@/playbooks/*": ["./src/pages/playbooks/*"],
-    }
+    },
+    "types": ["google.maps", "jest", "../../styled.d.ts"],
   },
   "include": ["src", "next-env.d.ts"]
 }

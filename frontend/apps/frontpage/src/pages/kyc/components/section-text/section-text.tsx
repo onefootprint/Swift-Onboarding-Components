@@ -68,15 +68,19 @@ const Title = styled.h3`
 
   ${media.greaterThan('md')`
     &::before {
-      ${({ theme }) => css`
-        content: '';
-        position: absolute;
-        left: calc(-1 * ${theme.spacing[9]});
-        top: 0;
-        height: 100%;
-        width: ${theme.borderWidth[1]};
-        background: ${theme.color.accent};
-      `}
+      ${
+        /** @ts-expect-error: Binding element 'theme' implicitly has an 'any' type. */ ({
+          theme,
+        }) => css`
+          content: '';
+          position: absolute;
+          left: calc(-1 * ${theme.spacing[9]});
+          top: 0;
+          height: 100%;
+          width: ${theme.borderWidth[1]};
+          background: ${theme.color.accent};
+        `
+      }
     }
   `}
 `;

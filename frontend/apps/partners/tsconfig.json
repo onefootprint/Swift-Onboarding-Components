@@ -3,7 +3,7 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
-    "types": ["bun-types", "google.maps"],
+    "types": ["bun-types", "google.maps", "../../styled.d.ts"],
     "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

@@ -38,7 +38,10 @@ const Container = styled.div<{ variant: FeedbackIconProps['variant'] }>`
     width: 24px;
     height: 24px;
     border-radius: ${theme.borderRadius.full};
-    background-color: ${getBackgroundColor(variant, theme)};
+    background-color: ${getBackgroundColor(
+      variant,
+      theme as Theme /** @ts-ignore-error: Argument of type 'DefaultTheme' is not assignable to parameter of type 'Theme' */,
+    )};
     animation: ${variant === 'loading' && spinnerAnimation} 1s infinite linear;
   `}
 `;

@@ -1,7 +1,7 @@
 import { IcoClose24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import Box from '../../box';
 import IconButton from '../../icon-button';

@@ -1,7 +1,7 @@
+import styled from '@onefootprint/styled';
 import { LinkButton, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import useDesktopMachine from '../../../../../hooks/desktop/use-desktop-machine';
 

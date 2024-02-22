@@ -1,4 +1,3 @@
-import type { Theme } from '@onefootprint/design-tokens';
 import * as styledComponents from 'styled-components';
 
 const {
@@ -9,14 +8,17 @@ const {
   keyframes,
   createGlobalStyle,
   ServerStyleSheet,
-} = styledComponents as unknown as styledComponents.ThemedStyledComponentsModule<Theme>;
+  StyleSheetManager,
+} = styledComponents;
 
 export {
   createGlobalStyle,
   css,
   keyframes,
   ServerStyleSheet,
+  StyleSheetManager,
   ThemeProvider,
   useTheme,
 };
+
 export default styled;

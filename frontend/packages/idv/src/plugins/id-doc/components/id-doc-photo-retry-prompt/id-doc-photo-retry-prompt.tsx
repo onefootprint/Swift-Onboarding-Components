@@ -1,7 +1,7 @@
+import styled from '@onefootprint/styled';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 import { NavigationHeader } from '../../../../components';
 import type {

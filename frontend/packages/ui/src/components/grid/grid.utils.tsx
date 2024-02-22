@@ -1,8 +1,7 @@
-import type { Theme } from '@onefootprint/design-tokens';
-
 import type { GridContainerProps } from './grid';
 
-export const getPadding = (props: GridContainerProps, theme: Theme) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getPadding = (props: GridContainerProps, theme: any) => {
   if (
     props.paddingTop ||
     props.paddingBottom ||
@@ -26,7 +25,8 @@ export const getPadding = (props: GridContainerProps, theme: Theme) => {
   return '0';
 };
 
-export const getMargin = (props: GridContainerProps, theme: Theme) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getMargin = (props: GridContainerProps, theme: any) => {
   if (
     props.marginTop ||
     props.marginBottom ||
@@ -47,7 +47,8 @@ export const getMargin = (props: GridContainerProps, theme: Theme) => {
   return '0';
 };
 
-export const getBorders = (props: GridContainerProps, theme: Theme) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getBorders = (props: GridContainerProps, theme: any) => {
   if (
     props.borderPosition &&
     props.borderPosition !== 'all' &&

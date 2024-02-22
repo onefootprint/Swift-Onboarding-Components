@@ -1,7 +1,7 @@
 import type { UIState } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
 import type { SXStyleProps } from '@onefootprint/ui';
-import type React from 'react';
+import React from 'react';
 
 import { createFontStyles } from '../../utils/mixins';
 
@@ -12,20 +12,27 @@ export type BadgeProps = {
   sx?: SXStyleProps;
 };
 
-const Badge = styled.span.attrs<BadgeProps>(({ testID }) => ({
-  'data-testid': testID,
-}))<BadgeProps>`
-  ${({ theme, variant, sx }) => css`
+const Badge = ({ children, testID, variant, sx }: BadgeProps) => (
+  <StyledBadge $variant={variant} $sx={sx} data-testid={testID}>
+    {children}
+  </StyledBadge>
+);
+
+const StyledBadge = styled.span<{
+  $variant: UIState;
+  $sx?: SXStyleProps;
+}>`
+  ${({ theme, $variant, $sx }) => css`
     ${createFontStyles('caption-1')};
-    background-color: ${theme.backgroundColor[variant]};
+    align-items: center;
+    background-color: ${theme.backgroundColor[$variant]};
     border-radius: ${theme.borderRadius.large};
     border: 0;
-    color: ${theme.color[variant]};
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
+    color: ${theme.color[$variant]};
     display: inline-flex;
     justify-content: center;
-    align-items: center;
-    ${sx};
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
+    ${$sx};
   `}
 `;
 

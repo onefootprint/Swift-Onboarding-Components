@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from '@onefootprint/styled';
 
 import { createFontStyles } from '../../utils/mixins';
 import type { StackProps } from './stack.types';

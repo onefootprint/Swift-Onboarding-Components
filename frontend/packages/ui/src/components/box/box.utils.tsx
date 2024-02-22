@@ -1,8 +1,7 @@
-import type { Theme } from '@onefootprint/design-tokens';
-
 import type { BoxProps } from './box.types';
 
-export const getPadding = (props: BoxProps, theme: Theme) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getPadding = (props: BoxProps, theme: any) => {
   if (
     props.paddingTop ||
     props.paddingBottom ||
@@ -26,7 +25,8 @@ export const getPadding = (props: BoxProps, theme: Theme) => {
   return undefined;
 };
 
-export const getMargin = (props: BoxProps, theme: Theme) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getMargin = (props: BoxProps, theme: any) => {
   if (
     props.marginTop ||
     props.marginBottom ||
@@ -47,7 +47,8 @@ export const getMargin = (props: BoxProps, theme: Theme) => {
   return undefined;
 };
 
-export const getBorders = (props: BoxProps, theme: Theme) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getBorders = (props: BoxProps, theme: any) => {
   if (
     props.borderPosition &&
     props.borderPosition !== 'all' &&

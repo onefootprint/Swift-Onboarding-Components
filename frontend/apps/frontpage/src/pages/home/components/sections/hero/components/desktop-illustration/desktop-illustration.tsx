@@ -103,7 +103,7 @@ const Frame = styled(motion(Container))`
   ${({ theme }) => css`
     position: relative;
     padding: ${theme.spacing[2]};
-    padding-bottom: ${theme.spacing[1]}};
+    padding-bottom: ${theme.spacing[1]};
     border-radius: ${theme.borderRadius.default};
     background-color: ${theme.borderColor.tertiary};
     isolation: isolate;

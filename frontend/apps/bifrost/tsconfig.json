@@ -2,6 +2,7 @@
   "exclude": ["node_modules"],
   "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
+    "types": ["google.maps", "jest", "../../styled.d.ts"],
     "rootDir": ".",
     "outDir": "dist",
     "baseUrl": ".",
