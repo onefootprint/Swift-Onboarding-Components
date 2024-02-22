@@ -104,7 +104,6 @@ const nextConfig = {
     '@onefootprint/idv-elements',
     '@onefootprint/idv',
     '@onefootprint/ui',
-    '@onefootprint/styled',
     '@onefootprint/design-tokens',
     '@onefootprint/icons',
     '@onefootprint/global-constants',
