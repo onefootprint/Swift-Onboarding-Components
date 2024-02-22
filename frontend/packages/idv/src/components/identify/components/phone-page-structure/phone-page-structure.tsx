@@ -41,7 +41,7 @@ const PhonePageStructure = ({
 }: PhonePageStructureProps) => {
   const { headerTitle, headerSubtitle, emailChangeCta, ...phoneTexts } = texts;
   const handleFormSubmit = (formData: { phoneNumber: string }) => {
-    onSubmit(formData.phoneNumber.replace(/\s/g, ''));
+    onSubmit(formData.phoneNumber);
   };
 
   return (
