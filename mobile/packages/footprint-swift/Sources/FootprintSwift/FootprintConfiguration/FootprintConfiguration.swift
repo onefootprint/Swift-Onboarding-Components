@@ -12,8 +12,6 @@ public struct FootprintConfiguration: Encodable {
     public var options: FootprintOptions?
     public var l10n: FootprintL10n?
     public var appearance: FootprintAppearance?
-    public var bundleIdentifier: String?
-    public var teamIdentifier: String?
     
     public init(authToken: String,
                 scheme: String,
@@ -23,9 +21,7 @@ public struct FootprintConfiguration: Encodable {
                 appearance: FootprintAppearance? = nil,
                 onCancel: (() -> Void)? = nil,
                 onComplete: ((_ validationToken: String) -> Void)? = nil,
-                onError: ((_ errorMessage: String) -> Void)? = nil,
-                bundleIdentifier: String? = nil,
-                teamIdentifier: String? = nil
+                onError: ((_ errorMessage: String) -> Void)? = nil
     ) {
         self.publicKey = nil
         self.authToken = authToken
@@ -37,8 +33,6 @@ public struct FootprintConfiguration: Encodable {
         self.options = options
         self.l10n = l10n
         self.appearance = appearance
-        self.bundleIdentifier = bundleIdentifier
-        self.teamIdentifier = teamIdentifier
     }
     
     public init(publicKey: String,
@@ -49,9 +43,7 @@ public struct FootprintConfiguration: Encodable {
                 appearance: FootprintAppearance? = nil,
                 onCancel: (() -> Void)? = nil,
                 onComplete: ((_ validationToken: String) -> Void)? = nil,
-                onError: ((_ errorMessage: String) -> Void)? = nil,
-                bundleIdentifier: String? = nil,
-                teamIdentifier: String? = nil
+                onError: ((_ errorMessage: String) -> Void)? = nil
     ) {
         self.publicKey = publicKey
         self.authToken = nil
@@ -63,8 +55,6 @@ public struct FootprintConfiguration: Encodable {
         self.options = options
         self.l10n = l10n
         self.appearance = appearance
-        self.bundleIdentifier = bundleIdentifier
-        self.teamIdentifier = teamIdentifier
     }
     
     // Callbacks and redirectUrl should not be serialized

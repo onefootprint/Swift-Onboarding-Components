@@ -85,8 +85,8 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
             }
             
             let urlComponents = URLComponents(url: callbackURL, resolvingAgainstBaseURL: true)
-            let service = (self?.configuration.bundleIdentifier)! as String
-            let accessGroup = "\((self?.configuration.teamIdentifier)! as String).\((self?.configuration.bundleIdentifier)! as String)"
+            let teamIdentifier = Bundle.main.infoDictionary!["AppIdentifierPrefix"] as! String // ends with "."
+            let bundleIdentifier = Bundle.main.bundleIdentifier as! String
             if let queryItems = urlComponents?.queryItems {
                 if let deviceResponseJson = queryItems.first(where: {$0.name == "device_response" })?.value {
                     if let authToken = queryItems.first(where: {$0.name == "auth_token" })?.value {
@@ -95,8 +95,8 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
                                 try await self?.attestationManager?.getAttestation(
                                     authToken: authToken,
                                     deviceResponseJson: deviceResponseJson,
-                                    service: service,
-                                    accessGroup: accessGroup
+                                    service: bundleIdentifier,
+                                    accessGroup: "\(teamIdentifier)\(bundleIdentifier)"
                                 )
                             } catch {
                                 self?.logger?.logWarn(warning: "Attestation failed")

@@ -2,9 +2,22 @@ import Foundation
 
 struct AttestationChallengeRequest: Encodable {
     public var deviceType: String
+    public var appBundleId: String
     
     init() {
         self.deviceType = "ios"
+        self.appBundleId = Bundle.main.bundleIdentifier as! String
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case deviceType = "device_type"
+        case appBundleId = "app_bundle_id"
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(self.deviceType, forKey: .deviceType)
+        try container.encodeIfPresent(self.appBundleId, forKey: .appBundleId)
     }
 }
 
