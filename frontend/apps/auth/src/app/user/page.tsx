@@ -3,8 +3,8 @@ import React from 'react';
 
 import { getCustomAppearanceFork } from '@/src/package-appearance';
 
+import ClientProviders from '../client-providers';
 import Loading from './loading';
-import UserProviders from './user-providers';
 
 type UserPageProps = {
   params: Record<string, string>;
@@ -28,9 +28,9 @@ const UserPage = async (props: UserPageProps) => {
 
   return (
     <main id="__next" data-variant={loadedStyle.variant}>
-      <UserProviders loadedStyle={loadedStyle}>
+      <ClientProviders loadedStyle={loadedStyle}>
         <UserContainer variant={variant} Loading={<Loading />} />
-      </UserProviders>
+      </ClientProviders>
     </main>
   );
 };

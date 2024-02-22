@@ -11,7 +11,7 @@ import type { AppearanceResponse } from '@/src/package-appearance/types';
 import FootprintProvider from '@/src/provider-footprint';
 import configureFootprint from '@/src/provider-footprint/adapters';
 
-type AppProvidersProps = {
+type ClientProvidersProps = {
   children: React.ReactNode;
   loadedStyle: AppearanceResponse;
 };
@@ -22,20 +22,37 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
 
+const overrideThemeBackground = (theme: AppearanceResponse['theme']) => {
+  if (theme) {
+    return {
+      ...theme,
+      backgroundColor: {
+        ...theme.backgroundColor,
+        primary:
+          theme.backgroundColor.primary === '#ffffff'
+            ? 'transparent'
+            : theme.backgroundColor.primary,
+      },
+    };
+  }
+
+  return theme;
+};
+
 try {
   Logger.setupSentry();
 } catch (e) {
   console.error(e);
 }
 
-const AppProviders = ({ loadedStyle, children }: AppProvidersProps) => {
+const ClientProviders = ({ loadedStyle, children }: ClientProvidersProps) => {
   useEffectOnceStrict(() => Logger.setupLogRocket('auth'));
 
   return (
     <AppearanceProvider
       appearance={loadedStyle.appearance || {}}
       rules={loadedStyle.rules || ''}
-      theme={loadedStyle.theme}
+      theme={overrideThemeBackground(loadedStyle.theme)}
     >
       <QueryClientProvider client={queryClient}>
         <FootprintProvider client={fpClient}>{children}</FootprintProvider>
@@ -44,4 +61,4 @@ const AppProviders = ({ loadedStyle, children }: AppProvidersProps) => {
   );
 };
 
-export default AppProviders;
+export default ClientProviders;

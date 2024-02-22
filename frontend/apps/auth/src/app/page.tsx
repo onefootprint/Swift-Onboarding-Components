@@ -6,7 +6,7 @@ import ModalLoading from '@/src/components/loading/modal-loading';
 import { getCustomAppearanceFork } from '@/src/package-appearance';
 
 import IdentifyApp from '../components/identify-app';
-import AppProviders from './app-providers';
+import ClientProviders from './client-providers';
 
 type Fallback = (() => JSX.Element) | (() => null);
 type AppPageProps = {
@@ -31,9 +31,9 @@ const AppPage = async ({ searchParams }: AppPageProps) => {
 
   return (
     <main id="__next" data-variant={loadedStyle.variant}>
-      <AppProviders loadedStyle={loadedStyle}>
+      <ClientProviders loadedStyle={loadedStyle}>
         <IdentifyApp variant={variant} fallback={<LoadingComponent />} />
-      </AppProviders>
+      </ClientProviders>
     </main>
   );
 };
