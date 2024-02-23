@@ -19,6 +19,9 @@
     "dist"
   ],
   "scripts": {
+    "test": "bun test --bail",
+    "test:ci:bun": "bun test --bail",
+    "test:watch": "bun test --watch",
     "dev": "tsup --watch",
     "build": "tsup",
     "lint": "eslint src --fix",
@@ -28,7 +31,10 @@
     "publish:local": "yarn && yarn build && yalc publish"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^13.3.8",
     "@onefootprint/footprint-js": "*",
+    "@testing-library/react": "^14.2.1",
+    "bun-types": "^1.0.26",
     "eslint-config-footprint": "*",
     "react": "^18",
     "react-dom": "^18",

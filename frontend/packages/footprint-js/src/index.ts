@@ -24,6 +24,8 @@ export type {
   PropsBase as FootprintPropsBase,
   RenderDataProps as FootprintRenderDataProps,
   RenderProps as FootprintRenderProps,
+  UpdateLoginMethodsDataProps as FootprintUpdateLoginMethodsDataProps,
+  UpdateLoginMethodsProps as FootprintUpdateLoginMethodsProps,
   Variant as FootprintVariant,
   VerifyAuthToken as FootprintVerifyAuthToken,
   VerifyButtonDataProps as FootprintVerifyButtonDataProps,
