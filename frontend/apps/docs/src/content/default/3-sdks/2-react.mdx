@@ -188,6 +188,8 @@ Click [here](https://github.com/onefootprint/examples/tree/master/form/frontend-
 
 2. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
 
+### Authentication flow
+
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import { FootprintAuthButton } from '@onefootprint/footprint-react';
@@ -213,9 +215,9 @@ const Page = () => {
 };
 ```
 
-Click [here](https://github.com/onefootprint/examples/tree/master/auth/frontend-react-cra) to check out a full example. We also have some examples using [Next.js](https://github.com/onefootprint/examples/tree/master/idv/frontend-react-typescript-next)
+Click [here](https://github.com/onefootprint/examples/blob/master/auth/frontend-react-typescript-next/pages/index.tsx) to check out a full example. We also have some examples using [Next.js](https://github.com/onefootprint/examples/tree/master/idv/frontend-react-typescript-next)
 
-### Setting user data
+#### Setting user data
 
 Depending on your onboarding configuration, Footprint might request customer's phone number and email. In some circustances,
 you might have this data already available, so Footprint doesn't need to request this data once more. To pass user data to Footprint's flow,
@@ -242,6 +244,34 @@ const Page = () => {
 ```
 
 Click [here](https://github.com/onefootprint/examples/tree/master/auth/frontend-react-user-data) to check out a full example and [here](https://docs.onefootprint.com/integrate/user-data) for more details about user data.
+
+### Update login methods flow
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintAuthButton } from '@onefootprint/footprint-react';
+
+const Page = () => {
+  const handleCancel = () => {
+    console.log('user canceled');
+  };
+
+  const handleComplete = (validationToken: string) => {
+    console.log(validationToken);
+  };
+
+  return (
+    <main>
+      <FootprintAuthButton
+        authToken="utok_123"
+        updateLoginMethods={true}
+        onComplete={handleComplete}
+        onCancel={handleCancel}
+      />
+    </main>
+  );
+};
+```
 
 ### Available FootprintAuthButton Props
 

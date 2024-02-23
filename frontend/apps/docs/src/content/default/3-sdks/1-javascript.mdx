@@ -268,6 +268,8 @@ This is our authentication flow that can be rendered in a modal or drawer.
 
 2. You can trigger Footprint when a custom button is clicked, passing the playbook key and the callback functions:
 
+### Authentication flow
+
 ```javascript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
@@ -284,10 +286,29 @@ const handleButtonClick = () => {
 };
 ```
 
+### Update login methods flow
+
+```javascript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const handleButtonClick = () => {
+  const component = footprint.init({
+    kind: 'auth',
+    authToken: 'utok_123',
+    updateLoginMethods: true,
+    onComplete: validationToken => {
+      console.log(validationToken);
+    },
+  });
+  component.render();
+};
+```
+
 3. Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` fuction defined on `window.footprintCallbacks`. From there,
    you can post it to your backend.
 
-Click [here](https://github.com/onefootprint/examples/tree/master/auth/frontend-vanilla-js) to check out a full example.
+Click [here](https://github.com/onefootprint/examples/blob/master/auth/frontend-react-typescript-next/pages/index.tsx) to check out a full example.
 
 ### Usage with frameworks
 

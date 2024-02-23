@@ -121,29 +121,9 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/token \
 
 You will provide this auth token to the Footprint SDK. This will ask the user to authenticate and then will launch them into the flow specified by the token kind and/or playbook. Check out the specific documentation for the SDK you're using, and review the documentation for the token kinds above to see which component to invoke.
 
-For example, if you are launching the user into a KYC onboarding flow using our React integration, you would pass the `authToken` as a prop into the `FootprintVerifyButton` component like so:
+### Onboarding flow example
 
-```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
-
-const MyComponent = () => {
-  const handleComplete = (validationToken: string) => {
-    // TODO: Post to Footprint server to fetch user ID or verification status
-  };
-
-  return (
-    <FootprintVerifyButton
-      authToken='utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0'
-      onComplete={handleComplete}
-    />
-  );
-};
-
-export default MyComponent;
-```
-
-If you are using our Javascript integration, you can pass the `authToken` along with the other props into the `footprint.init` method:
+If you are launching the user into a KYC onboarding flow, you would pass the `authToken` as a prop like so:
 
 ```javascript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
@@ -153,6 +133,27 @@ const handleClick = () => {
   const component = footprint.init({
     kind: 'verify',
     authToken: 'utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0', // Auth token from Step 2
+    onComplete: validationToken => {
+      // TODO: Post to Footprint server to fetch user ID or verification status
+    },
+  });
+  component.render();
+};
+```
+
+### Update auth methods example
+
+If you were launching the user into the Update auth methods flow, you would pass the `authToken` and `updateLoginMethods` flag as a prop like so:
+
+```javascript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const handleClick = () => {
+  const component = footprint.init({
+    kind: 'auth',
+    authToken: 'utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0',
+    updateLoginMethods: true,
     onComplete: validationToken => {
       // TODO: Post to Footprint server to fetch user ID or verification status
     },
