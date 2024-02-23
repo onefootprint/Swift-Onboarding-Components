@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.9.1
+
+### Patch Changes
+
+- c2ec96d12: add FootprintButton and type definition
+
 ## 3.9.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @onefootprint/footprint-react
 
+## 6.3.0
+
+### Minor Changes
+
+- c2ec96d12: add FootprintButton and type definition
+
+### Patch Changes
+
+- Updated dependencies [c2ec96d12]
+  - @onefootprint/footprint-js@3.9.1
+
 ## 6.2.1
 
 ### Minor Changes
