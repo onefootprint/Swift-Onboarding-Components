@@ -33,7 +33,6 @@ struct AndroidAttestationPayload {
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct AttestedMetadata {
-    #[serde(rename = "footprint_attestation_challenge")]
     attested_challenge: String,
     webauthn_device_response_json: Option<String>,
     model: Option<String>,
