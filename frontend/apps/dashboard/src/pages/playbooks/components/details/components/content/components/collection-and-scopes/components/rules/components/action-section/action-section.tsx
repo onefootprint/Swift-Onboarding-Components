@@ -77,7 +77,7 @@ const ActionSection = ({
       aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
     >
       <Stack align="center" justify="space-between">
-        <div>
+        <Stack direction="column" gap={1} textAlign="left">
           <Typography
             variant="label-3"
             color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
@@ -87,7 +87,7 @@ const ActionSection = ({
           <Typography variant="body-3" color="secondary">
             {t(`${actionName}.subtitle` as ParseKeys<'common'>)}
           </Typography>
-        </div>
+        </Stack>
         {shouldAllowEditing && (
           <Button
             size="small"
