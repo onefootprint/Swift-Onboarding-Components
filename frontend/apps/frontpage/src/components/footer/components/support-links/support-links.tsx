@@ -36,9 +36,6 @@ const SuportLinks = () => {
             {SUPPORT_EMAIL_ADDRESS}
           </Typography>
         </Link>
-        <Typography variant="body-3" color="tertiary">
-          {t('phone-number')}
-        </Typography>
         <Stack direction="row" gap={4}>
           {socialLinks.map(({ hrefKey, Icon }) => (
             <Link
