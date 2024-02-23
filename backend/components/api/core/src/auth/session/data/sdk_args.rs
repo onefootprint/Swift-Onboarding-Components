@@ -48,6 +48,12 @@ pub struct VerifyV1SdkArgs {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct VerifyResultV1SdkArgs {
+    pub auth_token: PiiString,
+    pub device_response: String,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct AuthV1Options {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_logo: Option<bool>,
@@ -221,6 +227,12 @@ impl ValidateSdkArgs for RenderV1SdkArgs {
     }
 }
 
+impl ValidateSdkArgs for VerifyResultV1SdkArgs {
+    fn validate(&self) -> ApiResult<()> {
+        Ok(())
+    }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema, EnumDiscriminants)]
 #[strum_discriminants(name(SdkArgsKind))]
 #[strum_discriminants(derive(Display))]
@@ -234,6 +246,7 @@ impl ValidateSdkArgs for RenderV1SdkArgs {
 /// enum variant.
 pub enum SdkArgs {
     VerifyV1(VerifyV1SdkArgs),
+    VerifyResultV1(VerifyResultV1SdkArgs),
     FormV1(FormV1SdkArgs),
     AuthV1(AuthV1SdkArgs),
     UpdateAuthMethodsV1(UpdateAuthMethodsV1SdkArgs),
@@ -259,6 +272,7 @@ impl ValidateSdkArgs for SdkArgs {
     fn validate(&self) -> ApiResult<()> {
         match self {
             Self::VerifyV1(args) => args.validate()?,
+            Self::VerifyResultV1(args) => args.validate()?,
             Self::FormV1(args) => args.validate()?,
             Self::AuthV1(args) => args.validate()?,
             Self::UpdateAuthMethodsV1(args) => args.validate()?,
@@ -270,6 +284,7 @@ impl ValidateSdkArgs for SdkArgs {
     fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
         match self {
             Self::VerifyV1(args) => args.ob_config(conn),
+            Self::VerifyResultV1(args) => args.ob_config(conn),
             Self::FormV1(args) => args.ob_config(conn),
             Self::AuthV1(args) => args.ob_config(conn),
             Self::UpdateAuthMethodsV1(args) => args.ob_config(conn),
@@ -290,6 +305,7 @@ mod test {
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234", "public_key": "ob_1234", "user_data": {"id.first_name": "Hayes", "id.citizenships": ["US", "NO"], "id.state": "Invalid"}, "options": {"show_completion_page": true, "show_logo": false}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234"}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
+    #[test_case(json!({"kind": "verify_result_v1", "data": {"auth_token": "tok_1234", "device_response": "123"}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US", "language": "en"}}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"language": "es"}}}))]

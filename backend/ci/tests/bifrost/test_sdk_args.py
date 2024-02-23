@@ -41,6 +41,21 @@ def test_sdk_args_fail_validation():
         {"kind": "render_v1", "data": {"id": "invalid_di"}},
         status_code=400,
     )
+    post(
+        "/org/sdk_args",
+        {"kind": "verify_result_v1", "data": {}},
+        status_code=400,
+    )
+    post(
+        "/org/sdk_args",
+        {"kind": "verify_result_v1", "data": {"auth_token": "123"}},
+        status_code=400,
+    )
+    post(
+        "/org/sdk_args",
+        {"kind": "verify_result_v1", "data": {"device_response": "123"}},
+        status_code=400,
+    )
 
 
 def test_sdk_args(sandbox_tenant):
@@ -167,6 +182,10 @@ def test_sdk_args(sandbox_tenant):
                 "id": "id.email",
                 "label": "Label",
             },
+        },
+        {
+            "kind": "verify_result_v1",
+            "data": {"auth_token": "tok_123", "device_response": "123"},
         },
     ]
     for data in TESTS:
