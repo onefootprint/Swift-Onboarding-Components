@@ -20,6 +20,7 @@ Our SDKs support a variety of components.
 | `<FootprintVerifyButton />` | A button that launches the footprint onboarding flow in a modal or drawer.                                        |
 | `<FootprintForm />`         | A PCI-compliant form to collect user data for specific fields. It can be rendered inline, in a modal or a drawer. |
 | `<FootprintAuthButton />`   | A button that launches the footprint authentication flow in a modal or drawer.                                    |
+| `<FootprintButton />`       | Added in @6.3.0, This button supports `onboarding`, `auth`, and `update_auth_methods` flows                       |
 
 You will find more information on each of these below:
 
@@ -289,3 +290,105 @@ const Page = () => {
 | `appearance`         | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                           |
 | `variant`            | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                                                                  |
 | `l10n`               | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                        |
+
+## FootprintButton Integration
+
+The new `<FootprintButton />` component, now available in version @6.3.0.
+This versatile button seamlessly initiates several important processes with a single click.
+Whether it's guiding users through our **onboarding process**, initiating **authentication**, or **updating login methods**.
+The flow can be rendered in a modal or drawer.
+
+### Onboarding flow
+
+#### With onboarding configuration public key
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintButton } from '@onefootprint/footprint-react';
+
+const Component = () => {
+  const onComplete = (validationToken: string) => undefined
+
+  return (
+    <FootprintButton
+      kind="verify"
+      publicKey="pk_"
+      onComplete={onComplete}
+    />
+  );
+};
+```
+
+#### With auth token
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintButton } from '@onefootprint/footprint-react';
+
+const Component = () => {
+  const onComplete = (validationToken: string) => undefined
+
+  return (
+    <FootprintButton
+      kind="verify"
+      authToken="utok_123"
+      onComplete={onComplete}
+    />
+  );
+};
+```
+
+### Authentication flow
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintButton } from '@onefootprint/footprint-react';
+
+const Component = () => {
+  const onComplete = (validationToken: string) => undefined
+
+  return (
+    <FootprintButton
+      kind="auth"
+      publicKey="pk_"
+      onComplete={onComplete}
+    />
+  );
+};
+```
+
+### Update login methods flow
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintButton } from '@onefootprint/footprint-react';
+
+const Component = () => {
+  const onComplete = () => undefined
+
+  return (
+    <FootprintButton
+      kind="update_login_methods"
+      authToken="utok_123"
+      onComplete={onComplete}
+    />
+  );
+};
+```
+
+### Properties
+
+| Property        | Description                                                                                                                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `className`     | Optional. Specifies a custom class name for the HTMLButtonElement.                                                                                                                             |
+| `dialogVariant` | Optional. Determines the dialog's appearance: 'modal', 'drawer'. Default: 'modal'.                                                                                                             |
+| `label`         | Optional. Sets the text displayed within the HTMLButtonElement.                                                                                                                                |
+| `onClick`       | Optional. Defines the action triggered upon clicking the HTMLButtonElement.                                                                                                                    |
+| `testID`        | Optional. Sets the value for the `data-testid` attribute of the HTMLButtonElement.                                                                                                             |
+| `appearance`    | Optional. Customizes the integration's visual style with a `FootprintAppearance` object.                                                                                                       |
+| `l10n`          | Optional. Specifies the desired localization. For more details, see [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                  |
+| `onCancel`      | Optional. Triggered when the user abandons the flow, such as clicking the close button inside our iframe.                                                                                      |
+| `onClose`       | Optional. Triggered when the user closes the flow, whether completed or canceled.                                                                                                              |
+| `onError`       | Optional. Calls a function in the event of an unrecoverable error during onboarding flow initialization, providing an error string with details.                                               |
+| `options`       | Optional. Customizes the flow with an options object, which may include `showLogo`. For more information, see [here](https://docs.onefootprint.com/integrate/customization#available-options). |
+| `userData`      | Optional. Contains previously collected user data to bootstrap the onboarding flow. See more [here](https://docs.onefootprint.com/integrate/user-data).                                        |
