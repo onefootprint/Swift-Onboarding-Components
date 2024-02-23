@@ -2472,6 +2472,10 @@
             "add": "and",
             "delete": "Delete rule",
             "empty-aria-label": "Empty rule",
+            "delete-confirmation": {
+              "title": "Are you sure you want to delete this rule?",
+              "confirm": "Delete"
+            },
             "success-toast": {
               "title": "Success!",
               "add-description": "Rule added.",

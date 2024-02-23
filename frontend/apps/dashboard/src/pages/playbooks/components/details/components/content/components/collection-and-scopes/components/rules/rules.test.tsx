@@ -242,15 +242,47 @@ describe('<Rules />', () => {
 
         const deleteButton = within(row).getByText('Delete rule');
         await userEvent.click(deleteButton);
-        await waitForElementToBeRemoved(deleteButton);
 
         await waitFor(() => {
-          const confirmationTitle = screen.getByText('Success!');
-          expect(confirmationTitle).toBeInTheDocument();
+          const confirmation = screen.getByText(
+            'Are you sure you want to delete this rule?',
+          );
+          expect(confirmation).toBeInTheDocument();
+        });
+
+        const deleteConfirmButton = within(row).getByText('Delete');
+        await userEvent.click(deleteConfirmButton);
+        await waitForElementToBeRemoved(deleteConfirmButton);
+
+        await waitFor(() => {
+          const toastTitle = screen.getByText('Success!');
+          expect(toastTitle).toBeInTheDocument();
         });
         await waitFor(() => {
-          const confirmationMessage = screen.getByText('Rule deleted.');
-          expect(confirmationMessage).toBeInTheDocument();
+          const toastMessage = screen.getByText('Rule deleted.');
+          expect(toastMessage).toBeInTheDocument();
+        });
+      });
+
+      it('should cancel deleting a rule correctly', async () => {
+        withDeleteRule(passRuleFixture.ruleId);
+        await renderRulesAndWaitFinishLoading();
+        const { row } = await startEditing('Pass + Manual review');
+
+        await userEvent.click(within(row).getByText('Delete rule'));
+
+        await waitFor(() => {
+          const confirmation = screen.getByText(
+            'Are you sure you want to delete this rule?',
+          );
+          expect(confirmation).toBeInTheDocument();
+        });
+
+        const deleteCancelButton = within(row).getByText('Cancel');
+        await userEvent.click(deleteCancelButton);
+
+        await waitFor(() => {
+          expect(within(row).getByText('Delete rule')).toBeInTheDocument();
         });
       });
 
