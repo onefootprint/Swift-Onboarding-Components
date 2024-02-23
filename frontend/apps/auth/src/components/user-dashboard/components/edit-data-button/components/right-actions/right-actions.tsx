@@ -1,5 +1,5 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 
 type RightActionsProps = {
@@ -21,17 +21,17 @@ const RightActions = ({
     {shouldShowVerify ? (
       <Stack gap={1} align="center">
         <IcoCheckSmall16 color="quaternary" />
-        <Typography as="span" variant="label-4" color="quaternary">
+        <Text as="span" variant="label-4" color="quaternary">
           {`${texts.verified}`}
-        </Typography>
+        </Text>
       </Stack>
     ) : null}
-    <Typography variant="label-4" color="quaternary">
+    <Text variant="label-4" color="quaternary">
       ·
-    </Typography>
-    <Typography as="span" variant="label-4" color="accent">
+    </Text>
+    <Text as="span" variant="label-4" color="accent">
       {isEmpty ? texts.add : texts.edit}
-    </Typography>
+    </Text>
   </Stack>
 );
 

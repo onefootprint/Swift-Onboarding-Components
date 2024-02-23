@@ -1,4 +1,4 @@
-import { PinInput, Typography } from '@onefootprint/ui';
+import { PinInput, Text } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -48,9 +48,9 @@ const PinForm = ({
       data-pending={!!isPending}
     >
       {title && (
-        <Typography isPrivate variant="body-2" color="secondary" as="h3">
+        <Text isPrivate variant="body-2" color="secondary" as="h3">
           {title}
-        </Typography>
+        </Text>
       )}
       <PinInput
         disabled={isPending}

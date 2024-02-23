@@ -9,9 +9,9 @@ import {
   Box,
   CopyButton,
   Stack,
+  Text,
   TextInput,
   Tooltip,
-  Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -57,7 +57,7 @@ const SandboxInput = ({
   return (
     <Stack direction="column" gap={2}>
       <InputTitle>
-        <Typography variant="label-2">{label}</Typography>
+        <Text variant="label-2">{label}</Text>
         <Tooltip text={texts.description} alignment="start" position="top">
           <IcoInfo16 testID="infoIcon" />
         </Tooltip>

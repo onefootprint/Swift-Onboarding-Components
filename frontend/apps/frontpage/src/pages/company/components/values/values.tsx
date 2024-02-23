@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Grid, media, Typography } from '@onefootprint/ui';
+import { Grid, media, Text } from '@onefootprint/ui';
 import rgba from 'polished/lib/color/rgba';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -18,12 +18,12 @@ type ValuesProps = {
 const Values = ({ title, description, items }: ValuesProps) => (
   <>
     <TitleContainer>
-      <Typography variant="display-3" as="h3" sx={{ marginBottom: 5 }}>
+      <Text variant="display-3" as="h3" sx={{ marginBottom: 5 }}>
         {title}
-      </Typography>
-      <Typography variant="body-1" color="secondary">
+      </Text>
+      <Text variant="body-1" color="secondary">
         {description}
-      </Typography>
+      </Text>
     </TitleContainer>
     <ItemsContainer as="ul" gap={5}>
       {items.map(item => {
@@ -33,12 +33,12 @@ const Values = ({ title, description, items }: ValuesProps) => (
             <IconContainer>
               <Icon />
             </IconContainer>
-            <Typography variant="heading-3" as="p" sx={{ marginBottom: 4 }}>
+            <Text variant="heading-3" as="p" sx={{ marginBottom: 4 }}>
               {item.title}
-            </Typography>
-            <Typography variant="body-1" color="secondary">
+            </Text>
+            <Text variant="body-1" color="secondary">
               {item.description}
-            </Typography>
+            </Text>
           </Item>
         );
       })}

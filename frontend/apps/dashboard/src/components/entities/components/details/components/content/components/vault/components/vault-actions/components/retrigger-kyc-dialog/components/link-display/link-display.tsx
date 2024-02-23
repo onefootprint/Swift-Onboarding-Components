@@ -1,4 +1,4 @@
-import { Stack, TextInput, Typography } from '@onefootprint/ui';
+import { Stack, Text, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,10 +13,10 @@ const LinkDisplay = ({ link }: LinkDisplayProps) => {
 
   return (
     <Stack gap={3} direction="column">
-      <Typography variant="label-3">{t('link.header')}</Typography>
-      <Typography variant="body-3" color="secondary">
+      <Text variant="label-3">{t('link.header')}</Text>
+      <Text variant="body-3" color="secondary">
         {t('link.share-this-link')}
-      </Typography>
+      </Text>
       <TextInput
         placeholder="https://verify.onefootprint.com#tok_okj3nppo1zyj6d7uJ9l49iLxY1uc2N4riz"
         value={link}

@@ -2,7 +2,7 @@ import {
   type WorkflowStartedEventData,
   WorkflowStartedEventKind,
 } from '@onefootprint/types/src/data/timeline';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,18 +22,18 @@ const WorkflowStartedEventHeader = ({
   if (data.kind === WorkflowStartedEventKind.playbook) {
     return (
       <>
-        <Typography variant="body-3" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           {t('started-onboarding-onto')}
-        </Typography>
+        </Text>
         <PlaybookLink playbook={data.playbook} />
       </>
     );
   }
   if (data.kind === WorkflowStartedEventKind.document) {
     return (
-      <Typography variant="body-3" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('started-uploading-document')}
-      </Typography>
+      </Text>
     );
   }
   return null;

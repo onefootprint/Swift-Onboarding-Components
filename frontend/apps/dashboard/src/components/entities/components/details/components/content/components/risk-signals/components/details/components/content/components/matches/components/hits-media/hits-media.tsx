@@ -1,12 +1,7 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import type { AmlHitMedia } from '@onefootprint/types';
-import {
-  createFontStyles,
-  LinkButton,
-  Stack,
-  Typography,
-} from '@onefootprint/ui';
+import { createFontStyles, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,9 +27,9 @@ const HitsMedia = ({ mediaList }: HitsMediaProps) => {
 
   const renderMediaRow = (label: string, value: string) => (
     <Stack display="flex" direction="column" gap={3}>
-      <Typography variant="body-3" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {label}
-      </Typography>
+      </Text>
       <ValueContainer>{value}</ValueContainer>
     </Stack>
   );
@@ -57,7 +52,7 @@ const HitsMedia = ({ mediaList }: HitsMediaProps) => {
               {renderMediaRow(t('title'), title ?? '-')}
               {snippet && (
                 <Stack direction="column" gap={3}>
-                  <Typography
+                  <Text
                     variant="body-3"
                     color="tertiary"
                     sx={{
@@ -66,7 +61,7 @@ const HitsMedia = ({ mediaList }: HitsMediaProps) => {
                     }}
                   >
                     {t('snippet')}
-                  </Typography>
+                  </Text>
                   <TruncatedText
                     text={snippet}
                     maxTextViewHeight={215}

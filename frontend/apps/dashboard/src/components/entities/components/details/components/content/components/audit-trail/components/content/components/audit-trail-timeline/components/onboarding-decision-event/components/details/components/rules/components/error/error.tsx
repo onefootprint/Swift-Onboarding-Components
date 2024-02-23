@@ -1,4 +1,4 @@
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
 
 type ErrorProps = {
@@ -7,7 +7,7 @@ type ErrorProps = {
 
 const Error = ({ errorMessage }: ErrorProps) => (
   <Box>
-    <Typography variant="body-3">{errorMessage}</Typography>
+    <Text variant="body-3">{errorMessage}</Text>
   </Box>
 );
 

@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { LinkButton, LoadingIndicator, Typography } from '@onefootprint/ui';
+import { LinkButton, LoadingIndicator, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -32,12 +32,12 @@ const Section = ({
       <Header>
         <TitleContainer>
           {IconComponent && <IconComponent />}
-          <Typography
+          <Text
             sx={IconComponent ? { marginLeft: 2 } : undefined}
             variant="label-2"
           >
             {title}
-          </Typography>
+          </Text>
         </TitleContainer>
         {hasActions && (
           <ActionsContainer>

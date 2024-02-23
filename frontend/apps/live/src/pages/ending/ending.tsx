@@ -5,14 +5,7 @@ import {
   IcoLock24,
   IcoShield40,
 } from '@onefootprint/icons';
-import {
-  Box,
-  Container,
-  Grid,
-  media,
-  Stack,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Container, Grid, media, Stack, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,17 +39,17 @@ const Ending = () => {
           >
             {t('chip')}
           </Stack>
-          <Typography as="h1" variant="display-2" color="primary">
+          <Text as="h1" variant="display-2" color="primary">
             {t('title')}
-          </Typography>
-          <Typography
+          </Text>
+          <Text
             as="h2"
             variant="display-4"
             color="secondary"
             sx={{ maxWidth: '600px' }}
           >
             {t('subtitle')}
-          </Typography>
+          </Text>
         </HeadingContainer>
         <Illustration />
         <Stack
@@ -68,17 +61,17 @@ const Ending = () => {
           marginTop={10}
           maxWidth="856px"
         >
-          <Typography as="h3" variant="display-3" color="primary">
+          <Text as="h3" variant="display-3" color="primary">
             {t('new-approach.title')}
-          </Typography>
-          <Typography
+          </Text>
+          <Text
             as="p"
             variant="body-1"
             color="secondary"
             sx={{ maxWidth: '600px' }}
           >
             {t('new-approach.description')}
-          </Typography>
+          </Text>
           <Box marginBottom={5} />
           <FeaturesContainer>
             <Stack
@@ -89,9 +82,9 @@ const Ending = () => {
               gap={5}
             >
               <IcoShield40 />
-              <Typography as="h2" variant="heading-2">
+              <Text as="h2" variant="heading-2">
                 {t('features.title')}
-              </Typography>
+              </Text>
             </Stack>
             <FeaturesGrid
               columns={['repeat(1, 1fr)']}

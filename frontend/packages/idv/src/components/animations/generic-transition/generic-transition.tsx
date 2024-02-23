@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -101,12 +101,12 @@ const GenericTransition = ({
       >
         {renderFirstIcon ? (
           <Stack as={motion.div} variants={firstTextVariantTransition}>
-            <Typography variant="label-1">{firstText}</Typography>
+            <Text variant="label-1">{firstText}</Text>
           </Stack>
         ) : null}
         {renderSecondIcon ? (
           <Stack as={motion.div} variants={secondTextVariantTransition}>
-            <Typography variant="label-1">{secondText}</Typography>
+            <Text variant="label-1">{secondText}</Text>
           </Stack>
         ) : null}
       </Stack>

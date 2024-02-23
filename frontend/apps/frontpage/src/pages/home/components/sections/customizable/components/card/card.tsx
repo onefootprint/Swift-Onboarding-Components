@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles, Text } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
@@ -31,9 +31,9 @@ const Card = ({
         <Title>
           {renderedIcon} {title}
         </Title>
-        <Typography variant="body-2" color="secondary">
+        <Text variant="body-2" color="secondary">
           {subtitle}
-        </Typography>
+        </Text>
       </TextContainer>
     </Container>
   );

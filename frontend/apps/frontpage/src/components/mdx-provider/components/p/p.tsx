@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 
 type PProps = {
@@ -6,9 +6,9 @@ type PProps = {
 };
 
 const P = ({ children }: PProps) => (
-  <Typography variant="body-2" color="secondary" sx={{ marginBottom: 9 }}>
+  <Text variant="body-2" color="secondary" sx={{ marginBottom: 9 }}>
     {children}
-  </Typography>
+  </Text>
 );
 
 export default P;

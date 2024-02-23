@@ -1,4 +1,4 @@
-import { media, Typography } from '@onefootprint/ui';
+import { media, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -36,9 +36,9 @@ const Demo = ({ page }: DemoProps) => {
             <Form html={page.html} onSuccess={handleSuccess} />
           )}
         </Inner>
-        <Typography color="tertiary" sx={{ marginTop: 7 }} variant="label-2">
+        <Text color="tertiary" sx={{ marginTop: 7 }} variant="label-2">
           Footprint ❤️ {page.title}
-        </Typography>
+        </Text>
       </Container>
     </>
   ) : null;

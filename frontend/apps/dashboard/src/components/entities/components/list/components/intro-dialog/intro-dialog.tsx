@@ -1,5 +1,5 @@
 import { EntityKind } from '@onefootprint/types';
-import { Box, Dialog, Typography } from '@onefootprint/ui';
+import { Box, Dialog, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,46 +50,46 @@ const IntroDialog = () => {
       }}
     >
       <Title>
-        <Typography variant="label-2" as="h1">
+        <Text variant="label-2" as="h1">
           {t('dialog.title')}
-        </Typography>
-        <Typography variant="body-2" color="secondary" as="p">
+        </Text>
+        <Text variant="body-2" color="secondary" as="p">
           {t('dialog.subtitle')}
-        </Typography>
+        </Text>
       </Title>
       <Box marginBottom={6} />
       <Steps>
         <Step>
-          <Typography variant="label-3">{t('dialog.step-1.number')}</Typography>
+          <Text variant="label-3">{t('dialog.step-1.number')}</Text>
           <Content>
-            <Typography variant="label-3" as="h2">
+            <Text variant="label-3" as="h2">
               {t('dialog.step-1.title')}
-            </Typography>
-            <Typography variant="body-3" color="secondary">
+            </Text>
+            <Text variant="body-3" color="secondary">
               {t('dialog.step-1.subtitle')}
-            </Typography>
+            </Text>
           </Content>
         </Step>
         <Step>
-          <Typography variant="label-3">{t('dialog.step-2.number')}</Typography>
+          <Text variant="label-3">{t('dialog.step-2.number')}</Text>
           <Content>
-            <Typography variant="label-3" as="h2">
+            <Text variant="label-3" as="h2">
               {t('dialog.step-2.title')}
-            </Typography>
-            <Typography variant="body-3" color="secondary">
+            </Text>
+            <Text variant="body-3" color="secondary">
               {t('dialog.step-2.subtitle')}
-            </Typography>
+            </Text>
           </Content>
         </Step>
         <Step>
-          <Typography variant="label-3">{t('dialog.step-3.number')}</Typography>
+          <Text variant="label-3">{t('dialog.step-3.number')}</Text>
           <Content>
-            <Typography variant="label-3" as="h2">
+            <Text variant="label-3" as="h2">
               {t('dialog.step-3.title')}
-            </Typography>
-            <Typography variant="body-3" color="secondary">
+            </Text>
+            <Text variant="body-3" color="secondary">
               {t('dialog.step-3.subtitle')}
-            </Typography>
+            </Text>
           </Content>
         </Step>
       </Steps>

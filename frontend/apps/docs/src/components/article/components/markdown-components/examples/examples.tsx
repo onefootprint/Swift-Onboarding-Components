@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
-import { Grid, media, Tab, Tabs, Typography } from '@onefootprint/ui';
+import { Grid, media, Tab, Tabs, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
@@ -55,7 +55,7 @@ const Examples = () => {
                   width={img.width}
                 />
               </ImageContainer>
-              <Typography
+              <Text
                 color="secondary"
                 variant="body-3"
                 sx={{
@@ -65,7 +65,7 @@ const Examples = () => {
                 }}
               >
                 {name}
-              </Typography>
+              </Text>
             </Item>
           );
         })}

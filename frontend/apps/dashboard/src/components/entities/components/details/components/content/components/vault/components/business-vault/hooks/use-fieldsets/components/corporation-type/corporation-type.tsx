@@ -1,6 +1,6 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { BusinessDI, isVaultDataDecrypted } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,9 +24,9 @@ const CorporationType = ({ di, entity }: CorporationTypeType) => {
       renderValue={value => {
         if (isVaultDataDecrypted(value)) {
           return (
-            <Typography variant="body-3" color="primary">
+            <Text variant="body-3" color="primary">
               {t(`${value}` as ParseKeys<'common'>)}
-            </Typography>
+            </Text>
           );
         }
         return <EncryptedCell />;

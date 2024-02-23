@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import RiveComponent from '@rive-app/react-canvas';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -90,14 +90,14 @@ const IdAnimation = ({ src, firstText, secondText }: IdAnimationProps) => (
       variants={textAnimationVariants}
       initial="initial"
     >
-      <Typography variant="label-2">{firstText}</Typography>
+      <Text variant="label-2">{firstText}</Text>
     </motion.div>
     <motion.div
       animate="finish"
       variants={secondTextAnimationVariants}
       initial="initial"
     >
-      <Typography variant="label-2">{secondText}</Typography>
+      <Text variant="label-2">{secondText}</Text>
     </motion.div>
   </AnimationWrapper>
 );

@@ -1,5 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Box, Container, media, Typography } from '@onefootprint/ui';
+import { Box, Container, media, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import LinkButton from 'src/components/linking-button';
@@ -25,12 +25,12 @@ const Compare = () => {
       <SEO title={t('html-title')} slug="/compare" />
       <Container>
         <HeroContainer>
-          <Typography color="primary" variant="display-2" as="h1">
+          <Text color="primary" variant="display-2" as="h1">
             {t('hero.title')}
-          </Typography>
-          <Typography color="secondary" variant="body-1" as="p">
+          </Text>
+          <Text color="secondary" variant="body-1" as="p">
             {t('hero.subtitle')}
-          </Typography>
+          </Text>
           <Box marginBottom={4} />
           <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
             {t('hero.cta')}
@@ -38,15 +38,15 @@ const Compare = () => {
           <Box marginBottom={10} />
         </HeroContainer>
         <NarrowContainer>
-          <Typography color="secondary" variant="body-1" as="p">
+          <Text color="secondary" variant="body-1" as="p">
             {t('introduction')}
-          </Typography>
+          </Text>
           <ComparisonTable />
         </NarrowContainer>
         <Box marginBottom={10} />
-        <Typography variant="display-2" sx={{ textAlign: 'center' }}>
+        <Text variant="display-2" sx={{ textAlign: 'center' }}>
           {t('why-footptint.title')}
-        </Typography>
+        </Text>
         <CardsContainer>
           <HorizontalCard
             title={t('why-footptint.user-experience.title')}

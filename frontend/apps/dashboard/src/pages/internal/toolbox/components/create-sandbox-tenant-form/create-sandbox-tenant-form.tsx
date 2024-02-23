@@ -1,4 +1,4 @@
-import { TextInput, Typography, useToast } from '@onefootprint/ui';
+import { Text, TextInput, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -50,9 +50,9 @@ const CleanUpUserForm = ({ formId }: RetriggerKYCFormProps) => {
   return (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-        <Typography variant="label-3">
+        <Text variant="label-3">
           {`Create a new tenant with the following parameters. You will be redirected to the new tenant's dashboard after creating`}
-        </Typography>
+        </Text>
         <TextInput
           label="Tenant name"
           placeholder="Acme Inc."

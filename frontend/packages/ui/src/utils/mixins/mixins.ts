@@ -37,9 +37,7 @@ const convertDeprecatedTypography = (
   };
 };
 
-export const createTypography = (
-  typography: Typography | DeprecatedTypography,
-) => {
+export const createText = (typography: Typography | DeprecatedTypography) => {
   const resolvedTypography =
     typeof typography === 'string'
       ? convertDeprecatedTypography(typography)

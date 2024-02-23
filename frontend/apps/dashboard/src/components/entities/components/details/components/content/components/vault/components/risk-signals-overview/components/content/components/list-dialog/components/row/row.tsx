@@ -1,7 +1,7 @@
 import { IcoChevronRight24, IcoInfo16 } from '@onefootprint/icons';
 import type { RiskSignal } from '@onefootprint/types';
 import { RiskSignalSeverity } from '@onefootprint/types';
-import { Badge, Stack, Tooltip, Typography } from '@onefootprint/ui';
+import { Badge, Stack, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -36,7 +36,7 @@ const Row = ({ riskSignal }: RowProps) => {
           whiteSpace="nowrap"
           textOverflow="ellipsis"
         >
-          <Typography variant="label-3">{riskSignal.note}</Typography>
+          <Text variant="label-3">{riskSignal.note}</Text>
         </Stack>
         <Tooltip text={riskSignal.description}>
           <IcoInfo16 />

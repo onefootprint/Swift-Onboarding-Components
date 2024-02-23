@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../../utils/mixins';
+import { createText } from '../../../utils/mixins';
 
 export type HintProps = {
   size?: 'compact' | 'default';
@@ -45,11 +45,11 @@ const HintContainer = styled.div`
       }
 
       &[data-size='default'] {
-        ${createTypography(hint.size.default.typography)}
+        ${createText(hint.size.default.typography)}
       }
 
       &[data-size='compact'] {
-        ${createTypography(hint.size.compact.typography)}
+        ${createText(hint.size.compact.typography)}
       }
     `;
   }}

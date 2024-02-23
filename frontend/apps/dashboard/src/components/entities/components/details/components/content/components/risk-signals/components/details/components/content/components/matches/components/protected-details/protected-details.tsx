@@ -1,7 +1,7 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoShield40 } from '@onefootprint/icons';
 import { type Entity, IdDI } from '@onefootprint/types';
-import { Button, LinkButton, Typography } from '@onefootprint/ui';
+import { Button, LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -36,8 +36,8 @@ const ProtectedDetails = ({
   return (
     <ProtectedSection>
       <IcoShield40 />
-      <Typography variant="label-1">{t('title')}</Typography>
-      <Typography variant="body-3">{t('description')}</Typography>
+      <Text variant="label-1">{t('title')}</Text>
+      <Text variant="body-3">{t('description')}</Text>
       {canDecrypt ? (
         <Button
           size="default"
@@ -49,9 +49,9 @@ const ProtectedDetails = ({
         </Button>
       ) : (
         <InstructionsBox>
-          <Typography variant="body-4" color="tertiary">
+          <Text variant="body-4" color="tertiary">
             {t('no-permission.message')}
-          </Typography>
+          </Text>
           <LinkButton
             size="tiny"
             href={`${DASHBOARD_BASE_URL}/settings`}

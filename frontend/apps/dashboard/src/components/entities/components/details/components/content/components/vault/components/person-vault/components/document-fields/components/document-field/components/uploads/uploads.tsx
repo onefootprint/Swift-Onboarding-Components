@@ -7,7 +7,7 @@ import type {
   EntityVault,
 } from '@onefootprint/types';
 import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
-import { createFontStyles, Tooltip, Typography } from '@onefootprint/ui';
+import { createFontStyles, Text, Tooltip } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -84,26 +84,22 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
       <Header>
         <LabelContainer>
           <IcoUpload24 />
-          <Typography variant="label-2">{t('title')}</Typography>
+          <Text variant="label-2">{t('title')}</Text>
         </LabelContainer>
         {!!uploadsSortedByDate.length && (
           <DocumentUploadContainer>
             <IcoInfo16 color="info" />
-            <Typography
-              color="info"
-              variant="body-4"
-              sx={{ whiteSpace: 'nowrap' }}
-            >
+            <Text color="info" variant="body-4" sx={{ whiteSpace: 'nowrap' }}>
               {`${t('uploaded-from')} ${t(
                 `upload-source.${uploadSource}` as ParseKeys<'common'>,
               )}`}
-            </Typography>
+            </Text>
           </DocumentUploadContainer>
         )}
       </Header>
       {!uploadsSortedByDate.length && (
         <Row>
-          <Typography variant="body-3">{t('no-uploads')}</Typography>
+          <Text variant="body-3">{t('no-uploads')}</Text>
         </Row>
       )}
       {uploadsSortedByDate.map((upload, i) => (
@@ -121,7 +117,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
           </IconAndLine>
           <Content>
             <Title>
-              <Typography variant="body-3">{getEventText(upload)}</Typography>
+              <Text variant="body-3">{getEventText(upload)}</Text>
               {getFailureReasons(upload) && (
                 <Tooltip alignment="end" text={getFailureReasons(upload)}>
                   <IcoInfo16 />

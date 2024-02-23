@@ -1,6 +1,6 @@
 import type { Color } from '@onefootprint/design-tokens';
 import type { Rule, RuleAction } from '@onefootprint/types';
-import { Button, Stack, Typography } from '@onefootprint/ui';
+import { Button, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import React, { useState } from 'react';
@@ -63,9 +63,9 @@ const ActionSection = ({
     return isAddingRule ? (
       <EmptySection>{emptyRow}</EmptySection>
     ) : (
-      <Typography variant="body-4" color="tertiary">
+      <Text variant="body-4" color="tertiary">
         {t('empty-rules')}
-      </Typography>
+      </Text>
     );
   };
 
@@ -78,15 +78,15 @@ const ActionSection = ({
     >
       <Stack align="center" justify="space-between">
         <Stack direction="column" gap={1} textAlign="left">
-          <Typography
+          <Text
             variant="label-3"
             color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
           >
             {t(`${actionName}.title` as ParseKeys<'common'>)}
-          </Typography>
-          <Typography variant="body-3" color="secondary">
+          </Text>
+          <Text variant="body-3" color="secondary">
             {t(`${actionName}.subtitle` as ParseKeys<'common'>)}
-          </Typography>
+          </Text>
         </Stack>
         {shouldAllowEditing && (
           <Button

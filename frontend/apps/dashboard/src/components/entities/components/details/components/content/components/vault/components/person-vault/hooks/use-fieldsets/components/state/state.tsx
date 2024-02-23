@@ -1,7 +1,7 @@
 import { STATES } from '@onefootprint/global-constants';
 import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
 import { isVaultDataDecrypted, isVaultDataText } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';
 
@@ -24,9 +24,9 @@ const State = ({ di, entity }: StateType) => (
     renderValue={value => {
       if (value && isVaultDataText(value) && isVaultDataDecrypted(value)) {
         return (
-          <Typography variant="body-3" color="primary">
+          <Text variant="body-3" color="primary">
             {getState(value)}
-          </Typography>
+          </Text>
         );
       }
       return <EncryptedCell />;

@@ -5,7 +5,7 @@ import {
   Divider,
   MultiSelect,
   Radio,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -45,12 +45,12 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
   return (
     <Container>
       <Header>
-        <Typography variant="label-1" color="secondary">
+        <Text variant="label-1" color="secondary">
           {t('title')}
-        </Typography>
-        <Typography variant="body-2" color="secondary">
+        </Text>
+        <Text variant="body-2" color="secondary">
           {t('subtitle')}
-        </Typography>
+        </Text>
       </Header>
       <Form onSubmit={handleSubmit(submit)}>
         <OptionContainer>
@@ -79,9 +79,9 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
                   {...register('restrictCountries')}
                 />
                 <AllCountriesHint>
-                  <Typography variant="body-3" color="tertiary">
+                  <Text variant="body-3" color="tertiary">
                     {t('all-countries.hint')}
-                  </Typography>
+                  </Text>
                 </AllCountriesHint>
               </AllCountriesContainer>
               <Radio

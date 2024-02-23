@@ -1,5 +1,5 @@
 import type { IdDocImageTypes } from '@onefootprint/types';
-import { LoadingIndicator, Stack, Typography } from '@onefootprint/ui';
+import { LoadingIndicator, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -25,13 +25,10 @@ const Loading = ({
     <Container>
       <LoadingIndicator />
       <Stack direction="column" justify="center" align="center" gap={3}>
-        <Typography
-          variant="label-1"
-          sx={{ marginTop: 5, textAlign: 'center' }}
-        >
+        <Text variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
           {t(`title.${step}-${imageType}`)}
-        </Typography>
-        <Typography
+        </Text>
+        <Text
           variant="body-2"
           sx={{
             textAlign: 'center',
@@ -39,7 +36,7 @@ const Loading = ({
           }}
         >
           {showSlowConnectionMessage ? t('slow-connection') : t('subtitle')}
-        </Typography>
+        </Text>
       </Stack>
     </Container>
   );

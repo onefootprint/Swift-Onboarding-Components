@@ -1,6 +1,6 @@
 import { IcoPencil16 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
-import { IconButton, Stack, Typography } from '@onefootprint/ui';
+import { IconButton, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -20,9 +20,9 @@ const Label = ({ children, cta }: LabelProps) => {
 
   return (
     <Stack align="center" gap={3} height="32px">
-      <Typography variant="label-3" color="tertiary">
+      <Text variant="label-3" color="tertiary">
         {children}
-      </Typography>
+      </Text>
       {cta && (
         <PermissionGate
           scopeKind={RoleScopeKind.orgSettings}

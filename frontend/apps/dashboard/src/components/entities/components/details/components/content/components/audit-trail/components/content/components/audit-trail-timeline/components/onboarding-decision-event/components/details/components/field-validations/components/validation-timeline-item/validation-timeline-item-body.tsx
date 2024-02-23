@@ -1,4 +1,4 @@
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,15 +24,15 @@ const ValidationTimelineItemBody = ({
         const key = `${reasonCode}-${i}`;
         return (
           <Container key={key}>
-            <Typography as="span" variant="label-3">
+            <Text as="span" variant="label-3">
               •
-            </Typography>
-            <Typography variant="body-3" sx={{ width: '100%' }}>
+            </Text>
+            <Text variant="body-3" sx={{ width: '100%' }}>
               <Title>{`${t(
                 `match-level.${matchLevel}` as ParseKeys<'common'>,
               )}:`}</Title>
               {description}
-            </Typography>
+            </Text>
           </Container>
         );
       })}

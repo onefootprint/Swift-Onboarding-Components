@@ -1,5 +1,5 @@
 import { type OnboardingConfig } from '@onefootprint/types';
-import { Divider, Typography } from '@onefootprint/ui';
+import { Divider, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -31,12 +31,12 @@ const AmlMonitoring = ({
         }}
       />
       <Divider variant="secondary" />
-      <Typography variant="body-3" color="tertiary">
-        <Typography variant="body-3" color="primary" as="span">
+      <Text variant="body-3" color="tertiary">
+        <Text variant="body-3" color="primary" as="span">
           {t('footer.label')}{' '}
-        </Typography>
+        </Text>
         {t('footer.content')}
-      </Typography>
+      </Text>
     </Container>
   );
 };

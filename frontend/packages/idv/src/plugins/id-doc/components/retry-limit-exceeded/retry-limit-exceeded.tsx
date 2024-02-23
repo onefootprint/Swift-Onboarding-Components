@@ -1,5 +1,5 @@
 import { IcoRepeat40, IcoWarning16 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -36,14 +36,10 @@ const RetryLimitExceeded = () => {
           }}
         />
         <ErrorMessage>
-          <Typography
-            variant="label-1"
-            color="error"
-            sx={{ textAlign: 'center' }}
-          >
+          <Text variant="label-1" color="error" sx={{ textAlign: 'center' }}>
             {t('title')}
-          </Typography>
-          <Typography
+          </Text>
+          <Text
             variant="body-2"
             color="secondary"
             sx={{
@@ -51,7 +47,7 @@ const RetryLimitExceeded = () => {
             }}
           >
             {t('description')}
-          </Typography>
+          </Text>
         </ErrorMessage>
       </ErrorContainer>
     </FadeInContainer>

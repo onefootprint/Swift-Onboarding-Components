@@ -3,7 +3,7 @@ import type { CountryCode } from '@onefootprint/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../../../../../utils';
+import { createText } from '../../../../../../utils';
 import Box from '../../../../../box';
 import Flag from '../../../../../flag';
 
@@ -38,7 +38,7 @@ const Button = styled.button`
     } = theme;
 
     return css`
-      ${createTypography(input.size.default.typography)}
+      ${createText(input.size.default.typography)}
       align-items: center;
       background: none;
       border: none;

@@ -1,5 +1,5 @@
 import { IcoCirclePlay16 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
@@ -98,9 +98,9 @@ const MobileDemoVideo = ({
           transition={{ duration: 0.5 }}
         >
           <IcoCirclePlay16 color="accent" />
-          <Typography variant="label-2" color="accent">
+          <Text variant="label-2" color="accent">
             Replay
-          </Typography>
+          </Text>
         </Replay>
       )}
     </PhoneContainer>

@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -9,12 +9,12 @@ export type HeaderProps = {
 
 const Header = ({ title, subtitle }: HeaderProps) => (
   <Container>
-    <Typography variant="heading-3" sx={{ marginBottom: 3 }}>
+    <Text variant="heading-3" sx={{ marginBottom: 3 }}>
       {title}
-    </Typography>
-    <Typography variant="body-2" color="secondary">
+    </Text>
+    <Text variant="body-2" color="secondary">
       {subtitle}
-    </Typography>
+    </Text>
   </Container>
 );
 

@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -20,15 +20,15 @@ const PromptWithGuidelines = ({
 }: PromptWithGuidelinesProps) => (
   <Container>
     <Icon color={variant === 'error' ? 'error' : 'primary'} />
-    <Typography
+    <Text
       variant="label-1"
       color={variant === 'error' ? 'error' : 'primary'}
       sx={{ textAlign: 'center' }}
     >
       {title}
-    </Typography>
+    </Text>
     {description && (
-      <Typography
+      <Text
         variant="body-2"
         color="secondary"
         sx={{
@@ -36,12 +36,12 @@ const PromptWithGuidelines = ({
         }}
       >
         {description}
-      </Typography>
+      </Text>
     )}
     {guidelines.length > 0 && (
       <Directions>
         {guidelines.length === 1 ? (
-          <Typography
+          <Text
             variant="body-2"
             color="secondary"
             sx={{
@@ -49,10 +49,10 @@ const PromptWithGuidelines = ({
             }}
           >
             {guidelines[0]}
-          </Typography>
+          </Text>
         ) : (
           guidelines.map(guideline => (
-            <Typography
+            <Text
               key={guideline}
               variant="body-2"
               color="secondary"
@@ -63,7 +63,7 @@ const PromptWithGuidelines = ({
               }}
             >
               {guideline}
-            </Typography>
+            </Text>
           ))
         )}
       </Directions>

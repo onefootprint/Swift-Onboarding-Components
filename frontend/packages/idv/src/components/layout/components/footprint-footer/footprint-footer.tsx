@@ -1,6 +1,6 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { media, Stack, Typography } from '@onefootprint/ui';
+import { media, Stack, Text } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -53,9 +53,9 @@ const FootprintFooter = ({
       <LinksContainer as="ul" align="center" justify="center" gap={3}>
         <SupportLinksSelect config={config} />
         <WhatsThisButton onClick={onWhatsThisClick} className="footer-link">
-          <Typography variant="caption-1" color="secondary" as="span">
+          <Text variant="caption-1" color="secondary" as="span">
             {t('whats-this')}
-          </Typography>
+          </Text>
         </WhatsThisButton>
         <li>
           <a
@@ -64,9 +64,9 @@ const FootprintFooter = ({
             rel="noreferrer"
             className="footer-link"
           >
-            <Typography variant="caption-1" color="secondary" as="span">
+            <Text variant="caption-1" color="secondary" as="span">
               {t('privacy')}
-            </Typography>
+            </Text>
           </a>
         </li>
         <LanguageSelect />

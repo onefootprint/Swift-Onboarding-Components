@@ -1,6 +1,6 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { Grid, InlineAlert, Typography } from '@onefootprint/ui';
+import { Grid, InlineAlert, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -38,9 +38,9 @@ const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
       <Header shouldShowRemove={index > 0} onRemove={handleRemove} />
       {index === 0 && (
         <InlineAlert variant="info">
-          <Typography variant="body-2" color="info">
+          <Text variant="body-2" color="info">
             {t('primary-bo-name-hint')}
-          </Typography>
+          </Text>
         </InlineAlert>
       )}
       <Name index={index} />

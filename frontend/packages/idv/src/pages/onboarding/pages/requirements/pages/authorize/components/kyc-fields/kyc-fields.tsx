@@ -27,7 +27,7 @@ import {
   CollectedKycDataOption,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -149,9 +149,9 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
   return fields.length > 0 ? (
     <>
       {showTitle && (
-        <Typography variant="label-1" sx={{ width: '100%' }}>
+        <Text variant="label-1" sx={{ width: '100%' }}>
           {t('kyc.title')}
-        </Typography>
+        </Text>
       )}
       <FieldsList fields={fields} />
     </>

@@ -1,6 +1,6 @@
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import { Checkbox, LinkButton, Tooltip, Typography } from '@onefootprint/ui';
+import { Checkbox, LinkButton, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -39,7 +39,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
       <Header>
         {meta.kind === PlaybookKind.Kyb ? (
           <TitleContainer>
-            <Typography variant="label-3">{t('title.kyb.main')}</Typography>
+            <Text variant="label-3">{t('title.kyb.main')}</Text>
             <Tooltip
               alignment="center"
               position="right"
@@ -49,7 +49,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
             </Tooltip>
           </TitleContainer>
         ) : (
-          <Typography variant="label-3">{t('title.kyc')}</Typography>
+          <Text variant="label-3">{t('title.kyc')}</Text>
         )}
         {internationalOnly ? null : (
           <LinkButton

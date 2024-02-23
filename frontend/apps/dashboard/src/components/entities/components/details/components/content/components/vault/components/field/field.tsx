@@ -3,7 +3,7 @@ import {
   type Entity,
   type VaultValue,
 } from '@onefootprint/types';
-import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
+import { Box, Checkbox, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -66,16 +66,16 @@ const Field = ({
             customLabel
           ) : (
             <LabelAndStatusContainer>
-              <Typography variant="body-3" color="tertiary" as="label">
+              <Text variant="body-3" color="tertiary" as="label">
                 {label}
-              </Typography>
+              </Text>
               {status}
             </LabelAndStatusContainer>
           )}
           {hint && (
-            <Typography variant="caption-2" color="secondary">
+            <Text variant="caption-2" color="secondary">
               {hint}
-            </Typography>
+            </Text>
           )}
         </LabelContainer>
       )}

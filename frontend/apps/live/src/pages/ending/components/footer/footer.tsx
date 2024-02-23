@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -13,20 +13,20 @@ const Footer = () => {
   return (
     <Container>
       <LeftColumn>
-        <Typography as="p" variant="label-4" color="tertiary">
+        <Text as="p" variant="label-4" color="tertiary">
           © {new Date().getFullYear()} One Footprint
-        </Typography>
+        </Text>
       </LeftColumn>
       <RightColumn>
         <Link rel="noopener noreferrer" href={TWITTER_URL}>
-          <Typography variant="label-4" color="tertiary">
+          <Text variant="label-4" color="tertiary">
             {t('footer.twitter')}
-          </Typography>
+          </Text>
         </Link>
         <Link rel="noopener noreferrer" href={LINKEDIN_URL}>
-          <Typography variant="label-4" color="tertiary">
+          <Text variant="label-4" color="tertiary">
             {t('footer.linkedin')}
-          </Typography>
+          </Text>
         </Link>
         <Image
           src="/ending/soc-2-badge.png"

@@ -1,5 +1,5 @@
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -19,12 +19,10 @@ const LinkSent = () => {
       <Container>
         <Inner>
           <ThemedLogoFpDefault />
-          <Typography variant="label-1" color="primary">
+          <Text variant="label-1" color="primary">
             {t('title')}
-          </Typography>
-          <Typography variant="body-2">
-            {t('instructions', { email })}
-          </Typography>
+          </Text>
+          <Text variant="body-2">{t('instructions', { email })}</Text>
           <Button onClick={() => router.push('/login')} fullWidth>
             {t('cta')}
           </Button>

@@ -8,7 +8,7 @@ import {
   IconButton,
   LinkButton,
   Stack,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -94,7 +94,7 @@ const UploadFile = ({
             </Box>
             <Stack align="center" justify="space-between">
               <Box>
-                <Typography variant="body-3">{fileName}</Typography>
+                <Text variant="body-3">{fileName}</Text>
               </Box>
               <IconButton aria-label={t('remove')} onClick={handleRemove}>
                 <IcoTrash16 color="error" />
@@ -105,9 +105,9 @@ const UploadFile = ({
           <>
             <Stack align="center" gap={3} marginTop={5} marginBottom={5}>
               <Divider />
-              <Typography color="quaternary" variant="body-4">
+              <Text color="quaternary" variant="body-4">
                 {t('or')}
-              </Typography>
+              </Text>
               <Divider />
             </Stack>
             {children}

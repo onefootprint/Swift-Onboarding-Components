@@ -6,7 +6,7 @@ import {
   IcoLeaf40,
   IcoShield40,
 } from '@onefootprint/icons';
-import { Divider, media, Typography } from '@onefootprint/ui';
+import { Divider, media, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -178,12 +178,12 @@ const Company = () => {
       <SEO title={t('html-title')} slug="/company" />
       <Container>
         <HeroContainer>
-          <Typography variant="display-2" as="h1" sx={{ marginBottom: 5 }}>
+          <Text variant="display-2" as="h1" sx={{ marginBottom: 5 }}>
             {t('title')}
-          </Typography>
-          <Typography variant="display-4" as="h2" color="secondary">
+          </Text>
+          <Text variant="display-4" as="h2" color="secondary">
             {t('subtitle')}
-          </Typography>
+          </Text>
         </HeroContainer>
         <CompanyPhotosContainer>
           <CompanyPhotos photos={companyPhotos} />

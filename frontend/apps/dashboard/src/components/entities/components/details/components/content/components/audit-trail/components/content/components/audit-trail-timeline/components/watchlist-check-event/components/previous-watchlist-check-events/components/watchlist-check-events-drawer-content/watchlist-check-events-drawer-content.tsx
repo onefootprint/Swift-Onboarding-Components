@@ -2,7 +2,7 @@ import type {
   PreviousWatchlistChecksEventData,
   WatchlistCheckEventData,
 } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
@@ -27,23 +27,23 @@ const WatchlistCheckEventsDrawerContent = ({
     return {
       headerComponent: (
         <Stack justify="space-between" align="center" width="100%">
-          <Typography variant="label-3" testID="watchlist-check-event-header">
+          <Text variant="label-3" testID="watchlist-check-event-header">
             {t('drawer-title')}
-          </Typography>
+          </Text>
           <Stack gap={2}>
-            <Typography variant="body-4" color="tertiary">
+            <Text variant="body-4" color="tertiary">
               {`${new Date(timestamp).toLocaleString('en-us', {
                 month: '2-digit',
                 day: '2-digit',
                 year: '2-digit',
               })},`}
-            </Typography>
-            <Typography variant="body-4" color="tertiary">
+            </Text>
+            <Text variant="body-4" color="tertiary">
               {new Date(timestamp).toLocaleString('en-us', {
                 hour: 'numeric',
                 minute: 'numeric',
               })}
-            </Typography>
+            </Text>
           </Stack>
         </Stack>
       ),

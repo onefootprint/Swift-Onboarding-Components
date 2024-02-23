@@ -1,5 +1,5 @@
 import { IcoPencil16 } from '@onefootprint/icons';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -27,7 +27,7 @@ const Preview = ({ onStartEditing }: PreviewProps) => {
   return (
     <Container>
       <Header>
-        <Typography variant="label-3">{t('title')}</Typography>
+        <Text variant="label-3">{t('title')}</Text>
         <LinkButton
           onClick={onStartEditing}
           iconComponent={IcoPencil16}
@@ -40,13 +40,13 @@ const Preview = ({ onStartEditing }: PreviewProps) => {
       <CollectedInformationContainer>
         {formValues.map(field => (
           <CollectedInformation key={field}>
-            <Typography
+            <Text
               variant="body-3"
               color="tertiary"
               sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
             >
               {t(field as ParseKeys<'common'>)}
-            </Typography>
+            </Text>
             <ValueContainer>
               <DisplayValue
                 field={field as keyof BusinessInformation}

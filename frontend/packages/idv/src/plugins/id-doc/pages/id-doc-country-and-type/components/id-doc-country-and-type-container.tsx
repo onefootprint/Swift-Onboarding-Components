@@ -12,7 +12,7 @@ import {
   CountrySelect,
   Divider,
   RadioSelect,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -211,12 +211,12 @@ const IdDocCountryAndTypeContainer = ({
             size="compact"
           />
         ) : (
-          <Typography
+          <Text
             variant="body-4"
             sx={{ textAlign: 'center', marginLeft: 5, marginRight: 5 }}
           >
             {t('form.not-supported')}
-          </Typography>
+          </Text>
         )}
       </InputsContainer>
       <ConsentMobile

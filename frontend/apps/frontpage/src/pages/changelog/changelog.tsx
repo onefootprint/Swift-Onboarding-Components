@@ -4,7 +4,7 @@ import {
   Container,
   createFontStyles,
   media,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -59,9 +59,9 @@ const Changelog = ({ posts }: ChangelogProps) => {
       <Container>
         <HeroContainer>
           <Chip>{t('microtitle')}</Chip>
-          <Typography color="primary" variant="display-2" as="h1">
+          <Text color="primary" variant="display-2" as="h1">
             {t('title')}
-          </Typography>
+          </Text>
         </HeroContainer>
         {posts.length === 0 ? (
           <PostEmpty />
@@ -97,9 +97,9 @@ const Changelog = ({ posts }: ChangelogProps) => {
         )}
       </Container>
       <Recaps>
-        <Typography color="primary" variant="display-3" as="h1">
+        <Text color="primary" variant="display-3" as="h1">
           {t('recaps-title')}
-        </Typography>
+        </Text>
         <Links>
           {recapPosts.map(
             post =>

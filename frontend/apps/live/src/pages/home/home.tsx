@@ -1,6 +1,6 @@
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { LogoFpDefault } from '@onefootprint/icons';
-import { media, Stack, Typography } from '@onefootprint/ui';
+import { media, Stack, Text } from '@onefootprint/ui';
 import { easeIn, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -104,14 +104,14 @@ const Live = () => {
               animate="visible"
             >
               <Stack as={motion.span} variants={childrenVariants}>
-                <Typography as="h1" variant="display-2">
+                <Text as="h1" variant="display-2">
                   {t(`${translationsKey}.title`)}
-                </Typography>
+                </Text>
               </Stack>
               <Stack as={motion.span} variants={childrenVariants}>
-                <Typography as="h1" variant="display-4">
+                <Text as="h1" variant="display-4">
                   {t(`${translationsKey}.subtitle`)}
-                </Typography>
+                </Text>
               </Stack>
               <Stack as={motion.span} variants={childrenVariants}>
                 <FootprintVerifyButton
@@ -123,7 +123,7 @@ const Live = () => {
                 />
               </Stack>
               <Stack as={motion.span} variants={childrenVariants}>
-                <Typography
+                <Text
                   as="p"
                   variant="body-2"
                   color="tertiary"
@@ -132,7 +132,7 @@ const Live = () => {
                   }}
                 >
                   {t(`${translationsKey}.disclaimer`)}
-                </Typography>
+                </Text>
               </Stack>
             </TextContainer>
           </Balancer>

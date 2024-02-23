@@ -1,4 +1,4 @@
-import { Dialog, Stack, Typography } from '@onefootprint/ui';
+import { Dialog, Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,7 @@ const HelpDialog = ({ open, onClose }: HelpDialogProps) => {
   return (
     <Dialog title={t('title')} open={open} onClose={onClose} size="compact">
       <Stack direction="column" gap={4}>
-        <Typography variant="body-3">{t('body')}</Typography>
+        <Text variant="body-3">{t('body')}</Text>
         <ImageContainer>
           <StyledImage
             alt={t('img-alt')}

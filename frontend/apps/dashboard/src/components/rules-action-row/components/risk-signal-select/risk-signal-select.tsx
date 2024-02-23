@@ -10,7 +10,7 @@ import {
   createFontStyles,
   createOverlayBackground,
   LinkButton,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { matchSorter } from 'match-sorter';
@@ -100,7 +100,7 @@ const RiskSignalSelect = ({
           style={style}
         >
           <ComboboxItem>
-            <Typography
+            <Text
               variant="body-4"
               sx={{
                 textOverflow: 'ellipsis',
@@ -109,10 +109,10 @@ const RiskSignalSelect = ({
               }}
             >
               {option.label}
-            </Typography>
-            <Typography variant="caption-4" color="tertiary">
+            </Text>
+            <Text variant="caption-4" color="tertiary">
               {option.description}
-            </Typography>
+            </Text>
           </ComboboxItem>
         </Item>
       </CellMeasurer>
@@ -146,7 +146,7 @@ const RiskSignalSelect = ({
           <Content position="popper" sideOffset={4} align="end">
             <Header>
               <HeaderControls>
-                <Typography variant="label-4">{t('title')}</Typography>
+                <Text variant="label-4">{t('title')}</Text>
                 <LinkButton
                   size="tiny"
                   variant="destructive"

@@ -1,5 +1,5 @@
 import type { ExternalIntegrationCalledData } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,11 +15,11 @@ const ExternalIntegrationCalledEventHeader = ({
   });
 
   return (
-    <Typography variant="body-3">
+    <Text variant="body-3">
       {t(`${data.successful}`, {
         kind: t(data.integration),
       })}
-    </Typography>
+    </Text>
   );
 };
 

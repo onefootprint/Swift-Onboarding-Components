@@ -1,5 +1,5 @@
 import type { RiskSignal } from '@onefootprint/types';
-import { Grid, Typography } from '@onefootprint/ui';
+import { Grid, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,9 +31,9 @@ const Overview = ({ description, scopes, severity }: OverviewProps) => {
   return (
     <OverviewSection ref={overviewRef}>
       <Header>
-        <Typography variant="label-2">
+        <Text variant="label-2">
           {t('pages.entity.risk-signals.details.overview.title')}
-        </Typography>
+        </Text>
       </Header>
       <Fieldset>
         <Grid.Container columns={['1fr', '1fr']} gap={5}>

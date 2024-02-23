@@ -1,6 +1,6 @@
 import type { Color } from '@onefootprint/design-tokens';
 import type { Rule, RuleAction } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { kebabCase } from 'lodash';
 import React from 'react';
@@ -36,7 +36,7 @@ const ActionResultSection = ({
         role="group"
         aria-label={triggeredName}
       >
-        <Typography variant="label-3">{triggeredName}</Typography>
+        <Text variant="label-3">{triggeredName}</Text>
         {rules.length ? (
           <RuleList>
             {rules.map(rule => (
@@ -49,9 +49,9 @@ const ActionResultSection = ({
             ))}
           </RuleList>
         ) : (
-          <Typography variant="body-3" color="tertiary">
+          <Text variant="body-3" color="tertiary">
             {t('no-rules')}
-          </Typography>
+          </Text>
         )}
       </Stack>
     );
@@ -64,12 +64,12 @@ const ActionResultSection = ({
       role="group"
       aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
     >
-      <Typography
+      <Text
         variant="label-2"
         color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
       >
         {t(`${actionName}.title` as ParseKeys<'common'>)}
-      </Typography>
+      </Text>
       {getResultSection('triggered')}
       {getResultSection('notTriggered')}
     </Stack>

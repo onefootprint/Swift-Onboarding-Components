@@ -1,5 +1,5 @@
 import { IcoCheckSmall16, IcoLang16 } from '@onefootprint/icons';
-import { createFontStyles, Stack, Typography } from '@onefootprint/ui';
+import { createFontStyles, Stack, Text } from '@onefootprint/ui';
 import * as Select from '@radix-ui/react-select';
 import i18n from 'i18next';
 import React from 'react';
@@ -34,9 +34,9 @@ const LanguageSelect = () => {
     <Select.Root value={language} onValueChange={handleLanguageChange}>
       <StyledTrigger>
         <IcoLang16 color="secondary" />
-        <Typography variant="caption-1" color="secondary">
+        <Text variant="caption-1" color="secondary">
           {language.toUpperCase()}
-        </Typography>
+        </Text>
       </StyledTrigger>
       <StyledContent sideOffset={8} position="popper" align="center">
         <Select.Group>

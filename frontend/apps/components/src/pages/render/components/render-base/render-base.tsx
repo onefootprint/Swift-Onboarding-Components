@@ -1,5 +1,5 @@
 import { IcoEye16, IcoEyeCrossed16 } from '@onefootprint/icons';
-import { CopyButton, IconButton, Typography } from '@onefootprint/ui';
+import { CopyButton, IconButton, Text } from '@onefootprint/ui';
 import { formatCardExpiry, formatCardNumber } from 'creditcardutils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -65,9 +65,9 @@ const RenderBase = ({
     <Container>
       <FieldContainer>
         {label && (
-          <Typography color="tertiary" variant="label-4">
+          <Text color="tertiary" variant="label-4">
             {label}
-          </Typography>
+          </Text>
         )}
         <ValueContainer>
           <Value isHidden={!!isHidden} variant="body-3">
@@ -118,7 +118,7 @@ const ValueContainer = styled.div`
   `}
 `;
 
-const Value = styled(Typography)<{ isHidden: boolean }>`
+const Value = styled(Text)<{ isHidden: boolean }>`
   ${({ theme, isHidden }) => css`
     ${isHidden &&
     css`

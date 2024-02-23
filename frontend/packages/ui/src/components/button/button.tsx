@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
-import { createTypography } from '../../utils/mixins';
+import { createText } from '../../utils/mixins';
 import Box from '../box';
 import LoadingIndicator from '../loading-indicator';
 import Stack from '../stack';
@@ -125,7 +125,7 @@ const ButtonContainer = styled.button<{
     const { button } = theme.components;
 
     return css`
-      ${createTypography(button.size[$size].typography)}
+      ${createText(button.size[$size].typography)}
       align-items: center;
       background-color: ${button.variant[$variant].bg};
       border-color: ${button.variant[$variant].borderColor};

@@ -2,7 +2,7 @@ import type { TextareaHTMLAttributes } from 'react';
 import React, { forwardRef, useId } from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../utils';
+import { createText } from '../../utils';
 import Box from '../box';
 import Hint from '../internal/hint';
 import Label from '../label';
@@ -63,7 +63,7 @@ const Textarea = styled.textarea`
     const { input } = theme.components;
 
     return css`
-      ${createTypography(input.size.default.typography)};
+      ${createText(input.size.default.typography)};
       background: ${input.state.default.initial.bg};
       border-color: ${input.state.default.initial.border};
       border-radius: ${input.global.borderRadius};

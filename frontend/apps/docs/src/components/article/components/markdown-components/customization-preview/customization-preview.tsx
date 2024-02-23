@@ -1,4 +1,4 @@
-import { CodeBlock, Typography } from '@onefootprint/ui';
+import { CodeBlock, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -23,9 +23,9 @@ const CustomizationPreview = () => {
         ))}
       </IframeContainer>
       <Content>
-        <Typography variant="label-2" sx={{ marginBottom: 7 }}>
+        <Text variant="label-2" sx={{ marginBottom: 7 }}>
           Customize it
-        </Typography>
+        </Text>
         <SelectContainer>
           <Select>
             {themes.map(theme => (

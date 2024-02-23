@@ -1,5 +1,5 @@
 import { RoleScopeKind } from '@onefootprint/types';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -18,7 +18,7 @@ const Value = ({ children, cta }: ValueProps) => {
   });
 
   return children ? (
-    <Typography variant="body-3">{children}</Typography>
+    <Text variant="body-3">{children}</Text>
   ) : (
     <PermissionGate
       scopeKind={RoleScopeKind.orgSettings}

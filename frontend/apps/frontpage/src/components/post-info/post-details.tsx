@@ -1,4 +1,4 @@
-import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
+import { Box, createFontStyles, media, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,18 +44,18 @@ const PostInfo = ({
             {authors.map(author => author.name).join(' & ')}
           </AuthorsName>
           <Separator />
-          <Typography variant="label-2">{tag.name}</Typography>
+          <Text variant="label-2">{tag.name}</Text>
         </Header>
         <Details>
-          <Typography variant="body-3" color="tertiary">
+          <Text variant="body-3" color="tertiary">
             {publishedAt}
-          </Typography>
+          </Text>
           {publishedAt && <Separator visibleMobile />}
-          <Typography variant="body-3" color="tertiary">
+          <Text variant="body-3" color="tertiary">
             {t('post.reading-time', {
               readingTime,
             })}
-          </Typography>
+          </Text>
         </Details>
       </Box>
     </Container>

@@ -1,6 +1,6 @@
 import { IcoSmartphone224 } from '@onefootprint/icons';
 import type { D2PGenerateResponse } from '@onefootprint/types';
-import { Divider, Grid, Shimmer, Stack, Typography } from '@onefootprint/ui';
+import { Divider, Grid, Shimmer, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
@@ -81,9 +81,9 @@ const QRRegister = () => {
         <SmsButtonWithCountdown authToken={scopedAuthToken} url={url} />
         <Divider variant="secondary" />
         <Stack direction="column" align="center" gap={5}>
-          <Typography variant="body-2" color="secondary">
+          <Text variant="body-2" color="secondary">
             {t('transfer.pages.desktop.qr-register.qr-code.instructions')}
-          </Typography>
+          </Text>
           {isLoading ? (
             <Shimmer
               sx={{ height: `${QR_CODE_SIZE}px`, width: `${QR_CODE_SIZE}px` }}

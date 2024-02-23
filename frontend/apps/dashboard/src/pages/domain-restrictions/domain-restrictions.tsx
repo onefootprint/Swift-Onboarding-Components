@@ -1,5 +1,5 @@
 import { RoleScopeKind } from '@onefootprint/types';
-import { Box, Button, Stack, Typography } from '@onefootprint/ui';
+import { Box, Button, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +29,10 @@ const DomainRestrictions = () => {
       <Box>
         <Stack justify="space-between" align="center" marginBottom={5}>
           <Box>
-            <Typography variant="heading-2">{t('header.title')}</Typography>
-            <Typography variant="body-2" color="secondary">
+            <Text variant="heading-2">{t('header.title')}</Text>
+            <Text variant="body-2" color="secondary">
               {t('header.subtitle')}
-            </Typography>
+            </Text>
           </Box>
           <Box>
             {hasPermission(RoleScopeKind.onboardingConfiguration) && (

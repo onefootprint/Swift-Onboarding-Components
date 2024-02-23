@@ -1,4 +1,4 @@
-import { media, Typography } from '@onefootprint/ui';
+import { media, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -19,9 +19,9 @@ const SecureFormDemo = () => {
         <Head>
           <title>Footprint Form Demo</title>
         </Head>
-        <Typography variant="heading-2" sx={{ marginBottom: 7 }}>
+        <Text variant="heading-2" sx={{ marginBottom: 7 }}>
           Secure Form Demo
-        </Typography>
+        </Text>
         {authToken ? (
           <DemoForm authToken={authToken} />
         ) : (

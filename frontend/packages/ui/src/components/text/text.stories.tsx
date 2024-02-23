@@ -2,13 +2,13 @@ import themes from '@onefootprint/design-tokens';
 import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import type { TypographyProps } from './typography';
-import Typography from './typography';
-import variantMapping from './typography.constants';
+import type { TextProps } from './text';
+import Text from './text';
+import variantMapping from './text.constants';
 
 export default {
-  title: 'Components/Typography',
-  component: Typography,
+  title: 'Components/Text',
+  component: Text,
   argTypes: {
     as: {
       control: 'select',
@@ -23,16 +23,16 @@ export default {
   },
 } as Meta;
 
-const Template: Story<TypographyProps> = ({
+const Template: Story<TextProps> = ({
   as,
   children = 'lorem',
   color = 'primary',
   testID,
   variant = 'heading-1',
-}: Partial<TypographyProps>) => (
-  <Typography as={as} color={color} testID={testID} variant={variant}>
+}: Partial<TextProps>) => (
+  <Text as={as} color={color} testID={testID} variant={variant}>
     {children}
-  </Typography>
+  </Text>
 );
 
 export const Display1 = Template.bind({});
@@ -77,7 +77,7 @@ Heading3.args = {
   as: 'p',
   children: 'Footprint (heading-3)',
   color: 'primary',
-  testID: 'typography-test-id',
+  testID: 'text-test-id',
   variant: 'heading-3',
 };
 

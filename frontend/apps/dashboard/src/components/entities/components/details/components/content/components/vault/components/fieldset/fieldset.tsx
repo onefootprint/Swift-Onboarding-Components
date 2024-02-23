@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Box, LinkButton, Typography } from '@onefootprint/ui';
+import { Box, LinkButton, Text } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -62,7 +62,7 @@ const Fieldset = ({
         <Header>
           <Title>
             <IconComponent />
-            <Typography variant="label-3">{title}</Typography>
+            <Text variant="label-3">{title}</Text>
           </Title>
           {shouldShowSelectAll && (
             <LinkButton

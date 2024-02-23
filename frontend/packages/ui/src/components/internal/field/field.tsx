@@ -3,7 +3,7 @@ import Cleave from 'cleave.js/react';
 import type React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../../utils/mixins';
+import { createText } from '../../../utils/mixins';
 
 export type FieldProps = {
   hasError?: boolean;
@@ -39,12 +39,12 @@ const Field = styled(Cleave)<FieldInternalProps>`
       box-shadow: ${input.state.default.initial.elevation};
 
       &[data-size='default'] {
-        ${createTypography(input.size.default.typography)};
+        ${createText(input.size.default.typography)};
         height: ${input.size.default.height};
       }
 
       &[data-size='compact'] {
-        ${createTypography(input.size.compact.typography)};
+        ${createText(input.size.compact.typography)};
         height: ${input.size.compact.height};
       }
 

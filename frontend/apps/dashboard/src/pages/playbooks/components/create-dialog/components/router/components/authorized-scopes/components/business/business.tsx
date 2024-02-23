@@ -1,4 +1,4 @@
-import { Checkbox, Divider, Typography } from '@onefootprint/ui';
+import { Checkbox, Divider, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ const Business = () => {
         {...register(`allBusinessData`)}
       />
       <Divider />
-      <Typography variant="label-2">{t('beneficial-owners')}</Typography>
+      <Text variant="label-2">{t('beneficial-owners')}</Text>
     </Container>
   );
 };

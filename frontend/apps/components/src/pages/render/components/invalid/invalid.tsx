@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,9 +8,9 @@ const Invalid = () => {
   });
 
   return (
-    <Typography color="primary" variant="body-2" testID="invalid">
+    <Text color="primary" variant="body-2" testID="invalid">
       {t('title')}
-    </Typography>
+    </Text>
   );
 };
 

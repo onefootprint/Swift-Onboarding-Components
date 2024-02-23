@@ -6,7 +6,7 @@ import {
   createFontStyles,
   LinkButton,
   Stack,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,7 +48,7 @@ const HitItemRow = ({
   );
 
   const renderGeneralValue = (generalValue: string) => (
-    <Typography
+    <Text
       variant="body-3"
       sx={{
         textAlign: 'right',
@@ -58,7 +58,7 @@ const HitItemRow = ({
       }}
     >
       {generalValue.charAt(0).toUpperCase() + generalValue.slice(1)}
-    </Typography>
+    </Text>
   );
 
   const renderShowAllValue = () => (
@@ -102,13 +102,13 @@ const HitItemRow = ({
       aria-label={fieldName}
     >
       <LabelContainer>
-        <Typography
+        <Text
           variant="body-3"
           color="tertiary"
           sx={{ textAlign: 'left', width: 'fit-content' }}
         >
           {labelText}
-        </Typography>
+        </Text>
       </LabelContainer>
       <ValueContainer>{valueElement}</ValueContainer>
     </Box>

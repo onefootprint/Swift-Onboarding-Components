@@ -4,8 +4,8 @@ import {
   Divider,
   Radio,
   Stack,
+  Text,
   Tooltip,
-  Typography,
 } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -55,7 +55,7 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   return (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-        <Typography variant="label-3">{t('prompt')}</Typography>
+        <Text variant="label-3">{t('prompt')}</Text>
         <Stack paddingBottom={2} direction="column" gap={4}>
           <div>
             <Radio
@@ -103,9 +103,9 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
             />
           </Tooltip>
           {errors.kind && (
-            <Typography variant="body-4" color="error">
+            <Text variant="body-4" color="error">
               {t('form.error')}
-            </Typography>
+            </Text>
           )}
         </Stack>
         <FrequentNotesTextArea
@@ -115,11 +115,11 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
           placeholder={t('form.note-for-user.placeholder')}
         />
         <Divider />
-        <Typography variant="body-3" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           {userHasPhone
             ? t('form.description-phone')
             : t('form.description-email')}
-        </Typography>
+        </Text>
       </StyledForm>
     </FormProvider>
   );

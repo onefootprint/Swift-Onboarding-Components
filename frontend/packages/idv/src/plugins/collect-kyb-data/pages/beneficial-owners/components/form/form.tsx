@@ -4,7 +4,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
-import { Divider, Grid, Typography, useToast } from '@onefootprint/ui';
+import { Divider, Grid, Text, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -153,9 +153,9 @@ const Form = ({
           </React.Fragment>
         ))}
         {shouldShowMultiKyc && (
-          <Typography variant="body-3" color="secondary">
+          <Text variant="body-3" color="secondary">
             {t('multi-kyc')}
-          </Typography>
+          </Text>
         )}
         <Divider />
         <AddButton onClick={handleAddMore} />

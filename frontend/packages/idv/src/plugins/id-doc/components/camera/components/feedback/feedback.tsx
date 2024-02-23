@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -13,9 +13,9 @@ type FeedbackProps = {
 const Feedback = ({ children, deviceKind, top }: FeedbackProps) => (
   <Container data-device={deviceKind} top={top}>
     <FeedbackText>
-      <Typography variant="label-4" color="quinary">
+      <Text variant="label-4" color="quinary">
         {children}
-      </Typography>
+      </Text>
     </FeedbackText>
   </Container>
 );

@@ -1,6 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoHelp24 } from '@onefootprint/icons';
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,11 +27,11 @@ const Banner = () => {
       <TextContainer>
         <TitleContainer>
           <IcoHelp24 />
-          <Typography variant="label-2">{t('title')}</Typography>
+          <Text variant="label-2">{t('title')}</Text>
         </TitleContainer>
-        <Typography variant="body-3" color="secondary">
+        <Text variant="body-3" color="secondary">
           {t('subtitle')}
-        </Typography>
+        </Text>
       </TextContainer>
       <Buttons>
         <Link href={`${DASHBOARD_BASE_URL}/sign-up`}>

@@ -1,6 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
 import type { Document } from '@onefootprint/types';
-import { Box, Select, Typography } from '@onefootprint/ui';
+import { Box, Select, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -41,7 +41,7 @@ const SessionSelect = ({
 
   return (
     <SelectContainer>
-      <Typography variant="label-2">{t('title')}</Typography>
+      <Text variant="label-2">{t('title')}</Text>
       <Box width="250px">
         <Select
           onChange={newOption => onActiveDocumentVersionChange(newOption.value)}

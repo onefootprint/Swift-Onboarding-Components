@@ -1,5 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { createFontStyles, media, Typography } from '@onefootprint/ui';
+import { createFontStyles, media, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -24,9 +24,9 @@ const SectionText = ({ title, subtitle, items, iconSrc }: SectionTextProps) => (
           <IconWrapper>
             <IcoCheck16 color="accent" />
           </IconWrapper>
-          <Typography variant="body-1" as="p" color="secondary">
+          <Text variant="body-1" as="p" color="secondary">
             {item}
-          </Typography>
+          </Text>
         </ItemContainer>
       ))}
     </ItemsContainer>

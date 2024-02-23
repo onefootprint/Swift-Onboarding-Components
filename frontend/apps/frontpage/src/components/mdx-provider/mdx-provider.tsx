@@ -25,7 +25,7 @@ export type MDXProviderProps = {
 
 const MDXProvider = ({ children }: MDXProviderProps) => (
   // Complaining about the types import("mdx/types").MDXComponents
-  // Not worth trying to fix, as we would need to create a generic property for the Typography,
+  // Not worth trying to fix, as we would need to create a generic property for the Text,
   // and won't produce any different behavior.
   // @ts-ignore
   <ReactMDXProvider components={components}>{children}</ReactMDXProvider>

@@ -1,4 +1,4 @@
-import { Select, Stack, Typography } from '@onefootprint/ui';
+import { Select, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Head from 'next/head';
 import React from 'react';
@@ -52,14 +52,12 @@ const Home = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Typography variant="heading-2" sx={{ marginBottom: 7 }}>
+      <Text variant="heading-2" sx={{ marginBottom: 7 }}>
         {t('header.title')}
-      </Typography>
+      </Text>
       {!metrics.error && (
         <SectionTitle>
-          <Typography variant="label-1">
-            {t('onboarding-metrics.title')}
-          </Typography>
+          <Text variant="label-1">{t('onboarding-metrics.title')}</Text>
           <Stack gap={4}>
             <div style={{ width: '210px' }}>
               <Select

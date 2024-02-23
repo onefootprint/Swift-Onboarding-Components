@@ -1,7 +1,7 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,10 +39,10 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
     const ssnValue = value as NonNullable<Option['ssn']>;
     if (ssnValue.active) {
       return (
-        <Typography variant="body-3">
+        <Text variant="body-3">
           {t(`${ssnValue.kind}` as ParseKeys<'common'>)}{' '}
           {ssnValue.optional ? t('optional') : ''}
-        </Typography>
+        </Text>
       );
     }
     return <IcoCloseSmall24 />;
@@ -53,7 +53,7 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
       Option['internationalCountryRestrictions']
     >;
     if (!countries || countries.length === 0) {
-      return <Typography variant="body-3">{t('none')}</Typography>;
+      return <Text variant="body-3">{t('none')}</Text>;
     }
 
     return (

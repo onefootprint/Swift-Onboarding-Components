@@ -1,6 +1,6 @@
 import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
 import { CollectedInvestorProfileDataOption } from '@onefootprint/types';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ const InvestorProfile = () => {
   return (
     <Container>
       <Header>
-        <Typography variant="label-3">{t('title')}</Typography>
+        <Text variant="label-3">{t('title')}</Text>
         <input
           aria-hidden="true"
           aria-checked={added}
@@ -50,27 +50,27 @@ const InvestorProfile = () => {
           </LinkButton>
         )}
       </Header>
-      {!added && <Typography variant="body-3">{t('subtitle')}</Typography>}
+      {!added && <Text variant="body-3">{t('subtitle')}</Text>}
       {added && (
         <InvestorProfileQuestionContainer>
-          <Typography variant="body-3" as="li">
+          <Text variant="body-3" as="li">
             {t('questions.employment-status')}
-          </Typography>
-          <Typography variant="body-3" as="li">
+          </Text>
+          <Text variant="body-3" as="li">
             {t('questions.annual-income')}
-          </Typography>
-          <Typography variant="body-3" as="li">
+          </Text>
+          <Text variant="body-3" as="li">
             {t('questions.net-worth')}
-          </Typography>
-          <Typography variant="body-3" as="li">
+          </Text>
+          <Text variant="body-3" as="li">
             {t('questions.investment-goals')}
-          </Typography>
-          <Typography variant="body-3" as="li">
+          </Text>
+          <Text variant="body-3" as="li">
             {t('questions.risk-tolerance')}
-          </Typography>
-          <Typography variant="body-3" as="li">
+          </Text>
+          <Text variant="body-3" as="li">
             {t('questions.immediate-family')}
-          </Typography>
+          </Text>
         </InvestorProfileQuestionContainer>
       )}
     </Container>

@@ -3,7 +3,7 @@ import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Button from '../button';
-import Typography from '../typography';
+import Text from '../text';
 import type { DialogProps } from './dialog';
 import Dialog from './dialog';
 
@@ -158,7 +158,7 @@ const Template: Story<DialogProps> = ({
         title={title}
         isConfirmation={isConfirmation}
       >
-        <Typography variant="body-4">{children}</Typography>
+        <Text variant="body-4">{children}</Text>
       </Dialog>
       <Button onClick={() => setOpen(true)} size="default">
         Open dialog
@@ -236,7 +236,7 @@ const OnlyPrimaryTemplate: Story<DialogProps> = ({
         title={title}
         isConfirmation={isConfirmation}
       >
-        <Typography variant="body-4">{children}</Typography>
+        <Text variant="body-4">{children}</Text>
       </Dialog>
       <Button onClick={() => setOpen(true)} size="default">
         Open dialog
@@ -288,7 +288,7 @@ const LinkTemplate: Story<DialogProps> = ({
         open={open}
         isConfirmation={isConfirmation}
       >
-        <Typography variant="body-4">Content</Typography>
+        <Text variant="body-4">Content</Text>
       </Dialog>
       <Button onClick={() => setOpen(true)} size="default">
         Open dialog

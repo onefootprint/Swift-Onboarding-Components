@@ -1,5 +1,5 @@
 import type { OnboardingConfig } from '@onefootprint/types';
-import { Button, TextInput, Typography } from '@onefootprint/ui';
+import { Button, Text, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -49,9 +49,9 @@ const EditName = ({ playbook, onDone }: EditNameProps) => {
   return (
     <Form onSubmit={handleSubmit(handleBeforeSubmit)} id="edit-playbook-form">
       <InputContainer>
-        <Typography variant="label-4" color="tertiary">
+        <Text variant="label-4" color="tertiary">
           {t('form.label')}
-        </Typography>
+        </Text>
         <TextInput
           autoFocus
           hasError={!!errors.name}

@@ -6,7 +6,7 @@ import {
   IcoForbid40,
 } from '@onefootprint/icons';
 import { EntityKind } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
@@ -56,7 +56,7 @@ const FloatingBox = ({
       ) : (
         <IcoForbid40 />
       )}
-      <Typography
+      <Text
         variant={hasInsights ? 'label-2' : 'label-1'}
         sx={{
           marginBottom: hasInsights ? 5 : 0,
@@ -71,40 +71,40 @@ const FloatingBox = ({
               deviceInfo.appClip,
             )
           : t('no-insights.title')}
-      </Typography>
+      </Text>
       {hasInsights && (
         <>
           {ipAddress && (
             <Row role="row" aria-label={t('ip-address')}>
-              <Typography variant="body-3" color="tertiary">
+              <Text variant="body-3" color="tertiary">
                 {t('ip-address')}
-              </Typography>
-              <Typography variant="body-3" isPrivate>
+              </Text>
+              <Text variant="body-3" isPrivate>
                 {ipAddress}
-              </Typography>
+              </Text>
             </Row>
           )}
           {context.kind === EntityKind.person ? (
             <>
               <Row role="row" aria-label={t('biometrics')}>
-                <Typography variant="body-3" color="tertiary">
+                <Text variant="body-3" color="tertiary">
                   {t('biometrics')}
-                </Typography>
+                </Text>
 
                 <Stack align="center" gap={3}>
                   {hasBiometrics ? (
                     <>
                       <IcoCheckCircle16 color="success" />
-                      <Typography variant="body-3" color="success">
+                      <Text variant="body-3" color="success">
                         {t('verified')}
-                      </Typography>
+                      </Text>
                     </>
                   ) : (
                     <>
                       <IcoClose16 color="error" />
-                      <Typography variant="body-3" color="error">
+                      <Text variant="body-3" color="error">
                         {t('not_verified')}
-                      </Typography>
+                      </Text>
                     </>
                   )}
                 </Stack>
@@ -112,32 +112,32 @@ const FloatingBox = ({
               {deviceInfo.instantApp && (
                 <Row role="row" aria-label={t('instant-app.label')}>
                   <Stack direction="row" align="center" gap={2}>
-                    <Typography variant="body-3" color="tertiary">
+                    <Text variant="body-3" color="tertiary">
                       {t('instant-app.label')}
-                    </Typography>
+                    </Text>
                     <AboutAppClipAndInstantApp kind="instant-app" />
                   </Stack>
                   <Stack direction="row" align="center" gap={3}>
                     <IcoBolt16 />
-                    <Typography variant="body-3" isPrivate>
+                    <Text variant="body-3" isPrivate>
                       {t('instant-app.yes')}
-                    </Typography>
+                    </Text>
                   </Stack>
                 </Row>
               )}
               {deviceInfo.appClip && (
                 <Row role="row" aria-label={t('app-clip.label')}>
                   <Stack direction="row" align="center" gap={2}>
-                    <Typography variant="body-3" color="tertiary">
+                    <Text variant="body-3" color="tertiary">
                       {t('app-clip.label')}
-                    </Typography>
+                    </Text>
                     <AboutAppClipAndInstantApp kind="app-clip" />
                   </Stack>
                   <Stack direction="row" align="center" gap={2} justify="end">
                     <IcoAppclip16 />
-                    <Typography variant="body-3" isPrivate>
+                    <Text variant="body-3" isPrivate>
                       {t('app-clip.yes')}
-                    </Typography>
+                    </Text>
                   </Stack>
                 </Row>
               )}
@@ -145,22 +145,22 @@ const FloatingBox = ({
           ) : null}
           {fullRegion && (
             <Row role="row" aria-label={t('region')}>
-              <Typography variant="body-3" color="tertiary">
+              <Text variant="body-3" color="tertiary">
                 {t('region')}
-              </Typography>
-              <Typography variant="body-3" isPrivate>
+              </Text>
+              <Text variant="body-3" isPrivate>
                 {fullRegion}
-              </Typography>
+              </Text>
             </Row>
           )}
           {country && (
             <Row role="row" aria-label={t('country')}>
-              <Typography variant="body-3" color="tertiary">
+              <Text variant="body-3" color="tertiary">
                 {t('country')}
-              </Typography>
-              <Typography variant="body-3" isPrivate>
+              </Text>
+              <Text variant="body-3" isPrivate>
                 {country}
-              </Typography>
+              </Text>
             </Row>
           )}
         </>

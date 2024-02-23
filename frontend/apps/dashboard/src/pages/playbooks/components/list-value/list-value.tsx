@@ -1,5 +1,5 @@
 import { IcoCloseSmall24 } from '@onefootprint/icons';
-import { Tooltip, Typography } from '@onefootprint/ui';
+import { Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -16,7 +16,7 @@ const ListValue = ({ value, threshold = 3 }: ListValueProps) => {
   if (value.length <= threshold) {
     return (
       <Container>
-        <Typography variant="body-3">{value.join(', ')}</Typography>
+        <Text variant="body-3">{value.join(', ')}</Text>
       </Container>
     );
   }
@@ -25,13 +25,13 @@ const ListValue = ({ value, threshold = 3 }: ListValueProps) => {
   const remaining = value.slice(threshold);
   return (
     <Container>
-      <Typography variant="body-3">{first.join(', ')}</Typography>
+      <Text variant="body-3">{first.join(', ')}</Text>
       <Tooltip text={remaining.join(', ')} alignment="center" position="bottom">
         <>
-          <Typography variant="body-3">and </Typography>{' '}
-          <Typography variant="body-3" sx={{ textDecoration: 'underline' }}>
+          <Text variant="body-3">and </Text>{' '}
+          <Text variant="body-3" sx={{ textDecoration: 'underline' }}>
             {`${remaining.length} more`}
-          </Typography>
+          </Text>
         </>
       </Tooltip>
     </Container>

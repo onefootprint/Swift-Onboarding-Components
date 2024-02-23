@@ -1,5 +1,5 @@
 import type { AccessEvent } from '@onefootprint/types';
-import { SearchInput, Typography } from '@onefootprint/ui';
+import { SearchInput, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -55,9 +55,9 @@ const SecurityLogs = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Typography variant="heading-2" sx={{ marginBottom: 5 }}>
+      <Text variant="heading-2" sx={{ marginBottom: 5 }}>
         {t('header.title')}
-      </Typography>
+      </Text>
       <FiltersContainer>
         <SearchInput
           width="232px"

@@ -1,4 +1,4 @@
-import { Button, Stack, Typography } from '@onefootprint/ui';
+import { Button, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -9,8 +9,8 @@ type FrontModalProps = {
 const FrontModal = ({ className }: FrontModalProps) => (
   <Container padding={5} gap={5} direction="column" className={className}>
     <Stack justify="space-between">
-      <Typography variant="label-3">Unknown charges</Typography>
-      <Typography variant="label-3">$120.77</Typography>
+      <Text variant="label-3">Unknown charges</Text>
+      <Text variant="label-3">$120.77</Text>
     </Stack>
     <Stack justify="end">
       <Button variant="primary" size="small">

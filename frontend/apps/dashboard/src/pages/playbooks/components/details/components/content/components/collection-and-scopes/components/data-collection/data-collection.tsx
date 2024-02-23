@@ -2,7 +2,7 @@ import {
   type OnboardingConfig,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import { Box, Divider, InlineAlert, Stack, Typography } from '@onefootprint/ui';
+import { Box, Divider, InlineAlert, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -51,9 +51,9 @@ const DataCollection = ({
     <Stack direction="column">
       {isKYB && (
         <Stack direction="column" gap={7}>
-          <Typography variant="label-3" color="secondary">
+          <Text variant="label-3" color="secondary">
             {t('kyb.business')}
-          </Typography>
+          </Text>
           <Stack direction="column" gap={7}>
             <CollectedInformation
               title={t('kyb.basic_information')}
@@ -83,9 +83,9 @@ const DataCollection = ({
       )}
       <Stack direction="column" gap={7}>
         {isKYB && (
-          <Typography variant="label-3" color="secondary">
+          <Text variant="label-3" color="secondary">
             {t('kyb.business_beneficial_owners')}
-          </Typography>
+          </Text>
         )}
         <Stack direction="column" gap={7}>
           <CollectedInformation
@@ -155,12 +155,12 @@ const DataCollection = ({
           <Box marginTop={5} marginBottom={5}>
             <Divider variant="secondary" />
           </Box>
-          <Typography variant="label-3" color="primary">
+          <Text variant="label-3" color="primary">
             {t('us-territories.label')}{' '}
-            <Typography variant="label-3" color="tertiary" as="span">
+            <Text variant="label-3" color="tertiary" as="span">
               {t('us-territories.content')}
-            </Typography>
-          </Typography>
+            </Text>
+          </Text>
         </footer>
       )}
     </Stack>

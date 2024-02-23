@@ -25,16 +25,16 @@ const NavigationLink = ({
   fontFamily = 'default',
 }: NavigationLinkProps) => (
   <Container href={href} target="_blank">
-    <StyledTypography variant={variant} color={color} fontFamily={fontFamily}>
+    <StyledText variant={variant} color={color} fontFamily={fontFamily}>
       {children}
-    </StyledTypography>
+    </StyledText>
     <Stack marginTop={1}>
       <IcoArrowUpRight16 color={color} />
     </Stack>
   </Container>
 );
 
-const StyledTypography = styled.p<{
+const StyledText = styled.p<{
   color: Color;
   variant: FontVariant;
   fontFamily: FontFamily;

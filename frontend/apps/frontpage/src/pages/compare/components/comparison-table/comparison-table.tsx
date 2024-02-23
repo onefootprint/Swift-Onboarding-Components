@@ -1,5 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -12,9 +12,9 @@ const ComparisonTable = () => (
     <Header>
       <Row data-type="header">
         {Object.values(tableOptions.companies).map(header => (
-          <Typography key={header} variant="body-2">
+          <Text key={header} variant="body-2">
             {header}
-          </Typography>
+          </Text>
         ))}
       </Row>
     </Header>
@@ -22,7 +22,7 @@ const ComparisonTable = () => (
       <div key={feature.title}>
         <Row>
           <Cell data-area="title">
-            <Typography variant="body-2">{feature.title}</Typography>
+            <Text variant="body-2">{feature.title}</Text>
           </Cell>
           <Cell data-area="footprint">
             {feature.footprint && <IcoCheck16 />}

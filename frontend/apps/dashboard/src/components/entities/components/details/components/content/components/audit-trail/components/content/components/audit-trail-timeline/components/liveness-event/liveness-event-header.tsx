@@ -1,6 +1,6 @@
 import type { LivenessEventData } from '@onefootprint/types';
 import { LivenessSource } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,11 +15,11 @@ const LivenessEventHeader = ({ data }: LivenessEventHeaderProps) => {
   const { source } = data;
 
   return (
-    <Typography variant="label-3" testID="liveness-event-header">
+    <Text variant="label-3" testID="liveness-event-header">
       {source === LivenessSource.skipped
         ? t('skipped-title')
         : t('success-title')}
-    </Typography>
+    </Text>
   );
 };
 

@@ -7,7 +7,7 @@ import {
   IdDocImageProcessingError,
   IdDocImageUploadError,
 } from '@onefootprint/types';
-import { Box, Button, media, Stack, Typography } from '@onefootprint/ui';
+import { Box, Button, media, Stack, Text } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -146,17 +146,17 @@ const DesktopPhotoPrompt = ({
         {!isRetry && !isLoading && (
           <>
             <Stack>
-              <Typography variant="label-2" color="accent">
+              <Text variant="label-2" color="accent">
                 {t('upload-link-button.title')}
-              </Typography>
-              <Typography variant="body-2" sx={{ color: 'quaternary' }}>
+              </Text>
+              <Text variant="body-2" sx={{ color: 'quaternary' }}>
                 &nbsp;{t('drag-drop-text.line-1')}
-              </Typography>
+              </Text>
             </Stack>
             {!allowPdf && (
-              <Typography variant="body-2" sx={{ color: 'quaternary' }}>
+              <Text variant="body-2" sx={{ color: 'quaternary' }}>
                 {t('drag-drop-text.line-2')}
-              </Typography>
+              </Text>
             )}
           </>
         )}

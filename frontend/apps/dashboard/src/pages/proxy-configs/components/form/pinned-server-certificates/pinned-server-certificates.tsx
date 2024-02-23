@@ -1,5 +1,5 @@
 import { IcoFileText224, IcoPlusSmall16 } from '@onefootprint/icons';
-import { LinkButton, TextArea, Typography } from '@onefootprint/ui';
+import { LinkButton, Text, TextArea } from '@onefootprint/ui';
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -37,9 +37,9 @@ const PinnedServerCertificates = ({ id, onSubmit, values }: StepProps) => {
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)}>
-      <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+      <Text variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
-      </Typography>
+      </Text>
       <FormGrid>
         {fields.map((field, index) => (
           <UploadFile

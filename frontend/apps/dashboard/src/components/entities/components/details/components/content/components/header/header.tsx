@@ -1,4 +1,4 @@
-import { CodeInline, Stack, Typography } from '@onefootprint/ui';
+import { CodeInline, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,9 +24,9 @@ const Header = ({ entity }: HeaderProps) => {
   return (
     <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)}>
       <Stack align="center" gap={3}>
-        <Typography variant="label-1">
+        <Text variant="label-1">
           {t(`${kind}.title` as ParseKeys<'common'>)}
-        </Typography>
+        </Text>
         <Stack gap={2}>
           <StatusBadge
             status={entity.status}

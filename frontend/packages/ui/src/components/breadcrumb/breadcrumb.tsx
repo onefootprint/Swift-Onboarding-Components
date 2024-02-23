@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
 
-import Typography from '../typography';
+import Text from '../text';
 
 export type BreadcrumbProps = {
   'aria-label': string;
@@ -20,9 +20,9 @@ const Breadcrumb = ({
         <>
           {child}
           {index !== React.Children.count(children) - 1 && (
-            <Typography color="tertiary" variant="label-3" as="li">
+            <Text color="tertiary" variant="label-3" as="li">
               {separator}
-            </Typography>
+            </Text>
           )}
         </>
       ))}

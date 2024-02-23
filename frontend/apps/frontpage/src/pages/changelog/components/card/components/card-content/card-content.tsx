@@ -1,5 +1,5 @@
 import { useIntl } from '@onefootprint/hooks';
-import { CopyButton, media, Typography } from '@onefootprint/ui';
+import { CopyButton, media, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -35,13 +35,13 @@ const CardContent = ({ post }: CardContentProps) => {
       )}
       <TextContent>
         <DateMobile>
-          <Typography variant="label-3" color="tertiary">
+          <Text variant="label-3" color="tertiary">
             {formattedDate}
-          </Typography>
+          </Text>
         </DateMobile>
         <Title>
           <Link href={`/changelog/${post.slug}`}>
-            <Typography variant="display-3">{post.title}</Typography>
+            <Text variant="display-3">{post.title}</Text>
           </Link>
           <CopyButton
             ariaLabel={t('cta')}

@@ -3,8 +3,8 @@ import {
   FormControl,
   FormLabel,
   NativeSelect,
+  Text,
   TextInput,
-  Typography,
 } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -29,9 +29,9 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)}>
-      <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+      <Text variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
-      </Typography>
+      </Text>
       <Box gap={7} sx={{ display: 'grid' }}>
         <TextInput
           autoFocus

@@ -1,5 +1,5 @@
 import { IcoForbid40 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -16,11 +16,11 @@ const Error = () => {
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <TitleContainer>
         <IcoForbid40 color="error" />
-        <Typography variant="heading-3">{t('title')}</Typography>
+        <Text variant="heading-3">{t('title')}</Text>
       </TitleContainer>
-      <Typography sx={{ textAlign: 'center' }} variant="body-2">
+      <Text sx={{ textAlign: 'center' }} variant="body-2">
         {t('description')}
-      </Typography>
+      </Text>
     </Container>
   );
 };

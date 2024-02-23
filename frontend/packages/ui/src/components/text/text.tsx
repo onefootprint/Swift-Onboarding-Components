@@ -5,9 +5,9 @@ import styled, { css } from 'styled-components';
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
-import variantMapping from './typography.constants';
+import variantMapping from './text.constants';
 
-type TypographyTag =
+type TextTag =
   | 'p'
   | 'h1'
   | 'h2'
@@ -20,8 +20,8 @@ type TypographyTag =
   | 'span'
   | 'li';
 
-export type TypographyProps = {
-  as?: TypographyTag;
+export type TextProps = {
+  as?: TextTag;
   children: React.ReactNode;
   color?: Color;
   id?: string;
@@ -32,7 +32,7 @@ export type TypographyProps = {
   isPrivate?: boolean;
 };
 
-const Typography = forwardRef<HTMLElement, TypographyProps>(
+const Typography = forwardRef<HTMLElement, TextProps>(
   (
     {
       as = 'p',
@@ -44,12 +44,12 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       title,
       variant,
       isPrivate,
-    }: TypographyProps,
+    }: TextProps,
     ref,
   ) => {
     const sxStyles = useSX(sx);
     return (
-      <StyledTypography
+      <StyledText
         as={as || variantMapping[variant]}
         $color={color}
         data-testid={testID}
@@ -61,12 +61,12 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
         data-private={isPrivate ? 'true' : undefined}
       >
         {children}
-      </StyledTypography>
+      </StyledText>
     );
   },
 );
 
-const StyledTypography = styled.p<{
+const StyledText = styled.p<{
   $color: Color;
   sx: SXStyles;
   variant: FontVariant;

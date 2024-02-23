@@ -3,7 +3,7 @@ import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import type { Organization } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Divider, Toggle, Tooltip, Typography } from '@onefootprint/ui';
+import { Divider, Text, Toggle, Tooltip } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -65,22 +65,22 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
           ) : (
             <IcoLock24 testID="lock-closed" />
           )}
-          <Typography variant="label-3">{t('title')}</Typography>
+          <Text variant="label-3">{t('title')}</Text>
         </Header>
-        <Typography color="secondary" variant="body-3">
+        <Text color="secondary" variant="body-3">
           {t('subtitle')}
-        </Typography>
+        </Text>
       </HeaderContainer>
       <Divider />
       <EnableContainer>
         <EnableSubContainer>
-          <Typography color="secondary" variant="body-3">
+          <Text color="secondary" variant="body-3">
             {t('action')}
-          </Typography>
+          </Text>
           &nbsp;
-          <Typography color="secondary" variant="label-3">
+          <Text color="secondary" variant="label-3">
             {createStringList(org.domains)}
-          </Typography>
+          </Text>
         </EnableSubContainer>
         {disableTogle ? (
           <Tooltip

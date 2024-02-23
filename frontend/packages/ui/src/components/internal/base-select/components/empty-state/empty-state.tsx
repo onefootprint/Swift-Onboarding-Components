@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Typography from '../../../../typography';
+import Text from '../../../../text';
 
 type EmptyStateProps = {
   children: React.ReactNode;
@@ -9,9 +9,9 @@ type EmptyStateProps = {
 
 const EmptyState = ({ children }: EmptyStateProps) => (
   <EmptyStateContainer>
-    <Typography variant="body-3" color="tertiary">
+    <Text variant="body-3" color="tertiary">
       {children}
-    </Typography>
+    </Text>
   </EmptyStateContainer>
 );
 

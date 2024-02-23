@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -22,7 +22,7 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
 
   return (
     <Container>
-      <Typography variant="label-2">{t('title')}</Typography>
+      <Text variant="label-2">{t('title')}</Text>
       <OutcomesContainer>
         {allowRealOutcome && (
           <RealOutcome onSelect={outcomeTypeChange} isSelected={!isSimulated} />

@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { Trans } from 'react-i18next';
@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 const TermsAndConditions = () => (
   <TextContainer>
-    <Typography variant="caption-3" color="secondary">
+    <Text variant="caption-3" color="secondary">
       <Trans
         i18nKey="components.terms-and-conditions.text"
         components={{
@@ -26,7 +26,7 @@ const TermsAndConditions = () => (
           ),
         }}
       />
-    </Typography>
+    </Text>
   </TextContainer>
 );
 

@@ -1,4 +1,4 @@
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -11,12 +11,12 @@ export type SectionHeaderProps = {
 const SectionHeader = ({ children, subtitle, title }: SectionHeaderProps) => (
   <Header>
     <Box>
-      <Typography variant="label-1" as="h3" sx={{ marginBottom: 1 }}>
+      <Text variant="label-1" as="h3" sx={{ marginBottom: 1 }}>
         {title}
-      </Typography>
-      <Typography variant="body-3" color="secondary">
+      </Text>
+      <Text variant="body-3" color="secondary">
         {subtitle}
-      </Typography>
+      </Text>
     </Box>
     {children}
   </Header>

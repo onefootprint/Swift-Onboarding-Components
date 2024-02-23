@@ -1,5 +1,5 @@
 import { IcoShield24, IcoStore24, IcoUsers24 } from '@onefootprint/icons';
-import { Button, RadioSelect, Typography } from '@onefootprint/ui';
+import { Button, RadioSelect, Text } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -37,12 +37,12 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
   return (
     <Container>
       <Header>
-        <Typography variant="label-1" color="secondary">
+        <Text variant="label-1" color="secondary">
           {t('title')}
-        </Typography>
-        <Typography variant="body-2" color="secondary">
+        </Text>
+        <Text variant="body-2" color="secondary">
           {t('subtitle')}
-        </Typography>
+        </Text>
       </Header>
       <Form onSubmit={handleSubmit(submit)}>
         <Controller

@@ -1,5 +1,5 @@
 import { IcoLinkedin24, IcoTwitter24 } from '@onefootprint/icons';
-import { media, Typography } from '@onefootprint/ui';
+import { media, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -19,12 +19,12 @@ type TeamProps = {
 
 const Team = ({ title, description, items }: TeamProps) => (
   <>
-    <Typography variant="display-3" as="h3" sx={{ marginBottom: 5 }}>
+    <Text variant="display-3" as="h3" sx={{ marginBottom: 5 }}>
       {title}
-    </Typography>
-    <Typography variant="body-1" sx={{ marginBottom: 7 }}>
+    </Text>
+    <Text variant="body-1" sx={{ marginBottom: 7 }}>
       {description}
-    </Typography>
+    </Text>
 
     <ItemsContainer>
       {items.map(item => (
@@ -38,10 +38,10 @@ const Team = ({ title, description, items }: TeamProps) => (
               priority
             />
           </AvatarContainer>
-          <Typography variant="heading-3">{item.name}</Typography>
-          <Typography variant="body-1" sx={{ marginBottom: 7 }}>
+          <Text variant="heading-3">{item.name}</Text>
+          <Text variant="body-1" sx={{ marginBottom: 7 }}>
             {item.role}
-          </Typography>
+          </Text>
           <SocialContainer>
             {item.twitter && (
               <Link href={item.twitter} target="_blank" rel="noreferrer">

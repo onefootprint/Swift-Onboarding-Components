@@ -1,11 +1,5 @@
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import {
-  Box,
-  Grid,
-  LoadingIndicator,
-  Stack,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Grid, LoadingIndicator, Stack, Text } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -40,7 +34,7 @@ export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
 const Timeline = ({ items, isLoading }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
   if (!isLoading && !items.length) {
-    return <Typography variant="body-4">{t('empty')}</Typography>;
+    return <Text variant="body-4">{t('empty')}</Text>;
   }
 
   return (

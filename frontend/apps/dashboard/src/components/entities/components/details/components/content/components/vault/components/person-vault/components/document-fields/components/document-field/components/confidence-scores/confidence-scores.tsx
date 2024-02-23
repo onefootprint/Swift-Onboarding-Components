@@ -1,6 +1,6 @@
 import { IcoSpeedometer24 } from '@onefootprint/icons';
 import type { Document } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -40,7 +40,7 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
     <Section>
       <LabelContainer>
         <IcoSpeedometer24 />
-        <Typography variant="label-2">{t('title')}</Typography>
+        <Text variant="label-2">{t('title')}</Text>
       </LabelContainer>
       <ScoresContainer>
         {confidenceScores.map((score, index) =>

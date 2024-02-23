@@ -1,4 +1,4 @@
-import { Banner, Typography } from '@onefootprint/ui';
+import { Banner, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,13 +29,13 @@ const SandboxBanner = () => {
             <Link href="mailto:eli@onefootprint.com">
               <button type="button">{t('contact-us')}</button>
             </Link>
-            <Typography variant="body-2" color="warning" sx={{ marginLeft: 2 }}>
+            <Text variant="body-2" color="warning" sx={{ marginLeft: 2 }}>
               {t('or')}
-            </Typography>
+            </Text>
             <ContactForm>{t('form')}</ContactForm>
-            <Typography variant="body-2" color="warning">
+            <Text variant="body-2" color="warning">
               .
-            </Typography>
+            </Text>
           </>
         )}
       </StyledBanner>

@@ -1,5 +1,5 @@
 export {
   createFontStyles,
   createOverlayBackground,
-  createTypography,
+  createText,
 } from './mixins';

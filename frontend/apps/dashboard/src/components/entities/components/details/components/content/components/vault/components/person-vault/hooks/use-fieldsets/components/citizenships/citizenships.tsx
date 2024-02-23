@@ -1,6 +1,6 @@
 import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
 import { isVaultDataDecrypted } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';
 
@@ -20,9 +20,9 @@ const Citizenships = ({ di, entity }: CitizenshipsType) => (
       if (value && isVaultDataDecrypted(value)) {
         const citizenships = getFormattedCountryLabels(value);
         return (
-          <Typography variant="body-3" color="primary">
+          <Text variant="body-3" color="primary">
             {citizenships}
-          </Typography>
+          </Text>
         );
       }
       return <EncryptedCell />;

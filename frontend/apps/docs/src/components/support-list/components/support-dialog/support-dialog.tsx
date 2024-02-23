@@ -1,9 +1,9 @@
 import {
   Dialog,
   Grid,
+  Text,
   TextArea,
   TextInput,
-  Typography,
   useToast,
 } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
@@ -97,11 +97,11 @@ const SupportDialog = ({
         onSubmit={handleSubmit(onSubmit)}
       >
         {submitFormMutation.isError && (
-          <Typography variant="body-2" color="error">
+          <Text variant="body-2" color="error">
             {t('form.submit-error')}
-          </Typography>
+          </Text>
         )}
-        <Typography variant="body-2">{description}</Typography>
+        <Text variant="body-2">{description}</Text>
         <TextInput
           hasError={!!errors.name}
           hint={getNameHint()}

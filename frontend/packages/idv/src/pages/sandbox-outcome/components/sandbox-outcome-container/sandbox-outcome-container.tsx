@@ -1,6 +1,6 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome } from '@onefootprint/types';
-import { Button, Grid, InlineAlert, Typography } from '@onefootprint/ui';
+import { Button, Grid, InlineAlert, Text } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -69,18 +69,18 @@ export const SandboxOutcomeContainer = ({
             )}
             {watchIdDocOutcome?.value === IdDocOutcome.real && (
               <InlineAlert variant="info">
-                <Typography variant="body-3" color="info">
+                <Text variant="body-3" color="info">
                   {t('id-doc-outcome.real-outcome.description')}
-                </Typography>
+                </Text>
               </InlineAlert>
             )}
             {watchIdDocOutcome?.value === IdDocOutcome.fail && (
               <InlineAlert variant="info">
-                <Typography variant="body-3" color="info">
+                <Text variant="body-3" color="info">
                   {t(
                     'id-doc-outcome.simulated-outcome.options.fail.description',
                   )}
-                </Typography>
+                </Text>
               </InlineAlert>
             )}
             <TestIdInput />

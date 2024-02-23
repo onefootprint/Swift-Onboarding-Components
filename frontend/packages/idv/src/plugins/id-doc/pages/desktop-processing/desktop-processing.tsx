@@ -1,7 +1,7 @@
 import { useRequestError } from '@onefootprint/request';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
-import { Button, media, Typography } from '@onefootprint/ui';
+import { Button, media, Text } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -197,9 +197,9 @@ const DeskTopProcessing = () => {
 
   if (isMissingRequirements) {
     return (
-      <Typography variant="label-1" color="error" sx={{ textAlign: 'center' }}>
+      <Text variant="label-1" color="error" sx={{ textAlign: 'center' }}>
         {t('missing-requirement-error')}
-      </Typography>
+      </Text>
     );
   }
   if (retryLimitExceeded) return <RetryLimitExceeded />;

@@ -1,4 +1,4 @@
-import { Container, media, Typography } from '@onefootprint/ui';
+import { Container, media, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,13 +27,9 @@ const MarkdownLayout = ({ children, meta }: MarkdownLayoutProps) => {
       <Container>
         <Inner>
           <Header>
-            <Typography
-              variant="display-2"
-              color="primary"
-              sx={{ marginBottom: 5 }}
-            >
+            <Text variant="display-2" color="primary" sx={{ marginBottom: 5 }}>
               {t(meta.titleKey as ParseKeys<'common'>)}
-            </Typography>
+            </Text>
           </Header>
           <Article>{children}</Article>
         </Inner>

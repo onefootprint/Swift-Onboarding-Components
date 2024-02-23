@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoDatabase24, IcoStore24, IcoUser24 } from '@onefootprint/icons';
-import { Dialog, Stack, Typography, useToast } from '@onefootprint/ui';
+import { Dialog, Stack, Text, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -88,10 +88,10 @@ const Tenants = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Stack gap={2} marginBottom={7} direction="column">
-        <Typography variant="heading-2">{t('title')}</Typography>
-        <Typography variant="body-2" color="secondary">
+        <Text variant="heading-2">{t('title')}</Text>
+        <Text variant="body-2" color="secondary">
           {t('subtitle')}
-        </Typography>
+        </Text>
       </Stack>
       <Stack direction="row" flexWrap="wrap" gap={5} width="100%">
         {tools.map(tool => (

@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
-import { createTypography } from '../../utils/mixins';
+import { createText } from '../../utils/mixins';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
 
 type IconPosition = 'left' | 'right';
@@ -110,7 +110,7 @@ export const LinkButtonStyled = styled.a.attrs<{
     } = theme;
 
     return css`
-      ${createTypography(linkButton.size[size].typography)}
+      ${createText(linkButton.size[size].typography)}
       align-items: center;
       background: transparent;
       border: none;

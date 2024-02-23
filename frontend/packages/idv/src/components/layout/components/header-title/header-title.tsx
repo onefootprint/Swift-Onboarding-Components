@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import type { SXStyleProps } from '@onefootprint/ui';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -35,18 +35,13 @@ const HeaderTitle = ({
       </IconContainer>
     )}
     <Stack direction="column" align="center" gap={3}>
-      <Typography
-        as="h2"
-        color="primary"
-        variant="heading-3"
-        id={titleElementId}
-      >
+      <Text as="h2" color="primary" variant="heading-3" id={titleElementId}>
         {title}
-      </Typography>
+      </Text>
       {subtitle && (
-        <Typography variant="body-2" color="secondary" as="h3">
+        <Text variant="body-2" color="secondary" as="h3">
           {subtitle}
-        </Typography>
+        </Text>
       )}
     </Stack>
   </Stack>

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Typography from '../typography';
+import Text from '../text';
 
 export type BreadcrumbItemProps = {
   as?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -14,14 +14,14 @@ const BreadcrumbItem = ({ as, href, children }: BreadcrumbItemProps) => {
   return hasLink ? (
     <li>
       <Anchor href={href} as={as}>
-        <Typography color="tertiary" variant="body-3">
+        <Text color="tertiary" variant="body-3">
           {children}
-        </Typography>
+        </Text>
       </Anchor>
     </li>
   ) : (
     <li>
-      <Typography variant="label-3">{children}</Typography>
+      <Text variant="label-3">{children}</Text>
     </li>
   );
 };

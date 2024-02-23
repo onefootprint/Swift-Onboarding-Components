@@ -1,4 +1,4 @@
-import { Button, TextInput, Typography } from '@onefootprint/ui';
+import { Button, Text, TextInput } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -57,12 +57,12 @@ const NameYourPlaybook = ({
       <FormProvider {...formMethods}>
         <Form id="your-playbook-form" onSubmit={handleSubmit(onSubmit)}>
           <Header>
-            <Typography variant="label-1" color="secondary">
+            <Text variant="label-1" color="secondary">
               {t('title')}
-            </Typography>
-            <Typography variant="body-2" color="secondary">
+            </Text>
+            <Text variant="body-2" color="secondary">
               {t('subtitle')}
-            </Typography>
+            </Text>
           </Header>
           <NameContainer>
             <TextInput
@@ -75,9 +75,9 @@ const NameYourPlaybook = ({
               placeholder={placeholder}
             />
             {errors.name && (
-              <Typography variant="body-3" color="error">
+              <Text variant="body-3" color="error">
                 {t('form.errors.required')}
-              </Typography>
+              </Text>
             )}
           </NameContainer>
           <ButtonContainer>

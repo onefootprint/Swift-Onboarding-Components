@@ -1,10 +1,5 @@
 import { IcoChevronRight16 } from '@onefootprint/icons';
-import {
-  Box,
-  CodeInline,
-  createFontStyles,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, CodeInline, createFontStyles, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
@@ -96,9 +91,9 @@ const ObjectProperties = ({
               {title}
             </CodeInline>
             <Separator>·</Separator>
-            <Typography variant="snippet-3" color="quaternary">
+            <Text variant="snippet-3" color="quaternary">
               {typeLabel}
-            </Typography>
+            </Text>
           </Button>
         </Header>
         {hasDescription && (

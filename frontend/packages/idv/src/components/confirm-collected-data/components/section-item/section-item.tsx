@@ -1,5 +1,5 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,13 +15,13 @@ const SectionItem = ({
   textColor = 'tertiary',
 }: SectionItemProps) => (
   <Container>
-    <Typography variant="label-3" color={textColor} isPrivate>
+    <Text variant="label-3" color={textColor} isPrivate>
       {text}
-    </Typography>
+    </Text>
     {subtext && (
-      <Typography variant="body-3" isPrivate>
+      <Text variant="body-3" isPrivate>
         {subtext}
-      </Typography>
+      </Text>
     )}
   </Container>
 );

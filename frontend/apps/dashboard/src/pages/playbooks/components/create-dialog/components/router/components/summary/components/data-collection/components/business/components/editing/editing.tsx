@@ -1,5 +1,5 @@
 import { CollectedKybDataOption } from '@onefootprint/types';
-import { Button, Toggle, Typography } from '@onefootprint/ui';
+import { Button, Text, Toggle } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +29,8 @@ const Editing = ({ onStopEditing }: EditingProps) => {
   return (
     <EditingContainer>
       <Section>
-        <Typography variant="label-2">{t('business-information')}</Typography>
-        <Typography variant="label-3">
-          {t('legal-entity-type.title')}
-        </Typography>
+        <Text variant="label-2">{t('business-information')}</Text>
+        <Text variant="label-3">{t('legal-entity-type.title')}</Text>
         <Controller
           control={control}
           name={`businessInformation.${CollectedKybDataOption.corporationType}`}
@@ -51,7 +49,7 @@ const Editing = ({ onStopEditing }: EditingProps) => {
         />
       </Section>
       <Section>
-        <Typography variant="label-3">{t('website.title')}</Typography>
+        <Text variant="label-3">{t('website.title')}</Text>
         <Controller
           control={control}
           name={`businessInformation.${CollectedKybDataOption.website}`}
@@ -71,7 +69,7 @@ const Editing = ({ onStopEditing }: EditingProps) => {
         />
       </Section>
       <Section>
-        <Typography variant="label-3">{t('phone-number.title')}</Typography>
+        <Text variant="label-3">{t('phone-number.title')}</Text>
         <Controller
           control={control}
           name={`businessInformation.${CollectedKybDataOption.phoneNumber}`}

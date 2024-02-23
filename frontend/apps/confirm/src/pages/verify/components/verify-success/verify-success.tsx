@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -7,12 +7,12 @@ const VerifySuccess = () => {
 
   return (
     <>
-      <Typography color="primary" variant="heading-3" sx={{ marginBottom: 5 }}>
+      <Text color="primary" variant="heading-3" sx={{ marginBottom: 5 }}>
         {t('title')}
-      </Typography>
-      <Typography color="secondary" variant="body-2">
+      </Text>
+      <Text color="secondary" variant="body-2">
         {t('description')}
-      </Typography>
+      </Text>
     </>
   );
 };

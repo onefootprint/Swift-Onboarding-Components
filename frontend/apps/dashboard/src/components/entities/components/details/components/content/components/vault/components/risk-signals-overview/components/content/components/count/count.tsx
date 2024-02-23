@@ -1,5 +1,5 @@
 import type { RiskSignal } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -21,43 +21,43 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
 
   if (hasOnlyLowRisks) {
     return (
-      <Typography variant="label-3">
+      <Text variant="label-3">
         <Trans
           components={{ a: <Intensity data-level="low" /> }}
           count={low.length}
           i18nKey="pages.entity.risks.low"
         />
-      </Typography>
+      </Text>
     );
   }
 
   if (hasOnlyMediumRisks) {
     return (
-      <Typography variant="label-3">
+      <Text variant="label-3">
         <Trans
           components={{ a: <Intensity data-level="medium" /> }}
           count={medium.length}
           i18nKey="pages.entity.risks.medium"
         />
-      </Typography>
+      </Text>
     );
   }
 
   if (hasOnlyHighRisks) {
     return (
-      <Typography variant="label-3">
+      <Text variant="label-3">
         <Trans
           components={{ a: <Intensity data-level="high" /> }}
           count={high.length}
           i18nKey="pages.entity.risks.high"
         />
-      </Typography>
+      </Text>
     );
   }
 
   if (hasLowRisks && hasMediumRisks && hasHighRisks) {
     return (
-      <Typography variant="label-3">
+      <Text variant="label-3">
         <Trans
           components={{
             a: <Intensity data-level="high" />,
@@ -72,13 +72,13 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
             highCount: high.length,
           }}
         />
-      </Typography>
+      </Text>
     );
   }
 
   if (hasLowRisks && hasMediumRisks) {
     return (
-      <Typography variant="label-3">
+      <Text variant="label-3">
         <Trans
           components={{
             a: <Intensity data-level="medium" />,
@@ -88,13 +88,13 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
           i18nKey="pages.entity.risks.low-medium"
           values={{ lowCount: low.length, mediumCount: medium.length }}
         />
-      </Typography>
+      </Text>
     );
   }
 
   if (hasLowRisks && hasHighRisks) {
     return (
-      <Typography variant="label-3">
+      <Text variant="label-3">
         <Trans
           components={{
             a: <Intensity data-level="medium" />,
@@ -104,13 +104,13 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
           i18nKey="pages.entity.risks.low-high"
           values={{ lowCount: low.length, highCount: high.length }}
         />
-      </Typography>
+      </Text>
     );
   }
 
   if (hasMediumRisks && hasHighRisks) {
     return (
-      <Typography variant="label-3">
+      <Text variant="label-3">
         <Trans
           components={{
             a: <Intensity data-level="high" />,
@@ -120,11 +120,11 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
           i18nKey="pages.entity.risks.medium-high"
           values={{ mediumCount: medium.length, highCount: high.length }}
         />
-      </Typography>
+      </Text>
     );
   }
 
-  return <Typography variant="label-3">{t('empty-state')}</Typography>;
+  return <Text variant="label-3">{t('empty-state')}</Text>;
 };
 
 const Intensity = styled.strong`

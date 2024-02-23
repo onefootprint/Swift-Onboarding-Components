@@ -1,5 +1,5 @@
 import { IcoQuoteLeft16 } from '@onefootprint/icons';
-import { Box, LinkButton, Stack, Typography } from '@onefootprint/ui';
+import { Box, LinkButton, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -33,12 +33,12 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
     <Container>
       <Header>
         <TitleContainer>
-          <Typography variant="label-3">
+          <Text variant="label-3">
             {author && t('title-by-author', { author })}
-          </Typography>
-          <Typography variant="label-3" sx={{ marginLeft: 2 }}>
+          </Text>
+          <Text variant="label-3" sx={{ marginLeft: 2 }}>
             &middot;
-          </Typography>
+          </Text>
           <LinkButton
             sx={{ marginLeft: 2 }}
             onClick={() => handleUnpinNote(noteId)}
@@ -47,9 +47,9 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
             {t('unpin-button-text')}
           </LinkButton>
         </TitleContainer>
-        <Typography variant="body-3" color="secondary">
+        <Text variant="body-3" color="secondary">
           {timestamp}
-        </Typography>
+        </Text>
       </Header>
       <Stack>
         <Box as="span" width="fit-content">

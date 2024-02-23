@@ -2,7 +2,7 @@ import { IcoChevronDown16 } from '@onefootprint/icons';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../../utils/mixins';
+import { createText } from '../../../utils/mixins';
 import Stack from '../../stack';
 
 type BaseSelectTriggerProps = {
@@ -80,13 +80,13 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
       width: 100%;
 
       &[data-size='default'] {
-        ${createTypography(input.size.default.typography)};
+        ${createText(input.size.default.typography)};
         height: ${input.size.default.height};
         padding: 0 ${theme.spacing[5]};
       }
 
       &[data-size='compact'] {
-        ${createTypography(input.size.compact.typography)};
+        ${createText(input.size.compact.typography)};
         height: ${input.size.compact.height};
         padding: 0 ${theme.spacing[4]};
       }

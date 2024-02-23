@@ -8,8 +8,8 @@ import styled, { css } from 'styled-components';
 import { createFontStyles } from '../../utils';
 import type { LabelTooltipProps } from '../label';
 import Shimmer from '../shimmer';
+import Text from '../text';
 import Tooltip from '../tooltip';
-import Typography from '../typography';
 import TableFilters from './components/table-filters';
 
 export type TableRow<T> = {
@@ -136,7 +136,7 @@ const Table = <T,>({
             {shouldShowEmptyState && (
               <EmptyTr>
                 <td colSpan={columns.length}>
-                  <Typography variant="body-3">{emptyStateText}</Typography>
+                  <Text variant="body-3">{emptyStateText}</Text>
                 </td>
               </EmptyTr>
             )}

@@ -1,5 +1,5 @@
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -12,9 +12,9 @@ const LivenessSuccess = () => {
   return (
     <IconContainer>
       <IcoCheckCircle40 color="success" />
-      <Typography variant="label-3" color="success">
+      <Text variant="label-3" color="success">
         {t('label')}
-      </Typography>
+      </Text>
     </IconContainer>
   );
 };

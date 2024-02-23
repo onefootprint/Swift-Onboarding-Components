@@ -5,7 +5,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import IconButton from '../../../icon-button';
-import Typography from '../../../typography';
+import Text from '../../../text';
 
 type HeaderProps = {
   closeAriaLabel?: string;
@@ -29,9 +29,9 @@ const Header = ({
       </DrawerPrimitive.Close>
     </CloseContainer>
     <DrawerPrimitive.Title asChild>
-      <Typography variant="label-2" as="h2">
+      <Text variant="label-2" as="h2">
         {children}
-      </Typography>
+      </Text>
     </DrawerPrimitive.Title>
   </Container>
 );

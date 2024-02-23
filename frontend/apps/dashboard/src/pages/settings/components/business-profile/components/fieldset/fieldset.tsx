@@ -1,4 +1,4 @@
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
 
 export type FieldsetProps = {
@@ -8,10 +8,10 @@ export type FieldsetProps = {
 
 const Fieldset = ({ label, value }: FieldsetProps) => (
   <Box>
-    <Typography variant="label-3" color="tertiary" sx={{ marginBottom: 2 }}>
+    <Text variant="label-3" color="tertiary" sx={{ marginBottom: 2 }}>
       {label}
-    </Typography>
-    <Typography variant="body-3">{value}</Typography>
+    </Text>
+    <Text variant="body-3">{value}</Text>
   </Box>
 );
 

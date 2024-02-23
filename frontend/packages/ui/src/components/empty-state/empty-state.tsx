@@ -4,7 +4,7 @@ import React from 'react';
 import Box from '../box';
 import Button from '../button';
 import Stack from '../stack';
-import Typography from '../typography';
+import Text from '../text';
 
 type OnlyIcon = {
   iconComponent: Icon;
@@ -48,12 +48,12 @@ const EmptyState = ({
       </Box>
     )}
     {renderHeader && <Box marginBottom={7}>{renderHeader()}</Box>}
-    <Typography variant="label-1" sx={{ marginBottom: 4 }}>
+    <Text variant="label-1" sx={{ marginBottom: 4 }}>
       {title}
-    </Typography>
-    <Typography variant="body-2" color="secondary">
+    </Text>
+    <Text variant="body-2" color="secondary">
       {description}
-    </Typography>
+    </Text>
     {cta && (
       <Button onClick={cta.onClick} sx={{ marginTop: 8 }}>
         {cta.label}

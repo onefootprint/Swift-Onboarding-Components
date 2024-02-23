@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 
 type TitleProps = {
@@ -6,12 +6,12 @@ type TitleProps = {
 };
 
 const Title = ({ children }: TitleProps) => (
-  <Typography
+  <Text
     variant="heading-2"
     sx={{ textAlign: 'left', width: '100%', margin: 4 }}
   >
     {children}
-  </Typography>
+  </Text>
 );
 
 export default Title;

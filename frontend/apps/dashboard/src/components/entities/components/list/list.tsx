@@ -1,6 +1,6 @@
 import type { Entity } from '@onefootprint/types';
 import { EntityKind } from '@onefootprint/types';
-import { Pagination, Typography } from '@onefootprint/ui';
+import { Pagination, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
@@ -59,13 +59,13 @@ const List = ({
       onRowClick={handleRowClick}
       onSearchChange={handleSearchChange}
     >
-      <Typography variant="heading-2" sx={{ marginBottom: subtitle ? 2 : 5 }}>
+      <Text variant="heading-2" sx={{ marginBottom: subtitle ? 2 : 5 }}>
         {title}
-      </Typography>
+      </Text>
       {subtitle && (
-        <Typography variant="body-2" color="secondary" sx={{ marginBottom: 7 }}>
+        <Text variant="body-2" color="secondary" sx={{ marginBottom: 7 }}>
           {subtitle}
-        </Typography>
+        </Text>
       )}
       {children}
       {response && response.meta.count > 0 && (

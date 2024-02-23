@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 
 type FeatureCardProps = {
@@ -23,11 +23,11 @@ const FeatureCard = ({ title, subtitle, icon: Icon }: FeatureCardProps) => {
     >
       <Stack direction="row" gap={3} align="center" justify="start">
         {renderedIcon}
-        <Typography variant="label-4">{title}</Typography>
+        <Text variant="label-4">{title}</Text>
       </Stack>
-      <Typography variant="body-4" color="secondary">
+      <Text variant="body-4" color="secondary">
         {subtitle}
-      </Typography>
+      </Text>
     </Stack>
   );
 };

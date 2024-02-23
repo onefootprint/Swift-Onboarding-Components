@@ -3,7 +3,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Stack from '../stack';
-import Typography from '../typography';
+import Text from '../text';
 import type {
   GroupedRadioSelectOptionFields,
   RadioSelectOptionFields,
@@ -30,12 +30,12 @@ const RadioSelect = ({
       if ('label' in option) {
         return (
           <GroupContainer key={option.label} direction="column" gap={4}>
-            <Typography
+            <Text
               variant={size === 'compact' ? 'label-3' : 'label-2'}
               color="secondary"
             >
               {option.label}
-            </Typography>
+            </Text>
             {option.options.map(subOption => (
               <RadioSelectOption
                 key={subOption.value}

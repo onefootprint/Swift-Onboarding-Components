@@ -1,4 +1,4 @@
-import { Badge, createFontStyles, Typography } from '@onefootprint/ui';
+import { Badge, createFontStyles, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -29,9 +29,9 @@ const Responses = ({ responses }: ResponsesProps) => {
               {schema?.type && (
                 <>
                   <Separator>·</Separator>
-                  <Typography variant="snippet-3" color="quaternary">
+                  <Text variant="snippet-3" color="quaternary">
                     {schema?.type}
-                  </Typography>
+                  </Text>
                 </>
               )}
             </Header>

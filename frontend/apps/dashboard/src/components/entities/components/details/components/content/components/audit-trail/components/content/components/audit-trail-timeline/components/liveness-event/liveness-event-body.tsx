@@ -1,5 +1,5 @@
 import type { LivenessEventData } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import capitalize from 'lodash/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,9 +29,9 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
               {t('attested-by')}
               {issuers?.map((issuer, i) => (
                 <>
-                  <Typography variant="label-3" sx={{ marginX: 2 }}>
+                  <Text variant="label-3" sx={{ marginX: 2 }}>
                     {capitalize(issuer)}
-                  </Typography>
+                  </Text>
                   {i === issuers.length - 1 ? '' : ' and '}
                 </>
               ))}
@@ -44,9 +44,9 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
           content={
             <>
               {t('device-os')}
-              <Typography variant="label-3" sx={{ marginLeft: 2 }}>
+              <Text variant="label-3" sx={{ marginLeft: 2 }}>
                 {`${device} (${os ?? ''})`}
-              </Typography>
+              </Text>
             </>
           }
         />
@@ -56,9 +56,9 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
           content={
             <>
               {t('ip-address')}
-              <Typography variant="label-3" sx={{ marginLeft: 2 }}>
+              <Text variant="label-3" sx={{ marginLeft: 2 }}>
                 {ipAddress}
-              </Typography>
+              </Text>
             </>
           }
         />

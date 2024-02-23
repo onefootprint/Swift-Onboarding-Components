@@ -1,10 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import {
-  createFontStyles,
-  LinkButton,
-  media,
-  Typography,
-} from '@onefootprint/ui';
+import { createFontStyles, LinkButton, media, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -33,12 +28,12 @@ const FeatureCard = ({
     {children}
     <TextContainer>
       <Title size={size}>{title}</Title>
-      <Typography
+      <Text
         variant={size === 'compact' ? 'body-2' : 'body-1'}
         color="secondary"
       >
         {subtitle}
-      </Typography>
+      </Text>
       {cta && (
         <LinkButton
           iconComponent={IcoArrowRightSmall16}

@@ -1,5 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -15,67 +15,67 @@ const Preview = () => {
     <Container>
       <div>
         <MarginBottom>
-          <Typography variant="label-3" color="primary">
+          <Text variant="label-3" color="primary">
             {t('signup')}
-          </Typography>
-          <Typography variant="body-4" color="secondary">
+          </Text>
+          <Text variant="body-4" color="secondary">
             {t('signup-method')}
-          </Typography>
+          </Text>
         </MarginBottom>
 
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
-          <Typography variant="body-4" color="primary">
+          <Text variant="body-4" color="primary">
             {t('names')}
-          </Typography>
+          </Text>
         </Topic>
 
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
           <div>
-            <Typography variant="body-4" color="primary">
+            <Text variant="body-4" color="primary">
               {t('email')}
-            </Typography>
-            <Typography variant="body-4" color="tertiary">
+            </Text>
+            <Text variant="body-4" color="tertiary">
               {t('email-validation-method')}
-            </Typography>
+            </Text>
           </div>
         </Topic>
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
           <div>
-            <Typography variant="body-4" color="primary">
+            <Text variant="body-4" color="primary">
               {t('phone-number')}
-            </Typography>
-            <Typography variant="body-4" color="tertiary">
+            </Text>
+            <Text variant="body-4" color="tertiary">
               {t('sms-validation-method')}
-            </Typography>
+            </Text>
           </div>
         </Topic>
       </div>
 
       <div>
         <MarginBottom>
-          <Typography variant="label-3" color="primary">
+          <Text variant="label-3" color="primary">
             {t('signin')}
-          </Typography>
-          <Typography variant="body-4" color="secondary">
+          </Text>
+          <Text variant="body-4" color="secondary">
             {t('signin-method')}
-          </Typography>
+          </Text>
         </MarginBottom>
 
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
-          <Typography variant="body-4" color="primary">
+          <Text variant="body-4" color="primary">
             {t('code-sending')}
-          </Typography>
+          </Text>
         </Topic>
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
           <div>
-            <Typography variant="body-4" color="primary">
+            <Text variant="body-4" color="primary">
               {t('passkeys')}
-            </Typography>
+            </Text>
             <Paragraph>
               {t('passkeys-availability')}
               <PopOver

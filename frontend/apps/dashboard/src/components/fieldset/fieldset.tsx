@@ -1,4 +1,4 @@
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -14,9 +14,9 @@ export type FieldsetProps = {
 const Fieldset = ({ children, cta, title }: FieldsetProps) => (
   <FieldsetContainer aria-label={title}>
     <Header>
-      <Typography variant="label-2" as="div">
+      <Text variant="label-2" as="div">
         {title}
-      </Typography>
+      </Text>
       {cta && (
         <LinkButton size="compact" onClick={cta.onClick}>
           {cta.label}

@@ -5,7 +5,7 @@ import {
   CodeInline,
   InlineAlert,
   media,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
@@ -46,14 +46,14 @@ const LeftPane = ({
   return (
     <Left>
       <Content>
-        <Typography variant="heading-3" sx={{ marginBottom: 4 }} as="h2">
+        <Text variant="heading-3" sx={{ marginBottom: 4 }} as="h2">
           Welcome to Footprint, {tenantName}! 👋
-        </Typography>
-        <Typography variant="body-2" sx={{ marginBottom: 7 }} as="h3">
+        </Text>
+        <Text variant="body-2" sx={{ marginBottom: 7 }} as="h3">
           {`This is a step-by-step guide on how to integrate Footprint Components into your
             product as well as customize it to match your brand's look and feel.`}
-        </Typography>
-        <Typography variant="body-2">
+        </Text>
+        <Text variant="body-2">
           1. Go to the{` `}
           <Link
             href="https://dashboard.onefootprint.com/developers?tab=api_keys"
@@ -64,26 +64,24 @@ const LeftPane = ({
           {` `}
           and get or create a new Secret API Key with permissions to
           &quot;Create and update users&quot;.
-        </Typography>
+        </Text>
         <InlineAlert variant="warning">
           Treat this key like a sensitive password! Your API keys carry many
           privileges, so be sure to keep them secure! Do not post your secret
           keys in publicly accessible places like GitHub or client-side code
           like web front-ends.
         </InlineAlert>
-        <Typography variant="body-2" sx={{ display: 'flex', gap: 3 }}>
+        <Text variant="body-2" sx={{ display: 'flex', gap: 3 }}>
           2. Grab the Secret API Key:{` `}
           <CodeInline>{secretKey}</CodeInline>
-        </Typography>
-        <Typography variant="body-2">
-          3. Install Footprint dependencies:
-        </Typography>
+        </Text>
+        <Text variant="body-2">3. Install Footprint dependencies:</Text>
         {framework === 'react' ? (
           <CodeBlock language="bash">{reactInstallation}</CodeBlock>
         ) : (
           <CodeBlock language="bash">{jsInstallation}</CodeBlock>
         )}
-        <Typography variant="body-2">
+        <Text variant="body-2">
           4. Generate a Footprint user vault (if needed). More details on how to
           create a new vault can be found{` `}
           <Link
@@ -93,10 +91,10 @@ const LeftPane = ({
             here
           </Link>
           .
-        </Typography>
-        <Typography variant="body-2">
+        </Text>
+        <Text variant="body-2">
           5. Generate an auth token using your secret token & footprint user ID:
-        </Typography>
+        </Text>
         <CodeBlock language="bash">
           {getAuthTokenRequest({
             secretKey,
@@ -105,25 +103,23 @@ const LeftPane = ({
             ttl: 1800,
           })}
         </CodeBlock>
-        <Typography variant="body-2">
-          A sample response can be found below:
-        </Typography>
+        <Text variant="body-2">A sample response can be found below:</Text>
         <CodeBlock language="json">{getAuthTokenResponse()}</CodeBlock>
-        <Typography variant="body-2">
+        <Text variant="body-2">
           {' '}
           The token returned will need to be passed into the Footprint component
           in the next step.
-        </Typography>
-        <Typography variant="body-2">
+        </Text>
+        <Text variant="body-2">
           6. To use your brand styles, create a file named config.ts and add to
           it the content you see below. This is an initial version, but it
           should already be very close to your brand&apos;s look and feel. Feel
           free to adjust as you wish.
-        </Typography>
+        </Text>
         <CodeBlock language="typescript">
           {getCustomization({ appearance })}
         </CodeBlock>
-        <Typography variant="body-2">7. Now, add to your app:</Typography>
+        <Text variant="body-2">7. Now, add to your app:</Text>
         {framework === 'react' && (
           <CodeBlock language="typescript">{getReactIntegration()}</CodeBlock>
         )}
@@ -132,16 +128,16 @@ const LeftPane = ({
         )}
         {customCSS && (
           <>
-            <Typography variant="body-2">
+            <Text variant="body-2">
               8. Last but not least, create an app.css file and add it to it the
               content you see below. This is the code responsible for handling
               the smooth drawer animation, and it lives in your page, not in the
               iframe.
-            </Typography>
+            </Text>
             <CodeBlock language="css">{customCSS}</CodeBlock>
           </>
         )}
-        <Typography variant="body-2" as="span">
+        <Text variant="body-2" as="span">
           When the user&apos;s card data has been successfully saved to
           Footprint, the onSave callback will be called. Later, you can decrypt
           the data from Footprint, more info can be found{' '}
@@ -151,7 +147,7 @@ const LeftPane = ({
           >
             here
           </Link>
-        </Typography>
+        </Text>
       </Content>
       <MobileButtonContainer>
         <Button onClick={onLaunch}>Submit Payment</Button>

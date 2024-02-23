@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,13 +15,13 @@ const InstructionItems = ({ items }: InstructionItemsProps) => (
           <Icon color="primary" />
         </IconContainer>
         <Stack direction="column" gap={3}>
-          <Typography color="primary" variant="label-3">
+          <Text color="primary" variant="label-3">
             {title}
-          </Typography>
+          </Text>
           {description && (
-            <Typography color="secondary" variant="body-3">
+            <Text color="secondary" variant="body-3">
               {description}
-            </Typography>
+            </Text>
           )}
         </Stack>
       </Item>

@@ -3,7 +3,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import { type OrgFrequentNoteKind, RoleScopeKind } from '@onefootprint/types';
 import {
   Box,
-  createTypography,
+  createText,
   LinkButton,
   Stack,
   TextArea as UnstyledTextArea,
@@ -229,7 +229,7 @@ const Title = styled.div`
   ${({ theme }) => {
     const { label } = theme.components;
     return css`
-      ${createTypography(label.size.default.typography)}
+      ${createText(label.size.default.typography)}
       color: ${label.states.default.color};
     `;
   }}

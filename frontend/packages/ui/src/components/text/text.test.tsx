@@ -3,36 +3,32 @@ import '../../config/initializers/i18next-test';
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Typography from './typography';
+import Text from './text';
 
-describe('<Typography />', () => {
+describe('<Text />', () => {
   it('should render the content', () => {
     customRender(
-      <Typography variant="caption-2" color="primary">
+      <Text variant="caption-2" color="primary">
         foo
-      </Typography>,
+      </Text>,
     );
     expect(screen.getByText('foo')).toBeInTheDocument();
   });
 
   it('should assign a testID', () => {
     customRender(
-      <Typography
-        variant="display-1"
-        color="primary"
-        testID="typography-test-id"
-      >
+      <Text variant="display-1" color="primary" testID="typography-test-id">
         foo
-      </Typography>,
+      </Text>,
     );
     expect(screen.getByTestId('typography-test-id')).toBeInTheDocument();
   });
 
   it('should assign an ID', () => {
     customRender(
-      <Typography variant="display-1" color="primary" id="typography-id">
+      <Text variant="display-1" color="primary" id="typography-id">
         foo
-      </Typography>,
+      </Text>,
     );
     expect(screen.getByText('foo').id).toEqual('typography-id');
   });

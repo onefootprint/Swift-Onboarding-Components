@@ -1,5 +1,5 @@
 import { IcoFootprint16 } from '@onefootprint/icons';
-import { media, Typography } from '@onefootprint/ui';
+import { media, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -15,14 +15,14 @@ const SecuredByFootprint = () => {
         <IcoFootprint16 />
       </IconContainer>
       <MobileTextContainer>
-        <Typography variant="caption-1" color="secondary">
+        <Text variant="caption-1" color="secondary">
           {t('mobile-label')}
-        </Typography>
+        </Text>
       </MobileTextContainer>
       <DesktopTextContainer>
-        <Typography variant="caption-1" color="secondary">
+        <Text variant="caption-1" color="secondary">
           {t('desktop-label')}
-        </Typography>
+        </Text>
       </DesktopTextContainer>
     </Container>
   );

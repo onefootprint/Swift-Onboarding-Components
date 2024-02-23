@@ -5,7 +5,7 @@ import styled, { css, useTheme } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import CopyButton from '../copy-button';
-import Typography from '../typography';
+import Text from '../text';
 
 export type CodeBlockProps = {
   title?: string;
@@ -29,7 +29,7 @@ const CodeBlock = ({
   return (
     <Container>
       <Header>
-        <Typography variant="label-3">{title || language}</Typography>
+        <Text variant="label-3">{title || language}</Text>
         <CopyButton
           contentToCopy={children}
           tooltipText={

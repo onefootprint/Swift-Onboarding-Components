@@ -4,7 +4,7 @@ import {
   isVaultDataDecrypted,
   isVaultDataText,
 } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';
 
@@ -24,9 +24,9 @@ const SSN = ({ di, entity }: SSNType) =>
       renderValue={value => {
         if (isVaultDataDecrypted(value) && isVaultDataText(value)) {
           return (
-            <Typography variant="body-3" color="primary">
+            <Text variant="body-3" color="primary">
               {ssnFormatter(value)}
-            </Typography>
+            </Text>
           );
         }
         return <EncryptedCell />;

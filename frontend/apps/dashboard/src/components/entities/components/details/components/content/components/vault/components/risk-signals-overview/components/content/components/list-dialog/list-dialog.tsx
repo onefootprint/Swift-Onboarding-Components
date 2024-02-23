@@ -1,6 +1,6 @@
 import type { RiskSignal } from '@onefootprint/types';
 import type { TableRow } from '@onefootprint/ui';
-import { Box, Dialog, Table, Typography } from '@onefootprint/ui';
+import { Box, Dialog, Table, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -48,9 +48,9 @@ const ListDialog = ({ riskSignals, renderCta }: ListDialogProps) => {
         onClose={handleClose}
         open={open}
       >
-        <Typography variant="body-3" sx={{ marginBottom: 6 }}>
+        <Text variant="body-3" sx={{ marginBottom: 6 }}>
           {t('risks.list-dialog.description')}
-        </Typography>
+        </Text>
         <Table<RiskSignal>
           aria-label={t('risk-signals.table.aria-label')}
           columns={columns}

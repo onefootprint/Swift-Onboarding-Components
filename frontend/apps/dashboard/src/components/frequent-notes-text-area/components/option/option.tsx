@@ -4,7 +4,7 @@ import {
   IcoPlusSmall16,
   IcoTrash16,
 } from '@onefootprint/icons';
-import { Button, createFontStyles, Stack, Typography } from '@onefootprint/ui';
+import { Button, createFontStyles, Stack, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -108,9 +108,9 @@ const Option = ({
           transition={{ duration: 0.1 }}
         >
           <ConfirmationFooter>
-            <Typography variant="body-4" color="tertiary">
+            <Text variant="body-4" color="tertiary">
               {t('warning')}
-            </Typography>
+            </Text>
             <Button size="small" onClick={handleDelete}>
               {t('delete')}
             </Button>

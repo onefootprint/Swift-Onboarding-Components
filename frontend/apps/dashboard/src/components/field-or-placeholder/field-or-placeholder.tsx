@@ -6,7 +6,7 @@ import {
   isVaultDataText,
 } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,9 +23,9 @@ const FieldOrPlaceholder = ({ data, transforms }: FieldOrPlaceholderProps) => {
 
   if (isVaultDataText(data)) {
     return (
-      <Typography isPrivate variant="body-3" color="primary">
+      <Text isPrivate variant="body-3" color="primary">
         {data}
-      </Typography>
+      </Text>
     );
   }
 
@@ -48,7 +48,7 @@ const FieldOrPlaceholder = ({ data, transforms }: FieldOrPlaceholderProps) => {
   }
 
   if (isVaultDataEmpty(data)) {
-    return <Typography variant="body-3">-</Typography>;
+    return <Text variant="body-3">-</Text>;
   }
 
   return null;

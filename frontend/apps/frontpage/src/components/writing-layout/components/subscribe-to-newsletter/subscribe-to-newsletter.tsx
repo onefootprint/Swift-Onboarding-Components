@@ -1,4 +1,4 @@
-import { Button, media, TextInput, Typography } from '@onefootprint/ui';
+import { Button, media, Text, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -28,12 +28,12 @@ const SubscribeToNewsletter = () => {
   return (
     <FormContainer>
       <FormHeader>
-        <Typography variant="heading-3" sx={{ marginBottom: 4 }}>
+        <Text variant="heading-3" sx={{ marginBottom: 4 }}>
           {t('title')}
-        </Typography>
-        <Typography variant="body-2" color="secondary">
+        </Text>
+        <Text variant="body-2" color="secondary">
           {t('description')}
-        </Typography>
+        </Text>
       </FormHeader>
       <Form onSubmit={handleSubmit(onSubmit)}>
         {!subscribeUser.isSuccess && (
@@ -60,14 +60,14 @@ const SubscribeToNewsletter = () => {
         )}
       </Form>
       {subscribeUser.isSuccess && (
-        <Typography variant="caption-1" color="tertiary">
+        <Text variant="caption-1" color="tertiary">
           {t('form.success')}
-        </Typography>
+        </Text>
       )}
       {subscribeUser.isError && (
-        <Typography variant="caption-1" color="error">
+        <Text variant="caption-1" color="error">
           {t('form.error')}
-        </Typography>
+        </Text>
       )}
     </FormContainer>
   );

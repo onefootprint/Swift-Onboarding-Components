@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { LinkButton, media, Typography } from '@onefootprint/ui';
+import { LinkButton, media, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -37,21 +37,18 @@ const InvestorUpdatePreview = ({
         )}
         <Content>
           <Header>
-            <Typography
-              variant="label-2"
-              sx={{ marginBottom: 6, marginRight: 2 }}
-            >
+            <Text variant="label-2" sx={{ marginBottom: 6, marginRight: 2 }}>
               {t('header-title-prefix', { index })}
-            </Typography>
-            <Typography variant="body-2" color="tertiary">
+            </Text>
+            <Text variant="body-2" color="tertiary">
               | {publishedAt}
-            </Typography>
+            </Text>
           </Header>
           <ArticleDetails>
-            <Typography variant="heading-1" sx={{ marginBottom: 6 }}>
+            <Text variant="heading-1" sx={{ marginBottom: 6 }}>
               {title}
-            </Typography>
-            <Typography variant="body-2">{excerpt}</Typography>
+            </Text>
+            <Text variant="body-2">{excerpt}</Text>
             <LinkButton
               sx={{ marginTop: 7, cursor: 'pointer' }}
               iconComponent={IcoArrowRightSmall16}

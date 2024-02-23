@@ -1,5 +1,5 @@
 import type { Entity } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +14,9 @@ const AbandonedEventHeader = ({ entity }: AbandonedEventHeaderProps) => {
   });
 
   return (
-    <Typography variant="label-3" color="warning">
+    <Text variant="label-3" color="warning">
       {t(`title.${entity.kind}` as ParseKeys<'common'>)}
-    </Typography>
+    </Text>
   );
 };
 

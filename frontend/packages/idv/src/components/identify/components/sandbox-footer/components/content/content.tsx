@@ -1,5 +1,5 @@
 import { OverallOutcome } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -25,21 +25,21 @@ const Content = ({ label, sandboxId, overallOutcome }: ContentProps) => {
     <Container>
       <Inner>
         <Column>
-          <Typography variant="label-4" color="tertiary">
+          <Text variant="label-4" color="tertiary">
             {label}
-          </Typography>
-          <Typography variant="label-4" color="secondary">
+          </Text>
+          <Text variant="label-4" color="secondary">
             {sandboxId}
-          </Typography>
+          </Text>
         </Column>
         {overallOutcome ? (
           <Column>
-            <Typography variant="label-4" color="tertiary">
+            <Text variant="label-4" color="tertiary">
               {t('label')}
-            </Typography>
-            <Typography variant="label-4" color="secondary">
+            </Text>
+            <Text variant="label-4" color="secondary">
               {outcomeLabels[overallOutcome]}
-            </Typography>
+            </Text>
           </Column>
         ) : (
           <Column />

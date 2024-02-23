@@ -1,6 +1,6 @@
 import type { Member } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Badge, Typography } from '@onefootprint/ui';
+import { Badge, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
@@ -29,9 +29,9 @@ const Row = ({ member }: RowProps) => {
     <>
       <Td>
         {firstName ? `${firstName} ${lastName}` : '-'}
-        <Typography variant="body-3" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           {email}
-        </Typography>
+        </Text>
       </Td>
       <Td>{lastLoginAt || '-'}</Td>
       <Td>

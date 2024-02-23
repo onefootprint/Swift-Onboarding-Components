@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
-import { Tooltip, Typography } from '@onefootprint/ui';
+import { Text, Tooltip } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,13 +46,13 @@ const Data = ({ authToken, organizations }: DataProps) => {
 
   return (
     <>
-      <Typography
+      <Text
         variant="label-1"
         color="primary"
         sx={{ marginTop: 8, marginBottom: 3, textAlign: 'center' }}
       >
         {t('title')}
-      </Typography>
+      </Text>
       <ButtonGroup>
         {organizations.map(organization => (
           <Tooltip

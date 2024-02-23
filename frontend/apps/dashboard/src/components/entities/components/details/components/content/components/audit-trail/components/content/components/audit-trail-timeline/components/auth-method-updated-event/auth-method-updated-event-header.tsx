@@ -1,5 +1,5 @@
 import type { AuthMethodUpdatedData } from '@onefootprint/types/src/data/timeline';
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ const AuthMethodUpdatedEventHeader = ({
   const actionLabel = t(action as string as ParseKeys<'common'>);
 
   return (
-    <Typography variant="body-3" color="tertiary">
+    <Text variant="body-3" color="tertiary">
       <Trans
         i18nKey={actionLabel}
         components={{
@@ -29,7 +29,7 @@ const AuthMethodUpdatedEventHeader = ({
           kind: t(`method.${kind}`),
         }}
       />
-    </Typography>
+    </Text>
   );
 };
 

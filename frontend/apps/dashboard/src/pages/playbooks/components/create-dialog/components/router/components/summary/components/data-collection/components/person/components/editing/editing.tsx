@@ -5,8 +5,8 @@ import {
   Checkbox,
   Divider,
   Radio,
+  Text,
   Toggle,
-  Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -76,9 +76,9 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
 
   const title =
     kind === PlaybookKind.Kyb ? (
-      <Typography variant="label-3">{t('editing.kyb')}</Typography>
+      <Text variant="label-3">{t('editing.kyb')}</Text>
     ) : (
-      <Typography variant="label-3">{t('editing.kyc')}</Typography>
+      <Text variant="label-3">{t('editing.kyc')}</Text>
     );
 
   return (
@@ -86,10 +86,10 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
       {showNoPhoneFlow && (
         <Section>
           {title}
-          <Typography sx={{ paddingBottom: 2 }} variant="label-1">
+          <Text sx={{ paddingBottom: 2 }} variant="label-1">
             {t('basic-information.title')}
-          </Typography>
-          <Typography variant="label-3">{t('phone.title')}</Typography>
+          </Text>
+          <Text variant="label-3">{t('phone.title')}</Text>
           <Controller
             control={control}
             name={`personal.${CollectedKycDataOption.phoneNumber}`}
@@ -110,10 +110,10 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
       )}
       <Section>
         {!showNoPhoneFlow && title}
-        <Typography sx={{ paddingBottom: 3 }} variant="label-1">
+        <Text sx={{ paddingBottom: 3 }} variant="label-1">
           {t('us-residents.title')}
-        </Typography>
-        <Typography variant="label-3">{t('ssn.title')}</Typography>
+        </Text>
+        <Text variant="label-3">{t('ssn.title')}</Text>
         <Controller
           control={control}
           name="personal.ssn"
@@ -187,14 +187,14 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         )}
       </Section>
       <Section>
-        <Typography variant="label-3">{t('us-legal-status.title')}</Typography>
+        <Text variant="label-3">{t('us-legal-status.title')}</Text>
         <Checkbox
           label={t('us-legal-status.label')}
           {...register(`personal.${CollectedKycDataOption.usLegalStatus}`)}
         />
       </Section>
       <Section>
-        <Typography variant="label-3">{t('id-doc.title')}</Typography>
+        <Text variant="label-3">{t('id-doc.title')}</Text>
         <Controller
           control={control}
           name="personal.idDoc"

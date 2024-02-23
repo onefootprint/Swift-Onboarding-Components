@@ -1,6 +1,6 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
-import { Flag, Typography } from '@onefootprint/ui';
+import { Flag, Text } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';
 import styled, { css } from 'styled-components';
@@ -31,9 +31,9 @@ const Nationality = ({ di, entity }: NationalityType) => {
           return (
             <FlagContainer>
               <Flag code={value} />
-              <Typography variant="body-3" color="primary">
+              <Text variant="body-3" color="primary">
                 {getInitialCountry(value).label}
-              </Typography>
+              </Text>
             </FlagContainer>
           );
         }

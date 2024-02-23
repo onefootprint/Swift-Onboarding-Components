@@ -1,5 +1,5 @@
 import type { Color, FontVariant } from '@onefootprint/design-tokens';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -16,7 +16,7 @@ const NavigationHeaderTitle = ({
 }: NavigationHeaderTitleProps) =>
   title ? (
     <Container>
-      <Typography
+      <Text
         variant={fontVariant || 'label-2'}
         color={fontColor || 'primary'}
         sx={{
@@ -27,7 +27,7 @@ const NavigationHeaderTitle = ({
         }}
       >
         {title}
-      </Typography>
+      </Text>
     </Container>
   ) : null;
 

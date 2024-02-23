@@ -4,7 +4,7 @@ import {
   isVaultDataEmpty,
   isVaultDataEncrypted,
 } from '@onefootprint/types';
-import { Box, Grid, Stack, Typography } from '@onefootprint/ui';
+import { Box, Grid, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
@@ -62,18 +62,18 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
 
   const renderLabel = (businessOwner: BusinessOwner) => (
     <Stack align="center" gap={2}>
-      <Typography variant="body-3" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {label}
-      </Typography>
+      </Text>
       {businessOwner.status && <StatusBadge status={businessOwner.status} />}
       {businessOwner.id && (
         <>
           <span>·</span>
-          <Typography color="accent" variant="label-4">
+          <Text color="accent" variant="label-4">
             <Link target="_blank" href={`/users/${businessOwner.id}`}>
               {t('link')}
             </Link>
-          </Typography>
+          </Text>
         </>
       )}
     </Stack>

@@ -1,4 +1,4 @@
-import { Grid, media, Stack, Typography } from '@onefootprint/ui';
+import { Grid, media, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -27,12 +27,12 @@ const Media = ({ articles }: MediaProps) => {
           paddingRight={5}
           textAlign="center"
         >
-          <Typography variant="display-2" as="h1">
+          <Text variant="display-2" as="h1">
             {t('title')}
-          </Typography>
-          <Typography variant="display-4" as="h2" color="secondary">
+          </Text>
+          <Text variant="display-4" as="h2" color="secondary">
             {t('subtitle')}
-          </Typography>
+          </Text>
         </Grid.Container>
         <Articles direction="column">
           {articles.map(article => (

@@ -1,5 +1,5 @@
 import type { ExternalIntegrationCalledData } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -19,12 +19,12 @@ const WorkflowTriggeredEventBody = ({
   return (
     <EventBodyEntry
       content={
-        <Typography variant="label-3" color="secondary">
+        <Text variant="label-3" color="secondary">
           {t('uuid')}
-          <Typography variant="body-3" color="tertiary" sx={{ marginLeft: 2 }}>
+          <Text variant="body-3" color="tertiary" sx={{ marginLeft: 2 }}>
             {data.externalId}
-          </Typography>
-        </Typography>
+          </Text>
+        </Text>
       }
     />
   );

@@ -1,5 +1,5 @@
 import { useIntl } from '@onefootprint/hooks';
-import { media, Typography } from '@onefootprint/ui';
+import { media, Text } from '@onefootprint/ui';
 import React from 'react';
 import type { PostDetails } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
@@ -26,9 +26,9 @@ const Card = ({
   return (
     <Container id={post.slug} blurColor={blurColor}>
       <DateDesktop>
-        <Typography variant="label-3" color="tertiary">
+        <Text variant="label-3" color="tertiary">
           {formattedDate}
-        </Typography>
+        </Text>
       </DateDesktop>
       <Progress active={post.featured} showLine={showLine} />
       <Content>

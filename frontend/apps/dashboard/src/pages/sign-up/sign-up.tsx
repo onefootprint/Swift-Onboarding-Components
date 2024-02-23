@@ -1,5 +1,5 @@
 import { LogoFpDefault } from '@onefootprint/icons';
-import { Button, GoogleButton, Typography } from '@onefootprint/ui';
+import { Button, GoogleButton, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -25,9 +25,9 @@ const Login = () => {
       <Container>
         <Inner>
           <LogoFpDefault />
-          <Typography variant="label-1" color="primary">
+          <Text variant="label-1" color="primary">
             {t('title')}
-          </Typography>
+          </Text>
           <ButtonsContainer>
             <GoogleButton
               fullWidth

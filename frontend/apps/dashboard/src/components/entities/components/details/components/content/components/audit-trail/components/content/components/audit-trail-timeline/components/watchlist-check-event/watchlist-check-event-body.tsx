@@ -8,7 +8,7 @@ import {
 } from '@onefootprint/icons';
 import type { WatchlistCheckEventData } from '@onefootprint/types';
 import { WatchlistCheckStatus } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,14 +60,14 @@ const WatchlistCheckEventBody = ({
       lineHeight={lineHeight}
       content={
         <Container>
-          <Typography
+          <Text
             variant="body-3"
             as="span"
             color={color}
             sx={{ marginRight: 1 }}
           >
             {statusStr}
-          </Typography>
+          </Text>
         </Container>
       }
       testID="watchlist-check-event-body"

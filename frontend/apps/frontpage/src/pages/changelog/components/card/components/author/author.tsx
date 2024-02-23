@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -20,7 +20,7 @@ const Author = ({ authorImg, authorName }: AuthorProps) => (
         />
       </AuthorImg>
     )}
-    <Typography variant="label-3">{authorName}</Typography>
+    <Text variant="label-3">{authorName}</Text>
   </Container>
 );
 

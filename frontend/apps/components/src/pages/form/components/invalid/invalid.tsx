@@ -1,5 +1,5 @@
 import { IcoClose24 } from '@onefootprint/icons';
-import { IconButton, Typography } from '@onefootprint/ui';
+import { IconButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -31,22 +31,22 @@ const Invalid = ({ onClose }: InvalidProps) => {
         )
       }
     >
-      <Typography
+      <Text
         as="h2"
         color="primary"
         variant="heading-3"
         sx={{ textAlign: 'center' }}
       >
         {t('invalid.title')}
-      </Typography>
-      <Typography
+      </Text>
+      <Text
         variant="body-2"
         color="secondary"
         as="h3"
         sx={{ marginTop: 3, marginBottom: 7, textAlign: 'center' }}
       >
         {t('invalid.subtitle')}
-      </Typography>
+      </Text>
     </Container>
   );
 };

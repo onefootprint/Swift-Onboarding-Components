@@ -1,5 +1,5 @@
 import type { CollectedDataEventData } from '@onefootprint/types';
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -36,9 +36,9 @@ const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
       <Title>{title}</Title>
       <CdoList cdos={attributes} />
       {data.isPrefill && (
-        <Typography variant="body-3" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           {t('end-prefill')}
-        </Typography>
+        </Text>
       )}
     </Container>
   );

@@ -1,4 +1,4 @@
-import { createFontStyles, Grid, media, Typography } from '@onefootprint/ui';
+import { createFontStyles, Grid, media, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -25,20 +25,20 @@ const HorizontalCard = ({
   <CardContainer data-orientation={orientation} data-theme={theme}>
     <CardImageContainer className="image">{children}</CardImageContainer>
     <CardContent className="content">
-      <Typography
+      <Text
         variant="heading-3"
         as="h3"
         color={theme === 'dark' ? 'quinary' : 'primary'}
       >
         {title}
-      </Typography>
-      <Typography
+      </Text>
+      <Text
         variant="body-1"
         as="p"
         color={theme === 'dark' ? 'quinary' : 'primary'}
       >
         {description}
-      </Typography>
+      </Text>
       {cta && href && (
         <StyledButtonLink data-theme={theme} href={href} target="_blank">
           {cta}

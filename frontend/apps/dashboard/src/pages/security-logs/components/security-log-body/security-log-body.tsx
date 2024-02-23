@@ -1,5 +1,5 @@
 import type { AccessEvent } from '@onefootprint/types';
-import { Box, CodeInline, Grid, Stack, Typography } from '@onefootprint/ui';
+import { Box, CodeInline, Grid, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import getRegionForInsightEvent from 'src/utils/insight-event-region';
@@ -17,11 +17,11 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
   return (
     <AccessEventBodyContainer direction="column" gap={9}>
       <Stack direction="column" gap={5}>
-        <Typography variant="label-4">{t('user')}</Typography>
+        <Text variant="label-4">{t('user')}</Text>
         <Grid.Container columns={['repeat(4, minmax(0, 1fr))']}>
-          <Typography variant="body-4" color="tertiary">
+          <Text variant="body-4" color="tertiary">
             {t('footprint-token')}
-          </Typography>
+          </Text>
           <Grid.Item column="2 / span 3">
             <CodeInline size="compact" isPrivate>
               {accessEvent.fpId}
@@ -31,57 +31,53 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
       </Stack>
       {accessEvent.insightEvent && (
         <Stack direction="column" gap={5}>
-          <Typography variant="label-4">{t('metadata')}</Typography>
+          <Text variant="label-4">{t('metadata')}</Text>
           <Grid.Container columns={['repeat(4, minmax(0, 1fr))']} gap={2}>
-            <Typography variant="body-4" color="tertiary">
+            <Text variant="body-4" color="tertiary">
               {t('region')}
-            </Typography>
-            <Typography variant="body-4" isPrivate>
+            </Text>
+            <Text variant="body-4" isPrivate>
               {getRegionForInsightEvent(accessEvent.insightEvent) || '-'}
-            </Typography>
-            <Typography variant="body-4" color="tertiary">
+            </Text>
+            <Text variant="body-4" color="tertiary">
               {t('ip-address')}
-            </Typography>
-            <Typography variant="body-4" isPrivate>
+            </Text>
+            <Text variant="body-4" isPrivate>
               {accessEvent.insightEvent.ipAddress || '-'}
-            </Typography>
-            <Typography variant="body-4" color="tertiary">
+            </Text>
+            <Text variant="body-4" color="tertiary">
               {t('country')}
-            </Typography>
-            <Typography variant="body-4" isPrivate>
+            </Text>
+            <Text variant="body-4" isPrivate>
               {accessEvent.insightEvent.country || '-'}
-            </Typography>
-            <Typography variant="body-4" color="tertiary">
+            </Text>
+            <Text variant="body-4" color="tertiary">
               {t('device-os')}
-            </Typography>
+            </Text>
             <Box
               overflow="hidden"
               sx={{
                 gridArea: '2 / 4 / span 2 / span 1',
               }}
             >
-              <Typography
-                variant="body-4"
-                sx={{ overflow: 'hidden' }}
-                isPrivate
-              >
+              <Text variant="body-4" sx={{ overflow: 'hidden' }} isPrivate>
                 {displayForUserAgent(accessEvent.insightEvent.userAgent || '')}
-              </Typography>
+              </Text>
             </Box>
-            <Typography variant="body-4" color="tertiary">
+            <Text variant="body-4" color="tertiary">
               Zip code
-            </Typography>
-            <Typography variant="body-4" isPrivate>
+            </Text>
+            <Text variant="body-4" isPrivate>
               {accessEvent.insightEvent.postalCode || '-'}
-            </Typography>
+            </Text>
           </Grid.Container>
         </Stack>
       )}
       <Stack direction="column" gap={5}>
-        <Typography variant="label-4">Reason</Typography>
-        <Typography variant="body-4" color="secondary">
+        <Text variant="label-4">Reason</Text>
+        <Text variant="body-4" color="secondary">
           {accessEvent.reason || '-'}
-        </Typography>
+        </Text>
       </Stack>
     </AccessEventBodyContainer>
   );

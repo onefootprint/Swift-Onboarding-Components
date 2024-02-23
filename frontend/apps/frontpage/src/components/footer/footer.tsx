@@ -1,11 +1,4 @@
-import {
-  Container,
-  Divider,
-  Grid,
-  media,
-  Stack,
-  Typography,
-} from '@onefootprint/ui';
+import { Container, Divider, Grid, media, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -120,9 +113,9 @@ const Footer = () => {
                 minWidth="160px"
                 key={section.title}
               >
-                <Typography variant="label-3">
+                <Text variant="label-3">
                   {t(section.title as ParseKeys<'common'>)}
-                </Typography>
+                </Text>
                 {section.links.map(link => (
                   <FooterLink
                     key={link.name}

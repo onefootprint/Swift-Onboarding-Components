@@ -1,4 +1,4 @@
-import { createFontStyles, media, Typography } from '@onefootprint/ui';
+import { createFontStyles, media, Text } from '@onefootprint/ui';
 import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -13,13 +13,13 @@ type FeatureCardProps = {
 const FeatureCard = ({ title, description, trans }: FeatureCardProps) => (
   <Container>
     <Title>{title}</Title>
-    <Typography variant="body-2">
+    <Text variant="body-2">
       {trans ? (
         <Trans i18nKey={trans.i18nKey} components={trans.components} />
       ) : (
         description
       )}
-    </Typography>
+    </Text>
   </Container>
 );
 

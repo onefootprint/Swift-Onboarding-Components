@@ -1,4 +1,4 @@
-import { Select, TextInput, Typography, useToast } from '@onefootprint/ui';
+import { Select, Text, TextInput, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -64,9 +64,9 @@ const CleanUpUserForm = ({ formId, onClose }: RetriggerKYCFormProps) => {
   return (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-        <Typography variant="label-3">
+        <Text variant="label-3">
           {`Enter the identifier for the user you'd like to delete`}
-        </Typography>
+        </Text>
         <TextInput
           label="Identifier"
           placeholder="+15555550100"

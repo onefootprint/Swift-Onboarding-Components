@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Divider, LinkButton, Typography } from '@onefootprint/ui';
+import { Divider, LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -27,9 +27,9 @@ const MultiSection = ({
     <Header>
       <TitleContainer>
         <IconComponent />
-        <Typography sx={{ marginLeft: 2 }} variant="label-2">
+        <Text sx={{ marginLeft: 2 }} variant="label-2">
           {title}
-        </Typography>
+        </Text>
       </TitleContainer>
       {editLabel && <LinkButton onClick={onEdit}>{editLabel}</LinkButton>}
     </Header>

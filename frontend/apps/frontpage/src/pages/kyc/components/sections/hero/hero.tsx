@@ -1,5 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -30,12 +30,12 @@ const Hero = () => {
     >
       <Illustration />
       <TitleContainer>
-        <Typography variant="display-2" sx={{ textAlign: 'center' }}>
+        <Text variant="display-2" sx={{ textAlign: 'center' }}>
           {t('title')}
-        </Typography>
-        <Typography variant="display-4" color="tertiary">
+        </Text>
+        <Text variant="display-4" color="tertiary">
           {t('subtitle')}
-        </Typography>
+        </Text>
       </TitleContainer>
       <Buttons>
         <Link href={`${DASHBOARD_BASE_URL}/sign-up`}>

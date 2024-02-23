@@ -1,4 +1,4 @@
-import { CodeInline, createFontStyles, Typography } from '@onefootprint/ui';
+import { CodeInline, createFontStyles, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -29,9 +29,9 @@ const Properties = ({ properties, title }: PropertiesProps) => {
       )}
       {properties.enum && (
         <AllowedValues>
-          <Typography variant="body-4" color="tertiary">
+          <Text variant="body-4" color="tertiary">
             {t('allowed-values')}
-          </Typography>
+          </Text>
           <List>
             {properties.enum.map((enumValue: string) => (
               <CodeInline size="compact" key={enumValue} disabled>

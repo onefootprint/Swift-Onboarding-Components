@@ -1,5 +1,5 @@
 import type { Rule, RuleAction } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,7 +27,7 @@ const Rules = ({ data, isLoading, errorMessage }: RulesProps) => {
 
   return (
     <Stack direction="column" gap={7}>
-      <Typography variant="body-3">{t('description')}</Typography>
+      <Text variant="body-3">{t('description')}</Text>
       {data && (
         <Content
           obConfigurationId={data.obConfigurationId as string}

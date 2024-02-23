@@ -1,6 +1,6 @@
 import type { Entity } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
-import { CodeInline, Typography } from '@onefootprint/ui';
+import { CodeInline, Text } from '@onefootprint/ui';
 import React from 'react';
 import { FieldOrPlaceholder, StatusBadge } from 'src/components';
 
@@ -24,7 +24,7 @@ const Row = ({ entity }: RowProps) => (
       <StatusBadge status={entity.status} />
     </td>
     <td>
-      <Typography
+      <Text
         variant="body-3"
         color="primary"
         sx={{
@@ -40,7 +40,7 @@ const Row = ({ entity }: RowProps) => (
           hour: 'numeric',
           minute: 'numeric',
         })}
-      </Typography>
+      </Text>
     </td>
     <td aria-label="tags">
       <Tags

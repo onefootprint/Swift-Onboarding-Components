@@ -1,4 +1,4 @@
-import { FootprintButton, Typography } from '@onefootprint/ui';
+import { FootprintButton, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -31,11 +31,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
         text={t('cta')}
       />
       {privacyPolicyUrl && (
-        <Typography
-          variant="label-4"
-          color="secondary"
-          sx={{ textAlign: 'center' }}
-        >
+        <Text variant="label-4" color="secondary" sx={{ textAlign: 'center' }}>
           <Trans
             ns="idv"
             i18nKey="onboarding.pages.authorize.footer"
@@ -50,7 +46,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
               ),
             }}
           />
-        </Typography>
+        </Text>
       )}
     </ButtonContainer>
   );

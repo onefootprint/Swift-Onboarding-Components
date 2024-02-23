@@ -1,4 +1,4 @@
-import { Container, Typography } from '@onefootprint/ui';
+import { Container, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -15,22 +15,22 @@ const IdvPrivacy = () => {
     <>
       <SEO title={t('html-title')} slug="/idv-privacy" />
       <Hero>
-        <Typography
+        <Text
           variant="display-2"
           sx={{
             textAlign: 'center',
           }}
         >
           {t('title')}
-        </Typography>
-        <Typography
+        </Text>
+        <Text
           variant="display-4"
           sx={{
             textAlign: 'center',
           }}
         >
           {t('subtitle')}
-        </Typography>
+        </Text>
       </Hero>
       <HowFootprint />
       <MoreAbout />

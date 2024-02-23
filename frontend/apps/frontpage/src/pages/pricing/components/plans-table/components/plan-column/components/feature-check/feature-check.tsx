@@ -1,5 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { Badge, Stack, Typography } from '@onefootprint/ui';
+import { Badge, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,7 +17,7 @@ const FeatureCheck = ({ children, soon }: FeatureCheckProps) => {
           <IcoCheck16 />
         </Stack>
         <Stack flexGrow={1}>
-          <Typography variant="label-3">{children}</Typography>
+          <Text variant="label-3">{children}</Text>
         </Stack>
       </Stack>
       {soon && <Badge variant="info">{t('soon')}</Badge>}

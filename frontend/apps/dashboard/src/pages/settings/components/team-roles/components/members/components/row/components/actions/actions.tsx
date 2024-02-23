@@ -6,7 +6,7 @@ import {
   Dialog,
   Dropdown,
   Stack,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -81,11 +81,7 @@ const Actions = ({ member }: ActionsProps) => {
             onClick: hideConfirmation,
           }}
         >
-          <Typography
-            variant="body-2"
-            color="secondary"
-            sx={{ textAlign: 'center' }}
-          >
+          <Text variant="body-2" color="secondary" sx={{ textAlign: 'center' }}>
             <Trans
               i18nKey="pages.settings.members.table.actions.remove.confirmation.description"
               components={{
@@ -95,7 +91,7 @@ const Actions = ({ member }: ActionsProps) => {
                 name: firstName ? `${firstName} ${lastName} (${email})` : email,
               }}
             />
-          </Typography>
+          </Text>
         </Dialog>
       </Box>
     </Stack>

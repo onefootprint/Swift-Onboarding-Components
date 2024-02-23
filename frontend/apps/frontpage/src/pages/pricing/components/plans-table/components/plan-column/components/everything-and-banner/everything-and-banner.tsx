@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,9 +15,9 @@ const EverythingAndBanner = ({ plan }: EverythingAndBannerProps) => {
 
   return (
     <Container direction="column" gap={2}>
-      <Typography variant="label-3" color="tertiary">
+      <Text variant="label-3" color="tertiary">
         {t(`plans.${plan}.everything-and` as ParseKeys<'common'>)}
-      </Typography>
+      </Text>
     </Container>
   );
 };

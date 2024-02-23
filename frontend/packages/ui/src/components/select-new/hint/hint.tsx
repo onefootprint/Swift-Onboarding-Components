@@ -1,13 +1,13 @@
 import React from 'react';
 
 import Stack from '../../stack';
-import Typography from '../../typography';
+import Text from '../../text';
 
 const Hint = ({ text }: { text: string }) => (
   <Stack marginTop={2}>
-    <Typography variant="caption-1" color="tertiary">
+    <Text variant="caption-1" color="tertiary">
       {text}
-    </Typography>
+    </Text>
   </Stack>
 );
 

@@ -1,6 +1,6 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import type { OnboardingConfigKind } from '@onefootprint/types';
-import { Box, FootprintButton, media, Typography } from '@onefootprint/ui';
+import { Box, FootprintButton, media, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -42,34 +42,34 @@ const Preview = ({ obConfig }: PreviewProps) => {
         <Inner>
           {showConfirmation ? (
             <Box>
-              <Typography
+              <Text
                 color="primary"
                 sx={{ marginBottom: 7 }}
                 variant="heading-2"
               >
                 {t.success.title}
-              </Typography>
-              <Typography color="secondary" variant="body-1" as="div">
+              </Text>
+              <Text color="secondary" variant="body-1" as="div">
                 {t.success.body}
-              </Typography>
+              </Text>
             </Box>
           ) : (
             <>
-              <Typography variant="heading-1" as="h1" sx={{ marginBottom: 3 }}>
+              <Text variant="heading-1" as="h1" sx={{ marginBottom: 3 }}>
                 {obConfig.org_name}
-              </Typography>
-              <Typography variant="body-1" color="secondary">
+              </Text>
+              <Text variant="body-1" color="secondary">
                 {t.body}
-              </Typography>
+              </Text>
               <ButtonContainer>
                 <FootprintButton onClick={handleOpen} text={t.cta} />
               </ButtonContainer>
             </>
           )}
         </Inner>
-        <Typography color="tertiary" sx={{ marginTop: 7 }} variant="label-2">
+        <Text color="tertiary" sx={{ marginTop: 7 }} variant="label-2">
           Footprint ❤️ {obConfig.org_name}
-        </Typography>
+        </Text>
       </Container>
     </>
   );

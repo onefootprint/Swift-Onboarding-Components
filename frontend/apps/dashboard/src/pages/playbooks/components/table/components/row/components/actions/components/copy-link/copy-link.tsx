@@ -1,5 +1,5 @@
 import type { OnboardingConfig } from '@onefootprint/types';
-import { Box, Button, Dialog, TextInput, Typography } from '@onefootprint/ui';
+import { Box, Button, Dialog, Text, TextInput } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -61,9 +61,9 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(
         onClose={handleClose}
       >
         <Content>
-          <Typography variant="body-2">
+          <Text variant="body-2">
             {t(`${playbook.kind}.description` as ParseKeys<'common'>)}
-          </Typography>
+          </Text>
           <InputContainer>
             <TextInput
               autoFocus

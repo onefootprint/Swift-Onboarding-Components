@@ -1,5 +1,5 @@
 import type { UIStates } from '@onefootprint/design-tokens';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 
@@ -20,16 +20,16 @@ const ConfidenceScore = ({ score, label }: ConfidenceScoreProps) => {
   }
   return (
     <>
-      <Typography variant="body-4" color="tertiary">
+      <Text variant="body-4" color="tertiary">
         {label}
-      </Typography>
+      </Text>
       <Score>
-        <Typography color={textColor} variant="heading-1">
+        <Text color={textColor} variant="heading-1">
           {score}/
-        </Typography>
-        <Typography color={textColor} variant="heading-3">
+        </Text>
+        <Text color={textColor} variant="heading-3">
           100
-        </Typography>
+        </Text>
       </Score>
     </>
   );

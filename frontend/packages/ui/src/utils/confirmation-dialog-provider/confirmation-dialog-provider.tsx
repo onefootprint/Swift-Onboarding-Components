@@ -2,7 +2,7 @@ import constate from 'constate';
 import React from 'react';
 
 import Dialog from '../../components/dialog';
-import Typography from '../../components/typography';
+import Text from '../../components/text';
 import useConfirmationDialog from './hooks/use-confirmation-dialog';
 
 export type ConfirmationDialogProps = {
@@ -47,13 +47,9 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
             ),
           }}
         >
-          <Typography
-            variant="body-2"
-            color="secondary"
-            sx={{ textAlign: 'center' }}
-          >
+          <Text variant="body-2" color="secondary" sx={{ textAlign: 'center' }}>
             {confirmationDialog.description}
-          </Typography>
+          </Text>
         </Dialog>
       )}
     </>

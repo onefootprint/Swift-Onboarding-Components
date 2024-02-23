@@ -9,7 +9,7 @@ import {
   LinkButton,
   Overlay,
   Stack,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import * as Dialog from '@radix-ui/react-dialog';
 import dynamic from 'next/dynamic';
@@ -102,7 +102,7 @@ const PdfViewer = ({ src, documentName }: PdfViewerProps) => {
               </IconButton>
             </Dialog.Close>
             <Dialog.Title asChild>
-              <Typography variant="label-2">{documentName}</Typography>
+              <Text variant="label-2">{documentName}</Text>
             </Dialog.Title>
             <Box width="24px" height="24px" />
           </Header>
@@ -126,9 +126,9 @@ const PdfViewer = ({ src, documentName }: PdfViewerProps) => {
                 >
                   <IcoChevronLeft24 />
                 </IconButton>
-                <Typography variant="label-2">
+                <Text variant="label-2">
                   {`${t('page')} ${currPageNumber} / ${numPages}`}
-                </Typography>
+                </Text>
                 <IconButton
                   onClick={handleNextPage}
                   aria-label="previous page"

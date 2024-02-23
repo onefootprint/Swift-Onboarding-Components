@@ -7,7 +7,7 @@ import { useLockedBody } from 'usehooks-ts';
 import { useEventListener, useOnClickOutside } from '../../../../../../hooks';
 import Button from '../../../../../button';
 import ScrollArea from '../../../../../scroll-area';
-import Typography from '../../../../../typography';
+import Text from '../../../../../text';
 
 export type PopoverProps = {
   children: React.ReactNode;
@@ -40,7 +40,7 @@ const Popover = ({ children, id, onClose, title }: PopoverProps) => {
         role="dialog"
       >
         <Header id={headerId}>
-          <Typography variant="label-3">{title}</Typography>
+          <Text variant="label-3">{title}</Text>
         </Header>
         <Body id={bodyId}>
           <ScrollArea>{children}</ScrollArea>

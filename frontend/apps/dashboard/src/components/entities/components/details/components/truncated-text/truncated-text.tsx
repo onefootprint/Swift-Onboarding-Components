@@ -4,7 +4,7 @@ import type {
   LinkButtonVariant,
   SXStyleProps,
 } from '@onefootprint/ui';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -38,11 +38,7 @@ const TruncatedText = ({
   });
 
   return (
-    <Typography
-      ref={textContainerRef}
-      variant={textFontVariant}
-      sx={textSxStyle}
-    >
+    <Text ref={textContainerRef} variant={textFontVariant} sx={textSxStyle}>
       <bdi>{currShownText}</bdi>
       {shownTextState !== ShownTextState.FULL_WITHIN_MAX_HEIGHT && (
         <LinkButton
@@ -56,7 +52,7 @@ const TruncatedText = ({
             : t('see-less')}
         </LinkButton>
       )}
-    </Typography>
+    </Text>
   );
 };
 

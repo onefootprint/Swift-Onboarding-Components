@@ -1,5 +1,5 @@
 import { IcoCheck24 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -27,13 +27,13 @@ const Success = ({ onComplete }: SuccessProps) => {
       <SuccessIconContainer>
         <IcoCheck24 color="quinary" />
       </SuccessIconContainer>
-      <Typography
+      <Text
         variant="label-1"
         sx={{ textAlign: 'center', marginTop: 5 }}
         color="success"
       >
         {t('title')}
-      </Typography>
+      </Text>
     </Container>
   );
 };

@@ -1,4 +1,4 @@
-import { Checkbox, Divider, Typography } from '@onefootprint/ui';
+import { Checkbox, Divider, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -48,7 +48,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
   return (
     <>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Typography
+      <Text
         variant="body-4"
         color="secondary"
         sx={{ marginBottom: 5, marginTop: 7 }}
@@ -83,7 +83,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
             ),
           }}
         />
-      </Typography>
+      </Text>
       <Divider />
       <ThirdPartyConsent>
         <Checkbox
@@ -93,9 +93,9 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
           checked={isThirdPartyConsented}
         />
         <LabelContainer onClick={handleThirdPartyConsent}>
-          <Typography variant="body-4" color="secondary">
+          <Text variant="body-4" color="secondary">
             {t('third-party-consent')}
-          </Typography>
+          </Text>
         </LabelContainer>
       </ThirdPartyConsent>
     </>

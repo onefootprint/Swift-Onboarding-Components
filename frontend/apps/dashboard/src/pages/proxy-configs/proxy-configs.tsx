@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@onefootprint/ui';
+import { Box, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,10 +24,10 @@ const ProxyConfigs = () => {
         marginBottom={7}
       >
         <Stack direction="column" gap={2}>
-          <Typography variant="heading-2">{t('header.title')}</Typography>
-          <Typography variant="body-2" color="secondary">
+          <Text variant="heading-2">{t('header.title')}</Text>
+          <Text variant="body-2" color="secondary">
             {t('header.subtitle')}
-          </Typography>
+          </Text>
         </Stack>
         <Create />
       </Stack>

@@ -1,5 +1,5 @@
 import { IcoCheckCircle16 } from '@onefootprint/icons';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -10,9 +10,9 @@ type EventProps = {
 const Event = ({ text }: EventProps) => (
   <Container justify="start" direction="row" align="center" gap={3}>
     <IcoCheckCircle16 color="tertiary" />
-    <Typography variant="label-3" as="p" color="tertiary">
+    <Text variant="label-3" as="p" color="tertiary">
       {text}
-    </Typography>
+    </Text>
   </Container>
 );
 

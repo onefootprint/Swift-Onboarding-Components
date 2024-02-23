@@ -1,6 +1,6 @@
 import type { OnboardingDecisionEventData } from '@onefootprint/types';
 import { ActorKind, DecisionStatus } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,13 +51,13 @@ const OnboardingDecisionEventHeader = ({
 
   return (
     <Stack direction="row" align="center" gap={2}>
-      <Typography
+      <Text
         variant="label-3"
         color={color}
         testID="onboarding-decision-event-header"
       >
         {text}
-      </Typography>
+      </Text>
       {isFootprintActor && <Details ruleSetResultId={ruleSetResultId} />}
     </Stack>
   );

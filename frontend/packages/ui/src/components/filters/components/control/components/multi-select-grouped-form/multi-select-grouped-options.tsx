@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 
 import Checkbox from '../../../../../checkbox';
 import Grid from '../../../../../grid';
-import Typography from '../../../../../typography';
+import Text from '../../../../../text';
 import type {
   FilterMultiSelectGrouped,
   FilterSelectedOption,
@@ -43,9 +43,9 @@ const MultiSelectGroupedForm = ({
     >
       {options.map(group => (
         <Grid.Container as="fieldset" gap={3} key={group.label}>
-          <Typography variant="label-3" sx={{ marginBottom: 3 }}>
+          <Text variant="label-3" sx={{ marginBottom: 3 }}>
             {group.label}
-          </Typography>
+          </Text>
           {group.options.map(option => (
             <Checkbox
               key={`${option.label}-${option.value}`}

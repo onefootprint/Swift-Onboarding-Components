@@ -1,5 +1,5 @@
 import { IcoCheck24 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import Rive from '@rive-app/react-canvas';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
@@ -77,14 +77,14 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
             <IconContainer>
               <Rive src="/animations/face-id.riv" />
             </IconContainer>
-            <Typography
+            <Text
               as="p"
               variant="label-4"
               color="secondary"
               sx={{ marginTop: 4 }}
             >
               {t('animation.validating-biometrics')}
-            </Typography>
+            </Text>
           </AnimationContainer>
         )}
       </AnimatePresence>
@@ -97,14 +97,14 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
             exit="exit"
           >
             <IcoCheck24 />
-            <Typography
+            <Text
               as="p"
               variant="label-4"
               color="secondary"
               sx={{ marginTop: 4 }}
             >
               {t('animation.success')}
-            </Typography>
+            </Text>
           </AnimationContainer>
         )}
       </AnimatePresence>
@@ -117,9 +117,9 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
               animate="animate"
               exit="exit"
             >
-              <Typography as="p" variant="label-3" color="secondary">
+              <Text as="p" variant="label-3" color="secondary">
                 {t('animation.end')}
-              </Typography>
+              </Text>
             </AnimationContainer>
           </Sparkles>
         )}

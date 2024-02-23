@@ -1,6 +1,6 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Dropdown, Stack, Typography } from '@onefootprint/ui';
+import { Dropdown, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -22,7 +22,7 @@ const Domain = ({ domain, onRemove }: DomainProps) => {
       role="listitem"
       aria-label={domain}
     >
-      <Typography variant="body-2">{domain}</Typography>
+      <Text variant="body-2">{domain}</Text>
       <Dropdown.Root>
         <PermissionGate
           scopeKind={RoleScopeKind.onboardingConfiguration}

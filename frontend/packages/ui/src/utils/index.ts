@@ -7,5 +7,5 @@ export { default as media } from './media';
 export {
   createFontStyles,
   createOverlayBackground,
-  createTypography,
+  createText,
 } from './mixins';

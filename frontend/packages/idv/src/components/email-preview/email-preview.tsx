@@ -1,5 +1,5 @@
 import { IcoEmail24 } from '@onefootprint/icons';
-import { Box, LinkButton, Typography } from '@onefootprint/ui';
+import { Box, LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -20,9 +20,9 @@ const EmailPreview = ({
         <Box>
           <StyledIcoEmail24 />
         </Box>
-        <Typography variant="label-3" color="primary" isPrivate>
+        <Text variant="label-3" color="primary" isPrivate>
           {email}
-        </Typography>
+        </Text>
       </EmailCardContent>
       <LinkButton size="compact" onClick={onChange}>
         {textCta}

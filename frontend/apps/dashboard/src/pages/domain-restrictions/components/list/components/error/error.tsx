@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 
 type ErrorProps = {
@@ -7,9 +7,9 @@ type ErrorProps = {
 };
 
 const Error = ({ error }: ErrorProps) => (
-  <Typography variant="body-2" color="secondary">
+  <Text variant="body-2" color="secondary">
     {getErrorMessage(error)}
-  </Typography>
+  </Text>
 );
 
 export default Error;

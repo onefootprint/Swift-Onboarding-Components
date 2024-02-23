@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import type { ButtonProps } from '../button';
 import Button from '../button';
-import Typography from '../typography';
+import Text from '../text';
 import type { FootprintButtonSize } from './footprint-button.types';
 import footprintButtonFontVariantBySize from './footprint-button.utils';
 
@@ -55,12 +55,9 @@ const FootprintButton = ({
       iconColor="septenary"
       ref={buttonRef}
     >
-      <Typography
-        color="quinary"
-        variant={footprintButtonFontVariantBySize[size]}
-      >
+      <Text color="quinary" variant={footprintButtonFontVariantBySize[size]}>
         {text ?? t('components.footprint-button.text-default')}
-      </Typography>
+      </Text>
     </Button>
   );
 };

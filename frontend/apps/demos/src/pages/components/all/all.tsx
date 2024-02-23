@@ -1,5 +1,5 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import { Tab, Tabs, Typography } from '@onefootprint/ui';
+import { Tab, Tabs, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -11,7 +11,7 @@ import Title from './components/title';
 import VerifyButtonReactIntegration from './components/verify-button-react';
 import VerifyJs from './components/verify-js';
 
-const Soon = () => <Typography variant="label-1">Coming soon</Typography>;
+const Soon = () => <Text variant="label-1">Coming soon</Text>;
 
 const AllComponents = () => {
   const { Auth, Form, Render, Verify, VerifyButton } = FootprintComponentKind;
@@ -24,9 +24,9 @@ const AllComponents = () => {
           .filter(k => k !== Auth)
           .map((k: FootprintComponentKind) => (
             <Tab key={k} selected={k === kind} onClick={() => setKind(k)}>
-              <Typography as="span" variant="label-2">
+              <Text as="span" variant="label-2">
                 {k}
-              </Typography>
+              </Text>
             </Tab>
           ))}
       </Tabs>

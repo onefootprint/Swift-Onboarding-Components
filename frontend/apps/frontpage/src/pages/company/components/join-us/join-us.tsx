@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { LinkButton, media, Typography } from '@onefootprint/ui';
+import { LinkButton, media, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,18 +20,18 @@ const JoinUs = () => {
         />
       </ImageContainer>
       <TextContainer>
-        <Typography variant="heading-1" color="primary" as="h2">
+        <Text variant="heading-1" color="primary" as="h2">
           {t('title')}
-        </Typography>
+        </Text>
         <ParagraphsContainer>
-          <Typography variant="body-1" color="secondary" as="p">
+          <Text variant="body-1" color="secondary" as="p">
             {t('description')}
-          </Typography>
+          </Text>
 
           <CtaContainer>
-            <Typography variant="body-1" color="secondary" as="p">
+            <Text variant="body-1" color="secondary" as="p">
               {t('pre-cta')}
-            </Typography>
+            </Text>
             <LinkButton
               href={`mailto:${t('email-address')}`}
               iconComponent={IcoArrowRightSmall16}

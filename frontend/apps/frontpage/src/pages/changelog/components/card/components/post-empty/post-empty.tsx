@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ const PostEmpty = () => {
         height={240}
         width={320}
       />
-      <Typography variant="display-3">{t('empty.title')}</Typography>
+      <Text variant="display-3">{t('empty.title')}</Text>
     </Container>
   );
 };

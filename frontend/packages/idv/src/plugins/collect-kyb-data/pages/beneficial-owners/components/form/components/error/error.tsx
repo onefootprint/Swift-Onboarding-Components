@@ -1,5 +1,5 @@
 import { IcoWarning16 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -12,9 +12,9 @@ const Error = () => {
   return (
     <Container>
       <IcoWarning16 color="error" />
-      <Typography variant="body-3" color="error">
+      <Text variant="body-3" color="error">
         {t('invalid')}
-      </Typography>
+      </Text>
     </Container>
   );
 };

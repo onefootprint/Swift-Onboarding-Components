@@ -5,7 +5,7 @@ import {
   createFontStyles,
   LinkButton,
   Stack,
-  Typography,
+  Text,
   useToast,
 } from '@onefootprint/ui';
 import React from 'react';
@@ -58,13 +58,9 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
       <AmlSection>
         {aml?.shareUrl && (
           <Stack direction="column" width="100%">
-            <Typography
-              variant="label-3"
-              color="tertiary"
-              sx={{ marginBottom: 2 }}
-            >
+            <Text variant="label-3" color="tertiary" sx={{ marginBottom: 2 }}>
               {t('source-url.label')}
-            </Typography>
+            </Text>
             <Stack align="center" justify="space-between">
               <SourceUrl>{aml.shareUrl}</SourceUrl>
               <CopyButton

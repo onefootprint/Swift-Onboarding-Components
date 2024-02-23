@@ -1,5 +1,5 @@
 import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
-import { Badge, Box, Shimmer, Stack, Typography } from '@onefootprint/ui';
+import { Badge, Box, Shimmer, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +16,7 @@ const Header = ({ hasRestrictions, isLoading }: HeaderProps) => {
       <Stack justify="space-between">
         <Stack gap={3} justify="start" align="center">
           {hasRestrictions ? <IcoLock24 /> : <IcoLockOpen24 />}
-          <Typography variant="label-3">{t('header.title')}</Typography>
+          <Text variant="label-3">{t('header.title')}</Text>
         </Stack>
         {isLoading ? (
           <Shimmer

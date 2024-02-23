@@ -1,4 +1,4 @@
-import { Button, media, Stack, Typography } from '@onefootprint/ui';
+import { Button, media, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -32,10 +32,10 @@ const PenguinBanner = ({
     <Illustration />
     <Stack direction="column" align="center" textAlign="center" gap={9}>
       <Stack direction="column" align="center" textAlign="center" gap={3}>
-        <Typography variant="display-3" color="primary">
+        <Text variant="display-3" color="primary">
           {title}
-        </Typography>
-        <Typography
+        </Text>
+        <Text
           variant="display-4"
           color="tertiary"
           sx={{
@@ -43,7 +43,7 @@ const PenguinBanner = ({
           }}
         >
           {subtitle}
-        </Typography>
+        </Text>
       </Stack>
       <ResponsiveStack gap={3}>
         <Button variant="primary" onClick={onClickPrimaryButton}>

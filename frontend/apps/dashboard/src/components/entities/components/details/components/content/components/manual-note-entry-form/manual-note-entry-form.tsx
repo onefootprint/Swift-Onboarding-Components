@@ -1,5 +1,5 @@
 import type { OrgFrequentNoteKind } from '@onefootprint/types';
-import { Divider, Toggle, Typography } from '@onefootprint/ui';
+import { Divider, Text, Toggle } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +42,7 @@ const ManualNoteEntryForm = ({
   return (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-        {prompt && <Typography variant="label-2">{prompt}</Typography>}
+        {prompt && <Text variant="label-2">{prompt}</Text>}
         <FrequentNotesTextArea
           kind={frequentNoteKind}
           formField="note"

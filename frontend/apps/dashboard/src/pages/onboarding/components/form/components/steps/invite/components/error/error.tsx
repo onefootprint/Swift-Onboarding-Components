@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
 
 type ErrorProps = {
@@ -8,7 +8,7 @@ type ErrorProps = {
 
 const Error = ({ error }: ErrorProps) => (
   <Box testID="onboarding-invite-error">
-    <Typography variant="body-3">{getErrorMessage(error)}</Typography>
+    <Text variant="body-3">{getErrorMessage(error)}</Text>
   </Box>
 );
 

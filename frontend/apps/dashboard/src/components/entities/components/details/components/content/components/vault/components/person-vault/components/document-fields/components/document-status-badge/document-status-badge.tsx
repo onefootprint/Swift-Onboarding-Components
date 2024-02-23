@@ -1,4 +1,4 @@
-import { Badge, Typography } from '@onefootprint/ui';
+import { Badge, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,13 +15,9 @@ const DocumentStatusBadge = ({ status }: DocumentBadgeStatusProps) => {
 
   return status ? (
     <Badge variant={status}>
-      <Typography
-        variant="caption-1"
-        color={status}
-        sx={{ whiteSpace: 'nowrap' }}
-      >
+      <Text variant="caption-1" color={status} sx={{ whiteSpace: 'nowrap' }}>
         {t(status)}
-      </Typography>
+      </Text>
     </Badge>
   ) : null;
 };

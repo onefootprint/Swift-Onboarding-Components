@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import React from 'react';
@@ -20,9 +20,9 @@ const Option = ({ name, image, selected, onClick }: OptionProps) => {
   return (
     <OptionContainer data-selected={selected} onClick={onClick}>
       <Image src={themedPath} width={120} height={97} alt={name} />
-      <Typography color="secondary" variant="body-3">
+      <Text color="secondary" variant="body-3">
         {name}
-      </Typography>
+      </Text>
     </OptionContainer>
   );
 };

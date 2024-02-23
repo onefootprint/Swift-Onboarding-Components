@@ -1,7 +1,7 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoDownload16, ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Dropdown, Typography } from '@onefootprint/ui';
+import { Dropdown, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
@@ -86,10 +86,10 @@ const LogoCopyAssets = ({
         {assetsToCopy.map(asset => (
           <StyledItem key={asset.label} onClick={handleSave(asset.label)}>
             <IcoDownload16 color="tertiary" />
-            <Typography variant="body-2">
+            <Text variant="body-2">
               {' '}
               {t(asset.label as ParseKeys<'common'>)}{' '}
-            </Typography>
+            </Text>
           </StyledItem>
         ))}
       </Dropdown.Content>

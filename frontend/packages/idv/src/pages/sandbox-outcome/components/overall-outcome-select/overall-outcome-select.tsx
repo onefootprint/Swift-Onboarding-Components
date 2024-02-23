@@ -1,6 +1,6 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
-import { Box, Select, Typography } from '@onefootprint/ui';
+import { Box, Select, Text } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -83,7 +83,7 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
 
   return (
     <Container>
-      <Typography variant="label-2">{t('title')}</Typography>
+      <Text variant="label-2">{t('title')}</Text>
       <Controller
         control={control}
         name="outcomes.overallOutcome"

@@ -1,4 +1,4 @@
-import { Grid, LinkButton, Stack, Typography } from '@onefootprint/ui';
+import { Grid, LinkButton, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -34,9 +34,9 @@ const Content = ({ organization }: ContentProps) => {
       </Grid.Container>
       <Stack direction="column" gap={5}>
         <Stack direction="column" gap={2}>
-          <Typography variant="label-2">{t('title')}</Typography>
+          <Text variant="label-2">{t('title')}</Text>
           <Stack direction="row" inline gap={2} align="center">
-            <Typography variant="body-3">{t('subtitle')}</Typography>
+            <Text variant="body-3">{t('subtitle')}</Text>
             <LinkButton size="compact" onClick={handleHelpDialogOpen}>
               {t('more-details')}
             </LinkButton>

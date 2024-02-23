@@ -71,11 +71,11 @@ export type {
   TagProps,
   TextAreaProps,
   TextInputProps,
+  TextProps,
   ThemeToggleProps,
   ToastProps,
   ToggleProps,
   TooltipProps,
-  TypographyProps,
 } from './components';
 export {
   AddressInput,
@@ -135,13 +135,13 @@ export {
   Table,
   Tabs,
   Tag,
+  Text,
   TextArea,
   TextInput,
   ThemeToggle,
   ToastProvider,
   Toggle,
   Tooltip,
-  Typography,
   useToast,
 } from './components';
 export { default as enUiJson } from './config/locales/en/ui.json';
@@ -163,7 +163,7 @@ export type { BootstrapProps } from './utils';
 export {
   createFontStyles,
   createOverlayBackground,
-  createTypography,
+  createText,
   DesignSystemProvider,
   getCountryCodeFromLocale,
   LoadFonts,

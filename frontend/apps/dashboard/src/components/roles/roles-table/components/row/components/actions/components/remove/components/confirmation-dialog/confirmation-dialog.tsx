@@ -1,4 +1,4 @@
-import { Dialog, Typography } from '@onefootprint/ui';
+import { Dialog, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -38,13 +38,9 @@ const ConfirmationDialog = ({
         onClick: onClose,
       }}
     >
-      <Typography
-        variant="body-2"
-        color="secondary"
-        sx={{ textAlign: 'center' }}
-      >
+      <Text variant="body-2" color="secondary" sx={{ textAlign: 'center' }}>
         {children}
-      </Typography>
+      </Text>
     </Dialog>
   );
 };

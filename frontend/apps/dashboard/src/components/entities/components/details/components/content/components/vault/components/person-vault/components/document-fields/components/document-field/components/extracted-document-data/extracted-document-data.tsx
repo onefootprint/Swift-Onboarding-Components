@@ -5,7 +5,7 @@ import type {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { isVaultDataText } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,28 +45,24 @@ const ExtractedDocumentData = ({
     <Section>
       <LabelContainer>
         <IcoFileText24 />
-        <Typography variant="label-2">
+        <Text variant="label-2">
           {t(`drawer.document-data.title` as ParseKeys<'common'>)}
-        </Typography>
+        </Text>
       </LabelContainer>
       <DocumentDataFieldContainer>
         {relevantKeys.sort().map(key => (
           <DocumentDataField key={key}>
-            <Typography variant="body-3" color="tertiary" as="label">
+            <Text variant="body-3" color="tertiary" as="label">
               {t(
                 `drawer.document-data.labels.${getDataLabel(
                   key,
                   activeDocumentVersion,
                 )}` as ParseKeys<'common'>,
               )}
-            </Typography>
-            <Typography
-              variant="body-3"
-              color="primary"
-              sx={{ textAlign: 'right' }}
-            >
+            </Text>
+            <Text variant="body-3" color="primary" sx={{ textAlign: 'right' }}>
               {getVaultValueString(key)}
-            </Typography>
+            </Text>
           </DocumentDataField>
         ))}
       </DocumentDataFieldContainer>

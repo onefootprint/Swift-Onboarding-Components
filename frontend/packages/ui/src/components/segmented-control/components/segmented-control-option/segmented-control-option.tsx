@@ -3,7 +3,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import Typography from '../../../typography';
+import Text from '../../../text';
 
 export type SegmentedControlOptionFields = {
   value: string;
@@ -32,7 +32,7 @@ const SegmentedControlOption = ({
         <IconComponent color={selected ? 'quinary' : 'tertiary'} />
       </IconContainer>
     )}
-    <Typography variant="label-4">{label}</Typography>
+    <Text variant="label-4">{label}</Text>
   </OptionTrigger>
 );
 

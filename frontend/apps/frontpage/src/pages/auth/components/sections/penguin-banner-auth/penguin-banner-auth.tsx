@@ -4,7 +4,7 @@ import {
   Grid,
   media,
   Stack,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
@@ -43,7 +43,7 @@ const PenguinBannerAuth = () => {
           gap={5}
         >
           <Title>{t('title')}</Title>
-          <Typography
+          <Text
             variant="display-4"
             as="h2"
             color="secondary"
@@ -52,7 +52,7 @@ const PenguinBannerAuth = () => {
             }}
           >
             {t('subtitle')}
-          </Typography>
+          </Text>
           <ContactButtons
             bookADemoButton={t('book-a-demo')}
             signUpButton={t('sign-up-for-free')}

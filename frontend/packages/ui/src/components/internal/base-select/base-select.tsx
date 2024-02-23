@@ -8,7 +8,7 @@ import ReactSelect from 'react-select';
 import styled, { useTheme } from 'styled-components';
 
 import { useOnClickOutside } from '../../../hooks';
-import { createTypography } from '../../../utils/mixins';
+import { createText } from '../../../utils/mixins';
 import type { LabelTooltipProps } from '../../label';
 import Label from '../../label';
 import Hint from '../hint';
@@ -161,7 +161,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
               }),
               placeholder: provided => ({
                 ...provided,
-                ...createTypography(theme.typography['body-3']),
+                ...createText(theme.typography['body-3']),
               }),
               control: () => ({
                 alignItems: 'center',
@@ -174,7 +174,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
               }),
               input: provided => ({
                 ...provided,
-                ...createTypography(theme.typography['body-3']),
+                ...createText(theme.typography['body-3']),
               }),
               menu: () => ({}),
             }}

@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import type { EntityCard, VaultValue } from '@onefootprint/types';
-import { Box, LinkButton, Typography } from '@onefootprint/ui';
+import { Box, LinkButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -95,9 +95,9 @@ const Fieldset = ({
         <Header>
           <Title>
             <IconComponent />
-            <Typography sx={{ whiteSpace: 'nowrap' }} variant="label-3">
+            <Text sx={{ whiteSpace: 'nowrap' }} variant="label-3">
               {getCardTitle(cards.length)}
-            </Typography>
+            </Text>
           </Title>
           {!decrypt.inProgress && cards.length > 1 && (
             <CardHeader

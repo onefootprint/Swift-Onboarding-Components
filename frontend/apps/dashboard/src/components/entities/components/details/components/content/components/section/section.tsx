@@ -1,4 +1,4 @@
-import { Divider, Typography } from '@onefootprint/ui';
+import { Divider, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -12,9 +12,9 @@ type SectionProps = {
 const Section = ({ children, title, id, suffixActions }: SectionProps) => (
   <section aria-label={title} id={id} data-testid={id}>
     <Header>
-      <Typography as="h2" variant="label-1">
+      <Text as="h2" variant="label-1">
         {title}
-      </Typography>
+      </Text>
       {suffixActions}
     </Header>
     <StyledDivider />

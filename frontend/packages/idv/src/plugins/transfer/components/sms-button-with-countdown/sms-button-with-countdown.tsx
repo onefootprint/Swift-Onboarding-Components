@@ -1,6 +1,6 @@
 import { useCountdown } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import { Button, Stack, Typography, useToast } from '@onefootprint/ui';
+import { Button, Stack, Text, useToast } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
@@ -96,11 +96,11 @@ const SmsButtonWithCountdown = ({
         {t('cta')}
       </Button>
       {countdown > 0 && (
-        <Typography variant="body-4" color="quaternary">
+        <Text variant="body-4" color="quaternary">
           {t('subtitleWithCount', {
             count: countdown,
           })}
-        </Typography>
+        </Text>
       )}
     </Stack>
   );

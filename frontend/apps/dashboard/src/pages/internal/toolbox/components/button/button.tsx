@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -16,12 +16,12 @@ const Button = ({ onClick, title, subtitle, icon: Icon }: ButtonProps) => (
       <Icon />
     </IconContainer>
     <Stack direction="column" gap={2}>
-      <Typography variant="heading-3" color="primary" as="h2">
+      <Text variant="heading-3" color="primary" as="h2">
         {title}
-      </Typography>
-      <Typography variant="body-3" color="secondary" as="p">
+      </Text>
+      <Text variant="body-3" color="secondary" as="p">
         {subtitle}
-      </Typography>
+      </Text>
     </Stack>
   </Container>
 );

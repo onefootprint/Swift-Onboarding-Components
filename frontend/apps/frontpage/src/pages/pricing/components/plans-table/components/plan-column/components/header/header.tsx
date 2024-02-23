@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -26,20 +26,20 @@ const Header = ({ title, price }: HeaderProps) => {
       justify="center"
     >
       <Stack direction="column" gap={2}>
-        <Typography variant="heading-3">{title}</Typography>
+        <Text variant="heading-3">{title}</Text>
         {hasPrice ? (
           <Stack direction="column">
             <Stack direction="row" gap={2}>
-              <Typography variant="label-3">
+              <Text variant="label-3">
                 {t('units.from')} {USDollar.format(price.monthly || 0)}
-              </Typography>
-              <Typography variant="label-3">{t('units.per-month')}</Typography>
+              </Text>
+              <Text variant="label-3">{t('units.per-month')}</Text>
             </Stack>
           </Stack>
         ) : (
-          <Typography variant="body-3" color="tertiary">
+          <Text variant="body-3" color="tertiary">
             {t('contact-us')}
-          </Typography>
+          </Text>
         )}
       </Stack>
     </Container>

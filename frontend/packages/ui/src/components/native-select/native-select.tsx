@@ -1,13 +1,13 @@
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../utils';
+import { createText } from '../../utils';
 
 const NativeSelect = styled.select`
   ${({ theme }) => {
     const { input } = theme.components;
 
     return css`
-      ${createTypography(input.size.default.typography)};
+      ${createText(input.size.default.typography)};
       appearance: none;
       background-color: ${input.state.default.initial.bg};
       background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M4.23966 5.70041C4.5432 5.41856 5.01775 5.43613 5.2996 5.73966L8 8.64779L10.7004 5.73966C10.9823 5.43613 11.4568 5.41856 11.7603 5.70041C12.0639 5.98226 12.0815 6.45681 11.7996 6.76034L8.5496 10.2603C8.40769 10.4132 8.20855 10.5 8 10.5C7.79145 10.5 7.59232 10.4132 7.45041 10.2603L4.20041 6.76034C3.91856 6.45681 3.93613 5.98226 4.23966 5.70041Z' fill='black'/%3E%3C/svg%3E%0A");

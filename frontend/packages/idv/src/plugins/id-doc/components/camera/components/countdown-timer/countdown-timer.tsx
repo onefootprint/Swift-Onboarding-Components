@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -14,9 +14,9 @@ const CountdownTimer = ({ current, start }: CountdownTimerProps) => {
 
   return (
     <Container size={COUNTDOWN_TIMER_SIZE}>
-      <Typography variant="display-2" color="quinary">
+      <Text variant="display-2" color="quinary">
         {current}
-      </Typography>
+      </Text>
     </Container>
   );
 };

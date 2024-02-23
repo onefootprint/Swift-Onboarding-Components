@@ -1,5 +1,5 @@
 import { IcoLink16 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import getSectionMeta from 'src/utils/section';
 import styled, { css } from 'styled-components';
@@ -12,10 +12,10 @@ const H1 = ({ children }: H1Props) => {
   const { id, label } = getSectionMeta(children);
   return (
     <Anchor id={id} href={`#${id}`} rel="noopener noreferrer">
-      <Typography as="h1" color="primary" variant="heading-2">
+      <Text as="h1" color="primary" variant="heading-2">
         {label}
         <IcoLink16 />
-      </Typography>
+      </Text>
     </Anchor>
   );
 };

@@ -1,4 +1,4 @@
-import { LoadingIndicator, Stack, Typography } from '@onefootprint/ui';
+import { LoadingIndicator, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -7,7 +7,7 @@ const Verifying = ({ text }: { text: string }) => (
     <Stack justify="center" width="40px" height="40px">
       <LoadingIndicator />
     </Stack>
-    <Typography variant="label-3">{text}</Typography>
+    <Text variant="label-3">{text}</Text>
   </Container>
 );
 

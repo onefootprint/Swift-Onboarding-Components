@@ -1,5 +1,5 @@
 import type { SXStyleProps } from '@onefootprint/ui';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 
 export type FieldProps = {
@@ -10,17 +10,12 @@ export type FieldProps = {
 
 const Field = ({ label, children, childrenSx }: FieldProps) => (
   <div role="row" aria-label={label}>
-    <Typography
-      variant="label-3"
-      color="tertiary"
-      sx={{ marginBottom: 3 }}
-      as="div"
-    >
+    <Text variant="label-3" color="tertiary" sx={{ marginBottom: 3 }} as="div">
       {label}
-    </Typography>
-    <Typography variant="body-3" as="div" sx={childrenSx}>
+    </Text>
+    <Text variant="body-3" as="div" sx={childrenSx}>
       {children}
-    </Typography>
+    </Text>
   </div>
 );
 

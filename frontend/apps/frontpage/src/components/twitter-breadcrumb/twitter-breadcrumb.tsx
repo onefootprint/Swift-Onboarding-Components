@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
-import { LinkButton, media, Typography } from '@onefootprint/ui';
+import { LinkButton, media, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -17,12 +17,12 @@ const TwitterBreadcrumb = ({
   <BreadcrumbContainer>
     <Breadcrumb>
       <BreadcrumbTitleContainer>
-        <Typography color="primary" variant="label-2" as="span">
+        <Text color="primary" variant="label-2" as="span">
           {title}
-        </Typography>
-        <Typography color="primary" variant="label-2" as="span">
+        </Text>
+        <Text color="primary" variant="label-2" as="span">
           {description}
-        </Typography>
+        </Text>
       </BreadcrumbTitleContainer>
       <LinkButton
         href="https://twitter.com/footprint_hq"

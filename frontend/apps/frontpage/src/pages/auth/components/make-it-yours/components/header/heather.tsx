@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 
 import BirdIcon from '../bird-icon';
@@ -18,10 +18,10 @@ const Heather = ({ title, subtitle }: HeatherProps) => (
       maxWidth="600px"
       textAlign="center"
     >
-      <Typography variant="display-3">{title}</Typography>
-      <Typography variant="display-4" color="tertiary">
+      <Text variant="display-3">{title}</Text>
+      <Text variant="display-4" color="tertiary">
         {subtitle}
-      </Typography>
+      </Text>
     </Stack>
   </Stack>
 );

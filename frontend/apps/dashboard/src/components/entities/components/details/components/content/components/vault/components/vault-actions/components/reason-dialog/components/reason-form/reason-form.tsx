@@ -1,10 +1,4 @@
-import {
-  Box,
-  Divider,
-  NativeSelect,
-  TextArea,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Divider, NativeSelect, Text, TextArea } from '@onefootprint/ui';
 import Hint from '@onefootprint/ui/src/components/internal/hint';
 import Label from '@onefootprint/ui/src/components/label';
 import React, { useId, useState } from 'react';
@@ -52,9 +46,9 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
 
   return (
     <form id="decrypt-reason-form" onSubmit={handleSubmit(handleBeforeSubmit)}>
-      <Typography variant="label-1" sx={{ marginBottom: 7 }}>
+      <Text variant="label-1" sx={{ marginBottom: 7 }}>
         {t('description')}
-      </Typography>
+      </Text>
       <Label htmlFor={useId()}>{t('form.reason.label')}</Label>
       <NativeSelect
         defaultValue={t('form.reason.options.customer-verification')}
@@ -93,9 +87,9 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
       <Box marginTop={7} marginBottom={7}>
         <Divider />
       </Box>
-      <Typography variant="body-3" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('disclaimer')}
-      </Typography>
+      </Text>
     </form>
   );
 };

@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -16,9 +16,9 @@ const SupportListItem = ({
 }: SupportListItemProps) => (
   <Item onClick={onClick}>
     <IconComponent color="tertiary" />
-    <Typography variant="label-3" color="tertiary">
+    <Text variant="label-3" color="tertiary">
       {label}
-    </Typography>
+    </Text>
   </Item>
 );
 

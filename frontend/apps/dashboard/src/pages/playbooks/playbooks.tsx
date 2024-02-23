@@ -1,5 +1,5 @@
 import { RoleScopeKind } from '@onefootprint/types';
-import { Button, Pagination, Stack, Typography } from '@onefootprint/ui';
+import { Button, Pagination, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,10 +51,10 @@ const Playbooks = () => {
       </Head>
       <HeaderContainer>
         <Title>
-          <Typography variant="heading-2">{t('header.title')}</Typography>
-          <Typography variant="body-2" color="secondary">
+          <Text variant="heading-2">{t('header.title')}</Text>
+          <Text variant="body-2" color="secondary">
             {t('header.subtitle')}
-          </Typography>
+          </Text>
         </Title>
         <Wrapper>
           <PermissionGate

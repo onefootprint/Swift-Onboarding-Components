@@ -1,5 +1,5 @@
 import { IcoChevronDown24 } from '@onefootprint/icons';
-import { createFontStyles, media, Typography } from '@onefootprint/ui';
+import { createFontStyles, media, Text } from '@onefootprint/ui';
 import * as AccordionRadix from '@radix-ui/react-accordion';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -36,7 +36,7 @@ const AccordionItem = ({ title, content }: AccordionItemProps) => (
 const AccordionTitle = ({ children }: AccordionTitleProps) => (
   <TitleContainer>
     <StyledTrigger>
-      <Typography variant="label-1">{children}</Typography>
+      <Text variant="label-1">{children}</Text>
       <IconContainer className="icon">
         <IcoChevronDown24 />
       </IconContainer>

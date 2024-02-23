@@ -1,6 +1,6 @@
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
 import type { OrgAuthMagicLinkRequest } from '@onefootprint/types';
-import { Button, Grid, Stack, TextInput, Typography } from '@onefootprint/ui';
+import { Button, Grid, Stack, Text, TextInput } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -51,9 +51,9 @@ const EmailLogin = () => {
           <Grid.Container gap={7}>
             <Stack align="center" justify="center" gap={7} direction="column">
               <ThemedLogoFpDefault />
-              <Typography variant="label-1" color="primary">
+              <Text variant="label-1" color="primary">
                 {t('title')}
-              </Typography>
+              </Text>
             </Stack>
             <TextInput
               hasError={!!errors.email}
@@ -79,13 +79,13 @@ const EmailLogin = () => {
             >
               {t('form.cta')}
             </Button>
-            <Typography
+            <Text
               variant="caption-2"
               color="tertiary"
               sx={{ maxWidth: '350px', textAlign: 'center' }}
             >
               {t('instructions')}
-            </Typography>
+            </Text>
           </Grid.Container>
         </Form>
       </Container>

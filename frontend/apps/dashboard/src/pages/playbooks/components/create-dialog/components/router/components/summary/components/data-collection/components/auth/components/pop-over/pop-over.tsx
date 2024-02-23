@@ -1,5 +1,5 @@
 import type { Color, FontVariant } from '@onefootprint/design-tokens';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import Image from 'next/image';
 import React, { useRef } from 'react';
@@ -29,12 +29,12 @@ const PopOver = ({
   return (
     <PopoverPrimitive.Root>
       <Trigger ref={hoverRef} isHovered={isHovered}>
-        <Typography
+        <Text
           variant={triggerVariants.variant}
           color={isHovered ? 'primary' : triggerVariants.color}
         >
           {label}
-        </Typography>
+        </Text>
       </Trigger>
       <PopoverPrimitive.Content asChild side="top">
         <Container gap={5} direction="column" align="start">
@@ -43,9 +43,9 @@ const PopOver = ({
               <Image src={videoSrc} alt="video" height={604} width={800} />
             </VideoContainer>
           )}
-          <Typography variant="body-4" color="secondary">
+          <Text variant="body-4" color="secondary">
             {content}
-          </Typography>
+          </Text>
           <PopoverPrimitive.Arrow />
         </Container>
       </PopoverPrimitive.Content>

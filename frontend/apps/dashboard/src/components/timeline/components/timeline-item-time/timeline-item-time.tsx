@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -20,19 +20,19 @@ const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
   if (isTimestamp) {
     return (
       <TimeContainer>
-        <Typography variant="label-3" color="tertiary">
+        <Text variant="label-3" color="tertiary">
           {new Date(time.timestamp).toLocaleString('en-us', {
             month: '2-digit',
             day: '2-digit',
             year: '2-digit',
           })}
-        </Typography>
-        <Typography variant="label-3" color="tertiary">
+        </Text>
+        <Text variant="label-3" color="tertiary">
           {new Date(time.timestamp).toLocaleString('en-us', {
             hour: 'numeric',
             minute: 'numeric',
           })}
-        </Typography>
+        </Text>
       </TimeContainer>
     );
   }
@@ -52,31 +52,31 @@ const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
   if (shouldCollapseRange) {
     return (
       <TimeContainer>
-        <Typography variant="label-3" color="tertiary">
+        <Text variant="label-3" color="tertiary">
           {start}
-        </Typography>
-        <Typography variant="label-3" color="tertiary">
+        </Text>
+        <Text variant="label-3" color="tertiary">
           --
-        </Typography>
+        </Text>
       </TimeContainer>
     );
   }
 
   return (
     <TimeContainer>
-      <Typography variant="label-3" color="tertiary">
+      <Text variant="label-3" color="tertiary">
         {start}
-      </Typography>
-      <Typography
+      </Text>
+      <Text
         variant="label-3"
         color="tertiary"
         sx={{ marginLeft: 1, marginRight: 1 }}
       >
         -
-      </Typography>
-      <Typography variant="label-3" color="tertiary">
+      </Text>
+      <Text variant="label-3" color="tertiary">
         {end}
-      </Typography>
+      </Text>
     </TimeContainer>
   );
 };

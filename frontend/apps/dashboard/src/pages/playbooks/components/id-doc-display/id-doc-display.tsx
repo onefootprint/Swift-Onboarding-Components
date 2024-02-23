@@ -2,7 +2,7 @@
 
 import { IcoCloseSmall24 } from '@onefootprint/icons';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
-import { Tooltip, Typography } from '@onefootprint/ui';
+import { Text, Tooltip } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
@@ -46,16 +46,16 @@ const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
 
     return (
       <DocPreviewContainer>
-        <Typography variant="body-3" sx={{ whiteSpace: 'nowrap' }}>
+        <Text variant="body-3" sx={{ whiteSpace: 'nowrap' }}>
           {threshold === 3 ? displayStringFirstTwo : displayStringFirst}
-        </Typography>
+        </Text>
         <Tooltip text={remainingDocString} alignment="center" position="bottom">
-          <Typography
+          <Text
             variant="body-3"
             sx={{ textDecoration: 'underline', whiteSpace: 'nowrap' }}
           >
             {`${remainingIdDocTypes.length} ${t('more')}`}
-          </Typography>
+          </Text>
         </Tooltip>
       </DocPreviewContainer>
     );
@@ -63,7 +63,7 @@ const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
   const possibleIdDocs = idDocKind
     .map(k => t(`${kebabCase(k as string)}` as ParseKeys<'common'>))
     .join(', ');
-  return <Typography variant="body-3">{possibleIdDocs}</Typography>;
+  return <Text variant="body-3">{possibleIdDocs}</Text>;
 };
 
 const DocPreviewContainer = styled.div`

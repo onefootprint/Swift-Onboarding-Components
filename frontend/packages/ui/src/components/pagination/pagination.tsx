@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 import Button from '../button';
 import Stack from '../stack';
-import Typography from '../typography';
+import Text from '../text';
 
 export type PaginationProps = {
   hasNextPage: boolean;
@@ -38,13 +38,13 @@ const Pagination = ({
     return (
       <Stack justify="space-between" marginTop={5}>
         <Stack align="center">
-          <Typography variant="body-3" color="secondary">
+          <Text variant="body-3" color="secondary">
             {t('showing', {
               lowerBoundShownResults,
               upperBoundShownResults,
               totalNumResults,
             })}
-          </Typography>
+          </Text>
         </Stack>
         <ButtonContainer>
           <Button

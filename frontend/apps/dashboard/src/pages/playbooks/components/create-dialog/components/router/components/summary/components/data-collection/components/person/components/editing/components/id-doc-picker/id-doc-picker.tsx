@@ -1,5 +1,5 @@
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import { Box, Checkbox, Divider, Grid, Typography } from '@onefootprint/ui';
+import { Box, Checkbox, Divider, Grid, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -54,9 +54,9 @@ const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
           {...register('personal.idDocKind')}
         />
         {(!idDocKind || idDocKind.length === 0) && unselectedIDDoc && (
-          <Typography color="error" variant="body-3" sx={{ paddingTop: 5 }}>
+          <Text color="error" variant="body-3" sx={{ paddingTop: 5 }}>
             {t('id-doc.no-id-doc-selected')}
-          </Typography>
+          </Text>
         )}
       </Grid.Container>
       {idDocKind?.length > 0 && (

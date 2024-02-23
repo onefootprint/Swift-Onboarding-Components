@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import IconButton from '../../../icon-button';
-import Typograhy from '../../../typography';
+import Typograhy from '../../../text';
 
 const shortMonthDateFormatter = (date: Date) =>
   date.toLocaleDateString(undefined, { year: 'numeric', month: 'short' });

@@ -6,7 +6,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 import LinkButton from '../link-button';
 import Stack from '../stack';
-import Typography from '../typography';
+import Text from '../text';
 import type { ToastProps } from './toast.types';
 
 const DESKTOP_WIDTH = '380px';
@@ -45,16 +45,16 @@ const Toast = ({
         gap={4}
       >
         <Stack direction="column">
-          <Typography
+          <Text
             color={variant === 'error' ? 'error' : 'primary'}
             variant="label-3"
             sx={{ marginBottom: 2 }}
           >
             {title}
-          </Typography>
-          <Typography color="tertiary" variant="body-3">
+          </Text>
+          <Text color="tertiary" variant="body-3">
             {description}
-          </Typography>
+          </Text>
         </Stack>
         {cta && (
           <LinkButton

@@ -2,7 +2,7 @@ import type { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
 import Box from '../box';
-import Typography from '../typography';
+import Text from '../text';
 import type { ContainerProps } from './container';
 import Container from './container';
 
@@ -41,9 +41,9 @@ const Template: Story<ContainerProps> = ({
       borderRadius="compact"
       padding={6}
     >
-      <Typography variant="label-1" color="quaternary">
+      <Text variant="label-1" color="quaternary">
         {children}
-      </Typography>
+      </Text>
     </Box>
   </Container>
 );

@@ -5,7 +5,7 @@ import React from 'react';
 
 import Box from '../box';
 import Stack from '../stack';
-import Typography from '../typography';
+import Text from '../text';
 
 export default {
   title: 'Components/Icon',
@@ -22,9 +22,9 @@ export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
 }) => (
   <Box>
     <Box marginBottom={10}>
-      <Typography color="primary" variant="heading-2" sx={{ marginBottom: 3 }}>
+      <Text color="primary" variant="heading-2" sx={{ marginBottom: 3 }}>
         Icos
-      </Typography>
+      </Text>
       {Object.keys(icos).map(iconName => {
         // @ts-ignore
         const IcoComponent = icos[iconName];
@@ -34,9 +34,9 @@ export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
               <Box minWidth="32px">
                 <IcoComponent color={color} testID={testID} />
               </Box>
-              <Typography variant="body-2" color="primary">
+              <Text variant="body-2" color="primary">
                 {iconName}
-              </Typography>
+              </Text>
             </Stack>
             <hr />
           </>

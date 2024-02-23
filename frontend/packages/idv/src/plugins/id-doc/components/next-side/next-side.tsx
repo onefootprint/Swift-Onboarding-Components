@@ -1,5 +1,5 @@
 import type { IdDocImageTypes } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTimeout } from 'usehooks-ts';
@@ -25,9 +25,9 @@ const NextSide = ({ nextSideImageType, onComplete }: NextSideProps) => {
   return (
     <Stack direction="column" align="center">
       <Icon />
-      <Typography variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
+      <Text variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
         {t(nextSideImageType)}
-      </Typography>
+      </Text>
     </Stack>
   );
 };

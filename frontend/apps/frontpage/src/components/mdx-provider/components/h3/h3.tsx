@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 
 type H3Props = {
@@ -6,9 +6,9 @@ type H3Props = {
 };
 
 const H3 = ({ children }: H3Props) => (
-  <Typography variant="heading-3" color="primary" sx={{ marginBottom: 3 }}>
+  <Text variant="heading-3" color="primary" sx={{ marginBottom: 3 }}>
     {children}
-  </Typography>
+  </Text>
 );
 
 export default H3;

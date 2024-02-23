@@ -4,7 +4,7 @@ import type {
   EntityVault,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import { Drawer, LinkButton, Typography } from '@onefootprint/ui';
+import { Drawer, LinkButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,15 +57,15 @@ const DocumentField = ({
     <Container>
       <Inner>
         <LabelContainer>
-          <Typography variant="body-3" color="tertiary" as="label">
+          <Text variant="body-3" color="tertiary" as="label">
             {label}
-          </Typography>
+          </Text>
           {documentStatus && <DocumentStatusBadge status={documentStatus} />}
         </LabelContainer>
         {showEditView ? (
-          <Typography variant="body-3" color="tertiary">
+          <Text variant="body-3" color="tertiary">
             {t('cannot-edit')}
-          </Typography>
+          </Text>
         ) : (
           <LinkButton size="compact" onClick={show}>
             {t('see-details')}

@@ -1,4 +1,4 @@
-import { Box, media, Stack, Typography } from '@onefootprint/ui';
+import { Box, media, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
@@ -48,12 +48,12 @@ const Article = ({ article }: ArticleProps) => {
               <Stack direction="row" gap={2}>
                 <TypeBadge type={method} />
                 <Stack direction="row" gap={1}>
-                  <Typography variant="label-2" as="h3" color="tertiary">
+                  <Text variant="label-2" as="h3" color="tertiary">
                     {API_BASE_URL}
-                  </Typography>
-                  <Typography variant="label-2" as="h3">
+                  </Text>
+                  <Text variant="label-2" as="h3">
                     {path}
-                  </Typography>
+                  </Text>
                 </Stack>
               </Stack>
             )}
@@ -61,9 +61,9 @@ const Article = ({ article }: ArticleProps) => {
           </TitleContainer>
           {security && (
             <Requests>
-              <Typography variant="label-1" sx={{ marginTop: 3 }}>
+              <Text variant="label-1" sx={{ marginTop: 3 }}>
                 {t('request')}
-              </Typography>
+              </Text>
               {security?.map((element: SecurityTypes) =>
                 Object.keys(element).map(type => (
                   <Security key={type} type={type as SecurityTypes} />

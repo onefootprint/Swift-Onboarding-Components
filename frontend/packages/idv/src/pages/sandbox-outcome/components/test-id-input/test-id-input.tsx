@@ -5,13 +5,7 @@ import {
   IcoInfo16,
   IcoPencil24,
 } from '@onefootprint/icons';
-import {
-  Box,
-  CopyButton,
-  TextInput,
-  Tooltip,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, CopyButton, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import Hint from '@onefootprint/ui/src/components/internal/hint';
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -53,7 +47,7 @@ const TestIdInput = () => {
   return (
     <InputContainer>
       <InputTitle>
-        <Typography variant="label-2">{t('test-id.label')}</Typography>
+        <Text variant="label-2">{t('test-id.label')}</Text>
         <Tooltip
           text={t('test-id.description')}
           alignment="start"

@@ -17,7 +17,7 @@ import LinkButton from '../link-button';
 import Overlay from '../overlay';
 import Portal from '../portal';
 import ScrollArea from '../scroll-area';
-import Typography from '../typography';
+import Text from '../text';
 import type {
   DialogAllButtons,
   DialogHeaderIcon,
@@ -109,7 +109,7 @@ const Dialog = ({
                 <HeaderIconComponent />
               </IconButton>
             </CloseContainer>
-            <Typography variant="label-2">{title}</Typography>
+            <Text variant="label-2">{title}</Text>
           </Header>
           <ScrollArea
             sx={{

@@ -10,8 +10,8 @@ import {
   createFontStyles,
   Divider,
   PhoneInput,
+  Text,
   TextInput,
-  Typography,
 } from '@onefootprint/ui';
 import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
@@ -158,9 +158,9 @@ const Form = ({ html, onSuccess }: FormProps) => {
         </Button>
         <OrDivider>
           <Divider />
-          <Typography variant="body-3" color="tertiary">
+          <Text variant="body-3" color="tertiary">
             or
-          </Typography>
+          </Text>
         </OrDivider>
         <FootprintVerifyButton onClick={showFootprint} />
       </FormContainer>

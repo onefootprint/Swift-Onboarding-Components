@@ -3,7 +3,7 @@ import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Button from '../button';
-import Typography from '../typography';
+import Text from '../text';
 import type { DrawerProps } from './drawer';
 import Drawer from './drawer';
 
@@ -95,7 +95,7 @@ const Template: Story<DrawerProps> = ({
         open={open}
         title={title}
       >
-        <Typography variant="body-4">{children}</Typography>
+        <Text variant="body-4">{children}</Text>
       </Drawer>
       <Button onClick={() => setOpen(true)} size="default">
         Open Drawer

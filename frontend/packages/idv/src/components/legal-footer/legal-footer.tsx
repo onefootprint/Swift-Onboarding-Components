@@ -5,7 +5,7 @@ import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 const LegalFooter = () => (
-  <StyledTypography>
+  <StyledText>
     <Trans
       ns="identify"
       i18nKey="email-step.legal-footer"
@@ -26,10 +26,10 @@ const LegalFooter = () => (
         ),
       }}
     />
-  </StyledTypography>
+  </StyledText>
 );
 
-const StyledTypography = styled.p`
+const StyledText = styled.p`
   ${({ theme }) => css`
     ${createFontStyles('caption-2')}
     color: ${theme.color.tertiary};

@@ -6,7 +6,7 @@ import {
   IcoLock24,
   IcoShield40,
 } from '@onefootprint/icons';
-import { Grid, media, Stack, Typography } from '@onefootprint/ui';
+import { Grid, media, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -74,12 +74,12 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
           gap={5}
           maxWidth="600px"
         >
-          <Typography as="h1" variant="display-2">
+          <Text as="h1" variant="display-2">
             {t('title')}
-          </Typography>
-          <Typography as="p" variant="display-4" color="secondary">
+          </Text>
+          <Text as="p" variant="display-4" color="secondary">
             {t('subtitle', { tenantName: tenant.name })}
-          </Typography>
+          </Text>
         </HeadingContainer>
         <FeaturesContainer
           align="center"
@@ -101,9 +101,9 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
             gap={5}
           >
             <IcoShield40 />
-            <Typography as="h2" variant="heading-2">
+            <Text as="h2" variant="heading-2">
               {t('features.title')}
-            </Typography>
+            </Text>
           </Stack>
           <FeaturesGrid
             columns={['repeat(1, 1fr)']}

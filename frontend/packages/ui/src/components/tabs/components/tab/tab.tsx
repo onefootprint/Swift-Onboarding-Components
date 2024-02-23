@@ -3,7 +3,7 @@ import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import Stack from '../../../stack';
-import Typography from '../../../typography/typography';
+import Text from '../../../text';
 
 type TabContainerProps = ComponentProps<typeof TabContainer>;
 
@@ -75,7 +75,7 @@ const TabContainer = styled(Stack)<{ selected: boolean }>`
   `}
 `;
 
-const Label = styled(Typography)<{ selected: boolean }>`
+const Label = styled(Text)<{ selected: boolean }>`
   ${({ theme }) => css`
     position: relative;
     z-index: 1;

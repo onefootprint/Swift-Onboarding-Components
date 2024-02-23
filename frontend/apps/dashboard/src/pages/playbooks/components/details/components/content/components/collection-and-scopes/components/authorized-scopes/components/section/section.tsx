@@ -1,5 +1,5 @@
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import { Tag, Typography } from '@onefootprint/ui';
+import { Tag, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
@@ -46,9 +46,9 @@ const Section = ({
 
   return (
     <Container>
-      <Typography variant="label-3" color="secondary">
+      <Text variant="label-3" color="secondary">
         {title}
-      </Typography>
+      </Text>
       <TagContainer>
         {dataToDisplay.map(field => (
           <Tag key={field}>{t(kebabCase(field) as ParseKeys<'common'>)}</Tag>

@@ -10,7 +10,7 @@ import type {
 import Select from 'react-select';
 import { useTheme } from 'styled-components';
 
-import { createTypography } from '../../utils';
+import { createText } from '../../utils';
 import Box from '../box';
 import Hint from '../internal/hint';
 import Label from '../label';
@@ -207,7 +207,7 @@ const MultiSelect = <
           }),
           placeholder: base => ({
             ...base,
-            ...createTypography(inputSize.typography),
+            ...createText(inputSize.typography),
             color: input.global.placeholderColor,
             padding: `0 ${theme.spacing[3]}`,
           }),
@@ -237,7 +237,7 @@ const MultiSelect = <
           }),
           groupHeading: () => ({
             color: theme.color.tertiary,
-            ...createTypography(theme.typography['caption-3']),
+            ...createText(theme.typography['caption-3']),
             marginBottom: theme.spacing[2],
             padding: `${theme.spacing[3]} ${theme.spacing[5]} ${theme.spacing[2]}`,
             textTransform: 'uppercase',
@@ -249,7 +249,7 @@ const MultiSelect = <
           input: (base, { hasValue }) => ({
             ...base,
             color: input.global.color,
-            ...createTypography(inputSize.typography),
+            ...createText(inputSize.typography),
             margin: `${theme.spacing[1]} auto ${theme.spacing[1]} ${
               theme.spacing[hasValue ? 1 : 3]
             }`,
@@ -270,7 +270,7 @@ const MultiSelect = <
             padding: `${theme.spacing[2]} ${theme.spacing[3]}`,
           }),
           multiValueLabel: () => ({
-            ...createTypography(theme.typography['body-4']),
+            ...createText(theme.typography['body-4']),
           }),
           multiValueRemove: () => ({
             cursor: 'pointer',
@@ -287,7 +287,7 @@ const MultiSelect = <
           }),
           noOptionsMessage: () => ({
             color: theme.color.tertiary,
-            ...createTypography(theme.typography['body-3']),
+            ...createText(theme.typography['body-3']),
             margin: `${theme.spacing[3]} ${theme.spacing[5]}`,
             textAlign: 'left',
           }),

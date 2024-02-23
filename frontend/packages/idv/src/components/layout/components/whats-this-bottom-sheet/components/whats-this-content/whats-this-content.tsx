@@ -1,6 +1,6 @@
 import { IcoDatabase16, IcoShield16 } from '@onefootprint/icons';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,13 +57,13 @@ const WhatsThisContent = ({ config }: WhatsThisContentProps) => {
             />
           </Stack>
         )}
-        <Typography variant="label-1">{localTranslations.title}</Typography>
-        <Typography variant="body-3" color="secondary">
+        <Text variant="label-1">{localTranslations.title}</Text>
+        <Text variant="body-3" color="secondary">
           {localTranslations.subtitle.replace(
             '{{tenant}}',
             config?.orgName ? config.orgName : 'this company',
           )}
-        </Typography>
+        </Text>
       </Stack>
       <Stack direction="column" gap={5}>
         {localTranslations.cards.map(({ cardTitle, subtitle, icon }) => (

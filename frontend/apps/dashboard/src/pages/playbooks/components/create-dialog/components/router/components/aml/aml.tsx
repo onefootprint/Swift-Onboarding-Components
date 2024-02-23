@@ -5,7 +5,7 @@ import {
   Checkbox,
   Divider,
   Stack,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -48,14 +48,14 @@ const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
     <Container>
       <Header>
         <TitleContainer>
-          <Typography variant="label-1" color="secondary">
+          <Text variant="label-1" color="secondary">
             {t('title')}
-          </Typography>
+          </Text>
           <Badge variant="info">{t('recommended')}</Badge>
         </TitleContainer>
-        <Typography variant="body-2" color="secondary">
+        <Text variant="body-2" color="secondary">
           {t('subtitle')}
-        </Typography>
+        </Text>
       </Header>
       <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
         <Stack gap={5} direction="column">
@@ -83,21 +83,21 @@ const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
                 {...register('adverseMedia')}
               />
               <Divider variant="secondary" />
-              <Typography variant="body-3" color="tertiary">
-                <Typography variant="body-3" color="primary" as="span">
+              <Text variant="body-3" color="tertiary">
+                <Text variant="body-3" color="primary" as="span">
                   {t('footer.label')}{' '}
-                </Typography>
+                </Text>
                 {t('footer.content')}
-              </Typography>
+              </Text>
             </>
           )}
         </Stack>
         {isMissingSelection && showError && (
           <ErrorContainer>
             <IcoWarning16 color="error" />
-            <Typography variant="body-3" color="error">
+            <Text variant="body-3" color="error">
               {t('missing-selection')}
-            </Typography>
+            </Text>
           </ErrorContainer>
         )}
         <ButtonContainer>

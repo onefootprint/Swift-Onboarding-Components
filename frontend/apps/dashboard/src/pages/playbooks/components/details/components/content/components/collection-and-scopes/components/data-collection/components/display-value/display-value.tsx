@@ -3,7 +3,7 @@ import {
   CollectedKycDataOption,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import IdDocDisplay from 'src/pages/playbooks/components/id-doc-display';
@@ -42,16 +42,16 @@ const DisplayValue = ({
   }
   if (field === 'ssn') {
     if (mustCollectData.includes(CollectedKycDataOption.ssn9)) {
-      return <Typography variant="body-3">{t('full')}</Typography>;
+      return <Text variant="body-3">{t('full')}</Text>;
     }
     if (mustCollectData.includes(CollectedKycDataOption.ssn4)) {
-      return <Typography variant="body-3">{t('last4')}</Typography>;
+      return <Text variant="body-3">{t('last4')}</Text>;
     }
     if (optionalData.includes(CollectedKycDataOption.ssn9)) {
-      return <Typography variant="body-3">{t('full_optional')}</Typography>;
+      return <Text variant="body-3">{t('full_optional')}</Text>;
     }
     if (optionalData.includes(CollectedKycDataOption.ssn4)) {
-      return <Typography variant="body-3">{t('last4_optional')}</Typography>;
+      return <Text variant="body-3">{t('last4_optional')}</Text>;
     }
     return <IcoCloseSmall24 testID="close-icon" />;
   }

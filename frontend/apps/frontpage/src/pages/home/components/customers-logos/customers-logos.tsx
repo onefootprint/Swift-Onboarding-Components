@@ -1,5 +1,5 @@
 import { IcoSparkles40 } from '@onefootprint/icons';
-import { Container, Stack, Typography } from '@onefootprint/ui';
+import { Container, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
@@ -22,7 +22,7 @@ const CustomersLogos = () => {
           textAlign="center"
         >
           <IcoSparkles40 color="secondary" />
-          <Typography variant="display-4">{t('title')}</Typography>
+          <Text variant="display-4">{t('title')}</Text>
         </Stack>
         <Logos />
       </Stack>

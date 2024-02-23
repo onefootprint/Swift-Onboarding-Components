@@ -1,9 +1,4 @@
-import {
-  CodeInline,
-  createFontStyles,
-  Stack,
-  Typography,
-} from '@onefootprint/ui';
+import { CodeInline, createFontStyles, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ContentSchema } from 'src/pages/api-reference/api-reference.types';
@@ -51,9 +46,9 @@ const Header = ({ title, schema, isRequired, isInBrackets }: HeaderProps) => {
       <Column isInBrackets={isInBrackets}>
         <CodeInline disabled>{title}</CodeInline>
         <Separator>·</Separator>
-        <Typography variant="snippet-2" color="quaternary">
+        <Text variant="snippet-2" color="quaternary">
           {typeLabel}
-        </Typography>
+        </Text>
       </Column>
     </StyledStack>
   );

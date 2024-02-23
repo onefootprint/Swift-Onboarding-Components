@@ -1,14 +1,14 @@
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 const Success = ({ text }: { text: string }) => (
   <Container>
     <IcoCheckCircle40 color="success" />
-    <Typography variant="label-3" color="success">
+    <Text variant="label-3" color="success">
       {text}
-    </Typography>
+    </Text>
   </Container>
 );
 

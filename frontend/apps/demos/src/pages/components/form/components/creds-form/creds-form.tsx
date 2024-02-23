@@ -1,4 +1,4 @@
-import { Button, Checkbox, TextInput, Typography } from '@onefootprint/ui';
+import { Button, Checkbox, Text, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import type { ClientTokenResponse } from 'src/hooks/use-client-token';
@@ -71,7 +71,7 @@ const CredsForm = ({ onSubmit }: CredsFormProps) => {
         hint={errors?.cardAlias && 'Please enter a valid card alias'}
         {...register('cardAlias', { required: true })}
       />
-      <Typography variant="body-3">Optional card fields to collect</Typography>
+      <Text variant="body-3">Optional card fields to collect</Text>
       <Checkbox label="Name" {...register('collectName')} />
       <Checkbox
         label="Partial Address"

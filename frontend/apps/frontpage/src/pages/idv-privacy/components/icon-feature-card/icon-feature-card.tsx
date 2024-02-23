@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -22,14 +22,14 @@ const IconFeatureCard = ({
   return (
     <Container>
       <IconContainer>{icon}</IconContainer>
-      <Typography variant="label-2">{title}</Typography>
-      <Typography variant="body-2" color="secondary">
+      <Text variant="label-2">{title}</Text>
+      <Text variant="body-2" color="secondary">
         {trans ? (
           <Trans i18nKey={trans.i18nKey} components={trans.components} />
         ) : (
           description
         )}
-      </Typography>
+      </Text>
     </Container>
   );
 };

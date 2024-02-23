@@ -6,7 +6,7 @@ import {
   Stack,
   Tab,
   Tabs,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -41,12 +41,12 @@ const StoreData = () => {
   return (
     <SectionContainer>
       <TitleContainer>
-        <Typography variant="display-2" color="primary" as="h2">
+        <Text variant="display-2" color="primary" as="h2">
           {t('title')}
-        </Typography>
-        <Typography variant="display-4" color="secondary" as="p">
+        </Text>
+        <Text variant="display-4" color="secondary" as="p">
           {t('subtitle')}
-        </Typography>
+        </Text>
         <LinkButton
           iconComponent={IcoArrowRightSmall16}
           href="/vaulting"

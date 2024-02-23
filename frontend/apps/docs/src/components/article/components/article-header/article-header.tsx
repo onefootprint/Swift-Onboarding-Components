@@ -1,4 +1,4 @@
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
 
 import H1 from '../markdown-components/h1';
@@ -11,9 +11,9 @@ type ArticleHeaderProps = {
 const ArticleHeader = ({ title, subtitle }: ArticleHeaderProps) => (
   <Box marginBottom={8}>
     <H1>{title}</H1>
-    <Typography color="tertiary" variant="label-3">
+    <Text color="tertiary" variant="label-3">
       {subtitle}
-    </Typography>
+    </Text>
   </Box>
 );
 

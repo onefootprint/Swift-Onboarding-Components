@@ -1,5 +1,5 @@
 import type { Tenant } from '@onefootprint/types';
-import { Pagination, Stack, Table, Typography } from '@onefootprint/ui';
+import { Pagination, Stack, Table, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -53,10 +53,10 @@ const Tenants = () => {
       </Head>
       <Container>
         <Stack gap={2} marginBottom={7} direction="column">
-          <Typography variant="heading-2">{t('title')}</Typography>
-          <Typography variant="body-2" color="secondary">
+          <Text variant="heading-2">{t('title')}</Text>
+          <Text variant="body-2" color="secondary">
             {t('subtitle')}
-          </Typography>
+          </Text>
         </Stack>
         <Table<Tenant>
           aria-label={t('table.aria-label')}

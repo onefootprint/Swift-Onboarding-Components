@@ -1,4 +1,4 @@
-const typographyVariables = new Map<
+const textVariables = new Map<
   string,
   { var: string; assignDefault?: string[] }
 >([
@@ -10,4 +10,4 @@ const typographyVariables = new Map<
   ],
 ]);
 
-export default typographyVariables;
+export default textVariables;

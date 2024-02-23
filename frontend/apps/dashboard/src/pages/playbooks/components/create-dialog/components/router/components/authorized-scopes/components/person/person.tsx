@@ -3,7 +3,7 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
-import { Box, Checkbox, Grid, Typography } from '@onefootprint/ui';
+import { Box, Checkbox, Grid, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -41,7 +41,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
   return (
     <Sections>
       <ScopeSection>
-        <Typography variant="label-3">{t('basic-information')}</Typography>
+        <Text variant="label-3">{t('basic-information')}</Text>
         <Grid.Container gap={3} columns={['repeat(2, 1fr)']} width="100%">
           <Checkbox disabled checked label={allT('cdo.email')} />
           {phoneNumber && (
@@ -63,7 +63,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
       </ScopeSection>
       {(ssn || usLegalStatus || idDocKind.length > 0) && allowUS && (
         <ScopeSection>
-          <Typography variant="label-3">{t('us-residents')}</Typography>
+          <Text variant="label-3">{t('us-residents')}</Text>
           <Grid.Container gap={3} columns={['repeat(2, 1fr)']} width="100%">
             {usLegalStatus && (
               <Checkbox
@@ -100,7 +100,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
       )}
       {allowInternational && (
         <ScopeSection>
-          <Typography variant="label-3">{t('non-us-residents')}</Typography>
+          <Text variant="label-3">{t('non-us-residents')}</Text>
           <Grid.Container gap={3} columns={['repeat(2, 1fr)']} width="100%">
             <Box>
               <Checkbox
@@ -114,7 +114,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
       )}
       {isCollectingInvestorProfile && (
         <ScopeSection>
-          <Typography variant="label-3">{t('investor-profile')}</Typography>
+          <Text variant="label-3">{t('investor-profile')}</Text>
           <Grid.Container gap={3} columns={['repeat(2, 1fr)']} width="100%">
             <Checkbox
               label={t('investor-profile-questions')}

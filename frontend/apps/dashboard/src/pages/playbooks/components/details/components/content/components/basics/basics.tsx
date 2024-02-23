@@ -1,7 +1,7 @@
 import { IcoPencil16 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { CodeInline, LinkButton, Typography } from '@onefootprint/ui';
+import { CodeInline, LinkButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,9 +31,9 @@ const Basics = ({ playbook }: BasicsProps) => {
   return (
     <Container>
       <Header>
-        <Typography sx={{ whiteSpace: 'nowrap' }} variant="label-3">
+        <Text sx={{ whiteSpace: 'nowrap' }} variant="label-3">
           {t('title')}
-        </Typography>
+        </Text>
         {!showForm && (
           <PermissionGate
             scopeKind={RoleScopeKind.onboardingConfiguration}
@@ -56,23 +56,23 @@ const Basics = ({ playbook }: BasicsProps) => {
       ) : (
         <ItemsContainer>
           <Item>
-            <Typography variant="body-3" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {t('type.label')}
-            </Typography>
-            <Typography variant="body-3">
+            </Text>
+            <Text variant="body-3">
               {t(`type.${playbook.kind}` as ParseKeys<'common'>)}
-            </Typography>
+            </Text>
           </Item>
           <Item>
-            <Typography variant="body-3" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {t('name')}
-            </Typography>
-            <Typography variant="body-3">{playbook?.name}</Typography>
+            </Text>
+            <Text variant="body-3">{playbook?.name}</Text>
           </Item>
           <Item>
-            <Typography variant="body-3" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {t('publishable-key')}
-            </Typography>
+            </Text>
             <CodeInline>{playbook.key}</CodeInline>
           </Item>
         </ItemsContainer>

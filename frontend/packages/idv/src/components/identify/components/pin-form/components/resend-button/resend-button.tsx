@@ -1,5 +1,5 @@
 import { useCountdown } from '@onefootprint/hooks';
-import { LinkButton, LoadingIndicator, Typography } from '@onefootprint/ui';
+import { LinkButton, LoadingIndicator, Text } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -70,9 +70,9 @@ const ResendButton = ({
         {texts.resendCta}
       </LinkButton>
       {resendClicked && countdown > 0 && (
-        <Typography variant="body-4" color="tertiary" sx={{ marginTop: 3 }}>
+        <Text variant="body-4" color="tertiary" sx={{ marginTop: 3 }}>
           {texts.resendCountDown.replace('{{seconds}}', String(countdown))}
-        </Typography>
+        </Text>
       )}
     </Container>
   );

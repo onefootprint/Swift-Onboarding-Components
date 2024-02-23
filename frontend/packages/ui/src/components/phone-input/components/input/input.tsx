@@ -4,7 +4,7 @@ import React, { forwardRef, useId, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../../../utils';
+import { createText } from '../../../../utils';
 import Box from '../../../box';
 import Label from '../../../label';
 import type { PhoneInputProps } from '../../phone-input.types';
@@ -179,7 +179,7 @@ const RealInput = styled(Cleave)`
     } = theme;
 
     return css`
-      ${createTypography(input.size.default.typography)};
+      ${createText(input.size.default.typography)};
       background: transparent;
       border: unset;
       outline: none;

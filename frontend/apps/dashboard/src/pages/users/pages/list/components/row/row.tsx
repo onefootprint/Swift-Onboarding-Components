@@ -1,5 +1,5 @@
 import { type Entity, IdDI } from '@onefootprint/types';
-import { CodeInline, Typography } from '@onefootprint/ui';
+import { CodeInline, Text } from '@onefootprint/ui';
 import React from 'react';
 import { StatusBadge } from 'src/components';
 import Tags from 'src/components/entities/components/tags';
@@ -41,7 +41,7 @@ const getName = (entity: Entity) => {
 const Row = ({ entity }: RowProps) => (
   <>
     <td>
-      <Typography
+      <Text
         variant="body-3"
         sx={{
           whiteSpace: 'nowrap',
@@ -50,7 +50,7 @@ const Row = ({ entity }: RowProps) => (
         }}
       >
         {getName(entity)}
-      </Typography>
+      </Text>
     </td>
     <td>
       <CodeInline isPrivate truncate>
@@ -64,7 +64,7 @@ const Row = ({ entity }: RowProps) => (
       />
     </td>
     <td>
-      <Typography
+      <Text
         variant="body-3"
         color="primary"
         sx={{
@@ -80,7 +80,7 @@ const Row = ({ entity }: RowProps) => (
           hour: 'numeric',
           minute: 'numeric',
         })}
-      </Typography>
+      </Text>
     </td>
     <td aria-label="tags">
       <Tags entity={entity} />

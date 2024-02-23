@@ -1,6 +1,6 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { isVaultDataDecrypted, isVaultDataText } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,11 +22,11 @@ const UsLegalStatus = ({ di, entity }: UsLegalStatusType) => {
       renderValue={value => {
         if (isVaultDataDecrypted(value) && isVaultDataText(value)) {
           return (
-            <Typography variant="body-3" color="primary">
+            <Text variant="body-3" color="primary">
               {t(
                 `us-legal-status.status.options.${value}` as ParseKeys<'common'>,
               )}
-            </Typography>
+            </Text>
           );
         }
         return <EncryptedCell />;

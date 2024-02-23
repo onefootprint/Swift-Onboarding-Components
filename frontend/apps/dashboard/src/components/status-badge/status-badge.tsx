@@ -1,6 +1,6 @@
 import { IcoEye16, IcoWarningSmall16 } from '@onefootprint/icons';
 import type { EntityStatus } from '@onefootprint/types';
-import { Badge, Stack, Tooltip, Typography } from '@onefootprint/ui';
+import { Badge, Stack, Text, Tooltip } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,9 +48,9 @@ const StatusBadge = ({
               </Stack>
             </Tooltip>
             {shouldShowWatchlistLabel && (
-              <Typography variant="caption-2" color="error">
+              <Text variant="caption-2" color="error">
                 {watchlistLabel}
-              </Typography>
+              </Text>
             )}
           </>
         )}

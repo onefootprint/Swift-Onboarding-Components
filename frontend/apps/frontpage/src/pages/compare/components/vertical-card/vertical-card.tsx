@@ -1,4 +1,4 @@
-import { LinkButton, media, Typography } from '@onefootprint/ui';
+import { LinkButton, media, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -18,12 +18,12 @@ const VerticalCard = ({
   <CardContainer>
     <CardImageContainer className="image">{children}</CardImageContainer>
     <CardContent className="content">
-      <Typography variant="heading-3" as="h3">
+      <Text variant="heading-3" as="h3">
         {title}
-      </Typography>
-      <Typography variant="body-1" as="p">
+      </Text>
+      <Text variant="body-1" as="p">
         {description}
-      </Typography>
+      </Text>
       {cta && (
         <LinkButton variant="default" href="/pricing">
           {cta}

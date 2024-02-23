@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -9,7 +9,7 @@ type SectionSubtitleProps = {
 
 const SectionSubtitle = ({ maxWidth, children }: SectionSubtitleProps) => (
   <Container maxWidth={maxWidth}>
-    <Typography
+    <Text
       variant="display-4"
       color="secondary"
       sx={{
@@ -17,7 +17,7 @@ const SectionSubtitle = ({ maxWidth, children }: SectionSubtitleProps) => (
       }}
     >
       {children}
-    </Typography>
+    </Text>
   </Container>
 );
 

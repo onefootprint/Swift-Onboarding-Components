@@ -1,5 +1,5 @@
 import { type WorkflowTriggeredEventData } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,11 +21,11 @@ const WorkflowTriggeredEventHeader = ({
   return (
     <>
       <Actor actor={data.actor} />
-      <Typography variant="body-3" color="tertiary" sx={{ marginLeft: 2 }}>
+      <Text variant="body-3" color="tertiary" sx={{ marginLeft: 2 }}>
         {t('requested-user-to', {
           action,
         })}
-      </Typography>
+      </Text>
     </>
   );
 };

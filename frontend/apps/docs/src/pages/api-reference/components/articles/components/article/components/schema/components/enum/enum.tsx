@@ -1,10 +1,5 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import {
-  CodeInline,
-  createFontStyles,
-  Stack,
-  Typography,
-} from '@onefootprint/ui';
+import { CodeInline, createFontStyles, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -34,9 +29,9 @@ const Enum = ({ enums }: EnumProps) => {
 
   return (
     <Container>
-      <Typography variant="body-4" color="tertiary">
+      <Text variant="body-4" color="tertiary">
         {t('allowed-values')}
-      </Typography>
+      </Text>
       {groupedItems.map((group: string[]) => (
         <List flexWrap="wrap" marginBottom={2} marginTop={2}>
           {group.map((enumValue: string) => (

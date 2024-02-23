@@ -1,12 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
-import {
-  Box,
-  Container,
-  LinkButton,
-  Stack,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Container, LinkButton, Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -86,10 +80,10 @@ const Post = ({ post }: PostProps) => {
                   url={`https://www.onefootprint.com/investor-updates/${post.slug}`}
                 />
               </Stack>
-              <Typography variant="display-2" as="h1" sx={{ marginY: 9 }}>
+              <Text variant="display-2" as="h1" sx={{ marginY: 9 }}>
                 {post.title}
                 {t('post.update-index', { index: post.meta_description })}
-              </Typography>
+              </Text>
             </header>
             <PostContent html={post.html} />
           </WritingLayout>

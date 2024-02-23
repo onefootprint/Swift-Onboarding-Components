@@ -1,5 +1,5 @@
 import { primitives } from '@onefootprint/design-tokens';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -34,9 +34,9 @@ const Toggle = ({ onValueChange, value }: ToggleProps) => {
           value={option.value}
           data-selected={value === option.value}
         >
-          <Typography variant="label-3" data-selected={value === option.value}>
+          <Text variant="label-3" data-selected={value === option.value}>
             {t(option.label).charAt(0).toUpperCase() + t(option.label).slice(1)}
-          </Typography>
+          </Text>
           {option.value === value ? <Indicator layoutId="indicator" /> : null}
         </Option>
       ))}

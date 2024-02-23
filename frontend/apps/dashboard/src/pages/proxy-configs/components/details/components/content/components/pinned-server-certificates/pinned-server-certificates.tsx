@@ -1,6 +1,6 @@
 import { IcoDownload16 } from '@onefootprint/icons';
 import type { ProxyConfigDetails } from '@onefootprint/types';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
@@ -42,7 +42,7 @@ const PinnedServerCertificates = ({
       </LinkButton>
     </Field>
   ) : (
-    <Typography variant="body-3">{t('empty')}</Typography>
+    <Text variant="body-3">{t('empty')}</Text>
   );
 };
 

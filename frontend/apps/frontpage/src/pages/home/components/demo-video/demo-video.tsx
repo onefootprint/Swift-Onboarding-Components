@@ -1,6 +1,6 @@
 import { useOnClickOutside } from '@onefootprint/hooks';
 import { IcoClose16 } from '@onefootprint/icons';
-import { media, Overlay, Typography } from '@onefootprint/ui';
+import { media, Overlay, Text } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactPlayer from 'react-player';
@@ -36,9 +36,9 @@ const DemoVideo = ({ open, link, onClose }: DemoVideoProps) => {
       <ModalContainer role="dialog" aria-label="Footprint Demo Modal">
         <CloseContainer onClick={onClose}>
           <IcoClose16 color="quinary" />
-          <Typography color="quinary" variant="label-1" sx={{ marginLeft: 2 }}>
+          <Text color="quinary" variant="label-1" sx={{ marginLeft: 2 }}>
             {t('demo-video-close')}
-          </Typography>
+          </Text>
         </CloseContainer>
         <VideoContainer ref={videoRef}>
           <ReactPlayer

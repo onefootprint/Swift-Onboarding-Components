@@ -1,5 +1,5 @@
 import { IcoFileText24, IcoWarning16 } from '@onefootprint/icons';
-import { Divider, Grid, Typography } from '@onefootprint/ui';
+import { Divider, Grid, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -25,22 +25,22 @@ const UploadComplianceLetter = ({
       <Grid.Container gap={4}>
         <UploadFilesLabel>
           <IcoFileText24 />
-          <Typography variant="label-3" color="secondary">
+          <Text variant="label-3" color="secondary">
             {t('label')}
-          </Typography>
+          </Text>
         </UploadFilesLabel>
         <UploadFiles onChange={onChange} />
         {hasError && (
           <ErrorContainer>
             <IcoWarning16 color="error" />
-            <Typography variant="body-3" color="error">
+            <Text variant="body-3" color="error">
               {t('required')}
-            </Typography>
+            </Text>
           </ErrorContainer>
         )}
-        <Typography variant="caption-4" color="tertiary">
+        <Text variant="caption-4" color="tertiary">
           {t('disclaimer')}
-        </Typography>
+        </Text>
       </Grid.Container>
       <Divider />
     </>

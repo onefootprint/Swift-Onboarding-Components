@@ -3,7 +3,7 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../utils';
+import { createText } from '../../utils';
 import Tooltip from '../tooltip';
 
 export type LabelTooltipProps = {
@@ -73,7 +73,7 @@ const StyledLabel = styled.label`
     const { label } = theme.components;
 
     return css`
-      ${createTypography(label.size.default.typography)}
+      ${createText(label.size.default.typography)}
       color: ${label.states.default.color};
 
       &[data-has-error='true'] {
@@ -81,7 +81,7 @@ const StyledLabel = styled.label`
       }
 
       &[data-size='compact'] {
-        ${createTypography(label.size.compact.typography)}
+        ${createText(label.size.compact.typography)}
       }
     `;
   }}

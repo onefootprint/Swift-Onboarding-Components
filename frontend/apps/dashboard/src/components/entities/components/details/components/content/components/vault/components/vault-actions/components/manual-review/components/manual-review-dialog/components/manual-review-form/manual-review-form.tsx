@@ -1,5 +1,5 @@
 import type { ReviewStatus } from '@onefootprint/types';
-import { Divider, TextArea, Toggle, Typography } from '@onefootprint/ui';
+import { Divider, Text, TextArea, Toggle } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -43,9 +43,9 @@ const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
       id="manual-review-form"
       onSubmit={handleSubmit(handleBeforeSubmit)}
     >
-      <Typography variant="label-2">
+      <Text variant="label-2">
         {t('dialog.form.prompt', { status: t(`status.${status}`) })}
-      </Typography>
+      </Text>
       <TextArea
         label={t('dialog.form.note.label')}
         placeholder={t('dialog.form.note.placeholder')}
@@ -70,9 +70,9 @@ const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
         )}
       />
       <Divider />
-      <Typography variant="body-3" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('dialog.form.disclaimer')}
-      </Typography>
+      </Text>
     </StyledForm>
   );
 };

@@ -5,7 +5,7 @@ import Box from '../box';
 import LinkButton from '../link-button';
 import LoadingIndicator from '../loading-indicator';
 import Stack from '../stack';
-import Typography from '../typography';
+import Text from '../text';
 import type { PinInputProps } from './pin-input';
 import PinInput from './pin-input';
 
@@ -66,14 +66,14 @@ const Template: Story<PinInputProps> = ({
       elevation={2}
     >
       <Box marginBottom={3}>
-        <Typography variant="heading-2" color="primary">
+        <Text variant="heading-2" color="primary">
           Welcome back! 🎉
-        </Typography>
+        </Text>
       </Box>
       <Box marginBottom={8}>
-        <Typography variant="body-2" color="secondary">
+        <Text variant="body-2" color="secondary">
           Enter the 6-digit code sent to your phone
-        </Typography>
+        </Text>
       </Box>
       <Box marginBottom={8}>
         {loading ? (

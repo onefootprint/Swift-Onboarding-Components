@@ -6,7 +6,7 @@ import {
   LinkButton,
   media,
   Stack,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -56,9 +56,9 @@ const PostPage = ({ post }: PostProps) => {
       <Container>
         <HeroContainer>
           <Chip>{t('microtitle')}</Chip>
-          <Typography color="primary" variant="display-2" as="h1">
+          <Text color="primary" variant="display-2" as="h1">
             {t('title')}
-          </Typography>
+          </Text>
         </HeroContainer>
         <PostContainer>
           <Link href="/changelog" passHref legacyBehavior>
@@ -80,10 +80,10 @@ const PostPage = ({ post }: PostProps) => {
             />
           </ImageContainer>
           <Stack marginTop={8} marginBottom={8} gap={4} direction="column">
-            <Typography variant="label-3" color="tertiary">
+            <Text variant="label-3" color="tertiary">
               {formattedDate}
-            </Typography>
-            <Typography variant="display-3">{post.title}</Typography>
+            </Text>
+            <Text variant="display-3">{post.title}</Text>
             <Author
               authorName={post.primary_author.name}
               authorImg={post.primary_author.profile_image}

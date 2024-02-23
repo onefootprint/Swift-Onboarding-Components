@@ -5,8 +5,8 @@ import {
   Grid,
   LinkButton,
   Stack,
+  Text,
   TextInput,
-  Typography,
 } from '@onefootprint/ui';
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -44,9 +44,9 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)}>
-      <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+      <Text variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
-      </Typography>
+      </Text>
       <FormGrid>
         {fields.map((field, index) => (
           <Box key={field.id}>

@@ -1,11 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import {
-  Box,
-  CodeInline,
-  Grid,
-  LinkButton,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, CodeInline, Grid, LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
@@ -69,7 +63,7 @@ const CustomDataFields = ({
         <Header>
           <Title>
             <IconComponent />
-            <Typography variant="label-3">{title}</Typography>
+            <Text variant="label-3">{title}</Text>
           </Title>
           {shouldShowSelectAll && (
             <LinkButton

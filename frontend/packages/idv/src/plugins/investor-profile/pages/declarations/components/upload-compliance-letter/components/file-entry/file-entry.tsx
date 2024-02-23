@@ -1,5 +1,5 @@
 import { IcoTrash16 } from '@onefootprint/icons';
-import { Box, IconButton, Stack, Typography } from '@onefootprint/ui';
+import { Box, IconButton, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +16,7 @@ const FileEntry = ({ file, onRemove }: FileEntryProps) => {
   return (
     <Stack align="center" justify="space-between" minHeight="32px">
       <Box>
-        <Typography variant="body-3">{file.name}</Typography>
+        <Text variant="body-3">{file.name}</Text>
       </Box>
       <Box minWidth="32px">
         <IconButton aria-label={t('remove-aria-label')} onClick={onRemove}>

@@ -1,7 +1,7 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { SecuredByFootprint } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { media, Typography } from '@onefootprint/ui';
+import { media, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,9 +47,9 @@ const Footer = ({ config }: FootprintFooterProps) => {
               rel="noreferrer"
               className="footer-link"
             >
-              <Typography variant="caption-1" color="secondary" as="span">
+              <Text variant="caption-1" color="secondary" as="span">
                 {label}
-              </Typography>
+              </Text>
             </a>
           </li>
         ))}

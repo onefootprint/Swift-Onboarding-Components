@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
@@ -45,9 +45,9 @@ const FieldValidations = ({ entityId }: FieldValidationsProps) => {
     }
     if (data && data.length === 0) {
       return (
-        <Typography variant="body-3" sx={{ marginLeft: 13 }}>
+        <Text variant="body-3" sx={{ marginLeft: 13 }}>
           {t('no-data')}
-        </Typography>
+        </Text>
       );
     }
     return null;

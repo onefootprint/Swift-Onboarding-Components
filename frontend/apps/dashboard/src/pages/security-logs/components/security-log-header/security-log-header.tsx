@@ -1,5 +1,5 @@
 import type { AccessEvent } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 
 import FieldTagList from '../field-tag-list';
@@ -17,12 +17,12 @@ const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => (
     marginTop={2}
   >
     <FieldTagList targets={accessEvent.targets} />
-    <Typography variant="body-4">
+    <Text variant="body-4">
       {accessEvent.targets.length > 1 ? 'were' : 'was'} accessed by
-    </Typography>
-    <Typography variant="label-4">
+    </Text>
+    <Text variant="label-4">
       {accessEvent.principal || 'an automated process'}{' '}
-    </Typography>
+    </Text>
   </Stack>
 );
 

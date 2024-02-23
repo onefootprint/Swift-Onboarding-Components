@@ -1,4 +1,4 @@
-import { Grid, media, Typography } from '@onefootprint/ui';
+import { Grid, media, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -10,10 +10,10 @@ type SectionProps = {
 };
 const Section = ({ title, subtitle, image, inverted }: SectionProps) => (
   <ResponsiveGridContainer justifyContent="center" alignItems="center">
-    <Text direction="column" gap={2} inverted={inverted}>
-      <Typography variant="heading-2">{title}</Typography>
-      <Typography variant="body-1">{subtitle}</Typography>
-    </Text>
+    <StyledGridItem direction="column" gap={2} inverted={inverted}>
+      <Text variant="heading-2">{title}</Text>
+      <Text variant="body-1">{subtitle}</Text>
+    </StyledGridItem>
     <Image inverted={inverted}>{image}</Image>
   </ResponsiveGridContainer>
 );
@@ -35,7 +35,7 @@ const ResponsiveGridContainer = styled(Grid.Container)`
   `}
 `;
 
-const Text = styled(Grid.Item)<{ inverted?: boolean }>`
+const StyledGridItem = styled(Grid.Item)<{ inverted?: boolean }>`
   ${({ theme, inverted }) => css`
     grid-area: text;
     white-space: pre-line;

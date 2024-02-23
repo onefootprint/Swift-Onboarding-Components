@@ -5,7 +5,7 @@ import type { CommonPropsAndClassName, GroupBase } from 'react-select';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../../../utils/mixins';
-import Typography from '../../../../typography';
+import Text from '../../../../text';
 import type { BaseSelectOption } from '../../base-select.types';
 
 export type OptionProps<
@@ -56,9 +56,9 @@ const Option = <
           {label}
         </Highlighter>
         {data.description && (
-          <Typography variant="caption-2" color="tertiary">
+          <Text variant="caption-2" color="tertiary">
             {data.description}
-          </Typography>
+          </Text>
         )}
       </Content>
       {isSelected && <IcoCheck16 color="primary" />}

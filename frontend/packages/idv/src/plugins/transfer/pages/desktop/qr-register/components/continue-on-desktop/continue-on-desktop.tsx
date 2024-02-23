@@ -1,4 +1,4 @@
-import { LinkButton, Stack, Typography } from '@onefootprint/ui';
+import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -30,9 +30,9 @@ const ContinueOnDesktop = () => {
 
   return (
     <Container align="center" justify="center" gap={3}>
-      <Typography variant="body-3" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('continue-on-desktop.title')}
-      </Typography>
+      </Text>
       <LinkButton onClick={handleContinueOnDesktop} size="compact">
         {t('continue-on-desktop.cta')}
       </LinkButton>

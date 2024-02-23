@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,18 +14,18 @@ const FooterLinks = () => {
         target="_blank"
         rel="noreferrer"
       >
-        <Typography variant="body-2" color="tertiary">
+        <Text variant="body-2" color="tertiary">
           {t('privacy-policy.title')}
-        </Typography>
+        </Text>
       </Link>
       <Link
         href="https://www.onefootprint.com/terms-of-service"
         target="_blank"
         rel="noreferrer"
       >
-        <Typography variant="body-2" color="tertiary">
+        <Text variant="body-2" color="tertiary">
           {t('terms-of-service.title')}
-        </Typography>
+        </Text>
       </Link>
     </Container>
   );

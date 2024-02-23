@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -10,7 +10,7 @@ type TitleProps = {
 const Title = ({ label, iconComponent }: TitleProps) => (
   <Container>
     {iconComponent}
-    <Typography variant="label-3">{label}</Typography>
+    <Text variant="label-3">{label}</Text>
   </Container>
 );
 

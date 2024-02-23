@@ -1,4 +1,4 @@
-import { BottomSheet, Typography } from '@onefootprint/ui';
+import { BottomSheet, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -45,9 +45,9 @@ const MissingPermissionsSheet = ({
     <BottomSheet open={open} onClose={onClose}>
       <Container>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        <Typography variant="body-2" sx={{ textAlign: 'center', marginTop: 9 }}>
+        <Text variant="body-2" sx={{ textAlign: 'center', marginTop: 9 }}>
           {getTranslation()}
-        </Typography>
+        </Text>
       </Container>
     </BottomSheet>
   );

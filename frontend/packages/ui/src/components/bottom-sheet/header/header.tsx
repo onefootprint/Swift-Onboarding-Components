@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import Box from '../../box';
 import IconButton from '../../icon-button';
 import Stack from '../../stack';
-import Typography from '../../typography';
+import Text from '../../text';
 
 export const HEADER_HEIGHT = 52;
 
@@ -25,7 +25,7 @@ const Header = ({ title, closeAriaLabel = 'Close', onClose }: HeaderProps) => (
     </DialogPrimitive.Close>
     {title && (
       <Title>
-        <Typography variant="label-2">{title}</Typography>
+        <Text variant="label-2">{title}</Text>
       </Title>
     )}
     <Box height="32px" width="32px" as="span" />

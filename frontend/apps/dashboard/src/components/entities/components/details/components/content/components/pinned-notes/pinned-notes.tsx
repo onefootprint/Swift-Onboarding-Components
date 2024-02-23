@@ -1,6 +1,6 @@
 import { IcoArrowDown16, IcoPin24 } from '@onefootprint/icons';
 import { ActorKind } from '@onefootprint/types';
-import { createFontStyles, Divider, Stack, Typography } from '@onefootprint/ui';
+import { createFontStyles, Divider, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +61,7 @@ const PinnedNotes = () => {
       <HeaderTitle>
         <Stack direction="row" gap={2}>
           <IcoPin24 />
-          <Typography variant="label-2">{t('title')}</Typography>
+          <Text variant="label-2">{t('title')}</Text>
         </Stack>
         {data.length > 1 ? (
           <SortButton

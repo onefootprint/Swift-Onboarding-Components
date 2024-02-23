@@ -1,4 +1,4 @@
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
 
 type FieldProps = {
@@ -8,10 +8,10 @@ type FieldProps = {
 
 const Field = ({ label, children }: FieldProps) => (
   <Box>
-    <Typography variant="label-3" color="tertiary" sx={{ marginBottom: 2 }}>
+    <Text variant="label-3" color="tertiary" sx={{ marginBottom: 2 }}>
       {label}
-    </Typography>
-    <Typography variant="body-3">{children}</Typography>
+    </Text>
+    <Text variant="body-3">{children}</Text>
   </Box>
 );
 

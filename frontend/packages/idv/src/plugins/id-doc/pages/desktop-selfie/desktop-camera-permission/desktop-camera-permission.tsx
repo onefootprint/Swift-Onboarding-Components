@@ -1,4 +1,4 @@
-import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
+import { Box, LoadingIndicator, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -31,16 +31,16 @@ const DesktopCameraPermission = ({
           <LoadingIndicator />
         ) : (
           <Box paddingLeft={9} paddingRight={9}>
-            <Typography variant="label-2" sx={{ textAlign: 'center' }}>
+            <Text variant="label-2" sx={{ textAlign: 'center' }}>
               {t(`title.${permissionState}`)}
-            </Typography>
-            <Typography
+            </Text>
+            <Text
               variant="body-2"
               color="tertiary"
               sx={{ textAlign: 'center' }}
             >
               {t(`subtitle.${permissionState}`)}
-            </Typography>
+            </Text>
           </Box>
         )}
       </CameraStateContainer>

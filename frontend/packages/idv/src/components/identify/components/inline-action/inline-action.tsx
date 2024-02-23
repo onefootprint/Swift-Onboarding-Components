@@ -1,13 +1,14 @@
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
 import React from 'react';
 
-type TypographyProps = ComponentProps<typeof Typography>;
+type TextProps = ComponentProps<typeof Text>;
+
 type InlineActionProps = {
   isDisabled?: boolean | undefined;
   label: string;
   labelCta: string;
-  sx?: TypographyProps['sx'];
+  sx?: TextProps['sx'];
   onClick: (
     event:
       | React.KeyboardEvent<HTMLAnchorElement>
@@ -23,7 +24,7 @@ const InlineAction = ({
   onClick,
   sx,
 }: InlineActionProps): JSX.Element => (
-  <Typography isPrivate variant="caption-1" color="tertiary" as="span" sx={sx}>
+  <Text isPrivate variant="caption-1" color="tertiary" as="span" sx={sx}>
     {label}&nbsp;
     <LinkButton
       disabled={isDisabled}
@@ -32,7 +33,7 @@ const InlineAction = ({
     >
       {labelCta}
     </LinkButton>
-  </Typography>
+  </Text>
 );
 
 export default InlineAction;

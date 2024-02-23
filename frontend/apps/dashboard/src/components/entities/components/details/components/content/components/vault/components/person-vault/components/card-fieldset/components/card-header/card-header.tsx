@@ -1,6 +1,6 @@
 import { IcoCheck24, IcoChevronDown24 } from '@onefootprint/icons';
 import type { EntityCard } from '@onefootprint/types';
-import { Dropdown, media, Typography } from '@onefootprint/ui';
+import { Dropdown, media, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -34,12 +34,12 @@ export const CardHeader = ({
         <CustomDropdownTrigger aria-label="Open card options">
           <CardIcon issuer={selectedCard?.issuer || ''} />
           <CardLine>
-            <Typography variant="body-4">
+            <Text variant="body-4">
               {selectedCard?.number_last4
                 ? `••••${selectedCard.number_last4}`
                 : `••••`}
-            </Typography>
-            <Typography variant="body-4">({selectedCard.alias})</Typography>
+            </Text>
+            <Text variant="body-4">({selectedCard.alias})</Text>
           </CardLine>
           <IcoChevronDown24 />
         </CustomDropdownTrigger>
@@ -61,14 +61,14 @@ export const CardHeader = ({
                     key={card.issuer || ''}
                     issuer={card.issuer || ''}
                   />
-                  <Typography variant="body-4">
+                  <Text variant="body-4">
                     {card?.number_last4 ? `••••${card.number_last4}` : `••••`}
-                  </Typography>
+                  </Text>
                 </CardAndNumber>
                 <AliasAndCheckmark>
-                  <Typography variant="body-4" color="tertiary">
+                  <Text variant="body-4" color="tertiary">
                     {card.alias}
-                  </Typography>
+                  </Text>
                   {card.alias === selectedCard.alias ? (
                     <IcoCheck24 />
                   ) : (

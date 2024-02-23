@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
@@ -12,10 +12,10 @@ const Title = ({ iconSrc, title, subtitle }: TitleProps) => (
   <Stack direction="column" gap={7} marginTop={10}>
     {iconSrc && <Image src={iconSrc} width={88} height={88} alt="" />}
     <Stack direction="column" gap={2}>
-      <Typography variant="display-3">{title}</Typography>
-      <Typography variant="display-4" color="secondary">
+      <Text variant="display-3">{title}</Text>
+      <Text variant="display-4" color="secondary">
         {subtitle}
-      </Typography>
+      </Text>
     </Stack>
   </Stack>
 );

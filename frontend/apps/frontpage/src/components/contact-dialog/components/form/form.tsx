@@ -1,4 +1,4 @@
-import { Grid, TextArea, TextInput, Typography } from '@onefootprint/ui';
+import { Grid, Text, TextArea, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +34,7 @@ const Form = ({ onSubmit }: FormProps) => {
       as="form"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Typography variant="body-2">{t('description')}</Typography>
+      <Text variant="body-2">{t('description')}</Text>
       <TextInput
         hasError={!!errors[FormField.name]}
         hint={getNameHint()}

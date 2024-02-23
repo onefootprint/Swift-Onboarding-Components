@@ -20,7 +20,7 @@ import type {
   LabelAddedEventData,
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
@@ -146,9 +146,9 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         time,
         headerComponent: (
           <>
-            <Typography variant="body-3" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {t('timeline.free-form-note-event.note-added-by')}
-            </Typography>
+            </Text>
             <Actor actor={eventData.source} />
           </>
         ),
@@ -160,9 +160,9 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         time,
         headerComponent: (
           <>
-            <Typography variant="body-3" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {t('timeline.vault-created-event.user-created-by')}
-            </Typography>
+            </Text>
             <LinkButton href="/api-keys" size="compact">
               {(eventData.actor as ActorApiKey).name}
             </LinkButton>
@@ -205,7 +205,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
   return items.length > 0 ? (
     <Timeline items={items} />
   ) : (
-    <Typography variant="body-3">{t('empty')}</Typography>
+    <Text variant="body-3">{t('empty')}</Text>
   );
 };
 

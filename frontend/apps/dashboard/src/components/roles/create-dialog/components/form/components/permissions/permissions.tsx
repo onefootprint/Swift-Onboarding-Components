@@ -6,7 +6,7 @@ import {
   Checkbox,
   createFontStyles,
   MultiSelect,
-  Typography,
+  Text,
 } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -56,7 +56,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
   return (
     <>
       <Box marginBottom={5}>
-        <Typography variant="label-2">{t('form.permissions.title')}</Typography>
+        <Text variant="label-2">{t('form.permissions.title')}</Text>
       </Box>
       <ToggleContainer>
         {supportedScopeKinds.includes(RoleScopeKind.read) && (

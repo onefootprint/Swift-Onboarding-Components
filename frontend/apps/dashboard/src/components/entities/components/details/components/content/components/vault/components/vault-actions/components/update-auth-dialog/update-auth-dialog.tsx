@@ -4,8 +4,8 @@ import {
   Dialog,
   Shimmer,
   Stack,
+  Text,
   TextInput,
-  Typography,
   useToast,
 } from '@onefootprint/ui';
 import React, { useCallback, useEffect } from 'react';
@@ -108,25 +108,25 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
       }}
     >
       <Stack gap={3} direction="column">
-        <Typography variant="label-3">{t('header')}</Typography>
-        <Typography variant="body-3" color="secondary">
+        <Text variant="label-3">{t('header')}</Text>
+        <Text variant="body-3" color="secondary">
           {t('share-this-link')}
-        </Typography>
+        </Text>
         <StyledLi>
-          <Typography variant="body-3" color="secondary" as="span">
+          <Text variant="body-3" color="secondary" as="span">
             {t('update-phone')}
-          </Typography>
+          </Text>
         </StyledLi>
         <StyledLi>
-          <Typography variant="body-3" color="secondary" as="span">
+          <Text variant="body-3" color="secondary" as="span">
             {t('update-email')}
-          </Typography>
+          </Text>
         </StyledLi>
         {/* TODO show this copy when passkey editing is fixed */}
         {/* <StyledLi>
-          <Typography variant="body-3" color="secondary" as="span">
+          <Text variant="body-3" color="secondary" as="span">
             {t('update-passkey')}
-          </Typography>
+          </Text>
         </StyledLi> */}
         {generateTokenMutation.isLoading ? (
           <Shimmer sx={{ width: '100%', height: '32px' }} />

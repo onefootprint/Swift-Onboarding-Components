@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -21,12 +21,12 @@ const FeatureCard = ({
   return (
     <Container gridArea={gridArea}>
       <IconContainer>{renderedIcon}</IconContainer>
-      <Typography variant="label-2" color="primary" as="h3">
+      <Text variant="label-2" color="primary" as="h3">
         {title}
-      </Typography>
-      <Typography variant="body-2" as="p">
+      </Text>
+      <Text variant="body-2" as="p">
         {subtitle}
-      </Typography>
+      </Text>
     </Container>
   );
 };

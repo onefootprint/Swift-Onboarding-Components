@@ -1,4 +1,4 @@
-import { media, Stack, Typography } from '@onefootprint/ui';
+import { media, Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -49,18 +49,18 @@ const PostPreview = ({
       </FeatureImageMobileContainer>
       <Content>
         <Header>
-          <Typography color="accent" variant="label-4" sx={{ marginBottom: 2 }}>
+          <Text color="accent" variant="label-4" sx={{ marginBottom: 2 }}>
             {primaryTag}
-          </Typography>
-          <Typography color="primary" variant="heading-2">
+          </Text>
+          <Text color="primary" variant="heading-2">
             {title}
-          </Typography>
+          </Text>
         </Header>
         <Stack direction="column" justify="space-between" flexGrow={1}>
           <Body>
-            <Typography color="secondary" variant="body-2">
+            <Text color="secondary" variant="body-2">
               {excerpt}
-            </Typography>
+            </Text>
           </Body>
         </Stack>
         <Footer authors={authors} publishedAt={publishedAt} />

@@ -1,5 +1,5 @@
 import { IcoCheck24 } from '@onefootprint/icons';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -12,7 +12,7 @@ const Bullet = ({ children }: BulletProps) => (
     <IconContainer>
       <IcoCheck24 color="tertiary" />
     </IconContainer>
-    <Typography variant="body-1">{children}</Typography>
+    <Text variant="body-1">{children}</Text>
   </Container>
 );
 

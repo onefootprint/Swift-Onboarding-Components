@@ -1,4 +1,4 @@
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, Text } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -46,12 +46,12 @@ const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
   return (
     <Container>
       <Header>
-        <Typography variant="label-1" color="secondary">
+        <Text variant="label-1" color="secondary">
           {getTitle()}
-        </Typography>
-        <Typography variant="body-2" color="secondary">
+        </Text>
+        <Text variant="body-2" color="secondary">
           {getSubtitle()}
-        </Typography>
+        </Text>
       </Header>
       <FormProvider {...formMethods}>
         <Form id="your-playbook-form" onSubmit={handleSubmit(onSubmit)}>

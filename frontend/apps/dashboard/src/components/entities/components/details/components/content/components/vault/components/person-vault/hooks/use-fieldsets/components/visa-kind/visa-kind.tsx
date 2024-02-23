@@ -1,6 +1,6 @@
 import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
 import { isVaultDataDecrypted } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,9 +22,9 @@ const VisaKind = ({ di, entity }: VisaKindType) => {
       renderValue={(value: VaultValue) => {
         if (value && isVaultDataDecrypted(value)) {
           return (
-            <Typography variant="body-3" color="primary">
+            <Text variant="body-3" color="primary">
               {t(`us-legal-status.visa-kind.${value}` as ParseKeys<'common'>)}
-            </Typography>
+            </Text>
           );
         }
         return <EncryptedCell />;

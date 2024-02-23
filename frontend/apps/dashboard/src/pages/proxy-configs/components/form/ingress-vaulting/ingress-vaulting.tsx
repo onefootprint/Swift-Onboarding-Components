@@ -6,8 +6,8 @@ import {
   Grid,
   LinkButton,
   NativeSelect,
+  Text,
   TextInput,
-  Typography,
 } from '@onefootprint/ui';
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -52,9 +52,9 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)}>
-      <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+      <Text variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
-      </Typography>
+      </Text>
       <Box marginBottom={8}>
         <FormControl>
           <FormLabel htmlFor="method">{t('content-type.label')}</FormLabel>
@@ -70,9 +70,9 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
       </Box>
       {ingressContentType !== 'none' && (
         <>
-          <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+          <Text variant="label-2" sx={{ marginBottom: 5 }}>
             {t('vaulting-rules.title')}
-          </Typography>
+          </Text>
           <FormGrid>
             {fields.map((field, index) => (
               <Box key={field.id}>

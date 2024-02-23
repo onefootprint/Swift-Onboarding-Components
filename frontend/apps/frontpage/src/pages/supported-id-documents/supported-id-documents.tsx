@@ -1,13 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoCheckSmall16, IcoInfo16 } from '@onefootprint/icons';
-import {
-  Button,
-  Grid,
-  media,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@onefootprint/ui';
+import { Button, Grid, media, Stack, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -28,12 +21,12 @@ const SupportedIdDocuments = () => {
       <SEO title={t('html-title')} slug="/supported-id-documents" />
       <Container>
         <Grid.Container gap={5} marginBottom={10} textAlign="center">
-          <Typography variant="display-2" as="h1">
+          <Text variant="display-2" as="h1">
             {t('title')}
-          </Typography>
-          <Typography variant="display-4" as="h1">
+          </Text>
+          <Text variant="display-4" as="h1">
             {t('subtitle')}
-          </Typography>
+          </Text>
         </Grid.Container>
         <Grid.Container
           borderColor="tertiary"
@@ -59,19 +52,19 @@ const SupportedIdDocuments = () => {
             align="center"
           >
             <HeaderCell data-align="left">
-              <Typography variant="caption-3" color="secondary" as="h4">
+              <Text variant="caption-3" color="secondary" as="h4">
                 {t('table-headers.country')}
-              </Typography>
+              </Text>
             </HeaderCell>
             <HeaderCell>
-              <Typography variant="caption-3" color="secondary" as="h4">
+              <Text variant="caption-3" color="secondary" as="h4">
                 {t('table-headers.passport')}
-              </Typography>
+              </Text>
             </HeaderCell>
             <HeaderCell>
-              <Typography variant="caption-3" color="secondary" as="h4">
+              <Text variant="caption-3" color="secondary" as="h4">
                 {t('table-headers.id-card.text')}
-              </Typography>
+              </Text>
               <Tooltip
                 text={t('table-headers.id-card.tooltip')}
                 position="bottom"
@@ -82,9 +75,9 @@ const SupportedIdDocuments = () => {
               </Tooltip>
             </HeaderCell>
             <HeaderCell>
-              <Typography variant="caption-3" color="secondary" as="h4">
+              <Text variant="caption-3" color="secondary" as="h4">
                 {t('table-headers.drivers-license')}
-              </Typography>
+              </Text>
             </HeaderCell>
           </Grid.Container>
           {COUNTRIES.map(({ label, passport, idCard, driversLicense }) => (
@@ -101,7 +94,7 @@ const SupportedIdDocuments = () => {
               alignItems="center"
             >
               <TableCell data-align="left">
-                <Typography variant="body-3">{label}</Typography>
+                <Text variant="body-3">{label}</Text>
               </TableCell>
               <TableCell>{passport && <IcoCheckSmall16 />}</TableCell>
               <TableCell>{idCard && <IcoCheckSmall16 />}</TableCell>
@@ -118,16 +111,12 @@ const SupportedIdDocuments = () => {
           textAlign="center"
           backgroundColor="primary"
         >
-          <Typography variant="label-1" sx={{ marginBottom: 3 }}>
+          <Text variant="label-1" sx={{ marginBottom: 3 }}>
             {t('contact.title')}
-          </Typography>
-          <Typography
-            color="secondary"
-            variant="body-2"
-            sx={{ marginBottom: 7 }}
-          >
+          </Text>
+          <Text color="secondary" variant="body-2" sx={{ marginBottom: 7 }}>
             {t('contact.subtitle')}
-          </Typography>
+          </Text>
           <Button onClick={handleClick} size="compact">
             {t('contact.cta')}
           </Button>

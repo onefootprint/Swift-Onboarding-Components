@@ -1,4 +1,4 @@
-import { Container, media, Typography } from '@onefootprint/ui';
+import { Container, media, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -11,10 +11,10 @@ const MoreAbout = () => {
   return (
     <StyledContainer>
       <Content>
-        <Typography variant="display-3" sx={{ textAlign: 'center' }}>
+        <Text variant="display-3" sx={{ textAlign: 'center' }}>
           {t('title')}
-        </Typography>
-        <Typography variant="body-2" color="secondary">
+        </Text>
+        <Text variant="body-2" color="secondary">
           <Trans
             i18nKey="pages.idv-privacy.more-about.description"
             components={{
@@ -34,7 +34,7 @@ const MoreAbout = () => {
               ),
             }}
           />
-        </Typography>
+        </Text>
       </Content>
     </StyledContainer>
   );

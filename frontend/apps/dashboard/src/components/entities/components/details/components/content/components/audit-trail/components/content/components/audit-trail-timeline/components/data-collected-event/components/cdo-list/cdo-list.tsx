@@ -6,7 +6,7 @@ import {
   CollectedKycDataOption,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -72,7 +72,7 @@ const CdoList = ({
         attributeLabels.indexOf(a) - attributeLabels.indexOf(b),
     );
 
-  return <Typography variant="label-3">{tagLabels.join(', ')}</Typography>;
+  return <Text variant="label-3">{tagLabels.join(', ')}</Text>;
 };
 
 export default CdoList;

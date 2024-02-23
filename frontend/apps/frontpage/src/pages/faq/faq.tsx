@@ -1,4 +1,4 @@
-import { Button, Grid, media, Stack, Typography } from '@onefootprint/ui';
+import { Button, Grid, media, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Accordion from 'src/components/accordion';
@@ -62,12 +62,12 @@ const Faq = () => {
       <SEO title={t('html-title')} slug="/faq" />
       <Container>
         <Grid.Container gap={5} marginBottom={10} textAlign="center">
-          <Typography variant="display-1" as="h1">
+          <Text variant="display-1" as="h1">
             {t('title')}
-          </Typography>
-          <Typography variant="display-4" as="h2" color="secondary">
+          </Text>
+          <Text variant="display-4" as="h2" color="secondary">
             {t('subtitle')}
-          </Typography>
+          </Text>
         </Grid.Container>
         <Accordion.List>
           {items.map(({ id, title, content }) => {
@@ -78,16 +78,12 @@ const Faq = () => {
           })}
         </Accordion.List>
         <ContactContainer direction="column" align="center" textAlign="center">
-          <Typography variant="label-1" sx={{ marginBottom: 3 }}>
+          <Text variant="label-1" sx={{ marginBottom: 3 }}>
             {t('contact.title')}
-          </Typography>
-          <Typography
-            color="secondary"
-            variant="body-2"
-            sx={{ marginBottom: 7 }}
-          >
+          </Text>
+          <Text color="secondary" variant="body-2" sx={{ marginBottom: 7 }}>
             {t('contact.subtitle')}
-          </Typography>
+          </Text>
           <Button onClick={handleClick} size="compact">
             {t('contact.cta')}
           </Button>

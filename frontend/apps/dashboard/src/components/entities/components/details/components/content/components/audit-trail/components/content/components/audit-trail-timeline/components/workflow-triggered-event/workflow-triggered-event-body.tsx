@@ -4,7 +4,7 @@ import type {
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
 import { TokenKind } from '@onefootprint/types';
-import { LinkButton, Stack, Tooltip, Typography } from '@onefootprint/ui';
+import { LinkButton, Stack, Text, Tooltip } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -98,9 +98,9 @@ const WorkflowTriggeredEventBody = ({
         testID="workflow-triggered-event-body"
         content={
           <Stack gap={2}>
-            <Typography variant="body-3" as="span">
+            <Text variant="body-3" as="span">
               {t('link-sent')}
-            </Typography>
+            </Text>
             {shouldShowCopyButton && (
               <>
                 <Stack

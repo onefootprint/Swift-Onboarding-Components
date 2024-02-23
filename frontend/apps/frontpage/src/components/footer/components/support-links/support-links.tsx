@@ -3,7 +3,7 @@ import {
   IcoTwitter24,
   ThemedLogoFpCompact,
 } from '@onefootprint/icons';
-import { media, Stack, Typography } from '@onefootprint/ui';
+import { media, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -28,13 +28,13 @@ const SuportLinks = () => {
         <Link href="/">
           <ThemedLogoFpCompact color="secondary" />
         </Link>
-        <Typography variant="body-3" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           © {currentYear} {t('copyright')}
-        </Typography>
+        </Text>
         <Link href={`mailto:${SUPPORT_EMAIL_ADDRESS}`}>
-          <Typography variant="body-3" color="tertiary">
+          <Text variant="body-3" color="tertiary">
             {SUPPORT_EMAIL_ADDRESS}
-          </Typography>
+          </Text>
         </Link>
         <Stack direction="row" gap={4}>
           {socialLinks.map(({ hrefKey, Icon }) => (

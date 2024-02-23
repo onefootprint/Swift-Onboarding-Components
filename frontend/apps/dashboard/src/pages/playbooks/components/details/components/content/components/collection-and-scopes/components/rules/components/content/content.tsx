@@ -1,6 +1,6 @@
 import type { Rule } from '@onefootprint/types';
 import { OnboardingConfigKind, RuleAction } from '@onefootprint/types';
-import { InlineAlert, Stack, Typography } from '@onefootprint/ui';
+import { InlineAlert, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -50,7 +50,7 @@ const Rules = ({
             />
           ))
       ) : (
-        <Typography variant="body-3">{t('empty-rules')}</Typography>
+        <Text variant="body-3">{t('empty-rules')}</Text>
       )}
     </Stack>
   );

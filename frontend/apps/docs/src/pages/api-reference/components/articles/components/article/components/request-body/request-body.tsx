@@ -1,4 +1,4 @@
-import { Box, createFontStyles, Typography } from '@onefootprint/ui';
+import { Box, createFontStyles, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -24,9 +24,9 @@ const RequestBody = ({ requestBody }: RequestBodyProps) => {
         {isOptional && (
           <>
             <Separator>·</Separator>
-            <Typography variant="snippet-3" color="quaternary">
+            <Text variant="snippet-3" color="quaternary">
               {t('optional')}
-            </Typography>
+            </Text>
           </>
         )}
       </Header>

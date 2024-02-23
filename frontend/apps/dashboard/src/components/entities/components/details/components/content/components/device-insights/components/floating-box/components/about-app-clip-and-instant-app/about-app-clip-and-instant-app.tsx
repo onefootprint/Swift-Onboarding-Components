@@ -1,4 +1,4 @@
-import { Box, Dialog, LinkButton, Typography } from '@onefootprint/ui';
+import { Box, Dialog, LinkButton, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
@@ -31,25 +31,21 @@ const AboutAppClipAndInstantApp = ({
         size="compact"
         title={t('dialog.title')}
       >
-        <Typography variant="body-2">{t('dialog.content')}</Typography>
+        <Text variant="body-2">{t('dialog.content')}</Text>
         <InstructionsContainer>
-          <Typography variant="body-2">{t('dialog.demo')}</Typography>
+          <Text variant="body-2">{t('dialog.demo')}</Text>
           <Box marginTop={5} marginBottom={5}>
             <QRCode
               value="https://handoff.onefootprint.com/appclip?demo=true#1234512345"
               size={128}
             />
           </Box>
-          <Typography variant="body-2" color="secondary">
+          <Text variant="body-2" color="secondary">
             {t('dialog.instructions')}
-          </Typography>
-          <Typography
-            variant="body-4"
-            color="tertiary"
-            sx={{ textAlign: 'center' }}
-          >
+          </Text>
+          <Text variant="body-4" color="tertiary" sx={{ textAlign: 'center' }}>
             {t('dialog.disclaimer')}
-          </Typography>
+          </Text>
         </InstructionsContainer>
       </Dialog>
     </>

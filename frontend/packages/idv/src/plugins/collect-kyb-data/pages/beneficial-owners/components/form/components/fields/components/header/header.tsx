@@ -1,4 +1,4 @@
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -15,13 +15,13 @@ const Header = ({ shouldShowRemove, onRemove }: HeaderProps) => {
 
   return shouldShowRemove ? (
     <HeaderContainer>
-      <Typography variant="label-2">{t('beneficial-owner-other')}</Typography>
+      <Text variant="label-2">{t('beneficial-owner-other')}</Text>
       <LinkButton onClick={onRemove} size="compact">
         {t('remove')}
       </LinkButton>
     </HeaderContainer>
   ) : (
-    <Typography variant="label-2">{t('beneficial-owner-you')}</Typography>
+    <Text variant="label-2">{t('beneficial-owner-you')}</Text>
   );
 };
 

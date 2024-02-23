@@ -1,5 +1,5 @@
 import type { LabelAddedEventData } from '@onefootprint/types';
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,9 +17,9 @@ const LabelAddedEvent = ({ data: { kind } }: LabelAddedEventProps) => {
   return (
     <Container data-testid="label-added-event-header">
       {t('as')}
-      <Typography variant="label-3" color="primary">
+      <Text variant="label-3" color="primary">
         {t(`labels.${kind}` as ParseKeys<'common'>)}
-      </Typography>
+      </Text>
     </Container>
   );
 };

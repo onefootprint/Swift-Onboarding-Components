@@ -1,4 +1,4 @@
-import { Box, ThemeToggle, Typography } from '@onefootprint/ui';
+import { Box, Text, ThemeToggle } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTheme } from 'next-themes';
 import React from 'react';
@@ -23,9 +23,9 @@ const Settings = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Header>
-        <Typography variant="heading-2" as="h2">
+        <Text variant="heading-2" as="h2">
           {t('header.title')}
-        </Typography>
+        </Text>
         <ThemeToggle
           label={t('header.theme')}
           onChange={handleToggleTheme}

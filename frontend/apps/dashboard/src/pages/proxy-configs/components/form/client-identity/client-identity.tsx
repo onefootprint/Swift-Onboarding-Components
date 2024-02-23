@@ -1,5 +1,5 @@
 import { IcoFileText224, IcoKey24 } from '@onefootprint/icons';
-import { Box, Divider, TextArea, Typography } from '@onefootprint/ui';
+import { Box, Divider, Text, TextArea } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -22,9 +22,9 @@ const ClientIdentity = ({ id, onSubmit, values }: StepProps) => {
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)}>
-      <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+      <Text variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
-      </Typography>
+      </Text>
       <UploadFile
         accept=".pem, .crt"
         cta={t('certificate.cta')}

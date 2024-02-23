@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
@@ -15,9 +15,9 @@ const FooterLink = ({ text, href, newWindow }: FooterLinkProps) => (
     rel="noopener noreferrer"
     target={newWindow ? '_blank' : undefined}
   >
-    <Typography color="tertiary" variant="body-3">
+    <Text color="tertiary" variant="body-3">
       {text}
-    </Typography>
+    </Text>
   </StyledLink>
 );
 

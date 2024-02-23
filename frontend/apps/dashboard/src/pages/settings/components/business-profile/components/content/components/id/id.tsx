@@ -1,4 +1,4 @@
-import { CodeInline, Stack, Typography } from '@onefootprint/ui';
+import { CodeInline, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,9 +13,9 @@ const Id = ({ value }: IdProps) => {
 
   return (
     <Stack direction="column" gap={3} justify="center">
-      <Typography variant="label-3" color="tertiary">
+      <Text variant="label-3" color="tertiary">
         {t('label')}
-      </Typography>
+      </Text>
       <CodeInline>{value}</CodeInline>
     </Stack>
   );

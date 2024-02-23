@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import type { ComponentProps } from 'react';
@@ -26,9 +26,9 @@ const CollectedInformation = ({
 
   return (
     <Container>
-      <Typography variant="label-3" color="secondary">
+      <Text variant="label-3" color="secondary">
         {title}
-      </Typography>
+      </Text>
       {options && (
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => {
@@ -52,9 +52,9 @@ const CollectedInformation = ({
         </OptionsContainer>
       )}
       {subtitle ? (
-        <Typography color="tertiary" variant="body-3">
+        <Text color="tertiary" variant="body-3">
           {subtitle}
-        </Typography>
+        </Text>
       ) : null}
     </Container>
   );
@@ -88,7 +88,7 @@ const OptionItem = styled.div`
   `}
 `;
 
-const Label = styled(Typography)`
+const Label = styled(Text)`
   white-space: nowrap;
   text-align: right;
 `;

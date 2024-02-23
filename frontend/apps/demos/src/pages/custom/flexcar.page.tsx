@@ -2,7 +2,7 @@ import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import footprint, {
   FootprintVerifyButton,
 } from '@onefootprint/footprint-react';
-import { CodeBlock, CodeInline, Typography } from '@onefootprint/ui';
+import { CodeBlock, CodeInline, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
@@ -186,39 +186,37 @@ const Flexcar = () => (
     <Grid>
       <Left>
         <Content>
-          <Typography variant="heading-3" sx={{ marginBottom: 4 }} as="h2">
+          <Text variant="heading-3" sx={{ marginBottom: 4 }} as="h2">
             Welcome to Footprint, Flexcar! 👋
-          </Typography>
-          <Typography variant="body-2" sx={{ marginBottom: 7 }} as="h3">
+          </Text>
+          <Text variant="body-2" sx={{ marginBottom: 7 }} as="h3">
             {`This is a step-by-step guide on how to integrate Footprint into your
             product as well as customize it to match your brand's look and feel.`}
-          </Typography>
-          <Typography variant="body-2">
+          </Text>
+          <Text variant="body-2">
             1. Go to the{` `}
             <Link href="https://dashboard.onefootprint.com" target="_blank">
               Footprint developer dashboard
             </Link>
             {` `}
             and create a new Playbook:
-          </Typography>
+          </Text>
           <span>
-            <Typography variant="body-2">
+            <Text variant="body-2">
               2. Grab the Onboarding Publishable Key, for example{' '}
               <CodeInline>{publicKey}</CodeInline>.
-            </Typography>
+            </Text>
           </span>
-          <Typography variant="body-2">
-            3. Install Footprint dependencies:
-          </Typography>
+          <Text variant="body-2">3. Install Footprint dependencies:</Text>
           <CodeBlock language="bash">{installation}</CodeBlock>
-          <Typography variant="body-2">4. Now, add to your app:</Typography>
+          <Text variant="body-2">4. Now, add to your app:</Text>
           <CodeBlock language="typescript">{basic}</CodeBlock>
-          <Typography variant="body-2">
+          <Text variant="body-2">
             {`5. To use your brand styles, create a file named config.ts and add
             to it the content you see below. This is an initial version, but it
             should already be very close to your brand's look and feel. Feel
             free to adjust as you wish.`}
-          </Typography>
+          </Text>
           <CodeBlock language="typescript">{customization}</CodeBlock>
         </Content>
       </Left>

@@ -1,4 +1,4 @@
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -9,9 +9,9 @@ type FieldSectionProps = {
 
 const FieldSection = ({ title, children }: FieldSectionProps) => (
   <Box>
-    <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+    <Text variant="label-2" sx={{ marginBottom: 5 }}>
       {title}
-    </Typography>
+    </Text>
     <FieldsContainer>{children}</FieldsContainer>
   </Box>
 );

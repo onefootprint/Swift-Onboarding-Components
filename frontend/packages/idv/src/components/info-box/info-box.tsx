@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Grid, Stack, Typography } from '@onefootprint/ui';
+import { Grid, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -25,13 +25,13 @@ const InfoBox = ({ items, variant }: InfoBoxProps) => (
           <Icon color="primary" />
         </IconContainer>
         <Stack direction="column" gap={variant === 'default' ? 3 : 2}>
-          <Typography color="primary" variant="label-3">
+          <Text color="primary" variant="label-3">
             {title}
-          </Typography>
+          </Text>
           {description && (
-            <Typography color="secondary" variant="body-3">
+            <Text color="secondary" variant="body-3">
               {description}
-            </Typography>
+            </Text>
           )}
         </Stack>
       </Stack>

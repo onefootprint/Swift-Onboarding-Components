@@ -5,7 +5,7 @@ import {
   isVaultDataEmpty,
 } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
@@ -57,9 +57,9 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
   if (showEditView) {
     if (!canEditField) {
       return (
-        <Typography variant="body-3" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           {t('not-allowed')}
-        </Typography>
+        </Text>
       );
     }
     if (!isDecrypted && !isVaultDataEmpty(value)) {

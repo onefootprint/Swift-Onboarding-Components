@@ -1,6 +1,6 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { MatchLevel } from '@onefootprint/types/src/data/match-signal';
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,12 +35,12 @@ const ValidationTimelineItemHeader = ({
 
   return (
     <HeaderContainer>
-      <Typography variant="label-3">
+      <Text variant="label-3">
         {t(`attributes.${attribute}` as ParseKeys<'common'>)}
-      </Typography>
-      <Typography variant="body-4" color={matchColors[matchLevel]}>
+      </Text>
+      <Text variant="body-4" color={matchColors[matchLevel]}>
         {t(`match-level.${matchLevel}` as ParseKeys<'common'>)}
-      </Typography>
+      </Text>
     </HeaderContainer>
   );
 };

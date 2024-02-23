@@ -2,7 +2,7 @@ import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Button from '../button';
-import Typography from '../typography';
+import Text from '../text';
 import type { BottomSheetProps } from './bottom-sheet';
 import BottomSheet from './bottom-sheet';
 
@@ -76,7 +76,7 @@ const Template: Story<BottomSheetProps> = ({
         open={open}
         title={title}
       >
-        <Typography variant="body-4">{children}</Typography>
+        <Text variant="body-4">{children}</Text>
       </BottomSheet>
       <Button onClick={() => setOpen(true)} size="default">
         Open bottom sheet
@@ -122,7 +122,7 @@ const LinkTemplate: Story<BottomSheetProps> = ({
         }}
         open={open}
       >
-        <Typography variant="body-4">Content</Typography>
+        <Text variant="body-4">Content</Text>
       </BottomSheet>
       <Button onClick={() => setOpen(true)} size="default">
         Open bottom sheet

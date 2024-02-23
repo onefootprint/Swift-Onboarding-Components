@@ -1,6 +1,6 @@
 import { IcoLogOut24 } from '@onefootprint/icons';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
-import { Dropdown, Typography } from '@onefootprint/ui';
+import { Dropdown, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,23 +39,23 @@ const NavDropdown = ({
         <Dropdown.Portal>
           <NavDropdownContent align="start" sideOffset={8}>
             <UserDropdownItem>
-              <Typography variant="label-3" as="div">
+              <Text variant="label-3" as="div">
                 {`${user.firstName} ${user.lastName}`}
-              </Typography>
-              <Typography variant="body-3" color="secondary" as="div">
+              </Text>
+              <Text variant="body-3" color="secondary" as="div">
                 {user.email}
-              </Typography>
+              </Text>
             </UserDropdownItem>
             {tenants?.length && (
               <>
                 <Dropdown.Divider />
-                <Typography
+                <Text
                   variant="label-3"
                   color="tertiary"
                   sx={{ paddingLeft: 5, paddingTop: 3 }}
                 >
                   {t('tenants-list.title')}
-                </Typography>
+                </Text>
                 <TenantsList
                   tenants={tenants}
                   currTenantId={currTenantId}

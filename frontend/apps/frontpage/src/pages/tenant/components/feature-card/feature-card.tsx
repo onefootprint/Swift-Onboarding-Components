@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -12,13 +12,13 @@ const FeatureCard = ({ title, description, children }: FeatureCardProps) => (
   <Container>
     <CardTitle>
       {children}
-      <Typography as="h3" variant="label-2">
+      <Text as="h3" variant="label-2">
         {title}
-      </Typography>
+      </Text>
     </CardTitle>
-    <Typography as="p" variant="body-2">
+    <Text as="p" variant="body-2">
       {description}
-    </Typography>
+    </Text>
   </Container>
 );
 
