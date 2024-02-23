@@ -68,7 +68,7 @@ const Root = ({ variant }: RootProps) => {
       if (!shouldShowCompletionPage) {
         fpProvider.complete({
           validationToken,
-          deviceResponseJson,
+          deviceResponse: deviceResponseJson,
           authToken: idvAuthToken,
         });
         return;
