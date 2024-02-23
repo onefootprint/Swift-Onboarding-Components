@@ -288,15 +288,16 @@ const handleButtonClick = () => {
 
 ### Update login methods flow
 
+<inline-alert variant='info'>Make sure you are using at least the @onefootprint/footprint-js@3.9.0 version.</inline-alert>
+
 ```javascript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const handleButtonClick = () => {
   const component = footprint.init({
-    kind: 'auth',
+    kind: 'update_login_methods',
     authToken: 'utok_123',
-    updateLoginMethods: true,
     onComplete: validationToken => {
       console.log(validationToken);
     },

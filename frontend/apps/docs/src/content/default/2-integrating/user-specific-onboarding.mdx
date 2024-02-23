@@ -143,7 +143,9 @@ const handleClick = () => {
 
 ### Update auth methods example
 
-If you were launching the user into the Update auth methods flow, you would pass the `authToken` and `updateLoginMethods` flag as a prop like so:
+If you are launching the user into the Update auth methods flow, you would pass the `authToken` as a prop like so:
+
+<inline-alert variant='info'>Make sure you are using at least the @onefootprint/footprint-js@3.9.0 version.</inline-alert>
 
 ```javascript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
@@ -151,9 +153,8 @@ import footprint from '@onefootprint/footprint-js';
 
 const handleClick = () => {
   const component = footprint.init({
-    kind: 'auth',
+    kind: 'update_login_methods',
     authToken: 'utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0',
-    updateLoginMethods: true,
     onComplete: validationToken => {
       // TODO: Post to Footprint server to fetch user ID or verification status
     },

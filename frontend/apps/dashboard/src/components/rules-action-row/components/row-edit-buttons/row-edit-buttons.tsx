@@ -2,13 +2,7 @@ import { primitives } from '@onefootprint/design-tokens';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoTrash16 } from '@onefootprint/icons';
 import { type Rule } from '@onefootprint/types';
-import {
-  Button,
-  LinkButton,
-  Stack,
-  Typography,
-  useToast,
-} from '@onefootprint/ui';
+import { Button, LinkButton, Stack, Text, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -90,9 +84,7 @@ const RowEditButtons = ({
 
   return isDeleting ? (
     <Stack direction="column" gap={5}>
-      <Typography variant="label-4">
-        {t('delete-confirmation.title')}
-      </Typography>
+      <Text variant="label-4">{t('delete-confirmation.title')}</Text>
       <DeleteConfirmation>
         <Button
           size="small"
