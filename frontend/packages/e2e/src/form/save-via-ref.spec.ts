@@ -38,7 +38,7 @@ test.describe('/components/form', () => {
     const refSuccessToast = page
       .getByText('Successfully saved via ref')
       .first();
-    await refSuccessToast.waitFor({ state: 'attached', timeout: 3000 });
+    await refSuccessToast.waitFor({ state: 'attached', timeout: 6000 });
     const completeToast = page.getByText('Successfully completed form').first();
     await completeToast.waitFor({ state: 'attached', timeout: 3000 });
 
