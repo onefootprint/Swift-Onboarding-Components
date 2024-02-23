@@ -103,13 +103,16 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
     padding: ${theme.spacing[2]} ${theme.spacing[5]};
     outline: none;
     border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[2]});
+    display: flex;
+    align-items: center;
+    justify-content: left;
 
     @media (hover: hover) {
-      :hover {
+      &:hover {
         ${createOverlayBackground('darken-1', 'primary')};
       }
     }
-    :focus {
+    &:focus {
       ${createOverlayBackground('darken-1', 'primary')};
     }
 
