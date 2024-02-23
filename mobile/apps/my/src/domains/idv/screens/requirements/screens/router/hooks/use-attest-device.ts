@@ -81,7 +81,9 @@ const getAttestation = async ({
     deviceResponseJson,
     attestationChallenge,
   );
-  if (!attestation) return null;
+  if (!attestation) {
+    throw new Error('Attestation is empty');
+  }
   await createDeviceAttestation(authToken, {
     attestation,
     state,
