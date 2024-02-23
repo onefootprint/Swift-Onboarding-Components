@@ -23,7 +23,7 @@ const ProxyConfigs = () => {
         justify="space-between"
         marginBottom={7}
       >
-        <Stack direction="column" gap={2}>
+        <Stack align="left" direction="column" gap={2}>
           <Text variant="heading-2">{t('header.title')}</Text>
           <Text variant="body-2" color="secondary">
             {t('header.subtitle')}

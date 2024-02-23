@@ -21,7 +21,7 @@ const ApiKeys = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Box>
-        <Stack align="center" justify="space-between" marginBottom={7}>
+        <Stack align="left" justify="space-between" marginBottom={7}>
           <Stack direction="column" gap={2}>
             <Text variant="heading-2">{t('header.title')}</Text>
             <Text variant="body-2" color="secondary">
