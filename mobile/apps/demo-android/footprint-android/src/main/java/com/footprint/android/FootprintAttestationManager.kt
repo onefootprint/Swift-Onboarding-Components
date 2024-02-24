@@ -53,7 +53,7 @@ private data class WidevineInfo(
 
 @Serializable
 private data class DataToAttest (
-    val footprintAttestationChallenge: String,
+    val attestedChallenge: String,
     val webauthnDeviceResponseJson: String?,
     val widevineId: String?,
     val widevineSecurityLevel: String?,
@@ -93,7 +93,7 @@ internal class FootprintAttestationManager(
     ) {
         val wv = getWidevine()
         val data = DataToAttest(
-            footprintAttestationChallenge = challenge.challenge,
+            attestedChallenge = challenge.challenge,
             webauthnDeviceResponseJson = deviceResponse,
             widevineId = wv.id,
             widevineSecurityLevel = wv.level,
@@ -208,23 +208,22 @@ internal class FootprintAttestationManager(
         })
     }
 
-    fun getAttestation(result: SessionResult.Complete, onDone: () -> Unit) {
-        if (result.deviceResponse.isNullOrEmpty() || result.authToken.isNullOrEmpty()) {
+    fun getAttestation(deviceResponse: String?, authToken: String?, onDone: () -> Unit) {
+        if (deviceResponse.isNullOrEmpty() || authToken.isNullOrEmpty()) {
             onDone()
             return;
         }
-
         // Attempt to do a device attestation. The attestation process involves a few steps:
         // 1. request attestation challenge from backend using the result
         // 2. generate a challenge response
         // 3. submit the response to the backend
         // Trigger onDone when the response is submitted. No need to block on waiting for response.
-        requestAttestationChallenge(result.authToken) { receivedChallenge ->
+        requestAttestationChallenge(authToken) { receivedChallenge ->
             receivedChallenge?.let { challenge ->
-                generateAttestation(result.deviceResponse, challenge) { attestation ->
+                generateAttestation(deviceResponse, challenge) { attestation ->
                     attestation?.let {
                         submitAttestation(
-                            result.authToken,
+                            authToken,
                             AttestationResult(attestation, challenge.state)
                         )
                     }

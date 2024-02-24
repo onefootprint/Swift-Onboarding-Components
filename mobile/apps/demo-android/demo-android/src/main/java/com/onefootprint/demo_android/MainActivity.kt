@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             )
             val config = FootprintConfiguration(
                 redirectActivityName = "com.onefootprint.demo_android.MainActivity",
-                publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
+                publicKey = "pb_test_w4lkmHZzpp3tsJKCcYGTmT",
                 userData = userData,
                 options = FootprintOptions(showLogo = true),
                 l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),

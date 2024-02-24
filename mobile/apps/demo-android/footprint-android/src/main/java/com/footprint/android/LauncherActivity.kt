@@ -1,10 +1,10 @@
 package com.footprint.android
+
 import FootprintLogger
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import java.lang.Exception
@@ -13,8 +13,7 @@ sealed class SessionResult {
     object Canceled : SessionResult()
     class Complete(
         val validationToken: String,
-        val deviceResponse: String? = null,
-        val authToken: String? = null
+        val sdkArgsToken: String?
     ) : SessionResult()
     object Error : SessionResult()
 }
@@ -79,19 +78,34 @@ internal class LauncherActivity : AppCompatActivity() {
                 handleError("Error parsing redirect URL.")
                 startDestinationActivity(result)
             }
+
             is SessionResult.Canceled -> {
                 config?.onCancel?.invoke()
                 startDestinationActivity(result)
             }
+
             is SessionResult.Complete -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    this.attestationManager?.getAttestation(result) {
-                        config?.onComplete?.invoke(result.validationToken)
-                        startDestinationActivity(result)
-                    }
-                } else {
+                fun complete() {
                     config?.onComplete?.invoke(result.validationToken)
                     startDestinationActivity(result)
+                }
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || result.sdkArgsToken.isNullOrEmpty()) {
+                    complete()
+                    return
+                }
+                // Fetch the data needed for device attestation from backend first
+                this.sdkArgsManager?.fetchArgs(result.sdkArgsToken) {
+                    if (it.error?.isNotEmpty() == true) {
+                        logger?.logWarn("Fetching SDK args failed: ${it.error}")
+                        complete()
+                    }
+                    this.attestationManager?.getAttestation(
+                        it.result?.args?.data?.deviceResponse,
+                        it.result?.args?.data?.authToken
+                    ) {
+                        complete()
+                    }
                 }
             }
         }
@@ -108,17 +122,16 @@ internal class LauncherActivity : AppCompatActivity() {
                 return SessionResult.Canceled
             }
             val validationToken = queryParams["validation_token"]
-            Log.d("Footprint", "$validationToken")
+            val sdkArgsToken = queryParams["sdk_args_token"]
             if (validationToken?.isNotEmpty() == true) {
-                val deviceResponse = queryParams["device_response"]
-                val authToken = queryParams["auth_token"]
-                return SessionResult.Complete(validationToken, deviceResponse, authToken)
+                return SessionResult.Complete(validationToken, sdkArgsToken)
             }
             return SessionResult.Error
         } catch (e: Exception) {
             return SessionResult.Error
         }
     }
+
     private fun handleError(error: String, shouldRedirect: Boolean = false) {
         logger?.logError(error)
         if (shouldRedirect) startDestinationActivity(SessionResult.Error)
