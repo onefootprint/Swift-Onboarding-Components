@@ -46,11 +46,15 @@ const linkSections = [
   {
     title: 'developers.title',
     links: [
-      { name: 'docs', textKey: 'developers.docs.text', hrefKey: 'docs.href' },
+      {
+        name: 'docs',
+        textKey: 'developers.docs.text',
+        hrefKey: 'developers.docs.href',
+      },
       {
         name: 'status',
         textKey: 'developers.status.text',
-        hrefKey: 'status.href',
+        hrefKey: 'developers.status.href',
       },
     ],
   },
