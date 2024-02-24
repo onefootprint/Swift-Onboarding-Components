@@ -4,7 +4,7 @@ export type CompletePayload = {
   validationToken: string;
   delay?: number;
   authToken?: string;
-  deviceResponse?: string;
+  deviceResponseJson?: string;
 };
 export type CustomChildAPI = Postmate.ChildAPI & {
   child?: Record<string, unknown>; // Window type; child === window
@@ -36,24 +36,17 @@ export type EmptyAdapterReturn = {
   on: () => () => void;
 };
 
-export type SendResultCallback = (
-  authToken: string,
-  deviceResponse: string,
-) => Promise<string | undefined>;
-
 export type WebViewAdapterReturn = {
   cancel: () => void;
   close: () => void;
   complete: (completePayload: CompletePayload) => void;
   load: () => Promise<void>;
   on: () => () => void;
-  setSendResultCallback: (cb: SendResultCallback) => void;
 };
 
 export type ProviderReturn = {
   getAdapterResponse?: IframeAdapterReturn['getAdapterResponse'];
   getLoadingStatus?: IframeAdapterReturn['getLoadingStatus'];
-  setSendResultCallback?: WebViewAdapterReturn['setSendResultCallback'];
   cancel:
     | EmptyAdapterReturn['cancel']
     | IframeAdapterReturn['cancel']

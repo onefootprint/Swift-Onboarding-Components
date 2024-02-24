@@ -31,7 +31,7 @@ const Complete = () => {
     if (idvCompletePayload && idvCompletePayload.validationToken) {
       fpProvider.complete({
         validationToken: idvCompletePayload.validationToken,
-        deviceResponse: idvCompletePayload.deviceResponseJson,
+        deviceResponseJson: idvCompletePayload.deviceResponseJson,
         authToken: idvCompletePayload.authToken,
         delay,
       });
