@@ -8,7 +8,7 @@ const checkIsExpired = (expiresAt?: Date) => {
   const now = new Date();
   const isExpired = now > expiresAt;
   if (isExpired) {
-    Logger.error('Client token has expired. Please generate a new one');
+    Logger.warn('Client token has expired. Please generate a new one');
   }
   return isExpired;
 };

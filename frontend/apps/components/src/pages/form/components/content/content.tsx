@@ -181,7 +181,7 @@ const Content = ({ fallback }: ContentProps) => {
 
   const isExpired = checkIsExpired(expiresAt);
   if (isExpired) {
-    Logger.error('Client auth token is expired, cannot save to vault');
+    Logger.warn('Client auth token is expired, cannot save to vault');
     return <Invalid onClose={handleClose} />;
   }
 
