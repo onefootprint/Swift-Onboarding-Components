@@ -40,7 +40,7 @@ use db::{
     },
     DbResult,
 };
-use idv::ParsedResponse;
+use idv::{incode::watchlist::response::UpdatedWatchlistResultResponse, ParsedResponse};
 use itertools::Itertools;
 use newtypes::{
     EncryptedVaultPrivateKey, EnhancedAmlOption, FootprintReasonCode, FpId, PiiJsonValue, RiskSignalId,
@@ -305,7 +305,7 @@ async fn get_aml_hits(
 
     if let Some(vres) = vreq_vres.vres {
         if let Some(res) = vres.response {
-            if let ParsedResponse::IncodeWatchlistCheck(wc) = res.response {
+            if let ParsedResponse::IncodeWatchlistCheck(wc) | ParsedResponse::IncodeUpdatedWatchlistResult(UpdatedWatchlistResultResponse(wc))  = res.response {
                 let share_url = wc
                     .content
                     .as_ref()
