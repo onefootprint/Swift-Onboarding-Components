@@ -42,6 +42,8 @@ pub struct DocumentUpload {
     /// more than normal. We do this when we detect the user has a poor internet connection.
     /// The results for this upload may be worse
     pub is_extra_compressed: bool,
+    /// Client-provided (so cannot always be trusted) flag that tells if the upload was *not* a live capture. Ie is_upload=True implies the user uploaded the image from camera roll
+    pub is_upload: Option<bool>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -58,6 +60,7 @@ struct NewDocumentUploadRow {
     is_app_clip: Option<bool>,
     is_manual: Option<bool>,
     is_extra_compressed: bool,
+    is_upload: Option<bool>,
 }
 
 #[derive(Debug, AsChangeset)]
@@ -116,6 +119,7 @@ impl DocumentUpload {
             is_app_clip,
             is_manual,
             is_extra_compressed,
+            is_upload: None,
         };
         let result = diesel::insert_into(document_upload::table)
             .values(new)
