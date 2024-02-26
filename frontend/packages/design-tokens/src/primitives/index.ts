@@ -90,17 +90,7 @@ export {
   Yellow800,
   Yellow900,
 } from './color';
-export {
-  onDark0,
-  onDark1,
-  onDark2,
-  onDark3,
-  onLight1,
-  onLight2,
-  onLight3,
-  onLightDialog,
-  onLightO,
-} from './elevation';
+export { elevationDark, elevationLight } from './elevation';
 export { default as grid } from './grid';
 export {
   opacity100,

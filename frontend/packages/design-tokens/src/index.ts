@@ -1,9 +1,5 @@
-import dark from './themes/dark';
-import light from './themes/light';
-
-export default { light, dark };
-
 export * as primitives from './primitives';
+export { default } from './themes';
 export type {
   BackgroundColor,
   BorderColor,
@@ -34,4 +30,4 @@ export type {
   UIState,
   UIStates,
   ZIndexes,
-} from './themes/types';
+} from './types';

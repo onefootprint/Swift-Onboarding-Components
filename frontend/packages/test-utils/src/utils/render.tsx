@@ -40,7 +40,7 @@ export const Wrapper = ({ children }: WrapperProps) => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <DesignSystemProvider theme={themes.light}>
+        <DesignSystemProvider theme={themes.footprint.light}>
           {children}
         </DesignSystemProvider>
       </QueryClientProvider>

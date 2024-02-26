@@ -45,7 +45,7 @@ export default {
     },
     variant: {
       control: 'select',
-      options: ['primary', 'secondary'],
+      options: ['primary', 'secondary', 'destructive'],
       description: 'Changes the style of the button',
     },
     iconColor: {

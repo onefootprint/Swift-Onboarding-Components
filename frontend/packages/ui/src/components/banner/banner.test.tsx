@@ -49,8 +49,9 @@ describe('<Badge />', () => {
       it('should render with the correct styles', () => {
         renderBanner({ children: 'banner content', variant });
         expect(screen.getByText('banner content')).toHaveStyle({
-          backgroundColor: themes.light.backgroundColor[styles.backgroundColor],
-          color: themes.light.color[styles.color],
+          backgroundColor:
+            themes.footprint.light.backgroundColor[styles.backgroundColor],
+          color: themes.footprint.light.color[styles.color],
         });
       });
     },

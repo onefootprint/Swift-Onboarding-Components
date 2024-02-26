@@ -202,6 +202,7 @@ export type Elevations = {
   1: string;
   2: string;
   3: string;
+  4: string;
 };
 
 export type Elevation = keyof Elevations;

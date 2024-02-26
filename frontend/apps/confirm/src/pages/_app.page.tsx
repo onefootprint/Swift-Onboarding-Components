@@ -14,7 +14,7 @@ configureSentry();
 
 const App = ({ Component, pageProps }: AppProps) => (
   <QueryClientProvider client={queryClient}>
-    <DesignSystemProvider theme={themes.light}>
+    <DesignSystemProvider theme={themes.footprint.light}>
       <GlobalStyle />
       <Component {...pageProps} />
     </DesignSystemProvider>

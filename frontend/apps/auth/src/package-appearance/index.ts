@@ -265,7 +265,7 @@ const getAppearanceFromObConfig = async (
 
 const getCustomAppearance = async ({
   variant = 'modal',
-  defaultTheme = themes.light,
+  defaultTheme = themes.footprint.light,
   params,
   strategy,
   authToken,

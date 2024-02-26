@@ -15,6 +15,7 @@ type MainButtonProps = {
   loadingAriaLabel?: string;
   children: React.ReactNode;
   ref?: React.Ref<HTMLButtonElement>;
+  flat?: boolean;
 };
 
 const MainButton = ({
@@ -22,9 +23,10 @@ const MainButton = ({
   disabled,
   onClick,
   type = 'button',
-  variant = 'primary',
+  variant = 'secondary',
   loadingAriaLabel = 'Loading',
   children,
+  flat,
   ref,
 }: MainButtonProps) => (
   <Container
@@ -37,6 +39,7 @@ const MainButton = ({
     tabIndex={0}
     type={type}
     variant={variant}
+    data-flat={flat}
   >
     <Stack align="center" justify="center">
       {loading ? (
@@ -54,70 +57,94 @@ const MainButton = ({
   </Container>
 );
 
-const Container = styled.button<{
-  variant: ButtonVariant;
-  loading?: boolean;
-}>`
+const Container = styled.button<{ variant: ButtonVariant; loading?: boolean }>`
   ${({ theme, variant, loading }) => {
     const { button } = theme.components;
 
     return css`
       all: unset;
+      --animation-duration: 0.1s;
       ${createFontStyles('label-4')}
       background-color: ${button.variant[variant].bg};
       border-color: ${button.variant[variant].borderColor};
       border-radius: ${button.borderRadius} 0 0 ${button.borderRadius};
       border-style: solid;
-      border-width: ${button.borderWidth} 0 ${button.borderWidth}
-        ${button.borderWidth};
-      border-right: 0;
+      border-width: ${button.borderWidth};
+      border-right: none;
       color: ${button.variant[variant].color};
       cursor: pointer;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       flex: 1;
       height: 100%;
-      justify-content: center;
       outline-offset: ${theme.spacing[2]};
       padding: 0 ${theme.spacing[4]};
       position: relative;
       user-select: none;
       width: fit-content;
+      z-index: 1;
+      transition: all 0.2s ease-in-out;
 
-      @media (hover: hover) {
-        &:hover:enabled {
-          background-color: ${button.variant[variant].hover.bg};
-          border-color: ${button.variant[variant].hover.borderColor};
-          color: ${button.variant[variant].hover.color};
-        }
+      &:hover:enabled {
+        background-color: ${button.variant[variant].hover.bg};
+        border-color: ${button.variant[variant].hover.borderColor};
+        color: ${button.variant[variant].hover.color};
+        box-shadow: ${button.variant[variant].hover.boxShadow};
       }
 
       &:active:enabled {
         background-color: ${button.variant[variant].active.bg};
         border-color: ${button.variant[variant].active.borderColor};
         color: ${button.variant[variant].active.color};
+        box-shadow: ${button.variant[variant].active.boxShadow};
       }
 
-      ${loading &&
-      css`
-        background-color: ${button.variant[variant].loading.bg};
-        color: ${button.variant[variant].loading.color};
-        pointer-event: none;
+      ${
+        loading &&
+        css`
+          background-color: ${button.variant[variant].loading.bg};
+          color: ${button.variant[variant].loading.color};
+          pointer-events: none;
 
-        path {
-          fill: ${button.variant[variant].loading.color};
-        }
-      `}
+          path {
+            fill: ${button.variant[variant].loading.color};
+          }
+        `
+      }
 
       &:disabled {
-        cursor: initial;
+        cursor: not-allowed;
         background-color: ${button.variant[variant].disabled.bg};
         border-color: ${button.variant[variant].disabled.borderColor};
         color: ${button.variant[variant].disabled.color};
 
         path {
           fill: ${button.variant[variant].disabled.color};
+        }
+      }
+
+      &:[data-flat='true'] {
+        box-shadow: none;
+      }
+
+      &:not([data-flat='true']) {
+        box-shadow var(--animation-duration) ease-in-out;
+        box-shadow: ${button.variant[variant].boxShadow};
+        clip-path: inset(-9999px 0 -9999px -9999px);
+
+        &:hover {
+          z-index: 0;
+          box-shadow: ${button.variant[variant].hover.boxShadow};
+        }
+
+        &:active {
+          z-index: 0;
+          box-shadow: ${button.variant[variant].active.boxShadow};
+        }
+
+        &:disabled {
+          box-shadow: ${button.variant[variant].disabled.boxShadow};
         }
       }
     `;

@@ -18,6 +18,7 @@ type DropdownOptionsProps = {
   loading?: boolean;
   disabled: boolean;
   onOptionChange: (option: Option) => void;
+  flat?: boolean;
 };
 
 const TRIGGER_WIDTH = '32px';
@@ -27,11 +28,16 @@ const DropdownOptions = ({
   variant,
   loading,
   disabled,
+  flat = false,
   onOptionChange,
 }: DropdownOptionsProps) => (
   <DropdownPrimitive.Root>
-    <Trigger variant={variant} data-loading={loading} disabled={disabled}>
-      <Divider variant={variant} />
+    <Trigger
+      variant={variant}
+      data-loading={loading}
+      disabled={disabled}
+      data-flat={flat}
+    >
       <IcoChevronDown16 color={variant === 'primary' ? 'quinary' : 'primary'} />
     </Trigger>
     <DropdownPrimitive.Portal>
@@ -64,19 +70,6 @@ const DropdownContainer = styled(DropdownPrimitive.Content)`
   }}
 `;
 
-const Divider = styled.span<{ variant: ButtonVariant }>`
-  ${({ theme, variant }) => css`
-    position: absolute;
-    height: 80%;
-    left: 0;
-    width: ${theme.borderWidth[1]};
-    opacity: 0.3;
-    background-color: ${variant === 'primary'
-      ? theme.color.quinary
-      : theme.color.tertiary};
-  `}
-`;
-
 const Item = styled(DropdownPrimitive.Item)`
   ${({ theme }) => {
     const { dropdown } = theme.components;
@@ -90,12 +83,11 @@ const Item = styled(DropdownPrimitive.Item)`
       border-radius: ${theme.borderRadius.compact};
 
       &:hover {
-        border: none;
         background-color: ${dropdown.hover.bg};
       }
 
       &:focus {
-        border: none;
+        outline: none;
       }
     `;
   }}
@@ -109,50 +101,72 @@ const Trigger = styled(DropdownPrimitive.Trigger)<{
 
     return css`
       all: unset;
-      position: relative;
+      --animation-duration: 0.1s;
+      ${createFontStyles('label-4')}
       background-color: ${button.variant[variant].bg};
       border-color: ${button.variant[variant].borderColor};
-      color: ${button.variant[variant].color};
       border-radius: 0 ${button.borderRadius} ${button.borderRadius} 0;
       border-style: solid;
       border-width: ${button.borderWidth};
-      height: 100%;
-      width: ${TRIGGER_WIDTH};
-      border-left: 0;
+      border-left: none;
+      color: ${button.variant[variant].color};
       cursor: pointer;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      flex: 1;
+      height: 100%;
+      outline-offset: ${theme.spacing[2]};
+      position: relative;
+      user-select: none;
+      width: ${TRIGGER_WIDTH};
+      transition: all 0.2s ease-in-out;
 
-      @media (hover: hover) {
-        &:hover:enabled {
-          background-color: ${button.variant[variant].hover.bg};
-          color: ${button.variant[variant].hover.color};
-        }
+      &:hover:enabled {
+        background-color: ${button.variant[variant].hover.bg};
+        border-color: ${button.variant[variant].hover.borderColor};
+        color: ${button.variant[variant].hover.color};
+        box-shadow: ${button.variant[variant].hover.boxShadow};
       }
 
       &:active:enabled {
         background-color: ${button.variant[variant].active.bg};
+        border-color: ${button.variant[variant].active.borderColor};
         color: ${button.variant[variant].active.color};
-      }
-
-      &[data-loading='true'] {
-        background-color: ${button.variant[variant].loading.bg};
-        color: ${button.variant[variant].loading.color};
-        pointer-event: none;
-
-        path {
-          fill: ${button.variant[variant].loading.color};
-        }
+        box-shadow: ${button.variant[variant].active.boxShadow};
       }
 
       &:disabled {
-        cursor: initial;
+        cursor: not-allowed;
         background-color: ${button.variant[variant].disabled.bg};
+        border-color: ${button.variant[variant].disabled.borderColor};
         color: ${button.variant[variant].disabled.color};
 
         path {
           fill: ${button.variant[variant].disabled.color};
+        }
+      }
+
+      &[data-flat='true'] {
+        box-shadow: none;
+      }
+
+      &:not([data-flat='true']) {
+        box-shadow: ${button.variant[variant]?.boxShadow};
+        clip-path: inset(-9999px -9999px -9999px 0);
+
+        &:hover {
+          z-index: 0;
+          box-shadow: ${button.variant[variant].hover.boxShadow};
+        }
+
+        &:active {
+          z-index: 0;
+          box-shadow: ${button.variant[variant].active.boxShadow};
+        }
+
+        &:disabled {
+          box-shadow: ${button.variant[variant].disabled.boxShadow};
         }
       }
     `;

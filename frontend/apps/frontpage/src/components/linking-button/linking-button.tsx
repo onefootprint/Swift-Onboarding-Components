@@ -31,24 +31,34 @@ const LinkingButton = styled(Link)<LinkingButtonProps>`
       };
       return css`
         ${createFontStyles(typographies[size] as FontVariant)}
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
         align-items: center;
         background-color: ${button.variant.primary.bg};
         border-radius: ${button.borderRadius};
         color: ${button.variant.primary.color};
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
         padding: ${paddings[size]};
+        height: ${heights[size]};
+        box-shadow: ${button.variant.primary.boxShadow};
         text-decoration: none;
         user-select: none;
-        height: ${heights[size]};
+        transition: all 0.2s;
 
         @media (hover: hover) {
           &:hover {
             background-color: ${button.variant.primary.hover.bg};
             border-color: ${button.variant.primary.hover.borderColor};
             color: ${button.variant.primary.hover.color};
+            box-shadow: ${button.variant.primary.hover.boxShadow};
           }
+        }
+
+        &:active {
+          background-color: ${button.variant.primary.active.bg};
+          border-color: ${button.variant.primary.active.borderColor};
+          color: ${button.variant.primary.active.color};
+          box-shadow: ${button.variant.primary.active.boxShadow};
         }
       `;
     }}

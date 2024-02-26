@@ -66,7 +66,7 @@ describe('<TextArea />', () => {
       expect(textarea).toHaveStyle({
         borderWidth: '1px',
         borderStyle: 'solid',
-        borderColor: themes.light.borderColor.error,
+        borderColor: themes.footprint.light.borderColor.error,
       });
     });
 
@@ -78,7 +78,7 @@ describe('<TextArea />', () => {
 
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({
-        color: themes.light.color.error,
+        color: themes.footprint.light.color.error,
       });
     });
   });

@@ -8,7 +8,9 @@ import StyledComponentsRegistry from './components/styled-registry';
 
 const ClientProviders = ({ children }: React.PropsWithChildren) => (
   <StyledComponentsRegistry>
-    <DesignSystemProvider theme={themes.light}>{children}</DesignSystemProvider>
+    <DesignSystemProvider theme={themes.footprint.light}>
+      {children}
+    </DesignSystemProvider>
   </StyledComponentsRegistry>
 );
 

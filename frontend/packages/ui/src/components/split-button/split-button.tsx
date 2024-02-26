@@ -1,6 +1,5 @@
-'use client';
-
 import React, { forwardRef, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Stack from '../stack';
 import type { Option } from './components/dropdown-options';
@@ -16,6 +15,7 @@ export type SplitButtonProps = {
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
   options: Option[];
+  flat?: boolean;
 };
 
 const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
@@ -26,6 +26,7 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
       type = 'button',
       variant = 'primary',
       options,
+      flat = false,
     }: SplitButtonProps,
     ref,
   ) => {
@@ -37,6 +38,7 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
         width="fit-content"
         position="relative"
         height={`${BUTTON_HEIGHT - 2}px`}
+        data-flat={flat}
       >
         <MainButton
           disabled={disabled}
@@ -46,9 +48,11 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
           type={type}
           variant={variant}
           tab-index="0"
+          flat={flat}
         >
           {activeOption.label}
         </MainButton>
+        <Divider />
         <DropdownOptions
           options={options}
           variant={variant}
@@ -59,10 +63,30 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
             option.onSelect();
           }}
           tab-index="1"
+          flat={flat}
         />
       </Stack>
     );
   },
 );
+
+const Divider = styled.span`
+  ${({ theme }) => css`
+    position: relative;
+    height: 100%;
+    width: 0px;
+
+    &:before {
+      content: '';
+      height: 100%;
+      position: absolute;
+      top: calc(50% + ${theme.borderWidth[1]});
+      width: 1px;
+      transform: translate(-50%, -50%);
+      background-color: ${theme.borderColor.tertiary};
+      z-index: 3;
+    }
+  `};
+`;
 
 export default Button;

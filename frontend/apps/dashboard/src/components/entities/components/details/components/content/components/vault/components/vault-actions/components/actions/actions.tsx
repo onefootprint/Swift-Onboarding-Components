@@ -4,6 +4,7 @@ import { Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
+import styled, { css } from 'styled-components';
 
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
@@ -35,9 +36,9 @@ const Actions = ({ entity }: WithEntityProps) => {
   return shouldShowActionsDropdown ? (
     <>
       <Dropdown.Root>
-        <Dropdown.Trigger $asButton aria-label={t('cta')}>
+        <StyledTrigger $asButton aria-label={t('cta')}>
           <IcoDotsHorizontal24 />
-        </Dropdown.Trigger>
+        </StyledTrigger>
         <Dropdown.Content align="end" sideOffset={8}>
           <PermissionGate
             scopeKind={RoleScopeKind.writeEntities}
@@ -76,5 +77,19 @@ const Actions = ({ entity }: WithEntityProps) => {
     </>
   ) : null;
 };
+const StyledTrigger = styled(Dropdown.Trigger)`
+  ${({ theme }) => {
+    const { button } = theme.components;
+    return css`
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: ${button.variant.secondary.boxShadow};
+
+      &:hover {
+        box-shadow: ${button.variant.secondary.hover.boxShadow};
+      }
+    `;
+  }}
+`;
 
 export default Actions;

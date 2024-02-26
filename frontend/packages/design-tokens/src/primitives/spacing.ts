@@ -1,4 +1,4 @@
-import type { Spacings } from '../themes/types';
+import type { Spacings } from '../types';
 
 // eslint-disable-next-line import/prefer-default-export
 export const spacing: Spacings = {

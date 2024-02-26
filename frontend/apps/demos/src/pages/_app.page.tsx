@@ -25,7 +25,7 @@ const App = ({ Component, pageProps }: AppProps) => (
       />
     </Head>
     <QueryClientProvider client={queryClient}>
-      <DesignSystemProvider theme={themes.light}>
+      <DesignSystemProvider theme={themes.footprint.light}>
         <GlobalStyle />
         <Component {...pageProps} />
       </DesignSystemProvider>

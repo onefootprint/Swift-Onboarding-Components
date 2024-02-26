@@ -14,7 +14,10 @@ export default {
       control: 'select',
       options: ['p', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'span'],
     },
-    color: { control: 'select', options: Object.keys(themes.light.color) },
+    color: {
+      control: 'select',
+      options: Object.keys(themes.footprint.light.color),
+    },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',

@@ -1,4 +1,4 @@
-import type { Typographies } from '../themes/types';
+import type { Typographies } from '../types';
 
 export const fontFamily = {
   default: 'DM Sans',

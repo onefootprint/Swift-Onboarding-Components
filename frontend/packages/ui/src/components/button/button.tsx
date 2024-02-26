@@ -59,7 +59,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         align="center"
         gap={3}
         visibility={loading ? 'hidden' : 'visible'}
-        $variant={variant}
+        variant={variant}
       >
         {PrefixIcon && <PrefixIcon color={iconColor || undefined} />}
         <LabelContainer>{children}</LabelContainer>
@@ -70,9 +70,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <ButtonContainer
         /** Do not change/remove these classes */
         {...props}
-        $size={size}
-        $sx={sxStyles}
-        $variant={variant}
         className="fp-button fp-custom-appearance"
         data-full-width={fullWidth}
         data-loading={loading}
@@ -82,8 +79,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled}
         form={form}
         ref={ref}
+        size={size}
+        sx={sxStyles}
         tabIndex={0}
         type={type}
+        variant={variant}
       >
         {getContent()}
         <Box visibility={loading ? 'visible' : 'hidden'} position="absolute">
@@ -100,18 +100,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 const IconContainer = styled(Stack)<{
-  $variant: ButtonVariant;
+  variant: ButtonVariant;
 }>`
-  ${({ theme, $variant }) => {
+  ${({ theme, variant }) => {
     const { button } = theme.components;
 
     return css`
       svg[data-colored='false'] {
         path {
-          stroke: ${button.variant[$variant].color};
+          stroke: ${button.variant[variant].color};
         }
         rect {
-          stroke: ${button.variant[$variant].color};
+          stroke: ${button.variant[variant].color};
         }
       }
     `;
@@ -119,64 +119,69 @@ const IconContainer = styled(Stack)<{
 `;
 
 const ButtonContainer = styled.button<{
-  $size: ButtonSize;
-  $variant: ButtonVariant;
-  $sx?: SXStyles;
+  size: ButtonSize;
+  variant: ButtonVariant;
+  sx?: SXStyles;
 }>`
-  ${({ theme, $variant, $size, $sx }) => {
+  ${({ theme, variant, size, sx }) => {
     const { button } = theme.components;
 
     return css`
-      ${createText(button.size[$size].typography)}
+      ${createText(button.size[size].typography)}
       align-items: center;
-      background-color: ${button.variant[$variant].bg};
-      border-color: ${button.variant[$variant].borderColor};
-      border-radius: ${button.borderRadius};
-      border-style: solid;
-      border-width: ${button.borderWidth};
-      color: ${button.variant[$variant].color};
-      cursor: pointer;
       display: flex;
-      height: ${button.size[$size].height};
       justify-content: center;
-      outline-offset: ${theme.spacing[2]};
-      padding: 0 ${button.size[$size].paddingHorizontal};
       position: relative;
       user-select: none;
-      ${$sx};
+      cursor: pointer;
+      outline-offset: ${theme.spacing[2]};
+      background-color: ${button.variant[variant].bg};
+      color: ${button.variant[variant].color};
+      border-style: solid;
+      border-width: ${button.borderWidth};
+      border-color: ${variant !== 'primary'
+        ? button.variant[variant].borderColor
+        : 'transparent'};
+      border-radius: ${button.borderRadius};
+      height: ${button.size[size].height};
+      padding: 0 ${button.size[size].paddingHorizontal};
+      box-shadow: ${button.variant[variant].boxShadow};
+      transition: ${button.transition};
+      ${sx};
 
-      @media (hover: hover) {
-        &:hover:enabled {
-          background-color: ${button.variant[$variant].hover.bg};
-          border-color: ${button.variant[$variant].hover.borderColor};
-          color: ${button.variant[$variant].hover.color};
-        }
+      &:hover:enabled {
+        background-color: ${button.variant[variant].hover.bg};
+        border-color: ${button.variant[variant].hover.borderColor};
+        color: ${button.variant[variant].hover.color};
+        box-shadow: ${button.variant[variant].hover.boxShadow};
       }
 
       &:active:enabled {
-        background-color: ${button.variant[$variant].active.bg};
-        border-color: ${button.variant[$variant].active.borderColor};
-        color: ${button.variant[$variant].active.color};
+        background-color: ${button.variant[variant].active.bg};
+        border-color: ${button.variant[variant].active.borderColor};
+        color: ${button.variant[variant].active.color};
+        box-shadow: ${button.variant[variant].active.boxShadow};
       }
 
       &[data-loading='true'] {
-        background-color: ${button.variant[$variant].loading.bg};
-        color: ${button.variant[$variant].loading.color};
-        pointer-event: none;
+        background-color: ${button.variant[variant].loading.bg};
+        color: ${button.variant[variant].loading.color};
+        pointer-events: none;
 
         path {
-          fill: ${button.variant[$variant].loading.color};
+          fill: ${button.variant[variant].loading.color};
         }
       }
 
       &:disabled {
         cursor: initial;
-        background-color: ${button.variant[$variant].disabled.bg};
-        border-color: ${button.variant[$variant].disabled.borderColor};
-        color: ${button.variant[$variant].disabled.color};
+        background-color: ${button.variant[variant].disabled.bg};
+        border-color: ${button.variant[variant].disabled.borderColor};
+        color: ${button.variant[variant].disabled.color};
+        box-shadow: ${button.variant[variant].disabled.boxShadow};
 
         path {
-          fill: ${button.variant[$variant].disabled.color};
+          fill: ${button.variant[variant].disabled.color};
         }
       }
 

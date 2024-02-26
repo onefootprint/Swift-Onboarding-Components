@@ -70,7 +70,7 @@ describe('<InvestorProfile />', () => {
       <React.StrictMode>
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
-            <DesignSystemProvider theme={themes.light}>
+            <DesignSystemProvider theme={themes.footprint.light}>
               <ToastProvider>
                 <Layout>
                   <InvestorProfile context={getContext()} onDone={onDone} />

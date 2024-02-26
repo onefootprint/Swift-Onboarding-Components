@@ -11,7 +11,10 @@ export default {
   title: 'Components/Icon',
   component: IcoChevronDown16,
   argTypes: {
-    color: { control: 'select', options: Object.keys(themes.light.color) },
+    color: {
+      control: 'select',
+      options: Object.keys(themes.footprint.light.color),
+    },
     testID: { control: 'text' },
   },
 } as ComponentMeta<typeof IcoChevronDown16>;

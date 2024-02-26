@@ -69,7 +69,7 @@ describe('<CollectKycData />', () => {
       <React.StrictMode>
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
-            <DesignSystemProvider theme={themes.light}>
+            <DesignSystemProvider theme={themes.footprint.light}>
               <FootprintProvider client={mockFootprintProviderClient}>
                 <ToastProvider>
                   <Layout>

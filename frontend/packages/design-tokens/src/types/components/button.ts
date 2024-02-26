@@ -6,6 +6,8 @@ type VariantStyles = Partial<{
   bg: CSS.Property.Background;
   color: CSS.Property.Color;
   borderColor: CSS.Property.BorderColor;
+  buttonBoxShadow: CSS.Property.BoxShadow;
+  boxShadow: CSS.Property.BoxShadow;
 }>;
 
 type Variant = VariantStyles & {
@@ -24,14 +26,11 @@ type Size = {
 export type Button = {
   borderWidth: CSS.Property.BorderWidth;
   borderRadius: CSS.Property.BorderRadius;
-  elevation: {
-    initial: CSS.Property.BoxShadow;
-    hover: CSS.Property.BoxShadow;
-    active: CSS.Property.BoxShadow;
-  };
+  transition: CSS.Property.Transition;
   variant: {
     primary: Variant;
     secondary: Variant;
+    destructive: Variant;
   };
   size: {
     large: Size;

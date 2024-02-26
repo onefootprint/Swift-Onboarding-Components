@@ -84,7 +84,7 @@ describe('<Idv />', () => {
       <React.StrictMode>
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
-            <DesignSystemProvider theme={themes.light}>
+            <DesignSystemProvider theme={themes.footprint.light}>
               <ToastProvider>
                 <Layout>
                   <Idv
