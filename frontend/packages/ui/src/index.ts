@@ -128,6 +128,7 @@ export {
   SegmentedControl,
   Select,
   Shimmer,
+  SplitButton,
   Stack,
   Stepper,
   SuccessCheck,

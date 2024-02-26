@@ -1,6 +1,5 @@
 import { EntityStatus, RoleScopeKind } from '@onefootprint/types';
-import { Button, Portal, Stack, Tooltip } from '@onefootprint/ui';
-import { SplitButton } from '@onefootprint/ui/src/components';
+import { Button, Portal, SplitButton, Stack, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';

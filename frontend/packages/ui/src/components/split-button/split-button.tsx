@@ -1,13 +1,11 @@
 import React, { forwardRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import type { ButtonSize, ButtonVariant } from '../button/button.types';
 import Stack from '../stack';
 import type { Option } from './components/dropdown-options';
 import DropdownOptions from './components/dropdown-options';
 import MainButton from './components/main-button';
-import type { ButtonVariant } from './split-button.types';
-
-const BUTTON_HEIGHT = 32;
 
 export type SplitButtonProps = {
   disabled?: boolean;
@@ -15,7 +13,7 @@ export type SplitButtonProps = {
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
   options: Option[];
-  flat?: boolean;
+  size?: ButtonSize;
 };
 
 const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
@@ -24,22 +22,16 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
       disabled = false,
       loading = false,
       type = 'button',
-      variant = 'primary',
+      variant = 'secondary',
+      size = 'small',
       options,
-      flat = false,
     }: SplitButtonProps,
     ref,
   ) => {
     const [activeOption, setActiveOption] = useState<Option>(options[0]);
 
     return (
-      <Stack
-        direction="row"
-        width="fit-content"
-        position="relative"
-        height={`${BUTTON_HEIGHT - 2}px`}
-        data-flat={flat}
-      >
+      <Container $size={size} direction="row" $variant={variant}>
         <MainButton
           disabled={disabled}
           loading={loading}
@@ -48,11 +40,9 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
           type={type}
           variant={variant}
           tab-index="0"
-          flat={flat}
         >
           {activeOption.label}
         </MainButton>
-        <Divider />
         <DropdownOptions
           options={options}
           variant={variant}
@@ -63,30 +53,28 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
             option.onSelect();
           }}
           tab-index="1"
-          flat={flat}
         />
-      </Stack>
+      </Container>
     );
   },
 );
 
-const Divider = styled.span`
-  ${({ theme }) => css`
-    position: relative;
-    height: 100%;
-    width: 0px;
+const Container = styled(Stack)<{ $size: ButtonSize; $variant: ButtonVariant }>`
+  ${({ theme, $size, $variant }) => {
+    const { button } = theme.components;
 
-    &:before {
-      content: '';
-      height: 100%;
-      position: absolute;
-      top: calc(50% + ${theme.borderWidth[1]});
-      width: 1px;
-      transform: translate(-50%, -50%);
-      background-color: ${theme.borderColor.tertiary};
-      z-index: 3;
-    }
-  `};
+    return css`
+      position: relative;
+      border-radius: ${button.borderRadius};
+      height: ${button.size[$size].height};
+      width: fit-content;
+      border-color: ${button.variant[$variant].borderColor};
+      border-style: solid;
+      border-width: ${button.borderWidth};
+      overflow: hidden;
+      box-shadow: ${button.variant[$variant].boxShadow};
+    `;
+  }}
 `;
 
 export default Button;

@@ -104,11 +104,9 @@ const Trigger = styled(DropdownPrimitive.Trigger)<{
       --animation-duration: 0.1s;
       ${createFontStyles('label-4')}
       background-color: ${button.variant[variant].bg};
-      border-color: ${button.variant[variant].borderColor};
+      border-left: ${theme.borderWidth[1]} solid
+        ${button.variant[variant].borderColor};
       border-radius: 0 ${button.borderRadius} ${button.borderRadius} 0;
-      border-style: solid;
-      border-width: ${button.borderWidth};
-      border-left: none;
       color: ${button.variant[variant].color};
       cursor: pointer;
       display: flex;

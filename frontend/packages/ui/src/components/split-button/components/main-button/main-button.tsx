@@ -66,11 +66,7 @@ const Container = styled.button<{ variant: ButtonVariant; loading?: boolean }>`
       --animation-duration: 0.1s;
       ${createFontStyles('label-4')}
       background-color: ${button.variant[variant].bg};
-      border-color: ${button.variant[variant].borderColor};
       border-radius: ${button.borderRadius} 0 0 ${button.borderRadius};
-      border-style: solid;
-      border-width: ${button.borderWidth};
-      border-right: none;
       color: ${button.variant[variant].color};
       cursor: pointer;
       display: flex;
