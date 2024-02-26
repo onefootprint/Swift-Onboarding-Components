@@ -61,9 +61,7 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
       padding={5}
       borderRadius="default"
       gap={5}
-      sx={{
-        display: 'grid',
-      }}
+      display="grid"
     >
       <Box>
         <Button

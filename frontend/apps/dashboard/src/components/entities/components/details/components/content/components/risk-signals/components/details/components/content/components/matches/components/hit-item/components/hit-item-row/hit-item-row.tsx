@@ -92,10 +92,8 @@ const HitItemRow = ({
       : toReadableString(fieldName);
   return (
     <Box
-      sx={{
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}
+      alignItems="center"
+      justifyContent="space-between"
       display="flex"
       gap={9}
       role="group"

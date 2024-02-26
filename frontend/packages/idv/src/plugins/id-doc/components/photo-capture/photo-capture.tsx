@@ -1,7 +1,6 @@
 import { IcoInfo24 } from '@onefootprint/icons';
 import type { IdDocImageTypes } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
-import type { ComponentProps } from 'react';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 
 import type { NavigationHeaderLeftButtonProps } from '../../../../components';
@@ -51,14 +50,6 @@ type PhotoCaptureProps = {
 const DesktopNavProps: NavigationHeaderLeftButtonProps = {
   variant: 'close',
   confirmClose: true,
-};
-
-const MobileBoxSX: ComponentProps<typeof Box>['sx'] = {
-  alignItems: 'center',
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-  justifyContent: 'center',
 };
 
 const logWarn = (e: string) => Logger.warn(e, 'photo-capture');
@@ -181,7 +172,13 @@ const PhotoCapture = ({
         </>
       )}
       {isMobile(deviceKind) && (
-        <Box sx={MobileBoxSX}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          height="100%"
+        >
           <Loading step="process" imageType={imageType} />
         </Box>
       )}

@@ -1,68 +1,177 @@
-import type { BoxProps } from './box.types';
+import type { HTMLAttributes } from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getPadding = (props: BoxProps, theme: any) => {
-  if (
-    props.paddingTop ||
-    props.paddingBottom ||
-    props.paddingLeft ||
-    props.paddingRight
-  ) {
-    return `${
-      props.paddingTop ? theme.spacing[props.paddingTop] : theme.spacing[0]
-    } ${
-      props.paddingRight ? theme.spacing[props.paddingRight] : theme.spacing[0]
-    } ${
-      props.paddingBottom
-        ? theme.spacing[props.paddingBottom]
-        : theme.spacing[0]
-    } ${props.paddingLeft ? theme.spacing[props.paddingLeft] : theme.spacing[0]}
-    `;
-  }
-  if (props.padding) {
-    return `${theme.spacing[props.padding]}`;
-  }
-  return undefined;
-};
+import type { BoxStyleProps } from './box.types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getMargin = (props: BoxProps, theme: any) => {
-  if (
-    props.marginTop ||
-    props.marginBottom ||
-    props.marginLeft ||
-    props.marginRight
-  ) {
-    return `${
-      props.marginTop ? theme.spacing[props.marginTop] : theme.spacing[0]
-    } ${
-      props.marginRight ? theme.spacing[props.marginRight] : theme.spacing[0]
-    } ${
-      props.marginBottom ? theme.spacing[props.marginBottom] : theme.spacing[0]
-    } ${props.marginLeft ? theme.spacing[props.marginLeft] : theme.spacing[0]}`;
-  }
-  if (props.margin) {
-    return `${props.margin}`;
-  }
-  return undefined;
-};
+export const styleKeyProps: string[] = [
+  'alignContent',
+  'alignItems',
+  'alignSelf',
+  'backdropFilter',
+  'backfaceVisibility',
+  'backgroundBlendMode',
+  'backgroundClip',
+  'backgroundImage',
+  'backgroundOrigin',
+  'backgroundPosition',
+  'backgroundRepeat',
+  'backgroundSize',
+  'borderCollapse',
+  'borderSpacing',
+  'bottom',
+  'boxSizing',
+  'clear',
+  'clip',
+  'columnCount',
+  'columnFill',
+  'columnGap',
+  'columnRule',
+  'columnRuleColor',
+  'columnRuleStyle',
+  'columnRuleWidth',
+  'columns',
+  'columnSpan',
+  'columnWidth',
+  'contain',
+  'content',
+  'counterIncrement',
+  'counterReset',
+  'counterSet',
+  'cursor',
+  'display',
+  'emptyCells',
+  'filter',
+  'flex',
+  'flexBasis',
+  'flexDirection',
+  'flexFlow',
+  'flexGrow',
+  'flexShrink',
+  'flexWrap',
+  'float',
+  'Gap',
+  'Grid',
+  'GridArea',
+  'GridAutoColumns',
+  'GridAutoFlow',
+  'GridAutoRows',
+  'GridColumn',
+  'GridColumnEnd',
+  'GridColumnGap',
+  'GridColumnStart',
+  'GridGap',
+  'GridRow',
+  'GridRowEnd',
+  'GridRowGap',
+  'GridRowStart',
+  'GridTemplate',
+  'GridTemplateAreas',
+  'GridTemplateColumns',
+  'GridTemplateRows',
+  'height',
+  'hyphens',
+  'justifyContent',
+  'justifyItems',
+  'justifySelf',
+  'left',
+  'letterSpacing',
+  'lineBreak',
+  'lineHeight',
+  'listStyle',
+  'listStyleImage',
+  'listStylePosition',
+  'listStyleType',
+  'maxHeight',
+  'maxWidth',
+  'minHeight',
+  'minWidth',
+  'objectFit',
+  'objectPosition',
+  'opacity',
+  'order',
+  'outline',
+  'overflow',
+  'overflowWrap',
+  'overflowX',
+  'overflowY',
+  'perspective',
+  'perspectiveOrigin',
+  'placeContent',
+  'placeItems',
+  'placeSelf',
+  'pointerEvents',
+  'position',
+  'resize',
+  'right',
+  'rirection',
+  'risplay',
+  'rowGap',
+  'scrollBehavior',
+  'tableLayout',
+  'tabSize',
+  'textAlign',
+  'textAlignLast',
+  'textDecoration',
+  'textDecorationColor',
+  'textDecorationLine',
+  'textDecorationStyle',
+  'textIndent',
+  'textJustify',
+  'textOverflow',
+  'textShadow',
+  'textTransform',
+  'top',
+  'transform',
+  'transformOrigin',
+  'transition',
+  'transitionDuration',
+  'transitionProperty',
+  'transitionTimingFunction',
+  'userSelect',
+  'verticalAlign',
+  'visibility',
+  'whiteSpace',
+  'width',
+  'wordBreak',
+  'wordSpacing',
+  'wordWrap',
+  'zIndex',
+  'backgroundColor',
+  'borderColor',
+  'borderPosition',
+  'borderRadius',
+  'borderWidth',
+  'elevation',
+  'fontStyle',
+  'gap',
+  'margin',
+  'marginBottom',
+  'marginLeft',
+  'marginRight',
+  'marginTop',
+  'marginX',
+  'marginY',
+  'padding',
+  'paddingBottom',
+  'paddingLeft',
+  'paddingRight',
+  'paddingTop',
+  'paddingX',
+  'paddingY',
+  'surfaceColor',
+];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getBorders = (props: BoxProps, theme: any) => {
-  if (
-    props.borderPosition &&
-    props.borderPosition !== 'all' &&
-    props.borderWidth &&
-    props.borderColor
-  ) {
-    return `border-${props.borderPosition}:  ${
-      theme.borderWidth[props.borderWidth]
-    } solid ${props.borderColor && theme.borderColor[props.borderColor]};`;
-  }
-  if (props.borderWidth && props.borderColor) {
-    return `border: ${theme.borderWidth[props.borderWidth]} solid ${
-      props.borderColor && theme.borderColor[props.borderColor]
-    };`;
-  }
-  return undefined;
+export const filterProps = (props: BoxStyleProps) => {
+  const styleProps: Partial<BoxStyleProps> = {};
+  const elProps: Partial<HTMLAttributes<Element>> = {};
+
+  Object.keys(props).forEach(key => {
+    if (styleKeyProps.includes(key)) {
+      // @ts-ignore
+      styleProps[key] = props[key];
+    } else {
+      // @ts-ignore
+      elProps[key] = props[key];
+    }
+  });
+  return { styleProps, ...elProps };
 };

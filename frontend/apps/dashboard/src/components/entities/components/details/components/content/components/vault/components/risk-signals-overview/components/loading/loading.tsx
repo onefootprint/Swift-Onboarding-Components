@@ -2,13 +2,7 @@ import { Box, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
-  <Box
-    aria-busy
-    sx={{
-      display: 'flex',
-      justifyContent: 'space-between',
-    }}
-  >
+  <Box aria-busy display="flex" justifyContent="space-between">
     <Shimmer
       sx={{
         width: '122px',

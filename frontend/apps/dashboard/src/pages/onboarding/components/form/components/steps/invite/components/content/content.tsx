@@ -74,7 +74,7 @@ const Content = ({
   };
 
   return (
-    <Box data-testid="onboarding-invite-content">
+    <Box testID="onboarding-invite-content">
       <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(handleAfterSubmit)}>
           {fields.map((field, index) => (

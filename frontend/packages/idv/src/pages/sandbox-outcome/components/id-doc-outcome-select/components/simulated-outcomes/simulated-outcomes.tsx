@@ -44,7 +44,7 @@ const SimulatedOutcomes = ({
     <Container>
       {allowRealOutcome ? (
         <>
-          <Box display="flex" gap={2} sx={{ alignItems: 'center' }}>
+          <Box display="flex" gap={2} alignItems="center">
             <Controller
               control={control}
               name="outcomes.idDocOutcome"

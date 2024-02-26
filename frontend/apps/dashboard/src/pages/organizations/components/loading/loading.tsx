@@ -6,7 +6,7 @@ const Loading = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.organizations' });
 
   return (
-    <Box testID="organizations-loading" sx={{ width: '100%' }}>
+    <Box testID="organizations-loading" width="100%">
       <Text
         variant="label-1"
         color="primary"

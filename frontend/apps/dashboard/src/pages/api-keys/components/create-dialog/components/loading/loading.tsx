@@ -2,7 +2,7 @@ import { Box, Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
-  <Box testID="members-roles-loading" sx={{ width: '100%' }}>
+  <Box testID="members-roles-loading" width="100%">
     <Stack gap={4} marginBottom={5}>
       <Stack direction="column" gap={3}>
         <SecretKeyLabel />

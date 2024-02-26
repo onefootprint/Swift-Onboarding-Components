@@ -9,13 +9,11 @@ const HitsShimmer = () => {
     isLink?: boolean,
   ) => (
     <Box
-      sx={{
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-      }}
+      alignItems="center"
       display="flex"
       gap={9}
+      justifyContent="space-between"
+      width="100%"
     >
       <HitRowItem width={labelWidth} />
       <HitRowItem width={valueWidth} isLink={isLink} />

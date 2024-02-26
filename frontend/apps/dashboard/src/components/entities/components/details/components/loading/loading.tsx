@@ -65,7 +65,7 @@ const Header = () => (
 );
 
 const Vault = () => (
-  <Box gap={5} sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
+  <Box gap={5} display="grid" gridTemplateColumns="repeat(2, 1fr)">
     <Box>
       <Shimmer sx={{ height: '317px', minWidth: '264px' }} />
     </Box>
