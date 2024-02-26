@@ -1,4 +1,4 @@
-import { Box, LoadingIndicator, Text } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Box, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,7 @@ const Loading = () => {
       >
         {t('title')}
       </Text>
-      <LoadingIndicator />
+      <AnimatedLoadingSpinner animationStart />
     </Box>
   );
 };

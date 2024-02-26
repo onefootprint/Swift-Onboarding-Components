@@ -1,7 +1,7 @@
 import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 import { OnboardingRequirementKind } from '@onefootprint/types';
-import { LoadingIndicator } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
@@ -107,7 +107,7 @@ const CheckRequirements = () => {
     <Error />
   ) : (
     <Container>
-      <LoadingIndicator />
+      <AnimatedLoadingSpinner animationStart />
     </Container>
   );
 };

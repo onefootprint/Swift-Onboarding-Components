@@ -1,6 +1,6 @@
 import { useCountdownCustom } from '@onefootprint/hooks';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
-import { LoadingIndicator, media } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, media } from '@onefootprint/ui';
 import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -360,7 +360,7 @@ const Camera = ({
           data-device-kind={deviceKind}
           desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}
         >
-          <LoadingIndicator />
+          <AnimatedLoadingSpinner animationStart />
         </LoadingContainer>
       ) : null}
       <Container data-visible={isCameraVisible}>
@@ -441,7 +441,7 @@ const Camera = ({
             </>
           ) : (
             <ProcessingContainer>
-              <LoadingIndicator />
+              <AnimatedLoadingSpinner animationStart />
             </ProcessingContainer>
           )}
         </VideoContainer>

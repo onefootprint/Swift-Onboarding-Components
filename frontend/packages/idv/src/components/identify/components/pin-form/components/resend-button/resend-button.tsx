@@ -1,5 +1,5 @@
 import { useCountdown } from '@onefootprint/hooks';
-import { LinkButton, LoadingIndicator, Text } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, LinkButton, Text } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -58,7 +58,7 @@ const ResendButton = ({
   };
 
   return isResendLoading ? (
-    <LoadingIndicator />
+    <AnimatedLoadingSpinner animationStart />
   ) : (
     <Container>
       <LinkButton

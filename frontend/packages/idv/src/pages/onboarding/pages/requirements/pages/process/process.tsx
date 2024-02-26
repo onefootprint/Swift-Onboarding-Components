@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { LoadingIndicator } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
@@ -45,7 +45,7 @@ const Process = ({ onDone }: ProcessProps) => {
     <Error />
   ) : (
     <Container>
-      <LoadingIndicator />
+      <AnimatedLoadingSpinner animationStart />
     </Container>
   );
 };

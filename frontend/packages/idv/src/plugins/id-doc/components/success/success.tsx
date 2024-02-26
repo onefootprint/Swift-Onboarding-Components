@@ -1,8 +1,7 @@
-import { IcoCheck24 } from '@onefootprint/icons';
-import { Text } from '@onefootprint/ui';
+import { SuccessCheck, Text } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 
@@ -24,9 +23,7 @@ const Success = ({ onComplete }: SuccessProps) => {
 
   return (
     <Container>
-      <SuccessIconContainer>
-        <IcoCheck24 color="quinary" />
-      </SuccessIconContainer>
+      <SuccessCheck animationStart />
       <Text
         variant="label-1"
         sx={{ textAlign: 'center', marginTop: 5 }}
@@ -37,18 +34,6 @@ const Success = ({ onComplete }: SuccessProps) => {
     </Container>
   );
 };
-
-const SuccessIconContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: ${theme.spacing[9]};
-    height: ${theme.spacing[9]};
-    background-color: ${theme.backgroundColor.successInverted};
-    border-radius: ${theme.borderRadius.full};
-  `}
-`;
 
 const Container = styled.div`
   display: flex;

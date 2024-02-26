@@ -1,11 +1,10 @@
-import { IcoCheckCircle40 } from '@onefootprint/icons';
-import { Text } from '@onefootprint/ui';
+import { SuccessCheck, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 const Success = ({ text }: { text: string }) => (
   <Container>
-    <IcoCheckCircle40 color="success" />
+    <SuccessCheck animationStart size={32} />
     <Text variant="label-3" color="success">
       {text}
     </Text>

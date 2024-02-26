@@ -1,5 +1,7 @@
 export type { AddressInputProps } from './address-input';
 export { default as AddressInput } from './address-input';
+export { default as AnimatedLoadingSpinner } from './animated-loading-spinner';
+export { default as SuccessCheck } from './animated-success-check';
 export type { AvatarProps } from './avatar';
 export { default as Avatar } from './avatar';
 export type { BadgeProps } from './badge';
@@ -84,8 +86,6 @@ export type {
   LinkButtonVariant,
 } from './link-button';
 export { default as LinkButton } from './link-button';
-export type { LoadingIndicatorProps } from './loading-indicator';
-export { default as LoadingIndicator } from './loading-indicator';
 export type { MultiSelectProps } from './multi-select';
 export { default as MultiSelect } from './multi-select';
 export { default as NativeSelect } from './native-select';

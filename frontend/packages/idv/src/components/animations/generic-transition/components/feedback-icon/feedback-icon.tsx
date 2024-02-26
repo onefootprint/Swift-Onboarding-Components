@@ -1,5 +1,6 @@
 import type { Theme } from '@onefootprint/design-tokens';
-import { IcoCheck16, IcoSpinner16, IcoWarning16 } from '@onefootprint/icons';
+import { IcoWarning16 } from '@onefootprint/icons';
+import { AnimatedLoadingSpinner, SuccessCheck } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
@@ -8,9 +9,11 @@ type FeedbackIconProps = {
 };
 const FeedbackIcon = ({ variant }: FeedbackIconProps) => (
   <Container variant={variant}>
-    {variant === 'success' && <IcoCheck16 color="success" />}
+    {variant === 'success' && <SuccessCheck size={24} animationStart />}
     {variant === 'error' && <IcoWarning16 color="error" />}
-    {variant === 'loading' && <IcoSpinner16 color="warning" />}
+    {variant === 'loading' && (
+      <AnimatedLoadingSpinner size={24} animationStart />
+    )}
   </Container>
 );
 

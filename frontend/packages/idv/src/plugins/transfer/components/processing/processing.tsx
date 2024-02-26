@@ -1,4 +1,4 @@
-import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -17,7 +17,7 @@ const Processing = ({ title, subtitle, cta, onCancel }: ProcessingProps) => (
     <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
     <Container>
       <HeaderTitle title={title} subtitle={subtitle} />
-      <LoadingIndicator />
+      <AnimatedLoadingSpinner animationStart />
       <LinkButton onClick={onCancel}>{cta}</LinkButton>
     </Container>
   </>

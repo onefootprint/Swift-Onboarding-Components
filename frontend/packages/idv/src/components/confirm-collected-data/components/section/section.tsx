@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { LinkButton, LoadingIndicator, Text } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -43,7 +43,7 @@ const Section = ({
           <ActionsContainer>
             {actions?.map(({ label, onClick, isLoading, actionTestID }) =>
               isLoading ? (
-                <LoadingIndicator key={label} />
+                <AnimatedLoadingSpinner key={label} animationStart />
               ) : (
                 <LinkButton
                   key={label}

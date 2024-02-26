@@ -4,8 +4,8 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils';
-import type { LoadingIndicatorProps } from '../loading-indicator';
-import LoadingIndicator from '../loading-indicator';
+import type { AnimatedLoadingSpinnerProps } from '../animated-loading-spinner';
+import AnimatedLoadingSpinner from '../animated-loading-spinner';
 import type { AvatarSize } from './avatar.types';
 
 export type AvatarProps = {
@@ -24,7 +24,10 @@ const Avatar = ({
   if (loading) {
     return (
       <Fallback data-size={size} data-variant={src ? 'secondary' : 'primary'}>
-        <LoadingIndicator size={loadingIndicatorSize[size]} />
+        <AnimatedLoadingSpinner
+          animationStart
+          size={loadingIndicatorSize[size]}
+        />
       </Fallback>
     );
   }
@@ -49,12 +52,12 @@ const sizes: Record<AvatarSize, CSS.Property.Width | CSS.Property.Height> = {
 
 export const loadingIndicatorSize: Record<
   AvatarSize,
-  LoadingIndicatorProps['size']
+  AnimatedLoadingSpinnerProps['size']
 > = {
-  compact: 'compact',
-  default: 'compact',
-  large: 'default',
-  xlarge: 'default',
+  compact: 20,
+  default: 24,
+  large: 32,
+  xlarge: 32,
 };
 
 const ImageContainer = styled.div<{

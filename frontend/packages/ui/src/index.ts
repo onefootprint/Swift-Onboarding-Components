@@ -48,7 +48,6 @@ export type {
   LinkButtonProps,
   LinkButtonSize,
   LinkButtonVariant,
-  LoadingIndicatorProps,
   MultiSelectProps,
   NextToast,
   PaginationProps,
@@ -79,6 +78,7 @@ export type {
 } from './components';
 export {
   AddressInput,
+  AnimatedLoadingSpinner,
   Avatar,
   Badge,
   Banner,
@@ -114,7 +114,6 @@ export {
   InputGroup,
   InternalInput,
   LinkButton,
-  LoadingIndicator,
   MultiSelect,
   NativeSelect,
   Overlay,
@@ -131,6 +130,7 @@ export {
   Shimmer,
   Stack,
   Stepper,
+  SuccessCheck,
   Tab,
   Table,
   Tabs,

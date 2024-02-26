@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../../utils';
-import LoadingIndicator from '../../../loading-indicator';
+import AnimatedLoadingSpinner from '../../../animated-loading-spinner';
 import Stack from '../../../stack';
 import type { ButtonVariant } from '../../split-button.types';
 
@@ -40,9 +40,10 @@ const MainButton = ({
   >
     <Stack align="center" justify="center">
       {loading ? (
-        <LoadingIndicator
-          aria-label={loadingAriaLabel}
+        <AnimatedLoadingSpinner
+          ariaLabel={loadingAriaLabel}
           color={variant === 'primary' ? 'quinary' : 'primary'}
+          animationStart
         />
       ) : (
         <Stack as="span" whiteSpace="nowrap">

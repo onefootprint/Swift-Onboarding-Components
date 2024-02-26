@@ -1,6 +1,6 @@
-import { LoadingIndicator } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 
-const Loading = () => <LoadingIndicator />;
+const Loading = () => <AnimatedLoadingSpinner animationStart />;
 
 export default Loading;

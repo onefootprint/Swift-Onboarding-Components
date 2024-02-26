@@ -3,32 +3,43 @@ import React, { useState } from 'react';
 
 import Button from '../button';
 import Stack from '../stack';
-import SuccessCheck from './success-check';
+import AnimatedLoadingSpinner from './animated-loading-spinner';
 
 export default {
-  title: 'Components/SuccessCheck',
-  component: SuccessCheck,
+  title: 'Components/AnimatedLoadingSpinner',
+  component: AnimatedLoadingSpinner,
   argTypes: {
     size: {
       control: 'number',
       defaultValue: 40,
     },
+    color: {
+      control: 'select',
+      options: ['primary', 'secondary', 'tertiary', 'quaternary'],
+    },
   },
-} as ComponentMeta<typeof SuccessCheck>;
+} as ComponentMeta<typeof AnimatedLoadingSpinner>;
 
-const Template: ComponentStory<typeof SuccessCheck> = ({ size }) => {
+const Template: ComponentStory<typeof AnimatedLoadingSpinner> = ({
+  size,
+  color,
+}) => {
   const [animationStart, setAnimationStart] = useState(false);
 
   return (
     <Stack direction="column" gap={5}>
-      <SuccessCheck animationStart={animationStart} size={size} />
+      <AnimatedLoadingSpinner
+        animationStart={animationStart}
+        size={size}
+        color={color}
+      />
       <Stack gap={3}>
         <Button
           type="button"
           size="small"
           onClick={() => setAnimationStart(true)}
         >
-          Play Animation
+          Start Animation
         </Button>
         <Button
           type="button"
@@ -36,7 +47,7 @@ const Template: ComponentStory<typeof SuccessCheck> = ({ size }) => {
           onClick={() => setAnimationStart(false)}
           variant="secondary"
         >
-          Reset Animation
+          Stop Animation
         </Button>
       </Stack>
     </Stack>

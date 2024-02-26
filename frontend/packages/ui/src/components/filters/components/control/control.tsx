@@ -4,9 +4,9 @@
 import React, { useId, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import AnimatedLoadingSpinner from '../../../animated-loading-spinner';
 import Box from '../../../box';
 import Fade from '../../../fade';
-import LoadingIndicator from '../../../loading-indicator';
 import type { FilterControl, FilterSelectedOption } from '../../filters.types';
 import AddPill from './components/add-pill';
 import ClearPill from './components/clear-pill';
@@ -108,10 +108,11 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
         >
           <Popover id={popoverId} onClose={close} title={label}>
             {loading ? (
-              <LoadingIndicator
+              <AnimatedLoadingSpinner
                 color="secondary"
-                size="compact"
-                aria-label={`Loading ${label}`}
+                ariaLabel={`Loading ${label}`}
+                size={24}
+                animationStart
               />
             ) : (
               <>

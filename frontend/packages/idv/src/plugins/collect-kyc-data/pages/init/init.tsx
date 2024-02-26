@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { LoadingIndicator } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -46,7 +46,7 @@ const Init = () => {
 
   return (
     <Container>
-      <LoadingIndicator />
+      <AnimatedLoadingSpinner animationStart />
     </Container>
   );
 };

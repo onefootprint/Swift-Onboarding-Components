@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { LoadingIndicator } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
@@ -42,7 +42,7 @@ const Unavailable = () => {
   return (
     <Container>
       <NavigationHeader />
-      <LoadingIndicator />
+      <AnimatedLoadingSpinner animationStart />
     </Container>
   );
 };

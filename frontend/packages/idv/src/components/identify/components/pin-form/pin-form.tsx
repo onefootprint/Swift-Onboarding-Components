@@ -1,4 +1,4 @@
-import { PinInput, Text } from '@onefootprint/ui';
+import { PinInput, Stack, Text } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -60,23 +60,25 @@ const PinForm = ({
         testID="verification-form-pin-input"
         autoFocus
       />
-      <ResendButton
-        isResendLoading={isResendLoading}
-        onResend={onResend}
-        resendDisabledUntil={resendDisabledUntil}
-        texts={{
-          resendCountDown: texts.resendCountDown,
-          resendCta: texts.resendCta,
-        }}
-      />
-      {tryOtherAction ? (
-        <InlineAction
-          isDisabled={tryOtherAction.isDisabled}
-          label={tryOtherAction.label}
-          labelCta={tryOtherAction.labelCta}
-          onClick={tryOtherAction.onClick}
+      <Stack height="32px">
+        <ResendButton
+          isResendLoading={isResendLoading}
+          onResend={onResend}
+          resendDisabledUntil={resendDisabledUntil}
+          texts={{
+            resendCountDown: texts.resendCountDown,
+            resendCta: texts.resendCta,
+          }}
         />
-      ) : null}
+        {tryOtherAction ? (
+          <InlineAction
+            isDisabled={tryOtherAction.isDisabled}
+            label={tryOtherAction.label}
+            labelCta={tryOtherAction.labelCta}
+            onClick={tryOtherAction.onClick}
+          />
+        ) : null}
+      </Stack>
     </StyledForm>
   );
 };

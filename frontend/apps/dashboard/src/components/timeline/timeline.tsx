@@ -1,5 +1,11 @@
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import { Box, Grid, LoadingIndicator, Stack, Text } from '@onefootprint/ui';
+import {
+  AnimatedLoadingSpinner,
+  Box,
+  Grid,
+  Stack,
+  Text,
+} from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -90,7 +96,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
       </Stack>
       {isLoading && (
         <Box marginBottom={4}>
-          <LoadingIndicator />
+          <AnimatedLoadingSpinner animationStart />
         </Box>
       )}
     </>

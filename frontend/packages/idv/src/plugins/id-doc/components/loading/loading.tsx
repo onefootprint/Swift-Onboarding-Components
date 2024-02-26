@@ -1,5 +1,5 @@
 import type { IdDocImageTypes } from '@onefootprint/types';
-import { LoadingIndicator, Stack, Text } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -23,7 +23,7 @@ const Loading = ({
 
   return (
     <Container>
-      <LoadingIndicator />
+      <AnimatedLoadingSpinner animationStart />
       <Stack direction="column" justify="center" align="center" gap={3}>
         <Text variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
           {t(`title.${step}-${imageType}`)}

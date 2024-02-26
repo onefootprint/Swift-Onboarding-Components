@@ -1,4 +1,4 @@
-import { LoadingIndicator, Stack } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Stack } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -21,7 +21,7 @@ const ScanCode = ({ children, Header }: ScanCodeProps) => {
           subtitle={t('use-camera-or-qr-reader')}
         />
         <CodePlaceholder>
-          <LoadingIndicator />
+          <AnimatedLoadingSpinner animationStart />
         </CodePlaceholder>
       </Stack>
       {children}

@@ -8,8 +8,8 @@ import styled, { css } from 'styled-components';
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
 import { createText } from '../../utils/mixins';
+import AnimatedLoadingSpinner from '../animated-loading-spinner';
 import Box from '../box';
-import LoadingIndicator from '../loading-indicator';
 import Stack from '../stack';
 import type { ButtonSize, ButtonVariant } from './button.types';
 
@@ -87,9 +87,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {getContent()}
         <Box visibility={loading ? 'visible' : 'hidden'} position="absolute">
-          <LoadingIndicator
-            aria-label={loadingAriaLabel}
-            color={variant === 'primary' ? 'quinary' : 'primary'}
+          <AnimatedLoadingSpinner
+            animationStart={loading ?? false}
+            ariaLabel={loadingAriaLabel}
+            color={variant === 'primary' ? 'quinary' : 'tertiary'}
+            size={size === 'default' ? 24 : 16}
           />
         </Box>
       </ButtonContainer>
