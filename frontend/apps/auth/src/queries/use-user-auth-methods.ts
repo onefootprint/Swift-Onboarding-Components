@@ -19,7 +19,6 @@ const requestFn = async (token: string) => {
     headers: { [AUTH_HEADER]: token },
   });
 
-  console.log('# response', response); // eslint-disable-line no-console
   return response.data;
 };
 

@@ -29,7 +29,7 @@ const EditDataButton = ({
     <Stack align="center" justify="center" height="24px" width="24px">
       <Icon />
     </Stack>
-    <TextContainer>{label}</TextContainer>
+    <TextContainer data-private="true">{label}</TextContainer>
     <RightActions
       shouldShowVerify={isVerified}
       isEmpty={isEmpty}

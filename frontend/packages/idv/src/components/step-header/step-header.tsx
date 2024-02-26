@@ -11,8 +11,8 @@ type HeaderProps = {
   logoUrl?: string;
   orgName?: string;
   showLogo?: boolean;
-  subtitle?: string;
-  title: string;
+  subtitle?: string | JSX.Element;
+  title: string | JSX.Element;
 };
 
 const StepHeader = ({

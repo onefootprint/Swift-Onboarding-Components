@@ -6,8 +6,8 @@ import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
 
 export type Variant = FootprintVariant;
 export type HeaderProps = {
-  title: string;
-  subtitle?: string;
+  title: string | JSX.Element;
+  subtitle?: string | JSX.Element;
   overrideLeftButton?: NavigationHeaderLeftButtonProps;
 };
 export type FootprintAuthDataProps = Omit<

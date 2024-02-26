@@ -7,7 +7,7 @@ import Stack from '../../../stack';
 
 type Size = 'compact' | 'default';
 type ContentProps = {
-  title: string;
+  title: string | JSX.Element;
   description?: string;
   IconComponent: Icon;
   selected: boolean;

@@ -782,7 +782,7 @@ describe('<Identify />', () => {
         ).toBeInTheDocument();
       });
       await userEvent.click(
-        screen.getByText('Send code to piip@onefootprint.com'),
+        screen.getByText('piip@onefootprint.com'), // Send code to <span data-private="true">piip@onefootprint.com</span>
       );
       await userEvent.click(screen.getByText('Continue'));
       await fillChallengePin();

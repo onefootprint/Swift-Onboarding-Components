@@ -7,9 +7,9 @@ import styled, { css } from 'styled-components';
 export const HEADER_TITLE_DEFAULT_ID = 'header-title';
 
 export type HeaderTitleProps = {
-  title: string;
+  title: string | JSX.Element;
   titleElementId?: string;
-  subtitle?: string;
+  subtitle?: string | JSX.Element;
   sx?: SXStyleProps;
   icon?: Icon;
 };
@@ -53,7 +53,6 @@ const IconContainer = styled(Stack)`
     width: ${theme.spacing[8]};
     border: 1.5px solid ${theme.color.secondary};
     border-radius: ${theme.borderRadius.full};
-    background-color: ${theme.backgroundColor.secondary};
     background-color: ${theme.backgroundColor.secondary};
   `}
 `;

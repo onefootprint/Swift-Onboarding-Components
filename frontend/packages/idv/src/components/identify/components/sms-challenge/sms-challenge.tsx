@@ -27,7 +27,7 @@ const getFormTitle = (
   t: TFunction<'identify'>,
   challengeData: ChallengeData | undefined,
   identify: IdentifyResult,
-): string => {
+): string | JSX.Element => {
   const scrubbedPhoneNumber = getScrubbedPhoneNumber({
     challengeData,
     phoneNumber: identify.phoneNumber,
@@ -36,9 +36,13 @@ const getFormTitle = (
       | undefined,
   });
 
-  return scrubbedPhoneNumber
-    ? t('sms-challenge.prompt-with-phone', { scrubbedPhoneNumber })
-    : t('sms-challenge.prompt-without-phone');
+  return scrubbedPhoneNumber ? (
+    <span data-private="true">
+      {t('sms-challenge.prompt-with-phone', { scrubbedPhoneNumber })}
+    </span>
+  ) : (
+    t('sms-challenge.prompt-without-phone')
+  );
 };
 
 const SmsChallenge = ({ Header }: SmsChallengeProps) => {
@@ -72,7 +76,7 @@ const SmsChallenge = ({ Header }: SmsChallengeProps) => {
 
   return (
     <Container>
-      <Header data-private title={headerTitle} subtitle={formTitle} />
+      <Header title={headerTitle} subtitle={formTitle} />
       <PinVerification
         identifier={successfulIdentifier ?? { phoneNumber }}
         onChallengeSucceed={handleChallengeSucceed}

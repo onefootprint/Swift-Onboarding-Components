@@ -1,4 +1,5 @@
 import { ChallengeKind } from '@onefootprint/types';
+import React from 'react';
 
 import { getChallengeTitleByKind, getMethods } from './utils';
 
@@ -17,7 +18,12 @@ describe('getChallengeTitleByKind', () => {
       },
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
-        email: 'challenge-select-or-biometric.send-code-to a@b.com',
+        email: (
+          <>
+            challenge-select-or-biometric.send-code-to{' '}
+            <span data-private="true">a@b.com</span>
+          </>
+        ),
         sms: 'challenge-select-or-biometric.send-code-via-sms',
       },
     },
@@ -29,7 +35,12 @@ describe('getChallengeTitleByKind', () => {
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
         email: 'challenge-select-or-biometric.send-code-via-email',
-        sms: 'challenge-select-or-biometric.send-code-to +123',
+        sms: (
+          <>
+            challenge-select-or-biometric.send-code-to{' '}
+            <span data-private="true">+123</span>
+          </>
+        ),
       },
     },
     {

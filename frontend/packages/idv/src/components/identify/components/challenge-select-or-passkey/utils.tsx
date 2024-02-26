@@ -2,6 +2,7 @@ import type { Icon } from '@onefootprint/icons';
 import { IcoEmail16, IcoFaceid16, IcoSmartphone16 } from '@onefootprint/icons';
 import { ChallengeKind } from '@onefootprint/types';
 import type { TFunction } from 'i18next';
+import React from 'react';
 
 import type { DeviceInfo } from '../../../../hooks';
 import {
@@ -13,7 +14,7 @@ import type { IdentifyResult } from '../../state/types';
 import { IdentifyVariant } from '../../state/types';
 
 type T = TFunction<'identify'>;
-type TitleMap = Record<ChallengeKind, string>;
+type TitleMap = Record<ChallengeKind, string | JSX.Element>;
 
 const challengeIcons: Record<ChallengeKind, Icon> = {
   [ChallengeKind.sms]: IcoSmartphone16,
@@ -61,25 +62,40 @@ export const getMethods = (
     }));
 };
 
-const getChallengeTitleEmail = (t: T, identify: IdentifyResult): string => {
+function getChallengeTitleEmail(
+  t: T,
+  identify: IdentifyResult,
+): string | JSX.Element {
   const { user, successfulIdentifier } = identify;
   const sendTo = t('challenge-select-or-biometric.send-code-to');
 
   if (successfulIdentifier && isEmailIdentifier(successfulIdentifier)) {
-    return `${sendTo} ${successfulIdentifier.email}`;
+    return (
+      <>
+        {sendTo} <span data-private="true">{successfulIdentifier.email}</span>
+      </>
+    );
   }
   if (typeof user?.scrubbedEmail === 'string') {
     return `${sendTo} ${user.scrubbedEmail}`;
   }
   return t('challenge-select-or-biometric.send-code-via-email');
-};
+}
 
-const getChallengeTitlePhone = (t: T, identify: IdentifyResult): string => {
+const getChallengeTitlePhone = (
+  t: T,
+  identify: IdentifyResult,
+): string | JSX.Element => {
   const { user, successfulIdentifier } = identify;
   const sendTo = t('challenge-select-or-biometric.send-code-to');
 
   if (successfulIdentifier && isPhoneIdentifier(successfulIdentifier)) {
-    return `${sendTo} ${successfulIdentifier.phoneNumber}`;
+    return (
+      <>
+        {sendTo}{' '}
+        <span data-private="true">{successfulIdentifier.phoneNumber}</span>
+      </>
+    );
   }
   if (typeof user?.scrubbedPhone === 'string') {
     return `${sendTo} ${user.scrubbedPhone}`;

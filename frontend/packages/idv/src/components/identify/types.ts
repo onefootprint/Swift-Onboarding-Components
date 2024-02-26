@@ -1,8 +1,8 @@
 import type { NavigationHeaderLeftButtonProps } from '../layout';
 
 export type HeaderProps = {
-  title: string;
-  subtitle?: string;
+  title: string | JSX.Element;
+  subtitle?: string | JSX.Element;
   overrideLeftButton?: NavigationHeaderLeftButtonProps;
 };
 export type ObKeyHeader = { 'X-Onboarding-Config-Key': string };

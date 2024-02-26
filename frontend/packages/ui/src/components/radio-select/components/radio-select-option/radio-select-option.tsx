@@ -9,7 +9,7 @@ import Tooltip from '../../../tooltip';
 import Content from '../content';
 
 export type RadioSelectOptionFields = {
-  title: string;
+  title: string | JSX.Element;
   description?: string;
   IconComponent: Icon;
   value: string;
@@ -61,7 +61,7 @@ const RadioSelectOption = ({
     </Tooltip>
   ) : (
     <Option
-      aria-label={title}
+      aria-label={typeof title === 'string' ? title : 'option'}
       aria-selected={selected}
       key={value}
       onClick={handleClick}

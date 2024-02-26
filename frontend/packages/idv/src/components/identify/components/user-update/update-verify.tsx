@@ -27,7 +27,7 @@ export type UpdateVerifyBaseProps = {
 type UpdateVerifyProps = UpdateVerifyBaseProps & {
   challengePayload: Pick<UserChallengeBody, PartialPayload>;
   headerTitle: string;
-  subtitle: string;
+  subtitle: string | JSX.Element;
   logError: (str: string, err?: unknown) => void;
   logWarn: (str: string, err?: unknown) => void;
   onChallengeVerificationSuccess: () => void;

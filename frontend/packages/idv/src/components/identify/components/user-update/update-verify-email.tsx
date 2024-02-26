@@ -23,9 +23,13 @@ const UpdateVerifyEmail = ({
   email,
 }: UpdateVerifyEmailProps) => {
   const { t } = useTranslation('identify');
-  const subtitle = email
-    ? t('email-challenge.prompt-with-email', { email })
-    : t('email-challenge.prompt-without-email');
+  const subtitle = email ? (
+    <span data-private="true">
+      {t('email-challenge.prompt-with-email', { email })}
+    </span>
+  ) : (
+    t('email-challenge.prompt-without-email')
+  );
 
   return (
     <UpdateVerify
