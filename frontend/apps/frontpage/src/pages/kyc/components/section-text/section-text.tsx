@@ -24,7 +24,7 @@ const SectionText = ({ title, subtitle, items, iconSrc }: SectionTextProps) => (
           <IconWrapper>
             <IcoCheck16 color="accent" />
           </IconWrapper>
-          <Text variant="body-1" as="p" color="secondary">
+          <Text variant="body-1" color="secondary">
             {item}
           </Text>
         </ItemContainer>

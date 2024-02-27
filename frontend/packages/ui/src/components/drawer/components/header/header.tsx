@@ -29,7 +29,7 @@ const Header = ({
       </DrawerPrimitive.Close>
     </CloseContainer>
     <DrawerPrimitive.Title asChild>
-      <Text variant="label-2" as="h2">
+      <Text variant="label-2" tag="h2">
         {children}
       </Text>
     </DrawerPrimitive.Title>

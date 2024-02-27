@@ -25,10 +25,10 @@ const Compare = () => {
       <SEO title={t('html-title')} slug="/compare" />
       <Container>
         <HeroContainer>
-          <Text color="primary" variant="display-2" as="h1">
+          <Text color="primary" variant="display-2" tag="h1">
             {t('hero.title')}
           </Text>
-          <Text color="secondary" variant="body-1" as="p">
+          <Text color="secondary" variant="body-1" tag="p">
             {t('hero.subtitle')}
           </Text>
           <Box marginBottom={4} />
@@ -38,7 +38,7 @@ const Compare = () => {
           <Box marginBottom={10} />
         </HeroContainer>
         <NarrowContainer>
-          <Text color="secondary" variant="body-1" as="p">
+          <Text color="secondary" variant="body-1" tag="p">
             {t('introduction')}
           </Text>
           <ComparisonTable />

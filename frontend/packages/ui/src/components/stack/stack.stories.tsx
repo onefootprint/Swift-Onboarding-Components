@@ -1,8 +1,8 @@
 import type { Story } from '@storybook/react';
 import React from 'react';
 
+import type { StackProps } from './stack';
 import Stack from './stack';
-import type { StackProps } from './stack.types';
 
 export default {
   component: Stack,

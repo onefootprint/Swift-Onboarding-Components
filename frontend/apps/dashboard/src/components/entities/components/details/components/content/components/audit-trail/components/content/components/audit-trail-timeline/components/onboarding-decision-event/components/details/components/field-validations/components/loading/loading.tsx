@@ -2,7 +2,7 @@ import { Box, Shimmer, Stack } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 
 const Loading = () => (
-  <Box as="section" testID="match-signal-loading">
+  <Box tag="section" testID="match-signal-loading">
     {[...Array(5).keys()].map(value => (
       <Fragment key={value}>
         <Box marginBottom={2} marginLeft={13}>

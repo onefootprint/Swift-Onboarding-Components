@@ -31,13 +31,13 @@ const Invalid = ({ onClose }: InvalidProps) => {
         )
       }
     >
-      <Text as="h2" color="primary" variant="heading-3" textAlign="center">
+      <Text tag="h2" color="primary" variant="heading-3" textAlign="center">
         {t('invalid.title')}
       </Text>
       <Text
         variant="body-2"
         color="secondary"
-        as="h3"
+        tag="h3"
         marginTop={3}
         marginBottom={7}
         textAlign="center"

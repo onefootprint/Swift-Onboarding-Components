@@ -62,10 +62,10 @@ const Faq = () => {
       <SEO title={t('html-title')} slug="/faq" />
       <Container>
         <Grid.Container gap={5} marginBottom={10} textAlign="center">
-          <Text variant="display-1" as="h1">
+          <Text variant="display-1" tag="h1">
             {t('title')}
           </Text>
-          <Text variant="display-4" as="h2" color="secondary">
+          <Text variant="display-4" tag="h2" color="secondary">
             {t('subtitle')}
           </Text>
         </Grid.Container>

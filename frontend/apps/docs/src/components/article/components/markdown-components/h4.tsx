@@ -12,7 +12,7 @@ const H4 = ({ children }: H4Props) => {
   const { id, label } = getSectionMeta(children);
   return (
     <Anchor id={id} href={`#${id}`} rel="noopener noreferrer">
-      <Text as="h4" color="primary" variant="label-2">
+      <Text tag="h4" color="primary" variant="label-2">
         {label}
         <IcoLink16 />
       </Text>

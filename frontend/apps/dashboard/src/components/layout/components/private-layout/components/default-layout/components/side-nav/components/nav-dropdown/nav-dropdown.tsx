@@ -39,10 +39,10 @@ const NavDropdown = ({
         <Dropdown.Portal>
           <NavDropdownContent align="start" sideOffset={8}>
             <UserDropdownItem>
-              <Text variant="label-3" as="div">
+              <Text variant="label-3" tag="div">
                 {`${user.firstName} ${user.lastName}`}
               </Text>
-              <Text variant="body-3" color="secondary" as="div">
+              <Text variant="body-3" color="secondary" tag="div">
                 {user.email}
               </Text>
             </UserDropdownItem>

@@ -41,13 +41,5 @@ describe('<Box />', () => {
       });
       expect(screen.getByText('some content')).toBeInTheDocument();
     });
-
-    it('should render as `section`', () => {
-      renderBox({
-        children: 'foo',
-        as: 'section',
-      });
-      expect(screen.getByText('foo').tagName).toBe('SECTION');
-    });
   });
 });

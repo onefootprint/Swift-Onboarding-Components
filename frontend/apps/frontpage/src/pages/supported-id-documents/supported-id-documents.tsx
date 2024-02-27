@@ -21,10 +21,10 @@ const SupportedIdDocuments = () => {
       <SEO title={t('html-title')} slug="/supported-id-documents" />
       <Container>
         <Grid.Container gap={5} marginBottom={10} textAlign="center">
-          <Text variant="display-2" as="h1">
+          <Text variant="display-2" tag="h1">
             {t('title')}
           </Text>
-          <Text variant="display-4" as="h1">
+          <Text variant="display-4" tag="h1">
             {t('subtitle')}
           </Text>
         </Grid.Container>
@@ -52,17 +52,17 @@ const SupportedIdDocuments = () => {
             align="center"
           >
             <HeaderCell data-align="left">
-              <Text variant="caption-3" color="secondary" as="h4">
+              <Text variant="caption-3" color="secondary" tag="h4">
                 {t('table-headers.country')}
               </Text>
             </HeaderCell>
             <HeaderCell>
-              <Text variant="caption-3" color="secondary" as="h4">
+              <Text variant="caption-3" color="secondary" tag="h4">
                 {t('table-headers.passport')}
               </Text>
             </HeaderCell>
             <HeaderCell>
-              <Text variant="caption-3" color="secondary" as="h4">
+              <Text variant="caption-3" color="secondary" tag="h4">
                 {t('table-headers.id-card.text')}
               </Text>
               <Tooltip
@@ -75,7 +75,7 @@ const SupportedIdDocuments = () => {
               </Tooltip>
             </HeaderCell>
             <HeaderCell>
-              <Text variant="caption-3" color="secondary" as="h4">
+              <Text variant="caption-3" color="secondary" tag="h4">
                 {t('table-headers.drivers-license')}
               </Text>
             </HeaderCell>

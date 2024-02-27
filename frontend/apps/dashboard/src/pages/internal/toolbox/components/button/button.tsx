@@ -16,10 +16,10 @@ const Button = ({ onClick, title, subtitle, icon: Icon }: ButtonProps) => (
       <Icon />
     </IconContainer>
     <Stack direction="column" gap={2}>
-      <Text variant="heading-3" color="primary" as="h2">
+      <Text variant="heading-3" color="primary" tag="h2">
         {title}
       </Text>
-      <Text variant="body-3" color="secondary" as="p">
+      <Text variant="body-3" color="secondary" tag="p">
         {subtitle}
       </Text>
     </Stack>

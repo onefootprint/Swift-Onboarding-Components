@@ -100,14 +100,14 @@ const GenericTransition = ({
         direction="column"
       >
         {renderFirstIcon ? (
-          <Stack as={motion.div} variants={firstTextVariantTransition}>
+          <MotionStack variants={firstTextVariantTransition}>
             <Text variant="label-1">{firstText}</Text>
-          </Stack>
+          </MotionStack>
         ) : null}
         {renderSecondIcon ? (
-          <Stack as={motion.div} variants={secondTextVariantTransition}>
+          <MotionStack variants={secondTextVariantTransition}>
             <Text variant="label-1">{secondText}</Text>
-          </Stack>
+          </MotionStack>
         ) : null}
       </Stack>
     </AnimationWrapper>
@@ -125,6 +125,10 @@ const AnimationWrapper = styled(Stack)<{
       ? theme.backgroundColor.secondary
       : theme.backgroundColor.primary};
   `}
+`;
+
+const MotionStack = styled(motion(Stack))`
+  display: flex;
 `;
 
 const FeedbackIconContainer = styled(motion.div)<{

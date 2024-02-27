@@ -28,7 +28,7 @@ const Row = ({ riskSignal }: RowProps) => {
           <Badge variant="info">{t('low')}</Badge>
         )}
       </StyledTd>
-      <Stack as="td" gap={2} width="100%">
+      <Stack tag="td" gap={2} width="100%">
         <Stack
           inline
           align="center"

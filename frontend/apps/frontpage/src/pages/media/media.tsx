@@ -27,10 +27,10 @@ const Media = ({ articles }: MediaProps) => {
           paddingRight={5}
           textAlign="center"
         >
-          <Text variant="display-2" as="h1">
+          <Text variant="display-2" tag="h1">
             {t('title')}
           </Text>
-          <Text variant="display-4" as="h2" color="secondary">
+          <Text variant="display-4" tag="h2" color="secondary">
             {t('subtitle')}
           </Text>
         </Grid.Container>

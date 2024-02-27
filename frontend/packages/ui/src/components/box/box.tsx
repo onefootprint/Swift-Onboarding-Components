@@ -18,17 +18,19 @@ import type { BoxProps, BoxStyleProps } from './box.types';
 import { filterProps } from './box.utils';
 
 const Box = forwardRef<HTMLDivElement, BoxProps>(
-  ({ typography, tag, as, testID, isPrivate, ...props }, ref) => {
+  ({ center, typography, tag, testID, isPrivate, ...props }, ref) => {
     const { styleProps, ...allProps } = filterProps(props);
     return (
       <SB
-        {...allProps}
+        $center={center}
         $styleProps={styleProps}
         $typography={typography}
-        as={as || tag}
+        as={tag}
         data-private={isPrivate ? 'true' : undefined}
         data-testid={testID}
         ref={ref}
+        className={props.className}
+        {...allProps}
       />
     );
   },
@@ -38,10 +40,12 @@ const SB = styled.div<
   HTMLAttributes<HTMLDivElement> & {
     $styleProps: BoxStyleProps;
     $typography?: FontVariant;
+    $center?: boolean;
   }
 >`
-  ${({ theme, $styleProps, $typography }) => css`
+  ${({ theme, $center, $styleProps, $typography }) => css`
     ${$typography && createFontStyles($typography)};
+    ${$center && 'display: flex; justify-content: center; align-items: center;'}
     ${Object.keys($styleProps)
       .map(prop => {
         const value = $styleProps[prop as keyof BoxStyleProps];
@@ -75,7 +79,7 @@ const SB = styled.div<
         if (prop === 'elevation') {
           return `box-shadow: ${theme.elevation[value as Elevation]};`;
         }
-        if (value !== undefined && typeof value === 'string') {
+        if (value !== undefined && value) {
           return `${toKebabCase(prop)}: ${value};`;
         }
         return '';

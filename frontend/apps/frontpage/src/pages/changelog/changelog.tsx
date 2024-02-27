@@ -59,7 +59,7 @@ const Changelog = ({ posts }: ChangelogProps) => {
       <Container>
         <HeroContainer>
           <Chip>{t('microtitle')}</Chip>
-          <Text color="primary" variant="display-2" as="h1">
+          <Text color="primary" variant="display-2" tag="h1">
             {t('title')}
           </Text>
         </HeroContainer>
@@ -97,7 +97,7 @@ const Changelog = ({ posts }: ChangelogProps) => {
         )}
       </Container>
       <Recaps>
-        <Text color="primary" variant="display-3" as="h1">
+        <Text color="primary" variant="display-3" tag="h1">
           {t('recaps-title')}
         </Text>
         <Links>

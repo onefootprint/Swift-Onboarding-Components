@@ -84,7 +84,7 @@ const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
               />
               <Divider variant="secondary" />
               <Text variant="body-3" color="tertiary">
-                <Text variant="body-3" color="primary" as="span">
+                <Text variant="body-3" color="primary" tag="span">
                   {t('footer.label')}{' '}
                 </Text>
                 {t('footer.content')}

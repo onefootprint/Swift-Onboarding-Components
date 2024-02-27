@@ -48,10 +48,10 @@ const Article = ({ article }: ArticleProps) => {
               <Stack direction="row" gap={2}>
                 <TypeBadge type={method} />
                 <Stack direction="row" gap={1}>
-                  <Text variant="label-2" as="h3" color="tertiary">
+                  <Text variant="label-2" tag="h3" color="tertiary">
                     {API_BASE_URL}
                   </Text>
-                  <Text variant="label-2" as="h3">
+                  <Text variant="label-2" tag="h3">
                     {path}
                   </Text>
                 </Stack>

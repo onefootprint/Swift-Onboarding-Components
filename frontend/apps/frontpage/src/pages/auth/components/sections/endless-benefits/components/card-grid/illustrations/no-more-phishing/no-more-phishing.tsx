@@ -9,7 +9,7 @@ const NoMorePhishing = () => (
   <IllustrationContainer>
     <BackgroundNumbers columns={['repeat(20, 1fr)']} rows={['repeat(20, 1fr)']}>
       {randomNumbersArray.map(e => (
-        <Character justify="center" align="center" key={e.id} as="span">
+        <Character justify="center" align="center" key={e.id} tag="span">
           {e.value}
         </Character>
       ))}

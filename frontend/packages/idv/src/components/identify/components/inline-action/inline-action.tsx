@@ -22,7 +22,7 @@ const InlineAction = ({
   onClick,
 }: InlineActionProps): JSX.Element => (
   <Text
-    as="span"
+    tag="span"
     className={className}
     color="tertiary"
     isPrivate

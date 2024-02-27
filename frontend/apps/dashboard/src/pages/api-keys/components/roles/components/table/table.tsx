@@ -13,7 +13,7 @@ const Table = () => {
   } = useRoles(RoleKind.apiKey);
 
   return (
-    <Box testID="roles-table" as="section">
+    <Box testID="roles-table" tag="section">
       <RolesTable
         data={response?.data}
         errorMessage={errorMessage}

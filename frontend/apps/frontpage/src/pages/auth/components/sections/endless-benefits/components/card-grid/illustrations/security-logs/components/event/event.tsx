@@ -10,7 +10,7 @@ type EventProps = {
 const Event = ({ text }: EventProps) => (
   <Container justify="start" direction="row" align="center" gap={3}>
     <IcoCheckCircle16 color="tertiary" />
-    <Text variant="label-3" as="p" color="tertiary">
+    <Text variant="label-3" color="tertiary">
       {text}
     </Text>
   </Container>

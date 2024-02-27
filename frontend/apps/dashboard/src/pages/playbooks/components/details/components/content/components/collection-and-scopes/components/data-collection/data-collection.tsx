@@ -157,7 +157,7 @@ const DataCollection = ({
           </Box>
           <Text variant="label-3" color="primary">
             {t('us-territories.label')}{' '}
-            <Text variant="label-3" color="tertiary" as="span">
+            <Text variant="label-3" color="tertiary" tag="span">
               {t('us-territories.content')}
             </Text>
           </Text>

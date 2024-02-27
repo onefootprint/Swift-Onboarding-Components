@@ -17,10 +17,10 @@ const TwitterBreadcrumb = ({
   <BreadcrumbContainer>
     <Breadcrumb>
       <BreadcrumbTitleContainer>
-        <Text color="primary" variant="label-2" as="span">
+        <Text color="primary" variant="label-2" tag="span">
           {title}
         </Text>
-        <Text color="primary" variant="label-2" as="span">
+        <Text color="primary" variant="label-2" tag="span">
           {description}
         </Text>
       </BreadcrumbTitleContainer>

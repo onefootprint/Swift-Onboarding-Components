@@ -27,7 +27,7 @@ const Template: ComponentStory<typeof AnimatedLoadingSpinner> = ({
   const [animationStart, setAnimationStart] = useState(false);
 
   return (
-    <Stack direction="column" gap={5}>
+    <Stack dir="column" gap={5}>
       <AnimatedLoadingSpinner
         animationStart={animationStart}
         size={size}

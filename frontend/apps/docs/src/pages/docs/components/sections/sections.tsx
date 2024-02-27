@@ -53,7 +53,7 @@ const Sections = ({ sections }: SectionsProps) => {
         {t('title')}
       </Header>
       <nav>
-        <Stack as="ul" direction="column">
+        <Stack tag="ul" direction="column">
           {sections.map(({ level, anchor, label, id }) => (
             <Stack key={id}>
               <StyledLink

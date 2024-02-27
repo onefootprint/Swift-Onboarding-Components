@@ -41,10 +41,10 @@ const StoreData = () => {
   return (
     <SectionContainer>
       <TitleContainer>
-        <Text variant="display-2" color="primary" as="h2">
+        <Text variant="display-2" color="primary" tag="h2">
           {t('title')}
         </Text>
-        <Text variant="display-4" color="secondary" as="p">
+        <Text variant="display-4" color="secondary">
           {t('subtitle')}
         </Text>
         <LinkButton

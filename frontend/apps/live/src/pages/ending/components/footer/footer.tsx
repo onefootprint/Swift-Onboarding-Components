@@ -13,7 +13,7 @@ const Footer = () => {
   return (
     <Container>
       <LeftColumn>
-        <Text as="p" variant="label-4" color="tertiary">
+        <Text tag="p" variant="label-4" color="tertiary">
           © {new Date().getFullYear()} One Footprint
         </Text>
       </LeftColumn>

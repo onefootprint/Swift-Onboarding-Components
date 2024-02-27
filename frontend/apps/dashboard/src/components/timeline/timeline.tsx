@@ -53,44 +53,66 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
           const last = i === items.length - 1;
 
           return (
-            <StepContainer key={key}>
-              <TimeContainer direction="row" gap={2} minHeight="40px">
+            <Grid.Container
+              key={key}
+              columns={['146px 24px 1fr']}
+              rows={['40px auto']}
+              alignItems="start"
+              justifyContent="start"
+              overflow="hidden"
+              templateAreas={[
+                'time icon content',
+                'empty line content',
+                'empty line content',
+              ]}
+            >
+              <Grid.Item grid="time" direction="row" gap={2} minHeight="40px">
                 {item.time && <TimelineItemTime time={item.time} />}
-              </TimeContainer>
+              </Grid.Item>
               <Line
                 data-last={last}
                 data-dashed={hasDashedBorder}
                 last={last}
+                gridArea="line"
               />
-              <Icon
+              <Grid.Item
                 align="center"
                 justify="center"
                 paddingTop={4}
                 paddingBottom={4}
                 backgroundColor="primary"
                 minHeight="40px"
+                gridArea="icon"
               >
                 {iconComponent ?? <IcoDotSmall16 />}
-              </Icon>
-              <Content direction="column">
-                <Header
+              </Grid.Item>
+              <Grid.Item
+                gridArea="content"
+                direction="column"
+                marginLeft={2}
+                gap={5}
+              >
+                <Grid.Item
+                  gridArea="header"
                   align="center"
                   justify="start"
-                  marginLeft={5}
                   marginTop={0}
+                  gap={2}
+                  minHeight={HEADER_HEIGHT}
                 >
                   {headerComponent}
-                </Header>
+                </Grid.Item>
                 <Stack
                   direction="column"
                   gap={2}
                   width="100%"
                   paddingBottom={7}
+                  paddingLeft={3}
                 >
-                  {bodyComponent && <Box paddingLeft={5}>{bodyComponent}</Box>}
+                  {bodyComponent}
                 </Stack>
-              </Content>
-            </StepContainer>
+              </Grid.Item>
+            </Grid.Container>
           );
         })}
       </Stack>
@@ -103,41 +125,8 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
   );
 };
 
-const StepContainer = styled.div`
-  display: grid;
-  grid-template-columns: 150px 16px 1fr;
-  grid-template-rows: auto;
-  grid-template-areas:
-    'time icon content'
-    'empty line content';
-  align-items: start;
-  justify-content: start;
-  overflow: hidden;
-`;
-
-const Content = styled(Grid.Item)`
-  grid-area: content;
-`;
-
-const Icon = styled(Grid.Item)`
-  grid-area: icon;
-`;
-
-const TimeContainer = styled(Grid.Item)`
-  grid-area: time;
-`;
-
-const Header = styled(Grid.Item)`
-  ${({ theme }) => css`
-    grid-area: header;
-    min-height: ${HEADER_HEIGHT};
-    gap: ${theme.spacing[2]};
-  `};
-`;
-
 const Line = styled(Grid.Item)<{ last: boolean }>`
   ${({ theme, last }) => css`
-    grid-area: icon / line / line;
     position: relative;
     height: 100%;
 

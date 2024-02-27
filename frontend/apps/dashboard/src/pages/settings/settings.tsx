@@ -23,7 +23,7 @@ const Settings = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Header>
-        <Text variant="heading-2" as="h2">
+        <Text variant="heading-2" tag="h2">
           {t('header.title')}
         </Text>
         <ThemeToggle

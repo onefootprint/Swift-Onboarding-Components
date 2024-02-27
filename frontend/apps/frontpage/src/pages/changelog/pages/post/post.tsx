@@ -56,7 +56,7 @@ const PostPage = ({ post }: PostProps) => {
       <Container>
         <HeroContainer>
           <Chip>{t('microtitle')}</Chip>
-          <Text color="primary" variant="display-2" as="h1">
+          <Text color="primary" variant="display-2" tag="h1">
             {t('title')}
           </Text>
         </HeroContainer>

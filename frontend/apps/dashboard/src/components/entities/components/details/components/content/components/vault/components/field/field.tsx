@@ -66,7 +66,7 @@ const Field = ({
             customLabel
           ) : (
             <LabelAndStatusContainer>
-              <Text variant="body-3" color="tertiary" as="label">
+              <Text variant="body-3" color="tertiary" tag="label">
                 {label}
               </Text>
               {status}

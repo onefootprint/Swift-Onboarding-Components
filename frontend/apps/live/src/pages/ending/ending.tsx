@@ -39,10 +39,10 @@ const Ending = () => {
           >
             {t('chip')}
           </Stack>
-          <Text as="h1" variant="display-2" color="primary">
+          <Text tag="h1" variant="display-2" color="primary">
             {t('title')}
           </Text>
-          <Text as="h2" variant="display-4" color="secondary" maxWidth="600px">
+          <Text tag="h2" variant="display-4" color="secondary" maxWidth="600px">
             {t('subtitle')}
           </Text>
         </HeadingContainer>
@@ -56,10 +56,10 @@ const Ending = () => {
           marginTop={10}
           maxWidth="856px"
         >
-          <Text as="h3" variant="display-3" color="primary">
+          <Text tag="h3" variant="display-3" color="primary">
             {t('new-approach.title')}
           </Text>
-          <Text as="p" variant="body-1" color="secondary" maxWidth="600px">
+          <Text tag="p" variant="body-1" color="secondary" maxWidth="600px">
             {t('new-approach.description')}
           </Text>
           <Box marginBottom={5} />
@@ -72,7 +72,7 @@ const Ending = () => {
               gap={5}
             >
               <IcoShield40 />
-              <Text as="h2" variant="heading-2">
+              <Text tag="h2" variant="heading-2">
                 {t('features.title')}
               </Text>
             </Stack>

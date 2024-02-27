@@ -52,7 +52,7 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
         </Text>
       </Header>
       <Stack>
-        <Box as="span" width="fit-content">
+        <Box tag="span" width="fit-content">
           <IcoQuoteLeft16 />
         </Box>
         <TruncatedText

@@ -165,7 +165,8 @@ export type BoxStyleProps = {
 
 export type BoxPrimitives<T = Element> = BoxStyleProps &
   HTMLAttributes<T> & {
-    as?: React.ElementType;
+    as?: never;
+    center?: boolean;
     className?: string;
     isPrivate?: boolean;
     tag?: React.ElementType;

@@ -18,12 +18,10 @@ const VerticalCard = ({
   <CardContainer>
     <CardImageContainer className="image">{children}</CardImageContainer>
     <CardContent className="content">
-      <Text variant="heading-3" as="h3">
+      <Text variant="heading-3" tag="h3">
         {title}
       </Text>
-      <Text variant="body-1" as="p">
-        {description}
-      </Text>
+      <Text variant="body-1">{description}</Text>
       {cta && (
         <LinkButton variant="default" href="/pricing">
           {cta}

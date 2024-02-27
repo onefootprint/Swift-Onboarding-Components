@@ -48,7 +48,7 @@ const LanguageSelect = () => {
             >
               <Select.ItemText>{LanguageLabels[lng]}</Select.ItemText>
               {lng === language && (
-                <Stack align="center" justify="center" as="span">
+                <Stack align="center" justify="center" tag="span">
                   <IcoCheckSmall16 color="tertiary" />
                 </Stack>
               )}

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Balancer from 'react-wrap-balancer';
 import styled, { css, useTheme } from 'styled-components';
 
 import SEO from '../../components/seo';
@@ -88,47 +87,43 @@ const Live = () => {
         <InnerContent
           direction="row"
           flexWrap="wrap-reverse"
-          flexGrow={2}
           align="center"
           justify="center"
           gap={10}
         >
-          <Balancer>
-            <TextContainer
-              align="start"
-              direction="column"
-              gap={5}
-              as={motion.span}
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <Stack as={motion.span} variants={childrenVariants}>
-                <Text as="h1" variant="display-2">
-                  {t(`${translationsKey}.title`)}
-                </Text>
-              </Stack>
-              <Stack as={motion.span} variants={childrenVariants}>
-                <Text as="h1" variant="display-4">
-                  {t(`${translationsKey}.subtitle`)}
-                </Text>
-              </Stack>
-              <Stack as={motion.span} variants={childrenVariants}>
-                <FootprintVerifyButton
-                  publicKey={publicKey}
-                  label={t(`${translationsKey}.cta`)}
-                  onComplete={() => {
-                    router.push('/ending');
-                  }}
-                />
-              </Stack>
-              <Stack as={motion.span} variants={childrenVariants}>
-                <Text as="p" variant="body-2" color="tertiary" maxWidth="520px">
-                  {t(`${translationsKey}.disclaimer`)}
-                </Text>
-              </Stack>
-            </TextContainer>
-          </Balancer>
+          <TextContainer
+            align="start"
+            direction="column"
+            gap={5}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <MotionStack variants={childrenVariants}>
+              <Text tag="h1" variant="display-2">
+                {t(`${translationsKey}.title`)}
+              </Text>
+            </MotionStack>
+            <MotionStack variants={childrenVariants}>
+              <Text tag="h2" variant="display-4">
+                {t(`${translationsKey}.subtitle`)}
+              </Text>
+            </MotionStack>
+            <MotionStack variants={childrenVariants}>
+              <FootprintVerifyButton
+                publicKey={publicKey}
+                label={t(`${translationsKey}.cta`)}
+                onComplete={() => {
+                  router.push('/ending');
+                }}
+              />
+            </MotionStack>
+            <MotionStack variants={childrenVariants}>
+              <Text tag="p" variant="body-2" color="tertiary" maxWidth="520px">
+                {t(`${translationsKey}.disclaimer`)}
+              </Text>
+            </MotionStack>
+          </TextContainer>
           <IllustrationContainer
             align="center"
             justify="center"
@@ -182,6 +177,10 @@ const FullContainer = styled(Stack)`
   `}
 `;
 
+const MotionStack = styled(motion.span)`
+  display: flex;
+`;
+
 const IllustrationContainer = styled(Stack)`
   height: 720px;
   width: 100%;
@@ -192,7 +191,7 @@ const IllustrationContainer = styled(Stack)`
   `}
 `;
 
-const TextContainer = styled(Stack)`
+const TextContainer = styled(motion(Stack))`
   max-width: 600px;
   text-align: center;
   align-items: center;
@@ -209,6 +208,8 @@ const TextContainer = styled(Stack)`
 
 const InnerContent = styled(Stack)`
   ${({ theme }) => css`
+    flex-grow: 1;
+    width: 100%;
     padding: ${theme.spacing[3]};
     margin-bottom: ${theme.spacing[7]};
 

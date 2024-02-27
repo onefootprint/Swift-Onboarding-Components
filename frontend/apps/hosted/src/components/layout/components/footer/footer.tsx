@@ -47,7 +47,7 @@ const Footer = ({ config }: FootprintFooterProps) => {
               rel="noreferrer"
               className="footer-link"
             >
-              <Text variant="caption-1" color="secondary" as="span">
+              <Text variant="caption-1" color="secondary" tag="span">
                 {label}
               </Text>
             </a>

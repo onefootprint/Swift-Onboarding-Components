@@ -24,7 +24,7 @@ const ValidationTimelineItemBody = ({
         const key = `${reasonCode}-${i}`;
         return (
           <Container key={key}>
-            <Text as="span" variant="label-3">
+            <Text tag="span" variant="label-3">
               •
             </Text>
             <Text variant="body-3" width="100%">

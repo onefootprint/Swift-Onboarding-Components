@@ -14,7 +14,7 @@ const IngressVaulting = ({ proxyConfig }: IngressVaultingProps) => {
   });
   if (!proxyConfig.ingressContentType) {
     return (
-      <Text variant="body-3" as="div" color="tertiary">
+      <Text variant="body-3" tag="div" color="tertiary">
         {t('empty')}
       </Text>
     );

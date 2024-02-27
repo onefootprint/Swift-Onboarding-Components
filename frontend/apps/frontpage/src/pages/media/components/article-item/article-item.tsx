@@ -22,13 +22,13 @@ const ArticleItem = ({
         <Text color="accent" variant="body-3" marginBottom={3}>
           {website}
         </Text>
-        <Text variant="heading-3" as="h3" marginBottom={2}>
+        <Text variant="heading-3" tag="h3" marginBottom={2}>
           {title}
         </Text>
-        <Text color="secondary" variant="body-2" as="p" marginBottom={5}>
+        <Text color="secondary" variant="body-2" tag="p" marginBottom={5}>
           {excerpt}
         </Text>
-        <Text color="tertiary" variant="body-3" as="div">
+        <Text color="tertiary" variant="body-3" tag="div">
           {publishedAt}
         </Text>
       </Content>

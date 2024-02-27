@@ -21,7 +21,7 @@ const RightActions = ({
     {shouldShowVerify ? (
       <Stack gap={1} align="center">
         <IcoCheckSmall16 color="quaternary" />
-        <Text as="span" variant="label-4" color="quaternary">
+        <Text tag="span" variant="label-4" color="quaternary">
           {`${texts.verified}`}
         </Text>
       </Stack>
@@ -29,7 +29,7 @@ const RightActions = ({
     <Text variant="label-4" color="quaternary">
       ·
     </Text>
-    <Text as="span" variant="label-4" color="accent">
+    <Text tag="span" variant="label-4" color="accent">
       {isEmpty ? texts.add : texts.edit}
     </Text>
   </Stack>

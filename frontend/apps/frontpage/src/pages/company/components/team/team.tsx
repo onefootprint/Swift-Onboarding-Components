@@ -19,7 +19,7 @@ type TeamProps = {
 
 const Team = ({ title, description, items }: TeamProps) => (
   <>
-    <Text variant="display-3" as="h3" marginBottom={5}>
+    <Text variant="display-3" tag="h3" marginBottom={5}>
       {title}
     </Text>
     <Text variant="body-1" marginBottom={7}>

@@ -54,7 +54,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const getContent = () => (
       <IconContainer
-        as="span"
+        tag="span"
         justify="center"
         align="center"
         gap={3}

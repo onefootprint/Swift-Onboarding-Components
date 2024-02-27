@@ -50,10 +50,10 @@ const IntroDialog = () => {
       }}
     >
       <Title>
-        <Text variant="label-2" as="h1">
+        <Text variant="label-2" tag="h1">
           {t('dialog.title')}
         </Text>
-        <Text variant="body-2" color="secondary" as="p">
+        <Text variant="body-2" color="secondary" tag="p">
           {t('dialog.subtitle')}
         </Text>
       </Title>
@@ -62,7 +62,7 @@ const IntroDialog = () => {
         <Step>
           <Text variant="label-3">{t('dialog.step-1.number')}</Text>
           <Content>
-            <Text variant="label-3" as="h2">
+            <Text variant="label-3" tag="h2">
               {t('dialog.step-1.title')}
             </Text>
             <Text variant="body-3" color="secondary">
@@ -73,7 +73,7 @@ const IntroDialog = () => {
         <Step>
           <Text variant="label-3">{t('dialog.step-2.number')}</Text>
           <Content>
-            <Text variant="label-3" as="h2">
+            <Text variant="label-3" tag="h2">
               {t('dialog.step-2.title')}
             </Text>
             <Text variant="body-3" color="secondary">
@@ -84,7 +84,7 @@ const IntroDialog = () => {
         <Step>
           <Text variant="label-3">{t('dialog.step-3.number')}</Text>
           <Content>
-            <Text variant="label-3" as="h2">
+            <Text variant="label-3" tag="h2">
               {t('dialog.step-3.title')}
             </Text>
             <Text variant="body-3" color="secondary">

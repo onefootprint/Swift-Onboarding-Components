@@ -21,10 +21,10 @@ const FeatureCard = ({
   return (
     <Container gridArea={gridArea}>
       <IconContainer>{renderedIcon}</IconContainer>
-      <Text variant="label-2" color="primary" as="h3">
+      <Text variant="label-2" color="primary" tag="h3">
         {title}
       </Text>
-      <Text variant="body-2" as="p">
+      <Text variant="body-2" color="primary" tag="p">
         {subtitle}
       </Text>
     </Container>

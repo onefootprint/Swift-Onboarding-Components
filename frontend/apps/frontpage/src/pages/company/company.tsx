@@ -178,10 +178,10 @@ const Company = () => {
       <SEO title={t('html-title')} slug="/company" />
       <Container>
         <HeroContainer>
-          <Text variant="display-2" as="h1" marginBottom={5}>
+          <Text variant="display-2" tag="h1" marginBottom={5}>
             {t('title')}
           </Text>
-          <Text variant="display-4" as="h2" color="secondary">
+          <Text variant="display-4" tag="h2" color="secondary">
             {t('subtitle')}
           </Text>
         </HeroContainer>

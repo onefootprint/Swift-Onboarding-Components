@@ -20,16 +20,16 @@ const JoinUs = () => {
         />
       </ImageContainer>
       <TextContainer>
-        <Text variant="heading-1" color="primary" as="h2">
+        <Text variant="heading-1" color="primary" tag="h2">
           {t('title')}
         </Text>
         <ParagraphsContainer>
-          <Text variant="body-1" color="secondary" as="p">
+          <Text variant="body-1" color="secondary" tag="p">
             {t('description')}
           </Text>
 
           <CtaContainer>
-            <Text variant="body-1" color="secondary" as="p">
+            <Text variant="body-1" color="secondary" tag="p">
               {t('pre-cta')}
             </Text>
             <LinkButton

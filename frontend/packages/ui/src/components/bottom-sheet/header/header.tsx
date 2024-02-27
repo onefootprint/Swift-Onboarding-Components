@@ -28,7 +28,7 @@ const Header = ({ title, closeAriaLabel = 'Close', onClose }: HeaderProps) => (
         <Text variant="label-2">{title}</Text>
       </Title>
     )}
-    <Box height="32px" width="32px" as="span" />
+    <Box height="32px" width="32px" tag="span" />
   </Container>
 );
 

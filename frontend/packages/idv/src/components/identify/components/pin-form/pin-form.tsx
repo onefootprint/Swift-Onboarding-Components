@@ -48,7 +48,7 @@ const PinForm = ({
       data-pending={!!isPending}
     >
       {title && (
-        <Text isPrivate variant="body-2" color="secondary" as="h3">
+        <Text isPrivate variant="body-2" color="secondary" tag="h3">
           {title}
         </Text>
       )}

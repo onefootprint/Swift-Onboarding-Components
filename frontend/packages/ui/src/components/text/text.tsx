@@ -13,12 +13,9 @@ export type TextProps = {
 } & BoxPrimitives<HTMLParagraphElement>;
 
 const Text = forwardRef<HTMLParagraphElement, TextProps>(
-  (
-    { as = 'p', children, left, right, truncate, variant, ...props }: TextProps,
-    ref,
-  ) => (
+  ({ tag = 'p', children, truncate, variant, ...props }: TextProps, ref) => (
     <StyledText
-      tag={as || variantMapping[variant] || 'p'}
+      tag={tag || variantMapping[variant] || 'p'}
       ref={ref}
       typography={variant}
       $truncate={truncate}

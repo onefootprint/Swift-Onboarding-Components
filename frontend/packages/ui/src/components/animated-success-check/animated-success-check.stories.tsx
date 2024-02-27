@@ -20,7 +20,7 @@ const Template: ComponentStory<typeof AnimatedSuccessCheck> = ({ size }) => {
   const [animationStart, setAnimationStart] = useState(false);
 
   return (
-    <Stack direction="column" gap={5}>
+    <Stack dir="column" gap={5}>
       <AnimatedSuccessCheck animationStart={animationStart} size={size} />
       <Stack gap={3}>
         <Button

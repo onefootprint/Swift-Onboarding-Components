@@ -12,11 +12,11 @@ const FeatureCard = ({ title, description, children }: FeatureCardProps) => (
   <Container>
     <CardTitle>
       {children}
-      <Text as="h3" variant="label-2">
+      <Text tag="h3" variant="label-2">
         {title}
       </Text>
     </CardTitle>
-    <Text as="p" variant="body-2">
+    <Text tag="p" variant="body-2">
       {description}
     </Text>
   </Container>

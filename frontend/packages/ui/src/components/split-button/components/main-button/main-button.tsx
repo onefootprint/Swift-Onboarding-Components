@@ -49,7 +49,7 @@ const MainButton = ({
           animationStart
         />
       ) : (
-        <Stack as="span" whiteSpace="nowrap">
+        <Stack tag="span" whiteSpace="nowrap">
           {children}
         </Stack>
       )}

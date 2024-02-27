@@ -46,10 +46,10 @@ const LeftPane = ({
   return (
     <Left>
       <Content>
-        <Text variant="heading-3" marginBottom={4} as="h2">
+        <Text variant="heading-3" marginBottom={4} tag="h2">
           Welcome to Footprint, {tenantName}! 👋
         </Text>
-        <Text variant="body-2" marginBottom={7} as="h3">
+        <Text variant="body-2" marginBottom={7} tag="h3">
           {`This is a step-by-step guide on how to integrate Footprint Components into your
             product as well as customize it to match your brand's look and feel.`}
         </Text>
@@ -137,7 +137,7 @@ const LeftPane = ({
             <CodeBlock language="css">{customCSS}</CodeBlock>
           </>
         )}
-        <Text variant="body-2" as="span">
+        <Text variant="body-2" tag="span">
           When the user&apos;s card data has been successfully saved to
           Footprint, the onSave callback will be called. Later, you can decrypt
           the data from Footprint, more info can be found{' '}

@@ -45,13 +45,13 @@ const Preview = ({ obConfig }: PreviewProps) => {
               <Text color="primary" marginBottom={7} variant="heading-2">
                 {t.success.title}
               </Text>
-              <Text color="secondary" variant="body-1" as="div">
+              <Text color="secondary" variant="body-1" tag="div">
                 {t.success.body}
               </Text>
             </Box>
           ) : (
             <>
-              <Text variant="heading-1" as="h1" marginBottom={3}>
+              <Text variant="heading-1" tag="h1" marginBottom={3}>
                 {obConfig.org_name}
               </Text>
               <Text variant="body-1" color="secondary">

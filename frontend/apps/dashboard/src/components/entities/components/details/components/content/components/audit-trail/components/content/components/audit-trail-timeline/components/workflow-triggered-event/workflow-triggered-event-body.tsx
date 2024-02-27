@@ -98,7 +98,7 @@ const WorkflowTriggeredEventBody = ({
         testID="workflow-triggered-event-body"
         content={
           <Stack gap={2}>
-            <Text variant="body-3" as="span">
+            <Text variant="body-3" tag="span">
               {t('link-sent')}
             </Text>
             {shouldShowCopyButton && (

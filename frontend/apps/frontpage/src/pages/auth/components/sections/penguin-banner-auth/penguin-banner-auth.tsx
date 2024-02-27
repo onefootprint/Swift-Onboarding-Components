@@ -43,7 +43,7 @@ const PenguinBannerAuth = () => {
           gap={5}
         >
           <Title>{t('title')}</Title>
-          <Text variant="display-4" as="h2" color="secondary" marginBottom={5}>
+          <Text variant="display-4" tag="h2" color="secondary" marginBottom={5}>
             {t('subtitle')}
           </Text>
           <ContactButtons

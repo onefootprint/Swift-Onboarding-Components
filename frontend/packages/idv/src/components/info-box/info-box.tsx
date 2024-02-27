@@ -20,7 +20,7 @@ const InfoBox = ({ items, variant }: InfoBoxProps) => (
     padding={variant === 'compact' ? 4 : 5}
   >
     {items.map(({ title, description, Icon }) => (
-      <Stack as="li" direction="row" gap={3} title={title} key={title}>
+      <Stack tag="li" direction="row" gap={3} title={title} key={title}>
         <IconContainer>
           <Icon color="primary" />
         </IconContainer>

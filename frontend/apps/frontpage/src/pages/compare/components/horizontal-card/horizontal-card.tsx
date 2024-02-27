@@ -27,16 +27,12 @@ const HorizontalCard = ({
     <CardContent className="content">
       <Text
         variant="heading-3"
-        as="h3"
+        tag="h3"
         color={theme === 'dark' ? 'quinary' : 'primary'}
       >
         {title}
       </Text>
-      <Text
-        variant="body-1"
-        as="p"
-        color={theme === 'dark' ? 'quinary' : 'primary'}
-      >
+      <Text variant="body-1" color={theme === 'dark' ? 'quinary' : 'primary'}>
         {description}
       </Text>
       {cta && href && (

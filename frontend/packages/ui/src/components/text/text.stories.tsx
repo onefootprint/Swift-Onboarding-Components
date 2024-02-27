@@ -10,7 +10,7 @@ export default {
   title: 'Components/Text',
   component: Text,
   argTypes: {
-    as: {
+    tag: {
       control: 'select',
       options: ['p', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'span'],
     },
@@ -27,13 +27,13 @@ export default {
 } as Meta;
 
 const Template: Story<TextProps> = ({
-  as,
+  tag,
   children = 'lorem',
   color = 'primary',
   testID,
   variant = 'heading-1',
 }: Partial<TextProps>) => (
-  <Text as={as} color={color} testID={testID} variant={variant}>
+  <Text tag={tag} color={color} testID={testID} variant={variant}>
     {children}
   </Text>
 );
@@ -78,7 +78,7 @@ Heading2.args = {
 
 export const Heading3 = Template.bind({});
 Heading3.args = {
-  as: 'p',
+  tag: 'p',
   children: 'Footprint (heading-3)',
   color: 'primary',
   testID: 'text-test-id',

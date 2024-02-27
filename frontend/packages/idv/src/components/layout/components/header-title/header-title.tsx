@@ -35,11 +35,11 @@ const HeaderTitle = ({
       </IconContainer>
     )}
     <Stack direction="column" align="center" gap={3}>
-      <Text as="h2" color="primary" variant="heading-3" id={titleElementId}>
+      <Text tag="h2" color="primary" variant="heading-3" id={titleElementId}>
         {title}
       </Text>
       {subtitle && (
-        <Text variant="body-2" color="secondary" as="h3">
+        <Text variant="body-2" color="secondary" tag="h3">
           {subtitle}
         </Text>
       )}

@@ -113,18 +113,18 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
           {t('share-this-link')}
         </Text>
         <StyledLi>
-          <Text variant="body-3" color="secondary" as="span">
+          <Text variant="body-3" color="secondary" tag="span">
             {t('update-phone')}
           </Text>
         </StyledLi>
         <StyledLi>
-          <Text variant="body-3" color="secondary" as="span">
+          <Text variant="body-3" color="secondary" tag="span">
             {t('update-email')}
           </Text>
         </StyledLi>
         {/* TODO show this copy when passkey editing is fixed */}
         {/* <StyledLi>
-          <Text variant="body-3" color="secondary" as="span">
+          <Text variant="body-3" color="secondary" tag="span">
             {t('update-passkey')}
           </Text>
         </StyledLi> */}

@@ -78,7 +78,7 @@ const Post = ({ post }: PostProps) => {
                   url={`https://www.onefootprint.com/blog/${post.slug}`}
                 />
               </Stack>
-              <Text variant="display-2" as="h1" marginTop={9} marginBottom={9}>
+              <Text variant="display-2" tag="h1" marginTop={9} marginBottom={9}>
                 {post.title}
               </Text>
             </header>

@@ -70,10 +70,10 @@ const OnboardingInstructions = ({
     <Grid>
       <Left>
         <Content>
-          <Text variant="heading-3" marginBottom={4} as="h2">
+          <Text variant="heading-3" marginBottom={4} tag="h2">
             Welcome to Footprint, {tenantName}! 👋
           </Text>
-          <Text variant="body-2" marginBottom={7} as="h3">
+          <Text variant="body-2" marginBottom={7} tag="h3">
             {`This is a step-by-step guide on how to integrate Footprint into your
             product as well as customize it to match your brand's look and feel.`}
           </Text>

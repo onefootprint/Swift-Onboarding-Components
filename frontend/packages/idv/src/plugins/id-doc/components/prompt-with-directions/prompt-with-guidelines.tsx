@@ -44,7 +44,7 @@ const PromptWithGuidelines = ({
               key={guideline}
               variant="body-2"
               color="secondary"
-              as="li"
+              tag="li"
               textAlign="center"
               width="100%"
             >

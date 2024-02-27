@@ -53,22 +53,22 @@ const InvestorProfile = () => {
       {!added && <Text variant="body-3">{t('subtitle')}</Text>}
       {added && (
         <InvestorProfileQuestionContainer>
-          <Text variant="body-3" as="li">
+          <Text variant="body-3" tag="li">
             {t('questions.employment-status')}
           </Text>
-          <Text variant="body-3" as="li">
+          <Text variant="body-3" tag="li">
             {t('questions.annual-income')}
           </Text>
-          <Text variant="body-3" as="li">
+          <Text variant="body-3" tag="li">
             {t('questions.net-worth')}
           </Text>
-          <Text variant="body-3" as="li">
+          <Text variant="body-3" tag="li">
             {t('questions.investment-goals')}
           </Text>
-          <Text variant="body-3" as="li">
+          <Text variant="body-3" tag="li">
             {t('questions.risk-tolerance')}
           </Text>
-          <Text variant="body-3" as="li">
+          <Text variant="body-3" tag="li">
             {t('questions.immediate-family')}
           </Text>
         </InvestorProfileQuestionContainer>

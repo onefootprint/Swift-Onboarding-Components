@@ -20,7 +20,7 @@ const Breadcrumb = ({
         <>
           {child}
           {index !== React.Children.count(children) - 1 && (
-            <Text color="tertiary" variant="label-3" as="li">
+            <Text color="tertiary" variant="label-3" tag="li">
               {separator}
             </Text>
           )}

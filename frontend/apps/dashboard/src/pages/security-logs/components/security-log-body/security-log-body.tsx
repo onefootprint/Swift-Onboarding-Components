@@ -4,7 +4,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent } from 'src/utils/user-agent';
-import styled, { css } from 'styled-components';
 
 type SecurityLogBodyProps = {
   accessEvent: AccessEvent;
@@ -15,7 +14,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
     keyPrefix: 'pages.security-logs.body',
   });
   return (
-    <AccessEventBodyContainer direction="column" gap={9}>
+    <Stack direction="column" gap={9}>
       <Stack direction="column" gap={5}>
         <Text variant="label-4">{t('user')}</Text>
         <Grid.Container columns={['repeat(4, minmax(0, 1fr))']}>
@@ -74,15 +73,8 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
           {accessEvent.reason || '-'}
         </Text>
       </Stack>
-    </AccessEventBodyContainer>
+    </Stack>
   );
 };
-
-const AccessEventBodyContainer = styled(Stack)`
-  ${({ theme }) => css`
-    margin: ${theme.spacing[5]} 0 ${theme.spacing[9]}
-      calc(-1 * ${theme.spacing[3]});
-  `};
-`;
 
 export default SecurityLogBody;

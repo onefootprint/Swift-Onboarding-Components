@@ -26,7 +26,7 @@ const CustomCaption = ({ displayMonth }: CaptionProps) => {
       >
         <IcoChevronLeft24 />
       </IconButton>
-      <Typograhy variant="label-2" as="h2">
+      <Typograhy variant="label-2" tag="h2">
         {shortMonthDateFormatter(displayMonth)}
       </Typograhy>
       <IconButton

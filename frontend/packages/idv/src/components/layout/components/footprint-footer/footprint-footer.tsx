@@ -50,25 +50,25 @@ const FootprintFooter = ({
       id={FOOTPRINT_FOOTER_ID}
     >
       <SecuredByFootprint />
-      <LinksContainer as="ul" align="center" justify="center" gap={3}>
+      <LinksContainer align="center" justify="center" gap={3}>
         <SupportLinksSelect config={config} />
         <WhatsThisButton onClick={onWhatsThisClick} className="footer-link">
-          <Text variant="caption-1" color="secondary" as="span">
+          <Text variant="caption-1" color="secondary" tag="span">
             {t('whats-this')}
           </Text>
         </WhatsThisButton>
-        <li>
+        <div>
           <a
             href={`${FRONTPAGE_BASE_URL}/privacy-policy`}
             target="_blank"
             rel="noreferrer"
             className="footer-link"
           >
-            <Text variant="caption-1" color="secondary" as="span">
+            <Text variant="caption-1" color="secondary" tag="span">
               {t('privacy')}
             </Text>
           </a>
-        </li>
+        </div>
         <LanguageSelect />
       </LinksContainer>
       <ActionsWrapper>

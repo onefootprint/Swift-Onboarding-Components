@@ -57,7 +57,7 @@ const DocumentField = ({
     <Container>
       <Inner>
         <LabelContainer>
-          <Text variant="body-3" color="tertiary" as="label">
+          <Text variant="body-3" color="tertiary" tag="label">
             {label}
           </Text>
           {documentStatus && <DocumentStatusBadge status={documentStatus} />}

@@ -74,10 +74,10 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
           gap={5}
           maxWidth="600px"
         >
-          <Text as="h1" variant="display-2">
+          <Text tag="h1" variant="display-2">
             {t('title')}
           </Text>
-          <Text as="p" variant="display-4" color="secondary">
+          <Text tag="p" variant="display-4" color="secondary">
             {t('subtitle', { tenantName: tenant.name })}
           </Text>
         </HeadingContainer>
@@ -101,7 +101,7 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
             gap={5}
           >
             <IcoShield40 />
-            <Text as="h2" variant="heading-2">
+            <Text tag="h2" variant="heading-2">
               {t('features.title')}
             </Text>
           </Stack>

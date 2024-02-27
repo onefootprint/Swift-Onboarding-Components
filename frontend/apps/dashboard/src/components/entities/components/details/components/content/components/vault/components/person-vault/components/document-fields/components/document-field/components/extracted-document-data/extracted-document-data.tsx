@@ -52,7 +52,7 @@ const ExtractedDocumentData = ({
       <DocumentDataFieldContainer>
         {relevantKeys.sort().map(key => (
           <DocumentDataField key={key}>
-            <Text variant="body-3" color="tertiary" as="label">
+            <Text variant="body-3" color="tertiary" tag="label">
               {t(
                 `drawer.document-data.labels.${getDataLabel(
                   key,

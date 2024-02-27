@@ -12,7 +12,7 @@ type SectionProps = {
 const Section = ({ children, title, id, suffixActions }: SectionProps) => (
   <section aria-label={title} id={id} data-testid={id}>
     <Header>
-      <Text as="h2" variant="label-1">
+      <Text tag="h2" variant="label-1">
         {title}
       </Text>
       {suffixActions}

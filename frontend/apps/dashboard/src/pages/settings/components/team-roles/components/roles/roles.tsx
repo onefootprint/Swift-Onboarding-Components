@@ -15,7 +15,7 @@ const Roles = () => {
   } = useRoles(RoleKind.dashboardUser);
 
   return (
-    <Box testID="roles-table" as="section">
+    <Box testID="roles-table" tag="section">
       <Portal selector="#team-roles-actions">
         <Create />
       </Portal>

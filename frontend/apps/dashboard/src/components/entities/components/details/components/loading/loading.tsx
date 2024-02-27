@@ -2,7 +2,7 @@ import { Box, Divider, Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
-  <Box as="section" testID="entity-loading" paddingTop={7}>
+  <Box tag="section" testID="entity-loading" paddingTop={7}>
     <Box marginBottom={7}>
       <Breadcrumb />
     </Box>

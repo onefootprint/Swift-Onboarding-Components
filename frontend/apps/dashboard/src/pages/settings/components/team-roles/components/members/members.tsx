@@ -9,7 +9,7 @@ const Members = () => {
   const { data: response, errorMessage, isLoading, pagination } = useMembers();
 
   return (
-    <Box testID="people-table" as="section">
+    <Box testID="people-table" tag="section">
       <Portal selector="#team-roles-actions">
         <Invite />
       </Portal>

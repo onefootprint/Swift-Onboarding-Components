@@ -31,7 +31,7 @@ const ProxyConfigs = () => {
         </Stack>
         <Create />
       </Stack>
-      <Box testID="proxy-configs-section" as="section">
+      <Box testID="proxy-configs-section" tag="section">
         <Table data={data} errorMessage={errorMessage} isLoading={isLoading} />
         <Details />
       </Box>
