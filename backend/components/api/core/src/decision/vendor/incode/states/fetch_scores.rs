@@ -104,12 +104,13 @@ impl IncodeStateTransition for FetchScores {
         let wf_id = ctx.wf_id.clone();
         let sv_id = ctx.sv_id.clone();
         let id_doc_id = ctx.id_doc_id.clone();
-        let (obc, vw, id_doc) = db_pool
+        let (obc, vw, id_doc, doc_uploads) = db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
                 let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
-                Ok((obc, vw, id_doc))
+                let doc_uploads = id_doc.images(conn, true)?;
+                Ok((obc, vw, id_doc, doc_uploads))
             })
             .await?;
 
@@ -175,6 +176,7 @@ impl IncodeStateTransition for FetchScores {
             expect_selfie: session.kind.requires_selfie() && !ctx.disable_selfie,
             fetch_ocr_response: &ocr_response,
             score_response: &score_response,
+            doc_uploads: &doc_uploads
         };
         let rs = compute_risk_signals(
             args,

@@ -857,6 +857,10 @@ footprint_reason_code_enum! {
         #[note = "Document was collected on a desktop device", severity = SignalSeverity::Medium,  description = "Document was collected on a desktop device"]
         DocumentCollectedViaDesktop,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document upload was not a live capture", severity = SignalSeverity::Medium,  description = "User manually uploaded an image instead of taking a live image with their camera"]
+        DocumentNotLiveCapture,
+
         // OCR matching
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Document name does not match input", severity = SignalSeverity::Medium,  description = "The document name does not match the name that was input."]

@@ -22,13 +22,7 @@ use crate::{
 use async_trait::async_trait;
 use db::{
     models::{
-        data_lifetime::DataLifetime,
-        document_data::DocumentData,
-        identity_document::{IdentityDocument, IdentityDocumentUpdate},
-        ob_configuration::ObConfiguration,
-        risk_signal::RiskSignal,
-        user_timeline::UserTimeline,
-        vault::Vault,
+        data_lifetime::DataLifetime, document_data::DocumentData, document_upload::DocumentUpload, identity_document::{IdentityDocument, IdentityDocumentUpdate}, ob_configuration::ObConfiguration, risk_signal::RiskSignal, user_timeline::UserTimeline, vault::Vault
     },
     DbPool, TxnPgConn,
 };
@@ -57,6 +51,7 @@ pub(super) struct PreCompleteArgs<'a> {
     pub expect_selfie: bool,
     pub fetch_ocr_response: &'a FetchOCRResponse,
     pub score_response: &'a FetchScoresResponse,
+    pub doc_uploads: &'a [DocumentUpload]
 }
 
 pub(super) async fn compute_ocr_data<'a>(
@@ -151,6 +146,7 @@ pub(super) fn compute_risk_signals<'a>(
         expect_selfie,
         fetch_ocr_response,
         score_response,
+        doc_uploads,
         ..
     } = args;
     if fetch_ocr_response.age().ok().is_some_and(|a| a < 18) {
@@ -191,6 +187,11 @@ pub(super) fn compute_risk_signals<'a>(
             VendorAPI::IncodeFetchScores,
             score_vres_id.clone(),
         )),
+        doc_uploads.iter().any(|du| du.is_upload.unwrap_or(false)).then_some((
+            FootprintReasonCode::DocumentNotLiveCapture,
+            VendorAPI::IncodeFetchScores,
+            score_vres_id.clone(),
+        ))
     ]
     .into_iter()
     .flatten();

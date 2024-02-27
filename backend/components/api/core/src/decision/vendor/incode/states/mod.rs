@@ -213,7 +213,8 @@ pub async fn save_incode_fixtures(
         &uv_public_key,
     )?;
     let suid = su_id.clone();
-    let vres = state
+    let iddoc = id_doc.clone();
+    let (vres, doc_uploads) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let di =
@@ -248,7 +249,10 @@ pub async fn save_incode_fixtures(
             let vres = vrs
                 .pop()
                 .ok_or(AssertionError("missing vres in incode fixture"))?;
-            Ok(vres)
+
+            let doc_uploads = iddoc.images(conn, true)?;
+
+            Ok((vres, doc_uploads))
         })
         .await?;
 
@@ -260,6 +264,7 @@ pub async fn save_incode_fixtures(
         expect_selfie: should_collect_selfie,
         fetch_ocr_response: &ocr_response,
         score_response: &score_response,
+        doc_uploads: &doc_uploads
     };
     // Use same VRes id because fixture
     let rs = compute_risk_signals(args, ocr_comparison_fields, vres.id.clone(), vres.id, &[])?;
