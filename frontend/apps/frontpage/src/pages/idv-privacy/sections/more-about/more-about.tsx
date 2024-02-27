@@ -11,7 +11,7 @@ const MoreAbout = () => {
   return (
     <StyledContainer>
       <Content>
-        <Text variant="display-3" sx={{ textAlign: 'center' }}>
+        <Text variant="display-3" textAlign="center">
           {t('title')}
         </Text>
         <Text variant="body-2" color="secondary">

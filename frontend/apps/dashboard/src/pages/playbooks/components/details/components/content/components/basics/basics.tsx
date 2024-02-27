@@ -31,7 +31,7 @@ const Basics = ({ playbook }: BasicsProps) => {
   return (
     <Container>
       <Header>
-        <Text sx={{ whiteSpace: 'nowrap' }} variant="label-3">
+        <Text whiteSpace="nowrap" variant="label-3">
           {t('title')}
         </Text>
         {!showForm && (

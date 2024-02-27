@@ -18,7 +18,7 @@ const Error = () => {
         <IcoForbid40 color="error" />
         <Text variant="heading-3">{t('title')}</Text>
       </TitleContainer>
-      <Text sx={{ textAlign: 'center' }} variant="body-2">
+      <Text variant="body-2" textAlign="center">
         {t('description')}
       </Text>
     </Container>

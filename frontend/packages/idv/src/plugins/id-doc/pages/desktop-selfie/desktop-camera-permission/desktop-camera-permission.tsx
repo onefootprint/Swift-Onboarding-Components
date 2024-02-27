@@ -31,14 +31,10 @@ const DesktopCameraPermission = ({
           <AnimatedLoadingSpinner animationStart />
         ) : (
           <Box paddingLeft={9} paddingRight={9}>
-            <Text variant="label-2" sx={{ textAlign: 'center' }}>
+            <Text variant="label-2" textAlign="center">
               {t(`title.${permissionState}`)}
             </Text>
-            <Text
-              variant="body-2"
-              color="tertiary"
-              sx={{ textAlign: 'center' }}
-            >
+            <Text variant="body-2" color="tertiary" textAlign="center">
               {t(`subtitle.${permissionState}`)}
             </Text>
           </Box>

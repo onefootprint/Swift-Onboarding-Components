@@ -55,7 +55,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
               {t('device-os')}
             </Text>
             <Box overflow="hidden" gridArea="2 / 4 / span 2 / span 1">
-              <Text variant="body-4" sx={{ overflow: 'hidden' }} isPrivate>
+              <Text variant="body-4" overflow="hidden" isPrivate>
                 {displayForUserAgent(accessEvent.insightEvent.userAgent || '')}
               </Text>
             </Box>

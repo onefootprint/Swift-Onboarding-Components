@@ -80,7 +80,7 @@ const Post = ({ post }: PostProps) => {
                   url={`https://www.onefootprint.com/investor-updates/${post.slug}`}
                 />
               </Stack>
-              <Text variant="display-2" as="h1" sx={{ marginY: 9 }}>
+              <Text variant="display-2" as="h1" marginBottom={9} marginTop={9}>
                 {post.title}
                 {t('post.update-index', { index: post.meta_description })}
               </Text>

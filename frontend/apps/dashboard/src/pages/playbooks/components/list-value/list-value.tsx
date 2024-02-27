@@ -29,7 +29,7 @@ const ListValue = ({ value, threshold = 3 }: ListValueProps) => {
       <Tooltip text={remaining.join(', ')} alignment="center" position="bottom">
         <>
           <Text variant="body-3">and </Text>{' '}
-          <Text variant="body-3" sx={{ textDecoration: 'underline' }}>
+          <Text variant="body-3" textDecoration="underline">
             {`${remaining.length} more`}
           </Text>
         </>

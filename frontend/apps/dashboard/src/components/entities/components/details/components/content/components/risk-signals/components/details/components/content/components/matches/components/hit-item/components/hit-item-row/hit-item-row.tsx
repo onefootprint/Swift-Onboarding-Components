@@ -48,15 +48,7 @@ const HitItemRow = ({
   );
 
   const renderGeneralValue = (generalValue: string) => (
-    <Text
-      variant="body-3"
-      sx={{
-        textAlign: 'right',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden',
-      }}
-    >
+    <Text variant="body-3" truncate textAlign="right">
       {generalValue.charAt(0).toUpperCase() + generalValue.slice(1)}
     </Text>
   );
@@ -103,7 +95,8 @@ const HitItemRow = ({
         <Text
           variant="body-3"
           color="tertiary"
-          sx={{ textAlign: 'left', width: 'fit-content' }}
+          textAlign="left"
+          width="fit-content"
         >
           {labelText}
         </Text>

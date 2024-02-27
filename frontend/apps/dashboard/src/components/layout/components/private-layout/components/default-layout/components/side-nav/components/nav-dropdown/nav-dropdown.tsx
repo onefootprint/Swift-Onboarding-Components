@@ -52,7 +52,8 @@ const NavDropdown = ({
                 <Text
                   variant="label-3"
                   color="tertiary"
-                  sx={{ paddingLeft: 5, paddingTop: 3 }}
+                  paddingLeft={5}
+                  paddingTop={3}
                 >
                   {t('tenants-list.title')}
                 </Text>

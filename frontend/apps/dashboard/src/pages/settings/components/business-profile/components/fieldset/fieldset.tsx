@@ -8,7 +8,7 @@ export type FieldsetProps = {
 
 const Fieldset = ({ label, value }: FieldsetProps) => (
   <Box>
-    <Text variant="label-3" color="tertiary" sx={{ marginBottom: 2 }}>
+    <Text variant="label-3" color="tertiary" marginBottom={2}>
       {label}
     </Text>
     <Text variant="body-3">{value}</Text>

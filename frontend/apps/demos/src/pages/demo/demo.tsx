@@ -36,7 +36,7 @@ const Demo = ({ page }: DemoProps) => {
             <Form html={page.html} onSuccess={handleSuccess} />
           )}
         </Inner>
-        <Text color="tertiary" sx={{ marginTop: 7 }} variant="label-2">
+        <Text color="tertiary" marginTop={7} variant="label-2">
           Footprint ❤️ {page.title}
         </Text>
       </Container>

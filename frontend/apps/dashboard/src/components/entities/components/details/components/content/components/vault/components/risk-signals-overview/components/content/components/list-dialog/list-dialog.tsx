@@ -48,7 +48,7 @@ const ListDialog = ({ riskSignals, renderCta }: ListDialogProps) => {
         onClose={handleClose}
         open={open}
       >
-        <Text variant="body-3" sx={{ marginBottom: 6 }}>
+        <Text variant="body-3" marginBottom={6}>
           {t('risks.list-dialog.description')}
         </Text>
         <Table<RiskSignal>

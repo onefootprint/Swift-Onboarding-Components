@@ -21,7 +21,7 @@ const WorkflowTriggeredEventHeader = ({
   return (
     <>
       <Actor actor={data.actor} />
-      <Text variant="body-3" color="tertiary" sx={{ marginLeft: 2 }}>
+      <Text variant="body-3" color="tertiary" marginLeft={2}>
         {t('requested-user-to', {
           action,
         })}

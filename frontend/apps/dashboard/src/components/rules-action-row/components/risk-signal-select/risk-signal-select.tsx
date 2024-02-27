@@ -100,14 +100,7 @@ const RiskSignalSelect = ({
           style={style}
         >
           <ComboboxItem>
-            <Text
-              variant="body-4"
-              sx={{
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-              }}
-            >
+            <Text variant="body-4" truncate>
               {option.label}
             </Text>
             <Text variant="caption-4" color="tertiary">

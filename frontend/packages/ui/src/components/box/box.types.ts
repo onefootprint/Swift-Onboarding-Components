@@ -142,11 +142,11 @@ export type BoxStyleProps = {
   borderPosition?: 'top' | 'right' | 'bottom' | 'left' | 'all';
   borderRadius?: keyof Theme['borderRadius'];
   borderWidth?: keyof Theme['borderWidth'];
+  color?: keyof Theme['color'];
+  columnGap?: keyof Theme['spacing'];
   elevation?: keyof Theme['elevation'];
   fontStyle?: keyof Theme['typography'];
   gap?: keyof Theme['spacing'];
-  rowGap?: keyof Theme['spacing'];
-  columnGap?: keyof Theme['spacing'];
   margin?: keyof Theme['spacing'];
   marginBottom?: keyof Theme['spacing'];
   marginLeft?: keyof Theme['spacing'];
@@ -159,13 +159,19 @@ export type BoxStyleProps = {
   paddingTop?: keyof Theme['spacing'];
   paddingX?: keyof Theme['spacing'];
   paddingY?: keyof Theme['spacing'];
+  rowGap?: keyof Theme['spacing'];
   surfaceColor?: keyof Theme['surfaceColor'];
 };
 
-export type BoxProps = HTMLAttributes<Element> &
-  BoxStyleProps & {
+export type BoxPrimitives<T = Element> = BoxStyleProps &
+  HTMLAttributes<T> & {
     as?: React.ElementType;
     className?: string;
+    isPrivate?: boolean;
+    tag?: React.ElementType;
     testID?: string;
-    typography?: FontVariant;
   };
+
+export type BoxProps = BoxPrimitives & {
+  typography?: FontVariant;
+};

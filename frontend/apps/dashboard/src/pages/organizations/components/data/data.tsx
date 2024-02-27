@@ -49,7 +49,9 @@ const Data = ({ authToken, organizations }: DataProps) => {
       <Text
         variant="label-1"
         color="primary"
-        sx={{ marginTop: 8, marginBottom: 3, textAlign: 'center' }}
+        marginTop={8}
+        marginBottom={3}
+        textAlign="center"
       >
         {t('title')}
       </Text>

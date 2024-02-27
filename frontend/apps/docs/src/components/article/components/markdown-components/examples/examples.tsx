@@ -58,11 +58,9 @@ const Examples = () => {
               <Text
                 color="secondary"
                 variant="body-3"
-                sx={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
+                overflow="hidden"
+                textOverflow="ellipsis"
+                whiteSpace="nowrap"
               >
                 {name}
               </Text>

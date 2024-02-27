@@ -27,7 +27,7 @@ const ValidationTimelineItemBody = ({
             <Text as="span" variant="label-3">
               •
             </Text>
-            <Text variant="body-3" sx={{ width: '100%' }}>
+            <Text variant="body-3" width="100%">
               <Title>{`${t(
                 `match-level.${matchLevel}` as ParseKeys<'common'>,
               )}:`}</Title>

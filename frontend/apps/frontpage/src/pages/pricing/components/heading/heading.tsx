@@ -9,20 +9,10 @@ type HeadingProps = {
 
 const Heading = ({ title, subtitle }: HeadingProps) => (
   <Hero direction="column" align="center" justify="center" gap={3}>
-    <Text
-      color="primary"
-      variant="display-2"
-      as="h1"
-      sx={{ textAlign: 'center' }}
-    >
+    <Text color="primary" variant="display-2" as="h1" textAlign="center">
       {title}
     </Text>
-    <Text
-      color="secondary"
-      variant="display-4"
-      as="p"
-      sx={{ textAlign: 'center' }}
-    >
+    <Text color="secondary" variant="display-4" as="p" textAlign="center">
       {subtitle}
     </Text>
   </Hero>

@@ -42,6 +42,7 @@ export const Display1 = Template.bind({});
 Display1.args = {
   variant: 'display-1',
   children: 'Footprint (display-1)',
+  color: 'error',
 };
 
 Display1.parameters = {

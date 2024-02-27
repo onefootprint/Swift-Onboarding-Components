@@ -7,7 +7,7 @@ const VerifyError = () => {
 
   return (
     <>
-      <Text color="primary" variant="heading-3" sx={{ marginBottom: 5 }}>
+      <Text color="primary" variant="heading-3" marginBottom={5}>
         {t('title')}
       </Text>
       <Text color="secondary" variant="body-2">

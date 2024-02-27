@@ -48,7 +48,7 @@ const Toast = ({
           <Text
             color={variant === 'error' ? 'error' : 'primary'}
             variant="label-3"
-            sx={{ marginBottom: 2 }}
+            marginBottom={2}
           >
             {title}
           </Text>

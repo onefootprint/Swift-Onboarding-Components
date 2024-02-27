@@ -35,13 +35,7 @@ const PenguinBanner = ({
         <Text variant="display-3" color="primary">
           {title}
         </Text>
-        <Text
-          variant="display-4"
-          color="tertiary"
-          sx={{
-            maxWidth: '600px',
-          }}
-        >
+        <Text variant="display-4" color="tertiary" maxWidth="600px">
           {subtitle}
         </Text>
       </Stack>

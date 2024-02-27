@@ -82,7 +82,8 @@ const EmailLogin = () => {
             <Text
               variant="caption-2"
               color="tertiary"
-              sx={{ maxWidth: '350px', textAlign: 'center' }}
+              maxWidth="350px"
+              textAlign="center"
             >
               {t('instructions')}
             </Text>

@@ -19,10 +19,10 @@ type TeamProps = {
 
 const Team = ({ title, description, items }: TeamProps) => (
   <>
-    <Text variant="display-3" as="h3" sx={{ marginBottom: 5 }}>
+    <Text variant="display-3" as="h3" marginBottom={5}>
       {title}
     </Text>
-    <Text variant="body-1" sx={{ marginBottom: 7 }}>
+    <Text variant="body-1" marginBottom={7}>
       {description}
     </Text>
 
@@ -39,7 +39,7 @@ const Team = ({ title, description, items }: TeamProps) => (
             />
           </AvatarContainer>
           <Text variant="heading-3">{item.name}</Text>
-          <Text variant="body-1" sx={{ marginBottom: 7 }}>
+          <Text variant="body-1" marginBottom={7}>
             {item.role}
           </Text>
           <SocialContainer>

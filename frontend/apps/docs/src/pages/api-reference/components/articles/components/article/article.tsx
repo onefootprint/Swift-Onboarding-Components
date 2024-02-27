@@ -61,7 +61,7 @@ const Article = ({ article }: ArticleProps) => {
           </TitleContainer>
           {security && (
             <Requests>
-              <Text variant="label-1" sx={{ marginTop: 3 }}>
+              <Text variant="label-1" marginTop={3}>
                 {t('request')}
               </Text>
               {security?.map((element: SecurityTypes) =>

@@ -43,7 +43,7 @@ const AboutAppClipAndInstantApp = ({
           <Text variant="body-2" color="secondary">
             {t('dialog.instructions')}
           </Text>
-          <Text variant="body-4" color="tertiary" sx={{ textAlign: 'center' }}>
+          <Text variant="body-4" color="tertiary" textAlign="center">
             {t('dialog.disclaimer')}
           </Text>
         </InstructionsContainer>

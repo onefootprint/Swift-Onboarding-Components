@@ -19,7 +19,7 @@ const SecureFormDemo = () => {
         <Head>
           <title>Footprint Form Demo</title>
         </Head>
-        <Text variant="heading-2" sx={{ marginBottom: 7 }}>
+        <Text variant="heading-2" marginBottom={7}>
           Secure Form Demo
         </Text>
         {authToken ? (

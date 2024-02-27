@@ -42,12 +42,7 @@ const Ending = () => {
           <Text as="h1" variant="display-2" color="primary">
             {t('title')}
           </Text>
-          <Text
-            as="h2"
-            variant="display-4"
-            color="secondary"
-            sx={{ maxWidth: '600px' }}
-          >
+          <Text as="h2" variant="display-4" color="secondary" maxWidth="600px">
             {t('subtitle')}
           </Text>
         </HeadingContainer>
@@ -64,12 +59,7 @@ const Ending = () => {
           <Text as="h3" variant="display-3" color="primary">
             {t('new-approach.title')}
           </Text>
-          <Text
-            as="p"
-            variant="body-1"
-            color="secondary"
-            sx={{ maxWidth: '600px' }}
-          >
+          <Text as="p" variant="body-1" color="secondary" maxWidth="600px">
             {t('new-approach.description')}
           </Text>
           <Box marginBottom={5} />

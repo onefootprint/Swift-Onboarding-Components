@@ -1,8 +1,9 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import type { FontVariant } from '@onefootprint/design-tokens';
 import type {
+  BoxStyleProps,
   LinkButtonSize,
   LinkButtonVariant,
-  SXStyleProps,
 } from '@onefootprint/ui';
 import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
@@ -14,7 +15,7 @@ type TruncatedTextProps = {
   text: string;
   maxTextViewHeight: number;
   textFontVariant: FontVariant;
-  textSxStyle?: SXStyleProps;
+  textStyleProps?: BoxStyleProps;
   seeMoreButtonVariant?: LinkButtonVariant;
   seeMoreButtonSize?: LinkButtonSize;
 };
@@ -23,7 +24,7 @@ const TruncatedText = ({
   text,
   maxTextViewHeight,
   textFontVariant,
-  textSxStyle,
+  textStyleProps,
   seeMoreButtonVariant = 'default',
   seeMoreButtonSize = 'compact',
 }: TruncatedTextProps) => {
@@ -38,7 +39,7 @@ const TruncatedText = ({
   });
 
   return (
-    <Text ref={textContainerRef} variant={textFontVariant} sx={textSxStyle}>
+    <Text ref={textContainerRef} variant={textFontVariant} {...textStyleProps}>
       <bdi>{currShownText}</bdi>
       {shownTextState !== ShownTextState.FULL_WITHIN_MAX_HEIGHT && (
         <LinkButton

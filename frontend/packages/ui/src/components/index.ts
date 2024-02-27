@@ -10,7 +10,7 @@ export type { BannerProps } from './banner';
 export { default as Banner } from './banner';
 export type { BottomSheetProps } from './bottom-sheet';
 export { default as BottomSheet } from './bottom-sheet';
-export type { BoxProps } from './box';
+export type { BoxPrimitives, BoxProps, BoxStyleProps } from './box';
 export { default as Box } from './box';
 export type { BreadcrumbProps } from './breadcrumb';
 export { default as Breadcrumb, BreadcrumbItem } from './breadcrumb';

@@ -21,7 +21,7 @@ const WorkflowTriggeredEventBody = ({
       content={
         <Text variant="label-3" color="secondary">
           {t('uuid')}
-          <Text variant="body-3" color="tertiary" sx={{ marginLeft: 2 }}>
+          <Text variant="body-3" color="tertiary" marginLeft={2}>
             {data.externalId}
           </Text>
         </Text>

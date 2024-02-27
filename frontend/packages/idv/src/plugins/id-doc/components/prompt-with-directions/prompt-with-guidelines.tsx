@@ -23,31 +23,19 @@ const PromptWithGuidelines = ({
     <Text
       variant="label-1"
       color={variant === 'error' ? 'error' : 'primary'}
-      sx={{ textAlign: 'center' }}
+      textAlign="center"
     >
       {title}
     </Text>
     {description && (
-      <Text
-        variant="body-2"
-        color="secondary"
-        sx={{
-          textAlign: 'center',
-        }}
-      >
+      <Text variant="body-2" color="secondary" textAlign="center">
         {description}
       </Text>
     )}
     {guidelines.length > 0 && (
       <Directions>
         {guidelines.length === 1 ? (
-          <Text
-            variant="body-2"
-            color="secondary"
-            sx={{
-              textAlign: 'center',
-            }}
-          >
+          <Text variant="body-2" textAlign="center" color="secondary">
             {guidelines[0]}
           </Text>
         ) : (
@@ -57,10 +45,8 @@ const PromptWithGuidelines = ({
               variant="body-2"
               color="secondary"
               as="li"
-              sx={{
-                textAlign: 'left',
-                width: '100%',
-              }}
+              textAlign="center"
+              width="100%"
             >
               {guideline}
             </Text>

@@ -36,16 +36,10 @@ const RetryLimitExceeded = () => {
           }}
         />
         <ErrorMessage>
-          <Text variant="label-1" color="error" sx={{ textAlign: 'center' }}>
+          <Text variant="label-1" color="error" textAlign="center">
             {t('title')}
           </Text>
-          <Text
-            variant="body-2"
-            color="secondary"
-            sx={{
-              textAlign: 'center',
-            }}
-          >
+          <Text variant="body-2" color="secondary" textAlign="center">
             {t('description')}
           </Text>
         </ErrorMessage>

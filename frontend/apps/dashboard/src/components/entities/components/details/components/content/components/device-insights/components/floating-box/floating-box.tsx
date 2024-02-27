@@ -58,10 +58,8 @@ const FloatingBox = ({
       )}
       <Text
         variant={hasInsights ? 'label-2' : 'label-1'}
-        sx={{
-          marginBottom: hasInsights ? 5 : 0,
-          marginTop: hasInsights ? 0 : 5,
-        }}
+        marginBottom={hasInsights ? 5 : 0}
+        marginTop={hasInsights ? 0 : 5}
         isPrivate
       >
         {hasInsights

@@ -123,14 +123,7 @@ const Live = () => {
                 />
               </Stack>
               <Stack as={motion.span} variants={childrenVariants}>
-                <Text
-                  as="p"
-                  variant="body-2"
-                  color="tertiary"
-                  sx={{
-                    maxWidth: '520px',
-                  }}
-                >
+                <Text as="p" variant="body-2" color="tertiary" maxWidth="520px">
                   {t(`${translationsKey}.disclaimer`)}
                 </Text>
               </Stack>

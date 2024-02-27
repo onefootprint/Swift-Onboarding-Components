@@ -27,7 +27,7 @@ const MarkdownLayout = ({ children, meta }: MarkdownLayoutProps) => {
       <Container>
         <Inner>
           <Header>
-            <Text variant="display-2" color="primary" sx={{ marginBottom: 5 }}>
+            <Text variant="display-2" color="primary" marginBottom={5}>
               {t(meta.titleKey as ParseKeys<'common'>)}
             </Text>
           </Header>

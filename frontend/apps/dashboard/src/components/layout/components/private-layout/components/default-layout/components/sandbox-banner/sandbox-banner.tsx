@@ -29,7 +29,7 @@ const SandboxBanner = () => {
             <Link href="mailto:eli@onefootprint.com">
               <button type="button">{t('contact-us')}</button>
             </Link>
-            <Text variant="body-2" color="warning" sx={{ marginLeft: 2 }}>
+            <Text variant="body-2" color="warning" marginLeft={2}>
               {t('or')}
             </Text>
             <ContactForm>{t('form')}</ContactForm>

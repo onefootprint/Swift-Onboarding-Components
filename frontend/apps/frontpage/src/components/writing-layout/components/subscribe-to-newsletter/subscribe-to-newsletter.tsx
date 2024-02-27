@@ -28,7 +28,7 @@ const SubscribeToNewsletter = () => {
   return (
     <FormContainer>
       <FormHeader>
-        <Text variant="heading-3" sx={{ marginBottom: 4 }}>
+        <Text variant="heading-3" marginBottom={4}>
           {t('title')}
         </Text>
         <Text variant="body-2" color="secondary">

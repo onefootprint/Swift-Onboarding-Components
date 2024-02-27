@@ -42,11 +42,7 @@ const Preview = ({ obConfig }: PreviewProps) => {
         <Inner>
           {showConfirmation ? (
             <Box>
-              <Text
-                color="primary"
-                sx={{ marginBottom: 7 }}
-                variant="heading-2"
-              >
+              <Text color="primary" marginBottom={7} variant="heading-2">
                 {t.success.title}
               </Text>
               <Text color="secondary" variant="body-1" as="div">
@@ -55,7 +51,7 @@ const Preview = ({ obConfig }: PreviewProps) => {
             </Box>
           ) : (
             <>
-              <Text variant="heading-1" as="h1" sx={{ marginBottom: 3 }}>
+              <Text variant="heading-1" as="h1" marginBottom={3}>
                 {obConfig.org_name}
               </Text>
               <Text variant="body-1" color="secondary">
@@ -67,7 +63,7 @@ const Preview = ({ obConfig }: PreviewProps) => {
             </>
           )}
         </Inner>
-        <Text color="tertiary" sx={{ marginTop: 7 }} variant="label-2">
+        <Text color="tertiary" marginTop={7} variant="label-2">
           Footprint ❤️ {obConfig.org_name}
         </Text>
       </Container>

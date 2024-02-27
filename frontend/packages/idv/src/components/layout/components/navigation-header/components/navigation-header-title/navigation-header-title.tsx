@@ -19,12 +19,10 @@ const NavigationHeaderTitle = ({
       <Text
         variant={fontVariant || 'label-2'}
         color={fontColor || 'primary'}
-        sx={{
-          textAlign: 'center',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
+        textAlign="center"
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
       >
         {title}
       </Text>

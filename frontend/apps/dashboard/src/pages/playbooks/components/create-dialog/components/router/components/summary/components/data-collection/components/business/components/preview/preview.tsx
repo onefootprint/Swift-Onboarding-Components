@@ -43,7 +43,8 @@ const Preview = ({ onStartEditing }: PreviewProps) => {
             <Text
               variant="body-3"
               color="tertiary"
-              sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
+              whiteSpace="nowrap"
+              textAlign="right"
             >
               {t(field as ParseKeys<'common'>)}
             </Text>

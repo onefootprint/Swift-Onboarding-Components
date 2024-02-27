@@ -29,7 +29,7 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
               {t('attested-by')}
               {issuers?.map((issuer, i) => (
                 <>
-                  <Text variant="label-3" sx={{ marginX: 2 }}>
+                  <Text variant="label-3" marginLeft={2} marginRight={2}>
                     {capitalize(issuer)}
                   </Text>
                   {i === issuers.length - 1 ? '' : ' and '}
@@ -44,7 +44,7 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
           content={
             <>
               {t('device-os')}
-              <Text variant="label-3" sx={{ marginLeft: 2 }}>
+              <Text variant="label-3" marginLeft={2}>
                 {`${device} (${os ?? ''})`}
               </Text>
             </>
@@ -56,7 +56,7 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
           content={
             <>
               {t('ip-address')}
-              <Text variant="label-3" sx={{ marginLeft: 2 }}>
+              <Text variant="label-3" marginLeft={2}>
                 {ipAddress}
               </Text>
             </>

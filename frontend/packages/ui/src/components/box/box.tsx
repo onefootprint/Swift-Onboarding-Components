@@ -1,7 +1,9 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import type {
   BackgroundColor,
   BorderColor,
   BorderRadius,
+  Color,
   Elevation,
   FontVariant,
   Spacing,
@@ -16,15 +18,15 @@ import type { BoxProps, BoxStyleProps } from './box.types';
 import { filterProps } from './box.utils';
 
 const Box = forwardRef<HTMLDivElement, BoxProps>(
-  ({ typography, as, testID, ...props }, ref) => {
+  ({ typography, tag, as, testID, isPrivate, ...props }, ref) => {
     const { styleProps, ...allProps } = filterProps(props);
     return (
       <SB
-        // eslint-disable-next-line react/jsx-props-no-spreading
         {...allProps}
         $styleProps={styleProps}
         $typography={typography}
-        as={as}
+        as={as || tag}
+        data-private={isPrivate ? 'true' : undefined}
         data-testid={testID}
         ref={ref}
       />
@@ -66,6 +68,9 @@ const SB = styled.div<
           return `background-color: ${
             theme.backgroundColor[value as BackgroundColor]
           };`;
+        }
+        if (prop === 'color') {
+          return `color: ${theme.color[value as Color]};`;
         }
         if (prop === 'elevation') {
           return `box-shadow: ${theme.elevation[value as Elevation]};`;

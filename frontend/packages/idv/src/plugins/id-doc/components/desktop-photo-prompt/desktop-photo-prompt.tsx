@@ -149,12 +149,12 @@ const DesktopPhotoPrompt = ({
               <Text variant="label-2" color="accent">
                 {t('upload-link-button.title')}
               </Text>
-              <Text variant="body-2" sx={{ color: 'quaternary' }}>
+              <Text variant="body-2" color="quaternary">
                 &nbsp;{t('drag-drop-text.line-1')}
               </Text>
             </Stack>
             {!allowPdf && (
-              <Text variant="body-2" sx={{ color: 'quaternary' }}>
+              <Text variant="body-2" color="quaternary">
                 {t('drag-drop-text.line-2')}
               </Text>
             )}

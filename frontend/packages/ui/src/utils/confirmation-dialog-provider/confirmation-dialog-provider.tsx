@@ -47,7 +47,7 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
             ),
           }}
         >
-          <Text variant="body-2" color="secondary" sx={{ textAlign: 'center' }}>
+          <Text variant="body-2" color="secondary" textAlign="center">
             {confirmationDialog.description}
           </Text>
         </Dialog>

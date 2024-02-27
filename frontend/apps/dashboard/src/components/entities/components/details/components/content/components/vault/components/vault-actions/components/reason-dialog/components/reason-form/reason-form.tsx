@@ -46,7 +46,7 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
 
   return (
     <form id="decrypt-reason-form" onSubmit={handleSubmit(handleBeforeSubmit)}>
-      <Text variant="label-1" sx={{ marginBottom: 7 }}>
+      <Text variant="label-1" marginBottom={7}>
         {t('description')}
       </Text>
       <Label htmlFor={useId()}>{t('form.reason.label')}</Label>

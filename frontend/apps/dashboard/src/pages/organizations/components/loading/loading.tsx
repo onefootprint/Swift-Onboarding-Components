@@ -10,7 +10,9 @@ const Loading = () => {
       <Text
         variant="label-1"
         color="primary"
-        sx={{ marginTop: 8, marginBottom: 6, textAlign: 'center' }}
+        marginTop={8}
+        marginBottom={6}
+        textAlign="center"
       >
         {t('title')}
       </Text>

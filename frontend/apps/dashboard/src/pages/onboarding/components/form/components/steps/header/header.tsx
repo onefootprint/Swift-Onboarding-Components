@@ -9,7 +9,7 @@ export type HeaderProps = {
 
 const Header = ({ title, subtitle }: HeaderProps) => (
   <Container>
-    <Text variant="heading-3" sx={{ marginBottom: 3 }}>
+    <Text variant="heading-3" marginBottom={3}>
       {title}
     </Text>
     <Text variant="body-2" color="secondary">

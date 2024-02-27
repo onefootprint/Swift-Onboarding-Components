@@ -25,7 +25,7 @@ const NextSide = ({ nextSideImageType, onComplete }: NextSideProps) => {
   return (
     <Stack direction="column" align="center">
       <Icon />
-      <Text variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
+      <Text variant="label-1" textAlign="center" marginTop={5}>
         {t(nextSideImageType)}
       </Text>
     </Stack>

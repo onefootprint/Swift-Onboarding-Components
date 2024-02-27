@@ -30,7 +30,7 @@ const PlayPermissionDialog = ({
       isConfirmation
       disableResponsiveness
     >
-      <Text variant="body-2" color="secondary" sx={{ textAlign: 'center' }}>
+      <Text variant="body-2" color="secondary" textAlign="center">
         {t('description')}
       </Text>
     </Dialog>

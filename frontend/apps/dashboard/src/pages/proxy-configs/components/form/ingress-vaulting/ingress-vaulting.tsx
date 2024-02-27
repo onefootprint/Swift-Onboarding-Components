@@ -52,7 +52,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)}>
-      <Text variant="label-2" sx={{ marginBottom: 5 }}>
+      <Text variant="label-2" marginBottom={5}>
         {t('title')}
       </Text>
       <Box marginBottom={8}>
@@ -70,7 +70,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
       </Box>
       {ingressContentType !== 'none' && (
         <>
-          <Text variant="label-2" sx={{ marginBottom: 5 }}>
+          <Text variant="label-2" marginBottom={5}>
             {t('vaulting-rules.title')}
           </Text>
           <FormGrid>

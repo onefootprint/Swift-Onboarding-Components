@@ -45,7 +45,7 @@ const FieldValidations = ({ entityId }: FieldValidationsProps) => {
     }
     if (data && data.length === 0) {
       return (
-        <Text variant="body-3" sx={{ marginLeft: 13 }}>
+        <Text variant="body-3" marginLeft={13}>
           {t('no-data')}
         </Text>
       );

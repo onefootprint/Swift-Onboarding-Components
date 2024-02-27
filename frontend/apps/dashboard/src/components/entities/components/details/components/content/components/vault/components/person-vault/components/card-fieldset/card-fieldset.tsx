@@ -95,7 +95,7 @@ const Fieldset = ({
         <Header>
           <Title>
             <IconComponent />
-            <Text sx={{ whiteSpace: 'nowrap' }} variant="label-3">
+            <Text whiteSpace="nowrap" variant="label-3">
               {getCardTitle(cards.length)}
             </Text>
           </Title>

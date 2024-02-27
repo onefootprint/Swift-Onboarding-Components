@@ -6,7 +6,7 @@ type PProps = {
 };
 
 const P = ({ children }: PProps) => (
-  <Text variant="body-2" color="secondary" sx={{ marginBottom: 9 }}>
+  <Text variant="body-2" color="secondary" marginBottom={9}>
     {children}
   </Text>
 );

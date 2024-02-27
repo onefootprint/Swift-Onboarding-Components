@@ -6,7 +6,7 @@ type H3Props = {
 };
 
 const H3 = ({ children }: H3Props) => (
-  <Text variant="heading-3" color="primary" sx={{ marginBottom: 3 }}>
+  <Text variant="heading-3" color="primary" marginBottom={3}>
     {children}
   </Text>
 );

@@ -36,7 +36,7 @@ const DemoVideo = ({ open, link, onClose }: DemoVideoProps) => {
       <ModalContainer role="dialog" aria-label="Footprint Demo Modal">
         <CloseContainer onClick={onClose}>
           <IcoClose16 color="quinary" />
-          <Text color="quinary" variant="label-1" sx={{ marginLeft: 2 }}>
+          <Text color="quinary" variant="label-1" marginLeft={2}>
             {t('demo-video-close')}
           </Text>
         </CloseContainer>

@@ -43,7 +43,7 @@ const MultiSelectGroupedForm = ({
     >
       {options.map(group => (
         <Grid.Container as="fieldset" gap={3} key={group.label}>
-          <Text variant="label-3" sx={{ marginBottom: 3 }}>
+          <Text variant="label-3" marginBottom={3}>
             {group.label}
           </Text>
           {group.options.map(option => (

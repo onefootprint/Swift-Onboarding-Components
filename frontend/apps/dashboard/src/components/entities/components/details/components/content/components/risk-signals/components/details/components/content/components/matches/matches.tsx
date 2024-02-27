@@ -58,7 +58,7 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
       <AmlSection>
         {aml?.shareUrl && (
           <Stack direction="column" width="100%">
-            <Text variant="label-3" color="tertiary" sx={{ marginBottom: 2 }}>
+            <Text variant="label-3" color="tertiary" marginBottom={2}>
               {t('source-url.label')}
             </Text>
             <Stack align="center" justify="space-between">

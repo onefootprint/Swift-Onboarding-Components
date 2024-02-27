@@ -19,18 +19,13 @@ const ArticleItem = ({
   <article>
     <Anchor href={url} target="_blank" rel="noreferrer">
       <Content>
-        <Text color="accent" variant="body-3" sx={{ marginBottom: 3 }}>
+        <Text color="accent" variant="body-3" marginBottom={3}>
           {website}
         </Text>
-        <Text variant="heading-3" as="h3" sx={{ marginBottom: 2 }}>
+        <Text variant="heading-3" as="h3" marginBottom={2}>
           {title}
         </Text>
-        <Text
-          color="secondary"
-          variant="body-2"
-          as="p"
-          sx={{ marginBottom: 5 }}
-        >
+        <Text color="secondary" variant="body-2" as="p" marginBottom={5}>
           {excerpt}
         </Text>
         <Text color="tertiary" variant="body-3" as="div">

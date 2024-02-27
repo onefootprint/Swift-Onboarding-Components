@@ -41,14 +41,7 @@ const getName = (entity: Entity) => {
 const Row = ({ entity }: RowProps) => (
   <>
     <td>
-      <Text
-        variant="body-3"
-        sx={{
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
+      <Text variant="body-3" truncate>
         {getName(entity)}
       </Text>
     </td>
@@ -64,15 +57,7 @@ const Row = ({ entity }: RowProps) => (
       />
     </td>
     <td>
-      <Text
-        variant="body-3"
-        color="primary"
-        sx={{
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
+      <Text variant="body-3" color="primary" truncate>
         {new Date(entity.lastActivityAt).toLocaleString('en-us', {
           month: 'numeric',
           day: 'numeric',

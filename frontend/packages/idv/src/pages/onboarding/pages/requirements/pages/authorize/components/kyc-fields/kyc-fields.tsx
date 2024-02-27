@@ -149,7 +149,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
   return fields.length > 0 ? (
     <>
       {showTitle && (
-        <Text variant="label-1" sx={{ width: '100%' }}>
+        <Text variant="label-1" width="100%">
           {t('kyc.title')}
         </Text>
       )}

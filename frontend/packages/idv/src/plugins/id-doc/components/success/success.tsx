@@ -24,11 +24,7 @@ const Success = ({ onComplete }: SuccessProps) => {
   return (
     <Container>
       <SuccessCheck animationStart />
-      <Text
-        variant="label-1"
-        sx={{ textAlign: 'center', marginTop: 5 }}
-        color="success"
-      >
+      <Text variant="label-1" textAlign="center" marginTop={5} color="success">
         {t('title')}
       </Text>
     </Container>

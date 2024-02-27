@@ -70,7 +70,7 @@ const ResendButton = ({
         {texts.resendCta}
       </LinkButton>
       {resendClicked && countdown > 0 && (
-        <Text variant="body-4" color="tertiary" sx={{ marginTop: 3 }}>
+        <Text variant="body-4" color="tertiary" marginTop={3}>
           {texts.resendCountDown.replace('{{seconds}}', String(countdown))}
         </Text>
       )}

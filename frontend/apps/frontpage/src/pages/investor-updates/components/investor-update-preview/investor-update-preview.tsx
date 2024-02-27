@@ -37,7 +37,7 @@ const InvestorUpdatePreview = ({
         )}
         <Content>
           <Header>
-            <Text variant="label-2" sx={{ marginBottom: 6, marginRight: 2 }}>
+            <Text variant="label-2" marginBottom={6} marginRight={2}>
               {t('header-title-prefix', { index })}
             </Text>
             <Text variant="body-2" color="tertiary">
@@ -45,7 +45,7 @@ const InvestorUpdatePreview = ({
             </Text>
           </Header>
           <ArticleDetails>
-            <Text variant="heading-1" sx={{ marginBottom: 6 }}>
+            <Text variant="heading-1" marginBottom={6}>
               {title}
             </Text>
             <Text variant="body-2">{excerpt}</Text>

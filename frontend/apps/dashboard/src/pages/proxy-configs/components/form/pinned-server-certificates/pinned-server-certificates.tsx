@@ -37,7 +37,7 @@ const PinnedServerCertificates = ({ id, onSubmit, values }: StepProps) => {
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)}>
-      <Text variant="label-2" sx={{ marginBottom: 5 }}>
+      <Text variant="label-2" marginBottom={5}>
         {t('title')}
       </Text>
       <FormGrid>

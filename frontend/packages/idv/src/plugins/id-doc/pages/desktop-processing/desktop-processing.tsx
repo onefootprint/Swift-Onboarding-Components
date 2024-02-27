@@ -197,7 +197,7 @@ const DeskTopProcessing = () => {
 
   if (isMissingRequirements) {
     return (
-      <Text variant="label-1" color="error" sx={{ textAlign: 'center' }}>
+      <Text variant="label-1" color="error" textAlign="center">
         {t('missing-requirement-error')}
       </Text>
     );

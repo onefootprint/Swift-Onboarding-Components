@@ -25,15 +25,13 @@ const Loading = ({
     <Container>
       <AnimatedLoadingSpinner animationStart />
       <Stack direction="column" justify="center" align="center" gap={3}>
-        <Text variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
+        <Text variant="label-1" marginTop={5} textAlign="center">
           {t(`title.${step}-${imageType}`)}
         </Text>
         <Text
           variant="body-2"
-          sx={{
-            textAlign: 'center',
-            color: showSlowConnectionMessage ? 'error' : 'secondary',
-          }}
+          textAlign="center"
+          color={showSlowConnectionMessage ? 'error' : 'secondary'}
         >
           {showSlowConnectionMessage ? t('slow-connection') : t('subtitle')}
         </Text>

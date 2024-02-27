@@ -89,7 +89,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
         {!!uploadsSortedByDate.length && (
           <DocumentUploadContainer>
             <IcoInfo16 color="info" />
-            <Text color="info" variant="body-4" sx={{ whiteSpace: 'nowrap' }}>
+            <Text color="info" variant="body-4" whiteSpace="nowrap">
               {`${t('uploaded-from')} ${t(
                 `upload-source.${uploadSource}` as ParseKeys<'common'>,
               )}`}

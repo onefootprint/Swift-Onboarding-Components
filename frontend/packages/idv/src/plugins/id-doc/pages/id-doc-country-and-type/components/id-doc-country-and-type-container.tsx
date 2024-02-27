@@ -213,7 +213,9 @@ const IdDocCountryAndTypeContainer = ({
         ) : (
           <Text
             variant="body-4"
-            sx={{ textAlign: 'center', marginLeft: 5, marginRight: 5 }}
+            textAlign="center"
+            marginLeft={5}
+            marginRight={5}
           >
             {t('form.not-supported')}
           </Text>

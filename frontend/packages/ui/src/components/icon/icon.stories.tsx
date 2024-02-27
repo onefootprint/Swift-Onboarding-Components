@@ -25,7 +25,7 @@ export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
 }) => (
   <Box>
     <Box marginBottom={10}>
-      <Text color="primary" variant="heading-2" sx={{ marginBottom: 3 }}>
+      <Text color="primary" variant="heading-2" marginBottom={3}>
         Icos
       </Text>
       {Object.keys(icos).map(iconName => {

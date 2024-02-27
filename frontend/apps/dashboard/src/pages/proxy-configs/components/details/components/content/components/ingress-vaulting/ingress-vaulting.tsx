@@ -22,7 +22,7 @@ const IngressVaulting = ({ proxyConfig }: IngressVaultingProps) => {
 
   return (
     <>
-      <Field label={t('content-type.label')} childrenSx={{ color: 'tertiary' }}>
+      <Field label={t('content-type.label')}>
         {proxyConfig.ingressContentType?.toUpperCase()}
       </Field>
       {proxyConfig.ingressRules.map(({ token, target }) => (

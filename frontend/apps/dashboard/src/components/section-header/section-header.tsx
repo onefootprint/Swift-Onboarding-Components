@@ -11,7 +11,7 @@ export type SectionHeaderProps = {
 const SectionHeader = ({ children, subtitle, title }: SectionHeaderProps) => (
   <Header>
     <Box>
-      <Text variant="label-1" as="h3" sx={{ marginBottom: 1 }}>
+      <Text variant="label-1" as="h3" marginBottom={1}>
         {title}
       </Text>
       <Text variant="body-3" color="secondary">

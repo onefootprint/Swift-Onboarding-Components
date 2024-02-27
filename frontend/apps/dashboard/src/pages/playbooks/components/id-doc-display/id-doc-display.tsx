@@ -46,14 +46,11 @@ const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
 
     return (
       <DocPreviewContainer>
-        <Text variant="body-3" sx={{ whiteSpace: 'nowrap' }}>
+        <Text variant="body-3" whiteSpace="nowrap">
           {threshold === 3 ? displayStringFirstTwo : displayStringFirst}
         </Text>
         <Tooltip text={remainingDocString} alignment="center" position="bottom">
-          <Text
-            variant="body-3"
-            sx={{ textDecoration: 'underline', whiteSpace: 'nowrap' }}
-          >
+          <Text variant="body-3" textDecoration="underline" whiteSpace="nowrap">
             {`${remainingIdDocTypes.length} ${t('more')}`}
           </Text>
         </Tooltip>

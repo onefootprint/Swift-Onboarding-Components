@@ -55,10 +55,8 @@ const HitsMedia = ({ mediaList }: HitsMediaProps) => {
                   <Text
                     variant="body-3"
                     color="tertiary"
-                    sx={{
-                      textAlign: 'left',
-                      width: 'fit-content',
-                    }}
+                    textAlign="left"
+                    width="fit-content"
                   >
                     {t('snippet')}
                   </Text>

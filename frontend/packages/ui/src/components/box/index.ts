@@ -1,2 +1,2 @@
 export { default } from './box';
-export type { BoxProps, BoxStyleProps } from './box.types';
+export type { BoxPrimitives, BoxProps, BoxStyleProps } from './box.types';

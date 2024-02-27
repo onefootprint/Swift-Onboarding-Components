@@ -111,10 +111,10 @@ const SupportedIdDocuments = () => {
           textAlign="center"
           backgroundColor="primary"
         >
-          <Text variant="label-1" sx={{ marginBottom: 3 }}>
+          <Text variant="label-1" marginBottom={3}>
             {t('contact.title')}
           </Text>
-          <Text color="secondary" variant="body-2" sx={{ marginBottom: 7 }}>
+          <Text color="secondary" variant="body-2" marginBottom={7}>
             {t('contact.subtitle')}
           </Text>
           <Button onClick={handleClick} size="compact">

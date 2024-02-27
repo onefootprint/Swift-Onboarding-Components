@@ -67,11 +67,7 @@ const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
       <Text variant="label-3" color="tertiary">
         {start}
       </Text>
-      <Text
-        variant="label-3"
-        color="tertiary"
-        sx={{ marginLeft: 1, marginRight: 1 }}
-      >
+      <Text variant="label-3" color="tertiary" marginLeft={1} marginRight={1}>
         -
       </Text>
       <Text variant="label-3" color="tertiary">

@@ -39,7 +39,7 @@ const AnnotationNote = ({ annotation, hidePinToggle }: AnnotationNoteProps) => {
         text={`"${annotation.note}"`}
         maxTextViewHeight={DEFAULT_TEXT_VIEW_HEIGHT}
         textFontVariant="body-3"
-        textSxStyle={{
+        textStyleProps={{
           marginBottom: 4,
           paddingTop: 3,
           paddingRight: 4,

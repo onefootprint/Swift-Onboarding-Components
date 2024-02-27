@@ -36,7 +36,7 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
           <Text variant="label-3">
             {author && t('title-by-author', { author })}
           </Text>
-          <Text variant="label-3" sx={{ marginLeft: 2 }}>
+          <Text variant="label-3" marginLeft={2}>
             &middot;
           </Text>
           <LinkButton
@@ -59,7 +59,7 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
           text={note}
           maxTextViewHeight={DEFAULT_TEXT_VIEW_HEIGHT}
           textFontVariant="body-3"
-          textSxStyle={{
+          textStyleProps={{
             marginLeft: 4,
             color: 'secondary',
           }}

@@ -3,7 +3,7 @@ import React from 'react';
 
 const Success = () => (
   <Box>
-    <Text color="primary" sx={{ marginBottom: 7 }} variant="heading-2">
+    <Text color="primary" marginBottom={7} variant="heading-2">
       Onboarding complete!
     </Text>
     <Text color="secondary" variant="body-1" as="div">

@@ -15,7 +15,7 @@ const DocumentStatusBadge = ({ status }: DocumentBadgeStatusProps) => {
 
   return status ? (
     <Badge variant={status}>
-      <Text variant="caption-1" color={status} sx={{ whiteSpace: 'nowrap' }}>
+      <Text variant="caption-1" color={status} whiteSpace="nowrap">
         {t(status)}
       </Text>
     </Badge>

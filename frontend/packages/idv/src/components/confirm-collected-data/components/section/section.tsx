@@ -32,10 +32,7 @@ const Section = ({
       <Header>
         <TitleContainer>
           {IconComponent && <IconComponent />}
-          <Text
-            sx={IconComponent ? { marginLeft: 2 } : undefined}
-            variant="label-2"
-          >
+          <Text marginLeft={IconComponent ? 2 : undefined} variant="label-2">
             {title}
           </Text>
         </TitleContainer>

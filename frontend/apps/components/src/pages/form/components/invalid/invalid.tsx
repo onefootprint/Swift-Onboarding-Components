@@ -31,19 +31,16 @@ const Invalid = ({ onClose }: InvalidProps) => {
         )
       }
     >
-      <Text
-        as="h2"
-        color="primary"
-        variant="heading-3"
-        sx={{ textAlign: 'center' }}
-      >
+      <Text as="h2" color="primary" variant="heading-3" textAlign="center">
         {t('invalid.title')}
       </Text>
       <Text
         variant="body-2"
         color="secondary"
         as="h3"
-        sx={{ marginTop: 3, marginBottom: 7, textAlign: 'center' }}
+        marginTop={3}
+        marginBottom={7}
+        textAlign="center"
       >
         {t('invalid.subtitle')}
       </Text>

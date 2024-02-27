@@ -3,6 +3,7 @@ import { AuthMethodKind } from '@onefootprint/types/src/data';
 import type { ComponentProps, FormEvent } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 import { isBiometric } from '../../../../utils';
 import useGetHeaderText from '../../hooks/use-get-header-text';
@@ -77,8 +78,7 @@ const ChallengeSelectOrPasskey = ({
       }}
     >
       {tryAnotherWay ? (
-        <InlineAction
-          sx={{ textAlign: 'center' }}
+        <StyledInlineAction
           label={tryAnotherWay.label}
           labelCta={tryAnotherWay.labelCta}
           onClick={tryAnotherWay.onClick}
@@ -87,5 +87,9 @@ const ChallengeSelectOrPasskey = ({
     </Component>
   );
 };
+
+const StyledInlineAction = styled(InlineAction)`
+  text-align: center;
+`;
 
 export default ChallengeSelectOrPasskey;

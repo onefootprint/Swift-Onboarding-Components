@@ -86,7 +86,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
       {showNoPhoneFlow && (
         <Section>
           {title}
-          <Text sx={{ paddingBottom: 2 }} variant="label-1">
+          <Text paddingBottom={2} variant="label-1">
             {t('basic-information.title')}
           </Text>
           <Text variant="label-3">{t('phone.title')}</Text>
@@ -110,7 +110,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
       )}
       <Section>
         {!showNoPhoneFlow && title}
-        <Text sx={{ paddingBottom: 3 }} variant="label-1">
+        <Text paddingBottom={3} variant="label-1">
           {t('us-residents.title')}
         </Text>
         <Text variant="label-3">{t('ssn.title')}</Text>

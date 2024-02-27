@@ -9,13 +9,7 @@ type SectionSubtitleProps = {
 
 const SectionSubtitle = ({ maxWidth, children }: SectionSubtitleProps) => (
   <Container maxWidth={maxWidth}>
-    <Text
-      variant="display-4"
-      color="secondary"
-      sx={{
-        textAlign: 'center',
-      }}
-    >
+    <Text variant="display-4" color="secondary" textAlign="center">
       {children}
     </Text>
   </Container>

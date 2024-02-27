@@ -45,7 +45,7 @@ const MissingPermissionsSheet = ({
     <BottomSheet open={open} onClose={onClose}>
       <Container>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        <Text variant="body-2" sx={{ textAlign: 'center', marginTop: 9 }}>
+        <Text variant="body-2" textAlign="center" marginTop={9}>
           {getTranslation()}
         </Text>
       </Container>

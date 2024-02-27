@@ -60,7 +60,7 @@ const ExtractedDocumentData = ({
                 )}` as ParseKeys<'common'>,
               )}
             </Text>
-            <Text variant="body-3" color="primary" sx={{ textAlign: 'right' }}>
+            <Text variant="body-3" color="primary" textAlign="right">
               {getVaultValueString(key)}
             </Text>
           </DocumentDataField>

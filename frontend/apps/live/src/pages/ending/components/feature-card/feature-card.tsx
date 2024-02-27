@@ -16,7 +16,7 @@ const FeatureCard = ({ title, description, children }: FeatureCardProps) => (
         {title}
       </Text>
     </CardTitle>
-    <Text as="p" variant="body-2" sx={{ width: '100%' }}>
+    <Text as="p" variant="body-2" width="100%">
       {description}
     </Text>
   </Container>

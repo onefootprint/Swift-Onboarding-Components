@@ -31,7 +31,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
         text={t('cta')}
       />
       {privacyPolicyUrl && (
-        <Text variant="label-4" color="secondary" sx={{ textAlign: 'center' }}>
+        <Text variant="label-4" color="secondary" textAlign="center">
           <Trans
             ns="idv"
             i18nKey="onboarding.pages.authorize.footer"

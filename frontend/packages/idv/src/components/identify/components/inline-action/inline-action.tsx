@@ -1,30 +1,33 @@
 import { LinkButton, Text } from '@onefootprint/ui';
-import type { ComponentProps } from 'react';
 import React from 'react';
-
-type TextProps = ComponentProps<typeof Text>;
 
 type InlineActionProps = {
   isDisabled?: boolean | undefined;
   label: string;
   labelCta: string;
-  sx?: TextProps['sx'];
   onClick: (
     event:
       | React.KeyboardEvent<HTMLAnchorElement>
       | React.KeyboardEvent<HTMLButtonElement>
       | React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => void;
+  className?: string;
 };
 
 const InlineAction = ({
+  className,
   isDisabled,
   label,
   labelCta,
   onClick,
-  sx,
 }: InlineActionProps): JSX.Element => (
-  <Text isPrivate variant="caption-1" color="tertiary" as="span" sx={sx}>
+  <Text
+    as="span"
+    className={className}
+    color="tertiary"
+    isPrivate
+    variant="caption-1"
+  >
     {label}&nbsp;
     <LinkButton
       disabled={isDisabled}

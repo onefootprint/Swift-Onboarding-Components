@@ -44,7 +44,7 @@ const Compare = () => {
           <ComparisonTable />
         </NarrowContainer>
         <Box marginBottom={10} />
-        <Text variant="display-2" sx={{ textAlign: 'center' }}>
+        <Text variant="display-2" textAlign="center">
           {t('why-footptint.title')}
         </Text>
         <CardsContainer>

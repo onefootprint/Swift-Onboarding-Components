@@ -38,7 +38,7 @@ const ConfirmationDialog = ({
         onClick: onClose,
       }}
     >
-      <Text variant="body-2" color="secondary" sx={{ textAlign: 'center' }}>
+      <Text variant="body-2" color="secondary" textAlign="center">
         {children}
       </Text>
     </Dialog>

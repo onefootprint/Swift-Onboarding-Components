@@ -60,12 +60,7 @@ const WatchlistCheckEventBody = ({
       lineHeight={lineHeight}
       content={
         <Container>
-          <Text
-            variant="body-3"
-            as="span"
-            color={color}
-            sx={{ marginRight: 1 }}
-          >
+          <Text variant="body-3" as="span" color={color} marginRight={1}>
             {statusStr}
           </Text>
         </Container>

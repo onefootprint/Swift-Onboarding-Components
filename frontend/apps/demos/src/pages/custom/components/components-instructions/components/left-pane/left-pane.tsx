@@ -46,10 +46,10 @@ const LeftPane = ({
   return (
     <Left>
       <Content>
-        <Text variant="heading-3" sx={{ marginBottom: 4 }} as="h2">
+        <Text variant="heading-3" marginBottom={4} as="h2">
           Welcome to Footprint, {tenantName}! 👋
         </Text>
-        <Text variant="body-2" sx={{ marginBottom: 7 }} as="h3">
+        <Text variant="body-2" marginBottom={7} as="h3">
           {`This is a step-by-step guide on how to integrate Footprint Components into your
             product as well as customize it to match your brand's look and feel.`}
         </Text>
@@ -71,7 +71,7 @@ const LeftPane = ({
           keys in publicly accessible places like GitHub or client-side code
           like web front-ends.
         </InlineAlert>
-        <Text variant="body-2" sx={{ display: 'flex', gap: 3 }}>
+        <Text variant="body-2" display="flex" gap={3}>
           2. Grab the Secret API Key:{` `}
           <CodeInline>{secretKey}</CodeInline>
         </Text>

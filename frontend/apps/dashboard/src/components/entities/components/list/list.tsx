@@ -59,11 +59,11 @@ const List = ({
       onRowClick={handleRowClick}
       onSearchChange={handleSearchChange}
     >
-      <Text variant="heading-2" sx={{ marginBottom: subtitle ? 2 : 5 }}>
+      <Text variant="heading-2" marginBottom={subtitle ? 2 : 5}>
         {title}
       </Text>
       {subtitle && (
-        <Text variant="body-2" color="secondary" sx={{ marginBottom: 7 }}>
+        <Text variant="body-2" color="secondary" marginBottom={7}>
           {subtitle}
         </Text>
       )}

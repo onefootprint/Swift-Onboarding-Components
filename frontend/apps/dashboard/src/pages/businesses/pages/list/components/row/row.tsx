@@ -24,15 +24,7 @@ const Row = ({ entity }: RowProps) => (
       <StatusBadge status={entity.status} />
     </td>
     <td>
-      <Text
-        variant="body-3"
-        color="primary"
-        sx={{
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
+      <Text variant="body-3" color="primary" truncate>
         {new Date(entity.lastActivityAt).toLocaleString('en-us', {
           month: 'numeric',
           day: 'numeric',

@@ -30,7 +30,7 @@ const Hero = () => {
     >
       <Illustration />
       <TitleContainer>
-        <Text variant="display-2" sx={{ textAlign: 'center' }}>
+        <Text variant="display-2" textAlign="center">
           {t('title')}
         </Text>
         <Text variant="display-4" color="tertiary">

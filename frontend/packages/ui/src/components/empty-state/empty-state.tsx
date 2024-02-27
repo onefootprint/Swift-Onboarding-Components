@@ -48,7 +48,7 @@ const EmptyState = ({
       </Box>
     )}
     {renderHeader && <Box marginBottom={7}>{renderHeader()}</Box>}
-    <Text variant="label-1" sx={{ marginBottom: 4 }}>
+    <Text variant="label-1" marginBottom={4}>
       {title}
     </Text>
     <Text variant="body-2" color="secondary">

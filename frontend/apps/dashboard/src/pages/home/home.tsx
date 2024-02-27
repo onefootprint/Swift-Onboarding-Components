@@ -52,7 +52,7 @@ const Home = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Text variant="heading-2" sx={{ marginBottom: 7 }}>
+      <Text variant="heading-2" marginBottom={7}>
         {t('header.title')}
       </Text>
       {!metrics.error && (

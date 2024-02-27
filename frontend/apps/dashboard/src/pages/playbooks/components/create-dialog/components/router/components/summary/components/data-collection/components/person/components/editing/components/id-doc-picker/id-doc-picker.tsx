@@ -54,7 +54,7 @@ const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
           {...register('personal.idDocKind')}
         />
         {(!idDocKind || idDocKind.length === 0) && unselectedIDDoc && (
-          <Text color="error" variant="body-3" sx={{ paddingTop: 5 }}>
+          <Text color="error" variant="body-3" paddingTop={5}>
             {t('id-doc.no-id-doc-selected')}
           </Text>
         )}

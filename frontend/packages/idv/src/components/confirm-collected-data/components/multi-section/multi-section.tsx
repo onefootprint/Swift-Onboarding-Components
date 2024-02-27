@@ -27,7 +27,7 @@ const MultiSection = ({
     <Header>
       <TitleContainer>
         <IconComponent />
-        <Text sx={{ marginLeft: 2 }} variant="label-2">
+        <Text marginLeft={2} variant="label-2">
           {title}
         </Text>
       </TitleContainer>

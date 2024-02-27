@@ -23,7 +23,7 @@ const CustomizationPreview = () => {
         ))}
       </IframeContainer>
       <Content>
-        <Text variant="label-2" sx={{ marginBottom: 7 }}>
+        <Text variant="label-2" marginBottom={7}>
           Customize it
         </Text>
         <SelectContainer>
