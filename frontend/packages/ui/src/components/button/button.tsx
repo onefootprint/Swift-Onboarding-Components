@@ -181,7 +181,7 @@ const ButtonContainer = styled.button<{
         box-shadow: ${button.variant[variant].disabled.boxShadow};
 
         path {
-          fill: ${button.variant[variant].disabled.color};
+          fill: ${button.variant[variant].disabled.color} !important;
         }
       }
 

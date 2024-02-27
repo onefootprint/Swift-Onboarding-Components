@@ -313,7 +313,7 @@ const tokens: Tokens = {
           },
           disabled: {
             bg: primaryBtnBackgroundColor.disabled,
-            color: textColor.quaternary,
+            color: textColor.quinary,
             borderColor: 'transparent',
             boxShadow: primaryBtnBoxShadow.disabled,
           },
