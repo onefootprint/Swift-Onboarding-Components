@@ -22,8 +22,8 @@ const Docs = ({ children, navigation, article }: DocsProps) =>
       <AppHeader navigation={navigation} />
       <MainContainer>
         <DesktopNav navigation={navigation} />
-        <Content gridArea="content">{children}</Content>
-        <GridAssigner gridArea="sections">
+        <Content $gridArea="content">{children}</Content>
+        <GridAssigner $gridArea="sections">
           <Sections sections={article.data.sections} />
         </GridAssigner>
       </MainContainer>
@@ -32,9 +32,9 @@ const Docs = ({ children, navigation, article }: DocsProps) =>
   ) : (
     <Page404 />
   );
-const Content = styled.article<{ gridArea: 'nav' | 'content' | 'sections' }>`
-  ${({ gridArea, theme }) => css`
-    grid-area: ${gridArea};
+const Content = styled.article<{ $gridArea: 'nav' | 'content' | 'sections' }>`
+  ${({ $gridArea, theme }) => css`
+    grid-area: ${$gridArea};
     max-width: 100%;
     padding: ${theme.spacing[10]} ${theme.spacing[6]};
 
@@ -46,9 +46,9 @@ const Content = styled.article<{ gridArea: 'nav' | 'content' | 'sections' }>`
   `}
 `;
 
-const GridAssigner = styled.div<{ gridArea: 'nav' | 'content' | 'sections' }>`
-  ${({ gridArea }) => css`
-    grid-area: ${gridArea};
+const GridAssigner = styled.div<{ $gridArea: 'nav' | 'content' | 'sections' }>`
+  ${({ $gridArea }) => css`
+    grid-area: ${$gridArea};
   `}
 `;
 

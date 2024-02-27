@@ -24,7 +24,7 @@ const MenuLinks = ({ navigation, onNavItemClick }: PageNavProps) => {
             <nav>
               {items.map(({ title, slug }) => (
                 <NavigationLink
-                  isSelected={router.asPath === slug}
+                  $isSelected={router.asPath === slug}
                   href={slug}
                   key={slug}
                   onClick={onNavItemClick}

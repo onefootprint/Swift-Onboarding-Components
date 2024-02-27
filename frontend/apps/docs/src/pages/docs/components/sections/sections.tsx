@@ -1,5 +1,6 @@
 import { IcoFileText16 } from '@onefootprint/icons';
 import { Box, createFontStyles, media, Stack } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ArticleSection } from 'src/types/article';
@@ -53,25 +54,35 @@ const Sections = ({ sections }: SectionsProps) => {
         {t('title')}
       </Header>
       <nav>
-        <Stack tag="ul" direction="column">
+        <LinksContainer tag="ul" direction="column" layoutRoot>
           {sections.map(({ level, anchor, label, id }) => (
-            <Stack key={id}>
+            <LinkContainer key={id}>
               <StyledLink
-                active={activeSectionID === id}
+                $active={activeSectionID === id}
                 href={anchor}
                 level={level}
                 onClick={scrollToArticle(id)}
               >
                 {label}
               </StyledLink>
-              {activeSectionID === id && <ActiveMarker />}
-            </Stack>
+              {activeSectionID === id && <ActiveMarker id="marker" />}
+            </LinkContainer>
           ))}
-        </Stack>
+        </LinksContainer>
       </nav>
     </Container>
   );
 };
+
+const LinksContainer = styled(motion(Stack))`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const LinkContainer = styled(motion(Stack))`
+  position: relative;
+`;
 
 const ActiveMarker = styled.div`
   ${({ theme }) => css`
@@ -85,8 +96,8 @@ const ActiveMarker = styled.div`
   `};
 `;
 
-const StyledLink = styled.a<{ level: number; active: boolean }>`
-  ${({ theme, level, active }) => css`
+const StyledLink = styled.a<{ level: number; $active: boolean }>`
+  ${({ theme, level, $active }) => css`
     all: unset;
     position: relative;
     display: inline-block;
@@ -103,7 +114,7 @@ const StyledLink = styled.a<{ level: number; active: boolean }>`
       ${createFontStyles('body-3')}
     }
 
-    ${active &&
+    ${$active &&
     css`
       color: ${theme.color.primary};
     `}

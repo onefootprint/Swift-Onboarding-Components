@@ -8,7 +8,7 @@ type IframeProps = {
 };
 
 const Iframe = ({ name, src, selected }: IframeProps) => (
-  <IframeContainer show={selected}>
+  <IframeContainer $show={selected}>
     <StyledIframe
       allow="otp-credentials *; publickey-credentials-get *; camera *; clipboard-write *;"
       src={src}
@@ -17,7 +17,7 @@ const Iframe = ({ name, src, selected }: IframeProps) => (
   </IframeContainer>
 );
 
-const IframeContainer = styled.div<{ show: boolean }>`
+const IframeContainer = styled.div<{ $show: boolean }>`
   align-items: center;
   display: flex;
   justify-content: center;
@@ -27,8 +27,8 @@ const IframeContainer = styled.div<{ show: boolean }>`
   transform: translateX(-50%);
   left: 50%;
 
-  ${({ show }) =>
-    !show &&
+  ${({ $show }) =>
+    !$show &&
     css`
       display: none;
     `}

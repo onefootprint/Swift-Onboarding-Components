@@ -25,7 +25,7 @@ const DesktopNav = ({ navigation }: DesktopNavProps) => {
                 <NavigationLink
                   key={slug}
                   href={slug}
-                  isSelected={router.asPath === slug}
+                  $isSelected={router.asPath === slug}
                 >
                   {title}
                 </NavigationLink>
