@@ -150,7 +150,7 @@ const DrawerFilter = () => {
                 </Stack>
               </fieldset>
             </Stack>
-            <Footer justify="space-between" align="center" as="footer">
+            <Footer justify="space-between" align="center" tag="footer">
               <LinkButton onClick={handleReset}>{t('reset')}</LinkButton>
               <Button type="submit">{t('cta')}</Button>
             </Footer>
