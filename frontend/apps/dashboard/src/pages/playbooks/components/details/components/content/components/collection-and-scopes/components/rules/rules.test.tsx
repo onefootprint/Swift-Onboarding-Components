@@ -108,17 +108,6 @@ describe('<Rules />', () => {
           within(manRevRows[0]).getByText('watchlist_hit_ofac'),
         ).toBeInTheDocument();
 
-        const stepUpSection = screen.getByRole('group', {
-          name: 'Step-up',
-        });
-        const stepUpRows = within(stepUpSection).queryAllByRole('row');
-        expect(stepUpRows).toHaveLength(1);
-        expect(
-          within(stepUpRows[0]).getByText(
-            'address_alert_single_address_in_file',
-          ),
-        ).toBeInTheDocument();
-
         const passSection = screen.getByRole('group', {
           name: 'Pass + Manual review',
         });
@@ -286,7 +275,7 @@ describe('<Rules />', () => {
         });
       });
 
-      it.skip('should add a rule to an empty section correctly', async () => {
+      it('should add a rule to an empty section correctly', async () => {
         withAddRule(stepUpRuleFixture);
         await renderRulesAndWaitFinishLoading();
         await startAdding('Step-up');
@@ -294,9 +283,9 @@ describe('<Rules />', () => {
         const stepUpSection = screen.getByRole('group', {
           name: 'Step-up',
         });
-        const addRuleButton = within(stepUpSection).getByRole('button', {
+        const addRuleButton = within(stepUpSection).getAllByRole('button', {
           name: 'Add rule',
-        });
+        })[0];
         await userEvent.click(addRuleButton);
         await waitFor(() => {
           expect(addRuleButton).toBeDisabled();

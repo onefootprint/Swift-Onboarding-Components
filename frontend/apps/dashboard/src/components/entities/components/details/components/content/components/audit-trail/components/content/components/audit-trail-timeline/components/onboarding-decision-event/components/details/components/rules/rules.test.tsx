@@ -1,9 +1,18 @@
-import { customRender, screen, within } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+  within,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { RulesProps } from './rules';
 import Rules from './rules';
-import { ruleResultResponseFixture } from './rules.test.config';
+import {
+  ruleResultResponseFixture,
+  selectRulesNotTriggered,
+} from './rules.test.config';
 
 const renderRules = ({ data, isLoading, errorMessage }: RulesProps) =>
   customRender(
@@ -12,100 +21,159 @@ const renderRules = ({ data, isLoading, errorMessage }: RulesProps) =>
 
 describe('<Rules />', () => {
   describe('when data is passed in', () => {
-    it('should show all triggered and not triggered rules in the correct sections', () => {
+    it('should show only triggered rules by default', () => {
       renderRules({ data: ruleResultResponseFixture, isLoading: false });
 
       const failSection = screen.getByRole('group', {
         name: 'Fail',
       });
-      const failRows = within(failSection).getAllByRole('row');
-      expect(failRows).toHaveLength(3);
-
-      const failTriggered = within(failSection).getByRole('group', {
-        name: 'Rules triggered',
-      });
-      const failTriggeredRows = within(failTriggered).getAllByRole('row');
-      expect(failTriggeredRows).toHaveLength(2);
+      expect(within(failSection).getAllByRole('row')).toHaveLength(2);
       expect(
-        within(failTriggered).getByText('subject_deceased'),
+        within(failSection).getByText('subject_deceased'),
       ).toBeInTheDocument();
-      expect(
-        within(failTriggered).getByText('name_matches'),
-      ).toBeInTheDocument();
-
-      const failNotTriggered = within(failSection).getByRole('group', {
-        name: 'Rules not triggered',
-      });
-      const failNotTriggeredRows = within(failNotTriggered).getAllByRole('row');
-      expect(failNotTriggeredRows).toHaveLength(1);
-      expect(
-        within(failNotTriggered).getByText('id_flagged'),
-      ).toBeInTheDocument();
-
-      const manRevSection = screen.getByRole('group', {
-        name: 'Fail + Manual review',
-      });
-      const manRevRows = within(manRevSection).getAllByRole('row');
-      expect(manRevRows).toHaveLength(1);
-
-      const manRevTriggered = within(manRevSection).getByRole('group', {
-        name: 'Rules triggered',
-      });
-      expect(within(manRevTriggered).queryAllByRole('row')).toHaveLength(0);
-      expect(within(manRevTriggered).getByText('None')).toBeInTheDocument();
-
-      const manRevNotTriggered = within(manRevSection).getByRole('group', {
-        name: 'Rules not triggered',
-      });
-      const manRevNotTriggeredRows =
-        within(manRevNotTriggered).getAllByRole('row');
-      expect(manRevNotTriggeredRows).toHaveLength(1);
-      expect(
-        within(manRevNotTriggered).getByText('watchlist_hit_ofac'),
-      ).toBeInTheDocument();
+      expect(within(failSection).getByText('name_matches')).toBeInTheDocument();
 
       const stepUpSection = screen.getByRole('group', {
         name: 'Step-up',
       });
-      const stepUpRows = within(stepUpSection).queryAllByRole('row');
-      expect(stepUpRows).toHaveLength(0);
-
-      const stepUpTriggered = within(stepUpSection).getByRole('group', {
-        name: 'Rules triggered',
+      const identitySsnSubSection = within(stepUpSection).getByRole('group', {
+        name: 'Identity card and Proof of SSN',
       });
-      expect(within(stepUpTriggered).queryAllByRole('row')).toHaveLength(0);
-      expect(within(stepUpTriggered).getByText('None')).toBeInTheDocument();
-
-      const stepUpNotTriggered = within(stepUpSection).getByRole('group', {
-        name: 'Rules not triggered',
+      expect(within(identitySsnSubSection).queryAllByRole('row')).toHaveLength(
+        0,
+      );
+      expect(
+        within(identitySsnSubSection).getByText('None'),
+      ).toBeInTheDocument();
+      const poaSubSection = within(stepUpSection).getByRole('group', {
+        name: 'Proof of Address',
       });
-      expect(within(stepUpNotTriggered).queryAllByRole('row')).toHaveLength(0);
-      expect(within(stepUpNotTriggered).getByText('None')).toBeInTheDocument();
+      expect(within(poaSubSection).queryAllByRole('row')).toHaveLength(0);
+      expect(within(poaSubSection).getByText('None')).toBeInTheDocument();
+      const identitySubSection = within(stepUpSection).getByRole('group', {
+        name: 'Identity card',
+      });
+      expect(within(identitySubSection).queryAllByRole('row')).toHaveLength(0);
+      expect(within(identitySubSection).getByText('None')).toBeInTheDocument();
+
+      const manRevSection = screen.getByRole('group', {
+        name: 'Fail + Manual review',
+      });
+      expect(within(manRevSection).queryAllByRole('row')).toHaveLength(0);
+      expect(within(manRevSection).getByText('None')).toBeInTheDocument();
 
       const passManRevSection = screen.getByRole('group', {
         name: 'Pass + Manual review',
       });
-      const passManRevRows = within(passManRevSection).getAllByRole('row');
-      expect(passManRevRows).toHaveLength(1);
+      expect(within(passManRevSection).queryAllByRole('row')).toHaveLength(0);
+      expect(within(passManRevSection).getByText('None')).toBeInTheDocument();
+    });
 
-      const passManRevTriggered = within(passManRevSection).getByRole('group', {
-        name: 'Rules triggered',
+    it('should show only not triggered rules when that dropdown option is selected', async () => {
+      renderRules({ data: ruleResultResponseFixture, isLoading: false });
+
+      const failSection = screen.getByRole('group', {
+        name: 'Fail',
       });
-      expect(within(passManRevTriggered).queryAllByRole('row')).toHaveLength(0);
-      expect(within(passManRevTriggered).getByText('None')).toBeInTheDocument();
+      await userEvent.click(within(failSection).getByText('Rules triggered'));
+      await waitFor(() => {
+        expect(
+          within(failSection).getByLabelText('Rule result group options'),
+        ).toBeInTheDocument();
+      });
+      selectRulesNotTriggered();
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('option', {
+            name: 'Rules not triggered',
+          }),
+        ).not.toBeInTheDocument();
+      });
+      expect(within(failSection).getAllByRole('row')).toHaveLength(1);
+      expect(within(failSection).getByText('id_flagged')).toBeInTheDocument();
 
-      const passManRevNotTriggered = within(passManRevSection).getByRole(
-        'group',
-        {
-          name: 'Rules not triggered',
-        },
-      );
-      const passManRevNotTriggeredRows = within(
-        passManRevNotTriggered,
-      ).getAllByRole('row');
-      expect(passManRevNotTriggeredRows).toHaveLength(1);
+      const stepUpSection = screen.getByRole('group', {
+        name: 'Step-up',
+      });
+      await userEvent.click(within(stepUpSection).getByText('Rules triggered'));
+      await waitFor(() => {
+        expect(
+          within(stepUpSection).getByLabelText('Rule result group options'),
+        ).toBeInTheDocument();
+      });
+      selectRulesNotTriggered();
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('option', {
+            name: 'Rules not triggered',
+          }),
+        ).not.toBeInTheDocument();
+      });
+
+      const identitySsnSubSection = within(stepUpSection).getByRole('group', {
+        name: 'Identity card and Proof of SSN',
+      });
+      expect(within(identitySsnSubSection).getAllByRole('row')).toHaveLength(1);
       expect(
-        within(passManRevNotTriggered).getByText(
+        within(identitySsnSubSection).getByText('dob_does_not_match'),
+      ).toBeInTheDocument();
+
+      const poaSubSection = within(stepUpSection).getByRole('group', {
+        name: 'Proof of Address',
+      });
+      expect(within(poaSubSection).queryAllByRole('row')).toHaveLength(0);
+      expect(within(poaSubSection).getByText('None')).toBeInTheDocument();
+
+      const identitySubSection = within(stepUpSection).getByRole('group', {
+        name: 'Identity card',
+      });
+      expect(within(identitySubSection).queryAllByRole('row')).toHaveLength(0);
+      expect(within(identitySubSection).getByText('None')).toBeInTheDocument();
+
+      const manRevSection = screen.getByRole('group', {
+        name: 'Fail + Manual review',
+      });
+      await userEvent.click(within(manRevSection).getByText('Rules triggered'));
+      await waitFor(() => {
+        expect(
+          within(manRevSection).getByLabelText('Rule result group options'),
+        ).toBeInTheDocument();
+      });
+      selectRulesNotTriggered();
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('option', {
+            name: 'Rules not triggered',
+          }),
+        ).not.toBeInTheDocument();
+      });
+      expect(within(manRevSection).getAllByRole('row')).toHaveLength(1);
+      expect(
+        within(manRevSection).getByText('watchlist_hit_ofac'),
+      ).toBeInTheDocument();
+
+      const passManRevSection = screen.getByRole('group', {
+        name: 'Pass + Manual review',
+      });
+      await userEvent.click(
+        within(passManRevSection).getByText('Rules triggered'),
+      );
+      await waitFor(() => {
+        expect(
+          within(passManRevSection).getByLabelText('Rule result group options'),
+        ).toBeInTheDocument();
+      });
+      selectRulesNotTriggered();
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('option', {
+            name: 'Rules not triggered',
+          }),
+        ).not.toBeInTheDocument();
+      });
+      expect(within(passManRevSection).getAllByRole('row')).toHaveLength(1);
+      expect(
+        within(passManRevSection).getByText(
           'document_is_permit_or_provisional_license',
         ),
       ).toBeInTheDocument();

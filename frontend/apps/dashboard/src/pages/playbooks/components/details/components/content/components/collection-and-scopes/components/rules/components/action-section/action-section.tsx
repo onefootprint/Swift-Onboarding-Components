@@ -1,5 +1,7 @@
 import type { Color } from '@onefootprint/design-tokens';
-import type { Rule, RuleAction } from '@onefootprint/types';
+import { IcoFileText16 } from '@onefootprint/icons';
+import type { Rule } from '@onefootprint/types';
+import { RuleAction } from '@onefootprint/types';
 import { Button, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
@@ -27,7 +29,13 @@ const ActionSection = ({
     keyPrefix: `pages.playbooks.details.rules.action-section`,
   });
   const [isAddingRule, setIsAddingRule] = useState(false);
-  const actionName = kebabCase(action);
+  const isStepUpSubsection = [
+    RuleAction.stepUpIdentity,
+    RuleAction.stepUpPoA,
+    RuleAction.stepUpIdentitySsn,
+  ].includes(action);
+  const showStepUpTitle = action === RuleAction.stepUpIdentitySsn;
+  const actionName = showStepUpTitle ? 'step-up' : kebabCase(action);
 
   const handleStartAdd = () => {
     setIsAddingRule(true);
@@ -36,6 +44,20 @@ const ActionSection = ({
   const handleEndAdd = () => {
     setIsAddingRule(false);
   };
+
+  const actionTitle = (
+    <Stack direction="column" gap={1} textAlign="left">
+      <Text
+        variant="label-3"
+        color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
+      >
+        {t(`${actionName}.title` as ParseKeys<'common'>)}
+      </Text>
+      <Text variant="body-3" color="secondary">
+        {t(`${actionName}.subtitle` as ParseKeys<'common'>)}
+      </Text>
+    </Stack>
+  );
 
   const getRuleList = () => {
     const emptyRow = (
@@ -74,31 +96,34 @@ const ActionSection = ({
       direction="column"
       gap={2}
       role="group"
-      aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
+      aria-label={t(`${kebabCase(actionName)}.title` as ParseKeys<'common'>)}
     >
-      <Stack align="center" justify="space-between">
-        <Stack direction="column" gap={1} textAlign="left">
-          <Text
-            variant="label-3"
-            color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
-          >
-            {t(`${actionName}.title` as ParseKeys<'common'>)}
-          </Text>
-          <Text variant="body-3" color="secondary">
-            {t(`${actionName}.subtitle` as ParseKeys<'common'>)}
-          </Text>
+      <Stack direction="column" gap={5}>
+        {showStepUpTitle && actionTitle}
+        <Stack align="center" justify="space-between">
+          {isStepUpSubsection ? (
+            <Stack align="center" gap={2}>
+              <IcoFileText16 />
+              <Text variant="label-4">{t('step-up.subsection-title')}</Text>
+              <Text variant="body-4">
+                {t(`step-up.${kebabCase(action)}` as ParseKeys<'common'>)}
+              </Text>
+            </Stack>
+          ) : (
+            actionTitle
+          )}
+          {shouldAllowEditing && (
+            <Button
+              size="small"
+              variant="secondary"
+              sx={{ minWidth: 'fit-content' }}
+              disabled={isAddingRule}
+              onClick={handleStartAdd}
+            >
+              {t('add-rule')}
+            </Button>
+          )}
         </Stack>
-        {shouldAllowEditing && (
-          <Button
-            size="small"
-            variant="secondary"
-            sx={{ minWidth: 'fit-content' }}
-            disabled={isAddingRule}
-            onClick={handleStartAdd}
-          >
-            {t('add-rule')}
-          </Button>
-        )}
       </Stack>
       <RuleList data-is-empty={!rules.length}>{getRuleList()}</RuleList>
     </Stack>

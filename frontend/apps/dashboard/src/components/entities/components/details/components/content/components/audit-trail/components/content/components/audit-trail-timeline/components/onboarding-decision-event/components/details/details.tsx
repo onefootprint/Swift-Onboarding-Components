@@ -30,7 +30,7 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
     entityId,
     ruleSetResultId,
   });
-  const showRulesTab = isLive && data && data.hasRuleResults;
+  const showRulesTab = isLive && data && data.actionTriggered;
 
   const handleChange = (value: string) => {
     setTab(value);

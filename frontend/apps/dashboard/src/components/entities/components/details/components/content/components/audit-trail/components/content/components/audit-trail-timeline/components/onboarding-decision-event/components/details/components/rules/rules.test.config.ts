@@ -1,3 +1,4 @@
+import { screen, userEvent } from '@onefootprint/test-utils';
 import type { Rule } from '@onefootprint/types';
 import { RuleAction, RuleOp } from '@onefootprint/types';
 
@@ -6,15 +7,12 @@ export const obcIdFixure = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
 
 export const ruleResultResponseFixture: Record<
   string,
-  | boolean
-  | string
-  | Partial<Record<RuleAction, Record<string, boolean | Rule[]>>>
+  RuleAction | string | Record<RuleAction, Record<string, Rule[]>>
 > = {
-  hasRuleResults: true,
+  actionTriggered: RuleAction.fail,
   obConfigurationId: obcIdFixure,
   ruleResults: {
     [RuleAction.fail]: {
-      isOutcome: true,
       triggered: [
         {
           ruleId: 'rule_MsUPlKcWagUEbpB4SIIzlp',
@@ -58,7 +56,6 @@ export const ruleResultResponseFixture: Record<
       ],
     },
     [RuleAction.manualReview]: {
-      isOutcome: false,
       triggered: [],
       notTriggered: [
         {
@@ -77,7 +74,6 @@ export const ruleResultResponseFixture: Record<
       ],
     },
     [RuleAction.passWithManualReview]: {
-      isOutcome: false,
       triggered: [],
       notTriggered: [
         {
@@ -95,10 +91,38 @@ export const ruleResultResponseFixture: Record<
         },
       ],
     },
-    [RuleAction.stepUp]: {
-      isOutcome: false,
+    [RuleAction.stepUpIdentitySsn]: {
+      triggered: [],
+      notTriggered: [
+        {
+          ruleId: 'rule_wcvtmwTlJRDG7y8kKt0ME5',
+          action: RuleAction.stepUpIdentitySsn,
+          createdAt: '2020-12-06T23:37:22.943740Z',
+          ruleExpression: [
+            {
+              field: 'dob_does_not_match',
+              op: RuleOp.eq,
+              value: true,
+            },
+          ],
+          isShadow: false,
+        },
+      ],
+    },
+    [RuleAction.stepUpPoA]: {
+      triggered: [],
+      notTriggered: [],
+    },
+    [RuleAction.stepUpIdentity]: {
       triggered: [],
       notTriggered: [],
     },
   },
+};
+
+export const selectRulesNotTriggered = async () => {
+  const newOption = screen.getByRole('option', {
+    name: 'Rules not triggered',
+  });
+  await userEvent.click(newOption);
 };

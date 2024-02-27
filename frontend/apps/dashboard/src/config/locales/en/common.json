@@ -1458,7 +1458,7 @@
               },
               "view-details": "View details",
               "rules": {
-                "description": "See below which rules have been triggered, and not triggered, for this onboarding.",
+                "onboarding-decision": "Onboarding decision",
                 "triggered": "Rules triggered",
                 "not-triggered": "Rules not triggered",
                 "fail": {
@@ -1471,7 +1471,11 @@
                 },
                 "step-up": {
                   "title": "Step-up",
-                  "color": "info"
+                  "color": "info",
+                  "subsection-title": "Step-up documents: ",
+                  "step-up-identity-proof-of-ssn": "Identity card and Proof of SSN",
+                  "step-up-proof-of-address": "Proof of Address",
+                  "step-up-identity": "Identity card"
                 },
                 "pass-with-manual-review": {
                   "title": "Pass + Manual review",
@@ -2454,8 +2458,12 @@
             },
             "step-up": {
               "title": "Step-up",
-              "subtitle": "User will be asked to scan a government-issued ID and take a selfie",
-              "color": "info"
+              "subtitle": "User will be asked to scan or upload another document",
+              "color": "info",
+              "subsection-title": "Step-up documents: ",
+              "step-up-identity-proof-of-ssn": "Identity card and Proof of SSN",
+              "step-up-proof-of-address": "Proof of Address",
+              "step-up-identity": "Identity card"
             },
             "pass-with-manual-review": {
               "title": "Pass + Manual review",

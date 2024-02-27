@@ -32,30 +32,17 @@ const useRules = (playbookId: string = '') => {
     {
       enabled: !!playbookId,
       select: rules => {
-        const formattedRules = {} as Partial<Record<RuleAction, Rule[]>>;
-        const newStepUpActions = [
-          RuleAction.stepUpIdentity,
-          RuleAction.stepUpPoA,
-          RuleAction.stepUpIdentitySsn,
-        ];
+        const formattedRules = {} as Record<RuleAction, Rule[]>;
 
         Object.values(RuleAction).forEach(action => {
-          if (newStepUpActions.includes(action)) {
-            return;
-          }
           formattedRules[action] = [];
         });
         rules.forEach(rule => {
-          const action = newStepUpActions.includes(rule.action)
-            ? RuleAction.stepUp
-            : rule.action;
-          (formattedRules[action] as Rule[]).push(rule);
+          formattedRules[rule.action].push(rule);
         });
 
         Object.keys(formattedRules).forEach(action => {
-          const rulesCopy = (
-            formattedRules[action as RuleAction] as Rule[]
-          ).slice();
+          const rulesCopy = formattedRules[action as RuleAction].slice();
           formattedRules[action as RuleAction] = rulesCopy.sort((a, b) =>
             a.createdAt > b.createdAt ? 1 : -1,
           );

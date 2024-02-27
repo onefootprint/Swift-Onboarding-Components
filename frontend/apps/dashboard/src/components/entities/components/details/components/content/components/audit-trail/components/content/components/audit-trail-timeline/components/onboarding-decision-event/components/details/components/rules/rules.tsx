@@ -1,7 +1,5 @@
 import type { Rule, RuleAction } from '@onefootprint/types';
-import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import Content from './components/content';
 import Error from './components/error';
@@ -12,37 +10,27 @@ export type RulesProps = {
     string,
     | boolean
     | string
-    | Partial<Record<RuleAction, Record<string, boolean | Rule[]>>>
+    | Record<RuleAction, Record<string, boolean | Rule[]>>
     | null
   >;
   isLoading: boolean;
   errorMessage?: string;
 };
 
-const Rules = ({ data, isLoading, errorMessage }: RulesProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.rules',
-  });
-
-  return (
-    <Stack direction="column" gap={7}>
-      <Text variant="body-3">{t('description')}</Text>
-      {data && (
-        <Content
-          obConfigurationId={data.obConfigurationId as string}
-          ruleResults={
-            data.ruleResults as Record<
-              RuleAction,
-              Record<string, boolean | Rule[]>
-            >
-          }
-        />
-      )}
-      {isLoading && <Loading />}
-      {errorMessage && <Error errorMessage={errorMessage} />}
-    </Stack>
-  );
-};
+const Rules = ({ data, isLoading, errorMessage }: RulesProps) => (
+  <>
+    {data && (
+      <Content
+        obConfigurationId={data.obConfigurationId as string}
+        ruleResults={
+          data.ruleResults as Record<RuleAction, Record<string, Rule[]>>
+        }
+        actionTriggered={data.actionTriggered as RuleAction}
+      />
+    )}
+    {isLoading && <Loading />}
+    {errorMessage && <Error errorMessage={errorMessage} />}
+  </>
+);
 
 export default Rules;

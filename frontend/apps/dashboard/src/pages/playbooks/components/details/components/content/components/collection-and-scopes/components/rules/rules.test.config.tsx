@@ -156,13 +156,13 @@ export const passRuleFixture = {
 };
 
 export const stepUpRuleFixture = {
-  ruleId: 'rule_KkNDHeqFUFLsuKLhNRZ4c8',
-  action: RuleAction.passWithManualReview,
-  createdAt: '2023-12-05T23:37:22.943740Z',
+  ruleId: 'rule_wcvtmwTlJRDG7y8kKt0ME5',
+  action: RuleAction.stepUpIdentitySsn,
+  createdAt: '2020-12-06T23:37:22.943740Z',
   ruleExpression: [
     {
       field: 'dob_does_not_match',
-      op: RuleOp.notEq,
+      op: RuleOp.eq,
       value: true,
     },
   ],
@@ -191,19 +191,6 @@ export const rulesFixture: Rule[] = [
     ruleExpression: [
       {
         field: 'id_flagged',
-        op: RuleOp.eq,
-        value: true,
-      },
-    ],
-    isShadow: false,
-  },
-  {
-    ruleId: 'rule_wcvtmwTlJRDG7y8kKt0ME5',
-    action: RuleAction.stepUpIdentitySsn,
-    createdAt: '2020-12-06T23:37:22.943740Z',
-    ruleExpression: [
-      {
-        field: 'address_alert_single_address_in_file',
         op: RuleOp.eq,
         value: true,
       },

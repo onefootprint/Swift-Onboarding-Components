@@ -40,7 +40,7 @@ const useEntityRuleSetResult = ({
       select: response => {
         if (!response) {
           return {
-            hasRuleResults: false,
+            actionTriggered: null,
             obConfigurationId: null,
             ruleResults: null,
           };
@@ -48,26 +48,11 @@ const useEntityRuleSetResult = ({
 
         const formattedRuleResults = {} as Record<
           RuleAction,
-          Record<string, Rule[] | boolean>
+          Record<string, Rule[]>
         >;
-        const newStepUpActions = [
-          RuleAction.stepUpIdentity,
-          RuleAction.stepUpPoA,
-          RuleAction.stepUpIdentitySsn,
-        ];
 
         Object.values(RuleAction).forEach(action => {
-          if (newStepUpActions.includes(action)) {
-            return;
-          }
-
-          let isOutcome = response.actionTriggered === action;
-          if (action === RuleAction.stepUp && !isOutcome) {
-            isOutcome = newStepUpActions.includes(action);
-          }
-
           formattedRuleResults[action] = {
-            isOutcome,
             triggered: [],
             notTriggered: [],
           };
@@ -77,17 +62,16 @@ const useEntityRuleSetResult = ({
           a.rule.createdAt > b.rule.createdAt ? 1 : -1,
         );
         sortedRuleResults.forEach(({ result, rule }) => {
-          const action = newStepUpActions.includes(rule.action)
-            ? RuleAction.stepUp
-            : rule.action;
           if (result) {
-            (formattedRuleResults[action].triggered as Rule[]).push(rule);
+            (formattedRuleResults[rule.action].triggered as Rule[]).push(rule);
           } else {
-            (formattedRuleResults[action].notTriggered as Rule[]).push(rule);
+            (formattedRuleResults[rule.action].notTriggered as Rule[]).push(
+              rule,
+            );
           }
         });
         return {
-          hasRuleResults: true,
+          actionTriggered: response.actionTriggered,
           obConfigurationId: response.obConfigurationId,
           ruleResults: formattedRuleResults,
         };
