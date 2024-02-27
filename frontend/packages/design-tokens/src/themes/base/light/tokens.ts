@@ -132,15 +132,9 @@ export const primaryBtnBoxShadow = {
 
 export const secondaryBtnBoxShadow = {
   none: 'none',
-  default: `0px 1px 2px 0px rgba(0, 0, 0, 0.12),
-  inset 0px -1px 1px rgba(200, 200, 200, 0.2),
-  inset 0px 1px 1px rgba(255, 255, 255, 0.2);`,
-  hover: `0px 1px 1px 0px rgba(0, 0, 0, 0.2),
-  inset 0px -1px 1px rgba(200, 200, 200, 0.12),
-  inset 0px 1px 1px rgba(255, 255, 255, 0.3);`,
-  active: `0px 1px 1px 0px rgba(0, 0, 0, 0.12),
-  inset 0px -1px 1px rgba(200, 200, 200, 0.1),
-  inset 0px 1px 1px rgba(255, 255, 255, 0.2);`,
+  default: `0px 1px 2px 0px rgba(0, 0, 0, 0.12);`,
+  hover: `0px 1px 1px 0px rgba(0, 0, 0, 0.2);`,
+  active: `0px 1px 1px 0px rgba(0, 0, 0, 0.12);`,
   disabled: 'none',
 };
 
