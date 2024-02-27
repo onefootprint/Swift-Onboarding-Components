@@ -14,6 +14,7 @@ pub struct MetaHeaders {
     pub is_manual: Option<bool>,
     pub process_separately: Option<bool>,
     pub is_extra_compressed: bool,
+    pub is_upload: Option<bool>,
 }
 
 impl MetaHeaders {
@@ -21,12 +22,15 @@ impl MetaHeaders {
     const IS_EXTRA_COMPRESSED: &'static str = "x-fp-is-extra-compressed";
     const IS_INSTANT_APP_HEADER_NAME: &'static str = "x-fp-is-instant-app";
     const IS_MANUAL_HEADER_NAME: &'static str = "x-fp-is-manual";
+    const IS_UPLOAD_HEADER_NAME: &'static str = "x-fp-is-upload";
     const PROCESS_SEPARATELY_HEADER_NAME: &'static str = "x-fp-process-separately";
+    
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
         let is_instant_app = get_bool_header(Self::IS_INSTANT_APP_HEADER_NAME, headers);
         let is_app_clip = get_bool_header(Self::IS_APP_CLIP_HEADER_NAME, headers);
         let is_manual = get_bool_header(Self::IS_MANUAL_HEADER_NAME, headers);
+        let is_upload = get_bool_header(Self::IS_UPLOAD_HEADER_NAME, headers);
         let process_separately = get_bool_header(Self::PROCESS_SEPARATELY_HEADER_NAME, headers);
         let is_extra_compressed = get_bool_header(Self::IS_EXTRA_COMPRESSED, headers).unwrap_or(false);
         Self {
@@ -35,6 +39,7 @@ impl MetaHeaders {
             is_manual,
             process_separately,
             is_extra_compressed,
+            is_upload
         }
     }
 }

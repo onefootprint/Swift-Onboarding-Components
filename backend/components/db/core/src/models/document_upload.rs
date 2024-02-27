@@ -81,6 +81,7 @@ pub struct NewDocumentUploadArgs {
     pub is_app_clip: Option<bool>,
     pub is_manual: Option<bool>,
     pub is_extra_compressed: bool,
+    pub is_upload: Option<bool>,
 }
 
 impl DocumentUpload {
@@ -100,6 +101,7 @@ impl DocumentUpload {
             is_app_clip,
             is_manual,
             is_extra_compressed,
+            is_upload
         } = args;
         // Deactivate existing upload, if any
         // TODO this kind of silently replaces an old image, but maybe we don't want to allow this...
@@ -119,7 +121,7 @@ impl DocumentUpload {
             is_app_clip,
             is_manual,
             is_extra_compressed,
-            is_upload: None,
+            is_upload,
         };
         let result = diesel::insert_into(document_upload::table)
             .values(new)
