@@ -92,6 +92,7 @@ const Retry = () => {
                 skipLivenessMutation.isLoading
               }
               fullWidth
+              size="large"
             >
               {t('cta')}
             </Button>
@@ -103,6 +104,7 @@ const Retry = () => {
               }
               onClick={handleSkip}
               fullWidth
+              size="large"
               variant="secondary"
             >
               {t('skip')}

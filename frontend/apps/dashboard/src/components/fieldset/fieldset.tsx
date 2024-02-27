@@ -17,11 +17,7 @@ const Fieldset = ({ children, cta, title }: FieldsetProps) => (
       <Text variant="label-2" tag="div">
         {title}
       </Text>
-      {cta && (
-        <LinkButton size="compact" onClick={cta.onClick}>
-          {cta.label}
-        </LinkButton>
-      )}
+      {cta && <LinkButton onClick={cta.onClick}>{cta.label}</LinkButton>}
     </Header>
     <Content>{children}</Content>
   </FieldsetContainer>

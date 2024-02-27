@@ -51,7 +51,6 @@ const Pagination = ({
             disabled={!hasPrevPage}
             onClick={onPrevPage}
             variant="secondary"
-            size="small"
           >
             {t('previous')}
           </Button>
@@ -59,7 +58,6 @@ const Pagination = ({
             disabled={!hasNextPage}
             onClick={onNextPage}
             variant="secondary"
-            size="small"
           >
             {t('next')}
           </Button>

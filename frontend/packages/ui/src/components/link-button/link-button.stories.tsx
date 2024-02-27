@@ -145,13 +145,6 @@ BaseSize3.args = {
   size: 'xTiny',
 };
 
-export const BaseSize4 = Template.bind({});
-BaseSize4.args = {
-  children: 'Link button',
-  onClick: () => alert('I was pressed'),
-  size: 'xxTiny',
-};
-
 export const WithIconLeft = Template.bind({});
 WithIconLeft.args = {
   children: 'Link button',

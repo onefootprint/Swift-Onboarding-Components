@@ -57,12 +57,10 @@ const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
         <Form id="your-playbook-form" onSubmit={handleSubmit(onSubmit)}>
           <DataCollection meta={meta} />
           <ButtonContainer>
-            <Button size="compact" variant="secondary" onClick={onBack}>
+            <Button variant="secondary" onClick={onBack}>
               {allT('back')}
             </Button>
-            <Button size="compact" type="submit">
-              {allT('next')}
-            </Button>
+            <Button type="submit">{allT('next')}</Button>
           </ButtonContainer>
         </Form>
       </FormProvider>

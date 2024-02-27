@@ -19,7 +19,7 @@ const Invite = () => {
         scopeKind={RoleScopeKind.orgSettings}
         fallbackText={t('not-allowed')}
       >
-        <Button size="small" variant="secondary" onClick={open}>
+        <Button variant="secondary" onClick={open}>
           {t('title')}
         </Button>
       </PermissionGate>

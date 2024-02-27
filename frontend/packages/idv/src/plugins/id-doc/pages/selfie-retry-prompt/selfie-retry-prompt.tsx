@@ -38,7 +38,7 @@ const SelfieRetryPrompt = () => {
           imageType={IdDocImageTypes.selfie}
           errors={state.context.errors || []}
         />
-        <Button fullWidth onClick={handleClick}>
+        <Button fullWidth onClick={handleClick} size="large">
           {t('cta')}
         </Button>
       </PromptContainer>

@@ -67,9 +67,7 @@ const DocumentField = ({
             {t('cannot-edit')}
           </Text>
         ) : (
-          <LinkButton size="compact" onClick={show}>
-            {t('see-details')}
-          </LinkButton>
+          <LinkButton onClick={show}>{t('see-details')}</LinkButton>
         )}
       </Inner>
       <Drawer

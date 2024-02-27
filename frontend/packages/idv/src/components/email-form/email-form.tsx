@@ -50,14 +50,11 @@ const EmailForm = ({
           })}
         />
       </Box>
-      <Button
-        fullWidth
-        loading={isLoading}
-        sx={{ marginBottom: 5 }}
-        type="submit"
-      >
-        {texts.cta}
-      </Button>
+      <Box marginBottom={5}>
+        <Button fullWidth loading={isLoading} type="submit" size="large">
+          {texts.cta}
+        </Button>
+      </Box>
     </form>
   );
 };

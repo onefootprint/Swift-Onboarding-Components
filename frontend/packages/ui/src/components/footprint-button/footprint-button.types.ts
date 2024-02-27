@@ -1,1 +1,1 @@
-export type FootprintButtonSize = 'default' | 'compact';
+export type FootprintButtonSize = 'large' | 'default' | 'compact';

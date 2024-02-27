@@ -55,7 +55,7 @@ const DesktopSelfieRetry = () => {
             countryName={countryName ?? country}
           />
         </ErrorContainer>
-        <Button fullWidth onClick={handleSelfieRetake}>
+        <Button fullWidth onClick={handleSelfieRetake} size="large">
           {t('take-selfie-again')}
         </Button>
       </Container>

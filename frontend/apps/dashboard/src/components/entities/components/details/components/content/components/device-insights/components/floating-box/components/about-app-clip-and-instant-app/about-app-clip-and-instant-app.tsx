@@ -22,9 +22,7 @@ const AboutAppClipAndInstantApp = ({
 
   return (
     <>
-      <LinkButton onClick={() => setIsOpen(true)} size="compact">
-        {t('about')}
-      </LinkButton>
+      <LinkButton onClick={() => setIsOpen(true)}>{t('about')}</LinkButton>
       <Dialog
         onClose={handleClose}
         open={isOpen}

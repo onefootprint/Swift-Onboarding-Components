@@ -87,15 +87,13 @@ const RowEditButtons = ({
       <Text variant="label-4">{t('delete-confirmation.title')}</Text>
       <DeleteConfirmation>
         <Button
-          size="small"
-          // variant="destructive"
+          variant="destructive"
           disabled={isLoading}
           onClick={handleDelete}
         >
           {t('delete-confirmation.confirm')}
         </Button>
         <Button
-          size="small"
           variant="secondary"
           disabled={isLoading}
           onClick={hideDeleteConfirmation}
@@ -107,20 +105,14 @@ const RowEditButtons = ({
   ) : (
     <Stack align="center" justify="space-between">
       <Stack align="center" gap={3}>
-        <Button size="small" disabled={isLoading} onClick={handleEdit}>
+        <Button disabled={isLoading} onClick={handleEdit}>
           {allT('save')}
         </Button>
-        <Button
-          size="small"
-          variant="secondary"
-          disabled={isLoading}
-          onClick={onCancel}
-        >
+        <Button variant="secondary" disabled={isLoading} onClick={onCancel}>
           {allT('cancel')}
         </Button>
       </Stack>
       <LinkButton
-        size="tiny"
         variant="destructive"
         iconComponent={IcoTrash16}
         iconPosition="left"

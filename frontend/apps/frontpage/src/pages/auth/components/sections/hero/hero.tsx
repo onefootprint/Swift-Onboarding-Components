@@ -1,7 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Button, Container, media, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 /* eslint-disable import/no-extraneous-dependencies */
@@ -38,10 +37,14 @@ const Hero = () => {
         </Text>
       </TitleContainer>
       <Buttons>
-        <Link href={`${DASHBOARD_BASE_URL}/sign-up`}>
-          <Button variant="primary">{t('sign-up-for-free')}</Button>
-        </Link>
-        <Button variant="secondary" onClick={handleClickTrigger}>
+        <Button
+          variant="primary"
+          size="large"
+          onClick={() => window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')}
+        >
+          {t('sign-up-for-free')}
+        </Button>
+        <Button size="large" variant="secondary" onClick={handleClickTrigger}>
           {t('book-a-demo')}
         </Button>
       </Buttons>

@@ -87,9 +87,7 @@ const PdfViewer = ({ src, documentName }: PdfViewerProps) => {
     <Dialog.Root>
       <Stack>
         <Dialog.Trigger asChild>
-          <LinkButton size="compact" onClick={loadWebWorkerForPdf}>
-            {t('expand')}
-          </LinkButton>
+          <LinkButton onClick={loadWebWorkerForPdf}>{t('expand')}</LinkButton>
         </Dialog.Trigger>
       </Stack>
       <Dialog.Portal>

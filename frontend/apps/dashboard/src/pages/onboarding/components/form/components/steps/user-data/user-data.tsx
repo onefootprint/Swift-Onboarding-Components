@@ -86,12 +86,11 @@ const UserData = ({ onBack, onComplete }: UserDataProps) => {
           <Button
             disabled={mutation.isLoading}
             onClick={onBack}
-            size="compact"
             variant="secondary"
           >
             {allT('back')}
           </Button>
-          <Button loading={mutation.isLoading} size="compact" type="submit">
+          <Button loading={mutation.isLoading} type="submit">
             {allT('next')}
           </Button>
         </ButtonContainer>

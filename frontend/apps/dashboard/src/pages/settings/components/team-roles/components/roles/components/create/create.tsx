@@ -21,7 +21,7 @@ const Create = () => {
         scopeKind={RoleScopeKind.orgSettings}
         fallbackText={t('not-allowed')}
       >
-        <Button onClick={handleOpen} size="small" variant="secondary">
+        <Button onClick={handleOpen} variant="secondary">
           {t('title')}
         </Button>
       </PermissionGate>

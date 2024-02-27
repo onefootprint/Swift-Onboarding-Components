@@ -1,8 +1,7 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Button, media, Stack } from '@onefootprint/ui';
-import Link from 'next/link';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import ContactDialog from '../contact-dialog';
 
@@ -32,11 +31,15 @@ const ContactButtons = ({
 
   return (
     <>
-      <Buttons width="100%" justify={justify}>
-        <Link href={`${DASHBOARD_BASE_URL}/sign-up`}>
-          <Button variant="primary">{signUpButton}</Button>
-        </Link>
-        <Button variant="secondary" onClick={handleClickTrigger}>
+      <Buttons width="100%" justify={justify} gap={4}>
+        <Button
+          variant="primary"
+          size="large"
+          onClick={() => window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')}
+        >
+          {signUpButton}
+        </Button>
+        <Button variant="secondary" size="large" onClick={handleClickTrigger}>
           {bookADemoButton}
         </Button>
       </Buttons>
@@ -50,19 +53,17 @@ const ContactButtons = ({
 };
 
 const Buttons = styled(Stack)`
-  ${({ theme }) => css`
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
+  flex-direction: column;
 
-    button,
-    a {
-      width: 100%;
-      text-decoration: none;
-    }
+  button,
+  a {
+    width: 100%;
+    text-decoration: none;
+  }
 
-    ${media.greaterThan('md')`
+  ${media.greaterThan('md')`
       flex-direction: row;
-      gap: ${theme.spacing[5]};
+    
 
       button,
       a {
@@ -70,7 +71,6 @@ const Buttons = styled(Stack)`
         text-decoration: none;
       }
     `}
-  `}
 `;
 
 export default ContactButtons;

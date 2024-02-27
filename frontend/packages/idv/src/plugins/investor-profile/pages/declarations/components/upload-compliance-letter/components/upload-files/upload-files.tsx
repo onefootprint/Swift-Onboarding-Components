@@ -70,6 +70,7 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
             inputRef.current?.click();
           }}
           variant="secondary"
+          size="large"
         >
           {/* TODO: uncomment when we support multiple files */}
           {/* {files.length > 0 ? t('cta-multiple') : t('cta')} */}

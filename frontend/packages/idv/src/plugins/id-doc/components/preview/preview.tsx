@@ -46,6 +46,7 @@ const Preview = ({
             variant="primary"
             loading={isLoading}
             disabled={isLoading}
+            size="large"
           >
             {t('confirm')}
           </Button>
@@ -54,6 +55,7 @@ const Preview = ({
             onClick={onRetake}
             variant="secondary"
             disabled={isLoading}
+            size="large"
           >
             {t('retake')}
           </Button>

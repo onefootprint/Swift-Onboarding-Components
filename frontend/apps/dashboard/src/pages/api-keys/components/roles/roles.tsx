@@ -21,7 +21,7 @@ const Roles = () => {
           fallbackText={t('header.cta-not-allowed')}
           scopeKind={RoleScopeKind.apiKeys}
         >
-          <Button size="small" variant="secondary" onClick={openCreateDialog}>
+          <Button variant="secondary" onClick={openCreateDialog}>
             {t('header.cta')}
           </Button>
         </PermissionGate>

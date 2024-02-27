@@ -35,7 +35,6 @@ const Row = ({ playbook }: RowProps) => {
                 href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
                 iconComponent={IcoArrowTopRight24}
                 target="_blank"
-                size="compact"
                 onClick={event => event.stopPropagation()}
               >
                 {name}

@@ -12,7 +12,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 /* eslint-disable import/no-extraneous-dependencies */
 import ContactDialog from 'src/components/contact-dialog';
-import LinkingButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 
 import DemoVideoReact from '../../demo-video';
@@ -83,13 +82,21 @@ const Hero = () => {
           transition={{ duration: 0.2, ease: 'easeOut', delay: 0.6 }}
         >
           <Row>
-            <LinkingButton href={`${DASHBOARD_BASE_URL}/sign-up`} size="large">
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() =>
+                window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')
+              }
+              size="large"
+            >
               {t('primary-button')}
-            </LinkingButton>
+            </Button>
             <Button
               type="button"
               variant="secondary"
               onClick={handleClickTrigger}
+              size="large"
             >
               {t('secondary-button')}
             </Button>

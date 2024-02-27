@@ -1,13 +1,13 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createFontStyles } from '../../../../utils';
+import { createText } from '../../../../utils';
 import AnimatedLoadingSpinner from '../../../animated-loading-spinner';
 import Stack from '../../../stack';
-import type { ButtonVariant } from '../../split-button.types';
+import type { ButtonSize, ButtonVariant } from '../../split-button.types';
 
 type MainButtonProps = {
-  loading?: boolean;
+  $loading?: boolean;
   disabled: boolean;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
@@ -15,58 +15,62 @@ type MainButtonProps = {
   loadingAriaLabel?: string;
   children: React.ReactNode;
   ref?: React.Ref<HTMLButtonElement>;
-  flat?: boolean;
+  $size?: ButtonSize;
 };
 
 const MainButton = ({
-  loading = false,
+  $loading = false,
   disabled,
   onClick,
   type = 'button',
   variant = 'secondary',
   loadingAriaLabel = 'Loading',
   children,
-  flat,
+  $size,
   ref,
 }: MainButtonProps) => (
   <Container
     /** Do not change/remove these classes */
     className="fp-button fp-custom-appearance"
-    data-loading={loading}
+    data-loading={$loading}
     disabled={disabled}
     onClick={onClick}
     ref={ref}
     tabIndex={0}
     type={type}
     variant={variant}
-    data-flat={flat}
+    $loading={$loading}
+    $size={$size ?? 'compact'}
   >
     <Stack align="center" justify="center">
-      {loading ? (
+      {$loading ? (
         <AnimatedLoadingSpinner
           ariaLabel={loadingAriaLabel}
           color={variant === 'primary' ? 'quinary' : 'primary'}
           animationStart
         />
       ) : (
-        <Stack tag="span" whiteSpace="nowrap">
-          {children}
-        </Stack>
+        <TextContent as="span">{children}</TextContent>
       )}
     </Stack>
   </Container>
 );
 
-const Container = styled.button<{ variant: ButtonVariant; loading?: boolean }>`
-  ${({ theme, variant, loading }) => {
+const Container = styled.button<{
+  variant: ButtonVariant;
+  $loading?: boolean;
+  $size: ButtonSize;
+}>`
+  ${({ theme, variant, $loading, $size }) => {
     const { button } = theme.components;
 
     return css`
       all: unset;
       --animation-duration: 0.1s;
-      ${createFontStyles('label-4')}
+      --adapted-border-radius: calc(${button.borderRadius} - 1px);
+      ${createText(button.size[$size].typography)}
       background-color: ${button.variant[variant].bg};
-      border-radius: ${button.borderRadius} 0 0 ${button.borderRadius};
+      border-radius: var(--adapted-border-radius) 0 0 var(--adapted-border-radius);
       color: ${button.variant[variant].color};
       cursor: pointer;
       display: flex;
@@ -80,7 +84,7 @@ const Container = styled.button<{ variant: ButtonVariant; loading?: boolean }>`
       user-select: none;
       width: fit-content;
       z-index: 1;
-      transition: all 0.2s ease-in-out;
+      transition: all var(--animation-duration) ease-in-out;
 
       &:hover:enabled {
         background-color: ${button.variant[variant].hover.bg};
@@ -97,7 +101,7 @@ const Container = styled.button<{ variant: ButtonVariant; loading?: boolean }>`
       }
 
       ${
-        loading &&
+        $loading &&
         css`
           background-color: ${button.variant[variant].loading.bg};
           color: ${button.variant[variant].loading.color};
@@ -145,6 +149,13 @@ const Container = styled.button<{ variant: ButtonVariant; loading?: boolean }>`
       }
     `;
   }}
+`;
+
+const TextContent = styled.span`
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export default MainButton;

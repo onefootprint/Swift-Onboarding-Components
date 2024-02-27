@@ -39,6 +39,11 @@ export default {
       control: 'object',
       description: 'Options to be rendered',
     },
+    size: {
+      control: 'select',
+      options: ['compact', 'default', 'large'],
+      description: 'Sets the size of the button',
+    },
   },
 } as Meta;
 
@@ -48,6 +53,7 @@ const Template: Story<SplitButtonProps> = ({
   type,
   variant,
   options,
+  size,
 }: SplitButtonProps) => (
   <Stack align="center" justify="center" height="100vh" width="100vw">
     <SplitButton
@@ -56,6 +62,7 @@ const Template: Story<SplitButtonProps> = ({
       type={type}
       variant={variant}
       options={options}
+      size={size}
     />
   </Stack>
 );
@@ -82,6 +89,7 @@ Primary.args = {
       },
     },
   ],
+  size: 'default',
 };
 
 export const Secondary = Template.bind({});
@@ -106,4 +114,5 @@ Secondary.args = {
       },
     },
   ],
+  size: 'default',
 };

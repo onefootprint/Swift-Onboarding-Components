@@ -30,11 +30,7 @@ const Header = ({ userEmail, onLogout }: HeaderProps) => {
               {t('logged-as')} <span>{userEmail}</span>
             </Pill>
           </PillContainer>
-          <LinkButton
-            size="compact"
-            iconComponent={IcoLogOut16}
-            onClick={onLogout}
-          >
+          <LinkButton iconComponent={IcoLogOut16} onClick={onLogout}>
             {t('logout')}
           </LinkButton>
         </Inner>

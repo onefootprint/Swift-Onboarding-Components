@@ -72,11 +72,7 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(
               size="compact"
             />
 
-            <Button
-              variant="primary"
-              onClick={handleCopyToClipboard}
-              size="small"
-            >
+            <Button variant="primary" onClick={handleCopyToClipboard}>
               <Box minWidth="62px">{copyButtonLabel}</Box>
             </Button>
           </InputContainer>

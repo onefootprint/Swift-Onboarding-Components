@@ -69,7 +69,6 @@ const HitsMedia = ({ mediaList }: HitsMediaProps) => {
               )}
               {url && (
                 <LinkButton
-                  size="tiny"
                   iconComponent={IcoArrowRightSmall16}
                   iconPosition="right"
                   href={url}

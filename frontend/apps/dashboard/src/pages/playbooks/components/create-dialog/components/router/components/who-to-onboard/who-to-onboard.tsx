@@ -94,7 +94,7 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
           )}
         />
         <ButtonContainer>
-          <Button variant="primary" size="compact" type="submit">
+          <Button variant="primary" type="submit">
             {allT('next')}
           </Button>
         </ButtonContainer>

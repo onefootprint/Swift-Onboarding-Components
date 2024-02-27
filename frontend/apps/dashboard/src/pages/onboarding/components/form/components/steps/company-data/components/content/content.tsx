@@ -117,12 +117,11 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
           <Button
             disabled={mutation.isLoading}
             onClick={onBack}
-            size="compact"
             variant="secondary"
           >
             {t('back')}
           </Button>
-          <Button loading={mutation.isLoading} size="compact" type="submit">
+          <Button loading={mutation.isLoading} type="submit">
             {t('next')}
           </Button>
         </ButtonContainer>

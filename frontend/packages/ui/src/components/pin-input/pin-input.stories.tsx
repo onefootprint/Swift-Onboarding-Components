@@ -88,7 +88,7 @@ const Template: Story<PinInputProps> = ({
         )}
       </Box>
       <Box>
-        <LinkButton size="compact">Resend code</LinkButton>
+        <LinkButton>Resend code</LinkButton>
       </Box>
     </Stack>
   );

@@ -138,7 +138,7 @@ const EmptyActionRow = ({
       </div>
       <Stack direction="column" gap={7}>
         <LinkButton
-          size="xTiny"
+          size="tiny"
           sx={{ width: 'fit-content' }}
           iconComponent={IcoPlusSmall16}
           iconPosition="left"
@@ -150,13 +150,12 @@ const EmptyActionRow = ({
         <Stack align="center" justify="space-between">
           <Stack align="center" gap={3}>
             <Button
-              size="small"
               onClick={handleSaveAdd}
               disabled={expressions.length === 1 && !expressions[0].field}
             >
               {t('save')}
             </Button>
-            <Button size="small" variant="secondary" onClick={handleCancelAdd}>
+            <Button variant="secondary" onClick={handleCancelAdd}>
               {t('cancel')}
             </Button>
           </Stack>

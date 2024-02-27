@@ -44,7 +44,7 @@ const Basics = ({ playbook }: BasicsProps) => {
               iconComponent={IcoPencil16}
               iconPosition="left"
               onClick={handleShowForm}
-              size="tiny"
+              size="compact"
             >
               {t('edit-name.cta')}
             </LinkButton>

@@ -26,7 +26,7 @@ const PenguinBanner = ({
   return (
     <StyledContainer>
       <SectionVerticalSpacer />
-      <Stack direction="column" gap={10} align="center" justify="center">
+      <Stack direction="column" gap={11} align="center" justify="center">
         <Illustration
           src={imgSrc}
           height={600}
@@ -59,10 +59,10 @@ const PenguinBanner = ({
 const Title = styled.h2<{ isDarkTheme?: boolean }>`
   ${({ theme, isDarkTheme }) => css`
     color: ${isDarkTheme ? theme.color.quinary : theme.color.primary};
-    ${createFontStyles('display-2')}
+    ${createFontStyles('display-3')}
 
     ${media.greaterThan('md')`
-      ${createFontStyles('display-1')}
+      ${createFontStyles('display-2')}
     `}
   `}
 `;
@@ -79,7 +79,7 @@ const StyledContainer = styled(Container)`
 
 const Illustration = styled(Image)`
   object-fit: contain;
-  max-height: 420px;
+  max-height: 380px;
   height: fit-content;
   width: 100%;
 

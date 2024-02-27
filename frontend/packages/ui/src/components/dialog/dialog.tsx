@@ -112,10 +112,11 @@ const Dialog = ({
             <Text variant="label-2">{title}</Text>
           </Header>
           <ScrollArea
-            sx={{
-              padding: 7,
-              maxHeight: `calc(100% - ${footerHeight}px)`,
-            }}
+            paddingTop={7}
+            paddingBottom={5}
+            paddingLeft={7}
+            paddingRight={7}
+            maxHeight={`calc(100% - ${footerHeight}px)`}
           >
             {children}
           </ScrollArea>
@@ -125,7 +126,6 @@ const Dialog = ({
                 {linkButton && (
                   <LinkButton
                     onClick={linkButton.onClick}
-                    size="compact"
                     type={linkButton.type}
                     form={linkButton.form}
                   >
@@ -141,7 +141,6 @@ const Dialog = ({
                     loading={secondaryButton.loading}
                     loadingAriaLabel={secondaryButton.loadingAriaLabel}
                     onClick={secondaryButton.onClick}
-                    size="compact"
                     type={secondaryButton.type}
                     variant="secondary"
                   >
@@ -155,7 +154,6 @@ const Dialog = ({
                     loading={primaryButton.loading}
                     loadingAriaLabel={primaryButton.loadingAriaLabel}
                     onClick={primaryButton.onClick}
-                    size="compact"
                     type={primaryButton.type}
                     variant="primary"
                   >
@@ -258,7 +256,7 @@ const Header = styled.header`
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     justify-content: center;
     padding: 0 ${theme.spacing[5]};
-    height: 52px;
+    height: 48px;
     position: sticky;
     top: 0;
     flex-shrink: 0;
@@ -278,7 +276,8 @@ const Footer = styled.footer`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
+    padding: ${theme.spacing[4]} ${theme.spacing[7]} ${theme.spacing[5]}
+      ${theme.spacing[7]};
     flex-shrink: 0;
     background-color: ${theme.surfaceColor[2]};
     width: 100%;

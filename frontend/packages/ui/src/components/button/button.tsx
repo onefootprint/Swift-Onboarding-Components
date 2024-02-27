@@ -5,8 +5,6 @@ import type { ButtonHTMLAttributes } from 'react';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
-import useSX from '../../hooks/use-sx';
 import { createText } from '../../utils/mixins';
 import AnimatedLoadingSpinner from '../animated-loading-spinner';
 import Box from '../box';
@@ -24,7 +22,6 @@ export type ButtonProps = {
   loadingAriaLabel?: string;
   prefixIcon?: Icon;
   size?: ButtonSize;
-  sx?: SXStyleProps;
   testID?: string;
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
@@ -43,15 +40,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       testID,
       type = 'button',
       variant = 'primary',
-      sx,
       prefixIcon: PrefixIcon,
       iconColor,
       ...props
     }: ButtonProps,
     ref,
   ) => {
-    const sxStyles = useSX(sx);
-
     const getContent = () => (
       <IconContainer
         tag="span"
@@ -80,7 +74,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         form={form}
         ref={ref}
         size={size}
-        sx={sxStyles}
         tabIndex={0}
         type={type}
         variant={variant}
@@ -121,9 +114,8 @@ const IconContainer = styled(Stack)<{
 const ButtonContainer = styled.button<{
   size: ButtonSize;
   variant: ButtonVariant;
-  sx?: SXStyles;
 }>`
-  ${({ theme, variant, size, sx }) => {
+  ${({ theme, variant, size }) => {
     const { button } = theme.components;
 
     return css`
@@ -147,7 +139,6 @@ const ButtonContainer = styled.button<{
       padding: 0 ${button.size[size].paddingHorizontal};
       box-shadow: ${button.variant[variant].boxShadow};
       transition: ${button.transition};
-      ${sx};
 
       &:hover:enabled {
         background-color: ${button.variant[variant].hover.bg};

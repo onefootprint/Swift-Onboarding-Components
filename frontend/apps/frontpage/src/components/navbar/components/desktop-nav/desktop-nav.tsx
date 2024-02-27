@@ -1,11 +1,10 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { createFontStyles, media } from '@onefootprint/ui';
+import { Button, createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 
 import type { NavEntry } from '../../types';
@@ -23,7 +22,7 @@ const DesktopNav = ({ entries, $isOnDarkSection }: DesktopNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
 
   return (
-    <Container delayDuration={0}>
+    <Container>
       <MainNav>
         <LogoCopyAssets $isOnDarkSection={$isOnDarkSection} />
         {entries.map(entry => {
@@ -55,29 +54,32 @@ const DesktopNav = ({ entries, $isOnDarkSection }: DesktopNavProps) => {
         >
           {t('login')}
         </Login>
-        <StyledLinkButton
-          href={`${DASHBOARD_BASE_URL}/sign-up`}
+        <StyledButton
+          onClick={() => window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')}
           size="compact"
-          data-is-dark={$isOnDarkSection}
+          $isOnDarkSection={$isOnDarkSection}
         >
           {t('sign-up')}
-        </StyledLinkButton>
+        </StyledButton>
       </SecondaryNav>
     </Container>
   );
 };
 
-const StyledLinkButton = styled(LinkButton)`
-  && {
-    &[data-is-dark='true'] {
-      background-color: ${primitives.Gray0};
-      color: ${primitives.Gray1000};
+const StyledButton = styled(Button)<{ $isOnDarkSection?: boolean }>`
+  ${({ $isOnDarkSection }) =>
+    $isOnDarkSection &&
+    css`
+      &&& {
+        background-color: ${primitives.Gray800}; /* Dark theme background */
+        color: ${primitives.Gray0}; /* Text color for dark theme */
+        border-color: ${primitives.Gray700}; /* Border color for dark theme */
 
-      &:hover {
-        background-color: ${primitives.Gray100};
+        &:hover {
+          background-color: ${primitives.Gray700}; /* Darker background on hover */
+        }
       }
-    }
-  }
+    `}
 `;
 
 const Container = styled(NavigationMenu.Root)`
@@ -89,6 +91,8 @@ const Container = styled(NavigationMenu.Root)`
       align-items: center;
       gap: ${theme.spacing[7]};
       justify-content: space-between;
+      
+      };
     `}
   `}
 `;

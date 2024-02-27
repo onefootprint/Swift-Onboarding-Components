@@ -39,11 +39,15 @@ const PenguinBanner = ({
           {subtitle}
         </Text>
       </Stack>
-      <ResponsiveStack gap={3}>
-        <Button variant="primary" onClick={onClickPrimaryButton}>
+      <ResponsiveStack gap={4}>
+        <Button variant="primary" onClick={onClickPrimaryButton} size="large">
           {primaryButton}
         </Button>
-        <Button variant="secondary" onClick={onClickSecondaryButton}>
+        <Button
+          variant="secondary"
+          onClick={onClickSecondaryButton}
+          size="large"
+        >
           {secondaryButton}
         </Button>
       </ResponsiveStack>

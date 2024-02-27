@@ -88,20 +88,10 @@ const Editing = ({ onStopEditing }: EditingProps) => {
         />
       </Section>
       <ButtonContainer>
-        <Button
-          variant="primary"
-          fullWidth
-          size="compact"
-          onClick={onStopEditing}
-        >
+        <Button variant="primary" fullWidth onClick={onStopEditing}>
           {t('save')}
         </Button>
-        <Button
-          variant="secondary"
-          fullWidth
-          size="compact"
-          onClick={handleCancel}
-        >
+        <Button variant="secondary" fullWidth onClick={handleCancel}>
           {t('cancel')}
         </Button>
       </ButtonContainer>

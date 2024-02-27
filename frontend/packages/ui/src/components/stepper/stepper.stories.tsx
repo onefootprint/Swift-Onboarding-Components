@@ -59,7 +59,6 @@ const Template: Story<StepperProps> = ({
       </Box>
       <Stack gap={2} marginTop={7}>
         <Button
-          size="small"
           onClick={() => {
             const nextIndex = index - 1;
             if (nextIndex < 0) return;
@@ -75,7 +74,6 @@ const Template: Story<StepperProps> = ({
           Back
         </Button>
         <Button
-          size="small"
           onClick={() => {
             const nextIndex = index + 1;
             if (nextIndex >= options.length) return;

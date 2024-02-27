@@ -385,20 +385,15 @@ const tokens: Tokens = {
             lineHeight: p.typography['label-1'].lineHeight,
           },
         },
-        compact: {
-          height: p.buttonHeights.compact,
-          paddingHorizontal: p.spacing[7],
-          typography: p.typography['label-3'],
-        },
-        small: {
-          height: p.buttonHeights.small,
-          paddingHorizontal: p.spacing[4],
-          typography: p.typography['label-4'],
-        },
         default: {
           height: p.buttonHeights.default,
-          paddingHorizontal: p.spacing[7],
-          typography: p.typography['label-2'],
+          paddingHorizontal: p.spacing[4],
+          typography: p.typography['label-3'],
+        },
+        compact: {
+          height: p.buttonHeights.compact,
+          paddingHorizontal: p.spacing[3],
+          typography: p.typography['label-4'],
         },
       },
     },
@@ -554,21 +549,17 @@ const tokens: Tokens = {
       size: {
         default: {
           height: p.linkButtonHeights.default,
-          typography: p.typography['label-2'],
+          typography: p.typography['label-3'],
         },
         compact: {
           height: p.linkButtonHeights.compact,
-          typography: p.typography['label-3'],
-        },
-        tiny: {
-          height: p.linkButtonHeights.tiny,
           typography: p.typography['label-4'],
         },
-        xTiny: {
+        tiny: {
           height: p.linkButtonHeights.xTiny,
           typography: p.typography['caption-1'],
         },
-        xxTiny: {
+        xTiny: {
           height: p.linkButtonHeights.xxTiny,
           typography: p.typography['caption-3'],
         },

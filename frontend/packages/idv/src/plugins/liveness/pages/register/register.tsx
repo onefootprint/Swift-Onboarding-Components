@@ -58,15 +58,17 @@ const Register = () => {
         {biometricInitMutation.isSuccess ? (
           <LivenessSuccess />
         ) : (
-          <Button
-            loading={biometricInitMutation.isLoading}
-            disabled={biometricInitMutation.isLoading}
-            onClick={handleClick}
-            fullWidth
-            sx={{ marginTop: 8 }}
-          >
-            {t('cta')}
-          </Button>
+          <Box marginTop={8} width="100%">
+            <Button
+              loading={biometricInitMutation.isLoading}
+              disabled={biometricInitMutation.isLoading}
+              onClick={handleClick}
+              fullWidth
+              size="large"
+            >
+              {t('cta')}
+            </Button>
+          </Box>
         )}
       </Box>
     </Container>

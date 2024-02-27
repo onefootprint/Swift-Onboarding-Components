@@ -35,11 +35,9 @@ const Banner = () => {
       </TextContainer>
       <Buttons>
         <Link href={`${DASHBOARD_BASE_URL}/sign-up`}>
-          <Button variant="primary" size="small">
-            {t('get-started')}
-          </Button>
+          <Button variant="primary">{t('get-started')}</Button>
         </Link>
-        <Button variant="secondary" size="small" onClick={handleClickTrigger}>
+        <Button variant="secondary" onClick={handleClickTrigger}>
           {t('contact-us')}
         </Button>
       </Buttons>

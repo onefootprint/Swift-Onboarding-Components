@@ -153,7 +153,12 @@ const Form = ({ html, onSuccess }: FormProps) => {
             )}
           />
         </InputsContainer>
-        <Button fullWidth variant="secondary" onClick={showFootprint}>
+        <Button
+          fullWidth
+          size="large"
+          variant="secondary"
+          onClick={showFootprint}
+        >
           Continue
         </Button>
         <OrDivider>

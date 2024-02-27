@@ -62,7 +62,6 @@ const Toast = ({
               onClose?.();
               cta.onClick?.();
             }}
-            size="compact"
           >
             {cta.label}
           </LinkButton>

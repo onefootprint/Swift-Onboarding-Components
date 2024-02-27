@@ -34,7 +34,6 @@ const PinnedServerCertificates = ({
       <LinkButton
         iconComponent={IcoDownload16}
         onClick={handleClick(proxyConfig.pinnedServerCertificates)}
-        size="compact"
       >
         {t('download', {
           count: proxyConfig.pinnedServerCertificates.length,

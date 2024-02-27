@@ -60,8 +60,8 @@ const PlanColumn = ({
         <Button
           variant={buttonVariant}
           onClick={onButtonClick}
-          size="compact"
           fullWidth
+          size="large"
         >
           {t(`plans.${title}.${buttonLabel}` as ParseKeys<'common'>)}
         </Button>

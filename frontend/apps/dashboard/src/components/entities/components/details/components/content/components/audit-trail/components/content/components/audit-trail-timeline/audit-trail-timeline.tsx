@@ -163,7 +163,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
             <Text variant="body-3" color="tertiary">
               {t('timeline.vault-created-event.user-created-by')}
             </Text>
-            <LinkButton href="/api-keys" size="compact">
+            <LinkButton href="/api-keys">
               {(eventData.actor as ActorApiKey).name}
             </LinkButton>
           </>

@@ -111,9 +111,7 @@ const Option = ({
             <Text variant="body-4" color="tertiary">
               {t('warning')}
             </Text>
-            <Button size="small" onClick={handleDelete}>
-              {t('delete')}
-            </Button>
+            <Button onClick={handleDelete}>{t('delete')}</Button>
           </ConfirmationFooter>
         </motion.span>
       )}

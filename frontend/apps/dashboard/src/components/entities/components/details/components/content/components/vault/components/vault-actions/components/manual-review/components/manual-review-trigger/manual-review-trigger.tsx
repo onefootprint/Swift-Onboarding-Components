@@ -27,7 +27,7 @@ const ManualReviewTrigger = ({
   return (
     <Dropdown.Root>
       <DropdownTrigger asChild disabled={disabled}>
-        <Button size="small">
+        <Button>
           {kind === EntityKind.person
             ? t('button.review-person')
             : t('button.review-business')}

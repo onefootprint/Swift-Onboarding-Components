@@ -21,8 +21,8 @@ const ApiKeys = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Box>
-        <Stack align="left" justify="space-between" marginBottom={7}>
-          <Stack direction="column" gap={2}>
+        <Stack align="center" justify="space-between" marginBottom={7}>
+          <Stack direction="column" align="start" gap={2} width="100%">
             <Text variant="heading-2">{t('header.title')}</Text>
             <Text variant="body-2" color="secondary">
               {t('header.subtitle')}
@@ -32,7 +32,7 @@ const ApiKeys = () => {
             fallbackText={t('header.cta-not-allowed')}
             scopeKind={RoleScopeKind.apiKeys}
           >
-            <Button onClick={openCreateDialog} size="small" variant="primary">
+            <Button onClick={openCreateDialog} variant="primary">
               {t('header.cta')}
             </Button>
           </PermissionGate>

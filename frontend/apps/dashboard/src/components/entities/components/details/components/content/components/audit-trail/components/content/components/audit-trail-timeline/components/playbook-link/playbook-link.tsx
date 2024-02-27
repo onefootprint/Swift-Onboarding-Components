@@ -16,11 +16,7 @@ const PlaybookLink = ({ playbook }: PlaybookLinkProps) => {
     });
   };
 
-  return (
-    <LinkButton size="compact" onClick={openPlaybook}>
-      {playbook.name}
-    </LinkButton>
-  );
+  return <LinkButton onClick={openPlaybook}>{playbook.name}</LinkButton>;
 };
 
 export default PlaybookLink;

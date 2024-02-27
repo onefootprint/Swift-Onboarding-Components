@@ -173,6 +173,7 @@ const DesktopPhotoPrompt = ({
           fullWidth
           disabled={isLoading}
           onClick={isRetry ? handleUpload : handleError}
+          size="large"
         >
           {isRetry ? t('choose-different-file') : t('continue')}
         </Button>

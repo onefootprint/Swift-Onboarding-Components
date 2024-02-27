@@ -24,9 +24,7 @@ const EmailPreview = ({
           {email}
         </Text>
       </EmailCardContent>
-      <LinkButton size="compact" onClick={onChange}>
-        {textCta}
-      </LinkButton>
+      <LinkButton onClick={onChange}>{textCta}</LinkButton>
     </EmailCard>
   ) : null;
 

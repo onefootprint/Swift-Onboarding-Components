@@ -23,8 +23,8 @@ const Container = styled.div`
     background-color: ${theme.backgroundColor.primary};
 
     ${media.greaterThan('md')`
-    padding: ${theme.spacing[7]}; 
-  `}
+      padding: ${theme.spacing[5]} ${theme.spacing[7]}; 
+    `}
   `}
 `;
 

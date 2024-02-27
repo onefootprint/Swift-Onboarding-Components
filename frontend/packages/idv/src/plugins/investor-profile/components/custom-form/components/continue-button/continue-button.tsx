@@ -18,6 +18,7 @@ const ContinueButton = ({ label, isLoading }: ContinueButtonProps) => {
       fullWidth
       loading={isLoading}
       loadingAriaLabel={t('loading-aria-label')}
+      size="large"
     >
       {label || t('label')}
     </Button>

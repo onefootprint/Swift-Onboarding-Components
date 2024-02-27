@@ -16,9 +16,7 @@ const Header = ({ shouldShowRemove, onRemove }: HeaderProps) => {
   return shouldShowRemove ? (
     <HeaderContainer>
       <Text variant="label-2">{t('beneficial-owner-other')}</Text>
-      <LinkButton onClick={onRemove} size="compact">
-        {t('remove')}
-      </LinkButton>
+      <LinkButton onClick={onRemove}>{t('remove')}</LinkButton>
     </HeaderContainer>
   ) : (
     <Text variant="label-2">{t('beneficial-owner-you')}</Text>

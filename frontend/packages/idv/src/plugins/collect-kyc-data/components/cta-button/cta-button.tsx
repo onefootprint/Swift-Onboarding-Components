@@ -11,7 +11,7 @@ const CtaButton = ({ label, isLoading }: CtaButtonProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.cta' });
 
   return (
-    <Button type="submit" fullWidth loading={isLoading}>
+    <Button type="submit" fullWidth loading={isLoading} size="large">
       {label ?? t('continue')}
     </Button>
   );

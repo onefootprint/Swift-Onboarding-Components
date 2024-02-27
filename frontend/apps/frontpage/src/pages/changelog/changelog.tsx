@@ -84,7 +84,7 @@ const Changelog = ({ posts }: ChangelogProps) => {
               <Actions>
                 <Button
                   variant="secondary"
-                  size="compact"
+                  size="large"
                   onClick={() => {
                     handleLoadMore();
                   }}

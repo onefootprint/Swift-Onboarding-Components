@@ -1,7 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Button, Text } from '@onefootprint/ui';
+import { Button, Stack, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 /* eslint-disable import/no-extraneous-dependencies */
@@ -37,14 +36,18 @@ const Hero = () => {
           {t('subtitle')}
         </Text>
       </TitleContainer>
-      <Buttons>
-        <Link href={`${DASHBOARD_BASE_URL}/sign-up`}>
-          <Button variant="primary">{t('get-started')}</Button>
-        </Link>
-        <Button variant="secondary" onClick={handleClickTrigger}>
+      <Stack gap={4}>
+        <Button
+          variant="primary"
+          size="large"
+          onClick={() => window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')}
+        >
+          {t('get-started')}
+        </Button>
+        <Button variant="secondary" onClick={handleClickTrigger} size="large">
           {t('book-a-demo')}
         </Button>
-      </Buttons>
+      </Stack>
       <ContactDialog
         url={GET_FORM_URL}
         open={showDialog}
@@ -71,20 +74,6 @@ const TitleContainer = styled.div`
     align-items: center;
     justify-content: center;
     gap: ${theme.spacing[4]};
-  `}
-`;
-
-const Buttons = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: ${theme.spacing[4]};
-
-    a {
-      text-decoration: none;
-    }
   `}
 `;
 

@@ -72,11 +72,7 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
                 {...register(`headers.${index}.secret`)}
               />
               {fields.length >= 2 && (
-                <LinkButton
-                  onClick={handleRemove(index)}
-                  variant="destructive"
-                  size="compact"
-                >
+                <LinkButton onClick={handleRemove(index)} variant="destructive">
                   {t('remove')}
                 </LinkButton>
               )}
@@ -88,7 +84,6 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
         iconComponent={IcoPlusSmall16}
         iconPosition="left"
         onClick={handleAdd}
-        size="compact"
       >
         {t('add-more')}
       </LinkButton>

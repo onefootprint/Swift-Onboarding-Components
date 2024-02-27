@@ -89,7 +89,6 @@ const Content = ({
                 inviteMembersMutations.isLoading || updateOrgMutation.isLoading
               }
               onClick={onBack}
-              size="compact"
               variant="secondary"
             >
               {allT('back')}
@@ -98,7 +97,6 @@ const Content = ({
               loading={
                 inviteMembersMutations.isLoading || updateOrgMutation.isLoading
               }
-              size="compact"
               type="submit"
             >
               {t('cta')}

@@ -43,7 +43,7 @@ const Introduction = () => {
         ]}
         variant="default"
       />
-      <Button fullWidth onClick={handleClick}>
+      <Button fullWidth onClick={handleClick} size="large">
         {t('cta.continue')}
       </Button>
     </Container>

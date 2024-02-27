@@ -24,9 +24,7 @@ const Content = ({ high, medium, low }: ContentProps) => {
         <ListDialog
           riskSignals={[...high, ...medium, ...low]}
           renderCta={({ onClick }) => (
-            <LinkButton size="compact" onClick={onClick}>
-              {t('cta')}
-            </LinkButton>
+            <LinkButton onClick={onClick}>{t('cta')}</LinkButton>
           )}
         />
       )}

@@ -72,7 +72,7 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
               </CopyButton>
             </Stack>
             <LinkButton
-              size="tiny"
+              size="compact"
               iconComponent={IcoArrowRightSmall16}
               iconPosition="right"
               href={aml.shareUrl}

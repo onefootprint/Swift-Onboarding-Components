@@ -154,11 +154,7 @@ const FrequentNotesTextArea = ({
 
         {hasEditPermissions && (
           <Stack marginBottom={5}>
-            <LinkButton
-              disabled={isLoading || !showSave}
-              onClick={handleSave}
-              size="compact"
-            >
+            <LinkButton disabled={isLoading || !showSave} onClick={handleSave}>
               {t('save')}
             </LinkButton>
           </Stack>
@@ -186,7 +182,6 @@ const FrequentNotesTextArea = ({
                   <LinkButton
                     disabled={isLoading}
                     onClick={() => setIsEdit(!isEdit)}
-                    size="compact"
                   >
                     {t(`${isEdit ? 'done' : 'edit'}` as ParseKeys<'common'>)}
                   </LinkButton>

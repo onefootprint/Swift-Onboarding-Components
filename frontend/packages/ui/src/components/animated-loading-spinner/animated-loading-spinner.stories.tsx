@@ -36,14 +36,14 @@ const Template: ComponentStory<typeof AnimatedLoadingSpinner> = ({
       <Stack gap={3}>
         <Button
           type="button"
-          size="small"
+          size="compact"
           onClick={() => setAnimationStart(true)}
         >
           Start Animation
         </Button>
         <Button
           type="button"
-          size="small"
+          size="compact"
           onClick={() => setAnimationStart(false)}
           variant="secondary"
         >

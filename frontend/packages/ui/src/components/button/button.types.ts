@@ -1,3 +1,3 @@
-export type ButtonSize = 'default' | 'compact' | 'small' | 'large';
+export type ButtonSize = 'default' | 'compact' | 'large';
 
-export type ButtonVariant = 'primary' | 'secondary';
+export type ButtonVariant = 'primary' | 'secondary' | 'destructive';

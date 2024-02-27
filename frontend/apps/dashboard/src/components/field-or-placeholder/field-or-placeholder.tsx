@@ -33,7 +33,6 @@ const FieldOrPlaceholder = ({ data, transforms }: FieldOrPlaceholderProps) => {
   if (isVaultDataDocument(data)) {
     return (
       <LinkButton
-        size="compact"
         onClick={() => {
           saveAs(data.content, data.name);
         }}

@@ -33,7 +33,7 @@ const InvestorProfile = () => {
             iconComponent={IcoTrash16}
             iconPosition="left"
             onClick={handleClick}
-            size="tiny"
+            size="compact"
             variant="destructive"
           >
             {t('toggle.remove')}
@@ -44,7 +44,7 @@ const InvestorProfile = () => {
             iconComponent={IcoPlusSmall16}
             iconPosition="left"
             onClick={handleClick}
-            size="tiny"
+            size="compact"
           >
             {t('toggle.add')}
           </LinkButton>

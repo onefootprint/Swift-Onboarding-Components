@@ -23,7 +23,7 @@ const FootprintButton = ({
   disabled = false,
   fullWidth,
   onClick,
-  size = 'default',
+  size = 'large',
   testID,
   type = 'button',
   text,

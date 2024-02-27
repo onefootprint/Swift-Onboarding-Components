@@ -223,15 +223,10 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         )}
       </Section>
       <ButtonContainer>
-        <Button fullWidth size="compact" variant="primary" onClick={handleSave}>
+        <Button fullWidth variant="primary" onClick={handleSave}>
           {allT('save')}
         </Button>
-        <Button
-          variant="secondary"
-          fullWidth
-          size="compact"
-          onClick={handleCancel}
-        >
+        <Button variant="secondary" fullWidth onClick={handleCancel}>
           {allT('cancel')}
         </Button>
       </ButtonContainer>

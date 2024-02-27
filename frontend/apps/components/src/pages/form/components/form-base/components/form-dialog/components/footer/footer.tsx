@@ -44,7 +44,6 @@ const Footer = ({
             loading={secondaryButton.loading}
             loadingAriaLabel={t('loading-aria-label')}
             onClick={secondaryButton.onClick}
-            size="compact"
             type={secondaryButton.type}
             variant="secondary"
           >
@@ -59,7 +58,6 @@ const Footer = ({
             loading={primaryButton.loading}
             loadingAriaLabel={t('loading-aria-label')}
             onClick={primaryButton.onClick}
-            size="compact"
             type={primaryButton.type}
             variant="primary"
           >

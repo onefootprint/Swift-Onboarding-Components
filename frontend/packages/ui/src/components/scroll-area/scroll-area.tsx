@@ -1,33 +1,40 @@
 'use client';
 
+import type { Spacing } from '@onefootprint/design-tokens';
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import type { SXStyleProps, SXStyles } from '../../hooks';
-import { useSX } from '../../hooks';
-
 type ScrollAreaProps = {
   asChild?: boolean;
   children: React.ReactNode;
-  sx?: SXStyleProps;
   className?: string;
-  maxHeight?: string;
   hideBottomLine?: boolean;
   hideTopLine?: boolean;
+  padding?: Spacing;
+  paddingTop?: Spacing;
+  paddingRight?: Spacing;
+  paddingBottom?: Spacing;
+  paddingLeft?: Spacing;
+  maxWidth?: string;
+  maxHeight?: string;
 };
 
 const ScrollArea = ({
   children,
-  sx,
-  asChild,
   className,
-  maxHeight,
+  asChild,
   hideBottomLine,
   hideTopLine,
+  padding,
+  paddingTop,
+  paddingRight,
+  paddingBottom,
+  paddingLeft,
+  maxWidth,
+  maxHeight,
 }: ScrollAreaProps) => {
-  const sxStyles = useSX(sx);
   const viewportRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -93,9 +100,15 @@ const ScrollArea = ({
     >
       <StyledViewport
         className={className}
-        sx={sxStyles}
         asChild
         ref={viewportRef}
+        $padding={padding}
+        $paddingTop={paddingTop}
+        $paddingRight={paddingRight}
+        $paddingBottom={paddingBottom}
+        $paddingLeft={paddingLeft}
+        $maxWidth={maxWidth}
+        $maxHeight={maxHeight}
       >
         {children}
       </StyledViewport>
@@ -129,11 +142,39 @@ const StyledRoot = styled(ScrollAreaRadix.Root)`
   `}
 `;
 
-const StyledViewport = styled(ScrollAreaRadix.Viewport)<{ sx?: SXStyles }>`
-  ${({ sx }) => css`
-    height: 100%;
-    width: 100%;
-    ${sx}
+const StyledViewport = styled(ScrollAreaRadix.Viewport)<{
+  $padding?: Spacing;
+  $paddingTop?: Spacing;
+  $paddingRight?: Spacing;
+  $paddingBottom?: Spacing;
+  $paddingLeft?: Spacing;
+  $maxWidth?: string;
+  $maxHeight?: string;
+}>`
+  ${({
+    $padding,
+    $paddingTop,
+    $paddingRight,
+    $paddingBottom,
+    $paddingLeft,
+    $maxWidth,
+    $maxHeight,
+  }) => css`
+    ${({ theme }) => css`
+      height: 100%;
+      width: 100%;
+      padding: ${$padding ? theme.spacing[$padding] : undefined};
+      padding-top: ${$paddingTop ? theme.spacing[$paddingTop] : undefined};
+      padding-right: ${$paddingRight
+        ? theme.spacing[$paddingRight]
+        : undefined};
+      padding-bottom: ${$paddingBottom
+        ? theme.spacing[$paddingBottom]
+        : undefined};
+      padding-left: ${$paddingLeft ? theme.spacing[$paddingLeft] : undefined};
+      max-width: ${$maxWidth};
+      max-height: ${$maxHeight};
+    `}
   `}
 `;
 

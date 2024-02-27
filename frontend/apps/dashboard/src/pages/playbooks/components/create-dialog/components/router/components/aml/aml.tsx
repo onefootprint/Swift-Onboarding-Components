@@ -101,20 +101,10 @@ const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
           </ErrorContainer>
         )}
         <ButtonContainer>
-          <Button
-            disabled={isLoading}
-            onClick={onBack}
-            size="compact"
-            variant="secondary"
-          >
+          <Button disabled={isLoading} onClick={onBack} variant="secondary">
             {allT('back')}
           </Button>
-          <Button
-            loading={isLoading}
-            size="compact"
-            type="submit"
-            variant="primary"
-          >
+          <Button loading={isLoading} type="submit" variant="primary">
             {allT('create')}
           </Button>
         </ButtonContainer>

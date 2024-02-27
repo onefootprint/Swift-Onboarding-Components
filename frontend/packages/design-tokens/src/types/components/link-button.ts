@@ -54,9 +54,5 @@ export type LinkButton = {
       height: CSS.Property.Height;
       typography: Typography;
     };
-    xxTiny: {
-      height: CSS.Property.Height;
-      typography: Typography;
-    };
   };
 };

@@ -112,6 +112,7 @@ const DesktopConsent = () => {
           loading={consentMutation.isLoading}
           disabled={!fullyScrolled}
           testID="consent-button"
+          size="large"
         >
           {fullyScrolled
             ? t('submit-button.enabled-title')

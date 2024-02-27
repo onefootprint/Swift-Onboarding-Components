@@ -76,9 +76,7 @@ const BottomSheet = ({
             />
             <ScrollArea
               hideBottomLine
-              sx={{
-                padding: 5,
-              }}
+              padding={5}
               maxHeight={scrollAreaMaxHeight}
             >
               {children}

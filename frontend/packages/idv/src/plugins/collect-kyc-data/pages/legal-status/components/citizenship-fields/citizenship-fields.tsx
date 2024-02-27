@@ -52,7 +52,6 @@ const CitizenshipFields = () => {
         iconComponent={IcoPlusSmall16}
         iconPosition="left"
         onClick={() => append({ label: '', value: undefined })}
-        size="compact"
         testID="add-citizenship-button"
       >
         {t('citizenship.add-text')}

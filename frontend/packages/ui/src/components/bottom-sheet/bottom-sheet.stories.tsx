@@ -78,9 +78,7 @@ const Template: Story<BottomSheetProps> = ({
       >
         <Text variant="body-4">{children}</Text>
       </BottomSheet>
-      <Button onClick={() => setOpen(true)} size="default">
-        Open bottom sheet
-      </Button>
+      <Button onClick={() => setOpen(true)}>Open bottom sheet</Button>
     </>
   );
 };
@@ -124,9 +122,7 @@ const LinkTemplate: Story<BottomSheetProps> = ({
       >
         <Text variant="body-4">Content</Text>
       </BottomSheet>
-      <Button onClick={() => setOpen(true)} size="default">
-        Open bottom sheet
-      </Button>
+      <Button onClick={() => setOpen(true)}>Open bottom sheet</Button>
     </>
   );
 };

@@ -13,7 +13,7 @@ const FrontModal = ({ className }: FrontModalProps) => (
       <Text variant="label-3">$120.77</Text>
     </Stack>
     <Stack justify="end">
-      <Button variant="primary" size="small">
+      <Button variant="primary" size="compact">
         Dispute
       </Button>
     </Stack>

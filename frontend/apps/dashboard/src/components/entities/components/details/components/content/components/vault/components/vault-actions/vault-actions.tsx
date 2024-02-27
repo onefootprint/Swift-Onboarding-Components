@@ -101,7 +101,6 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
       {(decryptControls.inProgress || editControls.inProgress) && (
         <Stack gap={3}>
           <Button
-            size="small"
             variant="secondary"
             onClick={
               decryptControls.inProgress
@@ -117,7 +116,6 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
                 ? DECRYPT_VAULT_FORM_ID
                 : EDIT_VAULT_FORM_ID
             }
-            size="small"
             type="submit"
             loading={!!editControls.isLoading}
           >

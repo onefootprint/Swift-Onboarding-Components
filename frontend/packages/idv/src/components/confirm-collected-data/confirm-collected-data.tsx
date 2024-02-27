@@ -33,7 +33,12 @@ const ConfirmCollectedData = ({
     <Stack gap={7} direction="column">
       <HeaderTitle title={title} subtitle={subtitle} />
       <SectionsContainer>{children}</SectionsContainer>
-      <Button fullWidth onClick={onClickConfirm} loading={isLoading}>
+      <Button
+        fullWidth
+        onClick={onClickConfirm}
+        loading={isLoading}
+        size="large"
+      >
         {cta}
       </Button>
     </Stack>

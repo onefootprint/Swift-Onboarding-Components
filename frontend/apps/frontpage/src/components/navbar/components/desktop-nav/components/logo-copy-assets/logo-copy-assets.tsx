@@ -74,7 +74,9 @@ const LogoCopyAssets = ({
           onContextMenu={handleButtonContextMenu}
           $isOnDarkSection={$isOnDarkSection}
         >
-          <ThemedLogoFpCompact />
+          <ThemedLogoFpCompact
+            color={$isOnDarkSection ? 'quinary' : 'primary'}
+          />
         </Trigger>
       </Dropdown.Trigger>
       <Dropdown.Content

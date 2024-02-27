@@ -111,10 +111,10 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
           )}
         </OptionContainer>
         <ButtonContainer>
-          <Button variant="secondary" size="compact" onClick={onBack}>
+          <Button variant="secondary" onClick={onBack}>
             {allT('back')}
           </Button>
-          <Button variant="primary" size="compact" type="submit">
+          <Button variant="primary" type="submit">
             {allT('next')}
           </Button>
         </ButtonContainer>

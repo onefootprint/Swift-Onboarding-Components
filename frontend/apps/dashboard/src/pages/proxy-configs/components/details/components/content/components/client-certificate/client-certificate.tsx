@@ -29,7 +29,6 @@ const ClientCertificate = ({ proxyConfig }: ClientCertificateProps) => {
       <LinkButton
         iconComponent={IcoDownload16}
         onClick={handleClick(proxyConfig.clientCertificate)}
-        size="compact"
       >
         {t('download')}
       </LinkButton>

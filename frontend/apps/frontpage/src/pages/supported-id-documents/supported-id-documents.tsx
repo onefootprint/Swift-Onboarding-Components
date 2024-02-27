@@ -117,9 +117,7 @@ const SupportedIdDocuments = () => {
           <Text color="secondary" variant="body-2" marginBottom={7}>
             {t('contact.subtitle')}
           </Text>
-          <Button onClick={handleClick} size="compact">
-            {t('contact.cta')}
-          </Button>
+          <Button onClick={handleClick}>{t('contact.cta')}</Button>
         </ContactContainer>
       </Container>
     </>

@@ -84,14 +84,14 @@ const SmsButtonWithCountdown = ({
   };
 
   return (
-    <Stack direction="column" align="center" gap={3}>
+    <Stack direction="column" align="center" gap={3} marginTop={2}>
       <Button
         variant="secondary"
         fullWidth
         disabled={isDisabled}
         loading={isResend && isLoading}
         onClick={isDisabled ? undefined : handleResend}
-        sx={{ marginTop: 2 }}
+        size="large"
       >
         {t('cta')}
       </Button>

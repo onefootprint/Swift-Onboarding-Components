@@ -114,9 +114,7 @@ const ActionSection = ({
           )}
           {shouldAllowEditing && (
             <Button
-              size="small"
               variant="secondary"
-              sx={{ minWidth: 'fit-content' }}
               disabled={isAddingRule}
               onClick={handleStartAdd}
             >
@@ -124,8 +122,8 @@ const ActionSection = ({
             </Button>
           )}
         </Stack>
+        <RuleList data-is-empty={!rules.length}>{getRuleList()}</RuleList>
       </Stack>
-      <RuleList data-is-empty={!rules.length}>{getRuleList()}</RuleList>
     </Stack>
   );
 };

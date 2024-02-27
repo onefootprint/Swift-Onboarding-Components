@@ -22,11 +22,7 @@ const VerticalCard = ({
         {title}
       </Text>
       <Text variant="body-1">{description}</Text>
-      {cta && (
-        <LinkButton variant="default" href="/pricing">
-          {cta}
-        </LinkButton>
-      )}
+      {cta && <LinkButton href="/pricing">{cta}</LinkButton>}
     </CardContent>
   </CardContainer>
 );

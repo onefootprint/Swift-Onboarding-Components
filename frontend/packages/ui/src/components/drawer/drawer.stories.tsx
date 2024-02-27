@@ -97,9 +97,7 @@ const Template: Story<DrawerProps> = ({
       >
         <Text variant="body-4">{children}</Text>
       </Drawer>
-      <Button onClick={() => setOpen(true)} size="default">
-        Open Drawer
-      </Button>
+      <Button onClick={() => setOpen(true)}>Open Drawer</Button>
     </>
   );
 };

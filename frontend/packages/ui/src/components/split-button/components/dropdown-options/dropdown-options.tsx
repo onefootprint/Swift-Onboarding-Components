@@ -19,15 +19,15 @@ type DropdownOptionsProps = {
   disabled: boolean;
   onOptionChange: (option: Option) => void;
   flat?: boolean;
+  $width: string;
 };
-
-const TRIGGER_WIDTH = '32px';
 
 const DropdownOptions = ({
   options,
   variant,
   loading,
   disabled,
+  $width,
   flat = false,
   onOptionChange,
 }: DropdownOptionsProps) => (
@@ -37,6 +37,7 @@ const DropdownOptions = ({
       data-loading={loading}
       disabled={disabled}
       data-flat={flat}
+      $width={$width}
     >
       <IcoChevronDown16 color={variant === 'primary' ? 'quinary' : 'primary'} />
     </Trigger>
@@ -95,18 +96,18 @@ const Item = styled(DropdownPrimitive.Item)`
 
 const Trigger = styled(DropdownPrimitive.Trigger)<{
   variant: ButtonVariant;
+  $width: string;
 }>`
-  ${({ theme, variant }) => {
+  ${({ theme, variant, $width }) => {
     const { button } = theme.components;
 
     return css`
       all: unset;
       --animation-duration: 0.1s;
-      ${createFontStyles('label-4')}
+      --adapted-border-radius: calc(${button.borderRadius} - 1px);
       background-color: ${button.variant[variant].bg};
-      border-left: ${theme.borderWidth[1]} solid
-        ${button.variant[variant].borderColor};
-      border-radius: 0 ${button.borderRadius} ${button.borderRadius} 0;
+      border-radius: 0 var(--adapted-border-radius) var(--adapted-border-radius)
+        0;
       color: ${button.variant[variant].color};
       cursor: pointer;
       display: flex;
@@ -117,7 +118,7 @@ const Trigger = styled(DropdownPrimitive.Trigger)<{
       outline-offset: ${theme.spacing[2]};
       position: relative;
       user-select: none;
-      width: ${TRIGGER_WIDTH};
+      width: ${$width};
       transition: all 0.2s ease-in-out;
 
       &:hover:enabled {

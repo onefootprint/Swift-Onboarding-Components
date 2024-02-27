@@ -31,7 +31,7 @@ export default {
     },
     size: {
       control: 'select',
-      options: ['default', 'compact', 'small', 'large'],
+      options: ['default', 'compact', 'large'],
       description: 'Button size',
     },
     testID: {

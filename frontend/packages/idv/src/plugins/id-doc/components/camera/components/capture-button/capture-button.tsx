@@ -24,6 +24,7 @@ const CaptureButton = ({
         data-disabled={disabled}
         onClick={onClick}
         disabled={disabled}
+        size="large"
       >
         Take photo
       </Button>

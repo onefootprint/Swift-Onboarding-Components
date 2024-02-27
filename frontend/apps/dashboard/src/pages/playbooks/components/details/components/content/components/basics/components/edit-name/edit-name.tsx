@@ -62,10 +62,10 @@ const EditName = ({ playbook, onDone }: EditNameProps) => {
         />
       </InputContainer>
       <ButtonContainer>
-        <Button variant="secondary" size="small" onClick={onDone}>
+        <Button variant="secondary" onClick={onDone}>
           {t('form.cancel')}
         </Button>
-        <Button variant="primary" size="small" type="submit">
+        <Button variant="primary" type="submit">
           {t('form.save')}
         </Button>
       </ButtonContainer>

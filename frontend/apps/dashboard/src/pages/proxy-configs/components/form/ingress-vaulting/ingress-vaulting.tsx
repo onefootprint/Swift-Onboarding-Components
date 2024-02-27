@@ -112,7 +112,6 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
                 {fields.length >= 2 && (
                   <LinkButton
                     onClick={handleRemove(index)}
-                    size="compact"
                     variant="destructive"
                   >
                     Remove
@@ -125,7 +124,6 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
             iconComponent={IcoPlusSmall16}
             iconPosition="left"
             onClick={handleAdd}
-            size="compact"
           >
             {t('add-more')}
           </LinkButton>

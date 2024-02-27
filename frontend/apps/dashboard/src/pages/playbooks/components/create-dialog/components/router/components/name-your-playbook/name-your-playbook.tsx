@@ -81,12 +81,10 @@ const NameYourPlaybook = ({
             )}
           </NameContainer>
           <ButtonContainer>
-            <Button size="compact" variant="secondary" onClick={onBack}>
+            <Button variant="secondary" onClick={onBack}>
               {allT('back')}
             </Button>
-            <Button size="compact" type="submit">
-              {allT('next')}
-            </Button>
+            <Button type="submit">{allT('next')}</Button>
           </ButtonContainer>
         </Form>
       </FormProvider>

@@ -24,9 +24,7 @@ const Value = ({ children, cta }: ValueProps) => {
       scopeKind={RoleScopeKind.orgSettings}
       fallbackText={t('not-allowed')}
     >
-      <LinkButton size="compact" onClick={cta.onClick}>
-        {cta.label}
-      </LinkButton>
+      <LinkButton onClick={cta.onClick}>{cta.label}</LinkButton>
     </PermissionGate>
   );
 };

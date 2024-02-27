@@ -71,19 +71,14 @@ const UploadFile = ({
           {label}
         </Label>
         {onRemove && (
-          <LinkButton onClick={onRemove} variant="destructive" size="compact">
+          <LinkButton onClick={onRemove} variant="destructive">
             {t('remove')}
           </LinkButton>
         )}
       </Stack>
       <Box backgroundColor="secondary" padding={5} borderRadius="default">
         <Box>
-          <Button
-            fullWidth
-            onClick={handleClick}
-            size="compact"
-            variant="secondary"
-          >
+          <Button fullWidth onClick={handleClick} variant="secondary">
             {cta}
           </Button>
         </Box>

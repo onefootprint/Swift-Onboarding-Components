@@ -26,7 +26,6 @@ const NavigationFooter = ({ linkTo }: NavigationFooterProps) => {
       <ExternalLink>
         <LinkButton
           href={linkTo === 'api-reference' ? API_REFERENCE_PATH : '/'}
-          size="compact"
           iconComponent={IcoArrowUpRight16}
         >
           {linkTo === 'api-reference' ? t('api-reference') : t('docs')}

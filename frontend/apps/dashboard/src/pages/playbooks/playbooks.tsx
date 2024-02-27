@@ -61,13 +61,7 @@ const Playbooks = () => {
             fallbackText={t('cta-not-allowed')}
             scopeKind={RoleScopeKind.onboardingConfiguration}
           >
-            <Button
-              size="small"
-              sx={{ whiteSpace: 'nowrap' }}
-              onClick={handleOpen}
-            >
-              {t('create-button')}
-            </Button>
+            <Button onClick={handleOpen}>{t('create-button')}</Button>
           </PermissionGate>
           {!hasHadPlaybook && <WaveAnimation width={140} />}
         </Wrapper>

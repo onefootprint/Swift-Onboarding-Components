@@ -228,6 +228,7 @@ const DeskTopProcessing = () => {
           fullWidth
           disabled={mode === 'loading'}
           onClick={handleNextStep}
+          size="large"
         >
           {t('continue')}
         </Button>

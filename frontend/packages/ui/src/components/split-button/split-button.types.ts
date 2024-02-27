@@ -1,3 +1,1 @@
-export type ButtonSize = 'default' | 'compact' | 'small' | 'large';
-
-export type ButtonVariant = 'primary' | 'secondary';
+export type { ButtonSize, ButtonVariant } from '../button/button.types';

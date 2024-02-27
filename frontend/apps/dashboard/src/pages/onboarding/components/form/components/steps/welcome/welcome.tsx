@@ -30,7 +30,7 @@ const Welcome = ({ onComplete }: WelcomeProps) => {
         {t('subtitle')}
       </Text>
       <ButtonContainer>
-        <Button size="compact" type="submit" fullWidth>
+        <Button type="submit" fullWidth>
           {allT('next')}
         </Button>
       </ButtonContainer>

@@ -46,15 +46,10 @@ const Popover = ({ children, id, onClose, title }: PopoverProps) => {
           <ScrollArea>{children}</ScrollArea>
         </Body>
         <Footer>
-          <Button onClick={onClose} size="small" variant="secondary">
+          <Button onClick={onClose} variant="secondary">
             {t('components.filters.popover.cancel')}
           </Button>
-          <Button
-            form="filter-form"
-            size="small"
-            type="submit"
-            variant="primary"
-          >
+          <Button form="filter-form" type="submit" variant="primary">
             {t('components.filters.popover.apply')}
           </Button>
         </Footer>

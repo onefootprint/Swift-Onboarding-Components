@@ -26,7 +26,6 @@ const EditableFormButtonContainer = ({
     return (
       <EndJustifiedButtons>
         <Button
-          size="small"
           variant="secondary"
           type="button"
           onClick={onCancel}
@@ -34,12 +33,7 @@ const EditableFormButtonContainer = ({
         >
           {t('cancel')}
         </Button>
-        <Button
-          size="small"
-          type="submit"
-          loading={isLoading}
-          testID={submitButtonTestID}
-        >
+        <Button type="submit" loading={isLoading} testID={submitButtonTestID}>
           {t('save')}
         </Button>
       </EndJustifiedButtons>
@@ -54,6 +48,7 @@ const EditableFormButtonContainer = ({
           fullWidth
           loading={isLoading}
           testID={submitButtonTestID}
+          size="large"
         >
           {ctaLabel ?? t('continue')}
         </Button>
@@ -66,6 +61,7 @@ const EditableFormButtonContainer = ({
     <Button
       type="submit"
       fullWidth
+      size="large"
       loading={isLoading}
       testID={submitButtonTestID}
     >

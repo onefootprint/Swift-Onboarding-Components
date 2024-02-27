@@ -35,7 +35,6 @@ export type Button = {
   size: {
     large: Size;
     compact: Size;
-    small: Size;
     default: Size;
   };
 };

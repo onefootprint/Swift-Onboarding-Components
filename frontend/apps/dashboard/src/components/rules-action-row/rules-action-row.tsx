@@ -107,7 +107,7 @@ const RulesActionRow = ({
       {isEditing ? (
         <Stack gap={7} direction="column">
           <LinkButton
-            size="xTiny"
+            size="compact"
             sx={{ width: 'fit-content' }}
             iconComponent={IcoPlusSmall16}
             iconPosition="left"
@@ -129,7 +129,6 @@ const RulesActionRow = ({
       ) : (
         shouldAllowEditing && (
           <LinkButton
-            size="tiny"
             sx={{ paddingTop: 5, paddingLeft: 3 }}
             onClick={handleStartEdit}
           >

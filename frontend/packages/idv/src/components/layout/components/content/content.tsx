@@ -119,7 +119,7 @@ const BodyContent = styled.div`
     overflow-y: auto;
 
     ${media.greaterThan('md')`
-      padding: 0 ${theme.spacing[7]} ${theme.spacing[8]}; 
+      padding: 0 ${theme.spacing[7]} ${theme.spacing[7]}; 
     `}
   `}
 `;

@@ -50,7 +50,6 @@ const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
         <LinkButtonContainer>
           <LinkButton
             onClick={toggleShowAll}
-            size="compact"
             sx={{ paddingLeft: 5, paddingBottom: 3 }}
           >
             {t(

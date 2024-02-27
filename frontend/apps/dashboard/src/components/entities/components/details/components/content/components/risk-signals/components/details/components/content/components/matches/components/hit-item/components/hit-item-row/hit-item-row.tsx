@@ -54,13 +54,11 @@ const HitItemRow = ({
   );
 
   const renderShowAllValue = () => (
-    <LinkButton size="compact" onClick={handleShowAllFields}>
-      {t('show-all.value')}
-    </LinkButton>
+    <LinkButton onClick={handleShowAllFields}>{t('show-all.value')}</LinkButton>
   );
 
   const renderMediaValue = (media: AmlHitMedia[]) => (
-    <LinkButton size="compact" onClick={() => handleShowAmlMedia(media)}>
+    <LinkButton onClick={() => handleShowAmlMedia(media)}>
       {t('media')}
     </LinkButton>
   );

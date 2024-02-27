@@ -46,7 +46,6 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
           onClick={() => {
             setDrawerOpen(true);
           }}
-          size="compact"
         >
           {t('view-details')}
         </LinkButton>

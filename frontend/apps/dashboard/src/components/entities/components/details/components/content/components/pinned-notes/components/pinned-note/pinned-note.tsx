@@ -42,7 +42,6 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
           <LinkButton
             sx={{ marginLeft: 2 }}
             onClick={() => handleUnpinNote(noteId)}
-            size="compact"
           >
             {t('unpin-button-text')}
           </LinkButton>

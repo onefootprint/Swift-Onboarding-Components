@@ -232,6 +232,7 @@ const IdDocCountryAndTypeContainer = ({
             fullWidth
             onClick={handleSubmit}
             loading={isDocTypeSubmissionLoading}
+            size="large"
           >
             {t('form.cta')}
           </Button>

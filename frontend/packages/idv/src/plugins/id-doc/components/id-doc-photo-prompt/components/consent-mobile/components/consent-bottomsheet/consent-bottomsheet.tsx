@@ -122,6 +122,7 @@ const ConsentBottomSheet = ({
               onClick={onComplete}
               loading={isLoading}
               disabled={!fullyScrolled}
+              size="large"
             >
               {fullyScrolled
                 ? t('submit-button.enabled-title')

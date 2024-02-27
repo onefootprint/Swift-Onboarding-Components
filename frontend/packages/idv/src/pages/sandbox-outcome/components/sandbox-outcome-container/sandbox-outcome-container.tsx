@@ -85,7 +85,12 @@ export const SandboxOutcomeContainer = ({
             )}
             <TestIdInput />
           </OptionsContainer>
-          <Button fullWidth type="submit" disabled={!!errors?.testID}>
+          <Button
+            fullWidth
+            type="submit"
+            disabled={!!errors?.testID}
+            size="large"
+          >
             {t('cta')}
           </Button>
         </Form>

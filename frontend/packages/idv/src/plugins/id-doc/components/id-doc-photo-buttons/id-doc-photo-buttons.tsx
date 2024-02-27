@@ -90,6 +90,7 @@ const IdDocPhotoButtons = ({
           onClick={handleUpload}
           loading={isLoading && captureMethod === 'upload'}
           disabled={isLoading}
+          size="large"
         >
           {t('upload-file.title')}
         </Button>
@@ -98,6 +99,7 @@ const IdDocPhotoButtons = ({
         fullWidth
         onClick={handleTake}
         variant={uploadFirst ? 'secondary' : 'primary'}
+        size="large"
       >
         {t('take-photo.title')}
       </Button>
@@ -108,6 +110,7 @@ const IdDocPhotoButtons = ({
           onClick={handleUpload}
           loading={isLoading && captureMethod === 'upload'}
           disabled={isLoading}
+          size="large"
         >
           {t('upload-photo.title')}
         </Button>

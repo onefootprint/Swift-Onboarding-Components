@@ -32,7 +32,7 @@ const InlineAction = ({
     <LinkButton
       disabled={isDisabled}
       onClick={isDisabled ? undefined : onClick}
-      size="tiny"
+      size="compact"
     >
       {labelCta}
     </LinkButton>

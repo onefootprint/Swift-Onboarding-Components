@@ -35,10 +35,20 @@ const ConfirmContinueOnDesktop = () => {
           {t('warning')}
         </InlineAlert>
         <Stack direction="column" gap={3} width="100%">
-          <Button fullWidth variant="primary" onClick={handleMobile}>
+          <Button
+            fullWidth
+            variant="primary"
+            onClick={handleMobile}
+            size="large"
+          >
             {t('cta.mobile')}
           </Button>
-          <Button fullWidth variant="secondary" onClick={handleDesktop}>
+          <Button
+            fullWidth
+            variant="secondary"
+            onClick={handleDesktop}
+            size="large"
+          >
             {t('cta.desktop')}
           </Button>
         </Stack>

@@ -94,6 +94,7 @@ const PhoneForm = ({
         loading={isLoading}
         type="submit"
         prefixIcon={IcoSmartphone224}
+        size="large"
       >
         {texts.cta}
       </Button>

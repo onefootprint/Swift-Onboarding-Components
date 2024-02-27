@@ -49,11 +49,7 @@ const SubscribeToNewsletter = () => {
                 required: true,
               })}
             />
-            <Button
-              size="compact"
-              type="submit"
-              loading={subscribeUser.isLoading}
-            >
+            <Button type="submit" loading={subscribeUser.isLoading}>
               {t('form.cta')}
             </Button>
           </FieldsContainer>

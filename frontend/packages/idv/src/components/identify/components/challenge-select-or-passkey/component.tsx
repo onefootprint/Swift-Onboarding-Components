@@ -46,6 +46,7 @@ const Component = ({
         fullWidth
         loading={isLoading}
         type="submit"
+        size="large"
       >
         {texts.cta}
       </Button>

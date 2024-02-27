@@ -27,7 +27,7 @@ const AddFreeFormNote = () => {
         scopeKind={RoleScopeKind.manualReview}
         tooltipPosition="bottom"
       >
-        <Button onClick={handleOpenDialog} size="small" variant="secondary">
+        <Button onClick={handleOpenDialog} size="compact" variant="secondary">
           {t('add-note-button.title')}
         </Button>
       </PermissionGate>

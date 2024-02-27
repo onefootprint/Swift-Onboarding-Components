@@ -104,7 +104,7 @@ const IdDocPhotoPrompt = ({
           />
         )}
         <StickyBottomBox>
-          <Button fullWidth onClick={handleTake}>
+          <Button fullWidth onClick={handleTake} size="large">
             {t('continue')}
           </Button>
         </StickyBottomBox>

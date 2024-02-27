@@ -29,6 +29,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
         loading={isLoading}
         onClick={onClick}
         text={t('cta')}
+        size="large"
       />
       {privacyPolicyUrl && (
         <Text variant="label-4" color="secondary" textAlign="center">

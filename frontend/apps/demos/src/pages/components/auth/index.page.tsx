@@ -81,19 +81,11 @@ const AuthDemo = () => {
         <title>Footprint Auth Demo</title>
       </Head>
       <Container>
-        <Button
-          onClick={handleAuthenticateClick}
-          size="compact"
-          variant="secondary"
-        >
+        <Button onClick={handleAuthenticateClick} variant="secondary">
           Authenticate with Footprint
         </Button>
         <br />
-        <Button
-          onClick={handleUpdateFlowClick}
-          size="compact"
-          variant="secondary"
-        >
+        <Button onClick={handleUpdateFlowClick} variant="secondary">
           Update Authentication Methods with Footprint
         </Button>
       </Container>

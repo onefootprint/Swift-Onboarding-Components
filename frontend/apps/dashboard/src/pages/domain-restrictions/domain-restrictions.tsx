@@ -36,9 +36,7 @@ const DomainRestrictions = () => {
           </Box>
           <Box>
             {hasPermission(RoleScopeKind.onboardingConfiguration) && (
-              <Button size="small" onClick={handleOpen}>
-                {t('header.cta')}
-              </Button>
+              <Button onClick={handleOpen}>{t('header.cta')}</Button>
             )}
           </Box>
         </Stack>

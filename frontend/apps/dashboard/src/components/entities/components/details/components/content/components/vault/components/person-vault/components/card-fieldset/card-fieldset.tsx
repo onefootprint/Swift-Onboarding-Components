@@ -109,7 +109,6 @@ const Fieldset = ({
           {shouldShowSelectAll && (
             <LinkButton
               onClick={allSelected ? handleDeselectAll : handleSelectAll}
-              size="compact"
             >
               {allSelected ? t('deselect-all') : t('select-all')}
             </LinkButton>

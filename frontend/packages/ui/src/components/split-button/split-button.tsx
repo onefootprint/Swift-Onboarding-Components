@@ -16,6 +16,12 @@ export type SplitButtonProps = {
   size?: ButtonSize;
 };
 
+export const triggerWidths: Record<ButtonSize, string> = {
+  compact: '24px',
+  default: '32px',
+  large: '40px',
+};
+
 const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
   (
     {
@@ -23,7 +29,7 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
       loading = false,
       type = 'button',
       variant = 'secondary',
-      size = 'small',
+      size = 'default',
       options,
     }: SplitButtonProps,
     ref,
@@ -34,12 +40,14 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
       <Container $size={size} direction="row" $variant={variant}>
         <MainButton
           disabled={disabled}
-          loading={loading}
+          $loading={loading}
           onClick={activeOption.onSelect}
           ref={ref}
           type={type}
           variant={variant}
-          tab-index="0"
+          loadingAriaLabel="Loading"
+          $size={size}
+          tab-index={0}
         >
           {activeOption.label}
         </MainButton>
@@ -52,7 +60,8 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
             setActiveOption(option);
             option.onSelect();
           }}
-          tab-index="1"
+          $width={triggerWidths[size]}
+          tab-index={1}
         />
       </Container>
     );
@@ -68,11 +77,21 @@ const Container = styled(Stack)<{ $size: ButtonSize; $variant: ButtonVariant }>`
       border-radius: ${button.borderRadius};
       height: ${button.size[$size].height};
       width: fit-content;
-      border-color: ${button.variant[$variant].borderColor};
-      border-style: solid;
-      border-width: ${button.borderWidth};
+      border: ${button.borderWidth} solid
+        ${button.variant[$variant].borderColor};
       overflow: hidden;
       box-shadow: ${button.variant[$variant].boxShadow};
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 1px;
+        right: ${triggerWidths[$size]};
+        background-color: ${button.variant[$variant].borderColor};
+        z-index: 2;
+      }
     `;
   }}
 `;

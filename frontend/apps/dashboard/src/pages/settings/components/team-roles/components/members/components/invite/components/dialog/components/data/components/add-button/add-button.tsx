@@ -17,7 +17,6 @@ const AddButton = ({ onClick }: AddButtonProps) => {
       iconComponent={IcoPlusSmall16}
       iconPosition="left"
       onClick={onClick}
-      size="compact"
       sx={{ marginTop: 5 }}
     >
       {t('add-more')}

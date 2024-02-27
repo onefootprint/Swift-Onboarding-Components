@@ -40,7 +40,7 @@ const Filters = ({
       </Controls>
       {hasSelectedOptions && (
         <ClearFiltersContainer>
-          <LinkButton onClick={onClear} size="compact">
+          <LinkButton onClick={onClear}>
             {t('components.filters.clear-filters')}
           </LinkButton>
         </ClearFiltersContainer>

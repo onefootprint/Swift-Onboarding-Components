@@ -55,9 +55,11 @@ const EmptyState = ({
       {description}
     </Text>
     {cta && (
-      <Button onClick={cta.onClick} sx={{ marginTop: 8 }}>
-        {cta.label}
-      </Button>
+      <Box marginTop={8}>
+        <Button onClick={cta.onClick} variant="primary" size="compact">
+          {cta.label}
+        </Button>
+      </Box>
     )}
   </Stack>
 );
