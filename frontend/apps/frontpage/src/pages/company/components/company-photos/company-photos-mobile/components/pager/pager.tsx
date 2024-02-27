@@ -39,7 +39,7 @@ const Pager = ({ max, value, onClick }: PagerProps) => {
 const Container = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: inline-flex;
     gap: ${theme.spacing[2]};

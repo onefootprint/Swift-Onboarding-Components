@@ -60,7 +60,7 @@ const Container = styled.div`
 const Inner = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: column;

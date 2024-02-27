@@ -70,7 +70,7 @@ const Option = styled.button`
     height: 28px;
     margin: 1px;
     padding: 0 ${theme.spacing[3]};
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
 
     &:enabled {
       cursor: pointer;
@@ -96,7 +96,7 @@ const Badge = styled.div`
     ${createFontStyles('label-4')};
     align-items: center;
     background-color: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
     color: ${theme.color.quaternary};
     display: inline-flex;
     height: ${theme.spacing[7]};

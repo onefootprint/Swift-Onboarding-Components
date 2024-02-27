@@ -80,7 +80,7 @@ const KeyCap = styled.span`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
   `}
 `;
 

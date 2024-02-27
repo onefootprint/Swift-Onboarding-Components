@@ -67,7 +67,7 @@ const TabContainer = styled(Stack)<{ selected: boolean }>`
           width: calc(100% + ${theme.spacing[3]});
           height: calc(100% - ${theme.spacing[2]});
           background-color: ${theme.backgroundColor.secondary};
-          border-radius: ${theme.borderRadius.compact};
+          border-radius: ${theme.borderRadius.sm};
           z-index: -1;
         }
       `}

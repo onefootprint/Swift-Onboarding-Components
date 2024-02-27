@@ -56,7 +56,7 @@ const Inner = styled.div`
     padding: ${theme.spacing[9]};
 
     ${media.greaterThan('md')`
-      border-radius: ${theme.borderRadius.compact};
+      border-radius: ${theme.borderRadius.sm};
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
       width: 90%;
       max-width: 700px;

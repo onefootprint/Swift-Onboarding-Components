@@ -25,7 +25,7 @@ const StyledBaseIllustration = styled(BaseIllustration)`
       left: 50%;
       transform: translateX(-50%);
       box-shadow: ${theme.elevation[3]};
-      border-radius: ${theme.borderRadius.large};
+      border-radius: ${theme.borderRadius.xl};
       overflow: hidden;
     }
   `}

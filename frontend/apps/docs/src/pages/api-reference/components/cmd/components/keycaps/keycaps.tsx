@@ -40,7 +40,7 @@ const KeyCap = styled.div`
     height: 20px;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
     ${createFontStyles('caption-4')}
     color: ${theme.color.tertiary};
     display: flex;

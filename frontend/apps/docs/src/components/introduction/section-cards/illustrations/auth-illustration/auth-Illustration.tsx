@@ -35,7 +35,7 @@ const AuthIllustration = ({ isHovered = false }: AuthIllustrationProps) => (
         justify="center"
         height="fit-content"
         width="fit-content"
-        borderRadius="compact"
+        borderRadius="sm"
         padding={3}
       >
         {Array.from({ length: 6 }).map(() => (
@@ -69,7 +69,7 @@ const CodeBoxItem = styled(Stack)`
     background-color: ${theme.backgroundColor.senary};
     height: ${theme.spacing[6]};
     width: ${theme.spacing[6]};
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
   `}
 `;
 

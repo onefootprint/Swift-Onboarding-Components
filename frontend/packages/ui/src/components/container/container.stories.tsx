@@ -38,7 +38,7 @@ const Template: Story<ContainerProps> = ({
       width="100%"
       height="100vh"
       backgroundColor="tertiary"
-      borderRadius="compact"
+      borderRadius="sm"
       padding={6}
     >
       <Text variant="label-1" color="quaternary">

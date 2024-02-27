@@ -45,7 +45,7 @@ const StyledButton = styled(motion.button)`
     position: relative;
 
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     cursor: pointer;
     color: ${theme.color.secondary};
     overflow: hidden;
@@ -60,9 +60,7 @@ const Border = styled.span`
     position: absolute;
     width: calc(100% + ${theme.spacing[1]} * 1.2);
     height: calc(100% + ${theme.spacing[1]} * 1.2);
-    border-radius: calc(
-      ${theme.borderRadius.large} + ${theme.spacing[1]} * 1.2
-    );
+    border-radius: calc(${theme.borderRadius.xl} + ${theme.spacing[1]} * 1.2);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

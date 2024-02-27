@@ -74,7 +74,7 @@ const CodeContent = styled.code<{ size?: 'default' | 'compact' }>`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: inline-block;
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
     color: ${size === 'compact' ? theme.color.secondary : theme.color.error};
     flex-flow: wrap;
     height: ${size === 'compact' ? 'auto' : ''};

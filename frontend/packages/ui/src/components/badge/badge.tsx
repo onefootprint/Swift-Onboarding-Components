@@ -26,7 +26,7 @@ const StyledBadge = styled.span<{
     ${createFontStyles('caption-1')};
     align-items: center;
     background-color: ${theme.backgroundColor[$variant]};
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     border: 0;
     color: ${theme.color[$variant]};
     display: inline-flex;

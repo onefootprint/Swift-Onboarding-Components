@@ -35,7 +35,7 @@ const CardContainer = styled.div`
     grid-template-rows: 280px auto;
     grid-template-areas: 'image' 'content';
     background-color: rgba(252, 252, 252, 0.6);
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     overflow: hidden;
     width: 100%;

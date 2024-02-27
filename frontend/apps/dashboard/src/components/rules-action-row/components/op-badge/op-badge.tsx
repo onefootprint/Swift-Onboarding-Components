@@ -40,7 +40,7 @@ const OpBadge = ({ defaultValue, isEditable, onClick }: OpBadgeProps) => {
 const Badge = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('caption-1')};
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     border: ${theme.borderWidth[1]} dashed ${theme.borderColor.tertiary};
     color: ${theme.color.quaternary};
     margin-right: ${theme.spacing[2]};

@@ -142,10 +142,10 @@ const CornerOutline = styled.div<{
       bottom: ${corner === 'bottom-left' || corner === 'bottom-right'
         ? 0
         : 'auto'};
-      border-radius: ${corner === 'top-left' ? theme.borderRadius.large : 0}
-        ${corner === 'top-right' ? theme.borderRadius.large : 0}
-        ${corner === 'bottom-right' ? theme.borderRadius.large : 0}
-        ${corner === 'bottom-left' ? theme.borderRadius.large : 0};
+      border-radius: ${corner === 'top-left' ? theme.borderRadius.xl : 0}
+        ${corner === 'top-right' ? theme.borderRadius.xl : 0}
+        ${corner === 'bottom-right' ? theme.borderRadius.xl : 0}
+        ${corner === 'bottom-left' ? theme.borderRadius.xl : 0};
       border-top: ${corner === 'top-left' || corner === 'top-right'
         ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
         : 0};
@@ -174,7 +174,7 @@ const FullFrameOutline = styled.div<{
     height: ${$outlineHeight}px;
     width: ${$outlineWidth}px;
     position: absolute;
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.6);
 
     &[data-show-border='true'] {
@@ -189,7 +189,7 @@ const TimerAnimation = styled(motion.div)`
     height: 100%;
     position: absolute;
     top: 0;
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     background: #00000080;
   `}
 `;

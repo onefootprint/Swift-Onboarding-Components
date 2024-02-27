@@ -69,7 +69,7 @@ const Container = styled.div`
     min-height: 240px;
     background-color: ${theme.backgroundColor.quaternary};
     overflow: hidden;
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
   `}
 `;
 

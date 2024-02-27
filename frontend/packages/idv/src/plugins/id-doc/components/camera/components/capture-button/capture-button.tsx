@@ -108,7 +108,7 @@ const InnerSquare = styled.button`
     width: ${theme.spacing[7]};
     background-color: ${theme.backgroundColor.primary};
     border: none;
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
     box-shadow: ${theme.elevation[2]};
   `}
 `;

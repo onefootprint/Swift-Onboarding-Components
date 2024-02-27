@@ -67,7 +67,7 @@ const Content = styled.div`
 
     *:not(pre) > code {
       background: ${theme.backgroundColor.secondary};
-      border-radius: ${theme.borderRadius.compact};
+      border-radius: ${theme.borderRadius.sm};
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
       color: ${theme.color.error};
       display: inline-block;

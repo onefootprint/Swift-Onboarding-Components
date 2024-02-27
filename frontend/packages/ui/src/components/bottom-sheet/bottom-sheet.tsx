@@ -120,7 +120,7 @@ const Content = styled(DialogPrimitive.Content)`
     bottom: 0;
     width: 100%;
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.large} ${theme.borderRadius.large} 0 0;
+    border-radius: ${theme.borderRadius.xl} ${theme.borderRadius.xl} 0 0;
     z-index: ${theme.zIndex.bottomSheet};
     align-self: end;
 

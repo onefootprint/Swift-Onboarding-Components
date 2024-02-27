@@ -189,7 +189,7 @@ const Trigger = styled(SelectPrimitive.Trigger)`
     ${createFontStyles('caption-1')};
     align-items: center;
     background-color: ${theme.backgroundColor.info};
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     border: 0;
     gap: ${theme.spacing[2]};
     color: ${theme.color.info};

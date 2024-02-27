@@ -74,7 +74,7 @@ const StyledTrigger = styled(Select.Trigger)`
         height: calc(100% + ${theme.spacing[2]});
         z-index: -1;
         background-color: ${theme.backgroundColor.senary};
-        border-radius: ${theme.borderRadius.compact};
+        border-radius: ${theme.borderRadius.sm};
       }
     }
 
@@ -96,7 +96,7 @@ const StyledItem = styled(Select.Item)`
     justify-content: start;
     padding: ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[2]}
       ${theme.spacing[3]};
-    border-radius: ${theme.borderRadius.compact};
+    border-radius: ${theme.borderRadius.sm};
     cursor: pointer;
     gap: ${theme.spacing[2]};
 

@@ -2,9 +2,10 @@ import type { BorderRadiuses } from '../types';
 
 export const borderRadius: BorderRadiuses = {
   none: '0px',
-  compact: '4px',
+  sm: '4px',
   default: '6px',
-  large: '16px',
+  lg: '12px',
+  xl: '16px',
   full: '100px',
 };
 

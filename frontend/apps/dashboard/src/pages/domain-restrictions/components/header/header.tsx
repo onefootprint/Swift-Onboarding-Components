@@ -20,7 +20,7 @@ const Header = ({ hasRestrictions, isLoading }: HeaderProps) => {
         </Stack>
         {isLoading ? (
           <Shimmer
-            sx={{ width: '145px', height: '26px', borderRadius: 'large' }}
+            sx={{ width: '145px', height: '26px', borderRadius: 'xl' }}
           />
         ) : (
           <Box>

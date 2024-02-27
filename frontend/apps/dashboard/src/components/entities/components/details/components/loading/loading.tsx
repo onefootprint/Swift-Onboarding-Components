@@ -33,9 +33,7 @@ const Header = () => (
         <Shimmer sx={{ height: '28px', width: '105px' }} />
       </Box>
       <Box id="entity-status">
-        <Shimmer
-          sx={{ height: '24px', width: '64px', borderRadius: 'large' }}
-        />
+        <Shimmer sx={{ height: '24px', width: '64px', borderRadius: 'xl' }} />
       </Box>
     </Stack>
     <Stack

@@ -149,9 +149,10 @@ export type Spacing = keyof Spacings;
 
 export type BorderRadiuses = {
   none: string;
-  compact: string;
+  sm: string;
   default: string;
-  large: string;
+  lg: string;
+  xl: string;
   full: string;
 };
 

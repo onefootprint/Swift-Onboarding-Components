@@ -113,7 +113,7 @@ const ImagePreview = styled.img`
     width: 100%;
 
     &[data-device-kind='mobile'] {
-      border-radius: ${theme.borderRadius.large};
+      border-radius: ${theme.borderRadius.xl};
     }
 
     &[data-camera-kind='front'] {

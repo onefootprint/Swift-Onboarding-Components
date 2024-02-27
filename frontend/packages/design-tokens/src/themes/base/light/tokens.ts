@@ -274,7 +274,7 @@ const tokens: Tokens = {
       },
       loading: {
         bg: 'rgba(0, 0, 0, 0.6)',
-        borderRadius: p.borderRadius.compact,
+        borderRadius: p.borderRadius.sm,
         color: textColor.primary,
         padding: p.spacing[5],
       },

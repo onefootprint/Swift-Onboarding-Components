@@ -48,7 +48,7 @@ const CardContainer = styled(Grid.Container)`
   ${({ theme }) => css`
     position: relative;
     background-color: rgba(252, 252, 252, 0.6);
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.xl};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     overflow: hidden;
     grid-template-columns: 1fr;

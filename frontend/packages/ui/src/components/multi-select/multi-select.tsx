@@ -262,7 +262,7 @@ const MultiSelect = <
           multiValue: () => ({
             alignItems: 'center',
             backgroundColor: theme.backgroundColor.neutral,
-            borderRadius: theme.borderRadius.compact,
+            borderRadius: theme.borderRadius.sm,
             display: 'flex',
             flexDirection: 'row',
             gap: theme.spacing[3],

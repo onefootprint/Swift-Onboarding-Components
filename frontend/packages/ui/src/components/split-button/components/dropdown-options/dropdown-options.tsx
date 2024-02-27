@@ -81,7 +81,7 @@ const Item = styled(DropdownPrimitive.Item)`
       background-color: ${dropdown.bg};
       cursor: pointer;
       padding: ${theme.spacing[2]} ${theme.spacing[5]};
-      border-radius: ${theme.borderRadius.compact};
+      border-radius: ${theme.borderRadius.sm};
 
       &:hover {
         background-color: ${dropdown.hover.bg};

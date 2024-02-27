@@ -58,7 +58,7 @@ const Template: Story<PinInputProps> = ({
   return (
     <Stack
       align="center"
-      borderRadius="compact"
+      borderRadius="sm"
       direction="column"
       height="240px"
       justify="center"
