@@ -217,7 +217,7 @@ export const startEditing = async (title: string) => {
   const editButton = within(row).getByText('Edit');
   await userEvent.click(editButton);
   await waitFor(() => {
-    expect(editButton).not.toBeInTheDocument();
+    expect(within(row).queryByText('Edit')).not.toBeInTheDocument();
   });
   return { section, row };
 };

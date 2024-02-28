@@ -1,6 +1,12 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import { type Rule, type RuleField, RuleOp } from '@onefootprint/types';
-import { Badge, createFontStyles, LinkButton, Stack } from '@onefootprint/ui';
+import {
+  Badge,
+  Box,
+  createFontStyles,
+  LinkButton,
+  Stack,
+} from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -77,7 +83,7 @@ const RulesActionRow = ({
       role="row"
       aria-label={rule.ruleExpression[0].field}
     >
-      <div>
+      <Box width="100%">
         {t('pages.playbooks.details.rules.action-row.if')}
         {expressions.map((expression, index) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -103,9 +109,9 @@ const RulesActionRow = ({
             )}
           </React.Fragment>
         ))}
-      </div>
+      </Box>
       {isEditing ? (
-        <Stack gap={7} direction="column">
+        <Stack gap={7} direction="column" width="100%">
           <LinkButton
             size="compact"
             sx={{ width: 'fit-content' }}
@@ -128,10 +134,7 @@ const RulesActionRow = ({
         </Stack>
       ) : (
         shouldAllowEditing && (
-          <LinkButton
-            sx={{ paddingTop: 5, paddingLeft: 3 }}
-            onClick={handleStartEdit}
-          >
+          <LinkButton onClick={handleStartEdit} size="compact">
             {t('edit')}
           </LinkButton>
         )
@@ -143,6 +146,7 @@ const RulesActionRow = ({
 const RulesListItem = styled(Stack)`
   ${({ theme }) => css`
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
+    align-items: center;
     ${createFontStyles('body-4')}
     line-height: 240%;
 
