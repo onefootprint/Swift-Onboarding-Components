@@ -605,6 +605,7 @@ dependencies = [
  "geoutils",
  "gethostname",
  "http",
+ "hyper",
  "idv",
  "itertools",
  "jsonpath_lib",

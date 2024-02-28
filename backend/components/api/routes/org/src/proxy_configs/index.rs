@@ -7,7 +7,7 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
-use api_core::proxy::validate_not_footprint_url;
+use api_core::proxy::ssrf_protection::validate_safe_url;
 use api_wire_types::{CreateProxyConfigRequest, GetProxyConfigRequest, PatchProxyConfigRequest};
 use db::{
     models::proxy_config::{NewProxyConfigArgs, ProxyConfig, ProxyConfigFilters, UpdateProxyConfigArgs},
@@ -148,7 +148,7 @@ pub async fn post(
         .collect::<Result<Vec<_>, _>>()?;
 
     let url = url::Url::parse(&url).map_err(|_| VaultProxyError::InvalidDestinationUrl)?;
-    validate_not_footprint_url(&url)?;
+    validate_safe_url(&url)?;
     let method = reqwest::Method::from_str(&method).map_err(|_| VaultProxyError::InvalidDestinationMethod)?;
 
     // ingress

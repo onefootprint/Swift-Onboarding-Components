@@ -220,6 +220,33 @@ class TestVaultProxy:
 
         assert result["message"] == "hello world"
 
+
+    def test_proxy_ssrf_protection(self, sandbox_tenant):
+        for url in [
+            "http://localhost/foo",
+            "http://example.com:8443",
+            "http://127.0.0.1/",
+            "http://magic.127.0.0.1.nip.io/example", # Resolves to 127.0.0.1
+            "http://169.254.170.2/v2/metadata",
+            "http://magic.169.254.170.2.nip.io/example",
+            "ftp://myserver.com",
+        ]:
+            response = _make_request(
+                method=requests.post,
+                path="vault_proxy/jit",
+                data={},
+                params=None,
+                status_code=400,
+                auths=[
+                    sandbox_tenant.sk.key,
+                    FwdTestHeader("test1234"),
+                    ProxyDestinationHeader(url),
+                    ProxyAccessReason("test reason"),
+                ],
+                files=None,
+            )
+
+
     def test_ingress(self, sandbox_tenant):
         # create the vault
         body = post("users/", None, sandbox_tenant.sk.key)

@@ -1,9 +1,11 @@
-use super::{config::EgressConfig, validate_not_footprint_url};
+use super::{
+    config::EgressConfig,
+    ssrf_protection::{validate_safe_url, PublicIpDNSResolver},
+};
 use crate::{
     errors::{proxy::VaultProxyError, ApiError, ApiResult},
     State,
 };
-
 use bytes::Bytes;
 use chrono::Utc;
 use db::models::{
@@ -12,6 +14,7 @@ use db::models::{
 };
 use newtypes::{PiiString, ProxyConfigId};
 use reqwest::{header::HeaderMap, StatusCode};
+use std::sync::Arc;
 
 pub struct ProxyResponse {
     pub status_code: StatusCode,
@@ -27,7 +30,13 @@ pub async fn proxy_request(
     body: PiiString,
     config: EgressConfig,
 ) -> Result<ProxyResponse, ApiError> {
+    // Prevent SSRF as much as possible before DNS resolution.
+    validate_safe_url(&config.url)?;
+
     let mut client = reqwest::Client::builder().use_rustls_tls();
+
+    // Prevent SSRF by blocking unsafe IPs resolved from DNS names.
+    client = client.dns_resolver(Arc::new(PublicIpDNSResolver::new()));
 
     if let Some(client_tls) = config.client_tls_credential {
         client = client.identity(client_tls.into_identity())
@@ -42,9 +51,6 @@ pub async fn proxy_request(
     }
 
     let client = client.build()?;
-
-    // Double check we aren't proxying to ourselves
-    validate_not_footprint_url(&config.url)?;
 
     // record the log
     let log = NewProxyRequestLog {

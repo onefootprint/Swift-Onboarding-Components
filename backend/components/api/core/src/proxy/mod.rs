@@ -2,9 +2,9 @@ pub mod config;
 pub mod detokenize;
 pub mod net_client;
 pub mod pii_parser;
+pub mod ssrf_protection;
 pub mod token_parser;
 pub mod tokenize;
-use crate::errors::{proxy::VaultProxyError, ApiResult};
 use enclave_proxy::{DataTransform, DataTransforms};
 use newtypes::{CountArgs, DateFormatArgs, EncryptArgs, FilterFunction, HmacSha256Args, ReplaceArgs};
 
@@ -55,27 +55,4 @@ fn filter_function_to_transform(value: &FilterFunction) -> DataTransform {
 
 pub fn get_transformer(ffs: &[FilterFunction]) -> DataTransforms {
     DataTransforms(to_data_transforms(ffs))
-}
-
-pub fn validate_not_footprint_url(url: &url::Url) -> ApiResult<()> {
-    if let Some(domain) = url.domain().as_ref() {
-        if domain.to_lowercase().ends_with("onefootprint.com") {
-            return Err(VaultProxyError::InvalidFootprintDestinationUrl.into());
-        }
-    }
-    Ok(())
-}
-
-#[cfg(test)]
-mod test {
-    use super::validate_not_footprint_url;
-    use test_case::test_case;
-
-    #[test_case("http://flerp.derp.com/hayes_valley" => true)]
-    #[test_case("https://api.onefootprint.com/vault_proxy/jit" => false)]
-    #[test_case("http://onefootprint.com" => false)]
-    fn test_validate_not_footprint_url(url: &str) -> bool {
-        let url = url::Url::parse(url).unwrap();
-        validate_not_footprint_url(&url).is_ok()
-    }
 }
