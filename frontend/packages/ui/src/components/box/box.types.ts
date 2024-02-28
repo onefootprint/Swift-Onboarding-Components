@@ -149,6 +149,8 @@ export type BoxStyleProps = {
   fontStyle?: keyof Theme['typography'];
   gap?: keyof Theme['spacing'];
   margin?: keyof Theme['spacing'];
+  marginInline?: keyof Theme['spacing'];
+  marginBlock?: keyof Theme['spacing'];
   marginBottom?: keyof Theme['spacing'];
   marginLeft?: keyof Theme['spacing'];
   marginRight?: keyof Theme['spacing'];
