@@ -25,14 +25,8 @@ const EditDataButton = ({
   isEmpty,
   texts,
 }: EditDataButtonProps) => (
-  <GrayContainer as="button" type="button" onClick={onClick} gap={3}>
-    <Stack
-      align="center"
-      justify="center"
-      height="24px"
-      width="24px"
-      marginRight={2}
-    >
+  <Button type="button" onClick={onClick}>
+    <Stack align="center" justify="center" height="24px" width="24px">
       <Icon />
     </Stack>
     <TextContainer data-private="true">{label}</TextContainer>
@@ -41,16 +35,17 @@ const EditDataButton = ({
       isEmpty={isEmpty}
       texts={texts}
     />
-  </GrayContainer>
+  </Button>
 );
 
-const GrayContainer = styled(Stack)`
+const Button = styled.button`
   ${({ theme }) => css`
     display: flex;
     border: none;
     cursor: pointer;
     user-select: none;
     min-height: 48px;
+    gap: ${theme.spacing[3]};
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
     border-radius: ${theme.borderRadius.default};
     background-color: ${theme.backgroundColor.secondary};

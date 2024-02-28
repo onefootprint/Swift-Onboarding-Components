@@ -21,7 +21,6 @@ const Stack = forwardRef<HTMLDivElement, StackProps>(
       inline,
       justify,
       right,
-      tag,
       ...props
     }: StackProps,
     ref,
@@ -32,7 +31,7 @@ const Stack = forwardRef<HTMLDivElement, StackProps>(
       flexDirection={direction}
       justifyContent={justify}
       ref={ref}
-      tag={tag}
+      tag={props.as}
       {...props}
     >
       {children}

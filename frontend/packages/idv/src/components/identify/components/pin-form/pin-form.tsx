@@ -60,7 +60,7 @@ const PinForm = ({
         testID="verification-form-pin-input"
         autoFocus
       />
-      <Stack height="32px">
+      <Stack height="32px" direction="column">
         <ResendButton
           isResendLoading={isResendLoading}
           onResend={onResend}
