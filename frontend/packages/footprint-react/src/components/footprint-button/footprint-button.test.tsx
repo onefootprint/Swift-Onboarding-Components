@@ -151,7 +151,7 @@ describe('Auth', () => {
     expect(onClickMock).toHaveBeenCalledTimes(1);
   });
 
-  it('should render button with authKey and updateLoginMethods', async () => {
+  it('should render button with authToken and updateLoginMethods', async () => {
     fpInitMock.mockClear();
     fpRenderMock.mockClear();
     const onClickMock = mock(noop);
@@ -162,8 +162,9 @@ describe('Auth', () => {
         label="envainaria"
         onClick={onClickMock}
         kind={FootprintComponentKind.Auth}
+        authToken="tok_"
+        updateLoginMethods
         dialogVariant="drawer"
-        publicKey="pk_"
         userData={{ 'id.phone_number': '+1234' }}
         options={{ showLogo: true }}
         l10n={{ locale: 'es-MX' }}
@@ -182,7 +183,7 @@ describe('Auth', () => {
     expect(fpInitMock).toHaveBeenCalledTimes(1);
     const fpInitArgs = JSON.stringify(fpInitMock.mock.calls[0], null, 0);
     expect(fpInitArgs).toEqual(
-      '[{"l10n":{"locale":"es-MX"},"kind":"auth","options":{"showLogo":true},"userData":{"id.phone_number":"+1234"},"variant":"drawer","publicKey":"pk_"}]',
+      '[{"l10n":{"locale":"es-MX"},"kind":"auth","options":{"showLogo":true},"userData":{"id.phone_number":"+1234"},"variant":"drawer","authToken":"tok_","updateLoginMethods":true}]',
     );
 
     /* footprint.init(fpInitArgs) */
