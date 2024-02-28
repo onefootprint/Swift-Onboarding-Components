@@ -16,9 +16,9 @@ const DMSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Footprint Auth',
-  applicationName: 'Auth',
-  keywords: ['Auth', 'Authentication', 'Footprint'],
+  title: 'Footprint - Partners',
+  applicationName: 'Partners',
+  keywords: ['Partners', 'Footprint'],
   other: {
     'app-commit-sha': String(COMMIT_SHA),
     'app-deployment-url': String(DEPLOYMENT_URL),
