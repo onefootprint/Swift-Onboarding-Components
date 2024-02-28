@@ -3,6 +3,7 @@ import type {
   BackgroundColor,
   BorderColor,
   BorderRadius,
+  BorderWidth,
   Color,
   Elevation,
   FontVariant,
@@ -68,6 +69,12 @@ const SB = styled.div<
             theme.borderRadius[value as BorderRadius]
           };`;
         }
+        if (prop.includes('borderWidth')) {
+          return `${toKebabCase(prop)}: ${
+            theme.borderWidth[value as BorderWidth]
+          };`;
+        }
+
         if (prop === 'backgroundColor') {
           return `background-color: ${
             theme.backgroundColor[value as BackgroundColor]

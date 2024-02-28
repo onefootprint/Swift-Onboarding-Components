@@ -21,6 +21,7 @@ export const styleKeyProps: string[] = [
   'borderPosition',
   'borderRadius',
   'borderSpacing',
+  'borderStyle',
   'borderWidth',
   'bottom',
   'boxSizing',

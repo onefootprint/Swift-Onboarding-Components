@@ -21,6 +21,7 @@ export type BoxStyleProps = {
   backgroundSize?: CSS.Property.BackgroundSize;
   borderCollapse?: CSS.Property.BorderCollapse;
   borderSpacing?: CSS.Property.BorderSpacing;
+  borderStyle?: CSS.Property.BorderStyle;
   bottom?: CSS.Property.Bottom;
   boxSizing?: CSS.Property.BoxSizing;
   clear?: CSS.Property.Clear;
