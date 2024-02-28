@@ -154,6 +154,7 @@ const FeaturesContainer = styled(motion.div)`
     gap: ${theme.spacing[8]};
     background-color: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[9]};

@@ -129,6 +129,7 @@ const ImageContainer = styled.div`
     background-color: ${theme.backgroundColor.tertiary};
     background-color: rgba(247, 247, 247, 0.4);
     backdrop-filter: (8px);
+    -webkit-backdrop-filter: (8px);
     overflow: hidden;
     width: 100%;
     height: 430px;

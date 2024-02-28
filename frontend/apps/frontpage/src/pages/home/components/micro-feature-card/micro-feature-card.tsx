@@ -19,7 +19,7 @@ const MicroFeatureCard = ({
   isDark,
   icon: Icon,
 }: MicroFeatureCardProps) => {
-  const icon = Icon && <Icon />;
+  const icon = Icon && <Icon color={isDark ? 'quinary' : 'primary'} />;
   return (
     <Container gridArea={gridArea} isDark={isDark}>
       <Title isDark={isDark}>

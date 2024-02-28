@@ -116,13 +116,15 @@ const Header = styled.header<{
       css`
         background-color: black;
         backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         opacity: 0.2;
       `}
-
+      
       ${background === 'light-glass' &&
       css`
         background: ${theme.backgroundColor.primary};
         backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         opacity: 0.2;
       `}
 

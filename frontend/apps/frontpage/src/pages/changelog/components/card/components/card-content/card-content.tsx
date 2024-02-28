@@ -102,6 +102,7 @@ const ImageContainer = styled.div`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     background-color: ${theme.backgroundColor.tertiary};
     background-color: rgba(247, 247, 247, 0.4);
+    -webkit-backdrop-filter: (8px);
     backdrop-filter: (8px);
     overflow: hidden;
     width: 100%;

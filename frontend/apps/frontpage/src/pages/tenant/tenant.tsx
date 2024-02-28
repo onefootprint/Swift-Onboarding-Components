@@ -170,6 +170,7 @@ const FeaturesContainer = styled(Stack)`
     box-shadow: ${theme.elevation[2]};
     background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[9]};

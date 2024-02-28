@@ -138,10 +138,11 @@ const Header = styled.header<{
 
     ${isFloating &&
     css`
+      -webkit-backdrop-filter: blur(15px) saturate(125%);
       backdrop-filter: blur(15px) saturate(125%);
       background-color: rgba(
-        ${$isOnDarkSection ? primitives.Gray0 : theme.backgroundColor.primary}
-          0.75
+        ${$isOnDarkSection ? primitives.Gray0 : theme.backgroundColor.primary},
+        0.75
       );
       border-bottom: ${theme.borderWidth[1]} solid
         ${$isOnDarkSection ? primitives.Gray700 : theme.borderColor.primary};

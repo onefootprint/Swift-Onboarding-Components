@@ -85,6 +85,7 @@ const DialogContainer = styled(motion.div)`
     border: 1px solid rgba(255, 255, 255, 0.47);
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
   `}
 `;
 

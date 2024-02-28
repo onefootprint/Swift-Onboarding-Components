@@ -54,7 +54,7 @@ const Cards = styled(Grid.Container)`
 
   ${media.greaterThan('md')`
     grid-template-columns: repeat(3, 1fr);
-    `}
+  `}
 `;
 
 const TitleContainer = styled.div`
