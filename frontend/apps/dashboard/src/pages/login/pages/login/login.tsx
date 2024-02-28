@@ -32,6 +32,7 @@ const Login = () => {
               fullWidth
               type="submit"
               onClick={handleGoggleButtonClick}
+              size="large"
             >
               {t('google')}
             </GoogleButton>
@@ -39,6 +40,7 @@ const Login = () => {
               onClick={() => router.push('/login/email')}
               variant="secondary"
               fullWidth
+              size="large"
             >
               {t('email')}
             </Button>

@@ -380,15 +380,15 @@ const tokens: Tokens = {
           height: p.buttonHeights.large,
           paddingHorizontal: p.spacing[7],
           typography: {
-            fontSize: p.typography['label-1'].fontSize,
-            fontWeight: p.typography['label-1'].fontWeight,
-            lineHeight: p.typography['label-1'].lineHeight,
+            fontSize: p.typography['label-3'].fontSize,
+            fontWeight: p.typography['label-3'].fontWeight,
+            lineHeight: p.typography['label-3'].lineHeight,
           },
         },
         default: {
           height: p.buttonHeights.default,
           paddingHorizontal: p.spacing[4],
-          typography: p.typography['label-3'],
+          typography: p.typography['label-4'],
         },
         compact: {
           height: p.buttonHeights.compact,
