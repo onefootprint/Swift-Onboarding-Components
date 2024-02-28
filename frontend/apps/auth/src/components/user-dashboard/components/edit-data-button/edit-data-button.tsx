@@ -25,8 +25,14 @@ const EditDataButton = ({
   isEmpty,
   texts,
 }: EditDataButtonProps) => (
-  <Container as="button" type="button" onClick={onClick} gap={3}>
-    <Stack align="center" justify="center" height="24px" width="24px">
+  <GrayContainer as="button" type="button" onClick={onClick} gap={3}>
+    <Stack
+      align="center"
+      justify="center"
+      height="24px"
+      width="24px"
+      marginRight={2}
+    >
       <Icon />
     </Stack>
     <TextContainer data-private="true">{label}</TextContainer>
@@ -35,11 +41,12 @@ const EditDataButton = ({
       isEmpty={isEmpty}
       texts={texts}
     />
-  </Container>
+  </GrayContainer>
 );
 
-const Container = styled(Stack)`
+const GrayContainer = styled(Stack)`
   ${({ theme }) => css`
+    display: flex;
     border: none;
     cursor: pointer;
     user-select: none;
