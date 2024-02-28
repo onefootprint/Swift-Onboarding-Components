@@ -23,7 +23,7 @@ dist
 *.pem
 .idea/
 *.tsbuildinfo
-*.mjs
+next-env.d.ts
 
 # debug
 npm-debug.log*
