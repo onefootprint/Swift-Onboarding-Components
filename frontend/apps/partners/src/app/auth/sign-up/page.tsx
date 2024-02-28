@@ -26,9 +26,10 @@ const Page = () => (
     elevation={1}
     position="relative"
   >
-    <StyledImage
+    <PenguinImage
       alt="Penguin"
       height={90}
+      priority
       src="/auth/penguin-create.png"
       width={135}
     />
@@ -57,7 +58,7 @@ const Page = () => (
   </Box>
 );
 
-const StyledImage = styled(Image)`
+const PenguinImage = styled(Image)`
   color: transparent;
   position: absolute;
   top: -90px;

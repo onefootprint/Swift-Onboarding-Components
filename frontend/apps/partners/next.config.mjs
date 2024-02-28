@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  i18n: {
-    locales: ['en', 'es'],
-    defaultLocale: 'en',
-  },
   compiler: { styledComponents: true },
   eslint: { ignoreDuringBuilds: true },
   transpilePackages: [

@@ -48,12 +48,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const getContent = () => (
       <IconContainer
-        tag="span"
-        justify="center"
+        $variant={variant}
         align="center"
         gap={3}
+        justify="center"
+        tag="span"
         visibility={loading ? 'hidden' : 'visible'}
-        variant={variant}
       >
         {PrefixIcon && <PrefixIcon color={iconColor || undefined} />}
         <LabelContainer>{children}</LabelContainer>
@@ -76,7 +76,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         size={size}
         tabIndex={0}
         type={type}
-        variant={variant}
+        $variant={variant}
       >
         {getContent()}
         <Box visibility={loading ? 'visible' : 'hidden'} position="absolute">
@@ -93,18 +93,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 const IconContainer = styled(Stack)<{
-  variant: ButtonVariant;
+  $variant: ButtonVariant;
 }>`
-  ${({ theme, variant }) => {
+  ${({ theme, $variant }) => {
     const { button } = theme.components;
 
     return css`
       svg[data-colored='false'] {
         path {
-          stroke: ${button.variant[variant].color};
+          stroke: ${button.variant[$variant].color};
         }
         rect {
-          stroke: ${button.variant[variant].color};
+          stroke: ${button.variant[$variant].color};
         }
       }
     `;
@@ -113,9 +113,9 @@ const IconContainer = styled(Stack)<{
 
 const ButtonContainer = styled.button<{
   size: ButtonSize;
-  variant: ButtonVariant;
+  $variant: ButtonVariant;
 }>`
-  ${({ theme, variant, size }) => {
+  ${({ theme, $variant, size }) => {
     const { button } = theme.components;
 
     return css`
@@ -127,52 +127,52 @@ const ButtonContainer = styled.button<{
       user-select: none;
       cursor: pointer;
       outline-offset: ${theme.spacing[2]};
-      background-color: ${button.variant[variant].bg};
-      color: ${button.variant[variant].color};
+      background-color: ${button.variant[$variant].bg};
+      color: ${button.variant[$variant].color};
       border-style: solid;
       border-width: ${button.borderWidth};
-      border-color: ${variant !== 'primary'
-        ? button.variant[variant].borderColor
+      border-color: ${$variant !== 'primary'
+        ? button.variant[$variant].borderColor
         : 'transparent'};
       border-radius: ${button.borderRadius};
       height: ${button.size[size].height};
       padding: 0 ${button.size[size].paddingHorizontal};
-      box-shadow: ${button.variant[variant].boxShadow};
+      box-shadow: ${button.variant[$variant].boxShadow};
       transition: ${button.transition};
 
       &:hover:enabled {
-        background-color: ${button.variant[variant].hover.bg};
-        border-color: ${button.variant[variant].hover.borderColor};
-        color: ${button.variant[variant].hover.color};
-        box-shadow: ${button.variant[variant].hover.boxShadow};
+        background-color: ${button.variant[$variant].hover.bg};
+        border-color: ${button.variant[$variant].hover.borderColor};
+        color: ${button.variant[$variant].hover.color};
+        box-shadow: ${button.variant[$variant].hover.boxShadow};
       }
 
       &:active:enabled {
-        background-color: ${button.variant[variant].active.bg};
-        border-color: ${button.variant[variant].active.borderColor};
-        color: ${button.variant[variant].active.color};
-        box-shadow: ${button.variant[variant].active.boxShadow};
+        background-color: ${button.variant[$variant].active.bg};
+        border-color: ${button.variant[$variant].active.borderColor};
+        color: ${button.variant[$variant].active.color};
+        box-shadow: ${button.variant[$variant].active.boxShadow};
       }
 
       &[data-loading='true'] {
-        background-color: ${button.variant[variant].loading.bg};
-        color: ${button.variant[variant].loading.color};
+        background-color: ${button.variant[$variant].loading.bg};
+        color: ${button.variant[$variant].loading.color};
         pointer-events: none;
 
         path {
-          fill: ${button.variant[variant].loading.color};
+          fill: ${button.variant[$variant].loading.color};
         }
       }
 
       &:disabled {
         cursor: initial;
-        background-color: ${button.variant[variant].disabled.bg};
-        border-color: ${button.variant[variant].disabled.borderColor};
-        color: ${button.variant[variant].disabled.color};
-        box-shadow: ${button.variant[variant].disabled.boxShadow};
+        background-color: ${button.variant[$variant].disabled.bg};
+        border-color: ${button.variant[$variant].disabled.borderColor};
+        color: ${button.variant[$variant].disabled.color};
+        box-shadow: ${button.variant[$variant].disabled.boxShadow};
 
         path {
-          fill: ${button.variant[variant].disabled.color} !important;
+          fill: ${button.variant[$variant].disabled.color} !important;
         }
       }
 
