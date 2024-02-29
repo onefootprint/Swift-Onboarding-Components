@@ -112,6 +112,7 @@ pub enum Reason {
     Arm7_32BitAndroidOld,
     PythonDetected,
     UnauthorizedRequestOrigin,
+    GolangDetected,
 }
 
 #[cfg(test)]

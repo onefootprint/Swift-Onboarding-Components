@@ -40,6 +40,7 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::Arm7_32BitAndroidOld => None,
         Reason::PythonDetected => None, // maybe BrowserAutomation?
         Reason::UnauthorizedRequestOrigin => None,
+        Reason::GolangDetected => None,
     }
 }
 
