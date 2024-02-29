@@ -1571,10 +1571,10 @@
             "step-up": {
               "title": "Step-up",
               "color": "info",
-              "subsection-title": "Step-up documents: ",
-              "step-up-identity-proof-of-ssn": "Identity card and Proof of SSN",
+              "subsection-title": "Documents: ",
+              "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
               "step-up-proof-of-address": "Proof of Address",
-              "step-up-identity": "Identity card"
+              "step-up-identity": "Identity document"
             },
             "pass-with-manual-review": {
               "title": "Pass + Manual review",
@@ -2474,10 +2474,10 @@
               "title": "Step-up",
               "subtitle": "User will be asked to scan or upload another document",
               "color": "info",
-              "subsection-title": "Step-up documents: ",
-              "step-up-identity-proof-of-ssn": "Identity card and Proof of SSN",
+              "subsection-title": "Documents: ",
+              "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
               "step-up-proof-of-address": "Proof of Address",
-              "step-up-identity": "Identity card"
+              "step-up-identity": "Identity document"
             },
             "pass-with-manual-review": {
               "title": "Pass + Manual review",

@@ -41,7 +41,7 @@ describe('<Rules />', () => {
         name: 'Step-up',
       });
       const identitySsnSubSection = within(stepUpSection).getByRole('group', {
-        name: 'Identity card and Proof of SSN',
+        name: 'Identity document and Proof of SSN',
       });
       expect(within(identitySsnSubSection).queryAllByRole('row')).toHaveLength(
         0,
@@ -55,7 +55,7 @@ describe('<Rules />', () => {
       expect(within(poaSubSection).queryAllByRole('row')).toHaveLength(0);
       expect(within(poaSubSection).getByText('None')).toBeInTheDocument();
       const identitySubSection = within(stepUpSection).getByRole('group', {
-        name: 'Identity card',
+        name: 'Identity document',
       });
       expect(within(identitySubSection).queryAllByRole('row')).toHaveLength(0);
       expect(within(identitySubSection).getByText('None')).toBeInTheDocument();
@@ -115,7 +115,7 @@ describe('<Rules />', () => {
       });
 
       const identitySsnSubSection = within(stepUpSection).getByRole('group', {
-        name: 'Identity card and Proof of SSN',
+        name: 'Identity document and Proof of SSN',
       });
       expect(within(identitySsnSubSection).getAllByRole('row')).toHaveLength(1);
       expect(
@@ -129,7 +129,7 @@ describe('<Rules />', () => {
       expect(within(poaSubSection).getByText('None')).toBeInTheDocument();
 
       const identitySubSection = within(stepUpSection).getByRole('group', {
-        name: 'Identity card',
+        name: 'Identity document',
       });
       expect(within(identitySubSection).queryAllByRole('row')).toHaveLength(0);
       expect(within(identitySubSection).getByText('None')).toBeInTheDocument();
