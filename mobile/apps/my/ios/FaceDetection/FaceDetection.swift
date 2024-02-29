@@ -10,8 +10,8 @@ public class FaceDetectionPlugin: FrameProcessorPlugin {
   private static let motionManager = CMMotionManager()
   private static let motionThreshold: Double = 0.05
   
-  public override init(options: [AnyHashable: Any]! = [:]) {
-    super.init(options: options)
+  public override init(proxy: VisionCameraProxyHolder, options: [AnyHashable: Any]! = [:]) {
+    super.init(proxy: proxy, options: options)
   }
   
   public static func isDeviceStable() -> Bool {

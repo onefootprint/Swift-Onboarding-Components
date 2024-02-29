@@ -7,8 +7,8 @@ import CoreMotion
 
 @objc(BarcodeDetectionPlugin)
 public class BarcodeDetectionPlugin: FrameProcessorPlugin {
-  public override init(options: [AnyHashable: Any]! = [:]) {
-    super.init(options: options)
+  public override init(proxy: VisionCameraProxyHolder, options: [AnyHashable: Any]! = [:]) {
+    super.init(proxy: proxy, options: options)
   }
   
   @available(iOS 13.0, *)
