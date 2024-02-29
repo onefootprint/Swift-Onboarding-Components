@@ -7,16 +7,20 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import type { RulesProps } from './rules';
-import Rules from './rules';
+import type { RuleSetResultsProps } from './rule-set-results';
+import RuleSetResults from './rule-set-results';
 import {
   ruleResultResponseFixture,
   selectRulesNotTriggered,
-} from './rules.test.config';
+} from './rules-set-results.test.config';
 
-const renderRules = ({ data, isLoading, errorMessage }: RulesProps) =>
+const renderRules = ({ data, isLoading, errorMessage }: RuleSetResultsProps) =>
   customRender(
-    <Rules data={data} isLoading={isLoading} errorMessage={errorMessage} />,
+    <RuleSetResults
+      data={data}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+    />,
   );
 
 describe('<Rules />', () => {

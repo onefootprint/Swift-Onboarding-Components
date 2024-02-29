@@ -191,6 +191,8 @@ export type {
   OnboardingDecisionEvent,
   OnboardingDecisionEventData,
   PreviousWatchlistChecksEventData,
+  StepUpDocument,
+  StepUpEventData,
   Timeline,
   TimelineEvent,
   VaultCreatedEvent,
@@ -201,6 +203,7 @@ export type {
   WorkflowTriggeredEventData,
 } from './timeline';
 export {
+  StepUpDocumentKind,
   TimelineEventKind,
   WatchlistCheckReasonCode,
   WatchlistCheckStatus,

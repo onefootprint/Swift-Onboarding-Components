@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { SignalShortInfoType } from '../../../../hooks/use-entity-match-signals/utils/transform-response';
+import type { SignalShortInfoType } from '../../hooks/use-entity-match-signals/utils/transform-response';
 
 type ValidationTimelineItemBodyProps = {
   signals: SignalShortInfoType[];

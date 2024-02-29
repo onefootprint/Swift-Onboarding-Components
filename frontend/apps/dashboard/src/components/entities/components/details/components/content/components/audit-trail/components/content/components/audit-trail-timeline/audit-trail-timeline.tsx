@@ -9,6 +9,7 @@ import type {
   LivenessEventData,
   OnboardingDecisionEventData,
   PreviousWatchlistChecksEventData,
+  StepUpEventData,
   Timeline as EntityTimeline,
   VaultCreatedEventData,
   WatchlistCheckEventData,
@@ -48,6 +49,7 @@ import {
   OnboardingDecisionEventBody,
   OnboardingDecisionEventHeader,
 } from './components/onboarding-decision-event';
+import { StepUpEventBody, StepUpEventHeader } from './components/step-up-event';
 import {
   WatchlistCheckEventBody,
   WatchlistCheckEventHeader,
@@ -198,6 +200,13 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
           <ExternalIntegrationCalledEventHeader data={eventData} />
         ),
         bodyComponent: <ExternalIntegrationCalledEventBody data={eventData} />,
+      });
+    } else if (kind === TimelineEventKind.stepUp) {
+      const eventData = data as StepUpEventData;
+      items.push({
+        time,
+        headerComponent: <StepUpEventHeader data={eventData} />,
+        bodyComponent: <StepUpEventBody data={eventData} />,
       });
     }
   });

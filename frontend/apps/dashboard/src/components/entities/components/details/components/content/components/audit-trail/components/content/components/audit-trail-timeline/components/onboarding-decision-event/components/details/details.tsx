@@ -5,9 +5,9 @@ import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
+import RuleSetResults from '../../../rule-set-results';
+import useEntityRuleSetResult from '../../../rule-set-results/hooks/use-entity-rule-set-result';
 import FieldValidations from './components/field-validations';
-import Rules from './components/rules';
-import useEntityRuleSetResult from './hooks/use-entity-rule-set-result';
 
 type DetailsProps = {
   ruleSetResultId?: string;
@@ -71,7 +71,7 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
               ))}
             </Tabs>
             {tab === 'rules' && (
-              <Rules
+              <RuleSetResults
                 data={data}
                 errorMessage={errorMessage}
                 isLoading={isLoading}

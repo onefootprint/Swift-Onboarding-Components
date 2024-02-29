@@ -1457,32 +1457,6 @@
                 }
               },
               "view-details": "View details",
-              "rules": {
-                "onboarding-decision": "Onboarding decision",
-                "triggered": "Rules triggered",
-                "not-triggered": "Rules not triggered",
-                "fail": {
-                  "title": "Fail",
-                  "color": "error"
-                },
-                "manual-review": {
-                  "title": "Fail + Manual review",
-                  "color": "warning"
-                },
-                "step-up": {
-                  "title": "Step-up",
-                  "color": "info",
-                  "subsection-title": "Step-up documents: ",
-                  "step-up-identity-proof-of-ssn": "Identity card and Proof of SSN",
-                  "step-up-proof-of-address": "Proof of Address",
-                  "step-up-identity": "Identity card"
-                },
-                "pass-with-manual-review": {
-                  "title": "Pass + Manual review",
-                  "color": "success"
-                },
-                "no-rules": "None"
-              },
               "field-validations": {
                 "attributes": {
                   "phone": "Phone number",
@@ -1567,6 +1541,46 @@
           "workflow-started-event": {
             "started-onboarding-onto": "Started onboarding onto",
             "started-uploading-document": "Started uploading document"
+          },
+          "step-up-event": {
+            "step-up-required": "<b>Step-up</b> required",
+            "details": {
+              "title": "Details",
+              "view-details": "View details"
+            },
+            "kind": {
+              "document-requested_one": "Document requested: ",
+              "document-requested_other": "Documents requested: ",
+              "identity": "Identity",
+              "proof-of-ssn": "Proof of SSN",
+              "proof-of-address": "Proof of address"
+            }
+          },
+          "rule-set-results": {
+            "onboarding-decision": "Onboarding decision",
+            "triggered": "Rules triggered",
+            "not-triggered": "Rules not triggered",
+            "fail": {
+              "title": "Fail",
+              "color": "error"
+            },
+            "manual-review": {
+              "title": "Fail + Manual review",
+              "color": "warning"
+            },
+            "step-up": {
+              "title": "Step-up",
+              "color": "info",
+              "subsection-title": "Step-up documents: ",
+              "step-up-identity-proof-of-ssn": "Identity card and Proof of SSN",
+              "step-up-proof-of-address": "Proof of Address",
+              "step-up-identity": "Identity card"
+            },
+            "pass-with-manual-review": {
+              "title": "Pass + Manual review",
+              "color": "success"
+            },
+            "no-rules": "None"
           }
         }
       },

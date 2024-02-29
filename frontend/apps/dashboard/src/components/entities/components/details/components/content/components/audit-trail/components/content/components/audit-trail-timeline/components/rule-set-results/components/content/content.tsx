@@ -22,8 +22,7 @@ const Content = ({
   actionTriggered,
 }: ContentProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.rules',
+    keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
   });
   const isStepUpSubsection = [
     RuleAction.stepUpIdentity,

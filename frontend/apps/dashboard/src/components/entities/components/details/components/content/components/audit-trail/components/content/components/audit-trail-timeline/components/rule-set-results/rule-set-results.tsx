@@ -5,7 +5,7 @@ import Content from './components/content';
 import Error from './components/error';
 import Loading from './components/loading';
 
-export type RulesProps = {
+export type RuleSetResultsProps = {
   data?: Record<
     string,
     | boolean
@@ -17,7 +17,11 @@ export type RulesProps = {
   errorMessage?: string;
 };
 
-const Rules = ({ data, isLoading, errorMessage }: RulesProps) => (
+const RuleSetResults = ({
+  data,
+  isLoading,
+  errorMessage,
+}: RuleSetResultsProps) => (
   <>
     {data && (
       <Content
@@ -33,4 +37,4 @@ const Rules = ({ data, isLoading, errorMessage }: RulesProps) => (
   </>
 );
 
-export default Rules;
+export default RuleSetResults;

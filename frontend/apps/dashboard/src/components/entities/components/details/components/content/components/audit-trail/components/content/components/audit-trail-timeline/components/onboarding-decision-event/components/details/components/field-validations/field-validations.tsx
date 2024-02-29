@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
 import styled from 'styled-components';
 
-import useEntityMatchSignals from '../../hooks/use-entity-match-signals';
 import Error from './components/error';
 import Loading from './components/loading';
 import {
@@ -12,6 +11,7 @@ import {
   ValidationTimelineItemHeader,
   ValidationTimelineItemIcon,
 } from './components/validation-timeline-item';
+import useEntityMatchSignals from './hooks/use-entity-match-signals';
 
 export type FieldValidationsProps = {
   entityId: string;

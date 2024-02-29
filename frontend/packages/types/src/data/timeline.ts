@@ -30,6 +30,7 @@ export enum TimelineEventKind {
   workflowStarted = 'workflow_started',
   authMethodUpdated = 'auth_method_updated',
   externalIntegrationCalled = 'external_integration_called',
+  stepUp = 'step_up',
 }
 
 export type LabelAddedEvent = {
@@ -197,6 +198,24 @@ export type PreviousWatchlistChecksEventData = {
   timestamp: string;
 }[];
 
+export type StepUpEvent = {
+  kind: TimelineEventKind.stepUp;
+  data: StepUpEventData;
+};
+
+export type StepUpEventData = StepUpDocument[];
+
+export type StepUpDocument = {
+  kind: StepUpDocumentKind;
+  ruleSetResultId: string;
+};
+
+export enum StepUpDocumentKind {
+  identity = 'identity',
+  proofOfSsn = 'proof_of_ssn',
+  proofOfAddress = 'proof_of_address',
+}
+
 export type TimelineEvent = {
   event:
     | LabelAddedEvent
@@ -211,7 +230,8 @@ export type TimelineEvent = {
     | WorkflowTriggeredEvent
     | WorkflowStartedEvent
     | AuthMethodUpdatedEvent
-    | ExternalIntegrationCalledEvent;
+    | ExternalIntegrationCalledEvent
+    | StepUpEvent;
   timestamp: string;
 };
 
