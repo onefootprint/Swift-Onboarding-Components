@@ -175,9 +175,11 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
-        requested_by_tenant_user_id -> Text,
-        spec_id -> Text,
-        assigned_to_tenant_id -> Text,
+        name -> Text,
+        description -> Text,
+        template_version_id -> Nullable<Text>,
+        tenant_compliance_partnership_id -> Text,
+        requested_by_partner_tenant_user_id -> Text,
         assigned_to_tenant_user_id -> Nullable<Text>,
     }
 }
@@ -191,26 +193,9 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         submission_id -> Text,
-        reviewed_by_tenant_user_id -> Text,
+        reviewed_by_partner_tenant_user_id -> Text,
         decision -> Text,
         note -> Text,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    compliance_doc_spec (id) {
-        id -> Text,
-        created_at -> Timestamptz,
-        updated_at -> Nullable<Timestamptz>,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-        deactivated_at -> Nullable<Timestamptz>,
-        owner_partner_tenant_id -> Text,
-        name -> Text,
-        description -> Text,
-        is_template -> Bool,
     }
 }
 
@@ -224,8 +209,35 @@ diesel::table! {
         _updated_at -> Timestamptz,
         request_id -> Text,
         submitted_by_tenant_user_id -> Text,
-        s3_url -> Text,
-        e_data_key -> Bytea,
+        assigned_to_partner_tenant_user_id -> Nullable<Text>,
+        doc_data -> Jsonb,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    compliance_doc_template (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        partner_tenant_id -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    compliance_doc_template_version (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_by_partner_tenant_user_id -> Text,
+        template_id -> Text,
+        name -> Text,
+        description -> Text,
     }
 }
 
@@ -1070,7 +1082,8 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
-    tenant_compliance_partnership (tenant_id, partner_tenant_id) {
+    tenant_compliance_partnership (id) {
+        id -> Text,
         tenant_id -> Text,
         partner_tenant_id -> Text,
         _created_at -> Timestamptz,
@@ -1412,13 +1425,14 @@ diesel::joinable!(auth_event -> webauthn_credential (webauthn_credential_id));
 diesel::joinable!(billing_event -> ob_configuration (ob_configuration_id));
 diesel::joinable!(billing_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(billing_profile -> tenant (tenant_id));
-diesel::joinable!(compliance_doc_request -> compliance_doc_spec (spec_id));
-diesel::joinable!(compliance_doc_request -> tenant (assigned_to_tenant_id));
+diesel::joinable!(compliance_doc_request -> compliance_doc_template_version (template_version_id));
+diesel::joinable!(compliance_doc_request -> tenant_compliance_partnership (tenant_compliance_partnership_id));
 diesel::joinable!(compliance_doc_review -> compliance_doc_submission (submission_id));
-diesel::joinable!(compliance_doc_review -> tenant_user (reviewed_by_tenant_user_id));
-diesel::joinable!(compliance_doc_spec -> partner_tenant (owner_partner_tenant_id));
+diesel::joinable!(compliance_doc_review -> tenant_user (reviewed_by_partner_tenant_user_id));
 diesel::joinable!(compliance_doc_submission -> compliance_doc_request (request_id));
-diesel::joinable!(compliance_doc_submission -> tenant_user (submitted_by_tenant_user_id));
+diesel::joinable!(compliance_doc_template -> partner_tenant (partner_tenant_id));
+diesel::joinable!(compliance_doc_template_version -> compliance_doc_template (template_id));
+diesel::joinable!(compliance_doc_template_version -> tenant_user (created_by_partner_tenant_user_id));
 diesel::joinable!(contact_info -> data_lifetime (lifetime_id));
 diesel::joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
 diesel::joinable!(data_lifetime -> vault (vault_id));
@@ -1527,8 +1541,9 @@ diesel::allow_tables_to_appear_in_same_query!(
     business_owner,
     compliance_doc_request,
     compliance_doc_review,
-    compliance_doc_spec,
     compliance_doc_submission,
+    compliance_doc_template,
+    compliance_doc_template_version,
     contact_info,
     custom_migration,
     data_lifetime,
