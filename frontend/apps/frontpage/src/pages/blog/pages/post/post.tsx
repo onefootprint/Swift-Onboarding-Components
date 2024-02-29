@@ -28,9 +28,9 @@ const Post = ({ post }: PostProps) => {
         image={post.og_image}
         kind="article"
         og={{
-          description: post.og_description,
-          image: post.og_image,
-          title: post.og_title,
+          description: post.twitter_description || post.og_description,
+          image: post.twitter_image || post.og_image,
+          title: post.twitter_title,
           author: post.primary_author.name,
         }}
         slug={`/blog/${post.slug}`}
