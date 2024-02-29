@@ -60,6 +60,7 @@ impl StartOnboarding {
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
+                let ivs = IncodeVerificationSession::lock(conn, &incode_session.id)?;
                 let next_state = AddFront::new();
 
                 // Update our state to the next stage, saving the auth token needed for all other
@@ -69,7 +70,7 @@ impl StartOnboarding {
                     IncodeSessionId::from(successful_response.interview_id),
                     IncodeAuthorizationToken::from(successful_response.token.leak_to_string()),
                 );
-                IncodeVerificationSession::update(conn, &incode_session.id, update)?;
+                IncodeVerificationSession::update(ivs, conn, update)?;
 
                 Ok(())
             })

@@ -29,6 +29,11 @@ pub enum StateError {
     UnexpectedConfigForWorkflow(newtypes::WorkflowConfig, WorkflowId),
     #[error("Attempted to transition state, but state has been modified. Expected: {0}, found state: {1}")]
     ConcurrentStateChange(newtypes::WorkflowState, newtypes::WorkflowState),
+    #[error("IncodeMachine: Attempted to transition state, but state has been modified. Expected: {0}, found state: {1}")]
+    IncodeMachineConcurrentStateChange(
+        newtypes::IncodeVerificationSessionState,
+        newtypes::IncodeVerificationSessionState,
+    ),
     #[error("Error initializing state {0}: {1}")]
     StateInitError(String, String),
     #[error("Cannot materialize {0} into WorkflowActions")]

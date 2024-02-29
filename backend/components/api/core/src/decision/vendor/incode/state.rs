@@ -5,7 +5,7 @@ use super::{
     },
     IncodeContext,
 };
-use crate::{errors::ApiResult, vendor_clients::IncodeClients};
+use crate::{decision::state::StateError, errors::ApiResult, vendor_clients::IncodeClients};
 use async_trait::async_trait;
 use db::{
     models::{
@@ -128,6 +128,13 @@ where
 
         let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
+                let ivs = IncodeVerificationSession::lock(conn, &session.id)?;
+                if ivs.state != starting_state.name() {
+                    Err(StateError::IncodeMachineConcurrentStateChange(
+                        starting_state.name(),
+                        ivs.state,
+                    ))?
+                }
                 let result = init_state.transition(conn, &ctx, &session)?;
                 let TransitionResult {
                     failure_reasons: all_failure_reasons,
@@ -217,7 +224,7 @@ where
                     AddConsent::enter(conn, &ctx.id_doc_id)?;
                 }
 
-                let ivs = IncodeVerificationSession::update(conn, &session.id, update)?;
+                let ivs = IncodeVerificationSession::update(ivs, conn, update)?;
                 // refresh our VerificationSession object that we pass around from IncodeState to IncodeState
                 let session = session.refresh(&ivs);
 

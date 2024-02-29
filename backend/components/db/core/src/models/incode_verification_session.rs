@@ -8,7 +8,7 @@ use diesel::{pg::Pg, prelude::*};
 use newtypes::{
     DocumentSide, IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeEnvironment,
     IncodeFailureReason, IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
-    IncodeVerificationSessionState, WorkflowId,
+    IncodeVerificationSessionState, Locked, WorkflowId,
 };
 
 use super::incode_verification_session_event::IncodeVerificationSessionEvent;
@@ -160,12 +160,12 @@ impl IncodeVerificationSession {
 
     #[tracing::instrument("IncodeVerificationSession::update", skip_all)]
     pub fn update(
+        session: Locked<Self>,
         conn: &mut TxnPgConn,
-        id: &IncodeVerificationSessionId,
         update: UpdateIncodeVerificationSession,
     ) -> DbResult<Self> {
         let res: IncodeVerificationSession = diesel::update(incode_verification_session::table)
-            .filter(incode_verification_session::id.eq(id))
+            .filter(incode_verification_session::id.eq(&session.id))
             .set(update)
             .get_result(conn.conn())?;
 
@@ -219,6 +219,15 @@ impl IncodeVerificationSession {
             .optional()?;
 
         Ok(res)
+    }
+
+    #[tracing::instrument("IncodeVerificationSession::lock", skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, id: &IncodeVerificationSessionId) -> DbResult<Locked<Self>> {
+        let result = incode_verification_session::table
+            .filter(incode_verification_session::id.eq(id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
     }
 }
 

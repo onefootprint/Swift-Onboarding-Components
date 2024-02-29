@@ -162,10 +162,13 @@ async fn on_incode_hard_error(
     db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &id_doc_id)?;
+
             if let Some(ivs) = ivs {
+                // non-ideal, but prob fine to double query for this rare case
+                let locked_ivs = IncodeVerificationSession::lock(conn, &ivs.id)?;
                 IncodeVerificationSession::update(
+                    locked_ivs,
                     conn,
-                    &ivs.id,
                     UpdateIncodeVerificationSession::set_hard_error(format!("{:?}", err)),
                 )?;
             }
