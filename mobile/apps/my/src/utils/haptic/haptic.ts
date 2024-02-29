@@ -1,10 +1,13 @@
+import { Platform } from 'react-native';
 import Haptic from 'react-native-haptic-feedback';
 
 const haptic = {
   trigger: (
     level: 'impactLight' | 'impactMedium' | 'impactHeavy' | 'rigid' | 'soft',
   ) => {
-    Haptic.trigger(level);
+    if (Platform.OS === 'ios') {
+      Haptic.trigger(level);
+    }
   },
 };
 
