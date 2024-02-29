@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
-import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
@@ -446,13 +445,11 @@ const Camera = ({
           )}
         </VideoContainer>
         {isDesktop(deviceKind) && (
-          <StickyBottomBox>
-            <CaptureButton
-              onClick={() => handleClick('manual')}
-              disabled={!isCameraVisible || !videoSize}
-              variant="default"
-            />
-          </StickyBottomBox>
+          <CaptureButton
+            onClick={() => handleClick('manual')}
+            disabled={!isCameraVisible || !videoSize}
+            variant="default"
+          />
         )}
         <PlayPermissionDialog
           open={showPlayAllowDialog}
@@ -472,13 +469,12 @@ const LoadingContainer = styled.div<{
     width: 100%;
     display: flex;
     justify-content: center;
-    align-content: center;
+    align-items: center;
 
     &[data-device-kind='desktop'] {
       min-height: ${desktopHeight}px;
       background-color: ${theme.backgroundColor.secondary};
       border-radius: ${theme.borderRadius.default};
-      margin-bottom: calc(-1 * ${theme.spacing[8]});
 
       ${media.lessThan('md')`
         padding: 0 ${theme.spacing[3]}; 
@@ -515,7 +511,6 @@ const VideoContainer = styled.div`
 
     &[data-device-kind='desktop'] {
       width: 100%;
-      margin-bottom: calc(-1 * ${theme.spacing[8]});
 
       ${media.lessThan('md')`
         padding: 0 ${theme.spacing[3]}; 

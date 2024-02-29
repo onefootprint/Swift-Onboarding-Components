@@ -12,7 +12,6 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import useProcessImage from '../../hooks/use-process-image';
@@ -168,16 +167,14 @@ const DesktopPhotoPrompt = ({
           onChange={handleImageUpload}
         />
       </DraggableInputField>
-      <StickyBottomBox>
-        <Button
-          fullWidth
-          disabled={isLoading}
-          onClick={isRetry ? handleUpload : handleError}
-          size="large"
-        >
-          {isRetry ? t('choose-different-file') : t('continue')}
-        </Button>
-      </StickyBottomBox>
+      <Button
+        fullWidth
+        disabled={isLoading}
+        onClick={isRetry ? handleUpload : handleError}
+        size="large"
+      >
+        {isRetry ? t('choose-different-file') : t('continue')}
+      </Button>
     </Container>
   );
 };
@@ -187,7 +184,6 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
-    margin-bottom: calc(-1 * ${theme.spacing[8]});
 
     ${media.lessThan('md')`
       padding: 0 ${theme.spacing[3]}; 

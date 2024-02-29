@@ -8,7 +8,6 @@ import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import Logger from '../../../../utils/logger';
 import DesktopHeader from '../../components/desktop-header';
 import IdDocAnimation from '../../components/id-doc-animation';
@@ -223,16 +222,14 @@ const DeskTopProcessing = () => {
           hasNextSide={false} // Although we might have next side, we don't want to show it in the animation for desktop
         />
       </FeedbackContainer>
-      <StickyBottomBox>
-        <Button
-          fullWidth
-          disabled={mode === 'loading'}
-          onClick={handleNextStep}
-          size="large"
-        >
-          {t('continue')}
-        </Button>
-      </StickyBottomBox>
+      <Button
+        fullWidth
+        disabled={mode === 'loading'}
+        onClick={handleNextStep}
+        size="large"
+      >
+        {t('continue')}
+      </Button>
     </Container>
   );
 };
@@ -242,7 +239,6 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
-    margin-bottom: calc(-1 * ${theme.spacing[8]});
 
     ${media.lessThan('md')`
       padding: 0 ${theme.spacing[3]}; 
