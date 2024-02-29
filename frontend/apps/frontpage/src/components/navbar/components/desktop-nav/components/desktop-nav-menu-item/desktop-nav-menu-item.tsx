@@ -14,15 +14,18 @@ type DesktopNavMenuItemProps = {
 const DesktopNavMenuItem = ({
   item,
   $isOnDarkSection,
-}: DesktopNavMenuItemProps) => (
-  <StyledLink href={item.href} $isOnDarkSection={$isOnDarkSection}>
-    <item.iconComponent />
-    <ItemText>
-      <Title $isOnDarkSection={$isOnDarkSection}>{item.text}</Title>
-      <Subtitle $isOnDarkSection={$isOnDarkSection}>{item.subtext}</Subtitle>
-    </ItemText>
-  </StyledLink>
-);
+}: DesktopNavMenuItemProps) => {
+  const Icon = item.iconComponent;
+  return (
+    <StyledLink href={item.href} $isOnDarkSection={$isOnDarkSection}>
+      <Icon />
+      <ItemText>
+        <Title $isOnDarkSection={$isOnDarkSection}>{item.text}</Title>
+        <Subtitle $isOnDarkSection={$isOnDarkSection}>{item.subtext}</Subtitle>
+      </ItemText>
+    </StyledLink>
+  );
+};
 
 const ItemText = styled.div`
   ${({ theme }) => css`
@@ -63,14 +66,10 @@ const StyledLink = styled(NavigationMenu.Link)<{ $isOnDarkSection?: boolean }>`
     text-decoration: none;
     transition: all 0.1s ease-in-out;
 
-    @media (hover: hover) {
-      :hover {
-        background-color: ${
-          $isOnDarkSection
-            ? primitives.Gray800
-            : theme.backgroundColor.secondary
-        };
-      }
+    &:hover {
+      background-color: ${
+        $isOnDarkSection ? primitives.Gray800 : theme.backgroundColor.secondary
+      };
     }
     :focus {
       background-color: ${
