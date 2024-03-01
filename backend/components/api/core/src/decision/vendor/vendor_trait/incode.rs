@@ -21,7 +21,7 @@ use idv::{
             response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
             IncodeUpdatedWatchlistResultRequest, IncodeWatchlistCheckRequest,
         },
-        IncodeAPIResult, IncodeResponse, IncodeStartOnboardingRequest,
+        IncodeResponse, IncodeStartOnboardingRequest,
     },
     ParsedResponse,
 };
@@ -51,10 +51,7 @@ impl VendorAPICall<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartR
                 request.custom_name_fields,
             )
             .await?;
-        let result = IncodeResponse::<OnboardingStartResponse> {
-            result: IncodeAPIResult::<OnboardingStartResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_response(raw_response).await;
 
         Ok(result)
     }
@@ -92,10 +89,7 @@ impl VendorAPICall<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>, Incod
         let raw_response = authenticated_client
             .add_document(self, request.docv_data, DocumentSide::Front)
             .await?;
-        let result = IncodeResponse::<AddSideResponse> {
-            result: IncodeAPIResult::<AddSideResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_response(raw_response).await;
 
         Ok(result)
     }
@@ -135,11 +129,7 @@ impl VendorAPICall<IncodeAddBackRequest, IncodeResponse<AddSideResponse>, Incode
         let raw_response = authenticated_client
             .add_document(self, request.docv_data, DocumentSide::Back)
             .await?;
-        let result = IncodeResponse::<AddSideResponse> {
-            result: IncodeAPIResult::<AddSideResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
-
+        let result = IncodeResponse::from_response(raw_response).await;
         Ok(result)
     }
 }
@@ -159,10 +149,7 @@ impl VendorAPICall<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>, In
             AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
 
         let raw_response = authenticated_client.process_id(self).await?;
-        let result = IncodeResponse::<ProcessIdResponse> {
-            result: IncodeAPIResult::<ProcessIdResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_response(raw_response).await;
 
         Ok(result)
     }
@@ -199,10 +186,7 @@ impl VendorAPICall<IncodeFetchScoresRequest, IncodeResponse<FetchScoresResponse>
             AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
 
         let raw_response = authenticated_client.fetch_scores(self).await?;
-        let result = IncodeResponse::<FetchScoresResponse> {
-            result: IncodeAPIResult::<FetchScoresResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_response(raw_response).await;
 
         Ok(result)
     }
@@ -244,10 +228,7 @@ impl VendorAPICall<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResp
         let raw_response = authenticated_client
             .add_privacy_consent(self, request.title, request.content)
             .await?;
-        let result = IncodeResponse::<AddConsentResponse> {
-            result: IncodeAPIResult::<AddConsentResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_response(raw_response).await;
 
         Ok(result)
     }
@@ -268,10 +249,7 @@ impl VendorAPICall<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>
             AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
 
         let raw_response = authenticated_client.add_ml_consent(self, request.status).await?;
-        let result = IncodeResponse::<AddConsentResponse> {
-            result: IncodeAPIResult::<AddConsentResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_response(raw_response).await;
 
         Ok(result)
     }
@@ -308,10 +286,7 @@ impl VendorAPICall<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>, Inco
             AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
 
         let raw_response = authenticated_client.fetch_ocr(self).await?;
-        let result = IncodeResponse::<FetchOCRResponse> {
-            result: IncodeAPIResult::<FetchOCRResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_response(raw_response).await;
 
         Ok(result)
     }
@@ -347,10 +322,7 @@ impl VendorAPICall<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>, In
             AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
 
         let raw_response = authenticated_client.add_selfie(self, request.docv_data).await?;
-        let result = IncodeResponse::<AddSelfieResponse> {
-            result: IncodeAPIResult::<AddSelfieResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_response(raw_response).await;
 
         Ok(result)
     }
@@ -386,12 +358,7 @@ impl VendorAPICall<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>
             AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
 
         let raw_response = authenticated_client.process_face(self).await?;
-
-        let result = IncodeResponse::<ProcessFaceResponse> {
-            result: IncodeAPIResult::<ProcessFaceResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
-
+        let result = IncodeResponse::from_response(raw_response).await;
         Ok(result)
     }
 }
@@ -438,10 +405,7 @@ impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardin
             )
             .await?;
 
-        let result = IncodeResponse::<GetOnboardingStatusResponse> {
-            result: IncodeAPIResult::<GetOnboardingStatusResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_value(raw_response);
 
         Ok(result)
     }
@@ -495,10 +459,7 @@ impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultRe
             )
             .await?;
 
-        let result = IncodeResponse::<WatchlistResultResponse> {
-            result: IncodeAPIResult::<WatchlistResultResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_value(raw_response);
 
         Ok(result)
     }
@@ -545,10 +506,7 @@ impl
             .updated_watchlist_result(self, &request.ref_)
             .await?;
 
-        let result = IncodeResponse::<UpdatedWatchlistResultResponse> {
-            result: IncodeAPIResult::<UpdatedWatchlistResultResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
+        let result = IncodeResponse::from_value(raw_response);
 
         Ok(result)
     }

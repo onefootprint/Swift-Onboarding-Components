@@ -1,4 +1,4 @@
-use crate::incode::{response::Error, APIResponseToIncodeError};
+use crate::incode::{response::Error, IncodeClientErrorCustomFailureReasons};
 use chrono::{DateTime, Utc};
 use derive_more::Deref;
 use newtypes::{
@@ -6,21 +6,13 @@ use newtypes::{
     ScrubbedPiiString,
 };
 
-impl APIResponseToIncodeError for WatchlistResultResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for WatchlistResultResponse {
     fn custom_failure_reasons(_error: Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }
 }
 
-impl APIResponseToIncodeError for UpdatedWatchlistResultResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.0.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for UpdatedWatchlistResultResponse {
     fn custom_failure_reasons(_error: Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }
@@ -33,9 +25,6 @@ pub struct UpdatedWatchlistResultResponse(pub WatchlistResultResponse);
 pub struct WatchlistResultResponse {
     pub status: Option<String>,
     pub content: Option<Content>,
-    // havent been able to trigger one but lets assume its the same as for the doc endpoints
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]

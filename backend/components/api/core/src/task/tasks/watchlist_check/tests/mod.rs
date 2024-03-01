@@ -239,11 +239,11 @@ fn mock_incode_updated_watchlist_result(state: &mut State, vendor_result: &Vendo
             result: IncodeAPIResult::Success(UpdatedWatchlistResultResponse(v)),
             raw_response: r.raw_response,
         },
-        IncodeAPIResult::ResponseError(e) => IncodeResponse {
-            result: IncodeAPIResult::ResponseError(e),
+        IncodeAPIResult::ResponseErrorHandled(e) => IncodeResponse {
+            result: IncodeAPIResult::ResponseErrorHandled(e),
             raw_response: r.raw_response,
         },
-        IncodeAPIResult::ResponseErrorOther(_) => unimplemented!("not tested"),
+        IncodeAPIResult::ResponseErrorUnhandled(_) => unimplemented!("not tested"),
     });
 
     let mut mock_incode_start_onboarding = MockVendorAPICall::<

@@ -1,13 +1,15 @@
 use std::{collections::HashMap, str::FromStr};
 
 use crate::{
-    incode::{error::Error as IncodeError, response::Error, APIResponseToIncodeError},
+    incode::{error::Error as IncodeError, IncodeClientErrorCustomFailureReasons},
     test_fixtures::{self, DocTestOpts},
 };
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use itertools::Itertools;
 use newtypes::{
-    incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType, IncodeStatus, IncodeTest},
+    incode::{
+        IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType, IncodeStatus, IncodeTest,
+    },
     IdDocKind, IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
     Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiInt, ScrubbedPiiLong,
     ScrubbedPiiString, DATE_FORMAT,
@@ -30,14 +32,13 @@ pub struct AddSideResponse {
     pub sharpness: Option<i32>,
     pub type_of_id: Option<IncodeDocumentType>,
     pub fail_reason: Option<String>,
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
 
 // https://onefootprint.slack.com/archives/C0514LEFUCS/p1692735019118229
 // Only for US atm
 // No documentation for these enum values
-const DRIVERS_LICENSE_PERMIT_IDENTIFIERS: [&str; 9] = [ // TODO: replace with IncodeDocumentSubType
+const DRIVERS_LICENSE_PERMIT_IDENTIFIERS: [&str; 9] = [
+    // TODO: replace with IncodeDocumentSubType
     "LEARNERS_PERMIT",
     "LEARNERS_PERMIT_UNDER21",
     "PROVISIONAL_DRIVERS_LICENSE_UNDER21",
@@ -91,16 +92,14 @@ impl AddSideResponse {
 
     pub fn document_sub_type(&self) -> Option<IncodeDocumentSubType> {
         // note: DL's will have this last token be the state and not really a document subtype which is kinda annoying
-        self.issue_name.as_ref().and_then(|i| i.split(' ').last()).and_then(|s| IncodeDocumentSubType::from_str(s).ok())
+        self.issue_name
+            .as_ref()
+            .and_then(|i| i.split(' ').last())
+            .and_then(|s| IncodeDocumentSubType::from_str(s).ok())
     }
-
 }
 
-impl APIResponseToIncodeError for AddSideResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for AddSideResponse {
     fn custom_failure_reasons(error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         let e = match error.status {
             1003 => vec![IncodeFailureReason::FaceCroppingFailure],
@@ -118,15 +117,9 @@ impl APIResponseToIncodeError for AddSideResponse {
 #[serde(rename_all = "camelCase")]
 pub struct ProcessIdResponse {
     pub success: Option<bool>,
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
 
-impl APIResponseToIncodeError for ProcessIdResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for ProcessIdResponse {
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }
@@ -141,9 +134,6 @@ pub struct FetchScoresResponse {
     pub face_recognition: Option<FaceRecognition>,
     pub id_ocr_confidence: Option<IdOcrConfidence>,
     pub overall: Option<IdTest>,
-
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
@@ -315,11 +305,7 @@ pub struct IdTest {
     pub key: Option<String>,
 }
 
-impl APIResponseToIncodeError for FetchScoresResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for FetchScoresResponse {
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }
@@ -329,15 +315,9 @@ impl APIResponseToIncodeError for FetchScoresResponse {
 #[serde(rename_all = "camelCase")]
 pub struct AddConsentResponse {
     pub success: bool,
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
 
-impl APIResponseToIncodeError for AddConsentResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for AddConsentResponse {
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }
@@ -357,9 +337,6 @@ pub struct AddSelfieResponse {
     // Age of th person in the photo.
     pub age: Option<i32>,
     pub session_status: Option<serde_json::Value>,
-
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
 
 impl AddSelfieResponse {
@@ -378,11 +355,7 @@ impl AddSelfieResponse {
     }
 }
 
-impl APIResponseToIncodeError for AddSelfieResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for AddSelfieResponse {
     fn custom_failure_reasons(error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         let e = match error.status {
             4019 => vec![IncodeFailureReason::SelfieFaceNotFound],
@@ -477,9 +450,6 @@ pub struct FetchOCRResponse {
     pub mrz1: Option<ScrubbedPiiString>,
     pub mrz2: Option<ScrubbedPiiString>,
     pub birth_place: Option<ScrubbedPiiString>,
-
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
 
 pub struct IncodeOcrFixtureResponseFields {
@@ -511,7 +481,13 @@ impl FetchOCRResponse {
 
     pub fn document_sub_type(&self) -> Option<IncodeDocumentSubType> {
         // maybe error or alert or something fancier if they arent the same??
-        self.document_front_subtype.as_ref().and_then(|s| IncodeDocumentSubType::from_str(s.leak()).ok()).or(self.document_back_subtype.as_ref().and_then(|s| IncodeDocumentSubType::from_str(s.leak()).ok()))
+        self.document_front_subtype
+            .as_ref()
+            .and_then(|s| IncodeDocumentSubType::from_str(s.leak()).ok())
+            .or(self
+                .document_back_subtype
+                .as_ref()
+                .and_then(|s| IncodeDocumentSubType::from_str(s.leak()).ok()))
     }
 
     // From https://onefootprint.slack.com/archives/C0514LEFUCS/p1692979980826089
@@ -687,11 +663,7 @@ impl FetchOCRResponse {
     }
 }
 
-impl APIResponseToIncodeError for FetchOCRResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for FetchOCRResponse {
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }
@@ -701,9 +673,6 @@ impl APIResponseToIncodeError for FetchOCRResponse {
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingStatusResponse {
     pub onboarding_status: String,
-
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
 impl GetOnboardingStatusResponse {
     pub fn ready(&self, session_kind: &IncodeVerificationSessionKind, wait_for_selfie: bool) -> bool {
@@ -727,13 +696,8 @@ impl GetOnboardingStatusResponse {
     }
 }
 
-impl APIResponseToIncodeError for GetOnboardingStatusResponse {
+impl IncodeClientErrorCustomFailureReasons for GetOnboardingStatusResponse {
     // no custom error codes here
-    // TODO: in future PR handle http errors
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }
@@ -752,16 +716,9 @@ pub struct ProcessFaceResponse {
     pub name_matched: Option<bool>,
     // In case the session does have an externalId which can be assigned at start call.
     pub existing_external_id: Option<String>,
-
-    #[serde(flatten)]
-    pub error: Option<Error>,
 }
-impl APIResponseToIncodeError for ProcessFaceResponse {
+impl IncodeClientErrorCustomFailureReasons for ProcessFaceResponse {
     // no custom error codes here
-    // TODO: in future PR handle http errors
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
 
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         // does this need to be something???

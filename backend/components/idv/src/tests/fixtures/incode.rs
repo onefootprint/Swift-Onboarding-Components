@@ -71,7 +71,6 @@ pub fn watchlist_result_response(list_types: Vec<String>) -> IncodeResponse<Watc
     let res = WatchlistResultResponse {
         status: Some("sucess".to_owned()),
         content: Some(content),
-        error: None,
     };
     IncodeResponse {
         result: IncodeAPIResult::Success(res.clone()),
@@ -88,7 +87,7 @@ pub fn watchlist_result_error_response() -> IncodeResponse<WatchlistResultRespon
         path: None,
     };
     IncodeResponse {
-        result: IncodeAPIResult::ResponseError(res.clone()),
+        result: IncodeAPIResult::ResponseErrorHandled(res.clone()),
         raw_response: PiiJsonValue::from(serde_json::to_value(&res).unwrap()),
     }
 }

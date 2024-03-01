@@ -12,6 +12,8 @@ pub enum Error {
     SendError(String),
     #[error("Unauthorized")]
     Unauthorized,
+    #[error("Unknown Error")]
+    UnknownError,
     #[error("Incode API Error: {0}")]
     APIResponseError(super::response::Error),
     #[error("Assertion Error: {0}")]

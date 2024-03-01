@@ -1,6 +1,6 @@
 use newtypes::{IncodeFailureReason, PiiString};
 
-use super::APIResponseToIncodeError;
+use super::IncodeClientErrorCustomFailureReasons;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -36,11 +36,7 @@ pub struct OnboardingStartResponse {
     pub error: Option<Error>,
 }
 
-impl APIResponseToIncodeError for OnboardingStartResponse {
-    fn to_error(&self) -> Option<Error> {
-        self.error.clone()
-    }
-
+impl IncodeClientErrorCustomFailureReasons for OnboardingStartResponse {
     fn custom_failure_reasons(_error: Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }

@@ -58,7 +58,7 @@ use db::{
     models::verification_result::{NewVerificationResult, VerificationResult},
     DbPool,
 };
-use idv::incode::{APIResponseToIncodeError, IncodeResponse};
+use idv::incode::{IncodeClientErrorCustomFailureReasons, IncodeResponse};
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, IdDocKind, IncodeFailureReason,
     IncodeVerificationSessionId, IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode,
@@ -99,7 +99,7 @@ struct SaveVerificationResultArgs<'a> {
 }
 
 impl<'a> SaveVerificationResultArgs<'a> {
-    fn from<T: APIResponseToIncodeError + serde::Serialize>(
+    fn from<T: IncodeClientErrorCustomFailureReasons + serde::Serialize>(
         request_result: &'a Result<IncodeResponse<T>, idv::incode::error::Error>,
         // TODO make VendorAPI a function of T
         vendor_api: VendorAPI,

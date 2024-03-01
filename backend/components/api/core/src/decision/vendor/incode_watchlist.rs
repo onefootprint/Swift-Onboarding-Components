@@ -18,7 +18,7 @@ use idv::{
             response::WatchlistResultResponse, IncodeUpdatedWatchlistResultRequest,
             IncodeWatchlistCheckRequest,
         },
-        APIResponseToIncodeError, IncodeResponse, IncodeStartOnboardingRequest,
+        IncodeClientErrorCustomFailureReasons, IncodeResponse, IncodeStartOnboardingRequest,
     },
     ParsedResponse, VendorResponse,
 };
@@ -48,9 +48,9 @@ use crate::{
 
 // TODO: similar to what incode state machine does, would be nice to code share more here
 #[tracing::instrument(skip(db_pool, res, user_vault_public_key, api_or_vreq_id))]
-async fn save_vres_and_maybe_vreq<T: APIResponseToIncodeError + serde::Serialize>(
+async fn save_vres_and_maybe_vreq<T: IncodeClientErrorCustomFailureReasons + serde::Serialize>(
     db_pool: &DbPool,
-    res: IncodeResponse<T>, // TODO: if we have "hard" errors that don't parse into an IncodeResponse then we won't save a vres with the error here!
+    res: &IncodeResponse<T>,
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
@@ -62,7 +62,7 @@ async fn save_vres_and_maybe_vreq<T: APIResponseToIncodeError + serde::Serialize
         .result
         .scrub()
         .map_err(|e| ApiError::from(idv::Error::from(e)))
-        .unwrap_or(serde_json::json!("").into());
+        .unwrap_or(serde_json::json!({}).into());
 
     let e_response =
         verification_result::encrypt_verification_result_response(&raw_response, user_vault_public_key)?;
@@ -112,7 +112,7 @@ async fn call_start_onboarding(
 
     save_vres_and_maybe_vreq(
         &state.db_pool,
-        res.clone(),
+        &res,
         sv_id,
         di_id,
         user_vault_public_key,
@@ -165,7 +165,7 @@ async fn call_watchlist_result(
                 .map_err(|e| ApiError::from(idv::Error::from(e)))?;
             let vres = save_vres_and_maybe_vreq(
                 &state.db_pool,
-                res.clone(),
+                &res,
                 sv_id,
                 di_id,
                 user_vault_public_key,
@@ -192,7 +192,7 @@ async fn call_watchlist_result(
                 .map_err(|e| ApiError::from(idv::Error::from(e)))?;
             let vres = save_vres_and_maybe_vreq(
                 &state.db_pool,
-                res.clone(),
+                &res,
                 sv_id,
                 di_id,
                 user_vault_public_key,

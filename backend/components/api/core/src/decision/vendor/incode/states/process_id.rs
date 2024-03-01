@@ -70,10 +70,13 @@ async fn process_id_inner(
 
     // If we get the "Id already processed" error, then we ignore this an continue
     // else we throw other kinds of errors as usual
-    if let idv::incode::IncodeAPIResult::ResponseError(e) = &res {
+    if let idv::incode::IncodeAPIResult::ResponseErrorHandled(e) = &res {
         if e.message
             .as_ref()
-            .map(|m| m.contains("Id already processed") || m.contains("NumberFormatException: Cannot parse null string"))
+            .map(|m| {
+                m.contains("Id already processed")
+                    || m.contains("NumberFormatException: Cannot parse null string")
+            })
             .unwrap_or(false)
         {
             tracing::warn!(

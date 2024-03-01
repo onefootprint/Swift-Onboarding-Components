@@ -451,7 +451,6 @@ mod test {
                     share_url: None,
                 }),
             }),
-            error: None,
         }
     }
 }

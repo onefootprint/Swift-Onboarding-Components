@@ -98,7 +98,7 @@ impl IncodeClientAdapter {
         // used to fetch a new token for requests
         incode_session_id: Option<IncodeSessionId>,
         custom_name_fields: Option<OnboardingStartCustomNameFields>,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let path = "omni/start";
         let request = OnboardingStartRequest {
             country_code: "ALL".into(),
@@ -117,9 +117,7 @@ impl IncodeClientAdapter {
             .json(&request)
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
         Ok(response)
     }
@@ -131,7 +129,7 @@ impl AuthenticatedIncodeClientAdapter {
         _: &FootprintVendorHttpClient,
         docv_data: DocVData,
         document_side: DocumentSide,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let document_type = docv_data
             .document_type
             .ok_or(IncodeError::AssertionError("Missing document type".into()))?;
@@ -158,24 +156,13 @@ impl AuthenticatedIncodeClientAdapter {
             .await
             .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        let (cl, s) = (response.content_length(), response.status());
-
-        let json = match response.json().await {
-            Ok(j) => Ok(j),
-            Err(err) => {
-                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
-
-                Err(err)
-            }
-        }?;
-
-        Ok(json)
+        Ok(response)
     }
 
     pub async fn process_id(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let url = self.client_adapter.api_url("omni/process/id")?;
 
         let response = footprint_http_client
@@ -186,18 +173,7 @@ impl AuthenticatedIncodeClientAdapter {
             .await
             .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        let (cl, s) = (response.content_length(), response.status());
-
-        let json = match response.json().await {
-            Ok(j) => Ok(j),
-            Err(err) => {
-                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
-
-                Err(err)
-            }
-        }?;
-
-        Ok(json)
+        Ok(response)
     }
 
     pub async fn add_privacy_consent(
@@ -205,7 +181,7 @@ impl AuthenticatedIncodeClientAdapter {
         footprint_http_client: &FootprintVendorHttpClient,
         title: String,
         content: String,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let url = self.client_adapter.api_url("omni/add/user-consent")?;
         let request = AddPrivacyConsent::new(title, content);
 
@@ -216,9 +192,7 @@ impl AuthenticatedIncodeClientAdapter {
             .json(&request)
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
         Ok(response)
     }
@@ -227,7 +201,7 @@ impl AuthenticatedIncodeClientAdapter {
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
         status: bool,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let url = self.client_adapter.api_url("omni/add/ml-consent")?;
         let request: AddMLConsent = AddMLConsent { status };
 
@@ -238,9 +212,7 @@ impl AuthenticatedIncodeClientAdapter {
             .json(&request)
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
         Ok(response)
     }
@@ -249,7 +221,7 @@ impl AuthenticatedIncodeClientAdapter {
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
         docv_data: DocVData,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let url = self
             .client_adapter
             .api_url("omni/add/face/third-party?imageType=selfie")?;
@@ -259,33 +231,20 @@ impl AuthenticatedIncodeClientAdapter {
                 .ok_or(IncodeError::AssertionError("missing selfie image".into()))?,
         };
 
-        let response = footprint_http_client
+        footprint_http_client
             .client
             .post(url)
             .headers(self.client_adapter.default_headers.clone())
             .json(&request)
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?;
-
-        let (cl, s) = (response.content_length(), response.status());
-
-        let json = match response.json().await {
-            Ok(j) => Ok(j),
-            Err(err) => {
-                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
-
-                Err(err)
-            }
-        }?;
-
-        Ok(json)
+            .map_err(|err| IncodeError::SendError(err.to_string()))
     }
 
     pub async fn fetch_scores(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let url = self.client_adapter.api_url("omni/get/score")?;
 
         let response = footprint_http_client
@@ -296,24 +255,13 @@ impl AuthenticatedIncodeClientAdapter {
             .await
             .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        let (cl, s) = (response.content_length(), response.status());
-
-        let json = match response.json().await {
-            Ok(j) => Ok(j),
-            Err(err) => {
-                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
-
-                Err(err)
-            }
-        }?;
-
-        Ok(json)
+        Ok(response)
     }
 
     pub async fn fetch_ocr(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let url = self.client_adapter.api_url("omni/get/ocr-data")?;
 
         let response = footprint_http_client
@@ -324,25 +272,14 @@ impl AuthenticatedIncodeClientAdapter {
             .await
             .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        let (cl, s) = (response.content_length(), response.status());
-
-        let json = match response.json().await {
-            Ok(j) => Ok(j),
-            Err(err) => {
-                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
-
-                Err(err)
-            }
-        }?;
-
-        Ok(json)
+        Ok(response)
     }
 
     // Note: should be called _after_ selfie, front, back and process-id
     pub async fn process_face(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
-    ) -> Result<serde_json::Value, IncodeError> {
+    ) -> Result<reqwest::Response, IncodeError> {
         let url = self.client_adapter.api_url("omni/process/face")?;
 
         let response = footprint_http_client
@@ -353,18 +290,7 @@ impl AuthenticatedIncodeClientAdapter {
             .await
             .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        let (cl, s) = (response.content_length(), response.status());
-
-        let json = match response.json().await {
-            Ok(j) => Ok(j),
-            Err(err) => {
-                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
-
-                Err(err)
-            }
-        }?;
-
-        Ok(json)
+        Ok(response)
     }
 
     async fn get_onboarding_status(
@@ -373,25 +299,29 @@ impl AuthenticatedIncodeClientAdapter {
         session_kind: IncodeVerificationSessionKind,
         incode_verification_session_id: IncodeVerificationSessionId,
         wait_for_selfie: bool,
+        // need to return json here since we deser to know if we poll
     ) -> Result<serde_json::Value, IncodeError> {
         let url = self.client_adapter.api_url("omni/get/onboarding/status")?;
-        let response: serde_json::Value = footprint_http_client
+        let response = footprint_http_client
             .client
             .get(url)
             .headers(self.client_adapter.default_headers.clone())
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        let parsed: GetOnboardingStatusResponse = serde_json::from_value(response.clone())?;
-        if !parsed.ready(&session_kind, wait_for_selfie) {
-            tracing::info!(status=%parsed.onboarding_status, session_kind=%session_kind, incode_verification_session_id=%incode_verification_session_id, wait_for_selfie=wait_for_selfie, "incode GetOnboardingStatusResponse not ready");
+        let (result, json) = IncodeAPIResult::<GetOnboardingStatusResponse>::from_response(response).await;
+
+        let parsed_result = result.into_success()
+            // retry any error we get
+            .map_err(|_| IncodeError::ResultsNotReady)?;
+
+        if !parsed_result.ready(&session_kind, wait_for_selfie) {
+            tracing::info!(status=%parsed_result.onboarding_status, session_kind=%session_kind, incode_verification_session_id=%incode_verification_session_id, wait_for_selfie=wait_for_selfie, "incode GetOnboardingStatusResponse not ready");
             return Err(IncodeError::ResultsNotReady);
         }
 
-        Ok(response)
+        Ok(json)
     }
 
     pub async fn mark_session_complete(
@@ -512,7 +442,10 @@ impl AuthenticatedIncodeClientAdapter {
             .client_adapter
             .onboarding_start(footprint_http_client, None, Some(incode_session_id), None)
             .await?;
-        let parsed = IncodeAPIResult::<OnboardingStartResponse>::try_from(result)?.into_success()?;
+        let parsed = IncodeAPIResult::<OnboardingStartResponse>::from_response(result)
+            .await
+            .0
+            .into_success()?;
 
         self.client_adapter.update_header_with_token(parsed.token)
     }
@@ -590,8 +523,9 @@ mod tests {
             .await
             .unwrap();
 
-        let parsed = IncodeAPIResult::<OnboardingStartResponse>::try_from(res)
-            .unwrap()
+        let parsed = IncodeAPIResult::<OnboardingStartResponse>::from_response(res)
+            .await
+            .0
             .into_success()
             .unwrap();
 
@@ -635,8 +569,9 @@ mod tests {
             .await
             .expect("add side failed");
         // check we can deser
-        IncodeAPIResult::<AddSideResponse>::try_from(raw_front_add_side_res)
-            .unwrap()
+        IncodeAPIResult::<AddSideResponse>::from_response(raw_front_add_side_res)
+            .await
+            .0
             .into_success()
             .unwrap();
 
@@ -645,8 +580,9 @@ mod tests {
             .await
             .expect("add side failed");
         // check we can deser
-        IncodeAPIResult::<AddSideResponse>::try_from(raw_back_add_side_res)
-            .unwrap()
+        IncodeAPIResult::<AddSideResponse>::from_response(raw_back_add_side_res)
+            .await
+            .0
             .into_success()
             .unwrap();
 
@@ -658,8 +594,9 @@ mod tests {
             .await
             .expect("add selfie failed");
         // check we can deser
-        IncodeAPIResult::<AddSideResponse>::try_from(selfie_res)
-            .unwrap()
+        IncodeAPIResult::<AddSideResponse>::from_response(selfie_res)
+            .await
+            .0
             .into_success()
             .unwrap();
         //
@@ -683,8 +620,9 @@ mod tests {
             .await
             .expect("process id failed");
         // check we can deser
-        IncodeAPIResult::<ProcessIdResponse>::try_from(raw_process_res)
-            .unwrap()
+        IncodeAPIResult::<ProcessIdResponse>::from_response(raw_process_res)
+            .await
+            .0
             .into_success()
             .unwrap();
         //
@@ -695,8 +633,9 @@ mod tests {
             .await
             .expect("process face failed");
 
-        IncodeAPIResult::<ProcessFaceResponse>::try_from(raw_process_face)
-            .unwrap()
+        IncodeAPIResult::<ProcessFaceResponse>::from_response(raw_process_face)
+            .await
+            .0
             .into_success()
             .unwrap();
 
@@ -720,8 +659,9 @@ mod tests {
             .await
             .expect("fetch scores failed");
 
-        let scores = IncodeAPIResult::<FetchScoresResponse>::try_from(raw_fetch_scores_res)
-            .unwrap()
+        let scores = IncodeAPIResult::<FetchScoresResponse>::from_response(raw_fetch_scores_res)
+            .await
+            .0
             .into_success()
             .unwrap();
         assert!(scores.id_validation.is_some());
@@ -734,8 +674,9 @@ mod tests {
             .await
             .expect("fetch ocr failed");
 
-        let ocr = IncodeAPIResult::<FetchOCRResponse>::try_from(raw_get_ocr)
-            .unwrap()
+        let ocr = IncodeAPIResult::<FetchOCRResponse>::from_response(raw_get_ocr)
+            .await
+            .0
             .into_success()
             .unwrap();
         assert!(ocr.name.clone().unwrap().full_name.is_some());
