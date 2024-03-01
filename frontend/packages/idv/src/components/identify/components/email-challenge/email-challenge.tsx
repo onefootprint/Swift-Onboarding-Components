@@ -25,11 +25,13 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
     identify: { email = '', successfulIdentifier },
   } = state.context;
   const headerTitle = useGetHeaderText();
-
-  // If we enter the email challenge via an auth token identifier, we won't have an email to display
-  const formTitle = email
-    ? t('email-challenge.prompt-with-email', { email })
-    : t('email-challenge.prompt-without-email');
+  const headerSubtitle = email ? ( // If we enter the email challenge via an auth token identifier, we won't have an email to display
+    <span data-private="true">
+      {t('email-challenge.prompt-with-email', { email })}
+    </span>
+  ) : (
+    t('email-challenge.prompt-without-email')
+  );
 
   const handleChallengeSucceed = (authToken: string) => {
     setTimeout(() => {
@@ -49,7 +51,7 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
 
   return (
     <Container>
-      <Header data-private title={headerTitle} subtitle={formTitle} />
+      <Header data-private title={headerTitle} subtitle={headerSubtitle} />
       <PinVerification
         identifier={successfulIdentifier ?? { email }}
         onChallengeSucceed={handleChallengeSucceed}
