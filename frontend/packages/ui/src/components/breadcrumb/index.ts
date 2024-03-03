@@ -1,3 +1,11 @@
+import BreadcrumbList from './breadcrumb';
+import BreadcrumbItem from './breadcrumb-item';
+
 export type { BreadcrumbProps } from './breadcrumb';
-export { default } from './breadcrumb';
-export { default as BreadcrumbItem } from './breadcrumb-item';
+
+const Breadcrumb = {
+  List: BreadcrumbList,
+  Item: BreadcrumbItem,
+};
+
+export default Breadcrumb;

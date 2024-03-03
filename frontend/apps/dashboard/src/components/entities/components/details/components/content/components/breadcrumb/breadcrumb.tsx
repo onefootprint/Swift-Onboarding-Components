@@ -1,4 +1,4 @@
-import { Breadcrumb as UIBreadcrumb, BreadcrumbItem } from '@onefootprint/ui';
+import { Breadcrumb as UIBreadcrumb } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
@@ -18,12 +18,12 @@ const Breadcrumb = () => {
   const params = searchParams ? `?${searchParams}` : '';
 
   return (
-    <UIBreadcrumb aria-label={t('title', { kind: label })}>
-      <BreadcrumbItem href={`${listPath}${params}`} as={Link}>
+    <UIBreadcrumb.List aria-label={t('title', { kind: label })}>
+      <UIBreadcrumb.Item href={`${listPath}${params}`} as={Link}>
         {title}
-      </BreadcrumbItem>
-      <BreadcrumbItem>{t('details')}</BreadcrumbItem>
-    </UIBreadcrumb>
+      </UIBreadcrumb.Item>
+      <UIBreadcrumb.Item>{t('details')}</UIBreadcrumb.Item>
+    </UIBreadcrumb.List>
   );
 };
 

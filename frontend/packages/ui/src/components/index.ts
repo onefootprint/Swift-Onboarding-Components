@@ -13,7 +13,7 @@ export { default as BottomSheet } from './bottom-sheet';
 export type { BoxPrimitives, BoxProps, BoxStyleProps } from './box';
 export { default as Box } from './box';
 export type { BreadcrumbProps } from './breadcrumb';
-export { default as Breadcrumb, BreadcrumbItem } from './breadcrumb';
+export { default as Breadcrumb } from './breadcrumb';
 export type { ButtonProps } from './button';
 export { default as Button } from './button';
 export type { CheckboxProps } from './checkbox';

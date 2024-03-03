@@ -87,7 +87,6 @@ export {
   BottomSheet,
   Box,
   Breadcrumb,
-  BreadcrumbItem,
   Button,
   Checkbox,
   CodeBlock,

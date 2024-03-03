@@ -1,20 +1,23 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
 
+import type { BoxPrimitives } from '../box';
+import Box from '../box';
 import Text from '../text';
 
 export type BreadcrumbProps = {
   'aria-label': string;
   children: React.ReactNode;
   separator?: string;
-};
+} & BoxPrimitives<HTMLElement>;
 
 const Breadcrumb = ({
-  'aria-label': ariaLabel,
   children,
   separator = '/',
+  ...props
 }: BreadcrumbProps) => (
-  <Nav aria-label={ariaLabel}>
+  <Nav {...props} tag="nav">
     <ol>
       {React.Children.map(children, (child, index) => (
         <>
@@ -30,7 +33,7 @@ const Breadcrumb = ({
   </Nav>
 );
 
-const Nav = styled.nav`
+const Nav = styled(Box)`
   ${({ theme }) => css`
     ol {
       display: flex;
