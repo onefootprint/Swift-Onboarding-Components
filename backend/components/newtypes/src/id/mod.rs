@@ -21,6 +21,8 @@ macro_rules! define_newtype_id {
             derive_more::From,
             derive_more::Into,
             derive_more::FromStr,
+            derive_more::AsRef,
+            derive_more::AsMut,
             serde::Serialize,
             serde::Deserialize,
             Default,

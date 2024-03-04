@@ -9,6 +9,7 @@ mod auth_event_kind;
 mod billing_event_kind;
 mod business_owner_kind;
 mod company_size;
+mod compliance_doc;
 mod compliance_status;
 mod contact_info_priority;
 mod d2p_session_status;
@@ -58,9 +59,9 @@ mod workos_auth_method;
 pub use self::{
     access_event_kind::*, access_event_purpose::*, actor::*, android_verdict_types::*, apple_attestation::*,
     attestation_type::*, audit_event::*, auth_event_kind::*, billing_event_kind::*, business_owner_kind::*,
-    company_size::*, compliance_status::*, contact_info_priority::*, d2p_session_status::*,
-    data_lifetime_source::*, decision_intent_kind::*, decision_status::*, document_request::*,
-    document_scan_device_type::*, document_side::*, fingerprint::*, fingerprint_meta::*,
+    company_size::*, compliance_doc::*, compliance_status::*, contact_info_priority::*,
+    d2p_session_status::*, data_lifetime_source::*, decision_intent_kind::*, decision_status::*,
+    document_request::*, document_scan_device_type::*, document_side::*, fingerprint::*, fingerprint_meta::*,
     footprint_reason_code::*, identify_scope::*, identity_document_fixture_result::*,
     identity_document_status::*, incode::*, label::*, liveness_source::*, manual_review::*,
     middesk_request_state::*, ob_config::*, onboarding_status::*, org_member_email::*, preview_api::*,

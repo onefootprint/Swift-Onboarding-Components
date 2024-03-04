@@ -1,4 +1,5 @@
-use crate::TenantId;
+use crate::{PartnerTenantId, TenantId};
+use derive_more::From;
 
 impl TenantId {
     pub fn is_findigs(&self) -> bool {
@@ -24,4 +25,10 @@ impl TenantId {
     pub fn is_coast(&self) -> bool {
         self.0 == *"org_vZfj1sekMjwGdURGCWisF"
     }
+}
+
+#[derive(Debug, From)]
+pub enum TenantOrPartnerTenantId<'a> {
+    TenantId(&'a TenantId),
+    PartnerTenantId(&'a PartnerTenantId),
 }

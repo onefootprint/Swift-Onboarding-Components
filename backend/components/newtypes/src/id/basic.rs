@@ -267,3 +267,35 @@ define_newtype_id!(
     "Identifier for a a tenant_business_info"
 );
 define_newtype_id!(AuditEventId, String, "Identifier for an audit event");
+
+define_newtype_id!(PartnerTenantId, String, "Identifier for an partner tenant");
+define_newtype_id!(
+    TenantCompliancePartnershipId,
+    String,
+    "Identifier for an tenant compliance partnership"
+);
+define_newtype_id!(
+    ComplianceDocTemplateId,
+    String,
+    "Identifier for a compliance document template"
+);
+define_newtype_id!(
+    ComplianceDocTemplateVersionId,
+    String,
+    "Identifier for a compliance document template version"
+);
+define_newtype_id!(
+    ComplianceDocRequestId,
+    String,
+    "Identifier for a compliance document request"
+);
+define_newtype_id!(
+    ComplianceDocSubmissionId,
+    String,
+    "Identifier for a compliance document submission"
+);
+define_newtype_id!(
+    ComplianceDocReviewId,
+    String,
+    "Identifier for a compliance document review"
+);
