@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use crate::errors::proxy::VaultProxyError;
+use crate::{errors::proxy::VaultProxyError, telemetry::RootSpan};
 
 use crate::errors::ApiResult;
 
@@ -54,6 +54,16 @@ impl<'a> ProxyTokenParser<'a> {
             matches,
             global_fp_id,
         })
+    }
+
+    /// If the proxy request is only for one user, log it in the root span for more easy tracking
+    pub fn log_fp_id(&self, root_span: RootSpan) {
+        let fp_ids = self.matches.keys().map(|pt| &pt.fp_id).unique().collect_vec();
+        if fp_ids.len() == 1 {
+            if let Some(fp_id) = fp_ids.first() {
+                root_span.record("fp_id", fp_id.to_string());
+            }
+        }
     }
 
     #[tracing::instrument("ProxyTokenParser::detokenize_body_new", skip_all)]

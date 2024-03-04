@@ -4,7 +4,9 @@ use crate::errors::ApiResult;
 
 use crate::{proxy, proxy::token_parser::ProxyTokenParser, utils::headers::InsightHeaders, State};
 
-use api_core::{api_headers_schema, auth::CanDecrypt, utils::body_bytes::BodyBytes, ApiErrorKind};
+use api_core::{
+    api_headers_schema, auth::CanDecrypt, telemetry::RootSpan, utils::body_bytes::BodyBytes, ApiErrorKind,
+};
 use newtypes::{AccessEventPurpose, FpId};
 use paperclip::actix::{api_v2_operation, post, web, web::HttpResponse};
 use reqwest::StatusCode;
@@ -24,7 +26,6 @@ api_headers_schema! {
     }
 }
 
-#[tracing::instrument(skip(state, body_bytes, params))]
 #[api_v2_operation(
     description = "Decrypt complex objects in place. Like the vault proxy endpoints, but reflects back the hydrated request to the caller.",
     tags(VaultProxy, Preview)
@@ -36,6 +37,7 @@ pub async fn post(
     body_bytes: BodyBytes<5_242_880>,
     insight: InsightHeaders,
     params: ReflectHeaderParams,
+    root_span: RootSpan,
 ) -> ApiResult<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
@@ -47,6 +49,7 @@ pub async fn post(
 
     // 1. parse
     let parser = ProxyTokenParser::parse(body, global_fp_id)?;
+    parser.log_fp_id(root_span);
     let auth = auth.check_guard(CanDecrypt::new(
         parser.matches.keys().map(|tok| tok.identifier.clone()).collect(),
     ))?;

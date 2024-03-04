@@ -12,7 +12,7 @@ use crate::{
 };
 
 use crate::{proxy::tokenize, utils::headers::InsightHeaders, State};
-use api_core::ApiErrorKind;
+use api_core::{telemetry::RootSpan, ApiErrorKind};
 
 use api_core::{
     auth::tenant::TenantAuth,
@@ -28,7 +28,7 @@ use paperclip::actix::{
 /// Limit the body payload to 5MB
 const FIVE_MB: usize = 5 * 1024 * 1024;
 
-#[tracing::instrument(skip(state, body_bytes, jit_params, opt_params, request))]
+#[allow(clippy::too_many_arguments)]
 #[api_v2_operation(
     description = "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination",
     tags(VaultProxy, PublicApi)
@@ -42,6 +42,7 @@ pub async fn just_in_time(
     opt_params: ProxyHeaderParams,
     insight: InsightHeaders,
     request: HttpRequest,
+    root_span: RootSpan,
 ) -> ApiResult<HttpResponse> {
     let proxy_config = ProxyConfig::try_from((jit_params, opt_params, request.headers()))?;
     let auth = auth.check_guard(InvokeVaultProxyPermission::JustInTime)?;
@@ -52,11 +53,12 @@ pub async fn just_in_time(
         body_bytes,
         insight,
         request,
+        root_span,
     )
     .await
 }
 
-#[tracing::instrument(skip(state, body_bytes, params, request))]
+#[allow(clippy::too_many_arguments)]
 #[api_v2_operation(
     description = "Invoke the vault proxy by configuration id to securely send and receive data to a target destination",
     tags(VaultProxy, PublicApi)
@@ -70,6 +72,7 @@ pub async fn id(
     insight: InsightHeaders,
     params: ProxyHeaderParams,
     request: HttpRequest,
+    root_span: RootSpan,
 ) -> ApiResult<HttpResponse> {
     let id = proxy_config_id.into_inner();
     let auth = auth.check_guard(InvokeVaultProxyPermission::Id { id: id.clone() })?;
@@ -80,6 +83,7 @@ pub async fn id(
         body_bytes,
         insight,
         request,
+        root_span,
     )
     .await
 }
@@ -97,6 +101,7 @@ async fn invoke_vault_proxy(
     body_bytes: BodyBytes<FIVE_MB>,
     insight: InsightHeaders,
     request: HttpRequest,
+    root_span: RootSpan,
 ) -> ApiResult<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
@@ -112,6 +117,7 @@ async fn invoke_vault_proxy(
 
     // 1. parse
     let parser = ProxyTokenParser::parse(body, config.global_fp_id)?;
+    parser.log_fp_id(root_span);
 
     // 2. detokenize
     let detokens = proxy::detokenize::detokenize(
