@@ -18,3 +18,4 @@ paperclip = { workspace = true }
 serde_json = { workspace = true }
 itertools = { workspace = true }
 either = { workspace = true }
+tracing = { workspace = true }

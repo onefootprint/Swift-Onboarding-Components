@@ -668,6 +668,7 @@ dependencies = [
  "newtypes",
  "paperclip",
  "serde_json",
+ "tracing",
 ]
 
 [[package]]

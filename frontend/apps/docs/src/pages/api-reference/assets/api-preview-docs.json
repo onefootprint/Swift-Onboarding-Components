@@ -142,6 +142,46 @@
                 ]
             }
         },
+        "/businesses/{fp_id}/risk_signals": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the risk signals for a Footprint user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PublicRiskSignal"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/org/risk_signals": {
             "get": {
                 "tags": [
@@ -2046,6 +2086,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -2410,6 +2451,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -2774,6 +2816,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -3138,6 +3181,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -3502,6 +3546,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -3866,6 +3911,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -4230,6 +4276,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -4594,6 +4641,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -4958,6 +5006,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -5322,6 +5371,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -5686,6 +5736,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -6050,6 +6101,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -6414,6 +6466,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -7532,6 +7585,7 @@
                             "document_is_permit_or_provisional_license",
                             "document_selfie_was_skipped",
                             "document_collected_via_desktop",
+                            "document_not_live_capture",
                             "document_ocr_name_does_not_match",
                             "document_ocr_name_could_not_match",
                             "document_ocr_name_matches",
@@ -7901,6 +7955,7 @@
                             "document_is_permit_or_provisional_license",
                             "document_selfie_was_skipped",
                             "document_collected_via_desktop",
+                            "document_not_live_capture",
                             "document_ocr_name_does_not_match",
                             "document_ocr_name_could_not_match",
                             "document_ocr_name_matches",
