@@ -1,10 +1,12 @@
+use std::collections::HashMap;
+
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_user;
 use diesel::{prelude::*, Insertable, Queryable};
 use newtypes::{Locked, OrgMemberEmail, PiiString, TenantUserId};
 
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Selectable)]
 #[diesel(table_name = tenant_user)]
 pub struct TenantUser {
     pub id: TenantUserId,
@@ -20,8 +22,23 @@ pub struct TenantUser {
 impl TenantUser {
     #[tracing::instrument("TenantUser::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
-        let user = tenant_user::table.filter(tenant_user::id.eq(id)).first(conn)?;
+        let user = tenant_user::table
+            .filter(tenant_user::id.eq(id))
+            .select(TenantUser::as_select())
+            .first(conn)?;
         Ok(user)
+    }
+
+    pub fn get_bulk(conn: &mut PgConn, ids: Vec<&TenantUserId>) -> DbResult<HashMap<TenantUserId, Self>> {
+        let res = tenant_user::table
+            .filter(tenant_user::id.eq_any(ids))
+            .select(TenantUser::as_select())
+            .get_results::<TenantUser>(conn)?
+            .into_iter()
+            .map(|w| (w.id.clone(), w))
+            .collect();
+
+        Ok(res)
     }
 
     #[tracing::instrument("TenantUser::get_firm_employee", skip_all)]
