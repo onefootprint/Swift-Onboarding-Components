@@ -1,4 +1,5 @@
 use super::{
+    curp_validation::request::CurpValidationRequest,
     doc::{
         request::{AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, AddSelfieRequest, DocumentSide},
         response::GetOnboardingStatusResponse,
@@ -410,6 +411,26 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    pub async fn curp_validation(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        curp: PiiString,
+    ) -> Result<reqwest::Response, IncodeError> {
+        let url = self.client_adapter.api_url("api/validate/curp/v4")?;
+        let request = CurpValidationRequest { curp };
+
+        let response = footprint_http_client
+            .client
+            .post(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
+
+        Ok(response)
+    }
+
     pub async fn updated_watchlist_result(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
@@ -487,6 +508,7 @@ mod tests {
     use crate::{
         footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
         incode::{
+            curp_validation::response::CurpValidationResponse,
             doc::{
                 request::DocumentSide,
                 response::{
@@ -496,7 +518,7 @@ mod tests {
             },
             response::OnboardingStartResponse,
             watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
-            IncodeAPIResult,
+            IncodeAPIResult, IncodeResponse,
         },
         tests::fixtures::images::load_image_and_encode_as_b64,
     };
@@ -752,5 +774,26 @@ mod tests {
                 .unwrap()
                 .clone()
         );
+    }
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_curp_validation_result() {
+        let (fp_client, authenticated_client) = get_authed_client().await;
+
+        let raw_res = authenticated_client
+            .curp_validation(&fp_client, PiiString::from(crate::test_fixtures::TEST_CURP))
+            .await
+            .unwrap();
+
+        let resp = IncodeResponse::<CurpValidationResponse>::from_response(raw_res)
+            .await
+            .result
+            .into_success()
+            .unwrap();
+
+        // we get a curp not found error with this one
+        assert_eq!(resp.error.unwrap().codigo_error.unwrap(), String::from("06"));
+        assert!(!resp.renapo_valid.unwrap());
     }
 }

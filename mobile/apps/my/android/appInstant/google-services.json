@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253665538362",
+    "project_id": "footprint-5da20",
+    "storage_bucket": "footprint-5da20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253665538362:android:cca575c9b42f1d6ebda003",
+        "android_client_info": {
+          "package_name": "com.onefootprint.my"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5lr0r95nsUN7ZTfA8RcJvFFBrQsOSf54"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

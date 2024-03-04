@@ -8,6 +8,7 @@ use serde::de::DeserializeOwned;
 use self::request::OnboardingStartCustomNameFields;
 
 pub mod client;
+pub mod curp_validation;
 pub mod doc;
 pub mod error;
 pub mod request;

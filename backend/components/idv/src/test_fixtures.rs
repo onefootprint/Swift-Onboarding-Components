@@ -3,6 +3,14 @@ use newtypes::{
     incode::IncodeStatus, ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes,
     ExperianWatchlistReasonCodes,
 };
+// From: https://learn.sayari.com/mexico-national-id-number-curp/
+//
+// Name: Juan Carlos Hernandez Garcia
+// Gender: Male
+// Date of birth: May 6, 1982
+// Place of birth: Ensenada, Baja California, Mexico
+// Final two digits of CURP assigned by the Mexican government: 09
+pub const TEST_CURP: &str = "HEGJ820506HBCRRN09";
 
 pub fn passing_lexis_flex_id_response() -> serde_json::Value {
     serde_json::json!({
@@ -6575,5 +6583,77 @@ pub fn incode_watchlist_result_response_yes_hits() -> serde_json::Value {
 
         },
         "status": "success"
+    })
+}
+
+
+pub fn incode_curp_validation_good_curp() -> serde_json::Value {
+    serde_json::json!({
+        "success": true,
+        "curp": "VIMR910502HNELLG04",
+        "sex": "HOMBRE",
+        "nationality": "HND",
+        "result": "success",
+        "renapo_valid": true,
+        "names": "BOBOBERTO JOSE",
+        "paternal_surname": "VILLEDA",
+        "mothers_maiden_name": "BOBERR",
+        "birthdate": "02/05/1995",
+        "entity_birth": "NE",
+        "probation_document": "3",
+        "probation_document_data": {
+            "foja": "",
+            "numEntidadReg": "",
+            "libro": "",
+            "NumRegExtranjeros": "221223",
+            "cveEntidadNac": "NE",
+            "numActa": "",
+            "CRIP": "",
+            "tomo": "",
+            "cveEntidadEmisora": "",
+            "anioReg": "",
+            "cveMunicipioReg": "",
+            "FolioCarta": ""
+        },
+        "status_curp": "AN"
+    })
+}
+
+pub fn incode_curp_validation_bad_curp() -> serde_json::Value {
+    serde_json::json!({
+        "success": false,
+        "error": {
+            "codigoError": "06",
+            "resultCURPS": {
+                "numEntidadReg": "",
+                "apellidoPaterno": "",
+                "libro": "",
+                "statusCurp": "",
+                "cveEntidadNac": "",
+                "numActa": "",
+                "CRIP": "",
+                "tomo": "",
+                "cveEntidadEmisora": "",
+                "FolioCertificado": "",
+                "anioReg": "",
+                "cveMunicipioReg": "",
+                "FolioCarta": "",
+                "CURP": "",
+                "apellidoMaterno": "",
+                "nombres": "",
+                "nacionalidad": "",
+                "foja": "",
+                "NumRegExtranjeros": "",
+                "fechNac": "",
+                "sexo": "",
+                "docProbatorio": ""
+            },
+            "statusOper": "NO EXITOSO",
+            "tipoError": "01",
+            "sessionID": "LNvRMK1zysdZDYLo7hQt8IeVu1hFnZIgGRTjhIa4dNUhlsfb5hik!-1293949714!1708611644787",
+            "message": "La CURP no se encuentra en la base de datos"
+        },
+        "result": "Not valid request: La CURP no se encuentra en la base de datos code: 06",
+        "renapo_valid": false
     })
 }

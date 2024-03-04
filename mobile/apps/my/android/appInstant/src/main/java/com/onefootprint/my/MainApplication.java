@@ -24,8 +24,7 @@ public class MainApplication extends Application implements ReactApplication {
       protected List<ReactPackage> getPackages() {
         // Packages need to be linked manually due to requirements of instant app
         // If the dependency is needed in an instant application - import and append it with the property path in PackageListSyntheticFull class and include the package in build.gradle file
-
-        return new PackageListInstant(this).getPackages();
+          return new PackageListInstant(this.getApplication()).getPackages();
       }
 
       @Override

@@ -9,20 +9,22 @@ type ScrollLayoutProps = {
 };
 
 const ScrollLayout = ({ children, Footer }: ScrollLayoutProps) => {
-  const { bottom } = useSafeAreaInsets();
+  const { bottom, top } = useSafeAreaInsets();
 
   return (
     <>
-      <StyledContainer scroll>{children}</StyledContainer>
+      <StyledContainer scroll top={top}>
+        {children}
+      </StyledContainer>
       <StickyFooter bottom={bottom}>{Footer}</StickyFooter>
     </>
   );
 };
 
-const StyledContainer = styled(Container)`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[4]};
-    margin-top: -${theme.spacing[7]};
+const StyledContainer = styled(Container)<{ top: number }>`
+  ${({ theme, top }) => css`
+    margin-bottom: ${top === 0 ? theme.spacing[9] : theme.spacing[4]};
+    margin-top: -${top}px;
   `}
 `;
 
@@ -32,7 +34,7 @@ const StickyFooter = styled.View<{ bottom: number }>`
     border-color: ${theme.borderColor.primary};
     border-top-width: ${theme.borderWidth[1]};
     bottom: 0;
-    padding-bottom: ${bottom + bottom / 2}px;
+    padding-bottom: ${bottom ? `${bottom + bottom / 2}px` : theme.spacing[5]};
     padding-horizontal: ${theme.spacing[5]};
     padding-top: ${theme.spacing[5]};
     position: absolute;

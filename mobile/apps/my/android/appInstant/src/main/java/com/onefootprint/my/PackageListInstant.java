@@ -87,7 +87,7 @@ public class PackageListInstant {
                 new WorkletsPackage(),
                 new MixpanelReactNativePackage(),
                 new RNHoleViewPackage(),
-                new DocumentDetectionPluginPackage(),
+                new DocumentDetectionPluginPackage(getApplicationContext()),
                 new FaceDetectionPluginPackage(),
                 new BarcodeDetectionPluginPackage()
         ));
