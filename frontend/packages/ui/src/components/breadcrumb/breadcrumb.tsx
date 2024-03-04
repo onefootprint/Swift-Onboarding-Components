@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import type { BoxPrimitives } from '../box';
