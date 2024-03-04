@@ -69,7 +69,13 @@ const SB = styled.div<
             theme.borderRadius[value as BorderRadius]
           };`;
         }
-        if (prop.includes('borderWidth')) {
+        if (
+          prop.includes('borderWidth') ||
+          prop.includes('borderTopWidth') ||
+          prop.includes('borderBottomWidth') ||
+          prop.includes('borderLeftWidth') ||
+          prop.includes('borderRightWidth')
+        ) {
           return `${toKebabCase(prop)}: ${
             theme.borderWidth[value as BorderWidth]
           };`;

@@ -143,6 +143,10 @@ export type BoxStyleProps = {
   borderPosition?: 'top' | 'right' | 'bottom' | 'left' | 'all';
   borderRadius?: keyof Theme['borderRadius'];
   borderWidth?: keyof Theme['borderWidth'];
+  borderBottomWidth?: keyof Theme['borderWidth'];
+  borderTopWidth?: keyof Theme['borderWidth'];
+  borderLeftWith?: keyof Theme['borderWidth'];
+  borderRightWidth?: keyof Theme['borderWidth'];
   color?: keyof Theme['color'];
   columnGap?: keyof Theme['spacing'];
   elevation?: keyof Theme['elevation'];
@@ -160,8 +164,8 @@ export type BoxStyleProps = {
   paddingLeft?: keyof Theme['spacing'];
   paddingRight?: keyof Theme['spacing'];
   paddingTop?: keyof Theme['spacing'];
-  paddingX?: keyof Theme['spacing'];
-  paddingY?: keyof Theme['spacing'];
+  paddingInline?: keyof Theme['spacing'];
+  paddingBlock?: keyof Theme['spacing'];
   rowGap?: keyof Theme['spacing'];
   surfaceColor?: keyof Theme['surfaceColor'];
 };

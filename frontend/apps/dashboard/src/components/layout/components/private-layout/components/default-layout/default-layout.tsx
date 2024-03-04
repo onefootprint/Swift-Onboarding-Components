@@ -57,7 +57,6 @@ const Main = styled.main`
   align-items: start;
   flex-grow: 1;
   min-height: 100%;
-  overflow: auto;
 `;
 
 const Inner = styled.div`
