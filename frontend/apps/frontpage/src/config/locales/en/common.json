@@ -117,7 +117,7 @@
             },
             "auth": {
               "text": "Auth",
-              "subtext": "Authentication and authorization",
+              "subtext": "Authentication and account security",
               "href": "/auth"
             }
           }
