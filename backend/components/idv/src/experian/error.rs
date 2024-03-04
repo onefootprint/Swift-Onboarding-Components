@@ -2,6 +2,8 @@ use std::fmt;
 
 use newtypes::PiiJsonValue;
 
+use super::cross_core::error_code::ErrorCode;
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("{0}")]
@@ -75,8 +77,8 @@ pub enum ConversionError {
 pub enum CrossCoreResponseError {
     #[error("Missing preciseID response")]
     PreciseIDResponseNotFound,
-    #[error("Error response code received: {0}")]
-    Error(String),
+    #[error("Error response code received: {0} ({1})")]
+    Error(ErrorCode, String),
 }
 
 /// The following is a list of the error codes that can be returned from the Precise ID application.

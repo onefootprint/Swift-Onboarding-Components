@@ -404,7 +404,10 @@ pub fn mock_experian_parseable_error(state: &mut State) {
         state,
         idv::experian::error::Error::ErrorWithResponse(Box::new(idv::experian::error::ErrorWithResponse {
             error: idv::experian::error::Error::ResponseError(
-                idv::experian::error::CrossCoreResponseError::Error("Invalid surname".to_owned()),
+                idv::experian::error::CrossCoreResponseError::Error(
+                    idv::experian::cross_core::error_code::ErrorCode::InvalidSurname,
+                    "018".to_owned(),
+                ),
             ),
             response: PiiJsonValue::new(
                 serde_json::json!({"responseHeader":{"category":null,"tenantId":"abc123","messageTime":"2023-11-29T15:31:06Z","requestType":"PreciseIdOnly","expRequestId":"abc123","responseCode":"R0201","responseType":"INFO","overallResponse":{"score":null,"decision":null,"decisionText":null,"spareObjects":[],"decisionReasons":[],"recommendedNextActions":[]},"responseMessage":"Workflow Complete.","clientReferenceId":"vreq_abc"},"clientResponsePayload":{"decisionElements":[{"matches":null,"decisions":null,"otherData":{"json":{"fraudSolutions":{"response":{"products":{"preciseIdServer":{"error":{"errorCode":"106","reportDate":"11292023","reportTime":"093108","actionIndicator":{"code":"C","value":""},"referenceNumber":"vreq_abc","errorDescription":"Invalid surname"},"header":"<SCRUBBED>","summary":null,"glbDetail":null,"ipAddress":"<SCRUBBED>","onFileSsn":"<SCRUBBED>","sessionId":null,"preciseMatch":null,"pidxmlversion":"06.00"},"customerManagement":null}}}}},"applicantId":"Contact1","serviceName":"PreciseId","warningsErrors":[{"responseCode":"106","responseType":"ERROR","responseMessage":"Invalid surname"}],"normalizedScore":-1}],"orchestrationDecisions":[]}}),

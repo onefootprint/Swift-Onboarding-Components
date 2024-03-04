@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use newtypes::{
     ExperianAddressAndNameMatchReasonCodes, ExperianDobMatchReasonCodes, ExperianFraudShieldCodes,
     ExperianPhoneMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
@@ -7,6 +9,8 @@ use crate::experian::{
     error::{CrossCoreResponseError, Error},
     precise_id::response::PreciseIDAPIResponse,
 };
+
+use super::error_code::ErrorCode;
 
 pub fn parse_response(response: serde_json::Value) -> Result<CrossCoreAPIResponse, Error> {
     let r: CrossCoreAPIResponse = serde_json::from_value(response)?;
@@ -101,11 +105,10 @@ impl CrossCoreAPIResponse {
 
     pub fn validate(&self) -> Result<(), Error> {
         let pm = self.precise_id_response()?;
-        let err = pm
-            .error
-            .as_ref()
-            .and_then(|e| e.error_code.clone())
-            .map(|code| Error::ResponseError(CrossCoreResponseError::Error(code)));
+        let err = pm.error.as_ref().and_then(|e| e.error_code.clone()).map(|code| {
+            let description = ErrorCode::from_str(&code).unwrap_or(ErrorCode::Other(code.clone()));
+            Error::ResponseError(CrossCoreResponseError::Error(description, code))
+        });
 
         // Check for errors
         if let Some(e) = err {

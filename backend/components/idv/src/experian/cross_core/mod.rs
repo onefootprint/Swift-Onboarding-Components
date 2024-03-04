@@ -5,6 +5,7 @@ use self::client::ExperianClientAdapter;
 use super::ExperianCrossCoreRequest;
 
 pub mod client;
+pub mod error_code;
 pub(crate) mod request;
 pub mod response;
 pub(crate) mod validation;
