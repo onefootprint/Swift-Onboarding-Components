@@ -1,5 +1,6 @@
 use super::{Error, VResult};
 use crate::{Iso3166TwoDigitCountryCode, PiiJsonValue, PiiString, UsState};
+use chrono::{Datelike, NaiveDate};
 use regex::Regex;
 use serde::de::DeserializeOwned;
 use std::str::FromStr;
@@ -82,9 +83,47 @@ pub(super) fn validate_state(
     }
 }
 
+// A struct that helps with ages
+pub struct AgeHelper {
+    pub dob: NaiveDate,
+}
+impl AgeHelper {
+    pub fn age_is_gte(&self, today: NaiveDate, age_to_check: i32) -> bool {
+        // if there haven't been enough years, that's easy
+        let difference_from_today_in_years = today.year() - self.dob.year();
+        match difference_from_today_in_years.cmp(&age_to_check) {
+            // not enough years
+            std::cmp::Ordering::Less => false,
+            // we're in the bday year
+            std::cmp::Ordering::Equal => {
+                match today.month0().cmp(&self.dob.month0()) {
+                    // we're before the bday
+                    std::cmp::Ordering::Less => false,
+                    // we're in bday month
+                    std::cmp::Ordering::Equal => {
+                        match today.day0().cmp(&self.dob.day0()) {
+                            // we're before the bday
+                            std::cmp::Ordering::Less => false,
+                            // happy bday
+                            std::cmp::Ordering::Equal => true,
+                            // happy belated
+                            std::cmp::Ordering::Greater => true,
+                        }
+                    }
+                    // we're in a month after
+                    std::cmp::Ordering::Greater => true,
+                }
+            }
+            // we're gt than 18 years
+            std::cmp::Ordering::Greater => true,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::PO_BOX;
+    use super::*;
+    use chrono::NaiveDate;
     use test_case::test_case;
 
     #[test_case("po box" => true; "lower")]
@@ -98,5 +137,21 @@ mod tests {
     #[test_case("122344%%$^" => false)]
     fn test_po_box_regex(s: &str) -> bool {
         PO_BOX.is_match(s)
+    }
+
+    #[test_case("1990-01-01", "2021-01-01", 18 => true; "older than 18")]
+    #[test_case("1990-01-01", "2008-01-01", 60 => false; "not older than year provided")]
+    #[test_case("1990-01-01", "2008-01-01", 18 => true; "bday")]
+    #[test_case("1990-01-01", "2007-12-31", 18 => false; "day before 18th bday")]
+    #[test_case("2004-02-29", "2022-03-01", 18 => true; "dob year is leap year, today is day after bday in non-leap year")]
+    #[test_case("2004-02-29", "2022-02-28", 18 => false; "dob year is leap year, today is day before bday in non- leap year")]
+    #[test_case("2004-02-29", "2022-03-01", 18 => true; "dob year is leap year, day after bday in non-leap year")]
+    #[test_case("2006-02-28", "2024-02-29", 18 => true; "day after bday, current year leap year")]
+    #[test_case("2024-02-28", "2022-02-28", 18 => false; "dob after today")]
+    fn test_age_is_gt(dob: &str, now: &str, age_to_check: i32) -> bool {
+        let dob = NaiveDate::parse_from_str(dob, "%Y-%m-%d").unwrap();
+        let now = NaiveDate::parse_from_str(now, "%Y-%m-%d").unwrap();
+        let age_helper = AgeHelper { dob };
+        age_helper.age_is_gte(now, age_to_check)
     }
 }

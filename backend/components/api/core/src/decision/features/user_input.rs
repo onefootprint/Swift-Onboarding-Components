@@ -4,11 +4,11 @@ use crate::{
     utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper},
     ApiErrorKind,
 };
-use chrono::{Datelike, Days, NaiveDate, Utc};
+use chrono::{Days, NaiveDate, Utc};
 use db::models::{ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo};
 use newtypes::{
-    CollectedData, DataIdentifier, Declaration, FootprintReasonCode, IdentityDataKind, InvestorProfileKind,
-    PiiString, VendorAPI, VerificationResultId, VisaKind, DATE_FORMAT,
+    AgeHelper, CollectedData, DataIdentifier, Declaration, FootprintReasonCode, IdentityDataKind,
+    InvestorProfileKind, PiiString, VendorAPI, VerificationResultId, VisaKind, DATE_FORMAT,
 };
 use std::str::FromStr;
 
@@ -143,47 +143,9 @@ fn age_gte(dob: PiiString, age_to_check: i32) -> ApiResult<bool> {
     let age_helper = AgeHelper { dob };
     let today = Utc::now().naive_utc().into();
 
-
     Ok(age_helper.age_is_gte(today, age_to_check))
 }
 
-
-// A struct that helps with ages
-pub struct AgeHelper {
-    pub dob: NaiveDate,
-}
-impl AgeHelper {
-    pub fn age_is_gte(&self, today: NaiveDate, age_to_check: i32) -> bool {
-        // if there haven't been enough years, that's easy
-        let difference_from_today_in_years = today.year() - self.dob.year();
-        match difference_from_today_in_years.cmp(&age_to_check) {
-            // not enough years
-            std::cmp::Ordering::Less => false,
-            // we're in the bday year
-            std::cmp::Ordering::Equal => {
-                match today.month0().cmp(&self.dob.month0()) {
-                    // we're before the bday
-                    std::cmp::Ordering::Less => false,
-                    // we're in bday month
-                    std::cmp::Ordering::Equal => {
-                        match today.day0().cmp(&self.dob.day0()) {
-                            // we're before the bday
-                            std::cmp::Ordering::Less => false,
-                            // happy bday
-                            std::cmp::Ordering::Equal => true,
-                            // happy belated
-                            std::cmp::Ordering::Greater => true,
-                        }
-                    }
-                    // we're in a month after
-                    std::cmp::Ordering::Greater => true,
-                }
-            }
-            // we're gt than 18 years
-            std::cmp::Ordering::Greater => true,
-        }
-    }
-}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -200,21 +162,5 @@ mod tests {
         let exp = Some(PiiString::from(visa_expiration));
         let now = NaiveDate::parse_from_str(now, "%Y-%m-%d").unwrap();
         super::visa_features(kind, exp, now).await.unwrap()
-    }
-
-    #[test_case("1990-01-01", "2021-01-01", 18 => true; "older than 18")]
-    #[test_case("1990-01-01", "2008-01-01", 60 => false; "not older than year provided")]
-    #[test_case("1990-01-01", "2008-01-01", 18 => true; "bday")]
-    #[test_case("1990-01-01", "2007-12-31", 18 => false; "day before 18th bday")]
-    #[test_case("2004-02-29", "2022-03-01", 18 => true; "dob year is leap year, today is day after bday in non-leap year")]
-    #[test_case("2004-02-29", "2022-02-28", 18 => false; "dob year is leap year, today is day before bday in non- leap year")]
-    #[test_case("2004-02-29", "2022-03-01", 18 => true; "dob year is leap year, day after bday in non-leap year")]
-    #[test_case("2006-02-28", "2024-02-29", 18 => true; "day after bday, current year leap year")]
-    #[test_case("2024-02-28", "2022-02-28", 18 => false; "dob after today")]
-    fn test_age_is_gt(dob: &str, now: &str, age_to_check: i32) -> bool {
-        let dob = NaiveDate::parse_from_str(dob, "%Y-%m-%d").unwrap();
-        let now = NaiveDate::parse_from_str(now, "%Y-%m-%d").unwrap();
-        let age_helper = AgeHelper { dob };
-        age_helper.age_is_gte(now, age_to_check)
     }
 }

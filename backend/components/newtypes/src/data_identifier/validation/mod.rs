@@ -15,7 +15,7 @@ pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
 pub use card::CardIssuer;
 pub use identity::{UsLegalStatus, VisaKind};
 pub use investor_profile::Declaration;
-
+pub use utils::AgeHelper;
 pub type AllData = HashMap<DataIdentifier, PiiJsonValue>;
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";

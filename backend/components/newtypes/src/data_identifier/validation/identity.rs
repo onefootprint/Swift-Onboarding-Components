@@ -1,5 +1,5 @@
 use super::{
-    utils::{self, validate_state, PO_BOX},
+    utils::{self, validate_state, AgeHelper, PO_BOX},
     Error, VResult,
 };
 use crate::{
@@ -73,20 +73,20 @@ fn clean_and_validate_date(input: PiiString) -> VResult<PiiString> {
 }
 
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
-    let date = NaiveDate::parse_from_str(input.leak(), DATE_FORMAT).map_err(|_| Error::InvalidDate)?;
+    let dob = NaiveDate::parse_from_str(input.leak(), DATE_FORMAT).map_err(|_| Error::InvalidDate)?;
     if for_bifrost {
-        if date.year() < 1900 {
+        if dob.year() < 1900 {
             return Err(Error::ImprobableDob);
         }
 
         let today = Utc::now().naive_utc().date();
-        let age = (today - date).num_days() / 365;
+        let age_helper = AgeHelper { dob };
 
-        if age <= 13 {
+        if !age_helper.age_is_gte(today, 14) {
             return Err(Error::ImprobableDobTooYoung);
         }
     }
-    Ok(PiiString::new(date.format(DATE_FORMAT).to_string()))
+    Ok(PiiString::new(dob.format(DATE_FORMAT).to_string()))
 }
 
 fn validate_name(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
