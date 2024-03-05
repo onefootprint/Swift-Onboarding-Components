@@ -110,7 +110,7 @@ def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
 
     # Already initialized in bifrost client, but try again to make sure this endpoint is
     # idempotent
-    body = bifrost.initialize_onboarding()
+    body = bifrost.initialize_onboarding(False)
 
     body = bifrost.get_status()
     assert body["ob_configuration"]["org_name"] == bifrost.ob_config.tenant.name

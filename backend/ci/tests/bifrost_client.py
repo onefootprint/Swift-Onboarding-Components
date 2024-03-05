@@ -38,12 +38,18 @@ class BifrostClient:
         sandbox_id,
         override_phone=None,
         override_email=None,
+        provide_playbook_auth=False,
     ):
         """
         Create an instance of BifrostClient that uses the provided auth token.
         """
         return BifrostClient(
-            ob_config, auth_token, sandbox_id, override_phone, override_email
+            ob_config,
+            auth_token,
+            sandbox_id,
+            override_phone,
+            override_email,
+            provide_playbook_auth,
         )
 
     def inherit(ob_config, sandbox_id, override_ob_config_auth=None):
@@ -84,6 +90,7 @@ class BifrostClient:
         sandbox_id,
         override_phone=None,
         override_email=None,
+        provide_playbook_auth=False,
     ):
         self.ob_config = ob_config
         self.auth_token = auth_token
@@ -128,8 +135,27 @@ class BifrostClient:
         # Keep track of biometric credentials created
         self.webauthn_device = SoftWebauthnDevice()
 
+        # Check the validation token
+        body = post("hosted/onboarding/validate", None, auth_token)
+        validation_token = body["validation_token"]
+
+        data = dict(validation_token=validation_token)
+        body = post("onboarding/session/validate", data, ob_config.tenant.sk.key)
+
+        # Shouldn't have any user or business associated
+        assert not body.get("business")
+        assert not body.get("user")
+        # Check user_auth
+        assert body["user_auth"]["fp_id"]
+        assert body["user_auth"]["auth_events"]
+        assert all(
+            e["kind"] in {"sms", "email", "passkey", "third_party"}
+            for e in body["user_auth"]["auth_events"]
+        )
+        assert all(e["timestamp"] for e in body["user_auth"]["auth_events"])
+
         # Initialize the onboarding
-        self.initialize_onboarding()
+        self.initialize_onboarding(provide_playbook_auth)
 
     @property
     def decrypted_data(self):
@@ -147,8 +173,11 @@ class BifrostClient:
             # Could add other derived entries here
         }
 
-    def initialize_onboarding(self):
-        return post("hosted/onboarding", None, self.auth_token)
+    def initialize_onboarding(self, provide_playbook_auth):
+        auths = [self.auth_token]
+        if provide_playbook_auth:
+            auths.append(self.ob_config.key)
+        return post("hosted/onboarding", None, *auths)
 
     def get_status(self):
         return get("hosted/onboarding/status", None, self.auth_token)

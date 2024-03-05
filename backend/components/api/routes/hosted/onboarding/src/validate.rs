@@ -5,25 +5,20 @@ use api_core::{
     auth::{
         session::{user::ValidateUserToken, AuthSessionData},
         user::{UserAuthContext, UserWfAuthContext},
-        Any,
+        IsGuardMet,
     },
     errors::{ApiResult, AssertionError},
     types::JsonApiResponse,
     utils::{
         identify::get_user_challenge_context,
-        requirements::{
-            get_data_collection_progress, get_requirements_for_person_and_maybe_business,
-            DecryptUncheckedResultForReqs, GetRequirementsArgs,
-        },
+        requirements::{get_requirements_for_person_and_maybe_business, GetRequirementsArgs},
         session::AuthSession,
-        vault_wrapper::{VaultWrapper, VwArgs},
     },
 };
 use api_wire_types::hosted::validate::HostedValidateResponse;
 use chrono::Duration;
 use db::models::auth_event::AuthEvent;
 use itertools::Itertools;
-use newtypes::{output::Csv, DataIdentifierDiscriminant, ObConfigurationKind};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -37,8 +32,8 @@ pub async fn post(
     user_auth: UserAuthContext,
     user_wf_auth: Option<UserWfAuthContext>,
 ) -> JsonApiResponse<HostedValidateResponse> {
-    let (wf, sv_id, id, obc, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
-        // Token from onboarding
+    let (wf, sv_id, id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
+        // We're generating a token after onboarding has finished
         let user_wf_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp)?;
 
         // Verify there are no unmet requirements
@@ -50,41 +45,24 @@ pub async fn post(
             return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
         }
 
-        let obc = user_wf_auth.ob_config().ok().cloned();
         let wf = user_wf_auth.workflow().clone();
         let sv_id = user_wf_auth.scoped_user.id.clone();
         let id = user_wf_auth.data.user_session.user_identifier();
-        (Some(wf), sv_id, id, obc, user_wf_auth.data.user_session)
+        (Some(wf), sv_id, id, user_wf_auth.data.user_session)
     } else {
-        // Token from auth
-        let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
-        let obc = user_auth
-            .ob_config()
-            .ok_or(OnboardingError::ObConfigKindNotAuth)?
-            .clone();
-        if obc.kind != ObConfigurationKind::Auth {
-            return Err(OnboardingError::ObConfigKindNotAuth.into());
-        }
+        // We're generating a token after auth has finished
+        let user_auth = user_auth.check_guard(UserAuthGuard::Auth.or(UserAuthGuard::SignUp))?;
         let sv_id = user_auth
             .scoped_user_id()
             .ok_or(AssertionError("No scoped user associated with auth session"))?;
-        // Primitive requirement checking for auth playbooks, which don't have many requirements
-        let sv_id2 = sv_id.clone();
-        let vw = state
-            .db_pool
-            .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv_id2)))
-            .await?;
-        let args = DecryptUncheckedResultForReqs::for_auth();
-        let progress = get_data_collection_progress(&vw, &obc, DataIdentifierDiscriminant::Id, &args);
-        if !progress.missing_attributes.is_empty() {
-            return Err(OnboardingError::MissingAttributes(Csv(progress.missing_attributes)).into());
-        }
         let id = user_auth.user_identifier();
-        (None, sv_id, id, Some(obc), user_auth.data)
+        (None, sv_id, id, user_auth.data)
     };
+    let obc = user_auth.ob_config().cloned();
 
     if let Some(obc) = obc {
         if let Some(required_auth_methods) = obc.required_auth_methods() {
+            // TODO don't error when there's a third-party auth event
             let ctx = get_user_challenge_context(&state, id, None).await?;
             let verified_auth_methods = ctx
                 .auth_methods
@@ -96,7 +74,8 @@ pub async fn post(
                 .iter()
                 .find(|m| !verified_auth_methods.contains(m))
             {
-                tracing::info!(%missing_method, "Missing required auth method");
+                // TODO hard error
+                tracing::info!(%missing_method, ?verified_auth_methods, "Missing required auth method");
             } else {
                 tracing::info!("All auth methods provided");
             }

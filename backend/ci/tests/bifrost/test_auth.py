@@ -3,7 +3,7 @@ import typing
 from tests.identify_client import IdentifyClient
 from tests.utils import create_ob_config, post, get, _gen_random_sandbox_id
 from tests.bifrost_client import BifrostClient
-from tests.headers import SandboxId, FpAuth
+from tests.headers import FpAuth
 
 
 class User(typing.NamedTuple):
@@ -59,18 +59,21 @@ def test_onboarding_authed_user(authed_user, sandbox_tenant):
     assert set(body["scopes"]) >= {"sign_up"}
     assert not "explicit_auth" in body["scopes"]
 
-    # Start onboarding with public key here
-    post("hosted/onboarding", None, auth_token, sandbox_tenant.default_ob_config.key)
+    bifrost = BifrostClient.raw_auth(
+        sandbox_tenant.default_ob_config,
+        auth_token,
+        authed_user.sandbox_id,
+        provide_playbook_auth=True,
+    )
 
     # Check that the status is incomplete (aka in progress)
     body = get(f"entities/{authed_user.fp_id}", None, *sandbox_tenant.db_auths)
     assert body["status"] == "in_progress"
 
-    bifrost = BifrostClient.raw_auth(
-        sandbox_tenant.default_ob_config, auth_token, authed_user.sandbox_id
-    )
+    # Finish running bifrost
     user = bifrost.run()
     assert user.fp_id == authed_user.fp_id
+
     # Auth events should be inherited
     assert (
         user.client.validate_response["user_auth"]

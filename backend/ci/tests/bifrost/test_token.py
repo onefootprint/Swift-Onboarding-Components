@@ -193,12 +193,14 @@ def test_provide_publishable_key_on_client(sandbox_tenant, ob_config):
     # Should require passing obc key
     body = post("hosted/onboarding", None, auth_token, status_code=400)
     assert body["error"]["message"] == "No playbook key provided"
-    body = post(
-        "hosted/onboarding", None, auth_token, sandbox_tenant.default_ob_config.key
-    )
 
     # Run bifrost
-    bifrost = BifrostClient.raw_auth(ob_config, auth_token, user.client.sandbox_id)
+    bifrost = BifrostClient.raw_auth(
+        ob_config,
+        auth_token,
+        user.client.sandbox_id,
+        provide_playbook_auth=True,
+    )
     bifrost.run()
 
 

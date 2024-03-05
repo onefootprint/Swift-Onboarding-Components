@@ -60,8 +60,6 @@ pub enum OnboardingError {
     NoObcForWorkflow,
     #[error("Workflow doesn't have an associated status")]
     NoStatusForWorkflow,
-    #[error("Expecting auth playbook")]
-    ObConfigKindNotAuth,
     #[error("{0}")]
     Validation(String),
     #[error("Can only provide one image at a time")]
