@@ -10,10 +10,16 @@ export type BadgeProps = {
   testID?: string;
   variant: UIState;
   sx?: SXStyleProps;
+  className?: string;
 };
 
-const Badge = ({ children, testID, variant, sx }: BadgeProps) => (
-  <StyledBadge $variant={variant} $sx={sx} data-testid={testID}>
+const Badge = ({ children, testID, variant, sx, className }: BadgeProps) => (
+  <StyledBadge
+    $variant={variant}
+    $sx={sx}
+    data-testid={testID}
+    className={className}
+  >
     {children}
   </StyledBadge>
 );
