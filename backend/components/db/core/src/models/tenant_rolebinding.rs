@@ -17,7 +17,8 @@ pub struct TenantRolebinding {
     pub id: TenantRolebindingId,
     pub tenant_user_id: TenantUserId,
     pub tenant_role_id: TenantRoleId,
-    pub tenant_id: TenantId,
+    // TODO: Remove
+    pub tenant_id: Option<TenantId>,
     pub last_login_at: Option<DateTime<Utc>>,
     pub deactivated_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
@@ -53,7 +54,7 @@ macro_rules! list_query {
     ($params: ident) => {{
         let mut query = tenant_user::table
             .inner_join(tenant_rolebinding::table.inner_join(tenant_role::table))
-            .filter(tenant_rolebinding::tenant_id.eq($params.tenant_id))
+            .filter(tenant_role::tenant_id.eq($params.tenant_id))
             .into_boxed();
 
         if $params.only_active {
@@ -157,7 +158,7 @@ impl TenantRolebinding {
     pub fn list_by_user(conn: &mut PgConn, user_id: &TenantUserId) -> DbResult<Vec<(Self, Tenant)>> {
         use db_schema::schema::tenant;
         let results = tenant_rolebinding::table
-            .inner_join(tenant::table)
+            .inner_join(tenant_role::table.inner_join(tenant::table))
             .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
             .filter(tenant_rolebinding::deactivated_at.is_null())
             .select((tenant_rolebinding::all_columns, tenant::all_columns))
@@ -174,11 +175,7 @@ impl TenantRolebinding {
     {
         use db_schema::schema::tenant;
         let mut query = tenant_user::table
-            .inner_join(
-                tenant_rolebinding::table
-                    .inner_join(tenant_role::table)
-                    .inner_join(tenant::table),
-            )
+            .inner_join(tenant_rolebinding::table.inner_join(tenant_role::table.inner_join(tenant::table)))
             .filter(tenant_rolebinding::deactivated_at.is_null())
             .into_boxed();
         match id.into() {
@@ -188,16 +185,16 @@ impl TenantRolebinding {
             TenantRolebindingIdentifier::Tenant(id, tenant_id) => {
                 query = query
                     .filter(tenant_rolebinding::id.eq(id))
-                    .filter(tenant_rolebinding::tenant_id.eq(tenant_id));
+                    .filter(tenant::id.eq(tenant_id));
             }
             TenantRolebindingIdentifier::User(user_id, tenant_id) => {
                 query = query
                     .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
-                    .filter(tenant_rolebinding::tenant_id.eq(tenant_id));
+                    .filter(tenant::id.eq(tenant_id));
             }
         }
-        let (user, (rb, role, tenant)) =
-            query.first::<(TenantUser, (TenantRolebinding, TenantRole, Tenant))>(conn)?;
+        let (user, (rb, (role, tenant))) =
+            query.first::<(TenantUser, (TenantRolebinding, (TenantRole, Tenant)))>(conn)?;
         rb.validate_login(&role)?;
         Ok((user, rb, role, tenant))
     }
@@ -210,9 +207,7 @@ impl TenantRolebinding {
         if role.deactivated_at.is_some() {
             return Err(DbError::TenantRoleDeactivated);
         }
-        if role.tenant_id != self.tenant_id {
-            return Err(DbError::TenantRoleMismatch);
-        }
+
         Ok(())
     }
 

@@ -1150,7 +1150,7 @@ diesel::table! {
         id -> Text,
         tenant_user_id -> Text,
         tenant_role_id -> Text,
-        tenant_id -> Text,
+        tenant_id -> Nullable<Text>,
         last_login_at -> Nullable<Timestamptz>,
         deactivated_at -> Nullable<Timestamptz>,
         created_at -> Timestamptz,

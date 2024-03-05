@@ -84,19 +84,19 @@ async fn handler(
     //
 
     let (matching_rolebindings, created_new_tenant) = if !matching_rolebindings.is_empty() {
-        let rbs = matching_rolebindings.into_iter().map(|(rb, _)| rb).collect();
-        (rbs, false)
+        (matching_rolebindings, false)
     } else if request_org_id.is_none() {
         let (tenant, created_new_tenant) = find_or_create_tenant(&state, profile).await?;
         // If there are no rolebindings for this user, make one.
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
         let user_id = user.id.clone();
+        let tenant_id = tenant.id.clone();
         let rb = state
             .db_pool
-            .db_transaction(move |conn| TenantRolebinding::get_or_create_login(conn, user_id, tenant.id))
+            .db_transaction(move |conn| TenantRolebinding::get_or_create_login(conn, user_id, tenant_id))
             .await?;
-        (vec![(rb)], created_new_tenant)
+        (vec![(rb, tenant)], created_new_tenant)
     } else {
         (vec![], false)
     };
@@ -109,12 +109,14 @@ async fn handler(
         // If a specific tenant ID was requested, only log into that tenant
         matching_rolebindings
             .into_iter()
-            .find(|rb| rb.tenant_id == org_id)
+            .find(|(_, tenant)| tenant.id == org_id)
+            .map(|(rb, _)| rb)
     } else {
         // If there's only one rolebinding for this user, log into it
         (matching_rolebindings.len() == 1)
             .then_some(matching_rolebindings.into_iter().next())
             .flatten()
+            .map(|(rb, _)| rb)
     };
 
     //
