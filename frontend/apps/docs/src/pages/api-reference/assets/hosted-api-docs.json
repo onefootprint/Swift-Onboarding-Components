@@ -3208,12 +3208,20 @@
             "GetDeviceAttestationChallengeRequest": {
                 "type": "object",
                 "properties": {
+                    "android_package_name": {
+                        "description": "required if running footprint sdk in android",
+                        "type": "string"
+                    },
                     "device_type": {
                         "type": "string",
                         "enum": [
                             "ios",
                             "android"
                         ]
+                    },
+                    "ios_bundle_id": {
+                        "description": "required if running footprint sdk in ios",
+                        "type": "string"
                     }
                 },
                 "required": [

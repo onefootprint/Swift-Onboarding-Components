@@ -3138,29 +3138,14 @@
                 ]
             }
         },
-        "/org/app_meta": {
+        "/org/app_meta/android": {
             "get": {
                 "tags": [
                     "OrgSettings",
                     "Organization",
                     "Private"
                 ],
-                "description": "Returns a list of tenant apps' metadata.",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "kind",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "ios",
-                                "android"
-                            ]
-                        },
-                        "style": "form"
-                    }
-                ],
+                "description": "Returns a list of metadata for tenant Android apps.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -3169,7 +3154,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/TenantAppMeta"
+                                        "$ref": "#/components/schemas/TenantAndroidAppMeta"
                                     }
                                 }
                             }
@@ -3188,12 +3173,12 @@
                     "Organization",
                     "Private"
                 ],
-                "description": "Creates a tenant app metadata entry for the organization.",
+                "description": "Creates a tenant Android app metadata entry for the organization.",
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CreateTenantAppMetaRequest"
+                                "$ref": "#/components/schemas/CreateTenantAndroidAppMetaRequest"
                             }
                         }
                     },
@@ -3205,7 +3190,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TenantAppMeta"
+                                    "$ref": "#/components/schemas/TenantAndroidAppMeta"
                                 }
                             }
                         }
@@ -3218,18 +3203,18 @@
                 ]
             }
         },
-        "/org/app_meta/{app_meta_id}": {
+        "/org/app_meta/android/{id}": {
             "delete": {
                 "tags": [
                     "OrgSettings",
                     "Organization",
                     "Private"
                 ],
-                "description": "Delete a tenant app metadata for the organization.",
+                "description": "Delete a tenant android app metadata for the organization.",
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "app_meta_id",
+                        "name": "id",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -3244,6 +3229,283 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/android/{id}/reveal": {
+            "post": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
+                "description": "Decrypts a specific android app metadata entry",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TenantAndroidAppMeta"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/android/{meta_id}": {
+            "patch": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Updates the provided tenant android app metadata",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "meta_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTenantAndroidAppMetaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TenantAndroidAppMeta"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/ios": {
+            "get": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns a list of metadata for tenant ios apps.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TenantIosAppMeta"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Creates a tenant ios app metadata entry for the organization.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTenantIosAppMetaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TenantIosAppMeta"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/ios/{id}": {
+            "delete": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Delete a tenant iOS app metadata for the organization.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/ios/{id}/reveal": {
+            "post": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
+                "description": "Decrypts a specific ios app metadata entry",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TenantIosAppMeta"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/ios/{meta_id}": {
+            "patch": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Updates the provided tenant ios app metadata",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "meta_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTenantIosAppMetaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TenantIosAppMeta"
                                 }
                             }
                         }
@@ -7285,35 +7547,59 @@
                     "rule_expression"
                 ]
             },
-            "CreateTenantAppMetaRequest": {
+            "CreateTenantAndroidAppMetaRequest": {
                 "type": "object",
                 "properties": {
-                    "android_apk_cert_sha256": {
+                    "apk_cert_sha256s": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "integrity_decryption_key": {
                         "type": "string"
                     },
-                    "android_package_name": {
+                    "integrity_verification_key": {
                         "type": "string"
                     },
-                    "ios_app_bundle_id": {
+                    "package_names": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "apk_cert_sha256s",
+                    "integrity_decryption_key",
+                    "integrity_verification_key",
+                    "package_names"
+                ]
+            },
+            "CreateTenantIosAppMetaRequest": {
+                "type": "object",
+                "properties": {
+                    "app_bundle_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "device_check_key_id": {
                         "type": "string"
                     },
-                    "ios_team_id": {
+                    "device_check_private_key": {
                         "type": "string"
                     },
-                    "kind": {
-                        "type": "string",
-                        "enum": [
-                            "ios",
-                            "android"
-                        ]
-                    },
-                    "name": {
+                    "team_id": {
                         "type": "string"
                     }
                 },
                 "required": [
-                    "kind",
-                    "name"
+                    "app_bundle_ids",
+                    "device_check_key_id",
+                    "device_check_private_key",
+                    "team_id"
                 ]
             },
             "CreateTenantRoleRequest": {
@@ -9706,6 +9992,7 @@
                                         "dob_partial_match",
                                         "dob_not_on_file",
                                         "dob_could_not_match",
+                                        "dob_input_age_less_than18",
                                         "ssn_not_available",
                                         "ssn_partially_matches",
                                         "ssn_does_not_match",
@@ -9823,6 +10110,7 @@
                                         "document_is_permit_or_provisional_license",
                                         "document_selfie_was_skipped",
                                         "document_collected_via_desktop",
+                                        "document_not_live_capture",
                                         "document_ocr_name_does_not_match",
                                         "document_ocr_name_could_not_match",
                                         "document_ocr_name_matches",
@@ -10381,6 +10669,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -10498,6 +10787,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -10745,6 +11035,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -10862,6 +11153,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -11109,6 +11401,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -11226,6 +11519,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -11473,6 +11767,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -11590,6 +11885,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -11837,6 +12133,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -11954,6 +12251,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -12201,6 +12499,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -12318,6 +12617,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -12565,6 +12865,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -12682,6 +12983,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -12929,6 +13231,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -13046,6 +13349,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -13293,6 +13597,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -13410,6 +13715,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -13657,6 +13963,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -13774,6 +14081,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -14021,6 +14329,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -14138,6 +14447,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -14385,6 +14695,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -14502,6 +14813,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -14749,6 +15061,7 @@
                                                 "dob_partial_match",
                                                 "dob_not_on_file",
                                                 "dob_could_not_match",
+                                                "dob_input_age_less_than18",
                                                 "ssn_not_available",
                                                 "ssn_partially_matches",
                                                 "ssn_does_not_match",
@@ -14866,6 +15179,7 @@
                                                 "document_is_permit_or_provisional_license",
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
+                                                "document_not_live_capture",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -19129,6 +19443,7 @@
                             "dob_partial_match",
                             "dob_not_on_file",
                             "dob_could_not_match",
+                            "dob_input_age_less_than18",
                             "ssn_not_available",
                             "ssn_partially_matches",
                             "ssn_does_not_match",
@@ -19246,6 +19561,7 @@
                             "document_is_permit_or_provisional_license",
                             "document_selfie_was_skipped",
                             "document_collected_via_desktop",
+                            "document_not_live_capture",
                             "document_ocr_name_does_not_match",
                             "document_ocr_name_could_not_match",
                             "document_ocr_name_matches",
@@ -19507,6 +19823,7 @@
                             "dob_partial_match",
                             "dob_not_on_file",
                             "dob_could_not_match",
+                            "dob_input_age_less_than18",
                             "ssn_not_available",
                             "ssn_partially_matches",
                             "ssn_does_not_match",
@@ -19624,6 +19941,7 @@
                             "document_is_permit_or_provisional_license",
                             "document_selfie_was_skipped",
                             "document_collected_via_desktop",
+                            "document_not_live_capture",
                             "document_ocr_name_does_not_match",
                             "document_ocr_name_could_not_match",
                             "document_ocr_name_matches",
@@ -20118,40 +20436,72 @@
                     "status"
                 ]
             },
-            "TenantAppMeta": {
-                "description": "Frequently used note for an Org",
+            "TenantAndroidAppMeta": {
                 "type": "object",
                 "properties": {
-                    "android_apk_cert_sha256": {
+                    "apk_cert_sha256s": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "id": {
                         "type": "string"
                     },
-                    "android_package_name": {
+                    "integrity_decryption_key": {
+                        "type": "string"
+                    },
+                    "integrity_verification_key": {
+                        "type": "string"
+                    },
+                    "package_names": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "tenant_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "apk_cert_sha256s",
+                    "id",
+                    "package_names",
+                    "tenant_id"
+                ]
+            },
+            "TenantIosAppMeta": {
+                "type": "object",
+                "properties": {
+                    "app_bundle_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "device_check_key_id": {
+                        "type": "string"
+                    },
+                    "device_check_private_key": {
                         "type": "string"
                     },
                     "id": {
                         "type": "string"
                     },
-                    "ios_app_bundle_id": {
+                    "team_id": {
                         "type": "string"
                     },
-                    "ios_team_id": {
-                        "type": "string"
-                    },
-                    "kind": {
-                        "type": "string",
-                        "enum": [
-                            "ios",
-                            "android"
-                        ]
-                    },
-                    "name": {
+                    "tenant_id": {
                         "type": "string"
                     }
                 },
                 "required": [
+                    "app_bundle_ids",
+                    "device_check_key_id",
                     "id",
-                    "kind",
-                    "name"
+                    "team_id",
+                    "tenant_id"
                 ]
             },
             "TriggerRequest": {
@@ -20243,6 +20593,49 @@
                         "items": {
                             "type": "string"
                         }
+                    }
+                }
+            },
+            "UpdateTenantAndroidAppMetaRequest": {
+                "type": "object",
+                "properties": {
+                    "apk_cert_sha256s": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "integrity_decryption_key": {
+                        "type": "string"
+                    },
+                    "integrity_verification_key": {
+                        "type": "string"
+                    },
+                    "package_names": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "UpdateTenantIosAppMetaRequest": {
+                "type": "object",
+                "properties": {
+                    "app_bundle_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "device_check_key_id": {
+                        "type": "string"
+                    },
+                    "device_check_private_key": {
+                        "type": "string"
+                    },
+                    "team_id": {
+                        "type": "string"
                     }
                 }
             },
