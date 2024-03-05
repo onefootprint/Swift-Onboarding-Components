@@ -161,7 +161,7 @@ impl AuthEvent {
             .into_iter()
             .flat_map(|(event, insight)| {
                 match (event.kind, &event.webauthn_credential_id) {
-                    (AuthEventKind::Sms | AuthEventKind::Email, None) => {
+                    (AuthEventKind::Sms | AuthEventKind::Email | AuthEventKind::ThirdParty, None) => {
                         Some(LoadedAuthEvent {
                             insight,
                             attested_devices: None, 
