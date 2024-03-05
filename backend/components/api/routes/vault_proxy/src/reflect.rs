@@ -1,13 +1,15 @@
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
-
-use crate::errors::ApiResult;
-
-use crate::{proxy, proxy::token_parser::ProxyTokenParser, utils::headers::InsightHeaders, State};
-
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext},
+    errors::ApiResult,
+    proxy,
+    proxy::token_parser::ProxyTokenParser,
+    utils::headers::InsightHeaders,
+    State,
+};
 use api_core::{
     api_headers_schema, auth::CanDecrypt, telemetry::RootSpan, utils::body_bytes::BodyBytes, ApiErrorKind,
 };
-use newtypes::{AccessEventPurpose, FpId};
+use newtypes::{AccessEventPurpose, FpId, PiiString};
 use paperclip::actix::{api_v2_operation, post, web, web::HttpResponse};
 use reqwest::StatusCode;
 
@@ -68,6 +70,11 @@ pub async fn post(
     let detokenized_body = parser.detokenize_body(detokens)?;
 
     // 3. build the reflect response
+    build_response(detokenized_body)
+}
+
+#[tracing::instrument(skip_all)]
+fn build_response(detokenized_body: PiiString) -> ApiResult<HttpResponse> {
     let mut builder = HttpResponse::build(StatusCode::OK);
     let response = builder.body(detokenized_body.leak().as_bytes().to_vec());
     Ok(response)
