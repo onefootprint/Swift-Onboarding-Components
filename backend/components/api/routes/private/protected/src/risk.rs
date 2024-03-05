@@ -4,14 +4,15 @@ use actix_web::{
     web::{self, Json},
 };
 use api_core::{
-    decision,
     decision::{
-        engine,
+        self, engine,
         features::risk_signals::{fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result},
         onboarding::Decision,
         rule_engine::eval::RuleEvalConfig,
-        vendor,
-        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
+        vendor::{
+            get_vendor_apis_for_verification_requests, tenant_vendor_control::TenantVendorControl,
+            vendor_result::VendorResult,
+        },
     },
     errors::{onboarding::OnboardingError, ApiError, ApiResult, AssertionError},
     task,
@@ -71,18 +72,20 @@ async fn make_vendor_calls(
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
             let decision_intent =
                 DecisionIntent::create(conn, newtypes::DecisionIntentKind::ManualRunKyc, &sv.id, None)?;
-            let requests = vendor::build_verification_requests_and_checkpoint(
-                conn,
-                &uvw,
-                &sv.id,
-                &decision_intent.id,
-                &tvc2,
-                vec![vendor_api],
-            )?;
+
+            let available_vendor_apis =
+                get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tvc2)?;
+            if !available_vendor_apis.contains(&vendor_api) {
+                Err(ApiErrorKind::AssertionError(format!(
+                    "{vendor_api} not enabled for tenant!"
+                )))?;
+            }
+            let request =
+                VerificationRequest::create(conn, (&sv.id, &decision_intent.id, vendor_api).into())?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
             let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
-            Ok((requests, uvw, rules))
+            Ok((vec![request], uvw, rules))
         })
         .await?;
 
@@ -165,7 +168,14 @@ async fn make_decision(
             ) {
                 return Err(AssertionError("decision was StepUp, erroring").into());
             }
-            engine::save_onboarding_decision(conn, &wf, decision.clone(), Some(&rule_set_result.id), vres_ids, vec![])?;
+            engine::save_onboarding_decision(
+                conn,
+                &wf,
+                decision.clone(),
+                Some(&rule_set_result.id),
+                vres_ids,
+                vec![],
+            )?;
             Ok(decision)
         })
         .await?;

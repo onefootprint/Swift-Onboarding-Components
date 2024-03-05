@@ -1,11 +1,6 @@
 use std::fmt::Display;
 
-use crate::{
-    errors::{ApiError, ApiErrorKind, ApiResult},
-    utils::vault_wrapper::VaultWrapper,
-};
-
-use db::{models::verification_request::VerificationRequest, TxnPgConn};
+use crate::errors::{ApiErrorKind, ApiResult};
 use newtypes::{DecisionIntentId, IdentityDataKind, ScopedVaultId, VendorAPI};
 
 use self::tenant_vendor_control::TenantVendorControl;
@@ -23,31 +18,6 @@ pub mod vendor_result;
 pub mod vendor_trait;
 pub mod verification_result;
 
-/// Build verification requests from the VaultWrapper and save.
-/// We save so that if something happens, we can always replay the requests
-#[tracing::instrument(skip(conn, uvw))]
-pub fn build_verification_requests_and_checkpoint(
-    conn: &mut TxnPgConn,
-    uvw: &VaultWrapper,
-    su_id: &ScopedVaultId,
-    decision_intent_id: &DecisionIntentId,
-    tenant_vendor_control: &TenantVendorControl,
-    vendor_apis: Vec<VendorAPI>,
-) -> Result<Vec<VerificationRequest>, ApiError> {
-    let mut available_vendor_apis =
-        get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), tenant_vendor_control)?;
-    available_vendor_apis.retain(|v| vendor_apis.contains(v));
-
-    let requests_to_initiate = VerificationRequest::bulk_create(
-        conn,
-        su_id.clone(),
-        available_vendor_apis,
-        decision_intent_id,
-        None,
-    )?;
-
-    Ok(requests_to_initiate)
-}
 
 pub fn get_vendor_apis_for_verification_requests(
     present_data_lifetime_kinds: &[IdentityDataKind],
