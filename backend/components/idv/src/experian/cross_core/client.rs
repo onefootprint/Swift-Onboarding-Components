@@ -179,7 +179,7 @@ impl ExperianClientAdapter {
                     }
                     _ => {
                         let err = Error::UnknownError;
-                        tracing::error!(?err, error_code=%&e.code, "send_precise_id_request error");
+                        tracing::info!(?err, error_code=%&e.code, "send_precise_id_request error");
                         err
                     }
                 };
@@ -194,12 +194,17 @@ impl ExperianClientAdapter {
             Ok(c) => {
                 let codes = c.error_codes();
 
-                if codes.contains(&"709".to_string()) {
-                    let err = Error::UserNamePasswordError;
-                    tracing::error!(?err, error_code=%"709", "send_precise_id_request error");
+                if !codes.is_empty() {
+                    let err = if codes.contains(&"709".to_string()) {
+                        Error::UserNamePasswordError
+                    } else if codes.contains(&"720".to_string()) {
+                        Error::OtherPreciseIdServerError
+                    } else {
+                        Error::UnknownError
+                    };
+
+                    tracing::info!(?err, ?codes, "send_precise_id_request error");
                     Err(err)
-                } else if codes.contains(&"720".to_string()) {
-                    Err(Error::UnknownError)
                 } else {
                     Ok(())
                 }

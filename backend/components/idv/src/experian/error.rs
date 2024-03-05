@@ -36,6 +36,8 @@ pub enum Error {
     JwtTokenNeedsRefresh,
     #[error("Unknown Error")]
     UnknownError,
+    #[error("Unknown Precise ID Error 720")]
+    OtherPreciseIdServerError,
     #[error("Username/Password Error")]
     UserNamePasswordError,
     #[error("Incorrect PreciseID Version (model or precise match)")]
