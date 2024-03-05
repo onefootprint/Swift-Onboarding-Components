@@ -301,8 +301,6 @@ impl Vault {
         use crate::models::scoped_vault::ScopedVault;
         use db_schema::schema::{data_lifetime, fingerprint};
 
-        tracing::info!(sh_datas=%Csv::from(sh_data.iter().cloned().collect_vec()), "Searching for fingerprints");
-
         // Look for verified vaults marked `is_portable` and `is_verified`
         // that also have portable, active data matching the fingerprint
         // and a matching sandbox_id, if provided
@@ -356,6 +354,8 @@ impl Vault {
             let unverified_vaults: Vec<_> = query.get_results::<Self>(conn)?;
             vaults.extend(unverified_vaults)
         }
+
+        tracing::info!(sh_datas=%Csv::from(sh_data.iter().cloned().collect_vec()), num_results=%vaults.len(), "Searching for fingerprints");
 
         // All of the vaults here presumably are the same user (or same contact info) that has,
         // for one reason or another, been duplicated around the Footprint ecosystem.
