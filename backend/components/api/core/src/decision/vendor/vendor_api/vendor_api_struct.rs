@@ -32,6 +32,8 @@ pub enum WrappedVendorAPI {
     IncodeUpdatedWatchlistResult,
     IncodeGetOnboardingStatus,
     IncodeProcessFace,
+    IncodeCurpValidation,
+    IncodeIneData,
     StytchLookup,
     FootprintDeviceAttestation,
     AwsRekognition,
@@ -68,6 +70,8 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::AwsRekognition => Self::AwsRekognition,
             VendorAPI::AwsTextract => Self::AwsTextract,
             VendorAPI::LexisFlexId => Self::LexisFlexId,
+            VendorAPI::IncodeCurpValidation => Self::IncodeCurpValidation,
+            VendorAPI::IncodeIneData => Self::IncodeIneData,
         }
     }
 }
@@ -102,6 +106,8 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::AwsRekognition => VendorAPI::AwsRekognition,
             WrappedVendorAPI::AwsTextract => VendorAPI::AwsTextract,
             WrappedVendorAPI::LexisFlexId => VendorAPI::LexisFlexId,
+            WrappedVendorAPI::IncodeCurpValidation => VendorAPI::IncodeCurpValidation,
+            WrappedVendorAPI::IncodeIneData => VendorAPI::IncodeIneData,
         }
     }
 }

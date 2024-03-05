@@ -85,6 +85,8 @@ pub enum VendorAPI {
     IncodeUpdatedWatchlistResult,
     IncodeGetOnboardingStatus,
     IncodeProcessFace,
+    IncodeCurpValidation,
+    IncodeIneData,
     StytchLookup,
     FootprintDeviceAttestation,
     AwsRekognition,
@@ -118,6 +120,8 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeUpdatedWatchlistResult => Self::Incode,
             VendorAPI::IncodeGetOnboardingStatus => Self::Incode,
             VendorAPI::IncodeProcessFace => Self::Incode,
+            VendorAPI::IncodeCurpValidation => Self::Incode,
+            VendorAPI::IncodeIneData => Self::Incode,
             VendorAPI::StytchLookup => Self::Stytch,
             VendorAPI::FootprintDeviceAttestation => Self::Footprint,
             VendorAPI::AwsRekognition => Self::Footprint,
@@ -135,39 +139,6 @@ pub fn vendor_apis_from_vendor(vendor: Vendor) -> Vec<VendorAPI> {
 }
 
 impl VendorAPI {
-    // temporary hack to allow us to filter to just vendor calls that are made in a batch of KYC vendor calls
-    pub fn is_kyc_call(&self) -> bool {
-        match self {
-            VendorAPI::IdologyExpectId
-            | VendorAPI::TwilioLookupV2
-            | VendorAPI::ExperianPreciseId
-            | VendorAPI::LexisFlexId => true,
-            VendorAPI::IdologyPa
-            | VendorAPI::MiddeskCreateBusiness
-            | VendorAPI::MiddeskGetBusiness
-            | VendorAPI::MiddeskBusinessUpdateWebhook
-            | VendorAPI::MiddeskTinRetriedWebhook
-            | VendorAPI::IncodeStartOnboarding
-            | VendorAPI::IncodeAddFront
-            | VendorAPI::IncodeAddBack
-            | VendorAPI::IncodeProcessId
-            | VendorAPI::IncodeFetchScores
-            | VendorAPI::IncodeAddPrivacyConsent
-            | VendorAPI::IncodeAddMlConsent
-            | VendorAPI::IncodeFetchOcr
-            | VendorAPI::IncodeAddSelfie
-            | VendorAPI::IncodeWatchlistCheck
-            | VendorAPI::IncodeUpdatedWatchlistResult
-            | VendorAPI::IncodeGetOnboardingStatus
-            | VendorAPI::IncodeProcessFace
-            | VendorAPI::SocureIdPlus
-            | VendorAPI::StytchLookup
-            | VendorAPI::AwsRekognition
-            | VendorAPI::AwsTextract
-            | VendorAPI::FootprintDeviceAttestation => false,
-        }
-    }
-
     pub fn is_incode_doc_flow_api(&self) -> bool {
         match self {
             VendorAPI::IncodeAddFront
@@ -196,7 +167,9 @@ impl VendorAPI {
             | VendorAPI::FootprintDeviceAttestation
             | VendorAPI::AwsRekognition
             | VendorAPI::AwsTextract
-            | VendorAPI::LexisFlexId => false,
+            | VendorAPI::LexisFlexId
+            | VendorAPI::IncodeCurpValidation
+            | VendorAPI::IncodeIneData => false,
         }
     }
 }

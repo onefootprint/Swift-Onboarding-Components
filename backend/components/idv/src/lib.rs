@@ -6,12 +6,14 @@ use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::{expectid::response::ExpectIDResponse, pa::response::PaResponse};
 use incode::{
+    curp_validation::response::CurpValidationResponse,
     doc::response::{
         AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
         GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
     },
     response::OnboardingStartResponse,
     watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
+    IncodeAPIResult, IncodeClientErrorCustomFailureReasons,
 };
 use lexis::response::FlexIdResponse;
 use middesk::response::{
@@ -68,6 +70,8 @@ pub enum ParsedResponse {
     AwsTextract(PiiJsonValue),
     AwsRekognition(PiiJsonValue),
     LexisFlexId(FlexIdResponse),
+    IncodeCurpValidation(CurpValidationResponse),
+    IncodeIneData(PiiJsonValue),
 }
 
 impl ParsedResponse {
@@ -210,6 +214,21 @@ impl ParsedResponse {
         let parsed = crate::lexis::parse_response(raw_response).map_err(Error::from)?;
         Ok(Self::LexisFlexId(parsed))
     }
+
+    pub fn from_incode_curp_validation(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let deser: CurpValidationResponse = Self::from_incode_response(raw_response)?;
+
+        Ok(Self::IncodeCurpValidation(deser))
+    }
+
+    fn from_incode_response<T>(raw_response: serde_json::Value) -> Result<T, crate::Error>
+    where
+        T: IncodeClientErrorCustomFailureReasons + serde::Serialize + serde::de::DeserializeOwned,
+    {
+        IncodeAPIResult::try_from(raw_response)?
+            .into_success()
+            .map_err(Error::from)
+    }
 }
 
 #[derive(Clone)]
@@ -284,6 +303,8 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::AwsTextract(_) => VendorAPI::AwsTextract,
             ParsedResponse::AwsRekognition(_) => VendorAPI::AwsRekognition,
             ParsedResponse::LexisFlexId(_) => VendorAPI::LexisFlexId,
+            ParsedResponse::IncodeCurpValidation(_) => VendorAPI::IncodeCurpValidation,
+            ParsedResponse::IncodeIneData(_) => VendorAPI::IncodeIneData,
         }
     }
 }

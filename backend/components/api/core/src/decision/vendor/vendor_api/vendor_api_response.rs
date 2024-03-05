@@ -1,5 +1,7 @@
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
-use idv::{lexis::response::FlexIdResponse, stytch};
+use idv::{
+    incode::curp_validation::response::CurpValidationResponse, lexis::response::FlexIdResponse, stytch,
+};
 use newtypes::{
     EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI,
     VerificationRequestId, VerificationResultId,
@@ -121,6 +123,8 @@ pub fn scrub_raw_error_vendor_response(
         VendorAPI::AwsRekognition => scrub_response::<AwsRekognition>(raw_response),
         VendorAPI::AwsTextract => scrub_response::<AwsTextract>(raw_response),
         VendorAPI::LexisFlexId => scrub_response::<LexisFlexId>(raw_response),
+        VendorAPI::IncodeCurpValidation => scrub_response::<IncodeCurpValidation>(raw_response),
+        VendorAPI::IncodeIneData => scrub_response::<IncodeIneData>(raw_response),
     }
 }
 
@@ -181,6 +185,8 @@ fn build_parsed_vendor_response_map_entry(
         VendorAPI::AwsRekognition => insert_map_entry(map, AwsRekognition, raw_response)?,
         VendorAPI::AwsTextract => insert_map_entry(map, AwsTextract, raw_response)?,
         VendorAPI::LexisFlexId => insert_map_entry(map, LexisFlexId, raw_response)?,
+        VendorAPI::IncodeCurpValidation => insert_map_entry(map, IncodeCurpValidation, raw_response)?,
+        VendorAPI::IncodeIneData => insert_map_entry(map, IncodeIneData, raw_response)?,
     };
 
     Ok(())
@@ -223,6 +229,8 @@ fn build_verification_identifier_map_entry(
         VendorAPI::AwsRekognition => map.insert(AwsRekognition, request_and_result),
         VendorAPI::AwsTextract => map.insert(AwsTextract, request_and_result),
         VendorAPI::LexisFlexId => map.insert(LexisFlexId, request_and_result),
+        VendorAPI::IncodeCurpValidation => map.insert(IncodeCurpValidation, request_and_result),
+        VendorAPI::IncodeIneData => map.insert(IncodeIneData, request_and_result),
     };
 }
 
@@ -384,6 +392,15 @@ impl TypedMapKey<VendorAPIResponseMarker> for LexisFlexId {
     type Value = FlexIdResponse;
 }
 
+impl TypedMapKey<VendorAPIResponseMarker> for IncodeCurpValidation {
+    type Value = CurpValidationResponse;
+}
+
+// TODO:
+impl TypedMapKey<VendorAPIResponseMarker> for IncodeIneData {
+    type Value = serde_json::Value;
+}
+
 /// Verification Request and Result map, used in conjunction with the above map for reason codes
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyExpectID {
     type Value = VerificationRequestAndResult;
@@ -464,6 +481,14 @@ impl TypedMapKey<VendorAPIResponseIdsMarker> for AwsTextract {
     type Value = VerificationRequestAndResult;
 }
 impl TypedMapKey<VendorAPIResponseIdsMarker> for LexisFlexId {
+    type Value = VerificationRequestAndResult;
+}
+
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeCurpValidation {
+    type Value = VerificationRequestAndResult;
+}
+
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeIneData {
     type Value = VerificationRequestAndResult;
 }
 

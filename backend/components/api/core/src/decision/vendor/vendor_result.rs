@@ -184,7 +184,7 @@ fn deserialize_from_vendor_api(
     raw_response: serde_json::Value,
     vendor_api: VendorAPI,
 ) -> Result<ParsedResponse, ApiError> {
-    let res = match vendor_api {
+    let res: ParsedResponse = match vendor_api {
         VendorAPI::IdologyExpectId => ParsedResponse::from_idology_expectid_response(raw_response)?,
         VendorAPI::TwilioLookupV2 => ParsedResponse::from_twilio_lookupv2_response(raw_response)?,
         VendorAPI::SocureIdPlus => ParsedResponse::from_socure_idplus_response(raw_response)?,
@@ -219,10 +219,14 @@ fn deserialize_from_vendor_api(
         VendorAPI::FootprintDeviceAttestation => {
             ParsedResponse::FootprintDeviceAttestation(serde_json::from_value(raw_response)?)
         }
+        // Caution Note
         // These json responses are subject to change, so for safety don't plan on ever using the deserialized version
         VendorAPI::AwsRekognition => ParsedResponse::AwsRekognition(raw_response.into()),
         VendorAPI::AwsTextract => ParsedResponse::AwsTextract(raw_response.into()),
+        // End of Caution Note
         VendorAPI::LexisFlexId => ParsedResponse::from_lexis_flex_id(raw_response)?,
+        VendorAPI::IncodeCurpValidation => ParsedResponse::from_incode_curp_validation(raw_response)?,
+        VendorAPI::IncodeIneData => ParsedResponse::IncodeIneData(raw_response.into()),
     };
 
     Ok(res)
