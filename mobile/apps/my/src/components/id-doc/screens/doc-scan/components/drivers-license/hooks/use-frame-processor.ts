@@ -2,7 +2,10 @@ import type { CountryRecord } from '@onefootprint/global-constants';
 import { UploadDocumentSide } from '@onefootprint/types';
 import { useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
-import { useFrameProcessor as useVCFrameProcessor } from 'react-native-vision-camera';
+import {
+  runAtTargetFps,
+  useFrameProcessor as useVCFrameProcessor,
+} from 'react-native-vision-camera';
 import { Worklets } from 'react-native-worklets-core';
 
 import { detectBarcodes, detectDocument } from '@/utils/vision-camera';
@@ -32,26 +35,30 @@ const useFrameProcessor = (
   const frameProcessor = useVCFrameProcessor(frame => {
     'worklet';
 
-    const documentResult = detectDocument(frame);
-    const barcodeResult = requiresCode
-      ? detectBarcodes(frame)
-      : DEFAULT_BARCODE_RESULT;
+    runAtTargetFps(30, () => {
+      'worklet';
 
-    const hasBarcode = barcodeResult.barcodes.length > 0;
-    const isDetected =
-      documentResult.isDocument && (requiresCode ? hasBarcode : true);
+      const documentResult = detectDocument(frame);
+      const barcodeResult = requiresCode
+        ? detectBarcodes(frame)
+        : DEFAULT_BARCODE_RESULT;
 
-    setObjectJs({
-      isDetected,
-      feedback: isDetected
-        ? ''
-        : `Scan the ${side.toUpperCase()} of your driver's license`,
-      data: {
-        barcodes: barcodeResult.barcodes,
-      },
+      const hasBarcode = barcodeResult.barcodes.length > 0;
+      const isDetected =
+        documentResult.isDocument && (requiresCode ? hasBarcode : true);
+
+      setObjectJs({
+        isDetected,
+        feedback: isDetected
+          ? ''
+          : `Scan the ${side.toUpperCase()} of your driver's license`,
+        data: {
+          barcodes: barcodeResult.barcodes,
+        },
+      });
+
+      setDetectorJs(isDetected);
     });
-
-    setDetectorJs(isDetected);
   }, []);
 
   return { object, detector, frameProcessor };

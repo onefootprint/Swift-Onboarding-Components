@@ -1,7 +1,10 @@
 import type { UploadDocumentSide } from '@onefootprint/types';
 import { useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
-import { useFrameProcessor as useVCFrameProcessor } from 'react-native-vision-camera';
+import {
+  runAtTargetFps,
+  useFrameProcessor as useVCFrameProcessor,
+} from 'react-native-vision-camera';
 import { Worklets } from 'react-native-worklets-core';
 
 import { detectDocument } from '@/utils/vision-camera';
@@ -35,18 +38,22 @@ const useFrameProcessor = ({ side, documentName }: DefaultDocumentProps) => {
     frame => {
       'worklet';
 
-      const result = detectDocument(frame);
-      if (result.isDocument) {
-        setDetectorJs(true);
-        setObjectJs(detected);
-      } else {
-        setDetectorJs(false);
-        setObjectJs({
-          isDetected: false,
-          feedback: `Scan the ${side.toUpperCase()} of your ${documentName}`,
-          data: {},
-        });
-      }
+      runAtTargetFps(30, () => {
+        'worklet';
+
+        const result = detectDocument(frame);
+        if (result.isDocument) {
+          setDetectorJs(true);
+          setObjectJs(detected);
+        } else {
+          setDetectorJs(false);
+          setObjectJs({
+            isDetected: false,
+            feedback: `Scan the ${side.toUpperCase()} of your ${documentName}`,
+            data: {},
+          });
+        }
+      });
     },
     [detector],
   );
