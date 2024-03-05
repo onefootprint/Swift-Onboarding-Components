@@ -4,7 +4,7 @@ use crate::{
 use api_core::{
     auth::{
         session::{user::ValidateUserToken, AuthSessionData},
-        user::{UserAuthContext, UserWfAuthContext},
+        user::{load_auth_events, UserAuthContext, UserWfAuthContext},
         IsGuardMet,
     },
     errors::{ApiResult, AssertionError},
@@ -19,6 +19,7 @@ use api_wire_types::hosted::validate::HostedValidateResponse;
 use chrono::Duration;
 use db::models::auth_event::AuthEvent;
 use itertools::Itertools;
+use newtypes::AuthEventKind;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -60,30 +61,44 @@ pub async fn post(
     };
     let obc = user_auth.ob_config().cloned();
 
-    if let Some(obc) = obc {
-        if let Some(required_auth_methods) = obc.required_auth_methods() {
-            // TODO don't error when there's a third-party auth event
-            let ctx = get_user_challenge_context(&state, id, None).await?;
-            let verified_auth_methods = ctx
-                .auth_methods
-                .into_iter()
-                .filter(|m| m.is_verified)
-                .map(|m| m.kind)
-                .collect_vec();
-            if let Some(missing_method) = required_auth_methods
-                .iter()
-                .find(|m| !verified_auth_methods.contains(m))
-            {
-                // TODO hard error
-                tracing::info!(%missing_method, ?verified_auth_methods, "Missing required auth method");
-            } else {
-                tracing::info!("All auth methods provided");
+    let has_3p_auth = {
+        let auth_events = user_auth.auth_events.clone();
+        let auth_events = state
+            .db_pool
+            .db_query(move |conn| load_auth_events(conn, &auth_events))
+            .await?;
+        auth_events
+            .iter()
+            .any(|(ae, _)| ae.kind == AuthEventKind::ThirdParty)
+    };
+    if !has_3p_auth {
+        // Third-party auth won't register an auth method, so we should waive the requirement that
+        // the playbook's auth methods are met.
+        // Perhaps when we start having more proper use of 3p auth from apiture we should actually
+        // mark the phone as verified
+        if let Some(obc) = obc {
+            // There won't be an obc associated with auth tokens that were generated via API
+            // without a playbook key.
+            if let Some(required_auth_methods) = obc.required_auth_methods() {
+                let ctx = get_user_challenge_context(&state, id, None).await?;
+                let verified_auth_methods = ctx
+                    .auth_methods
+                    .into_iter()
+                    .filter(|m| m.is_verified)
+                    .map(|m| m.kind)
+                    .collect_vec();
+                if let Some(missing_method) = required_auth_methods
+                    .iter()
+                    .find(|m| !verified_auth_methods.contains(m))
+                {
+                    // TODO hard error
+                    tracing::info!(%missing_method, ?verified_auth_methods, "Missing required auth method");
+                } else {
+                    tracing::info!("All auth methods provided");
+                }
             }
         }
-    } else {
-        // Don't expect this to happen, but going to add soft error before making this a hard error
-        tracing::info!("Validate call with no obc");
-    };
+    }
 
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
