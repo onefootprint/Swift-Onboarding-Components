@@ -1,7 +1,11 @@
 import { useCountdown } from '@onefootprint/hooks';
-import { AnimatedLoadingSpinner, LinkButton, Text } from '@onefootprint/ui';
+import {
+  AnimatedLoadingSpinner,
+  LinkButton,
+  Stack,
+  Text,
+} from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 
 export type ResendButtonProps = {
   isResendLoading?: boolean;
@@ -60,11 +64,16 @@ const ResendButton = ({
   return isResendLoading ? (
     <AnimatedLoadingSpinner animationStart />
   ) : (
-    <Container>
+    <Stack
+      align="center"
+      direction="column"
+      justify="center"
+      gap={2}
+      marginTop={5}
+    >
       <LinkButton
         disabled={resendClicked && countdown > 0}
         onClick={handleClick}
-        sx={{ marginBottom: 2, marginTop: 4 }}
       >
         {texts.resendCta}
       </LinkButton>
@@ -73,15 +82,8 @@ const ResendButton = ({
           {texts.resendCountDown.replace('{{seconds}}', String(countdown))}
         </Text>
       )}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  flex-direction: column;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
 
 export default ResendButton;
