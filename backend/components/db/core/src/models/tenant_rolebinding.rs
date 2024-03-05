@@ -17,8 +17,6 @@ pub struct TenantRolebinding {
     pub id: TenantRolebindingId,
     pub tenant_user_id: TenantUserId,
     pub tenant_role_id: TenantRoleId,
-    // TODO: Remove
-    pub tenant_id: Option<TenantId>,
     pub last_login_at: Option<DateTime<Utc>>,
     pub deactivated_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
@@ -104,7 +102,6 @@ impl TenantRolebinding {
         let new = NewTenantRolebinding {
             tenant_user_id,
             tenant_role_id,
-            tenant_id,
             // init to None since they haven't logged in yet!
             last_login_at: None,
             created_at: Utc::now(),
@@ -294,7 +291,6 @@ impl TenantRolebinding {
 struct NewTenantRolebinding {
     tenant_user_id: TenantUserId,
     tenant_role_id: TenantRoleId,
-    tenant_id: TenantId,
     last_login_at: Option<DateTime<Utc>>,
     created_at: DateTime<Utc>,
 }

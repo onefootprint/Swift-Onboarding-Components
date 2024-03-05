@@ -1150,7 +1150,6 @@ diesel::table! {
         id -> Text,
         tenant_user_id -> Text,
         tenant_role_id -> Text,
-        tenant_id -> Nullable<Text>,
         last_login_at -> Nullable<Timestamptz>,
         deactivated_at -> Nullable<Timestamptz>,
         created_at -> Timestamptz,
@@ -1503,7 +1502,6 @@ diesel::joinable!(tenant_compliance_partnership -> tenant (tenant_id));
 diesel::joinable!(tenant_frequent_note -> tenant (tenant_id));
 diesel::joinable!(tenant_ios_app_meta -> tenant (tenant_id));
 diesel::joinable!(tenant_role -> tenant (tenant_id));
-diesel::joinable!(tenant_rolebinding -> tenant (tenant_id));
 diesel::joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
 diesel::joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
 diesel::joinable!(tenant_vendor_control -> tenant (tenant_id));
