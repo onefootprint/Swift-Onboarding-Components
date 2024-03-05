@@ -8,6 +8,7 @@ use idv::{
         IdologyExpectIDAPIResponse, IdologyExpectIDRequest,
     },
     incode::{
+        curp_validation::{response::CurpValidationResponse, IncodeCurpValidationRequest},
         doc::{
             response::{
                 AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
@@ -91,6 +92,11 @@ pub struct IncodeClients {
         IncodeResponse<GetOnboardingStatusResponse>,
         idv::incode::error::Error,
     >,
+    pub incode_curp_validation: VendorClient<
+        IncodeCurpValidationRequest,
+        IncodeResponse<CurpValidationResponse>,
+        idv::incode::error::Error,
+    >,
 }
 
 impl IncodeClients {
@@ -163,6 +169,11 @@ impl IncodeClients {
                 IncodeResponse<UpdatedWatchlistResultResponse>,
                 idv::incode::error::Error,
             >::new()),
+            incode_curp_validation: Arc::new(MockVendorAPICall::<
+                IncodeCurpValidationRequest,
+                IncodeResponse<CurpValidationResponse>,
+                idv::incode::error::Error,
+            >::new()),
         }
     }
 
@@ -180,7 +191,8 @@ impl IncodeClients {
             incode_process_face: footprint_client.clone(),
             incode_watchlist_check: footprint_client.clone(),
             incode_updated_watchlist_result: footprint_client.clone(),
-            incode_get_onboarding_status: footprint_client,
+            incode_get_onboarding_status: footprint_client.clone(),
+            incode_curp_validation: footprint_client.clone(),
         }
     }
 }

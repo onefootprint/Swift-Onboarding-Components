@@ -4,6 +4,7 @@ use idv::{
     footprint_http_client::FootprintVendorHttpClient,
     incode::{
         client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
+        curp_validation::{response::CurpValidationResponse, IncodeCurpValidationRequest},
         doc::{
             request::DocumentSide,
             response::{
@@ -524,5 +525,43 @@ impl VendorAPIResponse for IncodeResponse<UpdatedWatchlistResultResponse> {
     // we don't use incode in this way
     fn parsed_response(&self) -> ParsedResponse {
         ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a IncodeRawResponse again ??
+    }
+}
+
+
+#[async_trait]
+impl VendorAPICall<IncodeCurpValidationRequest, IncodeResponse<CurpValidationResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeCurpValidationRequest"))]
+    async fn make_request(
+        &self,
+        request: IncodeCurpValidationRequest,
+    ) -> Result<IncodeResponse<CurpValidationResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client.curp_validation(self, request.curp).await?;
+
+        let result = IncodeResponse::from_response(raw_response).await;
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<CurpValidationResponse> {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeCurpValidation
+    }
+
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a IncodeRawResponse again ?? idk i forget
     }
 }
