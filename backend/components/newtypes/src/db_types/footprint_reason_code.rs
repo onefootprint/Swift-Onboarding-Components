@@ -365,7 +365,9 @@ footprint_reason_code_enum! {
         #[note = "Dob could not be matched", severity = SignalSeverity::High,  description = "DOB could not be matched"]
         DobCouldNotMatch,
 
-
+        #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = None]
+        #[note = "Dob input age is less than 18", severity = SignalSeverity::High,  description = "Dob input corresponds to an age less than 18 years old. This doesn't necessarily mean the DOB was verified or not, just that the user entered an age less than 18."]
+        DobInputAgeLessThan18,
 
 
         // ~~~~~~~~~~~~ SSN ~~~~~~~~~~~~
