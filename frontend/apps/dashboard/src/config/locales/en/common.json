@@ -656,7 +656,12 @@
       "page-title": "Footprint | Log in to the Footprint",
       "title": "Log into Footprint",
       "google": "Continue with Google",
-      "email": "Continue with email"
+      "email": "Continue with email",
+      "login-errors": {
+        "title": "Login failed",
+        "google-description": "Google login failed. Please try again or use a different method.",
+        "email-description": "Email login failed. Please try again or use a different method."
+      }
     },
     "organizations": {
       "page-title": "Footprint Login | Select an Organization",

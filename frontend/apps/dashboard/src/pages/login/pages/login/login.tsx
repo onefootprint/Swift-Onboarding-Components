@@ -1,19 +1,49 @@
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
-import { Button, GoogleButton, Text } from '@onefootprint/ui';
+import type { NextToast } from '@onefootprint/ui';
+import { Button, GoogleButton, Text, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 const Login = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.login' });
   const router = useRouter();
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+  const [isLoadingEmail, setIsLoadingEmail] = useState(false);
+  const toast = useToast();
 
-  const handleGoggleButtonClick = () => {
-    const redirect = `${window.location.origin}/auth`;
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/org/auth/google_oauth?redirect_url=${redirect}`;
-    window.location.href = url;
+  const getErrorTexts = (
+    type: 'google-description' | 'email-description',
+  ): NextToast => ({
+    description: t(`pages.login.login-errors.${type}`),
+    title: t('pages.login.login-errors.title'),
+    variant: 'error',
+  });
+
+  const handleGoogleButtonClick = async () => {
+    setIsLoadingGoogle(true);
+    try {
+      const redirect = `${window.location.origin}/auth`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/org/auth/google_oauth?redirect_url=${redirect}`;
+      window.location.href = url;
+    } catch (error) {
+      toast.show(getErrorTexts('google-description'));
+    } finally {
+      setIsLoadingGoogle(false);
+    }
+  };
+
+  const handleEmailButtonClick = async () => {
+    setIsLoadingEmail(true);
+    try {
+      await router.push('/login/email');
+    } catch (error) {
+      toast.show(getErrorTexts('email-description'));
+    } finally {
+      setIsLoadingEmail(false);
+    }
   };
 
   return (
@@ -31,16 +61,18 @@ const Login = () => {
             <GoogleButton
               fullWidth
               type="submit"
-              onClick={handleGoggleButtonClick}
+              onClick={handleGoogleButtonClick}
               size="large"
+              loading={isLoadingGoogle}
             >
               {t('google')}
             </GoogleButton>
             <Button
-              onClick={() => router.push('/login/email')}
+              onClick={handleEmailButtonClick}
               variant="secondary"
               fullWidth
               size="large"
+              loading={isLoadingEmail}
             >
               {t('email')}
             </Button>
