@@ -1,6 +1,7 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { UploadDocumentSide } from '@onefootprint/types';
 import { useState } from 'react';
+import { Platform } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import {
   runAtTargetFps,
@@ -25,8 +26,11 @@ const useFrameProcessor = (
     data: {},
   });
 
+  // TODO: Remove this once we support barcode detection on Android
   const requiresCode =
-    side === UploadDocumentSide.Back && country.value === 'US';
+    side === UploadDocumentSide.Back &&
+    country.value === 'US' &&
+    Platform.OS === 'ios';
   const setObjectJs = Worklets.createRunInJsFn(setObject);
   const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
     detector.value = value;

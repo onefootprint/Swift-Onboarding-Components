@@ -78,8 +78,8 @@ class FaceDetectionPlugin(proxy: VisionCameraProxy, options: Map<String, Any>?):
   }
 
   private fun detectFaces (image: InputImage): Map<String, Boolean> {
-    val task: Task<List<Face>> = faceDetector.process(image)
     try {
+      val task: Task<List<Face>> = faceDetector.process(image)
       val faces: List<Face> = Tasks.await<List<Face>>(task)
 
       // We don't accept multiple faces or no faces
