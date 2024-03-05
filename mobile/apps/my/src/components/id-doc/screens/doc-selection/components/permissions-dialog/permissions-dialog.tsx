@@ -1,6 +1,6 @@
 import { Box, Button, Dialog, Typography } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
-import { Linking } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Linking, PermissionsAndroid, Platform } from 'react-native';
 import type { CameraPermissionStatus } from 'react-native-vision-camera';
 import { Camera } from 'react-native-vision-camera';
 
@@ -20,22 +20,50 @@ const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
   );
   const isDenied = permissions === 'denied';
   const analytics = useAnalytics();
+  const isAndroid = Platform.OS === 'android';
+  const [
+    androidCameraPermissionPromptDenied,
+    setAndroidCameraPermissionPromptDenied,
+  ] = useState(false);
+  const shouldPromptAndroidCameraPermission =
+    isAndroid && !androidCameraPermissionPromptDenied;
 
-  const setInitialPermissions = async () => {
+  const checkPermissions = useCallback(async () => {
     try {
-      const newPermissions = await Camera.getCameraPermissionStatus();
-      setPermission(newPermissions);
-    } catch (error) {}
-  };
+      if (isAndroid) {
+        const hasPermission = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+        );
+        if (hasPermission) {
+          return 'granted';
+        } else {
+          return 'denied';
+        }
+      } else {
+        const newPermissions = await Camera.getCameraPermissionStatus();
+        return newPermissions;
+      }
+    } catch (error) {
+      return null;
+    }
+  }, [isAndroid]);
 
   useEffect(() => {
+    const setInitialPermissions = async () => {
+      const newPermissions = await checkPermissions();
+      setPermission(newPermissions);
+    };
     setInitialPermissions();
-  }, []);
+  }, [checkPermissions]);
 
   const handleAskPermission = async () => {
     try {
       const response = await Camera.requestCameraPermission();
       setPermission(response);
+
+      if (response === 'denied' && isAndroid) {
+        setAndroidCameraPermissionPromptDenied(true);
+      }
 
       if (response === 'granted') {
         analytics.track(Events.DocCameraPermissionsGranted);
@@ -45,11 +73,11 @@ const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
       if (response === 'denied') {
         analytics.track(Events.DocCameraPermissionsDenied);
       }
-      // TODO: add fallback for denied, speciallly for android
     } catch (error) {}
   };
 
   const handleOpenSettings = () => {
+    handleClose();
     analytics.track(Events.DocCameraSettingsOpened);
     Linking.openSettings();
   };
@@ -59,9 +87,17 @@ const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
     setOpen(false);
   };
 
-  const handlePress = () => {
-    analytics.track(Events.DocCameraPermissionsOpened);
-    setOpen(true);
+  const handlePress = async () => {
+    // In case user upadates the permission from settings, we don't have the information updated in our component
+    // So we need to check the permission again
+    const newPermissions = await checkPermissions();
+    if (newPermissions === 'granted') {
+      analytics.track(Events.DocCameraPermissionsGranted);
+      onGranted();
+    } else {
+      analytics.track(Events.DocCameraPermissionsOpened);
+      setOpen(true);
+    }
   };
 
   return permissions == null || permissions === 'granted' ? (
@@ -73,7 +109,7 @@ const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
         open={open}
         onClose={handleClose}
         cta={
-          isDenied
+          isDenied && !shouldPromptAndroidCameraPermission
             ? {
                 label: t('open-settings'),
                 onPress: handleOpenSettings,
