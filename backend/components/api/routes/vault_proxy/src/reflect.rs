@@ -50,24 +50,23 @@ pub async fn post(
     let global_fp_id = params.user_token_assignment;
 
     // 1. parse
-    let parser = ProxyTokenParser::parse(body, global_fp_id)?;
-    parser.log_fp_id(root_span);
+    let (parser, tokens) = ProxyTokenParser::parse_and_log_fp_id(body, global_fp_id, root_span)?;
     let auth = auth.check_guard(CanDecrypt::new(
-        parser.matches.keys().map(|tok| tok.identifier.clone()).collect(),
+        tokens.iter().map(|tok| tok.identifier.clone()).collect(),
     ))?;
 
     // 2. detokenize
     let detokens = proxy::detokenize::detokenize(
         &state,
         auth.as_ref(),
-        parser.matches.keys().cloned().collect(),
+        tokens,
         params.access_reason,
         insight.clone(),
         AccessEventPurpose::Reflect,
     )
     .await?;
 
-    let detokenized_body = parser.detokenize_body(detokens)?;
+    let detokenized_body = parser.detokenize_body(&detokens)?;
 
     // 3. build the reflect response
     build_response(detokenized_body)

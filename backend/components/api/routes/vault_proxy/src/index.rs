@@ -116,21 +116,20 @@ async fn invoke_vault_proxy(
     };
 
     // 1. parse
-    let parser = ProxyTokenParser::parse(body, config.global_fp_id)?;
-    parser.log_fp_id(root_span);
+    let (parser, tokens) = ProxyTokenParser::parse_and_log_fp_id(body, config.global_fp_id, root_span)?;
 
     // 2. detokenize
     let detokens = proxy::detokenize::detokenize(
         &state,
         auth.as_ref(),
-        parser.matches.keys().cloned().collect(),
+        tokens,
         config.access_reason.clone(),
         insight.clone(),
         AccessEventPurpose::VaultProxy,
     )
     .await?;
 
-    let detokenized_body = parser.detokenize_body(detokens)?;
+    let detokenized_body = parser.detokenize_body(&detokens)?;
 
     // 3. proxy the detokenized request
     let response = net_client::proxy_request(
