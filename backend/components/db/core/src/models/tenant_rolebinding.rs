@@ -84,10 +84,9 @@ macro_rules! list_query {
 }
 
 impl TenantRolebinding {
-    /// Gets or creates the TenantUser with the provided email, and creates a rolebinding to
-    /// associate the TenantUser with the provided role
-    #[tracing::instrument("TenantRolebinding::get_or_create", skip_all)]
-    pub fn get_or_create(
+    /// Creates a rolebinding to associate the TenantUser with the provided role
+    #[tracing::instrument("TenantRolebinding::create", skip_all)]
+    pub fn create(
         conn: &mut TxnPgConn,
         tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
@@ -126,7 +125,7 @@ impl TenantRolebinding {
     }
 
     #[tracing::instrument("TenantRolebinding::create_for_login", skip_all)]
-    pub fn get_or_create_login(
+    pub fn create_for_login(
         conn: &mut TxnPgConn,
         user_id: TenantUserId,
         tenant_id: TenantId,
@@ -148,7 +147,7 @@ impl TenantRolebinding {
         let (users, _) = TenantRolebinding::list(conn, &filters, pagination)?;
         let are_no_users = users.is_empty();
         let role_id = if are_no_users { admin_role.id } else { ro_role.id };
-        let (rb, _) = TenantRolebinding::get_or_create(conn, user_id, role_id, tenant_id)?;
+        let (rb, _) = TenantRolebinding::create(conn, user_id, role_id, tenant_id)?;
         Ok(rb)
     }
 
