@@ -220,7 +220,7 @@ pub async fn save_incode_fixtures(
             let di =
                 DecisionIntent::get_or_create_for_workflow(conn, &suid, &wf_id, DecisionIntentKind::DocScan)?;
             let apis = vec![VendorAPI::IncodeFetchOcr, VendorAPI::IncodeFetchScores];
-            let requests = VerificationRequest::bulk_create(conn, suid, apis, &di.id)?;
+            let requests = VerificationRequest::bulk_create(conn, suid, apis, &di.id, Some(&iddoc.id))?;
 
             let new_vres = requests
                 .into_iter()
@@ -264,7 +264,7 @@ pub async fn save_incode_fixtures(
         expect_selfie: should_collect_selfie,
         fetch_ocr_response: &ocr_response,
         score_response: &score_response,
-        doc_uploads: &doc_uploads
+        doc_uploads: &doc_uploads,
     };
     // Use same VRes id because fixture
     let rs = compute_risk_signals(args, ocr_comparison_fields, vres.id.clone(), vres.id, &[])?;

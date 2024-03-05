@@ -279,9 +279,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
                 // Create vreq for anticipated business.updated webhook
                 let business_update_webhook_vreq = VerificationRequest::create(
                     conn,
-                    &sv_id,
-                    &di_id,
-                    VendorAPI::MiddeskBusinessUpdateWebhook,
+                    (&sv_id, &di_id, VendorAPI::MiddeskBusinessUpdateWebhook).into(),
                 )?;
                 Ok((udpated_middesk_request, business_update_webhook_vreq))
             })
@@ -329,9 +327,7 @@ impl MiddeskState<AwaitingBusinessUpdateWebhook> {
                         MiddeskRequestState::AwaitingTinRetry,
                         Some(VerificationRequest::create(
                             conn,
-                            &sv_id,
-                            &di_id,
-                            VendorAPI::MiddeskTinRetriedWebhook,
+                            (&sv_id, &di_id, VendorAPI::MiddeskTinRetriedWebhook).into(),
                         )?),
                     )
                 } else {
@@ -394,8 +390,10 @@ impl MiddeskState<AwaitingTinRetry> {
                 )?;
 
                 // create a Vreq for the GET /business call we will now make
-                let get_business_vreq =
-                    VerificationRequest::create(conn, &sv_id, &di_id, VendorAPI::MiddeskGetBusiness)?;
+                let get_business_vreq = VerificationRequest::create(
+                    conn,
+                    (&sv_id, &di_id, VendorAPI::MiddeskGetBusiness).into(),
+                )?;
 
                 let updated_middesk_request = MiddeskRequest::update(
                     conn,
@@ -561,9 +559,7 @@ pub async fn init_middesk_request(
 
             let vreq = VerificationRequest::create(
                 conn,
-                sv_id,
-                &decision_intent.id,
-                VendorAPI::MiddeskCreateBusiness,
+                (sv_id, &decision_intent.id, VendorAPI::MiddeskCreateBusiness).into(),
             )?;
 
             let middesk_request = MiddeskRequest::create(

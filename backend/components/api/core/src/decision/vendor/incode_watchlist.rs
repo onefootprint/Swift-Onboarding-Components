@@ -73,7 +73,7 @@ async fn save_vres_and_maybe_vreq<T: IncodeClientErrorCustomFailureReasons + ser
         .db_transaction(move |conn| -> ApiResult<_> {
             let vreq_id = match api_or_vreq_id {
                 Either::Left(vendor_api) => {
-                    let vreq = VerificationRequest::create(conn, &sv_id, &di_id, vendor_api)?;
+                    let vreq = VerificationRequest::create(conn, (&sv_id, &di_id, vendor_api).into())?;
                     vreq.id
                 }
                 Either::Right(vreq_id) => vreq_id,
@@ -141,7 +141,7 @@ async fn call_watchlist_result(
     let vendor_api: VendorAPI = kind.clone().into();
     let vreq = state
         .db_pool
-        .db_query(move |conn| VerificationRequest::create(conn, &svid, &diid, vendor_api))
+        .db_query(move |conn| VerificationRequest::create(conn, (&svid, &diid, vendor_api).into()))
         .await?;
     let vreq_id = vreq.id.clone();
 

@@ -154,7 +154,7 @@ pub fn save_vreq_and_vres(
         Err(e) => e.vendor_api,
     };
 
-    let vreq = VerificationRequest::create(conn, sv_id, di_id, vendor_api)?;
+    let vreq = VerificationRequest::create(conn, (sv_id, di_id, vendor_api).into())?;
 
     let vres = save_vres(conn, public_key, &vendor_result, &vreq)?;
 

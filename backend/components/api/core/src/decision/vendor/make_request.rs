@@ -74,7 +74,7 @@ pub async fn make_idv_vendor_call_save_vreq(
     let di_id = di_id.clone();
     let vreq = state
         .db_pool
-        .db_query(move |conn| VerificationRequest::create(conn, &sv_id, &di_id, vendor_api))
+        .db_query(move |conn| VerificationRequest::create(conn, (&sv_id, &di_id, vendor_api).into()))
         .await?;
 
     let idv_data = build_request::build_idv_data_from_verification_request(

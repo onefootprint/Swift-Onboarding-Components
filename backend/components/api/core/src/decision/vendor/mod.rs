@@ -38,8 +38,13 @@ pub fn build_verification_requests_and_checkpoint(
         get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), tenant_vendor_control)?;
     available_vendor_apis.retain(|v| vendor_apis.contains(v));
 
-    let requests_to_initiate =
-        VerificationRequest::bulk_create(conn, su_id.clone(), available_vendor_apis, decision_intent_id)?;
+    let requests_to_initiate = VerificationRequest::bulk_create(
+        conn,
+        su_id.clone(),
+        available_vendor_apis,
+        decision_intent_id,
+        None,
+    )?;
 
     Ok(requests_to_initiate)
 }

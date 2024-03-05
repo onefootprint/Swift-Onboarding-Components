@@ -145,7 +145,10 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;
-    let vreq = VerificationRequest::create(conn, &sb.id, &di.id, VendorAPI::MiddeskBusinessUpdateWebhook)?;
+    let vreq = VerificationRequest::create(
+        conn,
+        (&sb.id, &di.id, VendorAPI::MiddeskBusinessUpdateWebhook).into(),
+    )?;
     let raw = idv::test_fixtures::middesk_business_response();
     let e_response = vendor::verification_result::encrypt_verification_result_response(
         &raw.clone().into(),

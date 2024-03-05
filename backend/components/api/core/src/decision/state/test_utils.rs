@@ -505,7 +505,7 @@ pub fn save_vres_for_doc_fixture_risk_signals(
     wf_id: &WorkflowId,
 ) -> Result<VerificationResult, ApiError> {
     let di = DecisionIntent::get_or_create_for_workflow(conn, sv_id, wf_id, DecisionIntentKind::DocScan)?;
-    let vreq = VerificationRequest::create(conn, sv_id, &di.id, vendor_api)?;
+    let vreq = VerificationRequest::create(conn, (sv_id, &di.id, vendor_api).into())?;
     let e_response = vendor::verification_result::encrypt_verification_result_response(
         &response.clone().into(),
         &vault.public_key,

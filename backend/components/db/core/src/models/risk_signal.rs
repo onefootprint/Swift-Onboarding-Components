@@ -354,7 +354,7 @@ mod tests {
         di_id: &DecisionIntentId,
         vendor_api: VendorAPI,
     ) -> VerificationResult {
-        let vreq = VerificationRequest::create(conn, sv_id, di_id, vendor_api).unwrap();
+        let vreq = VerificationRequest::create(conn, (sv_id, di_id, vendor_api).into()).unwrap();
 
         VerificationResult::create(
             conn,

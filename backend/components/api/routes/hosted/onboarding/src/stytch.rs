@@ -73,7 +73,7 @@ pub async fn post(
                 &sv_id,
                 wf_id.as_ref(),
             )?;
-            let vreq = VerificationRequest::create(conn, &sv_id, &di.id, VendorAPI::StytchLookup)?;
+            let vreq = VerificationRequest::create(conn, (&sv_id, &di.id, VendorAPI::StytchLookup).into())?;
             let uv = Vault::get(conn, &uv_id)?;
 
             match res {

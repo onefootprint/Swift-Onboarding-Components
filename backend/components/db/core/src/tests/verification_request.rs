@@ -68,7 +68,7 @@ fn save_req_and_result(
     DataLifetime::get_next_seqno(conn).unwrap();
 
     let verification_requests =
-        VerificationRequest::bulk_create(conn.conn(), su_id, vendor_apis, &di_id).unwrap();
+        VerificationRequest::bulk_create(conn.conn(), su_id, vendor_apis, &di_id, None).unwrap();
 
     verification_requests
         .into_iter()

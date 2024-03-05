@@ -66,7 +66,7 @@ async fn make_vendor_call(
     let diid = di_id.clone();
     let vreq = state
         .db_pool
-        .db_query(move |conn| VerificationRequest::create(conn, &svid, &diid, vendor_api))
+        .db_query(move |conn| VerificationRequest::create(conn, (&svid, &diid, vendor_api).into()))
         .await?;
     let idv_data = decision::vendor::build_request::build_idv_data_from_verification_request(
         &state.db_pool,

@@ -40,6 +40,41 @@ struct NewVerificationRequestRow {
     decision_intent_id: DecisionIntentId,
 }
 
+pub struct NewVerificationRequestArgs<'a> {
+    pub scoped_vault_id: &'a ScopedVaultId,
+    pub decision_intent_id: &'a DecisionIntentId,
+    pub identity_document_id: Option<&'a IdentityDocumentId>,
+    pub vendor_api: VendorAPI,
+}
+
+impl<'a> NewVerificationRequestArgs<'a> {
+    pub fn new(
+        scoped_vault_id: &'a ScopedVaultId,
+        decision_intent_id: &'a DecisionIntentId,
+        identity_document_id: Option<&'a IdentityDocumentId>,
+        vendor_api: VendorAPI,
+    ) -> Self {
+        Self {
+            scoped_vault_id,
+            decision_intent_id,
+            identity_document_id,
+            vendor_api,
+        }
+    }
+}
+
+impl<'a> From<(&'a ScopedVaultId, &'a DecisionIntentId, VendorAPI)> for NewVerificationRequestArgs<'a> {
+    fn from(value: (&'a ScopedVaultId, &'a DecisionIntentId, VendorAPI)) -> Self {
+        let (scoped_vault_id, decision_intent_id, vendor_api) = value;
+        NewVerificationRequestArgs {
+            scoped_vault_id,
+            decision_intent_id,
+            vendor_api,
+            identity_document_id: None,
+        }
+    }
+}
+
 pub type RequestAndResult = (VerificationRequest, VerificationResult);
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
 
@@ -50,6 +85,7 @@ impl VerificationRequest {
         scoped_vault_id: ScopedVaultId,
         vendor_apis: Vec<VendorAPI>,
         decision_intent_id: &DecisionIntentId,
+        identity_document_id: Option<&IdentityDocumentId>,
     ) -> Result<Vec<Self>, crate::DbError> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let requests: Vec<_> = vendor_apis
@@ -59,7 +95,7 @@ impl VerificationRequest {
                 vendor: Vendor::from(vendor_api),
                 timestamp: Utc::now(),
                 uvw_snapshot_seqno: seqno,
-                identity_document_id: None,
+                identity_document_id: identity_document_id.cloned(),
                 scoped_vault_id: scoped_vault_id.clone(),
                 decision_intent_id: decision_intent_id.clone(),
             })
@@ -71,17 +107,19 @@ impl VerificationRequest {
     }
 
     #[tracing::instrument("VerificationRequest::create", skip_all)]
-    pub fn create(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-        decision_intent_id: &DecisionIntentId,
-        vendor_api: VendorAPI,
-    ) -> DbResult<Self> {
+    pub fn create(conn: &mut PgConn, args: NewVerificationRequestArgs) -> DbResult<Self> {
+        let NewVerificationRequestArgs {
+            scoped_vault_id,
+            decision_intent_id,
+            identity_document_id,
+            vendor_api,
+        } = args;
         Self::bulk_create(
             conn,
             scoped_vault_id.clone(),
             vec![vendor_api],
             decision_intent_id,
+            identity_document_id,
         )?
         .pop()
         .ok_or(crate::DbError::ObjectNotFound)
