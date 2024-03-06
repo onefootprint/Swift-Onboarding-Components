@@ -37,11 +37,11 @@ export const identify = async (
 ): Promise<IdentifyResult | undefined> => {
   if (phoneNumber) {
     const result = await asyncFn({ phoneNumber });
-    if (result) return result;
+    if (result?.user) return result;
   }
   if (email) {
     const result = await asyncFn({ email });
-    if (result) return result;
+    if (result?.user) return result;
   }
   return undefined;
 };
