@@ -21,7 +21,7 @@ const Intro = () => {
   return (
     <Container>
       <Header />
-      <Button fullWidth onClick={handleClick}>
+      <Button fullWidth onClick={handleClick} size="large">
         {isKyb ? t('kyb') : t('kyc')}
       </Button>
     </Container>
