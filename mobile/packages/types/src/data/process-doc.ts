@@ -1,5 +1,5 @@
+import type { UploadDocumentSide } from '../api';
 import type { IdDocImageProcessingError } from './id-doc-image-error';
-import type { IdDocImageTypes } from './id-doc-type';
 
 export type ProcessDocRequest = {
   authToken: string;
@@ -8,6 +8,6 @@ export type ProcessDocRequest = {
 
 export type ProcessDocResponse = {
   errors: IdDocImageProcessingError[];
-  nextSideToCollect: IdDocImageTypes;
+  nextSideToCollect: UploadDocumentSide;
   isRetryLimitExceeded: boolean;
 };

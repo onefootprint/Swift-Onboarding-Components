@@ -22,9 +22,8 @@ const uploadDoc = async ({
       'x-fp-is-manual': meta.manual || false,
       'x-fp-is-app-clip': Platform.OS === 'ios',
       'x-fp-is-instant-app': Platform.OS === 'android',
-      // 'x-fp-process-separately': true,
+      'x-fp-process-separately': true,
     },
-    timeout: 180000,
   });
 
   return response.data;
