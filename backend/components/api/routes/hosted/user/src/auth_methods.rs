@@ -3,8 +3,10 @@ use crate::{
     types::response::ResponseData,
 };
 use api_core::{
-    auth::session::user::UserSessionPurpose, types::JsonApiResponse,
-    utils::identify::get_user_challenge_context, State,
+    auth::{session::user::UserSessionPurpose, IsGuardMet},
+    types::JsonApiResponse,
+    utils::identify::get_user_challenge_context,
+    State,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -17,7 +19,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<Vec<api_wire_types::AuthMethod>> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::Auth.or(UserAuthGuard::SignUp))?;
     let limit_auth_methods =
         if let UserSessionPurpose::ApiUpdateAuthMethods { limit_auth_methods } = &user_auth.data.purpose {
             limit_auth_methods.clone()
