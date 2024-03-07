@@ -9,6 +9,7 @@ mod document;
 mod entity;
 mod identity_document;
 mod insight_event;
+mod list;
 mod liveness_event;
 mod manual_review;
 mod onboarding_configuration;

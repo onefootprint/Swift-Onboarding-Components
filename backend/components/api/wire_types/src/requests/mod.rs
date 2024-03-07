@@ -84,3 +84,6 @@ pub use user_challenge::*;
 
 mod kba;
 pub use kba::*;
+
+pub mod lists;
+pub use self::lists::*;

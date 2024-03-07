@@ -6,6 +6,7 @@ mod authn;
 mod client_security_config;
 mod frequent_notes;
 mod index;
+mod lists;
 mod logo;
 mod member;
 mod members;
@@ -58,4 +59,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
     app_meta::routes(config);
     proxy_configs::routes(config);
     rules::routes(config);
+    lists::routes(config);
 }

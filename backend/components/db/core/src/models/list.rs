@@ -79,6 +79,25 @@ impl List {
         let res = list::table.filter(list::id.eq(list_id)).get_result(conn)?;
         Ok(res)
     }
+
+    /// Find for tenant by case insensitively querying on name or alias
+    #[tracing::instrument("List::find", skip_all)]
+    pub fn find(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        is_live: IsLive,
+        name: &String,
+        alias: &ListAlias,
+    ) -> DbResult<Option<Self>> {
+        let res = list::table
+            .filter(list::tenant_id.eq(tenant_id))
+            .filter(list::is_live.eq(is_live))
+            .filter(list::deactivated_seqno.is_null())
+            .filter(list::name.ilike(name).or(list::alias.ilike(alias)))
+            .get_result(conn)
+            .optional()?;
+        Ok(res)
+    }
 }
 
 #[cfg(test)]
