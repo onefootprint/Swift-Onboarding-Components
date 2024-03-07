@@ -27,6 +27,7 @@ pub mod identity_document;
 pub mod incode_verification_session;
 pub mod incode_verification_session_event;
 pub mod insight_event;
+pub mod list;
 pub mod liveness_event;
 pub mod manual_review;
 pub mod middesk_request;

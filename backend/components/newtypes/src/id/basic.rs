@@ -299,3 +299,5 @@ define_newtype_id!(
     String,
     "Identifier for a compliance document review"
 );
+define_newtype_id!(ListId, String, "Identifier for a List");
+define_newtype_id!(ListAlias, String, "User facing alias that is used to refer to List's from rules");

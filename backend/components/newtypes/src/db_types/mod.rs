@@ -27,6 +27,7 @@ mod identity_document_fixture_result;
 mod identity_document_status;
 mod incode;
 mod label;
+mod list;
 mod liveness_source;
 mod manual_review;
 mod middesk_request_state;
@@ -64,7 +65,7 @@ pub use self::{
     d2p_session_status::*, data_lifetime_source::*, decision_intent_kind::*, decision_status::*,
     document_request::*, document_scan_device_type::*, document_side::*, fingerprint::*, fingerprint_meta::*,
     footprint_reason_code::*, identify_scope::*, identity_document_fixture_result::*,
-    identity_document_status::*, incode::*, label::*, liveness_source::*, manual_review::*,
+    identity_document_status::*, incode::*, label::*, list::*, liveness_source::*, manual_review::*,
     middesk_request_state::*, ob_config::*, onboarding_status::*, org_member_email::*, preview_api::*,
     proxy_ingress_kind::*, risk_signal_group::*, rule_expression::*, rules::*, sealed_bytes::*,
     session_kind::*, supported_document_and_country_mapping::*, task_status::*, tenant_frequent_notes::*,
