@@ -97,3 +97,42 @@ def test_create_list_entry(sandbox_tenant):
     )
     assert entry["data"] == "protonmail.com"
     assert entry["actor"]["kind"] == "tenant_user"
+
+
+def test_list_list_entries(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    list = post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List {nonce}",
+            alias=f"my_super_list_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    entry1 = post(
+        f"/org/lists/{list['id']}/entries",
+        dict(data="protonmail.com"),
+        *sandbox_tenant.db_auths,
+    )
+    entry2 = post(
+        f"/org/lists/{list['id']}/entries",
+        dict(data="baddiesinc.org"),
+        *sandbox_tenant.db_auths,
+    )
+    entry3 = post(
+        f"/org/lists/{list['id']}/entries",
+        dict(data="bobertotech.org"),
+        *sandbox_tenant.db_auths,
+    )
+
+    entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
+    assert entries[0]["data"] == entry3["data"]
+    assert entries[0]["id"] == entry3["id"]
+
+    assert entries[1]["data"] == entry2["data"]
+    assert entries[1]["id"] == entry2["id"]
+
+    assert entries[2]["data"] == entry1["data"]
+    assert entries[2]["id"] == entry1["id"]

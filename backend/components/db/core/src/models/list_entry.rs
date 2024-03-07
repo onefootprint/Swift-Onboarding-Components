@@ -62,6 +62,17 @@ impl ListEntry {
             .get_result(conn)?;
         Ok(res)
     }
+
+    #[allow(clippy::self_named_constructors)]
+    #[tracing::instrument("ListEntry::list", skip_all)]
+    pub fn list(conn: &mut PgConn, list_id: &ListId) -> DbResult<Vec<Self>> {
+        let res = list_entry::table
+            .filter(list_entry::list_id.eq(list_id))
+            .filter(list_entry::deactivated_seqno.is_null())
+            .order_by(list_entry::created_at.desc())
+            .get_results(conn)?;
+        Ok(res)
+    }
 }
 
 #[cfg(test)]
