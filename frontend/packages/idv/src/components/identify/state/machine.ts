@@ -426,6 +426,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
         }),
         resetIdentifyState: assign(context => {
           context.identify.successfulIdentifier = undefined;
+          context.identify.identifyToken = undefined;
           context.identify.user = undefined;
           return context;
         }),

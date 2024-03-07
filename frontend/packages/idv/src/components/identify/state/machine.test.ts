@@ -129,6 +129,7 @@ describe('Identify Machine Tests', () => {
         email: 'belce@onefootprint.com',
         successfulIdentifier: { email: 'belce@onefootprint.com' },
         user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
@@ -186,6 +187,7 @@ describe('Identify Machine Tests', () => {
         phoneNumber: '+16509878899',
         successfulIdentifier: { phoneNumber: '+16509878899' },
         user: getFixtureUser([ChallengeKind.sms]),
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('smsChallenge');
     });
@@ -231,6 +233,7 @@ describe('Identify Machine Tests', () => {
         phoneNumber: '+16509878899',
         successfulIdentifier: { phoneNumber: '+16509878899' },
         user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
@@ -266,6 +269,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         successfulIdentifier: { authToken: 'utok_xxx' },
         user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
       expect(state.context.challenge.authToken).toBeFalsy();
@@ -557,6 +561,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         successfulIdentifier: { email: 'sandbox@onefootprint.com' },
         user: getFixtureUser([ChallengeKind.sms]),
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('smsChallenge');
     });
@@ -583,6 +588,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         successfulIdentifier: { email: 'sandbox@onefootprint.com' },
         user: getFixtureUser([ChallengeKind.sms, ChallengeKind.biometric]),
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
     });
@@ -609,6 +615,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         user: getFixtureUser([ChallengeKind.sms]),
         successfulIdentifier: { authToken: 'utok_xxx' },
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('smsChallenge');
 
@@ -651,6 +658,7 @@ describe('Identify Machine Tests', () => {
         email: 'hayes@valley.com',
         user: getFixtureUser([ChallengeKind.sms]),
         successfulIdentifier: { email: 'hayes@valley.com' },
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('smsChallenge');
 
@@ -697,6 +705,7 @@ describe('Identify Machine Tests', () => {
         phoneNumber: '+15555550100',
         user: getFixtureUser([ChallengeKind.sms]),
         successfulIdentifier: { phoneNumber: '+15555550100' },
+        identifyToken: 'utok_xxx',
       });
       expect(state.context.challenge.challengeData).toBeFalsy(); // Should clear because phone number updated from null
       expect(state.value).toEqual('smsChallenge');
@@ -752,6 +761,7 @@ describe('Identify Machine Tests', () => {
         email: 'hayes@valley.com',
         user: getFixtureUser([ChallengeKind.email]),
         successfulIdentifier: { email: 'hayes@valley.com' },
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('emailChallenge');
 
@@ -815,6 +825,7 @@ describe('Identify Machine Tests', () => {
         email: 'hayes@valley.com',
         user: getFixtureUser([ChallengeKind.email]),
         successfulIdentifier: { email: 'hayes@valley.com' },
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('emailChallenge');
 
@@ -852,6 +863,7 @@ describe('Identify Machine Tests', () => {
         phoneNumber: '+15555550100',
         user: getFixtureUser([ChallengeKind.email]),
         successfulIdentifier: { email: 'hayes@valley.com' },
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('success');
     });
@@ -873,6 +885,7 @@ describe('Identify Machine Tests', () => {
         email: 'belce@onefootprint.com',
         successfulIdentifier: { email: 'belce@onefootprint.com' },
         user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
@@ -1053,6 +1066,7 @@ describe('Identify Machine Tests', () => {
         email: 'belce@onefootprint.com',
         successfulIdentifier: { email: 'belce@onefootprint.com' },
         user,
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
@@ -1092,6 +1106,7 @@ describe('Identify Machine Tests', () => {
         phoneNumber: '+15555550100',
         successfulIdentifier: { phoneNumber: '+15555550100' },
         user,
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
@@ -1119,6 +1134,7 @@ describe('Identify Machine Tests', () => {
         phoneNumber: '+15555550100',
         user,
         successfulIdentifier: { phoneNumber: '+15555550100' },
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
@@ -1157,6 +1173,7 @@ describe('Identify Machine Tests', () => {
         email: 'belce@onefootprint.com',
         successfulIdentifier: { email: 'belce@onefootprint.com' },
         user,
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
@@ -1219,6 +1236,7 @@ describe('Identify Machine Tests', () => {
         phoneNumber: undefined,
         successfulIdentifier: { authToken: 'utok_xxx' },
         user: getFixtureUser([ChallengeKind.sms]),
+        identifyToken: 'utok_xxx',
       });
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
