@@ -33,6 +33,7 @@ const useFrameProcessor = ({ side, documentName }: DefaultDocumentProps) => {
   const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
     detector.value = value;
   });
+  const [shouldDetect, setShouldDetect] = useState(true);
 
   const frameProcessor = useVCFrameProcessor(
     frame => {
@@ -41,6 +42,7 @@ const useFrameProcessor = ({ side, documentName }: DefaultDocumentProps) => {
       runAtTargetFps(30, () => {
         'worklet';
 
+        if (!shouldDetect) return;
         const result = detectDocument(frame);
         if (result.isDocument) {
           setDetectorJs(true);
@@ -55,10 +57,15 @@ const useFrameProcessor = ({ side, documentName }: DefaultDocumentProps) => {
         }
       });
     },
-    [detector],
+    [detector, shouldDetect],
   );
 
-  return { object, detector, frameProcessor };
+  return {
+    object,
+    detector,
+    frameProcessor,
+    disableDetection: () => setShouldDetect(false),
+  };
 };
 
 export default useFrameProcessor;

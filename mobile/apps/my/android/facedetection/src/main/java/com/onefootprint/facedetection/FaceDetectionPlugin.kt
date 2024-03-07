@@ -1,5 +1,6 @@
 package com.onefootprint.facedetection
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.common.InputImage
@@ -20,6 +21,7 @@ class FaceDetectionPlugin(proxy: VisionCameraProxy, options: Map<String, Any>?):
     "isFaceStraight" to false,
     "isStable" to false
   )
+  private val TAG = "face-detection"
 
   // Constants - we can fine tune these later if needed
   private final val MIN_FACE_SIZE = 0.35f // trade-off between speed and accuracy
@@ -103,7 +105,13 @@ class FaceDetectionPlugin(proxy: VisionCameraProxy, options: Map<String, Any>?):
   }
 
   override fun callback(frame: Frame, arguments: Map<String, Any>?): Any? {
-    val inputImage = getInputImage(frame)
+    var inputImage: InputImage? = null
+    try {
+      inputImage = getInputImage(frame)
+    }catch (e: Exception){
+      Log.e(TAG, "Error converting frame image to MLkit InputImage $e", )
+      e.printStackTrace()
+    }
     inputImage?.let {
       return detectFaces(it)
     }

@@ -17,7 +17,8 @@ export type PassportProps = {
 
 const Passport = ({ onBack, onSubmit }: PassportProps) => {
   const { t } = useTranslation('scan.passport');
-  const { object, detector, frameProcessor } = useFrameProcessor();
+  const { object, detector, frameProcessor, disableDetection } =
+    useFrameProcessor();
 
   return (
     <Camera
@@ -26,6 +27,7 @@ const Passport = ({ onBack, onSubmit }: PassportProps) => {
       onBack={onBack}
       onSubmit={onSubmit}
       title={t('title')}
+      onCapture={disableDetection}
     >
       {value => (
         <Frame aspectRatio={DEFAULT_ASPECT_RATIO} detector={detector}>

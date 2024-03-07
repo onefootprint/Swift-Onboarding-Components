@@ -28,6 +28,7 @@ type CameraProps = {
   subtitle?: string;
   title: string;
   type?: CameraType;
+  onCapture: () => void;
 };
 
 const Camera = ({
@@ -40,6 +41,7 @@ const Camera = ({
   subtitle,
   title,
   type = 'back',
+  onCapture,
 }: CameraProps) => {
   const [isFlashing, setIsFlashing] = useState(false);
   const camera = useRef<VisionCamera>(null);
@@ -62,6 +64,7 @@ const Camera = ({
     disabled: !isAutoCaptureEnabled,
     object,
     onDone: () => {
+      onCapture();
       takePhoto({ manual: false });
     },
   });

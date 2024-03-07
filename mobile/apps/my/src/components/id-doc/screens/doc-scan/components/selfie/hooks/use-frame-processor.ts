@@ -29,6 +29,7 @@ const useFrameProcessor = () => {
   const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
     detector.value = value;
   });
+  const [shouldDetect, setShouldDetect] = useState(true);
 
   const frameProcessor = useVCFrameProcessor(
     frame => {
@@ -37,6 +38,7 @@ const useFrameProcessor = () => {
       runAtTargetFps(30, () => {
         'worklet';
 
+        if (!shouldDetect) return;
         const options = { width, height };
         const result = detectFace(frame, options);
         if (result.hasFace && result.isFaceInCenter && result.isFaceStraight) {
@@ -75,10 +77,15 @@ const useFrameProcessor = () => {
         }
       });
     },
-    [detector],
+    [detector, shouldDetect],
   );
 
-  return { frameProcessor, object, detector };
+  return {
+    frameProcessor,
+    object,
+    detector,
+    disableDetection: () => setShouldDetect(false),
+  };
 };
 
 export default useFrameProcessor;

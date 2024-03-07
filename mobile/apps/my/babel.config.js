@@ -26,7 +26,12 @@ module.exports = function (api) {
           },
         },
       ],
-      ['react-native-reanimated/plugin'],
+      [
+        'react-native-reanimated/plugin',
+        {
+          processNestedWorklets: true,
+        },
+      ],
       ['react-native-worklets-core/plugin'],
     ],
   };

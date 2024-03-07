@@ -35,37 +35,47 @@ const useFrameProcessor = (
   const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
     detector.value = value;
   });
+  const [shouldDetect, setShouldDetect] = useState(true);
 
-  const frameProcessor = useVCFrameProcessor(frame => {
-    'worklet';
-
-    runAtTargetFps(30, () => {
+  const frameProcessor = useVCFrameProcessor(
+    frame => {
       'worklet';
 
-      const documentResult = detectDocument(frame);
-      const barcodeResult = requiresCode
-        ? detectBarcodes(frame)
-        : DEFAULT_BARCODE_RESULT;
+      runAtTargetFps(30, () => {
+        'worklet';
 
-      const hasBarcode = barcodeResult.barcodes.length > 0;
-      const isDetected =
-        documentResult.isDocument && (requiresCode ? hasBarcode : true);
+        if (!shouldDetect) return;
+        const documentResult = detectDocument(frame);
+        const barcodeResult = requiresCode
+          ? detectBarcodes(frame)
+          : DEFAULT_BARCODE_RESULT;
 
-      setObjectJs({
-        isDetected,
-        feedback: isDetected
-          ? ''
-          : `Scan the ${side.toUpperCase()} of your driver's license`,
-        data: {
-          barcodes: barcodeResult.barcodes,
-        },
+        const hasBarcode = barcodeResult.barcodes.length > 0;
+        const isDetected =
+          documentResult.isDocument && (requiresCode ? hasBarcode : true);
+
+        setObjectJs({
+          isDetected,
+          feedback: isDetected
+            ? ''
+            : `Scan the ${side.toUpperCase()} of your driver's license`,
+          data: {
+            barcodes: barcodeResult.barcodes,
+          },
+        });
+
+        setDetectorJs(isDetected);
       });
+    },
+    [shouldDetect],
+  );
 
-      setDetectorJs(isDetected);
-    });
-  }, []);
-
-  return { object, detector, frameProcessor };
+  return {
+    object,
+    detector,
+    frameProcessor,
+    disableDetection: () => setShouldDetect(false),
+  };
 };
 
 export default useFrameProcessor;

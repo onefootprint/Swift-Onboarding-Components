@@ -26,7 +26,8 @@ const DriversLicense = ({
   side,
 }: DriversLicenseProps) => {
   const { t } = useTranslation('scan.drivers-license');
-  const { object, detector, frameProcessor } = useFrameProcessor(side, country);
+  const { object, detector, frameProcessor, disableDetection } =
+    useFrameProcessor(side, country);
   const hasBackButton = side === UploadDocumentSide.Front;
 
   return (
@@ -36,6 +37,7 @@ const DriversLicense = ({
       onBack={hasBackButton ? onBack : undefined}
       onSubmit={onSubmit}
       title={t(`title-${side}`)}
+      onCapture={disableDetection}
     >
       {value => (
         <Frame aspectRatio={DEFAULT_ASPECT_RATIO} detector={detector}>
