@@ -11,7 +11,9 @@ use serde::{Deserialize, Serialize};
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Deref)]
-/// When provided, locates only sandbox users with the provided sandbox id
+/// When provided, creates a sandbox user with the provided sandbox ID.
+/// Sandbox IDs allow you to create multiple users with the same contact info. In order to log in
+/// using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.
 pub struct SandboxId(pub Option<newtypes::SandboxId>);
 
 impl Apiv2Schema for SandboxId {
@@ -23,9 +25,8 @@ impl Apiv2Schema for SandboxId {
         vec![paperclip::v2::models::Parameter::<DefaultSchemaRaw> {
             name: "x-sandbox-id".to_owned(),
             in_: paperclip::v2::models::ParameterIn::Header,
-            description: Some(
-                "When provided, locates only sandbox users with the provided sandbox ID".into(),
-            ),
+            description: Some("When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.
+            ".into()),
             data_type: Some(paperclip::v2::models::DataType::String),
             format: None,
             required: Self::required(),

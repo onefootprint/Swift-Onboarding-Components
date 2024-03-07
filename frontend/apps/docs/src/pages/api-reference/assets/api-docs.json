@@ -30,7 +30,7 @@
                     {
                         "in": "header",
                         "name": "x-sandbox-id",
-                        "description": "When provided, locates only sandbox users with the provided sandbox ID",
+                        "description": "When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.\n            ",
                         "schema": {
                             "type": "string"
                         },
@@ -438,7 +438,7 @@
                     {
                         "in": "header",
                         "name": "x-sandbox-id",
-                        "description": "When provided, locates only sandbox users with the provided sandbox ID",
+                        "description": "When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.\n            ",
                         "schema": {
                             "type": "string"
                         },

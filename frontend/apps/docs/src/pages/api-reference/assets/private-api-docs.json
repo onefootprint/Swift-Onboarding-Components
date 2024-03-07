@@ -4002,6 +4002,43 @@
                 ]
             }
         },
+        "/org/lists": {
+            "post": {
+                "tags": [
+                    "Organization",
+                    "Private",
+                    "Lists"
+                ],
+                "description": "Creates a new List",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateListRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/List"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/logo": {
             "put": {
                 "tags": [
@@ -6670,6 +6707,33 @@
                     "expires_at",
                     "link",
                     "token"
+                ]
+            },
+            "CreateListRequest": {
+                "type": "object",
+                "properties": {
+                    "alias": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "email_address",
+                            "email_domain",
+                            "ssn9",
+                            "phone_number",
+                            "phone_country_code",
+                            "ip_address"
+                        ]
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "alias",
+                    "kind",
+                    "name"
                 ]
             },
             "CreateOnboardingConfigurationRequest": {
@@ -16148,6 +16212,49 @@
                 "required": [
                     "email_address",
                     "redirect_url"
+                ]
+            },
+            "List": {
+                "type": "object",
+                "properties": {
+                    "actor": {
+                        "type": "string",
+                        "enum": [
+                            "footprint"
+                        ]
+                    },
+                    "alias": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "email_address",
+                            "email_domain",
+                            "ssn9",
+                            "phone_number",
+                            "phone_country_code",
+                            "ip_address"
+                        ]
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "actor",
+                    "alias",
+                    "created_at",
+                    "id",
+                    "kind",
+                    "name"
                 ]
             },
             "ListEntitiesSearchRequest": {
