@@ -44,6 +44,7 @@ pub async fn post(
         challenge_kind,
     } = request.into_inner();
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
+    let token = user_auth.as_ref().map(|ua| ua.auth_token.clone());
 
     // Look up existing user vault by identifier
     let args = GetIdentifyChallengeArgs {
@@ -145,6 +146,7 @@ pub async fn post(
     let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
 
     let challenge_data = UserChallengeData {
+        token,
         challenge_kind,
         challenge_token,
         scrubbed_phone_number: phone_number.map(|p| p.scrubbed()),

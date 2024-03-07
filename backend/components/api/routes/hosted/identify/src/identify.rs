@@ -16,7 +16,11 @@ use api_core::{
     State,
 };
 use api_wire_types::{IdentifiedUser, IdentifyRequest, IdentifyResponse};
-use newtypes::{email::Email, DataIdentifier, IdentityDataKind as IDK, PhoneNumber};
+use db::models::scoped_vault::ScopedVault;
+use newtypes::{
+    email::Email, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, PhoneNumber, SessionAuthToken,
+    UserAuthScope, VaultId,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -75,29 +79,7 @@ pub async fn post(
         // In a newer verision of this API, we're going to start issuing an "identified" but
         // unauthed token as soon as the user is located.
         // Eventually, this will be the only option
-        let session_key = state.session_sealing_key.clone();
-        let token = state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let scopes = vec![];
-                let context = NewUserSessionContext {
-                    su_id: sv.map(|sv| sv.id),
-                    obc_id: ob_context.map(|obc| obc.ob_config().id.clone()),
-                    ..Default::default()
-                };
-                let args = NewUserSessionArgs {
-                    user_vault_id: v_id,
-                    purpose: scope.into(),
-                    context,
-                    scopes: scopes.clone(),
-                    auth_events: vec![],
-                };
-                let data = UserSession::make(args)?;
-                let duration = scope.token_ttl();
-                let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-                Ok((token, scopes))
-            })
-            .await?;
+        let token = create_identified_token(&state, v_id, scope, sv, ob_context).await?;
         Some(token)
     } else {
         None
@@ -160,4 +142,40 @@ pub async fn post(
         scrubbed_email: user.scrubbed_email,
     };
     ResponseData::ok(response).json()
+}
+
+/// Creates an identified, unauthed token for the provided vault ID.
+/// The token may either explicitly specify a sv_id when vault has already onboarded onto the tenant,
+/// or it may specify a playbook id onto which the vault will be onboarded after they complete the auth.
+pub(super) async fn create_identified_token(
+    state: &State,
+    v_id: VaultId,
+    scope: IdentifyScope,
+    sv: Option<ScopedVault>,
+    ob_context: Option<ObConfigAuth>,
+) -> ApiResult<(SessionAuthToken, Vec<UserAuthScope>)> {
+    let session_key = state.session_sealing_key.clone();
+    let token = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let scopes = vec![];
+            let context = NewUserSessionContext {
+                su_id: sv.map(|sv| sv.id),
+                obc_id: ob_context.map(|obc| obc.ob_config().id.clone()),
+                ..Default::default()
+            };
+            let args = NewUserSessionArgs {
+                user_vault_id: v_id,
+                purpose: scope.into(),
+                context,
+                scopes: scopes.clone(),
+                auth_events: vec![],
+            };
+            let data = UserSession::make(args)?;
+            let duration = scope.token_ttl();
+            let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            Ok((token, scopes))
+        })
+        .await?;
+    Ok(token)
 }

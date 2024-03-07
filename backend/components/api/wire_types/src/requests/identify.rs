@@ -87,6 +87,8 @@ pub struct IdentifyAuthMethod {
 #[derive(Apiv2Schema, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct UserChallengeData {
+    /// Auth token to pass to the verify call
+    pub token: Option<SessionAuthToken>,
     pub challenge_kind: ChallengeKind,
     pub challenge_token: ChallengeToken,
     /// For login challenges, provide some context on where the challenge was sent
@@ -112,6 +114,7 @@ pub struct LoginChallengeResponse {
 pub struct SignupChallengeRequest {
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
+    pub scope: Option<IdentifyScope>,
 }
 
 #[derive(Apiv2Schema, serde::Serialize)]

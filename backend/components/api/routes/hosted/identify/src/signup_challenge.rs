@@ -1,4 +1,6 @@
-use crate::{ChallengeData, ChallengeState, GetIdentifyChallengeArgs, State};
+use crate::{
+    identify::create_identified_token, ChallengeData, ChallengeState, GetIdentifyChallengeArgs, State,
+};
 use api_core::{
     auth::ob_config::ObConfigAuth,
     errors::{
@@ -37,7 +39,11 @@ pub async fn post(
     sandbox_id: SandboxId,
     root_span: RootSpan,
 ) -> JsonApiResponse<SignupChallengeResponse> {
-    let SignupChallengeRequest { phone_number, email } = request.into_inner();
+    let SignupChallengeRequest {
+        phone_number,
+        email,
+        scope,
+    } = request.into_inner();
     let sandbox_id = sandbox_id.0;
     let is_fixture = phone_number.as_ref().is_some_and(|p| p.is_fixture_phone_number())
         || email.as_ref().is_some_and(|e| e.is_fixture());
@@ -68,13 +74,24 @@ pub async fn post(
 
     // Create the new vault
     let ctx = make_vault_context(&state, &ob_context, identifiers, sandbox_id.clone()).await?;
-    let (uv, root_span) = state
+    let (uv, sv, root_span) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv, _, _) = VaultWrapper::create_unverified(conn, ctx, &root_span, duplicate_of_id)?;
-            Ok((uv.into_inner(), root_span))
+            let (uv, sv, _) = VaultWrapper::create_unverified(conn, ctx, &root_span, duplicate_of_id)?;
+            Ok((uv.into_inner(), sv, root_span))
         })
         .await?;
+
+    let token = if let Some(scope) = scope {
+        // In a newer verision of this API, we're going to start issuing an "identified" but
+        // unauthed token as soon as the user is created.
+        // Eventually, this will be the only option
+        let (token, _) =
+            create_identified_token(&state, uv.id.clone(), scope, Some(sv), Some(ob_context.clone())).await?;
+        Some(token)
+    } else {
+        None
+    };
 
     let (rx, challenge_data) = if !ob_context.ob_config().is_no_phone_flow {
         // Expect a phone number and initiate an SMS challenge
@@ -91,6 +108,7 @@ pub async fn post(
         let data = ChallengeState { data: challenge_data };
         let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
         let data = UserChallengeData {
+            token,
             challenge_kind: ChallengeKind::Sms,
             challenge_token,
             scrubbed_phone_number: Some(phone_number.scrubbed()),
@@ -119,6 +137,7 @@ pub async fn post(
         let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
 
         let data = UserChallengeData {
+            token,
             challenge_kind: ChallengeKind::Email,
             challenge_token,
             scrubbed_phone_number: None,

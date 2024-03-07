@@ -3914,6 +3914,10 @@
                             "time_before_retry_s": {
                                 "type": "integer",
                                 "format": "int64"
+                            },
+                            "token": {
+                                "description": "Auth token to pass to the verify call",
+                                "type": "string"
                             }
                         },
                         "required": [
@@ -5400,6 +5404,14 @@
                     },
                     "phone_number": {
                         "type": "string"
+                    },
+                    "scope": {
+                        "type": "string",
+                        "enum": [
+                            "my1fp",
+                            "onboarding",
+                            "auth"
+                        ]
                     }
                 }
             },
@@ -5431,6 +5443,10 @@
                             "time_before_retry_s": {
                                 "type": "integer",
                                 "format": "int64"
+                            },
+                            "token": {
+                                "description": "Auth token to pass to the verify call",
+                                "type": "string"
                             }
                         },
                         "required": [

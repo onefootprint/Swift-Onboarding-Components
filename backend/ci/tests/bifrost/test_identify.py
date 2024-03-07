@@ -215,7 +215,7 @@ def test_identify_with_non_portable_api_vault(
     assert body["id.first_name"] == "From Tenant C"
 
 
-def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
+def test_modern_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
     """
     The more modern version if the identify flow will issue a token after POST /hosted/identify.
     Many of our clients are using the legacy version. When they migrate, we will update the rest
@@ -249,6 +249,67 @@ def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
 
     # Make sure the token has scopes
     body = post("/hosted/identify", dict(identifier=None), auth_token)
+    assert set(body["user"]["token_scopes"]) >= {"sign_up"}
+
+    # Finish onboarding onto this playbook using the auth token issued from the new flow
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    bifrost.run()
+
+
+def test_modern_login_flow_new_tenant(sandbox_tenant, sandbox_user, foo_sandbox_tenant):
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    sandbox_user = bifrost.run()
+
+    obc = foo_sandbox_tenant.default_ob_config
+    sandbox_id = sandbox_user.client.sandbox_id
+    phone_number = sandbox_user.client.data["id.phone_number"]
+
+    # Identify the user, and get a token in exchange
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
+    user = body["user"]
+    token = FpAuth(user["token"])
+
+    # Now, we don't use the phone as an identifier - we just use the token that was given to us
+    auth_token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+
+    # Finish onboarding onto this playbook using the auth token issued from the new flow
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    bifrost.run()
+
+
+def test_modern_signup_flow(sandbox_tenant):
+    """
+    The more modern version if the identify flow will issue a token after POST /hosted/identify/signup_challenge.
+    Many of our clients are using the legacy version. When they migrate, we will update the rest
+    of the tests.
+    """
+    obc = sandbox_tenant.default_ob_config
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(
+        phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL, scope="onboarding"
+    )
+    body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
+    token = FpAuth(body["challenge_data"]["token"])
+
+    # Make sure the token issued has no scopes
+    token_body = get("/hosted/user/token", None, token)
+    assert not token_body["scopes"]
+
+    # Then finish sign up
+    data = {
+        "challenge_response": "000000",
+        "challenge_token": body["challenge_data"]["challenge_token"],
+        "scope": "onboarding",
+    }
+    body = post("hosted/identify/verify", data, token)
+    auth_token = FpAuth(body["auth_token"])
+
+    # Make sure the token has scopes
+    data = dict(identifier=None, scope="onboarding")
+    body = post("/hosted/identify", data, auth_token)
     assert set(body["user"]["token_scopes"]) >= {"sign_up"}
 
     # Finish onboarding onto this playbook using the auth token issued from the new flow
