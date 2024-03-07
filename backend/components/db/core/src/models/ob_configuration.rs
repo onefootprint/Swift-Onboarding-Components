@@ -92,6 +92,13 @@ impl ObConfiguration {
                 CipKind::Apex => todo!(),
             }
         }
+
+        // Now check if it's on the OBC itself
+        if let Some(ref mapping) = self.document_types_and_countries {
+            return mapping.into_country_mapping_for_bifrost();
+        }
+
+        // Otherwise old logic
         let id_doc_kinds = if let Some(kinds) = self
             .restricted_id_doc_kinds()
             .or(self.optional_ssn_restricted_id_doc_kinds())
@@ -693,11 +700,11 @@ mod tests {
     use chrono::Utc;
     use macros::db_test;
     use newtypes::{
-        AdverseMediaListKind, ApiKeyStatus, CipKind, CollectedDataOption, DocumentCdoInfo, EnhancedAmlOption,
-        IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind,
-        TenantId,
+        AdverseMediaListKind, ApiKeyStatus, CipKind, CollectedDataOption, CountrySpecificDocumentMapping,
+        DocumentAndCountryConfiguration, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
+        Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId,
     };
-    use std::str::FromStr;
+    use std::{collections::HashMap, str::FromStr};
     use strum::IntoEnumIterator;
     use test_case::test_case;
 
@@ -1118,6 +1125,113 @@ mod tests {
         } else {
             assert!(mapping.keys().len() > 1);
         }
+    }
+
+    #[test]
+    fn test_document_types_and_countries() {
+        let supported = CountrySpecificDocumentMapping(HashMap::from_iter(vec![(
+            Iso3166TwoDigitCountryCode::CA,
+            vec![IdDocKind::DriversLicense],
+        )]));
+        let doc_config = DocumentAndCountryConfiguration {
+            global: vec![],
+            country_specific: supported,
+        };
+        let obc_with_supported_countries_set = ObConfiguration {
+            id: ObConfigurationId::from_str("1234").unwrap(),
+            key: ObConfigurationKey::from_str("obk1").unwrap(),
+            name: "obc".into(),
+            tenant_id: TenantId::from_str("t_1234").unwrap(),
+            _created_at: Utc::now(),
+            _updated_at: Utc::now(),
+            is_live: true,
+            status: ApiKeyStatus::Enabled,
+            created_at: Utc::now(),
+            must_collect_data: vec![],
+            can_access_data: vec![],
+            appearance_id: None,
+            cip_kind: None,
+            optional_data: vec![],
+            is_no_phone_flow: false,
+            is_doc_first: false,
+            allow_international_residents: false,
+            international_country_restrictions: None,
+            author: None,
+            skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
+            enhanced_aml: EnhancedAmlOption::No,
+            allow_us_residents: true,
+            allow_us_territory_residents: false,
+            kind: ObConfigurationKind::Kyc,
+            skip_kyb: false,
+            skip_confirm: false,
+            // TESTING THIS
+            document_types_and_countries: Some(doc_config),
+        };
+
+        let mapping = obc_with_supported_countries_set
+            .supported_country_mapping_for_document(None)
+            .0;
+        assert_eq!(mapping.keys().len(), 1);
+        assert_eq!(
+            mapping.get(&Iso3166TwoDigitCountryCode::CA).unwrap().clone(),
+            vec![IdDocKind::DriversLicense]
+        );
+    }
+
+    #[test]
+    fn test_document_and_countries_field_with_cip_kind() {
+        let supported = CountrySpecificDocumentMapping(HashMap::from_iter(vec![(
+            Iso3166TwoDigitCountryCode::PR,
+            vec![IdDocKind::Visa],
+        )]));
+        let doc_config = DocumentAndCountryConfiguration {
+            global: vec![],
+            country_specific: supported,
+        };
+        let obc_with_supported_countries_and_cip_kind = ObConfiguration {
+            id: ObConfigurationId::from_str("1234").unwrap(),
+            key: ObConfigurationKey::from_str("obk1").unwrap(),
+            name: "obc".into(),
+            tenant_id: TenantId::from_str("t_1234").unwrap(),
+            _created_at: Utc::now(),
+            _updated_at: Utc::now(),
+            is_live: true,
+            status: ApiKeyStatus::Enabled,
+            created_at: Utc::now(),
+            must_collect_data: vec![],
+            can_access_data: vec![],
+            appearance_id: None,
+            // TESTING THIS
+            cip_kind: Some(CipKind::Alpaca),
+            optional_data: vec![],
+            is_no_phone_flow: false,
+            is_doc_first: false,
+            allow_international_residents: false,
+            international_country_restrictions: None,
+            author: None,
+            skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
+            enhanced_aml: EnhancedAmlOption::No,
+            allow_us_residents: true,
+            allow_us_territory_residents: false,
+            kind: ObConfigurationKind::Kyc,
+            skip_kyb: false,
+            skip_confirm: false,
+            // TESTING THIS
+            document_types_and_countries: Some(doc_config),
+        };
+
+        // Despite configuring document_types_and_countries on the OBC, we respect the alpaca overrides
+        let mapping = obc_with_supported_countries_and_cip_kind
+            .supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::PR))
+            .0;
+        assert_eq!(mapping.keys().len(), 2);
+        // we respect alpaca overrides
+        assert_eq!(
+            mapping.get(&Iso3166TwoDigitCountryCode::PR).unwrap().clone(),
+            vec![IdDocKind::DriversLicense, IdDocKind::IdCard]
+        );
     }
 
     #[db_test]
