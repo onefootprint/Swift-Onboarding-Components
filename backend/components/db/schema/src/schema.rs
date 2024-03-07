@@ -651,6 +651,7 @@ diesel::table! {
         kind -> Text,
         skip_kyb -> Bool,
         skip_confirm -> Bool,
+        document_types_and_countries -> Nullable<Jsonb>,
     }
 }
 

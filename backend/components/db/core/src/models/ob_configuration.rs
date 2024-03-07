@@ -9,9 +9,9 @@ use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     ApiKeyStatus, AppearanceId, AuthMethodKind, CipKind, CollectedDataOption as CDO,
-    DataIdentifierDiscriminant, DbActor, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
-    Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
-    SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
+    DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo, EnhancedAmlOption,
+    IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind,
+    ScopedVaultId, SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -56,6 +56,7 @@ pub struct ObConfiguration {
     /// When true on a KYC or KYB playbook, allows skipping confirm screen.
     /// Will still collect all data if it's missing, but skips confirm.
     pub skip_confirm: bool,
+    pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
 }
 
 
@@ -741,6 +742,7 @@ mod tests {
             kind: ObConfigurationKind::Kyc,
             skip_kyb: false,
             skip_confirm: false,
+            document_types_and_countries: None,
         };
 
         assert_have_same_elements(
@@ -785,6 +787,7 @@ mod tests {
             kind: ObConfigurationKind::Kyc,
             skip_kyb: false,
             skip_confirm: false,
+            document_types_and_countries: None,
         }
     }
 
@@ -1033,6 +1036,7 @@ mod tests {
             kind: ObConfigurationKind::Kyc,
             skip_kyb: false,
             skip_confirm: false,
+            document_types_and_countries: None,
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
@@ -1076,6 +1080,7 @@ mod tests {
             kind: ObConfigurationKind::Kyc,
             skip_kyb: false,
             skip_confirm: false,
+            document_types_and_countries: None,
         };
 
         let mapping = obc.supported_country_mapping_for_document(residential_country).0;

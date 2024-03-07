@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN document_types_and_countries JSONB;
