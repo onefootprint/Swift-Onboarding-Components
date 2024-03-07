@@ -34,13 +34,9 @@ export {
   useGetD2PStatus,
   useGetOnboardingConfig,
   useGetOnboardingStatus,
-  useIdentify,
-  useIdentifyVerify,
-  useLoginChallenge,
   useLogStateMachine,
   useOnboarding,
   useParseHandoffUrl,
-  useSignupChallenge,
   useUpdateD2PStatus,
 } from './hooks';
 export { default } from './idv';

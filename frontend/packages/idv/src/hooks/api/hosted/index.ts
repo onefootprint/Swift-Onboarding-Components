@@ -1,11 +1,5 @@
 export { default as useBusinessData } from './business';
 export {
-  useIdentify,
-  useIdentifyVerify,
-  useLoginChallenge,
-  useSignupChallenge,
-} from './identify';
-export {
   useD2PGenerate,
   useD2PSms,
   useGetD2PStatus,
