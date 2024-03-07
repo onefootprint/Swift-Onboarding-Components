@@ -11,7 +11,7 @@ use newtypes::{
     ApiKeyStatus, AppearanceId, AuthMethodKind, CipKind, CollectedDataOption as CDO,
     DataIdentifierDiscriminant, DbActor, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
     Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
-    TenantId, WorkflowId,
+    SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -58,24 +58,13 @@ pub struct ObConfiguration {
     pub skip_confirm: bool,
 }
 
-#[derive(derive_more::Deref, PartialEq, Eq)]
-pub struct SupportedDocumentAndCountryMapping(pub HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>);
-impl SupportedDocumentAndCountryMapping {
-    pub fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
-        self.0
-            .iter()
-            .filter_map(|(country, doc_types)| doc_types.contains(&doc_type).then_some(country))
-            .cloned()
-            .collect()
-    }
-}
 
 impl ObConfiguration {
     // returns a map of country -> supported document types
     pub fn supported_country_mapping_for_document(
         &self,
         residential_country: Option<Iso3166TwoDigitCountryCode>,
-    ) -> SupportedDocumentAndCountryMapping {
+    ) -> SupportedDocumentAndCountryMappingForBifrost {
         if let Some(cip) = self.cip_kind.as_ref() {
             match cip {
                 CipKind::Alpaca => {
@@ -93,7 +82,7 @@ impl ObConfiguration {
                     .flatten()
                     .collect();
 
-                    return SupportedDocumentAndCountryMapping(HashMap::from_iter(
+                    return SupportedDocumentAndCountryMappingForBifrost(HashMap::from_iter(
                         alpaca_allowed_countries
                             .into_iter()
                             .map(|c| (c, alpaca_doc_types.clone())),
@@ -158,7 +147,7 @@ impl ObConfiguration {
                 }
             });
 
-        SupportedDocumentAndCountryMapping(map)
+        SupportedDocumentAndCountryMappingForBifrost(map)
     }
 
     /// Construct the set of countries that we'll collect in bifrost.
@@ -205,8 +194,10 @@ impl ObConfiguration {
         }
     }
 
-    pub fn supported_countries_and_doc_types_for_proof_of_ssn(&self) -> SupportedDocumentAndCountryMapping {
-        SupportedDocumentAndCountryMapping(HashMap::from_iter(vec![(
+    pub fn supported_countries_and_doc_types_for_proof_of_ssn(
+        &self,
+    ) -> SupportedDocumentAndCountryMappingForBifrost {
+        SupportedDocumentAndCountryMappingForBifrost(HashMap::from_iter(vec![(
             Iso3166TwoDigitCountryCode::US,
             vec![IdDocKind::SsnCard],
         )]))
@@ -215,8 +206,8 @@ impl ObConfiguration {
     pub fn supported_countries_and_doc_types_for_proof_of_address(
         &self,
         country: Option<Iso3166TwoDigitCountryCode>,
-    ) -> SupportedDocumentAndCountryMapping {
-        SupportedDocumentAndCountryMapping(HashMap::from_iter(vec![(
+    ) -> SupportedDocumentAndCountryMappingForBifrost {
+        SupportedDocumentAndCountryMappingForBifrost(HashMap::from_iter(vec![(
             country.unwrap_or(Iso3166TwoDigitCountryCode::US),
             IdDocKind::proof_of_address_docs(),
         )]))

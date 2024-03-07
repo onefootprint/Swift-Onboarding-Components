@@ -10,7 +10,7 @@ use strum::IntoEnumIterator;
 
 // We currently use a similar looking map to drive bifrost requirements, so introduce a newtype here
 // This will be deprecated
-#[derive(Debug, Clone, Serialize, Eq, PartialEq)]
+#[derive(Debug, Clone, Serialize, Eq, PartialEq, derive_more::Deref)]
 pub struct SupportedDocumentAndCountryMappingForBifrost(
     pub HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
 );
