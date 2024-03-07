@@ -28,12 +28,12 @@ export type Props =
   | VerifyProps;
 
 export type PropsBase = {
-  appearance?: Appearance;
-  containerId?: string;
-  kind: ComponentKind;
-  l10n?: L10n;
-  onError?: (error: string) => void;
-  variant?: Variant;
+  readonly appearance?: Appearance;
+  readonly containerId?: string;
+  readonly kind: ComponentKind;
+  readonly l10n?: L10n;
+  readonly onError?: (error: string) => void;
+  readonly variant?: Variant;
 };
 
 /** verify */
@@ -41,46 +41,52 @@ export type VerifyAuthToken = { authToken: string; publicKey?: never };
 export type VerifyPublicKey = { publicKey: string; authToken?: never };
 type VerifyVariant = 'modal' | 'drawer';
 type VerifyPropsBase = PropsBase & {
-  onCancel?: () => void;
-  onClose?: () => void;
-  onComplete?: (validationToken: string) => void;
-  options?: Options;
-  userData?: UserData;
+  readonly onAuth?: (authToken: string) => void;
+  readonly onCancel?: () => void;
+  readonly onClose?: () => void;
+  readonly onComplete?: (validationToken: string) => void;
+  readonly options?: Options;
+  readonly userData?: UserData;
 } & (VerifyAuthToken | VerifyPublicKey);
 
 export type VerifyProps = VerifyPropsBase & {
-  kind: ComponentKind.Verify;
-  variant?: VerifyVariant;
+  readonly kind: ComponentKind.Verify;
+  readonly variant?: VerifyVariant;
 };
 
-export type VerifyDataProps = Pick<
-  VerifyProps,
-  'publicKey' | 'userData' | 'options' | 'authToken' | 'l10n'
->;
+export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys>;
+type VerifyDataKeys =
+  | 'publicKey'
+  | 'userData'
+  | 'options'
+  | 'authToken'
+  | 'l10n';
 
 /** verify-button */
 export type VerifyButtonProps = VerifyPropsBase & {
-  containerId: string;
-  dialogVariant?: VerifyVariant;
-  kind: ComponentKind.VerifyButton;
-  label?: string;
-  onClick?: () => void;
-  variant: 'inline';
+  readonly containerId: string;
+  readonly dialogVariant?: VerifyVariant;
+  readonly kind: ComponentKind.VerifyButton;
+  readonly label?: string;
+  readonly onClick?: () => void;
+  readonly variant: 'inline';
 };
-export type VerifyButtonDataProps = Pick<VerifyButtonProps, 'label'> &
-  VerifyDataProps;
+export type VerifyButtonDataProps = Pick<
+  VerifyButtonProps,
+  VerifyDataKeys | 'label'
+>;
 
 /** render */
 export type RenderProps = PropsBase & {
-  authToken: string;
-  canCopy?: boolean;
-  containerId: string;
-  defaultHidden?: boolean;
-  id: string; // a valid data identifier
-  kind: ComponentKind.Render;
-  label?: string; // defaults to a nice string chosen for that data identifier
-  showHiddenToggle?: boolean;
-  variant: 'inline';
+  readonly authToken: string;
+  readonly canCopy?: boolean;
+  readonly containerId: string;
+  readonly defaultHidden?: boolean;
+  readonly id: string; // a valid data identifier
+  readonly kind: ComponentKind.Render;
+  readonly label?: string; // defaults to a nice string chosen for that data identifier
+  readonly showHiddenToggle?: boolean;
+  readonly variant: 'inline';
 };
 
 export type RenderDataProps = Pick<
@@ -96,24 +102,22 @@ export type RenderDataProps = Pick<
 /** form */
 export type FormRef = { save: () => Promise<void> };
 export type FormOptions = {
-  hideButtons?: boolean;
-  hideCancelButton?: boolean;
-  hideFootprintLogo?: boolean;
+  readonly hideButtons?: boolean;
+  readonly hideCancelButton?: boolean;
+  readonly hideFootprintLogo?: boolean;
 };
-
 export type FormProps = PropsBase & {
-  authToken: string;
-  containerId?: string; // required for inline variant
-  getRef?: (ref: FormRef) => void; // returns a ref on mount that the tenants can trigger form actions from
-  kind: ComponentKind.Form;
-  onCancel?: () => void;
-  onClose?: () => void;
-  onComplete?: () => void;
-  options?: FormOptions;
-  title?: string;
-  variant?: Variant; // supports all variants, falls back to modal, so optional
+  readonly authToken: string;
+  readonly containerId?: string; // required for inline variant
+  readonly getRef?: (ref: FormRef) => void; // returns a ref on mount that the tenants can trigger form actions from
+  readonly kind: ComponentKind.Form;
+  readonly onCancel?: () => void;
+  readonly onClose?: () => void;
+  readonly onComplete?: () => void;
+  readonly options?: FormOptions;
+  readonly title?: string;
+  readonly variant?: Variant; // supports all variants, falls back to modal, so optional
 };
-
 export type FormDataProps = Pick<
   FormProps,
   'authToken' | 'options' | 'title' | 'l10n'
@@ -121,22 +125,20 @@ export type FormDataProps = Pick<
 
 /** auth */
 type AuthPropsBase = PropsBase & {
-  kind: ComponentKind.Auth;
-  onCancel?: () => void;
-  onClose?: () => void;
-  onComplete?: (validationToken: string) => void;
-  options?: Pick<Options, 'showLogo'>;
-  userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
-  variant?: 'modal' | 'drawer';
+  readonly kind: ComponentKind.Auth;
+  readonly onCancel?: () => void;
+  readonly onClose?: () => void;
+  readonly onComplete?: (validationToken: string) => void;
+  readonly options?: Pick<Options, 'showLogo'>;
+  readonly userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
+  readonly variant?: 'modal' | 'drawer';
 };
 
 export type AuthProps = AuthPropsBase & {
-  publicKey?: string;
-  authToken?: string;
-  /**
-   * @deprecated after version 3.9.0
-   */
-  updateLoginMethods?: true;
+  readonly publicKey?: string;
+  readonly authToken?: string;
+  /** @deprecated after version 3.9.0 */
+  readonly updateLoginMethods?: true;
 };
 export type AuthDataProps = Pick<
   AuthProps,
@@ -150,17 +152,16 @@ export type AuthDataProps = Pick<
 
 /** update_login_methods */
 export type UpdateLoginMethodsProps = PropsBase & {
-  kind: ComponentKind.UpdateLoginMethods;
-  onCancel?: () => void;
-  onClose?: () => void;
-  onComplete?: (validationToken: string) => void;
-  options?: Pick<Options, 'showLogo'>;
-  userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
-  variant?: 'modal' | 'drawer';
-  authToken?: string;
+  readonly kind: ComponentKind.UpdateLoginMethods;
+  readonly onCancel?: () => void;
+  readonly onClose?: () => void;
+  readonly onComplete?: (validationToken: string) => void;
+  readonly options?: Pick<Options, 'showLogo'>;
+  readonly userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
+  readonly variant?: 'modal' | 'drawer';
+  readonly authToken?: string;
 };
-
 export type UpdateLoginMethodsDataProps = Pick<
-  AuthProps,
+  UpdateLoginMethodsProps,
   'authToken' | 'userData' | 'l10n' | 'options'
 >;

@@ -1,11 +1,10 @@
 import { ComponentKind } from '../types/components';
+import type { CallbackKeys } from '../types/events';
 import { PublicEvent } from '../types/events';
 
 export const ComponentCallbacksByEvent: Record<
   ComponentKind,
-  Partial<
-    Record<PublicEvent, 'onCancel' | 'onClick' | 'onClose' | 'onComplete'>
-  >
+  Partial<Record<PublicEvent, CallbackKeys>>
 > = {
   [ComponentKind.Auth]: {
     [PublicEvent.canceled]: 'onCancel',
@@ -23,11 +22,13 @@ export const ComponentCallbacksByEvent: Record<
     [PublicEvent.completed]: 'onComplete',
   },
   [ComponentKind.Verify]: {
+    [PublicEvent.auth]: 'onAuth',
     [PublicEvent.canceled]: 'onCancel',
     [PublicEvent.closed]: 'onClose',
     [PublicEvent.completed]: 'onComplete',
   },
   [ComponentKind.VerifyButton]: {
+    [PublicEvent.auth]: 'onAuth',
     [PublicEvent.canceled]: 'onCancel',
     [PublicEvent.clicked]: 'onClick',
     [PublicEvent.closed]: 'onClose',

@@ -13,7 +13,7 @@ import {
   removeLoader,
 } from '../dom-utils';
 import getUniqueId from '../get-unique-id';
-import { logError } from '../logger';
+import { logError, logWarn } from '../logger';
 import { getCallbackProps, sanitizeAndValidateProps } from '../prop-utils';
 import { SdkKindByComponentKind } from '../request-utils/constants';
 import sendSdkArgs from '../request-utils/send-sdk-args';
@@ -129,10 +129,18 @@ const initIframe = (rawProps: Props): Iframe => {
 
   const render = async () => {
     if (isRendered) {
+      logWarn(
+        SdkKindByComponentKind[props.kind],
+        'Footprint component is already rendered',
+      );
       return;
     }
     const container = getOrCreateContainer();
     if (!container) {
+      logWarn(
+        SdkKindByComponentKind[props.kind],
+        'Unable to create container for Footprint component',
+      );
       return;
     }
     if (container.hasChildNodes()) {

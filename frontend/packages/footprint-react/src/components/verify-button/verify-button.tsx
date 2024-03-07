@@ -31,6 +31,7 @@ const VerifyButton = (
   {
     appearance,
     label = 'Verify with Footprint',
+    onAuth,
     onCancel,
     onClick,
     onComplete,
@@ -62,6 +63,7 @@ const VerifyButton = (
       kind: FootprintComponentKind.Verify,
       variant: dialogVariant,
       appearance,
+      onAuth,
       onCancel,
       onComplete,
       onClose,

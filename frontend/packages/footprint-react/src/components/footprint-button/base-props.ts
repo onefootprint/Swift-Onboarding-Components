@@ -31,6 +31,7 @@ export const getBaseVerifyProps = (
 ): Omit<FootprintVerifyProps, VerifyConditional> => ({
   ...base,
   kind: FootprintComponentKind.Verify,
+  onAuth: p.onAuth,
   options: p.options,
   userData: p.userData,
   variant: getVariant(p),

@@ -10,12 +10,8 @@ import type {
   VerifyProps,
 } from '../../types/components';
 import { ComponentKind } from '../../types/components';
+import type { CallbackKeys, ExtractOnProps } from '../../types/events';
 import { PublicEvent } from '../../types/events';
-
-type CallbackKeys = 'onCancel' | 'onClick' | 'onClose' | 'onComplete';
-type ExtractOnProps<T> = {
-  [K in keyof T as K extends `on${string}` ? K : never]: Function;
-};
 
 type PossibleCallbacks = ExtractOnProps<AuthProps> &
   ExtractOnProps<FormProps> &

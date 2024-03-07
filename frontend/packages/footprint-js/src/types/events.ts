@@ -1,6 +1,7 @@
 // Events sent from child -> parent -> (optional) tenant that
 // correspond to callbacks from the tenant
 export enum PublicEvent {
+  auth = 'auth',
   canceled = 'canceled',
   clicked = 'clicked',
   closed = 'closed',
@@ -15,3 +16,14 @@ export enum PrivateEvent {
   propsReceived = 'propsReceived',
   started = 'started',
 }
+
+export type CallbackKeys =
+  | 'onAuth'
+  | 'onCancel'
+  | 'onClick'
+  | 'onClose'
+  | 'onComplete';
+
+export type ExtractOnProps<T> = {
+  [K in keyof T as K extends `on${string}` ? K : never]: Function;
+};
