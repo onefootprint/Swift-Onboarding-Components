@@ -26,7 +26,7 @@ const InlineAction = ({
     className={className}
     color="tertiary"
     isPrivate
-    variant="caption-1"
+    variant="label-4"
   >
     {label}&nbsp;
     <LinkButton
