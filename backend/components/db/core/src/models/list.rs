@@ -75,8 +75,12 @@ impl List {
     }
 
     #[tracing::instrument("List::get", skip_all)]
-    pub fn get(conn: &mut PgConn, list_id: &ListId) -> DbResult<Self> {
-        let res = list::table.filter(list::id.eq(list_id)).get_result(conn)?;
+    pub fn get(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool, list_id: &ListId) -> DbResult<Self> {
+        let res = list::table
+            .filter(list::tenant_id.eq(tenant_id))
+            .filter(list::is_live.eq(is_live))
+            .filter(list::id.eq(list_id))
+            .get_result(conn)?;
         Ok(res)
     }
 
@@ -135,7 +139,7 @@ mod tests {
         )
         .unwrap();
 
-        let list = List::get(conn, &list.id).unwrap();
+        let list = List::get(conn, &t.id, true, &list.id).unwrap();
         assert_eq!(DbActor::Footprint, list.actor);
         assert_eq!("Some Real Baddies".to_owned(), list.name);
         assert_eq!(ListAlias::from_str("some_real_baddies").unwrap(), list.alias);

@@ -82,6 +82,12 @@ impl From<SealedVaultDataKey> for SealedVaultBytes {
     }
 }
 
+impl From<AeadSealedBytes> for SealedVaultBytes {
+    fn from(v: AeadSealedBytes) -> Self {
+        Self(v.0)
+    }
+}
+
 impl<DB> ToSql<Binary, DB> for SealedVaultBytes
 where
     DB: Backend,

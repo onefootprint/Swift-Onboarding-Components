@@ -29,7 +29,7 @@ struct NewListEntry<'a> {
     created_seqno: DataLifetimeSeqno,
     list_id: &'a ListId,
     actor: DbActor,
-    e_data: SealedVaultBytes,
+    e_data: &'a SealedVaultBytes,
 }
 
 impl ListEntry {
@@ -38,7 +38,7 @@ impl ListEntry {
         conn: &mut PgConn,
         list_id: &ListId,
         actor: DbActor,
-        e_data: SealedVaultBytes,
+        e_data: &SealedVaultBytes,
     ) -> DbResult<Self> {
         let created_seqno = DataLifetime::get_current_seqno(conn)?;
         let new_list_entry = NewListEntry {
@@ -91,7 +91,7 @@ mod tests {
             conn,
             &list.id,
             DbActor::Footprint,
-            SealedVaultBytes(vec![1, 2, 3]),
+            &SealedVaultBytes(vec![1, 2, 3]),
         )
         .unwrap();
         assert_eq!(DbActor::Footprint, le1.actor);
