@@ -98,6 +98,18 @@ impl List {
             .optional()?;
         Ok(res)
     }
+
+    #[allow(clippy::self_named_constructors)]
+    #[tracing::instrument("List::list", skip_all)]
+    pub fn list(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Vec<Self>> {
+        let res = list::table
+            .filter(list::tenant_id.eq(tenant_id))
+            .filter(list::is_live.eq(is_live))
+            .filter(list::deactivated_seqno.is_null())
+            .order_by(list::created_at.desc())
+            .get_results(conn)?;
+        Ok(res)
+    }
 }
 
 #[cfg(test)]

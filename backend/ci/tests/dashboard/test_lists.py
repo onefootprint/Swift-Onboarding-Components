@@ -1,4 +1,4 @@
-from tests.utils import _gen_random_str, post
+from tests.utils import _gen_random_str, post, get
 
 
 def test_create(sandbox_tenant):
@@ -40,3 +40,39 @@ def test_create(sandbox_tenant):
         *sandbox_tenant.db_auths,
         status_code=400,
     )
+
+
+def test_list(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List 1 {nonce}",
+            alias=f"my_super_list_1_{nonce}",
+            kind="ip_address",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List 2 {nonce}",
+            alias=f"my_super_list_2_{nonce}",
+            kind="email_address",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List 3 {nonce}",
+            alias=f"my_super_list_3_{nonce}",
+            kind="phone_country_code",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    lists = get(f"/org/lists", None, *sandbox_tenant.db_auths)
+    assert lists[0]["name"] == f"My Super List 3 {nonce}"
+    assert lists[1]["name"] == f"My Super List 2 {nonce}"
+    assert lists[2]["name"] == f"My Super List 1 {nonce}"
