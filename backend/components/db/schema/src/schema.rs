@@ -1168,7 +1168,7 @@ diesel::table! {
 
     tenant_role (id) {
         id -> Text,
-        tenant_id -> Text,
+        tenant_id -> Nullable<Text>,
         name -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -1178,6 +1178,7 @@ diesel::table! {
         scopes -> Array<Nullable<Jsonb>>,
         kind -> Text,
         is_live -> Nullable<Bool>,
+        partner_tenant_id -> Nullable<Text>,
     }
 }
 
@@ -1541,6 +1542,7 @@ diesel::joinable!(tenant_compliance_partnership -> partner_tenant (partner_tenan
 diesel::joinable!(tenant_compliance_partnership -> tenant (tenant_id));
 diesel::joinable!(tenant_frequent_note -> tenant (tenant_id));
 diesel::joinable!(tenant_ios_app_meta -> tenant (tenant_id));
+diesel::joinable!(tenant_role -> partner_tenant (partner_tenant_id));
 diesel::joinable!(tenant_role -> tenant (tenant_id));
 diesel::joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
 diesel::joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));

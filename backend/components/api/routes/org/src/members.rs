@@ -45,7 +45,7 @@ async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let filters = TenantRolebindingFilters {
-                tenant_id: &tenant_id,
+                t_pt_id: (&tenant_id).into(),
                 only_active: true,
                 role_ids,
                 search,
@@ -108,7 +108,7 @@ async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let inviter = TenantUser::get(conn, &user_id)?;
             let user = TenantUser::get_and_update_or_create(conn, email2, first_name, last_name)?;
-            let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, tenant_id)?;
+            let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, &tenant_id)?;
             Ok((inviter, user, rb, role))
         })
         .await?;

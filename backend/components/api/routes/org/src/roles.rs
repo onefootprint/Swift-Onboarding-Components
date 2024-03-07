@@ -88,7 +88,7 @@ async fn post(
     };
     let result = state
         .db_pool
-        .db_query(move |conn| TenantRole::create(conn, tenant_id, name, scopes, false, kind))
+        .db_query(move |conn| TenantRole::create(conn, &tenant_id, &name, scopes, false, kind))
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);

@@ -245,12 +245,13 @@ impl Tenant {
         let tenant = diesel::insert_into(tenant::table)
             .values(value)
             .get_result::<Self>(conn.conn())?;
+        let tenant_id = &tenant.id.clone();
+
         // Atomically create all of the immutable roles needed for the tenant
         let new_roles = [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly]
             .into_iter()
             .flat_map(|irk| {
                 let (name, scopes) = irk.props();
-                let tenant_id = tenant.id.clone();
                 [
                     TenantRoleKind::ApiKey { is_live: true },
                     TenantRoleKind::ApiKey { is_live: false },
@@ -258,13 +259,14 @@ impl Tenant {
                 ]
                 .into_iter()
                 .map(move |kind| NewTenantRoleRow {
-                    tenant_id: tenant_id.clone(),
-                    name: name.to_owned(),
+                    tenant_id: Some(tenant_id),
+                    name,
                     scopes: scopes.clone(),
                     is_immutable: true,
                     kind: TenantRoleKindDiscriminant::from(&kind),
                     is_live: kind.is_live(),
                     created_at: Utc::now(),
+                    partner_tenant_id: None,
                 })
             })
             .collect_vec();

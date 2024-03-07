@@ -4,11 +4,16 @@ use super::ob_configuration::IsLive;
 use crate::{DbError, DbResult, NextPage, NonNullVec, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_role::{self, BoxedQuery};
-use diesel::{dsl::count_star, prelude::*, Insertable, Queryable};
+use diesel::{
+    dsl::count_star,
+    prelude::*,
+    sql_types::{Bool, Nullable},
+    Insertable, Queryable,
+};
 use itertools::Itertools;
 use newtypes::{
-    ApiKeyStatus, InvokeVaultProxyPermission, Locked, TenantId, TenantRoleId, TenantRoleKind,
-    TenantRoleKindDiscriminant, TenantScope, TenantScopeDiscriminants,
+    ApiKeyStatus, InvokeVaultProxyPermission, Locked, PartnerTenantId, TenantId, TenantOrPartnerTenantId,
+    TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantScope, TenantScopeDiscriminants,
 };
 
 pub type IsImmutable = bool;
@@ -25,7 +30,7 @@ pub struct TenantRoleInfo {
 #[diesel(table_name = tenant_role)]
 pub struct TenantRole {
     pub id: TenantRoleId,
-    pub tenant_id: TenantId,
+    pub tenant_id: Option<TenantId>,
     pub name: String,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -40,6 +45,7 @@ pub struct TenantRole {
     pub kind: TenantRoleKindDiscriminant,
     // For ApiKey roles, is_live must be set
     pub is_live: Option<IsLive>,
+    pub partner_tenant_id: Option<PartnerTenantId>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,10 +68,17 @@ impl TenantRole {
     fn validate_scopes(
         conn: &mut PgConn,
         scopes: &[TenantScope],
-        tenant_id: &TenantId,
+        t_pt_id: TenantOrPartnerTenantId,
         kind: TenantRoleKindDiscriminant,
         is_live: Option<IsLive>,
     ) -> DbResult<()> {
+        let TenantOrPartnerTenantId::TenantId(tenant_id) = t_pt_id else {
+            // TODO: implement new scopes for partner tenants
+            return Err(DbError::ValidationError(
+                "Invalid scopes for this tenant kind".to_owned(),
+            ));
+        };
+
         if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
             // Every role must have at least Read permissions for now
             return Err(DbError::InsufficientTenantScopes);
@@ -108,15 +121,17 @@ impl TenantRole {
     }
 
     #[tracing::instrument("TenantRole::get_immutable", skip_all)]
-    pub fn get_immutable(
+    pub fn get_immutable<'a>(
         conn: &mut PgConn,
-        tenant_id: &TenantId,
+        t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
         kind: ImmutableRoleKind,
         role_kind: TenantRoleKind,
     ) -> DbResult<Self> {
+        let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
+
         let (name, scopes) = kind.props();
         let mut query = tenant_role::table
-            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .filter(TenantRole::tenant_or_partner_tenant_id_eq(t_pt_id))
             .filter(tenant_role::name.eq(name))
             .filter(tenant_role::scopes.eq(&scopes))
             .filter(tenant_role::is_immutable.eq(true))
@@ -139,17 +154,26 @@ impl TenantRole {
     }
 
     #[tracing::instrument("TenantRole::create", skip_all)]
-    pub fn create(
+    pub fn create<'a>(
         conn: &mut PgConn,
-        tenant_id: TenantId,
-        name: String,
+        t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
+        name: &str,
         scopes: Vec<TenantScope>,
         is_immutable: IsImmutable,
         kind: TenantRoleKind,
     ) -> DbResult<Self> {
+        let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
+
         let is_live = kind.is_live();
         let kind = TenantRoleKindDiscriminant::from(kind);
-        Self::validate_scopes(conn, &scopes, &tenant_id, kind, is_live)?;
+
+        Self::validate_scopes(conn, &scopes, t_pt_id, kind, is_live)?;
+
+        let (tenant_id, partner_tenant_id) = match t_pt_id {
+            TenantOrPartnerTenantId::TenantId(tid) => (Some(tid), None),
+            TenantOrPartnerTenantId::PartnerTenantId(ptid) => (None, Some(ptid)),
+        };
+
         let new = NewTenantRoleRow {
             tenant_id,
             name,
@@ -158,6 +182,7 @@ impl TenantRole {
             kind,
             is_live,
             created_at: Utc::now(),
+            partner_tenant_id,
         };
         let result = diesel::insert_into(tenant_role::table)
             .values(new)
@@ -175,16 +200,20 @@ impl TenantRole {
     }
 
     #[tracing::instrument("TenantRole::lock_active", skip_all)]
-    pub fn lock_active(
+    pub fn lock_active<'a>(
         conn: &mut TxnPgConn,
         id: &TenantRoleId,
-        tenant_id: &TenantId,
+        t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
     ) -> DbResult<Locked<Self>> {
+        let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
+
         let role: TenantRole = tenant_role::table
-            .filter(tenant_role::tenant_id.eq(tenant_id))
-            .filter(tenant_role::id.eq(id))
-            .for_no_key_update() // Make sure someone doesn't deactivate the role while we are using it
-            .first(conn.conn())?;
+                .filter(TenantRole::tenant_or_partner_tenant_id_eq(t_pt_id))
+                .filter(tenant_role::id.eq(id))
+                .for_no_key_update() // Make sure someone doesn't deactivate the role while we are using it
+                .first(conn.conn())?;
+
+
         if role.deactivated_at.is_some() {
             return Err(DbError::TargetTenantRoleDeactivated);
         }
@@ -192,9 +221,15 @@ impl TenantRole {
     }
 
     #[tracing::instrument("TenantRole::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut TxnPgConn, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
+    pub fn deactivate<'a>(
+        conn: &mut TxnPgConn,
+        id: &TenantRoleId,
+        t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
+    ) -> DbResult<Self> {
+        let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
+
         use db_schema::schema::{tenant_api_key, tenant_rolebinding};
-        let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
+        let role = Self::lock_active(conn, id, t_pt_id)?.into_inner();
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
         }
@@ -221,7 +256,7 @@ impl TenantRole {
         };
         let results: Vec<Self> = diesel::update(tenant_role::table)
             .filter(tenant_role::id.eq(id))
-            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .filter(TenantRole::tenant_or_partner_tenant_id_eq(t_pt_id))
             // Don't allow updating an immutable role
             .filter(tenant_role::is_immutable.eq(false))
             .set(update)
@@ -235,16 +270,18 @@ impl TenantRole {
     }
 
     #[tracing::instrument("TenantRole::update", skip_all)]
-    pub fn update(
+    pub fn update<'a>(
         conn: &mut TxnPgConn,
-        tenant_id: &TenantId,
+        t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
         id: &TenantRoleId,
         name: Option<String>,
         scopes: Option<Vec<TenantScope>>,
     ) -> DbResult<Self> {
-        let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
+        let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
+
+        let role = Self::lock_active(conn, id, t_pt_id)?.into_inner();
         if let Some(scopes) = scopes.as_ref() {
-            Self::validate_scopes(conn, scopes, &role.tenant_id, role.kind, role.is_live)?;
+            Self::validate_scopes(conn, scopes, t_pt_id, role.kind, role.is_live)?;
         }
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
@@ -256,7 +293,7 @@ impl TenantRole {
         };
         let results: Vec<Self> = diesel::update(tenant_role::table)
             .filter(tenant_role::id.eq(id))
-            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .filter(TenantRole::tenant_or_partner_tenant_id_eq(t_pt_id))
             // Don't allow updating an immutable role
             .filter(tenant_role::is_immutable.eq(false))
             .set(update)
@@ -355,18 +392,47 @@ impl TenantRole {
         let count = query.count().get_result(conn)?;
         Ok(count)
     }
+
+    pub fn tenant_or_partner_tenant_id(&self) -> DbResult<TenantOrPartnerTenantId> {
+        match (&self.tenant_id, &self.partner_tenant_id) {
+            (Some(tenant_id), None) => Ok(tenant_id.into()),
+            (None, Some(partner_tenant_id)) => Ok(partner_tenant_id.into()),
+            (Some(_), Some(_)) | (None, None) => {
+                // DB constraints should prevent these cases from occurring.
+                Err(DbError::ValidationError("Invalid tenant role".to_owned()))
+            }
+        }
+    }
+
+    pub fn tenant_or_partner_tenant_id_eq<'a, QS>(
+        t_pt_id: TenantOrPartnerTenantId<'a>,
+    ) -> Box<dyn BoxableExpression<QS, diesel::pg::Pg, SqlType = Nullable<Bool>> + 'a>
+    where
+        tenant_role::tenant_id: SelectableExpression<QS>,
+        tenant_role::partner_tenant_id: SelectableExpression<QS>,
+    {
+        // n.b.: check constraints enforce that exactly one of tenant_id and partner_tenant_id is
+        // not null.
+        match t_pt_id {
+            TenantOrPartnerTenantId::TenantId(tid) => Box::new(tenant_role::tenant_id.eq(tid)),
+            TenantOrPartnerTenantId::PartnerTenantId(ptid) => {
+                Box::new(tenant_role::partner_tenant_id.eq(ptid))
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = tenant_role)]
-pub(super) struct NewTenantRoleRow {
-    pub(super) tenant_id: TenantId,
-    pub(super) name: String,
+pub(super) struct NewTenantRoleRow<'a> {
+    pub(super) tenant_id: Option<&'a TenantId>,
+    pub(super) name: &'a str,
     pub(super) scopes: Vec<TenantScope>,
     pub(super) created_at: DateTime<Utc>,
     pub(super) is_immutable: IsImmutable,
     pub(super) kind: TenantRoleKindDiscriminant,
     pub(super) is_live: Option<IsLive>,
+    pub(super) partner_tenant_id: Option<&'a PartnerTenantId>,
 }
 
 #[derive(AsChangeset, Default)]

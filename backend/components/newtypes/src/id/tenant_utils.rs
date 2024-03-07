@@ -27,7 +27,7 @@ impl TenantId {
     }
 }
 
-#[derive(Debug, From)]
+#[derive(Debug, Clone, Copy, From)]
 pub enum TenantOrPartnerTenantId<'a> {
     TenantId(&'a TenantId),
     PartnerTenantId(&'a PartnerTenantId),

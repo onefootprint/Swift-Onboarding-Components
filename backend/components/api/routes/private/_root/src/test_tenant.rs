@@ -133,8 +133,7 @@ async fn post(
                             return Err(e.into()); // Real error, return
                         }
                         let role_id = role.id.clone();
-                        let tenant_id = role.tenant_id;
-                        let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, tenant_id)?;
+                        let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, &tenant.id)?;
                         rb
                     }
                 };

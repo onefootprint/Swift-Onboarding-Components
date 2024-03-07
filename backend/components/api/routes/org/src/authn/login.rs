@@ -94,7 +94,7 @@ async fn handler(
         let tenant_id = tenant.id.clone();
         let rb = state
             .db_pool
-            .db_transaction(move |conn| TenantRolebinding::create_for_login(conn, user_id, tenant_id))
+            .db_transaction(move |conn| TenantRolebinding::create_for_login(conn, user_id, &tenant_id))
             .await?;
         (vec![(rb, tenant)], created_new_tenant)
     } else {

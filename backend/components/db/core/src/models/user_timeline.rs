@@ -178,10 +178,13 @@ impl UserTimeline {
             DbUserTimelineEvent::LabelAdded(ref e) => Some(e.id.clone()),
             _ => None,
         });
-        let doc_req_ids = results.iter().flat_map(|ut| match ut.event {
-            DbUserTimelineEvent::StepUp(ref e) => Some(e.document_request_ids.clone()),
-            _ => None,
-        }).flatten();
+        let doc_req_ids = results
+            .iter()
+            .flat_map(|ut| match ut.event {
+                DbUserTimelineEvent::StepUp(ref e) => Some(e.document_request_ids.clone()),
+                _ => None,
+            })
+            .flatten();
 
         let decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
         let annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
@@ -309,7 +312,14 @@ impl UserTimeline {
                         SaturatedTimelineEvent::ExternalIntegrationCalled(e.clone())
                     }
                     DbUserTimelineEvent::StepUp(ref e) => {
-                        let drs = e.document_request_ids.iter().map(|dr_id| doc_reqs.get(dr_id).ok_or(DbError::RelatedObjectNotFound)).collect::<Result<Vec<_>, _>>()?.into_iter().cloned().collect();
+                        let drs = e
+                            .document_request_ids
+                            .iter()
+                            .map(|dr_id| doc_reqs.get(dr_id).ok_or(DbError::RelatedObjectNotFound))
+                            .collect::<Result<Vec<_>, _>>()?
+                            .into_iter()
+                            .cloned()
+                            .collect();
                         SaturatedTimelineEvent::StepUp(drs)
                     }
                 };

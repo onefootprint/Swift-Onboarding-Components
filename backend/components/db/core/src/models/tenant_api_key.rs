@@ -3,8 +3,8 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{tenant_api_key, tenant_api_key::BoxedQuery, tenant_role};
 use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use newtypes::{
-    ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, TenantRoleId,
-    TenantRoleKindDiscriminant,
+    ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, TenantOrPartnerTenantId,
+    TenantRoleId, TenantRoleKindDiscriminant,
 };
 
 use super::{ob_configuration::IsLive, tenant::Tenant, tenant_role::TenantRole};
@@ -167,9 +167,19 @@ impl TenantApiKey {
         if role.deactivated_at.is_some() {
             return Err(DbError::TenantRoleDeactivated);
         }
-        if role.tenant_id != api_key.tenant_id {
+
+        let role_tenant_id = match role.tenant_or_partner_tenant_id()? {
+            TenantOrPartnerTenantId::TenantId(tenant_id) => tenant_id,
+            TenantOrPartnerTenantId::PartnerTenantId(_) => {
+                // Partner tenants don't have API key access.
+                return Err(DbError::IncorrectTenantRoleKind);
+            }
+        };
+
+        if *role_tenant_id != api_key.tenant_id {
             return Err(DbError::TenantRoleMismatch);
         }
+
         let api_key = api_key.maybe_update_last_used_at(conn)?;
         Ok((api_key, tenant, role))
     }
