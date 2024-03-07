@@ -45,7 +45,7 @@ const PinVerification = ({
   const [state, send] = useIdentifyMachine();
   const {
     challenge: { challengeData: data },
-    identify: { email, phoneNumber, sandboxId, user },
+    identify: { email, identifyToken, phoneNumber, sandboxId },
     variant,
     obConfigAuth,
   } = state.context;
@@ -186,8 +186,8 @@ const PinVerification = ({
       return;
     }
 
-    if (user) {
-      initiatePhoneOrEmailLoginChallenge(user.token);
+    if (identifyToken) {
+      initiatePhoneOrEmailLoginChallenge(identifyToken);
     } else {
       initiateSignupChallenge();
     }

@@ -433,6 +433,9 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           const { email, phoneNumber, user, successfulIdentifier } =
             event.payload;
           context.identify.user = user;
+          if (user) {
+            context.identify.identifyToken = user.token;
+          }
           const isEmailChanged = email && context.identify.email !== email;
           const isPhoneChanged =
             phoneNumber && context.identify.phoneNumber !== phoneNumber;
