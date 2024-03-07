@@ -413,7 +413,7 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
     assert not body["user"]["can_initiate_signup_challenge"]
 
     # We should block making the signup challenge for this tenant
-    data = dict(phone_number=phone_number)
+    data = dict(phone_number=phone_number, scope="onboarding")
     body = post(
         "/hosted/identify/signup_challenge",
         data,
@@ -423,6 +423,10 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
     )
     assert body["error"]["message"] == "Please log into your existing account"
     assert body["error"]["code"] == "E120"
+
+    # Perform a login challenge using the token given in the erro
+    token = FpAuth(body["error"]["context"]["token"])
+    IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
 
 
 def test_create_duplicate_vault(sandbox_user, foo_sandbox_tenant):

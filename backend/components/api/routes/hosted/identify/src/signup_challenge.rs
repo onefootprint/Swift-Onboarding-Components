@@ -1,5 +1,6 @@
 use crate::{
-    identify::create_identified_token, ChallengeData, ChallengeState, GetIdentifyChallengeArgs, State,
+    identify::create_identified_token, ChallengeData, ChallengeState, GetIdentifyChallengeArgs,
+    IdentifyChallengeContext, State,
 };
 use api_core::{
     auth::ob_config::ObConfigAuth,
@@ -13,6 +14,7 @@ use api_core::{
         challenge::Challenge,
         email::send_email_challenge_non_blocking,
         headers::SandboxId,
+        identify::UserChallengeContext,
         sms::rx_background_error,
         vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper},
     },
@@ -66,11 +68,30 @@ pub async fn post(
         root_span: root_span.clone(),
     };
     let ctx = crate::get_identify_challenge_context(&state, args).await?;
+    let duplicate_of_id = ctx.as_ref().map(|ctx| ctx.ctx.vw.vault.id.clone());
     // TODO: one day, don't allow duplicate unverified vaults either
-    if ctx.as_ref().is_some_and(|ctx| !ctx.can_initiate_signup_challenge) {
-        return Err(ErrorWithCode::ExistingVault.into());
+    if let Some(ctx) = ctx {
+        let IdentifyChallengeContext {
+            ctx,
+            can_initiate_signup_challenge,
+            sv,
+            ..
+        } = ctx;
+        let UserChallengeContext { vw, .. } = ctx;
+        if !can_initiate_signup_challenge {
+            // There's already a duplicate vault. Create the auth token that allows creating a
+            // login challenge
+            let token = if let Some(scope) = scope {
+                let (token, _) =
+                    create_identified_token(&state, vw.vault.id.clone(), scope, sv, Some(ob_context.clone()))
+                        .await?;
+                Some(token)
+            } else {
+                None
+            };
+            return Err(ErrorWithCode::ExistingVault(token).into());
+        }
     }
-    let duplicate_of_id = ctx.map(|ctx| ctx.ctx.vw.vault.id);
 
     // Create the new vault
     let ctx = make_vault_context(&state, &ob_context, identifiers, sandbox_id.clone()).await?;

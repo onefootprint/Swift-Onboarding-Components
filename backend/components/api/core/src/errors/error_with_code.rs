@@ -1,4 +1,5 @@
 use http::StatusCode;
+use newtypes::SessionAuthToken;
 use serde_json::{json, Value};
 use strum::EnumMessage;
 use strum_macros;
@@ -59,7 +60,7 @@ pub enum ErrorWithCode {
     #[strum(message = "E119", detailed_message = "Session invalid")]
     CouldNotParseSession,
     #[strum(message = "E120", detailed_message = "Please log into your existing account")]
-    ExistingVault,
+    ExistingVault(Option<SessionAuthToken>),
 }
 
 impl ErrorWithCode {
@@ -84,7 +85,7 @@ impl ErrorWithCode {
             Self::NoSessionFound => StatusCode::UNAUTHORIZED,
             Self::SessionExpired => StatusCode::UNAUTHORIZED,
             Self::CouldNotParseSession => StatusCode::UNAUTHORIZED,
-            Self::ExistingVault => StatusCode::BAD_REQUEST,
+            Self::ExistingVault(_) => StatusCode::BAD_REQUEST,
         }
     }
 }
@@ -110,7 +111,8 @@ context_macro!(
     RateLimited(seconds: i64),
     UnsupportedChallengeKind(challenge_kind: String),
     InvalidMimeType(file_type: String),
-    FileTooLarge(max_size: usize)
+    FileTooLarge(max_size: usize),
+    ExistingVault(token: Option<SessionAuthToken>)
 );
 
 impl std::error::Error for ErrorWithCode {}
