@@ -3,54 +3,34 @@ import type {
   LoginChallengeRequest,
   LoginChallengeResponse,
 } from '@onefootprint/types';
-import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import type { EmailAndOrPhone } from '../types';
 import calculateRetryTime from './get-retry-time';
 
-type ToIgnore = 'identifier' | 'preferredChallengeKind';
-type PayloadPartial = 'obConfigAuth' | 'sandboxId' | 'authToken';
-type BasePayload = Pick<Payload, PayloadPartial>;
-type RestOfPayload = Omit<Payload, PayloadPartial>;
-type Payload = Omit<LoginChallengeRequest, ToIgnore> & {
-  authToken?: string;
-  identifier?: EmailAndOrPhone;
-  preferredChallengeKind: `${LoginChallengeRequest['preferredChallengeKind']}`;
+type Payload = LoginChallengeRequest & {
+  authToken: string;
 };
 
 const FIVE_MINUTES = 1000 * 60 * 5; // challenges expire after 5 mins
 
 const getQueryKeyForPayload = (payload: Payload) => {
-  const { identifier, preferredChallengeKind } = payload;
-  return ['login-challenge', identifier, preferredChallengeKind];
+  const { authToken, preferredChallengeKind } = payload;
+  return ['login-challenge', authToken, preferredChallengeKind];
 };
 
-const requestFn = async ({
-  authToken,
-  identifier,
-  obConfigAuth,
-  preferredChallengeKind,
-  sandboxId,
-}: Payload) => {
-  const headers: Record<string, string> = { ...obConfigAuth };
-  if (sandboxId) {
-    headers[SANDBOX_ID_HEADER] = sandboxId;
-  }
-  if (authToken) {
-    headers[AUTH_HEADER] = authToken;
-  }
+const requestFn = async ({ authToken, preferredChallengeKind }: Payload) => {
+  const headers: Record<string, string> = { [AUTH_HEADER]: authToken };
 
   const response = await request<LoginChallengeResponse>({
     method: 'POST',
     url: '/hosted/identify/login_challenge',
     data: {
       preferredChallengeKind,
-      identifier,
     },
     headers,
   });
-  const { challengeData, error } = { ...response.data };
+  const { challengeData, ...restOfResponse } = { ...response.data };
   if (challengeData.scrubbedPhoneNumber) {
     challengeData.scrubbedPhoneNumber =
       challengeData.scrubbedPhoneNumber.replaceAll('*', '•');
@@ -61,19 +41,15 @@ const requestFn = async ({
 
   return {
     challengeData,
-    error,
+    ...restOfResponse,
   };
 };
 
-const useLoginChallenge = (basePayload: BasePayload) => {
+const useLoginChallenge = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      isResend,
-      ...restOfPayload
-    }: Partial<BasePayload> & RestOfPayload) => {
-      const payload = { ...basePayload, ...restOfPayload };
+    mutationFn: ({ isResend, ...payload }: Payload) => {
       const queryKey = getQueryKeyForPayload(payload);
       const queryState =
         queryClient.getQueryState<LoginChallengeResponse>(queryKey);

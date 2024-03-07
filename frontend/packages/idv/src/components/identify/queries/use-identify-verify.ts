@@ -3,30 +3,17 @@ import type {
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
 } from '@onefootprint/types';
-import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-type PayloadPartKey = 'obConfigAuth' | 'sandboxId' | 'authToken' | 'scope';
+type PayloadPartKey = 'scope';
 type Payload = Omit<IdentifyVerifyRequest, 'identifier'> & {
   authToken?: string;
 };
 
 const requestFn = async (payload: Payload) => {
-  const {
-    challengeResponse,
-    challengeToken,
-    authToken,
-    obConfigAuth,
-    sandboxId,
-    scope,
-  } = payload;
-  const headers: Record<string, string> = { ...obConfigAuth };
-  if (sandboxId) {
-    headers[SANDBOX_ID_HEADER] = sandboxId;
-  }
-  if (authToken) {
-    headers[AUTH_HEADER] = authToken;
-  }
+  const { challengeResponse, challengeToken, authToken, scope } = payload;
+  const headers: Record<string, string> = { [AUTH_HEADER]: authToken };
 
   const response = await request<IdentifyVerifyResponse>({
     method: 'POST',

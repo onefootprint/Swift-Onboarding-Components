@@ -87,6 +87,17 @@ export const useRequestError = () => {
   const isValidErrorCode = (code?: string) =>
     !!code?.match(/^E[0-9]+$/g) && i18n.exists(`request:errors.${code}`);
 
+  const getContext = (
+    error?: unknown | Error,
+  ): Partial<Record<string, string>> => {
+    if (isFootprintError(error)) {
+      const data = error?.response?.data?.error;
+      const errorContext = data?.context;
+      return errorContext || {};
+    }
+    return {};
+  };
+
   const getMessage = (error?: unknown | Error): string => {
     if (typeof error === 'string') {
       return error;
@@ -127,7 +138,11 @@ export const useRequestError = () => {
     return undefined;
   };
 
-  return { getErrorMessage: getMessage, getErrorCode: getCode };
+  return {
+    getErrorMessage: getMessage,
+    getErrorCode: getCode,
+    getErrorContext: getContext,
+  };
 };
 
 const getRequestOptions = (

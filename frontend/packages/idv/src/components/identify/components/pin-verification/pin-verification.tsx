@@ -11,12 +11,7 @@ import type { ComponentProps } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  getLogger,
-  isEmailOrPhoneIdentifier,
-  isPhoneIdentifier,
-  isStringValid,
-} from '../../../../utils';
+import { getLogger, isPhoneIdentifier } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import {
   useIdentifyVerify,
@@ -50,22 +45,22 @@ const PinVerification = ({
   const [state, send] = useIdentifyMachine();
   const {
     challenge: { challengeData: data },
-    identify: { email, identifyToken, phoneNumber, sandboxId, user },
+    identify: { email, phoneNumber, sandboxId, user },
     variant,
     obConfigAuth,
   } = state.context;
-  const commonMutationProps = {
-    authToken: state.context.initialAuthToken,
-    obConfigAuth,
-    sandboxId,
-    scope: getTokenScope(variant),
-  };
   const requestError = useRequestError();
   const { t } = useTranslation('identify', { keyPrefix: 'pin-verification' });
   const showRequestErrorToast = useRequestErrorToast();
-  const mutLoginChallenge = useLoginChallenge(commonMutationProps);
-  const mutSignupChallenge = useSignupChallenge(commonMutationProps);
-  const mutIdentifyVerify = useIdentifyVerify(commonMutationProps);
+
+  const scope = getTokenScope(variant);
+  const mutLoginChallenge = useLoginChallenge();
+  const mutSignupChallenge = useSignupChallenge({
+    obConfigAuth,
+    sandboxId,
+    scope,
+  });
+  const mutIdentifyVerify = useIdentifyVerify({ scope });
 
   const challengeData: ChallengeData | undefined =
     data ||
@@ -86,9 +81,9 @@ const PinVerification = ({
       return;
     }
 
-    const { challengeToken } = challengeData;
+    const { challengeToken, token } = challengeData;
     mutIdentifyVerify.mutate(
-      { challengeResponse: pin, challengeToken },
+      { challengeResponse: pin, challengeToken, authToken: token },
       {
         onError: error => {
           logWarn('Failed to verify pin: ', error);
@@ -140,11 +135,14 @@ const PinVerification = ({
       },
       {
         onError: (error: unknown) => {
-          if (requestError.getErrorCode(error) === 'E120') {
+          const isExistingVaultError =
+            requestError.getErrorCode(error) === 'E120';
+          const { token } = requestError.getErrorContext(error);
+          if (isExistingVaultError && token) {
             logError(
               'Entered signup challenge when the user already has a vault. Initiating login challenge',
             );
-            initiatePhoneOrEmailLoginChallenge();
+            initiatePhoneOrEmailLoginChallenge(token);
             return;
           }
           logError('Failed to initiate signup challenge: ', error);
@@ -155,23 +153,14 @@ const PinVerification = ({
     );
   };
 
-  const initiatePhoneOrEmailLoginChallenge = () => {
+  const initiatePhoneOrEmailLoginChallenge = (authToken: string) => {
     if (mutLoginChallenge.isLoading) {
       return;
     }
 
-    // We'll be able to simplify this soon with the token-based login challenges
-    const conditionalPayload = isStringValid(identifyToken)
-      ? { authToken: identifyToken }
-      : {
-          identifier: isEmailOrPhoneIdentifier(identifier)
-            ? identifier
-            : undefined,
-        };
-
     mutLoginChallenge.mutate(
       {
-        ...conditionalPayload,
+        authToken,
         isResend: !!challengeData, // Check whether is resend, but isResend state might not have updated yet
         preferredChallengeKind,
       },
@@ -198,7 +187,7 @@ const PinVerification = ({
     }
 
     if (user) {
-      initiatePhoneOrEmailLoginChallenge();
+      initiatePhoneOrEmailLoginChallenge(user.token);
     } else {
       initiateSignupChallenge();
     }

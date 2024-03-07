@@ -24,6 +24,7 @@ const challengeKindToAuthMethod: Record<ChallengeKind, AuthMethodKind> = {
 };
 
 const CHALLENGE_DATA: ChallengeData = {
+  token: 'utok_xxx',
   challengeToken: 'challenge_token_info',
   challengeKind: ChallengeKind.sms,
 };
@@ -32,6 +33,7 @@ const getFixtureUser = (
   availableChallengeKinds: ChallengeKind[],
   tokenScopes?: UserTokenScope[],
 ): IdentifiedUser => ({
+  token: 'utok_xxx',
   isUnverified: false,
   availableChallengeKinds,
   authMethods: availableChallengeKinds.map(k => ({

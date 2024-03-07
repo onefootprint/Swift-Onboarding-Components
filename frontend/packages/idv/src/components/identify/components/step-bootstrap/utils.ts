@@ -17,7 +17,7 @@ export const identifyMutationCaller = async (
   mutation: UseMutationResult<
     IdentifyResponse,
     unknown,
-    IdentifyRequest,
+    Pick<IdentifyRequest, 'identifier'>,
     unknown
   >,
   identifier: EmailOrPhoneIdentifier,

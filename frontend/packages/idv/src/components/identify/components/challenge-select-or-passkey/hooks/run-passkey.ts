@@ -19,9 +19,7 @@ const { logError } = getLogger('run-passkey');
 const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
   const [state] = useIdentifyMachine();
   const {
-    identify: { successfulIdentifier, sandboxId },
-    obConfigAuth,
-    initialAuthToken,
+    identify: { user },
     variant,
   } = state.context;
   const { t } = useTranslation('identify', {
@@ -29,21 +27,18 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
   });
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();
-  const commonMutationProps = {
-    authToken: initialAuthToken,
-    obConfigAuth,
-    sandboxId,
+  const mutLoginChallenge = useLoginChallenge();
+  const mutIdentifyVerify = useIdentifyVerify({
     scope: getTokenScope(variant),
-  };
-  const mutLoginChallenge = useLoginChallenge(commonMutationProps);
-  const mutIdentifyVerify = useIdentifyVerify(commonMutationProps);
+  });
+
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
   const isWaiting = isRunningWebauthn || mutIdentifyVerify.isLoading;
 
   const initiatePasskeyChallenge = () => {
-    if (!successfulIdentifier) {
+    if (!user?.token) {
       logError(
-        'No successful identifier found while initiating login biometric challenge',
+        'No identifying token found while initiating login biometric challenge',
       );
       return;
     }
@@ -52,14 +47,9 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       return;
     }
 
-    // We'll be able to simplify this soon with the token-based login challenges
-    const loginIdentifier =
-      'email' in successfulIdentifier || 'phoneNumber' in successfulIdentifier
-        ? successfulIdentifier
-        : undefined;
     mutLoginChallenge.mutate(
       {
-        identifier: loginIdentifier,
+        authToken: user?.token,
         preferredChallengeKind: ChallengeKind.biometric,
       },
       {
@@ -75,7 +65,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
   const handleRequestChallengeSuccess = async (
     payload: LoginChallengeResponse,
   ) => {
-    const { biometricChallengeJson, challengeToken, challengeKind } =
+    const { token, biometricChallengeJson, challengeToken, challengeKind } =
       payload.challengeData || {};
 
     if (challengeKind !== ChallengeKind.biometric) {
@@ -118,6 +108,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
 
     mutIdentifyVerify.mutate(
       {
+        authToken: token,
         challengeResponse,
         challengeToken,
       },

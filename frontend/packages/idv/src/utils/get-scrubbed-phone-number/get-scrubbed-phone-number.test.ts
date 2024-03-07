@@ -11,7 +11,8 @@ describe('getScrubbedPhoneNumber', () => {
         successfulIdentifier: { email: '' },
         phoneNumber: '',
         challengeData: {
-          challengeToken: 'token',
+          token: 'utok_xxx',
+          challengeToken: 'ba5eba11',
           challengeKind: ChallengeKind.sms,
         },
       }),
@@ -22,7 +23,8 @@ describe('getScrubbedPhoneNumber', () => {
         successfulIdentifier: { email: 'piip@onefootprint.com' },
         phoneNumber: '+1 (123) 456-7890',
         challengeData: {
-          challengeToken: 'token',
+          token: 'utok_xxx',
+          challengeToken: 'ba5eba11',
           challengeKind: ChallengeKind.sms,
         },
       }),
@@ -35,7 +37,8 @@ describe('getScrubbedPhoneNumber', () => {
         successfulIdentifier: { phoneNumber: '+1 (123) 456-7890#test1' },
         phoneNumber: '+1 (123) 456-7891',
         challengeData: {
-          challengeToken: 'token',
+          token: 'utok_xxx',
+          challengeToken: 'ba5eba11',
           challengeKind: ChallengeKind.sms,
         },
       }),
@@ -46,7 +49,8 @@ describe('getScrubbedPhoneNumber', () => {
         successfulIdentifier: { phoneNumber: '+1 (123) 456-7890' },
         phoneNumber: '+1 (123) 456-7890',
         challengeData: {
-          challengeToken: 'token',
+          token: 'utok_xxx',
+          challengeToken: 'ba5eba11',
           challengeKind: ChallengeKind.sms,
         },
       }),
@@ -57,7 +61,8 @@ describe('getScrubbedPhoneNumber', () => {
         successfulIdentifier: { phoneNumber: '+55 48988124050' },
         phoneNumber: '+55 48988124050',
         challengeData: {
-          challengeToken: 'token',
+          token: 'utok_xxx',
+          challengeToken: 'ba5eba11',
           challengeKind: ChallengeKind.sms,
         },
       }),
@@ -68,7 +73,8 @@ describe('getScrubbedPhoneNumber', () => {
     expect(
       getScrubbedPhoneNumber({
         challengeData: {
-          challengeToken: 'token',
+          token: 'utok_xxx',
+          challengeToken: 'ba5eba11',
           challengeKind: ChallengeKind.sms,
           scrubbedPhoneNumber: '+1 (***) ***-**00',
         },
@@ -80,7 +86,8 @@ describe('getScrubbedPhoneNumber', () => {
         successfulIdentifier: { phoneNumber: '+1 (123) 456-7890' },
         phoneNumber: '+1 (123) 456-7890',
         challengeData: {
-          challengeToken: 'token',
+          token: 'utok_xxx',
+          challengeToken: 'ba5eba11',
           challengeKind: ChallengeKind.sms,
           scrubbedPhoneNumber: '+1 (***) ***-**90',
         },

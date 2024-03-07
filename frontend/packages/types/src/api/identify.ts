@@ -16,7 +16,7 @@ export type IdentifyRequest = {
   obConfigAuth?: ObConfigAuth;
   // Sandbox IDs uniquely distinguish different users even though same email/phone
   sandboxId?: string;
-  scope?: string; // Allowed values: my1fp, onboarding, auth
+  scope: string; // Allowed values: my1fp, onboarding, auth
 };
 
 export type IdentifiedAuthMethod = {
@@ -25,7 +25,7 @@ export type IdentifiedAuthMethod = {
 };
 
 export type IdentifiedUser = {
-  token?: string;
+  token: string;
   tokenScopes: UserTokenScope[];
   authMethods: IdentifiedAuthMethod[];
   /// Should deprecate this soon in favor of authMethods

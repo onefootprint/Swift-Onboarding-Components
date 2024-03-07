@@ -86,6 +86,7 @@ export const withIdentify = (
     path: '/hosted/identify',
     response: {
       user: userFound && {
+        token: 'utok_xxx',
         isUnverified: isUnverified ?? false,
         availableChallengeKinds,
         authMethods,
@@ -103,6 +104,7 @@ export const withLoginChallenge = (challengeKind: string) =>
     path: '/hosted/identify/login_challenge',
     response: {
       challengeData: {
+        token: 'utok_xxx',
         scrubbedPhoneNumber: '+1 (•••) •••-••99',
         biometricChallengeJson: {},
         challengeToken: 'token',
@@ -117,6 +119,7 @@ export const withSignupChallenge = (challengeKind?: string) =>
     path: '/hosted/identify/signup_challenge',
     response: {
       challengeData: {
+        token: 'utok_xxx',
         scrubbedPhoneNumber: '+1 (•••) •••-••99',
         challengeToken: 'token',
         challengeKind: challengeKind ?? 'sms',
