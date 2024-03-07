@@ -29,6 +29,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         ObConfigurationKind::Kyc,
         false,
         false,
+        None,
     )
     .expect("Could not create ob config")
 }
@@ -98,6 +99,7 @@ pub fn create_with_opts(
         ObConfigurationKind::Kyc,
         false,
         false,
+        None,
     )
     .expect("Could not create ob config")
 }

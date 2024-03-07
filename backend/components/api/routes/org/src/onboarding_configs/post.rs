@@ -15,8 +15,8 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     output::Csv, AdverseMediaListKind, CipKind, CollectedData as CD, CollectedDataOption as CDO,
-    CollectedDataOptionKind as CDOK, DataIdentifierDiscriminant, EnhancedAml, EnhancedAmlOption,
-    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
+    CollectedDataOptionKind as CDOK, DataIdentifierDiscriminant, DocumentAndCountryConfiguration,
+    EnhancedAml, EnhancedAmlOption, Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
@@ -48,6 +48,7 @@ pub struct CreateOnboardingConfigurationRequest {
     allow_us_territories: Option<bool>,
     kind: Option<ObConfigurationKind>,
     skip_confirm: Option<bool>,
+    document_types_and_countries: Option<DocumentAndCountryConfiguration>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -451,6 +452,7 @@ pub async fn post(
         allow_us_territories,
         kind,
         skip_confirm,
+        document_types_and_countries,
     } = request.clone();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -523,6 +525,7 @@ pub async fn post(
                 kind,
                 skip_kyb,
                 skip_confirm.unwrap_or(false),
+                document_types_and_countries,
             )?;
 
             match rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client)) {
@@ -631,6 +634,7 @@ mod test {
             allow_us_territories: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
+            document_types_and_countries: None,
         };
         req.validate_inner().is_ok()
     }
@@ -661,6 +665,7 @@ mod test {
             allow_us_territories: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
+            document_types_and_countries: None,
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }
@@ -690,6 +695,7 @@ mod test {
             allow_us_territories: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
+            document_types_and_countries: None,
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }
@@ -715,6 +721,7 @@ mod test {
             allow_us_territories: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
+            document_types_and_countries: None,
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }

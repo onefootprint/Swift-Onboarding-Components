@@ -132,6 +132,7 @@ impl
             doc_scan_for_optional_ssn,
             kind,
             tenant_id,
+            document_types_and_countries,
             ..
         } = ob_config;
 
@@ -159,6 +160,7 @@ impl
             doc_scan_for_optional_ssn,
             kind,
             is_rules_enabled,
+            document_types_and_countries,
         }
     }
 }

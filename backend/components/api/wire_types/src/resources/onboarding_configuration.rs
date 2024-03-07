@@ -1,7 +1,8 @@
 use crate::*;
 use newtypes::{
-    ApiKeyStatus, AppClipExperienceId, AuthMethodKind, CollectedDataOption, EnhancedAml,
-    Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId,
+    ApiKeyStatus, AppClipExperienceId, AuthMethodKind, CollectedDataOption, DocumentAndCountryConfiguration,
+    EnhancedAml, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind,
+    TenantId,
 };
 
 /// OnboardingConfiguration that was created
@@ -29,6 +30,7 @@ pub struct OnboardingConfiguration {
     pub doc_scan_for_optional_ssn: Option<CollectedDataOption>,
     pub kind: ObConfigurationKind,
     pub is_rules_enabled: bool,
+    pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
 }
 
 /// The public onboarding configuration

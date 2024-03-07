@@ -376,6 +376,7 @@ def test_no_phone_obc(sandbox_tenant):
 
 
 def test_doc_only(sandbox_tenant):
+    # TODO: eventually migrate this in favor of documents_and_countries
     collect_data = ["document.drivers_license,id_card.none.none"]
     data = dict(
         name="Doc only",
@@ -385,12 +386,14 @@ def test_doc_only(sandbox_tenant):
         kind="document",
         skip_kyc=True,
         skip_confirm=True,
+        document_types_and_countries= {'global': ['passport'], 'country_specific': {'US': ['drivers_license']}}
     )
     res = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
 
     assert res["kind"] == "document"
     assert res["must_collect_data"] == collect_data
     assert res["can_access_data"] == collect_data
+    assert res["document_types_and_countries"] == {'global': ['passport'], 'country_specific': {'US': ['drivers_license']}}
 
 
 @pytest.mark.parametrize(

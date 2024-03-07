@@ -352,6 +352,7 @@ struct NewObConfiguration {
     kind: ObConfigurationKind,
     skip_kyb: bool,
     skip_confirm: bool,
+    document_types_and_countries: Option<DocumentAndCountryConfiguration>,
 }
 
 #[derive(Debug)]
@@ -559,6 +560,7 @@ impl ObConfiguration {
         kind: ObConfigurationKind,
         skip_kyb: bool,
         skip_confirm: bool,
+        document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -584,6 +586,7 @@ impl ObConfiguration {
             kind,
             skip_kyb,
             skip_confirm,
+            document_types_and_countries,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

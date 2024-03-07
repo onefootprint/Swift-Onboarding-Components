@@ -163,6 +163,83 @@ def test_upload_documents_with_ob_config_restriction(
     assert document_types_to_authorize == ["drivers_license"]
 
 
+def test_upload_documents_with_new_ob_config_document_and_countries_field(
+    sandbox_tenant, must_collect_data, can_access_data
+):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Restricted doc request config (new)",
+        # we'll ignore all of this when using `document_types_and_countries`, which we test below by trying to upload a voter ID and it failing
+        must_collect_data + ["document.voter_identification.none.require_selfie"],
+        can_access_data + ["document.voter_identification.none.require_selfie"],
+        # restrict to only DL in US
+        document_types_and_countries = {'global': ['passport'], 'country_specific': {'US': ['drivers_license']}}
+    )
+    bifrost = BifrostClient.new(obc)
+    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_requirements(kind="liveness")
+
+    # Manually handle the document requirement with some invalid data
+    consent_data = {"consent_language_text": "I consent"}
+    post("hosted/user/consent", consent_data, bifrost.auth_token)
+
+    # Shouldn't be allowed to upload DL in MX
+    data = {
+        "document_type": "drivers_license",
+        "country_code": "MX",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    assert (
+        body["error"]["message"]
+        == "Unsupported document type. Supported document types: passport"
+    )
+
+    # Shouldn't be allowed to passport in US
+    data = {
+        "document_type": "passport",
+        "country_code": "US",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    assert (
+        body["error"]["message"]
+        == "Unsupported document type. Supported document types: drivers_license"
+    )
+
+    # Shouldn't be allowed to voter id in US
+    data = {
+        "document_type": "voter_identification",
+        "country_code": "US",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    assert (
+        body["error"]["message"]
+        == "Unsupported document type. Supported document types: drivers_license"
+    )
+
+    # Can upload a non-US passport
+    data = {
+        "document_type": "passport",
+        "country_code": "NO",
+    }
+    post("hosted/user/documents", data, bifrost.auth_token)
+
+    # Can upload a US DL
+    data = {
+        "document_type": "drivers_license",
+        "country_code": "US",
+    }
+    post("hosted/user/documents", data, bifrost.auth_token)
+
+    bifrost.handle_requirements(kind="collect_document")
+    status = bifrost.get_status()
+    fields_to_authorize = get_requirement_from_requirements(
+        "authorize", status["all_requirements"], is_met=True
+    )["fields_to_authorize"]
+    document_types_to_authorize = fields_to_authorize["document_types"]
+    # despite having created identity documents for NO passport, MX DL, we only actually uploaded successfully a DL
+    assert document_types_to_authorize == ["drivers_license"]
+
+
 def test_user_skipping_selfie(doc_request_sandbox_ob_config):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
     bifrost.handle_requirements(kind="collect_data")
