@@ -9,7 +9,7 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AuthEventKind, DataIdentifier, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId,
+    AuthEventKind, BoId, DataIdentifier, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId,
     WorkflowRequestId,
 };
 use paperclip::actix::Apiv2Security;
@@ -40,6 +40,7 @@ pub struct UserSessionContext {
     pub(super) tenant: Option<Tenant>,
     pub(super) scoped_user: Option<ScopedVault>,
     pub(super) sb_id: Option<ScopedVaultId>,
+    pub bo_id: Option<BoId>,
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
@@ -89,6 +90,7 @@ impl UserSessionContext {
         let context = NewUserSessionContext {
             su_id: new_ctx.su_id.or(self.scoped_user.map(|su| su.id)),
             sb_id: new_ctx.sb_id.or(self.sb_id),
+            bo_id: new_ctx.bo_id.or(self.bo_id),
             obc_id: new_ctx.obc_id.or(self.obc_id),
             wf_id: new_ctx.wf_id.or(self.wf_id),
             wfr_id: new_ctx.wfr_id.or(self.wfr_id),
@@ -183,6 +185,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     purpose,
                     su_id,
                     sb_id,
+                    bo_id,
                     wf_id,
                     wfr_id,
                     obc_id,
@@ -225,6 +228,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     user: vault,
                     purpose,
                     sb_id,
+                    bo_id,
                     wf_id,
                     wfr_id,
                     scoped_user,

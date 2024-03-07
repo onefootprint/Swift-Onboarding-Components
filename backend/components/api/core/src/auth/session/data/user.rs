@@ -1,5 +1,5 @@
 use newtypes::{
-    AuthEventId, AuthMethodKind, ContactInfoId, DataIdentifier, IdentifyScope, ObConfigurationId,
+    AuthEventId, AuthMethodKind, BoId, ContactInfoId, DataIdentifier, IdentifyScope, ObConfigurationId,
     ScopedVaultId, UserAuthScope, VaultId, WorkflowId, WorkflowRequestId,
 };
 
@@ -19,6 +19,8 @@ pub struct UserSession {
     pub su_id: Option<ScopedVaultId>,
     /// The scoped business for the auth session, if any
     pub sb_id: Option<ScopedVaultId>,
+    /// The business owner ID if we are in the process of conducting KYC for a business owner
+    pub bo_id: Option<BoId>,
     /// The obc that we'll use to make a new onboarding workflow, if any
     pub obc_id: Option<ObConfigurationId>,
     /// The workflow for the auth session, if any
@@ -47,6 +49,7 @@ pub struct UserSession {
 pub struct NewUserSessionContext {
     pub su_id: Option<ScopedVaultId>,
     pub sb_id: Option<ScopedVaultId>,
+    pub bo_id: Option<BoId>,
     pub obc_id: Option<ObConfigurationId>,
     pub wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
@@ -154,6 +157,7 @@ impl UserSession {
         let NewUserSessionContext {
             su_id,
             sb_id,
+            bo_id,
             obc_id,
             wf_id,
             wfr_id,
@@ -165,6 +169,7 @@ impl UserSession {
             purpose,
             su_id,
             sb_id,
+            bo_id,
             obc_id,
             wf_id,
             wfr_id,

@@ -34,8 +34,8 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    AuthEventKind, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, ObConfigurationKind,
-    ScopedVaultId, VaultId, WebauthnCredentialId,
+    AuthEventKind, BoId, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, ObConfigurationKind,
+    VaultId, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -115,7 +115,6 @@ pub async fn post(
                     (context, Some(su), obc)
                 }
                 IdentifyScope::Onboarding => {
-                    let bo = ob_pk_auth.as_ref().and_then(|a| a.business_owner());
                     let user_auth_obc = user_auth.as_ref().and_then(|a| a.ob_config());
                     let ob_pk_obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
                     let obc = user_auth_obc.or(ob_pk_obc).cloned();
@@ -138,11 +137,15 @@ pub async fn post(
                         )
                         .into());
                     };
-                    // TODO we should migrate the BO tokens to use these new un-authed, identified tokens
-                    let sb_id = bo.map(|bo| get_scoped_business_id(conn, &su, bo)).transpose()?;
+                    if let Some(bo_id) = user_auth.as_ref().and_then(|ua| ua.bo_id.as_ref()).or(ob_pk_auth
+                        .as_ref()
+                        .and_then(|ob| ob.business_owner())
+                        .map(|bo| &bo.id))
+                    {
+                        register_business_owner(conn, &su, bo_id)?;
+                    }
                     let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
-                        sb_id,
                         obc_id: obc.as_ref().map(|obc| obc.id.clone()),
                         // wf_id will be added later in POST /hosted/onboarding
                         ..Default::default()
@@ -219,14 +222,11 @@ pub async fn post(
     ResponseData::ok(IdentifyVerifyResponse { auth_token }).json()
 }
 
-fn get_scoped_business_id(
-    conn: &mut TxnPgConn,
-    sv: &ScopedVault,
-    bo: &BusinessOwner,
-) -> ApiResult<ScopedVaultId> {
+/// After logging into a vault in the context of multi-KYC KYB, save the authed vault as a business
+/// owner of the provided business.
+fn register_business_owner(conn: &mut TxnPgConn, sv: &ScopedVault, bo_id: &BoId) -> ApiResult<()> {
     // If we verified with a BoSessionAuth, update the corresponding BO
-    let bo = BusinessOwner::lock(conn, &bo.id)?.into_inner();
-    let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &sv.tenant_id))?;
+    let bo = BusinessOwner::lock(conn, bo_id)?.into_inner();
     if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
         // If uv on the BO, make sure it is the same UV that was located in identify flow
         if existing_uv_id != &sv.vault_id {
@@ -236,8 +236,7 @@ fn get_scoped_business_id(
         // If no uv_id on the BO, add it
         bo.add_user_vault_id(conn, &sv.vault_id)?;
     }
-    // TODO this will give the secondary BO perms to update the business vault
-    Ok(scoped_business.id)
+    Ok(())
 }
 
 fn validate_biometric_challenge(

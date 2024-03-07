@@ -159,8 +159,22 @@ pub(super) async fn create_identified_token(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let scopes = vec![];
+            // TODO we should migrate the BO tokens to use these new un-authed, identified tokens
+            let bo = ob_context.as_ref().and_then(|obc| obc.business_owner()).cloned();
+            let sb = if let Some(bo) = bo.as_ref() {
+                if let Some(obc) = ob_context.as_ref() {
+                    let sb = ScopedVault::get(conn, (&bo.business_vault_id, &obc.tenant().id))?;
+                    Some(sb)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
             let context = NewUserSessionContext {
                 su_id: sv.map(|sv| sv.id),
+                sb_id: sb.map(|sb| sb.id),
+                bo_id: bo.map(|bo| bo.id),
                 obc_id: ob_context.map(|obc| obc.ob_config().id.clone()),
                 ..Default::default()
             };
