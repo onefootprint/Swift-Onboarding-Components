@@ -629,6 +629,7 @@ dependencies = [
  "regex",
  "reqwest",
  "reqwest-middleware",
+ "reqwest-tracing",
  "selfie_doc",
  "sentry-tracing",
  "serde",

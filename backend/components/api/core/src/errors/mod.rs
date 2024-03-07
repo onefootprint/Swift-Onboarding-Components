@@ -110,6 +110,8 @@ pub enum ApiErrorKind {
     ContactInfoKindNotInVault(ContactInfoKind),
     #[error("{0}")]
     ReqwestError(#[from] reqwest::Error),
+    #[error("{0}")]
+    ReqwestMiddlewareError(#[from] reqwest_middleware::Error),
     #[error("Sendgrid error: {0}")]
     SendgridError(String),
     #[error("{0}")]
@@ -313,6 +315,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::ContactInfoKindNotInVault(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::ReqwestMiddlewareError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::Twilio(e) => match e {
                 TwilioError::Request(_) | TwilioError::ReqwestMiddleware(_) | TwilioError::SerdeJson(_) => {
                     StatusCode::INTERNAL_SERVER_ERROR

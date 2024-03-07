@@ -10,6 +10,8 @@ use feature_flag::BoolFlag;
 use newtypes::{email::Email, ContactInfoId, PiiString, SandboxId, TenantId, VaultId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
+use reqwest_middleware::ClientWithMiddleware;
+use reqwest_tracing::TracingMiddleware;
 use std::{collections::HashMap, str::FromStr};
 use tracing::Instrument;
 
@@ -18,7 +20,7 @@ use super::{challenge_rate_limit::RateLimit, session::AuthSession, sms::PhoneEma
 #[derive(Debug, Clone)]
 pub struct SendgridClient {
     api_key: String,
-    client: reqwest::Client,
+    client: ClientWithMiddleware,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -89,6 +91,9 @@ impl SendgridClient {
 
     pub fn new(api_key: String) -> Self {
         let client = reqwest::Client::new();
+        let client = reqwest_middleware::ClientBuilder::new(client)
+            .with(TracingMiddleware::default())
+            .build();
         Self { api_key, client }
     }
 

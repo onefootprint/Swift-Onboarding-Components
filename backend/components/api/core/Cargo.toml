@@ -64,6 +64,7 @@ url = "2.2.2"
 newtypes = { path = "../../newtypes" }
 reqwest = { workspace = true }
 reqwest-middleware = { workspace = true }
+reqwest-tracing = { workspace = true }
 hyper = { workspace = true }
 
 itertools = { workspace = true }
