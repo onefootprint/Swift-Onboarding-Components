@@ -1,4 +1,4 @@
-import { AuthMethodKind } from '@onefootprint/types/src/data';
+import { AuthMethodKind } from '@onefootprint/types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

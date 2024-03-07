@@ -14,6 +14,7 @@ const Content = ({ isRoot = false }) => (
       margin: 'auto',
       paddingBottom: isRoot ? '34px' : '0',
       background: isRoot ? '#fff' : 'transparent',
+      borderRadius: '6px',
     }}
   >
     <div

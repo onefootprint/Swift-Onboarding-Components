@@ -2,8 +2,7 @@ import type {
   ChallengeData,
   Identifier as IdvIdentifier,
 } from '@onefootprint/types';
-import { ChallengeKind as Kind } from '@onefootprint/types';
-import { AuthMethodKind } from '@onefootprint/types/src/data';
+import { AuthMethodKind, ChallengeKind as Kind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import React from 'react';

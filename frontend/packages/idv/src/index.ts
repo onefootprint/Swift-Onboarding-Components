@@ -5,6 +5,7 @@ export type {
 } from './components';
 export {
   AppErrorBoundary,
+  AuthMethods,
   configureFootprint,
   EmailForm,
   EmailPreview,

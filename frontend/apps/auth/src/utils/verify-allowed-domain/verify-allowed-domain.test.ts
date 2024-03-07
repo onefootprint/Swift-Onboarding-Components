@@ -31,6 +31,11 @@ describe('isDomainAllowed', () => {
       list: ['onefootprint.com'],
       x: true,
     },
+    {
+      url: 'https://demos-jmjxpdwdp.preview.onefootprint.com/components/auth?ob_key=ob_test_2TwubGlrWdKaJnWsQQKQYl',
+      list: ['https://google.com', 'http://acme.com'],
+      x: true,
+    },
     { url: '', list: ['www.onefootprint.com'], x: false },
     { url: 'not-adomain', list: ['www.onefootprint.com'], x: false },
   ])('.', ({ url, list, x }) => {

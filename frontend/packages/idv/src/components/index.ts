@@ -13,6 +13,7 @@ export {
   useFootprintProvider,
 } from './footprint-provider';
 export { default as configureFootprint } from './footprint-provider/adapters';
+export { AuthMethods } from './identify/components/auth-methods';
 export type { InfoBoxProps } from './info-box';
 export { default as InfoBox } from './info-box';
 export { default as InitShimmer } from './init-shimmer';

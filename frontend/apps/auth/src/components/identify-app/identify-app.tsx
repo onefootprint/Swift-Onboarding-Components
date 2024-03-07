@@ -27,7 +27,7 @@ import { isSdkUrlAllowed } from '@/src/utils';
 import { useFootprintProvider } from '../../provider-footprint';
 import useProps from '../../provider-footprint/hooks/use-props';
 import type { Variant } from '../../types';
-import Layout from '../layout';
+import Layout from '../client-layout';
 import type { NotificationProps } from '../notification';
 import Notification from '../notification';
 

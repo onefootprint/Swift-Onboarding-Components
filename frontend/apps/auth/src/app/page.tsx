@@ -1,8 +1,8 @@
 import { type FootprintVariant } from '@onefootprint/footprint-js';
 import React from 'react';
 
-import DrawerLoading from '@/src/components/loading/drawer-loading';
-import ModalLoading from '@/src/components/loading/modal-loading';
+import DrawerLoading from '@/src/components/client-loading/drawer-loading';
+import ModalLoading from '@/src/components/client-loading/modal-loading';
 import { getCustomAppearanceFork } from '@/src/package-appearance';
 
 import IdentifyApp from '../components/identify-app';

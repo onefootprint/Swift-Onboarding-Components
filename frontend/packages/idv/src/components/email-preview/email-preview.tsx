@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 export type EmailPreviewProps = {
   email?: string;
   onChange: () => void;
-  textCta: string;
+  textCta?: string;
 };
 
 const EmailPreview = ({
@@ -24,7 +24,7 @@ const EmailPreview = ({
           {email}
         </Text>
       </EmailCardContent>
-      <LinkButton onClick={onChange}>{textCta}</LinkButton>
+      <LinkButton onClick={onChange}>{textCta || 'Change'}</LinkButton>
     </EmailCard>
   ) : null;
 

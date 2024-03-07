@@ -4,8 +4,11 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { OnboardingConfigStatus } from '@onefootprint/types';
-import { AuthMethodKind, ChallengeKind } from '@onefootprint/types/src/data';
+import {
+  AuthMethodKind,
+  ChallengeKind,
+  OnboardingConfigStatus,
+} from '@onefootprint/types';
 
 import * as getBiometricChallengeResponse from '../../utils/get-biometric-challenge-response';
 

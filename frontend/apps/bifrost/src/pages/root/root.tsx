@@ -16,10 +16,10 @@ import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React from 'react';
-import Layout from 'src/components/layout';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useEffectOnce } from 'usehooks-ts';
 
+import Layout from '../../components/layout';
 import Complete from '../complete';
 import Init from '../init';
 import InitError from '../init-error';

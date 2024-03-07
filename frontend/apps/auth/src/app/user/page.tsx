@@ -6,17 +6,17 @@ import { getCustomAppearanceFork } from '@/src/package-appearance';
 import ClientProviders from '../client-providers';
 import Loading from './loading';
 
+const AuthMethodsApp = dynamic(
+  () => import('@/src/components/auth-methods-app'),
+  { ssr: false, loading: () => <Loading isRoot /> },
+);
+
 type UserPageProps = {
   params: Record<string, string>;
   searchParams: Record<string, string>;
 };
 
 const variant = 'modal';
-const UserContainer = dynamic(() => import('@/src/components/user-container'), {
-  ssr: false,
-  loading: () => <Loading isRoot />,
-});
-
 const UserPage = async (props: UserPageProps) => {
   const { searchParams } = props;
   const loadedStyle = await getCustomAppearanceFork({
@@ -29,7 +29,7 @@ const UserPage = async (props: UserPageProps) => {
   return (
     <main id="__next" data-variant={loadedStyle.variant}>
       <ClientProviders loadedStyle={loadedStyle}>
-        <UserContainer variant={variant} Loading={<Loading />} />
+        <AuthMethodsApp variant={variant} Loading={<Loading />} />
       </ClientProviders>
     </main>
   );

@@ -9,10 +9,10 @@ declare module 'i18next' {
     defaultNS: 'idv';
     fallbackNS: 'idv';
     resources: {
-      idv: typeof idvResource;
-      ui: typeof uiResource;
-      request: typeof requestResource;
       identify: typeof identifyResource;
+      idv: typeof idvResource;
+      request: typeof requestResource;
+      ui: typeof uiResource;
     };
   }
 }

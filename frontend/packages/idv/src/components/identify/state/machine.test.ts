@@ -5,12 +5,12 @@ import type {
   UserTokenScope,
 } from '@onefootprint/types';
 import {
+  AuthMethodKind,
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
-import { AuthMethodKind } from '@onefootprint/types/src/data';
 import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';

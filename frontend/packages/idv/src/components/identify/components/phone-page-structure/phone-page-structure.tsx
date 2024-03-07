@@ -22,7 +22,7 @@ type PhonePageStructureProps = {
   texts: {
     headerTitle: string;
     headerSubtitle?: string;
-    emailChangeCta: string;
+    emailChangeCta?: string;
   } & PhoneFormProps['texts'];
 };
 

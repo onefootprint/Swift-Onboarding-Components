@@ -3,9 +3,8 @@ import type {
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
-import { ChallengeKind as Kind } from '@onefootprint/types';
+import { AuthMethodKind, ChallengeKind as Kind } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
-import { AuthMethodKind } from '@onefootprint/types/src/data';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 

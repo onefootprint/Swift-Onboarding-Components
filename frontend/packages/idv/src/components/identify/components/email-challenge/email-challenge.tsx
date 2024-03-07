@@ -1,4 +1,4 @@
-import { AuthMethodKind, ChallengeKind } from '@onefootprint/types/src/data';
+import { AuthMethodKind, ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

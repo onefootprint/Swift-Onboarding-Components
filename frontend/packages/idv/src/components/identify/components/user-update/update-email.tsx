@@ -1,25 +1,33 @@
-import { Stack } from '@onefootprint/ui';
+import type { TFunction } from 'i18next';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import EmailForm from '../../../email-form';
-import { ActionKind } from '../../queries/use-user-challenge';
 import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
+import { UpdateAuthMethodActionKind } from '../../types';
+import EmailPageStructure from '../email-page-structure';
 import UpdateVerifyEmail from './update-verify-email';
 
 type UpdateEmailProps = {
   Header: (props: HeaderProps) => JSX.Element;
   authToken: string;
-  actionKind: ActionKind;
+  actionKind: UpdateAuthMethodActionKind;
   identifyVariant: IdentifyVariant;
   onSuccess: (newEmail: string) => void;
 };
 
 enum Screen {
-  collect,
-  verify,
+  collect = 'collect',
+  verify = 'verify',
 }
+
+const getHeaderTitle = (
+  t: TFunction<'identify'>,
+  kind: UpdateAuthMethodActionKind,
+): string =>
+  kind === UpdateAuthMethodActionKind.replace
+    ? t('email-step.replace-title')
+    : t('email-step.add-primary-title');
 
 const UpdateEmail = ({
   Header,
@@ -32,33 +40,28 @@ const UpdateEmail = ({
   const [screen, setScreen] = useState<Screen>(Screen.collect);
   const [email, setEmail] = useState<string>('');
 
-  const actionKindToHeader: Record<ActionKind, string> = {
-    [ActionKind.addPrimary]: t('email-step.add-primary-title'),
-    [ActionKind.replace]: t('email-step.replace-title'),
-  };
-  const title = actionKindToHeader[actionKind];
-
   if (screen === Screen.collect || !email) {
     return (
-      <Stack direction="column" gap={7}>
-        <Header title={title} subtitle={t('email-step.update-subtitle')} />
-        <EmailForm
-          defaultEmail={email}
-          isLoading={false}
-          onSubmit={({ email: newEmail }) => {
-            setEmail(newEmail);
-            setScreen(Screen.verify);
-          }}
-          texts={{
-            cta: t('continue'),
-            emailIsRequired: t('email-is-required'),
-            emailLabel: t('email'),
-            emailPlaceholder: t('email-placeholder'),
-          }}
-        />
-      </Stack>
+      <EmailPageStructure
+        Header={Header}
+        onSubmit={newEmail => {
+          setEmail(newEmail);
+          setScreen(Screen.verify);
+        }}
+        defaultEmail={email}
+        isLoading={false}
+        texts={{
+          headerTitle: getHeaderTitle(t, actionKind),
+          headerSubtitle: t('email-step.update-subtitle'),
+          cta: t('continue'),
+          emailIsRequired: t('email-is-required'),
+          emailLabel: t('email'),
+          emailPlaceholder: t('email-placeholder'),
+        }}
+      />
     );
   }
+
   return (
     <UpdateVerifyEmail
       Header={Header}

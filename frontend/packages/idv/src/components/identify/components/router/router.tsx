@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 import type { NavigationHeaderLeftButtonProps } from '../../../layout';
 import StepHeader from '../../../step-header';
-import { ActionKind } from '../../queries/use-user-challenge';
 import type { IdentifyMachineContext } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import type { DoneArgs, HeaderProps } from '../../types';
+import { UpdateAuthMethodActionKind } from '../../types';
 import getLeftNavButton from '../../utils/nav-left-btn';
 import ChallengeSelectOrPasskey from '../challenge-select-or-passkey';
 import DifferentAccountOption from '../different-account-option';
@@ -113,7 +113,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
       <UpdatePhone
         Header={Header}
         authToken={state.context.challenge.authToken}
-        actionKind={ActionKind.addPrimary}
+        actionKind={UpdateAuthMethodActionKind.addPrimary}
         identifyVariant={variant}
         onSuccess={phoneNumber => {
           send({ type: 'phoneAdded', payload: { phoneNumber } });

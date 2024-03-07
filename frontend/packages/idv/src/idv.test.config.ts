@@ -10,13 +10,13 @@ import type {
   OnboardingRequirement,
 } from '@onefootprint/types';
 import {
+  AuthMethodKind,
   ChallengeKind,
   CollectedKycDataOption,
   OnboardingRequirementKind,
   SessionStatus,
   UserTokenScope,
 } from '@onefootprint/types';
-import { AuthMethodKind } from '@onefootprint/types/src/data';
 
 // These tests take so long that a lot of them time out - this does a blanket replace on waitFor
 // to allow each step of the tests to run for a little longer

@@ -3,20 +3,16 @@ import type { AuthMethodKind, ObConfigAuth } from '@onefootprint/types';
 import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import type { UpdateAuthMethodActionKind } from '../types';
 import calculateRetryTime from './get-retry-time';
 
 export type UserChallengeBody = {
   authToken: string;
-  actionKind: ActionKind; // Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.
+  actionKind: UpdateAuthMethodActionKind; // Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.
   kind: AuthMethodKind; // The kind of challenge to initiate
   email?: string; // If the challenge kind is email, the email address to send the challenge to
   phoneNumber?: string; // If the challenge kind is SMS, the phone number t
 };
-
-export enum ActionKind {
-  replace = 'replace',
-  addPrimary = 'add_primary',
-}
 
 export type UserChallengeResponse = {
   biometricChallengeJson?: string;

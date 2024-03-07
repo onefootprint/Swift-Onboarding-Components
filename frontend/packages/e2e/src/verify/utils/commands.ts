@@ -31,6 +31,14 @@ export const clickOnTakePhoto = clickOn.bind(null, /take photo/i);
 export const clickOnConfirm = clickOn.bind(null, /confirm/i);
 export const clickOnCancel = clickOn.bind(null, /cancel/i);
 export const clickOnYes = clickOn.bind(null, /yes/i);
+export const clickOnAuthenticateWithFootprint = clickOn.bind(
+  null,
+  /Authenticate with Footprint/i,
+);
+export const clickOnUpdateAuthentication = clickOn.bind(
+  null,
+  /Update Authentication/i,
+);
 
 export const checkSupport = async ({ frame }: WithFrame) => {
   const supportButton = frame
@@ -70,6 +78,14 @@ export const selectOutcomeOptional = async (
 export const waitForVerifyButton = async ({ page }: WithPage) => {
   const btn = page.locator('.footprint-verify-button').first();
   await btn
+    .waitFor({ state: 'attached', timeout: 20000 })
+    .then(() => true)
+    .catch(() => false);
+};
+
+export const waitForEmailField = async ({ frame }: WithFrame) => {
+  const field = frame.getByLabel('Email').first();
+  return field
     .waitFor({ state: 'attached', timeout: 20000 })
     .then(() => true)
     .catch(() => false);
