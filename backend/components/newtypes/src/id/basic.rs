@@ -301,3 +301,4 @@ define_newtype_id!(
 );
 define_newtype_id!(ListId, String, "Identifier for a List");
 define_newtype_id!(ListAlias, String, "User facing alias that is used to refer to List's from rules");
+define_newtype_id!(ListEntryId, String, "Identifier for a ListEntry");
