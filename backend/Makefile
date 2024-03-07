@@ -161,3 +161,14 @@ run-jaeger:
 stop-jaeger:
 	docker stop jaeger
 
+# Lists all first-party crates, handy for figuring out the crate that includes a given file.
+.PHONY: ls-crates
+ls-crates:
+	@./internal_tools/ls-crates.sh
+
+# Occasionally, we'll get compiler panics that can be solved by `cargo clean`.
+# `make clean-crates` will clean only first-party crates, which solves the
+# compiler panics without having to rebuild third-party crates.
+.PHONY: clean-crates
+clean-crates:
+	@./internal_tools/clean-crates.sh

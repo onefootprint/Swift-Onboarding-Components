@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Lists all first-party crates with their location and dependencies
+
+set -euf -o pipefail
+
+CARGO_PROJECT_ROOT=$(dirname $(cargo locate-project | jq -r .root))
+
+( \
+  printf 'Crate\tPath\tDependencies\n'; \
+  printf -- '-----\t----\t------------\n'; \
+  cargo metadata --format-version 1 | jq --arg CARGO_PROJECT_ROOT "$CARGO_PROJECT_ROOT" -r '.packages[] | select(.source == null) | "\(.name)\t\(.manifest_path | sub("^" + $CARGO_PROJECT_ROOT+ "/"; "") | sub("/Cargo.toml$"; ""))\t\([.dependencies[] | select(.source == null) | .name] | join(", "))"'\
+) | column -t -s $'\t'
