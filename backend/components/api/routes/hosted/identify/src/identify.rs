@@ -62,6 +62,7 @@ pub async fn post(
         tenant: _,
         sv,
         can_initiate_signup_challenge,
+        matching_fps,
     } = ctx;
     let UserChallengeContext {
         webauthn_creds,
@@ -130,6 +131,7 @@ pub async fn post(
         can_initiate_signup_challenge,
         scrubbed_phone,
         scrubbed_email,
+        matching_fps,
     };
     let response = IdentifyResponse {
         user_found: true,

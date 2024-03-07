@@ -1,6 +1,6 @@
 use newtypes::{
-    email::Email, AuthMethodKind, ChallengeKind, ChallengeToken, IdentifyScope, PhoneNumber, PiiString,
-    SessionAuthToken, UserAuthGuard,
+    email::Email, AuthMethodKind, ChallengeKind, ChallengeToken, DataIdentifier, IdentifyScope, PhoneNumber,
+    PiiString, SessionAuthToken, UserAuthGuard,
 };
 
 use crate::*;
@@ -76,6 +76,8 @@ pub struct IdentifiedUser {
     pub scrubbed_phone: Option<PiiString>,
     /// Populated only when identifying a user via auth token that was created by the tenant
     pub scrubbed_email: Option<PiiString>,
+    /// The list of DataIdentifiers whose fingerprints matched on the vault
+    pub matching_fps: Vec<DataIdentifier>,
 }
 
 #[derive(Apiv2Schema, serde::Serialize, Clone)]

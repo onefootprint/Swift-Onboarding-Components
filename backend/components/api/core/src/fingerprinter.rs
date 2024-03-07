@@ -4,13 +4,16 @@ use aws_sdk_kms::primitives::Blob;
 use crypto::sha256;
 use db::{
     errors::OptionalExtension,
-    models::{scoped_vault::ScopedVault, vault::Vault},
+    models::{
+        scoped_vault::ScopedVault,
+        vault::{LocatedVault, Vault},
+    },
 };
 use itertools::Itertools;
 use newtypes::{
     fingerprinter::{FingerprintScopable, FingerprintScope, Fingerprinter, GlobalFingerprintKind},
     secret_api_key::ApiKeyFingerprinter,
-    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
+    Fingerprint, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
 };
 
 use crate::{
@@ -18,7 +21,7 @@ use crate::{
     errors::{kms::KmsSignError, ApiResult},
     ApiError, State,
 };
-use newtypes::{SandboxId, VaultId};
+use newtypes::SandboxId;
 
 /// Deprecated: old signed hash method using KMS directly
 /// replaced by hmac signing in the enclave
@@ -102,33 +105,29 @@ impl State {
         ids: Vec<IdentifyId>,
         sandbox_id: Option<SandboxId>,
         t_id: Option<&TenantId>,
-    ) -> ApiResult<Option<(VaultId, Option<ScopedVaultId>)>> {
+    ) -> ApiResult<Option<(LocatedVault, Option<ScopedVaultId>)>> {
         // Search via fingerprint
         let fps = ids
             .into_iter()
-            .flat_map(|id| {
-                let (scopes, data) = match id {
-                    IdentifyId::PhoneNumber(phone_number) => (
-                        vec![
-                            Some(GlobalFingerprintKind::PhoneNumber.scope()),
-                            t_id.map(|id| {
-                                FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)
-                            }),
-                        ],
-                        phone_number.e164(),
-                    ),
-                    IdentifyId::Email(email) => (
-                        vec![
-                            Some(GlobalFingerprintKind::Email.scope()),
-                            t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
-                        ],
-                        email.email,
-                    ),
-                };
-                scopes.into_iter().flatten().zip(std::iter::repeat(data.clone()))
+            .map(|id| match id {
+                IdentifyId::PhoneNumber(phone_number) => (
+                    IDK::PhoneNumber.into(),
+                    GlobalFingerprintKind::PhoneNumber,
+                    phone_number.e164(),
+                ),
+                IdentifyId::Email(email) => (IDK::Email.into(), GlobalFingerprintKind::Email, email.email),
             })
             .collect_vec();
-        let fps = fps.iter().map(|(s, d)| ((), s.clone(), d)).collect_vec();
+        let fps = fps
+            .iter()
+            .flat_map(|(di, gfk, pii)| {
+                let scopes = vec![
+                    Some(gfk.scope()),
+                    t_id.map(|t_id| FingerprintScope::Tenant(di, t_id)),
+                ];
+                scopes.into_iter().flatten().map(move |scope| ((), scope, pii))
+            })
+            .collect_vec();
         let sh_datas = self
             .enclave_client
             .compute_fingerprints(fps)
@@ -141,16 +140,16 @@ impl State {
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let existing = Vault::find_portable(conn, &sh_datas, sandbox_id, t_id.as_ref())?;
-                let Some(vault) = existing else {
+                let Some(existing) = existing else {
                     return Ok(None);
                 };
                 let sv_id = t_id
                     .as_ref()
-                    .map(|t_id| ScopedVault::get(conn, (&vault.id, t_id)).optional())
+                    .map(|t_id| ScopedVault::get(conn, (&existing.vault.id, t_id)).optional())
                     .transpose()?
                     .flatten()
                     .map(|sv| sv.id);
-                Ok(Some((vault.id, sv_id)))
+                Ok(Some((existing, sv_id)))
             })
             .await?;
 

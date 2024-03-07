@@ -287,6 +287,12 @@ pub(crate) struct Priority {
     pub(crate) created_at: DateTime<Utc>,
 }
 
+pub struct LocatedVault {
+    pub vault: Vault,
+    /// The list of DIs whose fingerprints matched the vault
+    pub matching_fps: Vec<DataIdentifier>,
+}
+
 impl Vault {
     /// Given a fingerprint search parameter, find the Vault that we should log into.
     /// When there are multiple vaults matching the search, we choose somewhat arbitrarily
@@ -297,7 +303,7 @@ impl Vault {
         sh_data: &[Fingerprint],
         sandbox_id: Option<SandboxId>,
         tenant_id: Option<&TenantId>,
-    ) -> DbResult<Option<Vault>> {
+    ) -> DbResult<Option<LocatedVault>> {
         use crate::models::scoped_vault::ScopedVault;
         use db_schema::schema::{data_lifetime, fingerprint};
 
@@ -318,7 +324,7 @@ impl Vault {
             // API-only vaults start as non-identifiable until they become PIDs
             .filter(vault::is_identifiable.eq(true))
             .filter(vault::is_hidden.eq(false))
-            .select(vault::all_columns)
+            .select((vault::all_columns, fingerprint::kind))
             .into_boxed();
 
         query = if let Some(sandbox_id) = sandbox_id.as_ref() {
@@ -326,7 +332,7 @@ impl Vault {
         } else {
             query.filter(vault::sandbox_id.is_null())
         };
-        let mut vaults: Vec<_> = query.get_results::<Self>(conn)?;
+        let mut vaults: Vec<(Vault, DataIdentifier)> = query.get_results(conn)?;
 
         // And, add in all of the unverified vaults owned by this tenant. This allows portablizing
         // non-portable vaults
@@ -344,24 +350,33 @@ impl Vault {
                 .filter(vault::is_verified.eq(false))
                 .filter(vault::is_identifiable.eq(false))
                 .filter(vault::is_hidden.eq(false))
-                .select(vault::all_columns)
+                .select((vault::all_columns, fingerprint::kind))
                 .into_boxed();
             query = if let Some(sandbox_id) = sandbox_id.as_ref() {
                 query.filter(vault::sandbox_id.eq(sandbox_id))
             } else {
                 query.filter(vault::sandbox_id.is_null())
             };
-            let unverified_vaults: Vec<_> = query.get_results::<Self>(conn)?;
+            let unverified_vaults: Vec<_> = query.get_results(conn)?;
             vaults.extend(unverified_vaults)
         }
-
         tracing::info!(sh_datas=%Csv::from(sh_data.iter().cloned().collect_vec()), num_results=%vaults.len(), "Searching for fingerprints");
+
+        // Keep track of which kinds of fingerprints were used to locate which vaults
+        let mut vault_id_to_matching_dis = vaults
+            .iter()
+            .map(|(v, di)| (v.id.clone(), di.clone()))
+            .into_group_map();
 
         // All of the vaults here presumably are the same user (or same contact info) that has,
         // for one reason or another, been duplicated around the Footprint ecosystem.
         // Perhaps the user onboarded onto tenant A and then tenant B created an identical user via API.
         // Now, we have to figure out which of the duplicate vaults we want to log into.
-        let vaults = vaults.into_iter().unique_by(|v| v.id.clone()).collect_vec();
+        let vaults = vaults
+            .into_iter()
+            .map(|(v, _)| v)
+            .unique_by(|v| v.id.clone())
+            .collect_vec();
         let v_ids = vaults.iter().map(|v| &v.id).collect_vec();
 
         // Get the scoped vaults for each vault
@@ -407,10 +422,15 @@ impl Vault {
             .max_by_key(|(p, _)| *p)
             .map(|(_, v)| v);
 
-        if let Some(id) = highest_priority.as_ref().map(|v| &v.id) {
-            tracing::info!(vault_id=%id, "Found match");
-        }
-        Ok(highest_priority)
+        let Some(vault) = highest_priority else {
+            return Ok(None);
+        };
+        tracing::info!(vault_id=%vault.id, "Found match");
+
+        let matching_fps = vault_id_to_matching_dis.remove(&vault.id).unwrap_or_default();
+        let matching_fps = matching_fps.into_iter().unique().collect();
+        let located_vault = LocatedVault { vault, matching_fps };
+        Ok(Some(located_vault))
     }
 }
 

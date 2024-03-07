@@ -16,9 +16,9 @@ use api_core::{
 use api_wire_types::IdentifyId;
 use db::{
     errors::OptionalExtension,
-    models::{scoped_vault::ScopedVault, tenant::Tenant},
+    models::{scoped_vault::ScopedVault, tenant::Tenant, vault::LocatedVault},
 };
-use newtypes::{SandboxId, VaultId};
+use newtypes::{DataIdentifier, SandboxId, VaultId};
 use paperclip::actix::{web, Apiv2Schema};
 use strum::EnumDiscriminants;
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
@@ -85,6 +85,8 @@ pub struct IdentifyChallengeContext {
     /// Generally, a user can make a new vault IF they're not in a context logging into a tenant
     /// that they've already onboarded onto
     pub can_initiate_signup_challenge: bool,
+    /// The list of DIs whose fingerprints matched the vault
+    pub matching_fps: Vec<DataIdentifier>,
 }
 
 #[tracing::instrument(skip_all)]
@@ -102,16 +104,17 @@ async fn get_identify_challenge_context(
 
     // Look up existing user vault by identifier
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
-    let (existing_user_id, sv_id) = match (user_auth.as_ref(), identifiers) {
+    let (existing_user_id, sv_id, matching_fps) = match (user_auth.as_ref(), identifiers) {
         // Identified via phone or email
         (None, ids) if !ids.is_empty() => {
-            let Some(existing) = state.find_vault(ids, sandbox_id, t_id).await? else {
+            let Some((existing, sv_id)) = state.find_vault(ids, sandbox_id, t_id).await? else {
                 return Ok(None);
             };
-            existing
+            let LocatedVault { vault, matching_fps } = existing;
+            (vault.id, sv_id, matching_fps)
         }
         // Identified via auth token
-        (Some(auth), ids) if ids.is_empty() => (auth.user.clone().id, auth.scoped_user_id()),
+        (Some(auth), ids) if ids.is_empty() => (auth.user.clone().id, auth.scoped_user_id(), vec![]),
         // Require one of user_auth or identifier
         (_, _) => return Err(ErrorWithCode::OnlyOneIdentifier.into()),
     };
@@ -160,6 +163,7 @@ async fn get_identify_challenge_context(
         tenant,
         sv,
         can_initiate_signup_challenge,
+        matching_fps,
     };
     Ok(Some(ctx))
 }
