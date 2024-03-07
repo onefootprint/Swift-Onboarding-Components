@@ -1,0 +1,2 @@
+DROP INDEX CONCURRENTLY IF EXISTS unique_active_per_name_tenant_id_is_live;
+DROP INDEX CONCURRENTLY IF EXISTS unique_active_per_alias_tenant_id_is_live;

@@ -54,7 +54,6 @@ impl List {
         kind: ListKind,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
-        // TODO: uniqueness constraint on name/alias and will need to check + throw nice user error in API route for that
         let created_seqno = DataLifetime::get_current_seqno(conn)?;
         let new_list = NewList {
             created_at: Utc::now(),
