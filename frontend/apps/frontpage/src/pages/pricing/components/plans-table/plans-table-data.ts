@@ -36,10 +36,6 @@ const PlansDetails = [
         soon: false,
       },
       {
-        translation: 'aml-monitoring',
-        soon: false,
-      },
-      {
         translation: 'pii',
         soon: false,
       },
@@ -94,6 +90,10 @@ const PlansDetails = [
       },
       {
         translation: 'custom-data-vaulting',
+        soon: false,
+      },
+      {
+        translation: 'aml-monitoring',
         soon: false,
       },
       {

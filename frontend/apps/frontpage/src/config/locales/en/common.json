@@ -633,7 +633,6 @@
           "passkeys": "Access Passkey Auth",
           "audit-logs": "Automatically generated audit logs",
           "sms-otp": "SMS OTP - Phone verification",
-          "aml-monitoring": "Continuous AML Monitoring",
           "pii": "PII Vaulting in managed Nitro Enclaves",
           "compute-environment": "Isolated compute environments for processing PII",
           "encryption": "Encryption and tokenization APIs",
@@ -653,6 +652,7 @@
           "custom-data-vaulting": "Custom data vaulting",
           "itin-verification": "ITIN verification",
           "eCBSV": "eCBSV verification",
+          "aml-monitoring": "Continuous AML Monitoring",
           "cta": "Get Growth plan"
         },
         "enterprise": {
