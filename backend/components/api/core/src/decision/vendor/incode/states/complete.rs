@@ -1,4 +1,4 @@
-use super::{IncodeStateTransition, VerificationSession};
+use super::{IncodeStateTransition, ValidatedIdDocKind, VerificationSession};
 use crate::{
     decision::{
         features::{
@@ -22,7 +22,14 @@ use crate::{
 use async_trait::async_trait;
 use db::{
     models::{
-        data_lifetime::DataLifetime, document_data::DocumentData, document_upload::DocumentUpload, identity_document::{IdentityDocument, IdentityDocumentUpdate}, ob_configuration::ObConfiguration, risk_signal::RiskSignal, user_timeline::UserTimeline, vault::Vault
+        data_lifetime::DataLifetime,
+        document_data::DocumentData,
+        document_upload::DocumentUpload,
+        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        ob_configuration::ObConfiguration,
+        risk_signal::RiskSignal,
+        user_timeline::UserTimeline,
+        vault::Vault,
     },
     DbPool, TxnPgConn,
 };
@@ -47,11 +54,11 @@ pub(super) struct PreCompleteArgs<'a> {
     pub obc: &'a ObConfiguration,
     pub id_doc: &'a IdentityDocument,
     pub vw: &'a VaultWrapper,
-    pub dk: IdDocKind,
+    pub dk: ValidatedIdDocKind,
     pub expect_selfie: bool,
     pub fetch_ocr_response: &'a FetchOCRResponse,
     pub score_response: &'a FetchScoresResponse,
-    pub doc_uploads: &'a [DocumentUpload]
+    pub doc_uploads: &'a [DocumentUpload],
 }
 
 pub(super) async fn compute_ocr_data<'a>(
@@ -76,7 +83,7 @@ pub(super) async fn compute_ocr_data<'a>(
     let data = ParsedIncodeFields::from_fetch_ocr_res(r)
         .0
         .into_iter()
-        .map(|pif| (DocumentKind::OcrData(dk, pif.odk).into(), pif.value))
+        .map(|pif| (DocumentKind::OcrData(dk.0, pif.odk).into(), pif.value))
         .collect_vec();
     // For doc-first onboardings, populate identity data
     let id_data = if obc.is_doc_first {
@@ -154,10 +161,14 @@ pub(super) fn compute_risk_signals<'a>(
         tracing::warn!("document submitted with age under 18");
     }
 
-    let score_reason_codes =
-        incode_docv::reason_codes_from_score_response(score_response, fetch_ocr_response, expect_selfie, dk)
-            .into_iter()
-            .map(|r| (r, VendorAPI::IncodeFetchScores, score_vres_id.clone()));
+    let score_reason_codes = incode_docv::reason_codes_from_score_response(
+        score_response,
+        fetch_ocr_response,
+        expect_selfie,
+        dk.into_inner(),
+    )
+    .into_iter()
+    .map(|r| (r, VendorAPI::IncodeFetchScores, score_vres_id.clone()));
 
     let pii_matching_ocr_reason_codes = if !obc.is_doc_first {
         // Only calculate OCR reason codes if we have already collected ID data
@@ -187,11 +198,14 @@ pub(super) fn compute_risk_signals<'a>(
             VendorAPI::IncodeFetchScores,
             score_vres_id.clone(),
         )),
-        doc_uploads.iter().any(|du| du.is_upload.unwrap_or(false)).then_some((
-            FootprintReasonCode::DocumentNotLiveCapture,
-            VendorAPI::IncodeFetchScores,
-            score_vres_id.clone(),
-        ))
+        doc_uploads
+            .iter()
+            .any(|du| du.is_upload.unwrap_or(false))
+            .then_some((
+                FootprintReasonCode::DocumentNotLiveCapture,
+                VendorAPI::IncodeFetchScores,
+                score_vres_id.clone(),
+            )),
     ]
     .into_iter()
     .flatten();
@@ -257,7 +271,7 @@ pub struct CompleteArgs<'a> {
     pub vault: &'a Vault,
     pub sv_id: &'a ScopedVaultId,
     pub id_doc_id: &'a IdentityDocumentId,
-    pub dk: IdDocKind,
+    pub dk: ValidatedIdDocKind,
     pub ocr_data: DataRequest<Fingerprints>,
     pub score_response: FetchScoresResponse,
     pub rs: Vec<NewRiskSignal>,
@@ -277,6 +291,7 @@ impl Complete {
         } = args;
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
         let (id_doc, _) = IdentityDocument::get(conn, id_doc_id)?;
+        let validated_doc_kind = dk.into_inner();
 
         // Create a timeline event
         let info = newtypes::IdentityDocumentUploadedInfo {
@@ -286,11 +301,11 @@ impl Complete {
 
         // The images were only vaulted under `.latest_upload` DIs. Now, vault them under the `.image` DIs.
         // Note that the dk here may be incorrect if we can't extract it from incode
-        vault_complete_images(conn, &uvw, dk, &id_doc)?;
+        vault_complete_images(conn, &uvw, validated_doc_kind, &id_doc)?;
 
         // Clear all OCR data for this document kind, even if we're not replacing it
         let odks_to_clear = ODK::iter()
-            .map(|odk| DocumentKind::OcrData(dk, odk).into())
+            .map(|odk| DocumentKind::OcrData(validated_doc_kind, odk).into())
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::bulk_deactivate_kinds(conn, sv_id, odks_to_clear, seqno)?;
@@ -312,7 +327,7 @@ impl Complete {
             selfie_score,
             ocr_confidence_score,
             status: Some(IdentityDocumentStatus::Complete),
-            vaulted_document_type: Some(dk),
+            vaulted_document_type: Some(validated_doc_kind),
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
 

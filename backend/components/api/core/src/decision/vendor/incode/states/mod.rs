@@ -167,7 +167,7 @@ pub async fn save_incode_fixtures(
     let args = PreCompleteArgs {
         obc: &obc,
         id_doc: &id_doc,
-        dk: id_doc.document_type,
+        dk: ValidatedIdDocKind(id_doc.document_type),
         vw: &vw,
         expect_selfie: should_collect_selfie,
         fetch_ocr_response: &ocr_response,
@@ -187,7 +187,7 @@ pub async fn save_incode_fixtures(
                 vault: &vw.vault,
                 sv_id: &suid,
                 id_doc_id: &id_doc.id,
-                dk: id_doc.document_type,
+                dk: ValidatedIdDocKind::new_for_fixture(id_doc.document_type),
                 ocr_data,
                 score_response,
                 rs,
@@ -201,6 +201,21 @@ pub async fn save_incode_fixtures(
     Ok(())
 }
 
+
+// Struct that represents a document kind that has been validated as the type indicated by a vendor, in this case incode
+// For example, we don't want to be vaulting something as a Passport that is in fact, a driver's license
+#[derive(Clone, Copy)]
+pub struct ValidatedIdDocKind(IdDocKind);
+impl ValidatedIdDocKind {
+    pub fn into_inner(self) -> IdDocKind {
+        self.0
+    }
+
+    pub fn new_for_fixture(id_doc_kind: IdDocKind) -> Self {
+        Self(id_doc_kind)
+    }
+}
+
 /// Parses the IdDocKind from the response. Returns an Err IncodeFailureReason if we can't parse
 #[tracing::instrument(skip(ctx))]
 fn parse_type_of_id(
@@ -208,7 +223,7 @@ fn parse_type_of_id(
     type_of_id: Option<&IncodeDocumentType>,
     document_sub_type: Option<&IncodeDocumentSubType>,
     country_code: Option<&ScrubbedPiiString>,
-) -> ApiResult<Result<IdDocKind, IncodeFailureReason>> {
+) -> ApiResult<Result<ValidatedIdDocKind, IncodeFailureReason>> {
     // Validate the doc type matches what the client told us (and what we validated against the
     // doc request)
     let expected_doc_type = ctx
@@ -251,7 +266,7 @@ fn parse_type_of_id(
         // TODO: maybe also check if here expected_country is allowed by OBC?
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }
-    Ok(Ok(id_doc_kind))
+    Ok(Ok(ValidatedIdDocKind(id_doc_kind)))
 }
 
 pub struct AddSideResponseHelper {

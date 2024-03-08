@@ -1,6 +1,6 @@
 use super::{
     compute_ocr_data, compute_risk_signals, Complete, CompleteArgs, IncodeStateTransition, NewRiskSignal,
-    PreCompleteArgs, VerificationSession,
+    PreCompleteArgs, ValidatedIdDocKind, VerificationSession,
 };
 use crate::{
     decision::{
@@ -41,8 +41,8 @@ use idv::{
 };
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataRequest, DecisionIntentKind,
-    DocumentKind, DocumentSide, Fingerprints, IdDocKind, IdentityDocumentId, PiiJsonValue, ScopedVaultId,
-    VendorAPI, WorkflowId,
+    DocumentKind, DocumentSide, Fingerprints, IdentityDocumentId, PiiJsonValue, ScopedVaultId, VendorAPI,
+    WorkflowId,
 };
 use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
 use tracing::Instrument;
@@ -50,7 +50,7 @@ use tracing::Instrument;
 pub struct FetchScores {
     score_response: FetchScoresResponse,
     ocr_data: DataRequest<Fingerprints>,
-    document_kind: IdDocKind,
+    document_kind: ValidatedIdDocKind,
     rs: Vec<NewRiskSignal>,
 }
 
@@ -136,9 +136,11 @@ impl IncodeStateTransition for FetchScores {
             Err(_) => {
                 // We had an error parsing the document kind from incode - just use the document
                 // kind selected by the user, even though it may be wrong
-                ctx.docv_data
-                    .document_type
-                    .ok_or(AssertionError("Docv data has no document_type"))?
+                ValidatedIdDocKind(
+                    ctx.docv_data
+                        .document_type
+                        .ok_or(AssertionError("Docv data has no document_type"))?,
+                )
             }
         };
 
