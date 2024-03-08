@@ -1,6 +1,6 @@
+use crate::TenantKind;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
-
 use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumDiscriminants)]
@@ -30,6 +30,18 @@ impl TenantRoleKind {
             Some(*is_live)
         } else {
             None
+        }
+    }
+}
+
+impl TenantRoleKindDiscriminant {
+    /// The kind of tenant that can hold this role kind.
+    pub fn tenant_kind(&self) -> TenantKind {
+        match &self {
+            TenantRoleKindDiscriminant::ApiKey | TenantRoleKindDiscriminant::DashboardUser => {
+                TenantKind::Tenant
+            }
+            TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => TenantKind::PartnerTenant,
         }
     }
 }

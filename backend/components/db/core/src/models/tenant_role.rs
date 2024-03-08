@@ -12,8 +12,9 @@ use diesel::{
 };
 use itertools::Itertools;
 use newtypes::{
-    ApiKeyStatus, InvokeVaultProxyPermission, Locked, PartnerTenantId, TenantId, TenantOrPartnerTenantId,
-    TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantScope, TenantScopeDiscriminants,
+    ApiKeyStatus, InvokeVaultProxyPermission, Locked, PartnerTenantId, TenantId, TenantKind,
+    TenantOrPartnerTenantId, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantScope,
+    TenantScopeDiscriminants,
 };
 
 pub type IsImmutable = bool;
@@ -56,6 +57,12 @@ pub enum ImmutableRoleKind {
 }
 
 impl ImmutableRoleKind {
+    pub(super) fn tenant_kind(&self) -> TenantKind {
+        match &self {
+            Self::Admin | Self::ReadOnly => TenantKind::Tenant,
+        }
+    }
+
     pub(super) fn props(&self) -> (&'static str, Vec<TenantScope>) {
         match self {
             Self::Admin => ("Admin", vec![TenantScope::Admin]),
@@ -91,6 +98,11 @@ impl TenantRole {
         if scopes.iter().unique().count() != scopes.len() {
             return Err(DbError::NonUniqueTenantScopes);
         }
+
+        if kind.tenant_kind() != t_pt_id.into() {
+            return Err(DbError::IncorrectTenantRoleKind);
+        }
+
         if let Some(s) = scopes
             .iter()
             .find(|s| !s.role_kinds().into_iter().contains(&kind))
@@ -136,6 +148,15 @@ impl TenantRole {
     ) -> DbResult<Self> {
         let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
 
+        let role_kind_discriminant = TenantRoleKindDiscriminant::from(&role_kind);
+        if role_kind_discriminant.tenant_kind() != t_pt_id.into() {
+            return Err(DbError::IncorrectTenantRoleKind);
+        }
+
+        if kind.tenant_kind() != t_pt_id.into() {
+            return Err(DbError::IncorrectTenantRoleKind);
+        }
+
         let (name, scopes) = kind.props();
         let mut query = tenant_role::table
             .filter(TenantRole::tenant_or_partner_tenant_id_eq(t_pt_id))
@@ -143,8 +164,7 @@ impl TenantRole {
             .filter(tenant_role::scopes.eq(&scopes))
             .filter(tenant_role::is_immutable.eq(true))
             .into_boxed();
-        let kind_discriminant = TenantRoleKindDiscriminant::from(&role_kind);
-        query = query.filter(tenant_role::kind.eq(kind_discriminant));
+        query = query.filter(tenant_role::kind.eq(role_kind_discriminant));
         if let TenantRoleKind::ApiKey { is_live } = role_kind {
             query = query.filter(tenant_role::is_live.eq(is_live))
         }
