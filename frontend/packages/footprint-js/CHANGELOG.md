@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.10.0
+
+### Minor Changes
+
+- 77a2c7e4d: Add appearance container width prop
+
 ## 3.9.1
 
 ### Patch Changes

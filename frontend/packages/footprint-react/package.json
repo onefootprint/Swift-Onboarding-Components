@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-react",
   "private": false,
   "type": "module",
-  "version": "6.3.0",
+  "version": "6.4.0",
   "main": "./dist/footprint-react.umd.js",
   "module": "./dist/footprint-react.js",
   "types": "./dist/footprint-react.d.ts",
@@ -43,7 +43,7 @@
     "typescript": "^5"
   },
   "peerDependencies": {
-    "@onefootprint/footprint-js": "3.x",
+    "@onefootprint/footprint-js": "3.10.0",
     "react": "17 - 18",
     "react-dom": "17 - 18"
   },

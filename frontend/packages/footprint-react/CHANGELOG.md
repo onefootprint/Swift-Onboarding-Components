@@ -1,5 +1,16 @@
 # @onefootprint/footprint-react
 
+## 6.4.0
+
+### Minor Changes
+
+- 77a2c7e4d: Add appearance container width prop
+
+### Patch Changes
+
+- Updated dependencies [77a2c7e4d]
+  - @onefootprint/footprint-js@3.10.0
+
 ## 6.3.0
 
 ### Minor Changes
