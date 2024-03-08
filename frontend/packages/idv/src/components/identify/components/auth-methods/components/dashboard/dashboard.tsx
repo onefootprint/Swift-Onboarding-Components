@@ -11,6 +11,7 @@ import { getLogger } from '../../../../../../utils/logger';
 import useEffectOnceStrict from '../../../../hooks/use-effect-once-strict';
 import type { UserAuthMethodsResponse } from '../../../../queries';
 import { useDecryptUser, useUserAuthMethods } from '../../../../queries';
+import { UpdateAuthMethodActionKind } from '../../../../types';
 import { useAuthMethodsMachine } from '../../state';
 import Component from './component';
 
@@ -29,6 +30,11 @@ type DashboardProps = Pick<TComponentProps, 'children' | 'Header'> & {
 const isPassKeyFeatureReady = false;
 const EmailAndPhone: IdDI[] = [IdDI.email, IdDI.phoneNumber];
 const EmptyMethodsMap: MethodsMap = Object.create(null);
+
+const actionKind = (isVerified: boolean): UpdateAuthMethodActionKind => {
+  if (isVerified) return UpdateAuthMethodActionKind.replace;
+  return UpdateAuthMethodActionKind.addPrimary;
+};
 
 const getAuthAddFlowTexts = (t: T): Texts => ({
   add: t('add'),
@@ -107,14 +113,22 @@ const DashBoard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
               isVerified: methodsMap.email.isVerified,
               label: userDashboard.email?.label || t('email'),
               status: userDashboard.email?.status || 'empty',
-              onClick: () => send({ type: 'updateEmail' }),
+              onClick: () =>
+                send({
+                  type: 'updateEmail',
+                  payload: actionKind(methodsMap.email.isVerified),
+                }),
             }
           : {
               isLoading: false,
               isVerified: false,
               label: t('email'),
               status: 'empty',
-              onClick: () => send({ type: 'updateEmail' }),
+              onClick: () =>
+                send({
+                  type: 'updateEmail',
+                  payload: UpdateAuthMethodActionKind.addPrimary,
+                }),
             }
       }
       entryPhone={
@@ -124,14 +138,22 @@ const DashBoard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
               isVerified: methodsMap.phone.isVerified,
               label: userDashboard.phone?.label || t('phone-number'),
               status: userDashboard.phone?.status || 'empty',
-              onClick: () => send({ type: 'updatePhone' }),
+              onClick: () =>
+                send({
+                  type: 'updatePhone',
+                  payload: actionKind(methodsMap.phone.isVerified),
+                }),
             }
           : {
               isLoading: false,
               isVerified: false,
               label: t('phone-number'),
               status: 'empty',
-              onClick: () => send({ type: 'updatePhone' }),
+              onClick: () =>
+                send({
+                  type: 'updatePhone',
+                  payload: UpdateAuthMethodActionKind.addPrimary,
+                }),
             }
       }
       entryPasskey={
@@ -141,7 +163,11 @@ const DashBoard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
               isVerified: methodsMap.passkey.isVerified,
               label: userDashboard.passkey?.label || t('passkey'),
               status: userDashboard.passkey?.status || 'empty',
-              onClick: () => send({ type: 'updatePasskey' }),
+              onClick: () =>
+                send({
+                  type: 'updatePasskey',
+                  payload: actionKind(methodsMap.passkey.isVerified),
+                }),
             }
           : undefined
       }

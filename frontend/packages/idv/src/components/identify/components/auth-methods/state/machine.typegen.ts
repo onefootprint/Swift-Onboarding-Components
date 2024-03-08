@@ -14,6 +14,7 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignDecryptedData: 'decryptUserDone';
+    assignUpdateMethod: 'updateEmail' | 'updatePasskey' | 'updatePhone';
     assignUserDashboard: 'updateUserDashboard';
     assignVerifyToken: 'setVerifyToken';
   };

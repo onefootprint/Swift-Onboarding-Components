@@ -1,7 +1,9 @@
 import { assign, createMachine } from 'xstate';
 
+import { UpdateAuthMethodActionKind } from '../../../types';
 import {
   assignDecryptedData,
+  assignUpdateMethod,
   assignUserDashboard,
   assignVerifyToken,
 } from './assigners';
@@ -31,6 +33,7 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
       initial: args.initialMachineState || 'init',
       context: {
         authToken: args.authToken,
+        updateMethod: UpdateAuthMethodActionKind.addPrimary,
         userDashboard: {
           email: { status: 'empty' },
           phone: { status: 'empty' },
@@ -61,9 +64,18 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
         },
         dashboard: {
           on: {
-            updateEmail: { target: 'updateEmail' },
-            updatePhone: { target: 'updatePhone' },
-            updatePasskey: { target: 'updatePasskey' },
+            updateEmail: {
+              target: 'updateEmail',
+              actions: ['assignUpdateMethod'],
+            },
+            updatePhone: {
+              target: 'updatePhone',
+              actions: ['assignUpdateMethod'],
+            },
+            updatePasskey: {
+              target: 'updatePasskey',
+              actions: ['assignUpdateMethod'],
+            },
           },
         },
         updateEmail: {
@@ -87,6 +99,7 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
     },
     {
       actions: {
+        assignUpdateMethod: assign(assignUpdateMethod),
         assignDecryptedData: assign(assignDecryptedData),
         assignUserDashboard: assign(assignUserDashboard),
         assignVerifyToken: assign(assignVerifyToken),

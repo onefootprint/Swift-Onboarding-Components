@@ -15,6 +15,9 @@ type MEvent<T, U> = T extends { type: U; payload: infer P }
 type DecryptUserDone = MCtx<MEvent<Events, 'decryptUserDone'>>;
 type SetVerifyToken = MCtx<MEvent<Events, 'setVerifyToken'>>;
 type UpdateUserDashboard = MCtx<MEvent<Events, 'updateUserDashboard'>>;
+type UpdateMethodActionKind = MCtx<
+  MEvent<Events, 'updateEmail' | 'updatePhone' | 'updatePasskey'>
+>;
 
 const getIdValue = (key: string, obj: Obj): string | undefined =>
   isObject(obj) &&
@@ -58,4 +61,14 @@ const assignDecryptedData: DecryptUserDone = (ctx, { payload }) => {
   return ctx;
 };
 
-export { assignDecryptedData, assignUserDashboard, assignVerifyToken };
+const assignUpdateMethod: UpdateMethodActionKind = (ctx, { payload }) => {
+  ctx.updateMethod = payload;
+  return ctx;
+};
+
+export {
+  assignDecryptedData,
+  assignUpdateMethod,
+  assignUserDashboard,
+  assignVerifyToken,
+};

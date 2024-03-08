@@ -9,7 +9,6 @@ import StepHeader from '../../../../../step-header';
 import {
   Identify,
   IdentifyVariant,
-  UpdateAuthMethodActionKind,
   UpdateEmail,
   UpdatePhone,
 } from '../../../..';
@@ -73,12 +72,11 @@ const AuthMethodsRouter = ({
     return <UserDashboard Header={Header} onDone={onDone} isEditing />;
   }
   if (matches('updateEmail') && context.verifyToken) {
-    // TODO use proper actionKind here
     return (
       <UpdateEmail
         Header={Header}
         authToken={context.verifyToken}
-        actionKind={UpdateAuthMethodActionKind.replace}
+        actionKind={context.updateMethod}
         identifyVariant={IdentifyVariant.updateLoginMethods}
         onSuccess={newEmail => {
           send({
@@ -93,12 +91,11 @@ const AuthMethodsRouter = ({
     );
   }
   if (matches('updatePhone') && context.verifyToken) {
-    // TODO use proper actionKind here
     return (
       <UpdatePhone
         Header={Header}
         authToken={context.verifyToken}
-        actionKind={UpdateAuthMethodActionKind.replace}
+        actionKind={context.updateMethod}
         identifyVariant={IdentifyVariant.updateLoginMethods}
         onSuccess={newPhoneNumber => {
           send({
