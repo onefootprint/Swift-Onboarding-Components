@@ -1,3 +1,4 @@
+pub mod common;
 mod state;
 mod state_machine;
 pub mod states;

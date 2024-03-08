@@ -1,9 +1,7 @@
-use super::{
-    map_to_api_err, save_incode_verification_result, AddConsent, IncodeStateTransition,
-    SaveVerificationResultArgs, VerificationSession,
-};
+use super::{AddConsent, IncodeStateTransition, VerificationSession};
 use crate::{
     decision::vendor::incode::{
+        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
         state::{IncodeState, TransitionResult},
         IncodeContext,
     },

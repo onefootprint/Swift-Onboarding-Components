@@ -1,8 +1,12 @@
-use super::{
-    map_to_api_err, save_incode_verification_result, AddFront, IncodeStateTransition,
-    SaveVerificationResultArgs,
+use super::{AddFront, IncodeStateTransition};
+use crate::{
+    decision::vendor::incode::{
+        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
+        IncodeContext,
+    },
+    errors::ApiResult,
+    State,
 };
-use crate::{decision::vendor::incode::IncodeContext, errors::ApiResult, State};
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use idv::incode::{request::OnboardingStartCustomNameFields, IncodeStartOnboardingRequest};
 use newtypes::{

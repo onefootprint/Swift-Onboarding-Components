@@ -1,9 +1,7 @@
-use super::{
-    map_to_api_err, save_incode_verification_result, AddConsent, AddSelfie, AddSideResponseHelper,
-    IncodeStateTransition, SaveVerificationResultArgs, VerificationSession,
-};
+use super::{AddConsent, AddSelfie, AddSideResponseHelper, IncodeStateTransition, VerificationSession};
 use crate::{
     decision::vendor::incode::{
+        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
         state::{IncodeState, TransitionResult},
         IncodeContext,
     },
@@ -52,28 +50,33 @@ impl IncodeStateTransition for AddBack {
         // TODO: fix this
         let response = request_result.map_err(map_to_api_err)?.result;
 
-        let (type_of_id, document_subtype, country_code, failure_reasons_from_response, failure_reasons_from_api_error) =
-            match response.safe_into_success() {
-                Either::Left(response) => (
-                    response.type_of_id.clone(),
-                    response.document_sub_type().clone(),
-                    response.country_code.clone(),
-                    // TODO: add restrictions from OBC
-                    response.failure_reasons(AddSideResponseHelper::get_restrictions(
-                        &ctx.tenant_id,
-                        ctx.ff_client.clone(),
-                        ctx.failed_attempts_for_side,
-                    )),
-                    vec![],
-                ),
-                Either::Right(failure_reasons) => (
-                    None,
-                    None,
-                    None,
-                    vec![],
-                    failure_reasons.unwrap_or(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
-                ),
-            };
+        let (
+            type_of_id,
+            document_subtype,
+            country_code,
+            failure_reasons_from_response,
+            failure_reasons_from_api_error,
+        ) = match response.safe_into_success() {
+            Either::Left(response) => (
+                response.type_of_id.clone(),
+                response.document_sub_type().clone(),
+                response.country_code.clone(),
+                // TODO: add restrictions from OBC
+                response.failure_reasons(AddSideResponseHelper::get_restrictions(
+                    &ctx.tenant_id,
+                    ctx.ff_client.clone(),
+                    ctx.failed_attempts_for_side,
+                )),
+                vec![],
+            ),
+            Either::Right(failure_reasons) => (
+                None,
+                None,
+                None,
+                vec![],
+                failure_reasons.unwrap_or(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
+            ),
+        };
 
         Ok(Some(Self {
             add_side_response_helper: AddSideResponseHelper {

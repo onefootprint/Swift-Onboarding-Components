@@ -1,13 +1,13 @@
 use super::{
-    compute_ocr_data, compute_risk_signals, map_to_api_err, save_incode_verification_result, Complete,
-    CompleteArgs, IncodeStateTransition, NewRiskSignal, PreCompleteArgs, SaveVerificationResultArgs,
-    VerificationSession,
+    compute_ocr_data, compute_risk_signals, Complete, CompleteArgs, IncodeStateTransition, NewRiskSignal,
+    PreCompleteArgs, VerificationSession,
 };
 use crate::{
     decision::{
         features::incode_docv::IncodeOcrComparisonDataFields,
         vendor::{
             incode::{
+                common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
                 state::{IncodeState, TransitionResult},
                 IncodeContext,
             },
@@ -70,7 +70,7 @@ impl IncodeStateTransition for FetchScores {
 
         // Save our result
         let score_args = SaveVerificationResultArgs::from(&scores_res, VendorAPI::IncodeFetchScores, ctx);
-        let score_vres = save_incode_verification_result(db_pool, score_args).await?;
+        let (score_vres_id, _) = save_incode_verification_result(db_pool, score_args).await?;
 
         // Now ensure we don't have an error
         let score_response = scores_res
@@ -92,7 +92,7 @@ impl IncodeStateTransition for FetchScores {
 
         // Save our result
         let ocr_args = SaveVerificationResultArgs::from(&ocr_res, VendorAPI::IncodeFetchOcr, ctx);
-        let ocr_vres = save_incode_verification_result(db_pool, ocr_args).await?;
+        let (ocr_vres_id, _) = save_incode_verification_result(db_pool, ocr_args).await?;
 
         // Now ensure we don't have an error
         let ocr_response = ocr_res
@@ -126,7 +126,12 @@ impl IncodeStateTransition for FetchScores {
 
         let type_of_id = ocr_response.type_of_id.as_ref();
         let country_code = ocr_response.issuing_country.as_ref();
-        let dk = match super::parse_type_of_id(ctx, type_of_id, ocr_response.document_sub_type().as_ref(), country_code)? {
+        let dk = match super::parse_type_of_id(
+            ctx,
+            type_of_id,
+            ocr_response.document_sub_type().as_ref(),
+            country_code,
+        )? {
             Ok(dk) => dk,
             Err(_) => {
                 // We had an error parsing the document kind from incode - just use the document
@@ -176,13 +181,13 @@ impl IncodeStateTransition for FetchScores {
             expect_selfie: session.kind.requires_selfie() && !ctx.disable_selfie,
             fetch_ocr_response: &ocr_response,
             score_response: &score_response,
-            doc_uploads: &doc_uploads
+            doc_uploads: &doc_uploads,
         };
         let rs = compute_risk_signals(
             args,
             ocr_comparison_fields,
-            ocr_vres.id,
-            score_vres.id,
+            ocr_vres_id,
+            score_vres_id,
             &session.ignored_failure_reasons,
         )?;
         let ocr_data = compute_ocr_data(&ctx.enclave_client, args, &rs).await?;
