@@ -93,9 +93,7 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    > :first-child /* Header */ {
-      margin-bottom: ${theme.spacing[8]};
-    }
+    gap: ${theme.spacing[8]};
   `}
 `;
 
