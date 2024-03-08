@@ -1,16 +1,19 @@
 import type { RequestError } from '@onefootprint/request';
 import request, { getErrorMessage } from '@onefootprint/request';
-import type { OrgAuthLoginResponse } from '@onefootprint/types';
+import type {
+  OrgAuthLoginRequest,
+  OrgAuthLoginResponse,
+} from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 
-const login = async (code: string) => {
+const login = async (data: OrgAuthLoginRequest) => {
   const response = await request<OrgAuthLoginResponse>({
     method: 'POST',
     url: '/org/auth/login',
-    data: { code },
+    data,
   });
 
   return response.data;

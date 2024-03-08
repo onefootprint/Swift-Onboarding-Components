@@ -3,9 +3,15 @@ import type { NextToast } from '@onefootprint/ui';
 import { Button, GoogleButton, Text, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import useFilters from 'src/hooks/use-filters';
+import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import styled, { css } from 'styled-components';
+
+type LoginFilters = {
+  orgId?: string;
+};
 
 const Login = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.login' });
@@ -13,6 +19,15 @@ const Login = () => {
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
   const [isLoadingEmail, setIsLoadingEmail] = useState(false);
   const toast = useToast();
+  const { query, isReady } = useFilters<LoginFilters>({});
+  const { setOrgId, data } = useLoggedOutStorage();
+  useEffect(() => {
+    if (!isReady || data.orgId === query.orgId) {
+      return;
+    }
+    setOrgId(query.orgId);
+    // Save the orgId from the querystring into local storage
+  }, [isReady, query, setOrgId, data]);
 
   const getErrorTexts = (
     type: 'google-description' | 'email-description',

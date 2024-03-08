@@ -10,6 +10,7 @@ import {
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
 import { getOrgMemberRequest } from '../use-get-org-member/use-get-org-member';
+import useLoggedOutStorage from '../use-logged-out-storage';
 import type {
   AuthHeaders,
   MetaSession,
@@ -57,6 +58,7 @@ export const useStore = create<UserSessionState>()(
 const useSession = () => {
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
+  const { setOrgId: setRequestedOrgId } = useLoggedOutStorage();
   const { data, reset, update } = useStore(state => state);
   // Dangerously cast fields that are nullable when the user is logged out into non-nullable fields
   // in order to remove unnecessary null checks in logged-in pages
@@ -84,6 +86,7 @@ const useSession = () => {
     if (session.meta) {
       update({ meta: session.meta });
     }
+    setRequestedOrgId(undefined);
     // Then asynchronously fetch user and tenant info from the backend for the new auth
     await refreshPermissions({ newAuthToken: session.auth, newIsLive: isLive });
   };

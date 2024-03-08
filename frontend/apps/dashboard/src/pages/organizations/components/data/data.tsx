@@ -14,9 +14,14 @@ import ButtonGroup from '../button-group';
 type DataProps = {
   authToken: string;
   organizations: GetAuthRolesOrg[];
+  isMissingAccessToRequestedOrg: boolean;
 };
 
-const Data = ({ authToken, organizations }: DataProps) => {
+const Data = ({
+  authToken,
+  organizations,
+  isMissingAccessToRequestedOrg,
+}: DataProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.organizations' });
   const { logIn } = useSession();
   const router = useRouter();
@@ -37,12 +42,16 @@ const Data = ({ authToken, organizations }: DataProps) => {
   };
 
   useEffect(() => {
-    if (organizations.length === 1) {
+    if (!isMissingAccessToRequestedOrg && organizations?.length === 1) {
       // If this user only belongs to one org, automatically log in
       handleClick(organizations[0].id)();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken, organizations]);
+  }, [isMissingAccessToRequestedOrg, authToken, organizations]);
+
+  if (!organizations.length) {
+    return null;
+  }
 
   return (
     <>
@@ -53,7 +62,9 @@ const Data = ({ authToken, organizations }: DataProps) => {
         marginBottom={3}
         textAlign="center"
       >
-        {t('title')}
+        {!isMissingAccessToRequestedOrg
+          ? t('title')
+          : t('title-missing-access')}
       </Text>
       <ButtonGroup>
         {organizations.map(organization => (

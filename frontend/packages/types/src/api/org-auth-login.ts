@@ -1,5 +1,10 @@
 import type { Member, Organization } from '../data';
 
+export type OrgAuthLoginRequest = {
+  code: string;
+  requestedOrgId?: string;
+};
+
 export type OrgAuthLoginResponse = {
   createdNewTenant: boolean;
   isFirstLogin: boolean;
@@ -8,5 +13,3 @@ export type OrgAuthLoginResponse = {
   user: Member | null;
   tenant: Organization | null;
 };
-
-export type OrgAuthLoginRequest = string;

@@ -1,11 +1,12 @@
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import { Box } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useAuthRoles from 'src/hooks/use-auth-roles';
+import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import styled, { css } from 'styled-components';
 
 import Data from './components/data';
@@ -18,6 +19,12 @@ const Organizations = () => {
   const authToken = isReady ? (query.token as string) : '';
   const hasToken = isReady && authToken;
   const { isLoading, error, data } = useAuthRoles(authToken);
+  const {
+    data: { orgId },
+  } = useLoggedOutStorage();
+  // If we make it to the org selector screen with an orgId, it means we didn't have access to log
+  // into the requested org
+  const isMissingAccessToRequestedOrg = !!orgId;
 
   return (
     <>
@@ -31,9 +38,22 @@ const Organizations = () => {
               <Box>
                 <ThemedLogoFpDefault color="primary" />
               </Box>
-              {isLoading && <Loading />}
+              {isMissingAccessToRequestedOrg && (
+                <Box textAlign="center">
+                  <Text variant="body-3">
+                    {t('no-access-to-requested-org')}
+                  </Text>
+                </Box>
+              )}
+              {isLoading && !isMissingAccessToRequestedOrg && <Loading />}
               {error && <Error message={getErrorMessage(error)} />}
-              {data && <Data authToken={authToken} organizations={data} />}
+              {data && (
+                <Data
+                  authToken={authToken}
+                  organizations={data}
+                  isMissingAccessToRequestedOrg={isMissingAccessToRequestedOrg}
+                />
+              )}
             </>
           ) : (
             <Error message={t('errors.no-auth-token')} />

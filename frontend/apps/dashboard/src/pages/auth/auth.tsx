@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
+import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import useSession from 'src/hooks/use-session';
 
 import Loading from './components/loading';
@@ -19,6 +20,7 @@ const Auth = () => {
   const loginMutation = useLogin();
   const { logIn } = useSession();
   const { isFinished, getRemainingDuration } = useTrackAnimationDuration();
+  const { data } = useLoggedOutStorage();
 
   const waitForAnimation = (callback: () => void) => {
     if (isFinished) {
@@ -33,7 +35,11 @@ const Auth = () => {
 
   useWorkosParams({
     onCodeFound: (code: string) => {
-      loginMutation.mutate(code, {
+      const requestData = {
+        code,
+        requestOrgId: data?.orgId,
+      };
+      loginMutation.mutate(requestData, {
         onSuccess: async ({
           authToken,
           user,
