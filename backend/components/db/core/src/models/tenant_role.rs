@@ -84,7 +84,7 @@ impl TenantRole {
             return Err(DbError::InsufficientTenantScopes);
         }
         if scopes.iter().unique().count() != scopes.len() {
-            return Err(DbError::NonUniqeTenantScopes);
+            return Err(DbError::NonUniqueTenantScopes);
         }
         if let Some(s) = scopes
             .iter()

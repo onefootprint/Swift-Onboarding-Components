@@ -85,7 +85,7 @@ pub enum DbError {
     #[error("Tenant role scopes must include at least Read")]
     InsufficientTenantScopes,
     #[error("Tenant role scopes must be unique")]
-    NonUniqeTenantScopes,
+    NonUniqueTenantScopes,
     #[error("Tenant role of kind {0} cannot have a scope of kind {1}")]
     InvalidTenantScope(TenantRoleKindDiscriminant, TenantScopeDiscriminants),
     #[error("Proxy config with provided ID does not exist")]
