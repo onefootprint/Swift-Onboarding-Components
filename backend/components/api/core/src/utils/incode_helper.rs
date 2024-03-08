@@ -5,7 +5,7 @@ use crate::{
     },
     errors::{ApiError, ApiResult, AssertionError},
     utils::vault_wrapper::{Person, VaultWrapper},
-    State,
+    ApiErrorKind, State,
 };
 use api_wire_types::{DocumentImageError, DocumentResponse};
 use db::{
@@ -152,6 +152,7 @@ pub async fn handle_incode_request(
     }
 }
 
+#[tracing::instrument(skip(db_pool))]
 async fn on_incode_hard_error(
     db_pool: &DbPool,
     err: ApiError,
@@ -159,6 +160,16 @@ async fn on_incode_hard_error(
 ) -> ApiResult<()> {
     tracing::error!(?err, "IncodeMachineError");
     let id_doc_id = id_doc_id.clone();
+    if matches!(
+        err.kind(),
+        ApiErrorKind::StateError(
+            crate::decision::state::StateError::IncodeMachineConcurrentStateChange(_, _)
+        )
+    ) {
+        tracing::error!(?err, "Not setting hard error");
+        return Ok(());
+    }
+
     db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &id_doc_id)?;
