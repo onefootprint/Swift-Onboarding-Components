@@ -13,7 +13,9 @@ use crate::{
 };
 use db::{
     models::{
-        tenant::Tenant, tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding,
+        tenant::Tenant,
+        tenant_role::TenantRole,
+        tenant_rolebinding::{TenantOrPartnerTenant, TenantRolebinding},
         tenant_user::TenantUser,
     },
     PgConn,
@@ -83,7 +85,14 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let (tu, rb, tr, tenant) = TenantRolebinding::get(conn, &data.tenant_rolebinding_id)?;
+        let (tu, rb, tr, t_pt) = TenantRolebinding::get(conn, &data.tenant_rolebinding_id)?;
+        let tenant = match t_pt {
+            TenantOrPartnerTenant::Tenant(tenant) => tenant,
+            _ => {
+                return Err(AuthError::SessionTypeError.into());
+            }
+        };
+
         let is_live = get_is_live(&req).unwrap_or(!tenant.sandbox_restricted);
 
         tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tr.id, tenant_rb_id=%rb.id, tenant_user_id=%tu.id, "authenticated");

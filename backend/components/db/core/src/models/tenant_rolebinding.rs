@@ -1,4 +1,5 @@
 use super::{
+    partner_tenant::PartnerTenant,
     tenant::Tenant,
     tenant_role::{ImmutableRoleKind, TenantRole},
     tenant_user::TenantUser,
@@ -6,13 +7,14 @@ use super::{
 use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
+use derive_more::From;
 use diesel::{dsl::not, prelude::*, Queryable};
 use newtypes::{
-    TenantId, TenantOrPartnerTenantId, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant,
-    TenantRolebindingId, TenantUserId,
+    PartnerTenantId, TenantId, TenantOrPartnerTenantId, TenantRoleId, TenantRoleKind,
+    TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId,
 };
 
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Selectable)]
 #[diesel(table_name = tenant_rolebinding)]
 pub struct TenantRolebinding {
     pub id: TenantRolebindingId,
@@ -26,26 +28,16 @@ pub struct TenantRolebinding {
 }
 
 pub type IsFirstLogin = bool;
-pub type TenantUserInfo = (TenantUser, TenantRolebinding, TenantRole, Tenant);
+pub type TenantUserInfo = (TenantUser, TenantRolebinding, TenantRole, TenantOrPartnerTenant);
 pub type BasicTenantUserInfo = (TenantUser, TenantRolebinding, TenantRole);
 
+#[derive(From)]
 pub enum TenantRolebindingIdentifier<'a> {
     Id(&'a TenantRolebindingId),
     /// Used when we have a TenantRolebindingId but want to check that the tenant owns the RB
     Tenant(&'a TenantRolebindingId, &'a TenantId),
     User(&'a TenantUserId, &'a TenantId),
-}
-
-impl<'a> From<&'a TenantRolebindingId> for TenantRolebindingIdentifier<'a> {
-    fn from(value: &'a TenantRolebindingId) -> Self {
-        Self::Id(value)
-    }
-}
-
-impl<'a> From<(&'a TenantUserId, &'a TenantId)> for TenantRolebindingIdentifier<'a> {
-    fn from((user_id, tenant_id): (&'a TenantUserId, &'a TenantId)) -> Self {
-        Self::User(user_id, tenant_id)
-    }
+    PartnerTenantUser(&'a TenantUserId, &'a PartnerTenantId),
 }
 
 // It's hard to type this query in Rust, so we use a macro to share its logic
@@ -153,18 +145,33 @@ impl TenantRolebinding {
         Ok(rb)
     }
 
-    /// Get the list of active TenantRolebindingIds for the provided user.
-    /// Could be multiple if a user has been invited to multiple tenants.
+    /// Get the list of active TenantRolebindings for the provided user along with the
+    /// corresponding tenant or partner tenant. Could be multiple if a user has been invited to
+    /// multiple tenants.
     #[tracing::instrument("TenantRolebinding::list_by_user", skip_all)]
-    pub fn list_by_user(conn: &mut PgConn, user_id: &TenantUserId) -> DbResult<Vec<(Self, Tenant)>> {
-        use db_schema::schema::tenant;
-        let results = tenant_rolebinding::table
-            .inner_join(tenant_role::table.inner_join(tenant::table))
+    pub fn list_by_user(
+        conn: &mut TxnPgConn,
+        user_id: &TenantUserId,
+    ) -> DbResult<Vec<(Self, TenantOrPartnerTenant)>> {
+        use db_schema::schema::{partner_tenant, tenant};
+        #[allow(clippy::type_complexity)]
+        let results: Vec<(
+            TenantRolebinding,
+            (TenantRole, Option<Tenant>, Option<PartnerTenant>),
+        )> = tenant_rolebinding::table
+            .inner_join(
+                tenant_role::table
+                    .left_join(tenant::table)
+                    .left_join(partner_tenant::table),
+            )
             .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
             .filter(tenant_rolebinding::deactivated_at.is_null())
-            .select((tenant_rolebinding::all_columns, tenant::all_columns))
-            .get_results(conn)?;
-        Ok(results)
+            .get_results(conn.conn())?;
+
+        results
+            .into_iter()
+            .map(|(rb, (_, t, pt))| Ok((rb, (t, pt).try_into()?)))
+            .collect()
     }
 
     /// Fetches TenantUserInfo when logging them in via a workos auth token, and
@@ -174,9 +181,15 @@ impl TenantRolebinding {
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
-        use db_schema::schema::tenant;
+        use db_schema::schema::{partner_tenant, tenant};
         let mut query = tenant_user::table
-            .inner_join(tenant_rolebinding::table.inner_join(tenant_role::table.inner_join(tenant::table)))
+            .inner_join(
+                tenant_rolebinding::table.inner_join(
+                    tenant_role::table
+                        .left_join(tenant::table)
+                        .left_join(partner_tenant::table),
+                ),
+            )
             .filter(tenant_rolebinding::deactivated_at.is_null())
             .into_boxed();
         match id.into() {
@@ -186,18 +199,31 @@ impl TenantRolebinding {
             TenantRolebindingIdentifier::Tenant(id, tenant_id) => {
                 query = query
                     .filter(tenant_rolebinding::id.eq(id))
-                    .filter(tenant::id.eq(tenant_id));
+                    .filter(tenant_role::tenant_id.eq(tenant_id));
             }
             TenantRolebindingIdentifier::User(user_id, tenant_id) => {
                 query = query
                     .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
-                    .filter(tenant::id.eq(tenant_id));
+                    .filter(tenant_role::tenant_id.eq(tenant_id));
+            }
+            TenantRolebindingIdentifier::PartnerTenantUser(user_id, pt_id) => {
+                query = query
+                    .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
+                    .filter(tenant_role::partner_tenant_id.eq(pt_id));
             }
         }
-        let (user, (rb, (role, tenant))) =
-            query.first::<(TenantUser, (TenantRolebinding, (TenantRole, Tenant)))>(conn)?;
+        let (user, (rb, (role, tenant, partner_tenant))) = query.first::<(
+            TenantUser,
+            (
+                TenantRolebinding,
+                (TenantRole, Option<Tenant>, Option<PartnerTenant>),
+            ),
+        )>(conn)?;
+
+        let t_pt: TenantOrPartnerTenant = (tenant, partner_tenant).try_into()?;
         rb.validate_login(&role)?;
-        Ok((user, rb, role, tenant))
+
+        Ok((user, rb, role, t_pt))
     }
 
     fn validate_login(&self, role: &TenantRole) -> DbResult<()> {
@@ -218,7 +244,7 @@ impl TenantRolebinding {
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
-        let (user, rb, role, tenant) = Self::get(conn, id)?;
+        let (user, rb, role, t_pt) = Self::get(conn, id)?;
 
         // Always set last_login_at to show when this user was logged into
         let is_first_login = rb.last_login_at.is_none();
@@ -226,8 +252,12 @@ impl TenantRolebinding {
             last_login_at: Some(Some(Utc::now())),
             ..TenantRolebindingUpdate::default()
         };
-        let rb = Self::update(conn, (&user.id, &tenant.id), rb_update)?;
-        Ok(((user, rb, role, tenant), is_first_login))
+        let rb_id: TenantRolebindingIdentifier<'_> = match &t_pt {
+            TenantOrPartnerTenant::Tenant(t) => (&user.id, &t.id).into(),
+            TenantOrPartnerTenant::PartnerTenant(pt) => (&user.id, &pt.id).into(),
+        };
+        let rb = Self::update(conn, rb_id, rb_update)?;
+        Ok(((user, rb, role, t_pt), is_first_login))
     }
 
     #[tracing::instrument("TenantRolebinding::update", skip_all)]
@@ -235,12 +265,12 @@ impl TenantRolebinding {
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
-        let (_, rb, _, tenant) = Self::get(conn, id)?;
+        let (_, rb, _, t_pt) = Self::get(conn, id)?;
 
         if let Some(tenant_role_id) = update.tenant_role_id.as_ref() {
             // Lock the role to make sure we don't deactivate it before we update this rolebinding.
             // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
-            let role = TenantRole::lock_active(conn, tenant_role_id, &tenant.id)?;
+            let role = TenantRole::lock_active(conn, tenant_role_id, t_pt.id())?;
             if role.kind != TenantRoleKindDiscriminant::DashboardUser {
                 return Err(DbError::IncorrectTenantRoleKind);
             }
@@ -316,4 +346,37 @@ pub struct TenantRolebindingFilters<'a> {
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub search: Option<String>,
     pub is_invite_pending: Option<bool>,
+}
+
+#[derive(Debug, Clone, From)]
+#[allow(clippy::large_enum_variant)]
+pub enum TenantOrPartnerTenant {
+    Tenant(Tenant),
+    PartnerTenant(PartnerTenant),
+}
+
+impl TenantOrPartnerTenant {
+    fn id(&self) -> TenantOrPartnerTenantId<'_> {
+        match self {
+            TenantOrPartnerTenant::Tenant(t) => (&t.id).into(),
+            TenantOrPartnerTenant::PartnerTenant(pt) => (&pt.id).into(),
+        }
+    }
+}
+
+impl TryFrom<(Option<Tenant>, Option<PartnerTenant>)> for TenantOrPartnerTenant {
+    type Error = DbError;
+
+    fn try_from(value: (Option<Tenant>, Option<PartnerTenant>)) -> Result<Self, Self::Error> {
+        let ret = match value {
+            (Some(tenant), None) => TenantOrPartnerTenant::Tenant(tenant),
+            (None, Some(partner_tenant)) => TenantOrPartnerTenant::PartnerTenant(partner_tenant),
+            _ => {
+                return Err(DbError::AssertionError(
+                    "tenant and partner tenant options are mutually exclusive".to_owned(),
+                ))
+            }
+        };
+        Ok(ret)
+    }
 }

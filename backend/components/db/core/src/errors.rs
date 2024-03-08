@@ -92,6 +92,8 @@ pub enum DbError {
     InvalidProxyConfigId,
     #[error("{0}")]
     ValidationError(String),
+    #[error("{0}")]
+    AssertionError(String),
 
     // Pass-through errors from other crates
     #[error("{0}")]

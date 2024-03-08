@@ -2,9 +2,12 @@ use crate::{
     auth::session::UpdateSession, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi,
     State,
 };
-use api_core::auth::{session::tenant::TenantRbSession, tenant::AnyTenantSessionAuth};
+use api_core::{
+    auth::{session::tenant::TenantRbSession, tenant::AnyTenantSessionAuth},
+    errors::AssertionError,
+};
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
-use db::models::tenant_rolebinding::TenantRolebinding;
+use db::models::tenant_rolebinding::{TenantOrPartnerTenant, TenantRolebinding};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
@@ -22,10 +25,18 @@ fn post(
     let auth_method = tenant_auth.auth_method();
     let tu_id = tenant_auth.clone().tenant_user_id()?;
 
-    let ((tenant_user, rb, tenant_role, tenant), _) = state
+    let ((tenant_user, rb, tenant_role, t_pt), _) = state
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id)))
         .await?;
+
+    let tenant = match t_pt {
+        TenantOrPartnerTenant::Tenant(tenant) => tenant,
+        TenantOrPartnerTenant::PartnerTenant(_) => {
+            return Err(AssertionError("expected tenant, found partner tenant").into());
+        }
+    };
+
     let session_data = TenantRbSession::create(&tenant, rb.id.clone(), auth_method)?.into();
 
     let session_sealing_key = state.session_sealing_key.clone();

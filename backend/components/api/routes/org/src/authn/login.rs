@@ -12,7 +12,7 @@ use api_wire_types::{OrgLoginRequest, OrgLoginResponse, Organization, Organizati
 use chrono::Duration;
 use db::models::{
     tenant::{NewTenant, Tenant},
-    tenant_rolebinding::TenantRolebinding,
+    tenant_rolebinding::{TenantOrPartnerTenant, TenantRolebinding},
     tenant_user::TenantUser,
 };
 use newtypes::{OrgMemberEmail, TenantScope, WorkosAuthMethod};
@@ -74,7 +74,13 @@ async fn handler(
             // Get or create tenant user
             let user =
                 TenantUser::get_and_update_or_create(conn, email, profile2.first_name, profile2.last_name)?;
-            let matching_rolebindings = TenantRolebinding::list_by_user(conn, &user.id)?;
+            let matching_rolebindings: Vec<_> = TenantRolebinding::list_by_user(conn, &user.id)?
+                .into_iter()
+                .filter_map(|(rb, t_or_pt)| match t_or_pt {
+                    TenantOrPartnerTenant::Tenant(t) => Some((rb, t)),
+                    TenantOrPartnerTenant::PartnerTenant(_) => None,
+                })
+                .collect();
             Ok((user, matching_rolebindings))
         })
         .await?;
@@ -105,18 +111,16 @@ async fn handler(
     // Determine if there's only one rolebinding to log into
     //
 
-    let single_rb = if let Some(org_id) = request_org_id {
+    let single_rb_and_tenant = if let Some(org_id) = request_org_id {
         // If a specific tenant ID was requested, only log into that tenant
         matching_rolebindings
             .into_iter()
             .find(|(_, tenant)| tenant.id == org_id)
-            .map(|(rb, _)| rb)
     } else {
         // If there's only one rolebinding for this user, log into it
         (matching_rolebindings.len() == 1)
             .then_some(matching_rolebindings.into_iter().next())
             .flatten()
-            .map(|(rb, _)| rb)
     };
 
     //
@@ -124,9 +128,9 @@ async fn handler(
     // that allows selecting amongst a list of available rolebindings
     //
 
-    let data = if let Some(rb) = single_rb {
+    let data = if let Some((rb, tenant)) = single_rb_and_tenant {
         // Log into the single user, updating the last_login_at and name (if new)
-        let ((tenant_user, rb, tenant_role, tenant), is_first_login) = state
+        let ((tenant_user, rb, tenant_role, _), is_first_login) = state
             .db_pool
             .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id))
             .await?;
