@@ -54,12 +54,15 @@ pub struct TenantRole {
 pub enum ImmutableRoleKind {
     Admin,
     ReadOnly,
+    CompliancePartnerAdmin,
+    CompliancePartnerReadOnly,
 }
 
 impl ImmutableRoleKind {
     pub(super) fn tenant_kind(&self) -> TenantKind {
         match &self {
             Self::Admin | Self::ReadOnly => TenantKind::Tenant,
+            Self::CompliancePartnerAdmin | Self::CompliancePartnerReadOnly => TenantKind::PartnerTenant,
         }
     }
 
@@ -67,6 +70,14 @@ impl ImmutableRoleKind {
         match self {
             Self::Admin => ("Admin", vec![TenantScope::Admin]),
             Self::ReadOnly => ("Member", vec![TenantScope::Read]),
+            Self::CompliancePartnerAdmin => (
+                "CompliancePartnerAdmin",
+                vec![TenantScope::CompliancePartnerAdmin],
+            ),
+            Self::CompliancePartnerReadOnly => (
+                "CompliancePartnerMember",
+                vec![TenantScope::CompliancePartnerRead],
+            ),
         }
     }
 }
@@ -451,7 +462,7 @@ impl TenantRole {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = tenant_role)]
-pub(super) struct NewTenantRoleRow<'a> {
+struct NewTenantRoleRow<'a> {
     pub(super) tenant_id: Option<&'a TenantId>,
     pub(super) name: &'a str,
     pub(super) scopes: Vec<TenantScope>,

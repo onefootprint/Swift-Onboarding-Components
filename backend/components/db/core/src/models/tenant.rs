@@ -1,3 +1,4 @@
+use super::tenant_role::{ImmutableRoleKind, TenantRole};
 use crate::{DbResult, NonNullVec, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
@@ -15,11 +16,9 @@ use diesel::{
 use itertools::Itertools;
 use newtypes::{
     AppClipExperienceId, CompanySize, EncryptedVaultPrivateKey, PreviewApi, ScopedVaultId, StripeCustomerId,
-    TenantId, TenantRoleKind, TenantRoleKindDiscriminant, VaultId, VaultPublicKey, WorkosAuthMethod,
+    TenantId, TenantRoleKind, VaultId, VaultPublicKey, WorkosAuthMethod,
 };
 use std::collections::HashMap;
-
-use super::tenant_role::{ImmutableRoleKind, NewTenantRoleRow};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant)]
@@ -245,34 +244,18 @@ impl Tenant {
         let tenant = diesel::insert_into(tenant::table)
             .values(value)
             .get_result::<Self>(conn.conn())?;
-        let tenant_id = &tenant.id.clone();
 
         // Atomically create all of the immutable roles needed for the tenant
-        let new_roles = [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly]
-            .into_iter()
-            .flat_map(|irk| {
-                let (name, scopes) = irk.props();
-                [
-                    TenantRoleKind::ApiKey { is_live: true },
-                    TenantRoleKind::ApiKey { is_live: false },
-                    TenantRoleKind::DashboardUser,
-                ]
-                .into_iter()
-                .map(move |kind| NewTenantRoleRow {
-                    tenant_id: Some(tenant_id),
-                    name,
-                    scopes: scopes.clone(),
-                    is_immutable: true,
-                    kind: TenantRoleKindDiscriminant::from(&kind),
-                    is_live: kind.is_live(),
-                    created_at: Utc::now(),
-                    partner_tenant_id: None,
-                })
-            })
-            .collect_vec();
-        diesel::insert_into(db_schema::schema::tenant_role::table)
-            .values(new_roles)
-            .execute(conn.conn())?;
+        for irk in [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly] {
+            let (name, scopes) = irk.props();
+            for kind in [
+                TenantRoleKind::ApiKey { is_live: true },
+                TenantRoleKind::ApiKey { is_live: false },
+                TenantRoleKind::DashboardUser,
+            ] {
+                TenantRole::create(conn, &tenant.id, name, scopes.clone(), true, kind)?;
+            }
+        }
         Ok(tenant)
     }
 

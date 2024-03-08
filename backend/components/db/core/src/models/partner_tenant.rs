@@ -1,8 +1,9 @@
-use crate::{DbResult, NonNullVec, OptionalNonNullVec, PgConn};
+use super::tenant_role::{ImmutableRoleKind, TenantRole};
+use crate::{DbResult, NonNullVec, OptionalNonNullVec, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::partner_tenant;
 use diesel::prelude::*;
-use newtypes::{EncryptedVaultPrivateKey, PartnerTenantId, VaultPublicKey, WorkosAuthMethod};
+use newtypes::{EncryptedVaultPrivateKey, PartnerTenantId, TenantRoleKind, VaultPublicKey, WorkosAuthMethod};
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = partner_tenant)]
@@ -32,9 +33,27 @@ pub struct NewPartnerTenant {
 
 impl NewPartnerTenant {
     #[tracing::instrument("NewPartnerTenant::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<PartnerTenant> {
-        Ok(diesel::insert_into(partner_tenant::table)
+    pub fn create(self, conn: &mut TxnPgConn) -> DbResult<PartnerTenant> {
+        let partner_tenant: PartnerTenant = diesel::insert_into(partner_tenant::table)
             .values(self)
-            .get_result(conn)?)
+            .get_result(conn.conn())?;
+
+        // Atomically create all of the immutable roles needed for the partner tenant.
+        for irk in [
+            ImmutableRoleKind::CompliancePartnerAdmin,
+            ImmutableRoleKind::CompliancePartnerReadOnly,
+        ] {
+            let (name, scopes) = irk.props();
+            TenantRole::create(
+                conn,
+                &partner_tenant.id,
+                name,
+                scopes,
+                true,
+                TenantRoleKind::CompliancePartnerDashboardUser,
+            )?;
+        }
+
+        Ok(partner_tenant)
     }
 }
