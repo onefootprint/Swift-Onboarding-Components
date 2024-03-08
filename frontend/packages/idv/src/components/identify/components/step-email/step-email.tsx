@@ -31,7 +31,7 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
 
   const handleSubmit = (emailFromForm: string) => {
     mutIdentify.mutate(
-      { identifier: { email: emailFromForm } },
+      { email: emailFromForm },
       {
         onError: error => {
           logError(

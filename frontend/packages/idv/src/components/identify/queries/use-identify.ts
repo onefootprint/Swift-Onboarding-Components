@@ -5,24 +5,24 @@ import { useMutation } from '@tanstack/react-query';
 
 type PayloadPartial = 'obConfigAuth' | 'sandboxId' | 'scope';
 type BasePayload = Pick<IdentifyRequest, PayloadPartial>;
-type RestOfPayload = Omit<IdentifyRequest, PayloadPartial>;
+export type IdentifyRestOfPayload = Omit<IdentifyRequest, PayloadPartial>;
 
 const requestFn = async ({
-  identifier,
+  phoneNumber,
+  email,
+  authToken,
   obConfigAuth,
   sandboxId,
   scope,
 }: IdentifyRequest) => {
   const headers: Record<string, string> = { ...obConfigAuth };
-  const data: Partial<IdentifyRequest> = { scope };
+  const data: Partial<IdentifyRequest> = { scope, email, phoneNumber };
 
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
   }
-  if ('authToken' in identifier) {
-    headers[AUTH_HEADER] = identifier.authToken;
-  } else {
-    data.identifier = identifier;
+  if (authToken) {
+    headers[AUTH_HEADER] = authToken;
   }
 
   const response = await request<IdentifyResponse>({
@@ -46,7 +46,7 @@ const requestFn = async ({
 
 const useIdentify = (basePayload: BasePayload) =>
   useMutation({
-    mutationFn: (restOfPayload: Partial<BasePayload> & RestOfPayload) =>
+    mutationFn: (restOfPayload: Partial<BasePayload> & IdentifyRestOfPayload) =>
       requestFn({ ...basePayload, ...restOfPayload }),
   });
 

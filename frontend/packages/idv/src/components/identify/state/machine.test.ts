@@ -8,6 +8,7 @@ import {
   AuthMethodKind,
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
+  IdDI,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
@@ -42,6 +43,7 @@ const getFixtureUser = (
   })),
   hasSyncablePasskey: true,
   tokenScopes: tokenScopes ?? [],
+  matchingFps: [IdDI.phoneNumber],
 });
 
 const getOnboardingConfig = (

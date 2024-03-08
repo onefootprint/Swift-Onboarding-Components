@@ -1,15 +1,16 @@
-import partial from 'lodash/fp/partial';
-import React, { useMemo } from 'react';
+import { IdDI } from '@onefootprint/types';
+import React from 'react';
 
-import { validateBootstrapData } from '../../../../utils';
+import { getLogger, validateBootstrapData } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import getTokenScope from '../../utils/token-scope';
 import Loading from '../loading';
-import { identify, identifyMutationCaller } from './utils';
 
 type StepBootstrapProps = { children?: JSX.Element | null };
+
+const { logError } = getLogger('auth-init-bootstrap');
 
 const StepBootstrap = ({ children }: StepBootstrapProps) => {
   const [state, send] = useIdentifyMachine();
@@ -20,15 +21,6 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
   } = state.context;
   const scope = getTokenScope(state.context.variant);
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
-  const memo = useMemo(
-    () => {
-      const identifyCaller = partial(identifyMutationCaller, [mutIdentify]);
-      return {
-        identify: partial(identify, [identifyCaller]),
-      };
-    },
-    [obConfigAuth, sandboxId], // eslint-disable-line react-hooks/exhaustive-deps
-  );
 
   const processBootstrapData = async () => {
     const { email, phoneNumber } = validateBootstrapData(bootstrapData);
@@ -37,13 +29,28 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
       return;
     }
 
-    const identifyResult = await memo.identify(email, phoneNumber);
+    const identifyResult = await mutIdentify
+      .mutateAsync({
+        email,
+        phoneNumber,
+      })
+      .catch((error: unknown) => {
+        logError('Identifying user by auth token failed in identify', error);
+        return undefined;
+      });
     if (
-      !identifyResult ||
-      !identifyResult.user?.availableChallengeKinds?.length
+      !identifyResult?.user ||
+      !identifyResult.user.availableChallengeKinds?.length
     ) {
       send({ type: 'identifyFailed', payload: { email, phoneNumber } });
       return;
+    }
+    const { user } = identifyResult;
+    let successfulIdentifier;
+    if (user.matchingFps.includes(IdDI.phoneNumber) && phoneNumber) {
+      successfulIdentifier = { phoneNumber };
+    } else if (user.matchingFps.includes(IdDI.email) && email) {
+      successfulIdentifier = { email };
     }
 
     send({
@@ -52,7 +59,7 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
         user: identifyResult.user,
         email,
         phoneNumber,
-        successfulIdentifier: identifyResult.successfulIdentifier,
+        successfulIdentifier,
       },
     });
   };

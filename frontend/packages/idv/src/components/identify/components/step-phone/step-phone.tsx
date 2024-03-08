@@ -38,7 +38,7 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
 
   const handleSubmit = (phoneFromForm: string) => {
     mutIdentify.mutate(
-      { identifier: { phoneNumber: phoneFromForm } },
+      { phoneNumber: phoneFromForm },
       {
         onError: error => {
           logError('Error while identify user on step-phone page:', error);

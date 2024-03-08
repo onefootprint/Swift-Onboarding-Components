@@ -1,7 +1,7 @@
 import type {
   AuthMethodKind,
   ChallengeKind,
-  Identifier,
+  DataIdentifier,
   ObConfigAuth,
 } from '../data';
 import type { UserTokenScope } from './user-token';
@@ -11,7 +11,9 @@ export const AUTH_HEADER = 'X-Fp-Authorization';
 
 export type IdentifyRequest = {
   // We can identify users by email/phone or auth token
-  identifier: Identifier;
+  phoneNumber?: string;
+  email?: string;
+  authToken?: string;
   // Must be provided when identifier is anything other than an authToken
   obConfigAuth?: ObConfigAuth;
   // Sandbox IDs uniquely distinguish different users even though same email/phone
@@ -38,6 +40,7 @@ export type IdentifiedUser = {
   isUnverified: boolean;
   scrubbedEmail?: string;
   scrubbedPhone?: string;
+  matchingFps: DataIdentifier[];
 };
 
 export type IdentifyResponse = {

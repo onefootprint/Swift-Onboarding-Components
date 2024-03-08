@@ -7,6 +7,7 @@ import {
 import {
   AuthMethodKind,
   ChallengeKind,
+  IdDI,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 
@@ -96,6 +97,7 @@ export const withIdentify = (
         hasSyncablePasskey: true,
         scrubbedPhoneNumber: '+1 (•••) •••-••99',
         tokenScopes: tokenScopes ?? [],
+        matchingFps: [IdDI.phoneNumber],
       },
     },
   });

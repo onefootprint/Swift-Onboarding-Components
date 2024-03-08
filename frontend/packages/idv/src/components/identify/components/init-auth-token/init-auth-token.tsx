@@ -25,9 +25,8 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
 
   const identifyViaToken = async () => {
     // Identify the user via auth token and then move to the login challenge
-    const identifier = { authToken };
     mutIdentify.mutate(
-      { identifier },
+      { authToken },
       {
         onError: e => {
           logError(
@@ -49,7 +48,7 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
                 type: 'identified',
                 payload: {
                   user: res.user,
-                  successfulIdentifier: identifier,
+                  successfulIdentifier: { authToken },
                 },
               });
             }
