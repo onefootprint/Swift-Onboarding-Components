@@ -15,7 +15,7 @@ concurrency:
 
 env:
   CI: true
-  SKIP_PLAYWRIGHT_RUN: false
+  SKIP_JOBS: false
   E2E_AUTH_BASE_URL: http://localhost:3011
   E2E_DEMOS_BASE_URL: http://localhost:3002
   E2E_UPDATE_UTOKEN: ''
@@ -64,22 +64,45 @@ jobs:
 
       - name: Get Vercel auth preview_url
         uses: zentered/vercel-preview-url@v1.1.9
+        continue-on-error: true
         id: vercel_auth_url
         with:
           vercel_team_id: ${{ env.VERCEL_TEAM_ID }}
           vercel_project_id: ${{ env.VERCEL_PROJECT_ID_AUTH }}
 
+      - name: Set E2E_AUTH_BASE_URL
+        if: ${{ env.SKIP_JOBS != 'true' }}
+        run: |
+          if [[ "${{ steps.vercel_auth_url.outputs.deployment_state }}" == "CANCELED" || "${{ steps.vercel_auth_url.outputs.deployment_state }}" == "" || "${{ steps.vercel_auth_url.outputs.deployment_state }}" == null ]]; then
+            echo "Workflow canceled due to auth url preview cancellation."
+            echo "SKIP_JOBS=true" >> $GITHUB_ENV
+          fi
+          export E2E_AUTH_BASE_URL="https://${{ steps.vercel_auth_url.outputs.preview_url }}"
+          echo "E2E_AUTH_BASE_URL=${E2E_AUTH_BASE_URL}" >> $GITHUB_ENV
+
       - name: Get Vercel demos preview_url
         uses: zentered/vercel-preview-url@v1.1.9
         id: vercel_demos_url
+        if: ${{ env.SKIP_JOBS != 'true' }}
+        continue-on-error: true
         with:
           vercel_team_id: ${{ env.VERCEL_TEAM_ID }}
           vercel_project_id: ${{ env.VERCEL_PROJECT_ID_DEMOS }}
 
+      - name: Set E2E_DEMOS_BASE_URL
+        if: ${{ env.SKIP_JOBS != 'true' }}
+        run: |
+          if [[ "${{ steps.vercel_demos_url.outputs.deployment_state }}" == "CANCELED" || "${{ steps.vercel_demos_url.outputs.deployment_state }}" == "" || "${{ steps.vercel_demos_url.outputs.deployment_state }}" == null ]]; then
+            echo "Workflow canceled due to demos_url preview cancellation."
+            echo "SKIP_JOBS=true" >> $GITHUB_ENV
+          fi
+          export E2E_DEMOS_BASE_URL="https://${{ steps.vercel_demos_url.outputs.preview_url }}"
+          echo "E2E_DEMOS_BASE_URL=${E2E_DEMOS_BASE_URL}" >> $GITHUB_ENV          
+
       - name: Wait for auth preview_url to be ready
         uses: UnlyEd/github-action-await-vercel@v1
         id: await-vercel-auth
-        if: steps.vercel_auth_url.outputs.deployment_state != 'CANCELED'
+        if: steps.vercel_auth_url.outputs.deployment_state != 'CANCELED' && env.SKIP_JOBS != 'true'
         continue-on-error: true
         with:
           deployment-url: ${{ steps.vercel_auth_url.outputs.preview_url }}
@@ -89,44 +112,25 @@ jobs:
       - name: Wait for demos preview_url to be ready
         uses: UnlyEd/github-action-await-vercel@v1
         id: await-vercel-demos
-        if: steps.vercel_demos_url.outputs.deployment_state != 'CANCELED'
+        if: steps.vercel_demos_url.outputs.deployment_state != 'CANCELED' && env.SKIP_JOBS != 'true'
         continue-on-error: true
         with:
           deployment-url: ${{ steps.vercel_demos_url.outputs.preview_url }}
           timeout: ${{ env.VERCEL_AWAIT_TIMEOUT_SEC }}
           poll-interval: ${{ env.VERCEL_AWAIT_POLL_INTERVAL_SEC }}
-
-      - name: Set E2E_DEMOS_BASE_URL
-        run: |
-          if [[ "${{ steps.vercel_demos_url.outputs.deployment_state }}" == "CANCELED" ]]; then
-            echo "Workflow canceled due to demos_url preview cancellation."
-            echo "SKIP_PLAYWRIGHT_RUN=true" >> $GITHUB_ENV
-          fi
-          export E2E_DEMOS_BASE_URL="https://${{ steps.vercel_demos_url.outputs.preview_url }}"
-          echo "E2E_DEMOS_BASE_URL=${E2E_DEMOS_BASE_URL}" >> $GITHUB_ENV
-
-      - name: Set E2E_AUTH_BASE_URL
-        if: ${{ env.SKIP_PLAYWRIGHT_RUN != 'true' }}
-        run: |
-          if [[ "${{ steps.vercel_auth_url.outputs.deployment_state }}" == "CANCELED" ]]; then
-            echo "Workflow canceled due to bifrost_url preview cancellation."
-            echo "SKIP_PLAYWRIGHT_RUN=true" >> $GITHUB_ENV
-          fi
-          export E2E_AUTH_BASE_URL="https://${{ steps.vercel_auth_url.outputs.preview_url }}"
-          echo "E2E_AUTH_BASE_URL=${E2E_AUTH_BASE_URL}" >> $GITHUB_ENV
       
       - name: Set E2E_UPDATE_UTOKEN
-        if: ${{ env.SKIP_PLAYWRIGHT_RUN != 'true' }}
+        if: ${{ env.SKIP_JOBS != 'true' }}
         run: |
           E2E_UPDATE_UTOKEN=$(curl -s https://api.dev.onefootprint.com/users/fp_id_test_rJBzCaVzkYQgWIfr0qtFDC/token -X POST -d '{"kind": "user"}' -u ${{ secrets.E2E_ACME_SECRET_API_KEY_DEV }}: | jq -r '.token')
           echo "E2E_UPDATE_UTOKEN=${E2E_UPDATE_UTOKEN}" >> $GITHUB_ENV
 
       - name: Sleep for 10 seconds
-        if: ${{ env.SKIP_PLAYWRIGHT_RUN != 'true' }}
+        if: ${{ env.SKIP_JOBS != 'true' }}
         run: sleep 10
 
       - name: Run Playwright tests
-        if: ${{ env.SKIP_PLAYWRIGHT_RUN != 'true' }}
+        if: ${{ env.SKIP_JOBS != 'true' }}
         working-directory: ./frontend
         env:
           E2E_UPDATE_UTOKEN: ${{ env.E2E_UPDATE_UTOKEN }}
@@ -135,7 +139,7 @@ jobs:
         run: yarn workspace @onefootprint/e2e test:e2e:auth-ci --project chromium
 
       - name: Upload artifacts
-        if: ${{ env.SKIP_PLAYWRIGHT_RUN != 'true' }}
+        if: ${{ env.SKIP_JOBS != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: playwright-report
