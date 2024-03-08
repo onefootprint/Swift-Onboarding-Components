@@ -21,6 +21,7 @@ type Container = {
   border: CSS.Property.Border;
   elevation: CSS.Property.BoxShadow;
   borderRadius: CSS.Property.BorderRadius;
+  width?: CSS.Property.Width;
 };
 
 export type Bifrost = {

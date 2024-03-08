@@ -23,6 +23,12 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
       var: 'components.bifrost.container.elevation',
     },
   ],
+  [
+    'containerWidth',
+    {
+      var: 'components.bifrost.container.width',
+    },
+  ],
   // Deprecated
   [
     'dialogBg',

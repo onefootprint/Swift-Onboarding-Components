@@ -14,6 +14,7 @@ export type AppearanceVariables = Partial<{
   containerElevation: CSS.Property.BoxShadow;
   containerBorder: CSS.Property.Border;
   containerBorderRadius: CSS.Property.BorderRadius;
+  containerWidth: CSS.Property.Width;
 
   // link
   linkColor: CSS.Property.Color;
