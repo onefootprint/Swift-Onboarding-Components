@@ -54,6 +54,7 @@ export const appearance: FootprintAppearance = {
     fontFamily:
       '"Inter", ui-sans-serif, system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
     colorAccent: '#3F83F7',
+    containerWidth: '500px',
     containerBorder: '1px solid #101516',
     containerElevation:
       '0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.24) 0px 4px 24px 0px',
