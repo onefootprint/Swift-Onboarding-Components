@@ -21,6 +21,7 @@ use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumString};
 pub enum TenantRoleKind {
     ApiKey { is_live: bool },
     DashboardUser,
+    CompliancePartnerDashboardUser,
 }
 
 impl TenantRoleKind {

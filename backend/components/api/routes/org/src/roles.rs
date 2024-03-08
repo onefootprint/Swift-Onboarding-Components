@@ -5,6 +5,7 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
+use api_core::errors::tenant::TenantError;
 use api_wire_types::OrgRoleFilters;
 use db::{
     models::tenant_role::{TenantRole, TenantRoleListFilters},
@@ -85,6 +86,10 @@ async fn post(
     let kind = match kind {
         TenantRoleKindDiscriminant::ApiKey => TenantRoleKind::ApiKey { is_live },
         TenantRoleKindDiscriminant::DashboardUser => TenantRoleKind::DashboardUser,
+        TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
+            // Tenant principals can't create partner tenant roles.
+            return Err(TenantError::InvalidTenantRoleKind.into());
+        }
     };
     let result = state
         .db_pool

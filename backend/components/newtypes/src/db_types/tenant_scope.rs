@@ -55,7 +55,9 @@ pub enum TenantScope {
     /// Forward identity data to a CIP integration
     CipIntegration,
     /// Invoke the specified vault proxies
-    InvokeVaultProxy { data: InvokeVaultProxyPermission },
+    InvokeVaultProxy {
+        data: InvokeVaultProxyPermission,
+    },
     /// Run KYB checks on a vaulted business
     TriggerKyb,
     /// Run KYC checks on a vaulted user
@@ -66,7 +68,9 @@ pub enum TenantScope {
     Onboarding,
 
     /// Allows decrypting data attributes belonging to the listed CollectedDataOption
-    Decrypt { data: CollectedDataOption },
+    Decrypt {
+        data: CollectedDataOption,
+    },
     /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,
     #[strum(to_string = "decrypt.document")]
@@ -84,6 +88,12 @@ pub enum TenantScope {
 
     /// Create labels and tags
     LabelAndTag,
+
+    //
+    // Compliance Partner Dashboard Scopes
+    //
+    CompliancePartnerRead,
+    CompliancePartnerAdmin,
 }
 
 impl TenantScope {
@@ -114,6 +124,9 @@ impl TenantScope {
             Self::Onboarding => vec![ApiKey],
 
             Self::LabelAndTag => vec![ApiKey, DashboardUser],
+
+            Self::CompliancePartnerRead => vec![CompliancePartnerDashboardUser],
+            Self::CompliancePartnerAdmin => vec![CompliancePartnerDashboardUser],
         }
     }
 }

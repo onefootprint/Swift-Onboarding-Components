@@ -20,11 +20,15 @@ export enum RoleScopeKind {
   manageVaultProxy = 'manage_vault_proxy',
   onboarding = 'onboarding',
   manageWebhooks = 'manage_webhooks',
+
+  compliancePartnerRead = 'compliance_partner_read',
+  compliancePartnerAdmin = 'compliance_partner_admin',
 }
 
 export enum RoleKind {
   dashboardUser = 'dashboard_user',
   apiKey = 'api_key',
+  compliancePartnerDashboardUser = 'compliance_partner_dashboard_user',
 }
 
 // Specify which kinds of roles are able to have the given scope
@@ -51,6 +55,13 @@ export const supportedRoleKinds: Record<RoleScopeKind, RoleKind[]> = {
   [RoleScopeKind.decryptDocuments]: [RoleKind.dashboardUser, RoleKind.apiKey],
   [RoleScopeKind.decrypt]: [RoleKind.dashboardUser, RoleKind.apiKey],
   [RoleScopeKind.decryptCustom]: [RoleKind.dashboardUser, RoleKind.apiKey],
+
+  [RoleScopeKind.compliancePartnerRead]: [
+    RoleKind.compliancePartnerDashboardUser,
+  ],
+  [RoleScopeKind.compliancePartnerAdmin]: [
+    RoleKind.compliancePartnerDashboardUser,
+  ],
 };
 
 export type BasicRoleScopeKind = Exclude<

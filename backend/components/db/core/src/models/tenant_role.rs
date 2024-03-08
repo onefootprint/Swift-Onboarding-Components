@@ -72,17 +72,22 @@ impl TenantRole {
         kind: TenantRoleKindDiscriminant,
         is_live: Option<IsLive>,
     ) -> DbResult<()> {
-        let TenantOrPartnerTenantId::TenantId(tenant_id) = t_pt_id else {
-            // TODO: implement new scopes for partner tenants
-            return Err(DbError::ValidationError(
-                "Invalid scopes for this tenant kind".to_owned(),
-            ));
-        };
-
-        if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
-            // Every role must have at least Read permissions for now
-            return Err(DbError::InsufficientTenantScopes);
+        // Every role must have at least Read permissions for now
+        match t_pt_id {
+            TenantOrPartnerTenantId::TenantId(_) => {
+                if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
+                    return Err(DbError::InsufficientTenantScopes);
+                }
+            }
+            TenantOrPartnerTenantId::PartnerTenantId(_) => {
+                if !scopes.contains(&TenantScope::CompliancePartnerRead)
+                    && !scopes.contains(&TenantScope::CompliancePartnerAdmin)
+                {
+                    return Err(DbError::InsufficientTenantScopes);
+                }
+            }
         }
+
         if scopes.iter().unique().count() != scopes.len() {
             return Err(DbError::NonUniqueTenantScopes);
         }
@@ -93,28 +98,30 @@ impl TenantRole {
             let s = TenantScopeDiscriminants::from(s);
             return Err(DbError::InvalidTenantScope(kind, s));
         }
-        let proxy_config_ids = scopes
-            .iter()
-            .filter_map(|s| match s {
-                TenantScope::InvokeVaultProxy {
-                    data: InvokeVaultProxyPermission::Id { id },
-                } => Some(id.clone()),
-                _ => None,
-            })
-            .collect_vec();
+        if let TenantOrPartnerTenantId::TenantId(tenant_id) = t_pt_id {
+            let proxy_config_ids = scopes
+                .iter()
+                .filter_map(|s| match s {
+                    TenantScope::InvokeVaultProxy {
+                        data: InvokeVaultProxyPermission::Id { id },
+                    } => Some(id.clone()),
+                    _ => None,
+                })
+                .collect_vec();
 
-        if !proxy_config_ids.is_empty() {
-            use db_schema::schema::proxy_config;
-            let mut query = proxy_config::table
-                .filter(proxy_config::tenant_id.eq(tenant_id))
-                .filter(proxy_config::id.eq_any(&proxy_config_ids))
-                .into_boxed();
-            if let Some(is_live) = is_live {
-                query = query.filter(proxy_config::is_live.eq(is_live));
-            }
-            let proxy_configs_count: i64 = query.count().get_result(conn)?;
-            if (proxy_config_ids.len() as i64) != proxy_configs_count {
-                return Err(DbError::InvalidProxyConfigId);
+            if !proxy_config_ids.is_empty() {
+                use db_schema::schema::proxy_config;
+                let mut query = proxy_config::table
+                    .filter(proxy_config::tenant_id.eq(tenant_id))
+                    .filter(proxy_config::id.eq_any(&proxy_config_ids))
+                    .into_boxed();
+                if let Some(is_live) = is_live {
+                    query = query.filter(proxy_config::is_live.eq(is_live));
+                }
+                let proxy_configs_count: i64 = query.count().get_result(conn)?;
+                if (proxy_config_ids.len() as i64) != proxy_configs_count {
+                    return Err(DbError::InvalidProxyConfigId);
+                }
             }
         }
         Ok(())

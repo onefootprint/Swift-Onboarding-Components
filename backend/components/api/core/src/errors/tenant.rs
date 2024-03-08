@@ -59,4 +59,6 @@ pub enum TenantError {
     VaultDoesntExist(FpId),
     #[error("Allowed origins must be HTTPS in live-mode")]
     AllowedOriginsMustBeHttpsInLive,
+    #[error("Invalid tenant role kind")]
+    InvalidTenantRoleKind,
 }

@@ -437,3 +437,42 @@ def test_deactivate_role_and_user(sandbox_tenant, run_id):
     # Make sure the deactivated role isn't displayed anymore
     body = get("org/roles", dict(page_size=100), *sandbox_tenant.db_auths)
     assert role_id not in set(r["id"] for r in body["data"])
+
+def test_partner_tenant_scopes(run_id, sandbox_tenant, admin_role):
+    suffix = _gen_random_n_digit_number(10)
+
+    # Creating a role with mismatching scopes and role kind yields an error.
+    role_data = dict(
+        name=f"Test partner tenant role {suffix}",
+        scopes=[{"kind": "read"}],
+        kind="compliance_partner_dashboard_user",
+    )
+    post("org/roles", role_data, *sandbox_tenant.db_auths, status_code=400)
+
+    role_data = dict(
+        name=f"Test partner tenant role {suffix}",
+        scopes=[{"kind": "compliance_partner_admin"}],
+        kind="compliance_partner_dashboard_user",
+    )
+    post("org/roles", role_data, *sandbox_tenant.db_auths, status_code=400)
+
+    # Read scope is required.
+    role_data = dict(
+        name=f"Test partner tenant role {suffix}",
+        scopes=[{"kind": "compliance_partner_admin"}],
+        kind="compliance_partner_dashboard_user",
+    )
+    post("org/roles", role_data, *sandbox_tenant.db_auths, status_code=400)
+
+    # FIXME: For now, even a proper matchup of role kind and scopes yield an
+    # HTTP 400 because we don't yet have auth implemented for partner tenants,
+    # and a regular tenant principals can't create partner tenant roles.
+    role_data = dict(
+        name=f"Test partner tenant role {suffix}",
+        scopes=[
+            {"kind": "compliance_partner_read"},
+            {"kind": "compliance_partner_admin"},
+        ],
+        kind="compliance_partner_dashboard_user",
+    )
+    post("org/roles", role_data, *sandbox_tenant.db_auths, status_code=400)
