@@ -51,12 +51,12 @@ const EmptyState = ({
     <Text variant="label-1" marginBottom={4}>
       {title}
     </Text>
-    <Text variant="body-2" color="secondary">
+    <Text variant="body-2" color="secondary" textAlign="center">
       {description}
     </Text>
     {cta && (
       <Box marginTop={8}>
-        <Button onClick={cta.onClick} variant="primary" size="compact">
+        <Button onClick={cta.onClick} variant="primary" size="large" fullWidth>
           {cta.label}
         </Button>
       </Box>

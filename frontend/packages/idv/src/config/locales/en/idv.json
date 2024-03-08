@@ -82,6 +82,12 @@
         "title": "Session expired",
         "description": "Your session has expired. Please restart it.",
         "cta": "Restart"
+      },
+      "confirmation-dialog": {
+        "title": "Are you sure?",
+        "description": "Closing this will not save your data.",
+        "confirm": "Yes",
+        "cancel": "No"
       }
     },
     "pages": {

@@ -2,6 +2,7 @@ import type { Color } from '@onefootprint/design-tokens';
 import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { NavigationHeaderCloseButtonProps } from '../../types';
 
@@ -18,6 +19,9 @@ const NavigationCloseButton = ({
   color,
 }: NavigationCloseButtonProps) => {
   const confirmationDialog = useConfirmationDialog();
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.components.confirmation-dialog',
+  });
 
   const handleClick = () => {
     if (!confirmClose) {
@@ -26,14 +30,14 @@ const NavigationCloseButton = ({
     }
 
     confirmationDialog.open({
-      title: 'Are you sure?',
-      description: 'Closing this will not save your data.',
+      title: t('title'),
+      description: t('description'),
       primaryButton: {
-        label: 'Yes',
+        label: t('confirm'),
         onClick: onClose,
       },
       secondaryButton: {
-        label: 'No',
+        label: t('cancel'),
       },
     });
   };

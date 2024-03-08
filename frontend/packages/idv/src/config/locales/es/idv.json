@@ -82,6 +82,12 @@
         "title": "Sesión expirada",
         "description": "Tu sesión ha expirado. Por favor, indentifícate nuevamente.",
         "cta": "Reiniciar sesión"
+      },
+      "confirmation-dialog": {
+        "title": "Are you sure?",
+        "description": "Closing this will not save your data.",
+        "confirm": "Yes",
+        "cancel": "No"
       }
     },
     "pages": {
