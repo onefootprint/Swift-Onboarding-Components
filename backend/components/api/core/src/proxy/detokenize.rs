@@ -1,6 +1,6 @@
 use crate::{
     auth::tenant::TenantAuth,
-    errors::{tenant::TenantError, ApiResult},
+    errors::{tenant::TenantError, ApiResult, ValidationError},
     utils::{
         headers::InsightHeaders,
         vault_wrapper::{
@@ -15,7 +15,7 @@ use itertools::Itertools;
 use newtypes::{AccessEventPurpose, FpId, PiiString, ProxyToken};
 use std::collections::HashMap;
 
-const MAX_NUM_FP_IDS_PER_BATCH: usize = 10_000;
+const MAX_NUM_FP_IDS_PER_BATCH: usize = 5_000;
 
 /// turns tokens -> PII
 /// TODO: depending on usage this function can be optimized greatly:
@@ -37,18 +37,18 @@ pub async fn detokenize(
         .into_group_map();
 
     let fp_ids = tokens.keys().cloned().collect_vec();
-    tracing::info!(num_fp_ids=%fp_ids.len(), "Detokenizing fp_ids");
     if fp_ids.len() > MAX_NUM_FP_IDS_PER_BATCH {
-        tracing::error!("Attempting to detokenize more than max allowed fp_ids");
-    }
-    if fp_ids.len() > 5_000 {
-        tracing::error!("Attempting to detokenize more than max allowed fp_ids, lower limit");
+        return ValidationError(&format!(
+            "Cannot exceed {} fp_ids per proxy invocation.",
+            MAX_NUM_FP_IDS_PER_BATCH
+        ))
+        .into();
     }
 
     // Add some indication of the range of fp_ids handled by this request
     let fp_id_min = fp_ids.iter().min().map(|id| id.to_string()).unwrap_or_default();
     let fp_id_max = fp_ids.iter().max().map(|id| id.to_string()).unwrap_or_default();
-    tracing::info!(%fp_id_min, %fp_id_max, "Detokenizing for range of fp_ids");
+    tracing::info!(%fp_id_min, %fp_id_max, num_fp_ids=%fp_ids.len(), "Detokenizing fp_ids");
 
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
