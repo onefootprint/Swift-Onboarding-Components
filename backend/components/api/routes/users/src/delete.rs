@@ -21,10 +21,10 @@ use paperclip::actix::{self, api_v2_operation, web};
 
 #[route_alias(actix::delete(
     "/businesses/{fp_bid}",
-    tags(Businesses, PublicApi),
+    tags(Businesses, Deprecated),
     description = "Deletes a business."
 ))]
-#[api_v2_operation(description = "Deletes a user.", tags(Users, PublicApi))]
+#[api_v2_operation(description = "Deletes a user.", tags(Users, Deprecated))]
 #[actix::delete("/users/{fp_id}")]
 pub async fn delete(
     state: web::Data<State>,

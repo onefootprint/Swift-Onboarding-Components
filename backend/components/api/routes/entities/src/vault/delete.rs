@@ -6,6 +6,7 @@ use crate::{
     State,
 };
 use api_core::{
+    errors::ValidationError,
     types::ResponseData,
     utils::{
         fp_id_path::FpIdPath,
@@ -29,7 +30,9 @@ use std::collections::{HashMap, HashSet};
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct DeleteRequest {
     /// List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
-    fields: Vec<DataIdentifier>,
+    fields: Option<Vec<DataIdentifier>>,
+    /// When true, deletes all data in the vault.
+    delete_all: Option<bool>,
 }
 
 flat_api_object_map_type!(
@@ -63,20 +66,25 @@ pub async fn delete(
     insight: InsightHeaders,
 ) -> JsonApiResponse<DeleteVaultResponse> {
     let fp_id = path.into_inner();
-    let DeleteRequest { fields } = request.into_inner();
+    let DeleteRequest { fields, delete_all } = request.into_inner();
+    let delete_all = delete_all.unwrap_or_default();
 
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let actor = auth.actor();
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
-    let requested_dis = fields.to_vec();
 
-    let deleted_dis = state
+    let (requested_fields_to_delete, deleted_dis) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<HashSet<_>> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;
-            let dis = uvw.soft_delete_vault_data(conn, fields.to_vec())?;
+            let requested_fields_to_delete = match (delete_all, fields) {
+                (true, None) => uvw.populated_dis(),
+                (false, Some(fields)) => fields,
+                _ => return ValidationError("Must provide only one of `delete_all` and `fields`").into(),
+            };
+            let deleted_dis = uvw.soft_delete_vault_data(conn, requested_fields_to_delete.clone())?;
 
             let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
             let actor: DbActor = actor.into();
@@ -91,7 +99,7 @@ pub async fn delete(
                 principal: actor.clone(),
                 insight_event_id: insight_event_id.clone(),
                 kind: AccessEventKind::Delete,
-                targets: dis.clone(),
+                targets: deleted_dis.clone(),
                 purpose: AccessEventPurpose::Api,
             }
             .create(conn)?;
@@ -104,17 +112,18 @@ pub async fn delete(
                 detail: AuditEventDetail::DeleteUserData {
                     is_live: scoped_vault.is_live,
                     scoped_vault_id: scoped_vault.id,
-                    deleted_fields: dis.clone(),
+                    deleted_fields: deleted_dis.clone(),
                 },
             }
             .create(conn)?;
 
-            Ok(HashSet::from_iter(dis.into_iter()))
+            Ok((requested_fields_to_delete, deleted_dis))
         })
         .await?;
 
+    let deleted_dis: HashSet<_> = deleted_dis.into_iter().collect();
     let results = HashMap::from_iter(
-        requested_dis
+        requested_fields_to_delete
             .into_iter()
             .map(|di| (di.clone(), deleted_dis.contains(&di))),
     );

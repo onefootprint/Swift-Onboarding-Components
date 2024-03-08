@@ -25,21 +25,26 @@ def test_vault_create_write_decrypt(tenant):
     }
     patch(f"entities/{fp_id}/vault", update_data, tenant.sk.key)
 
-    # check that the data is there now
-    all_data = {
-        **initial_data,
-        **update_data,
+    expiration = initial_data["card.hayes.expiration"]
+    derived_data = {
+        "card.hayes.expiration_month": expiration.split("/")[0],
+        "card.hayes.expiration_year": expiration.split("/")[1],
+        "card.hayes.issuer": "visa",
+        "card.hayes.number_last4": initial_data["card.hayes.number"][-4:],
     }
-    fields_to_check = [i for i in all_data] + ["custom.insurance_id"]
+    ALL_VAULT_DATA = initial_data | derived_data | update_data
+
+    # check that the data is there now
+    fields_to_check = [i for i in ALL_VAULT_DATA] + ["custom.insurance_id"]
     params = {"fields": ", ".join(fields_to_check)}
 
     response = get(f"entities/{fp_id}/vault", params, tenant.sk.key)
-    for k in all_data:
+    for k in ALL_VAULT_DATA:
         assert response[k]
     assert response["custom.insurance_id"] == False
 
     # decrypt the data
-    fields_to_check = [
+    fields_to_decrypt = [
         "id.first_name",
         "id.zip",
         "custom.ach_account_number",
@@ -51,55 +56,44 @@ def test_vault_create_write_decrypt(tenant):
     ]
     data = dict(
         reason="test",
-        fields=fields_to_check,
+        fields=fields_to_decrypt,
     )
     body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key)
-    data = body
-
-    all_data = {
-        **all_data,
-        "card.hayes.expiration_month": all_data["card.hayes.expiration"].split("/")[0],
-        "card.hayes.expiration_year": all_data["card.hayes.expiration"].split("/")[1],
-        "card.hayes.number_last4": all_data["card.hayes.number"][-4:],
-    }
-    for f in fields_to_check:
-        assert data[f] == all_data[f]
-
-    # verify access events created
-    body = get(
-        "org/access_events",
-        dict(search=fp_id),
-        *tenant.db_auths,
-    )
-    access_events = body["data"]
-    assert access_events[0]["kind"] == "decrypt"
-
-    events = set(access_events[0]["targets"])
-    assert events == set(fields_to_check)
+    for f in fields_to_decrypt:
+        assert body[f] == ALL_VAULT_DATA[f]
 
     # delete some data
-    fields = ["card.valley.cvc", "id.first_name"]
-    data = dict(fields=fields)
+    fields_to_delete = ["card.valley.cvc", "id.first_name"]
+    data = dict(fields=fields_to_delete)
     body = delete(f"entities/{fp_id}/vault", data, tenant.sk.key)
     assert body["card.valley.cvc"] == True
     assert body["id.first_name"] == True
 
     # check data no longer exists
-    params = dict(fields=",".join(fields))
+    params = dict(fields=",".join(fields_to_delete))
     body = get(f"entities/{fp_id}/vault", params, tenant.sk.key)
     assert not body["card.valley.cvc"]
     assert not body["id.first_name"]
 
-    # check the access events and check it's correct
-    body = get(
-        "org/access_events",
-        dict(search=fp_id),
-        *tenant.db_auths,
-    )
+    # delete all data
+    data = dict(delete_all=True)
+    body = delete(f"entities/{fp_id}/vault", data, tenant.sk.key)
+    expected_deleted_fields = list(set(ALL_VAULT_DATA.keys()) - set(fields_to_delete))
+    for k in expected_deleted_fields:
+        assert body[k] == True
+
+    # check the access events made by the two delete operations and the decrypt operation
+    body = get("org/access_events", dict(search=fp_id), *tenant.db_auths)
     access_events = body["data"]
-    events = access_events[0]["targets"]
-    assert set(events) == set(["card.valley.cvc", "id.first_name"])
+
+    assert set(access_events[0]["targets"]) == set(expected_deleted_fields)
     assert access_events[0]["kind"] == "delete"
+
+    assert set(access_events[1]["targets"]) == set(fields_to_delete)
+    assert access_events[1]["kind"] == "delete"
+
+    assert access_events[2]["kind"] == "decrypt"
+    assert set(access_events[2]["targets"]) == set(fields_to_decrypt)
 
     data = dict(fields=["card.valley.cvc"], reason="try decrypt failure")
     body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key, status_code=200)
@@ -198,3 +192,46 @@ def test_decrypt_rsa_encrypt(sandbox_tenant):
             bytes.fromhex(result_value), padding.PKCS1v15()
         ).decode("utf-8")
         assert decrypted == real_pii
+
+
+def test_delete(sandbox_tenant):
+    initial_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "custom.test_field": "hello world",
+    }
+    body = post("users", initial_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    # Check validation errors
+    for data in [
+        dict(),
+        dict(delete_all=False),
+        dict(fields=["id.phone_number"], delete_all=True),
+    ]:
+        body = delete(
+            f"users/{fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
+        )
+        assert (
+            body["error"]["message"]
+            == "Must provide only one of `delete_all` and `fields`"
+        )
+
+    # Check deleting data
+    data = dict(fields=["id.phone_number"])
+    body = delete(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+    assert body["id.phone_number"] == True
+
+    data = dict(delete_all=True)
+    body = delete(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
+    assert body["id.email"] == True
+    assert body["custom.test_field"] == True
+
+    # Verify access events
+    body = get("org/access_events", dict(search=fp_id), *sandbox_tenant.db_auths)
+    access_events = body["data"]
+
+    assert set(access_events[0]["targets"]) == {"id.email", "custom.test_field"}
+    assert access_events[0]["kind"] == "delete"
+    assert set(access_events[1]["targets"]) == {"id.phone_number"}
+    assert access_events[1]["kind"] == "delete"

@@ -8360,6 +8360,10 @@
             "DeleteRequest": {
                 "type": "object",
                 "properties": {
+                    "delete_all": {
+                        "description": "When true, deletes all data in the vault.",
+                        "type": "boolean"
+                    },
                     "fields": {
                         "description": "List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
                         "type": "array",
@@ -8617,10 +8621,7 @@
                             ]
                         }
                     }
-                },
-                "required": [
-                    "fields"
-                ]
+                }
             },
             "DeleteVaultResponse": {
                 "example": {

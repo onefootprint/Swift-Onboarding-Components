@@ -64,43 +64,6 @@
                 ]
             }
         },
-        "/businesses/{fp_bid}": {
-            "delete": {
-                "tags": [
-                    "Businesses",
-                    "PublicApi"
-                ],
-                "description": "Deletes a business.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_bid",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
         "/businesses/{fp_bid}/vault": {
             "get": {
                 "tags": [
@@ -941,43 +904,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/User"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
-        "/users/{fp_id}": {
-            "delete": {
-                "tags": [
-                    "Users",
-                    "PublicApi"
-                ],
-                "description": "Deletes a user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
                                 }
                             }
                         }
@@ -3287,6 +3213,10 @@
             "DeleteRequest": {
                 "type": "object",
                 "properties": {
+                    "delete_all": {
+                        "description": "When true, deletes all data in the vault.",
+                        "type": "boolean"
+                    },
                     "fields": {
                         "description": "List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
                         "type": "array",
@@ -3544,10 +3474,7 @@
                             ]
                         }
                     }
-                },
-                "required": [
-                    "fields"
-                ]
+                }
             },
             "DeleteVaultResponse": {
                 "example": {

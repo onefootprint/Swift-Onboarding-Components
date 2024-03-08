@@ -64,6 +64,7 @@ pub struct ScopedVault {
     /// have a workflow complete
     pub last_activity_at: DateTime<Utc>,
     /// When the scoped vault was deactivated, if it has been deactivated.
+    /// This was used by the deprecated DELETE /users/{fp_id} API.
     pub deactivated_at: Option<DateTime<Utc>>,
 }
 
