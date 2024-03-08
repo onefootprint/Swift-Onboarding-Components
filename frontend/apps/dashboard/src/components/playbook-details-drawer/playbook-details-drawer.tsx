@@ -1,17 +1,18 @@
 import { Drawer } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-import useFilters from '@/playbooks/hooks/use-filters';
-import usePlaybook from '@/playbooks/hooks/use-playbook';
+import usePlaybook from 'src/components/playbook-details-drawer/hooks/use-playbook';
+import useFilters from 'src/hooks/use-filters';
 
 import Content from './components/content';
 import Error from './components/error';
 import Loading from './components/loading';
 
-const Details = () => {
+const PlaybookDetailsDrawer = () => {
   const { t } = useTranslation('common');
-  const { query, push } = useFilters();
+  const { query, push } = useFilters<{ onboarding_config_id?: string }>({
+    onboarding_config_id: undefined,
+  });
   const isOpen = !!query.onboarding_config_id;
   const { data, isLoading, errorMessage } = usePlaybook(
     query.onboarding_config_id,
@@ -39,4 +40,4 @@ const Details = () => {
   );
 };
 
-export default Details;
+export default PlaybookDetailsDrawer;

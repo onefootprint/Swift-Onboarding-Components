@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-import { GET_QUERY_KEY } from '../use-rules/use-rules';
+import { GET_QUERY_KEY } from '../use-rules';
 
 const addRule = async (
   { playbookId, fields }: AddRuleRequest,

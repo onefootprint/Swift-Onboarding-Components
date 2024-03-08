@@ -7,12 +7,12 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Details from './details';
+import PlaybookDetailsDrawer from './playbook-details-drawer';
 import {
   playbookDetailsFixture,
   withPlaybookDetails,
   withPlaybookDetailsError,
-} from './details.test.config';
+} from './playbook-details-drawer.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -28,7 +28,7 @@ describe('<Details />', () => {
   });
 
   const renderDetails = () => {
-    customRender(<Details />);
+    customRender(<PlaybookDetailsDrawer />);
   };
 
   const renderDetailsAndWaitData = async () => {

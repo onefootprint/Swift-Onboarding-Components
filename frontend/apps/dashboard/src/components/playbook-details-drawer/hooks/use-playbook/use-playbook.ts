@@ -4,8 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-import { QUERY_KEY } from '../use-playbooks';
-
 const getPlaybook = async (authHeaders: AuthHeaders, id: string) => {
   const response = await request<GetOnboardingConfigResponse>({
     method: 'GET',
@@ -20,7 +18,7 @@ const usePlaybook = (id: string = '') => {
   const { authHeaders } = useSession();
 
   const onboardingConfigQuery = useQuery(
-    [QUERY_KEY, id],
+    ['onboarding_configs', id],
     () => getPlaybook(authHeaders, id),
     {
       enabled: !!id,

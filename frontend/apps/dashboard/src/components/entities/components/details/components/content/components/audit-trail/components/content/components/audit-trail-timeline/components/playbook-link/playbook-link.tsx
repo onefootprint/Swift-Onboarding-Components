@@ -1,22 +1,28 @@
 import type { TimelinePlaybook } from '@onefootprint/types/src/data/onboarding-decision';
 import { LinkButton } from '@onefootprint/ui';
-import { useRouter } from 'next/router';
 import React from 'react';
+import PlaybookDetailsDrawer from 'src/components/playbook-details-drawer';
+import useFilters from 'src/hooks/use-filters';
 
 type PlaybookLinkProps = {
   playbook: TimelinePlaybook;
 };
 
 const PlaybookLink = ({ playbook }: PlaybookLinkProps) => {
-  const router = useRouter();
+  const { push } = useFilters<{ onboarding_config_id?: string }>({
+    onboarding_config_id: undefined,
+  });
+
   const openPlaybook = () => {
-    router.push({
-      pathname: '/playbooks',
-      query: { onboarding_config_id: playbook.id },
-    });
+    push({ onboarding_config_id: playbook.id });
   };
 
-  return <LinkButton onClick={openPlaybook}>{playbook.name}</LinkButton>;
+  return (
+    <>
+      <LinkButton onClick={openPlaybook}>{playbook.name}</LinkButton>
+      <PlaybookDetailsDrawer />
+    </>
+  );
 };
 
 export default PlaybookLink;

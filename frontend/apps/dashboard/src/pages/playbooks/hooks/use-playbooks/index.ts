@@ -1,1 +1,1 @@
-export { default, QUERY_KEY } from './use-playbooks';
+export { default } from './use-playbooks';

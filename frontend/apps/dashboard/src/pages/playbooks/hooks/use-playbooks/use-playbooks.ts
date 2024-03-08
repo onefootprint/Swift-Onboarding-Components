@@ -11,8 +11,6 @@ import useSession from 'src/hooks/use-session';
 
 import useFilters from '../use-filters';
 
-export const QUERY_KEY = 'onboarding_configs';
-
 const getPlaybooks = async (
   authHeaders: AuthHeaders,
   params: GetOnboardingConfigsRequest,
@@ -34,7 +32,7 @@ const usePlaybooks = () => {
   const { requestParams } = filters;
   const { authHeaders, isLive } = useSession();
   const onboardingConfigsQuery = useQuery(
-    [QUERY_KEY, isLive, requestParams],
+    ['onboarding_configs', isLive, requestParams],
     () => getPlaybooks(authHeaders, { ...requestParams }),
     {
       enabled: filters.isReady,
