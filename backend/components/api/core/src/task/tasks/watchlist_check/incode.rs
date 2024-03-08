@@ -1,6 +1,6 @@
 use crate::{
     decision::{
-        vendor::{incode_watchlist::WatchlistCheckKind, vendor_result::VendorResult},
+        vendor::{incode::incode_watchlist::WatchlistCheckKind, vendor_result::VendorResult},
         {self},
     },
     errors::ApiResult,
@@ -70,7 +70,8 @@ pub async fn complete_vendor_call(
     };
 
     let (vres_id, res) =
-        decision::vendor::incode_watchlist::run_watchlist_check(state, &di, &obc.key, kind.clone()).await?;
+        decision::vendor::incode::incode_watchlist::run_watchlist_check(state, &di, &obc.key, kind.clone())
+            .await?;
 
     let reason_codes =
         decision::features::incode_watchlist::reason_codes_from_watchlist_result(&res, &obc.enhanced_aml);

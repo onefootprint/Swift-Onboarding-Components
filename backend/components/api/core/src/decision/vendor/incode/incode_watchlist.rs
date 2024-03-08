@@ -26,21 +26,21 @@ use newtypes::{
     VerificationRequestId, VerificationResultId,
 };
 
-use super::{
-    build_request,
-    incode::common::{
-        call_start_onboarding, map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs,
-        ShouldSaveVerificationRequest,
-    },
-    tenant_vendor_control::TenantVendorControl,
-    vendor_api::{
-        vendor_api_response::build_vendor_response_map_from_vendor_results,
-        vendor_api_struct::{IncodeUpdatedWatchlistResult, IncodeWatchlistCheck},
-    },
-    vendor_result::VendorResult,
-    verification_result,
-};
 use crate::{
+    decision::vendor::{
+        build_request,
+        incode::common::{
+            call_start_onboarding, map_to_api_err, save_incode_verification_result,
+            SaveVerificationResultArgs, ShouldSaveVerificationRequest,
+        },
+        tenant_vendor_control::TenantVendorControl,
+        vendor_api::{
+            vendor_api_response::build_vendor_response_map_from_vendor_results,
+            vendor_api_struct::{IncodeUpdatedWatchlistResult, IncodeWatchlistCheck},
+        },
+        vendor_result::VendorResult,
+        verification_result,
+    },
     enclave_client::EnclaveClient,
     errors::ApiResult,
     utils::vault_wrapper::{Any, VaultWrapper, VwArgs},

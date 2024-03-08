@@ -8,7 +8,6 @@ use self::tenant_vendor_control::TenantVendorControl;
 pub mod build_request;
 pub mod fp_device_attestation;
 pub mod incode;
-pub mod incode_watchlist;
 pub mod kyc;
 pub mod make_request;
 pub mod middesk;

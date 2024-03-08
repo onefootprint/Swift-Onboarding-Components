@@ -23,7 +23,7 @@ use crate::{
         utils::FixtureDecision,
         vendor::{
             self,
-            incode_watchlist::WatchlistCheckKind,
+            incode::incode_watchlist::WatchlistCheckKind,
             vendor_api::{
                 vendor_api_response::build_vendor_response_map_from_vendor_results,
                 vendor_api_struct::IncodeFetchOCR,
@@ -122,8 +122,13 @@ pub async fn run_aml_call(
         .map(|(vr, wr)| (vr.id, wr))
     } else {
         // maybe in future it might make sense to also re-use an existing search for AML calls we make from workflows?
-        vendor::incode_watchlist::run_watchlist_check(state, &di, &obc.key, WatchlistCheckKind::MakeNewSearch)
-            .await
+        vendor::incode::incode_watchlist::run_watchlist_check(
+            state,
+            &di,
+            &obc.key,
+            WatchlistCheckKind::MakeNewSearch,
+        )
+        .await
     }
 }
 
