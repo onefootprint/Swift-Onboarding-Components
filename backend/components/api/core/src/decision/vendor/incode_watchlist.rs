@@ -5,20 +5,17 @@ use db::{
         ob_configuration::ObConfiguration,
         scoped_vault::ScopedVault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
-        verification_result::VerificationResult,
     },
     DbPool,
 };
-use either::Either;
 use feature_flag::BoolFlag;
 use idv::{
     incode::{
-        response::OnboardingStartResponse,
         watchlist::{
             response::WatchlistResultResponse, IncodeUpdatedWatchlistResultRequest,
             IncodeWatchlistCheckRequest,
         },
-        IncodeClientErrorCustomFailureReasons, IncodeResponse, IncodeStartOnboardingRequest,
+        IncodeClientErrorCustomFailureReasons, IncodeResponse,
     },
     ParsedResponse, VendorResponse,
 };
@@ -31,6 +28,10 @@ use newtypes::{
 
 use super::{
     build_request,
+    incode::common::{
+        call_start_onboarding, map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs,
+        ShouldSaveVerificationRequest,
+    },
     tenant_vendor_control::TenantVendorControl,
     vendor_api::{
         vendor_api_response::build_vendor_response_map_from_vendor_results,
@@ -46,86 +47,35 @@ use crate::{
     ApiError, State,
 };
 
-// TODO: similar to what incode state machine does, would be nice to code share more here
-#[tracing::instrument(skip(db_pool, res, user_vault_public_key, api_or_vreq_id))]
-async fn save_vres_and_maybe_vreq<T: IncodeClientErrorCustomFailureReasons + serde::Serialize>(
+
+// Watchlist check saves Vreq first, so we wrap existing incode utils to just save vreq
+// For future us: This is just because we need IdvData, and we create that from `build_idv_data_from_verification_request` which requires a Vreq
+// We could just refactor so that the fn just takes a seqno, rather than a vreq
+#[tracing::instrument(skip(db_pool, res, user_vault_public_key, vreq_id))]
+async fn save_verification_result_for_watchlist_check<
+    T: IncodeClientErrorCustomFailureReasons + serde::Serialize,
+>(
     db_pool: &DbPool,
-    res: &IncodeResponse<T>,
+    res: &Result<IncodeResponse<T>, idv::incode::error::Error>,
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
-    api_or_vreq_id: Either<VendorAPI, VerificationRequestId>, // Since for now, the watchlist-result Vreq is written before the vres
-) -> ApiResult<VerificationResult> {
-    let is_error = res.result.is_error();
-    let raw_response = res.raw_response.clone();
-    let scrubbed_response = res
-        .result
-        .scrub()
-        .map_err(|e| ApiError::from(idv::Error::from(e)))
-        .unwrap_or(serde_json::json!({}).into());
+    vreq_id: VerificationRequestId,
+) -> ApiResult<VerificationResultId> {
+    let args = SaveVerificationResultArgs::new(
+        res,
+        di_id.clone(),
+        sv_id.clone(),
+        None,
+        user_vault_public_key.clone(),
+        ShouldSaveVerificationRequest::No(vreq_id),
+    );
 
-    let e_response =
-        verification_result::encrypt_verification_result_response(&raw_response, user_vault_public_key)?;
+    let (vres_id, _) = save_incode_verification_result(db_pool, args).await?;
 
-    let sv_id = sv_id.clone();
-    let di_id = di_id.clone();
-    let vres = db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let vreq_id = match api_or_vreq_id {
-                Either::Left(vendor_api) => {
-                    let vreq = VerificationRequest::create(conn, (&sv_id, &di_id, vendor_api).into())?;
-                    vreq.id
-                }
-                Either::Right(vreq_id) => vreq_id,
-            };
-
-            let vres = VerificationResult::create(conn, vreq_id, scrubbed_response, e_response, is_error)?;
-            Ok(vres)
-        })
-        .await?;
-    Ok(vres)
+    Ok(vres_id)
 }
 
-#[tracing::instrument(skip(state, user_vault_public_key, tvc))]
-async fn call_start_onboarding(
-    state: &State,
-    tvc: &TenantVendorControl,
-    sv_id: &ScopedVaultId,
-    di_id: &DecisionIntentId,
-    user_vault_public_key: &VaultPublicKey,
-) -> ApiResult<OnboardingStartResponse> {
-    // TODO: is it kosher to just call /omni/start before we do any watchlist-result call? Or is there a specific reason
-    // we need to track `interviewId` / `token` at a user level and re-use?
-    let request = IncodeStartOnboardingRequest {
-        credentials: tvc.incode_credentials(IncodeEnvironment::Production),
-        configuration_id: IncodeConfigurationId::from("65023dbdc221a0aba52791be".to_string()), // TODO: upstream this somewhere based on OBC, maybe not even necessary for watchlist
-        session_id: None, // for now we just make a new session everytime we do watchlist-result call to Incode
-        custom_name_fields: None, // TODO: this will be dropped from IncodeStartOnboardingRequest altogether. Was originally for doc scan but we decided we don't need even there
-    };
-    let res = state
-        .vendor_clients
-        .incode
-        .incode_start_onboarding
-        .make_request(request)
-        .await
-        .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-
-    save_vres_and_maybe_vreq(
-        &state.db_pool,
-        &res,
-        sv_id,
-        di_id,
-        user_vault_public_key,
-        Either::Left(VendorAPI::IncodeStartOnboarding),
-    )
-    .await?;
-
-    let res = res
-        .result
-        .into_success()
-        .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-    Ok(res)
-}
 
 #[tracing::instrument(skip(state, user_vault_public_key, credentials))]
 async fn call_watchlist_result(
@@ -135,7 +85,7 @@ async fn call_watchlist_result(
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
     kind: WatchlistCheckKind,
-) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
+) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
     let svid = sv_id.clone();
     let diid = di_id.clone();
     let vendor_api: VendorAPI = kind.clone().into();
@@ -151,7 +101,7 @@ async fn call_watchlist_result(
         build_request::build_idv_data_from_verification_request(&state.db_pool, &state.enclave_client, vreq)
             .await?;
 
-    let (vres, res) = match kind {
+    let (vres_id, res) = match kind {
         WatchlistCheckKind::MakeNewSearch => {
             let res = state
                 .vendor_clients
@@ -161,22 +111,22 @@ async fn call_watchlist_result(
                     credentials,
                     idv_data,
                 })
-                .await
-                .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-            let vres = save_vres_and_maybe_vreq(
+                .await;
+            let vres_id = save_verification_result_for_watchlist_check(
                 &state.db_pool,
                 &res,
                 sv_id,
                 di_id,
                 user_vault_public_key,
-                Either::Right(vreq_id),
+                vreq_id,
             )
             .await?;
             let res = res
+                .map_err(map_to_api_err)?
                 .result
                 .into_success()
                 .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-            (vres, res)
+            (vres_id, res)
         }
 
         WatchlistCheckKind::GetUpdatedResults(ref_) => {
@@ -188,27 +138,27 @@ async fn call_watchlist_result(
                     credentials,
                     ref_: ref_.clone(),
                 })
-                .await
-                .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-            let vres = save_vres_and_maybe_vreq(
+                .await;
+            let vres_id = save_verification_result_for_watchlist_check(
                 &state.db_pool,
                 &res,
                 sv_id,
                 di_id,
                 user_vault_public_key,
-                Either::Right(vreq_id),
+                vreq_id,
             )
             .await?;
             let res = res
+                .map_err(map_to_api_err)?
                 .result
                 .into_success()
                 .map_err(|e| ApiError::from(idv::Error::from(e)))?
                 .0;
-            (vres, res)
+            (vres_id, res)
         }
     };
 
-    Ok((vres, res))
+    Ok((vres_id, res))
 }
 
 #[tracing::instrument(skip(state, tvc, user_vault_public_key))]
@@ -219,8 +169,10 @@ pub async fn make_watchlist_result_call(
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
     kind: WatchlistCheckKind,
-) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
-    let res = call_start_onboarding(state, tvc, sv_id, di_id, user_vault_public_key).await?;
+) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
+    // TODO: upstream this somewhere based on OBC, maybe not even necessary for watchlist
+    let config_id = IncodeConfigurationId::from("65023dbdc221a0aba52791be".to_string());
+    let res = call_start_onboarding(state, tvc, sv_id, di_id, user_vault_public_key, config_id).await?;
 
     let token = res.token;
     let incode_credentials = IncodeCredentialsWithToken {
@@ -315,7 +267,7 @@ pub async fn run_watchlist_check(
             kind,
         )
         .await
-        .map(|(vr, wr)| (vr.id, wr)) //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
+        .map(|(vres_id, wr)| (vres_id, wr)) //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
     } else {
         save_canned_response(
             state,

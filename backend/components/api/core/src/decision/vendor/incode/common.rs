@@ -165,7 +165,7 @@ pub fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
 
 
 #[tracing::instrument(skip(state, user_vault_public_key, tvc))]
-async fn call_start_onboarding(
+pub async fn call_start_onboarding(
     state: &State,
     tvc: &TenantVendorControl,
     sv_id: &ScopedVaultId,
