@@ -1333,7 +1333,10 @@
         }
       },
       "country-and-type-selection": {
-        "title": "Escanear o subir tu identificación",
+        "title": {
+          "id": "Escanear o subir tu identificación",
+          "poa": "Escanee o cargue su comprobante de domicilio."
+        },
         "subtitle": "Necesitamos más información sobre tu identidad.",
         "form": {
           "country": "País",

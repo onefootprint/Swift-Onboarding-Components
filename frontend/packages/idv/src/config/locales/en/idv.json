@@ -1332,7 +1332,10 @@
         }
       },
       "country-and-type-selection": {
-        "title": "Scan or upload your ID",
+        "title": {
+          "id": "Scan or upload your ID",
+          "poa": "Scan or upload your proof of address"
+        },
         "subtitle": "We need some more information about your identity.",
         "form": {
           "country": "Country",

@@ -96,6 +96,7 @@ const IdDocCountryAndTypeContainer = ({
 
   const types: SupportedIdDocTypes[] =
     supportedCountryAndDocTypes[country.value] ?? [];
+  const isPoA = types.includes(SupportedIdDocTypes.proofOfAddress);
   const firstTypeFromOptions = types.length
     ? types[0]
     : SupportedIdDocTypes.passport;
@@ -182,7 +183,10 @@ const IdDocCountryAndTypeContainer = ({
             : undefined
         }
       />
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+      <HeaderTitle
+        title={isPoA ? t('title.poa') : t('title.id')}
+        subtitle={t('subtitle')}
+      />
       <InputsContainer>
         <CountrySelect
           data-private
