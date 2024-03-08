@@ -121,6 +121,7 @@ def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
         first_name=first_name,
         last_name=last_name,
         redirect_url="http://localhost:3001/auth",
+        omit_email_invite=True,
     )
     body = post("org/members", user_data, tenant.auth_token)
     assert not body["rolebinding"]["last_login_at"]

@@ -72,7 +72,7 @@ def test_sdk_args(sandbox_tenant):
                 "auth_token": "tok_12345",
                 "public_key": obc_key,
                 "user_data": {
-                    "id.email": "hayesvalley@onefootprint.com",
+                    "id.email": "sandbox@onefootprint.com",
                     "id.phone_number": "incorrect phone number",
                     "id.citizenships": ["US", "TR"],
                 },
@@ -138,7 +138,7 @@ def test_sdk_args(sandbox_tenant):
             "data": {
                 "public_key": obc_key,
                 "user_data": {
-                    "id.email": "hayesvalley@onefootprint.com",
+                    "id.email": "sandbox@onefootprint.com",
                     "id.phone_number": "incorrect phone number",
                 },
             },
@@ -148,7 +148,7 @@ def test_sdk_args(sandbox_tenant):
             "data": {
                 "public_key": obc_key,
                 "user_data": {
-                    "id.email": "hayesvalley@onefootprint.com",
+                    "id.email": "sandbox@onefootprint.com",
                     "id.phone_number": "incorrect phone number",
                 },
                 "options": {
