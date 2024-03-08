@@ -15,8 +15,9 @@ use api_core::{
     utils::{headers::SandboxId, session::AuthSession},
     State,
 };
-use api_wire_types::{IdentifiedUser, IdentifyRequest, IdentifyResponse};
+use api_wire_types::{IdentifiedUser, IdentifyId, IdentifyRequest, IdentifyResponse};
 use db::models::scoped_vault::ScopedVault;
+use itertools::Itertools;
 use newtypes::{
     email::Email, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, PhoneNumber, SessionAuthToken,
     UserAuthScope, VaultId,
@@ -40,14 +41,27 @@ pub async fn post(
     user_auth: Option<UserAuthContext>,
     root_span: RootSpan,
 ) -> JsonApiResponse<IdentifyResponse> {
-    let IdentifyRequest { identifier, scope } = request.into_inner();
+    let IdentifyRequest {
+        identifier,
+        email,
+        phone_number,
+        scope,
+    } = request.into_inner();
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
     let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.purpose.is_from_api());
 
     // Look up existing user vault by identifier
+    let identifiers = vec![
+        email.as_ref().map(|e| IdentifyId::Email(e.clone())),
+        phone_number.as_ref().map(|e| IdentifyId::PhoneNumber(e.clone())),
+        identifier,
+    ]
+    .into_iter()
+    .flatten()
+    .collect_vec();
     let args = GetIdentifyChallengeArgs {
         user_auth: user_auth.clone(),
-        identifiers: identifier.into_iter().collect(),
+        identifiers,
         sandbox_id: sandbox_id.0,
         obc: ob_context.clone(),
         root_span,

@@ -7,8 +7,8 @@ use db_schema::schema::{
 use diesel::{dsl::not, pg::Pg, prelude::*, upsert::on_constraint, Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked,
-    SandboxId, ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
+    output::Csv, DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId,
+    IdentityDataKind as IDK, Locked, SandboxId, ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
 };
 
 use super::ob_configuration::IsLive;
@@ -257,6 +257,7 @@ impl Vault {
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Clone, Copy)]
 /// When selecting which vault to log into of many vaults matching a Fingerprint, this struct
 /// represents the order-able Priority of each.
+/// We select the vault that has the maximum Priority.
 pub(crate) struct Priority {
     //
     // These are the two most important ordering criteria.
@@ -283,8 +284,19 @@ pub(crate) struct Priority {
     pub(crate) num_portable_dis: usize,
     /// Prefer vaults created via Footprint's UI vs via tenant-facing API
     pub(crate) is_created_via_bifrost: bool,
+    /// Prefer vaults matching a phone number fingerprint over an email fingerprint
+    pub(crate) matching_fp_priority: usize,
     /// All else equal, just get the most recently created vault
     pub(crate) created_at: DateTime<Utc>,
+}
+
+/// Prefer vaults matching a phone number fingerprint over an email fingerprint
+fn matching_fp_priority(di: &DataIdentifier) -> usize {
+    match di {
+        DataIdentifier::Id(IDK::PhoneNumber) => 2,
+        DataIdentifier::Id(IDK::Email) => 1,
+        _ => 0,
+    }
 }
 
 pub struct LocatedVault {
@@ -410,11 +422,16 @@ impl Vault {
                     .get(&vault.id)
                     .map(|dis| dis.len())
                     .unwrap_or_default();
+                let matching_fp_priority = vault_id_to_matching_dis
+                    .get(&vault.id)
+                    .and_then(|dis| dis.iter().map(matching_fp_priority).max())
+                    .unwrap_or_default();
                 let priority = Priority {
                     has_sv_at_tenant,
                     num_svs: svs.len(),
                     num_portable_dis,
                     is_created_via_bifrost: !vault.is_created_via_api,
+                    matching_fp_priority,
                     created_at: vault.created_at,
                 };
                 (priority, vault)

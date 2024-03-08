@@ -16,7 +16,10 @@ pub enum IdentifyId {
 #[derive(Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyRequest {
+    /// TODO deprecate
     pub identifier: Option<IdentifyId>,
+    pub email: Option<Email>,
+    pub phone_number: Option<PhoneNumber>,
     /// Determines which scopes the issued auth token will have. Request the correct scopes for
     /// your use case in order to get the least permissions required
     #[openapi(required)]

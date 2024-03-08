@@ -3680,7 +3680,14 @@
             "IdentifyRequest": {
                 "type": "object",
                 "properties": {
+                    "email": {
+                        "type": "string"
+                    },
                     "identifier": {
+                        "description": "TODO deprecate",
+                        "type": "string"
+                    },
+                    "phone_number": {
                         "type": "string"
                     },
                     "scope": {

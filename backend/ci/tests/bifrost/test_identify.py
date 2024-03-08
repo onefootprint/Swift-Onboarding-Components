@@ -215,6 +215,32 @@ def test_identify_with_non_portable_api_vault(
     assert body["id.first_name"] == "From Tenant C"
 
 
+def test_multi_identify(sandbox_user, sandbox_tenant):
+    """
+    Test identify queries with different amounts of matching data
+    """
+    sandbox_id = sandbox_user.client.sandbox_id
+    sandbox_id_h = SandboxId(sandbox_id)
+    email = sandbox_user.client.data["id.email"]
+    phone_number = sandbox_user.client.data["id.phone_number"]
+    obc = sandbox_tenant.default_ob_config
+
+    # Identify the user, and get a token in exchange
+    data = dict(phone_number=phone_number, email=email, scope="onboarding")
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
+    assert set(body["user"]["matching_fps"]) == {"id.phone_number", "id.email"}
+
+    data = dict(
+        phone_number=phone_number, email="flerp@onefootprint.com", scope="onboarding"
+    )
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
+    assert set(body["user"]["matching_fps"]) == {"id.phone_number"}
+
+    data = dict(phone_number="+15555555555", email=email, scope="onboarding")
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
+    assert set(body["user"]["matching_fps"]) == {"id.email"}
+
+
 def test_modern_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
     """
     The more modern version if the identify flow will issue a token after POST /hosted/identify.
