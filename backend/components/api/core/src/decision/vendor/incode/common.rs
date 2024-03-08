@@ -5,14 +5,22 @@ use db::{
     },
     DbPool,
 };
-use idv::incode::{IncodeClientErrorCustomFailureReasons, IncodeResponse};
+use idv::incode::{
+    response::OnboardingStartResponse, IncodeClientErrorCustomFailureReasons, IncodeResponse,
+    IncodeStartOnboardingRequest,
+};
 use newtypes::{
-    DecisionIntentId, IdentityDocumentId, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue, VaultPublicKey,
-    VendorAPI, VerificationRequestId, VerificationResultId,
+    DecisionIntentId, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment, PiiJsonValue,
+    ScopedVaultId, ScrubbedPiiJsonValue, VaultPublicKey, VendorAPI, VerificationRequestId,
+    VerificationResultId,
 };
 
 use crate::{
-    decision::vendor::verification_result::encrypt_verification_result_response, errors::ApiResult, ApiError,
+    decision::vendor::{
+        tenant_vendor_control::TenantVendorControl, verification_result::encrypt_verification_result_response,
+    },
+    errors::ApiResult,
+    ApiError, State,
 };
 
 use super::IncodeContext;
@@ -153,4 +161,46 @@ pub async fn save_incode_verification_result(
 
 pub fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
     ApiError::from(idv::Error::from(e))
+}
+
+
+#[tracing::instrument(skip(state, user_vault_public_key, tvc))]
+async fn call_start_onboarding(
+    state: &State,
+    tvc: &TenantVendorControl,
+    sv_id: &ScopedVaultId,
+    di_id: &DecisionIntentId,
+    user_vault_public_key: &VaultPublicKey,
+    configuration_id: IncodeConfigurationId,
+) -> ApiResult<OnboardingStartResponse> {
+    let request = IncodeStartOnboardingRequest {
+        credentials: tvc.incode_credentials(IncodeEnvironment::Production),
+        configuration_id,
+        session_id: None,
+        custom_name_fields: None, // TODO: this will be dropped from IncodeStartOnboardingRequest altogether. Was originally for doc scan but we decided we don't need even there
+    };
+    let res = state
+        .vendor_clients
+        .incode
+        .incode_start_onboarding
+        .make_request(request)
+        .await;
+
+    let args = SaveVerificationResultArgs::new(
+        &res,
+        di_id.clone(),
+        sv_id.clone(),
+        None,
+        user_vault_public_key.clone(),
+        ShouldSaveVerificationRequest::Yes(VendorAPI::IncodeStartOnboarding),
+    );
+
+    save_incode_verification_result(&state.db_pool, args).await?;
+
+    let res = res
+        .map_err(map_to_api_err)?
+        .result
+        .into_success()
+        .map_err(map_to_api_err)?;
+    Ok(res)
 }
