@@ -80,7 +80,7 @@ const GlobalStyle = createGlobalStyle`
       --page-aside-nav-api-reference-width: 420px;
       --page-aside-nav-api-reference-width-small: 320px;
       --page-sections-width: 240px;
-      --page-content-width: 720px;
+      --page-content-width: 800px;
 
       ${media.greaterThan('sm')`
         --header-height: 56px;

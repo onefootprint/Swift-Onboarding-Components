@@ -144,7 +144,9 @@ const Container = styled(Markdown)`
       border-radius: ${theme.borderRadius.default};
       border: 1px solid ${theme.borderColor.tertiary};
       margin-bottom: ${theme.spacing[9]};
-      width: 100%;
+      width: auto;
+      display: block;
+      overflow-x: auto;
 
       tr:not(:last-child) td {
         border-bottom: 1px solid ${theme.borderColor.tertiary};
@@ -161,18 +163,13 @@ const Container = styled(Markdown)`
           white-space: nowrap;
         }
         td:nth-child(2) {
-          min-width: ${theme.spacing[12]};
+          min-width: 180px;
         } 
       `}
 
-      tr:has(> :nth-child(2):last-child) {
-        td {
-          width: 50%;
-        }
-      }
-
       th {
         ${createFontStyles('caption-1')};
+        white-space: nowrap;
         background: ${theme.backgroundColor.secondary};
         border-bottom: 1px solid ${theme.borderColor.tertiary};
         border-radius: ${theme.borderRadius.default}
