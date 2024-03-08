@@ -40,6 +40,7 @@ struct NewVerificationRequestRow {
     decision_intent_id: DecisionIntentId,
 }
 
+#[derive(Clone)]
 pub struct NewVerificationRequestArgs<'a> {
     pub scoped_vault_id: &'a ScopedVaultId,
     pub decision_intent_id: &'a DecisionIntentId,
@@ -71,6 +72,32 @@ impl<'a> From<(&'a ScopedVaultId, &'a DecisionIntentId, VendorAPI)> for NewVerif
             decision_intent_id,
             vendor_api,
             identity_document_id: None,
+        }
+    }
+}
+
+impl<'a>
+    From<(
+        &'a ScopedVaultId,
+        &'a DecisionIntentId,
+        Option<&'a IdentityDocumentId>,
+        VendorAPI,
+    )> for NewVerificationRequestArgs<'a>
+{
+    fn from(
+        value: (
+            &'a ScopedVaultId,
+            &'a DecisionIntentId,
+            Option<&'a IdentityDocumentId>,
+            VendorAPI,
+        ),
+    ) -> Self {
+        let (scoped_vault_id, decision_intent_id, identity_document_id, vendor_api) = value;
+        NewVerificationRequestArgs {
+            scoped_vault_id,
+            decision_intent_id,
+            vendor_api,
+            identity_document_id,
         }
     }
 }

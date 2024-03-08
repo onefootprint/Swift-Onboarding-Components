@@ -2,16 +2,22 @@ use std::{str::FromStr, sync::Arc};
 
 use chrono::Utc;
 use db::models::{
-    decision_intent::DecisionIntent, document_upload::DocumentUpload, identity_document::IdentityDocument,
-    incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
-    verification_request::VerificationRequest,
+    decision_intent::DecisionIntent,
+    document_upload::DocumentUpload,
+    identity_document::IdentityDocument,
+    incode_verification_session::IncodeVerificationSession,
+    ob_configuration::ObConfiguration,
+    verification_request::{NewVerificationRequestArgs, VerificationRequest},
 };
 
 mod start_onboarding;
 
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
-use newtypes::incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType};
+use newtypes::{
+    incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType},
+    DecisionIntentId, IdentityDocumentId, VaultPublicKey, VerificationRequestId,
+};
 pub use start_onboarding::*;
 
 mod add_front;
@@ -89,25 +95,39 @@ impl VerificationSession {
     }
 }
 
+pub enum ShouldSaveVerificationRequest {
+    Yes(VendorAPI),
+    No(VerificationRequestId),
+}
 /// Struct to make sure we handle the different cases of Incode vendor call errors we may see
-struct SaveVerificationResultArgs<'a> {
+struct SaveVerificationResultArgs {
     is_error: bool,
     raw_response: PiiJsonValue,
     scrubbed_response: ScrubbedPiiJsonValue,
-    vendor_api: VendorAPI,
-    ctx: &'a IncodeContext,
+    vault_public_key: VaultPublicKey,
+    should_save_verification_request: ShouldSaveVerificationRequest,
+    decision_intent_id: DecisionIntentId,
+    scoped_vault_id: ScopedVaultId,
+    identity_document_id: Option<IdentityDocumentId>,
 }
 
-impl<'a> SaveVerificationResultArgs<'a> {
-    fn from<T: IncodeClientErrorCustomFailureReasons + serde::Serialize>(
+impl SaveVerificationResultArgs {
+    fn from<'a, T>(
         request_result: &'a Result<IncodeResponse<T>, idv::incode::error::Error>,
         // TODO make VendorAPI a function of T
         vendor_api: VendorAPI,
         ctx: &'a IncodeContext,
-    ) -> Self {
+    ) -> Self
+    where
+        T: IncodeClientErrorCustomFailureReasons + serde::Serialize,
+    {
         // We need to handle saving if
         // 1) if the Incode call fails (for some reason)
         // 2) if the Incode response succeeds but there's an error returned
+        let decision_intent_id = ctx.di_id.clone();
+        let vault_public_key = ctx.vault.public_key.clone();
+        let scoped_vault_id = ctx.sv_id.clone();
+        let identity_document_id = Some(ctx.id_doc_id.clone());
         match request_result {
             Ok(response) => {
                 let is_error = response.result.is_error();
@@ -122,46 +142,62 @@ impl<'a> SaveVerificationResultArgs<'a> {
                     is_error,
                     raw_response,
                     scrubbed_response,
-                    vendor_api,
-                    ctx,
+                    should_save_verification_request: ShouldSaveVerificationRequest::Yes(vendor_api),
+                    decision_intent_id,
+                    vault_public_key,
+                    scoped_vault_id,
+                    identity_document_id,
                 }
             }
             Err(_) => Self {
                 is_error: true,
                 raw_response: serde_json::json!("").into(),
                 scrubbed_response: serde_json::json!("").into(),
-                vendor_api,
-                ctx,
+                should_save_verification_request: ShouldSaveVerificationRequest::Yes(vendor_api),
+                decision_intent_id,
+                vault_public_key,
+                scoped_vault_id,
+                identity_document_id,
             },
         }
     }
 }
 
-async fn save_incode_verification_result<'a>(
+async fn save_incode_verification_result(
     db_pool: &DbPool,
-    args: SaveVerificationResultArgs<'a>,
+    args: SaveVerificationResultArgs,
 ) -> ApiResult<VerificationResult> {
     let SaveVerificationResultArgs {
         scrubbed_response,
         raw_response,
         is_error,
-        vendor_api,
-        ctx,
+        should_save_verification_request,
+        decision_intent_id,
+        vault_public_key,
+        scoped_vault_id,
+        identity_document_id,
     } = args;
-    let e_response = encrypt_verification_result_response(&raw_response, &ctx.vault.public_key)?;
-    let sv_id = ctx.sv_id.clone();
-    let id_doc_id = ctx.id_doc_id.clone();
-    let di_id = ctx.di_id.clone();
+    let e_response = encrypt_verification_result_response(&raw_response, &vault_public_key)?;
     let result = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // This is interesting - we make the VReq and VRes at the same time.
             // In other vendor APIs, the only bookkeeping we have for an outstanding vendor request
             // is a VReq without a VRes - for the document workflow, we have the incode state
             // machine that tells us what state we're in.
-            let req = VerificationRequest::create_document_verification_request(
-                conn, vendor_api, sv_id, id_doc_id, &di_id,
-            )?;
-            let res = VerificationResult::create(conn, req.id, scrubbed_response, e_response, is_error)?;
+            let vreq_id = match should_save_verification_request {
+                ShouldSaveVerificationRequest::Yes(vendor_api) => {
+                    let args = NewVerificationRequestArgs {
+                        scoped_vault_id: &scoped_vault_id,
+                        identity_document_id: identity_document_id.as_ref(),
+                        decision_intent_id: &decision_intent_id,
+                        vendor_api,
+                    };
+                    let vreq = VerificationRequest::create(conn, args)?;
+                    vreq.id
+                }
+                ShouldSaveVerificationRequest::No(vreq_id) => vreq_id,
+            };
+            let res = VerificationResult::create(conn, vreq_id, scrubbed_response, e_response, is_error)?;
 
             Ok(res)
         })
