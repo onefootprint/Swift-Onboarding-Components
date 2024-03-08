@@ -4003,6 +4003,34 @@
             }
         },
         "/org/lists": {
+            "get": {
+                "tags": [
+                    "Organization",
+                    "Private",
+                    "Lists"
+                ],
+                "description": "Retrieves all Lists for the Tenant",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/List"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Organization",
@@ -4027,6 +4055,93 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/List"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/lists/{list_id}/entries": {
+            "get": {
+                "tags": [
+                    "Organization",
+                    "Private",
+                    "Lists"
+                ],
+                "description": "Retrieves all entries of a list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "list_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ListEntry"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Organization",
+                    "Private",
+                    "Lists"
+                ],
+                "description": "Creates a new list entry",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "list_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateListEntryRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListEntry"
                                 }
                             }
                         }
@@ -6709,6 +6824,17 @@
                     "token"
                 ]
             },
+            "CreateListEntryRequest": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "data"
+                ]
+            },
             "CreateListRequest": {
                 "type": "object",
                 "properties": {
@@ -6805,6 +6931,36 @@
                             "BusinessCorporationType",
                             "InvestorProfile",
                             "Card"
+                        ]
+                    },
+                    "document_types_and_countries": {
+                        "type": "object",
+                        "properties": {
+                            "country_specific": {
+                                "type": "object"
+                            },
+                            "global": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "id_card",
+                                        "drivers_license",
+                                        "passport",
+                                        "passport_card",
+                                        "permit",
+                                        "visa",
+                                        "residence_document",
+                                        "voter_identification",
+                                        "ssn_card",
+                                        "proof_of_address"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "country_specific",
+                            "global"
                         ]
                     },
                     "enhanced_aml": {
@@ -16338,6 +16494,33 @@
                     "statuses"
                 ]
             },
+            "ListEntry": {
+                "type": "object",
+                "properties": {
+                    "actor": {
+                        "type": "string",
+                        "enum": [
+                            "footprint"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "data": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "actor",
+                    "created_at",
+                    "data",
+                    "id"
+                ]
+            },
             "LivenessEvent": {
                 "description": "Describes a liveness event that took place",
                 "type": "object",
@@ -16514,6 +16697,36 @@
                                         "BusinessCorporationType",
                                         "InvestorProfile",
                                         "Card"
+                                    ]
+                                },
+                                "document_types_and_countries": {
+                                    "type": "object",
+                                    "properties": {
+                                        "country_specific": {
+                                            "type": "object"
+                                        },
+                                        "global": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "id_card",
+                                                    "drivers_license",
+                                                    "passport",
+                                                    "passport_card",
+                                                    "permit",
+                                                    "visa",
+                                                    "residence_document",
+                                                    "voter_identification",
+                                                    "ssn_card",
+                                                    "proof_of_address"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "country_specific",
+                                        "global"
                                     ]
                                 },
                                 "enhanced_aml": {
@@ -17409,6 +17622,36 @@
                             "BusinessCorporationType",
                             "InvestorProfile",
                             "Card"
+                        ]
+                    },
+                    "document_types_and_countries": {
+                        "type": "object",
+                        "properties": {
+                            "country_specific": {
+                                "type": "object"
+                            },
+                            "global": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "id_card",
+                                        "drivers_license",
+                                        "passport",
+                                        "passport_card",
+                                        "permit",
+                                        "visa",
+                                        "residence_document",
+                                        "voter_identification",
+                                        "ssn_card",
+                                        "proof_of_address"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "country_specific",
+                            "global"
                         ]
                     },
                     "enhanced_aml": {
@@ -19205,7 +19448,7 @@
                     "custom.ach_account_number": "1234567890",
                     "custom.cc_last_4": "4242"
                 },
-                "description": "Key-value map of data to add to the vault",
+                "description": "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/apis#vault-fields).",
                 "type": "object",
                 "properties": {
                     "<key>": {

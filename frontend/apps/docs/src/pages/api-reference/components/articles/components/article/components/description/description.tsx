@@ -1,45 +1,71 @@
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import A from 'src/components/article/components/markdown-components/a';
 import styled, { css } from 'styled-components';
 
 type DescriptionProps = {
   children: string;
 };
 
-const Description = ({ children }: DescriptionProps) => {
+const Description = ({ children }: DescriptionProps) => (
+  <Content>{parseElements(children)}</Content>
+);
+
+/**
+ * The descriptions of fields may include markdown-esque syntax for a few common elements,
+ * like `monospace` and [link](href).
+ * This parses the textual description into a list of elements to render for the description.
+ */
+const parseElements = (text: string) => {
   const elements = [];
-  let startIndex = 0;
-
-  while (startIndex < children.length) {
-    const startMarkerIndex = children.indexOf('`', startIndex);
-
-    if (startMarkerIndex === -1) {
-      elements.push(children.substring(startIndex));
-      break;
-    } else {
-      elements.push(children.substring(startIndex, startMarkerIndex));
-
-      const endMarkerIndex = children.indexOf('`', startMarkerIndex + 1);
-      if (endMarkerIndex === -1) {
+  let i = 0;
+  let lastIdx = 0;
+  for (i = 0; i < text.length; i += 1) {
+    if (text[i] === '`') {
+      elements.push(text.substring(lastIdx, i));
+      // Process monospace with syntax`monospaceText`
+      const startIdx = i + 1;
+      const nextBacktickOffset = text.substring(startIdx).indexOf('`');
+      if (nextBacktickOffset === -1) {
         console.error('Mismatched backticks in text');
-        elements.push(children.substring(startMarkerIndex));
-        break;
-      } else {
-        const codeText = children.substring(
-          startMarkerIndex + 1,
-          endMarkerIndex,
-        );
-        elements.push(
-          <CodeInline disabled size="compact" key={endMarkerIndex}>
-            {codeText}
-          </CodeInline>,
-        );
-        startIndex = endMarkerIndex + 1;
+        // eslint-disable-next-line no-continue
+        continue;
       }
+      const endIdx = startIdx + nextBacktickOffset;
+      const monospaceText = text.substring(startIdx, endIdx);
+      elements.push(
+        <CodeInline disabled size="compact" key={i}>
+          {monospaceText}
+        </CodeInline>,
+      );
+      i = endIdx + 1;
+      lastIdx = i;
+    }
+    if (text[i] === '[') {
+      elements.push(text.substring(lastIdx, i));
+      // Process links with syntax [linkText](link)
+      const textStartIdx = i + 1;
+      const closingBraceOffset = text.substring(textStartIdx).indexOf('](');
+      if (closingBraceOffset === -1) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      const textEndIdx = textStartIdx + closingBraceOffset;
+      const closingParenOffset = text.substring(textEndIdx).indexOf(')');
+      if (closingParenOffset === -1) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      const linkEndIdx = textEndIdx + closingParenOffset;
+      const linkText = text.substring(textStartIdx, textEndIdx);
+      const link = text.substring(textEndIdx + 2, linkEndIdx);
+      elements.push(<A href={link}>{linkText}</A>);
+      i = linkEndIdx + 1;
+      lastIdx = i;
     }
   }
-
-  return <Content>{elements}</Content>;
+  elements.push(text.substring(lastIdx, i));
+  return elements;
 };
 
 const Content = styled.p`
