@@ -10,7 +10,6 @@ export {
   useSkipLiveness,
   useUpdateD2PStatus,
   useUserData,
-  useUserEmail,
   useUserToken,
 } from './api';
 export type { DeviceInfo } from './ui';

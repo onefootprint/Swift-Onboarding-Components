@@ -10,6 +10,7 @@ import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import useSyncData from '../../hooks/use-sync-data';
+import type { KycData } from '../../utils/data-types';
 import { getSsnKind } from '../../utils/ssn-utils';
 import SSN4 from './components/ssn4';
 import SSN9 from './components/ssn9';
@@ -17,7 +18,7 @@ import useConvertFormData from './hooks/use-convert-form-data';
 import type { FormData } from './types';
 
 type SSNProps = {
-  onComplete?: () => void;
+  onComplete?: (args: KycData) => void;
   onCancel?: () => void;
   ctaLabel?: string;
   hideDisclaimer?: boolean;
@@ -80,16 +81,14 @@ const SSN = ({
   };
 
   const onSubmitForm = (formData: FormData) => {
-    const convertedData = convertFormData(formData);
     syncData({
-      data: convertedData,
-      speculative: true,
-      onSuccess: () => {
+      data: convertFormData(formData),
+      onSuccess: cleanData => {
         send({
           type: 'dataSubmitted',
-          payload: convertedData,
+          payload: cleanData,
         });
-        onComplete?.();
+        onComplete?.(cleanData);
       },
       onError: handleSyncDataError,
     });
@@ -101,7 +100,7 @@ const SSN = ({
       type: 'dataSubmitted',
       payload: convertedData,
     });
-    onComplete?.();
+    onComplete?.(convertedData);
   };
 
   const handleSkip = () => {

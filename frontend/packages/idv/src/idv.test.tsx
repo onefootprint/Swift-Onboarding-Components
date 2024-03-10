@@ -47,7 +47,6 @@ import {
   withOnboardingValidate,
   withRequirements,
   withUserVault,
-  withUserVaultValidate,
 } from './idv.test.config';
 import type { IdvProps } from './types';
 
@@ -166,7 +165,6 @@ describe('<Idv />', () => {
 
   describe('When initialized with an auth token', () => {
     beforeEach(() => {
-      withUserVaultValidate();
       withUserVault();
       withAuthorize();
       const config = getKycOnboardingConfig(true);
@@ -226,7 +224,6 @@ describe('<Idv />', () => {
           TestAuthorizeRequirement,
         ]);
         withIdentify(true, true);
-        withUserVaultValidate();
         withUserVault();
 
         renderIdv({
@@ -261,7 +258,6 @@ describe('<Idv />', () => {
         withOnboarding(config);
         withOnboardingConfig(config);
         withIdentify(true, true);
-        withUserVaultValidate();
         withUserVault();
         withRequirements([
           {

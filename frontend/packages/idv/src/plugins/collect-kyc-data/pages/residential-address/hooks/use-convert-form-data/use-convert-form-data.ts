@@ -7,52 +7,75 @@ import type { FormData } from '../../types';
 const useConvertFormData = () => {
   const [machineState] = useCollectKycDataMachine();
   const { data } = machineState.context;
-  const isAddressLine1Disabled = data?.[IdDI.addressLine1]?.disabled;
-  const isAddressLine2Disabled = data?.[IdDI.addressLine2]?.disabled;
-  const isCityDisabled = data?.[IdDI.city]?.disabled;
-  const isStateDisabled = data?.[IdDI.state]?.disabled;
-  const isZipDisabled = data?.[IdDI.zip]?.disabled;
-  const isCountryDisabled = data?.[IdDI.country]?.disabled;
 
   return (formData: FormData) => {
     const convertedData: KycData = {};
     const { addressLine1, addressLine2, city, state, zip, country } = formData;
 
-    if (!isAddressLine1Disabled) {
-      convertedData[IdDI.addressLine1] = {
-        value: addressLine1,
-      };
-    }
+    const isAddressLine1Changed =
+      addressLine1 !== data[IdDI.addressLine1]?.value;
+    convertedData[IdDI.addressLine1] = {
+      value: addressLine1,
+      dirty: isAddressLine1Changed,
+      bootstrap: isAddressLine1Changed
+        ? false
+        : data[IdDI.addressLine1]?.bootstrap,
+      disabled: data[IdDI.addressLine1]?.disabled ?? false,
+      decrypted: isAddressLine1Changed
+        ? false
+        : data[IdDI.addressLine1]?.decrypted,
+    };
 
-    if (!isAddressLine2Disabled) {
-      convertedData[IdDI.addressLine2] = {
-        value: addressLine2,
-      };
-    }
+    const isAddressLine2Changed =
+      addressLine2 !== data[IdDI.addressLine2]?.value;
+    convertedData[IdDI.addressLine2] = {
+      value: addressLine2,
+      dirty: isAddressLine2Changed,
+      bootstrap: isAddressLine2Changed
+        ? false
+        : data[IdDI.addressLine2]?.bootstrap,
+      disabled: data[IdDI.addressLine2]?.disabled ?? false,
+      decrypted: isAddressLine2Changed
+        ? false
+        : data[IdDI.addressLine2]?.decrypted,
+    };
 
-    if (!isCityDisabled) {
-      convertedData[IdDI.city] = {
-        value: city,
-      };
-    }
+    const isCityChanged = city !== data[IdDI.city]?.value;
+    convertedData[IdDI.city] = {
+      value: city,
+      dirty: isCityChanged,
+      bootstrap: isCityChanged ? false : data[IdDI.city]?.bootstrap,
+      disabled: data[IdDI.city]?.disabled ?? false,
+      decrypted: isCityChanged ? false : data[IdDI.city]?.decrypted,
+    };
 
-    if (!isStateDisabled) {
-      convertedData[IdDI.state] = {
-        value: typeof state === 'object' ? state.value : state,
-      };
-    }
+    const newValue = typeof state === 'object' ? state.value : state;
+    const isStateChanged = newValue !== data[IdDI.state]?.value;
+    convertedData[IdDI.state] = {
+      value: newValue,
+      dirty: isStateChanged,
+      bootstrap: isStateChanged ? false : data[IdDI.state]?.bootstrap,
+      disabled: data[IdDI.state]?.disabled ?? false,
+      decrypted: isStateChanged ? false : data[IdDI.state]?.decrypted,
+    };
 
-    if (!isZipDisabled) {
-      convertedData[IdDI.zip] = {
-        value: zip,
-      };
-    }
+    const isZipChanged = zip !== data[IdDI.zip]?.value;
+    convertedData[IdDI.zip] = {
+      value: zip,
+      dirty: isZipChanged,
+      bootstrap: isZipChanged ? false : data[IdDI.zip]?.bootstrap,
+      disabled: data[IdDI.zip]?.disabled ?? false,
+      decrypted: isZipChanged ? false : data[IdDI.zip]?.decrypted,
+    };
 
-    if (!isCountryDisabled) {
-      convertedData[IdDI.country] = {
-        value: country.value,
-      };
-    }
+    const isCountryChanged = country.value !== data[IdDI.country]?.value;
+    convertedData[IdDI.country] = {
+      value: country.value,
+      dirty: isCountryChanged,
+      bootstrap: isCountryChanged ? false : data[IdDI.country]?.bootstrap,
+      disabled: data[IdDI.country]?.disabled ?? false,
+      decrypted: isCountryChanged ? false : data[IdDI.country]?.decrypted,
+    };
 
     return convertedData;
   };

@@ -1,18 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import { ChallengeKind, UserTokenScope } from '@onefootprint/types';
 
-export const withUserVaultValidate = () => {
-  mockRequest({
-    method: 'post',
-    path: '/hosted/user/vault/validate',
-    response: {
-      data: {
-        data: 'success',
-      },
-    },
-  });
-};
-
 export const withUserVault = () =>
   mockRequest({
     method: 'patch',

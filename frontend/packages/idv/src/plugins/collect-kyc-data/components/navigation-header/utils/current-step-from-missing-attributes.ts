@@ -5,7 +5,6 @@ import type { KycData } from '../../../utils/data-types';
 import {
   hasMissingAttributes,
   isMissingBasicAttribute,
-  isMissingEmailAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
   isMissingUsLegalStatusAttribute,
@@ -25,12 +24,6 @@ const getCurrentStepFromMissingAttributes = (
     return 0;
   }
   let currentStep = 0;
-  if (isMissingEmailAttribute(attributesToCollect, initData)) {
-    currentStep += 1;
-    if (state === 'email') {
-      return currentStep;
-    }
-  }
   if (isMissingBasicAttribute(attributesToCollect, initData)) {
     currentStep += 1;
     if (state === 'basicInformation') {

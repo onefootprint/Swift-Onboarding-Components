@@ -33,7 +33,6 @@ import {
   withOnboardingConfig,
   withUserToken,
   withUserVault,
-  withUserVaultValidate,
 } from './index.test.config';
 import type { CollectKycDataContext, CollectKycDataProps } from './types';
 
@@ -130,7 +129,6 @@ describe('<CollectKycData />', () => {
     beforeEach(() => {
       withUserToken();
       withOnboardingConfig();
-      withUserVaultValidate();
       withUserVault();
       withIdentify();
     });

@@ -1,32 +1,25 @@
-import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
-import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
-import Logger from '../../../../utils/logger';
 import getCurrentStepFromMissingAttributes from '../../components/navigation-header/utils/current-step-from-missing-attributes';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import useSyncData from '../../hooks/use-sync-data';
-import useSyncEmail from '../../hooks/use-sync-email';
-import { isMissingEmailAttribute } from '../../utils/missing-attributes';
 import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
-import EmailSection from './components/email-section';
 import IdentitySection from './components/identity-section';
 import LegalStatusSection from './components/legal-status-section';
 
 const Confirm = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.confirm' });
-  const showRequestErrorToast = useIdvRequestErrorToast();
+
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, requirement, initialData } = state.context;
+  const { data, requirement, initialData } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
-  const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
-  const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
+  const { isLoading } = syncDataMutation;
   const toast = useToast();
 
   const value = getCurrentStepFromMissingAttributes(
@@ -37,10 +30,9 @@ const Confirm = () => {
   const shouldShowBackButton = value > 0;
   const headerVariant = shouldShowBackButton ? 'back' : 'close';
 
-  const handleSyncData = () => {
+  const handleConfirm = () => {
     syncData({
       data,
-      speculative: false,
       onSuccess: () => {
         send({
           type: 'confirmed',
@@ -85,35 +77,6 @@ const Confirm = () => {
     });
   };
 
-  const handleConfirm = () => {
-    // If email is missing, we need to sync it successfully before we can
-    // sync the rest of the kyc data.
-    const attributes = [
-      ...requirement.missingAttributes,
-      ...requirement.optionalAttributes,
-    ];
-    if (!isMissingEmailAttribute(attributes)) {
-      handleSyncData();
-      return;
-    }
-
-    syncEmail({
-      authToken,
-      email: data[IdDI.email]?.value,
-      speculative: false,
-      onSuccess: handleSyncData,
-      onError: (error: unknown) => {
-        Logger.error(
-          `Speculatively sycing email data on kyc confirm page failed. ${getErrorMessage(
-            error,
-          )}`,
-          'kyc-confirm',
-        );
-        showRequestErrorToast(error);
-      },
-    });
-  };
-
   const handlePrev = () => {
     send({ type: 'navigatedToPrevPage' });
   };
@@ -128,7 +91,6 @@ const Confirm = () => {
       isLoading={isLoading}
       headerVariant={headerVariant}
     >
-      <EmailSection />
       <BasicInfoSection />
       <AddressSection />
       <LegalStatusSection />

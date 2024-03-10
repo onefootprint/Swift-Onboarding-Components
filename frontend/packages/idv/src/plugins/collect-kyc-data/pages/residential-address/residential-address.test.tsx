@@ -15,7 +15,7 @@ import type { MachineContext } from '../../utils/state-machine';
 import TestWrapper from '../../utils/test-wrapper';
 import ResidentialAddress from './residential-address';
 import getInitialContext, {
-  withUserVaultValidate,
+  withUserVault,
 } from './residential-address.test.config';
 
 const renderResidentialAddress = (
@@ -32,8 +32,15 @@ describe('<ResidentialAddress />', () => {
   beforeEach(() => {
     createGoogleMapsSpy();
     getPlacePredictions.mockClear();
-    withUserVaultValidate();
+    withUserVault();
   });
+  const otherValues = {
+    disabled: false,
+    decrypted: false,
+    scrubbed: false,
+    bootstrap: false,
+    dirty: false,
+  };
 
   describe('When in US only flow', () => {
     describe('when address is not a PO box', () => {
@@ -46,6 +53,7 @@ describe('<ResidentialAddress />', () => {
           data: {
             [IdDI.addressLine1]: {
               value: address,
+              ...otherValues,
             },
           },
         });
@@ -82,6 +90,7 @@ describe('<ResidentialAddress />', () => {
           data: {
             [IdDI.addressLine1]: {
               value: poBoxAddress,
+              ...otherValues,
             },
           },
         });
@@ -155,21 +164,27 @@ describe('<ResidentialAddress />', () => {
         data: {
           [IdDI.addressLine1]: {
             value: '345 Harrison Ave',
+            ...otherValues,
           },
           [IdDI.addressLine2]: {
             value: 'My neighborhood',
+            ...otherValues,
           },
           [IdDI.city]: {
             value: 'Boston',
+            ...otherValues,
           },
           [IdDI.state]: {
             value: 'MA',
+            ...otherValues,
           },
           [IdDI.zip]: {
             value: '12345',
+            ...otherValues,
           },
           [IdDI.country]: {
             value: 'US',
+            ...otherValues,
           },
         },
         allowInternationalResidents: false,
@@ -184,21 +199,27 @@ describe('<ResidentialAddress />', () => {
         expect(onComplete).toHaveBeenCalledWith({
           [IdDI.addressLine1]: {
             value: '345 Harrison Ave',
+            ...otherValues,
           },
           [IdDI.addressLine2]: {
             value: 'My neighborhood',
+            ...otherValues,
           },
           [IdDI.city]: {
             value: 'Boston',
+            ...otherValues,
           },
           [IdDI.state]: {
             value: 'MA',
+            ...otherValues,
           },
           [IdDI.zip]: {
             value: '12345',
+            ...otherValues,
           },
           [IdDI.country]: {
             value: 'US',
+            ...otherValues,
           },
         });
       });
@@ -213,18 +234,23 @@ describe('<ResidentialAddress />', () => {
           data: {
             [IdDI.addressLine1]: {
               value: '19 de Septiembre 79',
+              ...otherValues,
             },
             [IdDI.addressLine2]: {
               value: 'My neighborhood',
+              ...otherValues,
             },
             [IdDI.city]: {
               value: 'Ciudad de Mexico',
+              ...otherValues,
             },
             [IdDI.state]: {
               value: 'Baja California',
+              ...otherValues,
             },
             [IdDI.zip]: {
               value: '12345',
+              ...otherValues,
             },
           },
           allowInternationalResidents: true,
@@ -255,21 +281,27 @@ describe('<ResidentialAddress />', () => {
           data: {
             [IdDI.addressLine1]: {
               value: '19 de Septiembre 79',
+              ...otherValues,
             },
             [IdDI.addressLine2]: {
               value: 'My neighborhood',
+              ...otherValues,
             },
             [IdDI.city]: {
               value: 'Ciudad de Mexico',
+              ...otherValues,
             },
             [IdDI.state]: {
               value: 'Ciudad de Mexico',
+              ...otherValues,
             },
             [IdDI.zip]: {
               value: '12345',
+              ...otherValues,
             },
             [IdDI.country]: {
               value: 'MX',
+              ...otherValues,
             },
           },
           allowInternationalResidents: true,
@@ -284,21 +316,27 @@ describe('<ResidentialAddress />', () => {
           expect(onComplete).toHaveBeenCalledWith({
             [IdDI.addressLine1]: {
               value: '19 de Septiembre 79',
+              ...otherValues,
             },
             [IdDI.addressLine2]: {
               value: 'My neighborhood',
+              ...otherValues,
             },
             [IdDI.city]: {
               value: 'Ciudad de Mexico',
+              ...otherValues,
             },
             [IdDI.state]: {
               value: 'Ciudad de Mexico',
+              ...otherValues,
             },
             [IdDI.zip]: {
               value: '12345',
+              ...otherValues,
             },
             [IdDI.country]: {
               value: 'MX',
+              ...otherValues,
             },
           });
         });

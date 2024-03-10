@@ -50,10 +50,10 @@ export const getInitialContext = (data: KycData): MachineContext => ({
   initialData: {},
 });
 
-export const withUserVaultValidate = () => {
+export const withUserVault = () => {
   mockRequest({
-    method: 'post',
-    path: '/hosted/user/vault/validate',
+    method: 'patch',
+    path: '/hosted/user/vault',
     response: {
       data: {
         data: 'success',
@@ -62,10 +62,10 @@ export const withUserVaultValidate = () => {
   });
 };
 
-export const withUserVaultValidateError = () => {
+export const withUserVaultError = () => {
   mockRequest({
-    method: 'post',
-    path: '/hosted/user/vault/validate',
+    method: 'patch',
+    path: '/hosted/user/vault',
     statusCode: 400,
     response: {
       error: {

@@ -15,7 +15,7 @@ import {
   withIdentifyVerify,
   withLoginChallenge,
   withUserToken,
-  withUserVaultValidate,
+  withUserVault,
 } from './identity-section.test.config';
 import { renderIdentitySection } from './render-identity-section';
 
@@ -105,7 +105,7 @@ describe('IdentitySection', () => {
     it('the SSN should hidden after being edited', async () => {
       const initialContext = getInitialContext({ data });
       renderIdentitySection(initialContext);
-      withUserVaultValidate();
+      withUserVault();
 
       const editButton = screen.getByTestId('identity-edit-button');
       await userEvent.click(editButton);
@@ -238,7 +238,7 @@ describe('IdentitySection', () => {
     it('SSN should be hidden after being edited', async () => {
       const initialContext = getInitialContext({ requirement });
       renderIdentitySection(initialContext);
-      withUserVaultValidate();
+      withUserVault();
 
       const editButton = screen.getByTestId('identity-edit-button');
       await userEvent.click(editButton);

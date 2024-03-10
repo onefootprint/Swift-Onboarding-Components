@@ -279,6 +279,55 @@ export const fillSSN = async (
     .catch(() => false);
 };
 
+export const fillVisa = async ({ frame, page }: PageNFrame) => {
+  await frame
+    .getByRole('radio', { name: 'I have a Visa', disabled: false })
+    .first()
+    .click();
+
+  const citizenships = frame
+    .getByRole('button', {
+      name: 'Select',
+      disabled: false,
+      exact: true,
+    })
+    .first();
+  await citizenships.scrollIntoViewIfNeeded();
+  await citizenships.click();
+
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+
+  const nationality = frame
+    .getByRole('button', { name: 'Select', disabled: false, exact: true })
+    .first();
+  await nationality.scrollIntoViewIfNeeded();
+  await nationality.click();
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+
+  await frame
+    .getByText(/continue/i)
+    .first()
+    .scrollIntoViewIfNeeded();
+
+  const visaKind = frame
+    .getByRole('button', { name: 'Select', disabled: false, exact: true })
+    .first();
+  await visaKind.scrollIntoViewIfNeeded();
+  await visaKind.click();
+  await frame.getByText('E-1').first().click();
+
+  const field = frame.getByLabel('Visa expiration date').first();
+  await field
+    .waitFor(attachedState)
+    .then(() => field.fill('01/01/2024', { timeout: 200 }))
+    .then(() => true)
+    .catch(() => false);
+};
+
 export const confirmData = async (
   { frame }: WithFrame,
   payload: {
@@ -292,6 +341,11 @@ export const confirmData = async (
     country: string;
     zipCode: string;
     ssn?: string;
+    citizenship?: string;
+    nationality?: string;
+    usLegalStatus?: string;
+    visaKind?: string;
+    visaExpirationDate?: string;
   },
 ) => {
   await expect(frame.getByText(payload.firstName).first()).toBeAttached();
@@ -309,6 +363,23 @@ export const confirmData = async (
     // SSN value should be scrubbed by default
     await expect(
       frame.getByText('•'.repeat(payload.ssn.length)).first(),
+    ).toBeAttached();
+  }
+  if (payload.citizenship) {
+    await expect(frame.getByText(payload.citizenship).first()).toBeAttached();
+  }
+  if (payload.nationality) {
+    await expect(frame.getByText(payload.nationality).first()).toBeAttached();
+  }
+  if (payload.usLegalStatus) {
+    await expect(frame.getByText(payload.usLegalStatus).first()).toBeAttached();
+  }
+  if (payload.visaKind) {
+    await expect(frame.getByText(payload.visaKind).first()).toBeAttached();
+  }
+  if (payload.visaExpirationDate) {
+    await expect(
+      frame.getByText(payload.visaExpirationDate).first(),
     ).toBeAttached();
   }
 };

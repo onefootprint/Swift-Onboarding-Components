@@ -7,6 +7,11 @@ import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const businessDataRequest = async (payload: BusinessDataRequest) => {
+  // Don't send null values
+  const data = Object.fromEntries(
+    Object.entries(payload.data).filter(e => !!e[1]),
+  );
+
   let method;
   let url;
   if (payload.speculative) {
@@ -16,11 +21,6 @@ const businessDataRequest = async (payload: BusinessDataRequest) => {
     method = 'PATCH';
     url = '/hosted/business/vault';
   }
-  // Don't send null values
-  const data = Object.fromEntries(
-    Object.entries(payload.data).filter(e => !!e[1]),
-  );
-
   const response = await requestWithoutCaseConverter<BusinessDataResponse>({
     method,
     url,

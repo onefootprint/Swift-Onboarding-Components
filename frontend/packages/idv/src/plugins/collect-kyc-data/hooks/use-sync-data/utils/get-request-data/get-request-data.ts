@@ -25,12 +25,12 @@ const getRequestData = (
   locale: SupportedLocale,
   data: KycData,
   requirement: CollectKycDataRequirement,
-  requireCompleteCdos?: boolean,
 ) => {
-  // Filter out data that's already in the vault or has empty values
+  // Filter out data that's already in the vault or has empty values or is not dirty
   const filteredData = pickBy(
     data,
-    value => !value.decrypted && !value.scrubbed,
+    value =>
+      !value.decrypted && !value.scrubbed && (value.dirty || value.bootstrap),
   );
 
   // Start constructing the request data, while making sure data formats are correct
@@ -48,10 +48,6 @@ const getRequestData = (
     }
   });
 
-  if (!requireCompleteCdos) {
-    return requestData;
-  }
-
   // cdos includes the populated attributes too in case they got edited
   const cdos = allAttributes(requirement);
 
@@ -63,9 +59,10 @@ const getRequestData = (
       // Detect whether any part of the cdo is in request data
       const cdo = cdoKey as CollectedKycDataOption;
       const allDisForCdo = CdoToAllDisMap[cdo] as IdDI[];
+      // "" is a valid value to save to the backend, so only check for undefined
       if (
         cdos.indexOf(cdo) === -1 ||
-        !allDisForCdo.some(di => requestData[di])
+        !allDisForCdo.some(di => typeof requestData[di] !== 'undefined')
       ) {
         return;
       }

@@ -53,9 +53,12 @@ export const customRender = (Component?: React.ReactNode) => {
   return render(<Wrapper>{Component}</Wrapper>);
 };
 
-export const customRenderHook = (render: (initialProps: any) => any) => {
+export const customRenderHook = (
+  render: (initialProps: any) => any,
+  wrapper?: (props: WrapperProps) => JSX.Element,
+) => {
   throwOnConsoleErrors();
-  return renderHook(render, { wrapper: Wrapper });
+  return renderHook(render, { wrapper: wrapper ?? Wrapper });
 };
 
 export {

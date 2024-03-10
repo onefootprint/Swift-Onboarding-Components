@@ -12,8 +12,8 @@ import TestWrapper from '../../utils/test-wrapper';
 import BasicInformation from './basic-information';
 import {
   getInitialContext,
-  withUserVaultValidate,
-  withUserVaultValidateError,
+  withUserVault,
+  withUserVaultError,
 } from './basic-information.test.config';
 
 const renderBasicInformation = (
@@ -28,24 +28,36 @@ const renderBasicInformation = (
 };
 
 describe('BasicInformation', () => {
+  const otherValues = {
+    disabled: false,
+    decrypted: false,
+    scrubbed: false,
+    bootstrap: false,
+    dirty: false,
+  };
+
   describe('when the page is initially shown', () => {
     beforeEach(() => {
-      withUserVaultValidate();
+      withUserVault();
     });
 
     it('any existing data should be filled by default', async () => {
       const data = {
         [IdDI.firstName]: {
           value: 'Piip',
+          ...otherValues,
         },
         [IdDI.middleName]: {
           value: 'Middle',
+          ...otherValues,
         },
         [IdDI.lastName]: {
           value: 'Test',
+          ...otherValues,
         },
         [IdDI.dob]: {
           value: '01/01/2222',
+          ...otherValues,
         },
       };
       const initialContext = getInitialContext(data);
@@ -71,7 +83,7 @@ describe('BasicInformation', () => {
 
   describe('when validation fails', () => {
     beforeEach(() => {
-      withUserVaultValidateError();
+      withUserVaultError();
     });
 
     it('shows errors as hints', async () => {

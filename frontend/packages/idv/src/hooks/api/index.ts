@@ -9,7 +9,6 @@ export {
   useSkipLiveness,
   useUpdateD2PStatus,
   useUserData,
-  useUserEmail,
   useUserToken,
 } from './hosted';
 export { default as useGetOnboardingConfig } from './org';

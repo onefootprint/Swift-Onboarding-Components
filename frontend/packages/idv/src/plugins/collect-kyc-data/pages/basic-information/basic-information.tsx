@@ -15,6 +15,7 @@ import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import useSyncData from '../../hooks/use-sync-data';
 import allAttributes from '../../utils/all-attributes/all-attributes';
+import type { KycData } from '../../utils/data-types';
 import getInitialCountry from '../../utils/get-initial-country';
 import DobField from './components/dob-field';
 import NameFields from './components/name-fields';
@@ -25,7 +26,7 @@ import type { FormData } from './types';
 type BasicInformationProps = {
   hideHeader?: boolean;
   ctaLabel?: string;
-  onComplete?: () => void;
+  onComplete?: (args: KycData) => void;
   onCancel?: () => void;
 };
 
@@ -93,16 +94,14 @@ const BasicInformation = ({
   };
 
   const onSubmitFormData = (formData: FormData) => {
-    const convertedData = convertFormData(formData);
     syncData({
-      data: convertedData,
-      speculative: true,
-      onSuccess: () => {
+      data: convertFormData(formData),
+      onSuccess: cleanData => {
         send({
           type: 'dataSubmitted',
-          payload: convertedData,
+          payload: cleanData,
         });
-        onComplete?.();
+        onComplete?.(cleanData);
       },
       onError: handleSyncDataError,
     });

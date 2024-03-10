@@ -5,8 +5,13 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import type { CountryCode, VisaKind } from '@onefootprint/types';
-import { ChallengeKind, IdDI, UsLegalStatus } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
+import {
+  ChallengeKind,
+  IdDI,
+  UsLegalStatus,
+  VisaKind,
+} from '@onefootprint/types';
 import React from 'react';
 
 import type { KycData } from '../../utils/data-types';
@@ -17,7 +22,7 @@ import {
   withIdentifyVerify,
   withLoginChallenge,
   withUserToken,
-  withUserVaultValidate,
+  withUserVault,
 } from './index.test.config';
 import LegalStatus from './legal-status';
 import getInitialContext from './utils/test/get-initial-context';
@@ -39,8 +44,16 @@ describe('LegalStatus', () => {
     withIdentifyVerify();
     withLoginChallenge(ChallengeKind.biometric);
     withUserToken([]);
-    withUserVaultValidate();
+    withUserVault();
   });
+
+  const otherValues = {
+    disabled: false,
+    decrypted: false,
+    scrubbed: false,
+    bootstrap: false,
+    dirty: false,
+  };
 
   describe('when the page is initially shown', () => {
     it('only the three status fields and the country of birth field should be present', async () => {
@@ -79,15 +92,19 @@ describe('LegalStatus', () => {
       const data = {
         [IdDI.usLegalStatus]: {
           value: 'visa' as UsLegalStatus,
+          ...otherValues,
         },
         [IdDI.nationality]: {
           value: 'HK' as CountryCode,
+          ...otherValues,
         },
         [IdDI.visaKind]: {
           value: 'h1b' as VisaKind,
+          ...otherValues,
         },
         [IdDI.visaExpirationDate]: {
           value: '01/01/2222',
+          ...otherValues,
         },
       };
       const initialContext = getInitialContext({ data });
@@ -142,18 +159,23 @@ describe('LegalStatus', () => {
         const args = {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.citizen,
+            ...otherValues,
           },
           [IdDI.nationality]: {
             value: 'US',
+            ...otherValues,
           },
           [IdDI.citizenships]: {
             value: undefined,
+            ...otherValues,
           },
           [IdDI.visaExpirationDate]: {
             value: undefined,
+            ...otherValues,
           },
           [IdDI.visaKind]: {
             value: undefined,
+            ...otherValues,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
@@ -192,18 +214,23 @@ describe('LegalStatus', () => {
         const args = {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.citizen,
+            ...otherValues,
           },
           [IdDI.nationality]: {
             value: 'US',
+            ...otherValues,
           },
           [IdDI.citizenships]: {
             value: undefined,
+            ...otherValues,
           },
           [IdDI.visaExpirationDate]: {
             value: undefined,
+            ...otherValues,
           },
           [IdDI.visaKind]: {
             value: undefined,
+            ...otherValues,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
@@ -326,18 +353,23 @@ describe('LegalStatus', () => {
         const args = {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.permanentResident,
+            ...otherValues,
           },
           [IdDI.nationality]: {
             value: 'US',
+            ...otherValues,
           },
           [IdDI.citizenships]: {
             value: ['AL'],
+            ...otherValues,
           },
           [IdDI.visaExpirationDate]: {
             value: undefined,
+            ...otherValues,
           },
           [IdDI.visaKind]: {
             value: undefined,
+            ...otherValues,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
@@ -444,18 +476,23 @@ describe('LegalStatus', () => {
         const args = {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.permanentResident,
+            ...otherValues,
           },
           [IdDI.nationality]: {
             value: 'US',
+            ...otherValues,
           },
           [IdDI.citizenships]: {
             value: ['AL', 'AD'],
+            ...otherValues,
           },
           [IdDI.visaExpirationDate]: {
             value: undefined,
+            ...otherValues,
           },
           [IdDI.visaKind]: {
             value: undefined,
+            ...otherValues,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
@@ -513,18 +550,23 @@ describe('LegalStatus', () => {
         const args = {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.permanentResident,
+            ...otherValues,
           },
           [IdDI.nationality]: {
             value: 'US',
+            ...otherValues,
           },
           [IdDI.citizenships]: {
             value: ['AL'],
+            ...otherValues,
           },
           [IdDI.visaExpirationDate]: {
             value: undefined,
+            ...otherValues,
           },
           [IdDI.visaKind]: {
             value: undefined,
+            ...otherValues,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
@@ -634,18 +676,23 @@ describe('LegalStatus', () => {
         const args = {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.permanentResident,
+            ...otherValues,
           },
           [IdDI.nationality]: {
             value: 'US',
+            ...otherValues,
           },
           [IdDI.citizenships]: {
             value: ['AL', 'AF'],
+            ...otherValues,
           },
           [IdDI.visaExpirationDate]: {
             value: undefined,
+            ...otherValues,
           },
           [IdDI.visaKind]: {
             value: undefined,
+            ...otherValues,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
@@ -816,23 +863,27 @@ describe('LegalStatus', () => {
       });
       const continueButton = screen.getByTestId('continue-button');
       await userEvent.click(continueButton);
-
       await waitFor(() => {
-        const args = {
+        const args: KycData = {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.visa,
+            ...otherValues,
           },
           [IdDI.nationality]: {
             value: 'US',
+            ...otherValues,
           },
           [IdDI.citizenships]: {
             value: ['AL', 'AD'],
+            ...otherValues,
           },
           [IdDI.visaKind]: {
-            value: 'l1',
+            value: VisaKind.l1,
+            ...otherValues,
           },
           [IdDI.visaExpirationDate]: {
             value: '01/01/2100',
+            ...otherValues,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);

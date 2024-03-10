@@ -8,8 +8,6 @@ import type { FormData } from '../../types';
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
-  const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
-  const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
   const requiresSsn9 = allAttributes(requirement).includes(
     CollectedKycDataOption.ssn9,
   );
@@ -19,15 +17,23 @@ const useConvertFormData = () => {
     const { ssn4, ssn9 } = formData;
 
     // Only one of ssn4 vs ssn9 will be present
-    if (requiresSsn9) {
-      if (ssn9 && !isSsn9Disabled) {
-        convertedData[IdDI.ssn9] = {
-          value: isSkipped ? '' : ssn9,
-        };
-      }
-    } else if (ssn4 && !isSsn4Disabled) {
+    if (requiresSsn9 && ssn9) {
+      const isChanged = ssn9 !== data[IdDI.ssn9]?.value;
+      convertedData[IdDI.ssn9] = {
+        value: isSkipped ? '' : ssn9,
+        dirty: isSkipped ? false : isChanged,
+        bootstrap: isChanged ? false : data[IdDI.ssn9]?.bootstrap,
+        disabled: data[IdDI.ssn9]?.disabled ?? false,
+        decrypted: isChanged ? false : data[IdDI.ssn9]?.decrypted,
+      };
+    } else if (ssn4) {
+      const isChanged = ssn4 !== data[IdDI.ssn4]?.value;
       convertedData[IdDI.ssn4] = {
         value: isSkipped ? '' : ssn4,
+        dirty: isSkipped ? false : isChanged,
+        bootstrap: isChanged ? false : data[IdDI.ssn4]?.bootstrap,
+        disabled: data[IdDI.ssn4]?.disabled ?? false,
+        decrypted: isChanged ? false : data[IdDI.ssn4]?.decrypted,
       };
     }
 

@@ -9,4 +9,4 @@ export {
   useSkipLiveness,
   useUpdateD2PStatus,
 } from './onboarding';
-export { useUserData, useUserEmail, useUserToken } from './user';
+export { useUserData, useUserToken } from './user';

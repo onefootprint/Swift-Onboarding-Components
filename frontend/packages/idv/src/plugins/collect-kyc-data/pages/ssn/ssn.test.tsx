@@ -12,8 +12,8 @@ import TestWrapper from '../../utils/test-wrapper';
 import Ssn from './ssn';
 import {
   getInitialContext,
-  withUserVaultValidate,
-  withUserVaultValidateError,
+  withUserVault,
+  withUserVaultError,
 } from './ssn.test.config';
 
 const renderSsn = (initialContext: MachineContext, onComplete?: () => void) => {
@@ -25,15 +25,24 @@ const renderSsn = (initialContext: MachineContext, onComplete?: () => void) => {
 };
 
 describe('Ssn', () => {
+  const otherValues = {
+    disabled: false,
+    decrypted: false,
+    scrubbed: false,
+    bootstrap: false,
+    dirty: false,
+  };
+
   describe('when the page is shown with existing data', () => {
     beforeEach(() => {
-      withUserVaultValidate();
+      withUserVault();
     });
 
     it('any existing SSN4 should be filled by default', async () => {
       const data = {
         [IdDI.ssn4]: {
           value: '1234',
+          ...otherValues,
         },
       };
       const initialContext = getInitialContext(data, 'ssn4');
@@ -62,6 +71,7 @@ describe('Ssn', () => {
       const data = {
         [IdDI.ssn9]: {
           value: '121212121',
+          ...otherValues,
         },
       };
       const initialContext = getInitialContext(data, 'ssn9');
@@ -187,7 +197,7 @@ describe('Ssn', () => {
 
   describe('when ssn4 validation fails', () => {
     beforeEach(() => {
-      withUserVaultValidateError('ssn4');
+      withUserVaultError('ssn4');
     });
 
     it('shows errors as hints', async () => {
@@ -219,7 +229,7 @@ describe('Ssn', () => {
 
   describe('when ssn9 validation fails', () => {
     beforeEach(() => {
-      withUserVaultValidateError('ssn9');
+      withUserVaultError('ssn9');
     });
 
     it('shows errors as hints', async () => {

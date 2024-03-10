@@ -1,5 +1,9 @@
 import { getErrorMessage } from '@onefootprint/request';
-import type { UserDataError } from '@onefootprint/types';
+import type {
+  InvestorProfileDI,
+  UserDataError,
+  VaultValue,
+} from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { AxiosError } from 'axios';
@@ -17,8 +21,7 @@ export type SyncDataFieldErrors = UserDataError['error']['message'];
 
 type SyncDataArgs = {
   data: KycData;
-  speculative?: boolean;
-  onSuccess?: () => void;
+  onSuccess?: (data: KycData) => void;
   onError?: (errors: SyncDataFieldErrors) => void;
 };
 
@@ -38,12 +41,11 @@ const useSyncData = () => {
     Logger.error(errorMessage, 'kyc-use-sync-data');
   };
 
-  const syncData = ({
+  const syncData = async ({
     data: rawData,
-    speculative,
     onSuccess,
     onError,
-  }: SyncDataArgs) => {
+  }: SyncDataArgs): Promise<void> => {
     if (!authToken) {
       toast.show({
         title: t('empty-auth-token.title'),
@@ -57,51 +59,9 @@ const useSyncData = () => {
       return;
     }
 
+    let data: Partial<Record<IdDI | InvestorProfileDI, VaultValue>> | undefined;
     try {
-      const data = getRequestData(locale, rawData, requirement, !speculative);
-      userDataMutation.mutate(
-        {
-          data,
-          authToken,
-          speculative,
-        },
-        {
-          onSuccess,
-          onError: (err: unknown) => {
-            const errors = (err as AxiosError<UserDataError>)?.response?.data
-              .error.message;
-            if (typeof errors === 'string') {
-              showRequestErrorToast(err);
-              logError(
-                `Kyc useSyncData encountered error while syncing data${
-                  speculative ? ' speculatively' : ''
-                } ${getErrorMessage(err)}`,
-              );
-              return;
-            }
-            const validDis = new Set(Object.values(IdDI));
-            const fieldErrors = Object.fromEntries(
-              Object.entries(errors || {}).filter(([key]) =>
-                validDis.has(key as IdDI),
-              ),
-            );
-            if (Object.keys(fieldErrors).length > 0) {
-              onError?.(fieldErrors);
-            } else {
-              toast.show({
-                title: t('invalid-inputs.title'),
-                description: t('invalid-inputs.description'),
-                variant: 'error',
-              });
-              logError(
-                `Kyc useSyncData encountered error while syncing data${
-                  speculative ? ' speculatively' : ''
-                } ${getErrorMessage(err)}`,
-              );
-            }
-          },
-        },
-      );
+      data = getRequestData(locale, rawData, requirement);
     } catch (e) {
       toast.show({
         title: t('request-data.title'),
@@ -111,6 +71,66 @@ const useSyncData = () => {
       logError(
         `Unable to generate a valid request data obj because of incomplete/dangling DIs. ${e}`,
       );
+      return;
+    }
+
+    const handleError = (err: unknown) => {
+      const errors = (err as AxiosError<UserDataError>)?.response?.data.error
+        .message;
+      if (typeof errors === 'string') {
+        showRequestErrorToast(err);
+        logError(
+          `Kyc useSyncData encountered error while syncing data ${getErrorMessage(
+            err,
+          )}`,
+        );
+        return;
+      }
+      const validDis = new Set(Object.values(IdDI));
+      const fieldErrors = Object.fromEntries(
+        Object.entries(errors || {}).filter(([key]) =>
+          validDis.has(key as IdDI),
+        ),
+      );
+      if (Object.keys(fieldErrors).length > 0) {
+        onError?.(fieldErrors);
+      } else {
+        toast.show({
+          title: t('invalid-inputs.title'),
+          description: t('invalid-inputs.description'),
+          variant: 'error',
+        });
+        logError(
+          `Kyc useSyncData encountered error while syncing data${getErrorMessage(
+            err,
+          )}`,
+        );
+      }
+    };
+
+    const handleSuccess = () => {
+      // call onSuccess after cleaning the dirty flag now that the data has been saved
+      const cleanedData = Object.fromEntries(
+        Object.entries(rawData).map(([key, value]) => {
+          const valueCopy = { ...value };
+          valueCopy.dirty = false;
+          valueCopy.bootstrap = false;
+          valueCopy.decrypted = false;
+          valueCopy.scrubbed = false;
+          valueCopy.disabled = value.disabled ?? false;
+
+          return [key, valueCopy];
+        }),
+      );
+
+      onSuccess?.(cleanedData);
+    };
+
+    try {
+      await userDataMutation.mutateAsync({ data, authToken });
+      handleSuccess();
+    } catch (e) {
+      handleError(e);
     }
   };
 

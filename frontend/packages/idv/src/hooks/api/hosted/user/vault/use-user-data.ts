@@ -8,20 +8,10 @@ import {
 import { useMutation } from '@tanstack/react-query';
 
 const userDataRequest = async (payload: UserDataRequest) => {
-  let method;
-  let url;
-  if (payload.speculative) {
-    // For some requests, we just send data to the backend to validate it
-    method = 'POST';
-    url = '/hosted/user/vault/validate';
-  } else {
-    method = 'PATCH';
-    url = '/hosted/user/vault';
-  }
-
   const data = Object.fromEntries(
     Object.entries(payload.data).filter(
-      // Don't send null values
+      // Don't send null or undefined or empty values
+      // Empty string is a valid value to send to the backend
       e => !!e[1] && e[0] !== IdDI.phoneNumber && e[0] !== IdDI.email,
     ),
   );
@@ -30,14 +20,29 @@ const userDataRequest = async (payload: UserDataRequest) => {
     // If there's no data to send to the backend, short circuit
     return {} as UserDataResponse;
   }
+
+  if (payload.speculative) {
+    // used only in investor profile flows
+    // we just send data to the backend to validate it
+    const response = await requestWithoutCaseConverter<UserDataResponse>({
+      method: 'POST',
+      url: '/hosted/user/vault/validate',
+      data,
+      headers: {
+        [AUTH_HEADER]: payload.authToken,
+        [ALLOW_EXTRA_FIELDS_HEADER]: !!payload.allowExtraFields,
+      },
+    });
+    return response.data;
+  }
+
+  // used for kyc flows
   const response = await requestWithoutCaseConverter<UserDataResponse>({
-    method,
-    url,
+    method: 'PATCH',
+    url: '/hosted/user/vault',
     data,
     headers: {
       [AUTH_HEADER]: payload.authToken,
-      [ALLOW_EXTRA_FIELDS_HEADER]:
-        payload.speculative && payload.allowExtraFields ? true : undefined,
     },
   });
   return response.data;

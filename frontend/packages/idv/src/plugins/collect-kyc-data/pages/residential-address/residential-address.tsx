@@ -70,16 +70,14 @@ const ResidentialAddress = ({
   const { handleSubmit, setFocus, resetField } = methods;
 
   const onSubmitFormData = (formData: FormData) => {
-    const convertedData = convertFormData(formData);
     syncData({
-      data: convertedData,
-      speculative: true,
-      onSuccess: () => {
+      data: convertFormData(formData),
+      onSuccess: cleanData => {
         send({
           type: 'dataSubmitted',
-          payload: convertedData,
+          payload: cleanData,
         });
-        onComplete?.(convertedData);
+        onComplete?.(cleanData);
       },
     });
   };

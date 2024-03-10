@@ -4,7 +4,6 @@ import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
-import Email from '../email';
 import Init from '../init';
 import LegalStatus from '../legal-status';
 import Address from '../residential-address';
@@ -27,9 +26,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('init')) {
     return <Init />;
-  }
-  if (state.matches('email')) {
-    return <Email />;
   }
   if (state.matches('basicInformation')) {
     return <BasicInformation />;

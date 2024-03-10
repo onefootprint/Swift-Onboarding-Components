@@ -24,7 +24,6 @@ export interface Typegen0 {
     | 'basicInformation'
     | 'completed'
     | 'confirm'
-    | 'email'
     | 'init'
     | 'residentialAddress'
     | 'router'
