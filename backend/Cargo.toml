@@ -12,6 +12,7 @@ members = [
     "components/api/wire_types",
     "components/api/routes/_root",
     "components/api/routes/businesses",
+    "components/api/routes/compliance",
     "components/api/routes/entities",
     "components/api/routes/hosted/*",
     "components/api/routes/index",
