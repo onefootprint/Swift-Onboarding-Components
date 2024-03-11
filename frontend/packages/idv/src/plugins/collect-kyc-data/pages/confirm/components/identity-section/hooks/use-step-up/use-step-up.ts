@@ -1,16 +1,22 @@
 import { getErrorMessage } from '@onefootprint/request';
-import type { IdentifyResponse, UserTokenResponse } from '@onefootprint/types';
+import type {
+  IdentifyResponse,
+  IdentifyVerifyResponse,
+  LoginChallengeResponse,
+  UserTokenResponse,
+} from '@onefootprint/types';
 import { ChallengeKind, UserTokenScope } from '@onefootprint/types';
+import { IdentifyTokenScope } from '@onefootprint/types/src/api/identify-verify';
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
+import {
+  useIdentify,
+  useIdentifyVerify,
+  useLoginChallenge,
+} from '../../../../../../../../components/identify/queries';
 import { useUserToken } from '../../../../../../../../hooks/api';
 import type { DeviceInfo } from '../../../../../../../../hooks/ui/use-device-info';
-import useIdentify from './hooks/use-identify';
-import type { IdentifyVerifyResponse } from './hooks/use-identify-verify';
-import useIdentifyVerify from './hooks/use-identify-verify';
-import type { LoginChallengeResponse } from './hooks/use-login-challenge';
-import useLoginChallenge from './hooks/use-login-challenge';
 import getBiometricChallengeResponse from './utils/get-biometric-challenge-response';
 
 type UseStepUpArgs = {
@@ -58,9 +64,10 @@ const useStepUp = ({
       },
     },
   );
-  const identifyMutation = useIdentify();
+  const scope = IdentifyTokenScope.onboarding;
+  const identifyMutation = useIdentify({ scope });
   const loginChallengeMutation = useLoginChallenge();
-  const identifyVerifyMutation = useIdentifyVerify();
+  const identifyVerifyMutation = useIdentifyVerify({ scope });
   const isLoading =
     isRunningWebauthn ||
     userTokenQuery.isLoading ||
@@ -131,7 +138,7 @@ const useStepUp = ({
       {
         challengeResponse,
         challengeToken,
-        authToken,
+        authToken: payload.challengeData.token,
       },
       {
         onSuccess: ({
@@ -173,6 +180,7 @@ const useStepUp = ({
     loginChallengeMutation.mutate(
       {
         authToken,
+        preferredChallengeKind: ChallengeKind.biometric,
       },
       {
         onSuccess: handleLoginChallengeSuccess,
