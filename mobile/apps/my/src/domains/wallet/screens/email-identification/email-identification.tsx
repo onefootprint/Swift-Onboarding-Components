@@ -33,17 +33,17 @@ const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
   });
 
   const onSubmit = ({ email }) => {
-    const identifier = { email };
     identifyMutation.mutate(
-      { identifier },
+      { email },
       {
-        onSuccess: ({ userFound, availableChallengeKinds }) => {
-          if (!userFound) return;
+        onSuccess: ({ user }) => {
+          if (!user) return;
           navigation.push('Login', {
-            identifier,
-            canUseBiometric: availableChallengeKinds.includes(
+            identifier: { email },
+            canUseBiometric: user.availableChallengeKinds.includes(
               ChallengeKind.biometric,
             ),
+            identifiedAuthToken: user.token,
           });
         },
       },

@@ -4,18 +4,15 @@ import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const identifyRequest = async (payload: IdentifyRequest) => {
-  const { obConfigAuth, identifier, sandboxId } = payload;
+  const { obConfigAuth, email, phoneNumber, authToken, sandboxId } = payload;
   const headers: Record<string, string> = { ...obConfigAuth };
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
   }
-  const data: Record<string, unknown> = {};
-  if ('authToken' in identifier) {
-    headers[AUTH_HEADER] = identifier.authToken;
-  } else {
-    data.identifier = identifier;
+  const data: Record<string, unknown> = { email, phoneNumber };
+  if (authToken) {
+    headers[AUTH_HEADER] = authToken;
   }
-  data.identifier = identifier;
 
   const response = await request<IdentifyResponse>({
     method: 'POST',
@@ -23,19 +20,7 @@ const identifyRequest = async (payload: IdentifyRequest) => {
     data,
     headers,
   });
-  const {
-    userFound,
-    availableChallengeKinds,
-    hasSyncablePassKey,
-    isUnverified,
-  } = response.data;
-
-  return {
-    userFound,
-    isUnverified,
-    availableChallengeKinds,
-    hasSyncablePassKey,
-  };
+  return response.data;
 };
 
 const useIdentify = () => useMutation(identifyRequest);

@@ -47,24 +47,19 @@ const EmailIdentification = ({
     }
     mutate(
       {
-        identifier: { email },
+        email,
         obConfigAuth,
         sandboxId,
       },
       {
         onSuccess: response => {
-          const {
-            userFound,
-            isUnverified,
-            availableChallengeKinds,
-            hasSyncablePassKey,
-          } = response;
+          const { user } = response;
           onComplete({
-            userFound,
-            isUnverified,
+            userFound: !!user,
+            isUnverified: !!user?.isUnverified,
             email,
-            hasSyncablePassKey,
-            availableChallengeKinds,
+            hasSyncablePassKey: user?.hasSyncablePasskey,
+            availableChallengeKinds: user?.availableChallengeKinds,
             successfulIdentifier: { email },
           });
         },

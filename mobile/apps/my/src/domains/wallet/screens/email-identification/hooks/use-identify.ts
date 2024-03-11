@@ -6,17 +6,22 @@ import { useMutation } from '@tanstack/react-query';
 import useTranslation from '@/hooks/use-translation';
 
 const identify = async (data: IdentifyRequest) => {
-  if (data.identifier.email === 'apple@onefootprint.com') {
+  if (data.email === 'apple@onefootprint.com') {
     return {
-      userFound: true,
-      availableChallengeKinds: ['sms'],
-      hasSyncablePassKey: false,
+      user: {
+        availableChallengeKinds: ['sms'],
+        hasSyncablePassKey: false,
+      },
     };
   }
+  const requestData = {
+    scope: 'my1fp',
+    ...data,
+  };
   const response = await request<IdentifyResponse>({
     method: 'POST',
     url: '/hosted/identify',
-    data,
+    data: requestData,
   });
 
   return response.data;
@@ -28,8 +33,8 @@ const useIdentify = () => {
 
   return useMutation({
     mutationFn: identify,
-    onSuccess: ({ userFound }) => {
-      if (!userFound) {
+    onSuccess: ({ user }) => {
+      if (!user) {
         return toast.show({
           variant: 'error',
           title: t('user-not-found.title'),

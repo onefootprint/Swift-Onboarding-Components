@@ -3,7 +3,15 @@ import type { Identifier, LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-const loginChallenge = async (identifier: Identifier) => {
+import { AUTH_HEADER } from '@/config/constants';
+
+const loginChallenge = async ({
+  identifier,
+  authToken,
+}: {
+  identifier: Identifier;
+  authToken: string;
+}) => {
   if (identifier.email === 'apple@onefootprint.com') {
     return {
       challengeData: {
@@ -16,11 +24,14 @@ const loginChallenge = async (identifier: Identifier) => {
     };
   }
 
+  const headers = {
+    [AUTH_HEADER]: authToken,
+  };
   const response = await request<LoginChallengeResponse>({
     method: 'POST',
     url: '/hosted/identify/login_challenge',
+    headers,
     data: {
-      identifier,
       preferredChallengeKind: ChallengeKind.sms,
     },
   });

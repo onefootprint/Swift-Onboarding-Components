@@ -59,24 +59,19 @@ const PhoneIdentification = ({
 
     identifyMutation.mutate(
       {
-        identifier: { phoneNumber },
+        phoneNumber,
         obConfigAuth,
         sandboxId,
       },
       {
         onSuccess: response => {
-          const {
-            userFound,
-            isUnverified,
-            availableChallengeKinds,
-            hasSyncablePassKey,
-          } = response;
+          const { user } = response;
           onComplete({
-            userFound,
-            isUnverified,
+            userFound: !!user,
+            isUnverified: !!user?.isUnverified,
             phoneNumber,
-            hasSyncablePassKey,
-            availableChallengeKinds,
+            hasSyncablePassKey: user?.hasSyncablePasskey,
+            availableChallengeKinds: user?.availableChallengeKinds,
             successfulIdentifier: { phoneNumber },
           });
         },

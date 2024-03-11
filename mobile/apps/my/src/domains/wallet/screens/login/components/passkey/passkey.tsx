@@ -1,5 +1,4 @@
 import { IcoFaceid24 } from '@onefootprint/icons';
-import type { Identifier } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -9,17 +8,17 @@ import useLoginWithPasskey from './hooks/use-login-with-passkey';
 import hasUserCancelled from './utils/has-user-canceled-passkey';
 
 type PasskeyProps = {
-  identifier: Identifier;
+  identifiedAuthToken: string;
   onSuccess: (authToken: string) => void;
 };
 
-const Passkey = ({ identifier, onSuccess }: PasskeyProps) => {
+const Passkey = ({ identifiedAuthToken, onSuccess }: PasskeyProps) => {
   const { isLoading, mutate } = useLoginWithPasskey();
   const [isRetry, setRetry] = useState(false);
   const { t } = useTranslation('screens.login.passkey');
 
   const handlePress = () => {
-    mutate(identifier, {
+    mutate(identifiedAuthToken, {
       onSuccess: ({ authToken }) => {
         onSuccess(authToken);
       },

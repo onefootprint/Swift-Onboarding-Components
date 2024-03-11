@@ -1,7 +1,6 @@
 import request from '@onefootprint/request';
 import type {
   BiometricLoginChallengeJson,
-  Identifier,
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
   LoginChallengeResponse,
@@ -16,13 +15,17 @@ import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 
 import hasUserCancelledPasskey from '../utils/has-user-canceled-passkey';
+import { AUTH_HEADER } from '@/config/constants';
 
-const loginChallenge = async (identifier: Identifier) => {
+const loginChallenge = async (authToken: string) => {
+  const headers = {
+    [AUTH_HEADER]: authToken,
+  };
   const response = await request<LoginChallengeResponse>({
     method: 'POST',
     url: '/hosted/identify/login_challenge',
+    headers,
     data: {
-      identifier,
       preferredChallengeKind: ChallengeKind.biometric,
     },
   });
@@ -64,10 +67,10 @@ const identifyVerify = async (payload: IdentifyVerifyRequest) => {
   return response.data;
 };
 
-const loginWithPasskey = async (identifier: Identifier) => {
+const loginWithPasskey = async (authToken: string) => {
   const {
     challengeData: { biometricChallengeJson, challengeToken },
-  } = await loginChallenge(identifier);
+  } = await loginChallenge(authToken);
   const challengeResponse = await generateDeviceResponse(
     biometricChallengeJson,
   );

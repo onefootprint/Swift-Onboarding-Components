@@ -14,7 +14,7 @@ type LoginProps = ScreenProps<'Login'>;
 
 const Login = ({ route, navigation }: LoginProps) => {
   const { t } = useTranslation('screens.login');
-  const { canUseBiometric, identifier } = route.params;
+  const { canUseBiometric, identifier, identifiedAuthToken } = route.params;
   const shouldShowTabs = canUseBiometric;
   const [tab, setTab] = useState(canUseBiometric ? 'passkey' : 'sms');
   const session = useSession();
@@ -57,11 +57,12 @@ const Login = ({ route, navigation }: LoginProps) => {
         <Sms
           isApple={isApple}
           identifier={identifier}
+          identifiedAuthToken={identifiedAuthToken}
           onSuccess={handleSuccess(ChallengeKind.sms)}
         />
       ) : (
         <Passkey
-          identifier={identifier}
+          identifiedAuthToken={identifiedAuthToken}
           onSuccess={handleSuccess(ChallengeKind.biometric)}
         />
       )}

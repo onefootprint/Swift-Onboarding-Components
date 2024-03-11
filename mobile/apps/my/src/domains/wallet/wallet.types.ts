@@ -6,6 +6,7 @@ export type Navigation = {
   Login: {
     canUseBiometric: boolean;
     identifier: Identifier;
+    identifiedAuthToken: string;
   };
   MainTabs: undefined;
   Vault: undefined;

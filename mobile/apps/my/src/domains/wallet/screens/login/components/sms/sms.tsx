@@ -8,14 +8,20 @@ import useLoginChallenge from './hooks/use-login-challenge';
 type SmsProps = {
   isApple: boolean;
   identifier: Identifier;
+  identifiedAuthToken: string;
   onSuccess: (authToken) => void;
 };
 
-const Sms = ({ isApple, identifier, onSuccess }: SmsProps) => {
+const Sms = ({
+  isApple,
+  identifier,
+  identifiedAuthToken,
+  onSuccess,
+}: SmsProps) => {
   const { isLoading, data, mutate } = useLoginChallenge();
 
   const createChallenge = () => {
-    mutate(identifier);
+    mutate({ identifier, authToken: identifiedAuthToken });
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
