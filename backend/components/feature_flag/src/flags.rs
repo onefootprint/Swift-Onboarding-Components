@@ -80,6 +80,10 @@ pub enum BoolFlag<'a> {
     IsRulesProductEnabled(&'a TenantId),
     #[strum(to_string = "MakeLexisCall")]
     MakeLexisCall(&'a TenantId),
+    #[strum(to_string = "IsVaultProxyPreConfiguredEndpointEnabled")]
+    IsVaultProxyPreConfiguredEndpointEnabled(&'a TenantId),
+    #[strum(to_string = "IsVaultProxyJitEndpointEnabled")]
+    IsVaultProxyJitEndpointEnabled(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -127,6 +131,8 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
             Self::IsRulesProductEnabled(k) => Some(k.to_string()),
             Self::MakeLexisCall(k) => Some(k.to_string()),
+            Self::IsVaultProxyPreConfiguredEndpointEnabled(k) => Some(k.to_string()),
+            Self::IsVaultProxyJitEndpointEnabled(k) => Some(k.to_string()),
         }
     }
 
@@ -170,6 +176,8 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(_) => false,
             Self::IsRulesProductEnabled(_) => false,
             Self::MakeLexisCall(_) => false,
+            Self::IsVaultProxyPreConfiguredEndpointEnabled(_) => false,
+            Self::IsVaultProxyJitEndpointEnabled(_) => false,
         }
     }
 }

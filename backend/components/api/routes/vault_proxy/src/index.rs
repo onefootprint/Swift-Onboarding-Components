@@ -12,7 +12,7 @@ use crate::{
 };
 
 use crate::{proxy::tokenize, utils::headers::InsightHeaders, State};
-use api_core::{telemetry::RootSpan, ApiErrorKind};
+use api_core::{auth::AuthError, telemetry::RootSpan, ApiErrorKind};
 
 use api_core::{
     auth::tenant::TenantAuth,
@@ -30,7 +30,7 @@ const FIVE_MB: usize = 5 * 1024 * 1024;
 
 #[allow(clippy::too_many_arguments)]
 #[api_v2_operation(
-    description = "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination",
+    description = "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination. Please contact support to enable this API.",
     tags(VaultProxy, PublicApi)
 )]
 #[post("/vault_proxy/jit")]
@@ -46,6 +46,15 @@ pub async fn just_in_time(
 ) -> ApiResult<HttpResponse> {
     let proxy_config = ProxyConfig::try_from((jit_params, opt_params, request.headers()))?;
     let auth = auth.check_guard(InvokeVaultProxyPermission::JustInTime)?;
+
+    let tenant_id = &auth.tenant().id;
+    if !state
+        .feature_flag_client
+        .flag(feature_flag::BoolFlag::IsVaultProxyJitEndpointEnabled(tenant_id))
+    {
+        return Err(AuthError::ApiEndpointRequiresSupportEnablement.into());
+    }
+
     invoke_vault_proxy(
         state,
         auth,
@@ -60,7 +69,7 @@ pub async fn just_in_time(
 
 #[allow(clippy::too_many_arguments)]
 #[api_v2_operation(
-    description = "Invoke the vault proxy by configuration id to securely send and receive data to a target destination",
+    description = "Invoke the vault proxy by configuration id to securely send and receive data to a target destination. Please contact support to enable this API.",
     tags(VaultProxy, PublicApi)
 )]
 #[post("/vault_proxy/{id}")]
@@ -76,6 +85,17 @@ pub async fn id(
 ) -> ApiResult<HttpResponse> {
     let id = proxy_config_id.into_inner();
     let auth = auth.check_guard(InvokeVaultProxyPermission::Id { id: id.clone() })?;
+
+    let tenant_id = &auth.tenant().id;
+    if !state
+        .feature_flag_client
+        .flag(feature_flag::BoolFlag::IsVaultProxyPreConfiguredEndpointEnabled(
+            tenant_id,
+        ))
+    {
+        return Err(AuthError::ApiEndpointRequiresSupportEnablement.into());
+    }
+
     invoke_vault_proxy(
         state,
         auth,

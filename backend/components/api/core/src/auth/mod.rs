@@ -40,6 +40,8 @@ pub enum AuthError {
     SessionTypeError,
     #[error("Not allowed: restricted to sandbox mode")]
     SandboxRestricted,
+    #[error("Not allowed: please contact support to enable this API endpoint")]
+    ApiEndpointRequiresSupportEnablement,
     #[error("Not allowed: required permission is missing: {0}")]
     MissingUserPermission(String),
     #[error("Not allowed without business")]
