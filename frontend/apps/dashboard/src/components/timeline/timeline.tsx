@@ -45,16 +45,17 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
 
   return (
     <>
-      <Stack direction="column">
+      <Stack direction="column" overflow="hidden">
         {items.map((item: TimelineItem, i: number) => {
           const key = `${getKeyForItemTime(item.time)}-${i}`;
           const { iconComponent, headerComponent, bodyComponent } = item;
-          const hasDashedBorder = !iconComponent;
           const last = i === items.length - 1;
 
           return (
             <Grid.Container
               key={key}
+              position="relative"
+              height="auto"
               columns={['146px 24px 1fr']}
               rows={['40px auto']}
               alignItems="start"
@@ -68,12 +69,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
               <Grid.Item grid="time" direction="row" gap={2} minHeight="40px">
                 {item.time && <TimelineItemTime time={item.time} />}
               </Grid.Item>
-              <Line
-                data-last={last}
-                data-dashed={hasDashedBorder}
-                last={last}
-                gridArea="line"
-              />
+              {!last && <Line data-last={last} gridArea="line" />}
               <Grid.Item
                 align="center"
                 justify="center"
@@ -124,22 +120,15 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
   );
 };
 
-const Line = styled(Grid.Item)<{ last: boolean }>`
-  ${({ theme, last }) => css`
-    position: relative;
-    height: 100%;
-
-    ${!last &&
-    css`
-      &:before {
-        content: '';
-        display: block;
-        width: 1px;
-        height: 100%;
-        background-color: ${theme.borderColor.primary};
-        margin: 0 auto;
-      }
-    `}
+const Line = styled(Grid.Item)`
+  ${({ theme }) => css`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    background-color: ${theme.borderColor.primary};
   `}
 `;
 
