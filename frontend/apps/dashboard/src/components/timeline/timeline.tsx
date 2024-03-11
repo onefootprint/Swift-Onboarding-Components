@@ -59,7 +59,6 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
               rows={['40px auto']}
               alignItems="start"
               justifyContent="start"
-              overflow="hidden"
               templateAreas={[
                 'time icon content',
                 'empty line content',

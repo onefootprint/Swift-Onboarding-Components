@@ -485,6 +485,14 @@
         "required": "A note is required"
       }
     },
+    "insight-event-popover": {
+      "insights": "Insights",
+      "region": "Region",
+      "country": "Country",
+      "postal-code": "Postal code",
+      "ip-address": "IP Address",
+      "device-os": "Device / OS"
+    },
     "cmdk": {
       "erase-search": "Erase search",
       "no-results": "No results found",
@@ -1516,8 +1524,9 @@
             "user-created-by": "User created by "
           },
           "auth-method-updated": {
-            "replace": "Replaced <b>{{kind}}</b> used as a Footprint login method",
-            "add_primary": "New <b>{{kind}}</b> added as a Footprint login method",
+            "user": "User",
+            "replace": "updated the <b>{{kind}}</b> used as a Footprint login method",
+            "add_primary": "registered <b>{{kind}}</b> as a Footprint login method",
             "method": {
               "phone": "phone number",
               "email": "email",
