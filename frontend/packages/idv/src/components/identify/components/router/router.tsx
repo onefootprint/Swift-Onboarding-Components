@@ -43,25 +43,25 @@ const getHeader = (
 const Router = ({ onDone }: RouterProps): JSX.Element | null => {
   const [state, send] = useIdentifyMachine();
   const { context, matches } = state;
-  const { initialAuthToken, variant } = context;
+  const { initialAuthToken, variant, challenge, identify } = context;
   const isDone = matches('success');
   const { t } = useTranslation('identify');
   const Header = getHeader(context, getLeftNavButton(state, send));
 
   useEffect(() => {
-    if (isDone && context.challenge.authToken) {
+    if (isDone && challenge.authToken) {
       onDone({
-        authToken: context.challenge.authToken,
-        phoneNumber: context.identify.phoneNumber,
-        email: context.identify.email,
+        authToken: challenge.authToken,
+        phoneNumber: identify.phoneNumber,
+        email: identify.email,
       });
     }
   }, [
     isDone,
     onDone,
-    context.challenge.authToken,
-    context.identify.email,
-    context.identify.phoneNumber,
+    challenge.authToken,
+    identify.email,
+    identify.phoneNumber,
   ]);
 
   if (isDone) return null;
@@ -108,11 +108,11 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
   if (matches('phoneKbaChallenge')) {
     return <PhoneKbaChallenge Header={Header} />;
   }
-  if (matches('addPhone') && state.context.challenge.authToken) {
+  if (matches('addPhone') && challenge.authToken) {
     return (
       <UpdatePhone
         Header={Header}
-        authToken={state.context.challenge.authToken}
+        authToken={challenge.authToken}
         actionKind={UpdateAuthMethodActionKind.addPrimary}
         identifyVariant={variant}
         onSuccess={phoneNumber => {

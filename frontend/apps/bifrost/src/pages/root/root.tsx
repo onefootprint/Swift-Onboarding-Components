@@ -5,9 +5,10 @@ import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import type { IdvCompletePayload } from '@onefootprint/idv';
 import Idv, {
   AppErrorBoundary,
-  Logger,
+  getLogger,
   useFootprintProvider,
   useLogStateMachine,
+  useOnboardingValidate,
 } from '@onefootprint/idv';
 import { checkIsAndroid } from '@onefootprint/idv/src/utils';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
@@ -15,7 +16,7 @@ import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
-import React from 'react';
+import React, { useCallback } from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -24,9 +25,9 @@ import Complete from '../complete';
 import Init from '../init';
 import InitError from '../init-error';
 
-type RootProps = {
-  variant?: FootprintVariant;
-};
+type RootProps = { variant?: FootprintVariant };
+
+const { logError, logInfo } = getLogger('bifrost-root');
 
 const Root = ({ variant }: RootProps) => {
   const fpProvider = useFootprintProvider();
@@ -45,8 +46,9 @@ const Root = ({ variant }: RootProps) => {
 
   const isAndroidWebview = !checkIsIframe() && checkIsAndroid();
   const shouldShowCompletionPage = showCompletionPage || isAndroidWebview;
-
   const observeCollector = useObserveCollector();
+  const mutOnboardingValidate = useOnboardingValidate();
+
   useLogStateMachine('bifrost', state);
   useEffectOnce(() => {
     LogRocket.getSessionURL(logRocketSessionUrl => {
@@ -56,12 +58,25 @@ const Root = ({ variant }: RootProps) => {
     });
   });
 
-  const handleComplete = ({
+  const handleIdentifyCompletion = useCallback(
+    (args: { authToken: string }) => {
+      mutOnboardingValidate.mutate(
+        { authToken: args.authToken },
+        {
+          onError: err => logError('Error while validating auth token', err),
+          onSuccess: res => fpProvider.auth(res.validationToken),
+        },
+      );
+    },
+    [fpProvider, mutOnboardingValidate],
+  );
+
+  const handleBifrostCompletion = ({
     validationToken,
     authToken: idvAuthToken,
     deviceResponseJson,
   }: IdvCompletePayload) => {
-    Logger.info(
+    logInfo(
       'IDV flow is complete, sending validation token back to the tenant',
     );
     if (validationToken) {
@@ -86,7 +101,7 @@ const Root = ({ variant }: RootProps) => {
   };
 
   const handleClose = () => {
-    Logger.info('IDV flow is closed by the user');
+    logInfo('IDV flow is closed by the user');
     fpProvider.cancel();
     fpProvider.close();
   };
@@ -101,8 +116,9 @@ const Root = ({ variant }: RootProps) => {
             authToken={authToken}
             obConfigAuth={obConfigAuth}
             bootstrapData={bootstrapData}
-            onComplete={handleComplete}
+            onComplete={handleBifrostCompletion}
             onClose={handleClose}
+            onIdentifyDone={handleIdentifyCompletion}
             showLogo={showLogo}
             l10n={l10n}
           />

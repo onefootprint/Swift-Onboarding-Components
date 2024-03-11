@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
 
-import Logger from '../../../utils/logger';
+import { getLogger } from '../../../utils/logger';
 import type {
   CompletePayload,
   CustomChildAPI,
@@ -13,8 +13,9 @@ import type {
 } from '../types';
 import generateEventEmitter from '../utils/generate-event-emitter';
 
-const { closed, canceled, completed } = FootprintPublicEvent;
+const { auth, canceled, closed, completed } = FootprintPublicEvent;
 const { propsReceived, started } = FootprintPrivateEvent;
+const { logInfo, logWarn } = getLogger('bifrost-iframe-adapter');
 
 const getSpecificEvent = (
   event: string,
@@ -33,22 +34,12 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
     const specificEvent = getSpecificEvent(event, postmateChildApiRef);
     if (postmateChildApiRef) {
       postmateChildApiRef.emit(specificEvent, data);
+      logInfo(`The ${specificEvent} event has been dispatched`);
     } else {
-      Logger.warn(
+      logWarn(
         `Footprint.js must be initialized in order to dispatch the event "${event}"`,
-        'bifrost-iframe-adapter',
       );
     }
-  };
-
-  const close = (): void => {
-    Logger.info('Closing footprint from iframe adapter');
-    sendEvent(closed);
-  };
-
-  const cancel = (): void => {
-    Logger.info('Canceling footprint from iframe adapter');
-    sendEvent(canceled);
   };
 
   const load = async (): Promise<CustomChildAPI | null> => {
@@ -56,7 +47,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
       return Promise.resolve(postmateChildApiRef);
     }
 
-    Logger.info('Loading footprint from iframe adapter');
+    logInfo('Loading footprint from iframe adapter');
     const contextModel = {
       [propsReceived]: (props: FootprintProps) => {
         eventEmitter.emit(propsReceived, props);
@@ -65,33 +56,32 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
 
     try {
       postmateChildApiRef = await new Postmate.Model(contextModel);
-      Logger.info('Starting footprint from iframe adapter');
+      logInfo('Starting footprint from iframe adapter');
       postmateChildApiRef.emit(started);
       isAdapterLoaded = true;
 
       return postmateChildApiRef;
     } catch (err) {
       isAdapterLoaded = true;
-      Logger.warn('Footprint.js handshake reply failed');
+      logWarn('Footprint.js handshake reply failed');
 
       return null;
     }
   };
 
   const complete = ({ validationToken, delay = 0 }: CompletePayload) => {
-    Logger.info('Completing footprint from iframe adapter');
+    logInfo('Completing footprint from iframe adapter');
     sendEvent(completed, validationToken);
     setTimeout(() => {
-      Logger.info(
-        'Closing footprint after complete timeout from iframe adapter',
-      );
-      close();
+      logInfo('Closing footprint after complete timeout from iframe adapter');
+      sendEvent(closed);
     }, delay);
   };
 
   return {
-    cancel,
-    close,
+    auth: (token: string) => sendEvent(auth, token),
+    cancel: () => sendEvent(canceled),
+    close: () => sendEvent(closed),
     complete,
     getAdapterResponse: () => postmateChildApiRef,
     getLoadingStatus: () => isAdapterLoaded,

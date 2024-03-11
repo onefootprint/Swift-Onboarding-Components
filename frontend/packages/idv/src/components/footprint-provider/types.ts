@@ -19,6 +19,7 @@ export type CustomChildAPI = Postmate.ChildAPI & {
 };
 
 export type IframeAdapterReturn = {
+  auth: (token: string) => void;
   cancel: () => void;
   close: () => void;
   complete: (completePayload: CompletePayload) => void;
@@ -29,6 +30,7 @@ export type IframeAdapterReturn = {
 };
 
 export type EmptyAdapterReturn = {
+  auth: () => void;
   cancel: () => void;
   close: () => void;
   complete: () => void;
@@ -37,6 +39,7 @@ export type EmptyAdapterReturn = {
 };
 
 export type WebViewAdapterReturn = {
+  auth: (token: string) => void;
   cancel: () => void;
   close: () => void;
   complete: (completePayload: CompletePayload) => void;
@@ -47,6 +50,10 @@ export type WebViewAdapterReturn = {
 export type ProviderReturn = {
   getAdapterResponse?: IframeAdapterReturn['getAdapterResponse'];
   getLoadingStatus?: IframeAdapterReturn['getLoadingStatus'];
+  auth:
+    | EmptyAdapterReturn['auth']
+    | IframeAdapterReturn['auth']
+    | WebViewAdapterReturn['auth'];
   cancel:
     | EmptyAdapterReturn['cancel']
     | IframeAdapterReturn['cancel']

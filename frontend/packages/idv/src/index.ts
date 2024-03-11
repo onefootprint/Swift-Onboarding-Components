@@ -37,6 +37,7 @@ export {
   useGetOnboardingStatus,
   useLogStateMachine,
   useOnboarding,
+  useOnboardingValidate,
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from './hooks';

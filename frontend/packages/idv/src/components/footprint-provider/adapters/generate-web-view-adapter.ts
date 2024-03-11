@@ -56,6 +56,7 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
   };
 
   return {
+    auth: () => undefined,
     load,
     cancel,
     close,

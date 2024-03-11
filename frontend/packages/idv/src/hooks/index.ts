@@ -7,6 +7,7 @@ export {
   useGetOnboardingStatus,
   useOnboarding,
   useOnboardingAuthorize,
+  useOnboardingValidate,
   useSkipLiveness,
   useUpdateD2PStatus,
   useUserData,

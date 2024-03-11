@@ -5,6 +5,7 @@ type UseFootprintProvider = { client: ProviderReturn };
 const useFootprintProvider = ({
   client,
 }: UseFootprintProvider): ProviderReturn => ({
+  auth: client.auth,
   cancel: client.cancel,
   close: client.close,
   complete: client.complete,

@@ -4,9 +4,9 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
+import { useOnboardingValidate } from '../../../../hooks';
 import Error from '../../components/error';
 import { useOnboardingMachine } from '../../components/machine-provider';
-import useOnboardingValidate from './hooks/use-onboarding-validate';
 
 const Validate = () => {
   const [state, send] = useOnboardingMachine();

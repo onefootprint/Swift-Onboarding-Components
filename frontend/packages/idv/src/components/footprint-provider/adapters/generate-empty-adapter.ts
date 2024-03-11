@@ -7,6 +7,10 @@ const generateEmptyAdapter = (): EmptyAdapterReturn => {
     return Promise.resolve();
   };
 
+  const auth = (): void => {
+    Logger.info('Challenge token authentication from empty adapter');
+  };
+
   const close = (): void => {
     Logger.info('Closing footprint from empty adapter');
   };
@@ -25,6 +29,7 @@ const generateEmptyAdapter = (): EmptyAdapterReturn => {
 
   return {
     load,
+    auth,
     cancel,
     close,
     complete,

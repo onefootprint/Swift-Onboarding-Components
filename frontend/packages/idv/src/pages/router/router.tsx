@@ -1,15 +1,18 @@
 import type { L10n } from '@onefootprint/footprint-js';
-import { getErrorMessage } from '@onefootprint/request';
 import { SessionStatus } from '@onefootprint/types';
+import type { ComponentProps } from 'react';
 import React, { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { AppErrorBoundary, SessionExpired } from '../../components';
 import { Identify, IdentifyVariant } from '../../components/identify';
 import { L10nContextProvider } from '../../components/l10n-provider';
-import { useIdvMachine, useLogStateMachine } from '../../hooks';
-import useValidateSession from '../../hooks/ui/use-validate-session';
-import { FPCustomEvents, Logger } from '../../utils';
+import {
+  useIdvMachine,
+  useLogStateMachine,
+  useValidateSession,
+} from '../../hooks';
+import { FPCustomEvents, getLogger } from '../../utils';
 import {
   createAuthTokenChangedPayload,
   createReceivedDeviceResponseJsonPayload,
@@ -19,7 +22,13 @@ import Init from '../init';
 import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
 
-const Router = ({ l10n }: { l10n?: L10n }) => {
+type IdentifyProps = ComponentProps<typeof Identify>;
+type RouterProps = { l10n?: L10n; onIdentifyDone?: IdentifyProps['onDone'] };
+
+const { receivedDeviceResponseJson, stepUpCompleted } = FPCustomEvents;
+const { logWarn } = getLogger('idv-router');
+
+const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
   const [state, send] = useIdvMachine();
   useLogStateMachine('idv', state);
   const {
@@ -51,12 +60,7 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
         }
       },
       onError: error => {
-        Logger.warn(
-          `Validating user session failed with error: ${getErrorMessage(
-            error,
-          )}`,
-          'idv-router',
-        );
+        logWarn('Validating user session failed with error: ', error);
       },
     },
   );
@@ -72,8 +76,14 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     }
 
     onComplete?.({ validationToken, authToken, deviceResponseJson });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDone]);
+  }, [
+    authToken,
+    deviceResponseJson,
+    isDone,
+    isTransfer,
+    onComplete,
+    validationToken,
+  ]);
 
   useEffectOnce(() => {
     const authTokenListener = (e: Event) => {
@@ -85,22 +95,16 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
       if (payload) send(payload);
     };
 
+    document.addEventListener(stepUpCompleted, authTokenListener);
     document.addEventListener(
-      FPCustomEvents.stepUpCompleted,
-      authTokenListener,
-    );
-    document.addEventListener(
-      FPCustomEvents.receivedDeviceResponseJson,
+      receivedDeviceResponseJson,
       deviceResponseJsonListener,
     );
 
     return function cleanup() {
+      document.removeEventListener(stepUpCompleted, authTokenListener);
       document.removeEventListener(
-        FPCustomEvents.stepUpCompleted,
-        authTokenListener,
-      );
-      document.removeEventListener(
-        FPCustomEvents.receivedDeviceResponseJson,
+        receivedDeviceResponseJson,
         deviceResponseJsonListener,
       );
     };
@@ -108,9 +112,9 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
 
   return (
     <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
-      {state.matches('init') && <Init />}
-      {state.matches('sandboxOutcome') && <SandboxOutcome />}
-      {state.matches('identify') && config && device && (
+      {state.matches('init') ? <Init /> : null}
+      {state.matches('sandboxOutcome') ? <SandboxOutcome /> : null}
+      {state.matches('identify') && config && device ? (
         <L10nContextProvider l10n={l10n}>
           <Identify
             variant={IdentifyVariant.verify}
@@ -123,17 +127,23 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
             obConfigAuth={obConfigAuth}
             userData={bootstrapData}
             logoConfig={
-              (showLogo && {
-                orgName: config.orgName,
-                logoUrl: config.logoUrl || undefined,
-              }) ||
-              undefined
+              showLogo
+                ? {
+                    orgName: config.orgName,
+                    logoUrl: config.logoUrl || undefined,
+                  }
+                : undefined
             }
-            onDone={payload => send({ type: 'identifyCompleted', payload })}
+            onDone={payload => {
+              send({ type: 'identifyCompleted', payload });
+              if (onIdentifyDone && payload) {
+                onIdentifyDone(payload);
+              }
+            }}
           />
         </L10nContextProvider>
-      )}
-      {state.matches('onboarding') && authToken && config && device && (
+      ) : null}
+      {state.matches('onboarding') && authToken && config && device ? (
         <Onboarding
           config={config}
           device={device}
@@ -146,15 +156,11 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
           onDone={payload => send({ type: 'onboardingCompleted', payload })}
           l10n={l10n}
         />
-      )}
-      {state.matches('sessionExpired') && (
-        <SessionExpired
-          onRestart={() => {
-            send({ type: 'reset' });
-          }}
-        />
-      )}
-      {state.matches('configInvalid') && <ConfigInvalid />}
+      ) : null}
+      {state.matches('sessionExpired') ? (
+        <SessionExpired onRestart={() => send({ type: 'reset' })} />
+      ) : null}
+      {state.matches('configInvalid') ? <ConfigInvalid /> : null}
     </AppErrorBoundary>
   );
 };

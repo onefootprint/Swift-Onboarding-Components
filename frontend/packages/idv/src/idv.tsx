@@ -1,5 +1,5 @@
-import type { L10n } from '@onefootprint/footprint-js';
 import Script from 'next/script';
+import type { ComponentProps } from 'react';
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
@@ -9,14 +9,15 @@ import { GOOGLE_MAPS_KEY } from './config/constants';
 import Router from './pages/router';
 import type { IdvProps } from './types';
 
-type AppProps = IdvProps & { l10n?: L10n };
+type RouterProps = ComponentProps<typeof Router>;
+type AppProps = IdvProps & RouterProps;
 
-const App = ({ l10n, ...props }: AppProps) => (
+const App = ({ l10n, onIdentifyDone, ...props }: AppProps) => (
   <>
     <L10nContextProvider l10n={l10n}>
       <MachineProvider args={props}>
         <GlobalStyle />
-        <Router l10n={l10n} />
+        <Router l10n={l10n} onIdentifyDone={onIdentifyDone} />
       </MachineProvider>
     </L10nContextProvider>
     <Script

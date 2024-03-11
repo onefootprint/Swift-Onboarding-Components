@@ -613,6 +613,7 @@
           }
         }
       },
+      "phone-number": "Phone number",
       "cta": {
         "continue": "Continue",
         "save": "Save",
