@@ -1,9 +1,11 @@
+import { UserTokenScope } from '@onefootprint/types';
 import React from 'react';
 
 import { getLogger } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
+import { IdentifyVariant } from '../../state/types';
 import getTokenScope from '../../utils/token-scope';
 import Loading from '../loading';
 
@@ -14,13 +16,20 @@ type InitAuthTokenProps = {
 
 const { logError } = getLogger('identify-init-auth-token');
 
+const requiredScopes: Record<IdentifyVariant, UserTokenScope[]> = {
+  [IdentifyVariant.auth]: [],
+  [IdentifyVariant.updateLoginMethods]: [UserTokenScope.explicitAuth],
+  [IdentifyVariant.verify]: [],
+};
+
 const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
   const [state, send] = useIdentifyMachine();
   const {
     obConfigAuth,
     identify: { sandboxId },
+    variant,
   } = state.context;
-  const scope = getTokenScope(state.context.variant);
+  const scope = getTokenScope(variant);
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
 
   const identifyViaToken = async () => {
@@ -37,7 +46,13 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
         },
         onSuccess: res => {
           if (res.user) {
-            const needsAuth = !res.user.tokenScopes.length;
+            // Require the user to re-auth if either the token has no scopes or the Identify
+            // variant requires a scope and the token doesn't have it
+            const needsAuth =
+              !res.user.tokenScopes.length ||
+              requiredScopes[variant].some(
+                s => !res.user?.tokenScopes.includes(s),
+              );
             if (!needsAuth) {
               send({
                 type: 'identifiedWithSufficientScopes',
