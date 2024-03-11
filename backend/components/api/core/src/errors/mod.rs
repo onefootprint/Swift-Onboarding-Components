@@ -264,6 +264,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::InvalidRoleIsLive => StatusCode::BAD_REQUEST,
         DbError::TenantRoleHasActiveApiKeys(_) => StatusCode::BAD_REQUEST,
         DbError::IncorrectTenantRoleKind => StatusCode::BAD_REQUEST,
+        DbError::IncorrectTenantKind => StatusCode::BAD_REQUEST,
         DbError::SandboxMismatch => StatusCode::BAD_REQUEST,
         DbError::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,

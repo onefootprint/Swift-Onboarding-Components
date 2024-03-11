@@ -74,6 +74,8 @@ pub enum DbError {
     TenantRoleMismatch,
     #[error("This kind of role cannot be bound to this entity.")]
     IncorrectTenantRoleKind,
+    #[error("Incorrect tenant kind in this context.")]
+    IncorrectTenantKind,
     #[error("Scoped user is_live doesn't match UserVault is_live")]
     SandboxMismatch,
     #[error("Only portable vaults can be linked to an ob config")]

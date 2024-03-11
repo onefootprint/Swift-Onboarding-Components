@@ -96,7 +96,7 @@ impl TenantRolebinding {
             TenantRoleKindDiscriminant::DashboardUser
             | TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
                 if tenant_role.kind.tenant_kind() != t_pt_id.into() {
-                    return Err(DbError::IncorrectTenantRoleKind);
+                    return Err(DbError::IncorrectTenantKind);
                 }
             }
             TenantRoleKindDiscriminant::ApiKey => {
