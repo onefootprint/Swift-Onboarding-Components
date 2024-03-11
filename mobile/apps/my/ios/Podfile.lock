@@ -280,7 +280,7 @@ PODS:
     - React-Core
   - react-native-splash-screen (3.3.0):
     - React-Core
-  - react-native-worklets-core (0.2.4):
+  - react-native-worklets-core (0.3.0):
     - React
     - React-callinvoker
     - React-Core
@@ -395,7 +395,7 @@ PODS:
   - Sentry/HybridSDK (8.17.1):
     - SentryPrivate (= 8.17.1)
   - SentryPrivate (8.17.1)
-  - VisionCamera (3.7.0):
+  - VisionCamera (3.8.2):
     - React
     - React-callinvoker
     - React-Core
@@ -595,7 +595,7 @@ SPEC CHECKSUMS:
   react-native-passkey: 29ff814a83dfd4311478498e71a801dce68043ac
   react-native-safe-area-context: 0ee144a6170530ccc37a0fd9388e28d06f516a89
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
-  react-native-worklets-core: b4094f51cb2bc649e297206425cb8956f4945e3e
+  react-native-worklets-core: a894d572639fcf37c6d284cc799882d25d00c93d
   React-perflogger: 0cc42978a483a47f3696171dac2e7033936fc82d
   React-RCTActionSheet: ea922b476d24f6d40b8e02ac3228412bd3637468
   React-RCTAnimation: 7be2c148398eaa5beac950b2b5ec7102389ec3ad
@@ -620,7 +620,7 @@ SPEC CHECKSUMS:
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
   Sentry: d9f99f9cc13777c5d938650c1e1c85047bb4f0d1
   SentryPrivate: 839b1e58addf58624087a80b2628e543193fa8ef
-  VisionCamera: 45f8d46c0657ceac3f58eb1a3116fe9afa8f4277
+  VisionCamera: edbcd00e27a438b2228f67823e2b8d15a189065f
   Yoga: 68c9c592c3e80ec37ff28db20eedb13d84aae5df
 
 PODFILE CHECKSUM: a724509bf39ca344f580e91dde81d3aa2fd7d6d9
