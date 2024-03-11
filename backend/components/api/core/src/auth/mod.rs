@@ -36,7 +36,7 @@ pub enum AuthError {
     ErrorLoadingSession(String, String),
     #[error("Invalid request body")]
     InvalidBody,
-    #[error("Incorrect session type auth")]
+    #[error("Incorrect auth session type")]
     SessionTypeError,
     #[error("Not allowed: restricted to sandbox mode")]
     SandboxRestricted,

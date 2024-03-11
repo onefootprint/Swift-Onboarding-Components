@@ -27,7 +27,6 @@ pub struct TenantRbAuth {
     tenant: Tenant,
     tenant_role: TenantRole,
     tenant_user: TenantUser,
-    #[allow(unused)]
     tenant_rolebinding: TenantRolebinding,
     is_live: bool,
     pub(super) auth_method: WorkosAuthMethod,

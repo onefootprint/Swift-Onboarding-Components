@@ -9,6 +9,7 @@ from tests.constants import (
     TENANT_ID1,
     TENANT_ID2,
     TENANT_ID3,
+    PARTNER_TENANT_ID1,
     LIVE_PHONE_NUMBER,
     EMAIL,
 )
@@ -17,6 +18,7 @@ from tests.utils import (
     IncorrectServerVersion,
     _make_request,
     create_tenant,
+    create_partner_tenant,
     create_ob_config,
     _gen_random_sandbox_id,
     _gen_random_n_digit_number,
@@ -147,6 +149,19 @@ def foo_sandbox_tenant():
     }
 
     return create_tenant(org_data, ob_conf_data)
+
+
+@pytest.fixture(scope="session")
+def partner_tenant():
+    """
+    Production, non-sandbox tenant. Only used for these tests
+    """
+    org_data = {
+        "id": PARTNER_TENANT_ID1,
+        "name": "Footprint Compliance Partner Integration Testing",
+    }
+
+    return create_partner_tenant(org_data)
 
 
 @pytest.fixture(scope="session")

@@ -58,6 +58,15 @@ class Tenant(NamedTuple):
     ro_auth_token: DashboardAuth
 
 
+class PartnerTenant(NamedTuple):
+    id: str
+    name: str
+    db_auths: list
+    auth_token: DashboardAuth
+    ro_db_auths: list
+    ro_auth_token: DashboardAuth
+
+
 class BasicUser(NamedTuple):
     auth_token: str
     phone_number: str

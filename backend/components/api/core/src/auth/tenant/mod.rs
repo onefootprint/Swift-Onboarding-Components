@@ -1,32 +1,37 @@
-mod guards;
-pub use self::guards::*;
-mod workos;
-pub use self::workos::*;
-use async_trait::async_trait;
-use db::models::{tenant::Tenant, tenant_user::TenantUser};
-
-mod secret_key;
-use newtypes::{DataIdentifier, DataLifetimeSource, WorkosAuthMethod};
-pub use secret_key::*;
-mod tenant_rb;
-pub use self::tenant_rb::*;
-mod firm_employee_assume;
-pub use self::firm_employee_assume::*;
 mod client;
 pub use client::*;
 mod firm_employee;
+use db::models::partner_tenant::PartnerTenant;
 pub use firm_employee::*;
+mod firm_employee_assume;
+pub use self::firm_employee_assume::*;
+mod guards;
+pub use self::guards::*;
+mod partner_tenant_rb;
+pub use self::partner_tenant_rb::*;
+mod secret_key;
+pub use secret_key::*;
+mod tenant_rb;
+pub use self::tenant_rb::*;
+mod workos;
+pub use self::workos::*;
 
 use super::{Any, AuthError, CanDecrypt, Either, IsGuardMet, Or, SessionContext};
 use crate::{
     errors::{ApiError, ApiResult, ValidationError},
     State,
 };
-use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
+use async_trait::async_trait;
+use db::models::{tenant::Tenant, tenant_user::TenantUser};
+use newtypes::{
+    DataIdentifier, DataLifetimeSource, DbActor, TenantApiKeyId, TenantScope, TenantUserId, WorkosAuthMethod,
+};
 
 pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAssumeAuthContext>;
 
 pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, TenantSessionAuth>;
+
+pub type PartnerTenantSessionAuth = PartnerTenantRbAuthContext;
 
 impl AnyTenantSessionAuth {
     /// The different types of session auths have very different purposes, so we have to do some
@@ -72,6 +77,13 @@ pub trait TenantAuth {
         CanDecrypt::single(di).or_admin().is_met(&self.scopes())
     }
 }
+
+pub trait PartnerTenantAuth {
+    fn partner_tenant(&self) -> &PartnerTenant;
+    fn actor(&self) -> AuthActor;
+    fn scopes(&self) -> Vec<TenantScope>;
+}
+
 
 pub trait GetFirmEmployee {
     /// Escape hatch to get the `TenantUser` for an auth session, if and only if the authed user

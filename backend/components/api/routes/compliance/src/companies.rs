@@ -1,6 +1,6 @@
 use crate::{types::JsonApiResponse, State};
 use api_core::{
-    auth::protected_custodian::ProtectedCustodianAuthContext,
+    auth::tenant::PartnerTenantSessionAuth,
     types::{EmptyResponse, ResponseData},
 };
 use paperclip::actix::{self, api_v2_operation, web};
@@ -12,8 +12,8 @@ use paperclip::actix::{self, api_v2_operation, web};
 #[actix::get("/compliance/companies")]
 pub async fn get(
     _state: web::Data<State>,
-    // TODO: switch to partner tenant auth
-    _auth: ProtectedCustodianAuthContext,
+    _auth: PartnerTenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
+    // TODO: implement guards.
     ResponseData::ok(EmptyResponse {}).json()
 }

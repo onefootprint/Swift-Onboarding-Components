@@ -84,6 +84,7 @@ TENANT_ID1 = "_private_it_org_1"
 TENANT_ID2 = "_private_it_org_2"
 TENANT_ID3 = "_private_it_org_3"
 TENANT_ID4 = "_private_it_org_4"
+PARTNER_TENANT_ID1 = "_private_it_porg_1"
 
 
 # Sans phone number, ssn, email
