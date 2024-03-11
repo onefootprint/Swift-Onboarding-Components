@@ -1,4 +1,4 @@
-use crate::{PartnerTenantId, TenantId};
+use crate::{PartnerTenantId, TenantId, TenantKind};
 use derive_more::From;
 
 impl TenantId {
@@ -31,4 +31,13 @@ impl TenantId {
 pub enum TenantOrPartnerTenantId<'a> {
     TenantId(&'a TenantId),
     PartnerTenantId(&'a PartnerTenantId),
+}
+
+impl<'a> From<TenantOrPartnerTenantId<'a>> for TenantKind {
+    fn from(value: TenantOrPartnerTenantId<'a>) -> Self {
+        match value {
+            TenantOrPartnerTenantId::TenantId(_) => TenantKind::Tenant,
+            TenantOrPartnerTenantId::PartnerTenantId(_) => TenantKind::PartnerTenant,
+        }
+    }
 }

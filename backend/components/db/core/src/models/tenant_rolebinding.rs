@@ -10,7 +10,7 @@ use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
 use derive_more::From;
 use diesel::{dsl::not, prelude::*, Queryable};
 use newtypes::{
-    PartnerTenantId, TenantId, TenantOrPartnerTenantId, TenantRoleId, TenantRoleKind,
+    PartnerTenantId, TenantId, TenantKind, TenantOrPartnerTenantId, TenantRoleId, TenantRoleKind,
     TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId,
 };
 
@@ -88,9 +88,21 @@ impl TenantRolebinding {
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
         let tenant_role = TenantRole::lock_active(conn, &tenant_role_id, t_pt_id)?;
-        if tenant_role.kind != TenantRoleKindDiscriminant::DashboardUser {
-            return Err(DbError::IncorrectTenantRoleKind);
+
+        // Validate the given role's kind.
+        match tenant_role.kind {
+            TenantRoleKindDiscriminant::DashboardUser
+            | TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
+                if tenant_role.kind.tenant_kind() != t_pt_id.into() {
+                    return Err(DbError::IncorrectTenantRoleKind);
+                }
+            }
+            TenantRoleKindDiscriminant::ApiKey => {
+                // API keys roles can't be bound to a tenant user.
+                return Err(DbError::IncorrectTenantRoleKind);
+            }
         }
+
         // Lock the user so we don't create two rolebindings in parallel
         TenantUser::lock(conn, &tenant_user_id)?;
 
@@ -124,10 +136,22 @@ impl TenantRolebinding {
     ) -> DbResult<Self> {
         let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
 
-        // Get the default admin and read-only role for this tenant
-        let kind = TenantRoleKind::DashboardUser;
-        let admin_role = TenantRole::get_immutable(conn, t_pt_id, ImmutableRoleKind::Admin, kind)?;
-        let ro_role = TenantRole::get_immutable(conn, t_pt_id, ImmutableRoleKind::ReadOnly, kind)?;
+        // Get the default admin and read-only role for this tenant/partner tenant.
+        let (tenant_role_kind, admin_role_kind, ro_role_kind) = match t_pt_id {
+            TenantOrPartnerTenantId::TenantId(_) => (
+                TenantRoleKind::DashboardUser,
+                ImmutableRoleKind::Admin,
+                ImmutableRoleKind::ReadOnly,
+            ),
+            TenantOrPartnerTenantId::PartnerTenantId(_) => (
+                TenantRoleKind::CompliancePartnerDashboardUser,
+                ImmutableRoleKind::CompliancePartnerAdmin,
+                ImmutableRoleKind::CompliancePartnerReadOnly,
+            ),
+        };
+        let admin_role = TenantRole::get_immutable(conn, t_pt_id, admin_role_kind, tenant_role_kind)?;
+        let ro_role = TenantRole::get_immutable(conn, t_pt_id, ro_role_kind, tenant_role_kind)?;
+
         // If the tenant was just created and has no users, give the user admin perms.
         // Otherwise, read-only perms
         let filters = TenantRolebindingFilters {
@@ -271,8 +295,19 @@ impl TenantRolebinding {
             // Lock the role to make sure we don't deactivate it before we update this rolebinding.
             // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
             let role = TenantRole::lock_active(conn, tenant_role_id, t_pt.id())?;
-            if role.kind != TenantRoleKindDiscriminant::DashboardUser {
-                return Err(DbError::IncorrectTenantRoleKind);
+
+            // Validate the given role's kind.
+            match role.kind {
+                TenantRoleKindDiscriminant::DashboardUser
+                | TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
+                    if role.kind.tenant_kind() != t_pt.into() {
+                        return Err(DbError::IncorrectTenantRoleKind);
+                    }
+                }
+                TenantRoleKindDiscriminant::ApiKey => {
+                    // API keys roles can't be bound to a tenant user.
+                    return Err(DbError::IncorrectTenantRoleKind);
+                }
             }
             if role.deactivated_at.is_some() {
                 return Err(DbError::TenantRoleAlreadyDeactivated);
@@ -360,6 +395,15 @@ impl TenantOrPartnerTenant {
         match self {
             TenantOrPartnerTenant::Tenant(t) => (&t.id).into(),
             TenantOrPartnerTenant::PartnerTenant(pt) => (&pt.id).into(),
+        }
+    }
+}
+
+impl<'a> From<TenantOrPartnerTenant> for TenantKind {
+    fn from(value: TenantOrPartnerTenant) -> Self {
+        match value {
+            TenantOrPartnerTenant::Tenant(_) => TenantKind::Tenant,
+            TenantOrPartnerTenant::PartnerTenant(_) => TenantKind::PartnerTenant,
         }
     }
 }
