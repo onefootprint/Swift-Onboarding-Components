@@ -134,23 +134,27 @@ mod tests {
         let tenants = [&tenant1, &tenant2, &tenant3];
 
         // Create partner tenants and partner with each of the tenants.
-        let pt1 = NewPartnerTenant {
-            name: "Bank".to_string(),
-            public_key: VaultPublicKey::unvalidated(vec![]),
-            e_private_key: EncryptedVaultPrivateKey(vec![]),
-            supported_auth_methods: None,
-            domains: vec!["example bank dot com".to_owned()],
-        }
-        .create(conn)
+        let pt1 = PartnerTenant::create(
+            conn,
+            NewPartnerTenant {
+                name: "Bank".to_string(),
+                public_key: VaultPublicKey::unvalidated(vec![]),
+                e_private_key: EncryptedVaultPrivateKey(vec![]),
+                supported_auth_methods: None,
+                domains: vec!["example bank dot com".to_owned()],
+            },
+        )
         .unwrap();
-        let pt2 = NewPartnerTenant {
-            name: "Bank".to_string(),
-            public_key: VaultPublicKey::unvalidated(vec![]),
-            e_private_key: EncryptedVaultPrivateKey(vec![]),
-            supported_auth_methods: None,
-            domains: vec!["example bank dot com".to_owned()],
-        }
-        .create(conn)
+        let pt2 = PartnerTenant::create(
+            conn,
+            NewPartnerTenant {
+                name: "Bank".to_string(),
+                public_key: VaultPublicKey::unvalidated(vec![]),
+                e_private_key: EncryptedVaultPrivateKey(vec![]),
+                supported_auth_methods: None,
+                domains: vec!["example bank dot com".to_owned()],
+            },
+        )
         .unwrap();
         let pts = [&pt1, &pt2];
 

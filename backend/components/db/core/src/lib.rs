@@ -40,6 +40,8 @@ pub use cleanup::*;
 mod non_null_array;
 pub use non_null_array::*;
 
+pub mod helpers;
+
 // Old tests
 #[cfg(test)]
 mod test;

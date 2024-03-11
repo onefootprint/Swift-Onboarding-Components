@@ -1,5 +1,5 @@
 use super::tenant_role::{ImmutableRoleKind, TenantRole};
-use crate::{DbResult, NonNullVec, OptionalNonNullVec, PgConn, TxnPgConn};
+use crate::{helpers::WorkosAuthIdentity, DbResult, NonNullVec, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
     scoped_vault,
@@ -16,7 +16,7 @@ use diesel::{
 use itertools::Itertools;
 use newtypes::{
     AppClipExperienceId, CompanySize, EncryptedVaultPrivateKey, PreviewApi, ScopedVaultId, StripeCustomerId,
-    TenantId, TenantRoleKind, VaultId, VaultPublicKey, WorkosAuthMethod,
+    TenantId, TenantKind, TenantRoleKind, VaultId, VaultPublicKey, WorkosAuthMethod,
 };
 use std::collections::HashMap;
 
@@ -311,14 +311,20 @@ impl Tenant {
     }
 }
 
-impl Tenant {
-    pub fn supports_auth_method(&self, auth_method: WorkosAuthMethod) -> bool {
+impl WorkosAuthIdentity for Tenant {
+    fn supports_auth_method(&self, auth_method: WorkosAuthMethod) -> bool {
         if let Some(auth_methods) = self.supported_auth_methods.as_ref() {
             if !auth_methods.contains(&auth_method) {
                 return false;
             }
         }
         true
+    }
+}
+
+impl From<&Tenant> for TenantKind {
+    fn from(_: &Tenant) -> Self {
+        TenantKind::Tenant
     }
 }
 

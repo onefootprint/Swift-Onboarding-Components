@@ -1,9 +1,17 @@
 use super::tenant_role::{ImmutableRoleKind, TenantRole};
-use crate::{DbResult, NonNullVec, OptionalNonNullVec, TxnPgConn};
+use crate::{helpers::WorkosAuthIdentity, DbResult, NonNullVec, OptionalNonNullVec, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::partner_tenant;
-use diesel::prelude::*;
-use newtypes::{EncryptedVaultPrivateKey, PartnerTenantId, TenantRoleKind, VaultPublicKey, WorkosAuthMethod};
+use diesel::{
+    insertable::CanInsertInSingleQuery,
+    pg::Pg,
+    prelude::*,
+    query_builder::{QueryFragment, QueryId},
+    Insertable,
+};
+use newtypes::{
+    EncryptedVaultPrivateKey, PartnerTenantId, TenantKind, TenantRoleKind, VaultPublicKey, WorkosAuthMethod,
+};
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = partner_tenant)]
@@ -31,11 +39,28 @@ pub struct NewPartnerTenant {
     pub domains: Vec<String>,
 }
 
-impl NewPartnerTenant {
-    #[tracing::instrument("NewPartnerTenant::create", skip_all)]
-    pub fn create(self, conn: &mut TxnPgConn) -> DbResult<PartnerTenant> {
+/// Allows creating with an application-generated PartnerTenantId rather than a DB-generated ID.
+#[derive(Debug, Clone, Insertable)]
+#[diesel(table_name = partner_tenant)]
+pub struct NewIntegrationTestPartnerTenant {
+    pub id: PartnerTenantId,
+    pub name: String,
+    pub public_key: VaultPublicKey,
+    pub e_private_key: EncryptedVaultPrivateKey,
+    pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
+    pub domains: Vec<String>,
+}
+
+impl PartnerTenant {
+    #[tracing::instrument("PartnerTenant::create", skip_all)]
+    pub fn create<T>(conn: &mut TxnPgConn, value: T) -> DbResult<PartnerTenant>
+    where
+        T: Insertable<partner_tenant::table>,
+        <T as Insertable<partner_tenant::table>>::Values:
+            QueryFragment<Pg> + CanInsertInSingleQuery<Pg> + QueryId,
+    {
         let partner_tenant: PartnerTenant = diesel::insert_into(partner_tenant::table)
-            .values(self)
+            .values(value)
             .get_result(conn.conn())?;
 
         // Atomically create all of the immutable roles needed for the partner tenant.
@@ -55,5 +80,31 @@ impl NewPartnerTenant {
         }
 
         Ok(partner_tenant)
+    }
+
+    #[tracing::instrument("PartnerTenant::lock", skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, id: &PartnerTenantId) -> DbResult<Self> {
+        let pt = partner_tenant::table
+            .for_no_key_update()
+            .filter(partner_tenant::id.eq(id))
+            .first(conn.conn())?;
+        Ok(pt)
+    }
+}
+
+impl WorkosAuthIdentity for PartnerTenant {
+    fn supports_auth_method(&self, auth_method: WorkosAuthMethod) -> bool {
+        if let Some(auth_methods) = self.supported_auth_methods.as_ref() {
+            if !auth_methods.contains(&auth_method) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+impl From<&PartnerTenant> for TenantKind {
+    fn from(_: &PartnerTenant) -> Self {
+        TenantKind::PartnerTenant
     }
 }

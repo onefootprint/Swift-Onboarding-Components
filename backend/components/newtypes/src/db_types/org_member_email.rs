@@ -36,8 +36,10 @@ impl OrgMemberEmail {
     pub const INTEGRATION_TEST_USER_EMAIL: &'static str = "integrationtests@onefootprint.com";
 
     pub fn is_integration_test_email(&self) -> bool {
-        self.0.to_lowercase() == Self::INTEGRATION_TEST_USER_EMAIL.to_lowercase()
-            || self.0.to_lowercase() == Self::INTEGRATION_TEST_RO_USER_EMAIL.to_lowercase()
+        let email = self.0.to_lowercase();
+
+        email == Self::INTEGRATION_TEST_RO_USER_EMAIL.to_lowercase()
+            || email == Self::INTEGRATION_TEST_USER_EMAIL.to_lowercase()
     }
 }
 

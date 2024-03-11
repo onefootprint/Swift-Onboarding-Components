@@ -4,13 +4,15 @@ use super::{
     tenant_role::{ImmutableRoleKind, TenantRole},
     tenant_user::TenantUser,
 };
-use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
+use crate::{
+    helpers::TenantOrPartnerTenant, DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn,
+};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
 use derive_more::From;
 use diesel::{dsl::not, prelude::*, Queryable};
 use newtypes::{
-    PartnerTenantId, TenantId, TenantKind, TenantOrPartnerTenantId, TenantRoleId, TenantRoleKind,
+    PartnerTenantId, TenantId, TenantOrPartnerTenantId, TenantRoleId, TenantRoleKind,
     TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId,
 };
 
@@ -381,46 +383,4 @@ pub struct TenantRolebindingFilters<'a> {
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub search: Option<String>,
     pub is_invite_pending: Option<bool>,
-}
-
-#[derive(Debug, Clone, From)]
-#[allow(clippy::large_enum_variant)]
-pub enum TenantOrPartnerTenant {
-    Tenant(Tenant),
-    PartnerTenant(PartnerTenant),
-}
-
-impl TenantOrPartnerTenant {
-    fn id(&self) -> TenantOrPartnerTenantId<'_> {
-        match self {
-            TenantOrPartnerTenant::Tenant(t) => (&t.id).into(),
-            TenantOrPartnerTenant::PartnerTenant(pt) => (&pt.id).into(),
-        }
-    }
-}
-
-impl<'a> From<TenantOrPartnerTenant> for TenantKind {
-    fn from(value: TenantOrPartnerTenant) -> Self {
-        match value {
-            TenantOrPartnerTenant::Tenant(_) => TenantKind::Tenant,
-            TenantOrPartnerTenant::PartnerTenant(_) => TenantKind::PartnerTenant,
-        }
-    }
-}
-
-impl TryFrom<(Option<Tenant>, Option<PartnerTenant>)> for TenantOrPartnerTenant {
-    type Error = DbError;
-
-    fn try_from(value: (Option<Tenant>, Option<PartnerTenant>)) -> Result<Self, Self::Error> {
-        let ret = match value {
-            (Some(tenant), None) => TenantOrPartnerTenant::Tenant(tenant),
-            (None, Some(partner_tenant)) => TenantOrPartnerTenant::PartnerTenant(partner_tenant),
-            _ => {
-                return Err(DbError::AssertionError(
-                    "tenant and partner tenant options are mutually exclusive".to_owned(),
-                ))
-            }
-        };
-        Ok(ret)
-    }
 }

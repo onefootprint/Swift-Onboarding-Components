@@ -7,7 +7,7 @@ use api_core::{
     errors::AssertionError,
 };
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
-use db::models::tenant_rolebinding::{TenantOrPartnerTenant, TenantRolebinding};
+use db::{helpers::TenantOrPartnerTenant, models::tenant_rolebinding::TenantRolebinding};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(

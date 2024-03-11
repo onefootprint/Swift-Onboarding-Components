@@ -10,10 +10,13 @@ use crate::{
 use api_core::auth::session::tenant::{TenantRbSession, WorkOsSession};
 use api_wire_types::{OrgLoginRequest, OrgLoginResponse, Organization, OrganizationMember};
 use chrono::Duration;
-use db::models::{
-    tenant::{NewTenant, Tenant},
-    tenant_rolebinding::{TenantOrPartnerTenant, TenantRolebinding},
-    tenant_user::TenantUser,
+use db::{
+    helpers::TenantOrPartnerTenant,
+    models::{
+        tenant::{NewTenant, Tenant},
+        tenant_rolebinding::TenantRolebinding,
+        tenant_user::TenantUser,
+    },
 };
 use newtypes::{OrgMemberEmail, TenantScope, WorkosAuthMethod};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};

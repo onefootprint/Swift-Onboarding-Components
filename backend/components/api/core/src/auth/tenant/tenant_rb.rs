@@ -3,25 +3,21 @@ use std::sync::Arc;
 use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
-        session::{
-            get_is_live, tenant::TenantRbSession, AllowSessionUpdate, AuthSessionData,
-            ExtractableAuthSession, RequestInfo,
-        },
+        session::{get_is_live, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, SessionContext,
     },
     errors::ApiResult,
 };
 use db::{
+    helpers::TenantOrPartnerTenant,
     models::{
-        tenant::Tenant,
-        tenant_role::TenantRole,
-        tenant_rolebinding::{TenantOrPartnerTenant, TenantRolebinding},
+        tenant::Tenant, tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding,
         tenant_user::TenantUser,
     },
     PgConn,
 };
 use feature_flag::FeatureFlagClient;
-use newtypes::{DataLifetimeSource, TenantRolebindingId, TenantScope, WorkosAuthMethod};
+use newtypes::{DataLifetimeSource, TenantScope, WorkosAuthMethod};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -51,22 +47,6 @@ pub struct TenantRbAuth {
     description = "Short-lived token for an authenticated dashboard user."
 )]
 pub struct ParsedTenantRbAuth(pub(super) TenantRbAuth);
-
-impl TenantRbSession {
-    pub fn create(
-        tenant: &Tenant,
-        rb_id: TenantRolebindingId,
-        auth_method: WorkosAuthMethod,
-    ) -> ApiResult<Self> {
-        if !tenant.supports_auth_method(auth_method) {
-            return Err(AuthError::UnsupportedAuthMethod.into());
-        }
-        Ok(Self {
-            tenant_rolebinding_id: rb_id,
-            auth_method,
-        })
-    }
-}
 
 impl ExtractableAuthSession for ParsedTenantRbAuth {
     fn header_names() -> Vec<&'static str> {

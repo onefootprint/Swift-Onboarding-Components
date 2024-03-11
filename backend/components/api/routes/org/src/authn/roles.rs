@@ -1,7 +1,10 @@
 use crate::{errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi, State};
 use api_core::{auth::tenant::AnyTenantSessionAuth, serializers::IsAuthMethodSupported};
 use api_wire_types::Organization;
-use db::models::tenant_rolebinding::{TenantOrPartnerTenant, TenantRolebinding};
+use db::{
+    helpers::{TenantOrPartnerTenant, WorkosAuthIdentity},
+    models::tenant_rolebinding::TenantRolebinding,
+};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 pub type RolesResponse = Vec<Organization>;

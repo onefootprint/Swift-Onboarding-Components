@@ -1,6 +1,6 @@
 use crate::{
     AccessEventId, AuditEventId, BoLinkId, BusinessOwnerKind, FpId, NtResult, ObConfigurationKey,
-    ScopedVaultId, TenantId, VaultId, VaultKind,
+    PartnerTenantId, ScopedVaultId, TenantId, VaultId, VaultKind,
 };
 
 fn generate_random_id(prefix: &str, length: usize) -> String {
@@ -33,6 +33,12 @@ impl ObConfigurationKey {
 impl TenantId {
     pub fn is_integration_test_tenant(&self) -> bool {
         self.0.starts_with("_private_it_org_")
+    }
+}
+
+impl PartnerTenantId {
+    pub fn is_integration_test_tenant(&self) -> bool {
+        self.0.starts_with("_private_it_porg_")
     }
 }
 
