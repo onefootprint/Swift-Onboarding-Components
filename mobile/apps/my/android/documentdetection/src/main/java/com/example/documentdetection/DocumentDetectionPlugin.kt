@@ -31,8 +31,8 @@ class DocumentDetectionPlugin(
   private final val outlineHorizontalPadding = 32 // This is coming from the DOM specification of the frame outline
   private final val outlineAspectRatio = 1.586 // This is coming from the DOM specification of the frame outline
   private final val docHeightAllowedErrorMargin = 0.4
-  private final val docWidthAllowedErrorMargin = 0.3
-  private final val numAllowedFails = 2
+  private final val docWidthAllowedErrorMargin = 0.2
+  private final val numAllowedFails = 3
   private var numFailedDetection = numAllowedFails
 
   init{

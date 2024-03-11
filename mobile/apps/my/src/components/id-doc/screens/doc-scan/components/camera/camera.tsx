@@ -64,7 +64,6 @@ const Camera = ({
     disabled: !isAutoCaptureEnabled,
     object,
     onDone: () => {
-      onCapture();
       takePhoto({ manual: false });
     },
   });
@@ -81,6 +80,7 @@ const Camera = ({
       return;
     }
 
+    onCapture();
     setIsFlashing(true);
     setShowFeedback(false);
     const newPhoto = await camera.current.takePhoto({
