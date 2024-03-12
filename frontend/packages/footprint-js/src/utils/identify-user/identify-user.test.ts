@@ -41,20 +41,13 @@ const isTest = process.env.NODE_ENV === 'test';
 const baseUrl = process.env.API_BASE_URL ?? isTest ? 'http://test' : '';
 const handlers = [
   // @ts-ignore: Parameter 'res' implicitly has an 'any' type.
-  http.post(`${baseUrl}/hosted/identify`, async res => {
+  http.post(`${baseUrl}/hosted/identify/lite`, async res => {
     const bodyStream = res.request.body?.getReader();
     const body = await convertStreamToObject(bodyStream);
 
     return new Response(
       JSON.stringify({
-        available_challenge_kinds: ['sms', 'biometric'],
-        has_syncable_pass_key: true,
-        is_unverified: true,
-        scrubbed_email: 'Lorem ipsum dolor',
-        scrubbed_phone: 'Lorem ipsum dolor',
-        user_found:
-          isFoundEmail(body.identifier.email) ||
-          isFoundPhone(body.identifier.phone_number),
+        user_found: isFoundEmail(body.email) || isFoundPhone(body.phone_number),
       }),
     );
   }),

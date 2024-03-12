@@ -226,6 +226,48 @@
                 ]
             }
         },
+        "/hosted/identify/lite": {
+            "post": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Tries to identify an existing user by either phone number or email and returns whether a user exists. This is used exclusively in our SDK to check proactively if bootstrapped data identifies an existing user. This is very similar to the normal identify API, but it has a much simpler API will hopefully be more stable than the normal identify API since changes will break old SDK versions.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LiteIdentifyRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LiteIdentifyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Onboarding Config Publishable Key": []
+                    },
+                    {
+                        "Onboarding Config Token": []
+                    },
+                    {
+                        "Business Owner Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/identify/login_challenge": {
             "post": {
                 "tags": [
@@ -3696,10 +3738,7 @@
                             "auth"
                         ]
                     }
-                },
-                "required": [
-                    "scope"
-                ]
+                }
             },
             "IdentifyResponse": {
                 "type": "object",
@@ -4100,6 +4139,28 @@
                 },
                 "required": [
                     "token"
+                ]
+            },
+            "LiteIdentifyRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "phone_number": {
+                        "type": "string"
+                    }
+                }
+            },
+            "LiteIdentifyResponse": {
+                "type": "object",
+                "properties": {
+                    "user_found": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "user_found"
                 ]
             },
             "LogBody": {

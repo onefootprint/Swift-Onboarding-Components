@@ -56,6 +56,19 @@ pub struct IdentifiedUser {
     pub matching_fps: Vec<DataIdentifier>,
 }
 
+#[derive(Apiv2Schema, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct LiteIdentifyRequest {
+    pub email: Option<Email>,
+    pub phone_number: Option<PhoneNumber>,
+}
+
+#[derive(Apiv2Schema, serde::Serialize, Default)]
+#[serde(rename_all = "snake_case")]
+pub struct LiteIdentifyResponse {
+    pub user_found: bool,
+}
+
 #[derive(Apiv2Schema, serde::Serialize, Clone)]
 pub struct IdentifyAuthMethod {
     pub kind: AuthMethodKind,

@@ -167,3 +167,12 @@ def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
     # Should be idempotent if we authorize again
     bifrost.run()
     assert not bifrost.handled_requirements
+
+    # Identify lite should return a response here
+    for data in [
+        dict(phone_number=live_phone_number),
+        dict(email=EMAIL),
+        dict(phone_number=live_phone_number, email=EMAIL),
+    ]:
+        body = post("/hosted/identify/lite", data)
+        assert body["user_found"] == True

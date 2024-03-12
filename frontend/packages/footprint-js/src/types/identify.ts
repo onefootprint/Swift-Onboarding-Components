@@ -1,3 +1,4 @@
 export type IdentifyRequest = {
-  identifier: { email: string } | { phone_number: string };
+  email?: string;
+  phone_number?: string;
 };

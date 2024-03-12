@@ -25,6 +25,7 @@ use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
 
 #[allow(clippy::module_inception)]
 pub mod identify;
+mod identify_lite;
 mod kba;
 pub mod login_challenge;
 pub mod signup_challenge;
@@ -49,6 +50,7 @@ pub struct BiometricChallengeState {
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(identify::post)
+        .service(identify_lite::post)
         .service(login_challenge::post)
         .service(signup_challenge::post)
         .service(kba::post)
