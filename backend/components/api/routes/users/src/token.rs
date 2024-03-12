@@ -21,7 +21,7 @@ use api_core::{
 use api_wire_types::{CreateTokenRequest, CreateTokenResponse, TokenOperationKind};
 use chrono::{Duration, Utc};
 use db::models::{
-    auth_event::{AuthEvent, NewAuthEvent},
+    auth_event::{AuthEvent, NewAuthEventArgs},
     scoped_vault::ScopedVault,
 };
 use feature_flag::BoolFlag;
@@ -89,7 +89,7 @@ pub async fn post(
                 // are permissioned to provide us with third-party auth.
                 // We'll still portablize users with third-part auth (TODO if there's not already
                 // a portable vault for the phone number)
-                NewAuthEvent {
+                let args = NewAuthEventArgs {
                     vault_id: sv.vault_id.clone(),
                     scoped_vault_id: Some(sv.id.clone()),
                     insight_event_id: None,
@@ -97,8 +97,9 @@ pub async fn post(
                     webauthn_credential_id: None,
                     created_at: Utc::now(),
                     scope: IdentifyScope::Onboarding,
-                }
-                .create(conn)?;
+                    new_auth_method_action: None,
+                };
+                AuthEvent::save(args, conn)?;
             }
 
             let implied_auth_events = {

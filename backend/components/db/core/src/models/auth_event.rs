@@ -1,7 +1,10 @@
 use chrono::Duration;
 use db_schema::schema;
 
-use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn};
+use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn, errors::ValidationError};
+use newtypes::ActionKind;
+use newtypes::AuthMethodKind;
+use newtypes::AuthMethodUpdatedInfo;
 use chrono::{DateTime, Utc};
 use db_schema::schema::auth_event;
 use diesel::{prelude::*, Insertable, Queryable};
@@ -9,6 +12,7 @@ use newtypes::{AuthEventId, AuthEventKind, IdentifyScope, WebauthnCredentialId};
 
 use newtypes::{InsightEventId, ScopedVaultId};
 
+use super::user_timeline::UserTimeline;
 use super::{
     apple_device_attest::AppleDeviceAttestation, google_device_attest::GoogleDeviceAttestation,
     insight_event::InsightEvent,
@@ -34,7 +38,7 @@ pub struct AuthEvent {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = auth_event)]
-pub struct NewAuthEvent {
+pub struct NewAuthEventRow {
     pub vault_id: VaultId,
     pub scoped_vault_id: Option<ScopedVaultId>,
     pub insight_event_id: Option<InsightEventId>,
@@ -44,24 +48,70 @@ pub struct NewAuthEvent {
     pub scope: IdentifyScope,
 }
 
-impl NewAuthEvent {
-    #[tracing::instrument("NewAuthEvent::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<AuthEvent> {
-        match &self.scope {
+#[derive(Debug)]
+pub struct NewAuthEventArgs {
+    pub vault_id: VaultId,
+    pub scoped_vault_id: Option<ScopedVaultId>,
+    pub insight_event_id: Option<InsightEventId>,
+    pub kind: AuthEventKind,
+    pub webauthn_credential_id: Option<WebauthnCredentialId>,
+    pub created_at: DateTime<Utc>,
+    pub scope: IdentifyScope,
+
+    /// If this AuthEvent represents the first registration of an auth method,
+    /// context on this new auth method.
+    pub new_auth_method_action: Option<ActionKind>,
+}
+
+impl AuthEvent {
+    #[tracing::instrument("AuthEvent::save", skip_all)]
+    pub fn save(args: NewAuthEventArgs, conn: &mut TxnPgConn) -> DbResult<AuthEvent> {
+        let NewAuthEventArgs {
+            vault_id,
+            scoped_vault_id,
+            insight_event_id,
+            kind,
+            webauthn_credential_id,
+            created_at,
+            scope,
+            new_auth_method_action,
+        } = args;
+
+        match scope {
             IdentifyScope::My1fp => (),
             IdentifyScope::Onboarding | IdentifyScope::Auth => {
                 // We depend upon this in the validate API
-                if self.scoped_vault_id.is_none() {
-                    return Err(DbError::ValidationError(format!(
-                        "Auth event of type {} must have a scoped_vault_id",
-                        self.scope
-                    )));
+                if scoped_vault_id.is_none() {
+                    return Err(DbError::ValidationError(format!("Auth event of type {} must have a scoped_vault_id", scope)));
                 }
             }
         }
+        let row = NewAuthEventRow {
+            vault_id: vault_id.clone(),
+            scoped_vault_id: scoped_vault_id.clone(),
+            insight_event_id,
+            kind,
+            webauthn_credential_id,
+            created_at,
+            scope,
+        };
         let ev = diesel::insert_into(auth_event::table)
-            .values(self)
-            .get_result(conn)?;
+            .values(row)
+            .get_result::<AuthEvent>(conn.conn())?;
+
+        // For auth events when a new auth method is registered, create a timeline event
+        if let Some(new_auth_method_action) = new_auth_method_action {
+            if let Some(sv_id) = ev.scoped_vault_id.clone() {
+                let kind = AuthMethodKind::try_from(ev.kind).map_err(|_| ValidationError("Can't create a timeline event for third-party auth event"))?;
+                // Create a timeline event that shows the passkey was added
+                let info = AuthMethodUpdatedInfo {
+                    kind,
+                    action: new_auth_method_action,
+                    auth_event_id: ev.id.clone(),
+                };
+                UserTimeline::create(conn, info, ev.vault_id.clone(), sv_id)?;
+            }
+        }
         Ok(ev)
     }
 }

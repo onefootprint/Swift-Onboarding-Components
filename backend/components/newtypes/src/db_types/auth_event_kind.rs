@@ -1,4 +1,4 @@
-use crate::util::impl_enum_str_diesel;
+use crate::{util::impl_enum_str_diesel, ContactInfoKind};
 use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -40,6 +40,15 @@ pub enum AuthEventKind {
 }
 
 impl_enum_str_diesel!(AuthEventKind);
+
+impl From<ContactInfoKind> for AuthEventKind {
+    fn from(value: ContactInfoKind) -> Self {
+        match value {
+            ContactInfoKind::Email => Self::Email,
+            ContactInfoKind::Phone => Self::Sms,
+        }
+    }
+}
 
 #[derive(
     Debug,

@@ -1,7 +1,7 @@
 use paperclip::actix::Apiv2Schema;
 use strum_macros::Display;
 
-use crate::{AuthEventKind, ChallengeKind, DataIdentifier, IdentityDataKind};
+use crate::{AuthEventKind, ChallengeKind, DataIdentifier, Error, IdentityDataKind};
 
 #[derive(
     Debug,
@@ -23,6 +23,23 @@ pub enum AuthMethodKind {
     Phone,
     Passkey,
     Email,
+}
+
+impl TryFrom<AuthEventKind> for AuthMethodKind {
+    type Error = Error;
+    fn try_from(value: AuthEventKind) -> Result<Self, Self::Error> {
+        let value = match value {
+            AuthEventKind::Email => Self::Email,
+            AuthEventKind::Passkey => Self::Passkey,
+            AuthEventKind::Sms => Self::Phone,
+            AuthEventKind::ThirdParty => {
+                return Err(Error::Custom(
+                    "Third party auth event kind does not correspond to an auth method".to_owned(),
+                ))
+            }
+        };
+        Ok(value)
+    }
 }
 
 #[derive(Debug, Clone, Copy, Apiv2Schema, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
@@ -66,15 +83,6 @@ impl From<ContactInfoKind> for DataIdentifier {
         match value {
             ContactInfoKind::Phone => DataIdentifier::Id(IdentityDataKind::PhoneNumber),
             ContactInfoKind::Email => DataIdentifier::Id(IdentityDataKind::Email),
-        }
-    }
-}
-
-impl From<ContactInfoKind> for AuthEventKind {
-    fn from(value: ContactInfoKind) -> Self {
-        match value {
-            ContactInfoKind::Phone => AuthEventKind::Sms,
-            ContactInfoKind::Email => AuthEventKind::Email,
         }
     }
 }

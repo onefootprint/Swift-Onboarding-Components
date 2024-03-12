@@ -20,19 +20,17 @@ use chrono::Utc;
 use crypto::sha256;
 use db::{
     models::{
-        auth_event::{AuthEvent, NewAuthEvent},
+        auth_event::{AuthEvent, NewAuthEventArgs},
         contact_info::ContactInfo,
         insight_event::CreateInsightEvent,
-        user_timeline::UserTimeline,
         webauthn_credential::WebauthnCredential,
     },
     TxnPgConn,
 };
 use itertools::Itertools;
 use newtypes::{
-    ActionKind, AuthEventKind, AuthMethodKind, AuthMethodUpdatedInfo, ContactInfoKind, DataLifetimeSource,
-    DataRequest, Fingerprints, InsightEventId, PiiString, ScopedVaultId, TenantId, ValidateArgs,
-    WebauthnCredentialId,
+    ActionKind, AuthEventKind, ContactInfoKind, DataLifetimeSource, DataRequest, Fingerprints,
+    InsightEventId, PiiString, ScopedVaultId, TenantId, ValidateArgs, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -75,7 +73,6 @@ pub async fn post(
     }
 
     // Verify the challenge response and determine which action to perform
-    let kind = AuthMethodKind::from(&data);
     let action = match data {
         RegisterChallengeData::Sms {
             h_code,
@@ -112,7 +109,7 @@ pub async fn post(
                 .ok_or(AssertionError("No auth events found for user"))?;
             let existing_auth_event = AuthEvent::get(conn, &auth_event.id)?;
             let vault_id = user_auth.user_vault_id().clone();
-            let ae = NewAuthEvent {
+            let args = NewAuthEventArgs {
                 vault_id: vault_id.clone(),
                 scoped_vault_id: Some(sv_id.clone()),
                 insight_event_id: Some(ie.id),
@@ -121,14 +118,9 @@ pub async fn post(
                 created_at: Utc::now(),
                 // Use same scope as any of the auth events on this auth token
                 scope: existing_auth_event.scope,
-            }
-            .create(conn.conn())?;
-            let info = AuthMethodUpdatedInfo {
-                kind,
-                action: action_kind,
-                auth_event_id: ae.id,
+                new_auth_method_action: Some(action_kind),
             };
-            UserTimeline::create(conn, info, vault_id, sv_id)?;
+            AuthEvent::save(args, conn)?;
 
             Ok(())
         })

@@ -12,13 +12,13 @@ use api_core::{
 };
 use chrono::{Duration, Utc};
 use db::models::{
-    auth_event::{AuthEvent, NewAuthEvent},
+    auth_event::{AuthEvent, NewAuthEventArgs},
     insight_event::CreateInsightEvent,
     vault::Vault,
     webauthn_credential::WebauthnCredential,
 };
 use macros::route_alias;
-use newtypes::{AuthEventKind, ChallengeToken};
+use newtypes::{ActionKind, AuthEventKind, ChallengeToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
@@ -140,8 +140,8 @@ pub async fn complete_post(
             // and (b) so we can later link a device attestation to this passkey
             // TODO should we be storing this in the auth session and reporting at the end of an
             // auth session all of the credentials used?
-            NewAuthEvent {
-                vault_id,
+            let args = NewAuthEventArgs {
+                vault_id: vault_id.clone(),
                 scoped_vault_id: user_auth.scoped_user_id(),
                 insight_event_id: Some(credential.insight_event_id),
                 kind: AuthEventKind::Passkey,
@@ -149,8 +149,10 @@ pub async fn complete_post(
                 created_at: Utc::now(),
                 // Use same scope as any of the auth events on this auth token
                 scope: existing_auth_event.scope,
-            }
-            .create(conn.conn())?;
+                // This API is only used to add the primary passkey
+                new_auth_method_action: Some(ActionKind::AddPrimary),
+            };
+            AuthEvent::save(args, conn)?;
 
             Ok(())
         })

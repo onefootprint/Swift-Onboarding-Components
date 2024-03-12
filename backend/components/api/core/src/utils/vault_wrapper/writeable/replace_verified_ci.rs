@@ -22,8 +22,6 @@ impl<Type> WriteableVw<Type> {
         {
             return ValidationError("Can only replace_ci with phone or email").into();
         }
-        // TODO timeline event. internal_save_data will also make a timeline event, maybe we don't
-        // want duplicate
         request.assert_allowable_identifiers(self.vault.kind)?;
         let request = self.validate_request(conn, request, None, true)?;
         let PatchDataResult { new_ci, .. } = self.internal_save_data(conn, request, source, None)?;

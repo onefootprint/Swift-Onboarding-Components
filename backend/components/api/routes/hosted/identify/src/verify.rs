@@ -9,7 +9,7 @@ use api_core::{
     config::Config,
     errors::{
         business::BusinessError, challenge::ChallengeError, error_with_code::ErrorWithCode, user::UserError,
-        ApiError, ApiResult, ValidationError,
+        ApiResult, ValidationError,
     },
     telemetry::RootSpan,
     types::{response::ResponseData, JsonApiResponse},
@@ -27,14 +27,18 @@ use crypto::sha256;
 use db::{
     errors::OptionalExtension,
     models::{
-        auth_event::NewAuthEvent, business_owner::BusinessOwner, insight_event::CreateInsightEvent,
-        scoped_vault::ScopedVault, vault::Vault, webauthn_credential::WebauthnCredential,
+        auth_event::{AuthEvent, NewAuthEventArgs},
+        business_owner::BusinessOwner,
+        insight_event::CreateInsightEvent,
+        scoped_vault::ScopedVault,
+        vault::Vault,
+        webauthn_credential::WebauthnCredential,
     },
     TxnPgConn,
 };
 use newtypes::{
-    AuthEventKind, BoId, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, ObConfigurationKind,
-    VaultId, WebauthnCredentialId,
+    ActionKind, AuthEventKind, BoId, DataIdentifier, IdentifyScope, IdentityDataKind as IDK,
+    ObConfigurationKind, VaultId, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -70,18 +74,20 @@ pub async fn post(
     let (auth_token, vw, su, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv_id, event_kind, passkey_cred_id) = match challenge_state.data {
+            let (uv_id, event_kind, passkey_cred_id, added_auth_method) = match challenge_state.data {
                 ChallengeData::Sms(s) => {
-                    let vault_id = validate(conn, s, &user_auth, &c_response, IDK::PhoneNumber.into())?;
-                    (vault_id, AuthEventKind::Sms, None)
+                    let (vault_id, added_auth_method) =
+                        validate(conn, s, &user_auth, &c_response, IDK::PhoneNumber.into())?;
+                    (vault_id, AuthEventKind::Sms, None, added_auth_method)
                 }
                 ChallengeData::Email(s) => {
-                    let vault_id = validate(conn, s, &user_auth, &c_response, IDK::Email.into())?;
-                    (vault_id, AuthEventKind::Email, None)
+                    let (vault_id, added_auth_method) =
+                        validate(conn, s, &user_auth, &c_response, IDK::Email.into())?;
+                    (vault_id, AuthEventKind::Email, None, added_auth_method)
                 }
                 ChallengeData::Passkey(context) => {
                     let (vault_id, cred) = validate_biometric_challenge(conn, &config, context, &c_response)?;
-                    (vault_id, AuthEventKind::Passkey, Some(cred))
+                    (vault_id, AuthEventKind::Passkey, Some(cred), false)
                 }
             };
 
@@ -152,7 +158,7 @@ pub async fn post(
 
             // record the new auth event
             let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
-            let event = NewAuthEvent {
+            let ae_args = NewAuthEventArgs {
                 vault_id: uv_id.clone(),
                 scoped_vault_id: su.as_ref().map(|su| su.id.clone()),
                 insight_event_id: Some(insight.id),
@@ -160,8 +166,9 @@ pub async fn post(
                 webauthn_credential_id: passkey_cred_id,
                 created_at: Utc::now(),
                 scope,
-            }
-            .create(conn.conn())?;
+                new_auth_method_action: added_auth_method.then_some(ActionKind::AddPrimary),
+            };
+            let event = AuthEvent::save(ae_args, conn)?;
 
             let scopes = allowed_user_scopes(vec![event.kind], scope, true);
 
@@ -238,13 +245,16 @@ fn validate_biometric_challenge(
     Ok((challenge_state.user_vault_id, credential.id))
 }
 
+/// Identify verify can be used for both log in and sign up.
+pub type AddedAuthMethod = bool;
+
 fn validate(
     conn: &mut TxnPgConn,
     challenge_state: PhoneEmailChallengeState,
     user_auth: &CheckedUserAuthContext,
     challenge_response: &str,
     di: DataIdentifier,
-) -> Result<VaultId, ApiError> {
+) -> ApiResult<(VaultId, AddedAuthMethod)> {
     let PhoneEmailChallengeState { h_code, vault_id } = challenge_state;
     if h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ErrorWithCode::IncorrectPin.into());
@@ -257,11 +267,12 @@ fn validate(
     } else {
         None
     };
-    if let Some(existing_sv) = existing_sv {
+
+    let added_auth_method = if let Some(existing_sv) = existing_sv {
         // For bifrost logins that already have a SV (created in the signup challenge or via API)
         // we can mark the contact info as OTP verified
         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &existing_sv.id)?;
-        vw.on_otp_verified(conn, di)?;
+        let added_auth_method = vw.on_otp_verified(conn, di)?;
 
         let obc = user_auth.ob_config();
         if obc.is_some_and(|obc| obc.kind == ObConfigurationKind::Auth) && !vw.vault.is_portable {
@@ -277,7 +288,10 @@ fn validate(
             // data is accurate.
             vw.portablize_identity_data(conn)?;
         }
-    }
+        added_auth_method
+    } else {
+        false
+    };
 
-    Ok(vault_id)
+    Ok((vault_id, added_auth_method))
 }

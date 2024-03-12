@@ -116,23 +116,30 @@ impl WriteableVw<Person> {
 
     /// Mark the provided CI as verified.
     /// Note: VW could be stale after this
-    pub fn on_otp_verified(&self, conn: &mut TxnPgConn, di: DataIdentifier) -> ApiResult<()> {
+    pub fn on_otp_verified(
+        &self,
+        conn: &mut TxnPgConn,
+        di: DataIdentifier,
+    ) -> ApiResult<IsFirstTimeVerifying> {
         let lifetime = self
             .get_lifetime(di.clone())
             .ok_or(AssertionError("No lifetime for CI"))?;
         let ci = ContactInfo::get(conn, &lifetime.id)?;
-        on_otp_verified(conn, ci, &self.scoped_vault_id, &self.vault.id)?;
-        Ok(())
+        let is_first_time_verifying_ci = on_otp_verified(conn, ci, &self.scoped_vault_id, &self.vault.id)?;
+        Ok(is_first_time_verifying_ci)
     }
 }
+
+pub type IsFirstTimeVerifying = bool;
 
 pub(super) fn on_otp_verified(
     conn: &mut TxnPgConn,
     ci: ContactInfo,
     sv_id: &ScopedVaultId,
     v_id: &VaultId,
-) -> ApiResult<()> {
-    if !ci.is_otp_verified {
+) -> ApiResult<IsFirstTimeVerifying> {
+    let is_first_time_verifying_ci = !ci.is_otp_verified;
+    if is_first_time_verifying_ci {
         ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
@@ -143,7 +150,7 @@ pub(super) fn on_otp_verified(
         ..ScopedVaultUpdate::default()
     };
     ScopedVault::update(conn, sv_id, update)?;
-    Ok(())
+    Ok(is_first_time_verifying_ci)
 }
 
 #[cfg(test)]
