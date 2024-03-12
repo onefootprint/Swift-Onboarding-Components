@@ -64,8 +64,14 @@ This is our onboarding flow that can be rendered in a modal or drawer.
     />
     <script>
       window.footprintCallbacks = {
-        onComplete: function (validationToken) {
-          // TODO: Post the token to your server
+        onComplete: function (token) {
+          // TODO: User has finished the flow. This validation token can be used to see the fp_id
+          // of the user, the auth method they used to log in, and their KYC status
+          console.log(validationToken);
+        },
+        onAuth: function (token) => {
+          // User has authenticated. Optionally, this validation token can be used to see the fp_id
+          // of the authenticated user and the auth method they used to log in
           console.log(validationToken);
         },
         onCancel: function () {
@@ -108,8 +114,7 @@ What's happening under the hood?
    - `data-variant` attribute determines whether onboarding should launch in a modal or drawer
    - `data-props` are the stringified props objects that will be passed into your component
 
-2. Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` fuction defined on `window.footprintCallbacks`. From there,
-   you can post it to your backend.
+2. Once the user completes the flow "onComplete," you'll get the `validationToken` via the `onComplete` callback functions defined on `window.footprintCallbacks`. From there, your backend can exchange this token with Footprint in order to see the `fp_id` of the user, the login methods they used, and their KYC status.
 
 Click [here](https://github.com/onefootprint/examples/tree/master/idv/frontend-vanilla-js) to check out a full example.
 
@@ -121,8 +126,13 @@ Footprint provides some events based on some actions performed by the user. To l
 <script>
   window.footprintCallbacks = {
     onComplete: function (validationToken) {
-      // TODO: Post the token to your server
+      // TODO: User has finished the flow. This validation token can be used to see the fp_id
+      // of the user, the auth method they used to log in, and their KYC status
       console.log(validationToken);
+    },
+    onAuth: function (validationToken) => {
+      // User has authenticated. Optionally, this validation token can be used to see the fp_id
+      // of the authenticated user and the auth method they used to log in
     },
     onCancel: function () {
       console.log('canceled');
@@ -131,13 +141,14 @@ Footprint provides some events based on some actions performed by the user. To l
 </script>
 ```
 
-| Name         | Description                                                                                                                                                          |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `onComplete` | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend                                      |
-| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details. |
-| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                          |
-| `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                              |
-| `onClick`    | Triggered when the verify button is clicked.                                                                                                                         |
+| Name         | Description                                                                                                                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onComplete` | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                                                |
+| `onAuth`     | Optional. Triggered after the user finishes logging in, before the user has finished fully onboarding. You'll receive a `validationToken` in this callback that your backend can exchange with Footprint to see the fp_id and the login method used. |
+| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                                 |
+| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                                                          |
+| `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                                                              |
+| `onClick`    | Triggered when the verify button is clicked.                                                                                                                                                                                                         |
 
 ## Form Component Integration
 

@@ -13,7 +13,7 @@
     "start": "next start -p 3009",
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
-    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
