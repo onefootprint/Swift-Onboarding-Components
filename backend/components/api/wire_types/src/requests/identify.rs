@@ -22,7 +22,7 @@ pub struct IdentifyRequest {
     pub phone_number: Option<PhoneNumber>,
     /// Determines which scopes the issued auth token will have. Request the correct scopes for
     /// your use case in order to get the least permissions required
-    pub scope: IdentifyScope,
+    pub scope: Option<IdentifyScope>,
 }
 
 #[derive(Apiv2Schema, serde::Serialize, Default)]
