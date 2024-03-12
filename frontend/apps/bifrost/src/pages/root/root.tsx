@@ -8,8 +8,8 @@ import Idv, {
   getLogger,
   useFootprintProvider,
   useLogStateMachine,
-  useOnboardingValidate,
 } from '@onefootprint/idv';
+import { useIdentifyValidate } from '@onefootprint/idv/src/hooks/api';
 import { checkIsAndroid } from '@onefootprint/idv/src/utils';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
@@ -47,7 +47,7 @@ const Root = ({ variant }: RootProps) => {
   const isAndroidWebview = !checkIsIframe() && checkIsAndroid();
   const shouldShowCompletionPage = showCompletionPage || isAndroidWebview;
   const observeCollector = useObserveCollector();
-  const mutOnboardingValidate = useOnboardingValidate();
+  const mutIdentifyValidate = useIdentifyValidate();
 
   useLogStateMachine('bifrost', state);
   useEffectOnce(() => {
@@ -60,7 +60,7 @@ const Root = ({ variant }: RootProps) => {
 
   const handleIdentifyCompletion = useCallback(
     (args: { authToken: string }) => {
-      mutOnboardingValidate.mutate(
+      mutIdentifyValidate.mutate(
         { authToken: args.authToken },
         {
           onError: err => logError('Error while validating auth token', err),
@@ -68,7 +68,7 @@ const Root = ({ variant }: RootProps) => {
         },
       );
     },
-    [fpProvider, mutOnboardingValidate],
+    [fpProvider, mutIdentifyValidate],
   );
 
   const handleBifrostCompletion = ({
