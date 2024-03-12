@@ -200,6 +200,13 @@ pub enum ApiErrorKind {
     MigrationDryRun,
     #[error("Arbitrary json error - not used")]
     JsonError(serde_json::Value),
+
+    #[error("Invalid header name: {0}")]
+    InvalidHeaderName(#[from] reqwest::header::InvalidHeaderName),
+    #[error("Invalid header value: {0}")]
+    InvalidHeaderValue(#[from] reqwest::header::InvalidHeaderValue),
+    #[error("Failed to convert header to a str")]
+    HeaderToStrError(#[from] reqwest::header::ToStrError),
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -386,6 +393,9 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::AwsSelfieDocError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::MigrationDryRun => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::JsonError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::InvalidHeaderName(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::InvalidHeaderValue(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::HeaderToStrError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

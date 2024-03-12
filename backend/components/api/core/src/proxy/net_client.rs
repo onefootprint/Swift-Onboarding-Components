@@ -12,6 +12,7 @@ use db::models::{
     proxy_request_log::{FinishedRequestLog, NewProxyRequestLog, ProxyRequestLog},
     tenant::Tenant,
 };
+use http::HeaderName;
 use newtypes::{PiiString, ProxyConfigId};
 use reqwest::{header::HeaderMap, StatusCode};
 use std::sync::Arc;
@@ -98,7 +99,7 @@ pub async fn proxy_request(
 
     // parse the response
     let status_code = response.status();
-    let headers = response.headers().clone();
+    let headers = sanitize_headers(response.headers().clone())?;
     let response_body = response.bytes().await?;
 
     // log the actual result
@@ -136,4 +137,116 @@ async fn record_reqwest_error(log: ProxyRequestLog, state: &State, error: &reqwe
         .await?;
 
     Ok(())
+}
+
+
+// As long as we're serving proxy responses on api.onefootprint.com, we should be careful about
+// what response headers we allow. In theory, it should be hard to get a web browser to render a
+// web page with the response, since it's a POST request that requires an API key header. However,
+// it's easier to reason about safety with a trusted set of headers rather than allowing all
+// headers and filtering out a few we know are dangerous. For example, Set-Cookie may be dangerous
+// in some contexts, but not others. For example, Fetch APIs ignore Set-Cookie in the response, but
+// XMLHttpRequest may set cookies received in the response if withCredentials is true.
+fn sanitize_headers(original_headers: HeaderMap) -> ApiResult<HeaderMap> {
+    let mut ret = HeaderMap::new();
+
+    // Make sure the browser doesn't try to guess the content type if it does manage to render the
+    // response.
+    ret.insert("x-content-type-options", "nosniff".try_into()?);
+
+    for (name, value) in original_headers.iter() {
+        let proxied_header_name = format!("x-footprint-proxy-fwd-{}", name);
+        ret.insert(
+            HeaderName::from_lowercase(proxied_header_name.as_bytes())?,
+            value.clone(),
+        );
+
+        match name.as_str() {
+            "cache-control" | "content-language" | "content-length" | "expires" | "last-modified"
+            | "pragma" => {
+                // Chose these as safe set since CORS considers these safe response headers by default.
+                ret.insert(name.clone(), value.clone());
+            }
+            "content-type" => {
+                // Content types look like "text/json; charset=utf-8". Check that the content type
+                // matches a trusted list (or map to text/plain) and maintain the original charset.
+                let v = value.to_str()?;
+                let i = v.bytes().position(|b| b == b';').unwrap_or(v.bytes().len());
+                let (content_type, rest) = v.split_at(i);
+                let content_type = match content_type {
+                    "text/plain" | "application/json" | "application/xml" | "text/xml" => content_type,
+                    // Map unexpected content types to text/plain.
+                    _ => "text/plain",
+                };
+                ret.insert("content-type", format!("{}{}", content_type, rest).try_into()?);
+            }
+            _ => {}
+        }
+    }
+
+    Ok(ret)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sanitize_headers() {
+        // 1: untrusted content type, custom headers.
+        let mut orig = HeaderMap::new();
+        orig.insert("content-length", "123".try_into().unwrap());
+        orig.insert("x-custom-header", "abc".try_into().unwrap());
+        orig.insert("content-type", "text/html; charset=utf-8".try_into().unwrap());
+
+        let sanitized = sanitize_headers(orig).unwrap();
+        let expected = [
+            ("content-length", "123"),
+            ("content-type", "text/plain; charset=utf-8"),
+            ("x-content-type-options", "nosniff"),
+            ("x-footprint-proxy-fwd-content-length", "123"),
+            ("x-footprint-proxy-fwd-x-custom-header", "abc"),
+            ("x-footprint-proxy-fwd-content-type", "text/html; charset=utf-8"),
+        ];
+        assert_eq!(sanitized.iter().count(), expected.len());
+        for (name, value) in expected.into_iter() {
+            assert_eq!(sanitized.get(name).unwrap().to_str().unwrap(), value);
+        }
+
+        // 2: trusted content type with charset
+        let mut orig = HeaderMap::new();
+        orig.insert(
+            "content-type",
+            "application/json; charset=utf-8".try_into().unwrap(),
+        );
+
+        let sanitized = sanitize_headers(orig).unwrap();
+        let expected = [
+            ("content-type", "application/json; charset=utf-8"),
+            ("x-content-type-options", "nosniff"),
+            (
+                "x-footprint-proxy-fwd-content-type",
+                "application/json; charset=utf-8",
+            ),
+        ];
+        assert_eq!(sanitized.iter().count(), expected.len());
+        for (name, value) in expected.into_iter() {
+            assert_eq!(sanitized.get(name).unwrap().to_str().unwrap(), value);
+        }
+
+        // 3: trusted content type without charset
+        let mut orig = HeaderMap::new();
+        orig.insert("content-type", "text/xml".try_into().unwrap());
+
+        let sanitized = sanitize_headers(orig).unwrap();
+        let expected = [
+            ("content-type", "text/xml"),
+            ("x-content-type-options", "nosniff"),
+            ("x-footprint-proxy-fwd-content-type", "text/xml"),
+        ];
+        assert_eq!(sanitized.iter().count(), expected.len());
+        for (name, value) in expected.into_iter() {
+            assert_eq!(sanitized.get(name).unwrap().to_str().unwrap(), value);
+        }
+    }
 }

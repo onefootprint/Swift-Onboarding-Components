@@ -143,7 +143,7 @@ class TestVaultProxy:
         )
 
         # test the header came in
-        assert response.headers["test-header"] == "test1234"
+        assert response.headers["x-footprint-proxy-fwd-test-header"] == "test1234"
 
         # test the body came in
         result = response.json()
@@ -209,9 +209,9 @@ class TestVaultProxy:
         )
 
         # test the header came in
-        assert response.headers["test-header"] == "test1234"
+        assert response.headers["x-footprint-proxy-fwd-test-header"] == "test1234"
         assert (
-            response.headers["x-ditto-client-cert-serial"]
+            response.headers["x-footprint-proxy-fwd-x-ditto-client-cert-serial"]
             == "343209874978310929631036272380933492716043115756"
         )
 
@@ -336,8 +336,8 @@ class TestVaultProxy:
         )
 
         # test the header came in
-        assert response.headers["my-secret-header"] == "footprintrocks"
-        assert response.headers["my-test-header"] == "my-test-value"
+        assert response.headers["x-footprint-proxy-fwd-my-secret-header"] == "footprintrocks"
+        assert response.headers["x-footprint-proxy-fwd-my-test-header"] == "my-test-value"
 
         # test the body came in
         result = response.json()
