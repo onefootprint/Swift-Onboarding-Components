@@ -103,8 +103,7 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     phone_number = primary_bo.client.data["id.phone_number"]
     sandbox_id_h = SandboxId(primary_bo.client.sandbox_id)
 
-    identifier = dict(phone_number=phone_number)
-    data = dict(identifier=identifier, scope="onboarding")
+    data = dict(phone_number=phone_number, scope="onboarding")
     body = post("hosted/identify", data, secondary_bo_token, sandbox_id_h)
     assert body["user"]
     token = FpAuth(body["user"]["token"])

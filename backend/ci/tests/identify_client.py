@@ -63,12 +63,12 @@ class IdentifyClient:
         self.challenge_data = body["challenge_data"]
 
     def _login_challenge(self, kind, scope):
-        identifier = None
+        data = dict(scope=scope)
         if not self.auth_token:
             if kind == "email":
-                identifier = dict(email=self.email)
+                data["email"] = self.email
             else:
-                identifier = dict(phone_number=self.phone_number)
+                data["phone_number"] = self.phone_number
 
         # Check that the user is found in identify
         headers = []
@@ -78,7 +78,6 @@ class IdentifyClient:
             headers.append(self.playbook_key)
         if self.auth_token:
             headers.append(self.auth_token)
-        data = dict(identifier=identifier, scope=scope)
         body = post("hosted/identify", data, *headers)
         assert body["user"]
         assert kind in body["user"]["available_challenge_kinds"]

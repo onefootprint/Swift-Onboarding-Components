@@ -29,7 +29,7 @@ def test_portablize_nypid_via_auth(sandbox_tenant, foo_sandbox_tenant, auth_play
 
     # Assert only an SMS challenge is available to portablize the NYPID since we want them to
     # verify their phone number over their email
-    data = dict(identifier=dict(phone_number=FIXTURE_PHONE_NUMBER), scope="onboarding")
+    data = dict(phone_number=FIXTURE_PHONE_NUMBER, scope="onboarding")
     body = post("hosted/identify", data, sandbox_id_h, auth_playbook.key)
     assert body["user"]
     assert set(i["kind"] for i in body["user"]["auth_methods"]) == {"phone", "email"}

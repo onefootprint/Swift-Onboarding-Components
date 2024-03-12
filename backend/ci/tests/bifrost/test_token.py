@@ -63,7 +63,7 @@ def test_api_vault(sandbox_tenant, ob_config):
     auth_token = FpAuth(body["token"])
 
     # Token should be unverified because this vault was made via API
-    data = dict(identifier=None, scope="onboarding")
+    data = dict(scope="onboarding")
     body = post("/hosted/identify", data, auth_token)
     assert body["user"]
     assert body["user"]["is_unverified"]
@@ -213,9 +213,7 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     sandbox_id = body["sandbox_id"]
 
     # Test that the user isn't visible to be identified via phone number
-    identify_data = dict(
-        identifier=dict(phone_number=FIXTURE_PHONE_NUMBER), scope="onboarding"
-    )
+    identify_data = dict(phone_number=FIXTURE_PHONE_NUMBER, scope="onboarding")
     sandbox_id_h = SandboxId(sandbox_id)
     body = post("hosted/identify", identify_data, sandbox_id_h)
     assert not body["user"]
@@ -225,7 +223,7 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     auth_token = FpAuth(body["token"])
 
     # Token should be unverified because this vault was made via API
-    data = dict(identifier=None, scope="onboarding")
+    data = dict(scope="onboarding")
     body = post("/hosted/identify", data, auth_token)
     assert body["user"]
     assert body["user"]["is_unverified"]

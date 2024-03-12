@@ -100,27 +100,15 @@ def test_phone_user_cannot_inherit_from_email(sandbox_user):
     email = sandbox_user.client.data["id.email"]
     sandbox_id = SandboxId(sandbox_user.client.sandbox_id)
 
-    body = post(
-        "hosted/identify",
-        dict(identifier=dict(email=email), scope="onboarding"),
-        sandbox_user.client.ob_config.key,
-        sandbox_id,
-    )
+    data = dict(email=email, scope="onboarding")
+    body = post("hosted/identify", data, sandbox_user.client.ob_config.key, sandbox_id)
     assert body["user"]
     assert "email" not in body["user"]["available_challenge_kinds"]
     token = FpAuth(body["user"]["token"])
 
     # TODO: after adding is_otp_verified, confirm this still fails even if email is_verified
-    post(
-        "hosted/identify/login_challenge",
-        dict(
-            identifier=dict(email=email),
-            preferred_challenge_kind="email",
-            scope="onboarding",
-        ),
-        token,
-        status_code=400,
-    )
+    data = dict(email=email, preferred_challenge_kind="email", scope="onboarding")
+    post("hosted/identify/login_challenge", data, token, status_code=400)
 
 
 def test_trigger(no_phone_user):

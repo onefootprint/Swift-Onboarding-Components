@@ -107,9 +107,8 @@ def test_d2p_biometric(sandbox_tenant):
 
 def test_identify_login_repeat_customer_biometric(sandbox_user):
     # Identify the user by email, should have ability to auth via biometric
-    identifier = {"email": sandbox_user.client.data["id.email"]}
     sandbox_id = sandbox_user.client.sandbox_id
-    data = dict(identifier=identifier, scope="onboarding")
+    data = dict(email=sandbox_user.client.data["id.email"], scope="onboarding")
     body = post(
         "hosted/identify",
         data,

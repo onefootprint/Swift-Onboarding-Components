@@ -19,9 +19,7 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
 
-    identify_data = dict(
-        identifier=dict(phone_number=FIXTURE_PHONE_NUMBER), scope="onboarding"
-    )
+    identify_data = dict(phone_number=FIXTURE_PHONE_NUMBER, scope="onboarding")
     body = post("hosted/identify", identify_data, ob_config2.key, sandbox_id_h)
     assert not body["user"]
 
@@ -39,7 +37,7 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
         dict(email=bifrost.data["id.email"]),
     ]
     for identifier in identifiers:
-        data = dict(identifier=identifier, scope="onboarding")
+        data = dict(**identifier, scope="onboarding")
         # We can find via global fingerprints without specifying OBC
         body = post("hosted/identify", data, sandbox_id_h)
         assert body["user"]

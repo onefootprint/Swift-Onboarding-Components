@@ -310,7 +310,7 @@ def clean_up_user(phone_number, email):
 
     # Make sure the user doesn't exist after cleanup
     for identifier in [dict(email=email), dict(phone_number=phone_number)]:
-        data = dict(identifier=identifier, scope="onboarding")
+        data = dict(**identifier, scope="onboarding")
         body = post("hosted/identify", data)
         assert not body["user"]
 

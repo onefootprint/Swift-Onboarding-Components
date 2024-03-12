@@ -130,7 +130,7 @@ def vault4(sandbox_id, foo_sandbox_tenant):
     auth_token = FpAuth(body["token"])
 
     # Token should be unverified because this vault was made via API
-    data = dict(identifier=None, scope="onboarding")
+    data = dict(identifierscope="onboarding")
     body = post("/hosted/identify", data, auth_token)
     assert body["user"]
     assert body["user"]["is_unverified"]
@@ -260,7 +260,7 @@ def test_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
 
     # Identify the user, and get a token in exchange
     sandbox_id_h = SandboxId(sandbox_id)
-    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    data = dict(phone_number=phone_number, scope="onboarding")
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     user = body["user"]
     token = FpAuth(user["token"])
@@ -278,7 +278,7 @@ def test_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
     auth_token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
 
     # Make sure the token has scopes
-    data = dict(identifier=None, scope="onboarding")
+    data = dict(scope="onboarding")
     body = post("/hosted/identify", data, auth_token)
     assert set(body["user"]["token_scopes"]) >= {"sign_up"}
 
@@ -297,7 +297,7 @@ def test_login_flow_new_tenant(sandbox_tenant, sandbox_user, foo_sandbox_tenant)
 
     # Identify the user, and get a token in exchange
     sandbox_id_h = SandboxId(sandbox_id)
-    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    data = dict(phone_number=phone_number, scope="onboarding")
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     user = body["user"]
     token = FpAuth(user["token"])
@@ -334,7 +334,7 @@ def test_signup_flow(sandbox_tenant):
     auth_token = FpAuth(body["auth_token"])
 
     # Make sure the token has scopes
-    data = dict(identifier=None, scope="onboarding")
+    data = dict(scope="onboarding")
     body = post("/hosted/identify", data, auth_token)
     assert set(body["user"]["token_scopes"]) >= {"sign_up"}
 
@@ -371,7 +371,7 @@ def test_kba(sandbox_user, sandbox_tenant, kba_data, expected_error):
 
     # Identify the user, and get a token in exchange
     sandbox_id_h = SandboxId(sandbox_id)
-    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    data = dict(phone_number=phone_number, scope="onboarding")
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     token = FpAuth(body["user"]["token"])
 
@@ -397,7 +397,7 @@ def test_otp_unverified(sandbox_user, sandbox_tenant):
 
     # Identify the user, and get a token in exchange
     sandbox_id_h = SandboxId(sandbox_id)
-    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    data = dict(phone_number=phone_number, scope="onboarding")
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     token = FpAuth(body["user"]["token"])
 
@@ -426,7 +426,7 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
     sandbox_id = sandbox_user.client.sandbox_id
     phone_number = sandbox_user.client.data["id.phone_number"]
     sandbox_id_h = SandboxId(sandbox_id)
-    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    data = dict(phone_number=phone_number, scope="onboarding")
 
     # Shouldn't be able to initiate a new signup challenge when no playbook key is provided
     body = post("/hosted/identify", data, sandbox_id_h)
@@ -463,7 +463,7 @@ def test_create_duplicate_vault(sandbox_user, foo_sandbox_tenant):
     phone_number = sandbox_user.client.data["id.phone_number"]
 
     sandbox_id_h = SandboxId(sandbox_id)
-    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    data = dict(phone_number=phone_number, scope="onboarding")
     obc = foo_sandbox_tenant.default_ob_config
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     assert body["user"]["can_initiate_signup_challenge"]
