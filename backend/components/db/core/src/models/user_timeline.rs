@@ -39,6 +39,9 @@ pub struct UserTimeline {
     pub _updated_at: DateTime<Utc>,
     pub vault_id: VaultId,
     pub event_kind: DbUserTimelineEventKind,
+    /// True if the event was created manually via a backfill script. This is never set to true by
+    /// application code
+    pub is_backfilled: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]

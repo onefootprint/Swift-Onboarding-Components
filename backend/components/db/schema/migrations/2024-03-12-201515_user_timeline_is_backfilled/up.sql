@@ -1,0 +1,1 @@
+ALTER TABLE user_timeline ADD COLUMN is_backfilled BOOLEAN NOT NULL DEFAULT 'f';

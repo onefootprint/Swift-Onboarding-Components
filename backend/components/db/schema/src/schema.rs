@@ -1257,6 +1257,7 @@ diesel::table! {
         _updated_at -> Timestamptz,
         vault_id -> Text,
         event_kind -> Text,
+        is_backfilled -> Bool,
     }
 }
 
