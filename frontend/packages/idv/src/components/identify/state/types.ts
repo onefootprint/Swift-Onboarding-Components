@@ -9,7 +9,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
-import type { StateValue } from 'xstate';
+import type { EventObject, StateValue, TransitionConfigOrTarget } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
 import type { EmailAndOrPhone } from '../types';
@@ -36,6 +36,13 @@ export type IdentifyMachineContext = {
   overallOutcome?: OverallOutcome;
   variant: IdentifyVariant;
 };
+
+export type TransitionsFor<EVENT extends EventObject> =
+  TransitionConfigOrTarget<
+    IdentifyMachineContext,
+    EVENT,
+    IdentifyMachineEvents
+  >;
 
 export enum IdentifyVariant {
   auth = 'auth',

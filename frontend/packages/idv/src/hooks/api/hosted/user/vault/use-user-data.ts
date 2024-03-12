@@ -1,10 +1,6 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
 import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
-import {
-  ALLOW_EXTRA_FIELDS_HEADER,
-  AUTH_HEADER,
-  IdDI,
-} from '@onefootprint/types';
+import { ALLOW_EXTRA_FIELDS_HEADER, AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const userDataRequest = async (payload: UserDataRequest) => {
@@ -12,7 +8,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
     Object.entries(payload.data).filter(
       // Don't send null or undefined or empty values
       // Empty string is a valid value to send to the backend
-      e => !!e[1] && e[0] !== IdDI.phoneNumber && e[0] !== IdDI.email,
+      e => Boolean(e[1]),
     ),
   );
 

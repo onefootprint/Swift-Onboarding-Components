@@ -9,20 +9,16 @@ import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import { UpdateAuthMethodActionKind } from '../../types';
 import PhonePageStructure from '../phone-page-structure';
+import { isCollectScreen, ScreenState } from './helpers';
 import UpdateVerifyPhone from './update-verify-phone';
 
 type UpdatePhoneProps = {
-  Header: (props: HeaderProps) => JSX.Element;
-  authToken: string;
   actionKind: UpdateAuthMethodActionKind;
+  authToken: string;
+  Header: (props: HeaderProps) => JSX.Element;
   identifyVariant: IdentifyVariant;
   onSuccess: (newPhone: string) => void;
 };
-
-enum Screen {
-  collect = 'collect',
-  verify = 'verify',
-}
 
 const isProd = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
@@ -45,16 +41,16 @@ const UpdatePhone = ({
   identifyVariant,
 }: UpdatePhoneProps) => {
   const { t } = useTranslation('identify');
-  const [screen, setScreen] = useState<Screen>(Screen.collect);
+  const [screen, setScreen] = useState<ScreenState>(ScreenState.collect);
   const [phone, setPhone] = useState<string>('');
   const l10n = useL10nContext();
 
   const handleOnSubmit = useCallback((phoneNumber: string) => {
     setPhone(phoneNumber);
-    setScreen(Screen.verify);
+    setScreen(ScreenState.verify);
   }, []);
 
-  if (screen === Screen.collect || !phone) {
+  if (isCollectScreen(screen) || !phone) {
     return (
       <PhonePageStructure
         countries={COUNTRIES}
@@ -85,7 +81,7 @@ const UpdatePhone = ({
       identifyVariant={identifyVariant}
       onChallengeVerificationSuccess={() => onSuccess(phone)}
       onBack={() => {
-        setScreen(Screen.collect);
+        setScreen(ScreenState.collect);
       }}
     />
   );

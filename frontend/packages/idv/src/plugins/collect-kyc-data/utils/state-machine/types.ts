@@ -1,4 +1,5 @@
 import type {
+  AuthMethodKind,
   CollectKycDataRequirement,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
@@ -18,26 +19,16 @@ export type MachineContext = {
 };
 
 export type MachineEvents =
-  | { type: 'initialized'; payload: KycData }
-  | {
-      type: 'stepUpCompleted';
-      payload: {
-        authToken: string;
-      };
-    }
-  | {
-      type: 'decryptedData';
-      payload: KycData;
-    }
-  | {
-      type: 'dataSubmitted';
-      payload: KycData;
-    }
-  | { type: 'navigatedToPrevPage' }
+  | { type: 'addVerification'; payload: `${AuthMethodKind}` }
   | { type: 'confirmed' }
-  | { type: 'editEmail' }
-  | { type: 'editBasicInfo' }
+  | { type: 'dataSubmitted'; payload: KycData }
+  | { type: 'decryptedData'; payload: KycData }
   | { type: 'editAddress' }
-  | { type: 'editUsLegalStatus' }
+  | { type: 'editBasicInfo' }
+  | { type: 'editEmail' }
   | { type: 'editIdentity' }
-  | { type: 'returnToSummary' };
+  | { type: 'editUsLegalStatus' }
+  | { type: 'initialized'; payload: KycData }
+  | { type: 'navigatedToPrevPage' }
+  | { type: 'returnToSummary' }
+  | { type: 'stepUpCompleted'; payload: { authToken: string } };

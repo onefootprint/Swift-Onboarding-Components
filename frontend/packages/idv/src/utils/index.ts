@@ -20,6 +20,7 @@ export { default as shouldChallengeEmail } from './should-challenge-email';
 export type { DeviceResponseJsonPayload } from './state-machine/utils/custom-listener';
 export { createReceivedDeviceResponseJsonPayload } from './state-machine/utils/custom-listener';
 export {
+  hasAuthMethodUnverifiedEmail,
   hasEmailAndPhoneNumber,
   isAuth,
   isBiometric,
@@ -29,6 +30,7 @@ export {
   isError,
   isFunction,
   isObject,
+  isPhone,
   isPhoneIdentifier,
   isSms,
   isString,

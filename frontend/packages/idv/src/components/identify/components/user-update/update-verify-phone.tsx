@@ -46,7 +46,7 @@ const UpdateVerifyPhone = ({
       onBack={onBack}
       onChallengeVerificationSuccess={onChallengeVerificationSuccess}
       headerTitle={t('sms-challenge.verify-title')}
-      subtitle={subtitle}
+      headerSubtitle={subtitle}
       logError={logError}
       logWarn={logWarn}
     />

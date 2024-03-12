@@ -1,6 +1,12 @@
+import { AuthMethodKind } from '@onefootprint/types';
+import type { ComponentProps } from 'react';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
+import { UpdateVerify } from '../../../../components/identify';
+import StepHeader from '../../../../components/step-header';
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { getLogger } from '../../../../utils/logger';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
@@ -9,38 +15,95 @@ import LegalStatus from '../legal-status';
 import Address from '../residential-address';
 import Ssn from '../ssn';
 
-type RouterProps = {
-  onDone: () => void;
-};
+const { logWarn, logError } = getLogger('collect-kyc-router');
 
-const Router = ({ onDone }: RouterProps) => {
-  const [state] = useCollectKycDataMachine();
-  const isDone = state.matches('completed');
+const VerifyHeader: ComponentProps<typeof UpdateVerify>['Header'] = ({
+  title,
+  subtitle,
+  overrideLeftButton,
+}) => (
+  <StepHeader
+    leftButton={overrideLeftButton!}
+    subtitle={subtitle}
+    title={title}
+  />
+);
+
+const Router = ({ onDone }: { onDone: () => void }) => {
+  const [state, send] = useCollectKycDataMachine();
+  const { matches, context } = state;
+  const isStateCompleted = matches('completed');
   useLogStateMachine('collect-kyc-data', state);
+  const onBack = () => send({ type: 'navigatedToPrevPage' });
+  const { t } = useTranslation('idv');
+  const phoneValue = context.data['id.phone_number']?.value;
+  const emailValue = context.data['id.email']?.value;
 
   useEffect(() => {
-    if (isDone) {
+    if (isStateCompleted) {
       onDone();
     }
-  }, [isDone, onDone]);
+  }, [isStateCompleted, onDone]);
 
-  if (state.matches('init')) {
-    return <Init />;
+  if (matches('init')) return <Init />;
+  if (matches('basicInformation')) return <BasicInformation />;
+  if (matches('residentialAddress')) return <Address />;
+  if (matches('usLegalStatus')) return <LegalStatus />;
+  if (matches('ssn')) return <Ssn />;
+  if (matches('confirm')) return <Confirm />;
+
+  if (matches('addVerificationPhone') && phoneValue && context.authToken) {
+    return (
+      <UpdateVerify
+        Header={VerifyHeader}
+        headerTitle={t('identify.pages.sms-challenge.title')}
+        headerSubtitle={
+          <span data-private="true">
+            {t('identify.pages.sms-challenge.prompt-with-phone', {
+              scrubbedPhoneNumber: phoneValue,
+            })}
+          </span>
+        }
+        actionKind="add_primary"
+        identifyVariant="verify"
+        logError={logError}
+        logWarn={logWarn}
+        onBack={onBack}
+        onChallengeVerificationSuccess={onBack}
+        challengePayload={{
+          authToken: context.authToken,
+          kind: AuthMethodKind.phone,
+          phoneNumber: phoneValue,
+        }}
+      />
+    );
   }
-  if (state.matches('basicInformation')) {
-    return <BasicInformation />;
-  }
-  if (state.matches('residentialAddress')) {
-    return <Address />;
-  }
-  if (state.matches('usLegalStatus')) {
-    return <LegalStatus />;
-  }
-  if (state.matches('ssn')) {
-    return <Ssn />;
-  }
-  if (state.matches('confirm')) {
-    return <Confirm />;
+
+  if (matches('addVerificationEmail') && emailValue && context.authToken) {
+    return (
+      <UpdateVerify
+        Header={VerifyHeader}
+        headerTitle={t('identify.pages.email-challenge.title')}
+        headerSubtitle={
+          <span data-private="true">
+            {t('identify.pages.email-challenge.prompt-with-email', {
+              email: emailValue,
+            })}
+          </span>
+        }
+        actionKind="add_primary"
+        identifyVariant="verify"
+        logError={logError}
+        logWarn={logWarn}
+        onBack={onBack}
+        onChallengeVerificationSuccess={onBack}
+        challengePayload={{
+          authToken: context.authToken,
+          kind: AuthMethodKind.email,
+          email: emailValue,
+        }}
+      />
+    );
   }
 
   return null;

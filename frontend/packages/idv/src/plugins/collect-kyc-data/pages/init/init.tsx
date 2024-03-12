@@ -1,12 +1,13 @@
-import { getErrorMessage } from '@onefootprint/request';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
-import Logger from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import type { KycData } from '../../utils/data-types';
 import useDecryptKycData from './hooks/use-decrypt-kyc-data/use-decrypt-kyc-data';
+
+const { logError } = getLogger('kyc-init');
 
 const Init = () => {
   const [state, send] = useCollectKycDataMachine();
@@ -25,11 +26,11 @@ const Init = () => {
     // If we fail to decrypt the existing information on the vault, it's no big deal - we can move
     // forward and just have the user re-enter their info instead of taking the already portable info
     // But log anyways because this shouldn't happen :)
-    Logger.error(
+    logError(
       `Kyc init page failed to decrypt data fields (${populatedCdos.join(
         ', ',
-      )}) requested. ${getErrorMessage(err)}`,
-      'kyc-init',
+      )}) requested.`,
+      err,
     );
     send({
       type: 'initialized',

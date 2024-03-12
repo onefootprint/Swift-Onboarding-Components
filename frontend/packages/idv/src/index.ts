@@ -60,6 +60,7 @@ export {
   getRandomID,
   getScrubbedPhoneNumber,
   getSdkArgsToken,
+  hasAuthMethodUnverifiedEmail,
   hasEmailAndPhoneNumber,
   hasInvalidHashFragment,
   isAuth,

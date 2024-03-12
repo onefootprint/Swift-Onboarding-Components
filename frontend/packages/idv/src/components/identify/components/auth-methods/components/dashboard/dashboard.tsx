@@ -73,7 +73,7 @@ const getUserAuthMethods = (list: UserAuthMethodsResponse): MethodsMap =>
 
 const { logWarn } = getLogger('user-dashboard');
 
-const DashBoard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
+const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
   const [state, send] = useAuthMethodsMachine();
   const { userDashboard, verifyToken } = state.context;
   const { t } = useTranslation('identify');
@@ -183,4 +183,4 @@ const DashBoard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
   );
 };
 
-export default DashBoard;
+export default Dashboard;

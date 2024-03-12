@@ -1,15 +1,22 @@
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
+import { useUserAuthMethods } from '../../../../components/identify';
 import getCurrentStepFromMissingAttributes from '../../components/navigation-header/utils/current-step-from-missing-attributes';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
-import useSyncData from '../../hooks/use-sync-data';
+import useSyncData, {
+  checkPhoneEmailBeforeSubmit,
+} from '../../hooks/use-sync-data';
 import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
+import {
+  getVerifiedMap,
+  getVerifiedMethods,
+} from './components/basic-info-section/helpers';
 import IdentitySection from './components/identity-section';
 import LegalStatusSection from './components/legal-status-section';
 
@@ -17,10 +24,11 @@ const Confirm = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.confirm' });
 
   const [state, send] = useCollectKycDataMachine();
-  const { data, requirement, initialData } = state.context;
+  const { authToken, data, requirement, initialData } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { isLoading } = syncDataMutation;
   const toast = useToast();
+  const qryUserAuthMethods = useUserAuthMethods(authToken);
 
   const value = getCurrentStepFromMissingAttributes(
     requirement,
@@ -30,14 +38,18 @@ const Confirm = () => {
   const shouldShowBackButton = value > 0;
   const headerVariant = shouldShowBackButton ? 'back' : 'close';
 
+  const verifiedMethods = useMemo(() => {
+    const map = getVerifiedMap(qryUserAuthMethods.data);
+    return {
+      ...getVerifiedMethods(data, map),
+      isLoading: qryUserAuthMethods.isLoading,
+    };
+  }, [qryUserAuthMethods.data, qryUserAuthMethods.isLoading, data]);
+
   const handleConfirm = () => {
     syncData({
-      data,
-      onSuccess: () => {
-        send({
-          type: 'confirmed',
-        });
-      },
+      data: checkPhoneEmailBeforeSubmit(initialData, data, verifiedMethods),
+      onSuccess: () => send({ type: 'confirmed' }),
       onError: (fieldErrors: SyncDataFieldErrors) => {
         // We can't show the error messages as hints unless the sub-forms are in edit mode
         // For simplicity, just show the field names.
@@ -77,21 +89,17 @@ const Confirm = () => {
     });
   };
 
-  const handlePrev = () => {
-    send({ type: 'navigatedToPrevPage' });
-  };
-
   return (
     <ConfirmCollectedData
       title={t('summary.title')}
       subtitle={t('summary.subtitle')}
       cta={t('summary.cta')}
-      onClickPrev={handlePrev}
+      onClickPrev={() => send({ type: 'navigatedToPrevPage' })}
       onClickConfirm={handleConfirm}
       isLoading={isLoading}
       headerVariant={headerVariant}
     >
-      <BasicInfoSection />
+      <BasicInfoSection verifiedMethods={verifiedMethods} />
       <AddressSection />
       <LegalStatusSection />
       <IdentitySection />

@@ -1,81 +1,113 @@
-import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import allAttributes from '../../../../utils/all-attributes/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
+import getFieldStats from '../../get-field-stats';
 import type { FormData } from '../../types';
 
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
-  const { data, requirement } = state.context;
-  const attributes = allAttributes(requirement);
-  const requiresName = attributes.includes(CollectedKycDataOption.name);
-  const requiresDob = attributes.includes(CollectedKycDataOption.dob);
-  const requiresNationality = attributes.includes(
-    CollectedKycDataOption.nationality,
-  );
+  const {
+    dob: dobField,
+    email: emailField,
+    firstName: firstNameField,
+    fullName: fullNameField,
+    lastName: lastNameField,
+    middleName: middleNameField,
+    nationality: natField,
+    phone: phoneField,
+  } = getFieldStats(state.context);
 
   return (formData: FormData) => {
-    const convertedData: KycData = {};
-    const { firstName, middleName, lastName, dob, nationality } = formData;
-    const hasName = firstName || middleName || lastName;
+    const output: KycData = {};
+    const {
+      dob,
+      email,
+      firstName,
+      lastName,
+      middleName,
+      nationality,
+      phoneNumber,
+    } = formData;
 
-    if (requiresName && hasName) {
-      const isFirstNameChanged = firstName !== data[IdDI.firstName]?.value;
-      convertedData[IdDI.firstName] = {
-        value: firstName,
-        dirty: isFirstNameChanged,
-        bootstrap: isFirstNameChanged ? false : data[IdDI.firstName]?.bootstrap,
-        disabled: data[IdDI.firstName]?.disabled ?? false,
-        decrypted: isFirstNameChanged ? false : data[IdDI.firstName]?.decrypted,
-      };
-
-      const isMiddleNameChanged = middleName !== data[IdDI.middleName]?.value;
-      convertedData[IdDI.middleName] = {
-        value: middleName,
-        dirty: isMiddleNameChanged,
-        bootstrap: isMiddleNameChanged
-          ? false
-          : data[IdDI.middleName]?.bootstrap,
-        disabled: data[IdDI.middleName]?.disabled ?? false,
-        decrypted: isMiddleNameChanged
-          ? false
-          : data[IdDI.middleName]?.decrypted,
-      };
-
-      const isLastNameChanged = lastName !== data[IdDI.lastName]?.value;
-      convertedData[IdDI.lastName] = {
-        value: lastName,
-        dirty: isLastNameChanged,
-        bootstrap: isLastNameChanged ? false : data[IdDI.lastName]?.bootstrap,
-        disabled: data[IdDI.lastName]?.disabled ?? false,
-        decrypted: isLastNameChanged ? false : data[IdDI.lastName]?.decrypted,
-      };
+    if (fullNameField.required) {
+      if (firstName) {
+        const isFirstNameChanged = firstName !== firstNameField.value;
+        output[IdDI.firstName] = {
+          bootstrap: isFirstNameChanged ? false : firstNameField.bootstrap,
+          decrypted: isFirstNameChanged ? false : firstNameField.decrypted,
+          dirty: isFirstNameChanged,
+          disabled: firstNameField.disabled,
+          value: firstName,
+        };
+      }
+      if (middleName) {
+        const isMiddleNameChanged = middleName !== middleNameField.value;
+        output[IdDI.middleName] = {
+          bootstrap: isMiddleNameChanged ? false : middleNameField.bootstrap,
+          decrypted: isMiddleNameChanged ? false : middleNameField.decrypted,
+          dirty: isMiddleNameChanged,
+          disabled: middleNameField.disabled,
+          value: middleName,
+        };
+      }
+      if (lastName) {
+        const isLastNameChanged = lastName !== lastNameField.value;
+        output[IdDI.lastName] = {
+          bootstrap: isLastNameChanged ? false : lastNameField.bootstrap,
+          decrypted: isLastNameChanged ? false : lastNameField.decrypted,
+          dirty: isLastNameChanged,
+          disabled: lastNameField.disabled,
+          value: lastName,
+        };
+      }
     }
 
-    if (requiresDob && dob) {
-      const isChanged = dob !== data[IdDI.dob]?.value;
-      convertedData[IdDI.dob] = {
+    if (dobField.required && dob) {
+      const isDobChanged = dob !== dobField.value;
+      output[IdDI.dob] = {
+        bootstrap: isDobChanged ? false : dobField.bootstrap,
+        decrypted: isDobChanged ? false : dobField.decrypted,
+        dirty: isDobChanged,
+        disabled: dobField.disabled,
         value: dob,
-        dirty: isChanged,
-        bootstrap: isChanged ? false : data[IdDI.dob]?.bootstrap,
-        disabled: data[IdDI.dob]?.disabled ?? false,
-        decrypted: isChanged ? false : data[IdDI.dob]?.decrypted,
       };
     }
 
-    if (requiresNationality && nationality) {
-      const isChanged = nationality.value !== data[IdDI.nationality]?.value;
-      convertedData[IdDI.nationality] = {
+    if (natField.required && nationality?.value) {
+      const isNatChanged = nationality.value !== String(natField.value);
+      output[IdDI.nationality] = {
+        bootstrap: isNatChanged ? false : natField.bootstrap,
+        decrypted: isNatChanged ? false : natField.decrypted,
+        dirty: isNatChanged,
+        disabled: natField.disabled,
         value: nationality.value,
-        dirty: isChanged,
-        bootstrap: isChanged ? false : data[IdDI.nationality]?.bootstrap,
-        disabled: data[IdDI.nationality]?.disabled ?? false,
-        decrypted: isChanged ? false : data[IdDI.nationality]?.decrypted,
       };
     }
 
-    return convertedData;
+    if (emailField.required && email) {
+      const isEmailChanged = email !== emailField.value;
+      output[IdDI.email] = {
+        bootstrap: isEmailChanged ? false : emailField.bootstrap,
+        decrypted: isEmailChanged ? false : emailField.decrypted,
+        dirty: isEmailChanged,
+        disabled: emailField.disabled,
+        value: email,
+      };
+    }
+
+    if (phoneField.required && phoneNumber) {
+      const isPhoneChanged = phoneNumber !== phoneField.value;
+      output[IdDI.phoneNumber] = {
+        bootstrap: isPhoneChanged ? false : phoneField.bootstrap,
+        decrypted: isPhoneChanged ? false : phoneField.decrypted,
+        dirty: isPhoneChanged,
+        disabled: phoneField.disabled,
+        value: phoneNumber,
+      };
+    }
+
+    return output;
   };
 };
 

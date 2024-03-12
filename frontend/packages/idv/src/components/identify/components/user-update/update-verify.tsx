@@ -16,9 +16,9 @@ import PinForm from '../pin-form';
 
 type PartialPayload = 'kind' | 'email' | 'phoneNumber' | 'authToken';
 export type UpdateVerifyBaseProps = {
+  actionKind: `${UpdateAuthMethodActionKind}`;
   Header: (props: HeaderProps) => JSX.Element;
-  actionKind: UpdateAuthMethodActionKind;
-  identifyVariant: IdentifyVariant;
+  identifyVariant: `${IdentifyVariant}`;
   onBack: () => void;
   onChallengeVerificationSuccess: () => void;
 };
@@ -26,7 +26,7 @@ export type UpdateVerifyBaseProps = {
 type UpdateVerifyProps = UpdateVerifyBaseProps & {
   challengePayload: Pick<UserChallengeBody, PartialPayload>;
   headerTitle: string;
-  subtitle: string | JSX.Element;
+  headerSubtitle: string | JSX.Element;
   logError: (str: string, err?: unknown) => void;
   logWarn: (str: string, err?: unknown) => void;
   onChallengeVerificationSuccess: () => void;
@@ -39,7 +39,7 @@ const UpdateVerify = ({
   challengePayload,
   Header,
   headerTitle,
-  subtitle,
+  headerSubtitle,
   logError,
   logWarn,
   onChallengeVerificationSuccess,
@@ -138,7 +138,7 @@ const UpdateVerify = ({
       <Header
         data-private
         title={headerTitle}
-        subtitle={subtitle}
+        subtitle={headerSubtitle}
         overrideLeftButton={overrideLeftButton}
       />
       <PinForm

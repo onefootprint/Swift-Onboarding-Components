@@ -30,7 +30,7 @@ const ConfirmCollectedData = ({
     <NavigationHeader
       leftButton={{ variant: headerVariant, onBack: onClickPrev }}
     />
-    <Stack gap={7} direction="column">
+    <Stack gap={8} direction="column">
       <HeaderTitle title={title} subtitle={subtitle} />
       <SectionsContainer>{children}</SectionsContainer>
       <Button

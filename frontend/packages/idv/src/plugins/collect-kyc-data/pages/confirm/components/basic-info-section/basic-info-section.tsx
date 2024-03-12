@@ -1,124 +1,195 @@
-import { IcoFileText24 } from '@onefootprint/icons';
+import { IcoFileText24, IcoInfo16 } from '@onefootprint/icons';
 import {
-  CollectedKycDataOption,
-  IdDI,
-  isCountryCode,
-} from '@onefootprint/types';
-import React, { useState } from 'react';
+  Box,
+  Divider,
+  LinkButton,
+  media,
+  Shimmer,
+  Text,
+} from '@onefootprint/ui';
+import type { TFunction } from 'i18next';
+import type { ComponentProps } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
-import type {
-  SectionAction,
-  SectionItemProps,
-} from '../../../../../../components/confirm-collected-data';
+import type { SectionItemProps } from '../../../../../../components/confirm-collected-data';
 import {
   Section,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import allAttributes from '../../../../utils/all-attributes/all-attributes';
-import getInitialCountry from '../../../../utils/get-initial-country';
+import type { VerifiedMethods } from '../../../../types';
 import BasicInformation from '../../../basic-information';
+import {
+  getBasicInfoItems,
+  getNationalityItems,
+  getVerifiableItems,
+  isUsLegalStatusRequired,
+} from './helpers';
 
-const BasicInfoSection = () => {
+type T = TFunction<'idv', 'kyc.pages'>;
+type VerifiableItem = SectionItemProps & {
+  isVerified: boolean;
+  onClick: ComponentProps<typeof LinkButton>['onClick'];
+};
+type BasicInfoSectionProps = { verifiedMethods?: VerifiedMethods };
+
+const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages' });
-  const [state] = useCollectKycDataMachine();
+  const [state, send] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
-  const [editing, setEditing] = useState(false);
-  const attributes = allAttributes(requirement);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const basicInfo: SectionItemProps[] = [];
-
-  const firstName = data[IdDI.firstName]?.value;
-  if (firstName) {
-    basicInfo.push({
-      text: t('confirm.basic-info.first-name'),
-      subtext: firstName,
-    });
-  }
-
-  const middleName = data[IdDI.middleName]?.value;
-  if (middleName) {
-    basicInfo.push({
-      text: t('confirm.basic-info.middle-name'),
-      subtext: middleName,
-    });
-  }
-
-  const lastName = data[IdDI.lastName]?.value;
-  if (lastName) {
-    basicInfo.push({
-      text: t('confirm.basic-info.last-name'),
-      subtext: lastName,
-    });
-  }
-
-  const dob = data[IdDI.dob]?.value;
-  if (dob) {
-    basicInfo.push({
-      text: t('confirm.basic-info.dob'),
-      subtext: dob,
-    });
-  }
-
-  const requiresUsLegalStatus = attributes.includes(
-    CollectedKycDataOption.usLegalStatus,
+  const sectionItems = useMemo(
+    () => ({
+      basic: !isUsLegalStatusRequired(requirement)
+        ? getBasicInfoItems(t, data).concat(getNationalityItems(t, data))
+        : getBasicInfoItems(t, data),
+      verifiable: getVerifiableItems(t, data).map(({ kind, ...rest }) => ({
+        ...rest,
+        isVerified: !!verifiedMethods?.[kind],
+        onClick: () => send({ type: 'addVerification', payload: kind }),
+      })),
+    }),
+    [data, requirement, send, t, verifiedMethods],
   );
-  const countryVal = data[IdDI.nationality]?.value;
-  const defaultCountry =
-    countryVal && isCountryCode(countryVal) ? countryVal : undefined;
-  const nationality = getInitialCountry(defaultCountry)?.label;
-  // we only want to display nationality / the default country if we collected it and if there is no legal status data
-  if (!requiresUsLegalStatus && countryVal && nationality) {
-    basicInfo.push({
-      text: t('confirm.basic-info.nationality'),
-      subtext: nationality,
-    });
-  }
 
-  if (!basicInfo.length) {
+  const getSectionContent = useCallback(
+    (basicList: SectionItemProps[], verifiableList: VerifiableItem[]) => {
+      const stopEditing = () => setIsEditing(false);
+      const hasBasic = basicList.length > 0;
+      const hasVerifiable = verifiableList.length > 0;
+      const showVerifyHint =
+        hasVerifiable && verifiableList.some(x => !x.isVerified);
+
+      if (isEditing) {
+        return (
+          <BasicInformation
+            onComplete={stopEditing}
+            onCancel={stopEditing}
+            hideHeader
+            emailConfig={{
+              visible: true,
+              disabled: Boolean(verifiedMethods?.email),
+            }}
+            phoneConfig={{
+              visible: true,
+              disabled: Boolean(verifiedMethods?.phone),
+            }}
+          />
+        );
+      }
+
+      return (
+        <>
+          {hasBasic ? (
+            <ResponsiveGridContainer>
+              {basicList.map(({ text, subtext, textColor }) => (
+                <SectionItem
+                  key={text}
+                  text={text}
+                  subtext={subtext}
+                  textColor={textColor}
+                />
+              ))}
+            </ResponsiveGridContainer>
+          ) : null}
+          {hasBasic && hasVerifiable ? (
+            <StyledDivider variant="secondary" />
+          ) : null}
+          {hasVerifiable
+            ? verifiableList.map(
+                ({ isVerified, onClick, subtext, text, textColor }) => (
+                  <ItemAndAction key={text}>
+                    <SectionItem
+                      text={text}
+                      subtext={subtext}
+                      textColor={textColor}
+                    />
+                    {!verifiedMethods || verifiedMethods?.isLoading ? (
+                      <Shimmer sx={{ height: '24px', width: '100px' }} />
+                    ) : (
+                      <LinkButton onClick={onClick} disabled={isVerified}>
+                        {isVerified ? t('verified') : t('verify')}
+                      </LinkButton>
+                    )}
+                  </ItemAndAction>
+                ),
+              )
+            : null}
+          {showVerifyHint ? (
+            <>
+              <StyledDivider variant="secondary" />
+              <VerifyRecommendation t={t} />
+            </>
+          ) : null}
+        </>
+      );
+    },
+    [isEditing, t, verifiedMethods],
+  );
+
+  if (!sectionItems.basic.length) {
     return null;
   }
 
-  const stopEditing = () => {
-    setEditing(false);
-  };
-
-  const getSectionContent = (list: SectionItemProps[]) =>
-    !editing ? (
-      list.map(({ text, subtext, textColor }) => (
-        <SectionItem
-          key={text}
-          text={text}
-          subtext={subtext}
-          textColor={textColor}
-        />
-      ))
-    ) : (
-      <BasicInformation
-        onComplete={stopEditing}
-        onCancel={stopEditing}
-        hideHeader
-      />
-    );
-
-  const actions: SectionAction[] = [];
-  if (!editing) {
-    actions.push({
-      label: t('confirm.summary.edit'),
-      onClick: () => setEditing(true),
-    });
-  }
+  const actions = !isEditing
+    ? [{ label: t('confirm.summary.edit'), onClick: () => setIsEditing(true) }]
+    : [];
 
   return (
     <Section
       title={t('confirm.basic-info.title')}
       actions={actions}
       IconComponent={IcoFileText24}
-      content={getSectionContent(basicInfo)}
+      content={getSectionContent(sectionItems.basic, sectionItems.verifiable)}
       testID="basic-info-section"
     />
   );
 };
+
+const VerifyRecommendation = ({ t }: { t: T }) => (
+  <Box display="flex" alignItems="center" justifyContent="center" marginTop={5}>
+    <IcoInfo16 color="tertiary" />
+    <Text marginLeft={3} variant="caption-2" color="tertiary" tag="span">
+      {t('verify-recommendation')}
+    </Text>
+  </Box>
+);
+
+const ResponsiveGridContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
+
+    ${media.greaterThan('md')`
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      row-gap: ${theme.spacing[7]};
+      column-gap: ${theme.spacing[5]};
+    `}
+  `}
+`;
+
+const ItemAndAction = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    gap: ${theme.spacing[5]};
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    padding-top: ${theme.spacing[7]};
+  `}
+`;
+
+const StyledDivider = styled(Divider)`
+  ${({ theme }) => css`
+    width: auto;
+    margin-top: ${theme.spacing[7]};
+  `}
+`;
 
 export default BasicInfoSection;

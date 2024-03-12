@@ -13,7 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignAuthToken: 'challengeSucceeded' | 'identifiedWithSufficientScopes';
+    assignAuthToken: 'identifiedWithSufficientScopes';
     assignChallengeData: 'challengeReceived';
     assignEmail: 'identifyFailed';
     assignIdentifySuccessResult: 'identified';
@@ -36,7 +36,6 @@ export interface Typegen0 {
     | 'init'
     | 'initAuthToken'
     | 'initBootstrap'
-    | 'never'
     | 'phoneIdentification'
     | 'phoneKbaChallenge'
     | 'smsChallenge'

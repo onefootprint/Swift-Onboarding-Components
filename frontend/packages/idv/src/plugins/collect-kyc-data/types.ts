@@ -7,6 +7,12 @@ import type {
 
 import type { BasePluginProps } from '../base-plugin';
 
+export type VerifiedMethods = {
+  isLoading: boolean;
+  email?: string | false;
+  phone?: string | false;
+};
+
 export type CollectKycDataContext = {
   config: PublicOnboardingConfig;
   requirement: CollectKycDataRequirement;

@@ -402,6 +402,11 @@
           "nationality": {
             "label": "Nationality",
             "placeholder": "Select nationality"
+          },
+          "phone": {
+            "label": "Phone number",
+            "placeholder": "(123) 123-1234",
+            "error-required": "Phone number cannot be empty"
           }
         }
       },
@@ -613,12 +618,15 @@
           }
         }
       },
-      "phone-number": "Phone number",
       "cta": {
         "continue": "Continue",
         "save": "Save",
         "cancel": "Cancel"
-      }
+      },
+      "phone-number": "Phone number",
+      "verified": "Verified",
+      "verify-recommendation": "We recommend verifying both email and phone number",
+      "verify": "Verify"
     }
   },
   "kyb": {

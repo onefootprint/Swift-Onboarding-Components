@@ -1,4 +1,3 @@
-import { getErrorMessage } from '@onefootprint/request';
 import type {
   InvestorProfileDI,
   UserDataError,
@@ -7,23 +6,29 @@ import type {
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { AxiosError } from 'axios';
+import omit from 'lodash/omit';
 import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../components/l10n-provider';
 import useUserData from '../../../../hooks/api/hosted/user/vault/use-user-data';
 import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
-import Logger from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import type { KycData } from '../../utils/data-types';
 import useCollectKycDataMachine from '../use-collect-kyc-data-machine';
 import getRequestData from './utils/get-request-data';
 
 export type SyncDataFieldErrors = UserDataError['error']['message'];
-
+type ObjWithValue = Record<string, { value?: unknown }>;
 type SyncDataArgs = {
   data: KycData;
   onSuccess?: (data: KycData) => void;
   onError?: (errors: SyncDataFieldErrors) => void;
 };
+
+const onlyNumericAndPlus = (s?: unknown): string =>
+  typeof s === 'string' ? s.trim().replace(/[^0-9+]/g, '') : '';
+
+const { logError } = getLogger('kyc-use-sync-data');
 
 const useSyncData = () => {
   const { t } = useTranslation('idv', {
@@ -36,10 +41,6 @@ const useSyncData = () => {
   const locale = l10n?.locale || 'en-US';
   const userDataMutation = useUserData();
   const toast = useToast();
-
-  const logError = (errorMessage: string) => {
-    Logger.error(errorMessage, 'kyc-use-sync-data');
-  };
 
   const syncData = async ({
     data: rawData,
@@ -79,11 +80,7 @@ const useSyncData = () => {
         .message;
       if (typeof errors === 'string') {
         showRequestErrorToast(err);
-        logError(
-          `Kyc useSyncData encountered error while syncing data ${getErrorMessage(
-            err,
-          )}`,
-        );
+        logError('Kyc useSyncData encountered error while syncing data', err);
         return;
       }
       const validDis = new Set(Object.values(IdDI));
@@ -100,11 +97,7 @@ const useSyncData = () => {
           description: t('invalid-inputs.description'),
           variant: 'error',
         });
-        logError(
-          `Kyc useSyncData encountered error while syncing data${getErrorMessage(
-            err,
-          )}`,
-        );
+        logError('Kyc useSyncData encountered error while syncing data', err);
       }
     };
 
@@ -135,6 +128,35 @@ const useSyncData = () => {
   };
 
   return { syncData, mutation: userDataMutation };
+};
+
+export const omitPhoneAndEmail = <T extends ObjWithValue>(data: T) =>
+  omit(data, [IdDI.phoneNumber, IdDI.email]);
+
+export const checkPhoneEmailBeforeSubmit = <T extends ObjWithValue>(
+  initial: T,
+  current: T,
+  verifiedMethods?: { phone?: string | false; email?: string | false },
+) => {
+  const propsToRemove = [];
+
+  if (
+    Boolean(verifiedMethods?.email) ||
+    String(initial[IdDI.email]?.value).trim() ===
+      String(current[IdDI.email]?.value).trim()
+  ) {
+    propsToRemove.push(IdDI.email);
+  }
+
+  if (
+    Boolean(verifiedMethods?.phone) ||
+    onlyNumericAndPlus(initial[IdDI.phoneNumber]?.value) ===
+      onlyNumericAndPlus(current[IdDI.phoneNumber]?.value)
+  ) {
+    propsToRemove.push(IdDI.phoneNumber);
+  }
+
+  return omit(current, propsToRemove);
 };
 
 export default useSyncData;

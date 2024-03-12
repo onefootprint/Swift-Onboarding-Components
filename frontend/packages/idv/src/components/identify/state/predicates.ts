@@ -1,4 +1,6 @@
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { ChallengeKind as Kind } from '@onefootprint/types';
+import { AuthMethodKind } from '@onefootprint/types/src/data';
 
 import type {
   IdentifyMachineContext,
@@ -48,7 +50,18 @@ export const isPrevSmsChallenge = (_: unknown, ev: NavigatedToPrevPage) =>
 export const isPrevEmailChallenge = (_: unknown, ev: NavigatedToPrevPage) =>
   ev.payload?.prev === 'emailChallenge';
 
-export const hasEmailMethodUnVerified = (user: User): boolean =>
-  !!user &&
-  Array.isArray(user.authMethods) &&
-  user.authMethods.some(x => x.kind === 'email' && !x.isVerified);
+export const requiresPhoneVerification = (
+  config?: PublicOnboardingConfig,
+  user?: User,
+  completedAuthMethod?: AuthMethodKind,
+): boolean => {
+  const { phone } = AuthMethodKind;
+  const playbookRequiresPhone = config?.requiredAuthMethods?.includes(phone);
+  const userJustRegisteredPhone = completedAuthMethod === phone;
+  const userHadPhone = user?.authMethods
+    ?.filter(m => m.isVerified)
+    .map(m => m.kind)
+    .includes(phone);
+
+  return !!playbookRequiresPhone && !userHadPhone && !userJustRegisteredPhone;
+};

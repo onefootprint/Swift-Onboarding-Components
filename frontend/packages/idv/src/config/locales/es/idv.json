@@ -402,6 +402,11 @@
           "nationality": {
             "label": "Nacionalidad",
             "placeholder": "Selecciona la nacionalidad"
+          },
+          "phone": {
+            "label": "Número de teléfono",
+            "placeholder": "(123) 123-1234",
+            "error-required": "El campo 'Número de teléfono' es obligatorio"
           }
         }
       },
@@ -613,12 +618,15 @@
           }
         }
       },
-      "phone-number": "Número de teléfono",
       "cta": {
         "continue": "Continuar",
         "save": "Guardar",
         "cancel": "Cancelar"
-      }
+      },
+      "phone-number": "Número de teléfono",
+      "verified": "Verificado",
+      "verify-recommendation": "Recomendamos verificar correo electrónico y teléfono.",
+      "verify": "Verificar"
     }
   },
   "kyb": {

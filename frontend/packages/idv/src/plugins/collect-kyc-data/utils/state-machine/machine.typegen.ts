@@ -21,6 +21,8 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'addVerificationEmail'
+    | 'addVerificationPhone'
     | 'basicInformation'
     | 'completed'
     | 'confirm'

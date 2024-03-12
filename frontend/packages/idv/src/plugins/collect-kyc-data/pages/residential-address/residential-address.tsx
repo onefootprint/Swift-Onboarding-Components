@@ -9,7 +9,7 @@ import EditableFormButtonContainer from '../../../../components/editable-form-bu
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
-import useSyncData from '../../hooks/use-sync-data';
+import useSyncData, { omitPhoneAndEmail } from '../../hooks/use-sync-data';
 import type { KycData } from '../../utils/data-types';
 import getInitialCountry from '../../utils/get-initial-country';
 import AddressLines from './components/address-lines';
@@ -71,7 +71,7 @@ const ResidentialAddress = ({
 
   const onSubmitFormData = (formData: FormData) => {
     syncData({
-      data: convertFormData(formData),
+      data: omitPhoneAndEmail(convertFormData(formData)),
       onSuccess: cleanData => {
         send({
           type: 'dataSubmitted',

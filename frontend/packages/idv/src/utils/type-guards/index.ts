@@ -1,4 +1,5 @@
 export {
+  hasAuthMethodUnverifiedEmail,
   hasEmailAndPhoneNumber,
   isAuth,
   isBiometric,
@@ -8,6 +9,7 @@ export {
   isError,
   isFunction,
   isObject,
+  isPhone,
   isPhoneIdentifier,
   isSms,
   isString,

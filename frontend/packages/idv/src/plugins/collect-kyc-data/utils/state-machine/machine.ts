@@ -280,11 +280,7 @@ const createCollectKycDataMachine = (
             decryptedData: {
               actions: ['assignData'],
             },
-            confirmed: [
-              {
-                target: 'completed',
-              },
-            ],
+            confirmed: [{ target: 'completed' }],
             navigatedToPrevPage: [
               {
                 target: 'ssn',
@@ -328,7 +324,23 @@ const createCollectKycDataMachine = (
             dataSubmitted: {
               actions: ['assignData'],
             },
+            addVerification: [
+              {
+                cond: (c, { payload }) => payload === 'phone',
+                target: 'addVerificationPhone',
+              },
+              {
+                cond: (c, { payload }) => payload === 'email',
+                target: 'addVerificationEmail',
+              },
+            ],
           },
+        },
+        addVerificationPhone: {
+          on: { navigatedToPrevPage: { target: 'confirm' } },
+        },
+        addVerificationEmail: {
+          on: { navigatedToPrevPage: { target: 'confirm' } },
         },
         completed: {
           type: 'final',

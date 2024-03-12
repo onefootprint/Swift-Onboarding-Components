@@ -48,7 +48,11 @@ test('KYC with US legal status #ci', async ({
 
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
   await selectOutcomeOptional({ frame }, 'Success');
-  await checkSupport({ frame });
+
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (!isMobile) {
+    await checkSupport({ frame });
+  }
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 

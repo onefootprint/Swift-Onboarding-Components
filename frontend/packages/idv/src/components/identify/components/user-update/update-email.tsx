@@ -6,20 +6,16 @@ import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import { UpdateAuthMethodActionKind } from '../../types';
 import EmailPageStructure from '../email-page-structure';
+import { isCollectScreen, ScreenState } from './helpers';
 import UpdateVerifyEmail from './update-verify-email';
 
 type UpdateEmailProps = {
-  Header: (props: HeaderProps) => JSX.Element;
-  authToken: string;
   actionKind: UpdateAuthMethodActionKind;
+  authToken: string;
+  Header: (props: HeaderProps) => JSX.Element;
   identifyVariant: IdentifyVariant;
   onSuccess: (newEmail: string) => void;
 };
-
-enum Screen {
-  collect = 'collect',
-  verify = 'verify',
-}
 
 const getHeaderTitle = (
   t: TFunction<'identify'>,
@@ -31,38 +27,34 @@ const getHeaderTitle = (
 
 const UpdateEmail = ({
   Header,
-  authToken,
-  onSuccess,
   actionKind,
+  authToken,
   identifyVariant,
+  onSuccess,
 }: UpdateEmailProps) => {
   const { t } = useTranslation('identify');
-  const [screen, setScreen] = useState<Screen>(Screen.collect);
+  const [screen, setScreen] = useState<ScreenState>(ScreenState.collect);
   const [email, setEmail] = useState<string>('');
 
-  if (screen === Screen.collect || !email) {
-    return (
-      <EmailPageStructure
-        Header={Header}
-        onSubmit={newEmail => {
-          setEmail(newEmail);
-          setScreen(Screen.verify);
-        }}
-        defaultEmail={email}
-        isLoading={false}
-        texts={{
-          headerTitle: getHeaderTitle(t, actionKind),
-          headerSubtitle: t('email-step.update-subtitle'),
-          cta: t('continue'),
-          emailIsRequired: t('email-is-required'),
-          emailLabel: t('email'),
-          emailPlaceholder: t('email-placeholder'),
-        }}
-      />
-    );
-  }
-
-  return (
+  return isCollectScreen(screen) || !email ? (
+    <EmailPageStructure
+      Header={Header}
+      onSubmit={newEmail => {
+        setEmail(newEmail);
+        setScreen(ScreenState.verify);
+      }}
+      defaultEmail={email}
+      isLoading={false}
+      texts={{
+        headerTitle: getHeaderTitle(t, actionKind),
+        headerSubtitle: t('email-step.update-subtitle'),
+        cta: t('continue'),
+        emailIsRequired: t('email-is-required'),
+        emailLabel: t('email'),
+        emailPlaceholder: t('email-placeholder'),
+      }}
+    />
+  ) : (
     <UpdateVerifyEmail
       Header={Header}
       email={email}
@@ -70,9 +62,7 @@ const UpdateEmail = ({
       actionKind={actionKind}
       identifyVariant={identifyVariant}
       onChallengeVerificationSuccess={() => onSuccess(email)}
-      onBack={() => {
-        setScreen(Screen.collect);
-      }}
+      onBack={() => setScreen(ScreenState.collect)}
     />
   );
 };

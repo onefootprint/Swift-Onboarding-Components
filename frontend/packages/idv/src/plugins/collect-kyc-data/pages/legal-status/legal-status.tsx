@@ -10,7 +10,7 @@ import EditableFormButtonContainer from '../../../../components/editable-form-bu
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
-import useSyncData from '../../hooks/use-sync-data';
+import useSyncData, { omitPhoneAndEmail } from '../../hooks/use-sync-data';
 import type { KycData } from '../../utils/data-types';
 import CitizenshipFields from './components/citizenship-fields';
 import CountryOfBirthField from './components/country-of-birth-field';
@@ -104,7 +104,7 @@ const LegalStatus = ({
 
   const handleBeforeSubmit = (formData: FormData) => {
     syncData({
-      data: convertFormData(formData),
+      data: omitPhoneAndEmail(convertFormData(formData)),
       onSuccess: cleanData => {
         send({
           type: 'dataSubmitted',

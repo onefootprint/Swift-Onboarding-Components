@@ -6,4 +6,6 @@ export type FormData = {
   lastName?: string;
   dob?: string;
   nationality?: CountrySelectOption;
+  email?: string;
+  phoneNumber?: string;
 };

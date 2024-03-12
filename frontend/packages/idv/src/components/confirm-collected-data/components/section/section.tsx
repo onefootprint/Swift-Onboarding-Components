@@ -55,20 +55,13 @@ const Section = ({
           </ActionsContainer>
         )}
       </Header>
-      <Content>{content}</Content>
+      <FullWidthDiv>{content}</FullWidthDiv>
     </Container>
   );
 };
 
-const Content = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100%;
-    row-gap: ${theme.spacing[7]};
-  `}
+const FullWidthDiv = styled.div`
+  width: 100%;
 `;
 
 const ActionsContainer = styled.div`

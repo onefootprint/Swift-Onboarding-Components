@@ -7,10 +7,10 @@ import type { UpdateAuthMethodActionKind } from '../types';
 import calculateRetryTime from './get-retry-time';
 
 export type UserChallengeBody = {
+  actionKind: `${UpdateAuthMethodActionKind}`; // Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.
   authToken: string;
-  actionKind: UpdateAuthMethodActionKind; // Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.
-  kind: AuthMethodKind; // The kind of challenge to initiate
   email?: string; // If the challenge kind is email, the email address to send the challenge to
+  kind: AuthMethodKind; // The kind of challenge to initiate
   phoneNumber?: string; // If the challenge kind is SMS, the phone number t
 };
 

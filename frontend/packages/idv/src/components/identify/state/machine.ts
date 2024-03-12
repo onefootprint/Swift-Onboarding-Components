@@ -3,8 +3,7 @@ import type {
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
-import { AuthMethodKind, ChallengeKind as Kind } from '@onefootprint/types';
-import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
+import { ChallengeKind as Kind } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
@@ -22,6 +21,7 @@ import {
   isNoPhoneFlow,
   isPrevSmsChallenge,
   isUserFoundWithSingleChallenge,
+  requiresPhoneVerification,
   shouldShowChallengeSelector,
 } from './predicates';
 import type {
@@ -31,6 +31,8 @@ import type {
   IdentifyMachineEvents,
   IdentifyVariant,
   LogoConfig,
+  NavigatedToPrevPage,
+  TransitionsFor,
 } from './types';
 
 export type IdentifyMachineArgs = {
@@ -51,76 +53,55 @@ const getKindPayload = (_: unknown, { payload }: { payload: Kind }) => payload;
 const isPayloadEmail = compose(isEmail, getKindPayload);
 const isPayloadSms = compose(isSms, getKindPayload);
 
-const CHALLENGE_SELECTION_TRANSITIONS = [
+const CHALLENGE_SELECTION_TRANSITIONS: TransitionsFor<IdentifiedEvent> = [
   // If there are multiple available challenge kinds OR there's only biometric OR the IdentifyVariant
   // always requires the challenge selector screen
   {
-    cond: (c: IdentifyMachineContext, event: IdentifiedEvent) =>
-      shouldShowChallengeSelector(c, event.payload.user),
+    cond: (c, ev) => shouldShowChallengeSelector(c, ev.payload.user),
     target: 'challengeSelectOrPasskey',
     actions: ['assignIdentifySuccessResult'],
   },
   // Otherwise, go directly to the SMS or phone screen
   {
-    cond: (_: IdentifyMachineContext, event: IdentifiedEvent) =>
-      isUserFoundWithSingleChallenge(event.payload.user, Kind.email),
+    cond: (_, ev) =>
+      isUserFoundWithSingleChallenge(ev.payload.user, Kind.email),
     target: 'emailChallenge',
     actions: ['assignIdentifySuccessResult'],
   },
   {
-    cond: (_: IdentifyMachineContext, event: IdentifiedEvent) =>
-      isUserFoundWithSingleChallenge(event.payload.user, Kind.sms),
+    cond: (_, ev) => isUserFoundWithSingleChallenge(ev.payload.user, Kind.sms),
     target: 'smsChallenge',
     actions: ['assignIdentifySuccessResult'],
   },
 ];
 
 /// The set of transitions used to return from the SMS or Email challenge screens
-const BACK_FROM_CHALLENGE_TRANSITIONS = [
+const BACK_FROM_CHALLENGE_TRANSITIONS: TransitionsFor<NavigatedToPrevPage> = [
   // If we showed the challenge selector, return to it
   {
-    cond: (c: IdentifyMachineContext) =>
-      shouldShowChallengeSelector(c, c.identify.user),
+    cond: c => shouldShowChallengeSelector(c, c.identify.user),
     target: 'challengeSelectOrPasskey',
   },
   // If we didn't show the challenge selector screen, go back to the respective identification screen
   // If they were identified by email, go back to the email screen
   {
-    cond: (c: IdentifyMachineContext) =>
-      isEmailIdentifier(c.identify.successfulIdentifier),
+    cond: c => isEmailIdentifier(c.identify.successfulIdentifier),
     target: 'emailIdentification',
     actions: ['resetIdentifyState'],
   },
   // If the user had only one available challenge kind, go back to the phone input screen
   {
-    cond: (c: IdentifyMachineContext) =>
-      isPhoneIdentifier(c.identify.successfulIdentifier),
+    cond: c => isPhoneIdentifier(c.identify.successfulIdentifier),
     target: 'phoneIdentification',
     actions: ['resetIdentifyState'],
   },
 ];
 
-const requiresAddingPhone = (
-  config?: PublicOnboardingConfig,
-  user?: IdentifiedUser,
-  completedAuthMethod?: AuthMethodKind,
-) => {
-  const playbookRequiresPhone = config?.requiredAuthMethods?.includes(
-    AuthMethodKind.phone,
-  );
-  const userHadPhone = user?.authMethods
-    ?.filter(m => m.isVerified)
-    .map(m => m.kind)
-    .includes(AuthMethodKind.phone);
-  const userJustRegisteredPhone = completedAuthMethod === AuthMethodKind.phone;
-  return !!playbookRequiresPhone && !userHadPhone && !userJustRegisteredPhone;
-};
-
-const SUCCESS_TRANSITIONS = [
-  // If the playbook requires phone and the user doesn't have a phone, add it
+const SUCCESS_TRANSITIONS: TransitionsFor<ChallengeSucceededEvent> = [
   {
-    cond: (c: IdentifyMachineContext, event: ChallengeSucceededEvent) =>
-      requiresAddingPhone(c.config, c.identify.user, event.payload.kind),
+    /** If the playbook requires phone and the user doesn't have a phone, add it */
+    cond: (c, ev) =>
+      requiresPhoneVerification(c.config, c.identify.user, ev.payload.kind),
     target: 'addPhone',
     actions: ['assignAuthToken'],
     description:
@@ -376,18 +357,6 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
         success: {
           type: 'final',
         },
-
-        // This state is never used. But the machine typechecking doesn't properly explore
-        // transitions that are defined as a const, like BACK_FROM_CHALLENGE_TRANSITIONS and
-        // SUCCESS_TRANSITIONS. So we need this to tell the typechecker that the
-        // assignAuthToken action is used
-        never: {
-          on: {
-            challengeSucceeded: {
-              actions: ['assignAuthToken'],
-            },
-          },
-        },
       },
     },
     {
@@ -453,7 +422,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           }
           return context;
         }),
-        assignAuthToken: assign((context, event: ChallengeSucceededEvent) => {
+        assignAuthToken: assign((context, event) => {
           context.challenge.authToken = event.payload.authToken;
           return context;
         }),

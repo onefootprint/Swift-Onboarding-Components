@@ -44,7 +44,7 @@ const UpdateVerifyEmail = ({
       onBack={onBack}
       onChallengeVerificationSuccess={onChallengeVerificationSuccess}
       headerTitle={t('email-challenge.verify-title')}
-      subtitle={subtitle}
+      headerSubtitle={subtitle}
       logError={logError}
       logWarn={logWarn}
     />
