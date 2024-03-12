@@ -1,4 +1,4 @@
-import { createFontStyles, media } from '@onefootprint/ui';
+import { createFontStyles } from '@onefootprint/ui';
 import type { MarkdownToJSX } from 'markdown-to-jsx';
 import Markdown from 'markdown-to-jsx';
 import React from 'react';
@@ -22,6 +22,7 @@ import H5 from './components/markdown-components/h5';
 import Img from './components/markdown-components/img';
 import NavigationLink from './components/markdown-components/navigation-link';
 import Strong from './components/markdown-components/strong';
+import Table from './components/markdown-components/table';
 
 type ArticleProps = {
   article: Article;
@@ -72,6 +73,9 @@ const overrides: MarkdownToJSX.Overrides = {
   },
   'navigation-link': {
     component: NavigationLink,
+  },
+  table: {
+    component: Table,
   },
 };
 
@@ -137,51 +141,6 @@ const Container = styled(Markdown)`
 
     pre > div {
       margin-bottom: ${theme.spacing[9]};
-    }
-
-    table {
-      border-collapse: separate;
-      border-radius: ${theme.borderRadius.default};
-      border: 1px solid ${theme.borderColor.tertiary};
-      margin-bottom: ${theme.spacing[9]};
-      width: auto;
-      display: block;
-      overflow-x: auto;
-
-      tr:not(:last-child) td {
-        border-bottom: 1px solid ${theme.borderColor.tertiary};
-      }
-
-      th,
-      td {
-        padding: ${theme.spacing[5]} ${theme.spacing[6]};
-        vertical-align: middle;
-      }
-
-      ${media.greaterThan('md')`
-        code {
-          white-space: nowrap;
-        }
-        td:nth-child(2) {
-          min-width: 180px;
-        } 
-      `}
-
-      th {
-        ${createFontStyles('caption-1')};
-        white-space: nowrap;
-        background: ${theme.backgroundColor.secondary};
-        border-bottom: 1px solid ${theme.borderColor.tertiary};
-        border-radius: ${theme.borderRadius.default}
-          ${theme.borderRadius.default} 0 0;
-        color: ${theme.color.primary};
-        text-align: left;
-        text-transform: uppercase;
-      }
-
-      tbody {
-        ${createFontStyles('body-3')};
-      }
     }
   `};
 `;
