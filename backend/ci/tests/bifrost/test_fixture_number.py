@@ -19,9 +19,11 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
 
-    identify_data = dict(identifier=dict(phone_number=FIXTURE_PHONE_NUMBER))
+    identify_data = dict(
+        identifier=dict(phone_number=FIXTURE_PHONE_NUMBER), scope="onboarding"
+    )
     body = post("hosted/identify", identify_data, ob_config2.key, sandbox_id_h)
-    assert not body["user_found"]
+    assert not body["user"]
 
     bifrost = BifrostClient.create(ob_config2, override_sandbox_id=sandbox_id)
     bifrost.run()
@@ -37,16 +39,16 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
         dict(email=bifrost.data["id.email"]),
     ]
     for identifier in identifiers:
-        data = dict(identifier=identifier)
+        data = dict(identifier=identifier, scope="onboarding")
         # We can find via global fingerprints without specifying OBC
         body = post("hosted/identify", data, sandbox_id_h)
-        assert body["user_found"]
+        assert body["user"]
         # And find from another tenant (via global fingerprints)
         body = post("hosted/identify", data, tenant.default_ob_config.key, sandbox_id_h)
-        assert body["user_found"]
+        assert body["user"]
         # And find at the current tenant when specifying OBC
         body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
-        assert body["user_found"]
+        assert body["user"]
 
     bifrost2 = BifrostClient.inherit(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost2.run()
@@ -91,11 +93,9 @@ def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc
         sandbox_obc = skip_phone_obc
     # Should work with sandbox id
     sandbox_id = _gen_random_sandbox_id()
+    data = dict(**identifier, scope="onboarding")
     post(
-        "hosted/identify/signup_challenge",
-        identifier,
-        sandbox_obc.key,
-        SandboxId(sandbox_id),
+        "hosted/identify/signup_challenge", data, sandbox_obc.key, SandboxId(sandbox_id)
     )
 
     # Have to make a live OBC to test using the fixture numebr in live mode
@@ -111,7 +111,7 @@ def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc
     # Fixture number shouldn't even work in prod
     body = post(
         "hosted/identify/signup_challenge",
-        identifier,
+        data,
         live_obc.key,
         status_code=400,
     )
@@ -121,7 +121,7 @@ def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc
     )
     body = post(
         "hosted/identify/signup_challenge",
-        identifier,
+        data,
         live_obc.key,
         SandboxId(sandbox_id),
         status_code=400,

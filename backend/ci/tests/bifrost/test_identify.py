@@ -8,9 +8,12 @@ from tests.headers import SandboxId, FpAuth, IsLive
 
 def test_entity_created_after_signup_challenge(sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
+    data = dict(
+        phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL, scope="onboarding"
+    )
     post(
         "hosted/identify/signup_challenge",
-        dict(phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL),
+        data,
         sandbox_tenant.default_ob_config.key,
         SandboxId(sandbox_id),
     )
@@ -36,27 +39,29 @@ def test_concurrent_signup_same_phone_number(sandbox_tenant):
     obc = sandbox_tenant.default_ob_config
 
     # Initiate two signup challenges for the same phone number, email, and sandbox ID.
-    data = dict(phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL)
+    data = dict(
+        phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL, scope="onboarding"
+    )
     body = post("hosted/identify/signup_challenge", data, obc.key, sandbox_id_h)
-    challenge_token1 = body["challenge_data"]["challenge_token"]
+    challenge_data1 = body["challenge_data"]
 
-    data = dict(phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL)
     body = post("hosted/identify/signup_challenge", data, obc.key, sandbox_id_h)
-    challenge_token2 = body["challenge_data"]["challenge_token"]
+    challenge_data2 = body["challenge_data"]
 
-    def verify(challenge_token):
+    def verify(challenge_data):
         data = {
             "challenge_response": "000000",
             "challenge_kind": "sms",
-            "challenge_token": challenge_token,
+            "challenge_token": challenge_data["challenge_token"],
             "scope": "onboarding",
         }
-        post("hosted/identify/verify", data, obc.key)
+        token = FpAuth(challenge_data["token"])
+        post("hosted/identify/verify", data, token)
 
     # Should be able to complete both challenges without conflict, effectively making two vaults
     # with the same phone fingerprint and same sandbox ID.
-    verify(challenge_token2)
-    verify(challenge_token1)
+    verify(challenge_data2)
+    verify(challenge_data1)
 
 
 @pytest.fixture(scope="function")
@@ -71,9 +76,12 @@ def vault1(sandbox_id, sandbox_tenant):
     Should never be identified.
     """
     sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(
+        phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL, scope="onboarding"
+    )
     post(
         "hosted/identify/signup_challenge",
-        dict(phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL),
+        data,
         sandbox_tenant.default_ob_config.key,
         sandbox_id_h,
     )
@@ -122,9 +130,10 @@ def vault4(sandbox_id, foo_sandbox_tenant):
     auth_token = FpAuth(body["token"])
 
     # Token should be unverified because this vault was made via API
-    body = post("/hosted/identify", dict(identifier=None), auth_token)
-    assert body["user_found"]
-    assert body["is_unverified"]
+    data = dict(identifier=None, scope="onboarding")
+    body = post("/hosted/identify", data, auth_token)
+    assert body["user"]
+    assert body["user"]["is_unverified"]
 
     auth_token = IdentifyClient.from_token(auth_token).step_up(
         assert_had_no_scopes=True
@@ -241,12 +250,7 @@ def test_multi_identify(sandbox_user, sandbox_tenant):
     assert set(body["user"]["matching_fps"]) == {"id.email"}
 
 
-def test_modern_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
-    """
-    The more modern version if the identify flow will issue a token after POST /hosted/identify.
-    Many of our clients are using the legacy version. When they migrate, we will update the rest
-    of the tests.
-    """
+def test_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant, "flerp", must_collect_data, must_collect_data
     )
@@ -274,7 +278,8 @@ def test_modern_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
     auth_token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
 
     # Make sure the token has scopes
-    body = post("/hosted/identify", dict(identifier=None), auth_token)
+    data = dict(identifier=None, scope="onboarding")
+    body = post("/hosted/identify", data, auth_token)
     assert set(body["user"]["token_scopes"]) >= {"sign_up"}
 
     # Finish onboarding onto this playbook using the auth token issued from the new flow
@@ -282,7 +287,7 @@ def test_modern_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
     bifrost.run()
 
 
-def test_modern_login_flow_new_tenant(sandbox_tenant, sandbox_user, foo_sandbox_tenant):
+def test_login_flow_new_tenant(sandbox_tenant, sandbox_user, foo_sandbox_tenant):
     bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
 
@@ -305,12 +310,7 @@ def test_modern_login_flow_new_tenant(sandbox_tenant, sandbox_user, foo_sandbox_
     bifrost.run()
 
 
-def test_modern_signup_flow(sandbox_tenant):
-    """
-    The more modern version if the identify flow will issue a token after POST /hosted/identify/signup_challenge.
-    Many of our clients are using the legacy version. When they migrate, we will update the rest
-    of the tests.
-    """
+def test_signup_flow(sandbox_tenant):
     obc = sandbox_tenant.default_ob_config
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
@@ -402,7 +402,7 @@ def test_otp_unverified(sandbox_user, sandbox_tenant):
     token = FpAuth(body["user"]["token"])
 
     # Cannot initiate a login challenge
-    data = dict(preferred_challenge_kind="email")
+    data = dict(preferred_challenge_kind="email", scope="onboarding")
     body = post("/hosted/identify/login_challenge", data, token, status_code=400)
     assert body["error"]["message"] == "Cannot initiate a challenge of requested kind"
 
@@ -468,14 +468,15 @@ def test_create_duplicate_vault(sandbox_user, foo_sandbox_tenant):
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     assert body["user"]["can_initiate_signup_challenge"]
 
-    data = dict(phone_number=phone_number, email=FIXTURE_EMAIL)
+    data = dict(phone_number=phone_number, email=FIXTURE_EMAIL, scope="onboarding")
     body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     data = {
         "challenge_response": "000000",
         "challenge_token": body["challenge_data"]["challenge_token"],
         "scope": "onboarding",
     }
-    post("hosted/identify/verify", data, obc.key)
+    token = FpAuth(body["challenge_data"]["token"])
+    post("hosted/identify/verify", data, token)
 
 
 def test_double_signup_challenge(sandbox_tenant):
@@ -487,6 +488,6 @@ def test_double_signup_challenge(sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
     obc = sandbox_tenant.default_ob_config
-    data = dict(phone_number=FIXTURE_PHONE_NUMBER)
+    data = dict(phone_number=FIXTURE_PHONE_NUMBER, scope="onboarding")
     post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)

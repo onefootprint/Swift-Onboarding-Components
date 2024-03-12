@@ -2,8 +2,7 @@ use super::{BiometricChallengeState, PhoneEmailChallengeState};
 use crate::{ChallengeData, ChallengeState, State};
 use api_core::{
     auth::{
-        ob_config::ObConfigAuth,
-        session::user::{AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, UserSession},
+        session::user::{AssociatedAuthEvent, NewUserSessionContext},
         user::{allowed_user_scopes, CheckedUserAuthContext, UserAuthContext},
         Any,
     },
@@ -50,9 +49,8 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 pub async fn post(
     state: web::Data<State>,
     request: Json<IdentifyVerifyRequest>,
-    ob_pk_auth: Option<ObConfigAuth>,
     // When provided, augments the existing user_auth token with the scopes gained from the challenge
-    user_auth: Option<UserAuthContext>,
+    user_auth: UserAuthContext,
     insight_headers: InsightHeaders,
     root_span: RootSpan,
 ) -> JsonApiResponse<IdentifyVerifyResponse> {
@@ -65,22 +63,20 @@ pub async fn post(
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
 
-    let user_auth = user_auth.map(|a| a.check_guard(Any)).transpose()?;
+    let user_auth = user_auth.check_guard(Any)?;
 
     let config = state.config.clone();
     let session_key = state.session_sealing_key.clone();
     let (auth_token, vw, su, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let obc_auth = ob_pk_auth.as_ref();
-            let ua = user_auth.as_ref();
             let (uv_id, event_kind, passkey_cred_id) = match challenge_state.data {
                 ChallengeData::Sms(s) => {
-                    let vault_id = validate(conn, s, obc_auth, ua, &c_response, IDK::PhoneNumber.into())?;
+                    let vault_id = validate(conn, s, &user_auth, &c_response, IDK::PhoneNumber.into())?;
                     (vault_id, AuthEventKind::Sms, None)
                 }
                 ChallengeData::Email(s) => {
-                    let vault_id = validate(conn, s, obc_auth, ua, &c_response, IDK::Email.into())?;
+                    let vault_id = validate(conn, s, &user_auth, &c_response, IDK::Email.into())?;
                     (vault_id, AuthEventKind::Email, None)
                 }
                 ChallengeData::Passkey(context) => {
@@ -90,17 +86,16 @@ pub async fn post(
             };
 
             // Determine which scopes to issue on the auth token
-            let (context, su, obc) = match scope {
+            let (context, su) = match scope {
                 IdentifyScope::Auth => {
-                    let obc = ob_pk_auth.as_ref().map(|a| a.ob_config()).cloned();
-                    let su = if let Some(obc) = obc.as_ref() {
+                    let su = if let Some(obc) = user_auth.ob_config() {
                         if obc.kind != ObConfigurationKind::Auth {
                             return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
                         }
                         let uv = Vault::lock(conn, &uv_id)?;
                         ScopedVault::get_or_create(conn, &uv, obc.id.clone())?
                     } else {
-                        let Some(su_from_token) = user_auth.as_ref().and_then(|ua| ua.scoped_user()) else {
+                        let Some(su_from_token) = user_auth.scoped_user() else {
                             // A playbook MUST be provided if we're not stepping up
                             return Err(UserError::PlaybookMissingForAuth.into());
                         };
@@ -109,21 +104,18 @@ pub async fn post(
 
                     let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
-                        obc_id: obc.as_ref().map(|obc| obc.id.clone()),
                         ..Default::default()
                     };
-                    (context, Some(su), obc)
+                    (context, Some(su))
                 }
                 IdentifyScope::Onboarding => {
-                    let user_auth_obc = user_auth.as_ref().and_then(|a| a.ob_config());
-                    let ob_pk_obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
-                    let obc = user_auth_obc.or(ob_pk_obc).cloned();
-                    let su_id = user_auth.as_ref().and_then(|ua| ua.scoped_user_id());
+                    let obc = user_auth.ob_config();
+                    let su_id = user_auth.scoped_user_id();
                     let su = if let Some(su_id) = su_id {
                         // We are stepping up an existing token already attached to a SU
                         ScopedVault::get(conn, &su_id)?
                     } else if let Some(obc) = obc.as_ref() {
-                        // We are making a new auth token or adding the SU to a token that doesn't have it
+                        // We are adding the SU to a token that doesn't have it
                         if obc.kind == ObConfigurationKind::Auth {
                             return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
                         }
@@ -132,29 +124,21 @@ pub async fn post(
                         let uv = Vault::lock(conn, &uv_id)?;
                         ScopedVault::get_or_create(conn, &uv, obc.id.clone())?
                     } else {
-                        return Err(ValidationError(
-                            "Must provide either a playbook key or an existing auth token",
-                        )
-                        .into());
+                        return Err(ValidationError("No scoped vault available").into());
                     };
-                    if let Some(bo_id) = user_auth.as_ref().and_then(|ua| ua.bo_id.as_ref()).or(ob_pk_auth
-                        .as_ref()
-                        .and_then(|ob| ob.business_owner())
-                        .map(|bo| &bo.id))
-                    {
+                    if let Some(bo_id) = user_auth.bo_id.as_ref() {
                         register_business_owner(conn, &su, bo_id)?;
                     }
                     let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
-                        obc_id: obc.as_ref().map(|obc| obc.id.clone()),
                         // wf_id will be added later in POST /hosted/onboarding
                         ..Default::default()
                     };
-                    (context, Some(su), obc)
+                    (context, Some(su))
                 }
                 IdentifyScope::My1fp => {
                     let context = NewUserSessionContext::default();
-                    (context, None, None)
+                    (context, None)
                 }
             };
 
@@ -182,23 +166,12 @@ pub async fn post(
             let scopes = allowed_user_scopes(vec![event.kind], scope, true);
 
             let ae = AssociatedAuthEvent::explicit(event.id);
-            let data = if let Some(user_auth) = user_auth {
-                // Add the new scopes and args to the existing scopes and context on the auth token
-                user_auth.data.clone().update(context, scopes, Some(ae))?
-            } else {
-                // Otherwise, create a new token with these scopes / context
-                let args = NewUserSessionArgs {
-                    user_vault_id: uv_id.clone(),
-                    purpose: scope.into(),
-                    context,
-                    scopes,
-                    auth_events: vec![ae],
-                };
-                UserSession::make(args)?
-            };
+            // Add the new scopes and args to the existing scopes and context on the auth token
+            let data = user_auth.data.clone().update(context, scopes, Some(ae))?;
             let duration = scope.token_ttl();
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             let vw = VaultWrapper::<Any>::build_portable(conn, &uv_id)?;
+            let obc = user_auth.ob_config().cloned();
 
             Ok((token, vw, su, obc))
         })
@@ -268,8 +241,7 @@ fn validate_biometric_challenge(
 fn validate(
     conn: &mut TxnPgConn,
     challenge_state: PhoneEmailChallengeState,
-    ob_pk_auth: Option<&ObConfigAuth>,
-    user_auth: Option<&CheckedUserAuthContext>,
+    user_auth: &CheckedUserAuthContext,
     challenge_response: &str,
     di: DataIdentifier,
 ) -> Result<VaultId, ApiError> {
@@ -278,10 +250,10 @@ fn validate(
         return Err(ErrorWithCode::IncorrectPin.into());
     };
 
-    let existing_sv = if let Some(existing_su_id) = user_auth.and_then(|ua| ua.scoped_user_id()) {
+    let existing_sv = if let Some(existing_su_id) = user_auth.scoped_user_id() {
         Some(ScopedVault::get(conn, &existing_su_id)?)
-    } else if let Some(ob_pk_auth) = ob_pk_auth {
-        ScopedVault::get(conn, (&vault_id, &ob_pk_auth.tenant().id)).optional()?
+    } else if let Some(obc) = user_auth.ob_config() {
+        ScopedVault::get(conn, (&vault_id, &obc.tenant_id)).optional()?
     } else {
         None
     };
@@ -291,9 +263,7 @@ fn validate(
         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &existing_sv.id)?;
         vw.on_otp_verified(conn, di)?;
 
-        let obc = user_auth
-            .and_then(|ua| ua.ob_config())
-            .or(ob_pk_auth.map(|ob| ob.ob_config()));
+        let obc = user_auth.ob_config();
         if obc.is_some_and(|obc| obc.kind == ObConfigurationKind::Auth) && !vw.vault.is_portable {
             // If this is an auth playbook and the user was previously non-portable, we are
             // currently portablizing an NYPID.

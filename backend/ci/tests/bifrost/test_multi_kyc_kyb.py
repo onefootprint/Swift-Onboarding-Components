@@ -1,6 +1,6 @@
 import time
 import pytest
-from tests.headers import BusinessOwnerAuth, SandboxId
+from tests.headers import BusinessOwnerAuth, FpAuth, SandboxId
 from tests.identify_client import IdentifyClient
 from tests.utils import (
     get,
@@ -104,14 +104,13 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     sandbox_id_h = SandboxId(primary_bo.client.sandbox_id)
 
     identifier = dict(phone_number=phone_number)
-    data = dict(identifier=identifier)
-    body = post("hosted/identify", data, kyb_sandbox_ob_config.key, sandbox_id_h)
-    assert body["user_found"]
+    data = dict(identifier=identifier, scope="onboarding")
+    body = post("hosted/identify", data, secondary_bo_token, sandbox_id_h)
+    assert body["user"]
+    token = FpAuth(body["user"]["token"])
 
-    data = dict(identifier=identifier, preferred_challenge_kind="sms")
-    body = post(
-        "hosted/identify/login_challenge", data, kyb_sandbox_ob_config.key, sandbox_id_h
-    )
+    data = dict(preferred_challenge_kind="sms", scope="onboarding")
+    body = post("hosted/identify/login_challenge", data, token)
     challenge_data = body["challenge_data"]
 
     data = {
@@ -119,11 +118,11 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
         "challenge_token": challenge_data["challenge_token"],
         "scope": "onboarding",
     }
+    token = FpAuth(challenge_data["token"])
     body = post(
         "hosted/identify/verify",
         data,
-        secondary_bo_token,
-        sandbox_id_h,
+        token,
         status_code=400,
     )
     assert body["error"]["message"] == "This business owner has already started KYC"

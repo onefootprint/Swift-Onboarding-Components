@@ -4,13 +4,13 @@ use crate::{
     UserChallengeContext,
 };
 use api_core::{
-    auth::{ob_config::ObConfigAuth, user::UserAuthContext, Any},
+    auth::{user::UserAuthContext, Any},
     errors::{error_with_code::ErrorWithCode, onboarding::OnboardingError, ApiError},
     telemetry::RootSpan,
     types::{JsonApiResponse, ResponseData},
     utils::{
-        challenge::Challenge, email::send_email_challenge_non_blocking, headers::SandboxId,
-        passkey::WebauthnConfig, sms::rx_background_error,
+        challenge::Challenge, email::send_email_challenge_non_blocking, passkey::WebauthnConfig,
+        sms::rx_background_error,
     },
 };
 use api_wire_types::{LoginChallengeRequest, LoginChallengeResponse, UserChallengeData};
@@ -31,27 +31,19 @@ use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 pub async fn post(
     request: Json<LoginChallengeRequest>,
     state: web::Data<State>,
-    ob_context: Option<ObConfigAuth>,
-    // When provided, identifies only sandbox users with the suffix
-    sandbox_id: SandboxId,
-    // When provided, is used to identify the currently authed user. Will generate a challenge
-    // for the authed user
-    user_auth: Option<UserAuthContext>,
+    user_auth: UserAuthContext,
     root_span: RootSpan,
 ) -> JsonApiResponse<LoginChallengeResponse> {
-    let LoginChallengeRequest {
-        identifier,
-        challenge_kind,
-    } = request.into_inner();
-    let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
-    let token = user_auth.as_ref().map(|ua| ua.auth_token.clone());
+    let LoginChallengeRequest { challenge_kind } = request.into_inner();
+    let user_auth = user_auth.check_guard(Any)?;
+    let token = user_auth.auth_token.clone();
 
     // Look up existing user vault by identifier
     let args = GetIdentifyChallengeArgs {
-        user_auth,
-        identifiers: identifier.into_iter().collect(),
-        sandbox_id: sandbox_id.0,
-        obc: ob_context.clone(),
+        user_auth: Some(user_auth),
+        identifiers: vec![],
+        sandbox_id: None,
+        obc: None,
         root_span: root_span.clone(),
     };
     let Some(ctx) = crate::get_identify_challenge_context(&state, args).await? else {

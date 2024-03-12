@@ -22,46 +22,19 @@ pub struct IdentifyRequest {
     pub phone_number: Option<PhoneNumber>,
     /// Determines which scopes the issued auth token will have. Request the correct scopes for
     /// your use case in order to get the least permissions required
-    #[openapi(required)]
-    // TODO make required once all clients are updated
-    pub scope: Option<IdentifyScope>,
+    pub scope: IdentifyScope,
 }
 
 #[derive(Apiv2Schema, serde::Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyResponse {
-    /// Deprecated
-    #[openapi(skip)]
-    pub user_found: bool,
-    /// When user_found is true, all of the context on the identified user
+    /// All of the context on the identified user, if found
     pub user: Option<IdentifiedUser>,
-
-    #[openapi(skip)]
-    /// Deprecated
-    pub available_challenge_kinds: Option<Vec<ChallengeKind>>,
-    /// signals that one or more biometric credentials
-    /// support syncing and may be available to use on desktop/other devices
-    #[openapi(skip)]
-    /// Deprecated
-    pub has_syncable_pass_key: bool,
-    #[openapi(skip)]
-    /// Deprecated
-    pub is_unverified: bool,
-    /// Populated only when identifying a user via auth token
-    #[openapi(skip)]
-    /// Deprecated
-    pub scrubbed_phone: Option<PiiString>,
-    /// Populated only when identifying a user via auth token
-    #[openapi(skip)]
-    /// Deprecated
-    pub scrubbed_email: Option<PiiString>,
 }
 
 #[derive(Apiv2Schema, serde::Serialize, Clone)]
 pub struct IdentifiedUser {
-    // TODO make this non-optional when the client starts providing `scope` in the request
-    #[openapi(required)]
-    pub token: Option<SessionAuthToken>,
+    pub token: SessionAuthToken,
     /// The scopes of the returned token
     pub token_scopes: Vec<UserAuthGuard>,
     pub available_challenge_kinds: Vec<ChallengeKind>,
@@ -93,7 +66,7 @@ pub struct IdentifyAuthMethod {
 #[serde(rename_all = "snake_case")]
 pub struct UserChallengeData {
     /// Auth token to pass to the verify call
-    pub token: Option<SessionAuthToken>,
+    pub token: SessionAuthToken,
     pub challenge_kind: ChallengeKind,
     pub challenge_token: ChallengeToken,
     /// For login challenges, provide some context on where the challenge was sent
@@ -104,7 +77,6 @@ pub struct UserChallengeData {
 
 #[derive(Apiv2Schema, serde::Deserialize)]
 pub struct LoginChallengeRequest {
-    pub identifier: Option<IdentifyId>,
     #[serde(alias = "preferred_challenge_kind")]
     pub challenge_kind: ChallengeKind,
 }
@@ -119,7 +91,7 @@ pub struct LoginChallengeResponse {
 pub struct SignupChallengeRequest {
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
-    pub scope: Option<IdentifyScope>,
+    pub scope: IdentifyScope,
 }
 
 #[derive(Apiv2Schema, serde::Serialize)]

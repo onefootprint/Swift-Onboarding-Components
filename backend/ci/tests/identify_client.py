@@ -47,25 +47,22 @@ class IdentifyClient:
         self.email = email
         self.auth_token = auth_token
 
-        self.headers = []
-        if sandbox_id:
-            self.headers.append(SandboxId(sandbox_id))
-        if playbook_key:
-            self.headers.append(playbook_key)
-        if auth_token:
-            self.headers.append(auth_token)
-
-    def _signup_challenge(self, kind="sms"):
+    def _signup_challenge(self, scope, kind="sms"):
         if kind == "sms":
             data = dict(phone_number=self.phone_number, email=self.email)
         elif kind == "email":
             data = dict(email=self.email)
+        data = dict(**data, scope=scope)
 
-        body = post("hosted/identify/signup_challenge", data, *self.headers)
+        assert self.playbook_key, "Cannot issue signup challenge without playbook key"
+        headers = [self.playbook_key]
+        if self.sandbox_id:
+            headers.append(SandboxId(self.sandbox_id))
+        body = post("hosted/identify/signup_challenge", data, *headers)
         self.challenge_kind = kind
         self.challenge_data = body["challenge_data"]
 
-    def _login_challenge(self, kind="sms"):
+    def _login_challenge(self, kind, scope):
         identifier = None
         if not self.auth_token:
             if kind == "email":
@@ -74,17 +71,25 @@ class IdentifyClient:
                 identifier = dict(phone_number=self.phone_number)
 
         # Check that the user is found in identify
-        data = dict(identifier=identifier)
-        body = post("hosted/identify", data, *self.headers)
-        assert body["user_found"]
-        assert kind in body["available_challenge_kinds"]
+        headers = []
+        if self.sandbox_id:
+            headers.append(SandboxId(self.sandbox_id))
+        if self.playbook_key:
+            headers.append(self.playbook_key)
+        if self.auth_token:
+            headers.append(self.auth_token)
+        data = dict(identifier=identifier, scope=scope)
+        body = post("hosted/identify", data, *headers)
+        assert body["user"]
+        assert kind in body["user"]["available_challenge_kinds"]
+        token = FpAuth(body["user"]["token"])
 
         # Issue the login challenge
         data = dict(
-            identifier=identifier,
             preferred_challenge_kind=kind,
+            scope=scope,
         )
-        body = post("hosted/identify/login_challenge", data, *self.headers)
+        body = post("hosted/identify/login_challenge", data, token)
         if kind == "sms":
             last_two = self.phone_number[-2:]
             assert (
@@ -112,21 +117,23 @@ class IdentifyClient:
             "challenge_token": self.challenge_data["challenge_token"],
             "scope": scope,
         }
-        body = post("hosted/identify/verify", data, *self.headers)
+        token = FpAuth(self.challenge_data["token"])
+        body = post("hosted/identify/verify", data, token)
         auth_token = FpAuth(body["auth_token"])
 
         # Reset the challenge state so the machine can be used again
         self.challenge_kind = None
         self.challenge_data = None
 
+        print("verified", auth_token.value)
         return auth_token
 
     def create_user(self, scope="onboarding"):
-        self._signup_challenge()
+        self._signup_challenge(scope)
         return self._verify(scope)
 
     def inherit(self, kind="sms", scope="onboarding"):
-        self._login_challenge(kind)
+        self._login_challenge(kind, scope)
         return self._verify(scope)
 
     def step_up(self, kind="sms", scope="onboarding", assert_had_no_scopes=False):

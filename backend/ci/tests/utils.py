@@ -6,15 +6,12 @@ import random
 import arrow
 import time
 import os
-from tests.headers import SandboxId, TenantSecretAuth
+from tests.headers import TenantSecretAuth
 from tests.types import ObConfiguration, PartnerTenant, SecretApiKey, Tenant
-from tests.headers import DashboardAuth, FpAuth, IsLive
+from tests.headers import DashboardAuth, IsLive
 from tests.constants import (
     CUSTODIAN_AUTH,
     TEST_URL,
-    FIXTURE_PHONE_NUMBER,
-    FIXTURE_EMAIL_OTP_PIN,
-    FIXTURE_EMAIL,
 )
 
 url = lambda path: "{}/{}".format(TEST_URL, path.strip("/"))
@@ -28,6 +25,7 @@ EXPECTED_SERVER_VERSION_GIT_HASH = os.environ.get("EXPECTED_SERVER_VERSION", Non
 class NotRetryableException(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
 
 class HttpError(Exception):
     def __init__(
@@ -217,8 +215,6 @@ def create_tenant(org_data, ob_conf_data):
 
     def inner():
         body = post("private/test_tenant", org_data, CUSTODIAN_AUTH)
-        print("\n======org info======")
-        print(body)
 
         matching_sk = next(k for k in body["keys"] if k["is_live"] == is_live)
         live_key = next(k for k in body["keys"] if k["is_live"])
@@ -244,6 +240,7 @@ def create_tenant(org_data, ob_conf_data):
         return tenant
 
     return try_until_success(inner, 10)
+
 
 def create_partner_tenant(org_data):
     def inner():
@@ -281,7 +278,7 @@ def create_ob_config(
     override_auths=None,
     skip_confirm=None,
     enhanced_aml=None,
-    document_types_and_countries=None
+    document_types_and_countries=None,
 ):
     ob_conf_data = {
         "name": name,
@@ -303,8 +300,6 @@ def create_ob_config(
     auths = override_auths if override_auths else tenant.db_auths
     body = post("org/onboarding_configs", ob_conf_data, *auths)
     ob_config = ObConfiguration.from_response(body, tenant)
-    print("\n======org onboarding info======")
-    print(body)
     return ob_config
 
 
@@ -315,10 +310,9 @@ def clean_up_user(phone_number, email):
 
     # Make sure the user doesn't exist after cleanup
     for identifier in [dict(email=email), dict(phone_number=phone_number)]:
-        data = dict(identifier=identifier)
+        data = dict(identifier=identifier, scope="onboarding")
         body = post("hosted/identify", data)
-        assert not body["user_found"]
-        assert not body["available_challenge_kinds"]
+        assert not body["user"]
 
 
 def get_requirement_from_requirements(kind, requirements, is_met=False):

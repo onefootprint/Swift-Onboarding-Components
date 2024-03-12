@@ -78,7 +78,8 @@ def test_scrubbed_phone_email(sandbox_user, sandbox_tenant):
     body = post(f"entities/{sandbox_user.fp_id}/token", data, *sandbox_tenant.db_auths)
     auth_token = FpAuth(body["token"])
 
-    body = post("hosted/identify", dict(identifier=None), auth_token)
+    data = dict(identifier=None, scope="onboarding")
+    body = post("hosted/identify", data, auth_token)
     assert body["user"]["scrubbed_phone"] == "+1 (***) ***-**00"
     assert body["user"]["scrubbed_email"] == "s******@o***********.com"
 
@@ -90,7 +91,8 @@ def test_auth_methods(user_with_token):
     assert not next(i["is_verified"] for i in body if i["kind"] == "email")
     assert next(i["is_verified"] for i in body if i["kind"] == "phone")
 
-    body = post("hosted/identify", dict(identifier=None), auth_token)
+    data = dict(identifier=None, scope="onboarding")
+    body = post("hosted/identify", data, auth_token)
     auth_methods = body["user"]["auth_methods"]
     assert next(i["is_verified"] for i in auth_methods if i["kind"] == "phone")
     assert not next(i["is_verified"] for i in auth_methods if i["kind"] == "email")
@@ -131,16 +133,17 @@ def test_add_phone(skip_phone_obc):
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
     # Create a user on a skip_phone OBC so they don't have a phone
-    data = dict(email=FIXTURE_EMAIL)
+    data = dict(email=FIXTURE_EMAIL, scope="onboarding")
     res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
+    token = FpAuth(res["challenge_data"]["token"])
 
     data = dict(
         challenge_response=FIXTURE_EMAIL_OTP_PIN,
         challenge_token=challenge_token,
         scope="onboarding",
     )
-    body = post("hosted/identify/verify", data, *headers)
+    body = post("hosted/identify/verify", data, token)
 
     bifrost = BifrostClient.raw_auth(
         skip_phone_obc,
@@ -185,16 +188,17 @@ def test_add_phone_bifrost(skip_phone_obc):
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
     # Create a user on a skip_phone OBC so they don't have a phone
-    data = dict(email=FIXTURE_EMAIL)
+    data = dict(email=FIXTURE_EMAIL, scope="onboarding")
     res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
+    token = FpAuth(res["challenge_data"]["token"])
 
     data = dict(
         challenge_response=FIXTURE_EMAIL_OTP_PIN,
         challenge_token=challenge_token,
         scope="onboarding",
     )
-    body = post("hosted/identify/verify", data, *headers)
+    body = post("hosted/identify/verify", data, token)
     auth_token = FpAuth(body["auth_token"])
 
     # Make sure we can't _replace_ contact info using this auth token

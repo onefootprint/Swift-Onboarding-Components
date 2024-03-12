@@ -79,16 +79,11 @@ pub async fn post(
         } = ctx;
         let UserChallengeContext { vw, .. } = ctx;
         if !can_initiate_signup_challenge {
-            // There's already a duplicate vault. Create the auth token that allows creating a
+            // There's already a duplicate vault. Create the auth token that allows sending a
             // login challenge
-            let token = if let Some(scope) = scope {
-                let (token, _) =
-                    create_identified_token(&state, vw.vault.id.clone(), scope, sv, Some(ob_context.clone()))
-                        .await?;
-                Some(token)
-            } else {
-                None
-            };
+            let (token, _) =
+                create_identified_token(&state, vw.vault.id.clone(), scope, sv, Some(ob_context.clone()))
+                    .await?;
             return Err(ErrorWithCode::ExistingVault(token).into());
         }
     }
@@ -102,17 +97,8 @@ pub async fn post(
             Ok((uv.into_inner(), sv, root_span))
         })
         .await?;
-
-    let token = if let Some(scope) = scope {
-        // In a newer verision of this API, we're going to start issuing an "identified" but
-        // unauthed token as soon as the user is created.
-        // Eventually, this will be the only option
-        let (token, _) =
-            create_identified_token(&state, uv.id.clone(), scope, Some(sv), Some(ob_context.clone())).await?;
-        Some(token)
-    } else {
-        None
-    };
+    let (token, _) =
+        create_identified_token(&state, uv.id.clone(), scope, Some(sv), Some(ob_context.clone())).await?;
 
     let (rx, challenge_data) = if !ob_context.ob_config().is_no_phone_flow {
         // Expect a phone number and initiate an SMS challenge

@@ -233,17 +233,6 @@
                     "Hosted"
                 ],
                 "description": "Sends a challenge to the phone number and returns an HTTP 200. When the challenge is completed through the identify/verify endpoint, the client can get or create the user with this phone number.",
-                "parameters": [
-                    {
-                        "in": "header",
-                        "name": "x-sandbox-id",
-                        "description": "When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.\n            ",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -267,15 +256,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "Onboarding Config Publishable Key": []
-                    },
-                    {
-                        "Onboarding Config Token": []
-                    },
-                    {
-                        "Business Owner Token": []
-                    },
                     {
                         "User Token": []
                     }
@@ -365,15 +345,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "Onboarding Config Publishable Key": []
-                    },
-                    {
-                        "Onboarding Config Token": []
-                    },
-                    {
-                        "Business Owner Token": []
-                    },
                     {
                         "User Token": []
                     }
@@ -3708,7 +3679,7 @@
                 "type": "object",
                 "properties": {
                     "user": {
-                        "description": "When user_found is true, all of the context on the identified user",
+                        "description": "All of the context on the identified user, if found",
                         "type": "object",
                         "properties": {
                             "auth_methods": {
@@ -4142,9 +4113,6 @@
                             "biometric",
                             "email"
                         ]
-                    },
-                    "identifier": {
-                        "type": "string"
                     }
                 },
                 "required": [
@@ -4188,7 +4156,8 @@
                         "required": [
                             "challenge_kind",
                             "challenge_token",
-                            "time_before_retry_s"
+                            "time_before_retry_s",
+                            "token"
                         ]
                     },
                     "error": {
@@ -5678,7 +5647,10 @@
                             "auth"
                         ]
                     }
-                }
+                },
+                "required": [
+                    "scope"
+                ]
             },
             "SignupChallengeResponse": {
                 "type": "object",
@@ -5717,7 +5689,8 @@
                         "required": [
                             "challenge_kind",
                             "challenge_token",
-                            "time_before_retry_s"
+                            "time_before_retry_s",
+                            "token"
                         ]
                     },
                     "error": {

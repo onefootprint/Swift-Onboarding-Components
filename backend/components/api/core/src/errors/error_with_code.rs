@@ -60,7 +60,7 @@ pub enum ErrorWithCode {
     #[strum(message = "E119", detailed_message = "Session invalid")]
     CouldNotParseSession,
     #[strum(message = "E120", detailed_message = "Please log into your existing account")]
-    ExistingVault(Option<SessionAuthToken>),
+    ExistingVault(SessionAuthToken),
 }
 
 impl ErrorWithCode {
@@ -112,7 +112,7 @@ context_macro!(
     UnsupportedChallengeKind(challenge_kind: String),
     InvalidMimeType(file_type: String),
     FileTooLarge(max_size: usize),
-    ExistingVault(token: Option<SessionAuthToken>)
+    ExistingVault(token: SessionAuthToken)
 );
 
 impl std::error::Error for ErrorWithCode {}

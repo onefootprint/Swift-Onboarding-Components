@@ -63,9 +63,10 @@ def test_api_vault(sandbox_tenant, ob_config):
     auth_token = FpAuth(body["token"])
 
     # Token should be unverified because this vault was made via API
-    body = post("/hosted/identify", dict(identifier=None), auth_token)
-    assert body["user_found"]
-    assert body["is_unverified"]
+    data = dict(identifier=None, scope="onboarding")
+    body = post("/hosted/identify", data, auth_token)
+    assert body["user"]
+    assert body["user"]["is_unverified"]
 
     # Should require step up because auth was not implied for API vault
     auth_token = IdentifyClient.from_token(auth_token).step_up(
@@ -212,19 +213,22 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     sandbox_id = body["sandbox_id"]
 
     # Test that the user isn't visible to be identified via phone number
-    identify_data = dict(identifier=dict(phone_number=FIXTURE_PHONE_NUMBER))
+    identify_data = dict(
+        identifier=dict(phone_number=FIXTURE_PHONE_NUMBER), scope="onboarding"
+    )
     sandbox_id_h = SandboxId(sandbox_id)
     body = post("hosted/identify", identify_data, sandbox_id_h)
-    assert not body["user_found"]
+    assert not body["user"]
 
     data = dict(kind="onboard", key=ob_config.key.value)
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Token should be unverified because this vault was made via API
-    body = post("/hosted/identify", dict(identifier=None), auth_token)
-    assert body["user_found"]
-    assert body["is_unverified"]
+    data = dict(identifier=None, scope="onboarding")
+    body = post("/hosted/identify", data, auth_token)
+    assert body["user"]
+    assert body["user"]["is_unverified"]
 
     auth_token = IdentifyClient.from_token(auth_token).step_up(
         assert_had_no_scopes=True
@@ -237,9 +241,9 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
 
     # And now check that the user can be identified by phone number
     body = post("hosted/identify", identify_data, sandbox_id_h)
-    assert body["user_found"]
-    assert not body["is_unverified"]
-    assert set(body["available_challenge_kinds"]) >= {"sms"}
+    assert body["user"]
+    assert not body["user"]["is_unverified"]
+    assert set(body["user"]["available_challenge_kinds"]) >= {"sms"}
 
     # Now, one-click onboard onto another tenant!
     bifrost = BifrostClient.inherit(foo_sandbox_tenant.default_ob_config, sandbox_id)

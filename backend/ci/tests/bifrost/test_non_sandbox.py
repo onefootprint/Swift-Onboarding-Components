@@ -20,19 +20,19 @@ from tests.constants import EMAIL
 def identify_verify_real_sms(
     twilio,
     phone_number,
-    challenge_token,
+    challenge_data,
     scope,
-    *headers,
     expected_error=None,
 ):
     def verify(code):
         data = {
             "challenge_response": code,
             "challenge_kind": "sms",
-            "challenge_token": challenge_token,
+            "challenge_token": challenge_data["challenge_token"],
             "scope": scope,
         }
-        body = post("hosted/identify/verify", data, *headers)
+        token = FpAuth(challenge_data["token"])
+        body = post("hosted/identify/verify", data, token)
         return FpAuth(body["auth_token"])
 
     def inner():
@@ -83,21 +83,20 @@ def identify_verify_real_sms(
 def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
     # Create a user with the live phone number, fetching the OTP from the actual SMS
     def initiate_challenge():
-        data = dict(phone_number=live_phone_number, email=EMAIL)
+        data = dict(phone_number=live_phone_number, email=EMAIL, scope="onboarding")
         body = post(
             "hosted/identify/signup_challenge", data, tenant.default_ob_config.key
         )
-        return body["challenge_data"]["challenge_token"]
+        return body["challenge_data"]
 
     # Rate limiting may take a while
-    challenge_token = try_until_success(initiate_challenge, 20)
+    challenge_data = try_until_success(initiate_challenge, 20)
 
     auth_token = identify_verify_real_sms(
         twilio,
         live_phone_number,
-        challenge_token,
+        challenge_data,
         "onboarding",
-        tenant.default_ob_config.key,
     )
 
     bifrost = BifrostClient.raw_auth(

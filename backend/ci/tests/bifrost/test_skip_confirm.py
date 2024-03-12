@@ -39,9 +39,10 @@ def test_skip_confirm(sandbox_tenant, ob_config):
     auth_token = FpAuth(body["token"])
 
     # Token should be unverified because this vault was made via API
-    body = post("/hosted/identify", dict(identifier=None), auth_token)
-    assert body["user_found"]
-    assert body["is_unverified"]
+    data = dict(identifier=None, scope="onboarding")
+    body = post("/hosted/identify", data, auth_token)
+    assert body["user"]
+    assert body["user"]["is_unverified"]
 
     # Should require step up because auth was not implied for API vault
     auth_token = IdentifyClient.from_token(auth_token).step_up(

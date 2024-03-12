@@ -87,24 +87,13 @@ pub async fn post(
     } = ctx;
 
     let v_id = vw.vault.id.clone();
-    let token = if let Some(user_auth) = user_auth {
+    let (token, token_scopes) = if let Some(user_auth) = user_auth {
         // Don't issue a new identified token
-        Some((user_auth.auth_token, user_auth.data.scopes))
-    } else if let Some(scope) = scope {
-        // In a newer verision of this API, we're going to start issuing an "identified" but
-        // unauthed token as soon as the user is located.
-        // Eventually, this will be the only option
-        let token = create_identified_token(&state, v_id, scope, sv, ob_context).await?;
-        Some(token)
+        (user_auth.auth_token, user_auth.data.scopes)
     } else {
-        None
+        create_identified_token(&state, v_id, scope, sv, ob_context).await?
     };
-    let (token, token_scopes) = token.unzip();
-    let token_scopes = token_scopes
-        .unwrap_or_default()
-        .into_iter()
-        .map(|x| x.into())
-        .collect();
+    let token_scopes = token_scopes.into_iter().map(|x| x.into()).collect();
 
     let dis = vec![
         DataIdentifier::Id(IDK::PhoneNumber),
@@ -148,14 +137,7 @@ pub async fn post(
         matching_fps,
     };
     let response = IdentifyResponse {
-        user_found: true,
         user: Some(user.clone()),
-        // TODO deprecate these fields - they are derived from the `user` above
-        is_unverified: user.is_unverified,
-        available_challenge_kinds: Some(user.available_challenge_kinds),
-        has_syncable_pass_key: user.has_syncable_passkey,
-        scrubbed_phone: user.scrubbed_phone,
-        scrubbed_email: user.scrubbed_email,
     };
     ResponseData::ok(response).json()
 }

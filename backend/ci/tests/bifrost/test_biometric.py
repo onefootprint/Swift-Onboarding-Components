@@ -109,17 +109,15 @@ def test_identify_login_repeat_customer_biometric(sandbox_user):
     # Identify the user by email, should have ability to auth via biometric
     identifier = {"email": sandbox_user.client.data["id.email"]}
     sandbox_id = sandbox_user.client.sandbox_id
-    data = dict(
-        identifier=identifier,
-    )
+    data = dict(identifier=identifier, scope="onboarding")
     body = post(
         "hosted/identify",
         data,
         sandbox_user.client.ob_config.key,
         SandboxId(sandbox_id),
     )
-    assert body["user_found"]
-    assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
+    assert body["user"]
+    assert set(body["user"]["available_challenge_kinds"]) == {"sms", "biometric"}
 
     # Inherit the user via biometric
     auth_token = IdentifyClient.from_user(sandbox_user).inherit(kind="biometric")

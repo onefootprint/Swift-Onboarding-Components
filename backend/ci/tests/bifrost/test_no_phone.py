@@ -15,19 +15,17 @@ def no_phone_user(skip_phone_obc):
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
     # Should ignore phone number and initiate an email challenge
-    data = dict(email=FIXTURE_EMAIL, phone_number="+15555555555")
+    data = dict(email=FIXTURE_EMAIL, phone_number="+15555555555", scope="onboarding")
     res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
+    token = FpAuth(res["challenge_data"]["token"])
 
-    res = post(
-        "hosted/identify/verify",
-        dict(
-            challenge_response=FIXTURE_EMAIL_OTP_PIN,
-            challenge_token=challenge_token,
-            scope="onboarding",
-        ),
-        *headers,
+    data = dict(
+        challenge_response=FIXTURE_EMAIL_OTP_PIN,
+        challenge_token=challenge_token,
+        scope="onboarding",
     )
+    res = post("hosted/identify/verify", data, token)
 
     bifrost = BifrostClient.raw_auth(
         skip_phone_obc, FpAuth(res["auth_token"]), sandbox_id
@@ -49,31 +47,26 @@ def test_new_user(skip_phone_obc):
     collect_data = ["full_address", "name", "email"]
     headers = [skip_phone_obc.key, SandboxId(_gen_random_sandbox_id())]
 
-    res = post("hosted/identify/signup_challenge", dict(email=FIXTURE_EMAIL), *headers)
+    data = dict(email=FIXTURE_EMAIL, scope="onboarding")
+    res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
+    token = FpAuth(res["challenge_data"]["token"])
 
     # incorrect PIN fails
-    res = post(
-        "hosted/identify/verify",
-        dict(
-            challenge_response="323232",
-            challenge_token=challenge_token,
-            scope="onboarding",
-        ),
-        *headers,
-        status_code=400,
+    data = dict(
+        challenge_response="323232",
+        challenge_token=challenge_token,
+        scope="onboarding",
     )
+    res = post("hosted/identify/verify", data, token, status_code=400)
     assert res["error"]["message"] == "Incorrect PIN code"
     # correct PIN suceeds and gives auth
-    res = post(
-        "hosted/identify/verify",
-        dict(
-            challenge_response=FIXTURE_EMAIL_OTP_PIN,
-            challenge_token=challenge_token,
-            scope="onboarding",
-        ),
-        *headers,
+    data = dict(
+        challenge_response=FIXTURE_EMAIL_OTP_PIN,
+        challenge_token=challenge_token,
+        scope="onboarding",
     )
+    res = post("hosted/identify/verify", data, token)
 
     auth_token = FpAuth(res["auth_token"])
 
@@ -109,12 +102,13 @@ def test_phone_user_cannot_inherit_from_email(sandbox_user):
 
     body = post(
         "hosted/identify",
-        dict(identifier=dict(email=email)),
+        dict(identifier=dict(email=email), scope="onboarding"),
         sandbox_user.client.ob_config.key,
         sandbox_id,
     )
-    assert body["user_found"]
-    assert "email" not in body["available_challenge_kinds"]
+    assert body["user"]
+    assert "email" not in body["user"]["available_challenge_kinds"]
+    token = FpAuth(body["user"]["token"])
 
     # TODO: after adding is_otp_verified, confirm this still fails even if email is_verified
     post(
@@ -122,9 +116,9 @@ def test_phone_user_cannot_inherit_from_email(sandbox_user):
         dict(
             identifier=dict(email=email),
             preferred_challenge_kind="email",
+            scope="onboarding",
         ),
-        sandbox_user.client.ob_config.key,
-        sandbox_id,
+        token,
         status_code=400,
     )
 
