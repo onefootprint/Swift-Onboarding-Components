@@ -1526,7 +1526,7 @@
                     "VaultProxy",
                     "PublicApi"
                 ],
-                "description": "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination",
+                "description": "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination. Please contact support to enable this API.",
                 "parameters": [
                     {
                         "in": "header",
@@ -1650,7 +1650,7 @@
                     "VaultProxy",
                     "PublicApi"
                 ],
-                "description": "Invoke the vault proxy by configuration id to securely send and receive data to a target destination",
+                "description": "Invoke the vault proxy by configuration id to securely send and receive data to a target destination. Please contact support to enable this API.",
                 "parameters": [
                     {
                         "in": "path",

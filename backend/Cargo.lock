@@ -825,6 +825,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "api_route_hosted_core"
+version = "0.1.0"
+dependencies = [
+ "api_core",
+ "api_wire_types",
+ "chrono",
+ "db",
+ "itertools",
+ "newtypes",
+ "tracing",
+]
+
+[[package]]
 name = "api_route_hosted_d2p"
 version = "0.1.0"
 dependencies = [
@@ -870,6 +883,7 @@ dependencies = [
  "actix-web",
  "actix-web-httpauth",
  "api_core",
+ "api_route_hosted_core",
  "api_wire_types",
  "app-attest",
  "aws-config",
@@ -918,6 +932,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "api_core",
+ "api_route_hosted_core",
  "api_wire_types",
  "app-attest",
  "aws-config",

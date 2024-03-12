@@ -1,23 +1,18 @@
-use crate::{
-    auth::user::UserAuthGuard, errors::onboarding::OnboardingError, types::response::ResponseData, State,
-};
 use api_core::{
     auth::{
-        session::{user::ValidateUserToken, AuthSessionData},
-        user::{load_auth_events, UserAuthContext, UserWfAuthContext},
+        user::{load_auth_events, UserAuthContext, UserAuthGuard, UserIdentifier, UserWfAuthContext},
         IsGuardMet,
     },
-    errors::{ApiResult, AssertionError},
-    types::JsonApiResponse,
+    errors::{onboarding::OnboardingError, AssertionError},
+    types::{response::ResponseData, JsonApiResponse},
     utils::{
         identify::get_user_challenge_context,
         requirements::{get_requirements_for_person_and_maybe_business, GetRequirementsArgs},
-        session::AuthSession,
     },
+    State,
 };
+use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::validate::HostedValidateResponse;
-use chrono::Duration;
-use db::models::auth_event::AuthEvent;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -33,7 +28,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     user_wf_auth: Option<UserWfAuthContext>,
 ) -> JsonApiResponse<HostedValidateResponse> {
-    let (wf, sv_id, id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
+    let (wf, sv_id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
         // We're generating a token after onboarding has finished
         let user_wf_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp)?;
 
@@ -48,16 +43,14 @@ pub async fn post(
 
         let wf = user_wf_auth.workflow().clone();
         let sv_id = user_wf_auth.scoped_user.id.clone();
-        let id = user_wf_auth.data.user_session.user_identifier();
-        (Some(wf), sv_id, id, user_wf_auth.data.user_session)
+        (Some(wf), sv_id, user_wf_auth.data.user_session)
     } else {
         // We're generating a token after auth has finished
         let user_auth = user_auth.check_guard(UserAuthGuard::Auth.or(UserAuthGuard::SignUp))?;
         let sv_id = user_auth
             .scoped_user_id()
             .ok_or(AssertionError("No scoped user associated with auth session"))?;
-        let id = user_auth.user_identifier();
-        (None, sv_id, id, user_auth.data)
+        (None, sv_id, user_auth.data)
     };
     let obc = user_auth.ob_config().cloned();
 
@@ -80,6 +73,7 @@ pub async fn post(
             // There won't be an obc associated with auth tokens that were generated via API
             // without a playbook key.
             if let Some(required_auth_methods) = obc.required_auth_methods() {
+                let id = UserIdentifier::ScopedVault(sv_id.clone());
                 let ctx = get_user_challenge_context(&state, id, None).await?;
                 let verified_auth_methods = ctx
                     .auth_methods
@@ -100,43 +94,6 @@ pub async fn post(
         }
     }
 
-    let session_key = state.session_sealing_key.clone();
-    let validation_token = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            if user_auth.auth_events.is_empty() {
-                return Err(AssertionError("No auth events found for user").into());
-            }
-            // Validate as much as possible in this API instead of in the tenant-facing API.
-            // If this fails, the user may be able to retry and get a new validation token.
-            // But once the tenant has the validation token, they cannot do anything if it fails
-            let ae_ids = user_auth.auth_events.iter().map(|e| e.id.clone()).collect_vec();
-            let auth_events = AuthEvent::get_bulk(conn, &ae_ids)?;
-            if !auth_events.iter().any(|ae| ae.scoped_vault_id.is_some()) {
-                return Err(AssertionError("Auth event must have scoped vault").into());
-            }
-            if auth_events
-                .iter()
-                .filter_map(|ae| ae.scoped_vault_id.as_ref())
-                .any(|ae_sv_id| ae_sv_id != &sv_id)
-            {
-                return Err(AssertionError("Auth event has different user").into());
-            }
-            if wf.as_ref().is_some_and(|wf| wf.scoped_vault_id != sv_id) {
-                return Err(AssertionError("Workflow has different user").into());
-            }
-            let data = AuthSessionData::ValidateUserToken(ValidateUserToken {
-                sv_id,
-                auth_event_ids: ae_ids,
-                wf_id: wf.map(|wf| wf.id),
-            });
-            let (validation_token, _) =
-                AuthSession::create_sync(conn, &session_key, data, Duration::minutes(15))?;
-            let auth_token_hash = validation_token.id();
-            tracing::info!(%auth_token_hash, "Created validation token");
-            Ok(validation_token)
-        })
-        .await?;
-
+    let validation_token = create_validation_token(&state, user_auth, wf).await?;
     ResponseData::ok(HostedValidateResponse { validation_token }).json()
 }

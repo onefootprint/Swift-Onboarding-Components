@@ -136,7 +136,7 @@ class BifrostClient:
         self.webauthn_device = SoftWebauthnDevice()
 
         # Check the validation token
-        body = post("hosted/onboarding/validate", None, auth_token)
+        body = post("hosted/identify/validation_token", None, auth_token)
         validation_token = body["validation_token"]
 
         data = dict(validation_token=validation_token)

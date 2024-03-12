@@ -382,6 +382,32 @@
                 ]
             }
         },
+        "/compliance/companies": {
+            "get": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Returns a summary of partnered companies for a compliance partner.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/entities/client_token": {
             "get": {
                 "tags": [
@@ -5134,7 +5160,8 @@
                             "type": "string",
                             "enum": [
                                 "ApiKey",
-                                "DashboardUser"
+                                "DashboardUser",
+                                "CompliancePartnerDashboardUser"
                             ]
                         },
                         "style": "form"
@@ -5972,7 +5999,8 @@
                                         "type": "string",
                                         "enum": [
                                             "ApiKey",
-                                            "DashboardUser"
+                                            "DashboardUser",
+                                            "CompliancePartnerDashboardUser"
                                         ]
                                     },
                                     "name": {
@@ -6010,7 +6038,9 @@
                                                 "decrypt_document_and_selfie",
                                                 "decrypt_all",
                                                 "write_entities",
-                                                "label_and_tag"
+                                                "label_and_tag",
+                                                "compliance_partner_read",
+                                                "compliance_partner_admin"
                                             ]
                                         }
                                     }
@@ -6333,7 +6363,9 @@
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
                                 "write_entities",
-                                "label_and_tag"
+                                "label_and_tag",
+                                "compliance_partner_read",
+                                "compliance_partner_admin"
                             ]
                         }
                     },
@@ -7829,7 +7861,8 @@
                         "type": "string",
                         "enum": [
                             "ApiKey",
-                            "DashboardUser"
+                            "DashboardUser",
+                            "CompliancePartnerDashboardUser"
                         ]
                     },
                     "name": {
@@ -7859,7 +7892,9 @@
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
                                 "write_entities",
-                                "label_and_tag"
+                                "label_and_tag",
+                                "compliance_partner_read",
+                                "compliance_partner_admin"
                             ]
                         }
                     }
@@ -17202,7 +17237,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "ApiKey",
-                                                "DashboardUser"
+                                                "DashboardUser",
+                                                "CompliancePartnerDashboardUser"
                                             ]
                                         },
                                         "name": {
@@ -17240,7 +17276,9 @@
                                                     "decrypt_document_and_selfie",
                                                     "decrypt_all",
                                                     "write_entities",
-                                                    "label_and_tag"
+                                                    "label_and_tag",
+                                                    "compliance_partner_read",
+                                                    "compliance_partner_admin"
                                                 ]
                                             }
                                         }
@@ -17324,7 +17362,8 @@
                                     "type": "string",
                                     "enum": [
                                         "ApiKey",
-                                        "DashboardUser"
+                                        "DashboardUser",
+                                        "CompliancePartnerDashboardUser"
                                     ]
                                 },
                                 "name": {
@@ -17362,7 +17401,9 @@
                                             "decrypt_document_and_selfie",
                                             "decrypt_all",
                                             "write_entities",
-                                            "label_and_tag"
+                                            "label_and_tag",
+                                            "compliance_partner_read",
+                                            "compliance_partner_admin"
                                         ]
                                     }
                                 }
@@ -17452,7 +17493,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "ApiKey",
-                                                "DashboardUser"
+                                                "DashboardUser",
+                                                "CompliancePartnerDashboardUser"
                                             ]
                                         },
                                         "name": {
@@ -17490,7 +17532,9 @@
                                                     "decrypt_document_and_selfie",
                                                     "decrypt_all",
                                                     "write_entities",
-                                                    "label_and_tag"
+                                                    "label_and_tag",
+                                                    "compliance_partner_read",
+                                                    "compliance_partner_admin"
                                                 ]
                                             }
                                         }
@@ -18246,7 +18290,8 @@
                                         "type": "string",
                                         "enum": [
                                             "ApiKey",
-                                            "DashboardUser"
+                                            "DashboardUser",
+                                            "CompliancePartnerDashboardUser"
                                         ]
                                     },
                                     "name": {
@@ -18284,7 +18329,9 @@
                                                 "decrypt_document_and_selfie",
                                                 "decrypt_all",
                                                 "write_entities",
-                                                "label_and_tag"
+                                                "label_and_tag",
+                                                "compliance_partner_read",
+                                                "compliance_partner_admin"
                                             ]
                                         }
                                     }
@@ -18474,7 +18521,8 @@
                                 "type": "string",
                                 "enum": [
                                     "ApiKey",
-                                    "DashboardUser"
+                                    "DashboardUser",
+                                    "CompliancePartnerDashboardUser"
                                 ]
                             },
                             "name": {
@@ -18512,7 +18560,9 @@
                                         "decrypt_document_and_selfie",
                                         "decrypt_all",
                                         "write_entities",
-                                        "label_and_tag"
+                                        "label_and_tag",
+                                        "compliance_partner_read",
+                                        "compliance_partner_admin"
                                     ]
                                 }
                             }
@@ -18563,7 +18613,8 @@
                         "type": "string",
                         "enum": [
                             "ApiKey",
-                            "DashboardUser"
+                            "DashboardUser",
+                            "CompliancePartnerDashboardUser"
                         ]
                     },
                     "name": {
@@ -18601,7 +18652,9 @@
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
                                 "write_entities",
-                                "label_and_tag"
+                                "label_and_tag",
+                                "compliance_partner_read",
+                                "compliance_partner_admin"
                             ]
                         }
                     }
@@ -20718,7 +20771,8 @@
                                 "type": "string",
                                 "enum": [
                                     "ApiKey",
-                                    "DashboardUser"
+                                    "DashboardUser",
+                                    "CompliancePartnerDashboardUser"
                                 ]
                             },
                             "name": {
@@ -20756,7 +20810,9 @@
                                         "decrypt_document_and_selfie",
                                         "decrypt_all",
                                         "write_entities",
-                                        "label_and_tag"
+                                        "label_and_tag",
+                                        "compliance_partner_read",
+                                        "compliance_partner_admin"
                                     ]
                                 }
                             }
@@ -21071,7 +21127,9 @@
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
                                 "write_entities",
-                                "label_and_tag"
+                                "label_and_tag",
+                                "compliance_partner_read",
+                                "compliance_partner_admin"
                             ]
                         }
                     }

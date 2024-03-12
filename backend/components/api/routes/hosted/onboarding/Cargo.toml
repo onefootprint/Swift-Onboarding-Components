@@ -21,6 +21,7 @@ feature_flag = { path = "../../../../feature_flag" }
 webhooks = { path = "../../../../webhooks" }
 api_wire_types = { path = "../../../wire_types" }
 macros = { path = "../../../../macros" }
+api_route_hosted_core = { path = "../core" }
 
 actix-web = { workspace = true }
 paperclip = { workspace = true }

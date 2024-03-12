@@ -315,6 +315,32 @@
                 ]
             }
         },
+        "/hosted/identify/validation_token": {
+            "post": {
+                "tags": [
+                    "User",
+                    "Hosted"
+                ],
+                "description": "Generate a validation token after the user finishes the identify flow.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HostedValidateResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/identify/verify": {
             "post": {
                 "tags": [

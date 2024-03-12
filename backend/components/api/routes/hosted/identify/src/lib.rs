@@ -28,6 +28,7 @@ pub mod identify;
 mod kba;
 pub mod login_challenge;
 pub mod signup_challenge;
+mod validation_token;
 pub mod verify;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -51,7 +52,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(login_challenge::post)
         .service(signup_challenge::post)
         .service(kba::post)
-        .service(verify::post);
+        .service(verify::post)
+        .service(validation_token::post);
 }
 
 // TODO unnecessary wrapper
