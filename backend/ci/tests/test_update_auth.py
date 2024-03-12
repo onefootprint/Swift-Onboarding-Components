@@ -14,13 +14,12 @@ from tests.utils import (
 from tests.constants import (
     TEST_URL,
     FIXTURE_PHONE_NUMBER,
+    FIXTURE_PHONE_NUMBER2,
     FIXTURE_EMAIL,
+    FIXTURE_EMAIL2,
     FIXTURE_EMAIL_OTP_PIN,
 )
 from tests.webauthn_simulator import SoftWebauthnDevice
-
-FIXTURE_PHONE_NUMBER2 = "+15555550111"
-FIXTURE_EMAIL2 = f"sandbox2@onefootprint.com"
 
 
 @pytest.fixture(scope="function")

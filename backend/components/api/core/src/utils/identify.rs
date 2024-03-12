@@ -57,48 +57,37 @@ pub async fn get_user_challenge_context(
         .await?;
 
     let is_all_ci_unverified = cis.iter().all(|(_, ci, _)| !ci.is_otp_verified);
+    let mut allowed_unverified_methods = user_auth
+        .iter()
+        .flat_map(|ua| &ua.data.kba)
+        .flat_map(allowed_unverified_methods_for_kba)
+        .collect_vec();
     let is_vault_unverified = is_all_ci_unverified && uvw.vault.is_created_via_api;
-
-    let auth_methods = if is_vault_unverified {
-        // If this is a non-portable vault with a phone, allow initiating a challenge to the phone
-        // even though it is unverified.
-        // In theory, we could allow them to sign up with an email, but we'd prefer for them to
-        // verify their phone number now
-        let has_phone = cis.iter().any(|x| x.0 == ContactInfoKind::Phone);
-        has_phone
-            .then_some(AuthMethod {
-                kind: AuthMethodKind::Phone,
-                is_verified: false,
-                can_initiate_challenge: true,
-            })
-            .into_iter()
-            .collect_vec()
-    } else {
-        let allowed_unverified_methods = user_auth
-            .iter()
-            .flat_map(|ua| &ua.data.kba)
-            .flat_map(allowed_unverified_methods_for_kba)
-            .collect_vec();
-        cis.iter()
-            .map(|(cik, ci, _)| AuthMethod {
-                kind: AuthMethodKind::from(*cik),
-                is_verified: ci.is_otp_verified,
-                can_initiate_challenge: ci.is_otp_verified,
-            })
-            .chain((!passkeys.is_empty()).then_some(AuthMethod {
-                kind: AuthMethodKind::Passkey,
-                is_verified: true,
-                can_initiate_challenge: true,
-            }))
-            .map(|m| AuthMethod {
-                kind: m.kind,
-                is_verified: m.is_verified,
-                // Allow initiating challenges to unverified methods that are permitted by KBA
-                can_initiate_challenge: m.can_initiate_challenge
-                    || allowed_unverified_methods.contains(&m.kind),
-            })
-            .collect_vec()
-    };
+    if is_vault_unverified {
+        // If this is a non-portable vault, allow initiating a challenge to the phone and email
+        // even though they are unverified.
+        allowed_unverified_methods.append(&mut vec![AuthMethodKind::Phone, AuthMethodKind::Email]);
+    }
+    let auth_methods = cis
+        .iter()
+        .map(|(cik, ci, _)| AuthMethod {
+            kind: AuthMethodKind::from(*cik),
+            is_verified: ci.is_otp_verified,
+            can_initiate_challenge: ci.is_otp_verified,
+        })
+        .chain((!passkeys.is_empty()).then_some(AuthMethod {
+            kind: AuthMethodKind::Passkey,
+            is_verified: true,
+            can_initiate_challenge: true,
+        }))
+        .map(|m| AuthMethod {
+            kind: m.kind,
+            is_verified: m.is_verified,
+            // Allow initiating challenges to unverified methods that are either permitted by
+            // KBA or because the vault is "not yet" portable
+            can_initiate_challenge: m.can_initiate_challenge || allowed_unverified_methods.contains(&m.kind),
+        })
+        .collect_vec();
 
     let available_challenge_kinds = auth_methods
         .iter()

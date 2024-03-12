@@ -88,15 +88,16 @@
   },
   "challenge-select-or-biometric": {
     "continue": "Continue",
-    "log-in-options": "Log in using one of the options below",
-    "log-in-to-modify-details": "Log in to modify your account details",
+    "log-in-options": "Log in using one of the options below.",
+    "log-in-to-modify-details": "Log in to modify your account details.",
     "log-in-with-email": "Log in with Email",
     "log-in-with-sms": "Log in with SMS",
     "passkey": "Log in with passkey",
     "send-code-to": "Send code to",
     "send-code-via-email": "Send code via email",
     "send-code-via-sms": "Send code via SMS",
-    "welcome-back-title": "Welcome back! 🎉"
+    "welcome-back-title": "Welcome back! 🎉",
+    "verify-title": "Verify your contact info"
   },
   "log-in-different-account": {
     "or": "or",

@@ -755,7 +755,7 @@ describe('<Identify />', () => {
       await fillIdentifyEmail();
       await waitFor(() => {
         expect(
-          screen.getByText('Log in using one of the options below'),
+          screen.getByText('Log in using one of the options below.'),
         ).toBeInTheDocument();
       });
       await userEvent.click(screen.getByText('Send code via SMS'));
@@ -778,7 +778,7 @@ describe('<Identify />', () => {
       await fillIdentifyEmail();
       await waitFor(() => {
         expect(
-          screen.getByText('Log in using one of the options below'),
+          screen.getByText('Log in using one of the options below.'),
         ).toBeInTheDocument();
       });
       await userEvent.click(
@@ -804,7 +804,7 @@ describe('<Identify />', () => {
       await fillIdentifyEmail();
       await waitFor(() => {
         expect(
-          screen.getByText('Log in using one of the options below'),
+          screen.getByText('Log in using one of the options below.'),
         ).toBeInTheDocument();
       });
       await userEvent.click(screen.getByText('Log in with passkey'));
@@ -831,7 +831,7 @@ describe('<Identify />', () => {
       await fillIdentifyEmail();
       await waitFor(() => {
         expect(
-          screen.getByText('Log in using one of the options below'),
+          screen.getByText('Log in using one of the options below.'),
         ).toBeInTheDocument();
       });
       expect(screen.queryByText('Log in with passkey')).not.toBeInTheDocument();

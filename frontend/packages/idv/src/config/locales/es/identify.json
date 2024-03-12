@@ -88,15 +88,16 @@
   },
   "challenge-select-or-biometric": {
     "continue": "Continuar",
-    "log-in-options": "Inicia sesión usando una de las siguientes opciones",
-    "log-in-to-modify-details": "Inicia sesión para modificar los detalles de tu cuenta",
+    "log-in-options": "Inicia sesión usando una de las siguientes opciones.",
+    "log-in-to-modify-details": "Inicia sesión para modificar los detalles de tu cuenta.",
     "log-in-with-email": "Iniciar sesión con correo electrónico",
     "log-in-with-sms": "Iniciar sesión con SMS",
     "passkey": "Iniciar sesión con Passkeys",
     "send-code-to": "Enviar código a",
     "send-code-via-email": "Enviar código por correo electrónico",
     "send-code-via-sms": "Enviar código por SMS",
-    "welcome-back-title": "¡Bienvenido nuevamente! 🎉"
+    "welcome-back-title": "¡Bienvenido nuevamente! 🎉",
+    "verify-title": "Verifica tu información de contacto"
   },
   "log-in-different-account": {
     "or": "o",

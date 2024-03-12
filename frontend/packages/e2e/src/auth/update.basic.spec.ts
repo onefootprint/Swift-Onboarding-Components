@@ -24,7 +24,7 @@ test('Update auth methods #ci', async ({ browserName, page }) => {
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   const loginDescText = frame
-    .getByText('Log in to modify your account details')
+    .getByText('Log in to modify your account details.')
     .first();
   await loginDescText
     .waitFor({ state: 'attached', timeout: 20000 })

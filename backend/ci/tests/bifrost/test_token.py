@@ -62,11 +62,6 @@ def test_api_vault(sandbox_tenant, ob_config):
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    # Don't allow email challenge to log in
-    data = dict(preferred_challenge_kind="email")
-    body = post("hosted/identify/login_challenge", data, auth_token, status_code=400)
-    assert body["error"]["message"] == "Cannot initiate a challenge of requested kind"
-
     # Token should be unverified because this vault was made via API
     body = post("/hosted/identify", dict(identifier=None), auth_token)
     assert body["user_found"]

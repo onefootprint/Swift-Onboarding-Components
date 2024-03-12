@@ -29,7 +29,9 @@ const useGetHeaderText = (): string => {
       : t('email-challenge.verify-title');
   }
   if (state.matches('challengeSelectOrPasskey')) {
-    return t('challenge-select-or-biometric.welcome-back-title');
+    return shouldShowWelcomeBack
+      ? t('challenge-select-or-biometric.welcome-back-title')
+      : t('challenge-select-or-biometric.verify-title');
   }
 
   // We won't use this on any other page, but in case we do
