@@ -1587,7 +1587,6 @@
             "step-up": {
               "title": "Step-up",
               "color": "info",
-              "subsection-title": "Documents: ",
               "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
               "step-up-proof-of-address": "Proof of Address",
               "step-up-identity": "Identity document"
@@ -2490,7 +2489,6 @@
               "title": "Step-up",
               "subtitle": "User will be asked to scan or upload another document",
               "color": "info",
-              "subsection-title": "Documents: ",
               "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
               "step-up-proof-of-address": "Proof of Address",
               "step-up-identity": "Identity document"

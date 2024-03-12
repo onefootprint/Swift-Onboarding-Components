@@ -102,10 +102,9 @@ const ActionSection = ({
         {showStepUpTitle && actionTitle}
         <Stack align="center" justify="space-between">
           {isStepUpSubsection ? (
-            <Stack align="center" gap={2}>
+            <Stack align="center" gap={3}>
               <IcoFileText16 />
-              <Text variant="label-4">{t('step-up.subsection-title')}</Text>
-              <Text variant="body-4">
+              <Text variant="label-4">
                 {t(`step-up.${kebabCase(action)}` as ParseKeys<'common'>)}
               </Text>
             </Stack>

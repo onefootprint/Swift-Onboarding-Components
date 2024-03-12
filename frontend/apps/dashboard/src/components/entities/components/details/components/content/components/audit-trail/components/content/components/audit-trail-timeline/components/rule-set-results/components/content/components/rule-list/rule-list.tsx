@@ -32,10 +32,9 @@ const RuleList = ({
       aria-label={t(`step-up.${actionName}` as ParseKeys<'common'>)}
     >
       {stepUpAction && (
-        <Stack align="center" gap={2}>
+        <Stack align="center" gap={3}>
           <IcoFileText16 />
-          <Text variant="label-4">{t('step-up.subsection-title')}</Text>
-          <Text variant="body-4">
+          <Text variant="label-4">
             {t(`step-up.${actionName}` as ParseKeys<'common'>)}
           </Text>
         </Stack>
