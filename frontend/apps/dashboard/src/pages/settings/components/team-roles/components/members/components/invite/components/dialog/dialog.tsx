@@ -20,10 +20,10 @@ const Dialog = ({ onClose, open }: DialogProps) => {
     keyPrefix: 'pages.settings.members.invite',
   });
   const rolesQuery = useRoles(RoleKind.dashboardUser);
-  const inviteMembersMutations = useInviteMembers();
+  const inviteMembersMutation = useInviteMembers();
 
   const handleSubmit = (invitations: Invitation[]) => {
-    inviteMembersMutations.mutate(invitations, {
+    inviteMembersMutation.mutate(invitations, {
       onSuccess: onClose,
     });
   };
@@ -36,13 +36,13 @@ const Dialog = ({ onClose, open }: DialogProps) => {
       primaryButton={{
         form: 'members-invite-form',
         label: 'Invite',
-        loading: inviteMembersMutations.isLoading,
+        loading: inviteMembersMutation.isLoading,
         disabled: rolesQuery.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
         label: 'Cancel',
-        disabled: inviteMembersMutations.isLoading,
+        disabled: inviteMembersMutation.isLoading,
         onClick: onClose,
       }}
     >
