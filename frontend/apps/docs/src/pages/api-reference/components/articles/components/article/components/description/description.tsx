@@ -21,6 +21,12 @@ const parseElements = (text: string) => {
   let i = 0;
   let lastIdx = 0;
   for (i = 0; i < text.length; i += 1) {
+    if (text[i] === '\n') {
+      elements.push(text.substring(lastIdx, i));
+      elements.push(<br />);
+      i += 1;
+      lastIdx = i;
+    }
     if (text[i] === '`') {
       elements.push(text.substring(lastIdx, i));
       // Process monospace with syntax`monospaceText`

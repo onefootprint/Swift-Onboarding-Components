@@ -8,11 +8,12 @@ use crate::*;
 #[serde(rename_all = "snake_case")]
 pub struct CreateTokenRequest {
     /// The kind of token to create.
-    /// `onboard` creates a token that onboards the user onto a specific playbook, specified by the `key`.
-    /// `reonboard` creates a token that reonboards the user onto the last playbook that they onboarded onto.
-    /// `inherit` creates a token that inherits any operation previously requested via the dashboard.
-    /// `user` simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.
-    /// `update_auth_methods` creates a token that allows the user to update their contact info using the Footprint Auth SDK.
+    /// - `onboard` creates a token that onboards the user onto a specific playbook, specified by the `key`.
+    /// - `reonboard` creates a token that reonboards the user onto the last playbook that they onboarded onto.
+    /// - `inherit` creates a token that inherits any operation previously requested via the dashboard.
+    /// - `user` simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.
+    /// - `update_auth_methods` creates a token that allows the user to update their contact info using the Footprint Auth SDK.
+    /// You can find more information on the options [here](https://docs.onefootprint.com/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).
     #[openapi(required)]
     // TODO make this non-optional once apiture has upgraded
     pub kind: Option<TokenOperationKind>,

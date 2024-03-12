@@ -30,7 +30,7 @@ use newtypes::{AuthEventKind, IdentifyScope, PreviewApi};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently.",
+    description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
     tags(Users, Preview)
 )]
 #[post("/users/{fp_id}/token")]
