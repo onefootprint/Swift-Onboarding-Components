@@ -166,6 +166,8 @@ pub type SerializableEntity = (
     Vec<SerializableWorkflow>,
 );
 
+pub type IsNew = bool;
+
 impl ScopedVault {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
     #[tracing::instrument("ScopedVault::get_or_create", skip_all)]
@@ -173,7 +175,7 @@ impl ScopedVault {
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
         ob_configuration_id: ObConfigurationId,
-    ) -> DbResult<Self> {
+    ) -> DbResult<(Self, IsNew)> {
         // Get the ob config to do some validation before we make the SV
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
         if uv.is_live != ob_config.is_live {
@@ -188,7 +190,7 @@ impl ScopedVault {
             .first(conn.conn())
             .optional()?;
         if let Some(scoped_vault) = scoped_vault {
-            return Ok(scoped_vault);
+            return Ok((scoped_vault, false));
         }
         // Row doesn't exist for vault_id, tenant_id - create a new one
         let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -214,7 +216,7 @@ impl ScopedVault {
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
             .get_result::<ScopedVault>(conn.conn())?;
-        Ok(sv)
+        Ok((sv, true))
     }
 
     /// Used to create a ScopedUser for a non-portable vault

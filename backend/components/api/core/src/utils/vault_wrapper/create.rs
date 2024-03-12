@@ -101,7 +101,7 @@ impl VaultWrapper<Person> {
             duplicate_of_id,
         };
         let uv = Vault::create(conn, new_user_vault)?;
-        let su = ScopedVault::get_or_create(conn, &uv, obc.id)?;
+        let (su, _) = ScopedVault::get_or_create(conn, &uv, obc.id)?;
 
         // Since this vault is created for the first time here, it starts as billable and hidden from search
         let status = match obc.kind {

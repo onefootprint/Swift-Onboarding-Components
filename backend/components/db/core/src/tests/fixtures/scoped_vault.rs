@@ -10,7 +10,9 @@ use crate::{
 
 pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, ob_config_id: &ObConfigurationId) -> ScopedVault {
     let uv = Vault::lock(conn, uv_id).unwrap();
-    ScopedVault::get_or_create(conn, &uv, ob_config_id.clone()).unwrap()
+    ScopedVault::get_or_create(conn, &uv, ob_config_id.clone())
+        .unwrap()
+        .0
 }
 
 pub fn create_non_portable(

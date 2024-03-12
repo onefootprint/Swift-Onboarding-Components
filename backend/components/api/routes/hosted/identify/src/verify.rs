@@ -71,7 +71,7 @@ pub async fn post(
 
     let config = state.config.clone();
     let session_key = state.session_sealing_key.clone();
-    let (auth_token, vw, su, obc) = state
+    let (auth_token, portable_vw, su, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let (uv_id, event_kind, passkey_cred_id, added_auth_method) = match challenge_state.data {
@@ -92,9 +92,9 @@ pub async fn post(
             };
 
             // Determine which scopes to issue on the auth token
-            let (context, su) = match scope {
+            let (context, su, new_su) = match scope {
                 IdentifyScope::Auth => {
-                    let su = if let Some(obc) = user_auth.ob_config() {
+                    let (su, new_su) = if let Some(obc) = user_auth.ob_config() {
                         if obc.kind != ObConfigurationKind::Auth {
                             return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
                         }
@@ -105,21 +105,21 @@ pub async fn post(
                             // A playbook MUST be provided if we're not stepping up
                             return Err(UserError::PlaybookMissingForAuth.into());
                         };
-                        su_from_token.clone()
+                        (su_from_token.clone(), false)
                     };
 
                     let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
                         ..Default::default()
                     };
-                    (context, Some(su))
+                    (context, Some(su), new_su)
                 }
                 IdentifyScope::Onboarding => {
                     let obc = user_auth.ob_config();
                     let su_id = user_auth.scoped_user_id();
-                    let su = if let Some(su_id) = su_id {
+                    let (su, new_su) = if let Some(su_id) = su_id {
                         // We are stepping up an existing token already attached to a SU
-                        ScopedVault::get(conn, &su_id)?
+                        (ScopedVault::get(conn, &su_id)?, false)
                     } else if let Some(obc) = obc.as_ref() {
                         // We are adding the SU to a token that doesn't have it
                         if obc.kind == ObConfigurationKind::Auth {
@@ -140,11 +140,11 @@ pub async fn post(
                         // wf_id will be added later in POST /hosted/onboarding
                         ..Default::default()
                     };
-                    (context, Some(su))
+                    (context, Some(su), new_su)
                 }
                 IdentifyScope::My1fp => {
                     let context = NewUserSessionContext::default();
-                    (context, None)
+                    (context, None, false)
                 }
             };
 
@@ -177,17 +177,21 @@ pub async fn post(
             let data = user_auth.data.clone().update(context, scopes, Some(ae))?;
             let duration = scope.token_ttl();
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-            let vw = VaultWrapper::<Any>::build_portable(conn, &uv_id)?;
             let obc = user_auth.ob_config().cloned();
+            let portable_vw = if new_su {
+                Some(VaultWrapper::<Any>::build_portable(conn, &uv_id)?)
+            } else {
+                None
+            };
 
-            Ok((token, vw, su, obc))
+            Ok((token, portable_vw, su, obc))
         })
         .await?;
 
-    if let Some((su, obc)) = su.zip(obc) {
+    if let Some(((su, obc), portable_vw)) = su.zip(obc).zip(portable_vw) {
         if obc.kind == ObConfigurationKind::Auth {
             // If we're onboarding onto an auth playbook at a new tenant, prefill data (usually phone and email)
-            let prefill_data = vw.get_data_to_prefill(&state, &su, &obc).await?;
+            let prefill_data = portable_vw.get_data_to_prefill(&state, &su, &obc).await?;
             state
                 .db_pool
                 .db_transaction(move |conn| -> ApiResult<_> {
