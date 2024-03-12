@@ -1528,9 +1528,9 @@
             "replace": "updated the <b>{{kind}}</b> used as a Footprint login method",
             "add_primary": "registered <b>{{kind}}</b> as a Footprint login method",
             "method": {
-              "phone": "phone number",
-              "email": "email",
-              "passkey": "passkey"
+              "phone": "Phone number",
+              "email": "Email",
+              "passkey": "Passkey"
             }
           },
           "external-integration-called": {
