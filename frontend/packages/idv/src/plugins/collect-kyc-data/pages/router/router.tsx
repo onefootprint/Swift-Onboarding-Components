@@ -10,6 +10,7 @@ import { getLogger } from '../../../../utils/logger';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
+import Email from '../email';
 import Init from '../init';
 import LegalStatus from '../legal-status';
 import Address from '../residential-address';
@@ -46,6 +47,7 @@ const Router = ({ onDone }: { onDone: () => void }) => {
   }, [isStateCompleted, onDone]);
 
   if (matches('init')) return <Init />;
+  if (matches('email')) return <Email />;
   if (matches('basicInformation')) return <BasicInformation />;
   if (matches('residentialAddress')) return <Address />;
   if (matches('usLegalStatus')) return <LegalStatus />;

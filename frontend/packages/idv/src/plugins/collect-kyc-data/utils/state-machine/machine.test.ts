@@ -5,6 +5,7 @@ import {
   OnboardingConfigStatus,
   OnboardingRequirementKind,
   UsLegalStatus,
+  VisaKind,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -69,7 +70,7 @@ describe('Collect KYC Data Machine Tests', () => {
           CollectedKycDataOption.usLegalStatus,
           CollectedKycDataOption.ssn9,
         ],
-        {},
+        { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
         'sandboxTest',
       );
       machine.send({ type: 'initialized', payload: {} });
@@ -81,6 +82,10 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
+      expect(context.data[IdDI.email]).toEqual({
+        value: 'piip@onefootprint.com',
+        bootstrap: true,
+      });
       expect(state.value).toEqual('basicInformation');
 
       state = machine.send({
@@ -219,6 +224,7 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.name,
         CollectedKycDataOption.ssn9,
       ]);
+      expect(context.data[IdDI.email]).toBeUndefined();
       expect(state.value).toEqual('basicInformation');
 
       state = machine.send({
@@ -273,7 +279,7 @@ describe('Collect KYC Data Machine Tests', () => {
           CollectedKycDataOption.usLegalStatus,
           CollectedKycDataOption.ssn9,
         ],
-        {},
+        { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
         'sandboxTest',
       );
 
@@ -329,6 +335,283 @@ describe('Collect KYC Data Machine Tests', () => {
     });
   });
 
+  describe('When user is missing an email', () => {
+    it('If missing at least one attribute from each page, takes user to all pages in order', () => {
+      const machine = createMachine([
+        CollectedKycDataOption.email,
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.address,
+        CollectedKycDataOption.usLegalStatus,
+        CollectedKycDataOption.ssn9,
+      ]);
+      machine.send({ type: 'initialized', payload: {} });
+      let { state } = machine;
+      let { context } = state;
+      expect(context.requirement.missingAttributes).toEqual([
+        CollectedKycDataOption.email,
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.address,
+        CollectedKycDataOption.usLegalStatus,
+        CollectedKycDataOption.ssn9,
+      ]);
+      expect(context.data[IdDI.email]).toBeUndefined();
+      expect(state.value).toEqual('email');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.email]: { value: 'piip@onefootprint.com' },
+        },
+      });
+      expect(state.value).toEqual('basicInformation');
+      context = state.context;
+      expect(context.data[IdDI.email]).toEqual({
+        value: 'piip@onefootprint.com',
+      });
+
+      // Navigate to prev
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('email');
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.email]: { value: 'piip@onefootprint.com' },
+        },
+      });
+      expect(state.value).toEqual('basicInformation');
+      context = state.context;
+      expect(context.data[IdDI.email]).toEqual({
+        value: 'piip@onefootprint.com',
+      });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.firstName]: { value: 'Otto' },
+          [IdDI.lastName]: { value: 'Footprint' },
+        },
+      });
+      expect(state.value).toEqual('residentialAddress');
+      context = state.context;
+      expect(context.data[IdDI.firstName]).toEqual({ value: 'Otto' });
+
+      // Navigate to prev
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('basicInformation');
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.firstName]: { value: 'Diffie' },
+          [IdDI.lastName]: { value: 'Footprint' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.firstName]).toEqual({ value: 'Diffie' });
+      expect(state.value).toEqual('residentialAddress');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.country]: { value: 'US' },
+          [IdDI.zip]: { value: '94107' },
+        },
+      });
+      expect(state.value).toEqual('usLegalStatus');
+      context = state.context;
+      expect(context.data[IdDI.country]).toEqual({ value: 'US' });
+      expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
+
+      // Navigate to prev
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('residentialAddress');
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.country]: { value: 'US' },
+          [IdDI.zip]: { value: '12321' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.country]).toEqual({ value: 'US' });
+      expect(context.data[IdDI.zip]).toEqual({ value: '12321' });
+      expect(state.value).toEqual('usLegalStatus');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
+        },
+      });
+      expect(state.value).toEqual('ssn');
+      context = state.context;
+      expect(context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.citizen,
+      });
+
+      // Navigate to prev
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('usLegalStatus');
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.visa },
+          [IdDI.nationality]: { value: 'CA' },
+          [IdDI.citizenships]: { value: ['HK'] },
+          [IdDI.visaKind]: { value: VisaKind.h1b },
+          [IdDI.visaExpirationDate]: { value: '01012054' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.visa,
+      });
+      expect(context.data[IdDI.nationality]).toEqual({ value: 'CA' });
+      expect(context.data[IdDI.citizenships]).toEqual({ value: ['HK'] });
+      expect(context.data[IdDI.visaKind]).toEqual({ value: VisaKind.h1b });
+      expect(context.data[IdDI.visaExpirationDate]).toEqual({
+        value: '01012054',
+      });
+      expect(state.value).toEqual('ssn');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.ssn9]: { value: '101010101' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
+      expect(state.value).toEqual('confirm');
+
+      state = machine.send({
+        type: 'confirmed',
+      });
+      context = state.context;
+      expect(state.value).toEqual('completed');
+    });
+
+    it('Skips states without missing attributes', () => {
+      const machine = createMachine([
+        CollectedKycDataOption.email,
+        CollectedKycDataOption.ssn9,
+      ]);
+      machine.send({ type: 'initialized', payload: {} });
+      let { state } = machine;
+      let { context } = state;
+      expect(context.requirement.missingAttributes).toEqual([
+        CollectedKycDataOption.email,
+        CollectedKycDataOption.ssn9,
+      ]);
+      expect(context.data[IdDI.email]).toBeUndefined();
+      expect(state.value).toEqual('email');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.email]: { value: 'piip@onefootprint.com' },
+        },
+      });
+      expect(state.value).toEqual('ssn');
+      context = state.context;
+      expect(context.data[IdDI.email]).toEqual({
+        value: 'piip@onefootprint.com',
+      });
+
+      // Navigate to prev
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('email');
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.email]: { value: 'piip@onefootprint.com' },
+        },
+      });
+      expect(state.value).toEqual('ssn');
+      context = state.context;
+      expect(context.data[IdDI.email]).toEqual({
+        value: 'piip@onefootprint.com',
+      });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.ssn9]: { value: '101010101' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
+      expect(state.value).toEqual('confirm');
+
+      // Navigate to prev
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('ssn');
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.ssn9]: { value: '101010101' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
+      expect(state.value).toEqual('confirm');
+
+      state = machine.send({
+        type: 'confirmed',
+      });
+      context = state.context;
+      expect(state.value).toEqual('completed');
+    });
+
+    it('when email is received in the initial context', () => {
+      const machine = createMachine(
+        [CollectedKycDataOption.email, CollectedKycDataOption.ssn9],
+        { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
+        'sandboxTest',
+      );
+      machine.send({ type: 'initialized', payload: {} });
+      let { state } = machine;
+      let { context } = state;
+      expect(context.requirement.missingAttributes).toEqual([
+        CollectedKycDataOption.email,
+        CollectedKycDataOption.ssn9,
+      ]);
+      expect(context.data[IdDI.email]).toEqual({
+        value: 'piip@onefootprint.com',
+        bootstrap: true,
+      });
+
+      expect(state.value).toEqual('ssn');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.ssn9]: { value: '101010101' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
+      expect(state.value).toEqual('confirm');
+
+      state = machine.send({
+        type: 'confirmed',
+      });
+      context = state.context;
+      expect(state.value).toEqual('completed');
+    });
+  });
+
   describe('When user has bootstrapped/decrypted/disabled data', () => {
     it('if no attributes are missing at the start', () => {
       const machine = createMachine(
@@ -339,6 +622,7 @@ describe('Collect KYC Data Machine Tests', () => {
           CollectedKycDataOption.ssn9,
         ],
         {
+          [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
           [IdDI.firstName]: { value: 'John', bootstrap: true },
           [IdDI.lastName]: { value: 'Doe', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
@@ -363,6 +647,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.data[IdDI.dob]?.scrubbed).toEqual(true);
 
       // Check initial data, which controls the back button
+      expect(context.initialData[IdDI.email]?.bootstrap).toEqual(true);
       expect(context.initialData[IdDI.firstName]?.bootstrap).toEqual(true);
       expect(context.initialData[IdDI.lastName]?.bootstrap).toEqual(true);
       expect(context.initialData[IdDI.addressLine1]?.bootstrap).toEqual(true);
@@ -398,6 +683,7 @@ describe('Collect KYC Data Machine Tests', () => {
           CollectedKycDataOption.ssn9,
         ],
         {
+          [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'San Francisco', bootstrap: true },
           [IdDI.state]: { value: 'CA', disabled: true },
@@ -452,6 +738,7 @@ describe('Collect KYC Data Machine Tests', () => {
   describe('Confirm flow', () => {
     it('completes flow correctly', () => {
       const machine = createMachine([
+        CollectedKycDataOption.email,
         CollectedKycDataOption.name,
         CollectedKycDataOption.address,
         CollectedKycDataOption.usLegalStatus,
@@ -461,13 +748,22 @@ describe('Collect KYC Data Machine Tests', () => {
       let { state } = machine;
       const { context } = state;
       expect(context.requirement.missingAttributes).toEqual([
+        CollectedKycDataOption.email,
         CollectedKycDataOption.name,
         CollectedKycDataOption.address,
         CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
+      expect(context.data[IdDI.email]).toBeUndefined();
 
       // Collect all fields first
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.email]: { value: 'piip@onefootprint.com' },
+        },
+      });
+
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
@@ -501,6 +797,9 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('confirm');
 
       // These events shouldn't trigger any state changes
+      state = machine.send({
+        type: 'editEmail',
+      });
       expect(state.value).toEqual('confirm');
       state = machine.send({
         type: 'editBasicInfo',
@@ -520,6 +819,15 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('confirm');
 
       // We should be able to edit the data from the confirm state
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.email]: { value: 'new-email' },
+        },
+      });
+      expect(state.context.data[IdDI.email]).toEqual({ value: 'new-email' });
+      expect(state.value).toBe('confirm');
+
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
@@ -579,7 +887,7 @@ describe('Collect KYC Data Machine Tests', () => {
           CollectedKycDataOption.usLegalStatus,
           CollectedKycDataOption.ssn9,
         ],
-        {},
+        { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
         'sandboxTest',
       );
       machine.send({ type: 'initialized', payload: {} });
@@ -591,6 +899,10 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
+      expect(context.data[IdDI.email]).toEqual({
+        value: 'piip@onefootprint.com',
+        bootstrap: true,
+      });
       expect(state.value).toEqual('basicInformation');
 
       // Forward linearly through the entire flow
@@ -722,6 +1034,7 @@ describe('Collect KYC Data Machine Tests', () => {
           CollectedKycDataOption.ssn9,
         ],
         {
+          [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'San Francisco', bootstrap: true },
           [IdDI.state]: { value: 'CA', disabled: true },

@@ -5,7 +5,7 @@ import { pickBy } from 'lodash';
 import Logger from '../../../../../../../../utils/logger';
 
 const getKycBootstrapData = (data?: IdvBootstrapData): KycBootstrapData => {
-  // Filter down to keys of the IdDI enum that are not email or phone
+  // Filter down to keys of the IdDI enum
   const filtered = pickBy(data, (_, key) =>
     Object.values(IdDI).includes(key as IdDI),
   );

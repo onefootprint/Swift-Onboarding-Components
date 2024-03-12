@@ -88,6 +88,18 @@ export const isMissing = (
   return filteredAttributes.length > 0;
 };
 
+export const isMissingEmailAttribute = (
+  mustCollect: CollectedKycDataOption[],
+  collectedData?: KycData,
+  ignoreCollectedData?: boolean,
+) =>
+  isMissing(
+    [CollectedKycDataOption.email],
+    mustCollect,
+    collectedData,
+    ignoreCollectedData,
+  );
+
 export const isMissingBasicAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,

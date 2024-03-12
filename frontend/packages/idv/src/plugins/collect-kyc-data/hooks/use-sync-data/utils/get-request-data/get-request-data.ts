@@ -8,7 +8,6 @@ import {
   CollectedKycDataOptionToRequiredAttributes,
   IdDI,
 } from '@onefootprint/types';
-import { pickBy } from 'lodash';
 
 import {
   fromUSDateToISO8601Format,
@@ -27,10 +26,11 @@ const getRequestData = (
   requirement: CollectKycDataRequirement,
 ) => {
   // Filter out data that's already in the vault or has empty values or is not dirty
-  const filteredData = pickBy(
-    data,
-    value =>
-      !value.decrypted && !value.scrubbed && (value.dirty || value.bootstrap),
+  const filteredData = Object.fromEntries(
+    Object.entries(data).filter(
+      ([, value]) =>
+        !value.decrypted && !value.scrubbed && (value.dirty || value.bootstrap),
+    ),
   );
 
   // Start constructing the request data, while making sure data formats are correct

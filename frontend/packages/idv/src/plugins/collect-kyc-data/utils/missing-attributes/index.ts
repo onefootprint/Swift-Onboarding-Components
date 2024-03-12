@@ -2,6 +2,7 @@ export {
   hasMissingAttributes,
   isMissing,
   isMissingBasicAttribute,
+  isMissingEmailAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
   isMissingUsLegalStatusAttribute,

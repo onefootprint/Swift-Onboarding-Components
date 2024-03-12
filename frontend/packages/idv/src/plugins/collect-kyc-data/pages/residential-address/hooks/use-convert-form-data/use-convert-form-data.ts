@@ -26,8 +26,9 @@ const useConvertFormData = () => {
         : data[IdDI.addressLine1]?.decrypted,
     };
 
+    const bothEmpty = !addressLine2 === !data[IdDI.addressLine2]?.value;
     const isAddressLine2Changed =
-      addressLine2 !== data[IdDI.addressLine2]?.value;
+      !bothEmpty && addressLine2 !== data[IdDI.addressLine2]?.value;
     convertedData[IdDI.addressLine2] = {
       value: addressLine2,
       dirty: isAddressLine2Changed,

@@ -26,7 +26,7 @@ const Confirm = () => {
   const [state, send] = useCollectKycDataMachine();
   const { authToken, data, requirement, initialData } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
-  const { isLoading } = syncDataMutation;
+
   const toast = useToast();
   const qryUserAuthMethods = useUserAuthMethods(authToken);
 
@@ -96,7 +96,7 @@ const Confirm = () => {
       cta={t('summary.cta')}
       onClickPrev={() => send({ type: 'navigatedToPrevPage' })}
       onClickConfirm={handleConfirm}
-      isLoading={isLoading}
+      isLoading={syncDataMutation.isLoading}
       headerVariant={headerVariant}
     >
       <BasicInfoSection verifiedMethods={verifiedMethods} />

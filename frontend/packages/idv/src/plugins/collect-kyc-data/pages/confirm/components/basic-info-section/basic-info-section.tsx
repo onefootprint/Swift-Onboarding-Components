@@ -69,6 +69,7 @@ const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
             onComplete={stopEditing}
             onCancel={stopEditing}
             hideHeader
+            verifiedMethods={verifiedMethods}
             emailConfig={{
               visible: true,
               disabled: Boolean(verifiedMethods?.email),

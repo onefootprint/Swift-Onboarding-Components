@@ -7,8 +7,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
   const data = Object.fromEntries(
     Object.entries(payload.data).filter(
       // Don't send null or undefined or empty values
-      // Empty string is a valid value to send to the backend
-      e => Boolean(e[1]),
+      e => !!e[1],
     ),
   );
 

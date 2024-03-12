@@ -1,4 +1,8 @@
-import { IdDI } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  IdDI,
+  isCountryCode,
+} from '@onefootprint/types';
 import { Grid, Stack } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -13,13 +17,14 @@ import useSyncData, {
   checkPhoneEmailBeforeSubmit,
 } from '../../hooks/use-sync-data';
 import type { VerifiedMethods } from '../../types';
+import allAttributes from '../../utils/all-attributes';
 import type { KycData } from '../../utils/data-types';
+import getInitialCountry from '../../utils/get-initial-country';
 import DobField from './components/dob-field';
 import EmailField from './components/email-field';
 import NameFields from './components/name-fields';
 import NationalityField from './components/nationality-field';
 import PhoneField from './components/phone-field';
-import getFieldStats from './get-field-stats';
 import useConvertFormData from './hooks/use-convert-form-data';
 import type { FormData } from './types';
 
@@ -41,6 +46,8 @@ const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
   [IdDI.dob]: 'dob',
 };
 
+const isTest = process.env.NODE_ENV === 'test';
+
 const BasicInformation = ({
   ctaLabel,
   hideHeader,
@@ -51,23 +58,42 @@ const BasicInformation = ({
   verifiedMethods,
 }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const { data, initialData } = state.context;
+  const { data, initialData, requirement } = state.context;
   const { mutation, syncData } = useSyncData();
   const { t } = useTranslation('idv', { keyPrefix });
   const convertFormData = useConvertFormData();
-  const { dob, email, fullName, nationality, phone } = getFieldStats(
-    state.context,
+  const attributes = allAttributes(requirement);
+  const requiresName = attributes.includes(CollectedKycDataOption.name);
+  const requiresDob = attributes.includes(CollectedKycDataOption.dob);
+  const requiresNationality = attributes.includes(
+    CollectedKycDataOption.nationality,
   );
+  const requiresPhone =
+    !isTest && attributes.includes(CollectedKycDataOption.phoneNumber);
+  const requiresEmail =
+    !isTest && attributes.includes(CollectedKycDataOption.email);
 
+  const isNameDisabled =
+    data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
+  const isNationalityDisabled = data?.[IdDI.nationality]?.disabled;
+  const isDobDisabled = data?.[IdDI.dob]?.disabled;
+  const isPhoneDisabled = data?.[IdDI.phoneNumber]?.disabled;
+  const isEmailDisabled = data?.[IdDI.email]?.disabled;
+
+  const nationalityValue = data?.[IdDI.nationality]?.value;
+  const defaultNationality =
+    nationalityValue && isCountryCode(nationalityValue)
+      ? nationalityValue
+      : undefined;
   const formMethods = useForm<FormData>({
     defaultValues: {
       firstName: data[IdDI.firstName]?.value,
       middleName: data[IdDI.middleName]?.value,
       lastName: data[IdDI.lastName]?.value,
-      dob: dob.value,
-      nationality: nationality.value,
-      email: email.value,
-      phoneNumber: phone.value,
+      dob: data?.[IdDI.dob]?.value,
+      nationality: getInitialCountry(defaultNationality),
+      email: data?.[IdDI.email]?.value,
+      phoneNumber: data?.[IdDI.phoneNumber]?.value,
     },
   });
 
@@ -112,18 +138,16 @@ const BasicInformation = ({
           onSubmit={formMethods.handleSubmit(onSubmitFormData)}
         >
           <Stack direction="column" gap={5}>
-            {fullName.required ? (
-              <NameFields disabled={fullName.disabled} />
+            {requiresName ? <NameFields disabled={isNameDisabled} /> : null}
+            {requiresDob ? <DobField disabled={isDobDisabled} /> : null}
+            {requiresNationality ? (
+              <NationalityField disabled={isNationalityDisabled} />
             ) : null}
-            {dob.required ? <DobField disabled={dob.disabled} /> : null}
-            {nationality.required ? (
-              <NationalityField disabled={nationality.disabled} />
+            {phoneConfig?.visible && requiresPhone ? (
+              <PhoneField disabled={phoneConfig?.disabled || isPhoneDisabled} />
             ) : null}
-            {phoneConfig?.visible && phone.required ? (
-              <PhoneField disabled={phoneConfig?.disabled || phone.disabled} />
-            ) : null}
-            {emailConfig?.visible && email.required ? (
-              <EmailField disabled={emailConfig?.disabled || email.disabled} />
+            {emailConfig?.visible && requiresEmail ? (
+              <EmailField disabled={emailConfig?.disabled || isEmailDisabled} />
             ) : null}
           </Stack>
           <EditableFormButtonContainer
