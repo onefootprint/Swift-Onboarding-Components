@@ -35,22 +35,24 @@ const Table = ({ children }: TableProps) => {
   }, []);
 
   return (
-    <ShadowHandler
+    <Container
       data-overflow-right={overflowRight}
       data-overflow-left={overflowLeft}
     >
-      <Container ref={containerRef}>
+      <TableWrapper ref={containerRef}>
         <Content ref={tableRef}>{children}</Content>
-      </Container>
-    </ShadowHandler>
+      </TableWrapper>
+    </Container>
   );
 };
 
-const ShadowHandler = styled.div`
+const Container = styled.div`
   ${({ theme }) => css`
     position: relative;
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
+    margin-bottom: ${theme.spacing[9]};
+    
     &[data-overflow-right='true'] {
       &::after {
         content: '';
@@ -66,6 +68,7 @@ const ShadowHandler = styled.div`
         
       }
     }
+
     &[data-overflow-left='true'] {
       &::before {
         content: '';
@@ -82,14 +85,13 @@ const ShadowHandler = styled.div`
   `}
 `;
 
-const Container = styled.div`
+const TableWrapper = styled.div`
   ${({ theme }) => css`
     overflow-x: auto;
     width: 100%;
     position: relative;
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    margin-bottom: ${theme.spacing[9]};
   `}
 `;
 
