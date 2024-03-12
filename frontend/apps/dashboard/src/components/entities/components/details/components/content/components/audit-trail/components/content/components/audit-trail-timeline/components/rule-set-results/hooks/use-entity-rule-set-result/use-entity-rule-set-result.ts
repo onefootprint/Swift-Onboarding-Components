@@ -4,7 +4,7 @@ import type {
   GetEntityRuleSetResultResponse,
   Rule,
 } from '@onefootprint/types';
-import { RuleAction } from '@onefootprint/types';
+import { OnboardingDecisionRuleAction, RuleAction } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
@@ -70,8 +70,12 @@ const useEntityRuleSetResult = ({
             );
           }
         });
+
         return {
-          actionTriggered: response.actionTriggered,
+          // On the backend, if there's a non-null API response, a null actionTriggered is an implied Pass
+          actionTriggered: response.actionTriggered
+            ? response.actionTriggered
+            : OnboardingDecisionRuleAction.pass,
           obConfigurationId: response.obConfigurationId,
           ruleResults: formattedRuleResults,
         };

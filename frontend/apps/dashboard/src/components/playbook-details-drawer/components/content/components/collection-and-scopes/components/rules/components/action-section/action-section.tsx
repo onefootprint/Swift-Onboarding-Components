@@ -36,6 +36,12 @@ const ActionSection = ({
   ].includes(action);
   const showStepUpTitle = action === RuleAction.stepUpIdentitySsn;
   const actionName = showStepUpTitle ? 'step-up' : kebabCase(action);
+  const textColors: Record<string, Color> = {
+    fail: 'error',
+    'step-up': 'info',
+    'manual-review': 'warning',
+    'pass-with-manual-review': 'success',
+  };
 
   const handleStartAdd = () => {
     setIsAddingRule(true);
@@ -47,10 +53,7 @@ const ActionSection = ({
 
   const actionTitle = (
     <Stack direction="column" gap={1} textAlign="left">
-      <Text
-        variant="label-3"
-        color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
-      >
+      <Text variant="label-3" color={textColors[actionName]}>
         {t(`${actionName}.title` as ParseKeys<'common'>)}
       </Text>
       <Text variant="body-3" color="secondary">

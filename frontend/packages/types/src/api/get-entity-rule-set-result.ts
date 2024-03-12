@@ -1,4 +1,4 @@
-import type { RuleAction, RuleResult } from '../data';
+import type { OnboardingDecisionRuleAction, RuleResult } from '../data';
 
 export type GetEntityRuleSetResultRequest = {
   entityId: string;
@@ -6,7 +6,7 @@ export type GetEntityRuleSetResultRequest = {
 };
 
 export type GetEntityRuleSetResultResponse = {
-  actionTriggered: RuleAction;
+  actionTriggered: OnboardingDecisionRuleAction;
   createdAt: string;
   obConfigurationId: string;
   ruleResults: RuleResult[];

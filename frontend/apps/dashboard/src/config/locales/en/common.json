@@ -1577,23 +1577,22 @@
             "triggered": "Rules triggered",
             "not-triggered": "Rules not triggered",
             "fail": {
-              "title": "Fail",
-              "color": "error"
+              "title": "Fail"
             },
             "manual-review": {
-              "title": "Fail + Manual review",
-              "color": "warning"
+              "title": "Fail + Manual review"
             },
             "step-up": {
               "title": "Step-up",
-              "color": "info",
               "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
               "step-up-proof-of-address": "Proof of Address",
               "step-up-identity": "Identity document"
             },
             "pass-with-manual-review": {
-              "title": "Pass + Manual review",
-              "color": "success"
+              "title": "Pass + Manual review"
+            },
+            "pass": {
+              "title": "Pass"
             },
             "no-rules": "None"
           }
@@ -2477,26 +2476,22 @@
           "action-section": {
             "fail": {
               "title": "Fail",
-              "subtitle": "User will be marked as failed",
-              "color": "error"
+              "subtitle": "User will be marked as failed"
             },
             "manual-review": {
               "title": "Fail + Manual review",
-              "subtitle": "User will be marked as failed and flagged for review",
-              "color": "warning"
+              "subtitle": "User will be marked as failed and flagged for review"
             },
             "step-up": {
               "title": "Step-up",
               "subtitle": "User will be asked to scan or upload another document",
-              "color": "info",
               "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
               "step-up-proof-of-address": "Proof of Address",
               "step-up-identity": "Identity document"
             },
             "pass-with-manual-review": {
               "title": "Pass + Manual review",
-              "subtitle": "User will be onboarded, but should be manually reviewed",
-              "color": "success"
+              "subtitle": "User will be onboarded, but should be manually reviewed"
             },
             "add-rule": "Add rule",
             "empty-rules": "There are no rules for this outcome."

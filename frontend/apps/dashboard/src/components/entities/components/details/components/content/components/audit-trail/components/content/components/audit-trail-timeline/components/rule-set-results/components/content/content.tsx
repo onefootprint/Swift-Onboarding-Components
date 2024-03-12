@@ -32,6 +32,13 @@ const Content = ({
   const actionName = isStepUpSubsection
     ? 'step-up'
     : kebabCase(actionTriggered);
+  const textColors: Record<string, Color> = {
+    fail: 'error',
+    'step-up': 'info',
+    'manual-review': 'warning',
+    'pass-with-manual-review': 'success',
+    pass: 'success',
+  };
 
   return (
     <Stack direction="column" gap={8}>
@@ -39,10 +46,7 @@ const Content = ({
         <Text variant="body-3" color="tertiary">
           {t('onboarding-decision')}
         </Text>
-        <Text
-          variant="label-3"
-          color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
-        >
+        <Text variant="label-3" color={textColors[actionName]}>
           {t(`${actionName}.title` as ParseKeys<'common'>)}
         </Text>
       </ActionTriggered>

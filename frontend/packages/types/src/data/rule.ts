@@ -3,6 +3,16 @@ export enum RuleOp {
   notEq = 'not_eq',
 }
 
+export enum OnboardingDecisionRuleAction {
+  fail = 'fail',
+  stepUpIdentitySsn = 'step_up.identity_proof_of_ssn',
+  stepUpPoA = 'step_up.proof_of_address',
+  stepUpIdentity = 'step_up.identity',
+  manualReview = 'manual_review',
+  passWithManualReview = 'pass_with_manual_review',
+  pass = 'pass',
+}
+
 export enum RuleAction {
   fail = 'fail',
   stepUpIdentitySsn = 'step_up.identity_proof_of_ssn',

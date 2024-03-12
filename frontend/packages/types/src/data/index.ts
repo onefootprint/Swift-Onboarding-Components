@@ -171,7 +171,13 @@ export type {
 export { RoleKind, RoleScopeKind, supportedRoleKinds } from './role';
 export type { Rolebinding } from './rolebinding';
 export type { Rule, RuleField, RuleResult } from './rule';
-export { RuleAction, RuleActionSection, RuleOp, RuleResultGroup } from './rule';
+export {
+  OnboardingDecisionRuleAction,
+  RuleAction,
+  RuleActionSection,
+  RuleOp,
+  RuleResultGroup,
+} from './rule';
 export { IdDocOutcome, OverallOutcome } from './sandbox-outcomes-type';
 export { default as SessionStatus } from './session-status';
 export type { Tenant } from './tenant';

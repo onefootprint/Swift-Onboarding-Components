@@ -12,6 +12,7 @@ import {
   EntityLabel,
   LivenessIssuer,
   LivenessSource,
+  OnboardingDecisionRuleAction,
   RuleAction,
   RuleOp,
   TimelineEventKind,
@@ -302,7 +303,7 @@ export const ruleResultsFixture: RuleResult[] = [
 ];
 
 export const ruleResultFixture: GetEntityRuleSetResultResponse = {
-  actionTriggered: RuleAction.fail,
+  actionTriggered: OnboardingDecisionRuleAction.fail,
   createdAt: '2024-01-05T23:37:22.943740Z',
   obConfigurationId: obcIdFixure,
   ruleResults: ruleResultsFixture,

@@ -391,6 +391,7 @@ export {
   MatchLevel,
   OnboardingConfigKind,
   OnboardingConfigStatus,
+  OnboardingDecisionRuleAction,
   OnboardingStatus,
   OrganizationSize,
   OrgFrequentNoteKind,
