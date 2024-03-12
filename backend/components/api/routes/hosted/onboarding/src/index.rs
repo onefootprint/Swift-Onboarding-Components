@@ -15,7 +15,7 @@ use api_core::{
     utils::{
         db2api::DbToApi,
         onboarding::{NewBusinessVaultArgs, NewOnboardingArgs},
-        vault_wrapper::{Any, VaultWrapper},
+        vault_wrapper::{Any, PrefillKind, VaultWrapper},
     },
 };
 use api_wire_types::hosted::onboarding::OnboardingResponse;
@@ -72,7 +72,9 @@ pub async fn post(
         None
     };
 
-    let prefill_data = vw.get_data_to_prefill(&state, &scoped_user, &ob_config).await?;
+    let prefill_data = vw
+        .get_data_to_prefill(&state, &scoped_user, &ob_config, PrefillKind::Onboarding)
+        .await?;
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();

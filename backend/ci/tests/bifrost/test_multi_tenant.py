@@ -75,22 +75,27 @@ def test_prefill_timeline_events(
     fp_id = dual_onboarded_user.fp_id
     foo_fp_id = dual_onboarded_user.foo_fp_id
 
-    # Timeline events from sandbox_tenant's view belong to self
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     assert body
 
-    # But from foo_sandbox_tenant's view, these events are portable and belong to another org
+    # There should be two timeline events showing data was prefilled into the new tenant.
+    # The first event shows the contact info being prefilled, and the second shows the data
     body = get(
         f"entities/{foo_fp_id}/timeline",
         None,
         *foo_sandbox_tenant.db_auths,
     )
     collect_data_events = [i for i in body if i["event"]["kind"] == "data_collected"]
-    assert len(collect_data_events) == 1
-    assert set(collect_data_events[0]["event"]["data"]["attributes"]) == set(
-        foo_sandbox_tenant.default_ob_config.must_collect_data
-    )
+    assert len(collect_data_events) == 2
     assert all(e["event"]["data"]["is_prefill"] for e in collect_data_events)
+    assert set(collect_data_events[0]["event"]["data"]["attributes"]) == (
+        set(foo_sandbox_tenant.default_ob_config.must_collect_data)
+        - {"phone_number", "email"}
+    )
+    assert set(collect_data_events[1]["event"]["data"]["attributes"]) == {
+        "phone_number",
+        "email",
+    }
 
 
 def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):

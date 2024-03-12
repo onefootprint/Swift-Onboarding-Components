@@ -11,6 +11,8 @@ mod prefill;
 mod replace_verified_ci;
 mod validated_data_request;
 
+pub use prefill::PrefillKind;
+
 #[cfg(test)]
 mod tests;
 

@@ -18,7 +18,7 @@ use api_core::{
         headers::InsightHeaders,
         passkey::WebauthnConfig,
         session::AuthSession,
-        vault_wrapper::{Person, VaultWrapper, WriteableVw},
+        vault_wrapper::{Person, PrefillKind, VaultWrapper, WriteableVw},
     },
 };
 use api_wire_types::{IdentifyVerifyRequest, IdentifyVerifyResponse};
@@ -189,18 +189,18 @@ pub async fn post(
         .await?;
 
     if let Some(((su, obc), portable_vw)) = su.zip(obc).zip(portable_vw) {
-        if obc.kind == ObConfigurationKind::Auth {
-            // If we're onboarding onto an auth playbook at a new tenant, prefill data (usually phone and email)
-            let prefill_data = portable_vw.get_data_to_prefill(&state, &su, &obc).await?;
-            state
-                .db_pool
-                .db_transaction(move |conn| -> ApiResult<_> {
-                    let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
-                    tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
-                    Ok(())
-                })
-                .await?;
-        }
+        // If we just created this scoped vault, prefill login methods if any are portable
+        let prefill_data = portable_vw
+            .get_data_to_prefill(&state, &su, &obc, PrefillKind::Identify)
+            .await?;
+        state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
+                tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
+                Ok(())
+            })
+            .await?;
     }
 
     ResponseData::ok(IdentifyVerifyResponse { auth_token }).json()

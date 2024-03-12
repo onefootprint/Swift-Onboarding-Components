@@ -16,7 +16,7 @@ use itertools::Itertools;
 use newtypes::{
     fingerprinter::{FingerprintScope, GlobalFingerprintKind},
     output::Csv,
-    DataIdentifier, DataLifetimeSource, FingerprintRequest, VaultKind,
+    DataIdentifier, DataLifetimeSource, FingerprintRequest, IdentityDataKind as IDK, VaultKind,
 };
 use std::{collections::HashMap, marker::PhantomData};
 
@@ -34,6 +34,27 @@ pub struct PrefillData {
     phantom: PhantomData<()>,
 }
 
+pub enum PrefillKind {
+    /// After the identify flow, prefill login methods
+    Identify,
+    /// When starting onboarding, prefill all data required by the playbook. We shouldn't do this
+    /// before creating the Workflow in the database, otherwise we'll unintentionally give decrypt
+    /// access to all prefilled data.
+    Onboarding,
+}
+
+impl PrefillKind {
+    fn allow_prefilling(&self, di: &DataIdentifier) -> bool {
+        match self {
+            Self::Identify => matches!(
+                di,
+                DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email)
+            ),
+            Self::Onboarding => true,
+        }
+    }
+}
+
 impl<Type> VaultWrapper<Type> {
     /// Given a user-scoped VW and a destination ScopedVault, computes all of the portable data
     /// that can be prefilled into the destination ScopedVault.
@@ -47,6 +68,7 @@ impl<Type> VaultWrapper<Type> {
         state: &'a State,
         destination_sv: &'a ScopedVault,
         pb: &'a ObConfiguration,
+        kind: PrefillKind,
     ) -> ApiResult<PrefillData> {
         if self.vault.id != destination_sv.vault_id {
             return Err(AssertionError("Cannot prefill data into a separate vault").into());
@@ -80,6 +102,7 @@ impl<Type> VaultWrapper<Type> {
             })
             // Only autofill data into the that must be collected by the tenant's playbook
             .filter(|d| pb.must_collect_data.iter().any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(&d.lifetime.kind)))
+            .filter(|d| kind.allow_prefilling(&d.lifetime.kind))
             // Note: this won't support portable documents
             .filter_map(|d| if let PieceOfData::Vd(d) = &d.data {Some(d)} else { None})
             .collect_vec();

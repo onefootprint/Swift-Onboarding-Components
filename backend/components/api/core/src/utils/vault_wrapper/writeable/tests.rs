@@ -1,4 +1,4 @@
-use super::WriteableVw;
+use super::{PrefillKind, WriteableVw};
 use crate::{
     errors::ApiResult,
     utils::vault_wrapper::{Person, TenantVw, VaultWrapper},
@@ -40,7 +40,10 @@ async fn test_prefill_data(state: &mut State) {
 
     // su1 then goes through onboarding. When su1 triggers onboarding, we'll compose prefill data,
     // but it should be empty since the only data exists at the current tenant
-    let prefill_data = vw.get_data_to_prefill(state, &data.su1, &data.pb1).await.unwrap();
+    let prefill_data = vw
+        .get_data_to_prefill(state, &data.su1, &data.pb1, PrefillKind::Onboarding)
+        .await
+        .unwrap();
     assert!(prefill_data.data.is_empty());
     assert!(prefill_data.fingerprints.is_empty());
     assert!(prefill_data.old_ci.is_empty());
@@ -48,7 +51,10 @@ async fn test_prefill_data(state: &mut State) {
     // If the user then tried to onboard onto tenant2, there should be almost no prefill data since
     // nothing is portablized - only the phone number because the phone is portablized after it's
     // verified
-    let prefill_data = vw.get_data_to_prefill(state, &data.su2, &data.pb2).await.unwrap();
+    let prefill_data = vw
+        .get_data_to_prefill(state, &data.su2, &data.pb2, PrefillKind::Onboarding)
+        .await
+        .unwrap();
     assert_have_same_elements(
         prefill_data.data.iter().map(|d| d.kind.clone()).collect(),
         vec![IDK::PhoneNumber.into()],
@@ -92,7 +98,10 @@ async fn test_prefill_data(state: &mut State) {
         .unwrap();
 
     // When the user starts onboarding onto tenant2, we should have prefill data!
-    let prefill_data = vw.get_data_to_prefill(state, &data.su2, &data.pb2).await.unwrap();
+    let prefill_data = vw
+        .get_data_to_prefill(state, &data.su2, &data.pb2, PrefillKind::Onboarding)
+        .await
+        .unwrap();
 
     // Make sure prefill data has what we expect
     assert_have_same_elements(
@@ -248,7 +257,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
 
     // We should only prefill phone and email from this auth playbook
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.su2, &data.auth_pb2)
+        .get_data_to_prefill(state, &data.su2, &data.auth_pb2, PrefillKind::Onboarding)
         .await
         .unwrap();
     assert_have_same_elements(
@@ -271,7 +280,10 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
         .unwrap();
 
     // Then, prefill data for KYC playbook shouldn't prefill phone and email again
-    let prefill_data = vw.get_data_to_prefill(state, &data.su2, &data.pb2).await.unwrap();
+    let prefill_data = vw
+        .get_data_to_prefill(state, &data.su2, &data.pb2, PrefillKind::Onboarding)
+        .await
+        .unwrap();
     assert_have_same_elements(
         prefill_data.data.iter().map(|d| d.kind.clone()).collect(),
         vec![IDK::FirstName.into(), IDK::LastName.into(), IDK::Ssn4.into()],
