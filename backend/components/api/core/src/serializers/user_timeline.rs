@@ -89,6 +89,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 let (workflow, request) = if let Some(wfr) = wfr {
                     let kind = match wfr.config {
                         WorkflowRequestConfig::RedoKyc => TriggerKind::RedoKyc,
+                        WorkflowRequestConfig::Onboard { .. } => TriggerKind::Onboard,
                         WorkflowRequestConfig::IdDocument { kind, .. } => match kind {
                             DocumentRequestKind::ProofOfSsn => TriggerKind::ProofOfSsn,
                             DocumentRequestKind::Identity => TriggerKind::IdDocument,
@@ -152,12 +153,15 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     external_id,
                 })
             }
-            SaturatedTimelineEvent::StepUp(e) => {
-                Self::StepUp(e.into_iter().sorted_by_key(|dr| dr.kind).map(|dr| DocumentRequest {
-                    kind: dr.kind,
-                    rule_set_result_id: dr.rule_set_result_id,
-                }).collect())
-            },
+            SaturatedTimelineEvent::StepUp(e) => Self::StepUp(
+                e.into_iter()
+                    .sorted_by_key(|dr| dr.kind)
+                    .map(|dr| DocumentRequest {
+                        kind: dr.kind,
+                        rule_set_result_id: dr.rule_set_result_id,
+                    })
+                    .collect(),
+            ),
         }
     }
 }

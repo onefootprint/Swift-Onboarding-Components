@@ -94,6 +94,11 @@ def test_redo_kyc(sandbox_tenant, with_document, doc_first_obc):
     # Trigger redo
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, dict(kind="redo_kyc"))
 
+    # Make sure the proper ob config is associated with the token
+    body = get("hosted/onboarding/config", None, initial_auth_token)
+    assert body["name"] == obc.name
+    assert body["key"] == obc.key.value
+
     # Re-run bifrost with the token
     def pre_run(bifrost):
         # Check that requirements are what we expect
@@ -145,6 +150,11 @@ def test_redo_kyc_non_portable(sandbox_tenant, must_collect_data):
     # Trigger redo
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, dict(kind="redo_kyc"))
 
+    # Make sure the proper ob config is associated with the token
+    body = get("hosted/onboarding/config", None, initial_auth_token)
+    assert body["name"] == obc.name
+    assert body["key"] == obc.key.value
+
     # Re-run bifrost with the token
     def pre_run(bifrost):
         # Check that requirements are what we expect
@@ -157,6 +167,52 @@ def test_redo_kyc_non_portable(sandbox_tenant, must_collect_data):
         patch("/hosted/user/vault", data, bifrost.auth_token)
 
     complete_redo_flow(initial_auth_token, fp_id, obc, sandbox_id, pre_run)
+
+
+def test_retrigger_onboard(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Testing Foo Playbook", must_collect_data, must_collect_data
+    )
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": FIXTURE_EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+        **ID_DATA,
+    }
+    body = post("users/", vault_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+    sandbox_id = body["sandbox_id"]
+
+    # Trigger onboarding
+    data = dict(kind="onboard", data=dict(playbook_id=obc.id))
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, data)
+
+    # Make sure the proper ob config is associated with the token
+    body = get("hosted/onboarding/config", None, initial_auth_token)
+    assert body["name"] == obc.name
+    assert body["key"] == obc.key.value
+
+    # Re-run Bifrost with the token, optionally with any pre_run assertion checks
+    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
+        assert_had_no_scopes=True
+    )
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    requirements = bifrost.get_status()["all_requirements"]
+    assert requirements[0]["kind"] == "collect_data"
+    assert requirements[0]["is_met"]
+    bifrost.run()
+
+    # Verify we made a new timeline event
+    body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    trigger_event = next(
+        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
+    )
+    assert trigger_event["data"]["request"]["is_deactivated"]
+    assert trigger_event["data"]["request"]["playbook_id"] == obc.id
+    obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
+    assert len(obds) == 1
+    obd = obds[0]
+    assert obd["event"]["data"]["decision"]["ob_configuration"]["id"] == obc.id
 
 
 @pytest.mark.parametrize(

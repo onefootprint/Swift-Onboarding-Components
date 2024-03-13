@@ -1,4 +1,4 @@
-use newtypes::{TriggerKind, WorkflowRequestId};
+use newtypes::{ObConfigurationId, TriggerKind, WorkflowRequestId};
 
 use crate::{Apiv2Schema, Serialize};
 
@@ -6,6 +6,7 @@ use crate::{Apiv2Schema, Serialize};
 pub struct WorkflowRequest {
     pub id: WorkflowRequestId,
     pub is_deactivated: bool,
+    pub playbook_id: ObConfigurationId,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

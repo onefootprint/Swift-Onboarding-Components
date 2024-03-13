@@ -95,6 +95,7 @@ async fn send_communication(
         let WorkflowRequest { note, config, .. } = wfr;
         let kind = match config {
             WorkflowRequestConfig::RedoKyc => TriggerMessageKind::RedoKyc,
+            WorkflowRequestConfig::Onboard { .. } => TriggerMessageKind::Onboard,
             WorkflowRequestConfig::IdDocument {
                 kind,
                 collect_selfie: _,
@@ -147,6 +148,7 @@ struct TriggerMessage {
 enum TriggerMessageKind {
     Auth,
     RedoKyc,
+    Onboard,
     IdentityDocument,
     ProofOfAddress,
     ProofOfSsn,
@@ -163,6 +165,9 @@ impl TriggerMessageKind {
             }
             Self::RedoKyc => {
                 format!("{} has requested you to re-verify your identity.", org_name)
+            }
+            Self::Onboard => {
+                format!("{} has requested you to verify your identity.", org_name)
             }
             Self::IdentityDocument => {
                 format!(
@@ -196,6 +201,10 @@ impl TriggerMessageKind {
             ),
             Self::RedoKyc => (
                 format!("{} has requested you to re-verify your identity", org_name),
+                "Some of the information you have provided may be missing or incorrect. Please take a moment to re-verify your identity.".into()
+            ),
+            Self::Onboard => (
+                format!("{} has requested you to verify your identity", org_name),
                 "Some of the information you have provided may be missing or incorrect. Please take a moment to re-verify your identity.".into()
             ),
             Self::IdentityDocument => (

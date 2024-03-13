@@ -4,7 +4,9 @@ use serde::Deserialize;
 use serde_with::SerializeDisplay;
 use strum_macros::{Display, EnumDiscriminants};
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Apiv2Schema, EnumDiscriminants)]
+use crate::ObConfigurationId;
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, EnumDiscriminants)]
 #[strum_discriminants(
     name(TriggerKind),
     vis(pub),
@@ -15,7 +17,13 @@ use strum_macros::{Display, EnumDiscriminants};
 #[serde(tag = "kind", content = "data")]
 pub enum TriggerInfo {
     /// Allow editing data, re-verify data, and then re-trigger decision engine
+    /// TODO deprecate this one
     RedoKyc,
+    /// Onboard the user onto the requested playbook.
+    /// Allows editing data, re-verifies data, and then re-triggers decision engine
+    Onboard {
+        playbook_id: ObConfigurationId,
+    },
     /// Upload a new document and re-run the decision engine
     IdDocument {
         collect_selfie: bool,

@@ -12,13 +12,14 @@ use api_core::{
 use api_wire_types::{CreateTokenResponse, TriggerRequest};
 use chrono::Duration;
 use db::models::{
+    ob_configuration::ObConfiguration,
     scoped_vault::ScopedVault,
     user_timeline::UserTimeline,
     vault::Vault,
     workflow::Workflow,
     workflow_request::{NewWorkflowRequestArgs, WorkflowRequest},
 };
-use newtypes::{DbActor, TriggerKind, VaultKind, WorkflowTriggeredInfo};
+use newtypes::{DbActor, TriggerInfo, TriggerKind, VaultKind, WorkflowTriggeredInfo};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -53,7 +54,16 @@ pub async fn post(
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
 
-            let (_, obc) = Workflow::latest(conn, &sv.id, false)?.ok_or(UserError::NoCompleteOnboardings)?;
+            let obc = if let TriggerInfo::Onboard { playbook_id } = &trigger {
+                // Trigger specifically requested the playbook onto which the user should onboard
+                let (obc, _) = ObConfiguration::get(conn, (playbook_id, &tenant_id, is_live))?;
+                obc
+            } else {
+                // For all other trigger kinds, just associate the last playbook with the WFR
+                let (_, obc) =
+                    Workflow::latest(conn, &sv.id, false)?.ok_or(UserError::NoCompleteOnboardings)?;
+                obc
+            };
 
             let config = trigger.into();
             let wfr_args = NewWorkflowRequestArgs {
@@ -110,7 +120,7 @@ pub async fn post(
 
 fn validate(trigger_info: TriggerKind, scoped_vault: &ScopedVault) -> ApiResult<()> {
     match trigger_info {
-        TriggerKind::RedoKyc => Ok(()),
+        TriggerKind::RedoKyc | TriggerKind::Onboard { .. } => Ok(()),
         TriggerKind::IdDocument | TriggerKind::ProofOfSsn | TriggerKind::ProofOfAddress => {
             // if docs only or we have a decision
             // TODO: theoretically we should be checking risk signals here too or that there's an FP decision, but maybe not

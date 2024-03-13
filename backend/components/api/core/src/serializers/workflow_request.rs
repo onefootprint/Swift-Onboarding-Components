@@ -23,12 +23,16 @@ impl DbToApi<Workflow> for api_wire_types::TriggeredWorkflow {
 impl DbToApi<WorkflowRequest> for api_wire_types::WorkflowRequest {
     fn from_db(wfr: WorkflowRequest) -> Self {
         let WorkflowRequest {
-            id, deactivated_at, ..
+            id,
+            deactivated_at,
+            ob_configuration_id,
+            ..
         } = wfr;
 
         Self {
             id,
             is_deactivated: deactivated_at.is_some(),
+            playbook_id: ob_configuration_id,
         }
     }
 }

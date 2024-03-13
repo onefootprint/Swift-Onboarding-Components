@@ -260,7 +260,7 @@ impl Workflow {
 
         let config = if let Some(wfr_config) = wfr.as_ref().map(|wfr| &wfr.config) {
             match wfr_config {
-                WorkflowRequestConfig::RedoKyc => {
+                WorkflowRequestConfig::RedoKyc | WorkflowRequestConfig::Onboard { .. } => {
                     if v.kind != VaultKind::Person {
                         return Err(
                             ValidationError("Cannot create a RedoKyc flow for non-person vault").into(),
