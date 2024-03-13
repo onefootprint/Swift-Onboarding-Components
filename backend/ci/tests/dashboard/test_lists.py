@@ -155,13 +155,26 @@ def test_create_list_entry(sandbox_tenant):
         *sandbox_tenant.db_auths,
     )
 
-    entry = post(
+    # add single
+    entries = post(
         f"/org/lists/{list['id']}/entries",
-        dict(data="protonmail.com"),
+        ["protonmail.com"],
         *sandbox_tenant.db_auths,
     )
-    assert entry["data"] == "protonmail.com"
-    assert entry["actor"]["kind"] == "tenant_user"
+    assert len(entries) == 1
+    assert entries[0]["data"] == "protonmail.com"
+    assert entries[0]["actor"]["kind"] == "tenant_user"
+
+    # add multiple
+    entries = post(
+        f"/org/lists/{list['id']}/entries",
+        ["bobertotech.com", "badppl.org", "somethingelseketchy.net"],
+        *sandbox_tenant.db_auths,
+    )
+    assert len(entries) == 3
+    assert entries[0]["data"] == "bobertotech.com"
+    assert entries[1]["data"] == "badppl.org"
+    assert entries[2]["data"] == "somethingelseketchy.net"
 
 
 def test_list_list_entries(sandbox_tenant):
@@ -178,29 +191,29 @@ def test_list_list_entries(sandbox_tenant):
 
     entry1 = post(
         f"/org/lists/{list['id']}/entries",
-        dict(data="protonmail.com"),
+        ["protonmail.com"],
         *sandbox_tenant.db_auths,
     )
     entry2 = post(
         f"/org/lists/{list['id']}/entries",
-        dict(data="baddiesinc.org"),
+        ["baddiesinc.org"],
         *sandbox_tenant.db_auths,
     )
     entry3 = post(
         f"/org/lists/{list['id']}/entries",
-        dict(data="bobertotech.org"),
+        ["bobertotech.org"],
         *sandbox_tenant.db_auths,
     )
 
     entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
-    assert entries[0]["data"] == entry3["data"]
-    assert entries[0]["id"] == entry3["id"]
+    assert entries[0]["data"] == entry3[0]["data"]
+    assert entries[0]["id"] == entry3[0]["id"]
 
-    assert entries[1]["data"] == entry2["data"]
-    assert entries[1]["id"] == entry2["id"]
+    assert entries[1]["data"] == entry2[0]["data"]
+    assert entries[1]["id"] == entry2[0]["id"]
 
-    assert entries[2]["data"] == entry1["data"]
-    assert entries[2]["id"] == entry1["id"]
+    assert entries[2]["data"] == entry1[0]["data"]
+    assert entries[2]["id"] == entry1[0]["id"]
 
 
 def test_delete_list_entries(sandbox_tenant):
@@ -217,17 +230,17 @@ def test_delete_list_entries(sandbox_tenant):
 
     entry1 = post(
         f"/org/lists/{list['id']}/entries",
-        dict(data="protonmail.com"),
+        ["protonmail.com"],
         *sandbox_tenant.db_auths,
     )
     entry2 = post(
         f"/org/lists/{list['id']}/entries",
-        dict(data="baddiesinc.org"),
+        ["baddiesinc.org"],
         *sandbox_tenant.db_auths,
     )
     entry3 = post(
         f"/org/lists/{list['id']}/entries",
-        dict(data="bobertotech.org"),
+        ["bobertotech.org"],
         *sandbox_tenant.db_auths,
     )
 
@@ -236,19 +249,19 @@ def test_delete_list_entries(sandbox_tenant):
 
     # delete entry2
     delete(
-        f"/org/lists/{list['id']}/entries/{entry2['id']}",
+        f"/org/lists/{list['id']}/entries/{entry2[0]['id']}",
         None,
         *sandbox_tenant.db_auths,
     )
 
     entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
     assert len(entries) == 2
-    assert entries[0]["id"] == entry3["id"]
-    assert entries[1]["id"] == entry1["id"]
+    assert entries[0]["id"] == entry3[0]["id"]
+    assert entries[1]["id"] == entry1[0]["id"]
 
     # error when try to delete entry2 again
     delete(
-        f"/org/lists/{list['id']}/entries/{entry2['id']}",
+        f"/org/lists/{list['id']}/entries/{entry2[0]['id']}",
         None,
         *sandbox_tenant.db_auths,
         status_code=400,
@@ -256,18 +269,18 @@ def test_delete_list_entries(sandbox_tenant):
 
     # delete entry1
     delete(
-        f"/org/lists/{list['id']}/entries/{entry1['id']}",
+        f"/org/lists/{list['id']}/entries/{entry1[0]['id']}",
         None,
         *sandbox_tenant.db_auths,
     )
 
     entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
     assert len(entries) == 1
-    assert entries[0]["id"] == entry3["id"]
+    assert entries[0]["id"] == entry3[0]["id"]
 
     # delete entry3
     delete(
-        f"/org/lists/{list['id']}/entries/{entry3['id']}",
+        f"/org/lists/{list['id']}/entries/{entry3[0]['id']}",
         None,
         *sandbox_tenant.db_auths,
     )

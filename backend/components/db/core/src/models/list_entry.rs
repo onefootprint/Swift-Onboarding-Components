@@ -55,6 +55,32 @@ impl ListEntry {
         Ok(res)
     }
 
+    #[tracing::instrument("ListEntry::bulk_create", skip_all)]
+    pub fn bulk_create(
+        conn: &mut TxnPgConn,
+        list_id: &ListId,
+        actor: DbActor,
+        e_data: Vec<SealedVaultBytes>,
+    ) -> DbResult<Vec<Self>> {
+        let created_at = Utc::now();
+        let created_seqno = DataLifetime::get_current_seqno(conn)?;
+        let new_list_entries: Vec<_> = e_data
+            .iter()
+            .map(|e| NewListEntry {
+                created_at,
+                created_seqno,
+                list_id,
+                actor: actor.clone(),
+                e_data: e,
+            })
+            .collect();
+
+        let res = diesel::insert_into(list_entry::table)
+            .values(new_list_entries)
+            .get_results::<Self>(conn.conn())?;
+        Ok(res)
+    }
+
     #[tracing::instrument("ListEntry::get", skip_all)]
     pub fn get(conn: &mut PgConn, list_entry_id: &ListEntryId) -> DbResult<Self> {
         let res = list_entry::table
