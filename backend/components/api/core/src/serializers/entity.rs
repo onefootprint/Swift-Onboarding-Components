@@ -112,15 +112,6 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
         // If the latest Workflow has an uncompleted review
         let requires_manual_review = !mrs.is_empty();
 
-        // Deprecated
-        let can_reonboard = !wfs.is_empty();
-        // Deprecated
-        let insight_event = wfs
-            .iter()
-            .filter_map(|(wf, ie)| ie.as_ref().map(|ie| (wf.created_at, ie.clone())))
-            .max_by_key(|(t, _)| *t)
-            .map(|(_, ie)| ie);
-
         let has_outstanding_doc_wf = wfs.iter().any(|(wf, _)| {
             wf.kind == WorkflowKind::Document && wf.completed_at.is_none() && wf.deactivated_at.is_none()
         });
@@ -141,13 +132,9 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             watchlist_check: watchlist_check.map(api_wire_types::WatchlistCheck::from_db),
             ordering_id,
             status,
-            insight_event: insight_event.map(api_wire_types::InsightEvent::from_db),
             requires_manual_review,
             is_created_via_api,
             data,
-            // TODO inlcude the list of WFs, with obc ID.
-            // are these sorted?
-            can_reonboard,
             workflows,
             // Annoying: for now, document-only workflows are a really custom codepath. So we have
             // to check in another way if there are any outstanding doc-only workflows

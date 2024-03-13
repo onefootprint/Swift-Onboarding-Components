@@ -47,10 +47,6 @@ pub struct Entity {
     /// DEPRECATED.
     /// The list of attributes that are allowed to be decrypted by the authed user
     pub decryptable_attributes: Vec<DataIdentifier>,
-    /// DEPRECATED
-    pub insight_event: Option<InsightEvent>,
-    /// DEPRECATED
-    pub can_reonboard: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

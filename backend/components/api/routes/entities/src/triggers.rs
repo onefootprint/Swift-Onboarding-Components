@@ -6,7 +6,7 @@ use crate::{
 use api_core::{
     auth::session::user::{NewUserSessionArgs, NewUserSessionContext, UserSession, UserSessionPurpose},
     config::LinkKind,
-    errors::{tenant::TenantError, user::UserError, ApiResult},
+    errors::{tenant::TenantError, user::UserError, ApiResult, ValidationError},
     utils::{fp_id_path::FpIdPath, session::AuthSession},
 };
 use api_wire_types::{CreateTokenResponse, TriggerRequest};
@@ -19,7 +19,7 @@ use db::models::{
     workflow::Workflow,
     workflow_request::{NewWorkflowRequestArgs, WorkflowRequest},
 };
-use newtypes::{DbActor, TriggerInfo, TriggerKind, VaultKind, WorkflowTriggeredInfo};
+use newtypes::{DbActor, ObConfigurationKind, TriggerInfo, TriggerKind, VaultKind, WorkflowTriggeredInfo};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -64,6 +64,9 @@ pub async fn post(
                     Workflow::latest(conn, &sv.id, false)?.ok_or(UserError::NoCompleteOnboardings)?;
                 obc
             };
+            if obc.kind == ObConfigurationKind::Auth {
+                return ValidationError("Cannot triggering onboarding onto an auth playbook").into();
+            }
 
             let config = trigger.into();
             let wfr_args = NewWorkflowRequestArgs {
