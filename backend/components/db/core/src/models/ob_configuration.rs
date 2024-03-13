@@ -10,8 +10,8 @@ use itertools::Itertools;
 use newtypes::{
     ApiKeyStatus, AppearanceId, AuthMethodKind, CipKind, CollectedDataOption as CDO,
     DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo, EnhancedAmlOption,
-    IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind,
-    ScopedVaultId, SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
+    IdDocKind, Iso3166TwoDigitCountryCode, Locked, ObConfigurationId, ObConfigurationKey,
+    ObConfigurationKind, ScopedVaultId, SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -511,6 +511,15 @@ impl ObConfiguration {
 
         let result: (ObConfiguration, Tenant) = query.first(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument("ObConfiguration::lock", skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, obc_id: &ObConfigurationId) -> DbResult<Locked<Self>> {
+        let result = ob_configuration::table
+            .filter(ob_configuration::id.eq(obc_id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
     }
 
     #[tracing::instrument("ObConfiguration::get_bulk", skip_all)]

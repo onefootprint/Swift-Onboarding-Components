@@ -851,6 +851,23 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    rule_set (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        created_seqno -> Int8,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        deactivated_seqno -> Nullable<Int8>,
+        version -> Int4,
+        ob_configuration_id -> Text,
+        actor -> Jsonb,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     rule_set_result (id) {
         id -> Text,
         created_at -> Timestamptz,
@@ -1521,6 +1538,7 @@ diesel::joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
 diesel::joinable!(rule_instance -> ob_configuration (ob_configuration_id));
 diesel::joinable!(rule_result -> rule_instance (rule_instance_id));
 diesel::joinable!(rule_result -> rule_set_result (rule_set_result_id));
+diesel::joinable!(rule_set -> ob_configuration (ob_configuration_id));
 diesel::joinable!(rule_set_result -> ob_configuration (ob_configuration_id));
 diesel::joinable!(rule_set_result -> scoped_vault (scoped_vault_id));
 diesel::joinable!(rule_set_result -> workflow (workflow_id));
@@ -1620,6 +1638,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     risk_signal_group,
     rule_instance,
     rule_result,
+    rule_set,
     rule_set_result,
     rule_set_result_risk_signal_junction,
     scoped_vault,

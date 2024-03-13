@@ -42,6 +42,7 @@ pub mod risk_signal_group;
 pub mod rule_instance;
 pub mod rule_result;
 pub mod rule_set_result;
+pub mod rule_set_version;
 pub mod scoped_vault;
 pub mod scoped_vault_label;
 pub mod scoped_vault_tag;
