@@ -21,7 +21,7 @@ const useRouterSpy = createUseRouterSpy();
 const id = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
 const entity: Entity = { ...entityFixture, kind: EntityKind.person };
-const entityWithNoInsightEvent: Entity = { ...entity, insightEvent: undefined };
+const entityWithNoInsightEvent: Entity = { ...entity, workflows: [] };
 
 describe('<DeviceInsights />', () => {
   beforeEach(() => {

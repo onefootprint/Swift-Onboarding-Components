@@ -57,15 +57,10 @@ export type Attribute = {
 };
 
 export type Entity<TStatus = EntityStatus> = {
-  attributes: DataIdentifier[];
   data: Attribute[];
-  decryptableAttributes: DataIdentifier[];
-  decryptedAttributes: EntityVault;
   hasOutstandingWorkflowRequest: boolean;
   id: string;
-  insightEvent?: InsightEvent;
   isIdentifiable: boolean;
-  canReonboard: boolean;
   kind: EntityKind;
   label: EntityLabel | null;
   lastActivityAt: string;
@@ -74,6 +69,18 @@ export type Entity<TStatus = EntityStatus> = {
   startTimestamp: string;
   status: TStatus;
   watchlistCheck: WatchlistCheckEventData | null;
+  workflows: EntityWorkflow[];
+
+  // TODO: deprecate these in favor of `data`
+  attributes: DataIdentifier[];
+  decryptableAttributes: DataIdentifier[];
+  decryptedAttributes: EntityVault;
+};
+
+export type EntityWorkflow = {
+  createdAt: string;
+  playbookId: string;
+  insightEvent?: InsightEvent;
 };
 
 export const hasEntityUsLegalStatus = (entity: Entity) =>

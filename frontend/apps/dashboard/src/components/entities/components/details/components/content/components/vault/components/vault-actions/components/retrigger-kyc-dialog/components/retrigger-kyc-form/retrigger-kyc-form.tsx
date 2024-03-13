@@ -35,7 +35,7 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   const entityId = useEntityId();
   const entity = useEntity(entityId);
   const userHasPhone = entity.data?.attributes?.includes(IdDI.phoneNumber);
-  const shouldShowRetriggerKyc = entity.data?.canReonboard;
+  const shouldShowRetriggerKyc = !!entity.data?.workflows.length;
 
   const methods = useForm<RetriggerKYCFormData>();
   const {

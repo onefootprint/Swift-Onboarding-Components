@@ -6,7 +6,7 @@ export const entitiesFixture: Entity[] = [
   {
     id: 'fp_id_wL6XIWe26cRinucZrRK1yn',
     isIdentifiable: true,
-    canReonboard: true,
+    workflows: [],
     kind: EntityKind.person,
     requiresManualReview: false,
     status: EntityStatus.pass,

@@ -16,7 +16,6 @@ describe('getGridTemplateAreas', () => {
     id: '123',
     data: [],
     isIdentifiable: true,
-    canReonboard: true,
     kind: EntityKind.person,
     requiresManualReview: false,
     startTimestamp: '2023-06-27',
@@ -26,6 +25,7 @@ describe('getGridTemplateAreas', () => {
     watchlistCheck: null,
     hasOutstandingWorkflowRequest: false,
     label: null,
+    workflows: [],
   });
 
   it('should generate grid template areas for basic, address and identity', () => {

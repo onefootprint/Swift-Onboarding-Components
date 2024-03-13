@@ -16,7 +16,15 @@ const DeviceInsights = ({ entity }: ContentProps) => {
     keyPrefix: 'pages.entity.device-insights',
   });
   const { error, data, isSuccess } = useCurrentEntityAuthEvents();
-  const onboardingInsightEvent = entity.insightEvent;
+  const mostRecentWfInsight = entity.workflows.sort((wf1, wf2) => {
+    if (wf1.createdAt > wf2.createdAt) {
+      return -1;
+    }
+    if (wf1.createdAt < wf2.createdAt) {
+      return 1;
+    }
+    return 0;
+  })[0]?.insightEvent;
   const biometricCred = data?.find(e => e.kind === LivenessKind.passkey);
   const attestation = biometricCred?.linkedAttestations.at(0);
   const deviceInfo = {
@@ -32,7 +40,7 @@ const DeviceInsights = ({ entity }: ContentProps) => {
         <Content
           deviceInfo={deviceInfo}
           hasBiometrics={!!biometricCred}
-          insight={biometricCred?.insight || onboardingInsightEvent}
+          insight={biometricCred?.insight || mostRecentWfInsight}
         />
       )}
     </Section>
