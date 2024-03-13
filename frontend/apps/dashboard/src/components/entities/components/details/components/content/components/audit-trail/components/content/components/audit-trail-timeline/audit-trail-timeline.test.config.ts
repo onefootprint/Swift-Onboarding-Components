@@ -191,11 +191,12 @@ export const WorkflowTriggeredWithLinkEvent: TimelineEvent = {
     kind: TimelineEventKind.workflowTriggered,
     data: {
       workflow: {
-        kind: TriggerKind.RedoKyc,
+        kind: TriggerKind.Onboard,
       },
       request: {
         id: 'wfr_id',
         isDeactivated: false,
+        playbookId: 'obc_123',
       },
       actor: {
         kind: ActorKind.organization,

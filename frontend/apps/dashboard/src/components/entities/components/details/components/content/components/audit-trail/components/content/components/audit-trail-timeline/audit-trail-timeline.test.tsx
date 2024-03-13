@@ -117,6 +117,11 @@ describe('<AuditTrailTimeline />', () => {
       it('should be able to click link', async () => {
         const { writeTestMockFn } = createClipboardSpy();
         mockRequest({
+          method: 'get',
+          path: '/org/onboarding_configs/obc_123',
+          response: { name: 'My playbook' },
+        });
+        mockRequest({
           method: 'post',
           path: '/entities/fp_bid_VXND11zUVRYQKKUxbUN3KD/token',
           response: { link: 'https://mylink' },
@@ -127,8 +132,11 @@ describe('<AuditTrailTimeline />', () => {
           screen.getByText('Piip Penguin (piip@onefootprint.com)'),
         ).toBeInTheDocument();
         expect(
-          screen.getByText('requested user to revise KYC data'),
+          screen.getByText('requested user to onboard onto'),
         ).toBeInTheDocument();
+        await waitFor(() => {
+          expect(screen.getByText('My playbook')).toBeInTheDocument();
+        });
 
         const body = screen.getByTestId('workflow-triggered-event-body');
         expect(body).toBeInTheDocument();
@@ -163,6 +171,11 @@ describe('<AuditTrailTimeline />', () => {
 
       it('should handle link error', async () => {
         // Simulate an error generating the link
+        mockRequest({
+          method: 'get',
+          path: '/org/onboarding_configs/obc_123',
+          response: { name: 'My playbook' },
+        });
         mockRequest({
           method: 'post',
           path: '/entities/fp_bid_VXND11zUVRYQKKUxbUN3KD/token',

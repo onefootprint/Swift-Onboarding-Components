@@ -24,6 +24,7 @@ export type Trigger =
 
 export enum TriggerKind {
   RedoKyc = 'redo_kyc',
+  Onboard = 'onboard',
   IdDocument = 'id_document',
   ProofOfSsn = 'proof_of_ssn',
   ProofOfAddress = 'proof_of_address',

@@ -115,6 +115,7 @@ export type WorkflowTriggeredEventData = {
   request?: {
     id: string;
     isDeactivated: boolean;
+    playbookId: string;
   };
   actor: Actor;
   note?: string;

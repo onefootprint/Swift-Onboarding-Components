@@ -5,7 +5,7 @@ use crate::{
     State,
 };
 use api_core::{
-    errors::ApiResult,
+    errors::{ApiResult, ValidationError},
     types::{JsonApiResponse, OffsetPaginatedResponse, OffsetPaginationRequest},
 };
 use api_wire_types::OnboardingConfigFilters;
@@ -72,6 +72,7 @@ async fn get_detail(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
+    return ValidationError("flerp").into();
 
     let (obc, actor) = state
         .db_pool

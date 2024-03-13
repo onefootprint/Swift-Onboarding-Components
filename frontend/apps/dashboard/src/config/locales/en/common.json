@@ -1543,7 +1543,8 @@
             "requested-user-to": "requested user to {{action}}",
             "actions": {
               "id_document": "upload ID photo",
-              "redo_kyc": "revise KYC data",
+              "onboard": "onboard onto",
+              "redo_kyc": "reonboard onto",
               "proof_of_ssn": "provide proof of SSN",
               "proof_of_address": "provide proof of address"
             },
@@ -1552,7 +1553,8 @@
             "tooltip": {
               "copied": "Copied!",
               "couldnt-copy": "Couldn't copy..."
-            }
+            },
+            "playbook": "playbook"
           },
           "workflow-started-event": {
             "started-onboarding-onto": "Started onboarding onto",
