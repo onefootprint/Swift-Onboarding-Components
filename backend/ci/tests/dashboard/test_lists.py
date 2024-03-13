@@ -78,7 +78,7 @@ def test_list(sandbox_tenant):
     assert lists[2]["name"] == f"My Super List 1 {nonce}"
 
 
-def test_delete(sandbox_tenant):
+def test_delete_list(sandbox_tenant):
     nonce = _gen_random_str(5)
     list1 = post(
         f"/org/lists",
@@ -201,3 +201,77 @@ def test_list_list_entries(sandbox_tenant):
 
     assert entries[2]["data"] == entry1["data"]
     assert entries[2]["id"] == entry1["id"]
+
+
+def test_delete_list_entries(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    list = post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List {nonce}",
+            alias=f"my_super_list_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    entry1 = post(
+        f"/org/lists/{list['id']}/entries",
+        dict(data="protonmail.com"),
+        *sandbox_tenant.db_auths,
+    )
+    entry2 = post(
+        f"/org/lists/{list['id']}/entries",
+        dict(data="baddiesinc.org"),
+        *sandbox_tenant.db_auths,
+    )
+    entry3 = post(
+        f"/org/lists/{list['id']}/entries",
+        dict(data="bobertotech.org"),
+        *sandbox_tenant.db_auths,
+    )
+
+    entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
+    assert len(entries) == 3
+
+    # delete entry2
+    delete(
+        f"/org/lists/{list['id']}/entries/{entry2['id']}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
+    entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
+    assert len(entries) == 2
+    assert entries[0]["id"] == entry3["id"]
+    assert entries[1]["id"] == entry1["id"]
+
+    # error when try to delete entry2 again
+    delete(
+        f"/org/lists/{list['id']}/entries/{entry2['id']}",
+        None,
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+
+    # delete entry1
+    delete(
+        f"/org/lists/{list['id']}/entries/{entry1['id']}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
+    entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
+    assert len(entries) == 1
+    assert entries[0]["id"] == entry3["id"]
+
+    # delete entry3
+    delete(
+        f"/org/lists/{list['id']}/entries/{entry3['id']}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    assert (
+        len(get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths))
+        == 0
+    )

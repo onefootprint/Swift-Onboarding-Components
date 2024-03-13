@@ -94,6 +94,8 @@ pub enum DbError {
     InvalidProxyConfigId,
     #[error("List already deactivated")]
     ListAlreadyDeactivated,
+    #[error("ListEntry already deactivated")]
+    ListEntryAlreadyDeactivated,
     #[error("{0}")]
     ValidationError(String),
     #[error("{0}")]

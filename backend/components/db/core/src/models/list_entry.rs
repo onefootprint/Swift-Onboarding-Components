@@ -1,9 +1,9 @@
 use super::data_lifetime::DataLifetime;
-use crate::{DbResult, PgConn};
+use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::list_entry;
 use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{DataLifetimeSeqno, DbActor, ListEntryId, ListId, SealedVaultBytes};
+use newtypes::{DataLifetimeSeqno, DbActor, ListEntryId, ListId, Locked, SealedVaultBytes};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = list_entry)]
@@ -73,30 +73,46 @@ impl ListEntry {
             .get_results(conn)?;
         Ok(res)
     }
+
+    #[tracing::instrument("ListEntry::lock", skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, list_entry_id: &ListEntryId) -> DbResult<Locked<Self>> {
+        let result = list_entry::table
+            .filter(list_entry::id.eq(list_entry_id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
+    }
+
+    #[tracing::instrument("List::deactivate", skip_all)]
+    pub fn deactivate(conn: &mut TxnPgConn, list_entry: Locked<Self>) -> DbResult<Self> {
+        if list_entry.deactivated_seqno.is_some() {
+            return Err(DbError::ListEntryAlreadyDeactivated);
+        }
+
+        let now = Utc::now();
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let res = diesel::update(list_entry::table)
+            .filter(list_entry::id.eq(&list_entry.id))
+            .set((
+                list_entry::deactivated_at.eq(now),
+                list_entry::deactivated_seqno.eq(seqno),
+            ))
+            .get_result(conn.conn())?;
+        Ok(res)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{models::list::List, tests::prelude::*};
+    use crate::tests::prelude::*;
     use macros::db_test;
-    use newtypes::{DbActor, ListAlias, ListKind, SealedVaultDataKey};
-    use std::str::FromStr;
+    use newtypes::DbActor;
 
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let list = List::create(
-            conn,
-            &t.id,
-            true,
-            DbActor::Footprint,
-            "Some Real Baddies".to_owned(),
-            ListAlias::from_str("some_real_baddies").unwrap(),
-            ListKind::EmailAddress,
-            SealedVaultDataKey(vec![1]),
-        )
-        .unwrap();
+        let list = tests::fixtures::list::create(conn, &t.id);
 
         let le1 = ListEntry::create(
             conn,
@@ -107,5 +123,26 @@ mod tests {
         .unwrap();
         assert_eq!(DbActor::Footprint, le1.actor);
         assert_eq!(SealedVaultBytes(vec![1, 2, 3]), le1.e_data);
+    }
+
+    #[db_test]
+    fn test_deactivate(conn: &mut TestPgConn) {
+        let t = tests::fixtures::tenant::create(conn);
+        let list = tests::fixtures::list::create(conn, &t.id);
+
+        let le = tests::fixtures::list_entry::create(conn, &list.id);
+        assert_eq!(1, ListEntry::list(conn, &list.id).unwrap().len());
+
+        let le = ListEntry::lock(conn, &le.id).unwrap();
+        let le = ListEntry::deactivate(conn, le).unwrap();
+        assert!(le.deactivated_at.is_some());
+        assert!(le.deactivated_seqno.is_some());
+
+        assert_eq!(0, ListEntry::list(conn, &list.id).unwrap().len());
+        let le = ListEntry::lock(conn, &le.id).unwrap();
+        assert!(matches!(
+            ListEntry::deactivate(conn, le).unwrap_err(),
+            DbError::ListEntryAlreadyDeactivated
+        ));
     }
 }

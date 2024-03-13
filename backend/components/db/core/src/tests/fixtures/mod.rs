@@ -4,6 +4,7 @@ pub mod fingerprint;
 pub mod identity_document;
 pub mod insight_event;
 pub mod list;
+pub mod list_entry;
 pub mod ob_configuration;
 pub mod rule;
 pub mod scoped_vault;
