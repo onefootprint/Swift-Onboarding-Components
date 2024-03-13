@@ -4,7 +4,7 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
-const Hello = () => (
+const RootPage = () => (
   <div>
     <Title>hello</Title>
     <Button>hello</Button>
@@ -15,4 +15,4 @@ const Title = styled.h1`
   color: red;
 `;
 
-export default Hello;
+export default RootPage;

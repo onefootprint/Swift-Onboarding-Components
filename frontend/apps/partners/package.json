@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
+    "i18n:copy": "../../scripts/i18n/i18n-copy.sh -dep idv,ui,request",
+    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -dep idv,ui,request",
+    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep idv,ui,request",
+    "i18n:clean": "rm -rf ./public/locales/",
     "build": "next build",
     "dev": "next dev -p 3012",
-    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
     "lint:ci": "eslint src",
     "lint": "eslint src --fix",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
@@ -20,16 +25,19 @@
     "@onefootprint/icons": "*",
     "@onefootprint/ui": "*",
     "@radix-ui/react-navigation-menu": "1.0.0",
+    "i18next": "^23.10.1",
+    "i18next-resources-to-backend": "^1.2.0",
     "next": "14.1.0",
-    "react-dom": "^18",
-    "react-i18next": "^14.0.0",
+    "next-i18n-router": "^5.3.1",
     "react": "^18",
+    "react-dom": "^18",
+    "react-i18next": "^14.1.0",
     "styled-components": "^6"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react-dom": "^18",
     "@types/react": "^18",
+    "@types/react-dom": "^18",
     "bun-types": "^1",
     "typescript": "^5"
   }
