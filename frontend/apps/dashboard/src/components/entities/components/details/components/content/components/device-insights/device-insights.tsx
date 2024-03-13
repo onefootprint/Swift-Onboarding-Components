@@ -1,4 +1,5 @@
 import { LivenessKind } from '@onefootprint/types';
+import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Error } from 'src/components';
@@ -16,15 +17,8 @@ const DeviceInsights = ({ entity }: ContentProps) => {
     keyPrefix: 'pages.entity.device-insights',
   });
   const { error, data, isSuccess } = useCurrentEntityAuthEvents();
-  const mostRecentWfInsight = entity.workflows.sort((wf1, wf2) => {
-    if (wf1.createdAt > wf2.createdAt) {
-      return -1;
-    }
-    if (wf1.createdAt < wf2.createdAt) {
-      return 1;
-    }
-    return 0;
-  })[0]?.insightEvent;
+  const mostRecentWfInsight =
+    entity.workflows.sort(mostRecentWorkflow)[0]?.insightEvent;
   const biometricCred = data?.find(e => e.kind === LivenessKind.passkey);
   const attestation = biometricCred?.linkedAttestations.at(0);
   const deviceInfo = {

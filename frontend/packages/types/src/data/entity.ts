@@ -114,6 +114,19 @@ export const hasEntityDocuments = (entity: Entity) => {
   );
 };
 
+export const mostRecentWorkflow = (
+  wf1: EntityWorkflow,
+  wf2: EntityWorkflow,
+) => {
+  if (wf1.createdAt > wf2.createdAt) {
+    return -1;
+  }
+  if (wf1.createdAt < wf2.createdAt) {
+    return 1;
+  }
+  return 0;
+};
+
 export const augmentEntityWithOnboardingInfo = (
   entity: Entity<ApiEntityStatus | undefined>,
 ) => ({

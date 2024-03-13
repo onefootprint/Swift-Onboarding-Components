@@ -1,30 +1,40 @@
-import { IdDI, OrgFrequentNoteKind, TriggerKind } from '@onefootprint/types';
+import {
+  IdDI,
+  OnboardingConfigKind,
+  OrgFrequentNoteKind,
+  TriggerKind,
+} from '@onefootprint/types';
+import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
+import type { SelectOption } from '@onefootprint/ui';
 import {
   Checkbox,
   Divider,
   Radio,
+  Select,
+  Shimmer,
   Stack,
   Text,
-  Tooltip,
 } from '@onefootprint/ui';
-import React from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import AnimatedContainer from 'src/components/animated-container';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
+import usePlaybookOptions from 'src/pages/home/hooks/use-playbook-options';
 import styled, { css } from 'styled-components';
 
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-export type RetriggerKYCFormData = {
+export type TriggerFormData = {
   kind: TriggerKind;
   collectSelfie: boolean;
+  playbook?: SelectOption;
   note?: string;
 };
 
 type RetriggerKYCFormProps = {
-  onSubmit: (data: RetriggerKYCFormData) => void;
+  onSubmit: (data: TriggerFormData) => void;
   formId: string;
 };
 
@@ -35,21 +45,43 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   const entityId = useEntityId();
   const entity = useEntity(entityId);
   const userHasPhone = entity.data?.attributes?.includes(IdDI.phoneNumber);
-  const shouldShowRetriggerKyc = !!entity.data?.workflows.length;
+  const { data: playbooksData } = usePlaybookOptions({
+    kinds: [
+      OnboardingConfigKind.document,
+      OnboardingConfigKind.kyb,
+      OnboardingConfigKind.kyc,
+    ],
+  });
 
-  const methods = useForm<RetriggerKYCFormData>();
+  const methods = useForm<TriggerFormData>();
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
+    control,
+    setValue,
   } = methods;
-  const triggerKind = watch('kind');
 
-  const handleBeforeSubmit = (data: RetriggerKYCFormData) => {
-    onSubmit({
-      ...data,
-    });
+  const triggerKind = watch('kind');
+  const selectedPlaybook = watch('playbook');
+
+  useEffect(() => {
+    // Once the playbooks load, select the playbook the user last onboarded onto as the default
+    // selected option
+    const defaultPlaybookId =
+      entity.data?.workflows.sort(mostRecentWorkflow)[0]?.playbookId;
+    const defaultPlaybookValue = playbooksData?.find(
+      p => p.value === defaultPlaybookId,
+    );
+    if (!defaultPlaybookValue || !defaultPlaybookId || selectedPlaybook) {
+      return;
+    }
+    setValue('playbook', defaultPlaybookValue);
+  }, [playbooksData, selectedPlaybook, setValue, entity]);
+
+  const handleBeforeSubmit = (data: TriggerFormData) => {
+    onSubmit(data);
   };
 
   return (
@@ -61,7 +93,6 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
             <Radio
               value={TriggerKind.IdDocument}
               label={t('form.id-photo.title')}
-              hint={t('form.id-photo.description')}
               {...register('kind', { required: true })}
             />
             <AnimatedContainer
@@ -78,30 +109,49 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
           <Radio
             value={TriggerKind.ProofOfSsn}
             label={t('form.proof-of-ssn.title')}
-            hint={t('form.proof-of-ssn.description')}
+            {...register('kind', { required: true })}
+          />
+          <Radio
+            value={TriggerKind.ProofOfAddress}
+            label={t('form.proof-of-address.title')}
             {...register('kind', { required: true })}
           />
           <div>
             <Radio
-              value={TriggerKind.ProofOfAddress}
-              label={t('form.proof-of-address.title')}
-              hint={t('form.proof-of-address.description')}
+              value={TriggerKind.Onboard}
+              label={t('form.onboard.title')}
               {...register('kind', { required: true })}
             />
+            <AnimatedContainer
+              isExpanded={triggerKind === TriggerKind.Onboard}
+              marginLeft={8}
+              marginTop={4}
+            >
+              {playbooksData?.length ? (
+                <Controller
+                  control={control}
+                  name="playbook"
+                  rules={{ required: triggerKind === TriggerKind.Onboard }}
+                  render={select => (
+                    <Select
+                      hasError={!!select.fieldState.error}
+                      hint={
+                        select.fieldState.error &&
+                        t('form.onboard.playbook-required')
+                      }
+                      placeholder={t('form.onboard.select-a-playbook')}
+                      onBlur={select.field.onBlur}
+                      onChange={select.field.onChange}
+                      options={playbooksData}
+                      value={select.field.value}
+                    />
+                  )}
+                />
+              ) : (
+                <Shimmer sx={{ height: '38px', width: '100%' }} />
+              )}
+            </AnimatedContainer>
           </div>
-          <Tooltip
-            disabled={shouldShowRetriggerKyc}
-            position="left"
-            text={t('form.cannot-reonboard-user')}
-          >
-            <Radio
-              value={TriggerKind.RedoKyc}
-              label={t('form.revise-kyc.title')}
-              hint={t('form.revise-kyc.description')}
-              disabled={!shouldShowRetriggerKyc}
-              {...register('kind', { required: true })}
-            />
-          </Tooltip>
           {errors.kind && (
             <Text variant="body-4" color="error">
               {t('form.error')}

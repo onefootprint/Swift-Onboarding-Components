@@ -1284,20 +1284,18 @@
           "form": {
             "id-photo": {
               "title": "Re-upload ID photo",
-              "description": "Data will be updated with this new information.",
               "collect-selfie": "Collect selfie"
             },
             "proof-of-ssn": {
-              "title": "Upload proof of SSN",
-              "description": "Request the user to upload proof of SSN"
+              "title": "Upload proof of SSN"
             },
             "proof-of-address": {
-              "title": "Upload proof of address",
-              "description": "Request the user to upload proof of address"
+              "title": "Upload proof of address"
             },
-            "revise-kyc": {
-              "title": "Re-onboard user",
-              "description": "KYC data can be updated, and a new document can be uploaded (if any)."
+            "onboard": {
+              "title": "Onboard onto playbook",
+              "select-a-playbook": "Select a playbook...",
+              "playbook-required": "Playbook is required"
             },
             "note-for-user": {
               "label": "Note for user (optional)",

@@ -24,7 +24,6 @@ export const entityWithPhoneFixture: Entity = {
 export const entityWithoutPhoneFixture: Entity = {
   id: entityId,
   isIdentifiable: true,
-  workflows: [],
   kind: EntityKind.person,
   data: [],
   attributes: [],
@@ -37,6 +36,12 @@ export const entityWithoutPhoneFixture: Entity = {
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
   label: null,
+  workflows: [
+    {
+      createdAt: '2023-03-27T14:43:47.444716Z',
+      playbookId: 'obc_123',
+    },
+  ],
 };
 
 export const withEntity = (entityFixture: Entity) =>

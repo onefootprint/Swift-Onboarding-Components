@@ -11,8 +11,8 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 import useSendTokenLinkMutation from '../../hooks/use-send-token-link';
 import useRetriggerKYC from '../actions/components/hooks/use-retrigger-kyc';
 import LinkDisplay from './components/link-display/link-display';
-import type { RetriggerKYCFormData } from './components/retrigger-kyc-form';
 import RetriggerKYCForm from './components/retrigger-kyc-form';
+import type { TriggerFormData } from './components/retrigger-kyc-form/retrigger-kyc-form';
 
 export type RetriggerKYCDialogProps = {
   open: boolean;
@@ -45,13 +45,13 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
     onClose();
   };
 
-  const handleGenerateLink = (data: RetriggerKYCFormData) => {
-    const { kind, collectSelfie, note } = data;
+  const handleGenerateLink = (data: TriggerFormData) => {
+    const { kind, collectSelfie, note, playbook } = data;
     let trigger;
     if (kind === TriggerKind.IdDocument) {
       trigger = { kind, data: { collectSelfie } };
-    } else if (kind === TriggerKind.RedoKyc) {
-      trigger = { kind };
+    } else if (kind === TriggerKind.Onboard && playbook) {
+      trigger = { kind, data: { playbookId: playbook.value } };
     } else if (kind === TriggerKind.ProofOfSsn) {
       trigger = { kind };
     } else if (kind === TriggerKind.ProofOfAddress) {

@@ -18,7 +18,12 @@ const Home = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
   const filters = useFilters();
   const metrics = useOrgMetrics();
-  const { data: playbooksData } = usePlaybookOptions();
+  const { data: rawPlaybooksData } = usePlaybookOptions({});
+  const allPlaybooksOption = {
+    label: t('onboarding-metrics.filters.all-playbooks'),
+    value: ALL_PLAYBOOKS_ID,
+  };
+  const playbooksData = [allPlaybooksOption, ...(rawPlaybooksData || [])];
 
   const playbooksFilterValue = playbooksData?.find(
     ({ value }) => value === filters.values.playbook_id,

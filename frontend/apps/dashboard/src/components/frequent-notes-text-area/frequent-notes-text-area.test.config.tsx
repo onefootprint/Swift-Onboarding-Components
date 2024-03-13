@@ -39,6 +39,23 @@ export const withFrequentNotes = (
   });
 };
 
+export const withPlaybooks = () => {
+  mockRequest({
+    method: 'get',
+    path: '/org/onboarding_configs',
+    queryParams: new URLSearchParams({
+      kinds: 'document,kyb,kyc',
+      page_size: '100',
+    }),
+    response: [
+      {
+        name: 'My playbook',
+        id: 'obc_123',
+      },
+    ],
+  });
+};
+
 export const withCreateFrequentNote = (resp: CreateOrgFrequentNoteResponse) => {
   mockRequest({
     method: 'post',

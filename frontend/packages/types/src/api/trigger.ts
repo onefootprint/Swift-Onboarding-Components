@@ -7,7 +7,10 @@ export type TriggerRequest = {
 
 export type Trigger =
   | {
-      kind: TriggerKind.RedoKyc;
+      kind: TriggerKind.Onboard;
+      data: {
+        playbookId: string;
+      };
     }
   | {
       kind: TriggerKind.IdDocument;

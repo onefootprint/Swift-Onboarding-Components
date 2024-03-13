@@ -8,7 +8,10 @@ import {
 } from '@onefootprint/test-utils';
 import { OrgFrequentNoteKind } from '@onefootprint/types';
 import React from 'react';
-import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
+import {
+  withFrequentNotes,
+  withPlaybooks,
+} from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 import { asAdminUser } from 'src/config/tests';
 
 import TestWrapper from '../../../utils/test-wrapper';
@@ -37,6 +40,7 @@ const renderActions = async (isNoPhone?: boolean) =>
 describe('<Actions />', () => {
   beforeEach(() => {
     withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
+    withPlaybooks();
     useRouterSpy({
       asPath: `/entities/${entityId}&mode=sandbox`,
       pathname: '/users/[id]',
