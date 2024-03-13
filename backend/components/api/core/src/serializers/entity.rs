@@ -8,8 +8,10 @@ use crate::{
 use api_wire_types::{EntityAttribute, EntityStatus};
 use chrono::{Duration, Utc};
 use db::models::{
+    insight_event::InsightEvent,
     scoped_vault::{ScopedVault, SerializableEntity},
     vault::Vault,
+    workflow::Workflow,
 };
 use itertools::Itertools;
 use newtypes::{OnboardingStatus, WorkflowKind};
@@ -110,16 +112,23 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
         // If the latest Workflow has an uncompleted review
         let requires_manual_review = !mrs.is_empty();
 
-        let can_reonboard = !wfs.is_empty(); // In reality, probably to make sure it is KYB or KYC wf
+        // Deprecated
+        let can_reonboard = !wfs.is_empty();
+        // Deprecated
+        let insight_event = wfs
+            .iter()
+            .filter_map(|(wf, ie)| ie.as_ref().map(|ie| (wf.created_at, ie.clone())))
+            .max_by_key(|(t, _)| *t)
+            .map(|(_, ie)| ie);
+
         let has_outstanding_doc_wf = wfs.iter().any(|(wf, _)| {
             wf.kind == WorkflowKind::Document && wf.completed_at.is_none() && wf.deactivated_at.is_none()
         });
 
-        let insight_event = wfs
+        let workflows = wfs
             .into_iter()
-            .filter_map(|wf| wf.1.map(|ie| (wf.0, ie)))
-            .max_by_key(|wf| wf.0.created_at)
-            .map(|(_, ie)| ie);
+            .map(api_wire_types::EntityWorkflow::from_db)
+            .collect_vec();
 
         api_wire_types::Entity {
             id: fp_id,
@@ -136,7 +145,10 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             requires_manual_review,
             is_created_via_api,
             data,
+            // TODO inlcude the list of WFs, with obc ID.
+            // are these sorted?
             can_reonboard,
+            workflows,
             // Annoying: for now, document-only workflows are a really custom codepath. So we have
             // to check in another way if there are any outstanding doc-only workflows
             has_outstanding_workflow_request: has_outstanding_doc_wf || wr.is_some(),
@@ -179,6 +191,24 @@ impl DbToApi<ScopedVault> for api_wire_types::SuperAdminEntity {
             id: fp_id,
             is_live,
             tenant_id,
+        }
+    }
+}
+
+impl DbToApi<(Workflow, Option<InsightEvent>)> for api_wire_types::EntityWorkflow {
+    fn from_db((wf, insight_event): (Workflow, Option<InsightEvent>)) -> Self {
+        let Workflow {
+            status,
+            created_at,
+            ob_configuration_id,
+            ..
+        } = wf;
+        let insight_event = insight_event.map(api_wire_types::InsightEvent::from_db);
+        Self {
+            status,
+            created_at,
+            playbook_id: ob_configuration_id,
+            insight_event,
         }
     }
 }

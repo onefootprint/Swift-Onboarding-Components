@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::{InsightEvent, WatchlistCheck};
 use chrono::{DateTime, Utc};
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, ExternalId, FilterFunction, FpId, LabelKind, PiiString, SandboxId,
-    TenantId, VaultKind,
+    DataIdentifier, DataLifetimeSource, ExternalId, FilterFunction, FpId, LabelKind, ObConfigurationId,
+    OnboardingStatus, PiiString, SandboxId, TenantId, VaultKind,
 };
 use paperclip::actix::Apiv2Schema;
 
@@ -25,6 +25,19 @@ pub struct Entity {
     pub start_timestamp: DateTime<Utc>,
     pub watchlist_check: Option<WatchlistCheck>,
     pub ordering_id: i64,
+    /// Metadata on the data that exists in this vault
+    pub data: Vec<EntityAttribute>,
+    // These are a representation of the associated workflows
+    pub status: Option<EntityStatus>,
+    pub requires_manual_review: bool,
+    pub is_created_via_api: bool,
+    /// These are not sorted
+    pub workflows: Vec<EntityWorkflow>,
+    pub has_outstanding_workflow_request: bool,
+    pub external_id: Option<ExternalId>,
+    pub last_activity_at: DateTime<Utc>,
+    pub label: Option<LabelKind>,
+
     /// DEPRECATED.
     /// The list of attributes populated on this vault.
     pub attributes: Vec<DataIdentifier>,
@@ -34,18 +47,10 @@ pub struct Entity {
     /// DEPRECATED.
     /// The list of attributes that are allowed to be decrypted by the authed user
     pub decryptable_attributes: Vec<DataIdentifier>,
-    /// Metadata on the data that exists in this vault
-    pub data: Vec<EntityAttribute>,
-    // These are a representation of the associated workflows
-    pub status: Option<EntityStatus>,
+    /// DEPRECATED
     pub insight_event: Option<InsightEvent>,
-    pub requires_manual_review: bool,
-    pub is_created_via_api: bool,
+    /// DEPRECATED
     pub can_reonboard: bool,
-    pub has_outstanding_workflow_request: bool,
-    pub external_id: Option<ExternalId>,
-    pub last_activity_at: DateTime<Utc>,
-    pub label: Option<LabelKind>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
@@ -57,6 +62,14 @@ pub struct EntityAttribute {
     pub value: Option<PiiString>,
     /// Decrypted transforms of this attribute, if already decrypted
     pub transforms: HashMap<FilterFunction, PiiString>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct EntityWorkflow {
+    pub created_at: DateTime<Utc>,
+    pub playbook_id: Option<ObConfigurationId>,
+    pub status: Option<OnboardingStatus>,
+    pub insight_event: Option<InsightEvent>,
 }
 
 /// Mostly just OnboardingStatus but with other statuses that don't exist in OnboardingStatus

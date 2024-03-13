@@ -9512,6 +9512,7 @@
                         }
                     },
                     "can_reonboard": {
+                        "description": "DEPRECATED",
                         "type": "boolean"
                     },
                     "data": {
@@ -10074,7 +10075,7 @@
                         "type": "string"
                     },
                     "insight_event": {
-                        "description": "Describes a device insight event with locations and IP of the event",
+                        "description": "DEPRECATED",
                         "type": "object",
                         "properties": {
                             "city": {
@@ -10502,6 +10503,82 @@
                             "id",
                             "status"
                         ]
+                    },
+                    "workflows": {
+                        "description": "These are not sorted",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "created_at": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                },
+                                "insight_event": {
+                                    "description": "Describes a device insight event with locations and IP of the event",
+                                    "type": "object",
+                                    "properties": {
+                                        "city": {
+                                            "type": "string"
+                                        },
+                                        "country": {
+                                            "type": "string"
+                                        },
+                                        "ip_address": {
+                                            "type": "string"
+                                        },
+                                        "latitude": {
+                                            "type": "number",
+                                            "format": "double"
+                                        },
+                                        "longitude": {
+                                            "type": "number",
+                                            "format": "double"
+                                        },
+                                        "metro_code": {
+                                            "type": "string"
+                                        },
+                                        "postal_code": {
+                                            "type": "string"
+                                        },
+                                        "region": {
+                                            "type": "string"
+                                        },
+                                        "region_name": {
+                                            "type": "string"
+                                        },
+                                        "time_zone": {
+                                            "type": "string"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "user_agent": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "timestamp"
+                                    ]
+                                },
+                                "playbook_id": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "enum": [
+                                        "pass",
+                                        "fail",
+                                        "incomplete",
+                                        "pending"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "created_at"
+                            ]
+                        }
                     }
                 },
                 "required": [
@@ -10519,7 +10596,8 @@
                     "last_activity_at",
                     "ordering_id",
                     "requires_manual_review",
-                    "start_timestamp"
+                    "start_timestamp",
+                    "workflows"
                 ]
             },
             "EvaluateRuleRequest": {
