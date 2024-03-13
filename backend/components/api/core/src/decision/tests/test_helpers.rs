@@ -56,18 +56,19 @@ pub async fn create_user_and_onboarding(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
-            let ob_config = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
+            let obc = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
+            let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
             // TODO: need to rework our test utils so they use the same codepaths as our application logic to create things like OBC's and such
-            rule_engine::default_rules::save_default_rules_for_obc(conn, &ob_config, None).unwrap();
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, None).unwrap();
 
-            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
+            let (uv, su) = create_user_and_populate_vault(conn, obc.clone(), kyc_fixture_result);
 
             let args = NewOnboardingArgs {
                 existing_wf_id: None,
                 wfr_id: None,
                 force_create: false,
                 sv: &su,
-                obc: &ob_config,
+                obc: &obc,
                 insight_event: Some(CreateInsightEvent { ..Default::default() }),
                 new_biz_args: biz_args,
                 source: WorkflowSource::Hosted,
@@ -100,7 +101,7 @@ pub async fn create_user_and_onboarding(
                 }
             }
 
-            Ok((tenant, wf, uv, su, ob_config, biz_wf))
+            Ok((tenant, wf, uv, su, obc.into_inner(), biz_wf))
         })
         .await
         .unwrap()

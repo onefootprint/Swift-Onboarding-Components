@@ -30,14 +30,9 @@ pub async fn delete(
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
+            let obc = ObConfiguration::lock(conn, &obc.id)?;
 
-            RuleInstance::update(
-                conn,
-                &obc.id,
-                actor.into(),
-                &rule_id,
-                RuleInstanceUpdate::delete(),
-            )
+            RuleInstance::update(conn, &obc, actor.into(), &rule_id, RuleInstanceUpdate::delete())
         })
         .await?;
 

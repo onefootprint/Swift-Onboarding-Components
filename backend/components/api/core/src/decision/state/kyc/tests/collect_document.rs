@@ -14,6 +14,7 @@ use crate::decision::state::{DocCollected, MakeDecision, WorkflowWrapper};
 use crate::{errors::ApiResult, State};
 use db::{
     models::{
+        ob_configuration::ObConfiguration,
         onboarding_decision::OnboardingDecision,
         risk_signal::RiskSignal,
         rule_instance::RuleInstance,
@@ -70,9 +71,10 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
+                let obc = ObConfiguration::lock(conn, &obc_id2).unwrap();
                 RuleInstance::create(
                     conn,
-                    obc_id2,
+                    &obc,
                     DbActor::Footprint,
                     None,
                     RuleExpression(vec![RuleExpressionCondition::RiskSignal {

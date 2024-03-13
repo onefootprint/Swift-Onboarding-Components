@@ -2,7 +2,9 @@ use crate::{
     decision::state::{
         actions::{Authorize, MakeVendorCalls},
         test_utils::{
-            mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_doc_requests, query_rule_set_result, query_timeline_events, setup_data, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, WithQualifier
+            mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_doc_requests,
+            query_rule_set_result, query_timeline_events, setup_data, ExpectedRequiresManualReview,
+            ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, WithQualifier,
         },
         MakeDecision, WorkflowActions, WorkflowWrapper,
     },
@@ -11,7 +13,10 @@ use crate::{
 };
 
 use db::{
-    models::rule_instance::{NewRule, RuleInstance},
+    models::{
+        ob_configuration::ObConfiguration,
+        rule_instance::{NewRule, RuleInstance},
+    },
     test_helpers::assert_have_same_elements,
     tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool, MockFFClient},
 };
@@ -19,7 +24,9 @@ use feature_flag::BoolFlag;
 
 use macros::{test_state, test_state_case};
 use newtypes::{
-    BooleanOperator, CollectedDataOption as CDO, DbActor, DbUserTimelineEvent, DbUserTimelineEventKind, DecisionStatus, DocumentRequestKind, KycState, OnboardingStatus, RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, WorkflowState, FootprintReasonCode, FootprintReasonCode as FRC
+    BooleanOperator, CollectedDataOption as CDO, DbActor, DbUserTimelineEvent, DbUserTimelineEventKind,
+    DecisionStatus, DocumentRequestKind, FootprintReasonCode, FootprintReasonCode as FRC, KycState,
+    OnboardingStatus, RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, WorkflowState,
 };
 
 #[test_state_case(StepUpKind::Identity)]
@@ -55,9 +62,10 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
                 op: BooleanOperator::Equals,
                 value: true,
             }]);
+            let obc = ObConfiguration::lock(conn, &obc_id).unwrap();
             RuleInstance::create(
                 conn,
-                obc_id,
+                &obc,
                 DbActor::Footprint,
                 None,
                 expr,
@@ -129,7 +137,9 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     let (rule_set_result, _) = query_rule_set_result(state, &wf.scoped_vault_id).await.unwrap();
 
     // docreqs have correct rule_set_result_id
-    assert!(doc_requests.iter().all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
+    assert!(doc_requests
+        .iter()
+        .all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
 
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
@@ -153,7 +163,10 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     let DbUserTimelineEvent::StepUp(e) = uts.pop().unwrap().0.event else {
         panic!("Wrong timeline event created");
     };
-    assert_have_same_elements(doc_requests.iter().map(|dr| dr.id.clone()).collect(), e.document_request_ids);
+    assert_have_same_elements(
+        doc_requests.iter().map(|dr| dr.id.clone()).collect(),
+        e.document_request_ids,
+    );
 
     // Now mock document being collected
     // TODO: not quite right since we need to not let wf run to completion if there's still doc requests pending
@@ -190,7 +203,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     let (wf, _, _, obd, _) = query_data(state, &svid, &wfid).await;
     let (rule_set_result, _) = query_rule_set_result(state, &wf.scoped_vault_id).await.unwrap();
     assert!(rule_set_result.action_triggered.is_none());
-    
+
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(obd.unwrap().status, DecisionStatus::Pass)
@@ -260,9 +273,10 @@ async fn test_multi_stage_step_up(state: &mut State) {
                 name: None,
             };
 
+            let obc = ObConfiguration::lock(conn, &obc_id).unwrap();
             RuleInstance::bulk_create(
                 conn,
-                &obc_id,
+                &obc,
                 DbActor::Footprint,
                 vec![kyc_stepup_rule, poa_stepup_rule, poa_review_rule],
             )
@@ -333,9 +347,11 @@ async fn test_multi_stage_step_up(state: &mut State) {
     let identity_dr = &doc_requests[0];
     assert_eq!(identity_dr.kind, DocumentRequestKind::Identity);
     let (rule_set_result, _) = query_rule_set_result(state, &wf.scoped_vault_id).await.unwrap();
-    
+
     // docreqs have correct rule_set_result_id
-    assert!(doc_requests.iter().all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
+    assert!(doc_requests
+        .iter()
+        .all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
 
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
@@ -350,7 +366,10 @@ async fn test_multi_stage_step_up(state: &mut State) {
     let DbUserTimelineEvent::StepUp(e) = uts.pop().unwrap().0.event else {
         panic!("Wrong timeline event created");
     };
-    assert_have_same_elements(doc_requests.iter().map(|dr| dr.id.clone()).collect(), e.document_request_ids);
+    assert_have_same_elements(
+        doc_requests.iter().map(|dr| dr.id.clone()).collect(),
+        e.document_request_ids,
+    );
 
     // Now mock document being collected
     mock_incode_doc_collection(
@@ -394,9 +413,11 @@ async fn test_multi_stage_step_up(state: &mut State) {
         rule_set_result.action_triggered.unwrap(),
         RuleAction::StepUp(proof_of_address_stepup)
     );
-    
+
     // docreqs have correct rule_set_result_id
-    assert!(new_doc_request.iter().all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
+    assert!(new_doc_request
+        .iter()
+        .all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
 
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
@@ -406,7 +427,10 @@ async fn test_multi_stage_step_up(state: &mut State) {
     let DbUserTimelineEvent::StepUp(e) = uts.remove(0).0.event else {
         panic!("Wrong timeline event created");
     };
-    assert_have_same_elements(new_doc_request.iter().map(|dr| dr.id.clone()).collect(), e.document_request_ids);
+    assert_have_same_elements(
+        new_doc_request.iter().map(|dr| dr.id.clone()).collect(),
+        e.document_request_ids,
+    );
 
     // Expect Webhooks
     mock_webhooks(

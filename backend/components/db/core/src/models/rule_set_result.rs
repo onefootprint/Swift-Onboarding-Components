@@ -250,12 +250,14 @@ mod tests {
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
+        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+
         let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
         let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
 
         let rule1 = RuleInstance::create(
             conn,
-            obc.id.clone(),
+            &obc,
             DbActor::Footprint,
             None,
             tests::fixtures::rule::example_rule_expression(),
@@ -265,7 +267,7 @@ mod tests {
 
         let rule2 = RuleInstance::create(
             conn,
-            obc.id.clone(),
+            &obc,
             DbActor::Footprint,
             None,
             tests::fixtures::rule::example_rule_expression(),
@@ -275,7 +277,7 @@ mod tests {
 
         let rule3 = RuleInstance::create(
             conn,
-            obc.id.clone(),
+            &obc,
             DbActor::Footprint,
             None,
             tests::fixtures::rule::example_rule_expression(),

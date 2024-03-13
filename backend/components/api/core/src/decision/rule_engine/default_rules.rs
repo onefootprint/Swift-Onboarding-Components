@@ -11,7 +11,7 @@ use db::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
     BooleanOperator, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant as DID, DbActor,
-    EnhancedAmlOption, FootprintReasonCode as FRC, RuleAction as RA, RuleAction, RuleExpression,
+    EnhancedAmlOption, FootprintReasonCode as FRC, Locked, RuleAction, RuleAction as RA, RuleExpression,
     RuleExpressionCondition,
 };
 
@@ -223,7 +223,7 @@ pub fn default_rules_for_obc(
 #[tracing::instrument(skip_all)]
 pub fn save_default_rules_for_obc(
     conn: &mut TxnPgConn,
-    obc: &ObConfiguration,
+    obc: &Locked<ObConfiguration>,
     ff_client: Option<Arc<dyn FeatureFlagClient>>,
 ) -> ApiResult<()> {
     let existing_rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
@@ -238,7 +238,7 @@ pub fn save_default_rules_for_obc(
     let rules = default_rules_for_obc(obc, ff_client);
     let _ = RuleInstance::bulk_create(
         conn,
-        &obc.id,
+        obc,
         DbActor::Footprint,
         rules
             .into_iter()

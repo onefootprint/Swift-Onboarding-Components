@@ -1,5 +1,5 @@
 use super::{data_lifetime::DataLifetime, ob_configuration::ObConfiguration};
-use crate::{DbResult, TxnPgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::rule_set;
 use diesel::{prelude::*, Insertable, Queryable};
@@ -39,8 +39,12 @@ pub struct NewRuleSetVersion {
 
 impl RuleSetVersion {
     #[tracing::instrument("RuleSetVersion::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, obc: &Locked<ObConfiguration>, actor: DbActor) -> DbResult<Self> {
-        let seqno = DataLifetime::get_next_seqno(conn)?; // may need to pass in depending how we integrate with RuleInstance::update and whatever new bulk update path
+    pub(crate) fn create(
+        conn: &mut TxnPgConn,
+        obc: &Locked<ObConfiguration>,
+        actor: DbActor,
+    ) -> DbResult<(Self, DataLifetimeSeqno, DateTime<Utc>)> {
+        let seqno = DataLifetime::get_next_seqno(conn)?;
         let now = Utc::now();
 
         let current: Option<RuleSetVersion> = diesel::update(rule_set::table)
@@ -64,6 +68,16 @@ impl RuleSetVersion {
         let res = diesel::insert_into(rule_set::table)
             .values(new_rsv)
             .get_result(conn.conn())?;
+        Ok((res, seqno, now))
+    }
+
+    #[tracing::instrument("RuleSetVersion::get", skip_all)]
+    pub fn get_current(conn: &mut PgConn, obc_id: &ObConfigurationId) -> DbResult<Self> {
+        let res = rule_set::table
+            .filter(rule_set::ob_configuration_id.eq(obc_id))
+            .filter(rule_set::deactivated_seqno.is_null())
+            .get_result(conn)?;
+
         Ok(res)
     }
 }
@@ -85,11 +99,11 @@ mod tests {
         );
         let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
-        let rsv1 = RuleSetVersion::create(conn, &obc, DbActor::Footprint).unwrap();
+        let (rsv1, _, _) = RuleSetVersion::create(conn, &obc, DbActor::Footprint).unwrap();
         assert_eq!(1, rsv1.version);
         assert!(rsv1.deactivated_seqno.is_none());
 
-        let rsv2 = RuleSetVersion::create(conn, &obc, DbActor::Footprint).unwrap();
+        let (rsv2, _, _) = RuleSetVersion::create(conn, &obc, DbActor::Footprint).unwrap();
         assert_eq!(2, rsv2.version);
         assert!(rsv2.deactivated_seqno.is_none());
 

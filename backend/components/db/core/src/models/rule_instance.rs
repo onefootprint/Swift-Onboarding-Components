@@ -1,11 +1,11 @@
-use super::data_lifetime::DataLifetime;
+use super::{ob_configuration::ObConfiguration, rule_set_version::RuleSetVersion};
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{ob_configuration, rule_instance};
 use diesel::{prelude::*, Insertable, Queryable};
 use newtypes::{
-    DataLifetimeSeqno, DbActor, ObConfigurationId, RuleAction, RuleExpression, RuleId, RuleInstanceId,
-    TenantId,
+    DataLifetimeSeqno, DbActor, Locked, ObConfigurationId, RuleAction, RuleExpression, RuleId,
+    RuleInstanceId, TenantId,
 };
 use rand::distributions::{Alphanumeric, DistString};
 
@@ -89,20 +89,21 @@ impl RuleInstanceUpdate {
 impl RuleInstance {
     #[tracing::instrument("RuleInstance::create", skip_all)]
     pub fn create(
-        conn: &mut PgConn,
-        ob_configuration_id: ObConfigurationId,
+        conn: &mut TxnPgConn,
+        obc: &Locked<ObConfiguration>,
         actor: DbActor,
         name: Option<String>,
         rule_expression: RuleExpression,
         action: RuleAction,
     ) -> DbResult<Self> {
-        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let (_, seqno, now) = RuleSetVersion::create(conn, obc, actor.clone())?;
+
         let rule_id = format!("rule_{}", Alphanumeric.sample_string(&mut rand::thread_rng(), 22));
         let new_rule = NewRuleInstance {
-            created_at: Utc::now(),
+            created_at: now,
             created_seqno: seqno,
             rule_id: rule_id.into(),
-            ob_configuration_id,
+            ob_configuration_id: obc.id.clone(),
             actor,
             name,
             rule_expression,
@@ -118,21 +119,21 @@ impl RuleInstance {
     #[tracing::instrument("RuleInstance::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
-        ob_configuration_id: &ObConfigurationId,
+        obc: &Locked<ObConfiguration>,
         actor: DbActor,
         new_rules: Vec<NewRule>,
     ) -> DbResult<Vec<Self>> {
-        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let (_, seqno, now) = RuleSetVersion::create(conn, obc, actor.clone())?;
 
         let new_rules: Vec<_> = new_rules
             .into_iter()
             .map(|r| {
                 let rule_id = format!("rule_{}", Alphanumeric.sample_string(&mut rand::thread_rng(), 22));
                 NewRuleInstance {
-                    created_at: Utc::now(), //actually nicer to let each rule have a slightly different created_at so we get consistent ordering when we order by created_at. that being said..  not sure what granularity this clock will have and if subsequent rules here will even have a different created_at :thinkies:
+                    created_at: now,
                     created_seqno: seqno,
                     rule_id: rule_id.into(),
-                    ob_configuration_id: ob_configuration_id.clone(),
+                    ob_configuration_id: obc.id.clone(),
                     actor: actor.clone(),
                     name: r.name,
                     rule_expression: r.rule_expression,
@@ -161,22 +162,22 @@ impl RuleInstance {
     #[tracing::instrument("RuleInstance::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
-        ob_configuration_id: &ObConfigurationId,
+        obc: &Locked<ObConfiguration>,
         actor: DbActor,
         rule_id: &RuleId,
         update: RuleInstanceUpdate,
     ) -> DbResult<Self> {
+        let (_, seqno, now) = RuleSetVersion::create(conn, obc, actor.clone())?;
+
         // If we had 2 concurrent txn's trying to modify the same User-Facing Rule, then the second transaction would hit an error when trying to write the new Rule row below because it would violate the rule_one_active_per_rule_id constraint. Not a big deal and concurrent edits to the same Rule isn't something we need to try hard to gracefully support. If we used a 2 table representation here (ie Rule + RuleVersion), then row locking on Rule while writing new RuleVersion rows would allow both txn's to succeed.
         let current: RuleInstance = rule_instance::table
-            .filter(rule_instance::ob_configuration_id.eq(ob_configuration_id))
+            .filter(rule_instance::ob_configuration_id.eq(&obc.id))
             .filter(rule_instance::rule_id.eq(rule_id))
             .filter(rule_instance::deactivated_at.is_null())
             .for_no_key_update()
             .get_result(conn.conn())?;
 
         // TODO: check if no changes are actually being made and error or no-op in that case? Not a huge deal to just write a new row tho
-        let now = Utc::now();
-        let seqno = DataLifetime::get_current_seqno(conn)?;
         let current: RuleInstance = diesel::update(rule_instance::table)
             .filter(rule_instance::id.eq(current.id))
             .set((
@@ -226,7 +227,7 @@ impl RuleInstance {
             .filter(ob_configuration::id.eq(ob_config_id))
             .filter(rule_instance::deactivated_at.is_null())
             .select(rule_instance::all_columns)
-            .order_by(rule_instance::created_at.asc())
+            .order_by((rule_instance::created_at.asc(), rule_instance::id))
             .get_results(conn)?;
         Ok(res)
     }
@@ -235,10 +236,54 @@ impl RuleInstance {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::prelude::*;
+    use crate::{models::rule_set_version::RuleSetVersion, tests::prelude::*};
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
-    use newtypes::StepUpKind;
+    use newtypes::{BooleanOperator, FootprintReasonCode as FRC, RuleExpressionCondition, StepUpKind};
+
+
+    #[db_test]
+    fn test_bulk_create(conn: &mut TestPgConn) {
+        let t = tests::fixtures::tenant::create(conn);
+        let obc = tests::fixtures::ob_configuration::create_with_opts(
+            conn,
+            &t.id,
+            ObConfigurationOpts { ..Default::default() },
+        );
+        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+
+        let r1 = NewRule {
+            rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
+                field: FRC::DocumentOcrDobDoesNotMatch,
+                op: BooleanOperator::Equals,
+                value: true,
+            }]),
+            action: RuleAction::ManualReview,
+            name: None,
+        };
+        let r2 = NewRule {
+            rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
+                field: FRC::SubjectDeceased,
+                op: BooleanOperator::Equals,
+                value: true,
+            }]),
+            action: RuleAction::Fail,
+            name: None,
+        };
+        let r3 = NewRule {
+            rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
+                field: FRC::DeviceHighRisk,
+                op: BooleanOperator::Equals,
+                value: true,
+            }]),
+            action: RuleAction::Fail,
+            name: None,
+        };
+
+        let rules = RuleInstance::bulk_create(conn, &obc, DbActor::Footprint, vec![r1, r2, r3]).unwrap();
+        assert_eq!(3, rules.len());
+        assert_eq!(1, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
+    }
 
     #[db_test]
     fn test_update(conn: &mut TestPgConn) {
@@ -248,20 +293,22 @@ mod tests {
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
+        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
         let rule = RuleInstance::create(
             conn,
-            obc.id.clone(),
+            &obc,
             DbActor::Footprint,
             Some("name1".to_owned()),
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
         )
         .unwrap();
+        assert_eq!(1, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
 
         let updated_rule = RuleInstance::update(
             conn,
-            &obc.id,
+            &obc,
             DbActor::Footprint,
             &rule.rule_id,
             RuleInstanceUpdate {
@@ -288,16 +335,20 @@ mod tests {
             updated_rule.id,
             RuleInstance::get(conn, &rule.rule_id).unwrap().id
         );
+
+        // new RSV has been written for this update
+        assert_eq!(2, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
     }
 
     #[db_test]
     pub fn test_rule_action_is_backwards_compatible(conn: &mut TestPgConn) {
         let t = fixtures::tenant::create(conn);
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
         let rule1 = RuleInstance::create(
             conn,
-            obc.id.clone(),
+            &obc,
             DbActor::Footprint,
             Some("name1".to_owned()),
             tests::fixtures::rule::example_rule_expression(),
@@ -310,7 +361,7 @@ mod tests {
 
         let rule2 = RuleInstance::create(
             conn,
-            obc.id.clone(),
+            &obc,
             DbActor::Footprint,
             Some("name1".to_owned()),
             tests::fixtures::rule::example_rule_expression(),

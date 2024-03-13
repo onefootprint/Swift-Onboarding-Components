@@ -45,10 +45,11 @@ pub async fn update_rule(
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
+            let obc = ObConfiguration::lock(conn, &obc.id)?;
 
             RuleInstance::update(
                 conn,
-                &obc.id,
+                &obc,
                 actor.into(),
                 &rule_id,
                 RuleInstanceUpdate::update(name, rule_expression, is_shadow),

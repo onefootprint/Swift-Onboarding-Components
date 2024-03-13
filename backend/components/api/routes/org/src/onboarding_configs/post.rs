@@ -527,13 +527,9 @@ pub async fn post(
                 skip_confirm.unwrap_or(false),
                 document_types_and_countries,
             )?;
-
-            match rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client)) {
-                Ok(_) => {}
-                Err(err) => tracing::error!(?err, "Error saving default rules for Playbook"),
-            }
-
-            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
+            let obc = ObConfiguration::lock(conn, &obc.id)?;
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))?;
+            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
             Ok((obc, actor))
         })
         .await?;

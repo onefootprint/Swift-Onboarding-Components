@@ -129,7 +129,7 @@ pub fn evaluate_rules(
                 })
                 .collect_vec(),
             risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
-            allowed_actions: rule_eval_config.allowed_rule_actions.clone()
+            allowed_actions: rule_eval_config.allowed_rule_actions.clone(),
         },
     )?;
 
@@ -214,9 +214,11 @@ mod tests {
     ) -> Option<RuleAction> {
         // Setup
         let (sv, obc) = make_user(conn);
+        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+
         let rules = rules
             .into_iter()
-            .map(|r| RuleInstance::create(conn, obc.id.clone(), DbActor::Footprint, None, r.0, r.1).unwrap())
+            .map(|r| RuleInstance::create(conn, &obc, DbActor::Footprint, None, r.0, r.1).unwrap())
             .collect_vec();
         let risk_signals = make_risk_signals(conn, &sv.id, risk_signals);
 
