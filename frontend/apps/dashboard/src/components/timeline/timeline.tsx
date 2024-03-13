@@ -45,7 +45,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
 
   return (
     <>
-      <Stack direction="column" overflow="hidden">
+      <Stack direction="column">
         {items.map((item: TimelineItem, i: number) => {
           const key = `${getKeyForItemTime(item.time)}-${i}`;
           const { iconComponent, headerComponent, bodyComponent } = item;
