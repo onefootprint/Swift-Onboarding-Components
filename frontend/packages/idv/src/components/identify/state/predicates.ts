@@ -2,6 +2,7 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { ChallengeKind as Kind } from '@onefootprint/types';
 import { AuthMethodKind } from '@onefootprint/types/src/data';
 
+import type { DeviceInfo } from '../../../hooks/ui/use-device-info/use-device-info';
 import type {
   IdentifyMachineContext,
   IdentifyResult,
@@ -16,11 +17,17 @@ const isUpdateLoginMethodsVariant = (
 ): v is IdentifyVariant.updateLoginMethods =>
   v === IdentifyVariant.updateLoginMethods;
 
-const hasMultipleChallenges = (user?: User): boolean =>
-  !!user && user?.availableChallengeKinds?.length > 1;
-
-const hasPasskeyChallenge = (user?: User): boolean =>
-  !!user && user?.availableChallengeKinds?.includes(Kind.biometric);
+const hasMultipleChallenges = (device: DeviceInfo, user?: User): boolean => {
+  if (!user) return false;
+  let { availableChallengeKinds } = user;
+  // Check if device supports biometric challenge
+  if (!device.hasSupportForWebauthn) {
+    availableChallengeKinds = availableChallengeKinds.filter(
+      kind => kind !== Kind.biometric,
+    );
+  }
+  return availableChallengeKinds.length > 1;
+};
 
 export const hasBootstrapTruthyValue = (c: IdentifyMachineContext): boolean =>
   Object.values(c.bootstrapData).some(Boolean);
@@ -29,12 +36,11 @@ export const isNoPhoneFlow = (c: IdentifyMachineContext): boolean =>
   Boolean(c.config?.isNoPhoneFlow);
 
 export const shouldShowChallengeSelector = (
-  c: IdentifyMachineContext,
+  context: IdentifyMachineContext,
   user: User | undefined,
 ): boolean =>
-  isUpdateLoginMethodsVariant(c.variant) ||
-  hasMultipleChallenges(user) ||
-  hasPasskeyChallenge(user);
+  isUpdateLoginMethodsVariant(context.variant) ||
+  hasMultipleChallenges(context.device, user);
 
 export const isUserFoundWithSingleChallenge = (
   user: User,

@@ -11,17 +11,17 @@ import { Logger } from '../../utils';
 
 const Init = () => {
   const [state, send] = useIdvMachine();
-  const { obConfigAuth, authToken } = state.context;
+  const { obConfigAuth, authToken, device } = state.context;
   const observeCollector = useObserveCollector();
 
-  useDeviceInfo((device: DeviceInfo) => {
+  useDeviceInfo((newDevice: DeviceInfo) => {
     observeCollector.setAppContext({
-      device,
+      device: newDevice,
     });
     send({
       type: 'initContextUpdated',
       payload: {
-        device,
+        device: device ?? newDevice,
       },
     });
   });

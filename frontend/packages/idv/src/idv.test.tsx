@@ -71,6 +71,13 @@ describe('<Idv />', () => {
     withCheckSession();
   });
 
+  const testDeviceWithPasskey = {
+    osName: 'android',
+    browser: 'browser',
+    type: 'mobile',
+    hasSupportForWebauthn: true,
+  };
+
   const renderIdv = ({
     obConfigAuth = undefined,
     isTransfer = false,
@@ -78,6 +85,7 @@ describe('<Idv />', () => {
     onComplete = jest.fn(),
     onClose = jest.fn(),
     authToken,
+    device,
   }: Partial<IdvProps>) =>
     render(
       <React.StrictMode>
@@ -93,6 +101,7 @@ describe('<Idv />', () => {
                     bootstrapData={bootstrapData}
                     onComplete={onComplete}
                     onClose={onClose}
+                    device={device}
                   />
                 </Layout>
               </ToastProvider>
@@ -190,7 +199,10 @@ describe('<Idv />', () => {
       withLoginChallenge(ChallengeKind.sms);
       withIdentifyVerify();
 
-      renderIdv({ authToken: 'token' });
+      renderIdv({
+        authToken: 'token',
+        device: testDeviceWithPasskey,
+      });
 
       await waitFor(() => {
         expect(

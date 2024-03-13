@@ -1,7 +1,11 @@
+import { ChallengeKind } from '@onefootprint/types';
+
 import {
   requiresPhoneVerification,
   shouldShowChallengeSelector,
 } from './predicates';
+import type { IdentifyMachineContext, IdentifyResult } from './types';
+import { IdentifyVariant } from './types';
 
 describe('requiresPhoneVerification', () => {
   type Args = Parameters<typeof requiresPhoneVerification>;
@@ -18,12 +22,10 @@ describe('requiresPhoneVerification', () => {
     { config: required, user: phoneIn, method: 'phone', x: false },
     { config: required, user: phoneIn, method: 'email', x: false },
     { config: required, user: phoneIn, method: 'passkey', x: false },
-
     { config: required, user: phoneOut, method: undefined, x: true },
     { config: required, user: phoneOut, method: 'phone', x: false },
     { config: required, user: phoneOut, method: 'email', x: true },
     { config: required, user: phoneOut, method: 'passkey', x: true },
-
     {
       config: { requiredAuthMethods: undefined },
       user: phoneOut,
@@ -42,19 +44,112 @@ describe('requiresPhoneVerification', () => {
 });
 
 describe('shouldShowChallengeSelector', () => {
-  type Args = Parameters<typeof shouldShowChallengeSelector>;
-  type Ctx = Args[0];
-  type User = Args[1];
+  const contexts: {
+    context: Partial<IdentifyMachineContext>;
+    user: Partial<IdentifyResult['user']>;
+    x: boolean;
+  }[] = [
+    {
+      context: {
+        device: {
+          type: 'mobile',
+          hasSupportForWebauthn: false,
+          osName: 'android',
+          browser: 'browser',
+        },
+      },
+      user: { availableChallengeKinds: [] },
+      x: false,
+    },
+    {
+      context: {
+        device: {
+          type: 'mobile',
+          hasSupportForWebauthn: false,
+          osName: 'android',
+          browser: 'browser',
+        },
+      },
+      user: {
+        availableChallengeKinds: [ChallengeKind.biometric, ChallengeKind.sms],
+      },
+      x: false,
+    },
+    {
+      context: {
+        device: {
+          type: 'mobile',
+          hasSupportForWebauthn: false,
+          osName: 'android',
+          browser: 'browser',
+        },
+      },
+      user: {
+        availableChallengeKinds: [
+          ChallengeKind.biometric,
+          ChallengeKind.sms,
+          ChallengeKind.email,
+        ],
+      },
+      x: true,
+    },
+    {
+      context: {
+        device: {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+          osName: 'android',
+          browser: 'browser',
+        },
+      },
+      user: {
+        availableChallengeKinds: [ChallengeKind.biometric, ChallengeKind.sms],
+      },
+      x: true,
+    },
+    {
+      context: {
+        device: {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+          osName: 'android',
+          browser: 'browser',
+        },
+      },
+      user: {
+        availableChallengeKinds: [
+          ChallengeKind.biometric,
+          ChallengeKind.sms,
+          ChallengeKind.email,
+        ],
+      },
+      x: true,
+    },
+    {
+      context: {
+        device: {
+          type: 'mobile',
+          hasSupportForWebauthn: false,
+          osName: 'android',
+          browser: 'browser',
+        },
+      },
+      user: { availableChallengeKinds: [ChallengeKind.biometric] },
+      x: false,
+    },
+    {
+      context: { variant: IdentifyVariant.updateLoginMethods },
+      user: {},
+      x: true,
+    },
+  ];
 
-  it.each([
-    { c: {}, user: { availableChallengeKinds: [] }, x: false },
-    { c: {}, user: { availableChallengeKinds: ['one'] }, x: false },
-    { c: {}, user: { availableChallengeKinds: ['one', 'two'] }, x: true },
-    { c: {}, user: { availableChallengeKinds: ['biometric'] }, x: true },
-    { c: { variant: 'updateLoginMethods' }, user: {}, x: true },
-  ])('case %#', ({ c, user, x }) => {
+  it.each(contexts)('case %#', ({ context, user, x }) => {
     expect(
-      shouldShowChallengeSelector(c as Ctx, user as unknown as User),
+      shouldShowChallengeSelector(
+        context as IdentifyMachineContext,
+        user as unknown as IdentifyResult['user'],
+      ),
     ).toEqual(x);
   });
 });
