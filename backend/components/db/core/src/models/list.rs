@@ -1,9 +1,11 @@
 use super::{data_lifetime::DataLifetime, ob_configuration::IsLive};
-use crate::{DbResult, PgConn};
+use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::list;
 use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{DataLifetimeSeqno, DbActor, ListAlias, ListId, ListKind, SealedVaultDataKey, TenantId};
+use newtypes::{
+    DataLifetimeSeqno, DbActor, ListAlias, ListId, ListKind, Locked, SealedVaultDataKey, TenantId,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = list)]
@@ -113,6 +115,38 @@ impl List {
             .get_results(conn)?;
         Ok(res)
     }
+
+    #[tracing::instrument("List::lock", skip_all)]
+    pub fn lock(
+        conn: &mut TxnPgConn,
+        tenant_id: &TenantId,
+        is_live: bool,
+        list_id: &ListId,
+    ) -> DbResult<Locked<Self>> {
+        let result = list::table
+            .filter(list::tenant_id.eq(tenant_id))
+            .filter(list::is_live.eq(is_live))
+            .filter(list::id.eq(list_id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
+    }
+
+    #[tracing::instrument("List::deactivate", skip_all)]
+    pub fn deactivate(conn: &mut TxnPgConn, list: Locked<Self>) -> DbResult<Self> {
+        if list.deactivated_seqno.is_some() {
+            return Err(DbError::ListAlreadyDeactivated);
+        }
+
+        let now = Utc::now();
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let res = diesel::update(list::table)
+            .filter(list::id.eq(&list.id))
+            .filter(list::deactivated_seqno.is_null())
+            .set((list::deactivated_at.eq(now), list::deactivated_seqno.eq(seqno)))
+            .get_result(conn.conn())?;
+        Ok(res)
+    }
 }
 
 #[cfg(test)]
@@ -144,5 +178,24 @@ mod tests {
         assert_eq!(ListAlias::from_str("some_real_baddies").unwrap(), list.alias);
         assert_eq!(ListKind::EmailAddress, list.kind);
         assert_eq!(SealedVaultDataKey(vec![1, 2, 3, 2, 1]), list.e_data_key);
+    }
+
+    #[db_test]
+    fn test_deactivate(conn: &mut TestPgConn) {
+        let t = tests::fixtures::tenant::create(conn);
+        let list = tests::fixtures::list::create(conn, &t.id);
+        assert_eq!(1, List::list(conn, &t.id, true).unwrap().len());
+
+        let list = List::lock(conn, &t.id, true, &list.id).unwrap();
+        let list = List::deactivate(conn, list).unwrap();
+        assert!(list.deactivated_at.is_some());
+        assert!(list.deactivated_seqno.is_some());
+
+        assert_eq!(0, List::list(conn, &t.id, true).unwrap().len());
+        let list = List::lock(conn, &t.id, true, &list.id).unwrap();
+        assert!(matches!(
+            List::deactivate(conn, list).unwrap_err(),
+            DbError::ListAlreadyDeactivated
+        ));
     }
 }

@@ -92,6 +92,8 @@ pub enum DbError {
     InvalidTenantScope(TenantRoleKindDiscriminant, TenantScopeDiscriminants),
     #[error("Proxy config with provided ID does not exist")]
     InvalidProxyConfigId,
+    #[error("List already deactivated")]
+    ListAlreadyDeactivated,
     #[error("{0}")]
     ValidationError(String),
     #[error("{0}")]

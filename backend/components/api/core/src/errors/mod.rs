@@ -279,6 +279,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::InsufficientTenantScopes => StatusCode::BAD_REQUEST,
         DbError::NonUniqueTenantScopes => StatusCode::BAD_REQUEST,
         DbError::InvalidProxyConfigId => StatusCode::BAD_REQUEST,
+        DbError::ListAlreadyDeactivated => StatusCode::BAD_REQUEST,
         DbError::TenantRolebindingAlreadyExists => StatusCode::BAD_REQUEST,
         DbError::ValidationError(_) => StatusCode::BAD_REQUEST,
         DbError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
