@@ -19,7 +19,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct FieldsParams {
-    /// Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`
+    /// Optionally, a comma-separated list of fields whose existence to check. For example, `id.first_name,id.ssn4,custom.bank_account`
     #[openapi(example = "id.last_name, custom.ach_account, id.dob, id.ssn9")]
     fields: Option<Csv<DataIdentifier>>,
 }
@@ -33,17 +33,17 @@ flat_api_object_map_type!(
 #[route_alias(
     actix::get(
         "/users/{fp_id}/vault",
-        description = "Given a list of fields, checks for their existence in the user vault without decrypting them.",
+        description = "Returns the list of fields present on the vault.",
         tags(Users, Vault, PublicApi)
     ),
     actix::get(
         "/businesses/{fp_bid}/vault",
-        description = "Given a list of fields, checks for their existence in the business vault without decrypting them.",
+        description = "Returns the list of fields present on the vault.",
         tags(Businesses, Vault, PublicApi)
     )
 )]
 #[api_v2_operation(
-    description = "Works for either person or business entities. Given a list of fields, checks for their existence in the vault without decrypting them.",
+    description = "Works for either person or business entities. Returns the list of fields present on the vault.",
     tags(Vault, Entities, Private)
 )]
 #[actix::get("/entities/{fp_id}/vault")]

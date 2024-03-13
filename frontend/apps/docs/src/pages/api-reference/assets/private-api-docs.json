@@ -1811,7 +1811,7 @@
                     "Entities",
                     "Private"
                 ],
-                "description": "Works for either person or business entities. Given a list of fields, checks for their existence in the vault without decrypting them.",
+                "description": "Works for either person or business entities. Returns the list of fields present on the vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1825,7 +1825,7 @@
                     {
                         "in": "query",
                         "name": "fields",
-                        "description": "Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
+                        "description": "Optionally, a comma-separated list of fields whose existence to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
                         "schema": {
                             "type": "string"
                         },
@@ -4093,6 +4093,44 @@
                 ]
             }
         },
+        "/org/lists/{list_id}": {
+            "delete": {
+                "tags": [
+                    "Organization",
+                    "Private",
+                    "Lists"
+                ],
+                "description": "Delete the List",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "list_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/lists/{list_id}/entries": {
             "get": {
                 "tags": [
@@ -4168,6 +4206,53 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ListEntry"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/lists/{list_id}/entries/{list_entry_id}": {
+            "delete": {
+                "tags": [
+                    "Organization",
+                    "Private",
+                    "Lists"
+                ],
+                "description": "Delete the List",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "list_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "list_entry_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
                                 }
                             }
                         }
@@ -9519,10 +9604,6 @@
                             ]
                         }
                     },
-                    "can_reonboard": {
-                        "description": "DEPRECATED",
-                        "type": "boolean"
-                    },
                     "data": {
                         "description": "Metadata on the data that exists in this vault",
                         "type": "array",
@@ -10082,54 +10163,6 @@
                     "id": {
                         "type": "string"
                     },
-                    "insight_event": {
-                        "description": "DEPRECATED",
-                        "type": "object",
-                        "properties": {
-                            "city": {
-                                "type": "string"
-                            },
-                            "country": {
-                                "type": "string"
-                            },
-                            "ip_address": {
-                                "type": "string"
-                            },
-                            "latitude": {
-                                "type": "number",
-                                "format": "double"
-                            },
-                            "longitude": {
-                                "type": "number",
-                                "format": "double"
-                            },
-                            "metro_code": {
-                                "type": "string"
-                            },
-                            "postal_code": {
-                                "type": "string"
-                            },
-                            "region": {
-                                "type": "string"
-                            },
-                            "region_name": {
-                                "type": "string"
-                            },
-                            "time_zone": {
-                                "type": "string"
-                            },
-                            "timestamp": {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            "user_agent": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "timestamp"
-                        ]
-                    },
                     "is_created_via_api": {
                         "type": "boolean"
                     },
@@ -10591,7 +10624,6 @@
                 },
                 "required": [
                     "attributes",
-                    "can_reonboard",
                     "data",
                     "decryptable_attributes",
                     "decrypted_attributes",

@@ -82,7 +82,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Given a list of fields, checks for their existence in the business vault without decrypting them.",
+                "description": "Returns the list of fields present on the vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -96,7 +96,7 @@
                     {
                         "in": "query",
                         "name": "fields",
-                        "description": "Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
+                        "description": "Optionally, a comma-separated list of fields whose existence to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
                         "schema": {
                             "type": "string"
                         },
@@ -993,7 +993,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Given a list of fields, checks for their existence in the user vault without decrypting them.",
+                "description": "Returns the list of fields present on the vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1007,7 +1007,7 @@
                     {
                         "in": "query",
                         "name": "fields",
-                        "description": "Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
+                        "description": "Optionally, a comma-separated list of fields whose existence to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
                         "schema": {
                             "type": "string"
                         },
