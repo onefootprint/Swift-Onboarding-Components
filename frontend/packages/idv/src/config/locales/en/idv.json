@@ -994,7 +994,9 @@
           "cta": "Choose file to upload",
           "cta-multiple": "Upload another file",
           "disclaimer": "In accordance with applicable FINRA rules, you will need to obtain a letter written and signed by a compliance officer on company letterhead explicitly granting permission to carry the account and explicitly stating whether or not the firm requires access to duplicate account statements and/or trade confirmations. If the firm would like access to your duplicate account statements and/or trade confirmations, the letter must include the applicant's full name and a statement that the account holder is responsible for sharing statements with the firm.",
-          "required": "A compliance letter is required"
+          "required": "A compliance letter is required",
+          "hint": "Max size: 5 MB",
+          "size-limit-error": "File size exceeds 5 MB"
         }
       }
     }
