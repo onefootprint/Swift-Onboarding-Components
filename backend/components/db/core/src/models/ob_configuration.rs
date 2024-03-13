@@ -423,6 +423,7 @@ pub struct ObConfigurationQuery {
     pub is_live: bool,
     pub status: Option<ApiKeyStatus>,
     pub search: Option<String>,
+    pub kinds: Option<Vec<ObConfigurationKind>>,
 }
 
 pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>);
@@ -438,6 +439,9 @@ impl ObConfiguration {
         }
         if let Some(search) = filters.search.as_ref() {
             query = query.filter(ob_configuration::name.ilike(format!("%{}%", search)));
+        }
+        if let Some(kinds) = filters.kinds.as_ref() {
+            query = query.filter(ob_configuration::kind.eq_any(kinds));
         }
         query
     }

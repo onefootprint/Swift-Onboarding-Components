@@ -1,5 +1,6 @@
 use crate::{
-    api_schema_helper::string_api_data_type_alias, AuditEventName, DataIdentifier, TenantRoleId, TenantScope,
+    api_schema_helper::string_api_data_type_alias, AuditEventName, DataIdentifier, ObConfigurationKind,
+    TenantRoleId, TenantScope,
 };
 use derive_more::Deref;
 
@@ -36,6 +37,7 @@ string_api_data_type_alias!(Csv<DataIdentifier>);
 string_api_data_type_alias!(Csv<TenantRoleId>);
 string_api_data_type_alias!(Csv<TenantScope>);
 string_api_data_type_alias!(Csv<AuditEventName>);
+string_api_data_type_alias!(Csv<ObConfigurationKind>);
 
 /// serde_urlencoded, used by actix's web::Query, isn't very good at deserializing Vecs:
 /// https://github.com/nox/serde_urlencoded/issues/6

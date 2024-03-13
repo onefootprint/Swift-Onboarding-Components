@@ -4526,6 +4526,14 @@
                 "parameters": [
                     {
                         "in": "query",
+                        "name": "kinds",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
                         "name": "search",
                         "schema": {
                             "type": "string"

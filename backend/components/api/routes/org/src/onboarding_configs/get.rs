@@ -32,13 +32,19 @@ async fn get_list(
     let page = pagination.page;
     let page_size = pagination.page_size(&state);
     let pagination = OffsetPagination::new(page, page_size);
-    let OnboardingConfigFilters { status, search } = filters.into_inner();
+    let OnboardingConfigFilters {
+        status,
+        search,
+        kinds,
+    } = filters.into_inner();
+    let kinds = kinds.map(|k| k.into_iter().collect());
 
     let query = ObConfigurationQuery {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
         status,
         search,
+        kinds,
     };
     let (results, next_page, count) = state
         .db_pool
