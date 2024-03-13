@@ -2,7 +2,7 @@ use crate::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     errors::{tenant::TenantError, ApiResult, ValidationError},
     telemetry::RootSpan,
-    types::ResponseData,
+    types::{JsonApiResponse, ResponseData},
     utils::{
         actix::OptionalJson,
         db2api::DbToApi,
@@ -38,7 +38,7 @@ pub async fn create_non_portable_vault(
     external_id: ExternalId,
     vault_kind: VaultKind,
     root_span: RootSpan,
-) -> ApiResult<ResponseData<api_wire_types::LiteUser>> {
+) -> JsonApiResponse<api_wire_types::LiteUser> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
     let insight = CreateInsightEvent::from(insight);
@@ -147,8 +147,6 @@ pub async fn create_non_portable_vault(
         .await?;
     root_span.record("fp_id", scoped_user.fp_id.to_string());
 
-    Ok(ResponseData::ok(api_wire_types::LiteUser::from_db((
-        scoped_user,
-        vault,
-    ))))
+    let response = api_wire_types::LiteUser::from_db((scoped_user, vault));
+    ResponseData::ok(response).json()
 }

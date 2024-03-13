@@ -40,9 +40,7 @@ pub enum OnboardingError {
     MissingBoOnboarding,
     #[error("Expected 1 or more BO's to have an OnboardingDecision but it was not found: {0}")]
     MissingBoOnboardingDecision(Csv<WorkflowId>),
-    #[error(
-        "Need to provide onboarding public key or identified auth in order to initiate an email challenge"
-    )]
+    #[error("Tenant not present when initiating an email challenge")]
     NoTenantForEmailChallenge,
     #[error("Not expecting a selfie image to be uploaded")]
     NotExpectingSelfie,

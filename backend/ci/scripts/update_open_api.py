@@ -15,6 +15,13 @@ PUBLIC_TAG_VALUES = ["PublicApi", "Preview"]
 # the API isn't usable
 VISIBLE_API_SECURITY = ["Secret API Key", "Client Token"]
 
+ALLOWED_NO_RESPONSE_APIS = [
+    ("get", "/users/vault/decrypt/{token}"),
+    ("post", "/vault_proxy/jit"),
+    ("post", "/vault_proxy/{id}"),
+    ("post", "/vault_proxy/reflect"),
+]
+
 
 class Endpoint:
     """
@@ -77,6 +84,14 @@ class Endpoint:
         if self.identifying_tag == "Deprecated":
             # Add a disclaimer tag to all Deprecated APIs
             description = f"THIS API IS DEPRECATED.\n\n{description}"
+
+        if (
+            self.identifying_tag in {"Preview", "PublicApi"}
+            and (self.method, self.url) not in ALLOWED_NO_RESPONSE_APIS
+        ):
+            # Make sure there's a documented response for public-facing APIs
+            responses = self._path_info.get("responses", {})
+            assert responses, f"{self.method} {self.url} does not have a response body"
 
         # Update the security to filter out Firm Employee Token
         security = [

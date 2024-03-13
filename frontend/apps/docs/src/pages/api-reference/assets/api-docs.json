@@ -56,7 +56,18 @@
                         }
                     }
                 },
-                "responses": {},
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LiteUser"
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "Secret API Key": []
@@ -427,7 +438,18 @@
                         }
                     }
                 },
-                "responses": {},
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LiteUser"
+                                }
+                            }
+                        }
+                    }
+                },
                 "security": [
                     {
                         "Secret API Key": []
@@ -4017,6 +4039,21 @@
                 "required": [
                     "<key>",
                     "<value>"
+                ]
+            },
+            "LiteUser": {
+                "type": "object",
+                "properties": {
+                    "external_id": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "example": "fp_id_7p793EF07xKXHqAeg5VGPj",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
                 ]
             },
             "ObConfigSessionToken": {

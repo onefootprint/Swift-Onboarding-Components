@@ -1,9 +1,7 @@
-use crate::{
-    auth::tenant::SecretTenantAuthContext, errors::ApiResult, types::ResponseData,
-    utils::headers::InsightHeaders, State,
-};
+use crate::{auth::tenant::SecretTenantAuthContext, utils::headers::InsightHeaders, State};
 use api_core::{
     telemetry::RootSpan,
+    types::JsonApiResponse,
     utils::{
         actix::OptionalJson,
         headers::{ExternalId, IdempotencyId, SandboxId},
@@ -28,7 +26,7 @@ pub async fn post(
     sandbox_id: SandboxId,
     external_id: ExternalId,
     root_span: RootSpan,
-) -> ApiResult<ResponseData<api_wire_types::LiteUser>> {
+) -> JsonApiResponse<api_wire_types::LiteUser> {
     let result = create_non_portable_vault(
         state,
         request,
