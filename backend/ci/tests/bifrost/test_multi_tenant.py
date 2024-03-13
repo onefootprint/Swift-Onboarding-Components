@@ -1,12 +1,13 @@
 from typing import NamedTuple
 import pytest
+from tests.identify_client import IdentifyClient
 from tests.utils import (
     get,
     patch,
     post,
 )
 from tests.bifrost_client import BifrostClient
-from tests.headers import FpAuth
+from tests.headers import FpAuth, SandboxId
 
 
 class DualOnboardedUser(NamedTuple):
@@ -195,3 +196,31 @@ def test_cant_decrypt_unrequested_portable(dual_onboarded_user, foo_sandbox_tena
     data = dict(fields=["id.ssn4"], reason="Hello")
     body = post(f"entities/{fp_id}/vault/decrypt", data, *foo_sandbox_tenant.db_auths)
     assert body["id.ssn4"] == dual_onboarded_user.user.client.decrypted_data["id.ssn4"]
+
+
+def test_one_click_with_kba(sandbox_tenant, foo_sandbox_tenant):
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    sandbox_user = bifrost.run()
+
+    # Then onboard them onto foo_sandbox_tenant
+    obc = foo_sandbox_tenant.default_ob_config
+    sandbox_id = bifrost.sandbox_id
+    phone_number = bifrost.data["id.phone_number"]
+    email = bifrost.data["id.email"]
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(email=email, scope="onboarding")
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
+    token = FpAuth(body["user"]["token"])
+
+    # Run KBA
+    kba_data = {"id.phone_number": phone_number}
+    body = post("hosted/identify/kba", kba_data, token)
+    new_token = FpAuth(body["token"])
+
+    # Now, we can initiate an email challenge
+    auth_token = IdentifyClient.from_token(new_token).step_up(
+        kind="email", assert_had_no_scopes=True
+    )
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    foo_user = bifrost.run()
+    assert foo_user.fp_id != sandbox_user.fp_id

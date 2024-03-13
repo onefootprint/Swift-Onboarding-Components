@@ -203,7 +203,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     // Conservatively confirm that the onboarding in the auth token belongs to the user
                     .map(|id| ScopedVault::get(conn, (id, &vault.id)))
                     .transpose()?;
-                let (obc, _) = obc_id
+                let (obc, tenant) = obc_id
                     .as_ref()
                     .map(|id| ObConfiguration::get(conn, id))
                     .transpose()?
@@ -211,7 +211,8 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                 let tenant = scoped_user
                     .as_ref()
                     .map(|sv| Tenant::get(conn, &sv.tenant_id))
-                    .transpose()?;
+                    .transpose()?
+                    .or(tenant);
 
                 if let Some(su) = scoped_user.as_ref() {
                     // Every few minutes, set the heartbeat when a user auth session authenticates

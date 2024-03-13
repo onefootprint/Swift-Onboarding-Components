@@ -106,8 +106,14 @@ async fn get_identify_challenge_context(
         root_span,
     } = args;
 
+    // Get the OBC from either user auth or obc auth
+    let obc = obc
+        .as_ref()
+        .map(|ob| ob.ob_config())
+        .or(user_auth.as_ref().and_then(|ua| ua.ob_config()))
+        .cloned();
+    let t_id = obc.as_ref().map(|obc| &obc.tenant_id);
     // Look up existing user vault by identifier
-    let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
     let (existing_user_id, sv_id, matching_fps) = match (user_auth.as_ref(), identifiers) {
         // Identified via phone or email
         (None, ids) if !ids.is_empty() => {
@@ -139,15 +145,15 @@ async fn get_identify_challenge_context(
                 let tenant = Tenant::get(conn, &sv.tenant_id)?;
                 (Some(tenant), Some(sv))
             } else if let Some(obc) = obc {
-                root_span.record("tenant_id", obc.tenant().id.to_string());
-                root_span.record("is_live", obc.ob_config().is_live);
-                let t_id = &obc.tenant().id;
+                root_span.record("tenant_id", obc.tenant_id.to_string());
+                root_span.record("is_live", obc.is_live);
+                let t_id = &obc.tenant_id;
+                let tenant = Tenant::get(conn, t_id)?;
                 // If there's already a SV for this (user, tenant) pair, log the fp_id
                 let sv = ScopedVault::get(conn, (&v_id, t_id)).optional()?;
                 if let Some(sv) = sv.as_ref() {
                     root_span.record("fp_id", sv.fp_id.to_string());
                 }
-                let tenant = Tenant::get(conn, t_id)?;
                 (Some(tenant), sv)
             } else {
                 (None, None)
