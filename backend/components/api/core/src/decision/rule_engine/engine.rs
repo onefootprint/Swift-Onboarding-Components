@@ -218,7 +218,7 @@ mod tests {
 
         let rules = rules
             .into_iter()
-            .map(|r| RuleInstance::create(conn, &obc, DbActor::Footprint, None, r.0, r.1).unwrap())
+            .map(|r| RuleInstance::create(conn, &obc, &DbActor::Footprint, None, r.0, r.1).unwrap())
             .collect_vec();
         let risk_signals = make_risk_signals(conn, &sv.id, risk_signals);
 

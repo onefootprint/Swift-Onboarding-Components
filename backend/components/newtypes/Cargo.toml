@@ -34,6 +34,7 @@ card-validate = "2.3"
 enum_variant_type = { workspace = true }
 tracing = { workspace = true }
 macros = { path = "../macros" }
+rand = { workspace = true }
 # diesel
 diesel = { workspace = true }
 

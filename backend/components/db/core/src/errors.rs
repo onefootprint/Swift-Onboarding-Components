@@ -96,6 +96,8 @@ pub enum DbError {
     ListAlreadyDeactivated,
     #[error("ListEntry already deactivated")]
     ListEntryAlreadyDeactivated,
+    #[error("Expected version {0} but latest version is {1}")]
+    UnexpectedRuleSetVersion(i32, i32),
     #[error("{0}")]
     ValidationError(String),
     #[error("{0}")]

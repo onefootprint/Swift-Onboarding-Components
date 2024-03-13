@@ -1,5 +1,5 @@
 use super::{data_lifetime::DataLifetime, ob_configuration::ObConfiguration};
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::rule_set;
 use diesel::{prelude::*, Insertable, Queryable};
@@ -42,6 +42,7 @@ impl RuleSetVersion {
     pub(crate) fn create(
         conn: &mut TxnPgConn,
         obc: &Locked<ObConfiguration>,
+        expected_rule_set_version: Option<i32>,
         actor: DbActor,
     ) -> DbResult<(Self, DataLifetimeSeqno, DateTime<Utc>)> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
@@ -56,6 +57,17 @@ impl RuleSetVersion {
             ))
             .get_result(conn.conn())
             .optional()?;
+
+        if let Some(expected_rule_set_version) = expected_rule_set_version {
+            // If the client is forwarding an `expected_rule_set_version` then we assert this against the current RSV version
+            let current_version = current.as_ref().map(|c| c.version).unwrap_or(0);
+            if expected_rule_set_version != current_version {
+                return Err(DbError::UnexpectedRuleSetVersion(
+                    expected_rule_set_version,
+                    current_version,
+                ));
+            }
+        }
 
         let new_rsv = NewRuleSetVersion {
             created_at: now,
@@ -99,11 +111,11 @@ mod tests {
         );
         let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
-        let (rsv1, _, _) = RuleSetVersion::create(conn, &obc, DbActor::Footprint).unwrap();
+        let (rsv1, _, _) = RuleSetVersion::create(conn, &obc, None, DbActor::Footprint).unwrap();
         assert_eq!(1, rsv1.version);
         assert!(rsv1.deactivated_seqno.is_none());
 
-        let (rsv2, _, _) = RuleSetVersion::create(conn, &obc, DbActor::Footprint).unwrap();
+        let (rsv2, _, _) = RuleSetVersion::create(conn, &obc, None, DbActor::Footprint).unwrap();
         assert_eq!(2, rsv2.version);
         assert!(rsv2.deactivated_seqno.is_none());
 
@@ -115,5 +127,27 @@ mod tests {
         assert_eq!(1, rsv1.version);
         assert!(rsv1.deactivated_at.is_some());
         assert!(rsv1.deactivated_seqno.is_some());
+    }
+
+    #[db_test]
+    fn test_expected_rule_set_version(conn: &mut TestPgConn) {
+        let t = tests::fixtures::tenant::create(conn);
+        let obc = tests::fixtures::ob_configuration::create_with_opts(
+            conn,
+            &t.id,
+            ObConfigurationOpts { ..Default::default() },
+        );
+        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+
+        RuleSetVersion::create(conn, &obc, None, DbActor::Footprint).unwrap();
+
+        // no error when correct version is given
+        RuleSetVersion::create(conn, &obc, Some(1), DbActor::Footprint).unwrap();
+
+        // error when old version is given
+        assert!(matches!(
+            RuleSetVersion::create(conn, &obc, Some(1), DbActor::Footprint).unwrap_err(),
+            DbError::UnexpectedRuleSetVersion(1, 2)
+        ));
     }
 }

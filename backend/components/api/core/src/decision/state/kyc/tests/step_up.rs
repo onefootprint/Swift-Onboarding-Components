@@ -66,7 +66,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
             RuleInstance::create(
                 conn,
                 &obc,
-                DbActor::Footprint,
+                &DbActor::Footprint,
                 None,
                 expr,
                 RuleAction::StepUp(step_up_kind),
@@ -277,7 +277,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
             RuleInstance::bulk_create(
                 conn,
                 &obc,
-                DbActor::Footprint,
+                &DbActor::Footprint,
                 vec![kyc_stepup_rule, poa_stepup_rule, poa_review_rule],
             )
             .unwrap();

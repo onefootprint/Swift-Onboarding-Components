@@ -282,6 +282,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::ListAlreadyDeactivated => StatusCode::BAD_REQUEST,
         DbError::ListEntryAlreadyDeactivated => StatusCode::BAD_REQUEST,
         DbError::TenantRolebindingAlreadyExists => StatusCode::BAD_REQUEST,
+        DbError::UnexpectedRuleSetVersion(_, _) => StatusCode::BAD_REQUEST,
         DbError::ValidationError(_) => StatusCode::BAD_REQUEST,
         DbError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
     }

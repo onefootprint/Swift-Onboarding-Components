@@ -239,7 +239,7 @@ pub fn save_default_rules_for_obc(
     let _ = RuleInstance::bulk_create(
         conn,
         obc,
-        DbActor::Footprint,
+        &DbActor::Footprint,
         rules
             .into_iter()
             .map(|(e, a)| NewRule {

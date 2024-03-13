@@ -50,9 +50,8 @@ pub async fn update_rule(
             RuleInstance::update(
                 conn,
                 &obc,
-                actor.into(),
-                &rule_id,
-                RuleInstanceUpdate::update(name, rule_expression, is_shadow),
+                &actor.into(),
+                RuleInstanceUpdate::update(rule_id, name, rule_expression, is_shadow),
             )
         })
         .await?;

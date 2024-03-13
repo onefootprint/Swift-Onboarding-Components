@@ -258,7 +258,7 @@ mod tests {
         let rule1 = RuleInstance::create(
             conn,
             &obc,
-            DbActor::Footprint,
+            &DbActor::Footprint,
             None,
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
@@ -268,7 +268,7 @@ mod tests {
         let rule2 = RuleInstance::create(
             conn,
             &obc,
-            DbActor::Footprint,
+            &DbActor::Footprint,
             None,
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
@@ -278,7 +278,7 @@ mod tests {
         let rule3 = RuleInstance::create(
             conn,
             &obc,
-            DbActor::Footprint,
+            &DbActor::Footprint,
             None,
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,

@@ -75,7 +75,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
                 RuleInstance::create(
                     conn,
                     &obc,
-                    DbActor::Footprint,
+                    &DbActor::Footprint,
                     None,
                     RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                         field: FootprintReasonCode::DocumentIsPermitOrProvisionalLicense,

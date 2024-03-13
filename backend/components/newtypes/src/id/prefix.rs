@@ -1,7 +1,9 @@
 use crate::{
     AccessEventId, AuditEventId, BoLinkId, BusinessOwnerKind, FpId, NtResult, ObConfigurationKey,
-    PartnerTenantId, ScopedVaultId, TenantId, VaultId, VaultKind,
+    PartnerTenantId, RuleId, ScopedVaultId, TenantId, VaultId, VaultKind,
 };
+use rand::distributions::{Alphanumeric, DistString};
+
 
 fn generate_random_id(prefix: &str, length: usize) -> String {
     format!(
@@ -118,6 +120,18 @@ impl AuditEventId {
 
     pub fn into_correlated_access_event_id(self) -> AccessEventId {
         AccessEventId::from(self.0)
+    }
+}
+
+impl RuleId {
+    const LENGTH: usize = 22;
+
+    pub fn generate() -> Self {
+        format!(
+            "rule_{}",
+            Alphanumeric.sample_string(&mut rand::thread_rng(), Self::LENGTH)
+        )
+        .into()
     }
 }
 

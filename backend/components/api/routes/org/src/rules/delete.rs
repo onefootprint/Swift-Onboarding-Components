@@ -32,7 +32,7 @@ pub async fn delete(
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
 
-            RuleInstance::update(conn, &obc, actor.into(), &rule_id, RuleInstanceUpdate::delete())
+            RuleInstance::update(conn, &obc, &actor.into(), RuleInstanceUpdate::delete(rule_id))
         })
         .await?;
 
