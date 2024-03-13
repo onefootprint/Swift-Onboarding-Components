@@ -35,11 +35,19 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
       }
     : undefined;
 
-  const pagerRecipient: Recipient | undefined =
+  const pagerRecipientOld: Recipient | undefined =
     stackMeta.environment === StackEnvironment.Prod
       ? {
           type: 'webhook',
           target: 'BetterStack',
+        }
+      : undefined;
+
+  const pagerRecipient: Recipient | undefined =
+    stackMeta.environment === StackEnvironment.Prod
+      ? {
+          type: 'webhook',
+          target: 'Incident.io',
         }
       : undefined;
 
@@ -87,8 +95,8 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
       });
     }
     // Create a pager trigger
-    if (pageThreshold && pagerRecipient) {
-      const recipients = [pagerRecipient];
+    if (pageThreshold && pagerRecipient && pagerRecipientOld) {
+      const recipients = [pagerRecipientOld, pagerRecipient];
       if (slackRecipient) {
         recipients.push(slackRecipient);
       }
