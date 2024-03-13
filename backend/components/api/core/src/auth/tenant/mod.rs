@@ -16,16 +16,14 @@ pub use self::tenant_rb::*;
 mod workos;
 pub use self::workos::*;
 
-use super::{Any, AuthError, CanDecrypt, Either, IsGuardMet, Or, SessionContext};
+use super::{Any, AuthError, Either, IsGuardMet, SessionContext};
 use crate::{
     errors::{ApiError, ApiResult, ValidationError},
     State,
 };
 use async_trait::async_trait;
 use db::models::{tenant::Tenant, tenant_user::TenantUser};
-use newtypes::{
-    DataIdentifier, DataLifetimeSource, DbActor, TenantApiKeyId, TenantScope, TenantUserId, WorkosAuthMethod,
-};
+use newtypes::{DataLifetimeSource, DbActor, TenantApiKeyId, TenantScope, TenantUserId, WorkosAuthMethod};
 
 pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAssumeAuthContext>;
 
@@ -72,10 +70,6 @@ pub trait TenantAuth {
     fn actor(&self) -> AuthActor;
     fn scopes(&self) -> Vec<TenantScope>;
     fn source(&self) -> DataLifetimeSource;
-    /// Returns whether the auth scopes granted to this actor can decrypt the provided DI
-    fn actor_can_decrypt(&self, di: DataIdentifier) -> bool {
-        CanDecrypt::single(di).or_admin().is_met(&self.scopes())
-    }
 }
 
 pub trait PartnerTenantAuth {
@@ -137,18 +131,21 @@ impl From<AuthActor> for DbActor {
 }
 
 /// A trait to be implemented for any form of tenant auth class.
-/// Requires implementing `token_permissions()` and `tenant_auth()`, and then provides a default
+/// Requires implementing `token_permissions()` and `auth()`, and then provides a default
 /// implementation to check whether a guard is met by the token_permissions() and
 /// yield the tenant auth if so.
 /// Purposefully private to prevent calling these methods outside of this module
 trait CanCheckTenantGuard: Sized {
+    type Auth;
+
     /// The list of TenantPermissions scopes that are allowed by this auth token
     /// Though the impl is usually the same, don't provide a default since using Either will
     /// overwrite any custom impl
     fn token_scopes(&self) -> Vec<TenantScope>;
 
-    /// The boxed TenantAuth trait object that can be utilized once permissions are checked
-    fn tenant_auth(self) -> Box<dyn TenantAuth>;
+    /// The auth trait object (e.g. TenantAuth or PartnerTenantAuth) that can be utilized once
+    /// permissions are checked
+    fn auth(self) -> Self::Auth;
 }
 
 /// Implemented for tenant TAuthExtractors. Provides one function, check_permissions, that
@@ -157,9 +154,11 @@ trait CanCheckTenantGuard: Sized {
 /// sufficient to meet the guard.
 /// If so, returns a usable boxed TenantAuth. Otherwise, returns an AuthError.
 pub trait CheckTenantGuard: Sized {
+    type Auth;
+
     /// Checks if the guard is met by self.token_permissions().
-    /// If so, returns self.tenant_auth(), otherwise returns an auth error
-    fn check_guard<T>(self, guard: T) -> Result<Box<dyn TenantAuth>, AuthError>
+    /// If so, returns self.auth(), otherwise returns an auth error
+    fn check_guard<T>(self, guard: T) -> Result<Self::Auth, AuthError>
     where
         T: IsGuardMet<TenantScope>;
 
@@ -173,16 +172,18 @@ pub trait CheckTenantGuard: Sized {
     fn token_scopes(&self) -> Vec<TenantScope>;
 }
 
-impl<TAuthExtractor> CheckTenantGuard for TAuthExtractor
+impl<TAuthExtractor, A> CheckTenantGuard for TAuthExtractor
 where
-    TAuthExtractor: CanCheckTenantGuard,
+    TAuthExtractor: CanCheckTenantGuard<Auth = A>,
 {
-    fn check_guard<T>(self, guard: T) -> Result<Box<dyn TenantAuth>, AuthError>
+    type Auth = A;
+
+    fn check_guard<T>(self, guard: T) -> Result<A, AuthError>
     where
         T: IsGuardMet<TenantScope>,
     {
         self.check_one_guard(guard)?;
-        Ok(self.tenant_auth())
+        Ok(self.auth())
     }
 
     fn check_one_guard<T>(&self, guard: T) -> Result<(), AuthError>
@@ -190,8 +191,7 @@ where
         T: IsGuardMet<TenantScope>,
     {
         let requested_permission_str = format!("{}", guard);
-        let permission_to_check = guard.or_admin(); // Admin user can always do anything
-        if permission_to_check.is_met(&self.token_scopes()) {
+        if guard.is_met(&self.token_scopes()) {
             Ok(())
         } else {
             Err(AuthError::MissingTenantPermission(requested_permission_str))
@@ -202,14 +202,3 @@ where
         CanCheckTenantGuard::token_scopes(self)
     }
 }
-
-/// Contains some useful util methods for everything that implements IsGuardMet
-pub trait TenantGuardDsl: Sized + IsGuardMet<TenantScope> {
-    /// Shorthand to return a permission that is met if self is met OR if TenantGuard::Admin
-    /// is met
-    fn or_admin(self) -> Or<Self, TenantGuard> {
-        self.or(TenantGuard::Admin)
-    }
-}
-
-impl<T> TenantGuardDsl for T where T: IsGuardMet<TenantScope> {}

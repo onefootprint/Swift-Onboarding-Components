@@ -130,7 +130,7 @@ impl Display for CanVault {
 mod test {
     use std::fmt::Display;
 
-    use super::{CanDecrypt, CanVault};
+    use super::*;
     use newtypes::IdentityDataKind as IDK;
     use test_case::test_case;
 

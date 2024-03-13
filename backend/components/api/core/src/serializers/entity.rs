@@ -1,5 +1,5 @@
 use crate::{
-    auth::tenant::TenantAuth,
+    auth::{tenant::TenantAuth, CanDecrypt, IsGuardMet},
     utils::{
         db2api::DbToApi,
         vault_wrapper::{Any, DecryptedData, TenantVw},
@@ -49,7 +49,9 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
                 // To be decryptable, two conditions must be met
                 // - The tenant must be able to decrypt the attribute (via ob config permissions)
                 // - The authed user principal at the tenant must be able to decrypt the attribute (via IAM)
-                let can_decrypt = vw.tenant_can_decrypt(di.clone()) && auth.actor_can_decrypt(di.clone());
+                let can_decrypt = vw.tenant_can_decrypt(di.clone())
+                    && CanDecrypt::single(di.clone()).is_met(&auth.scopes());
+
                 let value = attribute_values.remove(&di.clone().into());
                 let transforms = attribute_values
                     .iter()

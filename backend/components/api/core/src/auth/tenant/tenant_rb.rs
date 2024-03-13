@@ -109,11 +109,13 @@ impl TenantRbAuth {
 pub type TenantRbAuthContext = SessionContext<ParsedTenantRbAuth>;
 
 impl CanCheckTenantGuard for TenantRbAuthContext {
+    type Auth = Box<dyn TenantAuth>;
+
     fn token_scopes(&self) -> Vec<TenantScope> {
         self.0.tenant_role.scopes.clone()
     }
 
-    fn tenant_auth(self) -> Box<dyn TenantAuth> {
+    fn auth(self) -> Box<dyn TenantAuth> {
         Box::new(self.map(|d| d.0))
     }
 }

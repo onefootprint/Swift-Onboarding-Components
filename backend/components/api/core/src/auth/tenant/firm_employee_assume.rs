@@ -161,11 +161,13 @@ impl FirmEmployeeAssumeAuth {
 }
 
 impl CanCheckTenantGuard for FirmEmployeeAssumeAuthContext {
+    type Auth = Box<dyn TenantAuth>;
+
     fn token_scopes(&self) -> Vec<TenantScope> {
         self.0.token_scopes()
     }
 
-    fn tenant_auth(self) -> Box<dyn TenantAuth> {
+    fn auth(self) -> Box<dyn TenantAuth> {
         Box::new(self.map(|d| d.0))
     }
 }

@@ -7,7 +7,7 @@ use crate::{
     State,
 };
 use api_core::{
-    auth::tenant::TenantAuth,
+    auth::{tenant::TenantAuth, CanDecrypt, IsGuardMet},
     errors::AssertionError,
     types::CursorPaginatedResponseInner,
     utils::{
@@ -181,7 +181,7 @@ pub async fn decrypt_visible_attrs(
             .into_iter()
             .chain(card_dis)
             // Filter out attributes that can't be decrypted
-            .filter(|target| auth.actor_can_decrypt(target.identifier.clone()))
+            .filter(|target| CanDecrypt::single(target.identifier.clone()).is_met(&auth.scopes()))
             .filter(|target| vw.tenant_can_decrypt(target.identifier.clone()))
             .collect();
 

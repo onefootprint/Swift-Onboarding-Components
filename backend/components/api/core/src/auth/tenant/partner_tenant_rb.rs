@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::{AuthActor, PartnerTenantAuth};
+use super::{AuthActor, CanCheckTenantGuard, PartnerTenantAuth};
 use crate::{
     auth::{
         session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
@@ -105,6 +105,18 @@ impl PartnerTenantRbAuth {
 
 /// A shorthand for the commonly used ParsedPartnerTenantRbAuth context
 pub type PartnerTenantRbAuthContext = SessionContext<ParsedPartnerTenantRbAuth>;
+
+impl CanCheckTenantGuard for PartnerTenantRbAuthContext {
+    type Auth = Box<dyn PartnerTenantAuth>;
+
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        self.0.tenant_role.scopes.clone()
+    }
+
+    fn auth(self) -> Box<dyn PartnerTenantAuth> {
+        Box::new(self.map(|d| d.0))
+    }
+}
 
 impl PartnerTenantAuth for SessionContext<PartnerTenantRbAuth> {
     fn partner_tenant(&self) -> &PartnerTenant {

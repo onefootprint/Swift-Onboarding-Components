@@ -1,4 +1,4 @@
-use super::{CanCheckTenantGuard, IsGuardMet, TenantAuth};
+use super::{CanCheckTenantGuard, IsGuardMet};
 use crate::auth::{CanDecrypt, Either};
 use either::Either::{Left, Right};
 use itertools::Itertools;
@@ -54,12 +54,40 @@ impl TenantGuard {
 
 impl IsGuardMet<TenantScope> for TenantGuard {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+        token_scopes.contains(&self.granting_scope()) || token_scopes.contains(&TenantScope::Admin)
+    }
+}
+
+/// Represents a complaince partner permission that is required to execute an HTTP handler.
+#[derive(Display)]
+pub enum PartnerTenantGuard {
+    Admin,
+    Read,
+}
+
+impl PartnerTenantGuard {
+    /// Maps a TenantPermission to the TenantScope that grants this permission
+    fn granting_scope(&self) -> TenantScope {
+        match self {
+            Self::Admin => TenantScope::CompliancePartnerAdmin,
+            Self::Read => TenantScope::CompliancePartnerRead,
+        }
+    }
+}
+
+impl IsGuardMet<TenantScope> for PartnerTenantGuard {
+    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
         token_scopes.contains(&self.granting_scope())
+            || token_scopes.contains(&TenantScope::CompliancePartnerAdmin)
     }
 }
 
 impl IsGuardMet<TenantScope> for InvokeVaultProxyPermission {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+        if token_scopes.contains(&TenantScope::Admin) {
+            return true;
+        }
+
         let allowed_vault_proxy_permissions = token_scopes
             .iter()
             .filter_map(|ts| match ts {
@@ -74,6 +102,10 @@ impl IsGuardMet<TenantScope> for InvokeVaultProxyPermission {
 
 impl IsGuardMet<TenantScope> for CanDecrypt {
     fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+        if token_scopes.contains(&TenantScope::Admin) {
+            return true;
+        }
+
         if token_scopes.contains(&TenantScope::DecryptAll) {
             return true;
         }
@@ -132,11 +164,14 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
     }
 }
 
-impl<A, B> CanCheckTenantGuard for Either<A, B>
+
+impl<A, B, T> CanCheckTenantGuard for Either<A, B>
 where
-    A: CanCheckTenantGuard,
-    B: CanCheckTenantGuard,
+    A: CanCheckTenantGuard<Auth = T>,
+    B: CanCheckTenantGuard<Auth = T>,
 {
+    type Auth = T;
+
     fn token_scopes(&self) -> Vec<TenantScope> {
         match self {
             Either::Left(l) => l.token_scopes(),
@@ -144,21 +179,18 @@ where
         }
     }
 
-    fn tenant_auth(self) -> Box<dyn TenantAuth> {
+    fn auth(self) -> T {
         match self {
-            Either::Left(l) => l.tenant_auth(),
-            Either::Right(r) => r.tenant_auth(),
+            Either::Left(l) => l.auth(),
+            Either::Right(r) => r.auth(),
         }
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::{CanDecrypt, TenantGuard as TG};
-    use crate::auth::{
-        tenant::{IsGuardMet, TenantGuardDsl},
-        Any,
-    };
+    use super::{CanDecrypt, PartnerTenantGuard as PTG, TenantGuard as TG};
+    use crate::auth::{tenant::IsGuardMet, Any};
     use newtypes::{
         BusinessDataKind as BDK, CollectedDataOption as CDO, DataIdentifier as DI, DocumentKind,
         DocumentSide, IdDocKind, IdentityDataKind as IDK, KvDataKey, TenantScope as TS,
@@ -210,15 +242,30 @@ mod test {
     #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => true)]
     #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::FirstName), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
     //
+    // Test Admin
+    //
+    // 1. Having admin scope passes admin guards.
+    #[test_case(&[TS::WriteEntities, TS::Admin], TG::Admin => true)]
+    #[test_case(&[TS::CompliancePartnerAdmin, TS::CompliancePartnerRead], PTG::Admin => true)]
+    // 2. Having admin scope passes sub-admin guards.
+    #[test_case(&[TS::Admin], TG::OnboardingConfiguration=> true)]
+    #[test_case(&[TS::CompliancePartnerAdmin], PTG::Read => true)]
+    // 3. Not having admin scope fails admin guards.
+    #[test_case(&[TS::OnboardingConfiguration], TG::Admin => false)]
+    #[test_case(&[TS::CompliancePartnerRead], PTG::Admin => false)]
+    // 4. Having admin scope doesn't allow passing admin guard for a different tenant type.
+    #[test_case(&[TS::WriteEntities, TS::Admin], PTG::Admin => false)]
+    #[test_case(&[TS::CompliancePartnerAdmin, TS::CompliancePartnerRead], TG::Admin => false)]
+    //
     // Test Or
     //
     #[test_case(&[TS::OnboardingConfiguration], TG::OnboardingConfiguration.or(TG::Admin) => true)]
     #[test_case(&[TS::OnboardingConfiguration], TG::Admin.or(TG::OnboardingConfiguration) => true)]
-    #[test_case(&[TS::Admin], TG::OnboardingConfiguration.or_admin() => true)]
-    #[test_case(&[TS::Admin], CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName, IDK::Email]).or_admin() => true)]
-    #[test_case(&[TS::Read], CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName, IDK::Email]).or_admin() => false)]
+    #[test_case(&[TS::Admin], TG::OnboardingConfiguration.or(TG::Admin) => true)]
+    #[test_case(&[TS::Admin], CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName, IDK::Email]).or(TG::Admin) => true)]
+    #[test_case(&[TS::Read], CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName, IDK::Email]).or(TG::Admin) => false)]
     #[test_case(&[TS::Read], TG::ApiKeys.or(TG::Read) => true)]
-    #[test_case(&[TS::OnboardingConfiguration], TG::ApiKeys.or_admin() => false)]
+    #[test_case(&[TS::OnboardingConfiguration], TG::ApiKeys.or(TG::Admin) => false)]
     #[test_case(&[TS::OnboardingConfiguration], TG::ApiKeys.or(TG::ApiKeys).or(TG::OrgSettings) => false)]
     #[test_case(&[TS::ApiKeys], TG::ApiKeys.or(TG::ManualReview).or(TG::OrgSettings) => true)]
     #[test_case(&[TS::ManualReview], TG::ApiKeys.or(TG::ManualReview).or(TG::OrgSettings) => true)]
@@ -235,9 +282,9 @@ mod test {
         requested_permission.is_met(token_scopes)
     }
 
-    #[test_case(TG::ApiKeys.or_admin() => "Or<ApiKeys,Admin>")]
+    #[test_case(TG::ApiKeys.or(TG::Admin) => "Or<ApiKeys,Admin>")]
     #[test_case(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName]).or(TG::ApiKeys) => "Or<CanDecrypt<id.ssn9, id.first_name>,ApiKeys>")]
-    #[test_case(Any.or_admin() => "Or<Any,Admin>")]
+    #[test_case(Any.or(TG::Admin) => "Or<Any,Admin>")]
     fn test_display<T: IsGuardMet<TS>>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met
         format!("{}", t)

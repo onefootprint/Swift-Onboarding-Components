@@ -144,11 +144,13 @@ impl TenantAuth for CheckedSecretTenantAuth {
 }
 
 impl CanCheckTenantGuard for SecretTenantAuthContext {
+    type Auth = Box<dyn TenantAuth>;
+
     fn token_scopes(&self) -> Vec<TenantScope> {
         self.0.role.scopes.clone()
     }
 
-    fn tenant_auth(self) -> Box<dyn TenantAuth> {
+    fn auth(self) -> Box<dyn TenantAuth> {
         Box::new(self.0)
     }
 }

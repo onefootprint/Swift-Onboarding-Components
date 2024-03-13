@@ -6,12 +6,15 @@ use api_core::{
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    description = "Returns a summary of partnered companies for a compliance partner.",
+    description = "Creates a new IAM user for the partner tenant. Sends an invite link via WorkOs.",
     tags(Compliance, Private)
 )]
-#[actix::get("/compliance/companies")]
-pub async fn get(_state: web::Data<State>, auth: PartnerTenantSessionAuth) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_guard(PartnerTenantGuard::Read)?;
+#[actix::post("/compliance/org/members")]
+pub async fn post(
+    _state: web::Data<State>,
+    auth: PartnerTenantSessionAuth,
+) -> JsonApiResponse<EmptyResponse> {
+    let auth = auth.check_guard(PartnerTenantGuard::Admin)?;
     let pt = auth.partner_tenant();
     dbg!(pt);
 
