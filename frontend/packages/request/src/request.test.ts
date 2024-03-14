@@ -8,7 +8,7 @@ import {
 
 describe('@onefootprint/request', () => {
   describe('getErrorMessage', () => {
-    it('should return the error message', () => {
+    it('should return the error message 1/3', () => {
       const error = {
         response: {
           data: {
@@ -21,6 +21,48 @@ describe('@onefootprint/request', () => {
 
       expect(getErrorMessageStandAlone(error as RequestError)).toBe(
         'error message',
+      );
+    });
+
+    it('should return the error message 2/3', () => {
+      const error = {
+        code: null,
+        message: {
+          error:
+            'Message delivery failed. Please try resending the message or use a different phone number.',
+        },
+        context: null,
+        status_code: 400,
+        support_id: '8214a664-4fba-4f24-af69-3363886b729d',
+      } as unknown as RequestError;
+
+      expect(getErrorMessageStandAlone(error as RequestError)).toBe(
+        'Message delivery failed. Please try resending the message or use a different phone number.',
+      );
+    });
+
+    it('should return the error message 3/3', () => {
+      const error = {
+        code: null,
+        message: {
+          error: {
+            error: {
+              error: {
+                error: {
+                  error:
+                    'Message delivery failed. Please try resending the message or use a different phone number.',
+                },
+              },
+            },
+          },
+        },
+        context: null,
+        status_code: 400,
+        support_id: '8214a664-4fba-4f24-af69-3363886b729d',
+      } as unknown as RequestError;
+
+      expect(getErrorMessageStandAlone(error as RequestError)).toBe(
+        'Message delivery failed. Please try resending the message or use a different phone number.',
       );
     });
   });

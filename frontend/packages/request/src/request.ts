@@ -5,14 +5,7 @@ import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 import { useTranslation } from 'react-i18next';
 
-const LOGOUT_ERROR_CODES = ['E117', 'E118', 'E119'];
-// TODO (belce): retire matching on exact error string
-const LOGOUT_ERRORS = [
-  'Session does not exist',
-  'Session is expired',
-  'Session invalid',
-];
-
+type Obj = Record<string, unknown>;
 export type FootprintServerError = {
   message: string;
   code?: string; // Translation code for resolving the erorr to the correct language
@@ -33,6 +26,20 @@ export type PaginatedRequestResponse<T> = {
     count: number;
   };
 };
+
+const uuidPattern =
+  /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g;
+
+const LOGOUT_ERROR_CODES = ['E117', 'E118', 'E119'];
+// TODO (belce): retire matching on exact error string
+const LOGOUT_ERRORS = [
+  'Session does not exist',
+  'Session is expired',
+  'Session invalid',
+];
+
+const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
+const isString = (x: unknown): x is string => typeof x === 'string' && !!x;
 
 export const isFootprintError = (error: unknown): error is RequestError =>
   (error as RequestError)?.response?.data !== undefined;
@@ -64,19 +71,41 @@ export const isLogoutError = (error: unknown) => {
   return codeMatches || messageMatches;
 };
 
+const extractStringProps = (x: unknown, acc: string[] = []): string[] => {
+  if (isString(x)) return [x];
+  if (isObject(x)) {
+    for (const key in x) {
+      if (isString(x[key])) {
+        acc.push(x[key] as string);
+      } else if (isObject(x[key])) {
+        extractStringProps(x[key] as Obj, acc);
+      }
+    }
+  }
+
+  return acc;
+};
+
 export const getErrorMessage = (error?: unknown | Error): string => {
   if (typeof error === 'string') {
     return error;
   }
-  if (isFootprintError(error)) {
-    if (error?.response?.data?.error?.message) {
-      return error.response.data.error.message;
-    }
+  if (isFootprintError(error) && error?.response?.data?.error?.message) {
+    return isString(error?.response?.data?.error?.message)
+      ? error.response.data.error.message
+      : extractStringProps(error.response.data.error.message)
+          .filter(x => !x.match(uuidPattern))
+          .join('') || '';
   }
-  if (isUnhandledError(error)) {
+  if (isUnhandledError(error) && isString(error.message)) {
     return error.message;
   }
-  return 'Something went wrong';
+
+  return (
+    extractStringProps(error)
+      .filter(x => !x.match(uuidPattern))
+      .join('') || 'Something went wrong'
+  );
 };
 
 export const useRequestError = () => {
