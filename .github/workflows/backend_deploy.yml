@@ -95,7 +95,7 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - name: Configure AWS Credentials (Image Cache)
-        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a #4.0.1
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 #1
         with:
           aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -109,7 +109,7 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
 
           docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ inputs.apiComponentVersion }}
-          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ inputs.apiComponentVersion }} api:${{ inputs.apiComponentVersion }}
+          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ inputs.apiComponentVersion }} api:${{ inputs.apiComponentVersion }} 
 
           docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }}
           docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }} enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }}
@@ -126,7 +126,7 @@ jobs:
           docker tag api:${apiComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
           docker tag api:${apiComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${apiComponentVersion}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${apiComponentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest          
 
           docker tag enclave_proxy_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
           docker tag enclave_proxy_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${enclaveComponentVersion}
@@ -142,7 +142,7 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - name: Configure AWS Credentials (Image Cache)
-        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a #4.0.1
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 #1
         with:
           aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -310,14 +310,14 @@ jobs:
               issue_number: context.issue.number,
             });
 
-            // Find any comment already made by the bot.
+            // Find any comment already made by the bot.                                                                                                    
             const botComment = comments.find(comment => comment.user.id === 41898282 && comment.body.includes('Deployed 🚀'));
             const commentBody = "**Deployed 🚀**\n\
             - URL: ${{ steps.pulumi_deploy.outputs.apiUrl }}\n\
             - Stack name: `${{ steps.pulumi_deploy.outputs.shortStackName }}`\n\
             - **api**: `${{ inputs.apiComponentVersion }}`\n\
             - **enclave**: `${{ inputs.enclaveComponentVersion }}`";
-
+                                                                  
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
