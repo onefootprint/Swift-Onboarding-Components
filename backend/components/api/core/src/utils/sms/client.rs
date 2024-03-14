@@ -1,21 +1,21 @@
-use aws_credential_types::provider::SharedCredentialsProvider;
-use std::fmt::Debug;
-use tokio::sync::oneshot::{self, Receiver, Sender};
-use tracing::Instrument;
-
+use super::{
+    super::challenge_rate_limit::RateLimit,
+    vendors::{Message, Pinpoint, SmsVendor, SmsVendorKind, Twilio},
+};
 use crate::{
     errors::{user::UserError, ApiError, ApiResult, AssertionError},
     State,
 };
-use async_trait::async_trait;
+use aws_credential_types::provider::SharedCredentialsProvider;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use itertools::Itertools;
-use newtypes::{Base64Data, PhoneNumber, PiiString, SandboxId, VaultId};
-
-use super::challenge_rate_limit::RateLimit;
+use newtypes::{PhoneNumber, PiiString, SandboxId, VaultId};
+use std::fmt::Debug;
+use tokio::sync::oneshot::{self, Receiver, Sender};
+use tracing::Instrument;
 
 pub type SecondsBeforeRetry = Duration;
 
@@ -34,82 +34,8 @@ pub struct SmsClient {
     /// back for errors on the prod account.
     pub twilio_client_backup: Option<twilio::Client>,
     /// AWS pinpoint SMS client
-    pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
-    ff_client: LaunchDarklyFeatureFlagClient,
-}
-
-#[derive(Debug, Eq, PartialEq)]
-enum SmsVendorKind {
-    Twilio,
-    Pinpoint,
-}
-
-#[derive(Clone, Copy)]
-struct Message<'a> {
-    message: &'a PiiString,
-    destination: &'a PiiString,
-    client: &'a SmsClient,
-}
-
-#[derive(derive_more::Deref)]
-struct Twilio<'a>(#[deref] Message<'a>);
-
-#[derive(derive_more::Deref)]
-struct Pinpoint<'a>(#[deref] Message<'a>);
-
-#[async_trait]
-trait SmsVendor: Send + Sync {
-    async fn send(&self) -> ApiResult<()>;
-    fn vendor(&self) -> SmsVendorKind;
-}
-
-#[async_trait]
-impl<'a> SmsVendor for Twilio<'a> {
-    #[tracing::instrument("Twilio::send", skip_all)]
-    async fn send(&self) -> ApiResult<()> {
-        // Don't want to send raw phone number to twilio
-        let h_destination =
-            Base64Data::into_string_standard(sha256(self.destination.leak().as_bytes()).to_vec()).0;
-        let flag = BoolFlag::UseBackupTwilioCredentials(&h_destination);
-        let use_backup_twilio = self.client.ff_client.flag(flag);
-        tracing::info!(%use_backup_twilio, %h_destination, has_backup=%self.client.twilio_client_backup.is_some(), "Choosing twilio client");
-        let twilio_client = match (use_backup_twilio, self.client.twilio_client_backup.as_ref()) {
-            (true, Some(backup_client)) => backup_client,
-            _ => &self.client.twilio_client,
-        };
-
-        twilio_client
-            .send_message(self.destination.clone(), self.message.clone())
-            .await?;
-        Ok(())
-    }
-
-    fn vendor(&self) -> SmsVendorKind {
-        SmsVendorKind::Twilio
-    }
-}
-
-#[async_trait]
-impl<'a> SmsVendor for Pinpoint<'a> {
-    #[tracing::instrument("Pinpoint::send", skip_all)]
-    async fn send(&self) -> ApiResult<()> {
-        self
-            .0
-            .client
-            .pinpoint_client
-            .send_text_message()
-            // TODO change number based on environment
-            .origination_identity("+17655634600".to_owned())
-            .destination_phone_number(self.destination.leak_to_string())
-            .message_body(self.message.leak_to_string())
-            .send()
-            .await?;
-        Ok(())
-    }
-
-    fn vendor(&self) -> SmsVendorKind {
-        SmsVendorKind::Pinpoint
-    }
+    pub(super) pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
+    pub(super) ff_client: LaunchDarklyFeatureFlagClient,
 }
 
 pub struct TwilioConfig {
