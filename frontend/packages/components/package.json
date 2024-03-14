@@ -1,0 +1,63 @@
+{
+  "name": "@onefootprint/components",
+  "private": false,
+  "type": "module",
+  "version": "0.0.1",
+  "main": "./dist/footprint-components.cjs",
+  "module": "./dist/footprint-components.js",
+  "unpkg": "./dist/footprint-components.js",
+  "types": "./dist/footprint-components.d.ts",
+  "style": "./dist/footprint-components.css",
+  "sideEffects": false,
+  "author": "Footprint",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "kyc",
+    "identity verification"
+  ],
+  "scripts": {
+    "test": "bun test --bail",
+    "test:ci:bun": "bun test --bail",
+    "test:watch": "bun test --watch",
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "lint": "eslint src --fix",
+    "lint:ci": "eslint src",
+    "typecheck": "yarn tsc --noEmit",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "publish:local": "yarn && yarn build && yalc publish"
+  },
+  "devDependencies": {
+    "@hookform/resolvers": "^3.3.2",
+    "@tanstack/react-query": "^4.29.5",
+    "@types/classnames": "^2.3.1",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20",
+    "@types/react-dom": "^18",
+    "@types/react": "^18",
+    "bun-types": "^1.0.25",
+    "eslint-config-footprint": "*",
+    "react-dom": "^18",
+    "react": "^18",
+    "tsconfig": "*",
+    "tsup": "^6.5.0",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "classnames": "^2.5.1",
+    "csstype": "^3.1.2",
+    "lodash": "^4.17.21",
+    "react-hook-form": "^7.47.0",
+    "zod": "^3.22.4"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

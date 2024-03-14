@@ -19,6 +19,7 @@
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },
   "dependencies": {
+    "@onefootprint/components": "*",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/footprint-react": "*",
