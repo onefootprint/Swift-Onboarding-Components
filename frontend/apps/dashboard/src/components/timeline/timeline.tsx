@@ -25,7 +25,7 @@ type TimelineProps = {
   isLoading?: boolean;
 };
 
-const HEADER_HEIGHT = '40px';
+const HEADER_HEIGHT = '32px';
 
 export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
   if (!time) {
@@ -57,7 +57,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
               position="relative"
               height="auto"
               columns={['146px 24px 1fr']}
-              rows={['40px auto']}
+              rows={[`${HEADER_HEIGHT} auto`]}
               alignItems="start"
               justifyContent="start"
               templateAreas={[
@@ -66,17 +66,22 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
                 'empty line content',
               ]}
             >
-              <Grid.Item grid="time" direction="row" gap={2} minHeight="40px">
+              <Grid.Item
+                grid="time"
+                direction="row"
+                gap={2}
+                height={HEADER_HEIGHT}
+              >
                 {item.time && <TimelineItemTime time={item.time} />}
               </Grid.Item>
               {!last && <Line data-last={last} gridArea="line" />}
               <Grid.Item
                 align="center"
                 justify="center"
-                paddingTop={4}
-                paddingBottom={4}
+                paddingTop={2}
+                paddingBottom={2}
                 backgroundColor="primary"
-                minHeight="40px"
+                minHeight={HEADER_HEIGHT}
                 gridArea="icon"
               >
                 {iconComponent ?? <IcoDotSmall16 />}
@@ -97,15 +102,19 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
                 >
                   {headerComponent}
                 </Grid.Item>
-                <Stack
-                  direction="column"
-                  gap={2}
-                  width="100%"
-                  paddingBottom={7}
-                  paddingLeft={3}
-                >
-                  {bodyComponent}
-                </Stack>
+                {bodyComponent ? (
+                  <Stack
+                    direction="column"
+                    gap={2}
+                    width="100%"
+                    paddingBottom={7}
+                    paddingLeft={3}
+                  >
+                    {bodyComponent}
+                  </Stack>
+                ) : (
+                  <Box height="4px" tag="span" />
+                )}
               </Grid.Item>
             </Grid.Container>
           );

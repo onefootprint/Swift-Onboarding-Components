@@ -27,10 +27,7 @@ import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 
-import {
-  AbandonedEventBody,
-  AbandonedEventHeader,
-} from './components/abandoned-event';
+import { AbandonedEventHeader } from './components/abandoned-event';
 import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
 import AuthMethodUpdatedEventHeader from './components/auth-method-updated-event';
@@ -80,12 +77,12 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       items.push({
         time: mergedTimeline[0].time,
         headerComponent: <AbandonedEventHeader entity={entity} />,
-        bodyComponent: <AbandonedEventBody />,
+        bodyComponent: undefined,
       });
     } else {
       items.push({
         headerComponent: <AbandonedEventHeader entity={entity} />,
-        bodyComponent: <AbandonedEventBody />,
+        bodyComponent: undefined,
       });
     }
   }
