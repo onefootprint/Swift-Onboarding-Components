@@ -1,5 +1,6 @@
 mod assume;
 mod cleanup;
+mod compliance_partnership;
 mod entities;
 mod invoice;
 mod long;
@@ -21,5 +22,6 @@ pub fn configure(config: &mut actix_web::web::ServiceConfig) {
         .service(panic::get)
         .service(long::get)
         .service(invoice::post)
-        .service(invoice::post_all);
+        .service(invoice::post_all)
+        .service(compliance_partnership::post);
 }

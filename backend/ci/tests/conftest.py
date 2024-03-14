@@ -4,6 +4,7 @@ import time
 import pytest
 from twilio.rest import Client
 from tests.constants import (
+    CUSTODIAN_AUTH,
     IT_TWILIO_ACCOUNT_SID,
     IT_TWILIO_SECRET_AUTH_TOKEN,
     TENANT_ID1,
@@ -13,16 +14,18 @@ from tests.constants import (
     LIVE_PHONE_NUMBER,
     EMAIL,
 )
+from tests.headers import DashboardAuth
+from tests.types import PartnerTenant
 from tests.utils import (
     EXPECTED_SERVER_VERSION_GIT_HASH,
     IncorrectServerVersion,
     _make_request,
     create_tenant,
-    create_partner_tenant,
     create_ob_config,
     _gen_random_sandbox_id,
     _gen_random_n_digit_number,
     patch,
+    post,
     clean_up_user,
 )
 
@@ -152,16 +155,43 @@ def foo_sandbox_tenant():
 
 
 @pytest.fixture(scope="session")
-def partner_tenant():
+def partner_tenant(tenant):
     """
-    Production, non-sandbox tenant. Only used for these tests
+    Production partner tenant. Only used for these tests.
     """
     org_data = {
         "id": PARTNER_TENANT_ID1,
         "name": "Footprint Compliance Partner Integration Testing",
     }
 
-    return create_partner_tenant(org_data)
+    body = post("private/test_partner_tenant", org_data, CUSTODIAN_AUTH)
+    print("\n======partner org info======")
+    print(body)
+
+    auth_token = DashboardAuth(body["auth_token"])
+    ro_auth_token = DashboardAuth(body["ro_auth_token"])
+    partner_tenant = PartnerTenant(
+        id=body["partner_tenant_id"],
+        name=org_data["name"],
+        db_auths=[auth_token],
+        auth_token=auth_token,
+        ro_db_auths=[ro_auth_token],
+        ro_auth_token=ro_auth_token,
+    )
+
+    # Create Partnership between the tenant and partner tenant fixtures.
+    body = post(
+        "private/compliance/partnership",
+        {
+            "tenant_id": tenant.id,
+            "partner_tenant_id": partner_tenant.id,
+        },
+        *tenant.db_auths,
+    )
+    print("\n======tenant compliance partnership info======")
+    print(body)
+
+    return partner_tenant
 
 
 @pytest.fixture(scope="session")

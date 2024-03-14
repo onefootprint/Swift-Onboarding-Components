@@ -241,27 +241,6 @@ def create_tenant(org_data, ob_conf_data):
 
     return try_until_success(inner, 10)
 
-
-def create_partner_tenant(org_data):
-    def inner():
-        body = post("private/test_partner_tenant", org_data, CUSTODIAN_AUTH)
-        print("\n======partner org info======")
-        print(body)
-
-        auth_token = DashboardAuth(body["auth_token"])
-        ro_auth_token = DashboardAuth(body["ro_auth_token"])
-        return PartnerTenant(
-            id=body["partner_tenant_id"],
-            name=org_data["name"],
-            db_auths=[auth_token],
-            auth_token=auth_token,
-            ro_db_auths=[ro_auth_token],
-            ro_auth_token=ro_auth_token,
-        )
-
-    return try_until_success(inner, 10)
-
-
 def create_ob_config(
     tenant,
     name,

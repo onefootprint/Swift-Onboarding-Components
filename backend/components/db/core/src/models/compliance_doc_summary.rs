@@ -161,11 +161,11 @@ mod tests {
         let mut partnerships = HashMap::new();
         for tenant in tenants.iter() {
             for pt in pts.iter() {
-                let partnership = NewTenantCompliancePartnership {
+                let (partnership, _) = NewTenantCompliancePartnership {
                     tenant_id: &tenant.id,
                     partner_tenant_id: &pt.id,
                 }
-                .create(conn)
+                .get_or_create(conn)
                 .unwrap();
                 partnerships.insert((&tenant.id, &pt.id), partnership);
             }

@@ -1,10 +1,11 @@
-use crate::{DbResult, PgConn};
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_compliance_partnership;
 use diesel::prelude::*;
 use newtypes::{PartnerTenantId, TenantCompliancePartnershipId, TenantId};
+use serde::Serialize;
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Queryable, Selectable, Identifiable)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Queryable, Selectable, Identifiable, Serialize)]
 #[diesel(table_name = tenant_compliance_partnership)]
 #[diesel(primary_key(tenant_id, partner_tenant_id))]
 pub struct TenantCompliancePartnership {
@@ -26,11 +27,24 @@ pub struct NewTenantCompliancePartnership<'a> {
     pub partner_tenant_id: &'a PartnerTenantId,
 }
 
+pub type IsNew = bool;
+
 impl<'a> NewTenantCompliancePartnership<'a> {
-    #[tracing::instrument("NewTenantCompliancePartnership::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<TenantCompliancePartnership> {
-        Ok(diesel::insert_into(tenant_compliance_partnership::table)
+    #[tracing::instrument("NewTenantCompliancePartnership::get_or_create", skip_all)]
+    pub fn get_or_create(self, conn: &mut TxnPgConn) -> DbResult<(TenantCompliancePartnership, IsNew)> {
+        let existing: Option<TenantCompliancePartnership> = tenant_compliance_partnership::table
+            .filter(tenant_compliance_partnership::tenant_id.eq(self.tenant_id))
+            .filter(tenant_compliance_partnership::partner_tenant_id.eq(self.partner_tenant_id))
+            .select(TenantCompliancePartnership::as_select())
+            .first(conn.conn())
+            .optional()?;
+        if let Some(p) = existing {
+            return Ok((p, false));
+        }
+
+        let p = diesel::insert_into(tenant_compliance_partnership::table)
             .values(self)
-            .get_result(conn)?)
+            .get_result(conn.conn())?;
+        Ok((p, true))
     }
 }
