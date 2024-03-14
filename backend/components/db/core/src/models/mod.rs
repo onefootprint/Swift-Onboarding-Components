@@ -10,7 +10,6 @@ pub mod business_owner;
 pub mod compliance_doc_request;
 pub mod compliance_doc_review;
 pub mod compliance_doc_submission;
-pub mod compliance_doc_summary;
 pub mod compliance_doc_template;
 pub mod compliance_doc_template_version;
 pub mod contact_info;
