@@ -25,6 +25,7 @@ pub async fn create_list_entry(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let actor = auth.actor();
+    let CreateListEntryRequest { entries } = request.into_inner();
 
     let (tenant, list) = state
         .db_pool
@@ -45,13 +46,12 @@ pub async fn create_list_entry(
 
     let list_id = list.id.clone();
     let key = decrypted_list_key.clone();
-    let data = request.0 .0;
     let list_entries = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            // TODO: validate `data` against `list.kind`
-            // TODO: check if `data` already exists in some other ListEntry? bit weirder to check since its bytea but should still work i guess
-            let e_data = data
+            // TODO: validate `entries` against `list.kind`
+            // TODO: check if `entries` already exists in some other ListEntry? bit weirder to check since its bytea but should still work i guess
+            let e_data = entries
                 .into_iter()
                 .map(|e| key.seal_bytes(e.leak().as_bytes()).map(|b| b.into()))
                 .collect::<Result<Vec<_>, _>>()?;

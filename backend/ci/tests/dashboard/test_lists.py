@@ -158,7 +158,7 @@ def test_create_list_entry(sandbox_tenant):
     # add single
     entries = post(
         f"/org/lists/{list['id']}/entries",
-        ["protonmail.com"],
+        dict(entries=["protonmail.com"]),
         *sandbox_tenant.db_auths,
     )
     assert len(entries) == 1
@@ -168,7 +168,7 @@ def test_create_list_entry(sandbox_tenant):
     # add multiple
     entries = post(
         f"/org/lists/{list['id']}/entries",
-        ["bobertotech.com", "badppl.org", "somethingelseketchy.net"],
+        dict(entries=["bobertotech.com", "badppl.org", "somethingelseketchy.net"]),
         *sandbox_tenant.db_auths,
     )
     assert len(entries) == 3
@@ -191,17 +191,17 @@ def test_list_list_entries(sandbox_tenant):
 
     entry1 = post(
         f"/org/lists/{list['id']}/entries",
-        ["protonmail.com"],
+        dict(entries=["protonmail.com"]),
         *sandbox_tenant.db_auths,
     )
     entry2 = post(
         f"/org/lists/{list['id']}/entries",
-        ["baddiesinc.org"],
+        dict(entries=["baddiesinc.org"]),
         *sandbox_tenant.db_auths,
     )
     entry3 = post(
         f"/org/lists/{list['id']}/entries",
-        ["bobertotech.org"],
+        dict(entries=["bobertotech.org"]),
         *sandbox_tenant.db_auths,
     )
 
@@ -230,17 +230,17 @@ def test_delete_list_entries(sandbox_tenant):
 
     entry1 = post(
         f"/org/lists/{list['id']}/entries",
-        ["protonmail.com"],
+        dict(entries=["protonmail.com"]),
         *sandbox_tenant.db_auths,
     )
     entry2 = post(
         f"/org/lists/{list['id']}/entries",
-        ["baddiesinc.org"],
+        dict(entries=["baddiesinc.org"]),
         *sandbox_tenant.db_auths,
     )
     entry3 = post(
         f"/org/lists/{list['id']}/entries",
-        ["bobertotech.org"],
+        dict(entries=["bobertotech.org"]),
         *sandbox_tenant.db_auths,
     )
 
