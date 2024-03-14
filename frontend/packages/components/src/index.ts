@@ -16,4 +16,6 @@ export { default as PhoneInput } from './components/phone-input';
 export { default as Provider } from './components/provider';
 export type { SSN4InputProps } from './components/ssn-4-input';
 export { default as SSN4Input } from './components/ssn-4-input';
+export type { SSN9INputProps } from './components/ssn-9-input';
+export { default as SSN9Input } from './components/ssn-9-input';
 export { useFootprint } from './hooks/use-footprint';
