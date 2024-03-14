@@ -4,6 +4,7 @@
 use actix_web::{dev::Service, http::KeepAlive};
 use api_core::{config::Config, *};
 use clap::{Parser, Subcommand};
+use std::time::Duration;
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
 use anyhow::{Context, Result};
@@ -139,6 +140,22 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
 
         App::new()
             .app_data(web::Data::new(state.clone()))
+            .wrap_fn(|req, srv| {
+                // Set a timeout slightly below the ALB timeout to ensure that the API server
+                // generates its own timeouts in most cases. Otherwise, the ALB will return a 504
+                // to the client but the API server will continue processing the request,
+                // potentially yielding a different status code.
+                let fut = srv.call(req);
+                let fut_with_timeout = actix_web::rt::time::timeout(Duration::from_secs(58), fut);
+                async {
+                    match fut_with_timeout.await {
+                        Ok(res) => res,
+                        Err(_) => {
+                            Err(ApiError::from(ApiErrorKind::ResponseTimeout).into())
+                        }
+                    }
+                }
+            })
             .wrap(request_metrics.clone()) // Export otel metrics for each API request
             // TODO also wrap RequestTracing::new()
             .wrap(

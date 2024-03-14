@@ -207,6 +207,9 @@ pub enum ApiErrorKind {
     InvalidHeaderValue(#[from] reqwest::header::InvalidHeaderValue),
     #[error("Failed to convert header to a str")]
     HeaderToStrError(#[from] reqwest::header::ToStrError),
+
+    #[error("Timeout handling request")]
+    ResponseTimeout,
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -399,6 +402,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::InvalidHeaderName(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::InvalidHeaderValue(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::HeaderToStrError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::ResponseTimeout => StatusCode::GATEWAY_TIMEOUT,
         }
     }
 
