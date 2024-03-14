@@ -31,8 +31,3 @@ pub struct UserChallengeResponse {
     /// The timeout until you're allowed to initiate another challenge
     pub time_before_retry_s: i64,
 }
-
-#[derive(serde::Serialize)]
-pub struct ErrorChallengeResponse {
-    pub error: String,
-}

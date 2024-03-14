@@ -6,14 +6,14 @@ use api_core::{
         user::{load_auth_events, UserAuthContext, UserAuthGuard},
         IsGuardMet,
     },
-    errors::{AssertionError, JsonError, ValidationError},
+    errors::{AssertionError, ValidationError},
     types::{response::ResponseData, JsonApiResponse},
     utils::{
         challenge::Challenge, email::send_email_challenge_non_blocking, passkey::WebauthnConfig,
         sms::rx_background_error,
     },
 };
-use api_wire_types::{ErrorChallengeResponse, UserChallengeRequest, UserChallengeResponse};
+use api_wire_types::{UserChallengeRequest, UserChallengeResponse};
 use itertools::Itertools;
 use newtypes::{ActionKind, AuthEventKind, AuthMethodKind};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -111,16 +111,12 @@ pub async fn post(
     };
     let challenge_token = Challenge::new(challenge).seal(&state.challenge_sealing_key)?;
 
-    let err = if let Some(rx) = rx {
-        rx_background_error(rx, 3).await.err()
-    } else {
-        None
-    };
-    if let Some(err) = err {
-        let e = ErrorChallengeResponse {
-            error: err.to_string(),
-        };
-        return Err(JsonError(e).into());
+    // TODO the client isn't currently set up to both display an error and receive the
+    // challenge_token as we do in the identify APIs.
+    // We should do this eventually to support cases where twilio still reports the message is
+    // unsent but the message actually makes it to the user, perhaps a few seconds later
+    if let Some(rx) = rx {
+        rx_background_error(rx, 5).await?;
     }
 
     let response = UserChallengeResponse {
