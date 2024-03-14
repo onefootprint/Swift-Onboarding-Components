@@ -14,4 +14,6 @@ export { default as MiddleNameInput } from './components/middle-name-input';
 export type { PhoneInputProps } from './components/phone-input';
 export { default as PhoneInput } from './components/phone-input';
 export { default as Provider } from './components/provider';
+export type { SSN4InputProps } from './components/ssn-4-input';
+export { default as SSN4Input } from './components/ssn-4-input';
 export { useFootprint } from './hooks/use-footprint';
