@@ -5,10 +5,8 @@ use newtypes::{ExternalId, FpId, OnboardingStatus, SandboxId};
 pub struct LiteUser {
     #[openapi(example = "fp_id_7p793EF07xKXHqAeg5VGPj")]
     pub id: FpId,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[openapi(skip)]
+    /// Only populated for users created in sandbox mode.
     pub sandbox_id: Option<SandboxId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub external_id: Option<ExternalId>,
 }
 

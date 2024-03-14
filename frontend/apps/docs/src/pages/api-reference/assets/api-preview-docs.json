@@ -7174,6 +7174,10 @@
                     "id": {
                         "example": "fp_id_7p793EF07xKXHqAeg5VGPj",
                         "type": "string"
+                    },
+                    "sandbox_id": {
+                        "description": "Only populated for users created in sandbox mode.",
+                        "type": "string"
                     }
                 },
                 "required": [
