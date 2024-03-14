@@ -22,9 +22,10 @@ jobs:
       - uses: dorny/paths-filter@affb29871ab1f927ecad0ee68c0989584101408f
         id: changes
         with:
-          filters: | 
+          filters: |
             src:
               - 'backend/**'
+              - '.github/**'
     outputs:
       filesChanged: ${{ steps.changes.outputs.src }}
 
@@ -160,8 +161,8 @@ jobs:
           head -n $CROP integration_test_output.txt | tail -n $BEGIN > out.txt
           sed -i 's/\[.*%\]//g' out.txt
           sed -i 's/tests/* tests/g' out.txt
-          echo '### Local integration tests' > test_out.txt          
-          cat out.txt >> test_out.txt   
+          echo '### Local integration tests' > test_out.txt
+          cat out.txt >> test_out.txt
           echo -e "$SHORT_SUMMARY" >> test_out.txt
           COMMENT="$(cat test_out.txt)"
           COMMENT="${COMMENT//'%'/'%25'}"

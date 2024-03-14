@@ -25,9 +25,10 @@ jobs:
       - uses: dorny/paths-filter@affb29871ab1f927ecad0ee68c0989584101408f
         id: changes
         with:
-          filters: | 
+          filters: |
             src:
               - 'frontend/**'
+              - '.github/**'
     outputs:
       filesChanged: ${{ steps.changes.outputs.src }}
 
