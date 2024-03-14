@@ -24,13 +24,15 @@ pub enum SmsMessage {
 
 impl SmsMessage {
     pub fn body(&self) -> PiiString {
+        // NOTE: some carriers, particularly in Mexico, have a character limit of 140.
+        // Be careful with long message bodies
         let body = match self {
             Self::Otp { tenant_name, code } => {
                 if let Some(tenant_name) = tenant_name {
-                    format!("Your {} verification code is {}. Don't share your code with anyone, we will never contact you to request this code.", tenant_name, code.leak())
+                    format!("Your {} verification code is {}.", tenant_name, code.leak())
                 } else {
                     // This copy likely won't work for safari's autofill, but the other one is being blocked by twilio
-                    format!("Your Footprint verification code is {}. Don't share your code with anyone, we will never contact you to request this code.", code.leak())
+                    format!("Your Footprint verification code is {}.", code.leak())
                 }
             }
             Self::D2p { url } => format!(
