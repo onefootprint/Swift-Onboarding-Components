@@ -22,6 +22,7 @@ const IGNORE_LATENT_HTTP_ROUTES: string[] = [
 const LATENT_HTTP_ROUTES: string[] = [
   '/vault_proxy/reflect',
   '/hosted/user/documents/{id}/process',
+  '/hosted/onboarding/tel',
 ];
 
 /// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25
