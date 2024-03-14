@@ -13,6 +13,7 @@ use db::{
 use newtypes::{ObConfigurationId, RuleId};
 use paperclip::actix::{self, api_v2_operation, web};
 
+/// Note: Being deprecated in favor of bulk edit API
 #[api_v2_operation(description = "Deletes a Rule", tags(Playbooks, Organization, Private, Rules))]
 #[actix::delete("/org/onboarding_configs/{obc_id}/rules/{rule_id}")]
 pub async fn delete(

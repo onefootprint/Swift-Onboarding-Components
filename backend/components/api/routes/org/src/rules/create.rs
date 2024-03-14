@@ -13,6 +13,7 @@ use db::{
 use newtypes::ObConfigurationId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
+/// Note: Being deprecated in favor of bulk edit API
 #[api_v2_operation(
     description = "Creates a new Rule for the playbook",
     tags(Playbooks, Organization, Private, Rules)

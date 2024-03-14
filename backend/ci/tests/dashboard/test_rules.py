@@ -302,3 +302,76 @@ def test_delete(sandbox_tenant, obc):
         )
         == 0
     )
+
+
+def test_multi_edit(sandbox_tenant, obc):
+    # When OBC's are created they are given a default set of rules
+    default_rules = get(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
+    # edit 2 rules, add 2 new ones, and delete the rest
+    rules = patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=1,
+            add=[
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "address_located_is_not_standard_hospital",
+                            "op": "eq",
+                            "value": True,
+                        }
+                    ],
+                ),
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "address_located_is_not_standard_college",
+                            "op": "eq",
+                            "value": True,
+                        }
+                    ],
+                ),
+            ],
+            edit=[
+                dict(
+                    rule_id=default_rules[0]["rule_id"],
+                    rule_expression=[
+                        {
+                            "field": "browser_automation",
+                            "op": "eq",
+                            "value": True,
+                        }
+                    ],
+                ),
+                dict(
+                    rule_id=default_rules[1]["rule_id"],
+                    rule_expression=[
+                        {
+                            "field": "browser_tampering",
+                            "op": "eq",
+                            "value": True,
+                        }
+                    ],
+                ),
+            ],
+            delete=[r["rule_id"] for r in default_rules[2:]],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # should have 4 rules now: 2 we edited (and did not delete) and 2 new ones we added
+    assert set([r["rule_expression"][0]["field"] for r in rules]) == set(
+        [
+            "address_located_is_not_standard_hospital",
+            "address_located_is_not_standard_college",
+            "browser_automation",
+            "browser_tampering",
+        ]
+    )

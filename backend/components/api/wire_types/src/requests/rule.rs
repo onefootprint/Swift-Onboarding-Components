@@ -1,5 +1,5 @@
 use crate::*;
-use newtypes::{RuleAction, RuleExpression};
+use newtypes::{RuleAction, RuleExpression, RuleId};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateRuleRequest {
@@ -14,6 +14,27 @@ pub struct UpdateRuleRequest {
     pub rule_expression: Option<RuleExpression>,
     pub is_shadow: Option<bool>,
 }
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct MultiUpdateRuleRequest {
+    pub expected_rule_set_version: i32,
+    pub add: Option<Vec<CreateRule>>,
+    pub edit: Option<Vec<EditRule>>,
+    pub delete: Option<Vec<RuleId>>,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct CreateRule {
+    pub rule_expression: RuleExpression,
+    pub rule_action: RuleAction,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct EditRule {
+    pub rule_id: RuleId,
+    pub rule_expression: RuleExpression,
+}
+
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct EvaluateRuleRequest {

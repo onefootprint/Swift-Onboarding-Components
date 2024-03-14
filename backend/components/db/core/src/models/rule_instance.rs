@@ -27,7 +27,7 @@ pub struct RuleInstance {
     pub rule_id: RuleId,
     pub ob_configuration_id: ObConfigurationId, // later to be replaced by rule_set_id which will in turn have a pointer to OBC
     pub actor: DbActor,
-    pub name: Option<String>,
+    pub name: Option<String>, // not used yet
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
     pub is_shadow: bool, // not yet used
@@ -60,9 +60,9 @@ pub struct NewRule {
 #[derive(Debug, Clone)]
 pub struct RuleInstanceUpdate {
     rule_id: RuleId,
-    name: Option<Option<String>>,
+    name: Option<Option<String>>, // TODO: remove, we don't actually use this currently
     rule_expression: Option<RuleExpression>,
-    is_shadow: Option<bool>,
+    is_shadow: Option<bool>, // TODO: remove, we don't actually use this currently
     deactivate: bool,
 }
 

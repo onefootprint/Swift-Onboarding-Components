@@ -10,6 +10,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(list::list_rules_for_playbook)
         .service(create::create_rule)
         .service(update::update_rule)
+        .service(update::multi_update_rules)
         .service(delete::delete)
         .service(evaluate::evaluate_rule);
 }
