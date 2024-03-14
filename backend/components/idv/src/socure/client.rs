@@ -42,7 +42,10 @@ impl SocureClient {
             header::HeaderValue::from_static("application/json"),
         );
 
-        let client = reqwest::Client::builder().default_headers(headers).build()?;
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(45))
+            .default_headers(headers)
+            .build()?;
         Ok(Self {
             client,
             idplus_url: idplus_url.to_string(),

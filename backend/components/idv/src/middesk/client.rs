@@ -23,6 +23,7 @@ impl MiddeskClient {
         );
 
         let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(45))
             .default_headers(headers)
             .build()
             .map_err(MiddeskReqwestError::from)?;

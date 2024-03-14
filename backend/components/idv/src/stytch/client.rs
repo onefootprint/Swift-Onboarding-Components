@@ -11,7 +11,9 @@ pub struct StytchClient {
 
 impl StytchClient {
     pub fn new(project_id: String, secret: PiiString) -> Result<Self, error::Error> {
-        let client = reqwest::Client::builder().build()?;
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(45))
+            .build()?;
         Ok(Self {
             client,
             project_id,

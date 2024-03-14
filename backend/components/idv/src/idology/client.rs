@@ -15,7 +15,9 @@ pub struct IdologyClient {
 impl IdologyClient {
     // TODO: deprecate
     pub fn new(username: PiiString, password: PiiString) -> Result<Self, IdologyError::ReqwestError> {
-        let client = reqwest::Client::builder().build()?;
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(45))
+            .build()?;
         Ok(Self {
             client,
             username,
