@@ -4,7 +4,7 @@ import type {
 } from '@onefootprint/types';
 
 import { AUTH_HEADER } from '../../../constants';
-import request from '../request';
+import request from '../../../utils/request';
 
 const getOnboardingStatus = async ({ authToken }: OnboardingStatusRequest) => {
   const response = await request<OnboardingStatusResponse>({

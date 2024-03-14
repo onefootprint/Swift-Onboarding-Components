@@ -18,7 +18,7 @@ function convertToRecordString(
 ): Record<string, string> {
   const output: Record<string, string> = {};
   for (const key in input) {
-    if (input[key]) {
+    if (Object.hasOwnProperty.call(input, key)) {
       output[key] = String(input[key]);
     }
   }
@@ -29,30 +29,35 @@ async function request<T>(options: Options): Promise<T> {
   const {
     baseURL = API_BASE_URL,
     url,
-    headers,
+    headers = {},
     params,
     data,
     ...otherOptions
   } = options;
+
   const snakeCaseData = data ? keysToSnakeCase(data) : undefined;
   const snakeCaseParams = params ? keysToSnakeCase(params) : {};
   const queryParams = new URLSearchParams(
     convertToRecordString(snakeCaseParams),
   );
+  const requestHeaders = new Headers({
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  });
+  Object.entries(headers).forEach(([key, value]) => {
+    requestHeaders.set(key, value);
+  });
 
-  const response = await fetch(`${baseURL}${url}?${queryParams.toString()}`, {
+  const response = await fetch(`${baseURL}${url}?${queryParams}`, {
     ...otherOptions,
-    // @ts-expect-error couldn't fix this issue
-    headers: {
-      'Content-Type': 'application/json',
-      accept: 'application/json',
-      ...headers,
-    },
+    headers: requestHeaders,
     body: snakeCaseData ? JSON.stringify(snakeCaseData) : undefined,
   });
+
   if (!response.ok) {
     throw new Error(response.statusText);
   }
+
   const jsonResponse = await response.json();
   return keysToCamelCase(jsonResponse);
 }

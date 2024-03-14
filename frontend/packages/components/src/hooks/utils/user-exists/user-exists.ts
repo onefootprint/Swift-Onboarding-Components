@@ -1,6 +1,6 @@
 import type { IdentifyRequest, IdentifyResponse } from '@onefootprint/types';
 
-import request from '../request';
+import request from '../../../utils/request';
 
 const identifyUserRequest = async (payload: IdentifyRequest) => {
   const response = await request<IdentifyResponse>({
