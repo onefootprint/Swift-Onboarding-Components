@@ -131,7 +131,7 @@ pub enum ProxyTokenError {
     InvalidDataIdentifier(#[from] crate::EnumDotNotationError),
     #[error("Cannot mix global footprint token with fully-qualified proxy tokens. Please remove the header 'x-fp-id' or remove the 'fp_id.' prefix from proxy tokens.")]
     CannotMixFullyQualifiedProxyTokens,
-    #[error("Missing or invalid footprint id in proxy token.")]
+    #[error("Missing or invalid fp_id in proxy token.")]
     InvalidFootprintIdInProxyToken,
 }
 

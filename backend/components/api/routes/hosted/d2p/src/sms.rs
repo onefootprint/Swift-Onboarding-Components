@@ -8,12 +8,12 @@ use crate::{
 use api_core::{
     auth::user::UserAuthGuard, errors::user::UserError, utils::vault_wrapper::Person, ApiErrorKind,
 };
-use newtypes::{ContactInfoKind, PhoneNumber};
+use newtypes::{ContactInfoKind, PhoneNumber, PiiString};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct D2pSmsRequest {
-    url: String,
+    url: PiiString,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]

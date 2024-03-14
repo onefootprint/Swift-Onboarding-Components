@@ -1,6 +1,6 @@
 use super::{
     super::challenge_rate_limit::RateLimit,
-    vendors::{Message, Pinpoint, SmsVendor, SmsVendorKind, Twilio},
+    vendors::{Pinpoint, SmsVendor, SmsVendorKind, TwilioSms},
 };
 use crate::{
     errors::{user::UserError, ApiError, ApiResult, AssertionError},
@@ -12,7 +12,7 @@ use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use itertools::Itertools;
-use newtypes::{PhoneNumber, PiiString, SandboxId, VaultId};
+use newtypes::{sms_message::SmsMessage, PhoneNumber, PiiString, SandboxId, VaultId};
 use std::fmt::Debug;
 use tokio::sync::oneshot::{self, Receiver, Sender};
 use tracing::Instrument;
@@ -103,11 +103,11 @@ impl SmsClient {
 
     #[tracing::instrument("SmsClient::send_message", skip_all)]
     /// Rate limits sending messages to the destination phone number and then spawns an async task
-    /// to send the message_body
+    /// to send the message
     pub async fn send_message(
         &self,
         state: &State,
-        message_body: PiiString,
+        message: SmsMessage,
         destination: &PhoneNumber,
         rate_limit_scope: &str,
     ) -> ApiResult<()> {
@@ -122,8 +122,7 @@ impl SmsClient {
         }
         .enforce_and_update(state)
         .await?;
-        let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
-        self._send_message(message_body, destination.e164(), None).await?;
+        self._send_message(message, destination.e164(), None).await?;
         Ok(())
     }
 
@@ -131,7 +130,7 @@ impl SmsClient {
     async fn send_message_non_blocking(
         &self,
         state: &State,
-        message_body: PiiString,
+        message: SmsMessage,
         destination: &PhoneNumber,
         rate_limit_scope: &str,
         tx: Sender<ApiError>,
@@ -147,11 +146,10 @@ impl SmsClient {
         }
         .enforce_and_update(state)
         .await?;
-        let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
         let e164 = destination.e164();
         let client = self.clone();
         let fut = async move {
-            let res = client._send_message(message_body, e164, Some(tx)).await;
+            let res = client._send_message(message, e164, Some(tx)).await;
             if let Err(err) = res {
                 tracing::error!(%err, "Couldn't send SMS asynchronously");
             }
@@ -160,24 +158,19 @@ impl SmsClient {
         Ok(())
     }
 
-    /// Sends the message_body to the provided destination, choosing which vendor to use if any
+    /// Sends the message to the provided destination, choosing which vendor to use if any
     #[tracing::instrument("SmsClient::_send_message", skip_all)]
     async fn _send_message(
         &self,
-        message_body: PiiString,
+        message: SmsMessage,
         destination: PiiString,
         mut tx: Option<Sender<ApiError>>,
     ) -> ApiResult<()> {
-        let message = Message {
-            client: self,
-            message: &message_body,
-            destination: &destination,
-        };
         let vendors: Vec<Box<dyn SmsVendor>> = vec![
             // Two twilios because we want to try twilio twice before falling back to pinpoint
-            Box::new(Twilio(message)),
-            Box::new(Twilio(message)),
-            Box::new(Pinpoint(message)),
+            Box::new(TwilioSms),
+            Box::new(TwilioSms),
+            Box::new(Pinpoint),
         ];
         let preferred_vendor = if self.ff_client.flag(BoolFlag::TwilioIsPreferredSmsVendor) {
             SmsVendorKind::Twilio
@@ -195,7 +188,7 @@ impl SmsClient {
         let mut err = None;
         let mut sent_error_to_caller = false;
         for vendor in ordered_vendors {
-            let e = match vendor.send().await {
+            let e = match vendor.send(self, &message, &destination).await {
                 Ok(_) => return Ok(()),
                 Err(e) => e,
             };
@@ -247,27 +240,23 @@ impl SmsClient {
         let code = if destination.is_fixture_phone_number() {
             // For our one fixture number in sandbox mode, we want the 2fac code to be fixed
             // to make it easy to test
-            "000000".to_owned()
+            PiiString::from("000000")
         } else {
-            crypto::random::gen_rand_n_digit_code(6)
+            PiiString::from(crypto::random::gen_rand_n_digit_code(6))
         };
-        let message_body = if let Some(tenant) = tenant {
-            PiiString::from(format!("Your {} verification code is {}. Don't share your code with anyone, we will never contact you to request this code.", tenant.name, &code))
-        } else {
-            // This copy likely won't work for safari's autofill, but the other one is being blocked by twilio
-            PiiString::from(format!("Your Footprint verification code is {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
-        };
+        let h_code = sha256(code.leak().as_bytes()).to_vec();
 
         // Oneshot channel to send an error back from async message sending
         let (tx, rx) = oneshot::channel();
 
-        self.send_message_non_blocking(state, message_body, destination, RateLimit::SMS_CHALLENGE, tx)
+        let message = SmsMessage::Otp {
+            tenant_name: tenant.map(|t| t.name.clone()),
+            code,
+        };
+        self.send_message_non_blocking(state, message, destination, RateLimit::SMS_CHALLENGE, tx)
             .await?;
 
-        let state = PhoneEmailChallengeState {
-            vault_id,
-            h_code: sha256(code.as_bytes()).to_vec(),
-        };
+        let state = PhoneEmailChallengeState { vault_id, h_code };
         Ok((rx, state, self.duration_between_challenges))
     }
 
@@ -276,14 +265,11 @@ impl SmsClient {
         &self,
         state: &State,
         destination: &PhoneNumber,
-        url: String,
+        url: PiiString,
     ) -> ApiResult<SecondsBeforeRetry> {
-        let message_body = PiiString::from(format!(
-            "Continue account verification on your phone using this link: {}",
-            url
-        ));
+        let message = SmsMessage::D2p { url };
 
-        self.send_message(state, message_body, destination, RateLimit::D2P_LINK)
+        self.send_message(state, message, destination, RateLimit::D2P_LINK)
             .await?;
 
         Ok(self.duration_between_challenges)
@@ -291,15 +277,14 @@ impl SmsClient {
 
     #[tracing::instrument(skip_all)]
     pub async fn send_bo_session<'a>(&self, state: &State, info: BoSessionSmsInfo<'a>) -> ApiResult<()> {
-        let message_body = PiiString::from(format!(
-            "{} identified you as a beneficial owner of {}. To finish verifying your business for {}, we need to verify your identity as well. Continue here: {}",
-            info.inviter.leak(),
-            info.business_name.leak(),
-            info.org_name,
-            info.url.leak()
-        ));
+        let message = SmsMessage::BoSession {
+            inviter: info.inviter.clone(),
+            business_name: info.business_name.clone(),
+            tenant_name: info.org_name.into(),
+            url: info.url,
+        };
 
-        self.send_message(state, message_body, info.destination, RateLimit::BO_SESSION)
+        self.send_message(state, message, info.destination, RateLimit::BO_SESSION)
             .await?;
 
         Ok(())

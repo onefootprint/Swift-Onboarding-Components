@@ -21,7 +21,10 @@ use api_wire_types::{CreateEntityTokenRequest, CreateEntityTokenResponse};
 use chrono::Duration;
 use db::models::{scoped_vault::ScopedVault, workflow_request::WorkflowRequest};
 use itertools::Itertools;
-use newtypes::{ContactInfoKind, DocumentRequestKind, PhoneNumber, PiiString, WorkflowRequestConfig};
+use newtypes::{
+    sms_message::SmsMessage, ContactInfoKind, DocumentRequestKind, PhoneNumber, PiiString,
+    WorkflowRequestConfig,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
@@ -117,16 +120,19 @@ async fn send_communication(
     };
 
     let method = if let Some(phone) = vw.decrypt_contact_info(state, ContactInfoKind::Phone).await? {
-        let msg = SmsMessage::from(msg);
+        let msg = TokenSmsMessage::from(msg);
         let scope = msg.rate_limit_scope;
         let phone = PhoneNumber::parse(phone.0)?;
+        let message = SmsMessage::Freeform {
+            content: msg.message_body,
+        };
         state
             .sms_client
-            .send_message(state, msg.message_body, &phone, scope)
+            .send_message(state, message, &phone, scope)
             .await?;
         Some(ContactInfoKind::Phone)
     } else if let Some(email) = vw.decrypt_contact_info(state, ContactInfoKind::Email).await? {
-        let msg = EmailMessage::from(msg);
+        let msg = TokenEmailMessage::from(msg);
         state
             .sendgrid_client
             .send_template(state, email.0, msg.template_id, msg.template_data)
@@ -232,17 +238,17 @@ impl TriggerMessageKind {
     }
 }
 
-pub struct SmsMessage<'a> {
+pub struct TokenSmsMessage<'a> {
     pub message_body: PiiString,
     pub rate_limit_scope: &'a str,
 }
 
-pub struct EmailMessage<'a> {
+pub struct TokenEmailMessage<'a> {
     pub template_id: &'a str,
     pub template_data: HashMap<String, PiiString>,
 }
 
-impl<'a> From<TriggerMessage> for SmsMessage<'a> {
+impl<'a> From<TriggerMessage> for TokenSmsMessage<'a> {
     fn from(value: TriggerMessage) -> Self {
         let message_body = PiiString::from(
             vec![
@@ -254,14 +260,14 @@ impl<'a> From<TriggerMessage> for SmsMessage<'a> {
             .flatten()
             .join("\n\n"),
         );
-        SmsMessage {
+        TokenSmsMessage {
             message_body,
             rate_limit_scope: RateLimit::DASHBOARD_TRIGGER,
         }
     }
 }
 
-impl<'a> From<TriggerMessage> for EmailMessage<'a> {
+impl<'a> From<TriggerMessage> for TokenEmailMessage<'a> {
     fn from(value: TriggerMessage) -> Self {
         let TriggerMessage {
             org_name,
@@ -282,7 +288,7 @@ impl<'a> From<TriggerMessage> for EmailMessage<'a> {
             .flatten(),
         );
 
-        EmailMessage {
+        TokenEmailMessage {
             template_id: SendgridClient::TRIGGER_TEMPLATE_ID,
             template_data,
         }

@@ -1,5 +1,5 @@
 use crate::{error::Error, response::message::Status};
-use newtypes::PiiString;
+use newtypes::{sms_message::SmsMessage, PiiString};
 use request::send_message::SendMessage;
 use reqwest::{IntoUrl, Method};
 use reqwest_middleware::{ClientWithMiddleware, RequestBuilder};
@@ -83,7 +83,7 @@ impl Client {
     pub async fn send_message(
         &self,
         destination: PiiString,
-        body: PiiString,
+        message: SmsMessage,
     ) -> crate::response::Result<Message> {
         /// if a message wasnt delivered in 15s it should be useless to us
         /// so tell twilio to drop it
@@ -100,7 +100,7 @@ impl Client {
         };
 
         let params = SendMessage {
-            body: body.leak_to_string(),
+            body: message.body().leak_to_string(),
             to: destination.leak_to_string(),
             from,
             validity_period: VALIDITY_PERIOD_SECS as u64, // dont send the message after TTL
