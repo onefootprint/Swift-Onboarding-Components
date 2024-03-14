@@ -27,7 +27,7 @@ pub struct PhoneEmailChallengeState {
 
 #[derive(Clone)]
 pub struct SmsClient {
-    duration_between_challenges: Duration,
+    pub duration_between_challenges: Duration,
     /// Twilio client
     pub twilio_client: twilio::Client,
     /// In prod, we still load the dev twilio account's credentials in case we need to quickly fall
@@ -108,8 +108,7 @@ impl SmsClient {
         &self,
         state: &State,
         message: SmsMessage,
-        destination: &PhoneNumber,
-        rate_limit_scope: &str,
+        destination: PhoneNumber,
     ) -> ApiResult<()> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
@@ -118,7 +117,7 @@ impl SmsClient {
         RateLimit {
             key: &destination.e164(),
             period: self.duration_between_challenges,
-            scope: rate_limit_scope,
+            scope: message.rate_limit_scope(),
         }
         .enforce_and_update(state)
         .await?;
@@ -132,7 +131,6 @@ impl SmsClient {
         state: &State,
         message: SmsMessage,
         destination: &PhoneNumber,
-        rate_limit_scope: &str,
         tx: Sender<ApiError>,
     ) -> ApiResult<()> {
         if destination.is_fixture_phone_number() {
@@ -142,7 +140,7 @@ impl SmsClient {
         RateLimit {
             key: &destination.e164(),
             period: self.duration_between_challenges,
-            scope: rate_limit_scope,
+            scope: message.rate_limit_scope(),
         }
         .enforce_and_update(state)
         .await?;
@@ -253,41 +251,11 @@ impl SmsClient {
             tenant_name: tenant.map(|t| t.name.clone()),
             code,
         };
-        self.send_message_non_blocking(state, message, destination, RateLimit::SMS_CHALLENGE, tx)
+        self.send_message_non_blocking(state, message, destination, tx)
             .await?;
 
         let state = PhoneEmailChallengeState { vault_id, h_code };
         Ok((rx, state, self.duration_between_challenges))
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub async fn send_d2p(
-        &self,
-        state: &State,
-        destination: &PhoneNumber,
-        url: PiiString,
-    ) -> ApiResult<SecondsBeforeRetry> {
-        let message = SmsMessage::D2p { url };
-
-        self.send_message(state, message, destination, RateLimit::D2P_LINK)
-            .await?;
-
-        Ok(self.duration_between_challenges)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub async fn send_bo_session<'a>(&self, state: &State, info: BoSessionSmsInfo<'a>) -> ApiResult<()> {
-        let message = SmsMessage::BoSession {
-            inviter: info.inviter.clone(),
-            business_name: info.business_name.clone(),
-            tenant_name: info.org_name.into(),
-            url: info.url,
-        };
-
-        self.send_message(state, message, info.destination, RateLimit::BO_SESSION)
-            .await?;
-
-        Ok(())
     }
 }
 

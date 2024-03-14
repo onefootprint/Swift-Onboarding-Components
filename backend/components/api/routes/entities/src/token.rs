@@ -10,7 +10,6 @@ use api_core::{
     config::LinkKind,
     errors::{user::UserError, ApiResult},
     utils::{
-        challenge_rate_limit::RateLimit,
         email::SendgridClient,
         fp_id_path::FpIdPath,
         token::{create_token, CreateTokenArgs, CreateTokenResult},
@@ -121,15 +120,11 @@ async fn send_communication(
 
     let method = if let Some(phone) = vw.decrypt_contact_info(state, ContactInfoKind::Phone).await? {
         let msg = TokenSmsMessage::from(msg);
-        let scope = msg.rate_limit_scope;
         let phone = PhoneNumber::parse(phone.0)?;
         let message = SmsMessage::Freeform {
             content: msg.message_body,
         };
-        state
-            .sms_client
-            .send_message(state, message, &phone, scope)
-            .await?;
+        state.sms_client.send_message(state, message, phone).await?;
         Some(ContactInfoKind::Phone)
     } else if let Some(email) = vw.decrypt_contact_info(state, ContactInfoKind::Email).await? {
         let msg = TokenEmailMessage::from(msg);
@@ -238,9 +233,8 @@ impl TriggerMessageKind {
     }
 }
 
-pub struct TokenSmsMessage<'a> {
+pub struct TokenSmsMessage {
     pub message_body: PiiString,
-    pub rate_limit_scope: &'a str,
 }
 
 pub struct TokenEmailMessage<'a> {
@@ -248,7 +242,7 @@ pub struct TokenEmailMessage<'a> {
     pub template_data: HashMap<String, PiiString>,
 }
 
-impl<'a> From<TriggerMessage> for TokenSmsMessage<'a> {
+impl From<TriggerMessage> for TokenSmsMessage {
     fn from(value: TriggerMessage) -> Self {
         let message_body = PiiString::from(
             vec![
@@ -260,10 +254,7 @@ impl<'a> From<TriggerMessage> for TokenSmsMessage<'a> {
             .flatten()
             .join("\n\n"),
         );
-        TokenSmsMessage {
-            message_body,
-            rate_limit_scope: RateLimit::DASHBOARD_TRIGGER,
-        }
+        TokenSmsMessage { message_body }
     }
 }
 

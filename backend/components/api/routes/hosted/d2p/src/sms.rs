@@ -8,7 +8,7 @@ use crate::{
 use api_core::{
     auth::user::UserAuthGuard, errors::user::UserError, utils::vault_wrapper::Person, ApiErrorKind,
 };
-use newtypes::{ContactInfoKind, PhoneNumber, PiiString};
+use newtypes::{sms_message::SmsMessage, ContactInfoKind, PhoneNumber, PiiString};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -58,10 +58,14 @@ pub async fn handler(
     }
     let phone_number = PhoneNumber::parse(phone_number)?;
 
-    let time_before_retry_s = state
+    let message = SmsMessage::D2p {
+        url: request.url.clone(),
+    };
+    state
         .sms_client
-        .send_d2p(&state, &phone_number, request.url.clone())
+        .send_message(&state, message, phone_number)
         .await?;
+    let time_before_retry_s = state.sms_client.duration_between_challenges;
 
     Ok(Json(ResponseData::ok(D2pSmsResponse {
         time_before_retry_s: time_before_retry_s.num_seconds(),

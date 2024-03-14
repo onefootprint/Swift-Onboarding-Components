@@ -8,7 +8,6 @@ use crate::{
     utils::{
         email::BoInviteEmailInfo,
         session::AuthSession,
-        sms::BoSessionSmsInfo,
         vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper},
     },
     State,
@@ -16,8 +15,8 @@ use crate::{
 use db::models::{business_owner::BusinessOwner, tenant::Tenant, workflow::Workflow};
 use futures::FutureExt;
 use newtypes::{
-    BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, KybState, KycedBusinessOwnerData, OnboardingStatus,
-    PiiString, WorkflowState,
+    sms_message::SmsMessage, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, KybState,
+    KycedBusinessOwnerData, OnboardingStatus, PiiString, WorkflowState,
 };
 
 pub struct BasicBusinessInfo {
@@ -112,13 +111,14 @@ pub async fn send_secondary_bo_links(
                 .config
                 .service_config
                 .generate_link(LinkKind::VerifyBusinessOwner, &token);
-            let sms = BoSessionSmsInfo {
-                destination: &bo_data.phone_number,
-                inviter: &inviter,
-                business_name: &business_name,
-                org_name: &tenant.name,
+            let sms_message = SmsMessage::BoSession {
+                inviter: inviter.clone(),
+                business_name: business_name.clone(),
+                tenant_name: tenant.name.clone(),
                 url: url.clone(),
             };
+            let sms_destination = bo_data.phone_number.clone();
+            let sms = (sms_message, sms_destination);
             let email = BoInviteEmailInfo {
                 to_email: bo_data.email.to_piistring(),
                 inviter: &inviter,
@@ -131,13 +131,15 @@ pub async fn send_secondary_bo_links(
         })
         .collect::<ApiResult<Vec<_>>>()?;
 
-    let futs = bo_sms_info.into_iter().flat_map(|(sms, email)| {
-        let sms = state.sms_client.send_bo_session(state, sms);
-        let email = state.sendgrid_client.send_business_owner_invite(state, email);
-        let v: Vec<Pin<Box<dyn futures::Future<Output = ApiResult<()>>>>> =
-            vec![Box::pin(sms), Box::pin(email)];
-        v
-    });
+    let futs = bo_sms_info
+        .into_iter()
+        .flat_map(|((sms_message, sms_destination), email)| {
+            let sms = state.sms_client.send_message(state, sms_message, sms_destination);
+            let email = state.sendgrid_client.send_business_owner_invite(state, email);
+            let v: Vec<Pin<Box<dyn futures::Future<Output = ApiResult<()>>>>> =
+                vec![Box::pin(sms), Box::pin(email)];
+            v
+        });
     futures::future::join_all(futs)
         .await
         .into_iter()

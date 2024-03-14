@@ -18,12 +18,6 @@ pub struct RateLimit<'a> {
 }
 
 impl<'a> RateLimit<'a> {
-    // TODO: probably just enum these dudes
-    pub const BO_SESSION: &'static str = "bo_session";
-    pub const D2P_LINK: &'static str = "d2p_session";
-    pub const DASHBOARD_TRIGGER: &'static str = "dashboard_trigger";
-    pub const SMS_CHALLENGE: &'static str = "sms_challenge";
-
     pub(super) async fn enforce_and_update(&self, state: &State) -> ApiResult<()> {
         let RateLimit { period, key, scope } = *self;
 

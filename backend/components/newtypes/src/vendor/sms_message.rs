@@ -50,4 +50,13 @@ impl SmsMessage {
         };
         PiiString::from(format!("{}\n\nSent via Footprint", body))
     }
+
+    pub fn rate_limit_scope(&self) -> &str {
+        match self {
+            Self::Otp { .. } => "sms_challenge",
+            Self::D2p { .. } => "d2p_session",
+            Self::BoSession { .. } => "bo_session",
+            Self::Freeform { .. } => "freeform",
+        }
+    }
 }
