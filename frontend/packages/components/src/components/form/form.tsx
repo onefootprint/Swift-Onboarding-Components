@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import type { UserData } from '../../types';
+import type { UserData } from '../../@types';
 
 export type FormProps = {
   children: React.ReactNode;

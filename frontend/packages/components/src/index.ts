@@ -1,3 +1,4 @@
+export type { UserData } from './@types/user-data';
 export type { DobInputProps } from './components/dob-input';
 export { default as DobInput } from './components/dob-input';
 export type { EmailInputProps } from './components/email-input';
@@ -14,4 +15,3 @@ export type { PhoneInputProps } from './components/phone-input';
 export { default as PhoneInput } from './components/phone-input';
 export { default as Provider } from './components/provider';
 export { useFootprint } from './hooks/use-footprint';
-export type { UserData } from './types/user-data';

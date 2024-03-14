@@ -2,7 +2,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { createContext, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type { UserData } from '../../types';
+import type { UserData } from '../../@types';
+import configureI18n from '../../config/initializers/i18next';
+
+configureI18n();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,7 +37,9 @@ export type ProviderProps = {
 };
 
 const FootprintProvider = ({ children }: ProviderProps) => {
-  const methods = useForm<UserData>();
+  const methods = useForm<UserData>({
+    // resolver: zodResolver(schema),
+  });
   const [value] = useState({
     publicKey: '',
     userData: {},

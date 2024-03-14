@@ -1,0 +1,101 @@
+{
+  "first-name": {
+    "label": "First name",
+    "placeholder": "Jane",
+    "errors": {
+      "required": "First name cannot be empty",
+      "invalid": "First name contains invalid characters."
+    }
+  },
+  "middle-name": {
+    "label": "Middle name (optional)",
+    "placeholder": "Sue",
+    "errors": {
+      "invalid": "Middle name contains invalid characters."
+    }
+  },
+  "last-name": {
+    "label": "Last name",
+    "placeholder": "Doe",
+    "errors": {
+      "required": "Last name cannot be empty",
+      "invalid": "First name contains invalid characters."
+    }
+  },
+  "dob": {
+    "label": "Date of Birth",
+    "errors": {
+      "required": "Date of birth cannot be empty",
+      "invalid": "Date of birth cannot be empty or is invalid",
+      "future-date": "Date of birth cannot be in the future",
+      "too-young": "Must be at least 18 years old",
+      "too-old": "Date of birth cannot be before than 1900"
+    }
+  },
+  "phone": {
+    "label": "Phone number",
+    "placeholder": "(123) 123-1234",
+    "errors": {
+      "required": "Phone number cannot be empty",
+      "invalid": "Phone number is invalid"
+    }
+  },
+  "address-line-1": {
+    "label": "Address line 1",
+    "placeholder": "Street and house number",
+    "errors": {
+      "required": "Address cannot be empty",
+      "invalid": "Address must be a residential address (e.g. cannot be a P.O. Box)"
+    }
+  },
+  "address-line-2": {
+    "label": "Address line 2 (optional)",
+    "placeholder": "Apartment, suite, etc."
+  },
+  "city": {
+    "label": "City",
+    "placeholder": "City",
+    "errors": {
+      "required": "City cannot be empty"
+    }
+  },
+  "state": {
+    "label": "State",
+    "placeholder": "State",
+    "errors": {
+      "required": "State cannot be empty"
+    }
+  },
+  "country": {
+    "label": "Country",
+    "placeholder": "Select",
+    "disabled-hint": "Only addresses in {{countryName}} are accepted",
+    "errors": {
+      "required": "Country cannot be empty"
+    }
+  },
+  "zip-code": {
+    "label": "Zip code",
+    "placeholder": "11206",
+    "errors": {
+      "required": "Zip code cannot be empty",
+      "invalid": "Zip code is invalid"
+    }
+  },
+  "ssn-9": {
+    "label": "SSN",
+    "placeholder": "XXX-XX-XXXX",
+    "errors": {
+      "required": "SSN cannot be empty",
+      "invalid": "SSN is invalid"
+    }
+  },
+  "ssn-4": {
+    "label": "SSN (last 4)",
+    "placeholder": "XXXX",
+    "errors": {
+      "required": "SSN cannot be empty",
+      "invalid": "SSN is invalid"
+    }
+  }
+}

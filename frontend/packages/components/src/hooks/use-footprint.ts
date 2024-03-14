@@ -1,8 +1,8 @@
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import type { UserData } from '../@types';
 import { Context } from '../components/provider';
-import type { UserData } from '../types';
 import getMissingRequirements from './utils/get-missing-requirements';
 import userExists from './utils/user-exists';
 
