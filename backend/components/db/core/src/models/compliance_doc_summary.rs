@@ -1,20 +1,21 @@
 use crate::{
     models::{
         compliance_doc_request::ComplianceDocRequest, compliance_doc_review::ComplianceDocReview,
-        compliance_doc_submission::ComplianceDocSubmission, partner_tenant::PartnerTenant, tenant::Tenant,
-        tenant_compliance_partnership::TenantCompliancePartnership, tenant_user::TenantUser,
+        compliance_doc_submission::ComplianceDocSubmission, compliance_doc_template::ComplianceDocTemplate,
+        compliance_doc_template_version::ComplianceDocTemplateVersion, partner_tenant::PartnerTenant,
+        tenant::Tenant, tenant_compliance_partnership::TenantCompliancePartnership, tenant_user::TenantUser,
     },
-    DbResult, PgConn,
+    DbResult, TxnPgConn,
 };
 use db_schema::schema::{
-    compliance_doc_request, compliance_doc_review, compliance_doc_submission, partner_tenant, tenant,
-    tenant_compliance_partnership,
+    compliance_doc_request, compliance_doc_review, compliance_doc_submission, compliance_doc_template,
+    compliance_doc_template_version, partner_tenant, tenant, tenant_compliance_partnership,
 };
 use diesel::prelude::*;
 use itertools::chain;
 use newtypes::{
-    ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocSubmissionId, TenantCompliancePartnershipId,
-    TenantOrPartnerTenantId, TenantUserId,
+    ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocSubmissionId, ComplianceDocTemplateId,
+    ComplianceDocTemplateVersionId, TenantCompliancePartnershipId, TenantOrPartnerTenantId, TenantUserId,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -23,6 +24,8 @@ pub struct ComplianceDocSummary {
     pub partnership: TenantCompliancePartnership,
     pub tenant: Tenant,
     pub partner_tenant: PartnerTenant,
+    pub doc_templates: HashMap<ComplianceDocTemplateId, ComplianceDocTemplate>,
+    pub doc_template_versions: HashMap<ComplianceDocTemplateVersionId, ComplianceDocTemplateVersion>,
     pub doc_requests: HashMap<ComplianceDocRequestId, ComplianceDocRequest>,
     pub doc_submissions: HashMap<ComplianceDocSubmissionId, ComplianceDocSubmission>,
     pub doc_reviews: HashMap<ComplianceDocReviewId, ComplianceDocReview>,
@@ -31,7 +34,7 @@ pub struct ComplianceDocSummary {
 
 impl ComplianceDocSummary {
     pub fn filter<'a>(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         id: impl Into<TenantOrPartnerTenantId<'a>>,
     ) -> DbResult<HashMap<TenantCompliancePartnershipId, ComplianceDocSummary>> {
         let id: TenantOrPartnerTenantId<'a> = id.into();
@@ -48,27 +51,43 @@ impl ComplianceDocSummary {
                 partnerships_join.filter(tenant_compliance_partnership::partner_tenant_id.eq(id))
             }
         }
-        .load(conn)?;
+        .load(conn.conn())?;
 
         let mut summaries = HashMap::new();
         for (partnership, tenant, partner_tenant) in partnerships.into_iter() {
+            let doc_templates: Vec<ComplianceDocTemplate> = compliance_doc_template::table
+                .filter(compliance_doc_template::partner_tenant_id.eq(&partnership.partner_tenant_id))
+                .select(ComplianceDocTemplate::as_select())
+                .load(conn.conn())?;
+            let doc_templates: HashMap<_, _> = doc_templates.into_iter().map(|r| (r.id.clone(), r)).collect();
+
+            let doc_template_versions: Vec<ComplianceDocTemplateVersion> =
+                compliance_doc_template_version::table
+                    .filter(compliance_doc_template_version::template_id.eq_any(doc_templates.keys()))
+                    .select(ComplianceDocTemplateVersion::as_select())
+                    .load(conn.conn())?;
+            let doc_template_versions: HashMap<_, _> = doc_template_versions
+                .into_iter()
+                .map(|r| (r.id.clone(), r))
+                .collect();
+
             let doc_requests: Vec<ComplianceDocRequest> = compliance_doc_request::table
                 .filter(compliance_doc_request::tenant_compliance_partnership_id.eq(&partnership.id))
                 .select(ComplianceDocRequest::as_select())
-                .load(conn)?;
+                .load(conn.conn())?;
             let doc_requests: HashMap<_, _> = doc_requests.into_iter().map(|r| (r.id.clone(), r)).collect();
 
             let doc_submissions: Vec<ComplianceDocSubmission> = compliance_doc_submission::table
                 .filter(compliance_doc_submission::request_id.eq_any(doc_requests.keys()))
                 .select(ComplianceDocSubmission::as_select())
-                .load(conn)?;
+                .load(conn.conn())?;
             let doc_submissions: HashMap<_, _> =
                 doc_submissions.into_iter().map(|s| (s.id.clone(), s)).collect();
 
             let doc_reviews: Vec<ComplianceDocReview> = compliance_doc_review::table
                 .filter(compliance_doc_review::submission_id.eq_any(doc_submissions.keys()))
                 .select(ComplianceDocReview::as_select())
-                .load(conn)?;
+                .load(conn.conn())?;
             let doc_reviews: HashMap<_, _> = doc_reviews.into_iter().map(|r| (r.id.clone(), r)).collect();
 
             let user_ids: HashSet<&TenantUserId> = chain!(
@@ -92,6 +111,8 @@ impl ComplianceDocSummary {
                 partnership,
                 tenant,
                 partner_tenant,
+                doc_templates,
+                doc_template_versions,
                 doc_requests,
                 doc_submissions,
                 doc_reviews,
@@ -362,6 +383,9 @@ mod tests {
         assert_eq!(summary.partnership.tenant_id, tenant.id);
         assert_eq!(summary.partner_tenant.id, pt.id);
         assert_eq!(summary.tenant.id, tenant.id);
+
+        assert_eq!(summary.doc_templates.len(), 3);
+        assert_eq!(summary.doc_template_versions.len(), 3);
 
         assert_eq!(summary.doc_requests.len(), 4);
         assert!(summary
