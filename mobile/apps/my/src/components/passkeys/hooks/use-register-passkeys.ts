@@ -1,7 +1,9 @@
 import request from '@onefootprint/request';
-import type {
-  BiometricRegisterChallengeJson,
-  BiometricRegisterResponse,
+import {
+  type BiometricRegisterChallengeJson,
+  type BiometricRegisterResponse,
+  AuthMethodKind,
+  UpdateAuthMethodActionKind,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
@@ -21,11 +23,14 @@ type RegisterResponse = {
 const biometricInit = async (authToken: string) => {
   const { data } = await request<{
     challengeToken: string;
-    challengeJson: string;
+    biometricChallengeJson: string;
   }>({
     method: 'POST',
-    url: '/hosted/user/passkey/register',
-    data: authToken,
+    url: '/hosted/user/challenge',
+    data: {
+      kind: AuthMethodKind.passkey,
+      actionKind: UpdateAuthMethodActionKind.addPrimary,
+    },
     headers: {
       [AUTH_HEADER]: authToken,
     },
@@ -69,18 +74,18 @@ const generateDeviceResponse = async ({
 
 const register = async ({
   authToken,
-  deviceResponseJson,
+  challengeResponse,
   challengeToken,
 }: {
   authToken: string;
-  deviceResponseJson: unknown;
+  challengeResponse: unknown;
   challengeToken: string;
 }) => {
   const response = await request<BiometricRegisterResponse>({
     method: 'POST',
-    url: '/hosted/user/passkey',
+    url: '/hosted/user/challenge/verify',
     data: {
-      deviceResponseJson,
+      challengeResponse,
       challengeToken,
     },
     headers: {
@@ -92,15 +97,19 @@ const register = async ({
 };
 
 const registerPasskeys = async (authToken: string) => {
-  const { challengeToken, challengeJson } = await biometricInit(authToken);
-  const challenge = JSON.parse(challengeJson) as BiometricRegisterChallengeJson;
-  const deviceResponseJson = await generateDeviceResponse(challenge);
+  const { challengeToken, biometricChallengeJson } = await biometricInit(
+    authToken,
+  );
+  const challenge = JSON.parse(
+    biometricChallengeJson,
+  ) as BiometricRegisterChallengeJson;
+  const challengeResponse = await generateDeviceResponse(challenge);
   await register({
     authToken,
     challengeToken,
-    deviceResponseJson,
+    challengeResponse,
   });
-  return deviceResponseJson;
+  return challengeResponse;
 };
 
 const useRegisterPasskeys = () => useMutation(registerPasskeys);
