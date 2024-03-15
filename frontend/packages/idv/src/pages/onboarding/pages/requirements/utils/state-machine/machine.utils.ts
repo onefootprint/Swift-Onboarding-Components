@@ -103,14 +103,21 @@ const shouldRunTransfer = (context: MachineContext): boolean => {
     onboardingContext: {
       isTransfer,
       config: { isNoPhoneFlow },
+      device: { type: deviceType },
     },
     didRunTransfer,
     requirements,
     isTransferOnDesktopDisabled,
   } = context;
-  if (!checkIsInIframe()) return false;
+  const isMobile = deviceType === 'mobile';
+
+  // When running natively (not in an iframe) on mobile, we can register the passkey without transferring.
+  // If we're on desktop, we should still attempt to transfer
+  if (!checkIsInIframe() && isMobile) return false;
+
   if (isTransferOnDesktopDisabled) return false;
-  if (didRunTransfer || isNoPhoneFlow) return false;
+  if (didRunTransfer) return false;
+  if (isNoPhoneFlow) return false;
   if (isTransfer) return false;
 
   const firstKind = requirements[0]?.kind;
