@@ -6,22 +6,21 @@ import { useFootprint } from '../../hooks/use-footprint';
 import type { InputProps } from '../internal/input';
 import Input from '../internal/input';
 
-export type PhoneInputProps = InputProps;
+export type AddressLine2InputProps = InputProps;
 
-const PhoneInput = ({ className, ...props }: PhoneInputProps) => {
+const AddressLine2Input = ({ className, ...props }: AddressLine2InputProps) => {
   const { form } = useFootprint();
   const { t } = useTranslation('common');
 
   return (
     <Input
-      autoComplete="tel"
-      className={cx('fp-phone-input', className)}
-      label={t('phone.label')}
-      type="tel"
+      autoComplete="address-line2"
+      className={cx('fp-address-line2-input', className)}
+      label={t('address-line2.label')}
       {...props}
-      {...form.register('id.phone_number', { required: true })}
+      {...form.register('id.address_line2')}
     />
   );
 };
 
-export default PhoneInput;
+export default AddressLine2Input;

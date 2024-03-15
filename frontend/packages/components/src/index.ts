@@ -1,4 +1,18 @@
 export type { UserData } from './@types/user-data';
+export type { AddressCityInputProps } from './components/address-city-input';
+export { default } from './components/address-city-input';
+export type { AddressCountryInputProps } from './components/address-country-input';
+export { default as AddressCountryInput } from './components/address-country-input';
+export type { AddressInputProps } from './components/address-input';
+export { default as AddressInput } from './components/address-input';
+export type { AddressLine1InputProps } from './components/address-line-1-input';
+export { default as AddressLine1Input } from './components/address-line-1-input';
+export type { AddressLine2InputProps } from './components/address-line-2-input';
+export { default as AddressLine2Input } from './components/address-line-2-input';
+export type { AddressStateInputProps } from './components/address-state-input';
+export { default as AddressStateInput } from './components/address-state-input';
+export type { AddressZipInputProps } from './components/address-zip-input';
+export { default as AddressZipInput } from './components/address-zip-input';
 export type { DobInputProps } from './components/dob-input';
 export { default as DobInput } from './components/dob-input';
 export type { EmailInputProps } from './components/email-input';

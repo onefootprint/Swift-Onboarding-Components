@@ -14,7 +14,7 @@ const SSN9INput = ({ className, ...props }: SSN9INputProps) => {
 
   return (
     <Input
-      className={cx('fp-ssn-9-input-input', className)}
+      className={cx('fp-ssn-9-input', className)}
       label={t('ssn-9.label')}
       {...props}
       {...form.register('id.ssn9')}

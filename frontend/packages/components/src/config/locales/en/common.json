@@ -40,7 +40,7 @@
       "invalid": "Phone number is invalid"
     }
   },
-  "address-line-1": {
+  "address-line1": {
     "label": "Address line 1",
     "placeholder": "Street and house number",
     "errors": {
@@ -48,7 +48,7 @@
       "invalid": "Address must be a residential address (e.g. cannot be a P.O. Box)"
     }
   },
-  "address-line-2": {
+  "address-line2": {
     "label": "Address line 2 (optional)",
     "placeholder": "Apartment, suite, etc."
   },
@@ -74,7 +74,7 @@
       "required": "Country cannot be empty"
     }
   },
-  "zip-code": {
+  "zip": {
     "label": "Zip code",
     "placeholder": "11206",
     "errors": {
