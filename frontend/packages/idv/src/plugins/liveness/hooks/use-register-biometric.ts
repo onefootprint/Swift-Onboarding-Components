@@ -1,14 +1,18 @@
-import request from '@onefootprint/request';
 import type {
   BiometricRegisterChallengeJson,
   BiometricRegisterRequest,
-  BiometricRegisterResponse,
 } from '@onefootprint/types';
-import { AUTH_HEADER } from '@onefootprint/types';
+import { AuthMethodKind } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 
-const generateDeviceResponse = async (challenge: string) => {
+import { UpdateAuthMethodActionKind } from '../../../components/identify';
+import {
+  useUserChallenge,
+  useUserChallengeVerify,
+} from '../../../components/identify/queries';
+
+const registerPasskeyOnDevice = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;
   const { publicKey } = challengeJson;
   publicKey.challenge = base64url.toBuffer(
@@ -39,38 +43,38 @@ const generateDeviceResponse = async (challenge: string) => {
   return JSON.stringify(pk);
 };
 
-const biometricInit = async (payload: BiometricRegisterRequest) => {
-  const { authToken } = payload;
-  const initResponse = await request<{
-    challengeToken: string;
-    challengeJson: string;
-  }>({
-    method: 'POST',
-    url: '/hosted/user/passkey/register',
-    data: payload,
-    headers: {
-      [AUTH_HEADER]: authToken,
-    },
-  });
+const useBiometricInit = () => {
+  const userChallengeMut = useUserChallenge();
+  const userChallengeVerifyMut = useUserChallengeVerify();
 
-  const { challengeToken, challengeJson } = initResponse.data;
-  const deviceResponseJson = await generateDeviceResponse(challengeJson);
+  const biometricInit = async (payload: BiometricRegisterRequest) => {
+    const { authToken } = payload;
 
-  const response = await request<BiometricRegisterResponse>({
-    method: 'POST',
-    url: '/hosted/user/passkey',
-    data: {
-      deviceResponseJson,
+    const { challengeToken, biometricChallengeJson } =
+      await userChallengeMut.mutateAsync({
+        authToken,
+        kind: AuthMethodKind.passkey,
+        actionKind: UpdateAuthMethodActionKind.addPrimary,
+      });
+
+    if (!biometricChallengeJson) {
+      throw new Error('No biometric challenge JSON when registering passkey');
+    }
+
+    const challengeResponse = await registerPasskeyOnDevice(
+      biometricChallengeJson,
+    );
+
+    const response = await userChallengeVerifyMut.mutateAsync({
+      authToken,
       challengeToken,
-    },
-    headers: {
-      [AUTH_HEADER]: authToken,
-    },
-  });
+      challengeResponse,
+    });
 
-  return { response: response.data, deviceResponseJson };
+    return { response, deviceResponseJson: challengeResponse };
+  };
+
+  return useMutation(biometricInit);
 };
-
-const useBiometricInit = () => useMutation(biometricInit);
 
 export default useBiometricInit;
