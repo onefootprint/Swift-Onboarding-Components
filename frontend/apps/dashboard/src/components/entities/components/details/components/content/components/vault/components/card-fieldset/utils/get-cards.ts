@@ -1,6 +1,5 @@
-import type { Entity, EntityCard } from '@onefootprint/types';
+import type { Entity, EntityCard, VaultValue } from '@onefootprint/types';
 import merge from 'lodash/merge';
-import set from 'lodash/set';
 
 type CardsBuffer = {
   card?: Partial<Record<string, EntityCard>>;
@@ -17,23 +16,36 @@ const getCards = (entity: Entity) => {
   const cardsEncryptedBuffer: CardsBuffer = entity.attributes.reduce(
     (acc, key) => {
       if (key.startsWith('card')) {
-        set(acc, key, null);
+        const [, cardAlias, cardField] = key.split('.');
+        if (cardAlias in acc) {
+          acc[cardAlias][cardField as string] = null;
+        } else {
+          acc[cardAlias] = { [cardField]: null };
+        }
       }
       return acc;
     },
-    {},
+    {} as Record<string, Record<string, VaultValue>>,
   );
 
   const cardsDecryptedBuffer: CardsBuffer = Object.entries(
     entity.decryptedAttributes,
-  ).reduce((acc, [key, value]) => {
-    if (key.startsWith('card')) {
-      set(acc, key, value);
-    }
-    return acc;
-  }, {});
+  ).reduce(
+    (acc, [key, value]) => {
+      if (key.startsWith('card')) {
+        const [, cardAlias, cardField] = key.split('.');
+        if (cardAlias in acc) {
+          acc[cardAlias][cardField as string] = value as VaultValue;
+        } else {
+          acc[cardAlias] = { [cardField]: value as VaultValue };
+        }
+      }
+      return acc;
+    },
+    {} as Record<string, Record<string, VaultValue>>,
+  );
 
-  if (!cardsDecryptedBuffer.card && !cardsEncryptedBuffer.card) {
+  if (!cardsDecryptedBuffer && !cardsEncryptedBuffer) {
     return [];
   }
 
@@ -42,12 +54,10 @@ const getCards = (entity: Entity) => {
     cardsDecryptedBuffer,
   );
 
-  return Object.entries(cardsAggregatedBuffer.card ?? {}).map(
-    ([alias, card]) => ({
-      ...card,
-      alias,
-    }),
-  ) as EntityCard[];
+  return Object.entries(cardsAggregatedBuffer ?? {}).map(([alias, card]) => ({
+    ...card,
+    alias,
+  })) as EntityCard[];
 };
 
 export default getCards;
