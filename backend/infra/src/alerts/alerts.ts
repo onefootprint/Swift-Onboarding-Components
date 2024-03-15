@@ -56,6 +56,13 @@ const staticAlerts: Alert[] = [
           op: '>=',
           value: 500,
         },
+        // Unfortunately, this will silence all 5xx errors for this API. But there are regularly
+        // 504s on which we don't want to alert
+        {
+          column: 'http.route',
+          op: '!=',
+          value: '/hosted/user/documents/{id}/upload/{side}',
+        },
       ],
       filter_combination: 'AND',
     },
