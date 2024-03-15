@@ -164,6 +164,9 @@ impl Action {
         user_auth: &CheckedUserAuthContext,
         ie_id: InsightEventId,
     ) -> ApiResult<(AuthEventKind, Option<WebauthnCredentialId>)> {
+        // TODO: eventually, let's make this a Vw util that is used to add login methods and use
+        // this in identify/verify.
+        // Then, send an email to the user's last verified CI any time their login methods change
         let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, sv_id)?;
         let vault_id = user_auth.user_vault_id();
         let (event_kind, passkey_cred_id) = match self {

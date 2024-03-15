@@ -75,17 +75,16 @@ def test_d2p_biometric(sandbox_tenant):
 
     # Add a biometric credential using the d2p token
     _update_status("in_progress")
-    body = post("hosted/user/passkey/register", None, d2p_auth_token)
+    data = dict(kind="passkey", action_kind="add_primary")
+    body = post("hosted/user/challenge", data, d2p_auth_token)
     chal_token = body["challenge_token"]
-    chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
+    chal = override_webauthn_challenge(json.loads(body["biometric_challenge_json"]))
     attestation = WEBAUTHN_DEVICE.create(chal, TEST_URL)
     attestation = override_webauthn_attestation(attestation)
 
     # Register credential
-    data = dict(
-        challenge_token=chal_token, device_response_json=json.dumps(attestation)
-    )
-    post("hosted/user/passkey", data, d2p_auth_token)
+    data = dict(challenge_token=chal_token, challenge_response=json.dumps(attestation))
+    post("hosted/user/challenge/verify", data, d2p_auth_token)
 
     # Check that the status is updated
     _update_status("completed")
@@ -94,9 +93,23 @@ def test_d2p_biometric(sandbox_tenant):
     # Don't allow transitioning the status backwards
     _update_status("canceled", status_code=400)
 
-    # Shouldn't be able to add a second biometric credential
-    post("hosted/user/passkey/register", None, d2p_auth_token, status_code=400)
-    post("hosted/user/passkey", data, d2p_auth_token, status_code=400)
+    # Shouldn't be able to add a second biometric credential with add_primary
+    init_data = dict(kind="passkey", action_kind="add_primary")
+    post("hosted/user/challenge", init_data, d2p_auth_token)
+    data = dict(challenge_token=chal_token, challenge_response=json.dumps(attestation))
+    body = post("hosted/user/challenge/verify", data, d2p_auth_token, status_code=400)
+    assert (
+        body["error"]["message"]
+        == "Cannot add primary passkey when one already exists."
+    )
+
+    # Shouldn't be able to replace existing credential
+    init_data = dict(kind="passkey", action_kind="replace")
+    body = post("hosted/user/challenge", init_data, d2p_auth_token, status_code=400)
+    assert (
+        body["error"]["message"]
+        == "Can only replace auth methods using auth issued via API"
+    )
 
     # Make sure the liveness requirement is met
     assert not any(
