@@ -1,6 +1,6 @@
 import request from '@onefootprint/request';
-import type { AuthMethodKind, ObConfigAuth } from '@onefootprint/types';
-import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
+import type { AuthMethodKind } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { UpdateAuthMethodActionKind } from '../types';
@@ -21,17 +21,13 @@ export type UserChallengeResponse = {
   retryDisabledUntil: Date;
 };
 
-type PayloadPartKey = 'obConfigAuth' | 'sandboxId';
-type Payload = UserChallengeBody & {
-  obConfigAuth?: ObConfigAuth;
-  sandboxId?: string;
-};
-
 const FIVE_MINUTES = 1000 * 60 * 5; // challenges expire after 5 mins
 
-const getQueryKey = (payload: Payload) => {
-  const { kind, email, phoneNumber } = payload;
-  return ['user-challenge', kind, email, phoneNumber].filter(Boolean);
+const getQueryKey = (payload: UserChallengeBody) => {
+  const { kind, email, phoneNumber, actionKind } = payload;
+  return ['user-challenge', kind, email, phoneNumber, actionKind].filter(
+    Boolean,
+  );
 };
 
 const requestFn = async ({
@@ -39,17 +35,9 @@ const requestFn = async ({
   authToken,
   email,
   kind,
-  obConfigAuth,
   phoneNumber,
-  sandboxId,
-}: Payload): Promise<UserChallengeResponse> => {
-  const headers: Record<string, string> = { ...obConfigAuth };
-  if (sandboxId) {
-    headers[SANDBOX_ID_HEADER] = sandboxId;
-  }
-  if (authToken) {
-    headers[AUTH_HEADER] = authToken;
-  }
+}: UserChallengeBody): Promise<UserChallengeResponse> => {
+  const headers: Record<string, string> = { [AUTH_HEADER]: authToken };
 
   const response = await request<UserChallengeResponse>({
     method: 'POST',
@@ -69,12 +57,11 @@ const requestFn = async ({
   };
 };
 
-const useUserChallenge = (basePayload: Pick<Payload, PayloadPartKey>) => {
+const useUserChallenge = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (restOfPayload: Omit<Payload, PayloadPartKey>) => {
-      const payload = { ...basePayload, ...restOfPayload };
+    mutationFn: (payload: UserChallengeBody) => {
       const queryKey = getQueryKey(payload);
       const queryState =
         queryClient.getQueryState<UserChallengeResponse>(queryKey);
@@ -94,11 +81,11 @@ const useUserChallenge = (basePayload: Pick<Payload, PayloadPartKey>) => {
       }
       return requestFn(payload);
     },
-    onMutate: async (payload: Payload) => {
+    onMutate: async (payload: UserChallengeBody) => {
       const queryKey = getQueryKey(payload);
       await queryClient.cancelQueries({ queryKey });
     },
-    onSuccess: (data: UserChallengeResponse, payload: Payload) => {
+    onSuccess: (data: UserChallengeResponse, payload: UserChallengeBody) => {
       const queryKey = getQueryKey(payload);
       queryClient.setQueryData(queryKey, data);
     },

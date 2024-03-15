@@ -50,8 +50,8 @@ const UpdateVerify = ({
   const { authToken } = challengePayload;
   const { t } = useTranslation('identify');
   const toast = useToast();
-  const mutUserChallenge = useUserChallenge({});
-  const mutUserChallengeVerify = useUserChallengeVerify({});
+  const mutUserChallenge = useUserChallenge();
+  const mutUserChallengeVerify = useUserChallengeVerify();
   const [challengeData, setChallengeData] = useState<
     UserChallengeResponse | undefined
   >(undefined);
