@@ -24,13 +24,15 @@ const OnboardingDecisionEventBody = ({
   if (annotation && source.kind !== ActorKind.footprint) {
     return <AnnotationNote annotation={annotation} />;
   }
-
-  return status === DecisionStatus.stepUpRequired ? (
-    <EventBodyEntry
-      testID="onboarding-decision-event-body"
-      content={t(`decision-status.${status}`)}
-    />
-  ) : null;
+  if (status === DecisionStatus.stepUpRequired) {
+    return (
+      <EventBodyEntry
+        testID="onboarding-decision-event-body"
+        content={t(`decision-status.${status}`)}
+      />
+    );
+  }
+  return null;
 };
 
 export default OnboardingDecisionEventBody;

@@ -15,7 +15,11 @@ import type {
   WatchlistCheckEventData,
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
-import { EntityStatus, TimelineEventKind } from '@onefootprint/types';
+import {
+  DecisionStatus,
+  EntityStatus,
+  TimelineEventKind,
+} from '@onefootprint/types';
 import type {
   AuthMethodUpdatedData,
   LabelAddedEventData,
@@ -121,10 +125,15 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       });
     } else if (kind === TimelineEventKind.onboardingDecision) {
       const eventData = data as OnboardingDecisionEventData;
+      const shouldShowBody =
+        eventData.annotation ||
+        eventData.decision.status === DecisionStatus.stepUpRequired;
       items.push({
         time,
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,
-        bodyComponent: <OnboardingDecisionEventBody data={eventData} />,
+        bodyComponent: shouldShowBody && (
+          <OnboardingDecisionEventBody data={eventData} />
+        ),
       });
     } else if (kind === TimelineEventKind.combinedWatchlistChecks) {
       const eventData = data as PreviousWatchlistChecksEventData;
