@@ -408,6 +408,32 @@
                 ]
             }
         },
+        "/compliance/org/members": {
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Creates a new IAM user for the partner tenant. Sends an invite link via WorkOs.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/entities/client_token": {
             "get": {
                 "tags": [
@@ -4205,7 +4231,10 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ListEntry"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ListEntry"
+                                    }
                                 }
                             }
                         }
@@ -4842,6 +4871,7 @@
                     "Private",
                     "Rules"
                 ],
+                "summary": "Note: Being deprecated in favor of bulk edit API",
                 "description": "Creates a new Rule for the playbook",
                 "parameters": [
                     {
@@ -4932,6 +4962,58 @@
                 ]
             }
         },
+        "/org/onboarding_configs/{obc_id}/rules": {
+            "patch": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private",
+                    "Rules"
+                ],
+                "description": "Performs 1 or more edits (additions, deletions, edits) to rules for the playbooks",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "obc_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MultiUpdateRuleRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Rule"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/onboarding_configs/{obc_id}/rules/{rule_id}": {
             "delete": {
                 "tags": [
@@ -4940,6 +5022,7 @@
                     "Private",
                     "Rules"
                 ],
+                "summary": "Note: Being deprecated in favor of bulk edit API",
                 "description": "Deletes a Rule",
                 "parameters": [
                     {
@@ -4986,6 +5069,7 @@
                     "Private",
                     "Rules"
                 ],
+                "summary": "Note: Being deprecated in favor of bulk edit API",
                 "description": "Updates a Rule",
                 "parameters": [
                     {
@@ -6952,12 +7036,15 @@
             "CreateListEntryRequest": {
                 "type": "object",
                 "properties": {
-                    "data": {
-                        "type": "string"
+                    "entries": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "required": [
-                    "data"
+                    "entries"
                 ]
             },
             "CreateListRequest": {
@@ -16768,6 +16855,71 @@
                 },
                 "required": [
                     "source"
+                ]
+            },
+            "MultiUpdateRuleRequest": {
+                "type": "object",
+                "properties": {
+                    "add": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "rule_action": {
+                                    "type": "string",
+                                    "enum": [
+                                        "PassWithManualReview",
+                                        "ManualReview",
+                                        "Fail"
+                                    ]
+                                },
+                                "rule_expression": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "required": [
+                                "rule_action",
+                                "rule_expression"
+                            ]
+                        }
+                    },
+                    "delete": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "edit": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "rule_expression": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "rule_id": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "rule_expression",
+                                "rule_id"
+                            ]
+                        }
+                    },
+                    "expected_rule_set_version": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "required": [
+                    "expected_rule_set_version"
                 ]
             },
             "OffsetPaginatedOnboardingConfiguration": {
