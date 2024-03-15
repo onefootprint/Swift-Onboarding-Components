@@ -125,7 +125,7 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
             <AnimatedContainer
               isExpanded={triggerKind === TriggerKind.Onboard}
               marginLeft={8}
-              marginTop={4}
+              marginTop={2}
             >
               {playbooksData?.length ? (
                 <Controller
@@ -135,6 +135,7 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
                   render={select => (
                     <Select
                       hasError={!!select.fieldState.error}
+                      size="compact"
                       hint={
                         select.fieldState.error &&
                         t('form.onboard.playbook-required')

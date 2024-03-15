@@ -1,5 +1,5 @@
 import type { InsightEvent } from '@onefootprint/types';
-import { Box, createFontStyles, Grid, Stack, Text } from '@onefootprint/ui';
+import { Box, Grid, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,7 @@ import getRegion from './utils/get-region';
 
 export type InsightEventPopoverProps = {
   insightEvent: InsightEvent;
-  children: React.ReactNode;
+  children: string;
 };
 
 const InsightEventPopover = ({
@@ -59,9 +59,7 @@ const InsightEventPopover = ({
 
   return (
     <Box position="relative">
-      <UnderlinedTrigger type="button" onClick={handleShowPopover}>
-        {children}
-      </UnderlinedTrigger>
+      <LinkButton onClick={handleShowPopover}>{children}</LinkButton>
       <AnimatePresence>
         {showPopover && (
           <Content
@@ -101,32 +99,6 @@ const InsightEventPopover = ({
     </Box>
   );
 };
-
-const UnderlinedTrigger = styled.button`
-  ${({ theme }) => css`
-    all: unset;
-    ${createFontStyles('label-3')}
-    cursor: pointer;
-    color: ${theme.color.primary};
-    position: relative;
-
-    &::after {
-      content: '';
-      display: block;
-      width: 90%;
-      height: 1.5px;
-      border-bottom: ${theme.borderWidth[2]} dashed ${theme.color.primary};
-      position: absolute;
-      bottom: -${theme.spacing[1]};
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    &:hover {
-      color: ${theme.color.tertiary};
-    }
-  `}
-`;
 
 const popOverEnter = keyframes`
   from {
