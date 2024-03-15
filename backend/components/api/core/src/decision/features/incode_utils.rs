@@ -199,14 +199,14 @@ impl ParsedIncodeNames {
                 .collect_vec();
 
             let incode_parsed_name_components: Vec<PiiString> = [
-                first_name_from_first_name_field.clone(),
-                middle_name_from_middle_name_field.clone(),
-                last_name.clone(),
+                first_name_from_first_name_field.as_ref().map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
+                middle_name_from_middle_name_field.as_ref().map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
+                last_name.as_ref().map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
             ]
-            .iter()
-            .flatten()
+            .into_iter()
+            .flatten().flatten()
             .map(|s| {
-                Self::remove_hyphens_and_apostrophes(s)
+                Self::remove_hyphens_and_apostrophes(&s.to_owned().into())
                     .leak_to_string()
                     .to_lowercase()
                     .into()
@@ -901,6 +901,21 @@ mod tests {
             last_name: Some("HOOK".into()),
             full_name: Some("AUSTIN WALLACE HOOK".into())
         } ; "comma in barcode/mrz name but Incode is dropping it so name ordering is ambiguous"
+    )]
+    #[test_case(
+        OCRName {
+            full_name: Some("MILES RODGER ALTA".into()),
+            machine_readable_full_name: Some("MILES RODGER ALTA".into()),
+            first_name: Some("MILES".into()),
+            given_name: Some("MILES".into()),
+            paternal_last_name: Some("RODGER ALTA".into()),
+            ..Default::default()               
+        } => ParsedIncodeNames {
+            first_name: Some("MILES".into()),
+            middle_name: None,
+            last_name: Some("RODGER ALTA".into()),
+            full_name: Some("MILES RODGER ALTA".into())
+        } ; "dont parse middle name from paternal last"
     )]
     fn test_parse_names_from_incode(name: OCRName) -> ParsedIncodeNames {
         ParsedIncodeNames::from_fetch_ocr_res(&FetchOCRResponse {
