@@ -18,7 +18,7 @@ const Router = ({ onDone }: RouterProps) => {
   const isDone = state.matches('complete');
   useLogStateMachine('transfer-mobile', state);
   const { t } = useTranslation('idv');
-  const title = useRequirementsTitle(missingRequirements);
+  const { title } = useRequirementsTitle(missingRequirements);
 
   useEffect(() => {
     if (isDone) {

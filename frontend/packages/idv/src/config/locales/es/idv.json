@@ -1017,10 +1017,17 @@
           "description": "Te hemos enviado un nuevo código."
         }
       },
-      "requirements-title": {
-        "liveness": "Verificación de autenticidad",
-        "id-doc": "Escanea o sube una imagen de tu identificación",
-        "liveness-with-id-doc": "Prueva de vida y de documento de identificación"
+      "requirements": {
+        "title": {
+          "liveness": "Agrega un passkey",
+          "id-doc": "Sube una imagen de tu identificación",
+          "liveness-with-id-doc": "Agrega un passkey y de documento de identificación"
+        },
+        "subtitle": {
+          "liveness": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar un passkey.",
+          "id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para subir una imagen de tu identificación.",
+          "liveness-with-id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar un passkey y subir una imagen de tu identificación."
+        }
       }
     },
     "pages": {
@@ -1045,7 +1052,6 @@
       },
       "desktop": {
         "qr-register": {
-          "subtitle": "Te hemos enviado un enlace a tu número de teléfono. Por favor, ábrelo y sigue las instrucciones.",
           "qr-code": {
             "instructions": "Alternativamente, también puedes escanear este código QR con tu teléfono para continuar."
           },
@@ -1078,23 +1084,17 @@
     },
     "pages": {
       "register": {
-        "title": "Prueba de vida",
-        "subtitle": "Necesitamos verificar que eres una persona real.",
+        "title": "Agrega un passkey",
+        "subtitle": "El proceso de configuración puede variar según su navegador.",
         "cta": "Iniciar verificación"
       },
       "retry": {
-        "title": "No pudimos verificar tus datos de biometría",
-        "subtitle": "Puedes intentarlo de nuevo o hacerlo la próxima vez que uses Footprint.",
-        "cta": "Intentar biometría de nuevo",
+        "title": "No pudimos agregar tu passkey",
+        "subtitle": "Puedes intentarlo de nuevo o agregarlo la próxima vez que uses Footprint.",
+        "success-title": "¡Éxito!",
+        "success-subtitle": "Tu passkey ha sido registrado.",
+        "cta": "Intentar de nuevo",
         "skip": "Hacerlo más tarde"
-      },
-      "unavailable": {
-        "title": "Autenticación biométrica no disponible",
-        "subtitle": "Lamentablemente tu dispositivo no admite autenticación biométrica."
-      },
-      "success": {
-        "title": "¡Autenticación biométrica exitosa!",
-        "subtitle": "Hemos podido verificar tus datos de biometría."
       }
     }
   },

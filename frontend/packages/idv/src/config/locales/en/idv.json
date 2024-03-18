@@ -1016,10 +1016,17 @@
           "description": "We sent you a new code."
         }
       },
-      "requirements-title": {
-        "liveness": "Liveness check",
-        "id-doc": "Scan or upload your ID",
-        "liveness-with-id-doc": "Liveness check & ID document"
+      "requirements": {
+        "title": {
+          "liveness": "Add a passkey",
+          "id-doc": "Scan or upload your ID",
+          "liveness-with-id-doc": "Register a passkey & ID document"
+        },
+        "subtitle": {
+          "liveness": "Open the link sent to your phone and follow the prompts to register a passkey.",
+          "id-doc": "Open the link sent to your phone and follow the prompts to upload an ID document.",
+          "liveness-with-id-doc": "Open the link sent to your phone and follow the prompts to register a passkey and upload an ID document."
+        }
       }
     },
     "pages": {
@@ -1044,7 +1051,6 @@
       },
       "desktop": {
         "qr-register": {
-          "subtitle": "We've sent you a link to your phone number. Please open it and follow the prompts.",
           "qr-code": {
             "instructions": "Alternatively, you can also scan this QR code with your phone to continue."
           },
@@ -1077,23 +1083,17 @@
     },
     "pages": {
       "register": {
-        "title": "Liveness check",
-        "subtitle": "We need to verify that you're a real person.",
-        "cta": "Launch Verification"
+        "title": "Add a passkey",
+        "subtitle": "The setup process may vary depending on your browser.",
+        "cta": "Launch registration"
       },
       "retry": {
-        "title": "Biometrics not recognized",
-        "subtitle": "You can try biometrics again or you can do this next time you use Footprint.",
-        "cta": "Try biometrics again",
-        "skip": "Do it later"
-      },
-      "unavailable": {
-        "title": "Biometric authentication unavailable",
-        "subtitle": "Unfortunately your device doesn't support biometric authentication."
-      },
-      "success": {
-        "title": "Biometric authentication successful!",
-        "subtitle": "We were able to verify your liveness."
+        "title": "We couldn't add your passkey",
+        "subtitle": "You can try again now or add it next time you sign in using Footprint.",
+        "success-title": "Success!",
+        "success-subtitle": "Your passkey has been registered.",
+        "cta": "Try again",
+        "skip": "Do later"
       }
     }
   },

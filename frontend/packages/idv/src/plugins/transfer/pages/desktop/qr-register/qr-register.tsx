@@ -15,7 +15,7 @@ import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-
 import useRequirementsTitle from '../../../hooks/use-requirements-title-translation-key';
 import ContinueOnDesktop from './components/continue-on-desktop';
 
-const QR_CODE_SIZE = 130;
+const QR_CODE_SIZE = 180;
 
 const QRRegister = () => {
   const {
@@ -69,13 +69,16 @@ const QRRegister = () => {
     },
   });
 
+  const { title, linkSentToPhoneSubtitle } =
+    useRequirementsTitle(missingRequirements);
+
   return (
     <>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Grid.Container gap={7} textAlign="center">
         <HeaderTitle
-          title={useRequirementsTitle(missingRequirements)}
-          subtitle={t('transfer.pages.desktop.qr-register.subtitle')}
+          title={title}
+          subtitle={linkSentToPhoneSubtitle}
           icon={IcoSmartphone224}
         />
         <SmsButtonWithCountdown authToken={scopedAuthToken} url={url} />

@@ -33,10 +33,11 @@ const Processing = () => {
       onError: handleError,
     },
   });
+  const { title } = useRequirementsTitle(missingRequirements);
 
   return (
     <ProcessingBase
-      title={useRequirementsTitle(missingRequirements)}
+      title={title}
       subtitle={t('subtitle')}
       cta={t('cancel')}
       onCancel={cancelD2P}

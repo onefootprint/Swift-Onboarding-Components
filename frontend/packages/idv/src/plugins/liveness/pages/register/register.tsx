@@ -1,3 +1,4 @@
+import { IcoPasskey40 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
@@ -54,11 +55,14 @@ const Register = () => {
     <Container>
       <Box>
         <NavigationHeader />
+        <Box marginBottom={3}>
+          <IcoPasskey40 />
+        </Box>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         {biometricInitMutation.isSuccess ? (
           <LivenessSuccess />
         ) : (
-          <Box marginTop={8} width="100%">
+          <Box marginTop={7} width="100%">
             <Button
               loading={biometricInitMutation.isLoading}
               disabled={biometricInitMutation.isLoading}

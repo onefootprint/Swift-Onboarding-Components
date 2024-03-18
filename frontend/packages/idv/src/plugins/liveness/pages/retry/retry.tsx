@@ -1,5 +1,6 @@
+import { IcoWarning40 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import { Button, Grid } from '@onefootprint/ui';
+import { Box, Button, Grid } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -77,39 +78,50 @@ const Retry = () => {
 
   return (
     <Container>
-      <Grid.Container as="form" gap={8}>
+      <Grid.Container as="form">
         <NavigationHeader />
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         {biometricInitMutation.isSuccess ? (
-          <LivenessSuccess />
+          <>
+            <HeaderTitle
+              title={t('success-title')}
+              subtitle={t('success-subtitle')}
+            />
+            <LivenessSuccess />
+          </>
         ) : (
-          <Grid.Container gap={4}>
-            <Button
-              onClick={handleRetry}
-              loading={biometricInitMutation.isLoading}
-              disabled={
-                biometricInitMutation.isLoading ||
-                skipLivenessMutation.isLoading
-              }
-              fullWidth
-              size="large"
-            >
-              {t('cta')}
-            </Button>
-            <Button
-              loading={skipLivenessMutation.isLoading}
-              disabled={
-                biometricInitMutation.isLoading ||
-                skipLivenessMutation.isLoading
-              }
-              onClick={handleSkip}
-              fullWidth
-              size="large"
-              variant="secondary"
-            >
-              {t('skip')}
-            </Button>
-          </Grid.Container>
+          <>
+            <Box marginTop={4} marginBottom={4}>
+              <IcoWarning40 color="error" />
+            </Box>
+            <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+            <Grid.Container marginTop={8} gap={4}>
+              <Button
+                onClick={handleRetry}
+                loading={biometricInitMutation.isLoading}
+                disabled={
+                  biometricInitMutation.isLoading ||
+                  skipLivenessMutation.isLoading
+                }
+                fullWidth
+                size="large"
+              >
+                {t('cta')}
+              </Button>
+              <Button
+                loading={skipLivenessMutation.isLoading}
+                disabled={
+                  biometricInitMutation.isLoading ||
+                  skipLivenessMutation.isLoading
+                }
+                onClick={handleSkip}
+                fullWidth
+                size="large"
+                variant="secondary"
+              >
+                {t('skip')}
+              </Button>
+            </Grid.Container>
+          </>
         )}
       </Grid.Container>
     </Container>

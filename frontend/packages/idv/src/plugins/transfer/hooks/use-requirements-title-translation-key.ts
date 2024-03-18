@@ -4,17 +4,26 @@ import type { TransferRequirements } from '../types';
 
 const useRequirementsTitle = (missingRequirements: TransferRequirements) => {
   const { t } = useTranslation('idv', {
-    keyPrefix: 'transfer.components.requirements-title',
+    keyPrefix: 'transfer.components.requirements',
   });
   const { liveness, idDoc } = missingRequirements;
 
   if (liveness && idDoc) {
-    return t('liveness-with-id-doc');
+    return {
+      title: t('title.liveness-with-id-doc'),
+      linkSentToPhoneSubtitle: t('subtitle.liveness-with-id-doc'),
+    };
   }
   if (liveness) {
-    return t('liveness');
+    return {
+      title: t('title.liveness'),
+      linkSentToPhoneSubtitle: t('subtitle.liveness'),
+    };
   }
-  return t('id-doc');
+  return {
+    title: t('title.id-doc'),
+    linkSentToPhoneSubtitle: t('subtitle.id-doc'),
+  };
 };
 
 export default useRequirementsTitle;
