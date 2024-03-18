@@ -170,6 +170,7 @@ impl CreateOnboardingConfigurationRequest {
         // Make sure there's only one CDO per CD, and create a map of CD -> selected CDO
         let must_collect = group_by_parent(self.must_collect_data.clone())?;
         let optional_data = group_by_parent(optional_data)?;
+        // TODO make sure we aren't decrypting more than can access?
         let can_access = group_by_parent(self.can_access_data.clone())?;
 
         // Make sure all decryption permissions are a subset of collected data
