@@ -19,7 +19,7 @@ const Content = styled.div`
     `}
 
     p {
-      ${createFontStyles('body-1')};
+      ${createFontStyles('body-2')};
 
       &:not(:last-child) {
         margin-bottom: ${theme.spacing[5]};
