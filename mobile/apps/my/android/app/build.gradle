@@ -108,8 +108,8 @@ android {
         applicationId 'com.onefootprint.my'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1043
-        versionName "1.2.2"
+        versionCode 1044
+        versionName "1.2.3"
     }
 
     splits {
