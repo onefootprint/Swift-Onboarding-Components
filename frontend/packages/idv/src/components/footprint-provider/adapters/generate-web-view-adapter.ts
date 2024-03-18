@@ -1,7 +1,17 @@
 import Logger from '../../../utils/logger';
-import type { CompletePayload, WebViewAdapterReturn } from '../types';
+import type {
+  CompletePayload,
+  SendResultCallback,
+  WebViewAdapterReturn,
+} from '../types';
 
 const generateWebViewAdapter = (): WebViewAdapterReturn => {
+  let sendResultCallback: SendResultCallback | undefined;
+
+  const setSendResultCallback = (callback: SendResultCallback) => {
+    sendResultCallback = callback;
+  };
+
   const getRedirectUrl = () => {
     const params = new URLSearchParams(document.location.search);
     return params.get('redirect_url');
@@ -33,20 +43,7 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
 
   const on = () => () => {};
 
-  const complete = ({
-    validationToken,
-    delay = 0,
-    authToken,
-    deviceResponseJson,
-  }: CompletePayload): void => {
-    Logger.info('Completing footprint from web view adapter');
-    const location: Record<string, string> = {
-      validation_token: validationToken,
-    };
-    if (authToken && deviceResponseJson) {
-      location.auth_token = authToken;
-      location.device_response = deviceResponseJson;
-    }
+  const setCompleteTimeout = (location: Record<string, string>, delay = 0) => {
     setTimeout(() => {
       Logger.info(
         'Closing footprint after complete timeout from web view adapter',
@@ -55,8 +52,34 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
     }, delay);
   };
 
+  const complete = ({
+    validationToken,
+    delay = 0,
+    authToken,
+    deviceResponse,
+  }: CompletePayload): void => {
+    Logger.info('Completing footprint from web view adapter');
+    const location: Record<string, string> = {
+      validation_token: validationToken,
+    };
+    if (authToken && deviceResponse && sendResultCallback) {
+      sendResultCallback(authToken, deviceResponse)
+        .then(token => {
+          if (token) {
+            location.sdk_args_token = token;
+          }
+        })
+        .finally(() => {
+          setCompleteTimeout(location, delay);
+        });
+    } else {
+      setCompleteTimeout(location, delay);
+    }
+  };
+
   return {
     auth: () => undefined,
+    setSendResultCallback,
     load,
     cancel,
     close,
