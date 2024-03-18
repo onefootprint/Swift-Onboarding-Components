@@ -5,8 +5,11 @@ import type {
   LoginChallengeResponse,
   UserTokenResponse,
 } from '@onefootprint/types';
-import { ChallengeKind, UserTokenScope } from '@onefootprint/types';
-import { IdentifyTokenScope } from '@onefootprint/types/src/api/identify-verify';
+import {
+  ChallengeKind,
+  IdentifyTokenScope,
+  UserTokenScope,
+} from '@onefootprint/types';
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 

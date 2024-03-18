@@ -192,6 +192,7 @@ export {
   AUTH_HEADER,
   ContactInfoKind,
   getRequirement,
+  IdentifyTokenScope,
   OnboardingRequirementKind,
   SANDBOX_ID_HEADER,
   TokenKind,

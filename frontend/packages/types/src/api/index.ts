@@ -114,6 +114,7 @@ export type {
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
 } from './identify-verify';
+export { IdentifyTokenScope } from './identify-verify';
 export type {
   LoginChallengeRequest,
   LoginChallengeResponse,

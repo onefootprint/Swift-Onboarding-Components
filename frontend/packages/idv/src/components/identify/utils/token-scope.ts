@@ -1,4 +1,4 @@
-import { IdentifyTokenScope } from '@onefootprint/types/src/api/identify-verify';
+import { IdentifyTokenScope } from '@onefootprint/types';
 
 import { IdentifyVariant } from '../state/types';
 

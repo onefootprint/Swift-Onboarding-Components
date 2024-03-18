@@ -1,10 +1,10 @@
 import request from '@onefootprint/request';
 import type {
+  IdentifyTokenScope,
   ObConfigAuth,
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import { SANDBOX_ID_HEADER } from '@onefootprint/types';
-import type { IdentifyTokenScope } from '@onefootprint/types/src/api/identify-verify';
 import { useMutation } from '@tanstack/react-query';
 
 import type { EmailAndOrPhone } from '../types';
