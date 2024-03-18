@@ -492,12 +492,11 @@ fn get_requirement_inner(
                         .iter()
                         // check we've actually completed the document, it's not just an empty id doc
                         // TODO: maybe we should revisit this empty ID doc shell design?
-                        .filter(|i| i.completed_seqno.is_some())
-                        .map(|id| id.document_type)
+                        .filter_map(|(id, _)| id.completed_seqno.and(id.vaulted_document_type))
                         .unique()
                         .collect();
                 // unless all were skipped, we need to authorize since we may have collected it
-                let selfie_skipped = id_docs.iter().all(|id| id.should_skip_selfie());
+                let selfie_skipped = id_docs.iter().all(|(id, _)| id.should_skip_selfie());
                 (doc_types, selfie_skipped)
             } else {
                 (vec![], false)

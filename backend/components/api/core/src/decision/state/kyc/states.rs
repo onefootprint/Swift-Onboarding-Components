@@ -2,13 +2,20 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::{
-    document_request::{DocumentRequest, NewDocumentRequestArgs}, ob_configuration::ObConfiguration, risk_signal::{NewRiskSignalInfo, RiskSignal}, risk_signal_group::RiskSignalGroup, user_timeline::UserTimeline, vault::Vault, workflow::{Workflow as DbWorkflow, WorkflowUpdate}
+    document_request::{DocumentRequest, NewDocumentRequestArgs},
+    ob_configuration::ObConfiguration,
+    risk_signal::{NewRiskSignalInfo, RiskSignal},
+    risk_signal_group::RiskSignalGroup,
+    user_timeline::UserTimeline,
+    vault::Vault,
+    workflow::{Workflow as DbWorkflow, WorkflowUpdate},
 };
 
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleSetResultKind, StepUpInfo, VerificationResultId
+    DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus,
+    RiskSignalGroupKind, RuleAction, RuleSetResultKind, StepUpInfo, VerificationResultId,
 };
 
 use super::{
@@ -359,7 +366,15 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         match decision.decision_status {
             DecisionStatus::Fail | DecisionStatus::Pass => {
-                common::save_kyc_decision(conn, &self.sv_id, &wf, vres_ids, decision, Some(&rule_set_result.id), review_reasons)?;
+                common::save_kyc_decision(
+                    conn,
+                    &self.sv_id,
+                    &wf,
+                    vres_ids,
+                    decision,
+                    Some(&rule_set_result.id),
+                    review_reasons,
+                )?;
                 Ok(KycState::from(KycComplete))
             }
             DecisionStatus::StepUp => {
@@ -377,13 +392,13 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                             workflow_id: wf_id.clone(),
                             should_collect_selfie,
                             kind: doc_req_kind,
-                            rule_set_result_id: Some(rule_set_result.id.clone())
+                            rule_set_result_id: Some(rule_set_result.id.clone()),
                         })
                     })
                 };
                 let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
                 let stepup_info = StepUpInfo {
-                    document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect()
+                    document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
                 };
                 UserTimeline::create(conn, stepup_info, v.id.clone(), self.sv_id.clone())?;
 

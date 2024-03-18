@@ -48,6 +48,10 @@ impl IdentityDocument {
     pub fn collected_on_desktop(&self) -> bool {
         matches!(self.device_type, Some(DocumentScanDeviceType::Desktop))
     }
+
+    pub fn is_complete(&self) -> bool {
+        matches!(self.status, IdentityDocumentStatus::Complete)
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -212,11 +216,11 @@ impl IdentityDocument {
     }
 
     #[tracing::instrument("IdentityDocument::list_by_wf_id", skip_all)]
-    pub fn list_by_wf_id(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Vec<Self>> {
+    pub fn list_by_wf_id(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Vec<(Self, DocumentRequest)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::workflow_id.eq(wf_id))
-            .select(identity_document::all_columns)
+            .select((identity_document::all_columns, document_request::all_columns))
             .get_results(conn)?;
 
         Ok(results)

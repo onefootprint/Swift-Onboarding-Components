@@ -30,6 +30,7 @@ use db::{
     models::{
         annotation::Annotation,
         document_request::DocumentRequest,
+        identity_document::IdentityDocument,
         insight_event::InsightEvent,
         manual_review::ManualReview,
         ob_configuration::ObConfiguration,
@@ -44,9 +45,9 @@ use db::{
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
-    format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentKind, DocumentRequestKind,
-    ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind, IdentityDataKind,
-    MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
+    format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentKind, ExternalIntegrationInfo,
+    ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind, IdentityDataKind, MatchLevel, OcrDataKind,
+    PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::collections::HashSet;
@@ -149,6 +150,7 @@ pub async fn post_old(
     result
 }
 
+#[tracing::instrument(skip(state, request))]
 pub async fn post_inner(
     state: &State,
     is_live: bool,
@@ -208,7 +210,7 @@ pub(crate) async fn create_cip_request(
         risk_signals,
         insight,
         vres,
-        collected_document,
+        latest_identity_document_and_request,
     ) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -240,9 +242,15 @@ pub(crate) async fn create_cip_request(
                     (mr, Some(obd_manual), annotation)
                 }
             };
+            let latest_identity_document_and_request: Option<(IdentityDocument, DocumentRequest)> =
+                IdentityDocument::list_by_wf_id(conn, &wf.id)?
+                .into_iter()
+                .filter(|(i, _)| i.is_complete())
+                // sort just for safety, we shouldn't have more than 1 completed doc per wf
+                .sorted_by(|(i1, _), (i2, _)| i1.completed_seqno.cmp(&i2.completed_seqno))
+                .collect_vec()
+                .pop();
 
-            let collected_document = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?
-                .map(|d| d.should_collect_selfie);
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let insight = InsightEvent::get(conn, &wf.id)?;
 
@@ -270,7 +278,7 @@ pub(crate) async fn create_cip_request(
                 risk_signals,
                 insight,
                 vres,
-                collected_document,
+                latest_identity_document_and_request,
             ))
         })
         .await?;
@@ -285,7 +293,7 @@ pub(crate) async fn create_cip_request(
         ?annotation,
         ?risk_signals,
         ?vres,
-        ?collected_document,
+        collect_document = ?latest_identity_document_and_request.as_ref().map(|(_, dr)| dr.should_collect_selfie),
         "create_cip_request data"
     );
 
@@ -346,18 +354,20 @@ pub(crate) async fn create_cip_request(
         mr.as_ref(),
     )?;
     let identity = identity(&scoped_vault, &decision, risk_signals);
-    let (document, photo) = if let Some(collected_selfie) = collected_document {
-        document_and_photo(
-            scoped_vault.clone(),
-            mr.as_ref(),
-            &vendor_results,
-            &vd,
-            document_check_created_at,
-            collected_selfie,
-        )?
-    } else {
-        (None, None)
-    };
+    let (document, photo) =
+        if let Some((identity_document, document_request)) = latest_identity_document_and_request {
+            document_and_photo(
+                scoped_vault.clone(),
+                mr.as_ref(),
+                &vendor_results,
+                &vd,
+                document_check_created_at,
+                identity_document,
+                document_request,
+            )?
+        } else {
+            (None, None)
+        };
 
     let cip = CipRequest {
         provider_name: vec![alpaca::Provider::Footprint],
@@ -631,8 +641,10 @@ fn document_and_photo(
     vendor_results: &[VendorResult],
     decrypted_data: &DecryptUncheckedResult,
     check_started_at: DateTime<Utc>,
-    expect_selfie: bool,
+    identity_document: IdentityDocument,
+    document_request: DocumentRequest,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
+    let expect_selfie = document_request.should_collect_selfie;
     let (vendor_map, _) = build_vendor_response_map_from_vendor_results(vendor_results)?;
     let ocr_api = IncodeFetchOCR;
     let scores_api = IncodeFetchScores;
@@ -650,10 +662,10 @@ fn document_and_photo(
         .clone();
 
     let ocr_name = ok_or(ocr_response.name.as_ref(), "missing ocr name".into())?;
-    let type_of_id = ocr_response.type_of_id.as_ref().ok_or_else(|| {
-        idv::Error::IncodeError(idv::incode::error::Error::OcrError("Missing type_of_id".into()))
-    })?;
-    let dk = IdDocKind::try_from((type_of_id, ocr_response.document_sub_type().as_ref()))?;
+    let dk = ok_or(
+        identity_document.vaulted_document_type,
+        "missing vaulted_document_type on IdentityDocument".into(),
+    )?;
     let document_type = Some(dk.try_into()?);
     let dob = ocr_response.dob().map(PiiString::from).ok();
     let over_18_check = ocr_response.age().ok().map(|a| a >= 18).unwrap_or(true); // If age wasn't OCR'd properly, we assume the reviewer confirmed they are over 18
