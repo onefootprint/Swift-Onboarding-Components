@@ -9,7 +9,6 @@ const useOptions = () => {
     { value: 'whoToOnboard', label: t('dialog.who-to-onboard.nav') },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
     { value: 'summary', label: t('dialog.summary.nav') },
-    { value: 'authorizedScopes', label: t('dialog.authorized-scopes.nav') },
     { value: 'aml', label: t('dialog.aml.nav') },
   ];
   const kycOptions = [
@@ -20,7 +19,6 @@ const useOptions = () => {
     },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
     { value: 'summary', label: t('dialog.summary.nav') },
-    { value: 'authorizedScopes', label: t('dialog.authorized-scopes.nav') },
     { value: 'aml', label: t('dialog.aml.nav') },
   ];
   const authOptions = [

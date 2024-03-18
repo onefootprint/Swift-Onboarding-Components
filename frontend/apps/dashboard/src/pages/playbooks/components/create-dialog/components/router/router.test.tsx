@@ -42,9 +42,6 @@ describe('<Router />', () => {
         // Summary
         await moveForward();
 
-        // Authorized scopes
-        await moveForward();
-
         // AML
         await createPlaybook();
 
@@ -124,7 +121,7 @@ describe('<Router />', () => {
       });
     });
 
-    describe('when in the "Authorized scopes" step', () => {
+    describe('when in the "AML" step', () => {
       it('should go to "Summary" when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
@@ -141,45 +138,12 @@ describe('<Router />', () => {
         // Summary
         await moveForward();
 
-        // Authorized scopes
+        // AML
         const back = screen.getByRole('button', { name: 'Back' });
         await userEvent.click(back);
 
         // Summary
         const title = screen.getByText('Your Playbook recommendation');
-        expect(title).toBeInTheDocument();
-      });
-    });
-
-    describe('when in the "AML" step', () => {
-      it('should go to "Authorized scopes" when clicking "Back"', async () => {
-        renderRouter({ onCreate: jest.fn() });
-
-        // Who to onboard
-        await moveForward();
-
-        // Residency
-        await moveForward();
-
-        // Name
-        await enterName('KYC');
-        await moveForward();
-
-        // Summary
-        await moveForward();
-
-        // Authorized scopes
-        await moveForward();
-
-        // AML
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
-
-        // Authorized scopes
-        const title = screen.getByText(
-          'Select the data attributes you need read access to after an onboarding.',
-          { exact: false },
-        );
         expect(title).toBeInTheDocument();
       });
     });
@@ -206,9 +170,6 @@ describe('<Router />', () => {
         await moveForward();
 
         // Summary
-        await moveForward();
-
-        // Authorized scopes
         await moveForward();
 
         // AML
@@ -269,36 +230,8 @@ describe('<Router />', () => {
       });
     });
 
-    describe('when in the "Authorized scopes" step', () => {
-      it('should go to "Summary" when clicking "Back"', async () => {
-        renderRouter({ onCreate: jest.fn() });
-
-        // Who to onboard
-        const option = screen.getByRole('button', {
-          name: 'Onboard businesses and their beneficial owners',
-        });
-        await userEvent.click(option);
-        await moveForward();
-
-        // Name
-        await enterName('KYB');
-        await moveForward();
-
-        // Summary
-        await moveForward();
-
-        // Authorized scopes
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
-
-        // Summary
-        const title = screen.getByText('Your Playbook recommendation');
-        expect(title).toBeInTheDocument();
-      });
-    });
-
     describe('when in the "AML" step', () => {
-      it('should go to "Authorized scopes" when clicking "Back"', async () => {
+      it('should go to "Summary" when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
@@ -314,18 +247,12 @@ describe('<Router />', () => {
         // Summary
         await moveForward();
 
-        // Authorized scopes
-        await moveForward();
-
         // AML
         const back = screen.getByRole('button', { name: 'Back' });
         await userEvent.click(back);
 
-        // Authorized scopes
-        const title = screen.getByText(
-          'Select the data attributes you need read access to after an onboarding.',
-          { exact: false },
-        );
+        // Summary
+        const title = screen.getByText('Your Playbook recommendation');
         expect(title).toBeInTheDocument();
       });
     });

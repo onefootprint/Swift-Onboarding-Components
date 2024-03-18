@@ -1,5 +1,4 @@
 import type {
-  AuthorizedScopesFormData,
   MachineContext,
   SummaryFormData,
 } from '@/playbooks/utils/machine/types';
@@ -11,10 +10,6 @@ export const getAuthFixedPayload = (
   kind: obj.kind,
   nameForm: obj.nameForm,
   playbook: obj,
-  authorizedScopesForm: {
-    email: true,
-    phone_number: true,
-  } as unknown as AuthorizedScopesFormData,
   residencyForm: {
     allowInternationalResidents: false,
     allowUsResidents: true,

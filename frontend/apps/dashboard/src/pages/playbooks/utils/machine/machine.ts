@@ -81,32 +81,11 @@ export const createPlaybookMachine = () =>
               target: 'nameYourPlaybook',
             },
             playbookSubmitted: {
-              target: 'authorizedScopes',
+              target: 'aml',
               actions: 'assignPlaybook',
             },
             navigationBackward: {
               target: 'nameYourPlaybook',
-            },
-          },
-        },
-        authorizedScopes: {
-          on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
-              actions: ['resetKind'],
-            },
-            nameYourPlaybookSelected: {
-              target: 'nameYourPlaybook',
-            },
-            summarySelected: {
-              target: 'summary',
-            },
-            navigationBackward: {
-              target: 'summary',
-            },
-            authorizedScopesSubmitted: {
-              target: 'aml',
-              actions: 'assignAuthorizedScopes',
             },
           },
         },
@@ -122,11 +101,8 @@ export const createPlaybookMachine = () =>
             summarySelected: {
               target: 'summary',
             },
-            authorizedScopesSelected: {
-              target: 'authorizedScopes',
-            },
             navigationBackward: {
-              target: 'authorizedScopes',
+              target: 'summary',
             },
             amlSubmitted: {
               actions: 'assignAml',
@@ -156,10 +132,6 @@ export const createPlaybookMachine = () =>
         assignPlaybook: assign((context, event) => ({
           ...context,
           playbook: event.payload.formData,
-        })),
-        assignAuthorizedScopes: assign((context, event) => ({
-          ...context,
-          authorizedScopesForm: event.payload.formData,
         })),
         assignAml: assign((context, event) => ({
           ...context,

@@ -72,34 +72,6 @@ export const defaultAmlFormData: AMLFormData = {
   adverseMedia: false,
 };
 
-export type AuthorizedScopesFormData = {
-  [CollectedKycDataOption.name]: boolean;
-  [CollectedKycDataOption.email]: boolean;
-  [CollectedKycDataOption.phoneNumber]: boolean;
-  [CollectedKycDataOption.dob]: boolean;
-  [CollectedKycDataOption.address]: boolean;
-  [CollectedKycDataOption.ssn4]?: boolean;
-  [CollectedKycDataOption.ssn9]?: boolean;
-  [CollectedKycDataOption.usLegalStatus]?: boolean;
-  [CollectedDocumentDataOption.document]?: boolean;
-  [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
-  allBusinessData?: boolean;
-};
-
-export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
-  [CollectedKycDataOption.email]: true,
-  [CollectedKycDataOption.phoneNumber]: true,
-  [CollectedKycDataOption.name]: true,
-  [CollectedKycDataOption.dob]: true,
-  [CollectedKycDataOption.address]: true,
-  [CollectedKycDataOption.ssn4]: true,
-  [CollectedKycDataOption.ssn9]: true,
-  [CollectedKycDataOption.usLegalStatus]: true,
-  [CollectedDocumentDataOption.document]: true,
-  [CollectedInvestorProfileDataOption.investorProfile]: true,
-  allBusinessData: true,
-};
-
 export type Personal = {
   [CollectedKycDataOption.email]: boolean;
   [CollectedKycDataOption.phoneNumber]: boolean;
@@ -190,7 +162,6 @@ export type MachineContext = {
   nameForm?: NameFormData;
   playbook?: SummaryFormData;
   residencyForm?: ResidencyFormData;
-  authorizedScopesForm?: AuthorizedScopesFormData;
   amlForm?: AMLFormData;
 };
 
@@ -199,15 +170,10 @@ export type MachineEvents =
   | { type: 'nameYourPlaybookSelected' }
   | { type: 'whoToOnboardSelected' }
   | { type: 'summarySelected' }
-  | { type: 'authorizedScopesSelected' }
   | { type: 'whoToOnboardSubmitted'; payload: { kind: PlaybookKind } }
   | { type: 'nameYourPlaybookSubmitted'; payload: { formData: NameFormData } }
   | { type: 'residencySubmitted'; payload: { formData: ResidencyFormData } }
   | { type: 'playbookSubmitted'; payload: { formData: SummaryFormData } }
-  | {
-      type: 'authorizedScopesSubmitted';
-      payload: { formData: AuthorizedScopesFormData };
-    }
   | { type: 'amlSubmitted'; payload: { formData: AMLFormData } };
 
 export const basicInformationFields: string[] = [

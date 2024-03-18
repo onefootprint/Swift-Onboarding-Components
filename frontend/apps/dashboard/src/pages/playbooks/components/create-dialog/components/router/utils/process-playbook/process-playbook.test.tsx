@@ -1,7 +1,7 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES } from '@onefootprint/global-constants';
+import type { CollectedDataOption } from '@onefootprint/types';
 import {
-  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -9,7 +9,6 @@ import {
 } from '@onefootprint/types';
 import {
   CountryRestriction,
-  defaultAuthorizedScopesValues,
   defaultBusinessInformation,
   defaultNameFormData,
   defaultPlaybookValuesKYB,
@@ -18,6 +17,11 @@ import {
 } from 'src/pages/playbooks/utils/machine/types';
 
 import processPlaybook from './process-playbook';
+
+const setsEqual = (
+  a: CollectedDataOption[],
+  b: CollectedDataOption[],
+): boolean => a.length === b.length && a.every(i => b.includes(i));
 
 describe('processPlaybook', () => {
   it('should return required KYC fields in mustCollectData regardless of playbook values', () => {
@@ -33,7 +37,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -56,7 +59,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyb,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -78,7 +80,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -87,6 +88,9 @@ describe('processPlaybook', () => {
     expect(optionalData).toContain(CollectedKycDataOption.ssn9);
     expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
     expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
+    expect(
+      setsEqual(canAccessData, mustCollectData.concat(optionalData)),
+    ).toBeTruthy();
   });
 
   it('should include SSN last 4 in optional data but not mustCollectData if it is optional', () => {
@@ -101,7 +105,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -111,6 +114,9 @@ describe('processPlaybook', () => {
     expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
     expect(canAccessData).toContain(CollectedKycDataOption.ssn4);
     expect(canAccessData).not.toContain(CollectedKycDataOption.ssn9);
+    expect(
+      setsEqual(canAccessData, mustCollectData.concat(optionalData)),
+    ).toBeTruthy();
   });
 
   it('should include full SSN in mustCollectData if required', () => {
@@ -124,7 +130,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -145,7 +150,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -167,7 +171,6 @@ describe('processPlaybook', () => {
         [CollectedInvestorProfileDataOption.investorProfile]: true,
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -186,7 +189,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyb,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -203,7 +205,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyb,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -222,7 +223,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyb,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -239,7 +239,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyb,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -256,7 +255,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyb,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -273,18 +271,16 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyb,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
     expect(mustCollectData).not.toContain(CollectedKybDataOption.phoneNumber);
   });
 
-  it('should handle authorized scopes as expected for default KYC values', () => {
-    const { canAccessData } = processPlaybook({
+  it('should handle canAccessData as expected for default KYC values', () => {
+    const { canAccessData, mustCollectData } = processPlaybook({
       playbook: defaultPlaybookValuesKYC,
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -299,166 +295,9 @@ describe('processPlaybook', () => {
     expect(canAccessData).not.toContain(
       CollectedInvestorProfileDataOption.investorProfile,
     );
+    expect(setsEqual(canAccessData, mustCollectData)).toBeTruthy();
   });
 
-  it('should handle authorized scopes as expected for non-default KYC values', () => {
-    const { canAccessData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        [CollectedInvestorProfileDataOption.investorProfile]: true,
-      },
-      kind: PlaybookKind.Kyc,
-      authorizedScopes: {
-        ...defaultAuthorizedScopesValues,
-        [CollectedKycDataOption.email]: false,
-        [CollectedKycDataOption.phoneNumber]: false,
-        [CollectedKycDataOption.name]: false,
-        [CollectedKycDataOption.dob]: false,
-        [CollectedKycDataOption.ssn4]: false,
-        [CollectedKycDataOption.ssn9]: true,
-      },
-      nameForm: defaultNameFormData,
-    });
-
-    expect(canAccessData).not.toContain(CollectedKycDataOption.email);
-    expect(canAccessData).not.toContain(CollectedKycDataOption.phoneNumber);
-    expect(canAccessData).not.toContain(CollectedKycDataOption.name);
-    expect(canAccessData).not.toContain(CollectedKycDataOption.dob);
-    expect(canAccessData).toContain(CollectedKycDataOption.address);
-    expect(canAccessData).not.toContain(CollectedKycDataOption.ssn4);
-    expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
-    // tk document case
-    expect(canAccessData).toContain(
-      CollectedInvestorProfileDataOption.investorProfile,
-    );
-  });
-
-  it('should handle authorized scopes as expected for default KYB values', () => {
-    const { canAccessData } = processPlaybook({
-      playbook: defaultPlaybookValuesKYB,
-      kind: PlaybookKind.Kyb,
-      authorizedScopes: {
-        ...defaultAuthorizedScopesValues,
-        allBusinessData: true,
-      },
-      nameForm: defaultNameFormData,
-    });
-
-    expect(canAccessData).toContain(CollectedKybDataOption.beneficialOwners);
-    expect(canAccessData).toContain(CollectedKybDataOption.name);
-    expect(canAccessData).toContain(CollectedKybDataOption.address);
-    expect(canAccessData).toContain(CollectedKybDataOption.tin);
-    expect(canAccessData).not.toContain(CollectedKybDataOption.website);
-    expect(canAccessData).not.toContain(CollectedKybDataOption.corporationType);
-    expect(canAccessData).not.toContain(CollectedKybDataOption.phoneNumber);
-  });
-
-  it('should handle authorized scopes as expected when adding optional KYB values', () => {
-    const { canAccessData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.website]: true,
-          [CollectedKybDataOption.corporationType]: true,
-          [CollectedKybDataOption.phoneNumber]: true,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      authorizedScopes: {
-        ...defaultAuthorizedScopesValues,
-        allBusinessData: true,
-      },
-      nameForm: defaultNameFormData,
-    });
-
-    expect(canAccessData).toContain(CollectedKybDataOption.beneficialOwners);
-    expect(canAccessData).toContain(CollectedKybDataOption.name);
-    expect(canAccessData).toContain(CollectedKybDataOption.address);
-    expect(canAccessData).toContain(CollectedKybDataOption.tin);
-    expect(canAccessData).toContain(CollectedKybDataOption.website);
-    expect(canAccessData).toContain(CollectedKybDataOption.corporationType);
-    expect(canAccessData).toContain(CollectedKybDataOption.phoneNumber);
-  });
-
-  it('should handle authorized scopes as expected when not including access to business data', () => {
-    const { canAccessData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.website]: true,
-          [CollectedKybDataOption.corporationType]: true,
-          [CollectedKybDataOption.phoneNumber]: true,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      authorizedScopes: {
-        ...defaultAuthorizedScopesValues,
-        allBusinessData: false,
-      },
-      nameForm: defaultNameFormData,
-    });
-
-    expect(canAccessData).not.toContain(
-      CollectedKybDataOption.beneficialOwners,
-    );
-    expect(canAccessData).not.toContain(CollectedKybDataOption.name);
-    expect(canAccessData).not.toContain(CollectedKybDataOption.address);
-    expect(canAccessData).not.toContain(CollectedKybDataOption.tin);
-    expect(canAccessData).not.toContain(CollectedKybDataOption.website);
-    expect(canAccessData).not.toContain(CollectedKybDataOption.corporationType);
-    expect(canAccessData).not.toContain(CollectedKybDataOption.phoneNumber);
-  });
-
-  it('should handle authorized scopes as expected for ID doc without selfie', () => {
-    const { canAccessData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.passport],
-          selfie: false,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      authorizedScopes: {
-        ...defaultAuthorizedScopesValues,
-        [CollectedDocumentDataOption.document]: true,
-      },
-      nameForm: defaultNameFormData,
-    });
-
-    expect(canAccessData).toContain('document.passport.none.none');
-  });
-
-  it('should handle authorized scopes as expected for ID docs with selfie', () => {
-    const { canAccessData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [
-            SupportedIdDocTypes.passport,
-            SupportedIdDocTypes.driversLicense,
-          ],
-          selfie: true,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      authorizedScopes: {
-        ...defaultAuthorizedScopesValues,
-        [CollectedDocumentDataOption.document]: true,
-      },
-      nameForm: defaultNameFormData,
-    });
-
-    expect(canAccessData).toContain(
-      'document.passport,drivers_license.none.require_selfie',
-    );
-  });
   it('should handle single id doc type correctly without selfie', () => {
     const { mustCollectData } = processPlaybook({
       playbook: {
@@ -471,7 +310,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -493,7 +331,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -514,7 +351,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -536,7 +372,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
 
@@ -561,7 +396,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
     expect(isDocFirstFlow).toBe(true);
@@ -582,7 +416,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
     expect(isDocFirstFlow).toBe(false);
@@ -604,7 +437,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
     expect(isDocFirstFlow).toBe(false);
@@ -619,7 +451,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
     expect(isNoPhoneFlow).toBe(false);
@@ -636,7 +467,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
     expect(isNoPhoneFlow).toBe(true);
@@ -653,7 +483,6 @@ describe('processPlaybook', () => {
         },
       },
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
     expect(isNoPhoneFlow).toBe(false);
@@ -664,7 +493,6 @@ describe('processPlaybook', () => {
     const { isNoPhoneFlow, mustCollectData } = processPlaybook({
       playbook: defaultPlaybookValuesKYC,
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
     expect(isNoPhoneFlow).toBe(false);
@@ -675,7 +503,6 @@ describe('processPlaybook', () => {
     const { name } = processPlaybook({
       playbook: defaultPlaybookValuesKYC,
       kind: PlaybookKind.Kyc,
-      authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
     });
     expect(name).toBe('test name');
@@ -692,7 +519,6 @@ describe('processPlaybook', () => {
         } = processPlaybook({
           playbook: defaultPlaybookValuesKYC,
           kind: PlaybookKind.Kyc,
-          authorizedScopes: defaultAuthorizedScopesValues,
           nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
           residencyForm: {
             allowUsResidents: true,
@@ -718,7 +544,6 @@ describe('processPlaybook', () => {
         } = processPlaybook({
           playbook: defaultPlaybookValuesKYC,
           kind: PlaybookKind.Kyc,
-          authorizedScopes: defaultAuthorizedScopesValues,
           nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
           residencyForm: {
             allowUsResidents: true,
@@ -744,7 +569,6 @@ describe('processPlaybook', () => {
         } = processPlaybook({
           playbook: defaultPlaybookValuesKYC,
           kind: PlaybookKind.Kyc,
-          authorizedScopes: defaultAuthorizedScopesValues,
           nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
           residencyForm: {
             allowUsResidents: true,
@@ -774,7 +598,6 @@ describe('processPlaybook', () => {
         } = processPlaybook({
           playbook: defaultPlaybookValuesKYC,
           kind: PlaybookKind.Kyc,
-          authorizedScopes: defaultAuthorizedScopesValues,
           nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
           residencyForm: {
             allowUsResidents: true,
@@ -806,7 +629,6 @@ describe('processPlaybook', () => {
         } = processPlaybook({
           playbook: defaultPlaybookValuesKYC,
           kind: PlaybookKind.Kyc,
-          authorizedScopes: defaultAuthorizedScopesValues,
           nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
           residencyForm: {
             allowUsResidents: false,
@@ -834,7 +656,6 @@ describe('processPlaybook', () => {
         } = processPlaybook({
           playbook: defaultPlaybookValuesKYC,
           kind: PlaybookKind.Kyc,
-          authorizedScopes: defaultAuthorizedScopesValues,
           nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
           residencyForm: {
             allowUsResidents: true,

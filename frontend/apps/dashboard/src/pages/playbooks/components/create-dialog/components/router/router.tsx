@@ -15,7 +15,6 @@ import type {
 } from '@/playbooks/utils/machine/types';
 
 import AML from './components/aml';
-import AuthorizedScopes from './components/authorized-scopes';
 import Name from './components/name-your-playbook';
 import Residency from './components/residency';
 import Summary from './components/summary';
@@ -49,8 +48,8 @@ const Router = ({ onCreate }: RouterProps) => {
     context: MachineContext,
     enhancedAml: AMLFormData,
   ) => {
-    const { playbook, nameForm, residencyForm, authorizedScopesForm } = context;
-    if (!playbook || !nameForm || !authorizedScopesForm || !enhancedAml) {
+    const { playbook, nameForm, residencyForm } = context;
+    if (!playbook || !nameForm || !enhancedAml) {
       return;
     }
 
@@ -67,7 +66,6 @@ const Router = ({ onCreate }: RouterProps) => {
       optionalData,
       docScanForOptionalSsn,
     } = processPlaybook({
-      authorizedScopes: authorizedScopesForm,
       kind,
       nameForm,
       playbook,
@@ -117,8 +115,6 @@ const Router = ({ onCreate }: RouterProps) => {
               send('whoToOnboardSelected');
             } else if (option.value === 'summary') {
               send('summarySelected');
-            } else if (option.value === 'authorizedScopes') {
-              send('authorizedScopesSelected');
             }
           }}
           value={stepperValue}
@@ -182,21 +178,6 @@ const Router = ({ onCreate }: RouterProps) => {
               }
 
               send('playbookSubmitted', { payload: { formData } });
-            }}
-          />
-        )}
-        {state.matches('authorizedScopes') && (
-          <AuthorizedScopes
-            meta={{
-              kind: state.context.kind,
-              residency: state.context.residencyForm,
-            }}
-            playbook={state.context.playbook ?? defaultValues.playbook}
-            onBack={() => {
-              send('navigationBackward');
-            }}
-            onSubmit={formData => {
-              send('authorizedScopesSubmitted', { payload: { formData } });
             }}
           />
         )}

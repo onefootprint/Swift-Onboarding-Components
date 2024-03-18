@@ -14,7 +14,6 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAml: 'amlSubmitted';
-    assignAuthorizedScopes: 'authorizedScopesSubmitted';
     assignNameYourPlaybook: 'nameYourPlaybookSubmitted';
     assignPlaybook: 'playbookSubmitted';
     assignResidency: 'residencySubmitted';
@@ -26,7 +25,6 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'aml'
-    | 'authorizedScopes'
     | 'nameYourPlaybook'
     | 'residency'
     | 'summary'

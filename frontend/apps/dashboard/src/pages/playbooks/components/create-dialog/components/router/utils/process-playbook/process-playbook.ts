@@ -1,6 +1,5 @@
 import type { CollectedDataOption } from '@onefootprint/types';
 import {
-  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -8,7 +7,6 @@ import {
 
 import { isAuth, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
-  AuthorizedScopesFormData,
   BusinessInformation,
   NameFormData,
   PlaybookKind,
@@ -20,7 +18,6 @@ import { CountryRestriction } from '@/playbooks/utils/machine/types';
 type ProcessPlaybookProps = {
   playbook: SummaryFormData;
   kind: PlaybookKind;
-  authorizedScopes: AuthorizedScopesFormData;
   residencyForm?: ResidencyFormData;
   nameForm: NameFormData;
 };
@@ -40,14 +37,12 @@ const getRequiredKycCollectFields = () => [
 ];
 
 const processPlaybook = ({
-  authorizedScopes,
   kind,
   nameForm,
   playbook,
   residencyForm,
 }: ProcessPlaybookProps) => {
   const mustCollectData: CollectedDataOption[] = [];
-  const canAccessData: CollectedDataOption[] = [];
   const optionalData: CollectedDataOption[] = [];
   const { personal, businessInformation } = playbook;
 
@@ -104,26 +99,6 @@ const processPlaybook = ({
     mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
 
-  // authorized scopes
-  const authorizedScopesKeys = Object.keys(authorizedScopes);
-  authorizedScopesKeys.forEach(key => {
-    if (
-      authorizedScopes[key as keyof AuthorizedScopesFormData] &&
-      key !== 'allBusinessData' &&
-      key !== CollectedDocumentDataOption.document &&
-      mustCollectData.includes(key)
-    ) {
-      canAccessData.push(key);
-    }
-  });
-
-  if (authorizedScopes[CollectedDocumentDataOption.document] && docString) {
-    canAccessData.push(docString);
-  }
-  if (optionalData.length > 0) {
-    canAccessData.push(...optionalData);
-  }
-
   // KYB field handling;
   const optionalKYBFields = [
     CollectedKybDataOption.corporationType,
@@ -139,21 +114,13 @@ const processPlaybook = ({
         mustCollectData.push(field);
       }
     });
-
-    if (authorizedScopes?.allBusinessData) {
-      canAccessData.push(...getRequiredKybCollectFields());
-      optionalKYBFields.forEach(field => {
-        if (
-          businessInformation[field as keyof BusinessInformation] &&
-          mustCollectData.includes(field)
-        ) {
-          canAccessData.push(field);
-        }
-      });
-    }
   }
 
   const { name } = nameForm;
+  // We removed the ability to configure canAccessData separately from mustCollectData (and optionalData).
+  // No tenants are currently using this, so we simplify the playbook creation flow by always
+  // assuming canAccess = mustCollect + optional
+  const canAccessData = mustCollectData.concat(optionalData);
 
   return {
     canAccessData,
