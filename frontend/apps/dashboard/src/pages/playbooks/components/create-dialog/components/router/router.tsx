@@ -225,6 +225,8 @@ const Router = ({ onCreate }: RouterProps) => {
             allowInternationalResident={
               state.context.residencyForm?.allowInternationalResidents
             }
+            allowUSResident={state.context.residencyForm?.allowUsResidents}
+            allowUSTerritories={state.context.residencyForm?.allowUsTerritories}
           />
         )}
       </Content>

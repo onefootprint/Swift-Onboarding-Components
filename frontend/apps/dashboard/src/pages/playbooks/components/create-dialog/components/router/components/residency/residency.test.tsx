@@ -32,7 +32,7 @@ describe('<Residency />', () => {
       it('should show "US Residents" selected and "International" unselected', async () => {
         renderResidencyForm({});
 
-        const usResidents = screen.getByRole('checkbox', {
+        const usResidents = screen.getByRole('radio', {
           name: 'United States',
         });
         expect(usResidents).toBeChecked();
@@ -42,64 +42,54 @@ describe('<Residency />', () => {
         // });
         // expect(usTerritories).not.toBeChecked();
 
-        const international = screen.getByRole('checkbox', {
+        const international = screen.getByRole('radio', {
           name: 'Other countries',
         });
         expect(international).not.toBeChecked();
       });
     });
 
-    describe('US residents + International', () => {
+    describe('International', () => {
       it('should show "US Residents" and "International" selected and "US territories" unselected', async () => {
         renderResidencyForm({
           defaultValues: {
             allowInternationalResidents: true,
-            allowUsResidents: true,
+            allowUsResidents: false,
             allowUsTerritories: false,
           },
         });
 
-        const usResidents = screen.getByRole('checkbox', {
-          name: 'United States',
-        });
-        expect(usResidents).toBeChecked();
-
-        // const usTerritories = screen.getByRole('checkbox', {
-        //   name: 'Allow residents from U.S. territories to be onboarded',
-        // });
-        // expect(usTerritories).not.toBeChecked();
-
-        const international = screen.getByRole('checkbox', {
+        const international = screen.getByRole('radio', {
           name: 'Other countries',
         });
         expect(international).toBeChecked();
       });
     });
 
-    describe('US residents + US Territories + International', () => {
+    describe('US residents + US Territories', () => {
       it('should show "US Residents", "US territories" and "International" selected', async () => {
         renderResidencyForm({
           defaultValues: {
-            allowInternationalResidents: true,
+            allowInternationalResidents: false,
             allowUsResidents: true,
             allowUsTerritories: true,
           },
         });
 
-        const usResidents = screen.getByRole('checkbox', {
+        const usResidents = screen.getByRole('radio', {
           name: 'United States',
         });
         expect(usResidents).toBeChecked();
 
-        // const usTerritories = screen.getByRole('checkbox', {
-        //   name: 'Allow residents from U.S. territories to be onboarded',
-        // });
-        // expect(usTerritories).toBeChecked();
+        const usTerritories = screen.getByRole('checkbox', {
+          name: 'Allow residents from U.S. territories to be onboarded',
+        });
+        expect(usTerritories).toBeChecked();
 
-        const international = screen.getByRole('checkbox', {
+        const international = screen.getByRole('radio', {
           name: 'Other countries',
         });
-        expect(international).toBeChecked();
+        expect(international).not.toBeChecked();
       });
     });
 
@@ -107,14 +97,14 @@ describe('<Residency />', () => {
       it('should check "International" and "Restrict onboarding to specific countries"', async () => {
         renderResidencyForm({
           defaultValues: {
-            allowUsResidents: true,
-            allowUsTerritories: true,
+            allowUsResidents: false,
+            allowUsTerritories: false,
             allowInternationalResidents: true,
             restrictCountries: CountryRestriction.restrict,
           },
         });
 
-        const international = screen.getByRole('checkbox', {
+        const international = screen.getByRole('radio', {
           name: 'Other countries',
         });
         expect(international).toBeChecked();
@@ -170,11 +160,11 @@ describe('<Residency />', () => {
     //   });
     // });
 
-    describe('when "US residents" and "International" are selected', () => {
+    describe('when initially "US residents", and then "International" are selected', () => {
       it('should call onSubmit with the correct values', async () => {
         const onSubmit = jest.fn();
         renderResidencyForm({ onSubmit });
-        const international = screen.getByRole('checkbox', {
+        const international = screen.getByRole('radio', {
           name: 'Other countries',
         });
         await userEvent.click(international);
@@ -183,7 +173,7 @@ describe('<Residency />', () => {
         await waitFor(() =>
           expect(onSubmit).toHaveBeenCalledWith({
             allowInternationalResidents: true,
-            allowUsResidents: true,
+            allowUsResidents: false,
             allowUsTerritories: false,
             restrictCountries: CountryRestriction.all,
           }),
@@ -191,12 +181,12 @@ describe('<Residency />', () => {
       });
     });
 
-    describe('when "US Residents", "International" and "Restrict onboarding to specific countries" is selected', () => {
+    describe('when initially "US Residents", "International" and "Restrict onboarding to specific countries" is selected', () => {
       it('should call onSubmit with the correct values', async () => {
         const onSubmit = jest.fn();
         renderResidencyForm({ onSubmit });
 
-        const international = screen.getByRole('checkbox', {
+        const international = screen.getByRole('radio', {
           name: 'Other countries',
         });
         await userEvent.click(international);
@@ -216,7 +206,7 @@ describe('<Residency />', () => {
         await waitFor(() =>
           expect(onSubmit).toHaveBeenCalledWith({
             allowInternationalResidents: true,
-            allowUsResidents: true,
+            allowUsResidents: false,
             allowUsTerritories: false,
             restrictCountries: CountryRestriction.restrict,
             countryList: COUNTRIES.filter(country => country.value === 'CL'),
@@ -225,17 +215,17 @@ describe('<Residency />', () => {
       });
     });
 
-    describe('when "US Residents" is unselected and "International" and is selected', () => {
+    describe('when initially "US Residents" is unselected and "International" and is selected', () => {
       it('should call onSubmit with the correct values', async () => {
         const onSubmit = jest.fn();
         renderResidencyForm({ onSubmit });
 
-        const unitedStates = screen.getByRole('checkbox', {
+        const unitedStates = screen.getByRole('radio', {
           name: 'United States',
         });
         await userEvent.click(unitedStates);
 
-        const international = screen.getByRole('checkbox', {
+        const international = screen.getByRole('radio', {
           name: 'Other countries',
         });
         await userEvent.click(international);

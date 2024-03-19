@@ -1,7 +1,6 @@
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
-import { SupportedIdDocTypes } from '@onefootprint/types';
 import { Checkbox, LinkButton, Text, Tooltip } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -10,6 +9,7 @@ import CollectedInformation from '@/playbooks/components/collected-information';
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
+import DocEditor from './components/doc-editor';
 import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
 
 type PreviewProps = {
@@ -36,6 +36,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   const showIdDocScan =
     values.idDocKind.length > 0 ||
     Object.keys(values.countrySpecificIdDocKind).length > 0;
+  const [showIdDocEditor, setShowIdDocEditor] = useState(false);
 
   return (
     <Container>
@@ -109,8 +110,6 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
               ...(meta.residency?.countryList
                 ? { countriesRestrictions: meta.residency?.countryList }
                 : {}),
-              idDocKind: [SupportedIdDocTypes.passport],
-              selfie: true,
             }}
           />
         )}
@@ -124,6 +123,14 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
             }}
           />
         )}
+        {internationalOnly &&
+          (showIdDocEditor ? (
+            <DocEditor onDone={() => setShowIdDocEditor(false)} />
+          ) : (
+            <LinkButton onClick={() => setShowIdDocEditor(true)}>
+              {showIdDocScan ? t('id-doc.edit') : t('id-doc.add')}
+            </LinkButton>
+          ))}
       </FormElementsContainer>
       {isIdDocFirstFlowEnabled && (
         <Subsection>

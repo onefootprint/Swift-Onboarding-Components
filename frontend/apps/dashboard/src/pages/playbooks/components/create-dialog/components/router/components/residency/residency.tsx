@@ -28,15 +28,19 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.residency',
   });
-  const { handleSubmit, register, watch, control } = useForm<ResidencyFormData>(
-    {
+  const { handleSubmit, register, watch, control, setValue } =
+    useForm<ResidencyFormData>({
       defaultValues,
-    },
-  );
+    });
   const usResidentsChecked = watch('allowUsResidents');
   const internationalChecked = watch('allowInternationalResidents');
   const restrictCountriesChecked =
     watch('restrictCountries') === CountryRestriction.restrict;
+
+  const handleResidencyChange = () => {
+    setValue('allowUsResidents', !usResidentsChecked);
+    setValue('allowInternationalResidents', !internationalChecked);
+  };
 
   const submit = (formData: ResidencyFormData) => {
     onSubmit(formData);
@@ -54,9 +58,10 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
       </Header>
       <Form onSubmit={handleSubmit(submit)}>
         <OptionContainer>
-          <Checkbox
+          <Radio
             label={t('us-residents')}
-            {...register('allowUsResidents')}
+            checked={usResidentsChecked}
+            onChange={handleResidencyChange}
           />
           {usResidentsChecked && (
             <UsTerritoriesContainer>
@@ -66,9 +71,13 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
               />
             </UsTerritoriesContainer>
           )}
-          <Checkbox
+          <Radio
             label={t('other-countries')}
-            {...register('allowInternationalResidents')}
+            checked={internationalChecked}
+            onChange={() => {
+              handleResidencyChange();
+              setValue('allowUsTerritories', false);
+            }}
           />
           {internationalChecked && (
             <InternationalOptions>

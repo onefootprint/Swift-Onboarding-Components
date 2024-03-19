@@ -17,6 +17,7 @@ describe('VerificationChecks', () => {
     onSubmit = jest.fn(),
     requiresDoc = false,
     allowInternationalResident = false,
+    allowUSResident = false,
   }: Partial<VerificationChecksProps>) => {
     customRender(
       <VerificationChecks
@@ -26,6 +27,7 @@ describe('VerificationChecks', () => {
         onSubmit={onSubmit}
         requiresDoc={requiresDoc}
         allowInternationalResident={allowInternationalResident}
+        allowUSResident={allowUSResident}
       />,
     );
   };
@@ -63,7 +65,7 @@ describe('VerificationChecks', () => {
 
   describe('kyc check', () => {
     it('should show the "KYC check" option', () => {
-      renderAml({ requiresDoc: true });
+      renderAml({ requiresDoc: true, allowUSResident: true });
 
       const kycCheck = screen.getByRole('switch', {
         name: 'Perform database checks with collected identity data',
@@ -102,11 +104,6 @@ describe('VerificationChecks', () => {
     it('should call the onSubmit callback', async () => {
       const onSubmit = jest.fn();
       renderAml({ onSubmit, allowInternationalResident: true });
-
-      const kycCheck = screen.getByRole('switch', {
-        name: 'Perform database checks with collected identity data',
-      });
-      await userEvent.click(kycCheck);
 
       const aml = screen.getByRole('switch', {
         name: 'Enhanced AML monitoring',

@@ -36,6 +36,8 @@ const CollectedInformation = ({
           {Object.entries(options).map(([name, value]) => {
             if (value == null || value === undefined) return null;
             if (name === 'countrySpecificIdDocKind') {
+              const hasCountrySpecificIdDocKind = Object.keys(value).length > 0;
+              if (!hasCountrySpecificIdDocKind) return null;
               return (
                 <CountrySpecificDocDisplay
                   key={name}

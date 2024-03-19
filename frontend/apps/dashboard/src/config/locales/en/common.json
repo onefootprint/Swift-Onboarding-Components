@@ -2574,7 +2574,7 @@
           "us-territories": "Allow residents from U.S. territories to be onboarded",
           "other-countries": "Other countries",
           "all-countries": {
-            "label": "All countries",
+            "label": "All other countries",
             "hint": "Except for embargoed or sanctioned countries"
           },
           "restrict": "Restrict onboarding to specific countries",
@@ -2686,7 +2686,9 @@
             },
             "id-doc": {
               "title": "ID document scan",
-              "toggle": "Request users to scan an ID document"
+              "toggle": "Request users to scan an ID document",
+              "add": "Add collected documents",
+              "edit": "Edit collected documents"
             }
           },
           "id-doc": {
