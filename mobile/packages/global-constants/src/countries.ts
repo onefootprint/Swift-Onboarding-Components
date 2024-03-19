@@ -28,6 +28,11 @@ export const COUNTRIES: CountryRecord[] = [
     value3: 'DZA',
   },
   {
+    label: 'American Samoa',
+    value: 'AS',
+    value3: 'ASM',
+  },
+  {
     label: 'Andorra',
     value: 'AD',
     value3: 'AND',
@@ -199,8 +204,8 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Congo (Democratic Republic)',
-    value: 'CG',
-    value3: 'COG',
+    value: 'CD',
+    value3: 'COD',
   },
   {
     label: 'Congo (Republic of)',
@@ -346,6 +351,11 @@ export const COUNTRIES: CountryRecord[] = [
     label: 'Grenada',
     value: 'GD',
     value3: 'GRD',
+  },
+  {
+    label: 'Guam',
+    value: 'GU',
+    value3: 'GUM',
   },
   {
     label: 'Guatemala',
@@ -689,8 +699,8 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Palestine (State of)',
-    value: 'PW',
-    value3: 'PLW',
+    value: 'PS',
+    value3: 'PSE',
   },
   {
     label: 'Panama',
@@ -814,8 +824,8 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Sint Maarten',
-    value: 'SG',
-    value3: 'SGP',
+    value: 'SX',
+    value3: 'SXM',
   },
   {
     label: 'Slovakia',
@@ -963,6 +973,11 @@ export const COUNTRIES: CountryRecord[] = [
     value3: 'GBR',
   },
   {
+    label: 'United States Minor Outlying Islands',
+    value: 'UM',
+    value3: 'UMI',
+  },
+  {
     label: 'Uruguay',
     value: 'UY',
     value3: 'URY',
@@ -979,13 +994,18 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Venezuela',
-    value: 'VU',
+    value: 'VE',
     value3: 'VEN',
   },
   {
     label: 'Vietnam',
     value: 'VN',
     value3: 'VNM',
+  },
+  {
+    label: 'Virgin Islands',
+    value: 'VI',
+    value3: 'VIR',
   },
   {
     label: 'Yemen',
