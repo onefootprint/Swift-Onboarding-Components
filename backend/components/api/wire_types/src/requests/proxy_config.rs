@@ -13,8 +13,7 @@ pub struct CreateProxyConfigRequest {
     /// a friendly name for this proxy config
     pub name: String,
 
-    /// the proxy destination URL
-    /// Can include path and query params
+    /// The proxy destination URL. Can include path and query params
     pub url: String,
 
     /// HTTP method: POST, GET, PUT, PATCH, DELETE
@@ -28,14 +27,10 @@ pub struct CreateProxyConfigRequest {
     #[serde(default)]
     pub secret_headers: Vec<SecretCustomHeader>,
 
-    /// A certificate and key to authenticate via mTLS
-    /// Omit to skip client-certificate authentication
+    /// A certificate and key to authenticate via mTLS. Omit to skip client-certificate authentication
     pub client_identity: Option<ClientIdentity>,
 
-    /// A list of PEM-encoded x509 certificates or chains
-    /// that are either CAs or self-signed. These certificates
-    /// will be used to verify the root-of-trust of the certificate
-    /// presented by the proxy
+    /// A list of PEM-encoded x509 certificates or chains that are either CAs or self-signed. These certificates will be used to verify the root-of-trust of the certificate presented by the proxy
     #[serde(default)]
     pub pinned_server_certificates: Vec<String>,
 

@@ -39,8 +39,7 @@ impl From<IdentityDocumentStatus> for DocumentResponseStatus {
     }
 }
 
-/// Response for a identity document request. Errors are non-optional if the identity vendor
-/// requires additional images be collected.
+/// Response for a identity document request. Errors are non-optional if the identity vendor. Requires additional images be collected.
 #[derive(Debug, Apiv2Schema, serde::Serialize)]
 pub struct DocumentResponse {
     pub next_side_to_collect: Option<DocumentSide>,

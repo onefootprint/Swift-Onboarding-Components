@@ -19,16 +19,10 @@ pub struct CreateTokenRequest {
     pub kind: Option<TokenOperationKind>,
 
     /// Can only be provided when the kind is `onboard`.
-    /// Optionally, the publishable key of the playbook onto which you would like this user to
-    /// onboard.
-    /// The user will be asked to provide any missing information required by playbook.
-    /// If you provide the key here, you can omit providing it in the frontend
-    /// Footprint.js SDK integration.
+    /// Optionally, the publishable key of the playbook onto which you would like this user to onboard. The user will be asked to provide any missing information required by playbook. If you provide the key here, you can omit providing it in the frontend Footprint.js SDK integration.
     pub key: Option<ObConfigurationKey>,
 
-    /// Can only be provided when the kind is `update_auth_methods`.
-    /// The set of auth methods that you would like to be allowed to be updated.
-    /// When not provided, the token allows updating any auth method.
+    /// Can only be provided when the kind is `update_auth_methods`. The set of auth methods that you would like to be allowed to be updated. When not provided, the token allows updating any auth method.
     pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
 
     #[openapi(skip)]
@@ -41,8 +35,7 @@ pub struct CreateTokenRequest {
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum TokenOperationKind {
-    /// Onboard onto a specific playbook, specified either through the key in this API or in the
-    /// Verify SDK
+    /// Onboard onto a specific playbook, specified either through the key in this API or in the Verify SDK
     Onboard,
     /// Reonboard onto the last playbook that the user onboarded onto
     Reonboard,

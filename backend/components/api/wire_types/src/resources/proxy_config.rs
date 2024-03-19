@@ -26,9 +26,9 @@ pub struct ProxyConfigDetailed {
     pub status: ApiKeyStatus,
     pub deactivated_at: Option<DateTime<Utc>>,
 
-    /// proxy url
+    /// Proxy URL
     pub url: String,
-    /// proxy http method
+    /// Http method to use when making the proxy request
     pub method: String,
 
     /// PEM encoded client certificate
@@ -40,27 +40,23 @@ pub struct ProxyConfigDetailed {
     /// Custom headers containing auth secrets
     pub secret_headers: Vec<OmittedSecretCustomHeader>,
 
-    /// A list of PEM-encoded x509 certificates or chains
-    /// that are either CAs or self-signed. These certificates
-    /// will be used to verify the root-of-trust of the certificate
-    /// presented by the proxy
+    /// A list of PEM-encoded x509 certificates or chains that are either CAs or self-signed. These certificates will be used to verify the root-of-trust of the certificate presented by the proxy.
     pub pinned_server_certificates: Vec<String>,
 
-    /// access reason to use during proxy decryptions
+    /// The reason to use for decryptions that occur during proxying.
     pub access_reason: Option<String>,
 
-    /// ingress type
+    /// The content type expected to be received from responses from the upstream.
     pub ingress_content_type: Option<ProxyIngressContentType>,
 
-    /// Ingress rules
     pub ingress_rules: Vec<ProxyIngressRule>,
 }
 
 /// a secret header to forward to the proxy
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct OmittedSecretCustomHeader {
-    /// identifier for the secret header
+    /// Identifier for the secret header
     pub id: ProxyConfigSecretHeaderId,
-    /// header name
+    /// Header name
     pub name: String,
 }

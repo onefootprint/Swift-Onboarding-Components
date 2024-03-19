@@ -73,8 +73,6 @@ pub struct PublicOnboardingConfiguration {
     pub support_phone: Option<String>,
     pub support_website: Option<String>,
 
-    /// When non-null, the provided auth methods are required to be verified by the playbook.
-    /// Null does not mean that no auth is required - it just means the playbook doesn't care
-    /// which method is used.
+    /// When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
 }

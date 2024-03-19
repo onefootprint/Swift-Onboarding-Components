@@ -19,9 +19,7 @@ pub struct User {
     pub status: Option<OnboardingStatus>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub external_id: Option<ExternalId>,
-    /// When non-null, there is additional info pending collection from this user.
-    /// When non-null, you may create a token for this user with the `inherited` operation. This
-    /// token can be used to collect any outstanding information
+    /// When non-null, there is additional info pending collection from this user. In this case, you may create a token for this user with the `inherited` operation. This token can be used to collect any outstanding information.
     pub requires_additional_info: Option<PublicWorkflowRequest>,
 }
 

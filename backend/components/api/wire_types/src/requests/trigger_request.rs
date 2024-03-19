@@ -15,8 +15,7 @@ pub struct TriggerKycRequest {
     #[openapi(skip)]
     pub onboarding_config_key: Option<ObConfigurationKey>,
     #[openapi(required)]
-    /// The publishable key of the playbook onto which you would like this user to onboard.
-    /// The playbook will specify required information and the rules by which to make a KYC decision.
+    /// The publishable key of the playbook onto which you would like this user to onboard. The playbook will specify required information and the rules by which to make a KYC decision.
     pub key: Option<ObConfigurationKey>,
     /// (only valid for sandbox users) choose the desired KYC outcome
     pub fixture_result: Option<SimpleFixtureResult>,

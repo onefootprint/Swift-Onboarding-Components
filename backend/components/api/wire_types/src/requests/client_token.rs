@@ -30,8 +30,7 @@ pub enum ModernClientTokenScopeKind {
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateClientTokenRequest {
-    /// List of data identifiers to which this token will have access. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`.
-    /// Should not be specified when using the `vault_card` scope.
+    /// List of data identifiers to which this token will have access. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`.. Should not be specified when using the `vault_card` scope.
     #[serde(default)]
     pub fields: HashSet<DataIdentifier>,
     /// Time to live until this token expires, provided in seconds. Defaults to 30 minutes. Must be at least 60 seconds, at most 1 day
@@ -43,11 +42,11 @@ pub struct CreateClientTokenRequest {
     pub scopes: Vec<DEPRECATEDClientTokenScopeKind>,
     #[openapi(required)]
     /// Specify the permissions of this token.
-    /// `vault` allows writing to the specified fields.
-    /// `decrypt` allows decrypting the specified fields.
-    /// `vault_and_decrypt` allows both.
-    /// `decrypt_download` allows decrypting a single piece of data as a file.
-    /// `vault_card` is a shorthand to generate a token to vault a card with a random alias.
+    /// - `vault` allows writing to the specified fields.
+    /// - `decrypt` allows decrypting the specified fields.
+    /// - `vault_and_decrypt` allows both.
+    /// - `decrypt_download` allows decrypting a single piece of data as a file.
+    /// - `vault_card` is a shorthand to generate a token to vault a card with a random alias.
     pub scope: Option<ModernClientTokenScopeKind>,
     /// If the token is allowed to decrypt, provide a default decryption reason
     pub decrypt_reason: Option<String>,

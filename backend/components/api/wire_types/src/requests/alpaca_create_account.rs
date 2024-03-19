@@ -11,8 +11,7 @@ pub struct AlpacaCreateAccountRequest {
     /// API Secret to use with alpaca
     pub api_secret: PiiString,
 
-    /// Alpaca Hostname to use (i.e. sandbox or production like: )
-    /// for example: `broker-api.sandbox.alpaca.markets`
+    /// Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)
     pub hostname: String,
 
     pub enabled_assets: Option<Vec<AssetClass>>,
@@ -33,8 +32,7 @@ pub struct DeprecatedAlpacaCreateAccountRequest {
     /// API Secret to use with alpaca
     pub api_secret: PiiString,
 
-    /// Alpaca Hostname to use (i.e. sandbox or production like: )
-    /// for example: `broker-api.sandbox.alpaca.markets`
+    /// Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)
     pub hostname: String,
 
     pub enabled_assets: Option<Vec<AssetClass>>,

@@ -3147,7 +3147,7 @@
                 ]
             },
             "DocumentResponse": {
-                "description": "Response for a identity document request. Errors are non-optional if the identity vendor\n requires additional images be collected.",
+                "description": "Response for a identity document request. Errors are non-optional if the identity vendor. Requires additional images be collected.",
                 "type": "object",
                 "properties": {
                     "errors": {
@@ -3345,7 +3345,7 @@
                                 "type": "string"
                             },
                             "required_auth_methods": {
-                                "description": "When non-null, the provided auth methods are required to be verified by the playbook.\n Null does not mean that no auth is required - it just means the playbook doesn't care\n which method is used.",
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.",
                                 "type": "array",
                                 "items": {
                                     "type": "string",
@@ -3730,7 +3730,7 @@
                         "type": "string"
                     },
                     "scope": {
-                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for\n your use case in order to get the least permissions required",
+                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for your use case in order to get the least permissions required",
                         "type": "string",
                         "enum": [
                             "my1fp",
@@ -3782,11 +3782,11 @@
                                 }
                             },
                             "can_initiate_signup_challenge": {
-                                "description": "When true, allowed to create a new user via a signup challenge even when there's already\n an existing user with this contact info.\n Generally, a user can make a new vault IF they're not in a context logging into a tenant\n that they've already onboarded onto",
+                                "description": "When true, allowed to create a new user via a signup challenge even when there's already an existing user with this contact info. Generally, a user can make a new vault IF they're not in a context logging into a tenant that they've already onboarded onto",
                                 "type": "boolean"
                             },
                             "has_syncable_passkey": {
-                                "description": "signals that one or more biometric credentials\n support syncing and may be available to use on desktop/other devices",
+                                "description": "Signals that one or more biometric credentials support syncing and may be available to use on desktop/other devices",
                                 "type": "boolean"
                             },
                             "is_unverified": {
@@ -4102,7 +4102,7 @@
                         "type": "string"
                     },
                     "scope": {
-                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for\n your use case in order to get the least permissions required",
+                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for your use case in order to get the least permissions required",
                         "type": "string",
                         "enum": [
                             "my1fp",
@@ -4330,7 +4330,7 @@
                                 "type": "string"
                             },
                             "required_auth_methods": {
-                                "description": "When non-null, the provided auth methods are required to be verified by the playbook.\n Null does not mean that no auth is required - it just means the playbook doesn't care\n which method is used.",
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.",
                                 "type": "array",
                                 "items": {
                                     "type": "string",
@@ -4733,7 +4733,7 @@
                                 "type": "string"
                             },
                             "required_auth_methods": {
-                                "description": "When non-null, the provided auth methods are required to be verified by the playbook.\n Null does not mean that no auth is required - it just means the playbook doesn't care\n which method is used.",
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.",
                                 "type": "array",
                                 "items": {
                                     "type": "string",
@@ -5135,7 +5135,7 @@
                         "type": "string"
                     },
                     "required_auth_methods": {
-                        "description": "When non-null, the provided auth methods are required to be verified by the playbook.\n Null does not mean that no auth is required - it just means the playbook doesn't care\n which method is used.",
+                        "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.",
                         "type": "array",
                         "items": {
                             "type": "string",
@@ -5734,10 +5734,7 @@
                             "auth"
                         ]
                     }
-                },
-                "required": [
-                    "scope"
-                ]
+                }
             },
             "SignupChallengeResponse": {
                 "type": "object",
@@ -5843,7 +5840,7 @@
                 "type": "object",
                 "properties": {
                     "action_kind": {
-                        "description": "Specifies whether to add the new auth method alongside existing auth methods or replace\n the existing method.",
+                        "description": "Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.",
                         "type": "string",
                         "enum": [
                             "replace",

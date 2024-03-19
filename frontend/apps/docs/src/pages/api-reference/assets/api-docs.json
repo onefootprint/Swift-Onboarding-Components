@@ -2108,7 +2108,7 @@
                         "type": "string"
                     },
                     "fields": {
-                        "description": "List of data identifiers to which this token will have access. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`.\n Should not be specified when using the `vault_card` scope.",
+                        "description": "List of data identifiers to which this token will have access. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`.. Should not be specified when using the `vault_card` scope.",
                         "type": "array",
                         "items": {
                             "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
@@ -2365,7 +2365,7 @@
                         }
                     },
                     "scope": {
-                        "description": "Specify the permissions of this token.\n `vault` allows writing to the specified fields.\n `decrypt` allows decrypting the specified fields.\n `vault_and_decrypt` allows both.\n `decrypt_download` allows decrypting a single piece of data as a file.\n `vault_card` is a shorthand to generate a token to vault a card with a random alias.",
+                        "description": "Specify the permissions of this token.\n - `vault` allows writing to the specified fields.\n - `decrypt` allows decrypting the specified fields.\n - `vault_and_decrypt` allows both.\n - `decrypt_download` allows decrypting a single piece of data as a file.\n - `vault_card` is a shorthand to generate a token to vault a card with a random alias.",
                         "type": "string",
                         "enum": [
                             "vault",
@@ -4354,7 +4354,7 @@
                         "type": "string"
                     },
                     "requires_additional_info": {
-                        "description": "When non-null, there is additional info pending collection from this user.\n When non-null, you may create a token for this user with the `inherited` operation. This\n token can be used to collect any outstanding information",
+                        "description": "When non-null, there is additional info pending collection from this user. In this case, you may create a token for this user with the `inherited` operation. This token can be used to collect any outstanding information.",
                         "type": "object",
                         "properties": {
                             "note": {

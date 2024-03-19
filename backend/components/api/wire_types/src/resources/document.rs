@@ -42,8 +42,7 @@ pub struct DocumentUpload {
     pub side: DocumentSide,
     pub failure_reasons: Vec<DocumentImageError>,
     pub version: DataLifetimeSeqno,
-    /// When true, we detected that the user had a slow internet connection and the client
-    /// compressed the image more than normal to allow for a faster upload.
+    /// When true, we detected that the user had a slow internet connection and the client compressed the image more than normal to allow for a faster upload.
     pub is_extra_compressed: bool,
 }
 

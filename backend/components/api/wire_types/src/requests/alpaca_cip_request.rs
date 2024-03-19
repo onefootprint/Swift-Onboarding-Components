@@ -9,12 +9,10 @@ pub struct AlpacaCipRequest {
     /// API Secret to use with alpaca
     pub api_secret: PiiString,
 
-    /// The default approver name/email to use for automatically approved users
-    /// This will be overwritten if done by a manual reviewer
+    /// The default approver name/email to use for automatically approved users. This will be overwritten if done by a manual reviewer
     pub default_approver: PiiString,
 
-    /// Alpaca Hostname to use (i.e. sandbox or production like: )
-    /// for example: `broker-api.sandbox.alpaca.markets`
+    /// Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)
     pub hostname: String,
 
     /// The associated user's alpaca account id
@@ -32,12 +30,10 @@ pub struct DeprecatedAlpacaCipRequest {
     /// API Secret to use with alpaca
     pub api_secret: PiiString,
 
-    /// The default approver name/email to use for automatically approved users
-    /// This will be overwritten if done by a manual reviewer
+    /// The default approver name/email to use for automatically approved users. This will be overwritten if done by a manual reviewer
     pub default_approver: PiiString,
 
-    /// Alpaca Hostname to use (i.e. sandbox or production like: )
-    /// for example: `broker-api.sandbox.alpaca.markets`
+    /// Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)
     pub hostname: String,
 
     /// The associated user's alpaca account id
@@ -46,9 +42,9 @@ pub struct DeprecatedAlpacaCipRequest {
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize)]
 pub struct AlpacaCipResponse {
-    /// alpaca response HTTP status code
+    /// Alpaca response HTTP status code
     pub status_code: u16,
 
-    /// response from alpaca
+    /// Response body from Alpaca
     pub alpaca_response: PiiJsonValue,
 }

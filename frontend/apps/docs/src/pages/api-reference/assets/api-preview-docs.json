@@ -1202,11 +1202,11 @@
                         "type": "string"
                     },
                     "default_approver": {
-                        "description": "The default approver name/email to use for automatically approved users\n This will be overwritten if done by a manual reviewer",
+                        "description": "The default approver name/email to use for automatically approved users. This will be overwritten if done by a manual reviewer",
                         "type": "string"
                     },
                     "hostname": {
-                        "description": "Alpaca Hostname to use (i.e. sandbox or production like: )\n for example: `broker-api.sandbox.alpaca.markets`",
+                        "description": "Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)",
                         "type": "string"
                     }
                 },
@@ -1222,11 +1222,11 @@
                 "type": "object",
                 "properties": {
                     "alpaca_response": {
-                        "description": "response from alpaca",
+                        "description": "Response body from Alpaca",
                         "type": "object"
                     },
                     "status_code": {
-                        "description": "alpaca response HTTP status code",
+                        "description": "Alpaca response HTTP status code",
                         "type": "integer",
                         "format": "int32"
                     }
@@ -1406,7 +1406,7 @@
                         }
                     },
                     "hostname": {
-                        "description": "Alpaca Hostname to use (i.e. sandbox or production like: )\n for example: `broker-api.sandbox.alpaca.markets`",
+                        "description": "Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)",
                         "type": "string"
                     },
                     "trusted_contact": {
@@ -1476,7 +1476,7 @@
                 "type": "object",
                 "properties": {
                     "default_approver": {
-                        "description": "The default approver name/email to use for automatically approved users\n This will be overwritten if done by a manual reviewer",
+                        "description": "The default approver name/email to use for automatically approved users. This will be overwritten if done by a manual reviewer",
                         "type": "string"
                     }
                 },
@@ -1760,7 +1760,7 @@
                 "type": "object",
                 "properties": {
                     "key": {
-                        "description": "Can only be provided when the kind is `onboard`.\n Optionally, the publishable key of the playbook onto which you would like this user to\n onboard.\n The user will be asked to provide any missing information required by playbook.\n If you provide the key here, you can omit providing it in the frontend\n Footprint.js SDK integration.",
+                        "description": "Can only be provided when the kind is `onboard`.\n Optionally, the publishable key of the playbook onto which you would like this user to onboard. The user will be asked to provide any missing information required by playbook. If you provide the key here, you can omit providing it in the frontend Footprint.js SDK integration.",
                         "type": "string"
                     },
                     "kind": {
@@ -1775,7 +1775,7 @@
                         ]
                     },
                     "limit_auth_methods": {
-                        "description": "Can only be provided when the kind is `update_auth_methods`.\n The set of auth methods that you would like to be allowed to be updated.\n When not provided, the token allows updating any auth method.",
+                        "description": "Can only be provided when the kind is `update_auth_methods`. The set of auth methods that you would like to be allowed to be updated. When not provided, the token allows updating any auth method.",
                         "type": "array",
                         "items": {
                             "type": "string",
@@ -8205,7 +8205,7 @@
                         ]
                     },
                     "key": {
-                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The playbook will specify required information and the rules by which to make a KYC decision.",
+                        "description": "The publishable key of the playbook onto which you would like this user to onboard. The playbook will specify required information and the rules by which to make a KYC decision.",
                         "type": "string"
                     }
                 },

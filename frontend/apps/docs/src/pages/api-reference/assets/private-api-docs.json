@@ -4746,7 +4746,7 @@
                     "Organization",
                     "Private"
                 ],
-                "description": "Returns a list of onboarding configurations owned by the tenant.",
+                "description": "Returns an onboarding configuration.",
                 "parameters": [
                     {
                         "in": "path",
@@ -7575,7 +7575,7 @@
                         "type": "string"
                     },
                     "client_identity": {
-                        "description": "A certificate and key to authenticate via mTLS\n Omit to skip client-certificate authentication",
+                        "description": "A certificate and key to authenticate via mTLS. Omit to skip client-certificate authentication",
                         "type": "object",
                         "properties": {
                             "certificate": {
@@ -7911,7 +7911,7 @@
                         "type": "string"
                     },
                     "pinned_server_certificates": {
-                        "description": "A list of PEM-encoded x509 certificates or chains\n that are either CAs or self-signed. These certificates\n will be used to verify the root-of-trust of the certificate\n presented by the proxy",
+                        "description": "A list of PEM-encoded x509 certificates or chains that are either CAs or self-signed. These certificates will be used to verify the root-of-trust of the certificate presented by the proxy",
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -7940,7 +7940,7 @@
                         }
                     },
                     "url": {
-                        "description": "the proxy destination URL\n Can include path and query params",
+                        "description": "The proxy destination URL. Can include path and query params",
                         "type": "string"
                     }
                 },
@@ -9370,7 +9370,7 @@
                                     }
                                 },
                                 "is_extra_compressed": {
-                                    "description": "When true, we detected that the user had a slow internet connection and the client\n compressed the image more than normal to allow for a faster upload.",
+                                    "description": "When true, we detected that the user had a slow internet connection and the client compressed the image more than normal to allow for a faster upload.",
                                     "type": "boolean"
                                 },
                                 "side": {
@@ -17401,6 +17401,18 @@
                                         ]
                                     }
                                 },
+                                "rule_set": {
+                                    "type": "object",
+                                    "properties": {
+                                        "version": {
+                                            "type": "integer",
+                                            "format": "int32"
+                                        }
+                                    },
+                                    "required": [
+                                        "version"
+                                    ]
+                                },
                                 "skip_kyc": {
                                     "type": "boolean"
                                 },
@@ -18335,6 +18347,18 @@
                             ]
                         }
                     },
+                    "rule_set": {
+                        "type": "object",
+                        "properties": {
+                            "version": {
+                                "type": "integer",
+                                "format": "int32"
+                            }
+                        },
+                        "required": [
+                            "version"
+                        ]
+                    },
                     "skip_kyc": {
                         "type": "boolean"
                     },
@@ -18418,7 +18442,7 @@
                         "type": "string"
                     },
                     "request_org_id": {
-                        "description": "Optionally request to log into the provided tenant, if the user has a rolebinding at this\n tenant.",
+                        "description": "Optionally request to log into the provided tenant, if the user has a rolebinding at this tenant.",
                         "type": "string"
                     }
                 },
@@ -18430,7 +18454,7 @@
                 "type": "object",
                 "properties": {
                     "auth_token": {
-                        "description": "If the email is associated with one tenant, a long-lived TenantRbAuth token to perform\n actions on the dashboard.\n If the email is associated with multiple tenants, a a short-lived WorkOsAuth token that\n can be used to select the tenant as which to auth.",
+                        "description": "If the email is associated with one tenant, a long-lived TenantRbAuth token to perform actions on the dashboard.\n If the email is associated with multiple tenants, a a short-lived WorkOsAuth token that can be used to select the tenant as which to auth.",
                         "type": "string"
                     },
                     "created_new_tenant": {
@@ -19382,7 +19406,7 @@
                 "type": "object",
                 "properties": {
                     "access_reason": {
-                        "description": "access reason to use during proxy decryptions",
+                        "description": "The reason to use for decryptions that occur during proxying.",
                         "type": "string"
                     },
                     "client_certificate": {
@@ -19423,14 +19447,13 @@
                         "type": "string"
                     },
                     "ingress_content_type": {
-                        "description": "ingress type",
+                        "description": "The content type expected to be received from responses from the upstream.",
                         "type": "string",
                         "enum": [
                             "json"
                         ]
                     },
                     "ingress_rules": {
-                        "description": "Ingress rules",
                         "type": "array",
                         "items": {
                             "description": "A proxy ingress parsing and vaulting rule",
@@ -19704,14 +19727,14 @@
                         "type": "boolean"
                     },
                     "method": {
-                        "description": "proxy http method",
+                        "description": "Http method to use when making the proxy request",
                         "type": "string"
                     },
                     "name": {
                         "type": "string"
                     },
                     "pinned_server_certificates": {
-                        "description": "A list of PEM-encoded x509 certificates or chains\n that are either CAs or self-signed. These certificates\n will be used to verify the root-of-trust of the certificate\n presented by the proxy",
+                        "description": "A list of PEM-encoded x509 certificates or chains that are either CAs or self-signed. These certificates will be used to verify the root-of-trust of the certificate presented by the proxy.",
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -19725,11 +19748,11 @@
                             "type": "object",
                             "properties": {
                                 "id": {
-                                    "description": "identifier for the secret header",
+                                    "description": "Identifier for the secret header",
                                     "type": "string"
                                 },
                                 "name": {
-                                    "description": "header name",
+                                    "description": "Header name",
                                     "type": "string"
                                 }
                             },
@@ -19747,7 +19770,7 @@
                         ]
                     },
                     "url": {
-                        "description": "proxy url",
+                        "description": "Proxy URL",
                         "type": "string"
                     }
                 },
