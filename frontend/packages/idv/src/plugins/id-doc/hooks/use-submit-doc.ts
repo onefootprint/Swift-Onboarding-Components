@@ -2,6 +2,7 @@ import request from '@onefootprint/request';
 import type { SubmitDocRequest, SubmitDocResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
+import { t } from 'i18next';
 
 const submitDoc = async (payload: SubmitDocRequest) => {
   const { authToken, image, side, id, meta, extraCompress } = payload;
@@ -21,7 +22,9 @@ const submitDoc = async (payload: SubmitDocRequest) => {
       'x-fp-process-separately': true,
       'x-fp-is-upload': meta.isUpload,
     },
-    timeout: 180000,
+    // Slightly higher than the server-side timeout.
+    timeout: 61000,
+    timeoutErrorMessage: t('request:errors.E121').toString(),
   });
 
   return response.data;

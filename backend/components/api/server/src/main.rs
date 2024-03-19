@@ -1,8 +1,8 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::expect_used)]
 
-use actix_web::{dev::Service, http::KeepAlive};
-use api_core::{config::Config, *};
+use actix_web::{dev::Service, http::KeepAlive, HttpMessage};
+use api_core::{config::Config, utils::timeouts::ResponseDeadline, *};
 use clap::{Parser, Subcommand};
 use std::time::Duration;
 mod custom_migrations;
@@ -145,8 +145,13 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
                 // generates its own timeouts in most cases. Otherwise, the ALB will return a 504
                 // to the client but the API server will continue processing the request,
                 // potentially yielding a different status code.
+
+                let timeout = Duration::from_secs(58);
+                let deadline = ResponseDeadline::from_timeout(timeout);
+                req.extensions_mut().insert(deadline);
+
                 let fut = srv.call(req);
-                let fut_with_timeout = actix_web::rt::time::timeout(Duration::from_secs(58), fut);
+                let fut_with_timeout = actix_web::rt::time::timeout(timeout, fut);
                 async {
                     match fut_with_timeout.await {
                         Ok(res) => res,

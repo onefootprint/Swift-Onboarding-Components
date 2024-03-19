@@ -61,6 +61,8 @@ pub enum ErrorWithCode {
     CouldNotParseSession,
     #[strum(message = "E120", detailed_message = "Please log into your existing account")]
     ExistingVault(SessionAuthToken),
+    #[strum(message = "E121", detailed_message = "File upload exceeded time limit")]
+    FileUploadTimeout,
 }
 
 impl ErrorWithCode {
@@ -86,6 +88,7 @@ impl ErrorWithCode {
             Self::SessionExpired => StatusCode::UNAUTHORIZED,
             Self::CouldNotParseSession => StatusCode::UNAUTHORIZED,
             Self::ExistingVault(_) => StatusCode::BAD_REQUEST,
+            Self::FileUploadTimeout => StatusCode::REQUEST_TIMEOUT,
         }
     }
 }

@@ -36,7 +36,7 @@ use crate::{
 };
 use twilio::error::Error as TwilioError;
 
-use self::{challenge::ChallengeError, handoff::HandoffError};
+use self::{challenge::ChallengeError, error_with_code::ErrorWithCode, handoff::HandoffError};
 
 pub type ApiResult<T> = Result<T, ApiError>;
 
@@ -430,7 +430,19 @@ impl actix_web::ResponseError for ApiError {
             message
         };
 
-        let response = ApiResponseError {
+        let mut resp = actix_web::HttpResponse::build(self.status_code());
+
+        // Failing to close the TCP connection after sending a timeout response allows clients to
+        // continue sending request data even server has sent an error response. This would create
+        // unneccesary work for both the server and the client.
+        match self.kind() {
+            ApiErrorKind::ResponseTimeout | ApiErrorKind::ErrorWithCode(ErrorWithCode::FileUploadTimeout) => {
+                resp.force_close();
+            }
+            _ => {}
+        };
+
+        resp.json(ApiResponseError {
             error: FpResponseErrorInfo {
                 status_code,
                 message,
@@ -438,7 +450,6 @@ impl actix_web::ResponseError for ApiError {
                 context: error_context,
                 support_id,
             },
-        };
-        actix_web::HttpResponse::build(self.status_code()).json(response)
+        })
     }
 }

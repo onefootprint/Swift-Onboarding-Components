@@ -1,9 +1,15 @@
-use crate::errors::{error_with_code::ErrorWithCode, ApiResult};
+use std::time::Duration;
+
+use crate::{
+    errors::{error_with_code::ErrorWithCode, ApiResult},
+    ApiError, ApiErrorKind,
+};
 use actix_multipart::Multipart;
-use actix_web::HttpRequest;
+use actix_web::{HttpMessage, HttpRequest};
 use bytes::{BufMut, BytesMut};
 use futures_util::StreamExt as _;
 
+use super::timeouts::ResponseDeadline;
 use mime::Mime;
 use newtypes::PiiBytes;
 use reqwest::header::CONTENT_LENGTH;
@@ -49,6 +55,39 @@ pub fn mime_type_to_extension(mime_type: &str) -> Option<&'static str> {
 
 #[tracing::instrument(skip_all)]
 pub async fn handle_file_upload(
+    payload: &mut Multipart,
+    request: &HttpRequest,
+    restrict_to_mime_types: Option<Vec<Mime>>,
+    max_allowed_file_size_in_bytes: usize,
+) -> ApiResult<FileUpload> {
+    let fut = handle_file_upload_inner(
+        payload,
+        request,
+        restrict_to_mime_types,
+        max_allowed_file_size_in_bytes,
+    );
+
+    // If there's no response deadline, don't apply a timeout. This wouldn't happen as long as the
+    // middleware is installed.
+    let Some(&resp_deadline) = request.extensions().get::<ResponseDeadline>() else {
+        return fut.await;
+    };
+
+    // Set to one second less than the timeout for the request to allow for the upload to complete.
+    let upload_deadline = resp_deadline.into_instant() - Duration::from_secs(1);
+
+    let fut_with_timeout = tokio::time::timeout_at(upload_deadline, fut);
+    match fut_with_timeout.await {
+        Ok(res) => res,
+        Err(_) => Err(ApiError::from(ApiErrorKind::ErrorWithCode(
+            ErrorWithCode::FileUploadTimeout,
+        ))),
+    }
+}
+
+
+#[tracing::instrument(skip_all)]
+async fn handle_file_upload_inner(
     payload: &mut Multipart,
     request: &HttpRequest,
     restrict_to_mime_types: Option<Vec<Mime>>,

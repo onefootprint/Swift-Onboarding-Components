@@ -19,6 +19,7 @@
     "E116": "Missing filename",
     "E117": "Session does not exist",
     "E118": "Session is expired",
-    "E119": "Session invalid"
+    "E119": "Session invalid",
+    "E121": "File upload exceeded time limit"
   }
 }

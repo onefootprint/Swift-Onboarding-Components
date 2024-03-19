@@ -19,6 +19,7 @@
     "E116": "Falta el nombre del documento",
     "E117": "Sesión inexistente",
     "E118": "La sesión ha expirado",
-    "E119": "Sesión inválida"
+    "E119": "Sesión inválida",
+    "E121": "Límite de tiempo de carga excedido"
   }
 }
