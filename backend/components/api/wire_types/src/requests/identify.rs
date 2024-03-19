@@ -104,7 +104,7 @@ pub struct LoginChallengeResponse {
 pub struct SignupChallengeRequest {
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
-    pub scope: IdentifyScope,
+    pub scope: Option<IdentifyScope>,
 }
 
 #[derive(Apiv2Schema, serde::Serialize)]

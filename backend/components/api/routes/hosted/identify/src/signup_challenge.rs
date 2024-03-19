@@ -22,7 +22,7 @@ use api_core::{
 use api_wire_types::{IdentifyId, SignupChallengeRequest, SignupChallengeResponse, UserChallengeData};
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::GlobalFingerprintKind, ChallengeKind, DataIdentifier, Fingerprinter,
+    fingerprinter::GlobalFingerprintKind, ChallengeKind, DataIdentifier, Fingerprinter, IdentifyScope,
     IdentityDataKind as IDK,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -47,6 +47,14 @@ pub async fn post(
         scope,
     } = request.into_inner();
     let sandbox_id = sandbox_id.0;
+    let scope = if let Some(scope) = scope {
+        tracing::info!("Scope provided");
+        scope
+    } else {
+        // TODO should deprecate this branch when all client SDKs are updated to use /hosted/identify/lite
+        tracing::info!(tenant_id=%ob_context.ob_config().tenant_id, "Scope not provided");
+        IdentifyScope::Onboarding
+    };
     let is_fixture = phone_number.as_ref().is_some_and(|p| p.is_fixture_phone_number())
         || email.as_ref().is_some_and(|e| e.is_fixture());
     if ob_context.ob_config().is_live && is_fixture {
