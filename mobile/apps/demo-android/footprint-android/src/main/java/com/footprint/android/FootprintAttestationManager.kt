@@ -82,13 +82,11 @@ internal class FootprintAttestationManager(
     private val logger: FootprintLogger,
     private val context: Context
 ) {
-
-    private val cloudProjectNumber = 682363691106
-
     @SuppressLint("HardwareIds")
     private fun generateAttestation(
         deviceResponse: String,
         challenge: AttestationChallenge,
+        cloudProjectNumber: Long,
         onDone: (String?) -> Unit,
     ) {
         val wv = getWidevine()
@@ -208,8 +206,8 @@ internal class FootprintAttestationManager(
         })
     }
 
-    fun getAttestation(deviceResponse: String?, authToken: String?, onDone: () -> Unit) {
-        if (deviceResponse.isNullOrEmpty() || authToken.isNullOrEmpty()) {
+    fun getAttestation(deviceResponse: String?, authToken: String?, cloudProjectNumber: Long?, onDone: () -> Unit) {
+        if (deviceResponse.isNullOrEmpty() || authToken.isNullOrEmpty() || cloudProjectNumber == null ) {
             onDone()
             return;
         }
@@ -220,7 +218,7 @@ internal class FootprintAttestationManager(
         // Trigger onDone when the response is submitted. No need to block on waiting for response.
         requestAttestationChallenge(authToken) { receivedChallenge ->
             receivedChallenge?.let { challenge ->
-                generateAttestation(deviceResponse, challenge) { attestation ->
+                generateAttestation(deviceResponse, challenge, cloudProjectNumber) { attestation ->
                     attestation?.let {
                         submitAttestation(
                             authToken,

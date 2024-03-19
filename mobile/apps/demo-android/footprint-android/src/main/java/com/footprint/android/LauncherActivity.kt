@@ -102,7 +102,8 @@ internal class LauncherActivity : AppCompatActivity() {
                     }
                     this.attestationManager?.getAttestation(
                         it.result?.args?.data?.deviceResponse,
-                        it.result?.args?.data?.authToken
+                        it.result?.args?.data?.authToken,
+                        this.config?.cloudProjectNumber,
                     ) {
                         complete()
                     }

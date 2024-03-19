@@ -12,6 +12,7 @@ data class FootprintConfiguration(
     @SerialName("user_data") val userData: FootprintUserData? = null,
     val options: FootprintOptions? = null,
     val l10n: FootprintL10n? = null,
+    @Transient val cloudProjectNumber: Long? = null, // used for generating device attestations
     @Transient val appearance: FootprintAppearance? = null,
     @Transient val onComplete: ((validationToken: String) -> Unit)? = null,
     @Transient val onCancel: (() -> Unit)? = null,

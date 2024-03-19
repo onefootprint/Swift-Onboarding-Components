@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
                     rules = FootprintAppearanceRules(button = mapOf("transition" to "all .2s linear")),
                     variables = FootprintAppearanceVariables(borderRadius = "10px", buttonPrimaryBg = "#0C6948")
                 ),
+                cloudProjectNumber = 53589614945,
                 onComplete = {token: String ->
                     Log.d("Footprint", "The flow has completed. The validation token is $token")
                 },
