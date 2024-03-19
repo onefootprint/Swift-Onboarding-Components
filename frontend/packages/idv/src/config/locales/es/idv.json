@@ -1021,7 +1021,7 @@
         "title": {
           "liveness": "Agrega un passkey",
           "id-doc": "Sube una imagen de tu identificación",
-          "liveness-with-id-doc": "Agrega un passkey y de documento de identificación"
+          "liveness-with-id-doc": "Agrega un passkey y sube documento de identificación"
         },
         "subtitle": {
           "liveness": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar un passkey.",
@@ -1031,47 +1031,43 @@
       }
     },
     "pages": {
-      "mobile": {
-        "sms": {
-          "title": "Revisa tus mensajes",
-          "subtitle": "Te hemos enviado un enlace a tu número de teléfono. Por favor, ábrelo y sigue las instrucciones."
+      "sms": {
+        "title": "Revisa tus mensajes",
+        "subtitle": "Te hemos enviado un enlace a tu número de teléfono. Por favor, ábrelo y sigue las instrucciones."
+      },
+      "sms-processing": {
+        "subtitle": "Enviamos un enlace a tu teléfono. Por favor, continúa desde allí.",
+        "cancel": "Cancelar"
+      },
+      "new-tab-requested": {
+        "title": "Nueva ventana del navegador",
+        "subtitle": "Para continuar, necesitamos abrir una nueva ventana del navegador.",
+        "cta": "Abrir nueva pestaña del navegador"
+      },
+      "new-tab-processing": {
+        "subtitle": "Hemos abierto una nueva pestaña en este dispositivo. Por favor, sigue las instrucciones en la pestaña nueva.",
+        "cancel": "Cancelar"
+      },
+      "qr-register": {
+        "qr-code": {
+          "instructions": "Alternativamente, también puedes escanear este código QR con tu teléfono para continuar."
         },
-        "sms-processing": {
-          "subtitle": "Enviamos un enlace a tu teléfono. Por favor, continúa desde allí.",
-          "cancel": "Cancelar"
-        },
-        "new-tab-requested": {
-          "title": "Nueva ventana del navegador",
-          "subtitle": "Para continuar, necesitamos abrir una nueva ventana del navegador.",
-          "cta": "Abrir nueva pestaña del navegador"
-        },
-        "new-tab-processing": {
-          "subtitle": "Hemos abierto una nueva pestaña en este dispositivo. Por favor, completa tu verificación de autenticidad allí.",
-          "cancel": "Cancelar"
+        "continue-on-desktop": {
+          "title": "¿No tienes un smartphone?",
+          "cta": "Continuar en el escritorio"
         }
       },
-      "desktop": {
-        "qr-register": {
-          "qr-code": {
-            "instructions": "Alternativamente, también puedes escanear este código QR con tu teléfono para continuar."
-          },
-          "continue-on-desktop": {
-            "title": "¿No tienes un smartphone?",
-            "cta": "Continuar en el escritorio"
-          }
-        },
-        "processing": {
-          "subtitle": "Sesión móvil iniciada. Por favor, continúa allí.",
-          "cancel": "Cancelar"
-        },
-        "confirm-continue-on-desktop": {
-          "title": "¿Estás seguro de que quieres continuar en el escritorio?",
-          "subtitle": "En caso de que no tengas un smartphone, puedes subir manualmente los documentos que necesitamos desde tu computadora por ahora y completar el resto de las validaciones más tarde.",
-          "warning": "Igualmente, si fuera posible, te recomendamos que continúes desde tu teléfono, ya que de esa forma aceleraremos significativamente el proceso de verificación de identidad.",
-          "cta": {
-            "mobile": "Continuar en mi smartphone",
-            "desktop": "Continuar en el escritorio"
-          }
+      "qr-processing": {
+        "subtitle": "Sesión móvil iniciada. Por favor, continúa allí.",
+        "cancel": "Cancelar"
+      },
+      "confirm-continue-on-desktop": {
+        "title": "¿Estás seguro de que quieres continuar en el escritorio?",
+        "subtitle": "En caso de que no tengas un smartphone, puedes subir manualmente los documentos que necesitamos desde tu computadora por ahora y completar el resto de las validaciones más tarde.",
+        "warning": "Igualmente, si fuera posible, te recomendamos que continúes desde tu teléfono, ya que de esa forma aceleraremos significativamente el proceso de verificación de identidad.",
+        "cta": {
+          "mobile": "Continuar en mi smartphone",
+          "desktop": "Continuar en el escritorio"
         }
       }
     }

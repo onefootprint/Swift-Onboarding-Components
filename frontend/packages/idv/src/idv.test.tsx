@@ -399,7 +399,9 @@ describe('<Idv />', () => {
       await authorizeData();
 
       await waitFor(() => {
-        expect(screen.getByText('Scan or upload your ID')).toBeInTheDocument();
+        expect(
+          screen.getByText('Scan or upload ID document'),
+        ).toBeInTheDocument();
       });
     });
   });
@@ -446,7 +448,9 @@ describe('<Idv />', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Scan or upload your ID')).toBeInTheDocument();
+        expect(
+          screen.getByText('Scan or upload ID document'),
+        ).toBeInTheDocument();
       });
     });
   });

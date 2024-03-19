@@ -1019,8 +1019,8 @@
       "requirements": {
         "title": {
           "liveness": "Add a passkey",
-          "id-doc": "Scan or upload your ID",
-          "liveness-with-id-doc": "Register a passkey & ID document"
+          "id-doc": "Scan or upload ID document",
+          "liveness-with-id-doc": "Register passkey & upload ID document"
         },
         "subtitle": {
           "liveness": "Open the link sent to your phone and follow the prompts to register a passkey.",
@@ -1030,47 +1030,43 @@
       }
     },
     "pages": {
-      "mobile": {
-        "sms": {
-          "title": "Check your messages",
-          "subtitle": "We've sent you a link to your phone number. Please open it and follow the prompts."
+      "sms": {
+        "title": "Check your messages",
+        "subtitle": "We've sent you a link to your phone number. Please open it and follow the prompts."
+      },
+      "sms-processing": {
+        "subtitle": "Link sent to phone. Please continue from there.",
+        "cancel": "Cancel"
+      },
+      "new-tab-requested": {
+        "title": "New browser window",
+        "subtitle": "To continue, we need to open a new browser window. Please tap the button below.",
+        "cta": "Open new browser tab"
+      },
+      "new-tab-processing": {
+        "subtitle": "We opened a new browser tab on this device. Please follow the instructions in the other tab.",
+        "cancel": "Cancel"
+      },
+      "qr-register": {
+        "qr-code": {
+          "instructions": "Alternatively, you can also scan this QR code with your phone to continue."
         },
-        "sms-processing": {
-          "subtitle": "Link sent to phone. Please continue from there.",
-          "cancel": "Cancel"
-        },
-        "new-tab-requested": {
-          "title": "New browser window",
-          "subtitle": "To continue, we need to open a new browser window. Please tap the button below.",
-          "cta": "Open new browser tab"
-        },
-        "new-tab-processing": {
-          "subtitle": "We opened a new browser tab on this device. Please complete your liveness check in there.",
-          "cancel": "Cancel"
+        "continue-on-desktop": {
+          "title": "Don't own a smartphone?",
+          "cta": "Continue on desktop"
         }
       },
-      "desktop": {
-        "qr-register": {
-          "qr-code": {
-            "instructions": "Alternatively, you can also scan this QR code with your phone to continue."
-          },
-          "continue-on-desktop": {
-            "title": "Don't own a smartphone?",
-            "cta": "Continue on desktop"
-          }
-        },
-        "processing": {
-          "subtitle": "Mobile session started. Please continue there.",
-          "cancel": "Cancel"
-        },
-        "confirm-continue-on-desktop": {
-          "title": "Are you sure you want to continue on desktop?",
-          "subtitle": "In case you don't have a smartphone, you can manually upload the documents we need from your computer for now and finish the rest of the validations later.",
-          "warning": "We highly recommend you to continue from your phone, if possible, since it will significantly expedite the identity verification process.",
-          "cta": {
-            "mobile": "Continue on my smartphone",
-            "desktop": "Continue on desktop"
-          }
+      "qr-processing": {
+        "subtitle": "Mobile session started. Please continue there.",
+        "cancel": "Cancel"
+      },
+      "confirm-continue-on-desktop": {
+        "title": "Are you sure you want to continue on desktop?",
+        "subtitle": "In case you don't have a smartphone, you can manually upload the documents we need from your computer for now and finish the rest of the validations later.",
+        "warning": "We highly recommend you to continue from your phone, if possible, since it will significantly expedite the identity verification process.",
+        "cta": {
+          "mobile": "Continue on my smartphone",
+          "desktop": "Continue on desktop"
         }
       }
     }

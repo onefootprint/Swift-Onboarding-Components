@@ -27,7 +27,6 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('retry')) {
     return <Retry />;
   }
-  // TODO when on a desktop that supports passkey registration in iframe, we need to transfer...
   if (state.matches('unavailable')) {
     return <Unavailable />;
   }
