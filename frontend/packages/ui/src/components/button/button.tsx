@@ -131,9 +131,7 @@ const ButtonContainer = styled.button<{
       color: ${button.variant[$variant].color};
       border-style: solid;
       border-width: ${button.borderWidth};
-      border-color: ${$variant !== 'primary'
-        ? button.variant[$variant].borderColor
-        : 'transparent'};
+      border-color: ${button.variant[$variant].borderColor};
       border-radius: ${button.borderRadius};
       height: ${button.size[size].height};
       padding: 0 ${button.size[size].paddingHorizontal};
