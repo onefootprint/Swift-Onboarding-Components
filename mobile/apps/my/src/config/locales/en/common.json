@@ -49,22 +49,22 @@
     },
     "passkeys": {
       "register": {
-        "title": "Liveness check",
-        "subtitle": "With a face or touch ID check, we ensure your account is always securely accessed by you, keeping your personal details private and protected.",
-        "cta": "Launch verification",
-        "skip": "Do it later",
+        "title": "Register a passkey",
+        "subtitle": "Create a passkey to start signing in using your device's a Face ID or Touch ID. This helps to ensure your account is only able to be accessed by you, keeping your personal details private and protected.",
+        "cta": "Launch registration",
+        "skip": "Do later",
         "about": {
           "cta": "More about passkeys",
           "title": "About passkeys",
-          "content": "Passkeys are our way of ditching complicated passwords. They're a simple, secure key to access the app, and they're unique to you! Say goodbye to remembering and typing passwords - your passkey does it all in a tap.",
+          "content": "Passkeys are a secure standard that helps us to ditch complicated passwords. They're a simple, secure key to access your account, and they're unique to you! Say goodbye to remembering and typing passwords - your passkey does it all in a tap.",
           "close": "Close"
         }
       },
       "retry": {
         "title": "Please try again",
-        "subtitle": "Face/Touch ID verification failed. Try again or complete later.",
-        "cta": "Launch verification",
-        "skip": "Do it later"
+        "subtitle": "Passkey registration failed. Try again or complete later.",
+        "cta": "Launch registration",
+        "skip": "Do later"
       },
       "success": {
         "title": "Biometric authentication successful!"

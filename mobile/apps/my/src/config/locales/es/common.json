@@ -49,8 +49,8 @@
     },
     "passkeys": {
       "register": {
-        "title": "Prueba de vida",
-        "subtitle": "Mediante una verificación biométrica o de huella dactilar (Passkeys), nos aseguramos de que solo tú puedas acceder a esta cuenta, manteniendo tus datos personales siempre protegidos.",
+        "title": "Agrega un passkey",
+        "subtitle": "Crea un passkey para comenzar iniciar sesión usando Face ID o Touch ID de tu dispositivo. Recomendamos agregar un passkey para garantizar que solo tú puedas acceder a tu cuenta.",
         "cta": "Iniciar verificación",
         "skip": "Hacerlo más tarde",
         "about": {
@@ -62,7 +62,7 @@
       },
       "retry": {
         "title": "Por favor, inténtalo de nuevo",
-        "subtitle": "La verificación biométrica falló. Por favor, inténtalo de nuevo.",
+        "subtitle": "No pudimos agregar tu passkey. Por favor, inténtalo de nuevo.",
         "cta": "Iniciar verificación",
         "skip": "Hacerlo más tarde"
       },
