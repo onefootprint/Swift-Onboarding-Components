@@ -2,20 +2,20 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
   [
     'linkButtonColor',
     {
-      var: 'components.linkButton.variant.default.color.text.initial',
+      var: 'components.linkButton.default.color.text.initial',
       assignDefault: ['linkButtonHoverColor', 'linkButtonActiveColor'],
     },
   ],
   [
     'linkButtonHoverColor',
     {
-      var: 'components.linkButton.variant.default.color.text.hover',
+      var: 'components.linkButton.default.color.text.hover',
     },
   ],
   [
     'linkButtonActiveColor',
     {
-      var: 'components.linkButton.variant.default.color.text.active',
+      var: 'components.linkButton.default.color.text.active',
     },
   ],
   [
