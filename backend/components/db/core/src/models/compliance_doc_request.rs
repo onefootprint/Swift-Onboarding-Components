@@ -2,9 +2,7 @@ use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_request;
 use diesel::prelude::*;
-use newtypes::{
-    ComplianceDocRequestId, ComplianceDocTemplateVersionId, TenantCompliancePartnershipId, TenantUserId,
-};
+use newtypes::{ComplianceDocId, ComplianceDocRequestId, TenantUserId};
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -20,12 +18,10 @@ pub struct ComplianceDocRequest {
     pub name: String,
     pub description: String,
 
-    // None if this is an ad-hoc request.
-    pub template_version_id: Option<ComplianceDocTemplateVersionId>,
-
-    pub tenant_compliance_partnership_id: TenantCompliancePartnershipId,
     pub requested_by_partner_tenant_user_id: TenantUserId,
     pub assigned_to_tenant_user_id: Option<TenantUserId>,
+
+    pub compliance_doc_id: ComplianceDocId,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -36,11 +32,10 @@ pub struct NewComplianceDocRequest<'a> {
     pub name: &'a str,
     pub description: &'a str,
 
-    pub template_version_id: Option<&'a ComplianceDocTemplateVersionId>,
-
-    pub tenant_compliance_partnership_id: &'a TenantCompliancePartnershipId,
     pub requested_by_partner_tenant_user_id: &'a TenantUserId,
     pub assigned_to_tenant_user_id: Option<&'a TenantUserId>,
+
+    pub compliance_doc_id: &'a ComplianceDocId,
 }
 
 impl<'a> NewComplianceDocRequest<'a> {

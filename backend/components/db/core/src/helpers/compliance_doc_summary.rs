@@ -1,60 +1,79 @@
 use crate::{
     models::{
-        compliance_doc_request::ComplianceDocRequest, compliance_doc_review::ComplianceDocReview,
-        compliance_doc_submission::ComplianceDocSubmission, compliance_doc_template::ComplianceDocTemplate,
+        compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest,
+        compliance_doc_review::ComplianceDocReview, compliance_doc_submission::ComplianceDocSubmission,
+        compliance_doc_template::ComplianceDocTemplate,
         compliance_doc_template_version::ComplianceDocTemplateVersion, partner_tenant::PartnerTenant,
-        tenant::Tenant, tenant_compliance_partnership::TenantCompliancePartnership, tenant_user::TenantUser,
+        tenant::Tenant, tenant_compliance_partnership::TenantCompliancePartnership,
     },
     DbResult, TxnPgConn,
 };
 use db_schema::schema::{
-    compliance_doc_request, compliance_doc_review, compliance_doc_submission, compliance_doc_template,
-    compliance_doc_template_version, partner_tenant, tenant, tenant_compliance_partnership,
+    compliance_doc, compliance_doc_request, compliance_doc_review, compliance_doc_submission,
+    compliance_doc_template, compliance_doc_template_version, partner_tenant, tenant,
+    tenant_compliance_partnership,
 };
 use diesel::prelude::*;
-use itertools::chain;
 use newtypes::{
-    ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocSubmissionId, ComplianceDocTemplateId,
-    ComplianceDocTemplateVersionId, TenantCompliancePartnershipId, TenantOrPartnerTenantId, TenantUserId,
+    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocSubmissionId,
+    ComplianceDocTemplateId, ComplianceDocTemplateVersionId, TenantCompliancePartnershipId,
+    TenantOrPartnerTenantId,
 };
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct ComplianceDocSummary {
     pub partnership: TenantCompliancePartnership,
     pub tenant: Tenant,
     pub partner_tenant: PartnerTenant,
+    pub docs: HashMap<ComplianceDocId, ComplianceDoc>,
     pub doc_templates: HashMap<ComplianceDocTemplateId, ComplianceDocTemplate>,
     pub doc_template_versions: HashMap<ComplianceDocTemplateVersionId, ComplianceDocTemplateVersion>,
     pub doc_requests: HashMap<ComplianceDocRequestId, ComplianceDocRequest>,
     pub doc_submissions: HashMap<ComplianceDocSubmissionId, ComplianceDocSubmission>,
     pub doc_reviews: HashMap<ComplianceDocReviewId, ComplianceDocReview>,
-    pub users: HashMap<TenantUserId, TenantUser>,
 }
 
 impl ComplianceDocSummary {
     pub fn filter<'a>(
         conn: &mut TxnPgConn,
-        id: impl Into<TenantOrPartnerTenantId<'a>>,
+        t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
+        p_id: Option<TenantCompliancePartnershipId>,
+        doc_id: Option<ComplianceDocId>,
     ) -> DbResult<HashMap<TenantCompliancePartnershipId, ComplianceDocSummary>> {
-        let id: TenantOrPartnerTenantId<'a> = id.into();
+        let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
 
-        let partnerships_join = tenant_compliance_partnership::table
+        let mut query = tenant_compliance_partnership::table
             .inner_join(tenant::table)
             .inner_join(partner_tenant::table)
             .into_boxed();
-        let partnerships: Vec<(TenantCompliancePartnership, Tenant, PartnerTenant)> = match id {
+        if let Some(p_id) = p_id {
+            query = query.filter(tenant_compliance_partnership::id.eq(p_id));
+        }
+        match t_pt_id {
             TenantOrPartnerTenantId::TenantId(ref id) => {
-                partnerships_join.filter(tenant_compliance_partnership::tenant_id.eq(id))
+                query = query.filter(tenant_compliance_partnership::tenant_id.eq(id))
             }
             TenantOrPartnerTenantId::PartnerTenantId(ref id) => {
-                partnerships_join.filter(tenant_compliance_partnership::partner_tenant_id.eq(id))
+                query = query.filter(tenant_compliance_partnership::partner_tenant_id.eq(id))
             }
         }
-        .load(conn.conn())?;
+        let partnerships: Vec<(TenantCompliancePartnership, Tenant, PartnerTenant)> =
+            query.load(conn.conn())?;
 
         let mut summaries = HashMap::new();
         for (partnership, tenant, partner_tenant) in partnerships.into_iter() {
+            let mut docs_query = compliance_doc::table
+                .filter(compliance_doc::tenant_compliance_partnership_id.eq(&partnership.id))
+                .into_boxed();
+
+            if let Some(doc_id) = doc_id.as_ref() {
+                docs_query = docs_query.filter(compliance_doc::id.eq(doc_id));
+            }
+
+            let docs: Vec<ComplianceDoc> = docs_query.select(ComplianceDoc::as_select()).load(conn.conn())?;
+            let docs: HashMap<_, _> = docs.into_iter().map(|r| (r.id.clone(), r)).collect();
+
             let doc_templates: Vec<ComplianceDocTemplate> = compliance_doc_template::table
                 .filter(compliance_doc_template::partner_tenant_id.eq(&partnership.partner_tenant_id))
                 .select(ComplianceDocTemplate::as_select())
@@ -72,7 +91,7 @@ impl ComplianceDocSummary {
                 .collect();
 
             let doc_requests: Vec<ComplianceDocRequest> = compliance_doc_request::table
-                .filter(compliance_doc_request::tenant_compliance_partnership_id.eq(&partnership.id))
+                .filter(compliance_doc_request::compliance_doc_id.eq_any(docs.keys()))
                 .select(ComplianceDocRequest::as_select())
                 .load(conn.conn())?;
             let doc_requests: HashMap<_, _> = doc_requests.into_iter().map(|r| (r.id.clone(), r)).collect();
@@ -90,33 +109,16 @@ impl ComplianceDocSummary {
                 .load(conn.conn())?;
             let doc_reviews: HashMap<_, _> = doc_reviews.into_iter().map(|r| (r.id.clone(), r)).collect();
 
-            let user_ids: HashSet<&TenantUserId> = chain!(
-                doc_requests.values().flat_map(|r| chain!(
-                    Some(&r.requested_by_partner_tenant_user_id),
-                    r.assigned_to_tenant_user_id.as_ref(),
-                )),
-                doc_submissions.values().flat_map(|s| chain!(
-                    Some(&s.submitted_by_tenant_user_id),
-                    s.assigned_to_partner_tenant_user_id.as_ref(),
-                )),
-                doc_reviews
-                    .values()
-                    .map(|r| &r.reviewed_by_partner_tenant_user_id),
-            )
-            .collect();
-
-            let users = TenantUser::get_bulk(conn, user_ids.into_iter().collect())?;
-
             let summary = ComplianceDocSummary {
                 partnership,
                 tenant,
                 partner_tenant,
+                docs,
                 doc_templates,
                 doc_template_versions,
                 doc_requests,
                 doc_submissions,
                 doc_reviews,
-                users,
             };
             summaries.insert(summary.partnership.id.clone(), summary);
         }
@@ -129,7 +131,10 @@ impl ComplianceDocSummary {
 mod tests {
     use super::*;
     use crate::{
-        models::partner_tenant::NewPartnerTenant,
+        models::{
+            partner_tenant::{NewPartnerTenant, PartnerTenant},
+            tenant::Tenant,
+        },
         tests::{fixtures, prelude::*},
     };
     use macros::db_test;
@@ -172,7 +177,7 @@ mod tests {
 
         // Check partner tenant-scoped summaries.
         for pt in pts.iter() {
-            let summaries = ComplianceDocSummary::filter(conn, &pt.id).unwrap();
+            let summaries = ComplianceDocSummary::filter(conn, &pt.id, None, None).unwrap();
             // All tenants are partnered with both partner tenants.
             assert_eq!(summaries.len(), tenants.len());
 
@@ -185,7 +190,7 @@ mod tests {
 
         // Check tenant-scoped summaries.
         for tenant in tenants.iter() {
-            let summaries = ComplianceDocSummary::filter(conn, &tenant.id).unwrap();
+            let summaries = ComplianceDocSummary::filter(conn, &tenant.id, None, None).unwrap();
             // All tenants are partnered with both partner tenants.
             assert_eq!(summaries.len(), pts.len());
 
@@ -203,6 +208,8 @@ mod tests {
         assert_eq!(summary.partner_tenant.id, pt.id);
         assert_eq!(summary.tenant.id, tenant.id);
 
+        assert_eq!(summary.docs.len(), 4);
+
         assert_eq!(summary.doc_templates.len(), 3);
         assert_eq!(summary.doc_template_versions.len(), 3);
 
@@ -210,21 +217,18 @@ mod tests {
         assert!(summary
             .doc_requests
             .values()
-            .all(|r| r.tenant_compliance_partnership_id == summary.partnership.id));
+            .all(|r| summary.docs.contains_key(&r.compliance_doc_id)));
 
         assert_eq!(summary.doc_submissions.len(), 4);
         assert!(summary
             .doc_submissions
             .values()
-            .all(|r| summary.doc_requests.get(&r.request_id).is_some()));
+            .all(|r| summary.doc_requests.contains_key(&r.request_id)));
 
         assert_eq!(summary.doc_reviews.len(), 4);
         assert!(summary
             .doc_reviews
             .values()
-            .all(|r| summary.doc_submissions.get(&r.submission_id).is_some()));
-
-        // Partner tenant user and tenant user.
-        assert_eq!(summary.users.len(), 2);
+            .all(|r| summary.doc_submissions.contains_key(&r.submission_id)));
     }
 }

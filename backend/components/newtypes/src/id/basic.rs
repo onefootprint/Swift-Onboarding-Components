@@ -274,6 +274,7 @@ define_newtype_id!(
     String,
     "Identifier for an tenant compliance partnership"
 );
+define_newtype_id!(ComplianceDocId, String, "Identifier for a compliance document");
 define_newtype_id!(
     ComplianceDocTemplateId,
     String,

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     models::{
+        compliance_doc::NewComplianceDoc,
         compliance_doc_request::NewComplianceDocRequest,
         compliance_doc_review::NewComplianceDocReview,
         compliance_doc_submission::NewComplianceDocSubmission,
@@ -122,14 +123,20 @@ pub fn create_resources<'a>(
 
             // Create some requests from templates.
             for tv in tvs.iter() {
+                let doc = NewComplianceDoc {
+                    tenant_compliance_partnership_id: &partnership.id,
+                    template_id: Some(&tv.template_id),
+                }
+                .create(conn)
+                .unwrap();
+
                 let req = NewComplianceDocRequest {
                     created_at: Utc::now(),
                     name: &tv.name,
                     description: &tv.description,
-                    template_version_id: Some(&tv.id),
-                    tenant_compliance_partnership_id: &partnership.id,
                     requested_by_partner_tenant_user_id: &pt_user.id,
                     assigned_to_tenant_user_id: Some(&tenant_user.id),
+                    compliance_doc_id: &doc.id,
                 }
                 .create(conn)
                 .unwrap();
@@ -137,14 +144,19 @@ pub fn create_resources<'a>(
             }
 
             // Create an ad-hoc request.
+            let doc = NewComplianceDoc {
+                tenant_compliance_partnership_id: &partnership.id,
+                template_id: None,
+            }
+            .create(conn)
+            .unwrap();
             let req = NewComplianceDocRequest {
                 created_at: Utc::now(),
                 name: "An ad-hoc request",
                 description: "This is a ad-hoc request",
-                template_version_id: None,
-                tenant_compliance_partnership_id: &partnership.id,
                 requested_by_partner_tenant_user_id: &pt_user.id,
                 assigned_to_tenant_user_id: Some(&tenant_user.id),
+                compliance_doc_id: &doc.id,
             }
             .create(conn)
             .unwrap();

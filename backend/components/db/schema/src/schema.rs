@@ -169,6 +169,18 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    compliance_doc (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_compliance_partnership_id -> Text,
+        template_id -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     compliance_doc_request (id) {
         id -> Text,
         created_at -> Timestamptz,
@@ -177,10 +189,9 @@ diesel::table! {
         deactivated_at -> Nullable<Timestamptz>,
         name -> Text,
         description -> Text,
-        template_version_id -> Nullable<Text>,
-        tenant_compliance_partnership_id -> Text,
         requested_by_partner_tenant_user_id -> Text,
         assigned_to_tenant_user_id -> Nullable<Text>,
+        compliance_doc_id -> Text,
     }
 }
 
@@ -1482,8 +1493,9 @@ diesel::joinable!(auth_event -> webauthn_credential (webauthn_credential_id));
 diesel::joinable!(billing_event -> ob_configuration (ob_configuration_id));
 diesel::joinable!(billing_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(billing_profile -> tenant (tenant_id));
-diesel::joinable!(compliance_doc_request -> compliance_doc_template_version (template_version_id));
-diesel::joinable!(compliance_doc_request -> tenant_compliance_partnership (tenant_compliance_partnership_id));
+diesel::joinable!(compliance_doc -> compliance_doc_template (template_id));
+diesel::joinable!(compliance_doc -> tenant_compliance_partnership (tenant_compliance_partnership_id));
+diesel::joinable!(compliance_doc_request -> compliance_doc (compliance_doc_id));
 diesel::joinable!(compliance_doc_review -> compliance_doc_submission (submission_id));
 diesel::joinable!(compliance_doc_review -> tenant_user (reviewed_by_partner_tenant_user_id));
 diesel::joinable!(compliance_doc_submission -> compliance_doc_request (request_id));
@@ -1599,6 +1611,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     billing_event,
     billing_profile,
     business_owner,
+    compliance_doc,
     compliance_doc_request,
     compliance_doc_review,
     compliance_doc_submission,
