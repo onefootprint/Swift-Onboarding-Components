@@ -1,29 +1,32 @@
+import { isEmail, isPhoneNumber } from '@onefootprint/core';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import type { UserData } from '../@types';
 import { Context } from '../components/provider';
-import getMissingRequirements from './utils/get-missing-requirements';
-import userExists from './utils/user-exists';
+import getMissingRequirements from '../queries/get-missing-requirements';
+import identify from '../queries/identify-user';
 
 export const useFootprint = () => {
   const fp = useContext(Context);
   const form = useFormContext<UserData>();
 
   const utils = {
-    userExists: async () => {
+    identify: async () => {
       const payload = {
         email: form.getValues('id.email'),
         phoneNumber: form.getValues('id.phone_number'),
+        scope: 'onboarding',
+        sandboxId: fp.sandboxId,
+        obConfigAuth: fp.publicKey,
       };
-      const response = await userExists(payload);
+      const response = await identify(payload);
       return response;
     },
     canInitiateOtpValidation: () => {
-      // TODO: Needs to check if email and phone are valid
       const email = form.getValues('id.email');
       const phoneNumber = form.getValues('id.phone_number');
-      return !!email && !!phoneNumber;
+      return isEmail(email) || isPhoneNumber(phoneNumber);
     },
     getAuthToken: () => fp.authToken,
     getMissingRequirements: () => {

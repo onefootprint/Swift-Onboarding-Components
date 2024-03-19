@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { createContext, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -7,53 +6,46 @@ import configureI18n from '../../config/initializers/i18next';
 
 configureI18n();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 3,
-    },
-  },
-});
-
 export const Context = createContext<{
-  authToken: string | null;
+  authToken?: string;
   publicKey: string;
-  sandboxId: string;
+  sandboxId?: string;
   userData?: UserData;
 }>({
-  authToken: null,
   publicKey: '',
-  sandboxId: '',
   userData: {},
 });
 
 export type ProviderProps = {
-  authToken?: string | null;
+  authToken?: string;
   children: React.ReactNode;
   publicKey: string;
   sandboxId?: string;
   userData?: UserData;
 };
 
-const FootprintProvider = ({ children }: ProviderProps) => {
+const FootprintProvider = ({
+  authToken,
+  children,
+  publicKey,
+  sandboxId,
+  userData,
+}: ProviderProps) => {
   const methods = useForm<UserData>({
     // resolver: zodResolver(schema),
   });
   const [value] = useState({
-    publicKey: '',
-    userData: {},
-    authToken: null,
-    sandboxId: '',
+    publicKey,
+    userData,
+    authToken,
+    sandboxId,
   });
 
   return (
     <Context.Provider value={value}>
-      <QueryClientProvider client={queryClient}>
-        <FormProvider {...methods}>
-          <div>{children}</div>
-        </FormProvider>
-      </QueryClientProvider>
+      <FormProvider {...methods}>
+        <div>{children}</div>
+      </FormProvider>
     </Context.Provider>
   );
 };

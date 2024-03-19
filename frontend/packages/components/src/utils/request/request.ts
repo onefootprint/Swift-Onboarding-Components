@@ -5,13 +5,13 @@ const API_BASE_URL =
     ? 'https://api.dev.onefootprint.com'
     : 'https://api.onefootprint.com';
 
-type Options = {
+type Options = Omit<RequestInit, 'headers'> & {
   baseURL?: string;
   data?: Record<string, unknown>;
   params?: Record<string, unknown>;
-  headers?: Record<string, string>;
+  headers?: Record<string, string | undefined>;
   url: string;
-} & RequestInit;
+};
 
 function convertToRecordString(
   input: Record<string, unknown>,
@@ -45,7 +45,9 @@ async function request<T>(options: Options): Promise<T> {
     Accept: 'application/json',
   });
   Object.entries(headers).forEach(([key, value]) => {
-    requestHeaders.set(key, value);
+    if (value) {
+      requestHeaders.set(key, value);
+    }
   });
 
   const response = await fetch(`${baseURL}${url}?${queryParams}`, {

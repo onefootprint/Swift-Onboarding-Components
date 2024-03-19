@@ -5809,20 +5809,20 @@
     superjson "^1.10.0"
     use-sync-external-store "^1.2.0"
 
-"@tanstack/react-query@4.35.7", "@tanstack/react-query@^4.35.7":
-  version "4.35.7"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.35.7.tgz#35a1db50156411b2a9eb68a020bae416948939db"
-  integrity sha512-0MankquP/6EOM2ATfEov6ViiKemey5uTbjGlFMX1xGotwNaqC76YKDMJdHumZupPbZcZPWAeoPGEHQmVKIKoOQ==
-  dependencies:
-    "@tanstack/query-core" "4.35.7"
-    use-sync-external-store "^1.2.0"
-
 "@tanstack/react-query@^4.29.5":
   version "4.29.25"
   resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.29.25.tgz#64df3260b65760fbd3c81ffae23b7b3802c71aa6"
   integrity sha512-c1+Ezu+XboYrdAMdusK2fTdRqXPMgPAnyoTrzHOZQqr8Hqz6PNvV9DSKl8agUo6nXX4np7fdWabIprt+838dLg==
   dependencies:
     "@tanstack/query-core" "4.29.25"
+    use-sync-external-store "^1.2.0"
+
+"@tanstack/react-query@^4.35.7":
+  version "4.35.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.35.7.tgz#35a1db50156411b2a9eb68a020bae416948939db"
+  integrity sha512-0MankquP/6EOM2ATfEov6ViiKemey5uTbjGlFMX1xGotwNaqC76YKDMJdHumZupPbZcZPWAeoPGEHQmVKIKoOQ==
+  dependencies:
+    "@tanstack/query-core" "4.35.7"
     use-sync-external-store "^1.2.0"
 
 "@tensorflow/tfjs-core@1.7.0":
