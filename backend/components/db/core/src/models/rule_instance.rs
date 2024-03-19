@@ -360,7 +360,13 @@ mod tests {
         assert_eq!(expression, rule.rule_expression);
         assert_eq!(action, rule.action);
         assert!(rule.deactivated_seqno.is_none());
-        assert_eq!(1, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
+        assert_eq!(
+            1,
+            RuleSetVersion::get_active(conn, &obc.id)
+                .unwrap()
+                .unwrap()
+                .version
+        );
     }
 
     #[db_test]
@@ -403,7 +409,13 @@ mod tests {
 
         let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
         assert_eq!(3, rules.len());
-        assert_eq!(1, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
+        assert_eq!(
+            1,
+            RuleSetVersion::get_active(conn, &obc.id)
+                .unwrap()
+                .unwrap()
+                .version
+        );
     }
 
     #[db_test]
@@ -425,7 +437,13 @@ mod tests {
             RuleAction::Fail,
         )
         .unwrap();
-        assert_eq!(1, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
+        assert_eq!(
+            1,
+            RuleSetVersion::get_active(conn, &obc.id)
+                .unwrap()
+                .unwrap()
+                .version
+        );
 
         let updated_rule = RuleInstance::update(
             conn,
@@ -458,7 +476,13 @@ mod tests {
         );
 
         // new RSV has been written for this update
-        assert_eq!(2, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
+        assert_eq!(
+            2,
+            RuleSetVersion::get_active(conn, &obc.id)
+                .unwrap()
+                .unwrap()
+                .version
+        );
     }
 
     #[db_test]
@@ -488,7 +512,13 @@ mod tests {
             },
         )
         .unwrap();
-        assert_eq!(1, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
+        assert_eq!(
+            1,
+            RuleSetVersion::get_active(conn, &obc.id)
+                .unwrap()
+                .unwrap()
+                .version
+        );
         assert_eq!(5, rules.len());
         assert_eq!(
             5,
@@ -536,7 +566,13 @@ mod tests {
             },
         )
         .unwrap();
-        assert_eq!(2, RuleSetVersion::get_current(conn, &obc.id).unwrap().version);
+        assert_eq!(
+            2,
+            RuleSetVersion::get_active(conn, &obc.id)
+                .unwrap()
+                .unwrap()
+                .version
+        );
         assert_eq!(6, edits.len()); // 6 new RuleInstance's are returned (2 additions, 2 edits, 2 deletes)
         assert!(edits
             .iter()

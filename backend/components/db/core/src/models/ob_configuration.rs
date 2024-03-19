@@ -1,4 +1,4 @@
-use super::{tenant::Tenant, workflow::Workflow};
+use super::{rule_set_version::RuleSetVersion, tenant::Tenant, workflow::Workflow};
 use crate::{
     actor, actor::SaturatedActor, DbError, DbResult, NextPage, NonNullVec, OffsetPagination,
     OptionalNonNullVec, PgConn, TxnPgConn,
@@ -426,7 +426,7 @@ pub struct ObConfigurationQuery {
     pub kinds: Option<Vec<ObConfigurationKind>>,
 }
 
-pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>);
+pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>, Option<RuleSetVersion>);
 
 impl ObConfiguration {
     fn list_query(filters: &ObConfigurationQuery) -> BoxedQuery<Pg> {
@@ -460,7 +460,17 @@ impl ObConfiguration {
             query = query.offset(offset)
         }
         let results = query.load::<Self>(conn)?;
+        let obc_ids = results.iter().map(|obc| &obc.id).collect();
+        let mut rule_sets = RuleSetVersion::bulk_get_active(conn, obc_ids)?;
         let results = actor::saturate_actors_nullable(conn, results)?;
+        let results = results
+            .into_iter()
+            .map(|(obc, actor)| {
+                let rs = rule_sets.remove(&obc.id);
+                (obc, actor, rs)
+            })
+            .collect();
+
         Ok(pagination.results(results))
     }
 

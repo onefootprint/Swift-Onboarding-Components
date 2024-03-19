@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{data_lifetime::DataLifetime, ob_configuration::ObConfiguration};
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -14,6 +16,7 @@ use newtypes::{DataLifetimeSeqno, DbActor, Locked, ObConfigurationId, RuleSetVer
 /// This enables a few things:
 ///  - We can use this table to easily query for different version of rules, and join in what the rules looked like at those rule_set.created_seqno (by cross referencing with rule_instance.created_seqno + rule_instance.deactivated_seqno) which is a likely feature we will expose to Tenant soon (and in the meantime is useful for us for debugging)
 ///  - For multi-rule editing, we can use this to mitigate concurrent rule edits which can be dangerous. A client would hold the current latest rule_set.version and send this up with the bulk rule edits it is making. We can then check if a newer rule_set.version exists, which would indicate that concurrenet edit(s) have occured since the client last retrieved the rules and we can error or perhaps in the future provide a way for the user to merge conflicting edits.
+// TODO: rename RuleSet
 pub struct RuleSetVersion {
     pub id: RuleSetVersionId,
     pub created_at: DateTime<Utc>,
@@ -83,12 +86,29 @@ impl RuleSetVersion {
         Ok((res, seqno, now))
     }
 
-    #[tracing::instrument("RuleSetVersion::get", skip_all)]
-    pub fn get_current(conn: &mut PgConn, obc_id: &ObConfigurationId) -> DbResult<Self> {
+    #[tracing::instrument("RuleSetVersion::get_active", skip_all)]
+    pub fn get_active(conn: &mut PgConn, obc_id: &ObConfigurationId) -> DbResult<Option<Self>> {
         let res = rule_set::table
             .filter(rule_set::ob_configuration_id.eq(obc_id))
             .filter(rule_set::deactivated_seqno.is_null())
-            .get_result(conn)?;
+            .get_result(conn)
+            .optional()?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("RuleSetVersion::bulk_get_active", skip_all)]
+    pub fn bulk_get_active(
+        conn: &mut PgConn,
+        obc_ids: Vec<&ObConfigurationId>,
+    ) -> DbResult<HashMap<ObConfigurationId, Self>> {
+        let res = rule_set::table
+            .filter(rule_set::ob_configuration_id.eq_any(obc_ids))
+            .filter(rule_set::deactivated_seqno.is_null())
+            .get_results(conn)?
+            .into_iter()
+            .map(|rs: RuleSetVersion| (rs.ob_configuration_id.clone(), rs))
+            .collect();
 
         Ok(res)
     }

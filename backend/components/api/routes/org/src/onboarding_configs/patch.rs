@@ -6,7 +6,7 @@ use crate::{
     State,
 };
 use api_core::errors::ApiResult;
-use db::models::ob_configuration::ObConfiguration;
+use db::models::{ob_configuration::ObConfiguration, rule_set_version::RuleSetVersion};
 use newtypes::{ApiKeyStatus, ObConfigurationId};
 use paperclip::actix::{api_v2_operation, patch, web, web::Json, Apiv2Schema};
 
@@ -38,16 +38,17 @@ async fn patch(
     let UpdateObConfigPath { id } = path.into_inner();
     let UpdateObConfigRequest { name, status } = request.into_inner();
     let tenant_id = tenant.id.clone();
-    let (obc, actor) = state
+    let (obc, actor, rs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let obc = ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
-            Ok((obc, actor))
+            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
+            Ok((obc, actor, rs))
         })
         .await?;
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone())),
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone())),
     )))
 }

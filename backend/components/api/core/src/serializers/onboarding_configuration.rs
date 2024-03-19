@@ -4,8 +4,8 @@ use api_wire_types::Actor;
 use db::{
     actor::SaturatedActor,
     models::{
-        appearance::Appearance, ob_configuration::ObConfiguration, tenant::Tenant,
-        tenant_client_config::TenantClientConfig,
+        appearance::Appearance, ob_configuration::ObConfiguration, rule_set_version::RuleSetVersion,
+        tenant::Tenant, tenant_client_config::TenantClientConfig,
     },
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -101,13 +101,15 @@ impl
     DbToApi<(
         ObConfiguration,
         Option<SaturatedActor>,
+        Option<RuleSetVersion>,
         Arc<dyn FeatureFlagClient>,
     )> for api_wire_types::OnboardingConfiguration
 {
     fn from_db(
-        (ob_config, author, ff_client): (
+        (ob_config, author, rule_set, ff_client): (
             ObConfiguration,
             Option<SaturatedActor>,
+            Option<RuleSetVersion>,
             Arc<dyn FeatureFlagClient>,
         ),
     ) -> Self {
@@ -161,6 +163,7 @@ impl
             kind,
             is_rules_enabled,
             document_types_and_countries,
+            rule_set: rule_set.map(|rs| api_wire_types::RuleSet { version: rs.version }),
         }
     }
 }

@@ -49,6 +49,12 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
     ],
 )
 def test_create(sandbox_tenant, data):
+    obc1 = get(
+        f"org/onboarding_configs/{sandbox_tenant.default_ob_config.id}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
     res = post(
         f"/org/onboarding_configs/{sandbox_tenant.default_ob_config.id}/rules",
         data,
@@ -62,6 +68,14 @@ def test_create(sandbox_tenant, data):
     assert res["rule_expression"] == data["rule_expression"]
     assert res["is_shadow"] == False
     assert res["action"] == data["action"]
+
+    # OBC has rule_set.version and it has incremented from rule change
+    obc2 = get(
+        f"org/onboarding_configs/{sandbox_tenant.default_ob_config.id}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    assert obc2["rule_set"]["version"] == obc1["rule_set"]["version"] + 1
 
 
 def test_list(sandbox_tenant, obc):
@@ -375,3 +389,11 @@ def test_multi_edit(sandbox_tenant, obc):
             "browser_tampering",
         ]
     )
+
+    # assert rule_set.version has incremented on OBC
+    obc = get(
+        f"org/onboarding_configs/{obc.id}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    assert obc["rule_set"]["version"] == 2

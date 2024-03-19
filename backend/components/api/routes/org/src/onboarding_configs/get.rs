@@ -10,7 +10,10 @@ use api_core::{
 };
 use api_wire_types::OnboardingConfigFilters;
 use db::{
-    models::ob_configuration::{ObConfiguration, ObConfigurationQuery},
+    models::{
+        ob_configuration::{ObConfiguration, ObConfigurationQuery},
+        rule_set_version::RuleSetVersion,
+    },
     DbError, OffsetPagination,
 };
 use newtypes::ObConfigurationId;
@@ -57,8 +60,13 @@ async fn get_list(
 
     let results = results
         .into_iter()
-        .map(|(obc, actor)| {
-            api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone()))
+        .map(|(obc, actor, rs)| {
+            api_wire_types::OnboardingConfiguration::from_db((
+                obc,
+                actor,
+                rs,
+                state.feature_flag_client.clone(),
+            ))
         })
         .collect::<Vec<_>>();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
@@ -66,7 +74,7 @@ async fn get_list(
 
 #[api_v2_operation(
     tags(Playbooks, Organization, Private),
-    description = "Returns a list of onboarding configurations owned by the tenant."
+    description = "Returns an onboarding configuration."
 )]
 #[get("/org/onboarding_configs/{id}")]
 async fn get_detail(
@@ -79,16 +87,17 @@ async fn get_detail(
     let is_live = auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
 
-    let (obc, actor) = state
+    let (obc, actor, rs) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
-            Ok((obc, actor))
+            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
+            Ok((obc, actor, rs))
         })
         .await?;
 
     let result =
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone()));
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone()));
     ResponseData::ok(result).json()
 }

@@ -10,7 +10,7 @@ use api_core::{
     errors::{AssertionError, ValidationError},
     telemetry::RootSpan,
 };
-use db::models::ob_configuration::ObConfiguration;
+use db::models::{ob_configuration::ObConfiguration, rule_set_version::RuleSetVersion};
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
@@ -499,7 +499,7 @@ pub async fn post(
 
     let actor = auth.actor().into();
     let ff_client = state.feature_flag_client.clone();
-    let (obc, actor) = state
+    let (obc, actor, rs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let skip_kyb = false;
@@ -531,12 +531,13 @@ pub async fn post(
             let obc = ObConfiguration::lock(conn, &obc.id)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
-            Ok((obc, actor))
+            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
+            Ok((obc, actor, rs))
         })
         .await?;
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone())),
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone())),
     )))
 }
 
