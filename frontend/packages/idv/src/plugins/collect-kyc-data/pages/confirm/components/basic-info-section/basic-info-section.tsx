@@ -2,6 +2,7 @@ import { IcoFileText24, IcoInfo16 } from '@onefootprint/icons';
 import {
   Box,
   Divider,
+  Grid,
   LinkButton,
   media,
   Shimmer,
@@ -102,20 +103,28 @@ const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
           {hasVerifiable
             ? verifiableList.map(
                 ({ isVerified, onClick, subtext, text, textColor }) => (
-                  <ItemAndAction key={text}>
-                    <SectionItem
-                      text={text}
-                      subtext={subtext}
-                      textColor={textColor}
-                    />
-                    {!verifiedMethods || verifiedMethods?.isLoading ? (
-                      <Shimmer sx={{ height: '24px', width: '100px' }} />
-                    ) : (
-                      <LinkButton onClick={onClick} disabled={isVerified}>
-                        {isVerified ? t('verified') : t('verify')}
-                      </LinkButton>
-                    )}
-                  </ItemAndAction>
+                  <Grid.Container
+                    paddingTop={7}
+                    width="100%"
+                    columns={['1fr auto']}
+                  >
+                    <Grid.Item width="100%" overflow="hidden">
+                      <SectionItem
+                        text={text}
+                        subtext={subtext}
+                        textColor={textColor}
+                      />
+                    </Grid.Item>
+                    <Box>
+                      {!verifiedMethods || verifiedMethods?.isLoading ? (
+                        <Shimmer sx={{ height: '24px', width: '100%' }} />
+                      ) : (
+                        <LinkButton onClick={onClick} disabled={isVerified}>
+                          {isVerified ? t('verified') : t('verify')}
+                        </LinkButton>
+                      )}
+                    </Box>
+                  </Grid.Container>
                 ),
               )
             : null}
@@ -171,18 +180,6 @@ const ResponsiveGridContainer = styled.div`
       row-gap: ${theme.spacing[7]};
       column-gap: ${theme.spacing[5]};
     `}
-  `}
-`;
-
-const ItemAndAction = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    gap: ${theme.spacing[5]};
-    justify-content: space-between;
-    flex-direction: row;
-    align-items: center;
-    padding-top: ${theme.spacing[7]};
   `}
 `;
 

@@ -1,5 +1,5 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 
 export type SectionItemProps = {
@@ -13,16 +13,16 @@ const SectionItem = ({
   subtext,
   textColor = 'tertiary',
 }: SectionItemProps) => (
-  <div>
+  <Stack direction="column" flexGrow={1} maxWidth="100%">
     <Text variant="label-3" color={textColor} isPrivate>
       {text}
     </Text>
     {subtext && (
-      <Text variant="body-3" isPrivate>
+      <Text variant="body-3" isPrivate truncate>
         {subtext}
       </Text>
     )}
-  </div>
+  </Stack>
 );
 
 export default SectionItem;
