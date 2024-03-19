@@ -22,7 +22,7 @@ pub async fn detail(
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<api_wire_types::User> {
     // Low confidence in this being the right future-proof API, so let's gate it
-    let show_requires_additional_info = auth.can_access_preview(&PreviewApi::UserDetailInfoRequested);
+    let show_requires_additional_info = auth.can_access_preview(&PreviewApi::CreateUserToken);
 
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
