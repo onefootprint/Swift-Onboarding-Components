@@ -138,8 +138,7 @@ const EmptyActionRow = ({
       </div>
       <Stack direction="column" gap={7}>
         <LinkButton
-          size="tiny"
-          sx={{ width: 'fit-content' }}
+          variant="label-4"
           iconComponent={IcoPlusSmall16}
           iconPosition="left"
           disabled={expressions.some(expression => expression.field === '')}

@@ -25,7 +25,7 @@ const Banner = ({ entity }: BannerProps) => {
         {entity.status === EntityStatus.failed
           ? t('manual-review.failed-needs-review')
           : t('manual-review.verified-needs-review')}
-        <LinkButton onClick={handleClick} sx={{ marginLeft: 2 }}>
+        <LinkButton onClick={handleClick} marginLeft={2}>
           {t('cta')}
         </LinkButton>
       </InlineAlert>
@@ -36,7 +36,7 @@ const Banner = ({ entity }: BannerProps) => {
     return (
       <InlineAlert variant="warning">
         {t(`incomplete.header.${entity.kind}` as ParseKeys<'common'>)}
-        <LinkButton onClick={handleClick} sx={{ marginLeft: 2 }}>
+        <LinkButton onClick={handleClick} marginLeft={2}>
           {t('cta')}
         </LinkButton>
       </InlineAlert>

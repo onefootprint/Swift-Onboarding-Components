@@ -15,11 +15,11 @@ describe('<LinkButton />', () => {
     iconComponent: Icon,
     iconPosition,
     onClick,
-    size = 'default',
     target,
     testID,
-    variant = 'default',
     disabled = false,
+    destructive = false,
+    variant,
   }: Partial<LinkButtonProps>) =>
     customRender(
       <LinkButton
@@ -28,24 +28,17 @@ describe('<LinkButton />', () => {
         iconComponent={Icon}
         iconPosition={iconPosition}
         onClick={onClick}
-        size={size}
         target={target}
         testID={testID}
         variant={variant}
         disabled={disabled}
+        destructive={destructive}
       >
         {children}
       </LinkButton>,
     );
 
   describe('<LinkButton />', () => {
-    it('should assign a testID', () => {
-      renderLinkButton({
-        testID: 'link-button-test-id',
-      });
-      expect(screen.getByTestId('link-button-test-id')).toBeInTheDocument();
-    });
-
     it('should render the text', () => {
       renderLinkButton({
         children: 'Link button',

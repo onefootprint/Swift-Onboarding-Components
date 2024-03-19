@@ -53,9 +53,11 @@ const Complete = () => {
         subtitle={isKyb ? t('subtitle-with-kyb') : t('subtitle')}
       />
       <Box />
-      <LinkButton sx={{ marginTop: 7 }} onClick={() => handleComplete()}>
-        {isWebview ? t('cta.webview') : t('cta.browser')}
-      </LinkButton>
+      <Box marginTop={7}>
+        <LinkButton onClick={() => handleComplete()}>
+          {isWebview ? t('cta.webview') : t('cta.browser')}
+        </LinkButton>
+      </Box>
     </Container>
   );
 };

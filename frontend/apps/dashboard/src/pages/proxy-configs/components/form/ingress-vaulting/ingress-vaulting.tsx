@@ -110,10 +110,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
                   </FormControl>
                 </Grid.Container>
                 {fields.length >= 2 && (
-                  <LinkButton
-                    onClick={handleRemove(index)}
-                    variant="destructive"
-                  >
+                  <LinkButton onClick={handleRemove(index)} destructive>
                     Remove
                   </LinkButton>
                 )}

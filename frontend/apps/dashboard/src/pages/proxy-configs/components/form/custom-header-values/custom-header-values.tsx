@@ -72,7 +72,7 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
                 {...register(`headers.${index}.secret`)}
               />
               {fields.length >= 2 && (
-                <LinkButton onClick={handleRemove(index)} variant="destructive">
+                <LinkButton onClick={handleRemove(index)} destructive>
                   {t('remove')}
                 </LinkButton>
               )}

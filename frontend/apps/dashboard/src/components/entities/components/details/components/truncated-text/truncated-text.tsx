@@ -1,10 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { FontVariant } from '@onefootprint/design-tokens';
-import type {
-  BoxStyleProps,
-  LinkButtonSize,
-  LinkButtonVariant,
-} from '@onefootprint/ui';
+import type { BoxStyleProps, LinkButtonVariant } from '@onefootprint/ui';
 import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +13,6 @@ type TruncatedTextProps = {
   textFontVariant: FontVariant;
   textStyleProps?: BoxStyleProps;
   seeMoreButtonVariant?: LinkButtonVariant;
-  seeMoreButtonSize?: LinkButtonSize;
 };
 
 const TruncatedText = ({
@@ -25,8 +20,6 @@ const TruncatedText = ({
   maxTextViewHeight,
   textFontVariant,
   textStyleProps,
-  seeMoreButtonVariant = 'default',
-  seeMoreButtonSize = 'compact',
 }: TruncatedTextProps) => {
   const {
     textContainerRef,
@@ -43,10 +36,9 @@ const TruncatedText = ({
       <bdi>{currShownText}</bdi>
       {shownTextState !== ShownTextState.FULL_WITHIN_MAX_HEIGHT && (
         <LinkButton
-          variant={seeMoreButtonVariant}
+          variant="label-4"
           onClick={showMoreOrLessText}
-          size={seeMoreButtonSize}
-          sx={{ marginLeft: 2 }}
+          marginLeft={2}
         >
           {shownTextState === ShownTextState.PARTIAL_WITHIN_MAX_HEIGHT
             ? t('see-more')

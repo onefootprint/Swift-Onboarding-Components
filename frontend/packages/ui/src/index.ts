@@ -48,7 +48,6 @@ export type {
   LabelProps,
   LabelTooltipProps,
   LinkButtonProps,
-  LinkButtonSize,
   LinkButtonVariant,
   MultiSelectProps,
   NextToast,

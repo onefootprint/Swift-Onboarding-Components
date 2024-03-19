@@ -59,7 +59,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
             iconComponent={IcoPencil16}
             iconPosition="left"
             onClick={onStartEditing}
-            size="compact"
+            variant="label-4"
           >
             {t('edit')}
           </LinkButton>

@@ -1,15 +1,28 @@
 /* eslint-disable no-alert */
-import {
-  IcoArrowRightSmall24,
-  IcoPlusSmall24,
-  icos,
-} from '@onefootprint/icons';
+import { IcoArrowRightSmall24, icos } from '@onefootprint/icons';
 import type { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
 import type { LinkButtonProps } from './link-button';
 import LinkButton from './link-button';
-import { sizes, variants } from './link-button.constants';
+
+const linkButtonVariants = [
+  'body-1',
+  'body-2',
+  'body-3',
+  'body-4',
+  'label-1',
+  'label-2',
+  'label-3',
+  'label-4',
+  'caption-1',
+  'caption-2',
+  'caption-3',
+  'caption-4',
+  'snippet-1',
+  'snippet-2',
+  'snippet-3',
+];
 
 export default {
   title: 'Components/LinkButton',
@@ -43,12 +56,6 @@ export default {
       control: 'object',
       description: 'Callback function triggered upon click',
     },
-    size: {
-      control: 'select',
-      description: 'Size',
-      options: sizes,
-      table: { defaultValue: { summary: 'default' } },
-    },
     target: {
       control: 'select',
       description: 'Where the browser should load the link',
@@ -61,7 +68,7 @@ export default {
     variant: {
       control: 'select',
       description: 'Variant style',
-      options: variants,
+      options: linkButtonVariants,
       table: { defaultValue: { summary: 'default' } },
     },
     disabled: {
@@ -78,9 +85,7 @@ const Template: Story<LinkButtonProps> = ({
   iconComponent: Icon,
   iconPosition,
   onClick,
-  size,
   target,
-  testID,
   variant,
   disabled,
 }: LinkButtonProps) => {
@@ -92,9 +97,7 @@ const Template: Story<LinkButtonProps> = ({
       iconComponent={SelectedIcon}
       iconPosition={iconPosition}
       onClick={onClick}
-      size={size}
       target={target}
-      testID={testID}
       variant={variant}
       disabled={disabled}
     >
@@ -110,10 +113,8 @@ AsLink.args = {
   href: 'https://onefootprint.com',
   iconComponent: IcoArrowRightSmall24,
   iconPosition: 'right',
-  size: 'default',
   target: '_blank',
-  testID: 'link-button-test-id',
-  variant: 'default',
+  variant: 'label-3',
   disabled: false,
 };
 
@@ -121,44 +122,4 @@ export const Base = Template.bind({});
 Base.args = {
   children: 'Link button',
   onClick: () => alert('I was pressed'),
-  size: 'default',
-};
-
-export const BaseSize1 = Template.bind({});
-BaseSize1.args = {
-  children: 'Link button',
-  onClick: () => alert('I was pressed'),
-  size: 'compact',
-};
-
-export const BaseSize2 = Template.bind({});
-BaseSize2.args = {
-  children: 'Link button',
-  onClick: () => alert('I was pressed'),
-  size: 'tiny',
-};
-
-export const BaseSize3 = Template.bind({});
-BaseSize3.args = {
-  children: 'Link button',
-  onClick: () => alert('I was pressed'),
-  size: 'xTiny',
-};
-
-export const WithIconLeft = Template.bind({});
-WithIconLeft.args = {
-  children: 'Link button',
-  iconComponent: IcoPlusSmall24,
-  iconPosition: 'left',
-  onClick: () => alert('I was pressed'),
-  size: 'default',
-};
-
-export const WithIconRight = Template.bind({});
-WithIconRight.args = {
-  children: 'Link button',
-  iconComponent: IcoPlusSmall24,
-  iconPosition: 'right',
-  onClick: () => alert('I was pressed'),
-  size: 'default',
 };

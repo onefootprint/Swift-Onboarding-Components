@@ -71,7 +71,7 @@ const UploadFile = ({
           {label}
         </Label>
         {onRemove && (
-          <LinkButton onClick={onRemove} variant="destructive">
+          <LinkButton onClick={onRemove} destructive>
             {t('remove')}
           </LinkButton>
         )}

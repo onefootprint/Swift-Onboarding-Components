@@ -43,7 +43,8 @@ const DifferentAccountOption = () => {
       </DividerContainer>
       <LinkButton
         onClick={handleLoginWithDifferent}
-        sx={{ alignItems: 'center', justifyContent: 'center' }}
+        alignItems="center"
+        justifyContent="center"
       >
         {t('label')}
       </LinkButton>

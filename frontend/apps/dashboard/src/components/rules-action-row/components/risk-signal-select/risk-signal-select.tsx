@@ -141,7 +141,7 @@ const RiskSignalSelect = ({
               <HeaderControls>
                 <Text variant="label-4">{t('title')}</Text>
                 <LinkButton
-                  variant="destructive"
+                  destructive
                   iconComponent={IcoTrash16}
                   iconPosition="left"
                   disabled={!onDelete}

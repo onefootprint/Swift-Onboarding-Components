@@ -118,9 +118,9 @@ const WorkflowTriggeredEventBody = ({
                   open={!!confirmationTooltipMessage}
                 >
                   <LinkButton
-                    size="compact"
                     onClick={generateLinkAndCopyToClipboard}
                     disabled={generateTokenMutation.isLoading}
+                    variant="label-4"
                   >
                     {t('copy-link')}
                   </LinkButton>

@@ -72,12 +72,13 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
               </CopyButton>
             </Stack>
             <LinkButton
-              size="compact"
+              variant="label-4"
               iconComponent={IcoArrowRightSmall16}
               iconPosition="right"
               href={aml.shareUrl}
               target="_blank"
-              sx={{ marginTop: 5, marginBottom: 5 }}
+              marginTop={5}
+              marginBottom={5}
             >
               {t('source-url.read-full-report')}
             </LinkButton>

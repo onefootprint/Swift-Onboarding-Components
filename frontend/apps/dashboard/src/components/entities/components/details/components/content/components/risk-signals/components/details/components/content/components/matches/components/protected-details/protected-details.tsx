@@ -52,7 +52,7 @@ const ProtectedDetails = ({
           <LinkButton
             href={`${DASHBOARD_BASE_URL}/settings`}
             target="_blank"
-            sx={{ marginTop: 3 }}
+            marginTop={3}
           >
             {t('no-permission.button')}
           </LinkButton>

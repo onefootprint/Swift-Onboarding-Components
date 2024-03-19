@@ -519,56 +519,36 @@ const tokens: Tokens = {
       color: textColor.accent,
     },
     linkButton: {
-      variant: {
-        default: {
-          color: {
-            text: {
-              initial: textColor.accent,
-              active: textColor.accentHover,
-              hover: textColor.accentHover,
-              disabled: textColor.quaternary,
-            },
-            icon: {
-              initial: textColor.accent,
-              active: textColor.accentHover,
-              hover: textColor.accentHover,
-              disabled: textColor.quaternary,
-            },
+      default: {
+        color: {
+          text: {
+            initial: textColor.accent,
+            active: textColor.accentHover,
+            hover: textColor.accentHover,
+            disabled: textColor.quaternary,
           },
-        },
-        destructive: {
-          color: {
-            text: {
-              initial: textColor.error,
-              active: textColor.errorHover,
-              hover: textColor.errorHover,
-              disabled: textColor.quaternary,
-            },
-            icon: {
-              initial: textColor.error,
-              active: textColor.errorHover,
-              hover: textColor.errorHover,
-              disabled: textColor.quaternary,
-            },
+          icon: {
+            initial: textColor.accent,
+            active: textColor.accentHover,
+            hover: textColor.accentHover,
+            disabled: textColor.quaternary,
           },
         },
       },
-      size: {
-        default: {
-          height: p.linkButtonHeights.default,
-          typography: p.typography['label-3'],
-        },
-        compact: {
-          height: p.linkButtonHeights.compact,
-          typography: p.typography['label-4'],
-        },
-        tiny: {
-          height: p.linkButtonHeights.xTiny,
-          typography: p.typography['caption-1'],
-        },
-        xTiny: {
-          height: p.linkButtonHeights.xxTiny,
-          typography: p.typography['caption-3'],
+      destructive: {
+        color: {
+          text: {
+            initial: textColor.error,
+            active: textColor.errorHover,
+            hover: textColor.errorHover,
+            disabled: textColor.quaternary,
+          },
+          icon: {
+            initial: textColor.error,
+            active: textColor.errorHover,
+            hover: textColor.errorHover,
+            disabled: textColor.quaternary,
+          },
         },
       },
     },

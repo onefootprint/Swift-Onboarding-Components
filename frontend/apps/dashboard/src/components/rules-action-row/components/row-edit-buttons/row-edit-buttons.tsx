@@ -113,7 +113,7 @@ const RowEditButtons = ({
         </Button>
       </Stack>
       <LinkButton
-        variant="destructive"
+        destructive
         iconComponent={IcoTrash16}
         iconPosition="left"
         onClick={showDeleteConfirmation}

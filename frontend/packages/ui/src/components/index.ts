@@ -80,11 +80,7 @@ export type { InputProps } from './internal/input';
 export { default as InternalInput } from './internal/input';
 export type { LabelProps, LabelTooltipProps } from './label';
 export { default as FormLabel } from './label';
-export type {
-  LinkButtonProps,
-  LinkButtonSize,
-  LinkButtonVariant,
-} from './link-button';
+export type { LinkButtonProps, LinkButtonVariant } from './link-button';
 export { default as LinkButton } from './link-button';
 export type { MultiSelectProps } from './multi-select';
 export { default as MultiSelect } from './multi-select';

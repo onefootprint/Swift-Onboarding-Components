@@ -48,10 +48,7 @@ const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
       </TenantsListContainer>
       {tenants.length > NUM_TENANTS_IN_DROPDOWN && (
         <LinkButtonContainer>
-          <LinkButton
-            onClick={toggleShowAll}
-            sx={{ paddingLeft: 5, paddingBottom: 3 }}
-          >
+          <LinkButton paddingLeft={5} paddingBottom={3} onClick={toggleShowAll}>
             {t(
               shouldShowAllTenants
                 ? 'tenants-list.show-less'
