@@ -84,7 +84,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             animationStart={loading ?? false}
             ariaLabel={loadingAriaLabel}
             color={variant === 'primary' ? 'quinary' : 'tertiary'}
-            size={size === 'default' ? 24 : 16}
+            size={size === 'large' ? 20 : 16}
           />
         </Box>
       </ButtonContainer>
