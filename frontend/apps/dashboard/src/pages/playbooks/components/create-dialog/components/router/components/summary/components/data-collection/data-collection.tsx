@@ -1,13 +1,14 @@
 import { InlineAlert } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { isAuth, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
+import { isAuth, isIdDoc, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
 import styled, { css } from 'styled-components';
 
 import type { SummaryMeta } from '@/playbooks/utils/machine/types';
 
 import Auth from './components/auth';
 import Business from './components/business';
+import Document from './components/document';
 import Investor from './components/investor';
 import Person from './components/person';
 
@@ -20,10 +21,26 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
     keyPrefix: 'pages.playbooks.dialog.summary.data-collection',
   });
 
+  if (isAuth(meta.kind)) {
+    return (
+      <Container>
+        <Auth />
+      </Container>
+    );
+  }
+
+  if (isIdDoc(meta.kind)) {
+    return (
+      <Container>
+        <Document />
+      </Container>
+    );
+  }
+
   return (
     <Container>
       {isKyb(meta.kind) && <Business />}
-      {isAuth(meta.kind) ? <Auth /> : <Person meta={meta} />}
+      <Person meta={meta} />
       {isKyc(meta.kind) && <Investor />}
       {isKyb(meta.kind) && (
         <InlineAlert variant="info">{t('alert')}</InlineAlert>

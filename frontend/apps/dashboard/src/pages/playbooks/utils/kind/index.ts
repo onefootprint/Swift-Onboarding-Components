@@ -1,2 +1,2 @@
 export { getAuthFixedPayload } from './auth';
-export { isAuth, isKyb, isKyc } from './is';
+export { isAuth, isIdDoc, isKyb, isKyc } from './is';

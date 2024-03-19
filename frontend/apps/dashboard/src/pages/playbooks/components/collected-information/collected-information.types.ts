@@ -8,6 +8,7 @@ export type Option = Partial<{
   fullAddress: boolean;
   idDocs: Record<string, unknown>;
   idDocKind: SupportedIdDocTypes[];
+  countrySpecificIdDocKind: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
   phoneNumber: boolean;
   selfie: boolean;
   ssn: {

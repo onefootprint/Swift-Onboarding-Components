@@ -33,6 +33,9 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   const internationalOnly =
     meta.residency?.allowInternationalResidents &&
     !meta.residency.allowUsResidents;
+  const showIdDocScan =
+    values.idDocKind.length > 0 ||
+    Object.keys(values.countrySpecificIdDocKind).length > 0;
 
   return (
     <Container>
@@ -88,8 +91,6 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
                 optional: values.ssnOptional,
               },
               usLegalStatus: values.us_legal_status,
-              idDocKind: values.idDocKind,
-              selfie: values.idDocKind.length > 0 && values.selfie,
               ...(values.ssnDocScanStepUp
                 ? { ssnDocScanStepUp: values.ssnDocScanStepUp }
                 : {}),
@@ -110,6 +111,16 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
                 : {}),
               idDocKind: [SupportedIdDocTypes.passport],
               selfie: true,
+            }}
+          />
+        )}
+        {showIdDocScan && (
+          <CollectedInformation
+            title={t('id-doc.title')}
+            options={{
+              idDocKind: values.idDocKind,
+              selfie: values.selfie,
+              countrySpecificIdDocKind: values.countrySpecificIdDocKind,
             }}
           />
         )}

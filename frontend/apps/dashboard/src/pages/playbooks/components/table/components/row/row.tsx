@@ -23,7 +23,9 @@ const Row = ({ playbook }: RowProps) => {
   const { name, key, status, createdAt, kind } = playbook;
   const { sandbox } = useOrgSession();
   const canShowLink =
-    kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
+    kind === OnboardingConfigKind.kyc ||
+    kind === OnboardingConfigKind.kyb ||
+    kind === OnboardingConfigKind.document;
 
   return (
     <>

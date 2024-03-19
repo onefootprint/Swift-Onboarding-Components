@@ -2,6 +2,7 @@ import type AuthMethodKind from './auth-method';
 import type { CollectedDataOption } from './collected-data-option';
 import type { CountryCode } from './countries';
 import type { FootprintAppearance } from './footprint-appearance';
+import type { SupportedIdDocTypes } from './id-doc-type';
 
 export enum OnboardingConfigStatus {
   enabled = 'enabled',
@@ -14,6 +15,11 @@ export enum OnboardingConfigKind {
   auth = 'auth',
   document = 'document',
 }
+
+export type DocumentTypesAndCountries = {
+  countrySpecific?: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
+  global?: SupportedIdDocTypes[];
+};
 
 // Used in the IDV context
 export type PublicOnboardingConfig = {
@@ -77,4 +83,6 @@ export type OnboardingConfig = {
     member: string;
   };
   isRulesEnabled?: boolean;
+  skipConfirm?: boolean;
+  documentTypesAndCountries?: DocumentTypesAndCountries;
 };

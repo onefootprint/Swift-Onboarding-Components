@@ -1,12 +1,12 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import type { AMLProps } from './aml';
-import Aml from './aml';
+import VerificationChecks from '.';
+import type { VerificationChecksProps } from './verification-checks';
 
-describe('Aml', () => {
+describe('VerificationChecks', () => {
   const renderAml = ({
-    defaultValues = {
+    defaultAmlValues = {
       enhancedAml: false,
       ofac: false,
       pep: false,
@@ -15,13 +15,17 @@ describe('Aml', () => {
     isLoading = false,
     onBack = jest.fn(),
     onSubmit = jest.fn(),
-  }: Partial<AMLProps>) => {
+    requiresDoc = false,
+    allowInternationalResident = false,
+  }: Partial<VerificationChecksProps>) => {
     customRender(
-      <Aml
-        defaultValues={defaultValues}
+      <VerificationChecks
+        defaultAmlValues={defaultAmlValues}
         isLoading={isLoading}
         onBack={onBack}
         onSubmit={onSubmit}
+        requiresDoc={requiresDoc}
+        allowInternationalResident={allowInternationalResident}
       />,
     );
   };
@@ -30,7 +34,14 @@ describe('Aml', () => {
     it('should only show the "AML monitoring" option', () => {
       renderAml({});
 
-      const aml = screen.getByRole('checkbox', { name: 'AML monitoring' });
+      const kycCheck = screen.queryAllByRole('switch', {
+        name: 'Perform database checks with collected identity data',
+      });
+      expect(kycCheck).toHaveLength(0);
+
+      const aml = screen.getByRole('switch', {
+        name: 'Enhanced AML monitoring',
+      });
       expect(aml).toBeInTheDocument();
 
       const ofac = screen.queryByRole('checkbox', {
@@ -50,11 +61,24 @@ describe('Aml', () => {
     });
   });
 
+  describe('kyc check', () => {
+    it('should show the "KYC check" option', () => {
+      renderAml({ requiresDoc: true });
+
+      const kycCheck = screen.getByRole('switch', {
+        name: 'Perform database checks with collected identity data',
+      });
+      expect(kycCheck).toBeInTheDocument();
+    });
+  });
+
   describe('when selecting "AML monitoring"', () => {
     it('should show the "AML monitoring" option', async () => {
       renderAml({});
 
-      const aml = screen.getByRole('checkbox', { name: 'AML monitoring' });
+      const aml = screen.getByRole('switch', {
+        name: 'Enhanced AML monitoring',
+      });
       await userEvent.click(aml);
 
       const ofac = screen.getByRole('checkbox', {
@@ -77,9 +101,16 @@ describe('Aml', () => {
   describe('when submitting the data', () => {
     it('should call the onSubmit callback', async () => {
       const onSubmit = jest.fn();
-      renderAml({ onSubmit });
+      renderAml({ onSubmit, allowInternationalResident: true });
 
-      const aml = screen.getByRole('checkbox', { name: 'AML monitoring' });
+      const kycCheck = screen.getByRole('switch', {
+        name: 'Perform database checks with collected identity data',
+      });
+      await userEvent.click(kycCheck);
+
+      const aml = screen.getByRole('switch', {
+        name: 'Enhanced AML monitoring',
+      });
       await userEvent.click(aml);
 
       const ofac = screen.getByRole('checkbox', {
@@ -97,14 +128,17 @@ describe('Aml', () => {
       });
       await userEvent.click(adverseMedia);
 
-      const submit = screen.getByRole('button', { name: 'Create' });
+      const submit = screen.getByRole('button', { name: 'Create Playbook' });
       await userEvent.click(submit);
 
       expect(onSubmit).toHaveBeenCalledWith({
-        enhancedAml: true,
-        ofac: true,
-        pep: true,
-        adverseMedia: true,
+        skipKyc: true,
+        amlFormData: {
+          enhancedAml: true,
+          ofac: true,
+          pep: true,
+          adverseMedia: true,
+        },
       });
     });
   });
@@ -136,7 +170,7 @@ describe('Aml', () => {
   describe('when it has default data', () => {
     it('should render the default data', () => {
       renderAml({
-        defaultValues: {
+        defaultAmlValues: {
           enhancedAml: true,
           ofac: true,
           pep: true,
@@ -144,7 +178,9 @@ describe('Aml', () => {
         },
       });
 
-      const aml = screen.getByRole('checkbox', { name: 'AML monitoring' });
+      const aml = screen.getByRole('switch', {
+        name: 'Enhanced AML monitoring',
+      });
       expect(aml).toBeChecked();
 
       const ofac = screen.getByRole('checkbox', {

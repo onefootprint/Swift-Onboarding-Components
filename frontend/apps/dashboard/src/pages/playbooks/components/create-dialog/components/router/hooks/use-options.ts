@@ -9,7 +9,7 @@ const useOptions = () => {
     { value: 'whoToOnboard', label: t('dialog.who-to-onboard.nav') },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
     { value: 'summary', label: t('dialog.summary.nav') },
-    { value: 'aml', label: t('dialog.aml.nav') },
+    { value: 'verificationChecks', label: t('dialog.verification-checks.nav') },
   ];
   const kycOptions = [
     {
@@ -19,7 +19,7 @@ const useOptions = () => {
     },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
     { value: 'summary', label: t('dialog.summary.nav') },
-    { value: 'aml', label: t('dialog.aml.nav') },
+    { value: 'verificationChecks', label: t('dialog.verification-checks.nav') },
   ];
   const authOptions = [
     {
@@ -30,12 +30,21 @@ const useOptions = () => {
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
     { value: 'summary', label: t('details.title') },
   ];
+  const docOptions = [
+    {
+      value: 'whoToOnboard',
+      label: t('dialog.who-to-onboard.nav'),
+    },
+    { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
+    { value: 'summary', label: t('dialog.summary.nav') },
+  ];
   const kybOptions = defaultOptions;
 
   return {
     [PlaybookKind.Auth]: authOptions,
     [PlaybookKind.Kyb]: kybOptions,
     [PlaybookKind.Kyc]: kycOptions,
+    [PlaybookKind.IdDoc]: docOptions,
     [PlaybookKind.Unknown]: defaultOptions,
   };
 };

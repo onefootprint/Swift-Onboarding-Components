@@ -1,5 +1,5 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type { SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
@@ -11,6 +11,7 @@ export enum PlaybookKind {
   Auth = 'auth',
   Kyb = 'kyb',
   Kyc = 'kyc',
+  IdDoc = 'document',
   Unknown = 'unknown',
 }
 
@@ -58,6 +59,11 @@ export const defaultResidencyFormData: ResidencyFormData = {
   restrictCountries: CountryRestriction.all,
 };
 
+export type VerificationChecksFormData = {
+  skipKyc?: boolean;
+  amlFormData: AMLFormData;
+};
+
 export type AMLFormData = {
   enhancedAml: boolean;
   ofac: boolean;
@@ -82,6 +88,7 @@ export type Personal = {
   ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
   idDoc: boolean;
   idDocKind: SupportedIdDocTypes[];
+  countrySpecificIdDocKind: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
   idDocFirst?: boolean;
   selfie?: boolean;
   ssnOptional?: boolean;
@@ -121,6 +128,7 @@ export const defaultPlaybookValuesAuth = {
       full_address: false,
       idDoc: false,
       idDocKind: [],
+      countrySpecificIdDocKind: {},
       name: false,
       ssn: false,
       us_legal_status: false,
@@ -143,10 +151,28 @@ export const defaultPlaybookValuesKYC: SummaryFormData = {
     email: true,
     idDoc: false,
     idDocKind: [],
+    countrySpecificIdDocKind: {},
     selfie: true,
     ssn: true,
     ssnDocScanStepUp: false,
     ssnKind: CollectedKycDataOption.ssn9,
+  },
+  [CollectedInvestorProfileDataOption.investorProfile]: false,
+};
+
+export const defaultPlaybookValuesIdDoc: SummaryFormData = {
+  kind: PlaybookKind.IdDoc,
+  personal: {
+    email: false,
+    idDoc: true,
+    idDocKind: [],
+    countrySpecificIdDocKind: {},
+    selfie: false,
+    ssn: false,
+    [CollectedKycDataOption.phoneNumber]: false,
+    [CollectedKycDataOption.dob]: false,
+    [CollectedKycDataOption.usLegalStatus]: false,
+    [CollectedKycDataOption.address]: false,
   },
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
@@ -162,7 +188,7 @@ export type MachineContext = {
   nameForm?: NameFormData;
   playbook?: SummaryFormData;
   residencyForm?: ResidencyFormData;
-  amlForm?: AMLFormData;
+  verificationChecksForm?: VerificationChecksFormData;
 };
 
 export type MachineEvents =
@@ -174,7 +200,10 @@ export type MachineEvents =
   | { type: 'nameYourPlaybookSubmitted'; payload: { formData: NameFormData } }
   | { type: 'residencySubmitted'; payload: { formData: ResidencyFormData } }
   | { type: 'playbookSubmitted'; payload: { formData: SummaryFormData } }
-  | { type: 'amlSubmitted'; payload: { formData: AMLFormData } };
+  | {
+      type: 'verificationChecksSubmitted';
+      payload: { formData: VerificationChecksFormData };
+    };
 
 export const basicInformationFields: string[] = [
   CollectedKycDataOption.email,

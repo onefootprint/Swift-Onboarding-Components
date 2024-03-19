@@ -1,7 +1,4 @@
-import {
-  type OnboardingConfig,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { type OnboardingConfig } from '@onefootprint/types';
 import { Box, Divider, InlineAlert, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +18,7 @@ const DataCollection = ({
     internationalCountryRestrictions,
     isDocFirstFlow,
     mustCollectData,
+    documentTypesAndCountries,
     optionalData = [],
   },
 }: DataCollectionProps) => {
@@ -34,9 +32,6 @@ const DataCollection = ({
   const documentsAsString =
     docScanForOptionalSsn ||
     mustCollectData.filter(scopes => scopes.includes('document'))?.[0];
-  const idDocKinds = Object.values(SupportedIdDocTypes).filter(
-    docType => documentsAsString?.includes(docType),
-  );
   const selfie = !!documentsAsString?.includes('selfie');
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
   const isKYB = mustCollectData.includes(
@@ -46,6 +41,11 @@ const DataCollection = ({
       'business_kyced_beneficial_owners' ||
       'business_tin',
   );
+  const showIdDocScan =
+    mustCollectData.includes('document') ||
+    mustCollectData.includes('document_and_selfie');
+  const idDocKind = documentTypesAndCountries?.global;
+  const countrySpecificIdDocKind = documentTypesAndCountries?.countrySpecific;
 
   return (
     <Stack direction="column">
@@ -112,8 +112,6 @@ const DataCollection = ({
                   optional: optionalSSN,
                 },
                 usLegalStatus: mustCollectData.includes('us_legal_status'),
-                idDocKind: idDocKinds,
-                selfie,
                 ssnDocScanStepUp: !!docScanForOptionalSsn,
               }}
             />
@@ -128,14 +126,22 @@ const DataCollection = ({
               title={t('non-us-residents.title')}
               options={{
                 internationalCountryRestrictions,
-                idDocKind: idDocKinds,
-                selfie,
               }}
             />
           ) : (
             <CollectedInformation
               title={t('non-us-residents.title')}
               subtitle={t('non-us-residents.empty')}
+            />
+          )}
+          {showIdDocScan && (
+            <CollectedInformation
+              title={t('id-doc.title')}
+              options={{
+                idDocKind,
+                selfie,
+                countrySpecificIdDocKind,
+              }}
             />
           )}
 

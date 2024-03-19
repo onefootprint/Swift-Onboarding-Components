@@ -70,7 +70,9 @@ describe('<Router />', () => {
         await userEvent.click(back);
 
         // Who to onboard
-        const title = screen.getByText('Who would you like to onboard?');
+        const title = screen.getByText(
+          "What type of playbook you'd like to create?",
+        );
         expect(title).toBeInTheDocument();
       });
     });
@@ -200,7 +202,9 @@ describe('<Router />', () => {
         await userEvent.click(back);
 
         // Who to onboard
-        const title = screen.getByText('Who would you like to onboard?');
+        const title = screen.getByText(
+          "What type of playbook you'd like to create?",
+        );
         expect(title).toBeInTheDocument();
       });
     });

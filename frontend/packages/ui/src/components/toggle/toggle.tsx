@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
-import Box from '../box';
+import Stack from '../stack';
 
 export type ToggleProps = {
   checked?: boolean;
@@ -84,7 +84,7 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
         data-align-center={!hint}
         sx={sxStyles}
       >
-        <Box>
+        <Stack flex={1} direction="column">
           {label && (
             <Label htmlFor={id} data-size={size}>
               {label}
@@ -95,7 +95,7 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
               {hint}
             </Hint>
           )}
-        </Box>
+        </Stack>
         <Button
           aria-checked={checked}
           aria-label={label}
@@ -145,8 +145,10 @@ const ToggleContainer = styled.div<{
   sx: SXStyles;
 }>`
   ${({ theme }) => css`
-    display: inline-flex;
+    display: flex;
     gap: ${theme.spacing[4]};
+    align-items: start;
+    justify-content: flex-start;
 
     &[data-full-width='false'] {
       justify-content: center;
@@ -215,6 +217,7 @@ const Button = styled(motion.button)<{
     width: ${size === 'compact' ? 30 : 36}px;
     display: flex;
     justify-content: ${checked ? 'flex-end' : 'flex-start'};
+    flex-shrink: 0;
 
     @media (hover: hover) {
       &:hover {

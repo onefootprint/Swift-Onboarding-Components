@@ -5,7 +5,7 @@ import {
   CollectedKycDataOption,
 } from '@onefootprint/types';
 
-import { isAuth, isKyb, isKyc } from '@/playbooks/utils/kind';
+import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
   BusinessInformation,
   NameFormData,
@@ -49,7 +49,7 @@ const processPlaybook = ({
   const requiredKycFields = getRequiredKycCollectFields();
   if (isAuth(kind)) {
     mustCollectData.push(CollectedKycDataOption.email);
-  } else {
+  } else if (!isIdDoc(kind)) {
     mustCollectData.push(...requiredKycFields);
   }
 
@@ -69,15 +69,23 @@ const processPlaybook = ({
   if (personal[CollectedKycDataOption.phoneNumber]) {
     mustCollectData.push(CollectedKycDataOption.phoneNumber);
   }
-  const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber];
+  const isNoPhoneFlow =
+    !personal[CollectedKycDataOption.phoneNumber] && !isIdDoc(kind);
 
   // id doc handling
-  const { idDoc, idDocKind, selfie, idDocFirst, ssnDocScanStepUp } = personal;
-  let docString = '';
-  if (idDoc && idDocKind?.length > 0) {
-    const docKinds = idDocKind.join(',');
-    const selfieParam = selfie ? 'require_selfie' : 'none';
-    docString = `document.${docKinds}.none.${selfieParam}`;
+  const {
+    idDoc,
+    idDocKind,
+    selfie,
+    idDocFirst,
+    ssnDocScanStepUp,
+    countrySpecificIdDocKind,
+  } = personal;
+  const docString = selfie ? 'document_and_selfie' : 'document';
+  if (
+    idDoc &&
+    (idDocKind?.length > 0 || Object.keys(countrySpecificIdDocKind).length > 0)
+  ) {
     mustCollectData.push(docString);
   }
 
@@ -121,6 +129,11 @@ const processPlaybook = ({
   // No tenants are currently using this, so we simplify the playbook creation flow by always
   // assuming canAccess = mustCollect + optional
   const canAccessData = mustCollectData.concat(optionalData);
+  const documentTypesAndCountries = {
+    countrySpecific: countrySpecificIdDocKind,
+    global: idDocKind,
+  };
+  const skipConfirm = isIdDoc(kind);
 
   return {
     canAccessData,
@@ -129,7 +142,9 @@ const processPlaybook = ({
     mustCollectData,
     name,
     optionalData,
+    skipConfirm,
     docScanForOptionalSsn,
+    documentTypesAndCountries,
     ...getResidency(residencyForm),
   };
 };

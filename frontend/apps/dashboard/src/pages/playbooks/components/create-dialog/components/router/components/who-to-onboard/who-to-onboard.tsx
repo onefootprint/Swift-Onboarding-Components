@@ -1,4 +1,9 @@
-import { IcoShield24, IcoStore24, IcoUsers24 } from '@onefootprint/icons';
+import {
+  IcoIdCard24,
+  IcoShield24,
+  IcoStore24,
+  IcoUsers24,
+} from '@onefootprint/icons';
 import { Button, RadioSelect, Text } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -84,6 +89,20 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
                       disabled:
                         org?.isLive && org?.isProdAuthPlaybookRestricted,
                       disabledHint: t('auth.disabled-tooltip'),
+                    },
+                  ],
+                },
+                {
+                  label: t('data-collection-title'),
+                  options: [
+                    {
+                      title: t('id-doc.title'),
+                      description: t('id-doc.description'),
+                      value: PlaybookKind.IdDoc,
+                      IconComponent: IcoIdCard24,
+                      disabled:
+                        org?.isLive && org?.isProdAuthPlaybookRestricted,
+                      disabledHint: t('id-doc.disabled-tooltip'),
                     },
                   ],
                 },

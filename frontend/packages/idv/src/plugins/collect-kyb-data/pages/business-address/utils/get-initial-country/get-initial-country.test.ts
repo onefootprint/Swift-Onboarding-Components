@@ -9,6 +9,7 @@ describe('getInitialCountry', () => {
       passport: true,
       idCard: true,
       driversLicense: true,
+      passportCard: true,
       visa: true,
       workPermit: true,
       residenceDocument: true,
@@ -21,11 +22,12 @@ describe('getInitialCountry', () => {
       label: 'Brazil',
       value3: 'BRA',
       passport: true,
-      idCard: false,
-      driversLicense: false,
-      visa: false,
-      workPermit: false,
-      residenceDocument: false,
+      idCard: true,
+      driversLicense: true,
+      passportCard: true,
+      visa: true,
+      workPermit: true,
+      residenceDocument: true,
     });
   });
 });

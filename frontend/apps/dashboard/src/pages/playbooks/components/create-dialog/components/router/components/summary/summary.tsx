@@ -4,10 +4,11 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { isAuth } from '@/playbooks/utils/kind';
-import type {
-  SummaryFormData,
-  SummaryMeta,
+import { isAuth, isIdDoc } from '@/playbooks/utils/kind';
+import {
+  PlaybookKind,
+  type SummaryFormData,
+  type SummaryMeta,
 } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
@@ -17,31 +18,63 @@ type SummaryProps = {
   meta: SummaryMeta;
   onBack: () => void;
   onSubmit: (data: SummaryFormData) => void;
+  isLastStep?: boolean;
+  isLoading?: boolean;
 };
 
-const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
+const Summary = ({
+  meta,
+  onSubmit,
+  onBack,
+  defaultValues,
+  isLastStep,
+  isLoading,
+}: SummaryProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.summary',
   });
 
-  const getTitle = (): string =>
-    isAuth(meta.kind) ? t('auth.title') : t('title');
+  const getTitle = (): string => {
+    if (isAuth(meta.kind)) {
+      return t('title.auth');
+    }
+    if (isIdDoc(meta.kind)) {
+      return t('title.id-doc');
+    }
+    return t('title.default');
+  };
 
   const getSubtitle = (): string => {
-    if (isAuth(meta.kind)) return t('auth.subtitle');
+    if (isAuth(meta.kind)) return t('subtitle.auth');
+    if (isIdDoc(meta.kind)) return t('subtitle.id-doc');
 
     const internationalOnly =
       meta.residency?.allowInternationalResidents &&
       !meta.residency.allowUsResidents;
 
     return internationalOnly
-      ? t('subtitle-international-only')
-      : t('subtitle-default');
+      ? t('subtitle.international-only')
+      : t('subtitle.default');
   };
 
   const formMethods = useForm<SummaryFormData>({ defaultValues });
-  const { handleSubmit } = formMethods;
+  const { handleSubmit, watch } = formMethods;
+  const selectedGlobalDocs = watch('personal.idDocKind');
+  const selectedCountrySpecificDocs = watch(
+    'personal.countrySpecificIdDocKind',
+  );
+
+  const isNextDisabled = () => {
+    if (
+      meta.kind === PlaybookKind.IdDoc &&
+      selectedGlobalDocs.length === 0 &&
+      Object.keys(selectedCountrySpecificDocs).length === 0
+    ) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <Container>
@@ -60,7 +93,15 @@ const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
             <Button variant="secondary" onClick={onBack}>
               {allT('back')}
             </Button>
-            <Button type="submit">{allT('next')}</Button>
+            <Button
+              disabled={isNextDisabled()}
+              type="submit"
+              loading={isLoading && isLastStep}
+            >
+              {isLastStep
+                ? allT('pages.playbooks.create-button')
+                : allT('next')}
+            </Button>
           </ButtonContainer>
         </Form>
       </FormProvider>

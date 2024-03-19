@@ -1,3 +1,4 @@
+import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
@@ -7,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { Option } from './collected-information.types';
+import CountrySpecificDocDisplay from './components/country-specific-doc-display';
 import DisplayValue from './components/display-value';
 
 type DisplayValueProps = ComponentProps<typeof DisplayValue>;
@@ -33,6 +35,16 @@ const CollectedInformation = ({
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => {
             if (value == null || value === undefined) return null;
+            if (name === 'countrySpecificIdDocKind') {
+              return (
+                <CountrySpecificDocDisplay
+                  key={name}
+                  countryDocMappings={
+                    value as Partial<Record<CountryCode, SupportedIdDocTypes[]>>
+                  }
+                />
+              );
+            }
             return (
               <OptionItem
                 key={name}

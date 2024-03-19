@@ -15,10 +15,13 @@ export const getAuthFixedPayload = (
     allowUsResidents: true,
     allowUsTerritories: false,
   },
-  enhancedAml: {
-    adverseMedia: false,
-    enhancedAml: false,
-    ofac: false,
-    pep: false,
+  verificationChecks: {
+    skipKyc: false,
+    amlFormData: {
+      adverseMedia: false,
+      enhancedAml: false,
+      ofac: false,
+      pep: false,
+    },
   },
 });

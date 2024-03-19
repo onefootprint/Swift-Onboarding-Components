@@ -17,7 +17,7 @@ import styled, { css } from 'styled-components';
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
-import IdDocPicker from './components/id-doc-picker';
+import Document from '../../../document';
 
 type EditingProps = {
   onStopEditing: () => void;
@@ -34,10 +34,12 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const {
     data: { user, org },
   } = useSession();
-  const [unselectedIDDoc, setUnselectedIDDoc] = useState(false);
   const ssnOpen = watch('personal.ssn');
   const shouldCollectIdDoc = watch('personal.idDoc');
-  const idDocKind = watch('personal.idDocKind');
+  const selectedGlobalDocs = watch('personal.idDocKind');
+  const selectedCountrySpecificDocs = watch(
+    'personal.countrySpecificIdDocKind',
+  );
   const isSsnOptional = !!watch('personal.ssnOptional');
   const shouldStepUpIdDoc = !!watch('personal.ssnDocScanStepUp');
 
@@ -52,12 +54,14 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   });
 
   const handleSave = () => {
-    if (shouldCollectIdDoc && idDocKind?.length >= 1) {
+    if (
+      (shouldCollectIdDoc || shouldStepUpIdDoc) &&
+      (selectedGlobalDocs?.length >= 1 ||
+        Object.keys(selectedCountrySpecificDocs).length >= 1)
+    ) {
       onStopEditing();
-    } else if (!shouldCollectIdDoc) {
+    } else if (!shouldCollectIdDoc && !shouldStepUpIdDoc) {
       onStopEditing();
-    } else {
-      setUnselectedIDDoc(true);
     }
   };
 
@@ -72,6 +76,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
 
   const resetDocs = () => {
     setValue('personal.idDocKind', []);
+    setValue('personal.countrySpecificIdDocKind', {});
   };
 
   const title =
@@ -80,6 +85,17 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     ) : (
       <Text variant="label-3">{t('editing.kyc')}</Text>
     );
+
+  const isSaveDisabled = () => {
+    if (
+      (shouldCollectIdDoc || shouldStepUpIdDoc) &&
+      selectedGlobalDocs.length === 0 &&
+      Object.keys(selectedCountrySpecificDocs).length === 0
+    ) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <EditingContainer>
@@ -177,7 +193,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                       <Box marginTop={5} marginBottom={5}>
                         <Divider variant="secondary" />
                       </Box>
-                      <IdDocPicker unselectedIDDoc={unselectedIDDoc} />
+                      <Document />
                     </Box>
                   )}
                 </LeftSpacing>
@@ -218,12 +234,17 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
             <Box marginBottom={5}>
               <Divider variant="secondary" />
             </Box>
-            <IdDocPicker unselectedIDDoc={unselectedIDDoc} />
+            <Document />
           </Box>
         )}
       </Section>
       <ButtonContainer>
-        <Button fullWidth variant="primary" onClick={handleSave}>
+        <Button
+          fullWidth
+          variant="primary"
+          onClick={handleSave}
+          disabled={isSaveDisabled()}
+        >
           {allT('save')}
         </Button>
         <Button variant="secondary" fullWidth onClick={handleCancel}>

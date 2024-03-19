@@ -13,10 +13,10 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignAml: 'amlSubmitted';
     assignNameYourPlaybook: 'nameYourPlaybookSubmitted';
     assignPlaybook: 'playbookSubmitted';
     assignResidency: 'residencySubmitted';
+    assignVerificationChecks: 'verificationChecksSubmitted';
     assignWhoToOnboard: 'whoToOnboardSubmitted';
     resetKind: 'navigationBackward' | 'whoToOnboardSelected';
   };
@@ -24,10 +24,10 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'aml'
     | 'nameYourPlaybook'
     | 'residency'
     | 'summary'
+    | 'verificationChecks'
     | 'whoToOnboard';
   tags: never;
 }

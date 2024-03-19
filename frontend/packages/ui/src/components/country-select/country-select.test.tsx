@@ -85,6 +85,7 @@ describe('<CountrySelect />', () => {
         value: 'US',
         value3: 'USA',
         visa: true,
+        passportCard: true,
         workPermit: true,
         residenceDocument: true,
       });

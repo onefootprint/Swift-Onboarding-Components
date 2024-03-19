@@ -10,7 +10,6 @@ import { FaceModelProvider } from './hooks/use-face-model-loader';
 import Router from './pages/router';
 import type { IdDocProps } from './types';
 import { getCountryCodeFromLocale } from './utils/get-country-from-code';
-import getSupportedCountryDocTypes from './utils/get-supported-country-doc-types';
 import type { MachineContext } from './utils/state-machine';
 
 const App = ({ context, onDone }: IdDocProps) => {
@@ -33,9 +32,9 @@ const App = ({ context, onDone }: IdDocProps) => {
       type: undefined,
     },
     sandboxOutcome,
-    supportedCountryAndDocTypes: getSupportedCountryDocTypes({
+    supportedCountryAndDocTypes: {
       ...customData.requirement.supportedCountryAndDocTypes,
-    }),
+    },
   };
 
   return (

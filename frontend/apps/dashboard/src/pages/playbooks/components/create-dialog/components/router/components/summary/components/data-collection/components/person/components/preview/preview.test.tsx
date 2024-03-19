@@ -35,7 +35,6 @@ describe('<Preview />', () => {
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText('Legal status in the U.S.')).toBeInTheDocument();
     expect(screen.getByText('SSN')).toBeInTheDocument();
-    expect(screen.getByText('ID document scan')).toBeInTheDocument();
   });
 
   it('should show SSN only once when we are showing', () => {
@@ -45,9 +44,9 @@ describe('<Preview />', () => {
     expect(screen.getAllByText('SSN').length).toBe(1);
   });
 
-  it("should show ID doc only once when we aren't showing", () => {
+  it('should not show ID doc when not id doc is not selected', () => {
     renderForm({ startingValues: { idDoc: false } });
-    expect(screen.getAllByText('ID document scan').length).toBe(1);
+    expect(screen.queryAllByText('ID document scan').length).toBe(0);
   });
 
   it('should show ID doc only once when we are showing', () => {

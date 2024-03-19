@@ -10,7 +10,7 @@ const getStep = ({ value }: GetStepProps) => {
     step = 1;
   } else if (value === 'summary') {
     step = 2;
-  } else if (value === 'aml') {
+  } else if (value === 'verificationChecks') {
     step = 3;
   }
   return step;

@@ -1,5 +1,6 @@
 import type { OnboardingConfigKind } from '../data';
 import type { CollectedDataOption } from '../data/collected-data-option';
+import type { DocumentTypesAndCountries } from '../data/onboarding-config';
 
 export type OrgOnboardingConfigCreateRequest = {
   name: string;
@@ -23,6 +24,9 @@ export type OrgOnboardingConfigCreateRequest = {
     adverseMedia: boolean;
   };
   kind: OnboardingConfigKind;
+  skipKyc?: boolean;
+  skipConfirm?: boolean;
+  documentTypesAndCountries: DocumentTypesAndCountries;
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

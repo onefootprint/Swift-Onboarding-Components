@@ -1,9 +1,10 @@
-import { isAuth, isKyb, isKyc } from '@/playbooks/utils/kind';
+import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type { MachineContext } from '@/playbooks/utils/machine/types';
 import {
   defaultAmlFormData,
   defaultNameFormData,
   defaultPlaybookValuesAuth,
+  defaultPlaybookValuesIdDoc,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
   defaultResidencyFormData,
@@ -18,12 +19,16 @@ const useDefaultValues = (context: MachineContext) => {
     };
   }
 
-  const defaultValues = isKyb(context.kind)
-    ? defaultPlaybookValuesKYB
-    : defaultPlaybookValuesKYC;
+  let defaultValues = defaultPlaybookValuesKYC;
+  if (isKyb(context.kind)) {
+    defaultValues = defaultPlaybookValuesKYB;
+  }
+  if (isIdDoc(context.kind)) {
+    defaultValues = defaultPlaybookValuesIdDoc;
+  }
 
   return {
-    aml: context.amlForm || defaultAmlFormData,
+    aml: context.verificationChecksForm?.amlFormData || defaultAmlFormData,
     name: context.nameForm || defaultNameFormData,
     playbook: context.playbook || defaultValues,
     residency:

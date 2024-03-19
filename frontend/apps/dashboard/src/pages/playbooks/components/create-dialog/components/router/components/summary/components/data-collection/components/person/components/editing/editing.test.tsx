@@ -33,12 +33,10 @@ describe('<Editing />', () => {
     ).toBeInTheDocument();
   });
 
-  it('should show warning if ID doc not selected', async () => {
+  it('should disable save button if ID doc not selected', async () => {
     renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
-    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-    expect(
-      screen.getByText('You must select at least one ID document type.'),
-    ).toBeInTheDocument();
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    expect(saveButton).toBeDisabled();
   });
 
   it('should not show warning if ID doc selected', async () => {
@@ -54,35 +52,16 @@ describe('<Editing />', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('should show warning if ID doc not selected and hide once any selected', async () => {
+  it('save button should be disabled if ID doc not selected', async () => {
     renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
-    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-    expect(
-      screen.getByText('You must select at least one ID document type.'),
-    ).toBeInTheDocument();
-    const idCard = screen.getByRole('checkbox', { name: 'Identity card' });
-    await userEvent.click(idCard);
-    expect(
-      screen.queryByText('You must select at least one ID document type.'),
-    ).not.toBeInTheDocument();
+    const saveButton = screen.getByRole('button', { name: 'Save' });
+    expect(saveButton).toBeDisabled();
   });
 
-  it('should not show selfie option when just ID doc is open', async () => {
+  it('should show selfie option when just ID doc is selected', async () => {
     renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
-    expect(screen.queryByText('Request a selfie')).not.toBeInTheDocument();
     expect(
-      screen.queryByText(
-        'You can optionally request users to take a selfie to validate the ID document requested.',
-      ),
-    ).not.toBeInTheDocument();
-
-    const idCard = screen.getByRole('checkbox', { name: 'Identity card' });
-    await userEvent.click(idCard);
-    expect(screen.getByText('Request a selfie')).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'You can optionally request users to take a selfie to validate the ID document requested.',
-      ),
+      screen.getByText('Request a selfie after ID upload'),
     ).toBeInTheDocument();
   });
 

@@ -1,23 +1,24 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import type { OnboardingConfigKind } from '@onefootprint/types';
+import { type OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { getDocPlaybookContext } from 'src/pages/playbooks/utils/kind/id-doc';
 import styled, { css } from 'styled-components';
 
-import { getAuthFixedPayload, isAuth } from '@/playbooks/utils/kind';
+import { getAuthFixedPayload, isAuth, isIdDoc } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
 import type {
-  AMLFormData,
   MachineContext,
+  VerificationChecksFormData,
 } from '@/playbooks/utils/machine/types';
 
-import AML from './components/aml';
 import Name from './components/name-your-playbook';
 import Residency from './components/residency';
 import Summary from './components/summary';
+import VerificationChecks from './components/verification-checks';
 import WhoToOnboard from './components/who-to-onboard';
 import useDefaultValues from './hooks/use-default-values';
 import useOptions from './hooks/use-options';
@@ -41,14 +42,22 @@ const Router = ({ onCreate }: RouterProps) => {
   const allOptions = useOptions();
   const options = allOptions[kind];
   const step = getStep({ value: state.value as string });
+  const isLastStep = step === options.length - 1;
   const stepperValue = options[step];
   const defaultValues = useDefaultValues(state.context);
+  const idDocKinds = state.context.playbook?.personal.idDocKind;
+  const countrySpecificIdDocKinds =
+    state.context.playbook?.personal.countrySpecificIdDocKind;
+  const requiresIdDoc =
+    (idDocKinds ?? []).length > 0 ||
+    Object.keys(countrySpecificIdDocKinds ?? {}).length > 0;
 
   const createPlaybook = (
     context: MachineContext,
-    enhancedAml: AMLFormData,
+    verificationChecks: VerificationChecksFormData,
   ) => {
     const { playbook, nameForm, residencyForm } = context;
+    const { skipKyc, amlFormData: enhancedAml } = verificationChecks;
     if (!playbook || !nameForm || !enhancedAml) {
       return;
     }
@@ -64,7 +73,9 @@ const Router = ({ onCreate }: RouterProps) => {
       mustCollectData,
       name,
       optionalData,
+      skipConfirm,
       docScanForOptionalSsn,
+      documentTypesAndCountries,
     } = processPlaybook({
       kind,
       nameForm,
@@ -86,6 +97,9 @@ const Router = ({ onCreate }: RouterProps) => {
         mustCollectData,
         name,
         optionalData,
+        skipKyc,
+        skipConfirm,
+        documentTypesAndCountries,
       },
       {
         onSuccess: () => {
@@ -169,29 +183,48 @@ const Router = ({ onCreate }: RouterProps) => {
             }}
             onSubmit={formData => {
               const { nameForm } = state.context;
+              if (isIdDoc(state.context.kind) && nameForm) {
+                const verificationChecksForm = {
+                  skipKyc: true,
+                  amlFormData: defaultValues.aml,
+                };
+                const idDocContext = getDocPlaybookContext(
+                  state.context,
+                  formData,
+                  verificationChecksForm,
+                );
+                createPlaybook(idDocContext, verificationChecksForm);
+                return;
+              }
 
               if (isAuth(formData.kind) && nameForm) {
                 const payload = getAuthFixedPayload({ nameForm, ...formData });
-                const { enhancedAml, ...ctx } = payload;
-                createPlaybook(ctx, enhancedAml);
+                const { verificationChecks, ...ctx } = payload;
+                createPlaybook(ctx, verificationChecks);
                 return;
               }
 
               send('playbookSubmitted', { payload: { formData } });
             }}
+            isLastStep={isLastStep}
+            isLoading={mutation.isLoading}
           />
         )}
-        {state.matches('aml') && (
-          <AML
-            defaultValues={defaultValues.aml}
+        {state.matches('verificationChecks') && (
+          <VerificationChecks
+            defaultAmlValues={defaultValues.aml}
             onBack={() => {
               send('navigationBackward');
             }}
             onSubmit={formData => {
-              send('amlSubmitted', { payload: { formData } });
+              send('verificationChecksSubmitted', { payload: { formData } });
               createPlaybook(state.context, formData);
             }}
             isLoading={mutation.isLoading}
+            requiresDoc={requiresIdDoc}
+            allowInternationalResident={
+              state.context.residencyForm?.allowInternationalResidents
+            }
           />
         )}
       </Content>

@@ -81,7 +81,7 @@ export const createPlaybookMachine = () =>
               target: 'nameYourPlaybook',
             },
             playbookSubmitted: {
-              target: 'aml',
+              target: 'verificationChecks',
               actions: 'assignPlaybook',
             },
             navigationBackward: {
@@ -89,7 +89,7 @@ export const createPlaybookMachine = () =>
             },
           },
         },
-        aml: {
+        verificationChecks: {
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
@@ -104,8 +104,8 @@ export const createPlaybookMachine = () =>
             navigationBackward: {
               target: 'summary',
             },
-            amlSubmitted: {
-              actions: 'assignAml',
+            verificationChecksSubmitted: {
+              actions: 'assignVerificationChecks',
             },
           },
         },
@@ -133,9 +133,9 @@ export const createPlaybookMachine = () =>
           ...context,
           playbook: event.payload.formData,
         })),
-        assignAml: assign((context, event) => ({
+        assignVerificationChecks: assign((context, event) => ({
           ...context,
-          amlForm: event.payload.formData,
+          verificationChecksForm: event.payload.formData,
         })),
       },
     },

@@ -313,7 +313,7 @@ describe('processPlaybook', () => {
       nameForm: defaultNameFormData,
     });
 
-    expect(mustCollectData).toContain('document.passport.none.none');
+    expect(mustCollectData).toContain('document');
   });
 
   it('should handle multiple id doc types correctly without selfie', () => {
@@ -334,9 +334,7 @@ describe('processPlaybook', () => {
       nameForm: defaultNameFormData,
     });
 
-    expect(mustCollectData).toContain(
-      'document.passport,drivers_license.none.none',
-    );
+    expect(mustCollectData).toContain('document');
   });
 
   it('should handle single id doc type correctly with selfie', () => {
@@ -354,7 +352,7 @@ describe('processPlaybook', () => {
       nameForm: defaultNameFormData,
     });
 
-    expect(mustCollectData).toContain('document.passport.none.require_selfie');
+    expect(mustCollectData).toContain('document_and_selfie');
   });
 
   it('should handle multiple id doc types correctly with selfie', () => {
@@ -375,9 +373,7 @@ describe('processPlaybook', () => {
       nameForm: defaultNameFormData,
     });
 
-    expect(mustCollectData).toContain(
-      'document.passport,drivers_license.none.require_selfie',
-    );
+    expect(mustCollectData).toContain('document_and_selfie');
   });
 
   it('should process case where doc flow is first correctly', () => {

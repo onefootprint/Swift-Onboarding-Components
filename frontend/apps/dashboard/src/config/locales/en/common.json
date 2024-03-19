@@ -2447,6 +2447,9 @@
             "entity-type": "Entity type",
             "business_website": "Business website",
             "business_phone": "Business phone"
+          },
+          "id-doc": {
+            "title": "ID document scan"
           }
         },
         "authorized-scopes": {
@@ -2535,8 +2538,8 @@
           }
         },
         "who-to-onboard": {
-          "nav": "Who to onboard",
-          "title": "Who would you like to onboard?",
+          "nav": "Playbook type",
+          "title": "What type of playbook you'd like to create?",
           "subtitle": "This helps us better recommend which data to collect.",
           "auth-title": "Authentication",
           "auth": {
@@ -2554,6 +2557,12 @@
             "title": "Onboard businesses and their beneficial owners",
             "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with.",
             "disabled-tooltip": "You are not configured to create production KYB playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
+          },
+          "data-collection-title": "Data collection",
+          "id-doc": {
+            "title": "ID Document only",
+            "description": "Users will upload and validate images of their ID documents (Passport, ID, etc.), but identity verification will not be conducted.",
+            "disabled-tooltip": "You are not configured to create production Auth playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
           }
         },
         "residency": {
@@ -2578,6 +2587,7 @@
           "auth": "Auth",
           "kyc": "KYC",
           "kyb": "KYB",
+          "document": "ID Document",
           "form": {
             "name": {
               "label": "Playbook name"
@@ -2589,9 +2599,17 @@
         },
         "summary": {
           "nav": "Your Playbook",
-          "title": "Your Playbook recommendation",
-          "subtitle-default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-          "subtitle-international-only": "Here’s our recommended Playbook configuration.",
+          "title": {
+            "auth": "Auth playbook details",
+            "id-doc": "Requested documents",
+            "default": "Your Playbook recommendation"
+          },
+          "subtitle": {
+            "international-only": "Here’s our recommended Playbook configuration.",
+            "auth": "Here's how your auth configuration is going to work",
+            "id-doc": "All selected documents will be presented as viable upload options for users to select from.",
+            "default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs."
+          },
           "data-collection": {
             "investor-profile": {
               "title": "Investor profile questions",
@@ -2668,18 +2686,41 @@
             },
             "id-doc": {
               "title": "ID document scan",
-              "toggle": "Request users to scan an ID document",
-              "drivers_license": "Driver's license",
-              "id_card": "Identity card",
-              "passport": "Passport (photo page)",
-              "visa": "Visa",
-              "residence_document": "Residence card",
-              "work_permit": "Work permit",
-              "voter_identification": "Voter identification",
-              "proof_of_address": "Proof of address",
-              "passport_card": "Passport card",
-              "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
-              "no-id-doc-selected": "You must select at least one ID document type."
+              "toggle": "Request users to scan an ID document"
+            }
+          },
+          "id-doc": {
+            "title": "ID document scan",
+            "toggle": "Request users to scan an ID document",
+            "drivers_license": "Driver's license",
+            "id_card": "Identity card",
+            "passport": "Passport (photo page)",
+            "visa": "Visa",
+            "residence_document": "Residence card",
+            "permit": "Work permit",
+            "voter_identification": "Voter identification",
+            "proof_of_address": "Proof of address",
+            "passport_card": "Passport card",
+            "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
+            "no-id-doc-selected": "You must select at least one ID document type.",
+            "sections": {
+              "global": {
+                "title": "Globally accepted documents"
+              },
+              "country-specific": {
+                "title": "Country-specific requirements",
+                "subtitle": "You can select documents for specific countries, overriding global settings.",
+                "add": "Add",
+                "add-more": "Add more",
+                "edit": "Edit",
+                "save": "Save",
+                "cancel": "Cancel",
+                "delete": "Delete"
+              },
+              "extra-requirements": {
+                "title": "Extra requirements",
+                "request-selfie": "Request a selfie after ID upload"
+              }
             }
           },
           "business-information": {
@@ -2736,31 +2777,41 @@
             }
           }
         },
-        "aml": {
-          "nav": "AML Monitoring",
-          "title": "AML monitoring",
-          "subtitle": "You can optionally add Anti-money Laundering (AML) monitoring to your onboarding flow.",
-          "recommended": "Recommended",
-          "missing-selection": "You must choose one of OFAC, PEP or Adverse Media.",
-          "aml": {
-            "label": "AML monitoring",
-            "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
+        "verification-checks": {
+          "nav": "Verification checks",
+          "title": "Verification checks",
+          "subtitle": "Configure which verification checks will be performed with the collected identity data.",
+          "aml-monitoring": {
+            "title": "Anti-Money Laundering (AML)",
+            "recommended": "Recommended",
+            "missing-selection": "You must choose one of OFAC, PEP or Adverse Media.",
+            "aml": {
+              "label": "Enhanced AML monitoring",
+              "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
+            },
+            "ofac": {
+              "label": "Office of Foreign Assets Control (OFAC)",
+              "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
+            },
+            "pep": {
+              "label": "Politically Exposed Person (PEP)",
+              "hint": "An individual who has been entrusted with a prominent public function"
+            },
+            "adverse-media": {
+              "label": "Adverse media",
+              "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities"
+            },
+            "footer": {
+              "label": "Note:",
+              "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+            }
           },
-          "ofac": {
-            "label": "Office of Foreign Assets Control (OFAC)",
-            "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
-          },
-          "pep": {
-            "label": "Politically Exposed Person (PEP)",
-            "hint": "An individual who has been entrusted with a prominent public function"
-          },
-          "adverse-media": {
-            "label": "Adverse media",
-            "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities"
-          },
-          "footer": {
-            "label": "Note:",
-            "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+          "kyc-check": {
+            "title": "Know Your Customer (KYC)",
+            "toggle": {
+              "label": "Perform database checks with collected identity data",
+              "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
+            }
           }
         }
       },
@@ -2778,7 +2829,7 @@
         "us-legal-status": "Legal status in the U.S.",
         "full-address": "Address",
         "ssn-doc-scan-step-up": "Request ID Document scan if SSN skipped",
-        "id-doc-kind": "ID document scan",
+        "id-doc-kind": "Globally accepted",
         "countries-restrictions": "Restricted to these countries",
         "selfie": "Selfie",
         "drivers-license": "Driver's license",
@@ -2810,7 +2861,8 @@
         "business-beneficial-owners": "Beneficial owners",
         "business-type": "Legal entity type",
         "business-website": "Business website",
-        "business-phone-number": "Business phone"
+        "business-phone-number": "Business phone",
+        "country-specific-docs": "Country-specific documents"
       }
     },
     "api-keys": {

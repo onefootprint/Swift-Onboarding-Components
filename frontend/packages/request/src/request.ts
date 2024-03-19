@@ -1,5 +1,5 @@
 import { getSessionId } from '@onefootprint/dev-tools';
-import { DataIdentifierKeys } from '@onefootprint/types';
+import { DataIdentifierKeys, isCountryCode } from '@onefootprint/types';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
@@ -195,7 +195,9 @@ const getRequestOptions = (
 // https://github.com/mpyw/axios-case-converter#preservedkeys-string--function
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const preservedKeys = (input: any) =>
-  [...DataIdentifierKeys].includes(input) || input.startsWith('card');
+  [...DataIdentifierKeys].includes(input) ||
+  input.startsWith('card') ||
+  isCountryCode(input);
 
 const request = <Response = unknown>(
   requestConfig: AxiosRequestConfig = {},
