@@ -14,7 +14,11 @@ const SupportPhone = ({ value }: SupportPhoneProps) => {
   });
 
   return (
-    <Fieldset label={t('label')} value={value} deleteKey="clear_support_phone">
+    <Fieldset
+      label={t('label')}
+      value={value}
+      deleteKey={value ? 'clear_support_phone' : undefined}
+    >
       {({ id, handleSubmit }) => (
         <Form
           id={id}

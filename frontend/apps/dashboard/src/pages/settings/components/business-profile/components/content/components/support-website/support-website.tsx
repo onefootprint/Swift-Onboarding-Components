@@ -17,7 +17,7 @@ const SupportWebsite = ({ value }: SupportWebsiteProps) => {
     <Fieldset
       label={t('label')}
       value={value}
-      deleteKey="clear_support_website"
+      deleteKey={value ? 'clear_support_website' : undefined}
     >
       {({ id, handleSubmit }) => (
         <Form
