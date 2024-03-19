@@ -1,30 +1,36 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Default",
+  "exclude": [
+    "node_modules"
+  ],
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "allowJs": false,
+    "allowUnreachableCode": false,
+    "baseUrl": "./",
+    "checkJs": false,
     "composite": false,
     "declaration": true,
     "declarationMap": true,
+    "disableSizeLimit": true,
     "downlevelIteration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
     "isolatedModules": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "moduleResolution": "node",
+    "noErrorTruncation": true,
     "noImplicitAny": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strict": true
-  },
-  "exclude": [
-    "node_modules"
-  ]
+    "strict": true,
+  }
 }

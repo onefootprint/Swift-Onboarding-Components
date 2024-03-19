@@ -17,7 +17,8 @@
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "typecheck": "yarn tsc --noEmit",
+    "typecheck": "yarn tsc --build",
+    "posttypecheck": "yarn tsc --build --clean",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },

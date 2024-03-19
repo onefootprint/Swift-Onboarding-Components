@@ -1,20 +1,49 @@
 {
-  "exclude": ["node_modules"],
   "extends": "tsconfig/nextjs.json",
+  "exclude": ["node_modules"],
+  "include": [
+    "next-env.d.ts",
+    "./src/**/*",
+    "../../../frontend/packages/design-tokens/src/**/*",
+    "../../../frontend/packages/dev-tools/src/**/*",
+    "../../../frontend/packages/global-constants/src/**/*",
+    "../../../frontend/packages/hooks/src/**/*",
+    "../../../frontend/packages/icons/src/**/*",
+    "../../../frontend/packages/request/src/**/*",
+    "../../../frontend/packages/test-utils/src/**/*",
+    "../../../frontend/packages/types/src/**/*",
+    "../../../frontend/packages/ui/src/**/*"
+  ],
+  "references": [
+    { "path": "../../../frontend/packages/design-tokens" },
+    { "path": "../../../frontend/packages/dev-tools" },
+    { "path": "../../../frontend/packages/global-constants" },
+    { "path": "../../../frontend/packages/hooks" },
+    { "path": "../../../frontend/packages/icons" },
+    { "path": "../../../frontend/packages/request" },
+    { "path": "../../../frontend/packages/test-utils" },
+    { "path": "../../../frontend/packages/types" },
+    { "path": "../../../frontend/packages/ui" }
+  ],
+  "files": [],
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "dist",
+    "allowJs": false,
     "baseUrl": ".",
+    "checkJs": false,
+    "declaration": true,
+    "declarationMap": false,
+    "disableSizeLimit": true,
+    "disableSourceOfProjectReferenceRedirect": true,
+    "incremental": true,
+    "outDir": "dist",
+    "rootDir": "../../../frontend/",
+    "types": ["google.maps", "jest", "../../styled.d.ts", "bun-types"],
     "paths": {
       "src/*": ["./src/*"],
       "@/proxy-configs/*": ["src/pages/proxy-configs/*"],
       "@/entities/*": ["./src/components/entities/*"],
       "@/entity/*": ["./src/components/entities/components/details/*"],
-      "@/playbooks/*": ["./src/pages/playbooks/*"],
-    },
-    "types": ["google.maps", "jest", "../../styled.d.ts"],
-  },
-  "include": ["src", "next-env.d.ts"]
+      "@/playbooks/*": ["./src/pages/playbooks/*"]
+    }
+  }
 }
-
-
