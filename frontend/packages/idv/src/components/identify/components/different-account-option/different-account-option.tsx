@@ -41,13 +41,9 @@ const DifferentAccountOption = () => {
           {t('or')}
         </Label>
       </DividerContainer>
-      <LinkButton
-        onClick={handleLoginWithDifferent}
-        alignItems="center"
-        justifyContent="center"
-      >
-        {t('label')}
-      </LinkButton>
+      <Stack direction="row" justify="center" align="center" width="100%">
+        <LinkButton onClick={handleLoginWithDifferent}>{t('label')}</LinkButton>
+      </Stack>
       <LegalFooter />
     </Container>
   );
