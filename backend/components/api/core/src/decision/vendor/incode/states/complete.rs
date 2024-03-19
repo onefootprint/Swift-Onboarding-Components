@@ -38,8 +38,8 @@ use itertools::Itertools;
 use newtypes::{
     DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentKind, Fingerprints,
     FootprintReasonCode, IdDocKind, IdentityDataKind as IDK, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeFailureReason, OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId, ScrubbedPiiString,
-    Validate, ValidateArgs, VendorAPI, VerificationResultId,
+    IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId,
+    ScrubbedPiiString, Validate, ValidateArgs, VendorAPI, VerificationResultId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -170,7 +170,9 @@ pub(super) fn compute_risk_signals<'a>(
     .into_iter()
     .map(|r| (r, VendorAPI::IncodeFetchScores, score_vres_id.clone()));
 
-    let pii_matching_ocr_reason_codes = if !obc.is_doc_first {
+    // Since doc first means we are vaulting `id.*` data from the document and obc.kind == Document means we are _just_ collecting document,
+    // we don't have any data to actually match to
+    let pii_matching_ocr_reason_codes = if !(obc.is_doc_first || obc.kind == ObConfigurationKind::Document) {
         // Only calculate OCR reason codes if we have already collected ID data
         let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
         incode_docv::pii_matching_reason_codes_from_ocr_response(fetch_ocr_response, vault_data)
