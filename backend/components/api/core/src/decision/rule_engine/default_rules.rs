@@ -11,8 +11,8 @@ use db::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
     BooleanOperator, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant as DID, DbActor,
-    EnhancedAmlOption, FootprintReasonCode as FRC, Locked, RuleAction, RuleAction as RA, RuleExpression,
-    RuleExpressionCondition,
+    EnhancedAmlOption, FootprintReasonCode as FRC, Locked, ObConfigurationKind, RuleAction, RuleAction as RA,
+    RuleExpression, RuleExpressionCondition,
 };
 
 pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
@@ -136,7 +136,7 @@ pub fn default_rules_for_obc(
                 d,
                 CDO::BusinessKycedBeneficialOwners | CDO::BusinessBeneficialOwners
             )
-    });
+    }) && obc.kind != ObConfigurationKind::Document;
     let must_collect_ssn =
         obc.must_collect_data.contains(&CDO::Ssn9) || obc.must_collect_data.contains(&CDO::Ssn4);
     let optional_ssn = obc.optional_data.contains(&CDO::Ssn9) || obc.optional_data.contains(&CDO::Ssn4);
@@ -287,6 +287,8 @@ mod tests {
     #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: false, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview)]].concat() ; "enhanced_aml, subbset of options")]
     // non-Alpaca but must_collect_data contains DOC CDO
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))],  ..Default::default()}, [base_doc_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "Doc CDO")]
+    // doc only (indicated by `kind = Document`)
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Document, must_collect_data: vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))],  ..Default::default()}, base_doc_rules(false); "Doc only")]
     // cip_kind = Alpaca
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB")]
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::BusinessBeneficialOwners, CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules(),base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB, non-KYC BO")]

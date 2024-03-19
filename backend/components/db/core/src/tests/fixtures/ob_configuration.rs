@@ -49,6 +49,7 @@ pub struct ObConfigurationOpts {
     pub skip_kyc: bool,
     pub doc_scan_for_optional_ssn: Option<CDO>,
     pub enhanced_aml: EnhancedAmlOption,
+    pub kind: ObConfigurationKind,
 }
 
 impl Default for ObConfigurationOpts {
@@ -68,6 +69,7 @@ impl Default for ObConfigurationOpts {
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
             enhanced_aml: EnhancedAmlOption::No,
+            kind: ObConfigurationKind::Kyc,
         }
     }
 }
@@ -96,7 +98,7 @@ pub fn create_with_opts(
         opts.enhanced_aml,
         true,
         false,
-        ObConfigurationKind::Kyc,
+        opts.kind,
         false,
         false,
         None,
