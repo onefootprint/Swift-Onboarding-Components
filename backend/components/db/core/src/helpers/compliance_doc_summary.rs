@@ -21,7 +21,7 @@ use newtypes::{
 };
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ComplianceDocSummary {
     pub partnership: TenantCompliancePartnership,
     pub tenant: Tenant,
@@ -219,13 +219,13 @@ mod tests {
             .values()
             .all(|r| summary.docs.contains_key(&r.compliance_doc_id)));
 
-        assert_eq!(summary.doc_submissions.len(), 4);
+        assert_eq!(summary.doc_submissions.len(), 3);
         assert!(summary
             .doc_submissions
             .values()
             .all(|r| summary.doc_requests.contains_key(&r.request_id)));
 
-        assert_eq!(summary.doc_reviews.len(), 4);
+        assert_eq!(summary.doc_reviews.len(), 2);
         assert!(summary
             .doc_reviews
             .values()

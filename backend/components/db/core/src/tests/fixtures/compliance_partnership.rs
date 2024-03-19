@@ -40,15 +40,15 @@ pub fn create_resources<'a>(
         }
     }
 
-    // Create a user for the partner tenant.
-    let pt_users: Vec<_> = tenants
+    // Create a user for each partner tenant.
+    let pt_users: Vec<_> = partner_tenants
         .iter()
         .map(|t| {
             TenantUser::get_and_update_or_create(
                 conn,
                 OrgMemberEmail(format!("partnertenantuser.{}@onefootprint.com", t.id)),
-                None,
-                None,
+                Some("Partner User".to_owned()),
+                Some("Last".to_owned()),
             )
             .unwrap()
         })
@@ -61,8 +61,8 @@ pub fn create_resources<'a>(
             TenantUser::get_and_update_or_create(
                 conn,
                 OrgMemberEmail(format!("tenantuser.{}@onefootprint.com", t.id)),
-                None,
-                None,
+                Some("Tenant User".to_owned()),
+                Some("Last".to_owned()),
             )
             .unwrap()
         })
@@ -153,7 +153,7 @@ pub fn create_resources<'a>(
             let req = NewComplianceDocRequest {
                 created_at: Utc::now(),
                 name: "An ad-hoc request",
-                description: "This is a ad-hoc request",
+                description: "This is an ad-hoc request",
                 requested_by_partner_tenant_user_id: &pt_user.id,
                 assigned_to_tenant_user_id: Some(&tenant_user.id),
                 compliance_doc_id: &doc.id,
@@ -163,50 +163,65 @@ pub fn create_resources<'a>(
             requests.push(req);
         }
 
-        // Submit docs in response to each request.
+        // For each partnership, there will be a document in each of the following four states:
+        // 1. Submitted and approved
+        // 2. Submitted and rejected
+        // 3. Submitted and not reviewed
+        // 4. Not submitted
+
+        // Submit docs in response to some of the request.
+        assert_eq!(requests.len() % 4, 0);
         let subs: Vec<_> = requests
             .iter()
-            .map(|req| {
-                NewComplianceDocSubmission {
-                    created_at: Utc::now(),
-
-                    request_id: &req.id,
-                    submitted_by_tenant_user_id: req.assigned_to_tenant_user_id.as_ref().unwrap(),
-                    assigned_to_partner_tenant_user_id: Some(&req.requested_by_partner_tenant_user_id),
-                    doc_data: &ComplianceDocData::SealedUpload {
-                        s3_url: S3Url::from("the url".to_owned()),
-                        e_data_key: SealedVaultDataKey(vec![]),
-                    },
+            .zip((0..=3).cycle())
+            .map(|(req, i)| {
+                if i == 3 {
+                    return None;
                 }
-                .create(conn)
-                .unwrap()
+
+                Some(
+                    NewComplianceDocSubmission {
+                        created_at: Utc::now(),
+
+                        request_id: &req.id,
+                        submitted_by_tenant_user_id: req.assigned_to_tenant_user_id.as_ref().unwrap(),
+                        assigned_to_partner_tenant_user_id: Some(&req.requested_by_partner_tenant_user_id),
+                        doc_data: &ComplianceDocData::SealedUpload {
+                            s3_url: S3Url::from("the url".to_owned()),
+                            e_data_key: SealedVaultDataKey(vec![]),
+                        },
+                    }
+                    .create(conn)
+                    .unwrap(),
+                )
             })
             .collect();
 
-        // Review each doc.
+        // Review the first two docs for each partnership.
+        assert_eq!(subs.len() % 4, 0);
         subs.iter()
             .zip(
                 [
-                    (ComplianceDocReviewDecision::Accepted, "accepting this"),
-                    (ComplianceDocReviewDecision::Rejected, "rejecting this"),
-                    (
-                        ComplianceDocReviewDecision::Rejected,
-                        "rejecting for a different reason",
-                    ),
+                    Some((ComplianceDocReviewDecision::Accepted, "accepting this")),
+                    Some((ComplianceDocReviewDecision::Rejected, "rejecting this")),
+                    None,
+                    None,
                 ]
                 .iter()
                 .cycle(),
             )
-            .for_each(|(sub, (decision, note))| {
-                NewComplianceDocReview {
-                    created_at: Utc::now(),
-                    submission_id: &sub.id,
-                    reviewed_by_partner_tenant_user_id: &pt_user.id,
-                    decision: *decision,
-                    note,
+            .for_each(|(sub, dn)| {
+                if let Some((decision, note)) = dn {
+                    NewComplianceDocReview {
+                        created_at: Utc::now(),
+                        submission_id: &sub.as_ref().unwrap().id,
+                        reviewed_by_partner_tenant_user_id: &pt_user.id,
+                        decision: *decision,
+                        note,
+                    }
+                    .create(conn)
+                    .unwrap();
                 }
-                .create(conn)
-                .unwrap();
             });
     }
 
