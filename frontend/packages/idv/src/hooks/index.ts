@@ -16,6 +16,7 @@ export {
 export type { DeviceInfo } from './ui';
 export {
   checkDeviceInfo,
+  getBasicDevice,
   useCreateHandoffUrl,
   useDeviceInfo,
   useIdvMachine,

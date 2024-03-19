@@ -9,7 +9,7 @@ import {
   fillNameAndDoB,
   fillPhoneNumber,
   selectOutcomeOptional,
-  skipTransferOnDesktop,
+  continueOnDesktop,
   verifyPhoneNumber,
   waitForVerifyButton,
 } from './utils/commands';
@@ -23,7 +23,12 @@ const addressLine1 = '432 3rd Ave';
 const city = 'Seward';
 const zipCode = '99664';
 
-test('E2E.es-MX.KYC.Docs #ci', async ({ browserName, isMobile, page }) => {
+test('E2E.es-MX.KYC.Docs #ci', async ({
+  browserName,
+  browser,
+  isMobile,
+  page,
+}) => {
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
@@ -96,7 +101,7 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ browserName, isMobile, page }) => {
     // await newPage.waitForLoadState();
     // await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
   } else {
-    await skipTransferOnDesktop({ frame });
+    await continueOnDesktop({ frame, browser });
     await page.waitForLoadState();
     await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
   }

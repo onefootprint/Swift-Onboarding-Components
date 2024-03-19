@@ -98,20 +98,42 @@ const createTransferMachine = (initialContext: MachineContext) =>
             d2pSessionExpired: {
               actions: ['clearScopedAuthToken'],
             },
-            // TODO in next PR: if we continue on desktop and have liveness, we should open new tab to transfer
-            continueOnDesktop: {
-              target: 'complete',
-            },
-            confirmationRequired: {
-              target: 'confirmContinueOnDesktop',
-            },
+            continueOnDesktop: [
+              {
+                target: 'confirmContinueOnDesktop',
+                cond: ctx => !!ctx.missingRequirements.idDoc,
+                description:
+                  'The document upload experience is better on mobile, so if the user is trying to upload on desktop, warn them we recommend they continue on mobile.',
+              },
+              {
+                target: 'newTabRequest',
+                actions: ['assignIsContinuingOnDesktop'],
+                cond: ctx =>
+                  !!ctx.missingRequirements.liveness && ctx.isInIframe,
+                description:
+                  'If the user wants to continue on desktop, and we have a passkey requirement in an iframe, open a new tab',
+              },
+              {
+                target: 'complete',
+              },
+            ],
           },
         },
         confirmContinueOnDesktop: {
           on: {
-            continueOnDesktop: {
-              target: 'complete',
-            },
+            continueOnDesktop: [
+              {
+                target: 'newTabRequest',
+                actions: ['assignIsContinuingOnDesktop'],
+                cond: ctx =>
+                  !!ctx.missingRequirements.liveness && ctx.isInIframe,
+                description:
+                  'If the user wants to continue on desktop, and we have a passkey requirement in an iframe, open a new tab',
+              },
+              {
+                target: 'complete',
+              },
+            ],
             continueOnMobile: {
               target: 'qrRegister',
             },
@@ -199,6 +221,10 @@ const createTransferMachine = (initialContext: MachineContext) =>
         assignTab: assign((context, event) => ({
           ...context,
           tab: event.payload.tab,
+        })),
+        assignIsContinuingOnDesktop: assign(context => ({
+          ...context,
+          isContinuingOnDesktop: true,
         })),
         clearScopedAuthToken: assign(context => ({
           ...context,

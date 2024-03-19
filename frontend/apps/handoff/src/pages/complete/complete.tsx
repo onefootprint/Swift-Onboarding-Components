@@ -1,5 +1,6 @@
 import { useCountdown } from '@onefootprint/hooks';
 import {
+  getBasicDevice,
   HeaderTitle,
   NavigationHeader,
   useUpdateD2PStatus,
@@ -21,9 +22,14 @@ const Complete = () => {
   const [state] = useHandoffMachine();
   const { authToken, opener } = state.context;
 
-  const shouldShowCounter = opener === 'mobile';
+  const device = getBasicDevice();
+  const isMobile = device.type === 'mobile';
+  const isOpenerMobile = opener === 'mobile';
+  // Show a countdown if we just opened a new tab on the same device. If we handed off to a
+  // different device, leave the window open
+  const isHandoffOnSameDevice = isOpenerMobile === isMobile;
   const { countdown, setSeconds } = useCountdown({
-    disabled: !shouldShowCounter,
+    disabled: !isHandoffOnSameDevice,
     onCompleted: () => window.close(),
   });
 
@@ -44,8 +50,13 @@ const Complete = () => {
         <HeaderTitle
           title={t('title')}
           subtitle={
-            shouldShowCounter
-              ? t('subtitle.with-countdown', { seconds: countdown })
+            isHandoffOnSameDevice
+              ? t(
+                  countdown === 1
+                    ? 'subtitle.with-countdown-singular'
+                    : 'subtitle.with-countdown',
+                  { seconds: countdown },
+                )
               : t('subtitle.without-countdown')
           }
         />

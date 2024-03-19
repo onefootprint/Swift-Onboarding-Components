@@ -71,8 +71,18 @@ const shouldRunCollectInvestorProfile = (context: MachineContext) =>
 const shouldRunLiveness = (context: MachineContext) =>
   context.requirements[0]?.kind === OnboardingRequirementKind.registerPasskey;
 
-const shouldRunIdDoc = (context: MachineContext) =>
-  context.requirements[0]?.kind === OnboardingRequirementKind.idDoc;
+const shouldRunIdDoc = (context: MachineContext) => {
+  const {
+    onboardingContext: { isTransfer, device },
+  } = context;
+  const isMobile = device.type === 'mobile' || device.type === 'tablet';
+  if (isTransfer && !isMobile) {
+    // If we're running the transfer app on desktop, we want to keep the transfer as small as
+    // possible. So, only register the passkey, don't allow also uploading id doc in desktop transfer
+    return false;
+  }
+  return context.requirements[0]?.kind === OnboardingRequirementKind.idDoc;
+};
 
 const shouldShowAuthorize = (context: MachineContext) => {
   const {

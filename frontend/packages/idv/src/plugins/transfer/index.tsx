@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { checkIsInIframe } from '../../utils';
 import checkIsSocialMediaBrowser from '../../utils/check-is-social-media-browser';
 import { TransferMachineProvider } from './components/machine-provider.tsx';
 import Router from './pages/router';
@@ -19,6 +20,7 @@ const AppWithMachine = ({ context, onDone }: TransferProps) => {
         idDocOutcome,
         scopedAuthToken: '',
         isSocialMediaBrowser: checkIsSocialMediaBrowser(),
+        isInIframe: checkIsInIframe(),
       }}
     >
       <Router onDone={onDone} />

@@ -6,6 +6,7 @@ import { OnboardingRequirementKind } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createTransferMachine from './machine';
+import type { MachineContext } from './types';
 
 const getLivenessReq = (): RegisterPasskeyRequirement => ({
   kind: OnboardingRequirementKind.registerPasskey,
@@ -33,9 +34,10 @@ const getMobileArgs = () => ({
     liveness: getLivenessReq(),
     idDoc: getIdDocReq(),
   },
+  isInIframe: true,
 });
 
-const getDesktopArgs = () => ({
+const getDesktopArgs = (args: Partial<MachineContext>) => ({
   authToken: 'tok_123',
   scopedAuthToken: '',
   device: {
@@ -48,12 +50,14 @@ const getDesktopArgs = () => ({
     liveness: getLivenessReq(),
     idDoc: getIdDocReq(),
   },
+  isInIframe: true,
+  ...args,
 });
 
 describe('Transfer machine tests', () => {
   describe('when running on non-mobile device', () => {
-    it('shows the qr transfer screen', () => {
-      const machine = interpret(createTransferMachine(getDesktopArgs()));
+    it('shows the qr transfer screen and requires confirm continue on desktop for id doc', () => {
+      const machine = interpret(createTransferMachine(getDesktopArgs({})));
       machine.start();
       let state = machine.send([
         {
@@ -63,7 +67,7 @@ describe('Transfer machine tests', () => {
           },
         },
         {
-          type: 'confirmationRequired',
+          type: 'continueOnDesktop',
         },
       ]);
       expect(state.value).toBe('confirmContinueOnDesktop');
@@ -76,21 +80,29 @@ describe('Transfer machine tests', () => {
       ]);
       expect(state.value).toBe('qrRegister');
 
-      state = machine.send([
-        {
-          type: 'confirmationRequired',
-        },
-        {
-          type: 'continueOnDesktop',
-        },
-      ]);
-      expect(state.value).toBe('complete');
+      state = machine.send({
+        type: 'continueOnDesktop',
+      });
+      expect(state.value).toBe('confirmContinueOnDesktop');
+      state = machine.send({
+        type: 'continueOnDesktop',
+      });
+      expect(state.value).toBe('newTabRequest');
     });
 
-    it('user can continue on desktop', () => {
-      const machine = interpret(createTransferMachine(getDesktopArgs()));
+    it('does not require confirm continue on desktop for id doc', () => {
+      const machine = interpret(
+        createTransferMachine(
+          getDesktopArgs({
+            missingRequirements: {
+              liveness: getLivenessReq(),
+              idDoc: undefined,
+            },
+          }),
+        ),
+      );
       machine.start();
-      let state = machine.send([
+      const state = machine.send([
         {
           type: 'scopedAuthTokenGenerated',
           payload: {
@@ -98,32 +110,15 @@ describe('Transfer machine tests', () => {
           },
         },
         {
-          type: 'confirmationRequired',
-        },
-      ]);
-      expect(state.value).toBe('confirmContinueOnDesktop');
-      expect(state.context.scopedAuthToken).toBe('tok_456');
-
-      state = machine.send([
-        {
-          type: 'continueOnMobile',
-        },
-      ]);
-      expect(state.value).toBe('qrRegister');
-
-      state = machine.send([
-        {
-          type: 'confirmationRequired',
-        },
-        {
           type: 'continueOnDesktop',
         },
       ]);
-      expect(state.value).toBe('complete');
+      expect(state.context.scopedAuthToken).toBe('tok_456');
+      expect(state.value).toBe('newTabRequest');
     });
 
     it('user can scan transition to qrProcessing', () => {
-      const machine = interpret(createTransferMachine(getDesktopArgs()));
+      const machine = interpret(createTransferMachine(getDesktopArgs({})));
       machine.start();
       let state = machine.send([
         {
@@ -148,7 +143,7 @@ describe('Transfer machine tests', () => {
     });
 
     it('handles cancellations and expirations correctly', () => {
-      const machine = interpret(createTransferMachine(getDesktopArgs()));
+      const machine = interpret(createTransferMachine(getDesktopArgs({})));
       machine.start();
       let state = machine.send([
         {
@@ -197,6 +192,134 @@ describe('Transfer machine tests', () => {
       state = machine.send({
         type: 'd2pSessionFailed',
       });
+      expect(state.value).toBe('complete');
+    });
+
+    it('continue on desktop does not open transfer for only id doc', () => {
+      const machine = interpret(
+        createTransferMachine(
+          getDesktopArgs({
+            missingRequirements: {
+              liveness: undefined,
+              idDoc: getIdDocReq(),
+            },
+          }),
+        ),
+      );
+      machine.start();
+      let state = machine.send([
+        {
+          type: 'scopedAuthTokenGenerated',
+          payload: {
+            scopedAuthToken: 'tok_456',
+          },
+        },
+        {
+          type: 'continueOnDesktop',
+        },
+      ]);
+      expect(state.value).toBe('confirmContinueOnDesktop');
+      expect(state.context.scopedAuthToken).toBe('tok_456');
+
+      state = machine.send([
+        {
+          type: 'continueOnMobile',
+        },
+      ]);
+      expect(state.value).toBe('qrRegister');
+
+      state = machine.send([
+        {
+          type: 'continueOnDesktop',
+        },
+        {
+          type: 'continueOnDesktop',
+        },
+      ]);
+      expect(state.value).toBe('complete');
+    });
+
+    it('continue on desktop opens transfer for liveness when in iframe', () => {
+      const machine = interpret(createTransferMachine(getDesktopArgs({})));
+      machine.start();
+      let state = machine.send([
+        {
+          type: 'scopedAuthTokenGenerated',
+          payload: {
+            scopedAuthToken: 'tok_456',
+          },
+        },
+        {
+          type: 'continueOnDesktop',
+        },
+      ]);
+      expect(state.value).toBe('confirmContinueOnDesktop');
+      expect(state.context.scopedAuthToken).toBe('tok_456');
+
+      state = machine.send([
+        {
+          type: 'continueOnMobile',
+        },
+      ]);
+      expect(state.value).toBe('qrRegister');
+
+      state = machine.send([
+        {
+          type: 'continueOnDesktop',
+        },
+        {
+          type: 'continueOnDesktop',
+        },
+      ]);
+      expect(state.value).toBe('newTabRequest');
+      state = machine.send([
+        {
+          type: 'newTabOpened',
+          payload: {
+            tab: {} as Window,
+          },
+        },
+        {
+          type: 'd2pSessionCompleted',
+        },
+      ]);
+      expect(state.value).toBe('complete');
+    });
+
+    it('continue on desktop does not open transfer for liveness when not in iframe', () => {
+      const machine = interpret(
+        createTransferMachine(getDesktopArgs({ isInIframe: false })),
+      );
+      machine.start();
+      let state = machine.send([
+        {
+          type: 'scopedAuthTokenGenerated',
+          payload: {
+            scopedAuthToken: 'tok_456',
+          },
+        },
+        {
+          type: 'continueOnDesktop',
+        },
+      ]);
+      expect(state.value).toBe('confirmContinueOnDesktop');
+      expect(state.context.scopedAuthToken).toBe('tok_456');
+
+      state = machine.send([
+        {
+          type: 'continueOnMobile',
+        },
+      ]);
+      expect(state.value).toBe('qrRegister');
+
+      state = machine.send([
+        {
+          type: 'continueOnDesktop',
+        },
+        {
+          type: 'continueOnDesktop',
+        },
+      ]);
       expect(state.value).toBe('complete');
     });
   });

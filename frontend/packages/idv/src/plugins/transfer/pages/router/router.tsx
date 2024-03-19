@@ -16,11 +16,14 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useTransferMachine();
-  const { missingRequirements } = state.context;
+  const { missingRequirements, isContinuingOnDesktop } = state.context;
   const isDone = state.matches('complete');
   useLogStateMachine('transfer-mobile', state);
   const { t } = useTranslation('idv');
-  const { title } = useRequirementsTitle(missingRequirements);
+  const { title } = useRequirementsTitle(
+    missingRequirements,
+    !!isContinuingOnDesktop,
+  );
 
   useEffect(() => {
     if (isDone) {

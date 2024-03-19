@@ -3,7 +3,8 @@
     "complete": {
       "title": "Completado",
       "subtitle": {
-        "with-countdown": "Esta página se cerrará en {{seconds}} segundos...",
+        "with-countdown": "Por favor, continúa en la otra pestaña. Esta página se cerrará en {{seconds}} segundos...",
+        "with-countdown-singular": "Por favor, continúa en la otra pestaña. Esta página se cerrará en {{seconds}} segundo...",
         "without-countdown": "Por favor, continúa en tu computadora."
       }
     },

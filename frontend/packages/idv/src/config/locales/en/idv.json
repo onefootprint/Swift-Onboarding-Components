@@ -1044,7 +1044,7 @@
         "cta": "Open new browser tab"
       },
       "new-tab-processing": {
-        "subtitle": "We opened a new browser tab on this device. Please follow the instructions in the other tab.",
+        "subtitle": "We opened a new browser window on this device. Please follow the instructions in the other tab.",
         "cancel": "Cancel"
       },
       "qr-register": {

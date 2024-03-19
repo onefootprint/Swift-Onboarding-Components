@@ -13,6 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignIsContinuingOnDesktop: 'continueOnDesktop';
     assignScopedAuthToken: 'scopedAuthTokenGenerated';
     assignTab: 'newTabOpened';
     clearScopedAuthToken: 'd2pSessionCanceled' | 'd2pSessionExpired';

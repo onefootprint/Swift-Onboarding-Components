@@ -48,7 +48,15 @@ const NewTabRequest = () => {
       return;
     }
 
-    const tab = window.open(url, '_blank');
+    // Open new window on desktop, new tab on mobile
+    const isMobile = device.type === 'mobile' || device.type === 'tablet';
+    const tab = window.open(
+      url,
+      '_blank',
+      !isMobile
+        ? 'height=800px,width=600px,location=no,menubar=no,status=no,toolbar=no,left=100px,top=100px'
+        : undefined,
+    );
     if (tab) {
       send({
         type: 'newTabOpened',

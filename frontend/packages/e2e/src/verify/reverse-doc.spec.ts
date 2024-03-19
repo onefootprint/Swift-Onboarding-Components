@@ -4,7 +4,7 @@ import {
   clickOnAgree,
   doTransferFromMobile,
   selectOutcomeOptional,
-  skipTransferOnDesktop,
+  continueOnDesktop,
   uploadImage,
   verifyPhoneNumber,
   waitForVerifyButton,
@@ -56,7 +56,7 @@ test('reverse-doc #ci', async ({ browserName, browser, page, isMobile }) => {
   }
 
   await page.waitForLoadState();
-  await skipTransferOnDesktop({ frame });
+  await continueOnDesktop({ frame, browser });
   await page.waitForLoadState();
 
   const scanText = frame.getByText(/scan or upload/i).first();

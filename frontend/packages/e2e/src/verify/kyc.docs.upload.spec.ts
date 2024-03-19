@@ -11,7 +11,7 @@ import {
   fillPhoneNumber,
   fillSSN,
   selectOutcomeOptional,
-  skipTransferOnDesktop,
+  continueOnDesktop,
   uploadImage,
   verifyPhoneNumber,
   waitForVerifyButton,
@@ -95,7 +95,7 @@ test('E2E.KYC.DriverDocOnly #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await skipTransferOnDesktop({ frame });
+  await continueOnDesktop({ frame, browser });
   await page.waitForLoadState();
 
   await clickOnContinue({ frame });

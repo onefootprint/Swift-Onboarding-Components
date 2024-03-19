@@ -26,6 +26,7 @@ const QRRegister = () => {
   const {
     authToken,
     missingRequirements,
+    isContinuingOnDesktop,
     device,
     config,
     scopedAuthToken,
@@ -69,8 +70,10 @@ const QRRegister = () => {
     },
   });
 
-  const { title, linkSentToPhoneSubtitle } =
-    useRequirementsTitle(missingRequirements);
+  const { title, linkSentToPhoneSubtitle } = useRequirementsTitle(
+    missingRequirements,
+    !!isContinuingOnDesktop,
+  );
 
   return (
     <>

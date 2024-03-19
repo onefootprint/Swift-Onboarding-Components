@@ -8,10 +8,12 @@ export type MachineContext = {
   authToken: string;
   scopedAuthToken: string;
   missingRequirements: TransferRequirements;
+  isContinuingOnDesktop?: boolean;
   config?: PublicOnboardingConfig;
   tab?: Window;
   idDocOutcome?: IdDocOutcome;
   isSocialMediaBrowser?: boolean;
+  isInIframe: boolean;
 };
 
 export type MachineEvents =

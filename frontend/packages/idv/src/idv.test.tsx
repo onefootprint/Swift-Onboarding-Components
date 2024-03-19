@@ -9,6 +9,7 @@ import {
   screen,
   userEvent,
 } from '@onefootprint/test-utils';
+import type { OnboardingRequirement } from '@onefootprint/types';
 import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
@@ -51,6 +52,55 @@ import {
 import type { IdvProps } from './types';
 
 const defaultObConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' };
+
+const desktopDevice = {
+  type: 'desktop',
+  osName: 'Mac OSX',
+  browser: 'Safari',
+  hasSupportForWebauthn: true,
+};
+
+const mobileDevice = {
+  type: 'mobile',
+  osName: 'iOS',
+  browser: 'Safari',
+  hasSupportForWebauthn: true,
+};
+
+const collectKycDataRequirement: OnboardingRequirement = {
+  kind: OnboardingRequirementKind.collectKycData,
+  isMet: false,
+  missingAttributes: [
+    CollectedKycDataOption.name,
+    CollectedKycDataOption.dob,
+    CollectedKycDataOption.ssn9,
+  ],
+  populatedAttributes: [],
+  optionalAttributes: [],
+};
+
+const idDocRequirement: OnboardingRequirement = {
+  kind: OnboardingRequirementKind.idDoc,
+  isMet: false,
+  shouldCollectConsent: false,
+  shouldCollectSelfie: false,
+  uploadMode: 'allow_upload',
+  supportedCountryAndDocTypes: {
+    us: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.residenceDocument,
+      SupportedIdDocTypes.visa,
+      SupportedIdDocTypes.workPermit,
+    ],
+    ca: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+  },
+};
 
 describe('<Idv />', () => {
   const useRouterSpy = createUseRouterSpy();
@@ -102,6 +152,7 @@ describe('<Idv />', () => {
                     onComplete={onComplete}
                     onClose={onClose}
                     device={device}
+                    l10n={{ locale: 'en-US', language: 'en' }}
                   />
                 </Layout>
               </ToastProvider>
@@ -221,20 +272,7 @@ describe('<Idv />', () => {
       });
 
       it('collects missing data before confirm', async () => {
-        withRequirements([
-          {
-            kind: OnboardingRequirementKind.collectKycData,
-            isMet: false,
-            missingAttributes: [
-              CollectedKycDataOption.name,
-              CollectedKycDataOption.dob,
-              CollectedKycDataOption.ssn9,
-            ],
-            populatedAttributes: [],
-            optionalAttributes: [],
-          },
-          TestAuthorizeRequirement,
-        ]);
+        withRequirements([collectKycDataRequirement, TestAuthorizeRequirement]);
         withIdentify(true, true);
         withUserVault();
 
@@ -371,30 +409,7 @@ describe('<Idv />', () => {
 
       // Update the mock response after we entered the authorize page
       // For next time we are checking for requirements
-      withRequirements([
-        {
-          kind: OnboardingRequirementKind.idDoc,
-          isMet: false,
-          shouldCollectConsent: false,
-          shouldCollectSelfie: false,
-          uploadMode: 'allow_upload',
-          supportedCountryAndDocTypes: {
-            us: [
-              SupportedIdDocTypes.driversLicense,
-              SupportedIdDocTypes.idCard,
-              SupportedIdDocTypes.passport,
-              SupportedIdDocTypes.residenceDocument,
-              SupportedIdDocTypes.visa,
-              SupportedIdDocTypes.workPermit,
-            ],
-            ca: [
-              SupportedIdDocTypes.driversLicense,
-              SupportedIdDocTypes.idCard,
-              SupportedIdDocTypes.passport,
-            ],
-          },
-        },
-      ]);
+      withRequirements([idDocRequirement]);
 
       await authorizeData();
 
@@ -417,34 +432,12 @@ describe('<Idv />', () => {
     });
 
     it('transfers when there is an id doc requirement', async () => {
-      withRequirements([
-        {
-          kind: OnboardingRequirementKind.idDoc,
-          isMet: false,
-          shouldCollectConsent: false,
-          shouldCollectSelfie: false,
-          uploadMode: 'allow_upload',
-          supportedCountryAndDocTypes: {
-            us: [
-              SupportedIdDocTypes.driversLicense,
-              SupportedIdDocTypes.idCard,
-              SupportedIdDocTypes.passport,
-              SupportedIdDocTypes.residenceDocument,
-              SupportedIdDocTypes.visa,
-              SupportedIdDocTypes.workPermit,
-            ],
-            ca: [
-              SupportedIdDocTypes.driversLicense,
-              SupportedIdDocTypes.idCard,
-              SupportedIdDocTypes.passport,
-            ],
-          },
-        },
-      ]);
+      withRequirements([idDocRequirement]);
 
       renderIdv({
         obConfigAuth: defaultObConfigAuth,
         authToken: 'token',
+        device: desktopDevice,
       });
 
       await waitFor(() => {
@@ -452,6 +445,60 @@ describe('<Idv />', () => {
           screen.getByText('Scan or upload ID document'),
         ).toBeInTheDocument();
       });
+      expect(
+        screen.getByText(
+          'Open the link sent to your phone and follow the prompts to upload an ID document.',
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('When isTransfer is true', () => {
+    beforeEach(() => {
+      const config = getKycOnboardingConfig(true);
+      withOnboarding(config);
+      withOnboardingConfig(config);
+      withD2PGenerate();
+      withD2PStatus(D2PStatus.waiting);
+      withIdentify(true, true);
+    });
+
+    it('desktop transfer app does not handle doc requirements', async () => {
+      // Also shouldn't render collect KYC data
+      withRequirements([idDocRequirement, collectKycDataRequirement]);
+
+      const onComplete = jest.fn();
+      renderIdv({
+        obConfigAuth: defaultObConfigAuth,
+        authToken: 'token',
+        device: desktopDevice,
+        isTransfer: true,
+        onComplete,
+      });
+
+      // Should immediately complete because we won't handle id doc requirement in desktop transfer
+      await waitFor(() => {
+        expect(onComplete).toHaveBeenCalledWith({});
+      });
+    });
+
+    it('mobile transfer app does handle doc requirements', async () => {
+      withRequirements([idDocRequirement, collectKycDataRequirement]);
+
+      renderIdv({
+        obConfigAuth: defaultObConfigAuth,
+        authToken: 'token',
+        isTransfer: true,
+        device: mobileDevice,
+      });
+
+      // Should render id doc requirement
+      await waitFor(() => {
+        expect(screen.getByText('Scan or upload your ID')).toBeInTheDocument();
+      });
+      expect(
+        screen.getByText('We need some more information about your identity.'),
+      ).toBeInTheDocument();
     });
   });
 });

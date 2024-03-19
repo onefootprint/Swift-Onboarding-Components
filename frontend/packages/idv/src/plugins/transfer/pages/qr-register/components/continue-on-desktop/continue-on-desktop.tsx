@@ -9,20 +9,9 @@ const ContinueOnDesktop = () => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'transfer.pages.qr-register',
   });
-  const [state, send] = useTransferMachine();
-  const {
-    missingRequirements: { idDoc },
-  } = state.context;
+  const [, send] = useTransferMachine();
 
   const handleContinueOnDesktop = () => {
-    if (idDoc) {
-      // If the missing requirements include ID doc, show a confirmation page
-      send({
-        type: 'confirmationRequired',
-      });
-      return;
-    }
-
     send({
       type: 'continueOnDesktop',
     });

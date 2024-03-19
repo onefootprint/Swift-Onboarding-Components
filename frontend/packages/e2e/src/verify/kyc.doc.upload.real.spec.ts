@@ -13,7 +13,7 @@ import {
   uploadImage,
   verifyPhoneNumber,
   clickOnVerifyWithSms,
-  skipTransferOnDesktop,
+  continueOnDesktop,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -100,7 +100,7 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await skipTransferOnDesktop({ frame });
+  await continueOnDesktop({ frame, browser });
   await page.waitForLoadState();
 
   await clickOnContinue({ frame });

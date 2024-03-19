@@ -384,6 +384,10 @@ export const confirmData = async (
   }
 };
 
+/** When running on desktop, the user is prompted to transfer to a mobile device for the id doc and
+ * liveness requirements are transferred to a mobile device.
+ * This transfers to a mobile device and handles the liveness requirement.
+ */
 export const doTransferFromDesktop = async ({
   frame,
   page,
@@ -394,7 +398,7 @@ export const doTransferFromDesktop = async ({
   browser: Browser;
 }) => {
   const requestPromise = page.waitForRequest('**/d2p/sms');
-  const header = frame.getByText(/liveness check/i).first();
+  const header = frame.getByText(/add a passkey/i).first();
   await header
     .waitFor({ state: 'attached', timeout: 10000 })
     .then(() => true)
@@ -407,7 +411,11 @@ export const doTransferFromDesktop = async ({
   const handoffUrl = request.postDataJSON().url;
   expect(handoffUrl).toBeDefined();
 
-  const popup = await browser.newPage({ baseURL: handoffUrl });
+  const iPhone = devices['iPhone 13'];
+  const popup = await browser.newPage({
+    baseURL: handoffUrl,
+    ...iPhone,
+  });
   await popup.goto(handoffUrl);
   await popup.waitForLoadState();
 
@@ -488,7 +496,7 @@ export const doTransferFromMobile = async ({
   const newPage = await pagePromise;
   await newPage.waitForLoadState();
 
-  const header = newPage.getByText(/liveness check/i).first();
+  const header = newPage.getByText(/add a passkey/i).first();
   await header
     .waitFor({ state: 'attached', timeout: 10000 })
     .then(() => true)
@@ -499,10 +507,17 @@ export const doTransferFromMobile = async ({
   return newPage;
 };
 
-export const skipTransferOnDesktop = async ({
+/** When running on desktop, the user is prompted to transfer to a mobile device for the id doc and
+ * liveness requirements are transferred to a mobile device.
+ * This continues on desktop, which transfers only the liveness requirement to a new window, and
+ * then allows handling id doc requirements in the current browser.
+ */
+export const continueOnDesktop = async ({
   frame,
+  browser,
 }: {
   frame: FrameLocator;
+  browser: Browser;
 }) => {
   let success = await clickOn(/continue on desktop/i, { frame });
   if (!success) {
@@ -512,4 +527,33 @@ export const skipTransferOnDesktop = async ({
   if (!success) {
     await clickOn(/continue on desktop/i, { frame });
   }
+
+  // After continuing on desktop, we'll be asked to open a new tab to handle passkey registration
+  const context = browser.contexts()[0];
+  const pagePromise = context.waitForEvent('page');
+  const button = frame
+    .getByRole('button', {
+      name: 'Open new browser tab',
+      disabled: false,
+      exact: true,
+    })
+    .first();
+  await button
+    .waitFor({ state: 'attached', timeout: 10000 })
+    .then(() => button.click())
+    .then(() => true)
+    .catch(() => false);
+
+  const newPage = await pagePromise;
+  await newPage.waitForLoadState();
+
+  const header = newPage.getByText(/add a passkey/i).first();
+  await header
+    .waitFor({ state: 'attached', timeout: 10000 })
+    .then(() => true)
+    .catch(() => false);
+  await clickOn(/launch verification/i, { frame: newPage });
+  await clickOn(/do it later/i, { frame: newPage });
+
+  return newPage;
 };
