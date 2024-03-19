@@ -166,8 +166,8 @@ const Picker = ({
         <LinkButton
           iconComponent={IcoTrash16}
           iconPosition="left"
-          variant="destructive"
           onClick={() => onRemove(selectedCountry.value)}
+          destructive
         >
           {t('delete')}
         </LinkButton>
