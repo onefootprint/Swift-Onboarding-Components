@@ -6,7 +6,7 @@ use crate::{
         compliance_doc_template_version::ComplianceDocTemplateVersion, partner_tenant::PartnerTenant,
         tenant::Tenant, tenant_compliance_partnership::TenantCompliancePartnership,
     },
-    DbResult, TxnPgConn,
+    DbResult, PgConn,
 };
 use db_schema::schema::{
     compliance_doc, compliance_doc_request, compliance_doc_review, compliance_doc_submission,
@@ -15,9 +15,9 @@ use db_schema::schema::{
 };
 use diesel::prelude::*;
 use newtypes::{
-    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocSubmissionId,
-    ComplianceDocTemplateId, ComplianceDocTemplateVersionId, TenantCompliancePartnershipId,
-    TenantOrPartnerTenantId,
+    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocReviewId,
+    ComplianceDocSubmissionId, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
+    TenantCompliancePartnershipId, TenantOrPartnerTenantId,
 };
 use std::collections::HashMap;
 
@@ -36,7 +36,7 @@ pub struct ComplianceDocSummary {
 
 impl ComplianceDocSummary {
     pub fn filter<'a>(
-        conn: &mut TxnPgConn,
+        conn: &mut PgConn,
         t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
         p_id: Option<TenantCompliancePartnershipId>,
         doc_id: Option<ComplianceDocId>,
@@ -58,8 +58,7 @@ impl ComplianceDocSummary {
                 query = query.filter(tenant_compliance_partnership::partner_tenant_id.eq(id))
             }
         }
-        let partnerships: Vec<(TenantCompliancePartnership, Tenant, PartnerTenant)> =
-            query.load(conn.conn())?;
+        let partnerships: Vec<(TenantCompliancePartnership, Tenant, PartnerTenant)> = query.load(conn)?;
 
         let mut summaries = HashMap::new();
         for (partnership, tenant, partner_tenant) in partnerships.into_iter() {
@@ -71,20 +70,20 @@ impl ComplianceDocSummary {
                 docs_query = docs_query.filter(compliance_doc::id.eq(doc_id));
             }
 
-            let docs: Vec<ComplianceDoc> = docs_query.select(ComplianceDoc::as_select()).load(conn.conn())?;
+            let docs: Vec<ComplianceDoc> = docs_query.select(ComplianceDoc::as_select()).load(conn)?;
             let docs: HashMap<_, _> = docs.into_iter().map(|r| (r.id.clone(), r)).collect();
 
             let doc_templates: Vec<ComplianceDocTemplate> = compliance_doc_template::table
                 .filter(compliance_doc_template::partner_tenant_id.eq(&partnership.partner_tenant_id))
                 .select(ComplianceDocTemplate::as_select())
-                .load(conn.conn())?;
+                .load(conn)?;
             let doc_templates: HashMap<_, _> = doc_templates.into_iter().map(|r| (r.id.clone(), r)).collect();
 
             let doc_template_versions: Vec<ComplianceDocTemplateVersion> =
                 compliance_doc_template_version::table
                     .filter(compliance_doc_template_version::template_id.eq_any(doc_templates.keys()))
                     .select(ComplianceDocTemplateVersion::as_select())
-                    .load(conn.conn())?;
+                    .load(conn)?;
             let doc_template_versions: HashMap<_, _> = doc_template_versions
                 .into_iter()
                 .map(|r| (r.id.clone(), r))
@@ -93,20 +92,20 @@ impl ComplianceDocSummary {
             let doc_requests: Vec<ComplianceDocRequest> = compliance_doc_request::table
                 .filter(compliance_doc_request::compliance_doc_id.eq_any(docs.keys()))
                 .select(ComplianceDocRequest::as_select())
-                .load(conn.conn())?;
+                .load(conn)?;
             let doc_requests: HashMap<_, _> = doc_requests.into_iter().map(|r| (r.id.clone(), r)).collect();
 
             let doc_submissions: Vec<ComplianceDocSubmission> = compliance_doc_submission::table
                 .filter(compliance_doc_submission::request_id.eq_any(doc_requests.keys()))
                 .select(ComplianceDocSubmission::as_select())
-                .load(conn.conn())?;
+                .load(conn)?;
             let doc_submissions: HashMap<_, _> =
                 doc_submissions.into_iter().map(|s| (s.id.clone(), s)).collect();
 
             let doc_reviews: Vec<ComplianceDocReview> = compliance_doc_review::table
                 .filter(compliance_doc_review::submission_id.eq_any(doc_submissions.keys()))
                 .select(ComplianceDocReview::as_select())
-                .load(conn.conn())?;
+                .load(conn)?;
             let doc_reviews: HashMap<_, _> = doc_reviews.into_iter().map(|r| (r.id.clone(), r)).collect();
 
             let summary = ComplianceDocSummary {
@@ -124,6 +123,59 @@ impl ComplianceDocSummary {
         }
 
         Ok(summaries)
+    }
+
+    pub fn newest_request_for_doc(&self, doc_id: &ComplianceDocId) -> Option<&ComplianceDocRequest> {
+        self.doc_requests
+            .values()
+            .filter(|r| r.compliance_doc_id == *doc_id)
+            .max_by_key(|r| r.created_at)
+    }
+
+    pub fn newest_submission_for_request(
+        &self,
+        request_id: &ComplianceDocRequestId,
+    ) -> Option<&ComplianceDocSubmission> {
+        self.doc_submissions
+            .values()
+            .filter(|s| s.request_id == *request_id)
+            .max_by_key(|s| s.created_at)
+    }
+
+    pub fn newest_review_for_submission(
+        &self,
+        submission_id: &ComplianceDocSubmissionId,
+    ) -> Option<&ComplianceDocReview> {
+        self.doc_reviews
+            .values()
+            .filter(|r| r.submission_id == *submission_id)
+            .max_by_key(|r| r.created_at)
+    }
+
+    pub fn num_controls_complete(&self) -> DbResult<i64> {
+        let mut count = 0;
+        for doc in self.docs.values() {
+            let Some(req) = self.newest_request_for_doc(&doc.id) else {
+                continue;
+            };
+
+            let Some(sub) = self.newest_submission_for_request(&req.id) else {
+                continue;
+            };
+
+            let Some(review) = self.newest_review_for_submission(&sub.id) else {
+                continue;
+            };
+
+            if review.decision == ComplianceDocReviewDecision::Accepted {
+                count += 1;
+            }
+        }
+        Ok(count)
+    }
+
+    pub fn num_controls_total(&self) -> i64 {
+        self.docs.len() as i64
     }
 }
 

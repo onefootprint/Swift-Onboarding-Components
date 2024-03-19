@@ -382,13 +382,13 @@
                 ]
             }
         },
-        "/compliance/companies": {
-            "get": {
+        "/compliance/org/members": {
+            "post": {
                 "tags": [
                     "Compliance",
                     "Private"
                 ],
-                "description": "Returns a summary of partnered companies for a compliance partner.",
+                "description": "Creates a new IAM user for the partner tenant. Sends an invite link via WorkOs.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -408,20 +408,20 @@
                 ]
             }
         },
-        "/compliance/org/members": {
-            "post": {
+        "/compliance/partners": {
+            "get": {
                 "tags": [
                     "Compliance",
                     "Private"
                 ],
-                "description": "Creates a new IAM user for the partner tenant. Sends an invite link via WorkOs.",
+                "description": "Returns a summary of partnered companies for a compliance partner.",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/GetComplianceCompaniesResponse"
                                 }
                             }
                         }
@@ -11022,6 +11022,47 @@
                     "expires_at",
                     "tenant",
                     "vault_fields"
+                ]
+            },
+            "GetComplianceCompaniesResponse": {
+                "type": "object",
+                "properties": {
+                    "companies": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "company_name": {
+                                    "type": "string"
+                                },
+                                "num_active_playbooks": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "num_controls_complete": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "num_controls_total": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "partnership_id": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "company_name",
+                                "num_active_playbooks",
+                                "num_controls_complete",
+                                "num_controls_total",
+                                "partnership_id"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "companies"
                 ]
             },
             "GetFieldValidationResponse": {

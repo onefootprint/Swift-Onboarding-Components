@@ -428,6 +428,8 @@ pub struct ObConfigurationQuery {
 
 pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>, Option<RuleSetVersion>);
 
+pub type TenantObConfigCounts = HashMap<TenantId, i64>;
+
 impl ObConfiguration {
     fn list_query(filters: &ObConfigurationQuery) -> BoxedQuery<Pg> {
         let mut query = ob_configuration::table
@@ -478,6 +480,24 @@ impl ObConfiguration {
     pub fn count(conn: &mut PgConn, query: &ObConfigurationQuery) -> DbResult<i64> {
         let count = Self::list_query(query).count().get_result(conn)?;
         Ok(count)
+    }
+
+    pub fn count_bulk(
+        conn: &mut PgConn,
+        tenant_ids: Vec<&TenantId>,
+        is_live: bool,
+    ) -> DbResult<TenantObConfigCounts> {
+        let counts: Vec<_> = ob_configuration::table
+            .filter(ob_configuration::is_live.eq(is_live))
+            .filter(ob_configuration::tenant_id.eq_any(&tenant_ids))
+            .group_by(ob_configuration::id)
+            .select((
+                ob_configuration::tenant_id,
+                diesel::dsl::count(ob_configuration::id),
+            ))
+            .load(conn)?;
+
+        Ok(counts.into_iter().collect())
     }
 
     #[tracing::instrument("ObConfiguration::get", skip_all)]

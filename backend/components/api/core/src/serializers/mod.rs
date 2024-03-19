@@ -5,6 +5,7 @@ mod audit_event;
 mod auth_event;
 mod authorized_org;
 mod business_owner;
+mod compliance;
 mod document;
 mod entity;
 mod identity_document;

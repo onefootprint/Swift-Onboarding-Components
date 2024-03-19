@@ -8,12 +8,12 @@ from tests.utils import (
 def test_partner_tenant_iam(tenant, partner_tenant):
     # Should be able to access a read-only compliance API with both partner
     # admin and read-only auth.
-    get("compliance/companies", {}, *partner_tenant.db_auths)
-    get("compliance/companies", {}, *partner_tenant.ro_db_auths)
+    get("compliance/partners", {}, *partner_tenant.db_auths)
+    get("compliance/partners", {}, *partner_tenant.ro_db_auths)
 
     # Regular tenant should not be able to access the partner APIs.
-    get("compliance/companies", {}, *tenant.db_auths, status_code=401)
-    get("compliance/companies", {}, *tenant.ro_db_auths, status_code=401)
+    get("compliance/partners", {}, *tenant.db_auths, status_code=401)
+    get("compliance/partners", {}, *tenant.ro_db_auths, status_code=401)
 
     # Should be able to access a admin compliance API only with partner
     # admin auth.
