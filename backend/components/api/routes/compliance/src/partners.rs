@@ -38,5 +38,5 @@ pub async fn get(
         .map(|summary| api_wire_types::ComplianceCompanySummary::try_from_db((summary, &counts)))
         .collect::<ApiResult<Vec<_>>>()?;
 
-    ResponseData::ok(GetComplianceCompaniesResponse { companies }).json()
+    ResponseData::ok(companies as GetComplianceCompaniesResponse).json()
 }

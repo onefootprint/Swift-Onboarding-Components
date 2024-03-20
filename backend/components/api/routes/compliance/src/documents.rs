@@ -1,9 +1,9 @@
 use crate::{types::JsonApiResponse, State};
 use api_core::{
     auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::{ApiResult, AssertionError},
+    errors::ApiResult,
     types::ResponseData,
-    utils::db2api::DbToApi,
+    utils::db2api::TryDbToApi,
     ApiError, ApiErrorKind,
 };
 use api_wire_types::GetComplianceDocumentsResponse;
@@ -27,47 +27,17 @@ pub async fn get(
 
     let partnership_id = partnership_id.into_inner();
 
-    let documents = state
+    let summary = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(partnership_id), None)?
                 .into_values()
                 .next()
                 .ok_or(ApiError::from(ApiErrorKind::ResourceNotFound))?;
-
-            let documents = summary
-                .docs
-                .keys()
-                .map(|doc_id| {
-                    let (req, sub, _) = summary.newest_resources_for_doc(doc_id)?;
-                    let status = summary.status_for_doc(doc_id)?;
-
-                    let assigned_to = sub
-                        .and_then(|sub| sub.assigned_to_partner_tenant_user_id.as_ref())
-                        .map(|user_id| -> ApiResult<_> {
-                            let user = summary
-                                .users
-                                .get(user_id)
-                                .ok_or(AssertionError("user not present in ComplianceDocSummary"))?;
-                            Ok(api_wire_types::LiteOrgMember::from_db(user.clone()))
-                        })
-                        .transpose()?;
-
-                    let last_updated = summary.last_updated(doc_id)?;
-
-                    Ok(api_wire_types::ComplianceDocSummary {
-                        id: doc_id.clone(),
-                        name: req.name.clone(),
-                        status,
-                        assigned_to,
-                        last_updated,
-                    })
-                })
-                .collect::<ApiResult<Vec<_>>>()?;
-
-            Ok(documents)
+            Ok(summary)
         })
         .await?;
 
-    ResponseData::ok(GetComplianceDocumentsResponse { documents }).json()
+    let resp = api_wire_types::GetComplianceDocumentsResponse::try_from_db(&summary)?;
+    ResponseData::ok(resp).json()
 }
