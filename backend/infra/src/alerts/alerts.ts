@@ -56,13 +56,6 @@ const staticAlerts: Alert[] = [
           op: '>=',
           value: 500,
         },
-        // Unfortunately, this will silence all 5xx errors for this API. But there are regularly
-        // 504s on which we don't want to alert
-        {
-          column: 'http.route',
-          op: '!=',
-          value: '/hosted/user/documents/{id}/upload/{side}',
-        },
       ],
       filter_combination: 'AND',
     },
@@ -278,21 +271,6 @@ const staticAlerts: Alert[] = [
           column: 'sc_status',
           op: '>=',
           value: 500,
-        },
-        {
-          column: 'cs_uri_stem',
-          op: 'does-not-contain',
-          value: '/upload/front',
-        },
-        {
-          column: 'cs_uri_stem',
-          op: 'does-not-contain',
-          value: '/upload/back',
-        },
-        {
-          column: 'cs_uri_stem',
-          op: 'does-not-contain',
-          value: '/upload/selfie',
         },
       ],
       filter_combination: 'AND',
