@@ -91,9 +91,7 @@ const processPlaybook = ({
 
   let docScanForOptionalSsn;
   if (ssnDocScanStepUp && idDocKind?.length > 0) {
-    const docKinds = idDocKind.join(',');
-    const selfieParam = selfie ? 'require_selfie' : 'none';
-    docScanForOptionalSsn = `document.${docKinds}.none.${selfieParam}`;
+    docScanForOptionalSsn = docString;
   }
 
   const isDocFirstFlow =

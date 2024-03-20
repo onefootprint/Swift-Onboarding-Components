@@ -21,7 +21,7 @@ const DocEditor = ({ onDone }: DocEditorProps) => {
     selectedGlobalDocs,
     selectedCountrySpecificDocs,
   });
-  const allowSave =
+  const hasDocs =
     selectedGlobalDocs.length > 0 ||
     Object.keys(selectedCountrySpecificDocs).length > 0;
 
@@ -35,6 +35,8 @@ const DocEditor = ({ onDone }: DocEditorProps) => {
   };
 
   const handleSave = () => {
+    if (hasDocs) setValue('personal.idDoc', true);
+    else setValue('personal.idDoc', false);
     onDone();
   };
 
@@ -42,12 +44,7 @@ const DocEditor = ({ onDone }: DocEditorProps) => {
     <>
       <Document />
       <ButtonContainer>
-        <Button
-          fullWidth
-          variant="primary"
-          onClick={handleSave}
-          disabled={!allowSave}
-        >
+        <Button fullWidth variant="primary" onClick={handleSave}>
           {allT('save')}
         </Button>
         <Button variant="secondary" fullWidth onClick={handleCancel}>

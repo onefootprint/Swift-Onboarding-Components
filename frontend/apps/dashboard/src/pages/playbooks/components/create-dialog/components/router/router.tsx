@@ -12,6 +12,7 @@ import { getAuthFixedPayload, isAuth, isIdDoc } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
 import type {
   MachineContext,
+  Personal,
   VerificationChecksFormData,
 } from '@/playbooks/utils/machine/types';
 
@@ -151,6 +152,14 @@ const Router = ({ onCreate }: RouterProps) => {
               send('navigationBackward');
             }}
             onSubmit={formData => {
+              const { allowInternationalResidents } = formData;
+              if (allowInternationalResidents) {
+                defaultValues.playbook.personal.ssn = false;
+                (defaultValues.playbook.personal as Personal).ssnOptional =
+                  false;
+                (defaultValues.playbook.personal as Personal).ssnKind =
+                  undefined;
+              }
               send('residencySubmitted', {
                 payload: { formData },
               });
