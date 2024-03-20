@@ -56,10 +56,10 @@ pub fn create_token(
     }
 
     if key.is_some() && !kind.allow_obc_key() {
-        return Err(ValidationError("Cannot provide playbook key for this operation").into());
+        return Err(ValidationError("Cannot provide playbook key for this token kind").into());
     }
     if limit_auth_methods.is_some() && !kind.allow_limit_auth_methods() {
-        return Err(ValidationError("Cannot provide limit_auth_methods for this operation").into());
+        return Err(ValidationError("Cannot provide limit_auth_methods for this token kind").into());
     }
 
     // Determine arguments for the auth token based on the requested operation
