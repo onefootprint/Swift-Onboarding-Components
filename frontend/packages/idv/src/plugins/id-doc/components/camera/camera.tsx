@@ -5,7 +5,7 @@ import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import { useTimeout } from 'usehooks-ts';
+import { useInterval, useTimeout } from 'usehooks-ts';
 
 import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
@@ -80,6 +80,7 @@ const CountDownProps = {
   countStart: AUTOCAPTURE_TIMER_START_VAL,
   intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
 };
+const PLAY_CHECK_INTERVAL = 3000;
 
 const logError = (e: string) => Logger.error(e, 'camera');
 const logWarn = (e: string) => Logger.warn(e, 'camera');
@@ -179,6 +180,7 @@ const Camera = ({
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [shouldDetect, setShouldDetect] = useState(false); // auto-detect control
   const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
+  const [onCanPlayTriggered, setOnCanPlayTriggered] = useState(false);
 
   const videoSize = useSize(videoRef);
   const [
@@ -207,7 +209,7 @@ const Camera = ({
   const handlePlayError = (err: unknown) => {
     const error = err as DOMException;
     if (error.name === 'NotAllowedError') {
-      setShowPlayAllowDialog(true);
+      if (!showPlayAllowDialog) setShowPlayAllowDialog(true);
       logWarn(
         'Video element status: play not allowed - prompting user interaction',
       );
@@ -217,23 +219,38 @@ const Camera = ({
   };
 
   const handleCanPlay = () => {
+    setOnCanPlayTriggered(true);
     logWarn('Video triggered onCanPlay');
-    if (isVideoPlaying) {
-      logError('Video already playing');
-      return;
-    }
-    if (!videoRef.current) {
-      logError('Video ref not initialized');
-      return;
-    }
-    videoRef.current
-      .play()
-      .then(() => {
-        logWarn('Video element status: started playing');
-        setIsVideoPlaying(true);
-      })
-      .catch(handlePlayError);
   };
+
+  useInterval(
+    () => {
+      logWarn(
+        `Loading video camera - mediaStream state: ${
+          mediaStream ? 'defined' : 'undefined'
+        }, mediaStream active: ${mediaStream?.active}, onCanPlayTriggered: ${onCanPlayTriggered}, isVideoPlaying: ${isVideoPlaying}`,
+      );
+      if (!onCanPlayTriggered) {
+        return;
+      }
+      if (isVideoPlaying) {
+        logWarn('Video already playing');
+        return;
+      }
+      if (!videoRef.current) {
+        logError('Video ref not initialized');
+        return;
+      }
+      videoRef.current
+        .play()
+        .then(() => {
+          logWarn('Video element status: started playing');
+          setIsVideoPlaying(true);
+        })
+        .catch(handlePlayError);
+    },
+    isVideoPlaying ? null : PLAY_CHECK_INTERVAL,
+  );
 
   const handlePlayAllow = () => {
     setShowPlayAllowDialog(false);
