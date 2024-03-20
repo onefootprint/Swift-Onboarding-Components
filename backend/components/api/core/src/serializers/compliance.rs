@@ -10,7 +10,7 @@ impl TryDbToApi<(&ComplianceDocSummary, &TenantObConfigCounts)> for api_wire_typ
         let num_active_playbooks = counts.get(&summary.tenant.id).copied().unwrap_or(0);
 
         Ok(api_wire_types::ComplianceCompanySummary {
-            partnership_id: summary.partnership.id.clone(),
+            id: summary.partnership.id.clone(),
             company_name: summary.tenant.name.clone(),
             num_controls_complete,
             num_controls_total,

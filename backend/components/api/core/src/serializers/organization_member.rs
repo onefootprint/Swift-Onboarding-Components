@@ -62,3 +62,19 @@ impl DbToApi<AuthedOrgMemberInfo> for api_wire_types::AuthOrgMember {
         }
     }
 }
+
+impl DbToApi<TenantUser> for api_wire_types::LiteOrgMember {
+    fn from_db(user: TenantUser) -> Self {
+        let TenantUser {
+            id,
+            first_name,
+            last_name,
+            ..
+        } = user;
+        Self {
+            id,
+            first_name,
+            last_name,
+        }
+    }
+}

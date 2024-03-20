@@ -37,3 +37,14 @@ pub struct AuthOrgMember {
     pub scopes: Vec<TenantScope>,
     pub tenant: Organization,
 }
+
+/// Limited information about member of organization
+///
+/// Intended to be non-sensitive information only, that may be shared between tenants/partner
+/// tenants.
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+pub struct LiteOrgMember {
+    pub id: TenantUserId,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+}

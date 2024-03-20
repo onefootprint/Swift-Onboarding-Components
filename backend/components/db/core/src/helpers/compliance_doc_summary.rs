@@ -4,22 +4,24 @@ use crate::{
         compliance_doc_review::ComplianceDocReview, compliance_doc_submission::ComplianceDocSubmission,
         compliance_doc_template::ComplianceDocTemplate,
         compliance_doc_template_version::ComplianceDocTemplateVersion, partner_tenant::PartnerTenant,
-        tenant::Tenant, tenant_compliance_partnership::TenantCompliancePartnership,
+        tenant::Tenant, tenant_compliance_partnership::TenantCompliancePartnership, tenant_user::TenantUser,
     },
-    DbResult, PgConn,
+    DbError, DbResult, PgConn,
 };
+use chrono::{DateTime, Utc};
 use db_schema::schema::{
     compliance_doc, compliance_doc_request, compliance_doc_review, compliance_doc_submission,
     compliance_doc_template, compliance_doc_template_version, partner_tenant, tenant,
     tenant_compliance_partnership,
 };
 use diesel::prelude::*;
+use itertools::chain;
 use newtypes::{
     ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocReviewId,
-    ComplianceDocSubmissionId, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
-    TenantCompliancePartnershipId, TenantOrPartnerTenantId,
+    ComplianceDocStatus, ComplianceDocSubmissionId, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
+    TenantCompliancePartnershipId, TenantOrPartnerTenantId, TenantUserId,
 };
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone)]
 pub struct ComplianceDocSummary {
@@ -32,6 +34,7 @@ pub struct ComplianceDocSummary {
     pub doc_requests: HashMap<ComplianceDocRequestId, ComplianceDocRequest>,
     pub doc_submissions: HashMap<ComplianceDocSubmissionId, ComplianceDocSubmission>,
     pub doc_reviews: HashMap<ComplianceDocReviewId, ComplianceDocReview>,
+    pub users: HashMap<TenantUserId, TenantUser>,
 }
 
 impl ComplianceDocSummary {
@@ -108,6 +111,22 @@ impl ComplianceDocSummary {
                 .load(conn)?;
             let doc_reviews: HashMap<_, _> = doc_reviews.into_iter().map(|r| (r.id.clone(), r)).collect();
 
+            let user_ids: HashSet<&TenantUserId> = chain!(
+                doc_requests.values().flat_map(|r| chain!(
+                    Some(&r.requested_by_partner_tenant_user_id),
+                    r.assigned_to_tenant_user_id.as_ref(),
+                )),
+                doc_submissions.values().flat_map(|s| chain!(
+                    Some(&s.submitted_by_tenant_user_id),
+                    s.assigned_to_partner_tenant_user_id.as_ref(),
+                )),
+                doc_reviews
+                    .values()
+                    .map(|r| &r.reviewed_by_partner_tenant_user_id),
+            )
+            .collect();
+            let users = TenantUser::get_bulk(conn, user_ids.into_iter().collect())?;
+
             let summary = ComplianceDocSummary {
                 partnership,
                 tenant,
@@ -118,6 +137,7 @@ impl ComplianceDocSummary {
                 doc_requests,
                 doc_submissions,
                 doc_reviews,
+                users,
             };
             summaries.insert(summary.partnership.id.clone(), summary);
         }
@@ -125,11 +145,19 @@ impl ComplianceDocSummary {
         Ok(summaries)
     }
 
-    pub fn newest_request_for_doc(&self, doc_id: &ComplianceDocId) -> Option<&ComplianceDocRequest> {
-        self.doc_requests
+    pub fn newest_request_for_doc(&self, doc_id: &ComplianceDocId) -> DbResult<&ComplianceDocRequest> {
+        let req = self
+            .doc_requests
             .values()
             .filter(|r| r.compliance_doc_id == *doc_id)
-            .max_by_key(|r| r.created_at)
+            .max_by_key(|r| r.created_at);
+
+        let Some(req) = req else {
+            return Err(DbError::AssertionError(
+                "invalid state: no request for document".to_owned(),
+            ));
+        };
+        Ok(req)
     }
 
     pub fn newest_submission_for_request(
@@ -155,20 +183,11 @@ impl ComplianceDocSummary {
     pub fn num_controls_complete(&self) -> DbResult<i64> {
         let mut count = 0;
         for doc in self.docs.values() {
-            let Some(req) = self.newest_request_for_doc(&doc.id) else {
-                continue;
-            };
-
-            let Some(sub) = self.newest_submission_for_request(&req.id) else {
-                continue;
-            };
-
-            let Some(review) = self.newest_review_for_submission(&sub.id) else {
-                continue;
-            };
-
-            if review.decision == ComplianceDocReviewDecision::Accepted {
-                count += 1;
+            let (_, _, review) = self.newest_resources_for_doc(&doc.id)?;
+            if let Some(review) = review {
+                if review.decision == ComplianceDocReviewDecision::Accepted {
+                    count += 1;
+                }
             }
         }
         Ok(count)
@@ -176,6 +195,56 @@ impl ComplianceDocSummary {
 
     pub fn num_controls_total(&self) -> i64 {
         self.docs.len() as i64
+    }
+
+    pub fn newest_resources_for_doc(
+        &self,
+        doc_id: &ComplianceDocId,
+    ) -> DbResult<(
+        &ComplianceDocRequest,
+        Option<&ComplianceDocSubmission>,
+        Option<&ComplianceDocReview>,
+    )> {
+        let req = self.newest_request_for_doc(doc_id)?;
+        let sub = self.newest_submission_for_request(&req.id);
+        let rev = sub.and_then(|s| self.newest_review_for_submission(&s.id));
+        Ok((req, sub, rev))
+    }
+
+    pub fn status_for_doc(&self, doc_id: &ComplianceDocId) -> DbResult<ComplianceDocStatus> {
+        let (_, sub, rev) = self.newest_resources_for_doc(doc_id)?;
+
+        let status = match (sub, rev) {
+            (None, None) => ComplianceDocStatus::WaitingForUpload,
+            (Some(_), None) => ComplianceDocStatus::WaitingForReview,
+            (Some(_), Some(rev)) => match rev.decision {
+                ComplianceDocReviewDecision::Accepted => ComplianceDocStatus::Accepted,
+                ComplianceDocReviewDecision::Rejected => {
+                    return Err(DbError::AssertionError(
+                        "invalid state: review rejected without new request".to_owned(),
+                    ));
+                }
+            },
+            (None, Some(_)) => {
+                return Err(DbError::AssertionError(
+                    "invalid state: review without submission".to_owned(),
+                ));
+            }
+        };
+        Ok(status)
+    }
+
+    pub fn last_updated(&self, doc_id: &ComplianceDocId) -> DbResult<Option<DateTime<Utc>>> {
+        let (req, sub, rev) = self.newest_resources_for_doc(doc_id)?;
+
+        let dates = [
+            Some(req.created_at),
+            req.deactivated_at,
+            sub.map(|s| s.created_at),
+            rev.map(|r| r.created_at),
+        ];
+
+        Ok(dates.iter().flatten().max().copied())
     }
 }
 
@@ -282,5 +351,8 @@ mod tests {
             .doc_reviews
             .values()
             .all(|r| summary.doc_submissions.contains_key(&r.submission_id)));
+
+        // Partner tenant user and tenant user.
+        assert_eq!(summary.users.len(), 2);
     }
 }

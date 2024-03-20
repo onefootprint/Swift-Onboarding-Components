@@ -13,3 +13,9 @@ pub struct CompliancePartnershipRequest {
 pub struct GetComplianceCompaniesResponse {
     pub companies: Vec<ComplianceCompanySummary>,
 }
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct GetComplianceDocumentsResponse {
+    pub documents: Vec<ComplianceDocSummary>,
+}

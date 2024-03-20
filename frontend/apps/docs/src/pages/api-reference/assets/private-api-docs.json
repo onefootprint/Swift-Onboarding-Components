@@ -434,6 +434,43 @@
                 ]
             }
         },
+        "/compliance/partners/{partnership_id}/documents": {
+            "get": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Returns a list of documents for a company partned with the authorized compliance partner.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetComplianceDocumentsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/entities/client_token": {
             "get": {
                 "tags": [
@@ -11035,6 +11072,9 @@
                                 "company_name": {
                                     "type": "string"
                                 },
+                                "id": {
+                                    "type": "string"
+                                },
                                 "num_active_playbooks": {
                                     "type": "integer",
                                     "format": "int64"
@@ -11046,23 +11086,77 @@
                                 "num_controls_total": {
                                     "type": "integer",
                                     "format": "int64"
-                                },
-                                "partnership_id": {
-                                    "type": "string"
                                 }
                             },
                             "required": [
                                 "company_name",
+                                "id",
                                 "num_active_playbooks",
                                 "num_controls_complete",
-                                "num_controls_total",
-                                "partnership_id"
+                                "num_controls_total"
                             ]
                         }
                     }
                 },
                 "required": [
                     "companies"
+                ]
+            },
+            "GetComplianceDocumentsResponse": {
+                "type": "object",
+                "properties": {
+                    "documents": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "assigned_to": {
+                                    "description": "Limited information about member of organization\n\n Intended to be non-sensitive information only, that may be shared between tenants/partner\n tenants.",
+                                    "type": "object",
+                                    "properties": {
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "last_name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "last_updated": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "enum": [
+                                        "WaitingForUpload",
+                                        "WaitingForReview",
+                                        "Accepted"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "name",
+                                "status"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "documents"
                 ]
             },
             "GetFieldValidationResponse": {

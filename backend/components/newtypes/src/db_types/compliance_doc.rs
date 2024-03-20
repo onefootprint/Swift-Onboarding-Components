@@ -4,6 +4,7 @@ use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use serde_json;
+use serde_with::SerializeDisplay;
 use strum_macros::{AsRefStr, Display, EnumString};
 
 #[derive(
@@ -12,12 +13,12 @@ use strum_macros::{AsRefStr, Display, EnumString};
     PartialEq,
     Ord,
     PartialOrd,
-    Display,
     Hash,
     Clone,
     Copy,
     Deserialize,
-    Serialize,
+    Display,
+    SerializeDisplay,
     Apiv2Schema,
     AsExpression,
     FromSqlRow,
@@ -25,7 +26,6 @@ use strum_macros::{AsRefStr, Display, EnumString};
     AsRefStr,
 )]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum ComplianceDocReviewDecision {
     Accepted,
@@ -34,10 +34,7 @@ pub enum ComplianceDocReviewDecision {
 
 impl_enum_str_diesel!(ComplianceDocReviewDecision);
 
-#[derive(
-    Display, Debug, Clone, Eq, PartialEq, Serialize, Deserialize, AsJsonb, Apiv2Schema, macros::SerdeAttr,
-)]
-#[strum(serialize_all = "snake_case")]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, AsJsonb, Apiv2Schema, macros::SerdeAttr)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum ComplianceDocData {
@@ -46,4 +43,12 @@ pub enum ComplianceDocData {
         s3_url: S3Url,
         e_data_key: SealedVaultDataKey,
     },
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Apiv2Schema, SerializeDisplay, Display)]
+#[strum(serialize_all = "snake_case")]
+pub enum ComplianceDocStatus {
+    WaitingForUpload,
+    WaitingForReview,
+    Accepted,
 }
