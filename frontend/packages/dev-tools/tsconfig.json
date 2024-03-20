@@ -4,6 +4,7 @@
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "composite": true,
+    "outDir": "./dist",
     "types": ["bun-types", "google.maps", "jest"]
   }
 }

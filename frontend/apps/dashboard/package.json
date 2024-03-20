@@ -8,7 +8,7 @@
     "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui,request",
     "i18n:clean": "rm -rf ./public/locales/",
     "dev": "yarn i18n:copy-watch & next dev -p 3001",
-    "build": "next build",
+    "build": "NODE_OPTIONS=--max-old-space-size=9216 next build",
     "build:analyze": "ANALYZE=true yarn build",
     "start": "next start -p 3001",
     "test": "jest",
@@ -18,7 +18,6 @@
     "lint:ci": "eslint src",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "typecheck": "yarn tsc --build",
-    "posttypecheck": "yarn tsc --build --clean",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },

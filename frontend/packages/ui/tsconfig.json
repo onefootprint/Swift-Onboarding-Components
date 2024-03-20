@@ -1,9 +1,10 @@
 {
   "extends": "tsconfig/react-library.json",
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "./src/**/locales/**/*.json"],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "composite": true,
+    "outDir": "./dist",
     "types": ["../../styled.d.ts", "google.maps"]
   }
 }

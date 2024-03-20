@@ -1,19 +1,7 @@
 {
   "extends": "tsconfig/nextjs.json",
   "exclude": ["node_modules"],
-  "include": [
-    "next-env.d.ts",
-    "./src/**/*",
-    "../../../frontend/packages/design-tokens/src/**/*",
-    "../../../frontend/packages/dev-tools/src/**/*",
-    "../../../frontend/packages/global-constants/src/**/*",
-    "../../../frontend/packages/hooks/src/**/*",
-    "../../../frontend/packages/icons/src/**/*",
-    "../../../frontend/packages/request/src/**/*",
-    "../../../frontend/packages/test-utils/src/**/*",
-    "../../../frontend/packages/types/src/**/*",
-    "../../../frontend/packages/ui/src/**/*"
-  ],
+  "include": ["next-env.d.ts", "./src/**/*"],
   "references": [
     { "path": "../../../frontend/packages/design-tokens" },
     { "path": "../../../frontend/packages/dev-tools" },
