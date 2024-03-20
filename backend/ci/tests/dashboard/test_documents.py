@@ -7,7 +7,7 @@ from tests.utils import (
 )
 
 from tests.bifrost_client import BifrostClient
-from tests.utils import compare_contents, compare_b64_contents, multipart_file
+from tests.utils import compare_contents, compare_b64_contents, open_multipart_file
 
 
 @pytest.fixture(scope="session")
@@ -130,7 +130,7 @@ def test_get_entity_documents_uploaded_via_api(sandbox_tenant):
         f"users/{fp_id}/vault/document.drivers_license.front.image/upload",
         None,
         sandbox_tenant.sk.key,
-        files=multipart_file("drivers_license.front.png", "image/png"),
+        files=open_multipart_file("drivers_license.front.png", "image/png")(),
     )
 
     body = get(f"entities/{fp_id}/documents", None, *sandbox_tenant.db_auths)

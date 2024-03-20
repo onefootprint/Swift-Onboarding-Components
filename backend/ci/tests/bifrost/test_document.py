@@ -1,6 +1,6 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config, post, get, get_requirement_from_requirements
+from tests.utils import create_ob_config, open_multipart_file, post, get, get_requirement_from_requirements
 
 
 @pytest.fixture(scope="session")
@@ -39,11 +39,12 @@ def test_upload_documents(doc_request_sandbox_ob_config):
     id = post("hosted/user/documents", data, bifrost.auth_token)["id"]
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
+    import copy 
     post(
         f"hosted/user/documents/{id}/upload/front",
         None,
         bifrost.auth_token,
-        files=bifrost.data["document.drivers_license.front.image"],
+        files=bifrost.data["document.drivers_license.front.image"](),
     )
 
     data = {
@@ -273,7 +274,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config):
             f"hosted/user/documents/{doc_id}/upload/{side}",
             None,
             bifrost.auth_token,
-            files=bifrost.data[f"document.drivers_license.{side}.image"],
+            files=bifrost.data[f"document.drivers_license.{side}.image"](),
             addl_headers=headers,
         )
         post(f"hosted/user/documents/{doc_id}/process", None, bifrost.auth_token)
@@ -329,7 +330,7 @@ def test_upload_apis(doc_request_sandbox_ob_config):
             f"hosted/user/documents/{doc_id}/upload/{side}",
             None,
             bifrost.auth_token,
-            files=bifrost.data[f"document.drivers_license.{side}.image"],
+            files=bifrost.data[f"document.drivers_license.{side}.image"](),
             addl_headers=headers,
         )
         body = post(f"hosted/user/documents/{doc_id}/process", None, bifrost.auth_token)
@@ -348,4 +349,37 @@ def test_upload_apis(doc_request_sandbox_ob_config):
     # We set is_extra_compressed for the front of this document
     assert all(
         [d["is_extra_compressed"] == (d["side"] == "front") for d in body[0]["uploads"]]
+    )
+
+
+def test_user_uploading_small_image(doc_request_sandbox_ob_config):
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_requirements(kind="liveness")
+    status = bifrost.get_status()
+    # consent
+    consent_data = {"consent_language_text": "I consent"}
+    post("hosted/user/consent", consent_data, bifrost.auth_token)
+
+    data = {
+        "document_type": "drivers_license",
+        "country_code": "US",
+        "skip_selfie": True,
+        "device_type": "desktop",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token)
+    doc_id = body["id"]
+
+    
+    body = post(
+        f"hosted/user/documents/{doc_id}/upload/front",
+        None,
+        bifrost.auth_token,
+        files=open_multipart_file(
+                "small_image.png", "image/png"
+            )(),
+        status_code=400
+    )
+    assert body["error"]["message"].startswith(
+        "Image too small"
     )

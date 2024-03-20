@@ -15,7 +15,7 @@ from tests.webauthn_simulator import SoftWebauthnDevice
 from tests.identify_client import IdentifyClient
 from tests.utils import (
     _gen_random_sandbox_id,
-    multipart_file,
+    open_multipart_file,
     _gen_random_ssn,
     get,
     post,
@@ -109,16 +109,16 @@ class BifrostClient:
             **ID_DATA,
             **BUSINESS_DATA,
             **IP_DATA,
-            "document.finra_compliance_letter": multipart_file(
+            "document.finra_compliance_letter": open_multipart_file(
                 "example_pdf.pdf", "application/pdf"
             ),
-            "document.drivers_license.front.image": multipart_file(
+            "document.drivers_license.front.image": open_multipart_file(
                 "drivers_license.front.png", "image/png"
             ),
-            "document.drivers_license.back.image": multipart_file(
+            "document.drivers_license.back.image": open_multipart_file(
                 "drivers_license.back.png", "image/png"
             ),
-            "document.drivers_license.selfie.image": multipart_file(
+            "document.drivers_license.selfie.image": open_multipart_file(
                 "drivers_license.selfie.png", "image/png"
             ),
             "id.ssn9": ssn9,
@@ -271,7 +271,7 @@ class BifrostClient:
         declarations = self.data["investor_profile.declarations"]
         if doc_required_declarations & set(declarations):
             path = "/hosted/user/upload/document.finra_compliance_letter"
-            file = self.data["document.finra_compliance_letter"]
+            file = self.data["document.finra_compliance_letter"]()
             post(path, None, self.auth_token, files=file)
 
     def handle_collect_document(self, requirement):
@@ -300,29 +300,20 @@ class BifrostClient:
         if requirement["should_collect_selfie"]:
             sides.append("selfie")
 
-        data = {
-            "document_type": doc_kind,
-            "country_code": "US",
-        }
+        data = {"document_type": doc_kind,"country_code": "US",}
         body = post("hosted/user/documents", data, self.auth_token)
         doc_id = body["id"]
 
         # Upload the documents consecutively in separate requests
         for i, side in enumerate(sides):
-            file = self.data[f"document.drivers_license.{side}.image"]
+            file = self.data[f"document.drivers_license.{side}.image"]()
             headers = {
                 "x-fp-is-app-clip": "true",
                 "x-fp-is-instant-app": "false",
                 "x-fp-is-mobile": "true",
                 "x-fp-process-separately": "true",
             }
-            post(
-                f"hosted/user/documents/{doc_id}/upload/{side}",
-                None,
-                self.auth_token,
-                files=file,
-                addl_headers=headers,
-            )
+            post(f"hosted/user/documents/{doc_id}/upload/{side}",None,self.auth_token,files=file,addl_headers=headers,)
             body = post(
                 f"hosted/user/documents/{doc_id}/process", None, self.auth_token
             )

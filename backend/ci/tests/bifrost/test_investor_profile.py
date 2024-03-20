@@ -5,7 +5,7 @@ from tests.utils import (
     post,
     get_requirement_from_requirements,
     file_contents,
-    multipart_file,
+    open_multipart_file,
     get,
 )
 from tests.constants import IP_DATA
@@ -105,7 +105,7 @@ def test_invalid_doc_upload(incomplete_client):
         "/hosted/user/upload/document.finra_compliance_letter",
         None,
         incomplete_client.auth_token,
-        files=multipart_file("example_txt.txt", "text/plain"),
+        files=open_multipart_file("example_txt.txt", "text/plain")(),
         status_code=400,
     )
     assert res["error"]["message"] == "Invalid file type"
@@ -130,7 +130,7 @@ def test_doc_reupload(sandbox_tenant, investor_profile_ob_config):
     # First upload one document
     bifrost.handle_ip_doc()
     # Then change the document and run again
-    bifrost.data["document.finra_compliance_letter"] = multipart_file(
+    bifrost.data["document.finra_compliance_letter"] = open_multipart_file(
         "example_pdf2.pdf", "application/pdf"
     )
     user = bifrost.run()

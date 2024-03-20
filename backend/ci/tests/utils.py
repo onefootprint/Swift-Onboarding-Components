@@ -351,9 +351,11 @@ def override_webauthn_attestation(attestation):
 def file_path(filename):
     return os.path.join(os.path.dirname(__file__), "resources/", filename)
 
-
-def multipart_file(filename, mime_type):
-    return {"upload_file": (filename, open(file_path(filename), "rb"), mime_type)}
+# returns a fn that will return a buffered reader
+def open_multipart_file(filename, mime_type):
+    def multi_part_inner():
+        return {"upload_file": (filename, open(file_path(filename), "rb"), mime_type)}
+    return multi_part_inner
 
 
 def file_contents(filename):

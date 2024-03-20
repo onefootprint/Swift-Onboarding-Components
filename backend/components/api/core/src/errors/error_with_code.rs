@@ -63,6 +63,8 @@ pub enum ErrorWithCode {
     ExistingVault(SessionAuthToken),
     #[strum(message = "E121", detailed_message = "File upload exceeded time limit")]
     FileUploadTimeout,
+    #[strum(message = "E122", detailed_message = "Image too small")]
+    FileTooSmall(usize),
 }
 
 impl ErrorWithCode {
@@ -82,6 +84,7 @@ impl ErrorWithCode {
             Self::InvalidMimeType(_) => StatusCode::BAD_REQUEST,
             Self::MultipartError => StatusCode::BAD_REQUEST,
             Self::FileTooLarge(_) => StatusCode::BAD_REQUEST,
+            Self::FileTooSmall(_) => StatusCode::BAD_REQUEST,
             Self::InvalidContentLength => StatusCode::BAD_REQUEST,
             Self::MissingFilename => StatusCode::BAD_REQUEST,
             Self::NoSessionFound => StatusCode::UNAUTHORIZED,
