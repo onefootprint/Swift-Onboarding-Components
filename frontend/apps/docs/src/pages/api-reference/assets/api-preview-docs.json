@@ -1801,11 +1801,11 @@
                     },
                     "link": {
                         "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
-                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow.",
+                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow. This is useful to send in an automated message to the end user.",
                         "type": "string"
                     },
                     "token": {
-                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow.",
+                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow. This is useful when you'd like to open a native interface inside your app for the user to complete the flow.",
                         "type": "string"
                     }
                 },

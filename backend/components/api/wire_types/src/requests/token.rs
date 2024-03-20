@@ -77,9 +77,9 @@ pub struct CreateEntityTokenRequest {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateTokenResponse {
-    /// A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow.
+    /// A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow. This is useful when you'd like to open a native interface inside your app for the user to complete the flow.
     pub token: SessionAuthToken,
-    /// A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow.
+    /// A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow. This is useful to send in an automated message to the end user.
     #[openapi(example = "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt")]
     pub link: PiiString,
     /// The time at which the token (and link) expire
