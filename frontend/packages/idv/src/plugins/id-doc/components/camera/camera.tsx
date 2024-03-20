@@ -217,7 +217,15 @@ const Camera = ({
   };
 
   const handleCanPlay = () => {
-    if (!videoRef.current || isVideoPlaying) return;
+    logWarn('Video triggered onCanPlay');
+    if (isVideoPlaying) {
+      logError('Video already playing');
+      return;
+    }
+    if (!videoRef.current) {
+      logError('Video ref not initialized');
+      return;
+    }
     videoRef.current
       .play()
       .then(() => {
