@@ -12,32 +12,21 @@ export type AnimatedLoadingSpinnerProps = {
   ariaLabel?: string;
 };
 
-const spinnerVariants = {
+const getSpinnerVariants = (size: number) => ({
   animate: {
-    strokeDashoffset: [
-      -180, -210, -240, -270, -300, -330, -360, -390, -420, -450, -480, -510,
-      -540, -570, -600, -630, -660, -690, -720, 0, -30, -60, -90, -120, -150,
-      -180,
-    ],
-    rotate: [0, 360],
+    strokeDashoffset: [size, (size * 11) / 16, size],
+    rotate: 360,
     transition: {
-      strokeDashoffset: {
-        repeat: Infinity,
-        duration: 20,
-        ease: 'linear',
-      },
-      rotate: {
-        repeat: Infinity,
-        duration: 4,
-        ease: 'linear',
-      },
+      repeat: Infinity,
+      duration: 2,
+      ease: 'linear',
     },
   },
   initial: {
-    strokeDashoffset: 0,
+    strokeDashoffset: size,
     rotate: 0,
   },
-};
+});
 
 const AnimatedLoadingSpinner = ({
   animationStart = true,
@@ -53,6 +42,7 @@ const AnimatedLoadingSpinner = ({
   const radius = (size - strokeWidth) / 3;
   const circumference = radius * 2 * Math.PI;
   const adjustedCircumference = circumference * 0.75;
+  const spinnerVariants = getSpinnerVariants(size);
 
   return (
     <Container
