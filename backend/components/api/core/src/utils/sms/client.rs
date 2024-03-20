@@ -1,7 +1,4 @@
-use super::{
-    super::challenge_rate_limit::RateLimit,
-    vendors::{Pinpoint, SmsVendor, TwilioSms, TwilioWhatsapp},
-};
+use super::{super::challenge_rate_limit::RateLimit, vendors::SmsVendorKind};
 use crate::{
     errors::{user::UserError, ApiError, ApiResult, AssertionError},
     State,
@@ -10,8 +7,11 @@ use aws_credential_types::provider::SharedCredentialsProvider;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::tenant::Tenant;
-use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use newtypes::{sms_message::SmsMessage, Base64Data, PhoneNumber, PiiString, SandboxId, VaultId};
+use feature_flag::{BoolFlag, FeatureFlagClient, JsonFlag, LaunchDarklyFeatureFlagClient};
+use itertools::Itertools;
+use newtypes::{
+    output::Csv, sms_message::SmsMessage, Base64Data, PhoneNumber, PiiString, SandboxId, VaultId,
+};
 use std::fmt::Debug;
 use tokio::sync::oneshot::{self, Receiver, Sender};
 use tracing::Instrument;
@@ -36,6 +36,13 @@ pub struct SmsClient {
     /// AWS pinpoint SMS client
     pub(super) pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
     pub(super) ff_client: LaunchDarklyFeatureFlagClient,
+}
+
+/// For any phone-number specific flags, we don't want to be sending the plaintext phone number to
+/// LD to get the experiment assignment. So, we hash phone numbers before passing them to
+/// LD
+fn h_recipient(e164: &PiiString) -> String {
+    Base64Data::into_string_standard(sha256(e164.leak().as_bytes()).to_vec()).0
 }
 
 impl SmsClient {
@@ -80,11 +87,10 @@ impl SmsClient {
     /// we could quickly divert traffic to the fallback
     pub(super) fn twilio_client(&self, recipient_e164: &PiiString) -> &twilio::Client {
         // Don't want to send raw phone number to launch darkly
-        let h_destination =
-            Base64Data::into_string_standard(sha256(recipient_e164.leak().as_bytes()).to_vec()).0;
-        let flag = BoolFlag::UseBackupTwilioCredentials(&h_destination);
+        let h_recipient = h_recipient(recipient_e164);
+        let flag = BoolFlag::UseBackupTwilioCredentials(&h_recipient);
         let use_backup_twilio = self.ff_client.flag(flag);
-        tracing::info!(%use_backup_twilio, %h_destination, has_backup=%self.twilio_client_backup.is_some(), "Choosing twilio client");
+        tracing::info!(%use_backup_twilio, %h_recipient, has_backup=%self.twilio_client_backup.is_some(), "Choosing twilio client");
         match (use_backup_twilio, self.twilio_client_backup.as_ref()) {
             (true, Some(backup_client)) => backup_client,
             _ => &self.twilio_client,
@@ -153,29 +159,44 @@ impl SmsClient {
         destination: PhoneNumber,
         mut tx: Option<Sender<ApiError>>,
     ) -> ApiResult<()> {
-        // Assemble the list of vendors we will use to attempt to send the message
-        let mut vendors: Vec<Box<dyn SmsVendor>> = Vec::new();
-        // TODO global LD flag for which vendors are available
-        // TODO LD flag for which vendor to use per user
-        let try_whatsapp = false;
-        if try_whatsapp {
-            // Always try whatsapp first if the recipient probably prefers whatsapp
-            vendors.push(Box::new(TwilioWhatsapp))
-        }
-        let prefer_twilio_over_pinpoint = self.ff_client.flag(BoolFlag::TwilioIsPreferredSmsVendor);
-        if prefer_twilio_over_pinpoint {
-            // Two twilios because we want to try twilio twice before falling back to pinpoint
-            vendors.append(&mut vec![
-                Box::new(TwilioSms),
-                Box::new(TwilioSms),
-                Box::new(Pinpoint),
-            ])
-        } else {
-            vendors.append(&mut vec![
-                Box::new(Pinpoint),
-                Box::new(TwilioSms),
-                Box::new(TwilioSms),
-            ])
+        let h_recipient = h_recipient(&destination.e164());
+
+        // Assemble the list of vendors we will use to attempt to send the message.
+        // This launchdarkly flag controls both (1) which vendors are available and
+        // (2) the priority of which to use first.
+        // We can use this flag to quickly switch away from vendors who are misbehaving without a deploy
+        let vendors_str: String = self
+            .ff_client
+            .json_flag(JsonFlag::AvailableOtpVendorPriorities(&h_recipient))?;
+        let vendor_kinds = match serde_json::de::from_str::<Option<Vec<SmsVendorKind>>>(&vendors_str) {
+            Err(err) => {
+                tracing::error!(
+                    ?err,
+                    "Can't deserialize OTP vendors. Falling back to SmsVendorKind::default_vendors()"
+                );
+                SmsVendorKind::default_vendors()
+            }
+            Ok(Some(vendors)) => vendors,
+            Ok(None) => SmsVendorKind::default_vendors(),
+        };
+        tracing::info!(vendors=%Csv(vendor_kinds.clone()), %h_recipient, "Selected SMS vendors");
+
+        let vendors = vendor_kinds
+            .iter()
+            .filter(|v| match **v {
+                SmsVendorKind::TwilioWhatsapp => {
+                    // Try sending via whatsapp only if the message supports it and the user resides in a
+                    // country that prefers whatsapp
+                    let user_prefers_whatsapp = destination.prefers_whatsapp()
+                        || self.ff_client.flag(BoolFlag::PreferWhatsapp(&h_recipient));
+                    message.supports_whatsapp() && user_prefers_whatsapp
+                }
+                _ => true,
+            })
+            .map(|v| v.vendor())
+            .collect_vec();
+        if vendors.is_empty() {
+            return AssertionError("No OTP vendors available").into();
         }
 
         // Iterate through vendors in the order of preference, trying each one until we get a
@@ -187,7 +208,7 @@ impl SmsClient {
                 Ok(_) => return Ok(()),
                 Err(e) => e,
             };
-            tracing::warn!(%prefer_twilio_over_pinpoint, err=%e, err_debug=?e, "Moving on to next SMS vendor");
+            tracing::warn!(vendors=%Csv(vendor_kinds.clone()), err=%e, err_debug=?e, "Moving on to next SMS vendor");
             err = if let Some(tx) = tx.take() {
                 // After the first error is encountered, pass the error back on the channel in
                 // case someone is listening

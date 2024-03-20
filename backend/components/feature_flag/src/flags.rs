@@ -59,9 +59,6 @@ pub enum BoolFlag<'a> {
     DisallowDriverLicensePermits(&'a TenantId),
     #[strum(to_string = "EnableIncodeWatchlistCheckInNonProd")]
     EnableIncodeWatchlistCheckInNonProd(&'a ObConfigurationKey),
-    // This should probably be a StringFlag, but just doing this for now to be easy
-    #[strum(to_string = "TwilioIsPreferredSmsVendor")]
-    TwilioIsPreferredSmsVendor,
     #[strum(to_string = "UseIncodeDemoCredentialsInLivemode")]
     UseIncodeDemoCredentialsInLivemode(&'a TenantId),
     #[strum(to_string = "IsKycWaterfallOnRuleFailureEnabled")]
@@ -76,6 +73,8 @@ pub enum BoolFlag<'a> {
     StepUpOnAmlHit(&'a ObConfigurationKey),
     #[strum(to_string = "UseBackupTwilioCredentials")]
     UseBackupTwilioCredentials(&'a str),
+    #[strum(to_string = "PreferWhatsapp")]
+    PreferWhatsapp(&'a str),
     #[strum(to_string = "IsRulesProductEnabled")]
     IsRulesProductEnabled(&'a TenantId),
     #[strum(to_string = "MakeLexisCall")]
@@ -120,7 +119,6 @@ impl<'a> BoolFlag<'a> {
             Self::DisableConservativeSharpnessForDocument(k) => Some(k.to_string()),
             Self::DisallowDriverLicensePermits(k) => Some(k.to_string()),
             Self::EnableIncodeWatchlistCheckInNonProd(k) => Some(k.to_string()),
-            Self::TwilioIsPreferredSmsVendor => None,
             Self::DisableSelfieChecking(k) => Some(k.to_string()),
             Self::UseIncodeDemoCredentialsInLivemode(k) => Some(k.to_string()),
             Self::IsKycWaterfallOnRuleFailureEnabled(k) => Some(k.to_string()),
@@ -129,6 +127,7 @@ impl<'a> BoolFlag<'a> {
             Self::CreateKycWorkflowForAlpacaOnboardings(k) => Some(k.to_string()),
             Self::StepUpOnAmlHit(k) => Some(k.to_string()),
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
+            Self::PreferWhatsapp(k) => Some(k.to_string()),
             Self::IsRulesProductEnabled(k) => Some(k.to_string()),
             Self::MakeLexisCall(k) => Some(k.to_string()),
             Self::IsVaultProxyPreConfiguredEndpointEnabled(k) => Some(k.to_string()),
@@ -165,7 +164,6 @@ impl<'a> BoolFlag<'a> {
             Self::DisableConservativeSharpnessForDocument(_) => false,
             Self::DisallowDriverLicensePermits(_) => false,
             Self::EnableIncodeWatchlistCheckInNonProd(_) => false,
-            Self::TwilioIsPreferredSmsVendor => true,
             Self::DisableSelfieChecking(_) => false,
             Self::UseIncodeDemoCredentialsInLivemode(_) => false,
             Self::IsKycWaterfallOnRuleFailureEnabled(_) => false,
@@ -174,6 +172,7 @@ impl<'a> BoolFlag<'a> {
             Self::CreateKycWorkflowForAlpacaOnboardings(_) => false,
             Self::StepUpOnAmlHit(_) => false,
             Self::UseBackupTwilioCredentials(_) => false,
+            Self::PreferWhatsapp(_) => false,
             Self::IsRulesProductEnabled(_) => false,
             Self::MakeLexisCall(_) => false,
             Self::IsVaultProxyPreConfiguredEndpointEnabled(_) => false,
@@ -186,6 +185,8 @@ impl<'a> BoolFlag<'a> {
 pub enum JsonFlag<'a> {
     #[strum(to_string = "BillingProfile")]
     BillingProfile(&'a TenantId),
+    #[strum(to_string = "AvailableOtpVendorPriorities")]
+    AvailableOtpVendorPriorities(&'a str),
 }
 
 impl<'a> JsonFlag<'a> {
@@ -196,12 +197,14 @@ impl<'a> JsonFlag<'a> {
     pub(crate) fn key(&self) -> Option<String> {
         match self {
             Self::BillingProfile(k) => Some(k.to_string()),
+            Self::AvailableOtpVendorPriorities(k) => Some(k.to_string()),
         }
     }
 
     pub(crate) fn default(&self) -> serde_json::Value {
         match self {
             Self::BillingProfile(_) => json!({}),
+            Self::AvailableOtpVendorPriorities(_) => json!(null),
         }
     }
 }

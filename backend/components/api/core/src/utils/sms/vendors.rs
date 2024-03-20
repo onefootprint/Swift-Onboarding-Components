@@ -9,6 +9,35 @@ pub struct TwilioWhatsapp;
 
 pub struct Pinpoint;
 
+#[derive(Eq, PartialEq, Clone, serde::Deserialize, strum::Display)]
+pub enum SmsVendorKind {
+    TwilioWhatsapp,
+    TwilioSms,
+    Pinpoint,
+}
+
+impl SmsVendorKind {
+    pub fn vendor(&self) -> Box<dyn SmsVendor> {
+        match self {
+            Self::TwilioSms => Box::new(TwilioSms),
+            Self::TwilioWhatsapp => Box::new(TwilioWhatsapp),
+            Self::Pinpoint => Box::new(Pinpoint),
+        }
+    }
+
+    pub fn default_vendors() -> Vec<Self> {
+        vec![
+            Self::TwilioWhatsapp,
+            // We have TwilioSms twice because we want it to retry. But, we can't just build the
+            // retries into the client because the SmsClient actually needs to know and orchestrate
+            // each time a retry occurs
+            Self::TwilioSms,
+            Self::TwilioSms,
+            Self::Pinpoint,
+        ]
+    }
+}
+
 #[async_trait]
 pub trait SmsVendor: Send + Sync {
     async fn send(&self, client: &SmsClient, message: &SmsMessage, destination: &PiiString) -> ApiResult<()>;
