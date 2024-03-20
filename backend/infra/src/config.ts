@@ -76,6 +76,8 @@ export interface Workos {
 export interface Twilio {
   accountSid: string;
   phoneNumber: string;
+  whatsappSenderId: string;
+  whatsappOtpTemplateId: string;
 }
 
 export interface S3 {

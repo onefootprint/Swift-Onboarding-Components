@@ -1,5 +1,6 @@
 use crate::{api_schema_helper::string_api_data_type_alias, NtResult, PiiString};
 
+use phonenumber::country::Id as CountryId;
 use serde_with::DeserializeFromStr;
 use std::{fmt::Debug, str::FromStr};
 
@@ -97,6 +98,19 @@ impl FromStr for PhoneNumber {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Self::parse(s.into())
+    }
+}
+
+impl PhoneNumber {
+    const PREFER_WHATSAPP_COUNTRIES: &'static [CountryId] = &[CountryId::MX, CountryId::BZ];
+
+    /// Returns true if we decide the country of this phone number prefers to receive messages
+    /// via WhatsApp over SMS
+    pub fn prefers_whatsapp(&self) -> bool {
+        self.number
+            .country()
+            .id()
+            .is_some_and(|c| Self::PREFER_WHATSAPP_COUNTRIES.contains(&c))
     }
 }
 

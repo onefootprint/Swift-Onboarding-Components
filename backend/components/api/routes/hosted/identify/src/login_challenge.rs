@@ -92,7 +92,7 @@ pub async fn post(
                 let t = tenant.as_ref();
                 let (rx, challenge_state, time_before_retry_s) = state
                     .sms_client
-                    .send_challenge_non_blocking(&state, t, &phone_number, vault_id, sandbox_id)
+                    .send_challenge_non_blocking(&state, t, phone_number.clone(), vault_id, sandbox_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (

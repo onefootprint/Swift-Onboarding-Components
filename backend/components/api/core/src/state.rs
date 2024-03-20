@@ -7,10 +7,7 @@ use crate::{
     fingerprinter::AwsHmacClient,
     metrics::Metrics,
     s3::{self, S3Client},
-    utils::{
-        email::SendgridClient,
-        sms::{SmsClient, TwilioConfig},
-    },
+    utils::{email::SendgridClient, sms::SmsClient},
     vendor_clients::VendorClients,
     GIT_HASH,
 };
@@ -27,6 +24,7 @@ use idv::{
 };
 
 use selfie_doc::AwsSelfieDocClient;
+use twilio::TwilioConfig;
 use webhooks::WebhookClient;
 use workos::{ApiKey, WorkOs};
 
@@ -153,13 +151,17 @@ impl State {
             account_sid: config.twilio_acount_sid.clone(),
             api_key: config.twilio_api_key.clone(),
             api_secret: config.twilio_api_key_secret.clone(),
-            source_phone_number: config.twilio_phone_number.clone(),
+            from_number: config.twilio_phone_number.clone(),
+            whatsapp_sender_sid: config.twilio_whatsapp_sender_sid.clone(),
+            whatsapp_otp_template_id: config.twilio_whatsapp_otp_template_id.clone(),
         };
         let twilio_backup = TwilioConfig {
             account_sid: config.twilio_acount_sid_backup.clone(),
             api_key: config.twilio_api_key_backup.clone(),
             api_secret: config.twilio_api_key_secret_backup.clone(),
-            source_phone_number: config.twilio_phone_number_backup.clone(),
+            from_number: config.twilio_phone_number_backup.clone(),
+            whatsapp_sender_sid: config.twilio_whatsapp_sender_sid_backup.clone(),
+            whatsapp_otp_template_id: config.twilio_whatsapp_otp_template_id_backup.clone(),
         };
         let twilio_client = SmsClient::new(
             twilio,

@@ -509,12 +509,28 @@ export abstract class ServiceContainers {
                 value: constants.twilio.phoneNumber,
               },
               {
+                name: 'TWILIO_WHATSAPP_SENDER_SID',
+                value: constants.twilio.whatsappSenderId,
+              },
+              {
+                name: 'TWILIO_WHATSAPP_OTP_TEMPLATE_ID',
+                value: constants.twilio.whatsappOtpTemplateId,
+              },
+              {
                 name: 'TWILIO_ACCOUNT_SID_BACKUP',
                 value: constants.twilioBackup?.accountSid || '',
               },
               {
                 name: 'TWILIO_PHONE_NUMBER_BACKUP',
                 value: constants.twilioBackup?.phoneNumber || '',
+              },
+              {
+                name: 'TWILIO_WHATSAPP_SENDER_SID_BACKUP',
+                value: constants.twilioBackup?.whatsappSenderId,
+              },
+              {
+                name: 'TWILIO_WHATSAPP_OTP_TEMPLATE_ID_BACKUP',
+                value: constants.twilioBackup?.whatsappOtpTemplateId,
               },
               {
                 name: 'SENDGRID_FROM_EMAIL',

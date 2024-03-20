@@ -11,7 +11,7 @@ pub struct Message {
     pub direction: String,
     pub error_code: Option<i64>,
     pub error_message: Option<String>,
-    pub from: String,
+    pub from: Option<String>,
     pub messaging_service_sid: Option<String>,
     pub num_media: String,
     pub num_segments: String,
@@ -43,6 +43,7 @@ pub enum Status {
     Sent,
     Delivered,
     Undelivered,
+    Read,
     Failed,
     /// Match any variant not represented above
     #[serde(other)]

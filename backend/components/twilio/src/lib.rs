@@ -17,11 +17,52 @@ use tokio_retry::{
 };
 
 #[derive(Clone)]
-pub struct Client {
+pub struct TwilioConfig {
     pub account_sid: String,
+    pub api_key: String,
+    pub api_secret: String,
     pub from_number: String,
-    api_key: String,
-    api_secret: String,
+    pub whatsapp_sender_sid: String,
+    pub whatsapp_otp_template_id: String,
+}
+
+impl TwilioConfig {
+    pub fn make_client(self) -> Option<Client> {
+        let Self {
+            account_sid,
+            api_key,
+            api_secret,
+            from_number,
+            whatsapp_sender_sid,
+            whatsapp_otp_template_id,
+        } = &self;
+        if account_sid.is_empty()
+            || api_key.is_empty()
+            || api_secret.is_empty()
+            || from_number.is_empty()
+            || whatsapp_sender_sid.is_empty()
+            || whatsapp_otp_template_id.is_empty()
+        {
+            return None;
+        }
+        let client = Client::new(self);
+        Some(client)
+    }
+
+    /// The environment-specific twilio content template ID for the provided SmsMessage kind,
+    /// if there is one.
+    pub fn whatsapp_content_sid(&self, message: &SmsMessage) -> Option<String> {
+        match message {
+            SmsMessage::Otp { .. } => Some(self.whatsapp_otp_template_id.clone()),
+            _ => None,
+        }
+    }
+}
+
+
+#[derive(Clone)]
+pub struct Client {
+    config: TwilioConfig,
     client: ClientWithMiddleware,
 }
 
@@ -32,24 +73,16 @@ impl std::fmt::Debug for Client {
 }
 
 impl Client {
-    pub fn new(
-        account_sid: String,
-        api_key: String,
-        api_secret: String,
-        source_phone_number: String,
-    ) -> Self {
+    /// If a message wasnt delivered in 15s it should be useless to us, so tell twilio to drop it
+    const VALIDITY_PERIOD_SECS: usize = 15;
+
+    fn new(config: TwilioConfig) -> Self {
         let client = reqwest::Client::new();
         let client = reqwest_middleware::ClientBuilder::new(client)
             .with(TracingMiddleware::default())
             .build();
 
-        Self {
-            account_sid,
-            api_key,
-            api_secret,
-            from_number: source_phone_number,
-            client,
-        }
+        Self { config, client }
     }
 
     fn request_builder<U: IntoUrl>(&self, method: Method, url: U) -> RequestBuilder {
@@ -57,7 +90,7 @@ impl Client {
         .client
         .request(method, url)
         .timeout(Duration::from_secs(3)) // fail fast in 3sec
-        .basic_auth(self.api_key.clone(), Some(self.api_secret.clone()))
+        .basic_auth(self.config.api_key.clone(), Some(self.config.api_secret.clone()))
     }
 
     /// validate a phone number against Twilio
@@ -80,35 +113,54 @@ impl Client {
         Ok(twilio_response)
     }
 
-    pub async fn send_message(
-        &self,
-        destination: PiiString,
-        message: SmsMessage,
-    ) -> crate::response::Result<Message> {
-        /// if a message wasnt delivered in 15s it should be useless to us
-        /// so tell twilio to drop it
-        const VALIDITY_PERIOD_SECS: usize = 15;
-
-        let account_sid = self.account_sid.clone();
-        let url = format!("https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json");
-
+    pub fn compose_sms_message(&self, message: &SmsMessage, destination: &PiiString) -> SendMessage {
         // temporary workaround to support UK numbers with Alphanumeric Sender ID
         let from = if destination.leak().starts_with("+44") {
             "Footprint".to_string()
         } else {
-            self.from_number.to_string()
+            self.config.from_number.to_string()
         };
-
-        let params = SendMessage {
-            body: message.body().leak_to_string(),
+        SendMessage {
+            body: Some(message.body().leak_to_string()),
             to: destination.leak_to_string(),
             from,
-            validity_period: VALIDITY_PERIOD_SECS as u64, // dont send the message after TTL
-        };
+            validity_period: Self::VALIDITY_PERIOD_SECS as u64,
+            // We only need to use these fields for whatsapp
+            content_sid: None,
+            content_variables: None,
+        }
+    }
 
+    pub fn compose_whatsapp_message(
+        &self,
+        message: &SmsMessage,
+        destination: &PiiString,
+    ) -> crate::response::Result<SendMessage> {
+        let from = self.config.whatsapp_sender_sid.clone();
+        let to = format!("whatsapp:{}", destination.leak_to_string());
+        let content_variables = message
+            .whatsapp_content_variables()
+            .map(|v| serde_json::ser::to_string(&v))
+            .transpose()?;
+        let message = SendMessage {
+            to,
+            from,
+            validity_period: Self::VALIDITY_PERIOD_SECS as u64,
+            content_sid: self.config.whatsapp_content_sid(message),
+            content_variables,
+            // body cannot be used in whatsapp messages, so we send the message using
+            // content_sid and content_variables
+            body: None,
+        };
+        Ok(message)
+    }
+
+    pub async fn send(&self, message: SendMessage) -> crate::response::Result<Message> {
+        let account_sid = self.config.account_sid.clone();
+        let url = format!("https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json");
         let response = self
             .request_builder(Method::POST, url)
-            .form(&params)
+            .form(&message)
             .send()
             .await?;
 
@@ -173,15 +225,15 @@ impl Client {
     async fn _check_status_inner(&self, message_uri: String) -> Result<Result<Message, Error>, Message> {
         let message = match self._get_message(message_uri).await {
             Ok(message) => message,
-            // Determinate failure
+            // Terminal failure
             Err(err) => return Ok(Err(err)),
         };
         if matches!(message.status, Status::Undelivered | Status::Failed) {
-            // Determinate failure
+            // Terminal failure status
             return Ok(Err(Error::DeliveryFailed(message.status, message.error_code)));
         };
-        if matches!(message.status, Status::Delivered) {
-            // Determinate success
+        if matches!(message.status, Status::Delivered | Status::Read) {
+            // Terminal success status
             return Ok(Ok(message));
         }
         // Indeterminate result. Continue polling.

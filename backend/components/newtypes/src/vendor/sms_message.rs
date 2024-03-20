@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::PiiString;
 
 
@@ -58,5 +60,18 @@ impl SmsMessage {
             Self::BoSession { .. } => "bo_session",
             Self::Freeform { .. } => "freeform",
         }
+    }
+
+    /// The variables used to render the SmsMessage's content
+    pub fn whatsapp_content_variables(&self) -> Option<HashMap<String, String>> {
+        match self {
+            // WhatsApp only supports a pre-defined message with a variable OTP
+            Self::Otp { code, .. } => Some(HashMap::from([("1".into(), code.leak_to_string())])),
+            _ => None,
+        }
+    }
+
+    pub fn supports_whatsapp(&self) -> bool {
+        self.whatsapp_content_variables().is_some()
     }
 }

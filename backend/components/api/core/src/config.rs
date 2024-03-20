@@ -68,6 +68,10 @@ pub struct Config {
     pub twilio_api_key_secret: String,
     #[envconfig(from = "TWILIO_PHONE_NUMBER")]
     pub twilio_phone_number: String,
+    #[envconfig(from = "TWILIO_WHATSAPP_SENDER_SID")]
+    pub twilio_whatsapp_sender_sid: String,
+    #[envconfig(from = "TWILIO_WHATSAPP_OTP_TEMPLATE_ID")]
+    pub twilio_whatsapp_otp_template_id: String,
 
     /// In prod, we have a separate set of credentials from a backup twilio account in case
     /// there are problems
@@ -79,6 +83,10 @@ pub struct Config {
     pub twilio_api_key_secret_backup: String,
     #[envconfig(from = "TWILIO_PHONE_NUMBER_BACKUP", default = "")]
     pub twilio_phone_number_backup: String,
+    #[envconfig(from = "TWILIO_WHATSAPP_SENDER_SID_BACKUP", default = "")]
+    pub twilio_whatsapp_sender_sid_backup: String,
+    #[envconfig(from = "TWILIO_WHATSAPP_OTP_TEMPLATE_ID_BACKUP", default = "")]
+    pub twilio_whatsapp_otp_template_id_backup: String,
 
     #[envconfig(from = "SENDGRID_API_KEY")]
     pub sendgrid_api_key: String,

@@ -168,6 +168,8 @@ config:
       apiKeySecret:
         secure: v1:6Sct1OQ1Y3A0QapO:dA7CqK0HR3NsmSDgJAR/kicJY7+i7k5KLfugEoCHIn1MqTsQ6BFOv0qKbqVWWT27
       phoneNumber: "+14152129648"
+      whatsappSenderId: "MGf4b90d6bc32195702ba16a4606f049bf"
+      whatsappOtpTemplateId: "HX728369d784be2b98babfae0e399b8d1f"
     twilioBackup:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
@@ -175,6 +177,8 @@ config:
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
       phoneNumber: "+15105883668"
+      whatsappSenderId: "MG25d83f1f121913d74d8bc2ea96e35db6"
+      whatsappOtpTemplateId: "HXeb04132acb5883c98bf6ff80dbeeb2b6"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

@@ -71,14 +71,15 @@ pub async fn post(
             let phone_number = phone_number.ok_or(ValidationError(
                 "Phone number required to initiate sign up challenge",
             ))?;
+            let e164 = phone_number.e164();
             let (rx, challenge_data, time_before_retry) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, tenant, &phone_number, uv.id, uv.sandbox_id)
+                .send_challenge_non_blocking(&state, tenant, phone_number, uv.id, uv.sandbox_id)
                 .await?;
 
             let challenge_data = RegisterChallengeData::Sms {
                 h_code: challenge_data.h_code,
-                phone_number: phone_number.e164(),
+                phone_number: e164,
             };
             (Some(rx), challenge_data, time_before_retry.num_seconds(), None)
         }

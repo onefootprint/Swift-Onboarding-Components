@@ -1,6 +1,6 @@
 use super::{
     super::challenge_rate_limit::RateLimit,
-    vendors::{Pinpoint, SmsVendor, SmsVendorKind, TwilioSms},
+    vendors::{Pinpoint, SmsVendor, TwilioSms, TwilioWhatsapp},
 };
 use crate::{
     errors::{user::UserError, ApiError, ApiResult, AssertionError},
@@ -11,11 +11,11 @@ use chrono::Duration;
 use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use itertools::Itertools;
-use newtypes::{sms_message::SmsMessage, PhoneNumber, PiiString, SandboxId, VaultId};
+use newtypes::{sms_message::SmsMessage, Base64Data, PhoneNumber, PiiString, SandboxId, VaultId};
 use std::fmt::Debug;
 use tokio::sync::oneshot::{self, Receiver, Sender};
 use tracing::Instrument;
+use twilio::TwilioConfig;
 
 pub type SecondsBeforeRetry = Duration;
 
@@ -36,33 +36,6 @@ pub struct SmsClient {
     /// AWS pinpoint SMS client
     pub(super) pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
     pub(super) ff_client: LaunchDarklyFeatureFlagClient,
-}
-
-pub struct TwilioConfig {
-    pub account_sid: String,
-    pub api_key: String,
-    pub api_secret: String,
-    pub source_phone_number: String,
-}
-
-impl TwilioConfig {
-    fn make_client(self) -> Option<twilio::Client> {
-        let Self {
-            account_sid,
-            api_key,
-            api_secret,
-            source_phone_number,
-        } = self;
-        if account_sid.is_empty()
-            || api_key.is_empty()
-            || api_secret.is_empty()
-            || source_phone_number.is_empty()
-        {
-            return None;
-        }
-        let client = twilio::Client::new(account_sid, api_key, api_secret, source_phone_number);
-        Some(client)
-    }
 }
 
 impl SmsClient {
@@ -101,6 +74,23 @@ impl SmsClient {
         Ok(client)
     }
 
+    /// Via launch darkly flag, proxy between the twilio client and backup twilio client based
+    /// on the recipient.
+    /// We don't use the backup client - but in case there's a problem with the main account,
+    /// we could quickly divert traffic to the fallback
+    pub(super) fn twilio_client(&self, recipient_e164: &PiiString) -> &twilio::Client {
+        // Don't want to send raw phone number to launch darkly
+        let h_destination =
+            Base64Data::into_string_standard(sha256(recipient_e164.leak().as_bytes()).to_vec()).0;
+        let flag = BoolFlag::UseBackupTwilioCredentials(&h_destination);
+        let use_backup_twilio = self.ff_client.flag(flag);
+        tracing::info!(%use_backup_twilio, %h_destination, has_backup=%self.twilio_client_backup.is_some(), "Choosing twilio client");
+        match (use_backup_twilio, self.twilio_client_backup.as_ref()) {
+            (true, Some(backup_client)) => backup_client,
+            _ => &self.twilio_client,
+        }
+    }
+
     #[tracing::instrument("SmsClient::send_message", skip_all)]
     /// Rate limits sending messages to the destination phone number and then spawns an async task
     /// to send the message
@@ -121,7 +111,7 @@ impl SmsClient {
         }
         .enforce_and_update(state)
         .await?;
-        self._send_message(message, destination.e164(), None).await?;
+        self._send_message(message, destination, None).await?;
         Ok(())
     }
 
@@ -130,7 +120,7 @@ impl SmsClient {
         &self,
         state: &State,
         message: SmsMessage,
-        destination: &PhoneNumber,
+        destination: PhoneNumber,
         tx: Sender<ApiError>,
     ) -> ApiResult<()> {
         if destination.is_fixture_phone_number() {
@@ -144,10 +134,9 @@ impl SmsClient {
         }
         .enforce_and_update(state)
         .await?;
-        let e164 = destination.e164();
         let client = self.clone();
         let fut = async move {
-            let res = client._send_message(message, e164, Some(tx)).await;
+            let res = client._send_message(message, destination, Some(tx)).await;
             if let Err(err) = res {
                 tracing::error!(%err, "Couldn't send SMS asynchronously");
             }
@@ -161,36 +150,44 @@ impl SmsClient {
     async fn _send_message(
         &self,
         message: SmsMessage,
-        destination: PiiString,
+        destination: PhoneNumber,
         mut tx: Option<Sender<ApiError>>,
     ) -> ApiResult<()> {
-        let vendors: Vec<Box<dyn SmsVendor>> = vec![
+        // Assemble the list of vendors we will use to attempt to send the message
+        let mut vendors: Vec<Box<dyn SmsVendor>> = Vec::new();
+        // TODO global LD flag for which vendors are available
+        // TODO LD flag for which vendor to use per user
+        let try_whatsapp = false;
+        if try_whatsapp {
+            // Always try whatsapp first if the recipient probably prefers whatsapp
+            vendors.push(Box::new(TwilioWhatsapp))
+        }
+        let prefer_twilio_over_pinpoint = self.ff_client.flag(BoolFlag::TwilioIsPreferredSmsVendor);
+        if prefer_twilio_over_pinpoint {
             // Two twilios because we want to try twilio twice before falling back to pinpoint
-            Box::new(TwilioSms),
-            Box::new(TwilioSms),
-            Box::new(Pinpoint),
-        ];
-        let preferred_vendor = if self.ff_client.flag(BoolFlag::TwilioIsPreferredSmsVendor) {
-            SmsVendorKind::Twilio
+            vendors.append(&mut vec![
+                Box::new(TwilioSms),
+                Box::new(TwilioSms),
+                Box::new(Pinpoint),
+            ])
         } else {
-            SmsVendorKind::Pinpoint
-        };
-        let ordered_vendors = vendors
-            .into_iter()
-            // The clients matching the preferred vendor will be put at the top of the list
-            .sorted_by_key(|v| v.vendor() != preferred_vendor)
-            .collect_vec();
+            vendors.append(&mut vec![
+                Box::new(Pinpoint),
+                Box::new(TwilioSms),
+                Box::new(TwilioSms),
+            ])
+        }
 
         // Iterate through vendors in the order of preference, trying each one until we get a
         // successful response or reach the end of our vendors
         let mut err = None;
         let mut sent_error_to_caller = false;
-        for vendor in ordered_vendors {
-            let e = match vendor.send(self, &message, &destination).await {
+        for vendor in vendors {
+            let e = match vendor.send(self, &message, &destination.e164()).await {
                 Ok(_) => return Ok(()),
                 Err(e) => e,
             };
-            tracing::warn!(?preferred_vendor, err=%e, err_debug=?e, "Moving on to next SMS vendor");
+            tracing::warn!(%prefer_twilio_over_pinpoint, err=%e, err_debug=?e, "Moving on to next SMS vendor");
             err = if let Some(tx) = tx.take() {
                 // After the first error is encountered, pass the error back on the channel in
                 // case someone is listening
@@ -226,7 +223,7 @@ impl SmsClient {
         &self,
         state: &State,
         tenant: Option<&Tenant>,
-        destination: &PhoneNumber,
+        destination: PhoneNumber,
         vault_id: VaultId,
         sandbox_id: Option<SandboxId>,
     ) -> ApiResult<(Receiver<ApiError>, PhoneEmailChallengeState, SecondsBeforeRetry)> {
