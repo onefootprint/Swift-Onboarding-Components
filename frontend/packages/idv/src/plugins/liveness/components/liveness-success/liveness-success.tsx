@@ -1,5 +1,5 @@
-import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
+import AnimatedSuccessCheck from '@onefootprint/ui/src/components/animated-success-check';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -11,8 +11,8 @@ const LivenessSuccess = () => {
 
   return (
     <IconContainer>
-      <IcoCheckCircle40 color="success" />
-      <Text variant="label-3" color="success">
+      <AnimatedSuccessCheck animationStart />
+      <Text variant="label-3" color="success" marginTop={5}>
         {t('label')}
       </Text>
     </IconContainer>
