@@ -51,6 +51,12 @@ const useIdDocOptions = (country: CountryRecord) => {
       label: t('visa'),
     });
   }
+  if (country.voterIdentification) {
+    options.push({
+      value: SupportedIdDocTypes.voterIdentification,
+      label: t('voter_identification'),
+    });
+  }
 
   return options;
 };

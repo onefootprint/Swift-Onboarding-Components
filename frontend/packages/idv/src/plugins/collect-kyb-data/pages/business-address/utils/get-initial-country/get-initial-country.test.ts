@@ -13,6 +13,7 @@ describe('getInitialCountry', () => {
       visa: true,
       workPermit: true,
       residenceDocument: true,
+      voterIdentification: true,
     });
   });
 
@@ -28,6 +29,7 @@ describe('getInitialCountry', () => {
       visa: true,
       workPermit: true,
       residenceDocument: true,
+      voterIdentification: true,
     });
   });
 });

@@ -68,7 +68,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
       </Header>
       <FormElementsContainer>
         <CollectedInformation
-          title={t('us-residents.title')}
+          title={t('basic-information.title')}
           options={{
             name: true,
             email: values.email,

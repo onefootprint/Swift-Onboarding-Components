@@ -88,6 +88,7 @@ describe('<CountrySelect />', () => {
         passportCard: true,
         workPermit: true,
         residenceDocument: true,
+        voterIdentification: true,
       });
     });
   });

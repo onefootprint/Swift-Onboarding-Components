@@ -53,6 +53,11 @@ const GlobalIdDocPicker = () => {
             label={t('permit')}
             {...register('personal.idDocKind')}
           />
+          <Checkbox
+            value={SupportedIdDocTypes.voterIdentification}
+            label={t('voter_identification')}
+            {...register('personal.idDocKind')}
+          />
         </Grid.Container>
       </Container>
     </>
