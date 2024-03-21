@@ -16,8 +16,6 @@ impl WorkflowState {
             // Don't want to display any other requirements in a collect doc workflow
             Self::Document(_) => vec![
                 OnboardingRequirementKind::CollectDocument,
-                OnboardingRequirementKind::CollectProofOfSsn,
-                OnboardingRequirementKind::CollectProofOfAddress,
                 OnboardingRequirementKind::Process,
             ],
         }

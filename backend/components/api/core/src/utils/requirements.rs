@@ -24,7 +24,7 @@ use newtypes::{
     DocumentCdoInfo, DocumentKind, DocumentRequestKind, DocumentUploadMode, IdentityDataKind as IDK,
     IdentityDocumentStatus, InvestorProfileKind as IPK, Iso3166TwoDigitCountryCode, KycState, LivenessSource,
     OnboardingRequirement, OnboardingRequirementKind, ScopedVaultId, Selfie, UsLegalStatus, VaultId,
-    WorkflowState,
+    WorkflowId, WorkflowState,
 };
 
 use super::vault_wrapper::Any;
@@ -415,95 +415,36 @@ fn get_requirement_inner(
             out.into_iter().collect()
         }
         OnboardingRequirementKind::CollectDocument => {
-            let mut requirements = vec![];
-            let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?;
-            if let Some(dr) = dr {
-                let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
-                let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
-                let country = decrypted_values
-                    .get(&IDK::Country.into())
-                    .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
+            let document_requests = DocumentRequest::get_all(conn, &wf.id)?;
+            document_requests
+                .into_iter()
+                .map(|dr| -> ApiResult<_> {
+                    let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
+                    let should_render = id_doc.is_empty()
+                        || id_doc
+                            .into_iter()
+                            .any(|d| d.status == IdentityDocumentStatus::Pending);
 
-                // Show a CollectDocument requirement if there's no id_document or the existing
-                // id_document is still Pending
-                let should_render = id_doc.is_empty()
-                    || id_doc
-                        .into_iter()
-                        .any(|d| d.status == IdentityDocumentStatus::Pending);
-                let supported_country_and_doc_types = obc.supported_country_mapping_for_document(country);
+                    if should_render {
+                        let req = match dr.kind {
+                            DocumentRequestKind::Identity => {
+                                identity_doc_requirement(conn, &wf.id, &dr, obc, decrypted_values)?
+                            }
+                            DocumentRequestKind::ProofOfSsn => proof_of_ssn_requirement(&dr, obc),
+                            DocumentRequestKind::ProofOfAddress => {
+                                proof_of_address_requirement(&dr, obc, decrypted_values)
+                            }
+                        };
 
-                if should_render {
-                    requirements.push(OnboardingRequirement::CollectDocument {
-                        document_request_id: dr.id,
-                        should_collect_selfie: dr.should_collect_selfie,
-                        should_collect_consent: user_consent.is_none(),
-                        supported_country_and_doc_types: supported_country_and_doc_types.0,
-                        upload_mode: DocumentUploadMode::Default,
-                        document_request_kind: dr.kind,
-                    })
-                }
-            };
-
-            requirements
-        }
-        OnboardingRequirementKind::CollectProofOfSsn => {
-            let mut requirements = vec![];
-            let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::ProofOfSsn)?;
-            if let Some(dr) = dr {
-                let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
-                // Show a CollectDocument requirement if there's no id_document or the existing
-                // id_document is still Pending
-                let should_render = id_doc.is_empty()
-                    || id_doc
-                        .into_iter()
-                        .any(|d| d.status == IdentityDocumentStatus::Pending);
-
-                if should_render {
-                    requirements.push(OnboardingRequirement::CollectDocument {
-                        document_request_id: dr.id,
-                        should_collect_selfie: false,
-                        should_collect_consent: false,
-                        supported_country_and_doc_types: obc
-                            .supported_countries_and_doc_types_for_proof_of_ssn()
-                            .0,
-                        upload_mode: DocumentUploadMode::Default,
-                        document_request_kind: dr.kind,
-                    })
-                }
-            };
-
-            requirements
-        }
-        OnboardingRequirementKind::CollectProofOfAddress => {
-            let mut requirements = vec![];
-            let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::ProofOfAddress)?;
-            if let Some(dr) = dr {
-                let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
-                let country = decrypted_values
-                    .get(&IDK::Country.into())
-                    .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
-                // Show a CollectDocument requirement if there's no id_document or the existing
-                // id_document is still Pending
-                let should_render = id_doc.is_empty()
-                    || id_doc
-                        .into_iter()
-                        .any(|d| d.status == IdentityDocumentStatus::Pending);
-
-                if should_render {
-                    requirements.push(OnboardingRequirement::CollectDocument {
-                        document_request_id: dr.id,
-                        should_collect_selfie: false,
-                        should_collect_consent: false,
-                        supported_country_and_doc_types: obc
-                            .supported_countries_and_doc_types_for_proof_of_address(country)
-                            .0,
-                        upload_mode: DocumentUploadMode::AllowUpload,
-                        document_request_kind: dr.kind,
-                    })
-                }
-            };
-
-            requirements
+                        Ok(Some(req))
+                    } else {
+                        Ok(None)
+                    }
+                })
+                .collect::<ApiResult<Vec<Option<_>>>>()?
+                .into_iter()
+                .flatten()
+                .collect()
         }
         OnboardingRequirementKind::Authorize => {
             let (document_types, skipped_selfie) = if obc.can_access_document() {
@@ -565,4 +506,61 @@ fn get_requirement_inner(
         }
     };
     Ok(req)
+}
+
+
+fn identity_doc_requirement(
+    conn: &mut PgConn,
+    wf_id: &WorkflowId,
+    dr: &DocumentRequest,
+    obc: &ObConfiguration,
+    decrypted_values: &DecryptUncheckedResult,
+) -> ApiResult<OnboardingRequirement> {
+    let user_consent = UserConsent::get_for_workflow(conn, wf_id)?;
+    let country = decrypted_values
+        .get(&IDK::Country.into())
+        .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
+    let supported_country_and_doc_types = obc.supported_country_mapping_for_document(country);
+
+    Ok(OnboardingRequirement::CollectDocument {
+        document_request_id: dr.id.clone(),
+        should_collect_selfie: dr.should_collect_selfie,
+        should_collect_consent: user_consent.is_none(),
+        supported_country_and_doc_types: supported_country_and_doc_types.0,
+        upload_mode: DocumentUploadMode::Default,
+        document_request_kind: dr.kind,
+    })
+}
+
+
+fn proof_of_ssn_requirement(dr: &DocumentRequest, obc: &ObConfiguration) -> OnboardingRequirement {
+    OnboardingRequirement::CollectDocument {
+        document_request_id: dr.id.clone(),
+        should_collect_selfie: false,
+        should_collect_consent: false,
+        supported_country_and_doc_types: obc.supported_countries_and_doc_types_for_proof_of_ssn().0,
+        upload_mode: DocumentUploadMode::Default,
+        document_request_kind: dr.kind,
+    }
+}
+
+fn proof_of_address_requirement(
+    dr: &DocumentRequest,
+    obc: &ObConfiguration,
+    decrypted_values: &DecryptUncheckedResult,
+) -> OnboardingRequirement {
+    let country = decrypted_values
+        .get(&IDK::Country.into())
+        .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
+
+    OnboardingRequirement::CollectDocument {
+        document_request_id: dr.id.clone(),
+        should_collect_selfie: false,
+        should_collect_consent: false,
+        supported_country_and_doc_types: obc
+            .supported_countries_and_doc_types_for_proof_of_address(country)
+            .0,
+        upload_mode: DocumentUploadMode::AllowUpload,
+        document_request_kind: dr.kind,
+    }
 }

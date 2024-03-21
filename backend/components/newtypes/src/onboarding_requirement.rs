@@ -46,10 +46,6 @@ pub enum OnboardingRequirement {
         upload_mode: DocumentUploadMode,
         document_request_kind: DocumentRequestKind,
     },
-    /// Uses the same struct as CollectDocument in practice
-    CollectProofOfSsn,
-    /// Uses the same struct as CollectDocument in practice
-    CollectProofOfAddress,
     /// The client needs to display the authorization consent page and confirm the user authorizes access
     Authorize {
         fields_to_authorize: AuthorizeFields,
@@ -69,8 +65,6 @@ impl OnboardingRequirementKind {
                 Self::CollectInvestorProfile => 2,
                 Self::RegisterPasskey => 3,
                 Self::CollectDocument => 4,
-                Self::CollectProofOfSsn => 5,
-                Self::CollectProofOfAddress => 6,
                 Self::Authorize => 7,
                 Self::Process => 8,
             }
@@ -79,8 +73,6 @@ impl OnboardingRequirementKind {
             match self {
                 Self::RegisterPasskey => 0,
                 Self::CollectDocument => 1,
-                Self::CollectProofOfSsn => 2,
-                Self::CollectProofOfAddress => 3,
                 Self::CollectBusinessData => 4,
                 Self::CollectData => 5,
                 Self::CollectInvestorProfile => 6,
@@ -122,8 +114,6 @@ impl OnboardingRequirement {
                 upload_mode: _,
                 document_request_kind: _,
             } => false,
-            Self::CollectProofOfSsn => false,
-            Self::CollectProofOfAddress => false,
             Self::Process => false,
         }
     }
