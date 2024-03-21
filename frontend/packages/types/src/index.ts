@@ -14,6 +14,8 @@ export type {
   CollectKycDataRequirement,
   ConsentRequest,
   ConsentResponse,
+  CreateListRequest,
+  CreateListResponse,
   CreateMembersRequest,
   CreateMembersResponse,
   CreateOrgFrequentNoteRequest,

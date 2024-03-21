@@ -2314,7 +2314,57 @@
         }
       },
       "dialog": {
-        "title": "Create List"
+        "title": "Create List",
+        "cta": {
+          "create": {
+            "label": "Create",
+            "aria-label": "Create list"
+          },
+          "cancel": "Cancel"
+        },
+        "form": {
+          "name": {
+            "label": "List name",
+            "hint": "Will appear in rules as \"{{alias}}\"",
+            "placeholder": "e.g. Blocked users",
+            "errors": {
+              "required": "Please enter a name for the list."
+            }
+          },
+          "kind": {
+            "label": "Type",
+            "placeholder": "Select",
+            "errors": {
+              "required": "Please select a type."
+            },
+            "options": {
+              "email_address": "Email address",
+              "email_domain": "Email domain",
+              "ssn9": "SSN",
+              "phone_number": "Phone number",
+              "phone_country_code": "Phone country code",
+              "ip_address": "IP address"
+            }
+          },
+          "entries": {
+            "label": "Enter values manually",
+            "placeholder": "jane.doe@acme.com,joe.doe@acme.com",
+            "hint": "Separated by commas",
+            "errors": {
+              "required": "Please enter at least one entry for the list."
+            }
+          }
+        },
+        "feedback": {
+          "success": {
+            "title": "Success",
+            "description": "List created successfully."
+          },
+          "error": {
+            "title": "Error creating list",
+            "description": "Something went wrong, please try again."
+          }
+        }
       }
     },
     "playbooks": {

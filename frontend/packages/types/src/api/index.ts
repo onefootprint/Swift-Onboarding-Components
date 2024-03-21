@@ -9,6 +9,7 @@ export type {
   BusinessDataResponse,
 } from './business-data';
 export type { ConsentRequest, ConsentResponse } from './consent';
+export type { CreateListRequest, CreateListResponse } from './create-list';
 export type {
   CreateMembersRequest,
   CreateMembersResponse,
