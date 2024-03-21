@@ -278,6 +278,8 @@ export { default as IcoShare24 } from './ico-share-24';
 export { default as IcoShield16 } from './ico-shield-16';
 export { default as IcoShield24 } from './ico-shield-24';
 export { default as IcoShield40 } from './ico-shield-40';
+export { default as IcoShuffle16 } from './ico-shuffle-16';
+export { default as IcoShuffle24 } from './ico-shuffle-24';
 export { default as IcoSmartphone216 } from './ico-smartphone-2-16';
 export { default as IcoSmartphone224 } from './ico-smartphone-2-24';
 export { default as IcoSmartphone16 } from './ico-smartphone-16';
