@@ -102,7 +102,7 @@ impl FromStr for PhoneNumber {
 }
 
 impl PhoneNumber {
-    const PREFER_WHATSAPP_COUNTRIES: &'static [CountryId] = &[CountryId::MX, CountryId::BZ];
+    const PREFER_WHATSAPP_COUNTRIES: &'static [CountryId] = &[CountryId::MX, CountryId::BR];
 
     /// Returns true if we decide the country of this phone number prefers to receive messages
     /// via WhatsApp over SMS
@@ -149,6 +149,15 @@ mod tests {
     fn test_subscriber_number(number: &str) -> String {
         let phone_number = PhoneNumber::parse(number.into()).unwrap();
         phone_number.subscriber_number().leak_to_string()
+    }
+
+    #[test_case("+1-415-123-1234" => false)]
+    #[test_case("+55 (12) 12345-1234" => true)]
+    #[test_case(" +52 55 1254 5678" => true)]
+    #[test_case("+47 913 12 123" => false)]
+    fn test_prefers_whatsapp(number: &str) -> bool {
+        let phone_number = PhoneNumber::parse(number.into()).unwrap();
+        phone_number.prefers_whatsapp()
     }
 
     #[test]
