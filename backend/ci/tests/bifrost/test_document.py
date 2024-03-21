@@ -383,3 +383,57 @@ def test_user_uploading_small_image(doc_request_sandbox_ob_config):
     assert body["error"]["message"].startswith(
         "Image too small"
     )
+
+# When a user has issues with their mobile device's camera initializing, we force the user to upload images
+# and we produce a risk signal so that tenants are aware
+def test_user_having_trouble_with_their_mobile_camera(sandbox_tenant, doc_request_sandbox_ob_config):
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_requirements(kind="liveness")
+    status = bifrost.get_status()
+    doc_requirement = get_requirement_from_requirements(
+        "collect_document", status["all_requirements"]
+    )
+    # consent
+    consent_data = {"consent_language_text": "I consent"}
+    post("hosted/user/consent", consent_data, bifrost.auth_token)
+
+    data = {
+        "document_type": "drivers_license",
+        "country_code": "US",
+        "device_type": "desktop",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token)
+    doc_id = body["id"]
+
+    # Upload the documents consecutively in separate requests
+    sides = ["front", "back", "selfie"]
+    for i, side in enumerate(sides):
+        headers = {
+            "x-fp-process-separately": "true",
+            "x-fp-is-forced-upload": "true",
+        }
+        post(
+            f"hosted/user/documents/{doc_id}/upload/{side}",
+            None,
+            bifrost.auth_token,
+            files=bifrost.data[f"document.drivers_license.{side}.image"](),
+            addl_headers=headers,
+        )
+        post(f"hosted/user/documents/{doc_id}/process", None, bifrost.auth_token)
+
+    # Finish bifrost
+    user = bifrost.run()
+
+
+    # we have correct risk signal for forcing upload
+    risk_signals = get(
+        f"entities/{user.fp_id}/risk_signals", None, sandbox_tenant.sk.key
+    )
+    reason_codes = set(r["reason_code"] for r in risk_signals)
+    assert "document_live_capture_failed" in reason_codes
+    
+    # this is added as a default rule, so we test user triggers the rule
+    rsr = get(f"entities/{user.fp_id}/rule_set_result", None, *sandbox_tenant.db_auths)
+    doc_capture_failed_rule_results = [r for r in rsr['rule_results'] if r['rule']['rule_expression'][0]['field'] == 'document_live_capture_failed']
+    assert doc_capture_failed_rule_results[0]['result']
