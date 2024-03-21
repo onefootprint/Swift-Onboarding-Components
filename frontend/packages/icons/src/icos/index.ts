@@ -86,6 +86,7 @@ export { default as IcoClipboard16 } from './ico-clipboard-16';
 export { default as IcoClipboard24 } from './ico-clipboard-24';
 export { default as IcoClock16 } from './ico-clock-16';
 export { default as IcoClock24 } from './ico-clock-24';
+export { default as IcoClock40 } from './ico-clock-40';
 export { default as IcoClockSmall16 } from './ico-clock-small-16';
 export { default as IcoClose16 } from './ico-close-16';
 export { default as IcoClose24 } from './ico-close-24';
