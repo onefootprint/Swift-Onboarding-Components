@@ -17,8 +17,9 @@ const DeviceInsights = ({ entity }: ContentProps) => {
     keyPrefix: 'pages.entity.device-insights',
   });
   const { error, data, isSuccess } = useCurrentEntityAuthEvents();
-  const mostRecentWfInsight =
-    entity.workflows.sort(mostRecentWorkflow)[0]?.insightEvent;
+  const mostRecentWfInsight = entity.workflows
+    .filter(wf => !!wf.insightEvent)
+    .sort(mostRecentWorkflow)[0]?.insightEvent;
   const biometricCred = data?.find(e => e.kind === LivenessKind.passkey);
   const attestation = biometricCred?.linkedAttestations.at(0);
   const deviceInfo = {
