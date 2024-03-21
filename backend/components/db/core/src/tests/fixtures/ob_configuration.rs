@@ -1,7 +1,7 @@
 use crate::PgConn;
 use newtypes::{
-    CipKind, CollectedDataOption as CDO, DbActor, EnhancedAmlOption, Iso3166TwoDigitCountryCode,
-    ObConfigurationKind, TenantId,
+    CipKind, CollectedDataOption as CDO, DbActor, DocumentAndCountryConfiguration, EnhancedAmlOption,
+    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
 };
 
 use crate::models::ob_configuration::ObConfiguration;
@@ -50,6 +50,7 @@ pub struct ObConfigurationOpts {
     pub doc_scan_for_optional_ssn: Option<CDO>,
     pub enhanced_aml: EnhancedAmlOption,
     pub kind: ObConfigurationKind,
+    pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
 }
 
 impl Default for ObConfigurationOpts {
@@ -70,6 +71,7 @@ impl Default for ObConfigurationOpts {
             doc_scan_for_optional_ssn: None,
             enhanced_aml: EnhancedAmlOption::No,
             kind: ObConfigurationKind::Kyc,
+            document_types_and_countries: None,
         }
     }
 }
@@ -101,7 +103,7 @@ pub fn create_with_opts(
         opts.kind,
         false,
         false,
-        None,
+        opts.document_types_and_countries,
     )
     .expect("Could not create ob config")
 }

@@ -1345,4 +1345,27 @@ mod tests {
             obc.enhanced_aml
         );
     }
+
+
+    #[db_test]
+    pub fn test_document_and_countries_roundtrip(conn: &mut TestPgConn) {
+        let t = fixtures::tenant::create(conn);
+        let supported = CountrySpecificDocumentMapping(HashMap::from_iter(vec![
+            (Iso3166TwoDigitCountryCode::CA, vec![IdDocKind::DriversLicense]),
+            (Iso3166TwoDigitCountryCode::MX, vec![IdDocKind::DriversLicense]),
+        ]));
+        let document_types_and_countries = Some(DocumentAndCountryConfiguration {
+            global: vec![IdDocKind::Passport],
+            country_specific: supported,
+        });
+
+        let opts = ObConfigurationOpts {
+            document_types_and_countries: document_types_and_countries.clone(),
+            ..Default::default()
+        };
+        let obc = fixtures::ob_configuration::create_with_opts(conn, &t.id, opts);
+
+        let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
+        assert_eq!(document_types_and_countries, obc.document_types_and_countries)
+    }
 }
