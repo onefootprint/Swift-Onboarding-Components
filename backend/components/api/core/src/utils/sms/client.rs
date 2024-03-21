@@ -1,6 +1,7 @@
 use super::{super::challenge_rate_limit::RateLimit, vendors::SmsVendorKind};
 use crate::{
     errors::{user::UserError, ApiError, ApiResult, AssertionError},
+    utils::sms::vendors::SmsSendStatus,
     State,
 };
 use aws_credential_types::provider::SharedCredentialsProvider;
@@ -205,10 +206,15 @@ impl SmsClient {
         let mut sent_error_to_caller = false;
         for vendor in vendors {
             let e = match vendor.send(self, &message, &destination.e164()).await {
-                Ok(_) => return Ok(()),
-                Err(e) => e,
+                Ok(SmsSendStatus::Sent) => return Ok(()),
+                Ok(SmsSendStatus::Unsent) => None,
+                Err(e) => Some(e),
             };
-            tracing::warn!(vendors=%Csv(vendor_kinds.clone()), err=%e, err_debug=?e, "Moving on to next SMS vendor");
+            tracing::warn!(vendors=%Csv(vendor_kinds.clone()), has_err=e.is_some(), err=?e.as_ref().map(|e| e.to_string()), err_debug=?e, "Moving on to next SMS vendor");
+            let Some(e) = e else {
+                // There's no error to return to the client but we still want to retry the next vendor
+                continue;
+            };
             err = if let Some(tx) = tx.take() {
                 // After the first error is encountered, pass the error back on the channel in
                 // case someone is listening

@@ -18,6 +18,17 @@ pub enum Error {
     SerdeJson(#[from] serde_json::Error),
 }
 
+impl Error {
+    /// Returns true if the error is from failed delivery due to the recipient being invalid
+    pub fn is_invalid_recipient_error(&self) -> bool {
+        const TWILIO_INVALID_RECIPIENT_ERROR_CODE: i64 = 63024;
+        matches!(
+            self,
+            Error::DeliveryFailed(Status::Failed, Some(TWILIO_INVALID_RECIPIENT_ERROR_CODE))
+        )
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Error)]
 pub struct ApiErrorResponse {
     pub code: i64,
