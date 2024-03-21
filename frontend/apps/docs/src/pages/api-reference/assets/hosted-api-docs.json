@@ -1315,68 +1315,6 @@
                 "security": []
             }
         },
-        "/hosted/user/passkey": {
-            "post": {
-                "tags": [
-                    "Passkey",
-                    "Hosted"
-                ],
-                "description": "Accepts a response to a passkey registration challenge",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/WebauthnRegisterRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "User Token": []
-                    }
-                ]
-            }
-        },
-        "/hosted/user/passkey/register": {
-            "post": {
-                "tags": [
-                    "Passkey",
-                    "Hosted"
-                ],
-                "description": "Generates a passkey registration challenge.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/WebAuthnInitResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "User Token": []
-                    }
-                ]
-            }
-        },
         "/hosted/user/token": {
             "get": {
                 "tags": [
@@ -6172,41 +6110,6 @@
                 },
                 "required": [
                     "fields"
-                ]
-            },
-            "WebAuthnInitResponse": {
-                "description": "Contains the payload for the frontend to communicate to the device via webauthn",
-                "type": "object",
-                "properties": {
-                    "challenge_json": {
-                        "description": "NOTE: this json needs to be a string as we need to be able to compute it's hash",
-                        "type": "string"
-                    },
-                    "challenge_token": {
-                        "description": "Encrypted, base64-encoded challenge information",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "challenge_json",
-                    "challenge_token"
-                ]
-            },
-            "WebauthnRegisterRequest": {
-                "description": "Contains the response from the device",
-                "type": "object",
-                "properties": {
-                    "challenge_token": {
-                        "description": "Encrypted, base64-encoded challenge information",
-                        "type": "string"
-                    },
-                    "device_response_json": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "challenge_token",
-                    "device_response_json"
                 ]
             }
         }

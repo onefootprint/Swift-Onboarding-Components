@@ -8,7 +8,6 @@ mod challenge;
 mod consent;
 pub mod documents;
 mod email;
-mod passkey;
 mod token;
 mod upload;
 mod vault;
@@ -22,8 +21,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(vault::decrypt::post)
         .service(access_events::get)
         .service(authorized_orgs::get)
-        .service(passkey::init_post)
-        .service(passkey::complete_post)
         .service(documents::index::post)
         .service(documents::upload::post)
         .service(documents::process::post)
@@ -36,7 +33,4 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(auth_methods::get)
         .service(attest_device::post_challenge)
         .service(attest_device::post_attestation);
-
-    passkey::configure_init_post_aliases(config);
-    passkey::configure_complete_post_aliases(config);
 }

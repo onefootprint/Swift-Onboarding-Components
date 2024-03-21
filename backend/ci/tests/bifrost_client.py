@@ -300,7 +300,10 @@ class BifrostClient:
         if requirement["should_collect_selfie"]:
             sides.append("selfie")
 
-        data = {"document_type": doc_kind,"country_code": "US",}
+        data = {
+            "document_type": doc_kind,
+            "country_code": "US",
+        }
         body = post("hosted/user/documents", data, self.auth_token)
         doc_id = body["id"]
 
@@ -313,7 +316,13 @@ class BifrostClient:
                 "x-fp-is-mobile": "true",
                 "x-fp-process-separately": "true",
             }
-            post(f"hosted/user/documents/{doc_id}/upload/{side}",None,self.auth_token,files=file,addl_headers=headers,)
+            post(
+                f"hosted/user/documents/{doc_id}/upload/{side}",
+                None,
+                self.auth_token,
+                files=file,
+                addl_headers=headers,
+            )
             body = post(
                 f"hosted/user/documents/{doc_id}/process", None, self.auth_token
             )
@@ -335,15 +344,16 @@ class BifrostClient:
 
     def handle_liveness(self):
         """Register the passkey credential"""
-        body = post("hosted/user/passkey/register", None, self.auth_token)
+        data = dict(kind="passkey", action_kind="add_primary")
+        body = post("hosted/user/challenge", data, self.auth_token)
         chal_token = body["challenge_token"]
-        chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
+        chal = override_webauthn_challenge(json.loads(body["biometric_challenge_json"]))
         attestation = self.webauthn_device.create(chal, TEST_URL)
         attestation = override_webauthn_attestation(attestation)
         data = dict(
-            challenge_token=chal_token, device_response_json=json.dumps(attestation)
+            challenge_token=chal_token, challenge_response=json.dumps(attestation)
         )
-        post("hosted/user/passkey", data, self.auth_token)
+        post("hosted/user/challenge/verify", data, self.auth_token)
 
     def handle_authorize(self, **kwargs):
         post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)

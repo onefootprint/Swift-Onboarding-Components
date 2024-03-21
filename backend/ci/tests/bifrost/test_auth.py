@@ -66,6 +66,10 @@ def test_onboarding_authed_user(authed_user, sandbox_tenant):
         provide_playbook_auth=True,
     )
 
+    # Since bifrost has implicit auth, we need to skip passkey registering - can only register with
+    # explicit auth
+    body = post("hosted/onboarding/skip_passkey_register", None, auth_token)
+
     # Check that the status is incomplete (aka in progress)
     body = get(f"entities/{authed_user.fp_id}", None, *sandbox_tenant.db_auths)
     assert body["status"] == "in_progress"

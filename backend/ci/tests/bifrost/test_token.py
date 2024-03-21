@@ -113,13 +113,17 @@ def test_3p_auth(sandbox_tenant, ob_config):
     body = get("hosted/user/token", None, auth_token)
     assert set(body["scopes"]) >= {"sign_up"}
 
-    # Run bifrost
     bifrost = BifrostClient.raw_auth(ob_config, auth_token, sandbox_id)
+
+    # Since bifrost has implicit auth, we need to skip passkey registering - can only register with
+    # explicit auth
+    body = post("hosted/onboarding/skip_passkey_register", None, auth_token)
+
+    # Run bifrost
     user = bifrost.run()
     assert [i["kind"] for i in bifrost.already_met_requirements] == ["authorize"]
     assert [i["kind"] for i in bifrost.handled_requirements] == [
         "collect_data",
-        "liveness",
         "process",
     ]
     assert user.fp_id == fp_id
