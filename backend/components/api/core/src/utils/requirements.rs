@@ -428,6 +428,7 @@ fn get_requirement_inner(
                     should_collect_consent: user_consent.is_none(),
                     supported_country_and_doc_types: supported_country_and_doc_types.0,
                     upload_mode: DocumentUploadMode::Default,
+                    document_request_kind: dr.kind,
                 })
             } else {
                 None
@@ -452,6 +453,7 @@ fn get_requirement_inner(
                         .supported_countries_and_doc_types_for_proof_of_ssn()
                         .0,
                     upload_mode: DocumentUploadMode::Default,
+                    document_request_kind: dr.kind,
                 })
             } else {
                 None
@@ -479,6 +481,7 @@ fn get_requirement_inner(
                         .supported_countries_and_doc_types_for_proof_of_address(country)
                         .0,
                     upload_mode: DocumentUploadMode::AllowUpload,
+                    document_request_kind: dr.kind,
                 })
             } else {
                 None

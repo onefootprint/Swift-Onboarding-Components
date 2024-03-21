@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    CollectedDataOption, DocumentRequestId, DocumentUploadMode, IdDocKind, Iso3166TwoDigitCountryCode,
+    CollectedDataOption, DocumentRequestId, DocumentRequestKind, DocumentUploadMode, IdDocKind,
+    Iso3166TwoDigitCountryCode,
 };
 use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
@@ -43,6 +44,7 @@ pub enum OnboardingRequirement {
         should_collect_consent: bool,
         supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
         upload_mode: DocumentUploadMode,
+        document_request_kind: DocumentRequestKind,
     },
     /// Uses the same struct as CollectDocument in practice
     CollectProofOfSsn,
@@ -56,6 +58,7 @@ pub enum OnboardingRequirement {
     /// The client needs to tell us when user input is done in order for us to continue processing
     Process,
 }
+
 
 impl OnboardingRequirementKind {
     pub fn priority(&self, is_doc_first: bool) -> usize {
@@ -117,6 +120,7 @@ impl OnboardingRequirement {
                 should_collect_selfie: _,
                 supported_country_and_doc_types: _,
                 upload_mode: _,
+                document_request_kind: _,
             } => false,
             Self::CollectProofOfSsn => false,
             Self::CollectProofOfAddress => false,
