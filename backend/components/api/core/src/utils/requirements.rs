@@ -331,21 +331,24 @@ fn get_requirement_inner(
     obc: &ObConfiguration,
     wf: &Workflow,
     decrypted_values: &DecryptUncheckedResultForReqs,
-) -> ApiResult<Option<OnboardingRequirement>> {
+) -> ApiResult<Vec<OnboardingRequirement>> {
     let req = match k {
         OnboardingRequirementKind::CollectData => {
-            obc.must_collect(DID::Id).then(|| {
-                let RequirementProgress {
-                    populated_attributes,
-                    missing_attributes,
-                } = get_data_collection_progress(vw, obc, DID::Id, decrypted_values);
-                // if ob config needs to collect id data
-                OnboardingRequirement::CollectData {
-                    missing_attributes,
-                    optional_attributes: obc.optional_data.clone(),
-                    populated_attributes,
-                }
-            })
+            obc.must_collect(DID::Id)
+                .then(|| {
+                    let RequirementProgress {
+                        populated_attributes,
+                        missing_attributes,
+                    } = get_data_collection_progress(vw, obc, DID::Id, decrypted_values);
+                    // if ob config needs to collect id data
+                    OnboardingRequirement::CollectData {
+                        missing_attributes,
+                        optional_attributes: obc.optional_data.clone(),
+                        populated_attributes,
+                    }
+                })
+                .into_iter()
+                .collect()
         }
         OnboardingRequirementKind::CollectInvestorProfile => {
             obc.must_collect(DID::InvestorProfile)
@@ -371,6 +374,8 @@ fn get_requirement_inner(
                     })
                 })
                 .transpose()?
+                .into_iter()
+                .collect()
         }
         OnboardingRequirementKind::CollectBusinessData => obc
             .must_collect(DID::Business)
@@ -384,12 +389,14 @@ fn get_requirement_inner(
                     populated_attributes,
                 })
             })
-            .transpose()?,
+            .transpose()?
+            .into_iter()
+            .collect(),
         // The below requirements we will never include when met
         // (kind of confusing in that we are checking in real-time if they've been satisifed)
         OnboardingRequirementKind::RegisterPasskey => {
             // skip passkey registration on no-phone flows
-            if obc.is_no_phone_flow {
+            let out = if obc.is_no_phone_flow {
                 None
             } else {
                 let credentials = WebauthnCredential::list(conn, &vw.vault().id)?;
@@ -403,9 +410,12 @@ fn get_requirement_inner(
 
                 (liveness_skip_events.is_empty() && credentials.is_empty())
                     .then_some(OnboardingRequirement::RegisterPasskey)
-            }
+            };
+
+            out.into_iter().collect()
         }
         OnboardingRequirementKind::CollectDocument => {
+            let mut requirements = vec![];
             let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?;
             if let Some(dr) = dr {
                 let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
@@ -422,19 +432,22 @@ fn get_requirement_inner(
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
                 let supported_country_and_doc_types = obc.supported_country_mapping_for_document(country);
 
-                should_render.then_some(OnboardingRequirement::CollectDocument {
-                    document_request_id: dr.id,
-                    should_collect_selfie: dr.should_collect_selfie,
-                    should_collect_consent: user_consent.is_none(),
-                    supported_country_and_doc_types: supported_country_and_doc_types.0,
-                    upload_mode: DocumentUploadMode::Default,
-                    document_request_kind: dr.kind,
-                })
-            } else {
-                None
-            }
+                if should_render {
+                    requirements.push(OnboardingRequirement::CollectDocument {
+                        document_request_id: dr.id,
+                        should_collect_selfie: dr.should_collect_selfie,
+                        should_collect_consent: user_consent.is_none(),
+                        supported_country_and_doc_types: supported_country_and_doc_types.0,
+                        upload_mode: DocumentUploadMode::Default,
+                        document_request_kind: dr.kind,
+                    })
+                }
+            };
+
+            requirements
         }
         OnboardingRequirementKind::CollectProofOfSsn => {
+            let mut requirements = vec![];
             let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::ProofOfSsn)?;
             if let Some(dr) = dr {
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
@@ -445,21 +458,24 @@ fn get_requirement_inner(
                         .into_iter()
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
 
-                should_render.then_some(OnboardingRequirement::CollectDocument {
-                    document_request_id: dr.id,
-                    should_collect_selfie: false,
-                    should_collect_consent: false,
-                    supported_country_and_doc_types: obc
-                        .supported_countries_and_doc_types_for_proof_of_ssn()
-                        .0,
-                    upload_mode: DocumentUploadMode::Default,
-                    document_request_kind: dr.kind,
-                })
-            } else {
-                None
-            }
+                if should_render {
+                    requirements.push(OnboardingRequirement::CollectDocument {
+                        document_request_id: dr.id,
+                        should_collect_selfie: false,
+                        should_collect_consent: false,
+                        supported_country_and_doc_types: obc
+                            .supported_countries_and_doc_types_for_proof_of_ssn()
+                            .0,
+                        upload_mode: DocumentUploadMode::Default,
+                        document_request_kind: dr.kind,
+                    })
+                }
+            };
+
+            requirements
         }
         OnboardingRequirementKind::CollectProofOfAddress => {
+            let mut requirements = vec![];
             let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::ProofOfAddress)?;
             if let Some(dr) = dr {
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
@@ -473,19 +489,21 @@ fn get_requirement_inner(
                         .into_iter()
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
 
-                should_render.then_some(OnboardingRequirement::CollectDocument {
-                    document_request_id: dr.id,
-                    should_collect_selfie: false,
-                    should_collect_consent: false,
-                    supported_country_and_doc_types: obc
-                        .supported_countries_and_doc_types_for_proof_of_address(country)
-                        .0,
-                    upload_mode: DocumentUploadMode::AllowUpload,
-                    document_request_kind: dr.kind,
-                })
-            } else {
-                None
-            }
+                if should_render {
+                    requirements.push(OnboardingRequirement::CollectDocument {
+                        document_request_id: dr.id,
+                        should_collect_selfie: false,
+                        should_collect_consent: false,
+                        supported_country_and_doc_types: obc
+                            .supported_countries_and_doc_types_for_proof_of_address(country)
+                            .0,
+                        upload_mode: DocumentUploadMode::AllowUpload,
+                        document_request_kind: dr.kind,
+                    })
+                }
+            };
+
+            requirements
         }
         OnboardingRequirementKind::Authorize => {
             let (document_types, skipped_selfie) = if obc.can_access_document() {
@@ -532,17 +550,17 @@ fn get_requirement_inner(
                 collected_data,
                 document_types,
             };
-            Some(OnboardingRequirement::Authorize {
+            vec![OnboardingRequirement::Authorize {
                 fields_to_authorize,
                 authorized_at: wf.authorized_at,
-            })
+            }]
         }
         OnboardingRequirementKind::Process => {
             if wf.state.requires_user_input() {
                 // If the worfklow is in a state that requires user input, make a Process requirement
-                Some(OnboardingRequirement::Process)
+                vec![OnboardingRequirement::Process]
             } else {
-                None
+                vec![]
             }
         }
     };
