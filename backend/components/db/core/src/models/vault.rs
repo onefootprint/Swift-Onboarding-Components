@@ -150,10 +150,13 @@ impl Vault {
     }
 
     #[tracing::instrument("Vault::mark_verified", skip_all)]
+    /// As soon as a vault's contact info is marked as OTP verified, the vault itself is marked as
+    /// verified _and_ identifiable.
+    // This has the effect of allowing vaults initially created via API to now be identifiable
     pub fn mark_verified(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
         diesel::update(vault::table)
             .filter(vault::id.eq(id))
-            .set(vault::is_verified.eq(true))
+            .set((vault::is_verified.eq(true), vault::is_identifiable.eq(true)))
             .execute(conn.conn())?;
         Ok(())
     }
@@ -240,6 +243,12 @@ impl Vault {
     #[tracing::instrument("Vault::mark_portable", skip_all)]
     /// Mark the provided vault as portable
     pub fn mark_portable(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
+        let existing: Self = vault::table.filter(vault::id.eq(id)).get_result(conn.conn())?;
+        if !existing.is_identifiable {
+            // TODO if we don't see this happening at all, we can remove the logic that sets
+            // is_identifiable to true below
+            tracing::error!(%id, "Portablizing vault that is not identifiable");
+        }
         diesel::update(vault::table)
             .filter(vault::id.eq(id))
             .set((
