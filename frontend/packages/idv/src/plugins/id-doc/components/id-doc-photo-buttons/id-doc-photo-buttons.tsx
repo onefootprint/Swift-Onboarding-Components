@@ -15,11 +15,13 @@ type IdDocPhotoButtonsProp = {
     captureKind: CaptureKind,
   ) => void;
   uploadFirst?: boolean;
+  hideCaptureButton?: boolean;
 };
 
 const IdDocPhotoButtons = ({
   onComplete,
   uploadFirst,
+  hideCaptureButton,
 }: IdDocPhotoButtonsProp) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.id-doc-photo-upload-buttons',
@@ -30,6 +32,7 @@ const IdDocPhotoButtons = ({
   const { processImageFile, acceptedFileFormats } = useProcessImage({
     allowPdf: uploadFirst,
   });
+  const showCaptureButton = !hideCaptureButton;
 
   const [isLoading, setIsLoading] = useState(false);
   const [captureMethod, setCaptureMethod] = useState<
@@ -95,14 +98,16 @@ const IdDocPhotoButtons = ({
           {t('upload-file.title')}
         </Button>
       )}
-      <Button
-        fullWidth
-        onClick={handleTake}
-        variant={uploadFirst ? 'secondary' : 'primary'}
-        size="large"
-      >
-        {t('take-photo.title')}
-      </Button>
+      {showCaptureButton && (
+        <Button
+          fullWidth
+          onClick={handleTake}
+          variant={uploadFirst ? 'secondary' : 'primary'}
+          size="large"
+        >
+          {t('take-photo.title')}
+        </Button>
+      )}
       {!uploadFirst && (
         <Button
           fullWidth

@@ -4,7 +4,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 type PromptWithGuidelinesProps = {
-  icon: Icon;
+  icon?: Icon;
   guidelines: string[];
   title: string;
   description?: string;
@@ -19,7 +19,7 @@ const PromptWithGuidelines = ({
   variant = 'default',
 }: PromptWithGuidelinesProps) => (
   <Container>
-    <Icon color={variant === 'error' ? 'error' : 'primary'} />
+    {Icon && <Icon color={variant === 'error' ? 'error' : 'primary'} />}
     <Text
       variant="label-1"
       color={variant === 'error' ? 'error' : 'primary'}

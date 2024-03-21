@@ -1,4 +1,4 @@
-import type { IdDocImageTypes } from '@onefootprint/types';
+import type { CountryCode, IdDocImageTypes } from '@onefootprint/types';
 
 import type { MachineContext, ProccessingSucceededEvent } from './types';
 
@@ -57,3 +57,15 @@ export const NextSideTargetsDesktop: MachineTarget[] = [
     target: 'complete',
   },
 ];
+
+export const isSingleDocCountryMap = (context: MachineContext) => {
+  const { supportedCountryAndDocTypes } = context;
+  const supportedCountries = Object.keys(supportedCountryAndDocTypes);
+  const numCountries = supportedCountries.length;
+  if (numCountries !== 1) {
+    return false;
+  }
+  const numDocTypes =
+    supportedCountryAndDocTypes[supportedCountries[0] as CountryCode]?.length;
+  return numDocTypes === 1;
+};

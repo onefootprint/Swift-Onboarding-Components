@@ -26,10 +26,10 @@ import useIdvRequestErrorToast from '../../../../../hooks/ui/use-idv-request-err
 import Logger from '../../../../../utils/logger';
 import ConsentMobile from '../../../components/id-doc-photo-prompt/components/consent-mobile';
 import { useIdDocMachine } from '../../../components/machine-provider';
+import useSubmitDocType from '../../../hooks/use-submit-doc-type';
+import detectWebcam from '../../../utils/detect-webcam';
 import { getCountryFromCode } from '../../../utils/get-country-from-code';
 import useOptionsByDocType from '../hooks/use-options-by-doc-type';
-import useSubmitDocType from '../hooks/use-submit-doc-type';
-import detectWebcam from '../utils/detect-webcam';
 
 type IdDocCountryAndTypeContainerProps = {
   onSubmitDocTypeSuccess: (

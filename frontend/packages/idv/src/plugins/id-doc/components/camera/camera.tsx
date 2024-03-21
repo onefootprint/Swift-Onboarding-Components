@@ -80,7 +80,7 @@ const CountDownProps = {
   countStart: AUTOCAPTURE_TIMER_START_VAL,
   intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
 };
-const PLAY_CHECK_INTERVAL = 3000;
+const PLAY_CHECK_INTERVAL = 1500;
 
 const logError = (e: string) => Logger.error(e, 'camera');
 const logWarn = (e: string) => Logger.warn(e, 'camera');

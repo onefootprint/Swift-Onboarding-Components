@@ -43,7 +43,7 @@ const Router = ({ onDone }: RouterProps) => {
     return <DesktopConsent />;
   }
 
-  if (state.matches('frontImageUploadFirstMobile')) {
+  if (state.matches('frontImageUploadFirst')) {
     return <IdDocUploadFirstPrompt />;
   }
 

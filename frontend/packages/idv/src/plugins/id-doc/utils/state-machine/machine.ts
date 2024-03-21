@@ -5,7 +5,11 @@ import {
 import { assign, createMachine } from 'xstate';
 
 import Logger from '../../../../utils/logger';
-import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
+import {
+  isSingleDocCountryMap,
+  NextSideTargetsDesktop,
+  NextSideTargetsMobile,
+} from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (args: MachineContext, initState?: string) =>
@@ -25,6 +29,13 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         init: {
           always: [
             {
+              target: 'frontImageUploadFirst',
+              cond: context =>
+                !context.requirement.shouldCollectConsent &&
+                context.requirement.uploadMode === 'allow_upload' &&
+                isSingleDocCountryMap(context),
+            },
+            {
               target: 'countryAndType',
             },
           ],
@@ -33,9 +44,8 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           on: {
             receivedCountryAndType: [
               {
-                target: 'frontImageUploadFirstMobile',
+                target: 'frontImageUploadFirst',
                 cond: context =>
-                  context.device.type === 'mobile' &&
                   !context.requirement.shouldCollectConsent &&
                   context.requirement.uploadMode === 'allow_upload',
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
@@ -65,7 +75,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             ],
             consentReceived: [
               {
-                target: 'frontImageUploadFirstMobile',
+                target: 'frontImageUploadFirst',
                 cond: context =>
                   !!context.id &&
                   context.requirement.uploadMode === 'allow_upload',
@@ -109,25 +119,36 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        frontImageUploadFirstMobile: {
+        frontImageUploadFirst: {
           on: {
+            receivedCountryAndType: {
+              actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+            },
             navigatedToPrev: {
               target: 'countryAndType',
             },
             startImageCapture: {
               target: 'frontImageCaptureMobile',
             },
-            receivedImage: {
-              target: 'processingMobile',
-              actions: 'assignImage',
-            },
+            receivedImage: [
+              {
+                target: 'processingMobile',
+                actions: 'assignImage',
+                cond: context => context.device.type === 'mobile',
+              },
+              {
+                target: 'processingDesktop',
+                actions: 'assignImage',
+                cond: context => context.device.type !== 'mobile',
+              },
+            ],
           },
         },
         frontImageCaptureMobile: {
           on: {
             navigatedToPrev: [
               {
-                target: 'frontImageUploadFirstMobile',
+                target: 'frontImageUploadFirst',
                 cond: context =>
                   context.requirement.uploadMode === 'allow_upload',
               },

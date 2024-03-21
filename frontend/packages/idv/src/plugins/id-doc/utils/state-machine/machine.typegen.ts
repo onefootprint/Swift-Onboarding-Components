@@ -38,7 +38,7 @@ export interface Typegen0 {
     | 'frontImageDesktop'
     | 'frontImageRetryDesktop'
     | 'frontImageRetryMobile'
-    | 'frontImageUploadFirstMobile'
+    | 'frontImageUploadFirst'
     | 'init'
     | 'processingDesktop'
     | 'processingMobile'
