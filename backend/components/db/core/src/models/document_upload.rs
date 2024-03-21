@@ -44,6 +44,8 @@ pub struct DocumentUpload {
     pub is_extra_compressed: bool,
     /// Client-provided (so cannot always be trusted) flag that tells if the upload was *not* a live capture. Ie is_upload=True implies the user uploaded the image from camera roll
     pub is_upload: Option<bool>,
+    /// Client-provided: if camera permissions are granted, but camera won't initialize.
+    pub is_forced_upload: Option<bool>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -61,6 +63,7 @@ struct NewDocumentUploadRow {
     is_manual: Option<bool>,
     is_extra_compressed: bool,
     is_upload: Option<bool>,
+    is_forced_upload: Option<bool>,
 }
 
 #[derive(Debug, AsChangeset)]
@@ -82,6 +85,7 @@ pub struct NewDocumentUploadArgs {
     pub is_manual: Option<bool>,
     pub is_extra_compressed: bool,
     pub is_upload: Option<bool>,
+    pub is_forced_upload: Option<bool>,
 }
 
 impl DocumentUpload {
@@ -101,7 +105,8 @@ impl DocumentUpload {
             is_app_clip,
             is_manual,
             is_extra_compressed,
-            is_upload
+            is_upload,
+            is_forced_upload,
         } = args;
         // Deactivate existing upload, if any
         // TODO this kind of silently replaces an old image, but maybe we don't want to allow this...
@@ -122,6 +127,7 @@ impl DocumentUpload {
             is_manual,
             is_extra_compressed,
             is_upload,
+            is_forced_upload,
         };
         let result = diesel::insert_into(document_upload::table)
             .values(new)

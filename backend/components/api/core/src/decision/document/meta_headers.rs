@@ -15,16 +15,18 @@ pub struct MetaHeaders {
     pub process_separately: Option<bool>,
     pub is_extra_compressed: bool,
     pub is_upload: Option<bool>,
+    /// When true, camera permissions were granted, but the camera did not initialize so we allowed uploads.
+    pub is_forced_upload: Option<bool>,
 }
 
 impl MetaHeaders {
     const IS_APP_CLIP_HEADER_NAME: &'static str = "x-fp-is-app-clip";
     const IS_EXTRA_COMPRESSED: &'static str = "x-fp-is-extra-compressed";
+    const IS_FORCED_UPLOAD_HEADER_NAME: &'static str = "x-fp-is-forced-upload";
     const IS_INSTANT_APP_HEADER_NAME: &'static str = "x-fp-is-instant-app";
     const IS_MANUAL_HEADER_NAME: &'static str = "x-fp-is-manual";
     const IS_UPLOAD_HEADER_NAME: &'static str = "x-fp-is-upload";
     const PROCESS_SEPARATELY_HEADER_NAME: &'static str = "x-fp-process-separately";
-    
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
         let is_instant_app = get_bool_header(Self::IS_INSTANT_APP_HEADER_NAME, headers);
@@ -33,13 +35,15 @@ impl MetaHeaders {
         let is_upload = get_bool_header(Self::IS_UPLOAD_HEADER_NAME, headers);
         let process_separately = get_bool_header(Self::PROCESS_SEPARATELY_HEADER_NAME, headers);
         let is_extra_compressed = get_bool_header(Self::IS_EXTRA_COMPRESSED, headers).unwrap_or(false);
+        let is_forced_upload = get_bool_header(Self::IS_FORCED_UPLOAD_HEADER_NAME, headers);
         Self {
             is_instant_app,
             is_app_clip,
             is_manual,
             process_separately,
             is_extra_compressed,
-            is_upload
+            is_upload,
+            is_forced_upload,
         }
     }
 }

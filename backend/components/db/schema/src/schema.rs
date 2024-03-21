@@ -364,6 +364,7 @@ diesel::table! {
         is_manual -> Nullable<Bool>,
         is_extra_compressed -> Bool,
         is_upload -> Nullable<Bool>,
+        is_forced_upload -> Nullable<Bool>,
     }
 }
 

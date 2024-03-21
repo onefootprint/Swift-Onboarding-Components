@@ -445,7 +445,8 @@ fn create_latest_doc_upload(
         is_app_clip: meta.is_app_clip,
         is_manual: meta.is_manual,
         is_extra_compressed: meta.is_extra_compressed,
-        is_upload: meta.is_upload
+        is_upload: meta.is_upload,
+        is_forced_upload: meta.is_forced_upload
     };
     DocumentUpload::create(conn, args)?;
     Ok(())
