@@ -60,6 +60,11 @@ const useRoutes = (): Route[] => {
           Icon: IcoBook16,
           text: t('playbooks'),
         },
+        // {
+        //   href: '/lists',
+        //   Icon: IcoBook16,
+        //   text: t('lists'),
+        // },
         {
           href: '/api-keys',
           Icon: IcoKey16,

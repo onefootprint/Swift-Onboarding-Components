@@ -538,6 +538,7 @@
         "settings": "Settings",
         "manual-reviews": "Manual reviews",
         "playbooks": "Playbooks",
+        "lists": "Lists",
         "api-keys": "API keys",
         "proxy-configs": "Vault proxy",
         "webhooks": "Webhooks",
@@ -2284,6 +2285,36 @@
             "decrypt": "Decrypt the specified attributes"
           }
         }
+      }
+    },
+    "lists": {
+      "page-title": "Footprint | Lists",
+      "header": {
+        "title": "Lists",
+        "subtitle": "Lists are used to manage and organize blocked users and businesses."
+      },
+      "create-button": "Create list",
+      "empty-description": "You haven't created any lists just yet.",
+      "cta-not-allowed": "You're not allowed to create lists",
+      "table": {
+        "aria-label": "Lists",
+        "header": {
+          "name": "List name",
+          "alias": "Alias",
+          "entries": "Entries",
+          "used-in-rules": "Used in rules",
+          "created": "Created at"
+        },
+        "empty-state": "You haven't created any lists.",
+        "row": {
+          "used-in-rules": {
+            "yes": "Yes",
+            "no": "No"
+          }
+        }
+      },
+      "dialog": {
+        "title": "Create List"
       }
     },
     "playbooks": {

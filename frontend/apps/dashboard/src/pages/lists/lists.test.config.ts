@@ -1,0 +1,53 @@
+import { mockRequest } from '@onefootprint/test-utils';
+import type { List } from '@onefootprint/types';
+import { ActorKind, ListKind } from '@onefootprint/types';
+
+import { playbooksFixture } from '../home/home.test.config';
+
+export const listsFixture: List[] = [
+  {
+    id: '1',
+    actor: {
+      kind: ActorKind.footprint,
+    },
+    alias: 'my_list',
+    createdAt: 'date',
+    kind: ListKind.emailAddress,
+    name: 'Email List',
+  },
+  {
+    id: '2',
+    actor: {
+      kind: ActorKind.footprint,
+    },
+    alias: 'my_list2',
+    createdAt: 'date',
+    kind: ListKind.ssn9,
+    name: 'SSN List',
+  },
+];
+
+export const withLists = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/lists',
+    response: {
+      data: listsFixture,
+      meta: {
+        nextPage: 0,
+        count: playbooksFixture.length,
+      },
+    },
+  });
+
+export const withListsError = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/lists',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
