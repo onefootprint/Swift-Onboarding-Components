@@ -15,8 +15,12 @@ type CaseTransformed<T> = T extends Array<infer U>
 
 const keysToCamelCase = <T extends Record<string, unknown>>(
   obj: T,
-): CaseTransformed<T> =>
-  transform(
+  disabled?: boolean,
+): CaseTransformed<T> | T => {
+  if (disabled) {
+    return obj;
+  }
+  return transform(
     obj,
     (result: Record<string, unknown>, value: unknown, key: string) => {
       let newValue: unknown;
@@ -42,11 +46,16 @@ const keysToCamelCase = <T extends Record<string, unknown>>(
     },
     {} as Record<string, unknown>,
   ) as CaseTransformed<T>;
+};
 
 const keysToSnakeCase = <T extends Record<string, unknown>>(
   obj: T,
-): CaseTransformed<T> =>
-  transform(
+  disabled?: boolean,
+): CaseTransformed<T> | T => {
+  if (disabled) {
+    return obj;
+  }
+  return transform(
     obj,
     (result: Record<string, unknown>, value: unknown, key: string) => {
       let newValue: unknown;
@@ -72,5 +81,6 @@ const keysToSnakeCase = <T extends Record<string, unknown>>(
     },
     {} as Record<string, unknown>,
   ) as CaseTransformed<T>;
+};
 
 export { keysToCamelCase, keysToSnakeCase };

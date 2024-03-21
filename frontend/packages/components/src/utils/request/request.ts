@@ -11,6 +11,7 @@ type Options = Omit<RequestInit, 'headers'> & {
   params?: Record<string, unknown>;
   headers?: Record<string, string | undefined>;
   url: string;
+  disableCaseConverter?: boolean;
 };
 
 function convertToRecordString(
@@ -32,11 +33,16 @@ async function request<T>(options: Options): Promise<T> {
     headers = {},
     params,
     data,
+    disableCaseConverter,
     ...otherOptions
   } = options;
 
-  const snakeCaseData = data ? keysToSnakeCase(data) : undefined;
-  const snakeCaseParams = params ? keysToSnakeCase(params) : {};
+  const snakeCaseData = data
+    ? keysToSnakeCase(data, disableCaseConverter)
+    : undefined;
+  const snakeCaseParams = params
+    ? keysToSnakeCase(params, disableCaseConverter)
+    : {};
   const queryParams = new URLSearchParams(
     convertToRecordString(snakeCaseParams),
   );
