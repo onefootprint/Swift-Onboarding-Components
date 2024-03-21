@@ -247,7 +247,7 @@ impl Vault {
         if !existing.is_identifiable {
             // TODO if we don't see this happening at all, we can remove the logic that sets
             // is_identifiable to true below
-            tracing::error!(%id, "Portablizing vault that is not identifiable");
+            tracing::warn!(%id, "Portablizing vault that is not identifiable");
         }
         diesel::update(vault::table)
             .filter(vault::id.eq(id))
