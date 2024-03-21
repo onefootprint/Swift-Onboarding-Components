@@ -56,28 +56,44 @@ pub enum OnboardingRequirement {
 }
 
 
-impl OnboardingRequirementKind {
+impl OnboardingRequirement {
     pub fn priority(&self, is_doc_first: bool) -> usize {
         if !is_doc_first {
             match self {
-                Self::CollectBusinessData => 0,
-                Self::CollectData => 1,
-                Self::CollectInvestorProfile => 2,
-                Self::RegisterPasskey => 3,
-                Self::CollectDocument => 4,
-                Self::Authorize => 7,
-                Self::Process => 8,
+                OnboardingRequirement::CollectBusinessData { .. } => 0,
+                OnboardingRequirement::CollectData { .. } => 1,
+                OnboardingRequirement::CollectInvestorProfile { .. } => 2,
+
+                OnboardingRequirement::RegisterPasskey => 3,
+                OnboardingRequirement::CollectDocument {
+                    document_request_kind,
+                    ..
+                } => match document_request_kind {
+                    DocumentRequestKind::Identity => 4,
+                    DocumentRequestKind::ProofOfSsn => 5,
+                    DocumentRequestKind::ProofOfAddress => 6,
+                },
+                OnboardingRequirement::Authorize { .. } => 7,
+                OnboardingRequirement::Process => 8,
             }
         } else {
             // For a doc-first config, we show passkey and doc collection first
             match self {
-                Self::RegisterPasskey => 0,
-                Self::CollectDocument => 1,
-                Self::CollectBusinessData => 4,
-                Self::CollectData => 5,
-                Self::CollectInvestorProfile => 6,
-                Self::Authorize => 7,
-                Self::Process => 8,
+                OnboardingRequirement::RegisterPasskey => 0,
+                OnboardingRequirement::CollectDocument {
+                    document_request_kind,
+                    ..
+                } => match document_request_kind {
+                    DocumentRequestKind::Identity => 1,
+                    DocumentRequestKind::ProofOfSsn => 2,
+                    DocumentRequestKind::ProofOfAddress => 3,
+                },
+                OnboardingRequirement::CollectBusinessData { .. } => 4,
+                OnboardingRequirement::CollectData { .. } => 5,
+                OnboardingRequirement::CollectInvestorProfile { .. } => 6,
+
+                OnboardingRequirement::Authorize { .. } => 7,
+                OnboardingRequirement::Process => 8,
             }
         }
     }
@@ -127,21 +143,70 @@ pub struct AuthorizeFields {
 
 #[cfg(test)]
 mod test {
-    use crate::OnboardingRequirementKind;
+    use std::{collections::HashMap, str::FromStr};
+
+    use crate::{
+        AuthorizeFields, DocumentRequestId, DocumentRequestKind, DocumentUploadMode, OnboardingRequirement,
+        OnboardingRequirementKind,
+    };
     use itertools::Itertools;
     use strum::IntoEnumIterator;
     use test_case::test_case;
 
+    fn test_requirements() -> Vec<OnboardingRequirement> {
+        let mut base = vec![
+            OnboardingRequirement::CollectBusinessData {
+                missing_attributes: vec![],
+                populated_attributes: vec![],
+            },
+            OnboardingRequirement::CollectData {
+                missing_attributes: vec![],
+                optional_attributes: vec![],
+                populated_attributes: vec![],
+            },
+            OnboardingRequirement::CollectInvestorProfile {
+                missing_attributes: vec![],
+                populated_attributes: vec![],
+                missing_document: false,
+            },
+            OnboardingRequirement::RegisterPasskey,
+            OnboardingRequirement::Authorize {
+                fields_to_authorize: AuthorizeFields {
+                    collected_data: vec![],
+                    document_types: vec![],
+                },
+                authorized_at: None,
+            },
+            OnboardingRequirement::Process,
+        ];
+
+        // add doc reqs in
+        for dr_kind in DocumentRequestKind::iter() {
+            base.push(OnboardingRequirement::CollectDocument {
+                document_request_id: DocumentRequestId::from_str("dr12").unwrap(),
+                should_collect_selfie: false,
+                should_collect_consent: false,
+                supported_country_and_doc_types: HashMap::new(),
+                upload_mode: DocumentUploadMode::AllowUpload,
+                document_request_kind: dr_kind,
+            });
+        }
+
+        base
+    }
+
     #[test_case(true)]
     #[test_case(false)]
     fn test_priority(is_doc_first: bool) {
+        let expected_len = OnboardingRequirementKind::iter().len() + DocumentRequestKind::iter().len() - 1;
         // Make sure each requirement has its own unique priority
         assert_eq!(
-            OnboardingRequirementKind::iter()
+            test_requirements()
+                .into_iter()
                 .map(|i| i.priority(is_doc_first))
                 .unique()
                 .count(),
-            OnboardingRequirementKind::iter().len()
+            expected_len
         )
     }
 }

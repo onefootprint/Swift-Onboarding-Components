@@ -315,7 +315,7 @@ pub fn get_requirements_inner(
             }
             true
         })
-        .sorted_by_key(|r| OnboardingRequirementKind::from(r).priority(obc.is_doc_first))
+        .sorted_by_key(|r| r.priority(obc.is_doc_first))
         .collect();
 
     tracing::info!(workflow_id=%wf.id, requirements=%format!("{:?}", requirements), scoped_user_id=%wf.scoped_vault_id, "get_requirements result");
