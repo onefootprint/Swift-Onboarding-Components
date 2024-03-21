@@ -11,7 +11,9 @@ use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, JsonFlag, LaunchDarklyFeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, sms_message::SmsMessage, Base64Data, PhoneNumber, PiiString, SandboxId, VaultId,
+    output::Csv,
+    sms_message::{SmsMessage, SmsMessageKind},
+    Base64Data, PhoneNumber, PiiString, SandboxId, VaultId,
 };
 use std::fmt::Debug;
 use tokio::sync::oneshot::{self, Receiver, Sender};
@@ -194,22 +196,35 @@ impl SmsClient {
                 }
                 _ => true,
             })
-            .map(|v| v.vendor())
             .collect_vec();
         if vendors.is_empty() {
             return AssertionError("No OTP vendors available").into();
         }
 
-        // Iterate through vendors in the order of preference, trying each one until we get a
-        // successful response or reach the end of our vendors
         let mut err = None;
         let mut sent_error_to_caller = false;
-        for vendor in vendors {
+        let mut attempted_vendors = vec![];
+        // Iterate through vendors in the order of preference, trying each one until we get a
+        // successful response or reach the end of our vendors
+        let mut vendors = vendors.into_iter();
+        let is_success = loop {
+            let Some(vendor_kind) = vendors.next() else {
+                break false;
+            };
+            attempted_vendors.push(vendor_kind);
+
+            // Send the message using this vendor
+            let vendor = vendor_kind.vendor();
             let e = match vendor.send(self, &message, &destination.e164()).await {
-                Ok(SmsSendStatus::Sent) => return Ok(()),
+                Ok(SmsSendStatus::Sent) => {
+                    err = None;
+                    break true;
+                }
                 Ok(SmsSendStatus::Unsent) => None,
                 Err(e) => Some(e),
             };
+
+            // Handle any error/fallback from the vendor
             tracing::warn!(vendors=%Csv(vendor_kinds.clone()), has_err=e.is_some(), err=?e.as_ref().map(|e| e.to_string()), err_debug=?e, "Moving on to next SMS vendor");
             let Some(e) = e else {
                 // There's no error to return to the client but we still want to retry the next vendor
@@ -231,8 +246,10 @@ impl SmsClient {
                 // After the first error, just save the err in ram to raise after all vendors
                 // have been tried
                 Some(e)
-            }
-        }
+            };
+        };
+
+        tracing::info!(attempted_vendors=%Csv(attempted_vendors), %is_success, message_kind=?SmsMessageKind::from(message), "SmsClient::_send result");
         if let Some(err) = err {
             if !sent_error_to_caller {
                 // If the error was not sent to the caller, return it here.

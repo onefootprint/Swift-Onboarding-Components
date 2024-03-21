@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use crate::PiiString;
 
 
-#[derive(Clone)]
+#[derive(Clone, strum::EnumDiscriminants)]
+#[strum_discriminants(vis(pub), name(SmsMessageKind))]
 pub enum SmsMessage {
     Otp {
         tenant_name: Option<String>,

@@ -38,6 +38,7 @@ impl SmsVendorKind {
     }
 }
 
+#[derive(Debug)]
 pub enum SmsSendStatus {
     /// The message was properly sent and is likely to be delivered
     Sent,
@@ -63,7 +64,7 @@ pub trait SmsVendor: Send + Sync {
 
 #[async_trait]
 impl SmsVendor for TwilioSms {
-    #[tracing::instrument("Twilio::send", skip_all)]
+    #[tracing::instrument("TwilioSms::send", skip_all)]
     async fn send(
         &self,
         client: &SmsClient,
@@ -79,7 +80,7 @@ impl SmsVendor for TwilioSms {
 
 #[async_trait]
 impl SmsVendor for TwilioWhatsapp {
-    #[tracing::instrument("Twilio::send", skip_all)]
+    #[tracing::instrument("TwilioWhatsapp::send", skip_all)]
     async fn send(
         &self,
         client: &SmsClient,
@@ -89,7 +90,7 @@ impl SmsVendor for TwilioWhatsapp {
         let twilio_client = client.twilio_client(destination);
         let message = twilio_client.compose_whatsapp_message(message, destination)?;
         let result = twilio_client.send(message).await;
-        match result {
+        let result = match result {
             Ok(m) if m.status == twilio::response::message::Status::Sent => {
                 // Special logic for WhatsApp - we want to consider Sent as a failure and fall back
                 // to SMS, in case someone has a WhatsApp account but doesn't have the app installed
@@ -98,12 +99,13 @@ impl SmsVendor for TwilioWhatsapp {
             Err(e) if e.is_invalid_recipient_error() => {
                 // Special logic for WhatsApp - if the recipient was invalid, we want to gracefully
                 // fall back to SMS without returning the error to the client
-                return Ok(SmsSendStatus::Unsent);
+                Ok(SmsSendStatus::Unsent)
             }
-            Err(e) => return Err(e.into()),
-            Ok(_) => (),
-        }
-        Ok(SmsSendStatus::Sent)
+            Err(e) => Err(e.into()),
+            Ok(_) => Ok(SmsSendStatus::Sent),
+        };
+        tracing::info!(result=?result.as_ref().ok(), err=?result.as_ref().err(), "WhatsApp message status");
+        result
     }
 }
 
