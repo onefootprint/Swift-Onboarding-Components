@@ -1,6 +1,6 @@
 use crate::{
     util::{impl_enum_str_diesel, impl_enum_string_diesel},
-    DecisionStatus, DocKind,
+    DecisionStatus, DocumentRequestKind,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
@@ -80,13 +80,19 @@ pub enum StepUpKind {
 }
 
 impl StepUpKind {
-    pub fn to_doc_kinds(&self) -> Vec<DocKind> {
+    pub fn to_doc_kinds(&self) -> Vec<DocumentRequestKind> {
         match self {
-            StepUpKind::Identity => vec![DocKind::Identity],
-            StepUpKind::ProofOfAddress => vec![DocKind::ProofOfAddress],
-            StepUpKind::IdentityProofOfSsn => vec![DocKind::Identity, DocKind::ProofOfSsn],
+            StepUpKind::Identity => vec![DocumentRequestKind::Identity],
+            StepUpKind::ProofOfAddress => vec![DocumentRequestKind::ProofOfAddress],
+            StepUpKind::IdentityProofOfSsn => {
+                vec![DocumentRequestKind::Identity, DocumentRequestKind::ProofOfSsn]
+            }
             StepUpKind::IdentityProofOfSsnProofOfAddress => {
-                vec![DocKind::Identity, DocKind::ProofOfSsn, DocKind::ProofOfAddress]
+                vec![
+                    DocumentRequestKind::Identity,
+                    DocumentRequestKind::ProofOfSsn,
+                    DocumentRequestKind::ProofOfAddress,
+                ]
             }
         }
     }

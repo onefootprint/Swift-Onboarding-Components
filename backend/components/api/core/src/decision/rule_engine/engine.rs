@@ -39,7 +39,7 @@ pub fn evaluate_workflow_decision(
     let doc_collected = doc_reqs
         .iter()
         .any(|dr| matches!(dr.kind, DocumentRequestKind::Identity));
-    let rule_eval_config = RuleEvalConfig::new(doc_reqs.into_iter().map(|dr| dr.kind.into()).collect());
+    let rule_eval_config = RuleEvalConfig::new(doc_reqs.into_iter().map(|dr| dr.kind).collect());
 
     if doc_collected
         && !risk_signals
@@ -148,7 +148,7 @@ mod tests {
     use eval::tests::TRule;
     use macros::db_test_case;
     use newtypes::{
-        BooleanOperator as BO, DbActor, DecisionIntentKind, DocKind, FootprintReasonCode as FRC,
+        BooleanOperator as BO, DbActor, DecisionIntentKind, DocumentRequestKind, FootprintReasonCode as FRC,
         RiskSignalGroupKind, RiskSignalId, RuleAction, RuleAction as RA, RuleExpression as RE,
         RuleExpressionCondition as REC, VendorAPI,
     };
@@ -224,7 +224,7 @@ mod tests {
 
         // Eval
         let docs_collected = if doc_collected {
-            vec![DocKind::Identity]
+            vec![DocumentRequestKind::Identity]
         } else {
             vec![]
         };

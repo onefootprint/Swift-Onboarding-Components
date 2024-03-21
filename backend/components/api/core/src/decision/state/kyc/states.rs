@@ -383,15 +383,14 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                     let sv_id = self.sv_id.clone();
                     let wf_id: newtypes::WorkflowId = self.wf_id.clone();
 
-                    kind.to_doc_kinds().into_iter().for_each(|k| {
-                        let should_collect_selfie = k.is_identity(); // TODO: should come from config
-                        let doc_req_kind = k.into();
+                    kind.to_doc_kinds().into_iter().for_each(|kind| {
+                        let should_collect_selfie = kind.is_identity(); // TODO: should come from config
                         doc_reqs.push(NewDocumentRequestArgs {
                             scoped_vault_id: sv_id.clone(),
                             ref_id: None,
                             workflow_id: wf_id.clone(),
                             should_collect_selfie,
-                            kind: doc_req_kind,
+                            kind,
                             rule_set_result_id: Some(rule_set_result.id.clone()),
                         })
                     })

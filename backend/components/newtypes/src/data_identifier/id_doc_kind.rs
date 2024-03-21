@@ -43,24 +43,7 @@ pub enum IdDocKind {
     ProofOfAddress,
 }
 
-#[derive(Debug, Display, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord, EnumString)]
-#[strum(serialize_all = "snake_case")]
-pub enum DocKind {
-    Identity,
-    ProofOfSsn,
-    ProofOfAddress,
-}
-impl DocKind {
-    pub fn should_initiate_incode_requests(&self) -> bool {
-        self.is_identity()
-    }
-
-    pub fn is_identity(&self) -> bool {
-        matches!(self, Self::Identity)
-    }
-}
-
-impl From<IdDocKind> for DocKind {
+impl From<IdDocKind> for DocumentRequestKind {
     fn from(value: IdDocKind) -> Self {
         match value {
             IdDocKind::IdCard => Self::Identity,
@@ -78,15 +61,6 @@ impl From<IdDocKind> for DocKind {
 }
 
 
-impl From<DocumentRequestKind> for DocKind {
-    fn from(value: DocumentRequestKind) -> DocKind {
-        match value {
-            DocumentRequestKind::Identity => Self::Identity,
-            DocumentRequestKind::ProofOfSsn => Self::ProofOfSsn,
-            DocumentRequestKind::ProofOfAddress => Self::ProofOfAddress,
-        }
-    }
-}
 crate::util::impl_enum_string_diesel!(IdDocKind);
 
 impl IdDocKind {
@@ -113,13 +87,13 @@ impl IdDocKind {
 
     pub fn identity_docs() -> Vec<IdDocKind> {
         IdDocKind::iter()
-            .filter(|id| DocKind::from(*id) == DocKind::Identity)
+            .filter(|id| DocumentRequestKind::from(*id) == DocumentRequestKind::Identity)
             .collect()
     }
 
     pub fn proof_of_address_docs() -> Vec<IdDocKind> {
         IdDocKind::iter()
-            .filter(|id| DocKind::from(*id) == DocKind::ProofOfAddress)
+            .filter(|id| DocumentRequestKind::from(*id) == DocumentRequestKind::ProofOfAddress)
             .collect()
     }
 

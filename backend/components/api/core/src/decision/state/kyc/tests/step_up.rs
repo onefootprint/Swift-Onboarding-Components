@@ -146,11 +146,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     // We have the correct pending doc requests
     assert_have_same_elements(
         doc_requests.iter().map(|d| d.kind).collect(),
-        step_up_kind
-            .to_doc_kinds()
-            .into_iter()
-            .map(|k| k.into())
-            .collect(),
+        step_up_kind.to_doc_kinds(),
     );
     // assert correct action was applied
     assert_eq!(

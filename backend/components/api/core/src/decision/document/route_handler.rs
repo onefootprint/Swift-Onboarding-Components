@@ -1,5 +1,5 @@
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocKind, DocumentKind, DocumentRequestKind,
+    DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestKind,
     DocumentScanDeviceType, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId,
     IdentityDocumentStatus, Iso3166TwoDigitCountryCode, S3Url, ScopedVaultId, SealedVaultDataKey, TenantId,
     WorkflowId,
@@ -50,7 +50,7 @@ pub async fn handle_document_create(
         skip_selfie,
         device_type,
     } = create_identity_document_request;
-    let doc_kind: DocKind = document_type.into();
+    let doc_kind: DocumentRequestKind = document_type.into();
     let su_id = sv_id.clone();
     let su_id2 = su_id.clone();
     let ff_client = state.feature_flag_client.clone();
@@ -162,7 +162,7 @@ pub async fn handle_document_upload(
         })
         .await?;
     let meta2 = meta.clone();
-    let doc_kind: DocKind = id_doc.document_type.into();
+    let doc_kind: DocumentRequestKind = id_doc.document_type.into();
 
     if id_doc.status != IdentityDocumentStatus::Pending {
         return Err(ErrorWithCode::IdentityDocumentNotPending.into());
@@ -286,7 +286,7 @@ pub async fn handle_document_process(
         .await?;
 
     let is_sandbox = id_doc.fixture_result.is_some();
-    let doc_kind: DocKind = id_doc.document_type.into();
+    let doc_kind: DocumentRequestKind = id_doc.document_type.into();
     let is_non_identity_document = !doc_kind.is_identity();
     let should_initiate_reqs =
         crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result)
@@ -385,13 +385,13 @@ async fn handle_non_identity_document(
     document_type: IdDocKind,
     country_code: Iso3166TwoDigitCountryCode,
     device_type: Option<DocumentScanDeviceType>,
-    doc_kind: DocKind,
+    doc_kind: DocumentRequestKind,
 ) -> ApiResult<IdentityDocumentId> {
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // If there's no doc request, nothing to do here
-            let doc_request = DbDocumentRequest::get(conn, &workflow_id, doc_kind.into())?
+            let doc_request = DbDocumentRequest::get(conn, &workflow_id, doc_kind)?
                 .ok_or(OnboardingError::NoDocumentRequestFound)?;
 
 
@@ -452,7 +452,7 @@ fn create_latest_doc_upload(
     Ok(())
 }
 
-fn check_consent(user_consent: Option<UserConsent>, doc_kind: DocKind) -> ApiResult<()> {
+fn check_consent(user_consent: Option<UserConsent>, doc_kind: DocumentRequestKind) -> ApiResult<()> {
     if user_consent.is_none() && doc_kind.is_identity() {
         Err(OnboardingError::UserConsentNotFound.into())
     } else {

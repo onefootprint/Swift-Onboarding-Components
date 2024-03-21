@@ -18,8 +18,8 @@ use db::{
 
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocKind, DocTypeRestriction, DocumentCdoInfo, DocumentSide,
-    IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
+    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentRequestKind,
+    DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
     IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind, ScopedVaultId,
     Selfie, TenantId, WorkflowFixtureResult,
 };
@@ -104,9 +104,9 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
 
     // Save proof of SSN doc req
-    let doc_kind: DocKind = test_case.document_type.into();
+    let doc_kind: DocumentRequestKind = test_case.document_type.into();
     if !doc_kind.is_identity() {
-        save_document_request(state, doc_kind.into(), wf.id.clone(), sv.id.clone(), false).await;
+        save_document_request(state, doc_kind, wf.id.clone(), sv.id.clone(), false).await;
     }
 
     let wf_id = wf.id.clone();

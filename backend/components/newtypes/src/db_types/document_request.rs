@@ -5,8 +5,6 @@ use strum_macros::Display;
 
 use strum_macros::EnumString;
 
-use crate::DocKind;
-
 #[derive(
     Debug,
     Display,
@@ -22,7 +20,7 @@ use crate::DocKind;
     SerializeDisplay,
     DeserializeFromStr,
     macros::SerdeAttr,
-    Apiv2Schema
+    Apiv2Schema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -36,15 +34,9 @@ impl DocumentRequestKind {
     pub fn is_identity(&self) -> bool {
         matches!(self, DocumentRequestKind::Identity)
     }
-}
 
-impl From<DocKind> for DocumentRequestKind {
-    fn from(value: DocKind) -> Self {
-        match value {
-            DocKind::Identity => Self::Identity,
-            DocKind::ProofOfSsn => Self::ProofOfSsn,
-            DocKind::ProofOfAddress => Self::ProofOfAddress,
-        }
+    pub fn should_initiate_incode_requests(&self) -> bool {
+        self.is_identity()
     }
 }
 

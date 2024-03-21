@@ -1,7 +1,7 @@
 use db::models::rule_instance::RuleInstance;
 use itertools::Itertools;
 use newtypes::{
-    BooleanOperator, DocKind, FootprintReasonCode, RuleAction, RuleExpression, RuleExpressionCondition,
+    BooleanOperator, DocumentRequestKind, FootprintReasonCode, RuleAction, RuleExpression, RuleExpressionCondition,
     StepUpKind,
 };
 use strum::IntoEnumIterator;
@@ -45,7 +45,7 @@ pub struct RuleEvalConfig {
     pub allowed_rule_actions: Vec<RuleAction>,
 }
 impl RuleEvalConfig {
-    pub fn new(doc_kinds_collected: Vec<DocKind>) -> Self {
+    pub fn new(doc_kinds_collected: Vec<DocumentRequestKind>) -> Self {
         let excluded_rule_actions = Self::excluded_rule_actions(doc_kinds_collected);
         let allowed_rule_actions = RuleAction::all_rule_actions()
             .into_iter()
@@ -61,7 +61,7 @@ impl RuleEvalConfig {
     }
 
     // see what eligible risk actions we can take from a set of documents we already collected
-    fn excluded_rule_actions(doc_kinds_collected: Vec<DocKind>) -> Vec<RuleAction> {
+    fn excluded_rule_actions(doc_kinds_collected: Vec<DocumentRequestKind>) -> Vec<RuleAction> {
         StepUpKind::iter()
             .filter(|suk| {
                 let doc_kinds_from_suk = suk.to_doc_kinds();
@@ -152,16 +152,16 @@ pub mod tests {
         }
     }
 
-    fn id_doc_collected() -> Vec<DocKind> {
-        vec![DocKind::Identity]
+    fn id_doc_collected() -> Vec<DocumentRequestKind> {
+        vec![DocumentRequestKind::Identity]
     }
 
-    fn poa_doc_collected() -> Vec<DocKind> {
-        vec![DocKind::ProofOfAddress]
+    fn poa_doc_collected() -> Vec<DocumentRequestKind> {
+        vec![DocumentRequestKind::ProofOfAddress]
     }
 
-    fn id_poa_collected() -> Vec<DocKind> {
-        vec![DocKind::Identity, DocKind::ProofOfAddress]
+    fn id_poa_collected() -> Vec<DocumentRequestKind> {
+        vec![DocumentRequestKind::Identity, DocumentRequestKind::ProofOfAddress]
     }
 
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
@@ -273,7 +273,7 @@ pub mod tests {
     pub fn test_evaluate_rule_set(
         rules: Vec<TRule>,
         input: Vec<FRC>,
-        docs_collected: Vec<DocKind>,
+        docs_collected: Vec<DocumentRequestKind>,
     ) -> (Vec<bool>, Option<RuleAction>) {
         let config = RuleEvalConfig::new(docs_collected);
         let (rule_results, action) = evaluate_rule_set(rules, &input, &config);
@@ -372,14 +372,14 @@ pub mod tests {
 
 
     #[test_case(
-        vec![DocKind::Identity], 
+        vec![DocumentRequestKind::Identity], 
         vec![
             RA::StepUp(StepUpKind::Identity), 
             RA::StepUp(StepUpKind::IdentityProofOfSsn), 
             RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress)
         ])]
     #[test_case(
-        vec![DocKind::Identity, DocKind::ProofOfAddress], 
+        vec![DocumentRequestKind::Identity, DocumentRequestKind::ProofOfAddress], 
         vec![
             RA::StepUp(StepUpKind::Identity), 
             RA::StepUp(StepUpKind::IdentityProofOfSsn), 
@@ -388,12 +388,12 @@ pub mod tests {
         ])]
     #[test_case(vec![], vec![])]
     #[test_case(
-        vec![DocKind::ProofOfSsn], 
+        vec![DocumentRequestKind::ProofOfSsn], 
         vec![
             RA::StepUp(StepUpKind::IdentityProofOfSsn), 
             RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
         ])]
-    fn test_rule_eval_config(doc_kinds: Vec<DocKind>, expected_disallowed_rule_actions: Vec<RuleAction>) {
+    fn test_rule_eval_config(doc_kinds: Vec<DocumentRequestKind>, expected_disallowed_rule_actions: Vec<RuleAction>) {
         let rc = RuleEvalConfig::new(doc_kinds);
         expected_disallowed_rule_actions
             .iter()

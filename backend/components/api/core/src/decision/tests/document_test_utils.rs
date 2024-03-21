@@ -22,9 +22,8 @@ use idv::incode::{
     IncodeResponse, IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    DocKind, DocumentRequestKind, DocumentSide, EncryptedVaultPrivateKey, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, S3Url, ScopedVaultId, SealedVaultBytes, Selfie,
-    TenantId, WorkflowId,
+    DocumentRequestKind, DocumentSide, EncryptedVaultPrivateKey, IdDocKind, IdentityDocumentFixtureResult,
+    IdentityDocumentId, S3Url, ScopedVaultId, SealedVaultBytes, Selfie, TenantId, WorkflowId,
 };
 
 #[derive(Clone, Copy)]
@@ -81,7 +80,7 @@ impl DocumentUploadTestCase {
     }
 
     pub fn is_non_identity_document_flow(&self) -> bool {
-        !matches!(self.document_type.into(), DocKind::Identity)
+        !matches!(self.document_type.into(), DocumentRequestKind::Identity)
     }
 }
 
@@ -321,7 +320,7 @@ pub async fn save_document_request(
         workflow_id: wf_id,
         should_collect_selfie,
         kind,
-        rule_set_result_id: None
+        rule_set_result_id: None,
     };
 
     state
