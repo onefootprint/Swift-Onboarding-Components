@@ -863,6 +863,10 @@ footprint_reason_code_enum! {
         #[note = "Document upload was not a live capture", severity = SignalSeverity::Medium,  description = "User manually uploaded an image instead of taking a live image with their camera"]
         DocumentNotLiveCapture,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document live capture failed", severity = SignalSeverity::Medium,  description = "User's device camera could not capture or experienced an error while capturing documents so they were uploaded."]
+        DocumentLiveCaptureFailed,
+
         // OCR matching
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Document name does not match input", severity = SignalSeverity::Medium,  description = "The document name does not match the name that was input."]

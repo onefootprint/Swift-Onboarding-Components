@@ -208,6 +208,14 @@ pub(super) fn compute_risk_signals<'a>(
                 VendorAPI::IncodeFetchScores,
                 score_vres_id.clone(),
             )),
+        doc_uploads
+            .iter()
+            .any(|du| du.is_forced_upload.unwrap_or(false))
+            .then_some((
+                FootprintReasonCode::DocumentLiveCaptureFailed,
+                VendorAPI::IncodeFetchScores,
+                score_vres_id.clone(),
+            )),
     ]
     .into_iter()
     .flatten();
