@@ -47,6 +47,7 @@ pub async fn post(
         key,
         third_party_auth,
         limit_auth_methods,
+        ttl_min,
     } = request.0.unwrap_or_default();
     let third_party_auth = third_party_auth.unwrap_or(false);
     let kind = if let Some(kind) = kind {
@@ -169,11 +170,17 @@ pub async fn post(
                 is_implied_auth,
                 limit_auth_methods,
             };
+            let ttl_min = ttl_min.unwrap_or(60);
+            const MAX_TTL: u32 = 60 * 24;
+            if !(1..=MAX_TTL).contains(&ttl_min) {
+                return ValidationError("Token must have a TTL for at least one minute and at most one day")
+                    .into();
+            }
             let CreateTokenResult {
                 token,
                 session,
                 wfr: _,
-            } = create_token(conn, &session_key, args, Duration::hours(1))?;
+            } = create_token(conn, &session_key, args, Duration::minutes(ttl_min as i64))?;
             Ok((token, session))
         })
         .await?;

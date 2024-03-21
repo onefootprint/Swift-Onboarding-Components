@@ -421,7 +421,10 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GetComplianceCompaniesResponse"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ComplianceCompanySummary"
+                                    }
                                 }
                             }
                         }
@@ -458,7 +461,10 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/GetComplianceDocumentsResponse"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ComplianceDocSummary"
+                                    }
                                 }
                             }
                         }
@@ -6986,6 +6992,82 @@
                     "fields"
                 ]
             },
+            "ComplianceCompanySummary": {
+                "type": "object",
+                "properties": {
+                    "company_name": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "num_active_playbooks": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "num_controls_complete": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "num_controls_total": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "required": [
+                    "company_name",
+                    "id",
+                    "num_active_playbooks",
+                    "num_controls_complete",
+                    "num_controls_total"
+                ]
+            },
+            "ComplianceDocSummary": {
+                "type": "object",
+                "properties": {
+                    "assigned_to": {
+                        "description": "Limited information about member of organization\n\n Intended to be non-sensitive information only, that may be shared between tenants/partner\n tenants.",
+                        "type": "object",
+                        "properties": {
+                            "first_name": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "last_name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "last_updated": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "WaitingForUpload",
+                            "WaitingForReview",
+                            "Accepted"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "status"
+                ]
+            },
             "CreateAnnotationRequest": {
                 "type": "object",
                 "properties": {
@@ -10533,6 +10615,7 @@
                                         "document_selfie_was_skipped",
                                         "document_collected_via_desktop",
                                         "document_not_live_capture",
+                                        "document_live_capture_failed",
                                         "document_ocr_name_does_not_match",
                                         "document_ocr_name_could_not_match",
                                         "document_ocr_name_matches",
@@ -11061,104 +11144,6 @@
                     "vault_fields"
                 ]
             },
-            "GetComplianceCompaniesResponse": {
-                "type": "object",
-                "properties": {
-                    "companies": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "company_name": {
-                                    "type": "string"
-                                },
-                                "id": {
-                                    "type": "string"
-                                },
-                                "num_active_playbooks": {
-                                    "type": "integer",
-                                    "format": "int64"
-                                },
-                                "num_controls_complete": {
-                                    "type": "integer",
-                                    "format": "int64"
-                                },
-                                "num_controls_total": {
-                                    "type": "integer",
-                                    "format": "int64"
-                                }
-                            },
-                            "required": [
-                                "company_name",
-                                "id",
-                                "num_active_playbooks",
-                                "num_controls_complete",
-                                "num_controls_total"
-                            ]
-                        }
-                    }
-                },
-                "required": [
-                    "companies"
-                ]
-            },
-            "GetComplianceDocumentsResponse": {
-                "type": "object",
-                "properties": {
-                    "documents": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "assigned_to": {
-                                    "description": "Limited information about member of organization\n\n Intended to be non-sensitive information only, that may be shared between tenants/partner\n tenants.",
-                                    "type": "object",
-                                    "properties": {
-                                        "first_name": {
-                                            "type": "string"
-                                        },
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "last_name": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "id"
-                                    ]
-                                },
-                                "id": {
-                                    "type": "string"
-                                },
-                                "last_updated": {
-                                    "type": "string",
-                                    "format": "date-time"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "status": {
-                                    "type": "string",
-                                    "enum": [
-                                        "WaitingForUpload",
-                                        "WaitingForReview",
-                                        "Accepted"
-                                    ]
-                                }
-                            },
-                            "required": [
-                                "id",
-                                "name",
-                                "status"
-                            ]
-                        }
-                    }
-                },
-                "required": [
-                    "documents"
-                ]
-            },
             "GetFieldValidationResponse": {
                 "type": "object",
                 "properties": {
@@ -11384,6 +11369,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -11750,6 +11736,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -12116,6 +12103,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -12482,6 +12470,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -12848,6 +12837,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -13214,6 +13204,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -13580,6 +13571,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -13946,6 +13938,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -14312,6 +14305,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -14678,6 +14672,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -15044,6 +15039,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -15410,6 +15406,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -15776,6 +15773,7 @@
                                                 "document_selfie_was_skipped",
                                                 "document_collected_via_desktop",
                                                 "document_not_live_capture",
+                                                "document_live_capture_failed",
                                                 "document_ocr_name_does_not_match",
                                                 "document_ocr_name_could_not_match",
                                                 "document_ocr_name_matches",
@@ -20394,6 +20392,7 @@
                             "document_selfie_was_skipped",
                             "document_collected_via_desktop",
                             "document_not_live_capture",
+                            "document_live_capture_failed",
                             "document_ocr_name_does_not_match",
                             "document_ocr_name_could_not_match",
                             "document_ocr_name_matches",
@@ -20774,6 +20773,7 @@
                             "document_selfie_was_skipped",
                             "document_collected_via_desktop",
                             "document_not_live_capture",
+                            "document_live_capture_failed",
                             "document_ocr_name_does_not_match",
                             "document_ocr_name_could_not_match",
                             "document_ocr_name_matches",

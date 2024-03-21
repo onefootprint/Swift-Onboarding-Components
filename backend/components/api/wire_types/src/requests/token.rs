@@ -27,6 +27,10 @@ pub struct CreateTokenRequest {
 
     #[openapi(skip)]
     pub third_party_auth: Option<bool>,
+
+    /// Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be at least 1 minute, at most 1 day
+    #[openapi(example = "60")]
+    pub ttl_min: Option<u32>,
 }
 
 #[derive(
