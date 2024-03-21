@@ -3,10 +3,16 @@ import cx from 'classnames';
 import type { HTMLAttributes } from 'react';
 import React from 'react';
 
-export type HintProps = HTMLAttributes<HTMLParagraphElement>;
+export type HintProps = {
+  hasError?: boolean;
+} & HTMLAttributes<HTMLParagraphElement>;
 
-const Hint = ({ className, ...props }: HintProps) => (
-  <p className={cx('fp-hint', className)} {...props} />
+const Hint = ({ className, hasError, ...props }: HintProps) => (
+  <p
+    className={cx('fp-hint', className)}
+    aria-invalid={hasError ? 'true' : 'false'}
+    {...props}
+  />
 );
 
 export default Hint;

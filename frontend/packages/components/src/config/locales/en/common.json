@@ -32,6 +32,14 @@
       "too-old": "Date of birth cannot be before than 1900"
     }
   },
+  "email": {
+    "label": "Email",
+    "placeholder": "jane@acme.com",
+    "errors": {
+      "required": "Email cannot be empty",
+      "invalid": "Email is invalid"
+    }
+  },
   "phone": {
     "label": "Phone number",
     "placeholder": "(123) 123-1234",
@@ -97,5 +105,9 @@
       "required": "SSN cannot be empty",
       "invalid": "SSN is invalid"
     }
+  },
+  "otp": {
+    "title": "Enter the 6-digit code sent to {{identifier}}",
+    "resend": "Resend code"
   }
 }

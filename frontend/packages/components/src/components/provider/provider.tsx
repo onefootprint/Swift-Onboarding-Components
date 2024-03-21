@@ -1,4 +1,9 @@
-import React, { createContext, useState } from 'react';
+import type {
+  OnboardingRequirement,
+  SignupChallengeResponse,
+} from '@onefootprint/types';
+import type { Dispatch, SetStateAction } from 'react';
+import React, { createContext, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { UserData } from '../../@types';
@@ -6,15 +11,26 @@ import configureI18n from '../../config/initializers/i18next';
 
 configureI18n();
 
-export const Context = createContext<{
+type ContextData = {
   authToken?: string;
   publicKey: string;
   sandboxId?: string;
   userData?: UserData;
-}>({
-  publicKey: '',
-  userData: {},
-});
+  signupChallenge: SignupChallengeResponse | null;
+  missingRequirements: OnboardingRequirement[];
+};
+
+type UpdateContext = Dispatch<SetStateAction<ContextData>>;
+
+const Context = createContext<[ContextData, UpdateContext]>([
+  {
+    publicKey: '',
+    userData: {},
+    signupChallenge: null,
+    missingRequirements: [],
+  },
+  () => {},
+]);
 
 export type ProviderProps = {
   authToken?: string;
@@ -31,15 +47,20 @@ const FootprintProvider = ({
   sandboxId,
   userData,
 }: ProviderProps) => {
-  const methods = useForm<UserData>({
-    // resolver: zodResolver(schema),
-  });
-  const [value] = useState({
-    publicKey,
-    userData,
+  const methods = useForm<UserData>({});
+  const [context, setContext] = useState<ContextData>({
     authToken,
+    publicKey,
     sandboxId,
+    userData,
+    signupChallenge: null,
+    missingRequirements: [],
   });
+
+  const value = useMemo<[ContextData, UpdateContext]>(
+    () => [context, setContext],
+    [context],
+  );
 
   return (
     <Context.Provider value={value}>
@@ -51,3 +72,4 @@ const FootprintProvider = ({
 };
 
 export default FootprintProvider;
+export { Context };

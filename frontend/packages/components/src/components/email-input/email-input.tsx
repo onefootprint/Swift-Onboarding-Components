@@ -16,7 +16,7 @@ const EmailInput = ({ className, ...props }: EmailInputProps) => {
     <Input
       autoComplete="email"
       className={cx('fp-email-input', className)}
-      label={t('first-name.label')}
+      label={t('email.label')}
       type="email"
       {...props}
       {...form.register('id.email', { required: true })}

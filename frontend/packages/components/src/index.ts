@@ -1,6 +1,6 @@
 export type { UserData } from './@types/user-data';
 export type { AddressCityInputProps } from './components/address-city-input';
-export { default } from './components/address-city-input';
+export { default as AddressCityInput } from './components/address-city-input';
 export type { AddressCountryInputProps } from './components/address-country-input';
 export { default as AddressCountryInput } from './components/address-country-input';
 export type { AddressInputProps } from './components/address-input';
@@ -25,6 +25,7 @@ export type { LastNameInputProps } from './components/last-name-input';
 export { default as LastNameInput } from './components/last-name-input';
 export type { MiddleNameInputProps } from './components/middle-name-input';
 export { default as MiddleNameInput } from './components/middle-name-input';
+export { default as OtpVerification } from './components/otp';
 export type { PhoneInputProps } from './components/phone-input';
 export { default as PhoneInput } from './components/phone-input';
 export { default as Provider } from './components/provider';

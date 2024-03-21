@@ -1,14 +1,15 @@
-import type {
-  OnboardingStatusRequest,
-  OnboardingStatusResponse,
-} from '@onefootprint/types';
+import type { OnboardingStatusResponse } from '@onefootprint/types';
 
 import { AUTH_HEADER } from '../../constants';
 import request from '../../utils/request';
 
+export type GetMissingRequirementsRequest = {
+  authToken: string;
+};
+
 const getMissingRequirements = async ({
   authToken,
-}: OnboardingStatusRequest) => {
+}: GetMissingRequirementsRequest) => {
   const response = await request<OnboardingStatusResponse>({
     url: '/hosted/onboarding/status',
     headers: {

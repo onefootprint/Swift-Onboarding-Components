@@ -1,15 +1,26 @@
 import cx from 'classnames';
-import type { InputHTMLAttributes } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-export type MiddleNameInputProps = InputHTMLAttributes<HTMLInputElement>;
+import { useFootprint } from '../../hooks/use-footprint';
+import type { InputProps } from '../internal/input';
+import Input from '../internal/input';
 
-const MiddleNameInput = ({ className, ...props }: MiddleNameInputProps) => (
-  <input
-    autoComplete="additional-name"
-    className={cx('fp-middle-name-input', className)}
-    {...props}
-  />
-);
+export type MiddleNameInputProps = InputProps;
+
+const MiddleNameInput = ({ className, ...props }: MiddleNameInputProps) => {
+  const { form } = useFootprint();
+  const { t } = useTranslation('common');
+
+  return (
+    <Input
+      autoComplete="additional-name"
+      className={cx('fp-middle-name-input', className)}
+      label={t('middle-name.label')}
+      {...props}
+      {...form.register('id.middle_name')}
+    />
+  );
+};
 
 export default MiddleNameInput;

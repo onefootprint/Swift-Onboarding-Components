@@ -3,10 +3,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFootprint } from '../../hooks/use-footprint';
-import type { InputProps } from '../internal/input';
-import Input from '../internal/input';
+import type { SelectProps } from '../internal/select';
+import Select from '../internal/select';
 
-export type AddressCountryInputProps = InputProps;
+export type AddressCountryInputProps = SelectProps;
 
 const AddressCountryInput = ({
   className,
@@ -17,13 +17,15 @@ const AddressCountryInput = ({
   const { t } = useTranslation('common');
 
   return (
-    <Input
+    <Select
       autoComplete="country"
       className={cx('fp-country-input', className)}
       label={t('country.label')}
       {...props}
       {...form.register('id.country', { onChange })}
-    />
+    >
+      <option value="US">United States</option>
+    </Select>
   );
 };
 
