@@ -254,10 +254,10 @@
         "prompt-without-email": "Introduce el código de 6 dígitos que enviamos a tu correo electrónico."
       },
       "biometric-challenge": {
-        "label": "Passkey",
+        "label": "passkey",
         "loading": "Procesando...",
         "success": "¡Éxito!",
-        "cta": "Iniciar sesión con Passkey",
+        "cta": "Iniciar sesión con passkey",
         "title": "¡Bienvenido de nuevo! 🎉",
         "login-with-sms": "Iniciar sesión con SMS",
         "passkey-error": {
@@ -1019,14 +1019,14 @@
       },
       "requirements": {
         "title": {
-          "liveness": "Agrega un passkey",
+          "liveness": "Agrega tu passkey",
           "id-doc": "Sube una imagen de tu identificación",
-          "liveness-with-id-doc": "Agrega un passkey y sube documento de identificación"
+          "liveness-with-id-doc": "Continúa en tu teléfono"
         },
         "subtitle": {
-          "liveness": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar un passkey.",
-          "id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para subir una imagen de tu identificación.",
-          "liveness-with-id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar un passkey y subir una imagen de tu identificación."
+          "liveness": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar tu passkey.",
+          "id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para subir una imagen de tu ID.",
+          "liveness-with-id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar tu passkey y subir una imagen de tu ID."
         }
       }
     },
@@ -1080,7 +1080,7 @@
     },
     "pages": {
       "register": {
-        "title": "Agrega un passkey",
+        "title": "Agrega tu passkey",
         "subtitle": "El proceso de configuración puede variar según su navegador.",
         "cta": "Iniciar verificación"
       },

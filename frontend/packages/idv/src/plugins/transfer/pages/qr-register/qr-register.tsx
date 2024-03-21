@@ -1,9 +1,8 @@
-import { IcoSmartphone224 } from '@onefootprint/icons';
+import { IcoSmartphone40 } from '@onefootprint/icons';
 import type { D2PGenerateResponse } from '@onefootprint/types';
-import { Divider, Grid, Shimmer, Stack, Text } from '@onefootprint/ui';
+import { Grid } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import QRCode from 'react-qr-code';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { useL10nContext } from '../../../../components/l10n-provider';
@@ -14,8 +13,7 @@ import useHandleD2PStatusUpdate from '../../hooks/use-handle-d2p-status-update';
 import useTransferMachine from '../../hooks/use-machine';
 import useRequirementsTitle from '../../hooks/use-requirements-title-translation-key';
 import ContinueOnDesktop from './components/continue-on-desktop';
-
-const QR_CODE_SIZE = 180;
+import QRSection from './components/qr-section';
 
 const QRRegister = () => {
   const {
@@ -78,27 +76,20 @@ const QRRegister = () => {
   return (
     <>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <Grid.Container gap={7} textAlign="center">
-        <HeaderTitle
-          title={title}
-          subtitle={linkSentToPhoneSubtitle}
-          icon={IcoSmartphone224}
+      <Grid.Container textAlign="center">
+        <Grid.Item paddingBottom={7} direction="column" gap={5}>
+          <HeaderTitle
+            title={title}
+            subtitle={linkSentToPhoneSubtitle}
+            icon={IcoSmartphone40}
+          />
+          <SmsButtonWithCountdown authToken={scopedAuthToken} url={url} />
+        </Grid.Item>
+        <QRSection
+          text={t('transfer.pages.qr-register.qr-code.instructions')}
+          qrValue={url}
+          isLoading={isLoading}
         />
-        <SmsButtonWithCountdown authToken={scopedAuthToken} url={url} />
-        <Divider variant="secondary" />
-        <Stack direction="column" align="center" gap={5}>
-          <Text variant="body-2" color="secondary">
-            {t('transfer.pages.qr-register.qr-code.instructions')}
-          </Text>
-          {isLoading ? (
-            <Shimmer
-              sx={{ height: `${QR_CODE_SIZE}px`, width: `${QR_CODE_SIZE}px` }}
-            />
-          ) : (
-            <QRCode size={QR_CODE_SIZE} value={url} />
-          )}
-        </Stack>
-        <Divider variant="secondary" />
         <ContinueOnDesktop />
       </Grid.Container>
     </>

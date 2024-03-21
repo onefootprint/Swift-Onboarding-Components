@@ -1020,12 +1020,12 @@
         "title": {
           "liveness": "Add a passkey",
           "id-doc": "Scan or upload ID document",
-          "liveness-with-id-doc": "Register passkey & upload ID document"
+          "liveness-with-id-doc": "Continue on your mobile phone"
         },
         "subtitle": {
           "liveness": "Open the link sent to your phone and follow the prompts to register a passkey.",
           "id-doc": "Open the link sent to your phone and follow the prompts to upload an ID document.",
-          "liveness-with-id-doc": "Open the link sent to your phone and follow the prompts to register a passkey and upload an ID document."
+          "liveness-with-id-doc": "Open the link sent to your phone and follow the prompts to upload your ID document and register your passkey."
         }
       }
     },

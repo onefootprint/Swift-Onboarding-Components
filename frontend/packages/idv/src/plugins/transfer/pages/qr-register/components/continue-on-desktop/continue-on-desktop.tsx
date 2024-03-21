@@ -18,7 +18,7 @@ const ContinueOnDesktop = () => {
   };
 
   return (
-    <Container align="center" justify="center" gap={3}>
+    <Container align="center" justify="center" gap={3} paddingTop={7}>
       <Text variant="body-3" color="tertiary">
         {t('continue-on-desktop.title')}
       </Text>
