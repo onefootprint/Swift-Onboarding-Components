@@ -7,11 +7,21 @@ import type { UserData } from '../@types';
 import { Context } from '../components/provider';
 import getMissingRequirementsReq from '../queries/get-missing-requirements';
 import identifyReq from '../queries/identify-user';
+import saveReq from '../queries/save';
 import createSignupChallenge from '../queries/signup';
+import flattenFormData from '../utils/flatten-form-data';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
   const form = useFormContext<UserData>();
+
+  const getVaultFormData = () => {
+    const values = form.getValues();
+    const formValues = flattenFormData(values);
+    delete formValues['id.email'];
+    delete formValues['id.phone_number'];
+    return formValues;
+  };
 
   const identify = async () => {
     const payload = {
@@ -81,17 +91,27 @@ export const useFootprint = () => {
     setContext(prev => ({ ...prev, missingRequirements }));
   };
 
+  const save = async () => {
+    const { authToken } = context;
+    if (!authToken) {
+      throw new Error('No authToken found');
+    }
+    const data = getVaultFormData();
+    await saveReq({ data, authToken });
+    await getMissingRequirements(authToken);
+  };
+
   const methods = {
     identify,
     identifyAndAuthenticate,
     canInitiateOtpValidation,
     getAuthToken,
     getMissingRequirements,
-    save: async () => {},
     verifyOtp: async () => {},
     handoff: async () => {},
     updateAuthToken,
     updateMissingRequirements,
+    save,
   };
 
   return { form, context, ...methods };
