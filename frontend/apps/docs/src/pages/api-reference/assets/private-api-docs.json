@@ -382,6 +382,151 @@
                 ]
             }
         },
+        "/compliance/doc_templates": {
+            "get": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Lists compliance document templates.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ComplianceDocTemplate"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Creates a new compliance document template.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateComplianceDocTemplateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ComplianceDocTemplate"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/compliance/doc_templates/{template_id}": {
+            "delete": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Deactivates a compliance document template.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "template_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Updates a compliance document template by creating a new template version.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "template_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateComplianceDocTemplateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ComplianceDocTemplate"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/compliance/org/members": {
             "post": {
                 "tags": [
@@ -6260,7 +6405,8 @@
                                                 "write_entities",
                                                 "label_and_tag",
                                                 "compliance_partner_read",
-                                                "compliance_partner_admin"
+                                                "compliance_partner_admin",
+                                                "compliance_partner_manage_templates"
                                             ]
                                         }
                                     }
@@ -6585,7 +6731,8 @@
                                 "write_entities",
                                 "label_and_tag",
                                 "compliance_partner_read",
-                                "compliance_partner_admin"
+                                "compliance_partner_admin",
+                                "compliance_partner_manage_templates"
                             ]
                         }
                     },
@@ -7068,6 +7215,65 @@
                     "status"
                 ]
             },
+            "ComplianceDocTemplate": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "latest_version": {
+                        "type": "object",
+                        "properties": {
+                            "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "created_by_partner_tenant_user": {
+                                "description": "Limited information about member of organization\n\n Intended to be non-sensitive information only, that may be shared between tenants/partner\n tenants.",
+                                "type": "object",
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id"
+                                ]
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "template_id": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "created_at",
+                            "created_by_partner_tenant_user",
+                            "description",
+                            "id",
+                            "name",
+                            "template_id"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "latest_version"
+                ]
+            },
             "CreateAnnotationRequest": {
                 "type": "object",
                 "properties": {
@@ -7096,6 +7302,21 @@
                 "required": [
                     "name",
                     "role_id"
+                ]
+            },
+            "CreateComplianceDocTemplateRequest": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "description",
+                    "name"
                 ]
             },
             "CreateEntityTokenRequest": {
@@ -8193,7 +8414,8 @@
                                 "write_entities",
                                 "label_and_tag",
                                 "compliance_partner_read",
-                                "compliance_partner_admin"
+                                "compliance_partner_admin",
+                                "compliance_partner_manage_templates"
                             ]
                         }
                     }
@@ -17693,7 +17915,8 @@
                                                     "write_entities",
                                                     "label_and_tag",
                                                     "compliance_partner_read",
-                                                    "compliance_partner_admin"
+                                                    "compliance_partner_admin",
+                                                    "compliance_partner_manage_templates"
                                                 ]
                                             }
                                         }
@@ -17818,7 +18041,8 @@
                                             "write_entities",
                                             "label_and_tag",
                                             "compliance_partner_read",
-                                            "compliance_partner_admin"
+                                            "compliance_partner_admin",
+                                            "compliance_partner_manage_templates"
                                         ]
                                     }
                                 }
@@ -17949,7 +18173,8 @@
                                                     "write_entities",
                                                     "label_and_tag",
                                                     "compliance_partner_read",
-                                                    "compliance_partner_admin"
+                                                    "compliance_partner_admin",
+                                                    "compliance_partner_manage_templates"
                                                 ]
                                             }
                                         }
@@ -18758,7 +18983,8 @@
                                                 "write_entities",
                                                 "label_and_tag",
                                                 "compliance_partner_read",
-                                                "compliance_partner_admin"
+                                                "compliance_partner_admin",
+                                                "compliance_partner_manage_templates"
                                             ]
                                         }
                                     }
@@ -18989,7 +19215,8 @@
                                         "write_entities",
                                         "label_and_tag",
                                         "compliance_partner_read",
-                                        "compliance_partner_admin"
+                                        "compliance_partner_admin",
+                                        "compliance_partner_manage_templates"
                                     ]
                                 }
                             }
@@ -19081,7 +19308,8 @@
                                 "write_entities",
                                 "label_and_tag",
                                 "compliance_partner_read",
-                                "compliance_partner_admin"
+                                "compliance_partner_admin",
+                                "compliance_partner_manage_templates"
                             ]
                         }
                     }
@@ -21240,7 +21468,8 @@
                                         "write_entities",
                                         "label_and_tag",
                                         "compliance_partner_read",
-                                        "compliance_partner_admin"
+                                        "compliance_partner_admin",
+                                        "compliance_partner_manage_templates"
                                     ]
                                 }
                             }
@@ -21397,6 +21626,21 @@
                 },
                 "required": [
                     "allowed_origins"
+                ]
+            },
+            "UpdateComplianceDocTemplateRequest": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "description",
+                    "name"
                 ]
             },
             "UpdateObConfigRequest": {
@@ -21557,7 +21801,8 @@
                                 "write_entities",
                                 "label_and_tag",
                                 "compliance_partner_read",
-                                "compliance_partner_admin"
+                                "compliance_partner_admin",
+                                "compliance_partner_manage_templates"
                             ]
                         }
                     }

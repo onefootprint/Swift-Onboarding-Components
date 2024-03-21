@@ -249,6 +249,7 @@ diesel::table! {
         template_id -> Text,
         name -> Text,
         description -> Text,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

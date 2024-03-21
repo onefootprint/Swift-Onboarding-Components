@@ -5,7 +5,7 @@ use api_core::{
     types::ResponseData,
     utils::db2api::TryDbToApi,
 };
-use api_wire_types::GetComplianceCompaniesResponse;
+use api_wire_types::ListComplianceCompaniesResponse;
 use db::{helpers::ComplianceDocSummary, models::ob_configuration::ObConfiguration};
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -17,7 +17,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiResponse<GetComplianceCompaniesResponse> {
+) -> JsonApiResponse<ListComplianceCompaniesResponse> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -38,5 +38,5 @@ pub async fn get(
         .map(|summary| api_wire_types::ComplianceCompanySummary::try_from_db((summary, &counts)))
         .collect::<ApiResult<Vec<_>>>()?;
 
-    ResponseData::ok(companies as GetComplianceCompaniesResponse).json()
+    ResponseData::ok(companies as ListComplianceCompaniesResponse).json()
 }

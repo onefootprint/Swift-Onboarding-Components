@@ -6,7 +6,7 @@ use crate::{
         compliance_doc_request::NewComplianceDocRequest,
         compliance_doc_review::NewComplianceDocReview,
         compliance_doc_submission::NewComplianceDocSubmission,
-        compliance_doc_template::NewComplianceDocTemplate,
+        compliance_doc_template::{ComplianceDocTemplate, NewComplianceDocTemplate},
         compliance_doc_template_version::NewComplianceDocTemplateVersion,
         partner_tenant::PartnerTenant,
         tenant::Tenant,
@@ -75,14 +75,18 @@ pub fn create_resources<'a>(
         }
         .create(conn)
         .unwrap();
-        let tv1 = NewComplianceDocTemplateVersion {
-            created_at: Utc::now(),
-            created_by_partner_tenant_user_id: &pt_user.id,
-            template_id: &t1.id,
-            name: "Privacy Policy",
-            description: "The privacy policy",
-        }
-        .create(conn)
+
+        let tv1 = ComplianceDocTemplate::create_new_version(
+            conn,
+            &t1,
+            NewComplianceDocTemplateVersion {
+                created_at: Utc::now(),
+                created_by_partner_tenant_user_id: &pt_user.id,
+                template_id: &t1.id,
+                name: "Privacy Policy",
+                description: "The privacy policy",
+            },
+        )
         .unwrap();
 
         let t2 = NewComplianceDocTemplate {
@@ -90,14 +94,17 @@ pub fn create_resources<'a>(
         }
         .create(conn)
         .unwrap();
-        let tv2 = NewComplianceDocTemplateVersion {
-            created_at: Utc::now(),
-            created_by_partner_tenant_user_id: &pt_user.id,
-            template_id: &t2.id,
-            name: "Audited Financials",
-            description: "The audited financials",
-        }
-        .create(conn)
+        let tv2 = ComplianceDocTemplate::create_new_version(
+            conn,
+            &t2,
+            NewComplianceDocTemplateVersion {
+                created_at: Utc::now(),
+                created_by_partner_tenant_user_id: &pt_user.id,
+                template_id: &t2.id,
+                name: "Audited Financials",
+                description: "The audited financials",
+            },
+        )
         .unwrap();
 
         let t3 = NewComplianceDocTemplate {
@@ -105,14 +112,17 @@ pub fn create_resources<'a>(
         }
         .create(conn)
         .unwrap();
-        let tv3 = NewComplianceDocTemplateVersion {
-            created_at: Utc::now(),
-            created_by_partner_tenant_user_id: &pt_user.id,
-            template_id: &t3.id,
-            name: "Information Security Policy",
-            description: "The information security policy",
-        }
-        .create(conn)
+        let tv3 = ComplianceDocTemplate::create_new_version(
+            conn,
+            &t3,
+            NewComplianceDocTemplateVersion {
+                created_at: Utc::now(),
+                created_by_partner_tenant_user_id: &pt_user.id,
+                template_id: &t3.id,
+                name: "Information Security Policy",
+                description: "The information security policy",
+            },
+        )
         .unwrap();
         let tvs = [&tv1, &tv2, &tv3];
 

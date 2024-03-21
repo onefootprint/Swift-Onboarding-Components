@@ -2,24 +2,22 @@ use crate::{
     models::{
         compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest,
         compliance_doc_review::ComplianceDocReview, compliance_doc_submission::ComplianceDocSubmission,
-        compliance_doc_template::ComplianceDocTemplate,
-        compliance_doc_template_version::ComplianceDocTemplateVersion, partner_tenant::PartnerTenant,
-        tenant::Tenant, tenant_compliance_partnership::TenantCompliancePartnership, tenant_user::TenantUser,
+        partner_tenant::PartnerTenant, tenant::Tenant,
+        tenant_compliance_partnership::TenantCompliancePartnership, tenant_user::TenantUser,
     },
     DbError, DbResult, PgConn,
 };
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
-    compliance_doc, compliance_doc_request, compliance_doc_review, compliance_doc_submission,
-    compliance_doc_template, compliance_doc_template_version, partner_tenant, tenant,
-    tenant_compliance_partnership,
+    compliance_doc, compliance_doc_request, compliance_doc_review, compliance_doc_submission, partner_tenant,
+    tenant, tenant_compliance_partnership,
 };
 use diesel::prelude::*;
 use itertools::chain;
 use newtypes::{
     ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocReviewId,
-    ComplianceDocStatus, ComplianceDocSubmissionId, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
-    TenantCompliancePartnershipId, TenantOrPartnerTenantId, TenantUserId,
+    ComplianceDocStatus, ComplianceDocSubmissionId, TenantCompliancePartnershipId, TenantOrPartnerTenantId,
+    TenantUserId,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -29,8 +27,6 @@ pub struct ComplianceDocSummary {
     pub tenant: Tenant,
     pub partner_tenant: PartnerTenant,
     pub docs: HashMap<ComplianceDocId, ComplianceDoc>,
-    pub doc_templates: HashMap<ComplianceDocTemplateId, ComplianceDocTemplate>,
-    pub doc_template_versions: HashMap<ComplianceDocTemplateVersionId, ComplianceDocTemplateVersion>,
     pub doc_requests: HashMap<ComplianceDocRequestId, ComplianceDocRequest>,
     pub doc_submissions: HashMap<ComplianceDocSubmissionId, ComplianceDocSubmission>,
     pub doc_reviews: HashMap<ComplianceDocReviewId, ComplianceDocReview>,
@@ -76,22 +72,6 @@ impl ComplianceDocSummary {
             let docs: Vec<ComplianceDoc> = docs_query.select(ComplianceDoc::as_select()).load(conn)?;
             let docs: HashMap<_, _> = docs.into_iter().map(|r| (r.id.clone(), r)).collect();
 
-            let doc_templates: Vec<ComplianceDocTemplate> = compliance_doc_template::table
-                .filter(compliance_doc_template::partner_tenant_id.eq(&partnership.partner_tenant_id))
-                .select(ComplianceDocTemplate::as_select())
-                .load(conn)?;
-            let doc_templates: HashMap<_, _> = doc_templates.into_iter().map(|r| (r.id.clone(), r)).collect();
-
-            let doc_template_versions: Vec<ComplianceDocTemplateVersion> =
-                compliance_doc_template_version::table
-                    .filter(compliance_doc_template_version::template_id.eq_any(doc_templates.keys()))
-                    .select(ComplianceDocTemplateVersion::as_select())
-                    .load(conn)?;
-            let doc_template_versions: HashMap<_, _> = doc_template_versions
-                .into_iter()
-                .map(|r| (r.id.clone(), r))
-                .collect();
-
             let doc_requests: Vec<ComplianceDocRequest> = compliance_doc_request::table
                 .filter(compliance_doc_request::compliance_doc_id.eq_any(docs.keys()))
                 .select(ComplianceDocRequest::as_select())
@@ -132,8 +112,6 @@ impl ComplianceDocSummary {
                 tenant,
                 partner_tenant,
                 docs,
-                doc_templates,
-                doc_template_versions,
                 doc_requests,
                 doc_submissions,
                 doc_reviews,
@@ -330,9 +308,6 @@ mod tests {
         assert_eq!(summary.tenant.id, tenant.id);
 
         assert_eq!(summary.docs.len(), 4);
-
-        assert_eq!(summary.doc_templates.len(), 3);
-        assert_eq!(summary.doc_template_versions.len(), 3);
 
         assert_eq!(summary.doc_requests.len(), 4);
         assert!(summary

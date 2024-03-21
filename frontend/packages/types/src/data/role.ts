@@ -23,6 +23,7 @@ export enum RoleScopeKind {
 
   compliancePartnerRead = 'compliance_partner_read',
   compliancePartnerAdmin = 'compliance_partner_admin',
+  compliancePartnerManageTemplates = 'compliance_partner_manage_templates',
 }
 
 export enum RoleKind {
@@ -60,6 +61,9 @@ export const supportedRoleKinds: Record<RoleScopeKind, RoleKind[]> = {
     RoleKind.compliancePartnerDashboardUser,
   ],
   [RoleScopeKind.compliancePartnerAdmin]: [
+    RoleKind.compliancePartnerDashboardUser,
+  ],
+  [RoleScopeKind.compliancePartnerManageTemplates]: [
     RoleKind.compliancePartnerDashboardUser,
   ],
 };

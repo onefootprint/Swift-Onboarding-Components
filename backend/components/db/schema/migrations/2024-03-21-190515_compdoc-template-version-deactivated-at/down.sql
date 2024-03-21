@@ -1,0 +1,3 @@
+DROP INDEX compliance_doc_template_version_unique_active_template_id;
+
+ALTER TABLE compliance_doc_template_version DROP COLUMN deactivated_at;

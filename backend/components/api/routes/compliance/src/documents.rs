@@ -6,7 +6,7 @@ use api_core::{
     utils::db2api::TryDbToApi,
     ApiError, ApiErrorKind,
 };
-use api_wire_types::GetComplianceDocumentsResponse;
+use api_wire_types::ListComplianceDocumentsResponse;
 use db::helpers::ComplianceDocSummary;
 use newtypes::TenantCompliancePartnershipId;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -20,7 +20,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
     partnership_id: web::Path<TenantCompliancePartnershipId>,
-) -> JsonApiResponse<GetComplianceDocumentsResponse> {
+) -> JsonApiResponse<ListComplianceDocumentsResponse> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -38,6 +38,6 @@ pub async fn get(
         })
         .await?;
 
-    let resp = api_wire_types::GetComplianceDocumentsResponse::try_from_db(&summary)?;
+    let resp = api_wire_types::ListComplianceDocumentsResponse::try_from_db(&summary)?;
     ResponseData::ok(resp).json()
 }

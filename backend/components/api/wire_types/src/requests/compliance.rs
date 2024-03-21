@@ -8,5 +8,20 @@ pub struct CompliancePartnershipRequest {
     pub tenant_id: TenantId,
 }
 
-pub type GetComplianceCompaniesResponse = Vec<ComplianceCompanySummary>;
-pub type GetComplianceDocumentsResponse = Vec<ComplianceDocSummary>;
+pub type ListComplianceCompaniesResponse = Vec<ComplianceCompanySummary>;
+pub type ListComplianceDocumentsResponse = Vec<ComplianceDocSummary>;
+pub type ListComplianceDocTemplatesResponse = Vec<ComplianceDocTemplate>;
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct CreateComplianceDocTemplateRequest {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct UpdateComplianceDocTemplateRequest {
+    pub name: String,
+    pub description: String,
+}

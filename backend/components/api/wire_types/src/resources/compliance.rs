@@ -1,4 +1,7 @@
-use newtypes::{ComplianceDocId, ComplianceDocStatus, TenantCompliancePartnershipId};
+use newtypes::{
+    ComplianceDocId, ComplianceDocStatus, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
+    TenantCompliancePartnershipId,
+};
 
 use crate::*;
 
@@ -20,4 +23,24 @@ pub struct ComplianceDocSummary {
     pub status: ComplianceDocStatus,
     pub assigned_to: Option<LiteOrgMember>,
     pub last_updated: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocTemplate {
+    pub id: ComplianceDocTemplateId,
+    pub latest_version: ComplianceDocTemplateVersion,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocTemplateVersion {
+    pub id: ComplianceDocTemplateVersionId,
+    pub template_id: ComplianceDocTemplateId,
+
+    pub created_at: DateTime<Utc>,
+    pub created_by_partner_tenant_user: LiteOrgMember,
+
+    pub name: String,
+    pub description: String,
 }

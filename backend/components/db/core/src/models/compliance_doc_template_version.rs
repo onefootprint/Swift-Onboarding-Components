@@ -1,4 +1,3 @@
-use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_template_version;
 use diesel::prelude::*;
@@ -18,6 +17,8 @@ pub struct ComplianceDocTemplateVersion {
 
     pub name: String,
     pub description: String,
+
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -28,13 +29,4 @@ pub struct NewComplianceDocTemplateVersion<'a> {
     pub template_id: &'a ComplianceDocTemplateId,
     pub name: &'a str,
     pub description: &'a str,
-}
-
-impl<'a> NewComplianceDocTemplateVersion<'a> {
-    #[tracing::instrument("NewComplianceDocTemplateVersion::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<ComplianceDocTemplateVersion> {
-        Ok(diesel::insert_into(compliance_doc_template_version::table)
-            .values(self)
-            .get_result(conn)?)
-    }
 }

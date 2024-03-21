@@ -63,6 +63,7 @@ impl IsGuardMet<TenantScope> for TenantGuard {
 pub enum PartnerTenantGuard {
     Admin,
     Read,
+    ManageTemplates,
 }
 
 impl PartnerTenantGuard {
@@ -71,6 +72,7 @@ impl PartnerTenantGuard {
         match self {
             Self::Admin => TenantScope::CompliancePartnerAdmin,
             Self::Read => TenantScope::CompliancePartnerRead,
+            Self::ManageTemplates => TenantScope::CompliancePartnerManageTemplates,
         }
     }
 }
