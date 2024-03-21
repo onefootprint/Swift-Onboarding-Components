@@ -17,7 +17,7 @@ const AddButton = ({ onClick }: AddButtonProps) => {
       iconComponent={IcoPlusSmall16}
       iconPosition="left"
       onClick={onClick}
-      marginTop={5}
+      $marginTop={5}
     >
       {t('add-more')}
     </LinkButton>

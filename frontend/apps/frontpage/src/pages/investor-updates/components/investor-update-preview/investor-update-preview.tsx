@@ -50,7 +50,7 @@ const InvestorUpdatePreview = ({
             </Text>
             <Text variant="body-2">{excerpt}</Text>
             <LinkButton
-              marginTop={7}
+              $marginTop={7}
               iconComponent={IcoArrowRightSmall16}
               iconPosition="right"
               href={href}

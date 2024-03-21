@@ -77,8 +77,8 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
               iconPosition="right"
               href={aml.shareUrl}
               target="_blank"
-              marginTop={5}
-              marginBottom={5}
+              $marginTop={5}
+              $marginBottom={5}
             >
               {t('source-url.read-full-report')}
             </LinkButton>

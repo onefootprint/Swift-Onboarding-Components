@@ -47,15 +47,13 @@ const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
         ))}
       </TenantsListContainer>
       {tenants.length > NUM_TENANTS_IN_DROPDOWN && (
-        <LinkButtonContainer>
-          <LinkButton paddingLeft={5} paddingBottom={3} onClick={toggleShowAll}>
-            {t(
-              shouldShowAllTenants
-                ? 'tenants-list.show-less'
-                : 'tenants-list.show-all',
-            )}
-          </LinkButton>
-        </LinkButtonContainer>
+        <LinkButton $paddingLeft={5} $paddingBottom={3} onClick={toggleShowAll}>
+          {t(
+            shouldShowAllTenants
+              ? 'tenants-list.show-less'
+              : 'tenants-list.show-all',
+          )}
+        </LinkButton>
       )}
     </>
   );
@@ -69,12 +67,6 @@ const TenantsListContainer = styled.div`
     width: 100%;
     ${createFontStyles('body-3')};
   `};
-`;
-
-const LinkButtonContainer = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[3]} 0;
-  `}
 `;
 
 export default TenantsList;

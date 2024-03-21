@@ -38,7 +38,7 @@ const TruncatedText = ({
         <LinkButton
           variant="label-4"
           onClick={showMoreOrLessText}
-          marginLeft={2}
+          $marginLeft={2}
         >
           {shownTextState === ShownTextState.PARTIAL_WITHIN_MAX_HEIGHT
             ? t('see-more')

@@ -88,6 +88,21 @@ const Template: Story<LinkButtonProps> = ({
   target,
   variant,
   disabled,
+  destructive,
+  $margin,
+  $marginInline,
+  $marginBlock,
+  $marginBottom,
+  $marginLeft,
+  $marginRight,
+  $marginTop,
+  $padding,
+  $paddingBottom,
+  $paddingLeft,
+  $paddingRight,
+  $paddingTop,
+  $paddingInline,
+  $paddingBlock,
 }: LinkButtonProps) => {
   const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
   return (
@@ -100,6 +115,21 @@ const Template: Story<LinkButtonProps> = ({
       target={target}
       variant={variant}
       disabled={disabled}
+      destructive={destructive}
+      $margin={$margin}
+      $marginInline={$marginInline}
+      $marginBlock={$marginBlock}
+      $marginBottom={$marginBottom}
+      $marginLeft={$marginLeft}
+      $marginRight={$marginRight}
+      $marginTop={$marginTop}
+      $padding={$padding}
+      $paddingBottom={$paddingBottom}
+      $paddingLeft={$paddingLeft}
+      $paddingRight={$paddingRight}
+      $paddingTop={$paddingTop}
+      $paddingInline={$paddingInline}
+      $paddingBlock={$paddingBlock}
     >
       {children}
     </LinkButton>
@@ -122,4 +152,11 @@ export const Base = Template.bind({});
 Base.args = {
   children: 'Link button',
   onClick: () => alert('I was pressed'),
+};
+
+export const WithSpacing = Template.bind({});
+WithSpacing.args = {
+  children: 'Link button',
+  $margin: 4,
+  $padding: 3,
 };

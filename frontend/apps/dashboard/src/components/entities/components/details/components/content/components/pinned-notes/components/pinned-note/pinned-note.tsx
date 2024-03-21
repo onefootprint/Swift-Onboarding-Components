@@ -39,7 +39,7 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
           <Text variant="label-3" marginLeft={2}>
             &middot;
           </Text>
-          <LinkButton marginLeft={2} onClick={() => handleUnpinNote(noteId)}>
+          <LinkButton $marginLeft={2} onClick={() => handleUnpinNote(noteId)}>
             {t('unpin-button-text')}
           </LinkButton>
         </TitleContainer>
