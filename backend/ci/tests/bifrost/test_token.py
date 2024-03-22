@@ -117,7 +117,7 @@ def test_3p_auth(sandbox_tenant, ob_config):
 
     # Since bifrost has implicit auth, we need to skip passkey registering - can only register with
     # explicit auth
-    body = post("hosted/onboarding/skip_passkey_register", None, auth_token)
+    body = post("hosted/onboarding/skip_passkey_register", dict(), auth_token)
 
     # Run bifrost
     user = bifrost.run()

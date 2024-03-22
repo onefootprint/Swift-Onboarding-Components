@@ -159,6 +159,7 @@ pub async fn post_attestation(
                                     ..Default::default()
                                 }),
                                 insight_event_id: Some(insight_event.id),
+                                skip_context: None,
                             }
                             .insert(conn)?;
 
@@ -216,6 +217,7 @@ pub async fn post_attestation(
                                     ..Default::default()
                                 }),
                                 insight_event_id: Some(insight_event.id),
+                                skip_context: None,
                             }
                             .insert(conn)?;
 

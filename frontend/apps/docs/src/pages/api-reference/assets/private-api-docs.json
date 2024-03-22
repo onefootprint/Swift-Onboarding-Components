@@ -446,42 +446,7 @@
             }
         },
         "/compliance/doc_templates/{template_id}": {
-            "delete": {
-                "tags": [
-                    "Compliance",
-                    "Private"
-                ],
-                "description": "Deactivates a compliance document template.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "template_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            },
-            "patch": {
+            "put": {
                 "tags": [
                     "Compliance",
                     "Private"
@@ -515,6 +480,41 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ComplianceDocTemplate"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Deactivates a compliance document template.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "template_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
                                 }
                             }
                         }
@@ -10867,6 +10867,10 @@
                                         "document_dob_check_digit_does_not_match",
                                         "document_number_check_digit_matches",
                                         "document_number_check_digit_does_not_match",
+                                        "curp_not_valid",
+                                        "curp_not_found",
+                                        "curp_valid",
+                                        "curp_could_not_validate",
                                         "address_matches",
                                         "address_zip_code_matches",
                                         "address_street_name_matches",
@@ -11621,6 +11625,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -11988,6 +11996,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -12355,6 +12367,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -12722,6 +12738,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -13089,6 +13109,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -13456,6 +13480,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -13823,6 +13851,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -14190,6 +14222,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -14557,6 +14593,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -14924,6 +14964,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -15291,6 +15335,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -15658,6 +15706,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -16025,6 +16077,10 @@
                                                 "document_dob_check_digit_does_not_match",
                                                 "document_number_check_digit_matches",
                                                 "document_number_check_digit_does_not_match",
+                                                "curp_not_valid",
+                                                "curp_not_found",
+                                                "curp_valid",
+                                                "curp_could_not_validate",
                                                 "address_matches",
                                                 "address_zip_code_matches",
                                                 "address_street_name_matches",
@@ -20650,6 +20706,10 @@
                             "document_dob_check_digit_does_not_match",
                             "document_number_check_digit_matches",
                             "document_number_check_digit_does_not_match",
+                            "curp_not_valid",
+                            "curp_not_found",
+                            "curp_valid",
+                            "curp_could_not_validate",
                             "address_matches",
                             "address_zip_code_matches",
                             "address_street_name_matches",
@@ -21031,6 +21091,10 @@
                             "document_dob_check_digit_does_not_match",
                             "document_number_check_digit_matches",
                             "document_number_check_digit_does_not_match",
+                            "curp_not_valid",
+                            "curp_not_found",
+                            "curp_valid",
+                            "curp_could_not_validate",
                             "address_matches",
                             "address_zip_code_matches",
                             "address_street_name_matches",

@@ -1,0 +1,1 @@
+ALTER TABLE liveness_event DROP COLUMN skip_context;

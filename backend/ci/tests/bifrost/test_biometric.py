@@ -27,7 +27,12 @@ def test_skip_liveness(sandbox_tenant):
         if r["kind"] == "liveness" and not r["is_met"]
     )
 
-    post("hosted/onboarding/skip_passkey_register", None, bifrost.auth_token)
+    data = dict(
+        context=dict(
+            reason="unavailable", client_type="web", num_attempts=0, attempts=[]
+        )
+    )
+    post("hosted/onboarding/skip_passkey_register", data, bifrost.auth_token)
 
     # After skipping, liveness requirement does not exist
     body = bifrost.get_status()

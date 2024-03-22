@@ -98,6 +98,7 @@ async fn authorize_privacy_pass(
                 }),
                 liveness_source: newtypes::LivenessSource::PrivacyPass,
                 insight_event_id: Some(insight_event.id),
+                skip_context: None,
             }
             .insert(conn)?;
 

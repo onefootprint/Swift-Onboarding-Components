@@ -191,6 +191,7 @@ impl VerifyChallengeResult {
                     liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                     attributes: Some(attributes),
                     insight_event_id: Some(ie_id.clone()),
+                    skip_context: None,
                 }
                 .insert(conn)?;
                 // create the timeline event for a liveness

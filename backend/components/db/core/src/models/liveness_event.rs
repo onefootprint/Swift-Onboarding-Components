@@ -10,13 +10,13 @@ use chrono::{DateTime, Utc};
 use crate::PgConn;
 use diesel::{prelude::*, Insertable, Queryable};
 
-use newtypes::{FpId, InsightEventId, LivenessAttributes};
+use newtypes::{FpId, InsightEventId, LivenessAttributes, SkipLivenessContext};
 
 use newtypes::{LivenessEventId, LivenessSource, ScopedVaultId, TenantId, VaultId};
 
 use super::insight_event::InsightEvent;
 
-#[derive(Debug, Clone, Queryable, Insertable, Default)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = liveness_event)]
 pub struct LivenessEvent {
     pub id: LivenessEventId,
@@ -27,6 +27,7 @@ pub struct LivenessEvent {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub insight_event_id: Option<InsightEventId>,
+    pub skip_context: Option<SkipLivenessContext>,
 }
 
 impl LivenessEvent {
@@ -97,13 +98,14 @@ impl LivenessEvent {
     }
 }
 
-#[derive(Debug, Clone, Insertable, Default)]
+#[derive(Debug, Insertable)]
 #[diesel(table_name = liveness_event)]
 pub struct NewLivenessEvent {
     pub scoped_vault_id: ScopedVaultId,
     pub liveness_source: LivenessSource,
     pub attributes: Option<LivenessAttributes>,
     pub insight_event_id: Option<InsightEventId>,
+    pub skip_context: Option<SkipLivenessContext>,
 }
 
 impl NewLivenessEvent {

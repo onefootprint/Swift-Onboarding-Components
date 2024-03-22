@@ -597,6 +597,7 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         insight_event_id -> Nullable<Text>,
+        skip_context -> Nullable<Jsonb>,
     }
 }
 

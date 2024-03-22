@@ -1,0 +1,1 @@
+ALTER TABLE liveness_event ADD COLUMN skip_context JSONB;

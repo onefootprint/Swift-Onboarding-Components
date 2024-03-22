@@ -782,6 +782,17 @@
                     "Hosted"
                 ],
                 "description": "Tells us that a passkey registration was skipped",
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SkipPasskeyRegisterRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5722,6 +5733,58 @@
                 "required": [
                     "challenge_data"
                 ]
+            },
+            "SkipPasskeyRegisterRequest": {
+                "type": "object",
+                "properties": {
+                    "context": {
+                        "type": "object",
+                        "properties": {
+                            "attempts": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "elapsed_time_in_os_prompt_ms": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        "error_message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error_message"
+                                    ]
+                                }
+                            },
+                            "client_type": {
+                                "type": "string",
+                                "enum": [
+                                    "Web",
+                                    "Mobile"
+                                ]
+                            },
+                            "num_attempts": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "reason": {
+                                "type": "string",
+                                "enum": [
+                                    "Unavailable",
+                                    "Failed"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "attempts",
+                            "client_type",
+                            "num_attempts",
+                            "reason"
+                        ]
+                    }
+                }
             },
             "SocureDeviceSessionIdRequest": {
                 "type": "object",

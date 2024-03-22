@@ -1,10 +1,13 @@
 use crate::util::impl_enum_str_diesel;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
+use macros::SerdeAttr;
 use paperclip::actix::Apiv2Schema;
 
 use serde::{Deserialize, Serialize};
 use serde_json;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum::Display;
 use strum_macros::{AsRefStr, EnumString};
 
 #[derive(
@@ -54,4 +57,35 @@ pub enum LivenessIssuer {
     Google,
     Cloudflare,
     Footprint,
+}
+
+
+#[derive(Display, Clone, EnumString, Debug, SerializeDisplay, DeserializeFromStr, Apiv2Schema, SerdeAttr)]
+#[strum(serialize_all = "snake_case")]
+#[serde(serialize_all = "snake_case")]
+pub enum SkipLivenessReason {
+    Unavailable,
+    Failed,
+}
+
+#[derive(Display, Clone, EnumString, Debug, SerializeDisplay, DeserializeFromStr, Apiv2Schema, SerdeAttr)]
+#[strum(serialize_all = "snake_case")]
+#[serde(serialize_all = "snake_case")]
+pub enum SkipLivenessClientType {
+    Web,
+    Mobile,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema, AsJsonb)]
+pub struct SkipLivenessContext {
+    pub reason: SkipLivenessReason,
+    pub client_type: SkipLivenessClientType,
+    pub num_attempts: i64,
+    pub attempts: Vec<RegisterPasskeyAttemptContext>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
+pub struct RegisterPasskeyAttemptContext {
+    pub error_message: String,
+    pub elapsed_time_in_os_prompt_ms: Option<i64>,
 }

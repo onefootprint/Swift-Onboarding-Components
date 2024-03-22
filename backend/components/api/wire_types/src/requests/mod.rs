@@ -90,3 +90,6 @@ pub use self::lists::*;
 
 pub mod compliance;
 pub use self::compliance::*;
+
+mod skip_passkey_register;
+pub use skip_passkey_register::*;

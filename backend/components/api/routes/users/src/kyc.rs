@@ -141,6 +141,7 @@ pub async fn post(
                 attributes: None,
                 liveness_source: newtypes::LivenessSource::Skipped,
                 insight_event_id: None,
+                skip_context: None,
             }
             .insert(conn)?;
 
