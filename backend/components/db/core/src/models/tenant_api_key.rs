@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{tenant_api_key, tenant_api_key::BoxedQuery, tenant_role};
 use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use newtypes::{
-    ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, TenantOrPartnerTenantId,
+    ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, TenantOrPartnerTenantIdRef,
     TenantRoleId, TenantRoleKindDiscriminant,
 };
 
@@ -169,8 +169,8 @@ impl TenantApiKey {
         }
 
         let role_tenant_id = match role.tenant_or_partner_tenant_id()? {
-            TenantOrPartnerTenantId::TenantId(tenant_id) => tenant_id,
-            TenantOrPartnerTenantId::PartnerTenantId(_) => {
+            TenantOrPartnerTenantIdRef::TenantId(tenant_id) => tenant_id,
+            TenantOrPartnerTenantIdRef::PartnerTenantId(_) => {
                 // Partner tenants don't have API key access.
                 return Err(DbError::IncorrectTenantRoleKind);
             }

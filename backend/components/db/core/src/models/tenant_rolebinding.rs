@@ -12,7 +12,7 @@ use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
 use derive_more::From;
 use diesel::{dsl::not, prelude::*, Queryable};
 use newtypes::{
-    PartnerTenantId, TenantId, TenantOrPartnerTenantId, TenantRoleId, TenantRoleKind,
+    PartnerTenantId, TenantId, TenantOrPartnerTenantIdRef, TenantRoleId, TenantRoleKind,
     TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId,
 };
 
@@ -83,9 +83,9 @@ impl TenantRolebinding {
         conn: &mut TxnPgConn,
         tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
-        t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
+        t_pt_id: impl Into<TenantOrPartnerTenantIdRef<'a>>,
     ) -> DbResult<(Self, TenantRole)> {
-        let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
+        let t_pt_id: TenantOrPartnerTenantIdRef<'a> = t_pt_id.into();
 
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
@@ -134,18 +134,18 @@ impl TenantRolebinding {
     pub fn create_for_login<'a>(
         conn: &mut TxnPgConn,
         user_id: TenantUserId,
-        t_pt_id: impl Into<TenantOrPartnerTenantId<'a>>,
+        t_pt_id: impl Into<TenantOrPartnerTenantIdRef<'a>>,
     ) -> DbResult<Self> {
-        let t_pt_id: TenantOrPartnerTenantId<'a> = t_pt_id.into();
+        let t_pt_id: TenantOrPartnerTenantIdRef<'a> = t_pt_id.into();
 
         // Get the default admin and read-only role for this tenant/partner tenant.
         let (tenant_role_kind, admin_role_kind, ro_role_kind) = match t_pt_id {
-            TenantOrPartnerTenantId::TenantId(_) => (
+            TenantOrPartnerTenantIdRef::TenantId(_) => (
                 TenantRoleKind::DashboardUser,
                 ImmutableRoleKind::Admin,
                 ImmutableRoleKind::ReadOnly,
             ),
-            TenantOrPartnerTenantId::PartnerTenantId(_) => (
+            TenantOrPartnerTenantIdRef::PartnerTenantId(_) => (
                 TenantRoleKind::CompliancePartnerDashboardUser,
                 ImmutableRoleKind::CompliancePartnerAdmin,
                 ImmutableRoleKind::CompliancePartnerReadOnly,
@@ -378,7 +378,7 @@ pub struct TenantRolebindingUpdate {
 }
 
 pub struct TenantRolebindingFilters<'a> {
-    pub t_pt_id: TenantOrPartnerTenantId<'a>,
+    pub t_pt_id: TenantOrPartnerTenantIdRef<'a>,
     pub only_active: bool,
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub search: Option<String>,

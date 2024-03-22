@@ -3,7 +3,7 @@ use crate::{
     DbError,
 };
 use derive_more::From;
-use newtypes::{TenantKind, TenantOrPartnerTenantId};
+use newtypes::{TenantKind, TenantOrPartnerTenantIdRef};
 
 #[derive(Debug, Clone, From)]
 #[allow(clippy::large_enum_variant)]
@@ -13,7 +13,7 @@ pub enum TenantOrPartnerTenant {
 }
 
 impl TenantOrPartnerTenant {
-    pub fn id(&self) -> TenantOrPartnerTenantId<'_> {
+    pub fn id(&self) -> TenantOrPartnerTenantIdRef<'_> {
         match self {
             TenantOrPartnerTenant::Tenant(t) => (&t.id).into(),
             TenantOrPartnerTenant::PartnerTenant(pt) => (&pt.id).into(),

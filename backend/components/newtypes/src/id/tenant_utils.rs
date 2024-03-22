@@ -28,16 +28,33 @@ impl TenantId {
 }
 
 #[derive(Debug, Clone, Copy, From)]
-pub enum TenantOrPartnerTenantId<'a> {
+pub enum TenantOrPartnerTenantIdRef<'a> {
     TenantId(&'a TenantId),
     PartnerTenantId(&'a PartnerTenantId),
 }
 
-impl<'a> From<TenantOrPartnerTenantId<'a>> for TenantKind {
-    fn from(value: TenantOrPartnerTenantId<'a>) -> Self {
+#[derive(Debug, Clone, From)]
+pub enum TenantOrPartnerTenantId {
+    TenantId(TenantId),
+    PartnerTenantId(PartnerTenantId),
+}
+
+impl<'a> From<TenantOrPartnerTenantIdRef<'a>> for TenantKind {
+    fn from(value: TenantOrPartnerTenantIdRef<'a>) -> Self {
         match value {
-            TenantOrPartnerTenantId::TenantId(_) => TenantKind::Tenant,
-            TenantOrPartnerTenantId::PartnerTenantId(_) => TenantKind::PartnerTenant,
+            TenantOrPartnerTenantIdRef::TenantId(_) => TenantKind::Tenant,
+            TenantOrPartnerTenantIdRef::PartnerTenantId(_) => TenantKind::PartnerTenant,
+        }
+    }
+}
+
+impl<'a> TenantOrPartnerTenantIdRef<'a> {
+    pub fn clone_into(&self) -> TenantOrPartnerTenantId {
+        match *self {
+            TenantOrPartnerTenantIdRef::TenantId(t_id) => TenantOrPartnerTenantId::TenantId(t_id.clone()),
+            TenantOrPartnerTenantIdRef::PartnerTenantId(pt_id) => {
+                TenantOrPartnerTenantId::PartnerTenantId(pt_id.clone())
+            }
         }
     }
 }
