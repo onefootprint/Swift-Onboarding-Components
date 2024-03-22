@@ -1549,7 +1549,8 @@
             "insurance": "Tarjeta de seguro médico",
             "phone-internet-bill": "Facturas recientes de teléfono o internet"
           }
-        }
+        },
+        "issued-in": "Must be issued in"
       }
     }
   }

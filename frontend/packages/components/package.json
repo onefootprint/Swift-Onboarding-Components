@@ -31,17 +31,17 @@
     "publish:local": "yarn && yarn build && yalc publish"
   },
   "devDependencies": {
-    "@onefootprint/core": "*",
     "@hookform/resolvers": "^3.3.2",
+    "@onefootprint/core": "*",
     "@types/classnames": "^2.3.1",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20",
-    "@types/react-dom": "^18",
     "@types/react": "^18",
+    "@types/react-dom": "^18",
     "bun-types": "^1.0.25",
     "eslint-config-footprint": "*",
-    "react-dom": "^18",
     "react": "^18",
+    "react-dom": "^18",
     "tsconfig": "*",
     "tsup": "^6.5.0",
     "typescript": "^5"
@@ -51,6 +51,7 @@
     "csstype": "^3.1.2",
     "i18next": "^23.10.1",
     "lodash": "^4.17.21",
+    "qrcode.react": "^3.1.0",
     "react-hook-form": "^7.47.0",
     "react-i18next": "^14.1.0",
     "zod": "^3.22.4"

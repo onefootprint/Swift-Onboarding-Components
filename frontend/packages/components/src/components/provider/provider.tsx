@@ -1,5 +1,6 @@
 import type {
   OnboardingRequirement,
+  PublicOnboardingConfig,
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
@@ -18,6 +19,8 @@ type ContextData = {
   userData?: UserData;
   signupChallenge: SignupChallengeResponse | null;
   missingRequirements: OnboardingRequirement[];
+  onboardingConfig: PublicOnboardingConfig | null;
+  scopedAuthToken: string | null;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -28,6 +31,8 @@ const Context = createContext<[ContextData, UpdateContext]>([
     userData: {},
     signupChallenge: null,
     missingRequirements: [],
+    onboardingConfig: null,
+    scopedAuthToken: null,
   },
   () => {},
 ]);
@@ -55,6 +60,8 @@ const FootprintProvider = ({
     userData,
     signupChallenge: null,
     missingRequirements: [],
+    onboardingConfig: null,
+    scopedAuthToken: null,
   });
 
   const value = useMemo<[ContextData, UpdateContext]>(

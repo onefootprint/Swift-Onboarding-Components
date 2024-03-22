@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 
 import useFootprint from '../../hooks/use-footprint';
 import useRequest from '../../hooks/use-request';
-import identifyAndStart from '../../queries/identify-and-start';
 import PinInput from './components/pin-input';
 import ResendButton from './components/resend-button';
 import Title from './components/title';
@@ -45,23 +44,16 @@ const OtpVerification = ({
 }: OtpVerificationProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'otp' });
   const fp = useFootprint();
-  const mutation = useRequest(identifyAndStart);
+  const mutation = useRequest(fp.identifyAndStart);
 
   const handleSubmit = async (value: string) => {
     mutation.mutate(
       {
-        authToken: token,
+        token,
         challengeResponse: value,
         challengeToken,
-        scope: 'onboarding',
       },
-      {
-        onSuccess: response => {
-          fp.updateAuthToken(response.authToken);
-          fp.updateMissingRequirements(response.missingRequirements);
-          onSuccess();
-        },
-      },
+      { onSuccess },
     );
   };
 

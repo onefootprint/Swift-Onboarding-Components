@@ -30,6 +30,7 @@
         "FORCE_FOOTPRINT_JS_TO_USE_LOCAL",
         "GHOST_API_URL",
         "GHOST_CONTENT_API_KEY",
+        "HANDOFF_BASE_URL",
         "IS_E2E",
         "IS_LOCAL",
         "IS_VERCEL_ENV_DEV",

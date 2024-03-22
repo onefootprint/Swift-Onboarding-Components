@@ -4,8 +4,7 @@ import { useFormContext } from 'react-hook-form';
 
 import type { UserData } from '../@types';
 import { Context } from '../components/provider';
-import createD2pToken from '../queries/create-d2p-token';
-import getD2PStatusReq from '../queries/get-d2p-status';
+// TODO: FIX THIS
 import getOnboardingStatusReq from '../queries/get-onboarding-status';
 import identifyAndStartReq from '../queries/identify-and-start';
 import identifyReq from '../queries/identify-user';
@@ -119,43 +118,26 @@ export const useFootprint = () => {
     await getMissingRequirements(authToken);
   };
 
-  const createHandoffUrl = async () => {
+  const createHandoffUrl = () => {
     const { authToken, onboardingConfig } = context;
     if (!authToken || !onboardingConfig) {
-      throw new Error('No authToken or onboardingConfig found');
+      throw new Error('authToken and onboardingConfig are required');
     }
-    const res = await createD2pToken({
-      authToken,
-      meta: {
-        opener: 'unknown',
-      },
-    });
-    setContext(prev => ({ ...prev, scopedAuthToken: res.authToken }));
-    const url = createHandoffUrlUtil({
-      authToken: res.authToken,
-      onboardingConfig,
-    });
-    return { url, scopedAuthToken: res.authToken };
-  };
 
-  const getD2PStatus = async () => {
-    const { scopedAuthToken } = context;
-    if (!scopedAuthToken) {
-      throw new Error('No authToken found');
-    }
-    return getD2PStatusReq({ scopedAuthToken });
+    return createHandoffUrlUtil({ authToken, onboardingConfig });
   };
 
   const methods = {
-    canInitiateOtpValidation,
     createHandoffUrl,
+    canInitiateOtpValidation,
     getAuthToken,
-    getD2PStatus,
     getMissingRequirements,
+    handoff: async () => {},
     identify,
     identifyAndAuthenticate,
     identifyAndStart,
     save,
+    verifyOtp: async () => {},
   };
 
   return { form, context, ...methods };

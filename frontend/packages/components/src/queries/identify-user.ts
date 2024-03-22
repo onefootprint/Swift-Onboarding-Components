@@ -4,8 +4,8 @@ import {
   AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,
   SANDBOX_ID_HEADER,
-} from '../../constants';
-import request from '../../utils/request';
+} from '../constants';
+import request from '../utils/request';
 
 const identifyUser = async ({
   scope,
