@@ -45,6 +45,7 @@ const DeskTopProcessing = () => {
     authToken,
     currSide,
     id,
+    forceUpload,
   } = state.context;
 
   const handleProcessDocSuccess = (data: ProcessDocResponse) => {
@@ -169,6 +170,7 @@ const DeskTopProcessing = () => {
         extraCompress: extraCompressed,
         side: currSide,
         id,
+        forceUpload,
         meta: {
           manual: captureKind === 'manual',
           isUpload: captureKind === 'upload',

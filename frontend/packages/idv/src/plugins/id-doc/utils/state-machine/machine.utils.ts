@@ -18,13 +18,31 @@ const assignCurrSide = (
 
 export const NextSideTargetsMobile: MachineTarget[] = [
   {
+    target: 'mobileFrontPhotoFallback',
+    cond: (context, event) =>
+      event.payload.nextSideToCollect === 'front' && !!context.forceUpload,
+    actions: assignCurrSide,
+  },
+  {
     target: 'frontImageCaptureMobile',
     cond: (context, event) => event.payload.nextSideToCollect === 'front',
     actions: assignCurrSide,
   },
   {
+    target: 'mobileBackPhotoFallback',
+    cond: (context, event) =>
+      event.payload.nextSideToCollect === 'back' && !!context.forceUpload,
+    actions: assignCurrSide,
+  },
+  {
     target: 'backImageCaptureMobile',
     cond: (context, event) => event.payload.nextSideToCollect === 'back',
+    actions: assignCurrSide,
+  },
+  {
+    target: 'mobileSelfieFallback',
+    cond: (context, event) =>
+      event.payload.nextSideToCollect === 'selfie' && !!context.forceUpload,
     actions: assignCurrSide,
   },
   {
@@ -46,6 +64,12 @@ export const NextSideTargetsDesktop: MachineTarget[] = [
   {
     target: 'backImageDesktop',
     cond: (context, event) => event.payload.nextSideToCollect === 'back',
+    actions: assignCurrSide,
+  },
+  {
+    target: 'desktopSelfieFallback',
+    cond: (context, event) =>
+      event.payload.nextSideToCollect === 'selfie' && !!context.forceUpload,
     actions: assignCurrSide,
   },
   {

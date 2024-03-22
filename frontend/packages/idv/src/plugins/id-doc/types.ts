@@ -4,6 +4,7 @@ import type { BasePluginProps } from '../base-plugin';
 
 export type IdDocCustomData = {
   requirement: IdDocRequirement;
+  orgId: string;
   sandboxOutcome?: IdDocOutcome;
 };
 

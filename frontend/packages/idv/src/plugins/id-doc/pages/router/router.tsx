@@ -10,12 +10,16 @@ import DesktopFrontPhoto from '../desktop-front-photo';
 import DesktopFrontPhotoRetry from '../desktop-front-photo-retry';
 import DesktopProcessing from '../desktop-processing';
 import DesktopSelfie from '../desktop-selfie';
+import DesktopSelfieFallbackUpload from '../desktop-selfie-fallback-upload';
 import DesktopSelfieRetry from '../desktop-selfie-retry';
 import FrontPhotoCapture from '../front-photo-capture';
 import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
 import IdDocCountryAndType from '../id-doc-country-and-type';
 import IdDocFrontPhotoRetry from '../id-doc-front-photo-retry';
 import IdDocUploadFirstPrompt from '../id-doc-upload-first-prompt';
+import MobileBackPhotoFallbackUpload from '../mobile-back-photo-fallback-upload';
+import MobileFrontPhotoFallbackUpload from '../mobile-front-photo-fallback-upload';
+import MobileSelfieFallbackUpload from '../mobile-selfie-fallback-upload';
 import Processing from '../processing';
 import SelfiePhoto from '../selfie-photo';
 import SelfieRetryPrompt from '../selfie-retry-prompt';
@@ -51,6 +55,10 @@ const Router = ({ onDone }: RouterProps) => {
     return <FrontPhotoCapture />;
   }
 
+  if (state.matches('mobileFrontPhotoFallback')) {
+    return <MobileFrontPhotoFallbackUpload />;
+  }
+
   if (state.matches('frontImageRetryMobile')) {
     return <IdDocFrontPhotoRetry />;
   }
@@ -65,6 +73,10 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('backImageCaptureMobile')) {
     return <BackPhotoCapture />;
+  }
+
+  if (state.matches('mobileBackPhotoFallback')) {
+    return <MobileBackPhotoFallbackUpload />;
   }
 
   if (state.matches('backImageRetryMobile')) {
@@ -83,12 +95,20 @@ const Router = ({ onDone }: RouterProps) => {
     return <SelfiePhoto />;
   }
 
+  if (state.matches('mobileSelfieFallback')) {
+    return <MobileSelfieFallbackUpload />;
+  }
+
   if (state.matches('selfieImageRetryMobile')) {
     return <SelfieRetryPrompt />;
   }
 
   if (state.matches('selfieImageDesktop')) {
     return <DesktopSelfie />;
+  }
+
+  if (state.matches('desktopSelfieFallback')) {
+    return <DesktopSelfieFallbackUpload />;
   }
 
   if (state.matches('selfieImageRetryDesktop')) {

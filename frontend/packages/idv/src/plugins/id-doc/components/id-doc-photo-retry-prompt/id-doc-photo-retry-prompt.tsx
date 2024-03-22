@@ -32,7 +32,8 @@ const IdDocPhotoRetryPrompt = ({
   errors,
   onComplete,
 }: IdDocPhotoRetryPromptProps) => {
-  const [, send] = useIdDocMachine();
+  const [state, send] = useIdDocMachine();
+  const { forceUpload } = state.context;
 
   const handleClickBack = () => {
     send({
@@ -58,7 +59,11 @@ const IdDocPhotoRetryPrompt = ({
           docType={docType}
           countryName={countryName}
         />
-        <IdDocPhotoButtons onComplete={onComplete} />
+        <IdDocPhotoButtons
+          onComplete={onComplete}
+          hideCaptureButton={!!forceUpload}
+          uploadFirst={!!forceUpload}
+        />
       </PromptContainer>
     </FadeInContainer>
   );

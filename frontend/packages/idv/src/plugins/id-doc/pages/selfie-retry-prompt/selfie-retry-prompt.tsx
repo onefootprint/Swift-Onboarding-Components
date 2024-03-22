@@ -6,8 +6,10 @@ import styled, { css } from 'styled-components';
 
 import Error from '../../components/error/error';
 import FadeInContainer from '../../components/fade-in-container';
+import IdDocPhotoRetryPrompt from '../../components/id-doc-photo-retry-prompt';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
+import type { CaptureKind } from '../../utils/state-machine';
 
 const SelfieRetryPrompt = () => {
   const [state, send] = useIdDocMachine();
@@ -17,6 +19,8 @@ const SelfieRetryPrompt = () => {
 
   const {
     idDoc: { type, country },
+    forceUpload,
+    errors,
   } = state.context;
 
   if (!type || !country) {
@@ -29,6 +33,32 @@ const SelfieRetryPrompt = () => {
     send({ type: 'startImageCapture' });
   };
 
+  const handleComplete = (
+    imageFile: File | Blob,
+    extraCompressed: boolean,
+    captureKind: CaptureKind,
+  ) =>
+    send({
+      type: 'receivedImage',
+      payload: {
+        imageFile,
+        extraCompressed,
+        captureKind,
+      },
+    });
+
+  if (forceUpload) {
+    return (
+      <IdDocPhotoRetryPrompt
+        docType={type}
+        countryName={countryName ?? country}
+        imageType={IdDocImageTypes.front}
+        onComplete={handleComplete}
+        errors={errors || []}
+      />
+    );
+  }
+
   return (
     <FadeInContainer>
       <PromptContainer>
@@ -36,7 +66,7 @@ const SelfieRetryPrompt = () => {
           docType={type}
           countryName={countryName ?? country}
           imageType={IdDocImageTypes.selfie}
-          errors={state.context.errors || []}
+          errors={errors || []}
         />
         <Button fullWidth onClick={handleClick} size="large">
           {t('cta')}

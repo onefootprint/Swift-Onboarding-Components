@@ -1,11 +1,12 @@
-import { useCountdownCustom } from '@onefootprint/hooks';
+import { useCountdownCustom, useInterval } from '@onefootprint/hooks';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
-import { AnimatedLoadingSpinner, media } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, media, Stack, Text } from '@onefootprint/ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import { useInterval, useTimeout } from 'usehooks-ts';
+import { useTimeout } from 'usehooks-ts';
 
 import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
@@ -71,6 +72,7 @@ type CameraProps = {
   outlineWidthRatio: number; // with respect to the video width
   setIsCaptured: React.Dispatch<React.SetStateAction<boolean>>;
   allowPdf: boolean;
+  onCameraStuck: () => void;
 };
 
 const AUTOCAPTURE_TIMER_START_VAL = 3;
@@ -81,6 +83,8 @@ const CountDownProps = {
   intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
 };
 const PLAY_CHECK_INTERVAL = 1500;
+const FORCED_UPLOAD_DELAY = 10000;
+const CAMERA_LOADING_FEEDBACK_DELAY = 4000;
 
 const logError = (e: string) => Logger.error(e, 'camera');
 const logWarn = (e: string) => Logger.warn(e, 'camera');
@@ -166,6 +170,7 @@ const Camera = ({
   outlineWidthRatio,
   setIsCaptured,
   allowPdf,
+  onCameraStuck,
 }: CameraProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.camera',
@@ -181,6 +186,8 @@ const Camera = ({
   const [shouldDetect, setShouldDetect] = useState(false); // auto-detect control
   const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
   const [onCanPlayTriggered, setOnCanPlayTriggered] = useState(false);
+  const [showCameraLoadingFeedback, setShowCameraLoadingFeedback] =
+    useState(false);
 
   const videoSize = useSize(videoRef);
   const [
@@ -221,6 +228,25 @@ const Camera = ({
   const handleCanPlay = () => {
     setOnCanPlayTriggered(true);
     logWarn('Video triggered onCanPlay');
+    if (isVideoPlaying) {
+      logWarn('Video already playing: handleCanPlay');
+      return;
+    }
+    if (!videoRef.current) {
+      logError('Video ref not initialized: handleCanPlay');
+      return;
+    }
+    if (videoRef.current.readyState < 2) {
+      logWarn('Video not ready to play: handleCanPlay');
+      return;
+    }
+    videoRef.current
+      .play()
+      .then(() => {
+        logWarn('Video element status: started playing: handleCanPlay');
+        setIsVideoPlaying(true);
+      })
+      .catch(handlePlayError);
   };
 
   useInterval(
@@ -234,23 +260,33 @@ const Camera = ({
         return;
       }
       if (isVideoPlaying) {
-        logWarn('Video already playing');
+        logWarn('Video already playing: useInterval');
         return;
       }
       if (!videoRef.current) {
-        logError('Video ref not initialized');
+        logError('Video ref not initialized: useInterval');
         return;
       }
       videoRef.current
         .play()
         .then(() => {
-          logWarn('Video element status: started playing');
+          logWarn('Video element status: started playing: useInterval');
           setIsVideoPlaying(true);
         })
         .catch(handlePlayError);
     },
     isVideoPlaying ? null : PLAY_CHECK_INTERVAL,
   );
+
+  useTimeout(() => {
+    if (!isCameraVisible) {
+      onCameraStuck();
+    }
+  }, FORCED_UPLOAD_DELAY);
+
+  useTimeout(() => {
+    setShowCameraLoadingFeedback(true);
+  }, CAMERA_LOADING_FEEDBACK_DELAY);
 
   const handlePlayAllow = () => {
     setShowPlayAllowDialog(false);
@@ -384,7 +420,21 @@ const Camera = ({
           data-device-kind={deviceKind}
           desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}
         >
-          <AnimatedLoadingSpinner animationStart />
+          <AnimatePresence>
+            <AnimatedLoadingSpinner animationStart />
+            {showCameraLoadingFeedback && (
+              <TextContainer
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+                initial={{ opacity: 0, y: 10 }}
+                exit={{ opacity: 0, y: 10 }}
+              >
+                <Text variant="label-1">{t('loading.title')}</Text>
+                <Text variant="body-2" color="secondary">
+                  {t('loading.subtitle')}
+                </Text>
+              </TextContainer>
+            )}
+          </AnimatePresence>
         </LoadingContainer>
       ) : null}
       <Container data-visible={isCameraVisible}>
@@ -486,17 +536,35 @@ const Camera = ({
   );
 };
 
+const TextContainer = styled(motion(Stack))`
+  ${({ theme }) => css`
+    flex-direction: column;
+    gap: ${theme.spacing[3]};
+    height: fit-content;
+  `}
+`;
+
 const LoadingContainer = styled.div<{
   desktopHeight: number;
 }>`
   ${({ theme, desktopHeight }) => css`
-    height: 100%;
-    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    gap: ${theme.spacing[7]};
+
+    &[data-device-kind='mobile'] {
+      position: absolute;
+      top: calc(50% - ${theme.spacing[5]});
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
 
     &[data-device-kind='desktop'] {
+      position: relative;
       min-height: ${desktopHeight}px;
       background-color: ${theme.backgroundColor.secondary};
       border-radius: ${theme.borderRadius.default};

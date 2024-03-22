@@ -35,6 +35,7 @@ const Router = ({ onDone }: RouterProps) => {
     collectedKycData,
     requirements,
   } = state.context;
+  const { orgId } = config;
   const kyb = getRequirement(
     requirements,
     OnboardingRequirementKind.collectKybData,
@@ -161,6 +162,7 @@ const Router = ({ onDone }: RouterProps) => {
           customData: {
             requirement: idDoc,
             sandboxOutcome: idDocOutcome,
+            orgId,
           },
         }}
         onDone={handleRequirementCompleted}

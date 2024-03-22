@@ -4,6 +4,7 @@ export type SubmitDocRequest = {
   image: File | Blob;
   side: string;
   id: string;
+  forceUpload?: boolean;
   meta: {
     isUpload: boolean;
     manual?: boolean;

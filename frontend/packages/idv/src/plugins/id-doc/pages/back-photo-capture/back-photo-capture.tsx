@@ -1,29 +1,14 @@
-import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
+import { IdDocImageTypes } from '@onefootprint/types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import docTypeTranslationKeyMap from '../../utils/doc-type-translation-key-map';
 import type { CaptureKind } from '../../utils/state-machine';
 
 const ID_OUTLINE_WIDTH_RATIO = 0.9;
 const ID_OUTLINE_HEIGHT_RATIO = 0.56;
-
-const translationIndex: { [key in SupportedIdDocTypes]: string } = {
-  [SupportedIdDocTypes.driversLicense]: 'driversLicense',
-  [SupportedIdDocTypes.idCard]: 'idCard',
-  [SupportedIdDocTypes.passport]: 'passport',
-  [SupportedIdDocTypes.visa]: 'visa',
-  [SupportedIdDocTypes.workPermit]: 'workPermit',
-  [SupportedIdDocTypes.residenceDocument]: 'residenceDocument',
-  [SupportedIdDocTypes.voterIdentification]: 'voterIdentification',
-  [SupportedIdDocTypes.ssnCard]: 'ssnCard',
-  [SupportedIdDocTypes.lease]: 'lease',
-  [SupportedIdDocTypes.bankStatement]: 'bankStatement',
-  [SupportedIdDocTypes.utilityBill]: 'utilityBill',
-  [SupportedIdDocTypes.proofOfAddress]: 'proofOfAddress',
-  [SupportedIdDocTypes.passportCard]: 'passportCard',
-};
 
 const BackPhotoCapture = () => {
   const { t } = useTranslation('idv', {
@@ -57,7 +42,7 @@ const BackPhotoCapture = () => {
     });
   };
 
-  const translationKey = translationIndex[docType];
+  const translationKey = docTypeTranslationKeyMap[docType];
   const camera = t(
     `title.camera.${translationKey}` as unknown as TemplateStringsArray,
   ) as unknown as string;

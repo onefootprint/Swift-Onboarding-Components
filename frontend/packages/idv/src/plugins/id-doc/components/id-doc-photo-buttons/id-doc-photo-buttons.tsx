@@ -16,12 +16,14 @@ type IdDocPhotoButtonsProp = {
   ) => void;
   uploadFirst?: boolean;
   hideCaptureButton?: boolean;
+  allowPdf?: boolean;
 };
 
 const IdDocPhotoButtons = ({
   onComplete,
   uploadFirst,
   hideCaptureButton,
+  allowPdf,
 }: IdDocPhotoButtonsProp) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.id-doc-photo-upload-buttons',
@@ -30,7 +32,7 @@ const IdDocPhotoButtons = ({
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
   const { processImageFile, acceptedFileFormats } = useProcessImage({
-    allowPdf: uploadFirst,
+    allowPdf,
   });
   const showCaptureButton = !hideCaptureButton;
 

@@ -1,3 +1,4 @@
+import { IcoClock40 } from '@onefootprint/icons';
 import type {
   CountryCode,
   IdDocImageTypes,
@@ -12,6 +13,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { HeaderTitle } from '../../../../components';
 import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import useProcessImage from '../../hooks/use-process-image';
@@ -30,6 +32,7 @@ type DesktopPhotoPromptProps = {
   country: CountryCode;
   isRetry?: boolean;
   errors?: IdDocImageErrorType[];
+  showCameraFallbackText?: boolean;
 };
 
 const DesktopPhotoPrompt = ({
@@ -38,6 +41,7 @@ const DesktopPhotoPrompt = ({
   country,
   isRetry,
   errors,
+  showCameraFallbackText,
 }: DesktopPhotoPromptProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.desktop-photo-prompt',
@@ -125,6 +129,17 @@ const DesktopPhotoPrompt = ({
         onUploadError={handleUploadError}
         allowPdf={allowPdf}
       >
+        {showCameraFallbackText && (
+          <>
+            <HeaderTitle
+              title={t('camera-fallback-text.title')}
+              icon={IcoClock40}
+            />
+            <Text variant="body-2" color="quaternary">
+              {t('camera-fallback-text.subtitle')}
+            </Text>
+          </>
+        )}
         {isRetry && (
           <Box paddingLeft={6} paddingRight={6}>
             <Error

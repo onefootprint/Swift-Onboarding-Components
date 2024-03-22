@@ -51,6 +51,14 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
               {
+                target: 'mobileFrontPhotoFallback',
+                cond: context =>
+                  context.device.type === 'mobile' &&
+                  !context.requirement.shouldCollectConsent &&
+                  !!context.forceUpload,
+                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+              },
+              {
                 target: 'frontImageCaptureMobile',
                 cond: context =>
                   context.device.type === 'mobile' &&
@@ -159,6 +167,30 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             cameraErrored: {
               target: 'countryAndType',
             },
+            cameraStuck: [
+              {
+                target: 'frontImageUploadFirst',
+                actions: 'assignForcedUpload',
+                cond: context =>
+                  context.requirement.uploadMode === 'allow_upload',
+              },
+              {
+                target: 'mobileFrontPhotoFallback',
+                actions: 'assignForcedUpload',
+              },
+            ],
+            receivedImage: {
+              target: 'processingMobile',
+              actions: 'assignImage',
+            },
+          },
+        },
+        // Called when there is an issue with camera and we need to fallback to upload
+        mobileFrontPhotoFallback: {
+          on: {
+            navigatedToPrev: {
+              target: 'countryAndType',
+            },
             receivedImage: {
               target: 'processingMobile',
               actions: 'assignImage',
@@ -219,6 +251,18 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
+        // Called when there is an issue with camera and we need to fallback to upload
+        mobileBackPhotoFallback: {
+          on: {
+            navigatedToPrev: {
+              target: 'countryAndType',
+            },
+            receivedImage: {
+              target: 'processingMobile',
+              actions: 'assignImage',
+            },
+          },
+        },
         backImageRetryDesktop: {
           on: {
             receivedImage: {
@@ -261,7 +305,31 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
+        // Called when there is an issue with camera and we need to fallback to upload
+        mobileSelfieFallback: {
+          on: {
+            navigatedToPrev: {
+              target: 'countryAndType',
+            },
+            receivedImage: {
+              target: 'processingMobile',
+              actions: 'assignImage',
+            },
+          },
+        },
         selfieImageDesktop: {
+          on: {
+            receivedImage: {
+              target: 'processingDesktop',
+              actions: 'assignImage',
+            },
+            cameraStuck: {
+              target: 'desktopSelfieFallback',
+              actions: 'assignForcedUpload',
+            },
+          },
+        },
+        desktopSelfieFallback: {
           on: {
             receivedImage: {
               target: 'processingDesktop',
@@ -274,12 +342,20 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             startImageCapture: {
               target: 'selfieImageMobile',
             },
+            receivedImage: {
+              target: 'processingMobile',
+              actions: 'assignImage',
+            },
           },
         },
         selfieImageRetryDesktop: {
           on: {
             startImageCapture: {
               target: 'selfieImageDesktop',
+            },
+            receivedImage: {
+              target: 'processingDesktop',
+              actions: 'assignImage',
             },
           },
         },
@@ -391,6 +467,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         clearImageAndErrors: assign(context => {
           context.errors = [];
           context.image = undefined;
+          return context;
+        }),
+        assignForcedUpload: assign(context => {
+          context.forceUpload = true;
           return context;
         }),
       },

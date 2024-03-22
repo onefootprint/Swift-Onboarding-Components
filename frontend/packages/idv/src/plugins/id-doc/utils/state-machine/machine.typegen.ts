@@ -15,6 +15,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignConsent: 'consentReceived';
     assignCountryAndType: 'receivedCountryAndType';
+    assignForcedUpload: 'cameraStuck';
     assignHasBadConnectivity: 'processingErrored';
     assignId: 'receivedCountryAndType';
     assignIdDocImageErrors: 'processingErrored' | 'uploadErrored';
@@ -33,6 +34,7 @@ export interface Typegen0 {
     | 'complete'
     | 'consentDesktop'
     | 'countryAndType'
+    | 'desktopSelfieFallback'
     | 'failure'
     | 'frontImageCaptureMobile'
     | 'frontImageDesktop'
@@ -40,6 +42,9 @@ export interface Typegen0 {
     | 'frontImageRetryMobile'
     | 'frontImageUploadFirst'
     | 'init'
+    | 'mobileBackPhotoFallback'
+    | 'mobileFrontPhotoFallback'
+    | 'mobileSelfieFallback'
     | 'processingDesktop'
     | 'processingMobile'
     | 'selfieImageDesktop'

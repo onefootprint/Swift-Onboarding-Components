@@ -20,6 +20,7 @@ export type CaptureKind = 'auto' | 'manual' | 'upload';
 export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
+  orgId: string;
   requirement: IdDocRequirement;
   image?: {
     imageFile: File | Blob;
@@ -38,6 +39,7 @@ export type MachineContext = {
     Record<CountryCode, SupportedIdDocTypes[]>
   >;
   hasBadConnectivity?: boolean;
+  forceUpload?: boolean;
 };
 
 export type ProccessingSucceededEvent = {
@@ -105,5 +107,8 @@ export type MachineEvents =
     }
   | {
       type: 'navigatedToCountryDoc';
+    }
+  | {
+      type: 'cameraStuck';
     }
   | ProccessingSucceededEvent;

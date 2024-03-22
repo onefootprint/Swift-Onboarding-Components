@@ -1,6 +1,7 @@
 import { IcoInfo24 } from '@onefootprint/icons';
 import type { IdDocImageTypes } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 
 import type { NavigationHeaderLeftButtonProps } from '../../../../components';
@@ -71,6 +72,7 @@ const PhotoCapture = ({
     hasBadConnectivity,
     idDoc: { type: docType },
     requirement: { uploadMode },
+    orgId,
   } = state.context;
   const allowPdf = uploadMode === 'allow_upload';
   const { processImageUrl } = useProcessImage({ allowPdf });
@@ -85,6 +87,9 @@ const PhotoCapture = ({
   const {
     footer: { set: updateFooter },
   } = useLayoutOptions();
+  const { FallbackToDocUploadOnCameraError } = useFlags();
+  const orgIds = new Set<string>(FallbackToDocUploadOnCameraError);
+  const shouldFallbackToUpload = orgIds.has(orgId);
 
   useLayoutEffect(() => {
     if (isMobile(deviceKind)) {
@@ -153,6 +158,15 @@ const PhotoCapture = ({
     setCaptureKind(newCaptureKind);
   };
 
+  const handleCameraStuck = () => {
+    if (shouldFallbackToUpload) {
+      send({ type: 'cameraStuck' });
+      logWarn('Camera is stuck - prompting user to upload document');
+    } else {
+      logWarn('Camera is stuck');
+    }
+  };
+
   return image ? (
     <>
       {isDesktop(deviceKind) && (
@@ -214,6 +228,7 @@ const PhotoCapture = ({
         outlineWidthRatio={outlineWidthRatio}
         setIsCaptured={setIsCaptured}
         allowPdf={allowPdf}
+        onCameraStuck={handleCameraStuck}
       >
         {({
           canvasAutoCaptureRef,

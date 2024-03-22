@@ -25,6 +25,7 @@ const App = ({ context, onDone }: IdDocProps) => {
   const initialContext: MachineContext = {
     authToken,
     device,
+    orgId: customData.orgId,
     currSide: IdDocImageTypes.front,
     requirement: customData.requirement,
     idDoc: {

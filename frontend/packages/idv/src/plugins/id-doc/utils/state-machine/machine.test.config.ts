@@ -38,6 +38,7 @@ export const argsRegularMobile: MachineContext = {
     browser: 'Mobile Safari',
   },
   currSide: IdDocImageTypes.front,
+  orgId: 'orgId',
   requirement: JSON.parse(JSON.stringify(requirement)),
   idDoc: {},
   supportedCountryAndDocTypes: {
@@ -66,6 +67,7 @@ export const argsRegularDesktop: MachineContext = {
     browser: 'Chrome',
   },
   currSide: IdDocImageTypes.front,
+  orgId: 'orgId',
   requirement: JSON.parse(JSON.stringify(requirement)),
   idDoc: {},
   supportedCountryAndDocTypes: {

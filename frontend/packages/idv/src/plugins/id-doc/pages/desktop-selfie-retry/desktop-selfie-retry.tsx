@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components';
 
 import { NavigationHeader } from '../../../../components';
 import DesktopHeader from '../../components/desktop-header';
+import DesktopPhotoPrompt from '../../components/desktop-photo-prompt';
 import Error from '../../components/error';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
@@ -22,6 +23,7 @@ const DesktopSelfieRetry = () => {
   const {
     idDoc: { type, country },
     errors,
+    forceUpload,
   } = state.context;
 
   if (!type || !country) {
@@ -39,26 +41,40 @@ const DesktopSelfieRetry = () => {
   return (
     <>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <Container>
-        <DesktopHeader
+      {forceUpload ? (
+        <DesktopPhotoPrompt
+          imageType={IdDocImageTypes.selfie}
           type={type}
           country={country}
-          imageType={IdDocImageTypes.selfie}
+          isRetry
+          errors={
+            errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]
+          }
         />
-        <ErrorContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
-          <Error
-            errors={
-              errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]
-            }
+      ) : (
+        <Container>
+          <DesktopHeader
+            type={type}
+            country={country}
             imageType={IdDocImageTypes.selfie}
-            docType={type}
-            countryName={countryName ?? country}
           />
-        </ErrorContainer>
-        <Button fullWidth onClick={handleSelfieRetake} size="large">
-          {t('take-selfie-again')}
-        </Button>
-      </Container>
+          <ErrorContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
+            <Error
+              errors={
+                errors ?? [
+                  { errorType: IdDocImageProcessingError.unknownError },
+                ]
+              }
+              imageType={IdDocImageTypes.selfie}
+              docType={type}
+              countryName={countryName ?? country}
+            />
+          </ErrorContainer>
+          <Button fullWidth onClick={handleSelfieRetake} size="large">
+            {t('take-selfie-again')}
+          </Button>
+        </Container>
+      )}
     </>
   );
 };

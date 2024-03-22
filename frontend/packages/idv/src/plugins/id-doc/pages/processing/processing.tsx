@@ -39,6 +39,7 @@ const Processing = () => {
     image,
     authToken,
     currSide,
+    forceUpload,
     id,
   } = state.context;
 
@@ -166,6 +167,7 @@ const Processing = () => {
         image: imageFile,
         extraCompress: extraCompressed,
         side: currSide,
+        forceUpload,
         id,
         meta: {
           manual: captureKind === 'manual',

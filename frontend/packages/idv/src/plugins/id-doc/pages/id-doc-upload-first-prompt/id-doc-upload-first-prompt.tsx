@@ -49,6 +49,7 @@ const IdDocUploadFirstPrompt = () => {
     supportedCountryAndDocTypes,
     idDoc: { type: docType, country },
     id,
+    forceUpload,
   } = state.context;
   const isContextInitialized = docType && country && id;
   const singleDocCountryMap = isSingleDocCountryMap(state.context);
@@ -170,7 +171,8 @@ const IdDocUploadFirstPrompt = () => {
         <IdDocPhotoButtons
           onComplete={handleComplete}
           uploadFirst
-          hideCaptureButton={!isMobile}
+          allowPdf
+          hideCaptureButton={!isMobile || !!forceUpload}
         />
         <CountryNote>
           <Text variant="body-3" color="tertiary">{`${t(

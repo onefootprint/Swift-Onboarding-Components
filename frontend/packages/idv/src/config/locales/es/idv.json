@@ -1168,7 +1168,11 @@
           "line-2": "Solo se permiten imágenes (JPG, PNG, etc)"
         },
         "continue": "Continuar",
-        "choose-different-file": "Elegir un archivo diferente"
+        "choose-different-file": "Elige otro archivo",
+        "camera-fallback-text": {
+          "title": "Tiempo excedido",
+          "subtitle": "No podemos acceder a tu cámara en este momento."
+        }
       },
       "image-consent": {
         "title": "Consentimiento para usar tus imágenes",
@@ -1280,6 +1284,10 @@
       },
       "camera": {
         "take": "Tomar foto",
+        "loading": {
+          "title": "Preparando tu cámara",
+          "subtitle": "Solo tomará unos instantes"
+        },
         "autocapture": {
           "feedback": {
             "face": {
@@ -1426,6 +1434,21 @@
           "preview": "Lado frontal"
         }
       },
+      "mobile-front-photo-fallback-upload": {
+        "title": "Tiempo excedido",
+        "subtitle": {
+          "driversLicense": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu licencia de conducir",
+          "idCard": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu tarjeta de identificación",
+          "passport": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu pasaporte",
+          "visa": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu visa",
+          "workPermit": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu tarjeta de permiso de trabajo (EAD)",
+          "residenceDocument": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu tarjeta de residencia permanente (green card)",
+          "voterIdentification": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu identificación de votante",
+          "ssnCard": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu tarjeta del Seguro Social (SSN)",
+          "proofOfAddress": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu comprobante de domicilio",
+          "passportCard": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el lado frontal de tu tarjeta de pasaporte"
+        }
+      },
       "back-photo-capture": {
         "title": {
           "camera": {
@@ -1455,6 +1478,21 @@
         },
         "subtitle": {
           "preview": "Lado posterior"
+        }
+      },
+      "mobile-back-photo-fallback-upload": {
+        "title": "Tiempo excedido",
+        "subtitle": {
+          "driversLicense": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu licencia de conducir.",
+          "idCard": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu tarjeta de identificación.",
+          "passport": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu pasaporte.",
+          "visa": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu visa.",
+          "workPermit": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu tarjeta de EAD.",
+          "residenceDocument": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu tarjeta de residencia permanente (green card).",
+          "voterIdentification": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu identificación de votante.",
+          "ssnCard": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu tarjeta del Seguro Social (SSN).",
+          "proofOfAddress": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu comprobante de domicilio.",
+          "passportCard": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente el reverso de tu tarjeta de pasaporte."
         }
       },
       "selfie-photo-prompt": {
@@ -1487,6 +1525,10 @@
             "title": "La imagen se capturará automáticamente"
           }
         }
+      },
+      "mobile-selfie-fallback-upload": {
+        "title": "Sube un selfie",
+        "subtitle": "No podemos acceder a tu cámara en este momento. Por favor, carga manualmente tu foto de selfie."
       },
       "selfie-retry-prompt": {
         "cta": "Tomar foto"
@@ -1550,7 +1592,7 @@
             "phone-internet-bill": "Facturas recientes de teléfono o internet"
           }
         },
-        "issued-in": "Debe ser emitido en"
+        "issued-in": "Debe estar emitido en"
       }
     }
   }

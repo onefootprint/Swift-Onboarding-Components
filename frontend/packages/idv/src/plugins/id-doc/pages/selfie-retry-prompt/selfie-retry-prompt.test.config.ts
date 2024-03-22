@@ -16,6 +16,7 @@ const contextWithSelfieErrors: MachineContext = {
     browser: 'Mobile Safari',
   },
   currSide: IdDocImageTypes.front,
+  orgId: 'orgId',
   requirement: {
     isMet: false,
     kind: OnboardingRequirementKind.idDoc,

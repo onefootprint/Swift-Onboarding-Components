@@ -16,6 +16,7 @@ export const initialContextAllDocTypes: MachineContext = {
     browser: 'Mobile Safari',
   },
   currSide: IdDocImageTypes.front,
+  orgId: 'orgId',
   requirement: {
     isMet: false,
     kind: OnboardingRequirementKind.idDoc,
@@ -70,6 +71,7 @@ export const initialContextSomeDocTypes: MachineContext = {
     browser: 'Mobile Safari',
   },
   currSide: IdDocImageTypes.front,
+  orgId: 'orgId',
   requirement: {
     isMet: false,
     kind: OnboardingRequirementKind.idDoc,
@@ -108,6 +110,7 @@ export const initialContextOnlyUS: MachineContext = {
     browser: 'Mobile Safari',
   },
   currSide: IdDocImageTypes.front,
+  orgId: 'orgId',
   requirement: {
     isMet: false,
     kind: OnboardingRequirementKind.idDoc,
@@ -144,6 +147,7 @@ export const initialContextBD: MachineContext = {
     browser: 'Mobile Safari',
   },
   currSide: IdDocImageTypes.front,
+  orgId: 'orgId',
   requirement: {
     isMet: false,
     kind: OnboardingRequirementKind.idDoc,
@@ -172,6 +176,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
     browser: 'Mobile Safari',
   },
   currSide: IdDocImageTypes.front,
+  orgId: 'orgId',
   requirement: {
     isMet: false,
     kind: OnboardingRequirementKind.idDoc,

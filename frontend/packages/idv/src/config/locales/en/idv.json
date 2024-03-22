@@ -1167,7 +1167,11 @@
           "line-2": "Only images allowed (JPG, PNG, etc)"
         },
         "continue": "Continue",
-        "choose-different-file": "Choose a different file"
+        "choose-different-file": "Choose a different file",
+        "camera-fallback-text": {
+          "title": "Time exceeded",
+          "subtitle": "We're unable to access your camera at this time."
+        }
       },
       "image-consent": {
         "title": "Consent to use your images",
@@ -1279,6 +1283,10 @@
       },
       "camera": {
         "take": "Take photo",
+        "loading": {
+          "title": "Getting your camera ready",
+          "subtitle": "Hang tight! It'll be done soon."
+        },
         "autocapture": {
           "feedback": {
             "face": {
@@ -1425,6 +1433,21 @@
           "preview": "Front side"
         }
       },
+      "mobile-front-photo-fallback-upload": {
+        "title": "Time exceeded",
+        "subtitle": {
+          "driversLicense": "We're unable to access your camera at this time. Please manually upload the front side of your driver's license",
+          "idCard": "We're unable to access your camera at this time. Please manually upload the front side of your ID card",
+          "passport": "We're unable to access your camera at this time. Please manually upload the front side of your passport",
+          "visa": "We're unable to access your camera at this time. Please manually upload the front side of your visa",
+          "workPermit": "We're unable to access your camera at this time. Please manually upload the front side of your EAD card",
+          "residenceDocument": "We're unable to access your camera at this time. Please manually upload the front side of your green card",
+          "voterIdentification": "We're unable to access your camera at this time. Please manually upload the front side of your voter identification",
+          "ssnCard": "We're unable to access your camera at this time. Please manually upload the front side of your SSN Card",
+          "proofOfAddress": "We're unable to access your camera at this time. Please manually upload the front side of your proof of address",
+          "passportCard": "We're unable to access your camera at this time. Please manually upload the front side of your passport card"
+        }
+      },
       "back-photo-capture": {
         "title": {
           "camera": {
@@ -1454,6 +1477,21 @@
         },
         "subtitle": {
           "preview": "Back side"
+        }
+      },
+      "mobile-back-photo-fallback-upload": {
+        "title": "Time exceeded",
+        "subtitle": {
+          "driversLicense": "We're unable to access your camera at this time. Please manually upload the back side of your driver's license",
+          "idCard": "We're unable to access your camera at this time. Please manually upload the back side of your ID card",
+          "passport": "We're unable to access your camera at this time. Please manually upload the back side of your passport",
+          "visa": "We're unable to access your camera at this time. Please manually upload the back side of your visa",
+          "workPermit": "We're unable to access your camera at this time. Please manually upload the back side of your EAD card",
+          "residenceDocument": "We're unable to access your camera at this time. Please manually upload the back side of your green card",
+          "voterIdentification": "We're unable to access your camera at this time. Please manually upload the back side of your voter identification",
+          "ssnCard": "We're unable to access your camera at this time. Please manually upload the back side of your SSN Card",
+          "proofOfAddress": "We're unable to access your camera at this time. Please manually upload the back side of your proof of address",
+          "passportCard": "We're unable to access your camera at this time. Please manually upload the back side of your passport card"
         }
       },
       "selfie-photo-prompt": {
@@ -1486,6 +1524,10 @@
             "title": "Image will be captured automatically"
           }
         }
+      },
+      "mobile-selfie-fallback-upload": {
+        "title": "Time exceeded",
+        "subtitle": "We're unable to access your camera at this time. Please manually upload your selfie photo."
       },
       "selfie-retry-prompt": {
         "cta": "Take photo"
