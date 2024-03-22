@@ -5,7 +5,10 @@ use crate::{
     State,
 };
 use actix_web::web;
-use api_core::{errors::tenant::TenantError, serializers::IsDomainAlreadyClaimed};
+use api_core::{
+    errors::{tenant::TenantError, ApiResult},
+    serializers::IsDomainAlreadyClaimed,
+};
 use api_wire_types::UpdateTenantRequest;
 use db::models::tenant::{Tenant, UpdateTenant};
 use paperclip::actix::{self, api_v2_operation, patch, web::Json};
@@ -76,7 +79,7 @@ async fn patch(
     let support_phone = clear_or_set(clear_support_phone, support_phone);
     let support_website = clear_or_set(clear_support_website, support_website);
 
-    // Note: Tenant domain uniqueness constraint protects us from having multiple tenants with the same domain and allow_domain_access true
+
     let update_tenant = UpdateTenant {
         name,
         logo_url,
@@ -91,7 +94,23 @@ async fn patch(
     };
     let updated_tenant = state
         .db_pool
-        .db_query(move |conn| Tenant::update(conn, &tenant_id, update_tenant))
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let tenant = Tenant::lock(conn, &tenant_id)?;
+
+            // If we're enabling domain access, ensure the tenant's domains aren't already claimed.
+            // TODO: Enforce this better with a uniqueness constraint on claimed domains in the DB.
+            if !tenant.allow_domain_access
+                && update_tenant.allow_domain_access.is_some_and(|allow| allow)
+                && Tenant::is_domain_already_claimed(conn, tenant.domains)?
+            {
+                return Err(TenantError::ValidationError(
+                    "Can not allow domain access: domains are already claimed".to_string(),
+                )
+                .into());
+            }
+
+            Ok(Tenant::update(conn, &tenant_id, update_tenant)?)
+        })
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
