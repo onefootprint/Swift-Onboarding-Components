@@ -1,5 +1,5 @@
 use super::tenant_role::{ImmutableRoleKind, TenantRole};
-use crate::{helpers::WorkosAuthIdentity, DbResult, NonNullVec, OptionalNonNullVec, TxnPgConn};
+use crate::{helpers::WorkosAuthIdentity, DbResult, NonNullVec, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::partner_tenant;
 use diesel::{
@@ -27,6 +27,7 @@ pub struct PartnerTenant {
     pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
     #[diesel(deserialize_as = NonNullVec<String>)]
     pub domains: Vec<String>,
+    pub allow_domain_access: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -37,6 +38,7 @@ pub struct NewPartnerTenant {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
     pub domains: Vec<String>,
+    pub allow_domain_access: bool,
 }
 
 /// Allows creating with an application-generated PartnerTenantId rather than a DB-generated ID.
@@ -49,6 +51,7 @@ pub struct NewIntegrationTestPartnerTenant {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
     pub domains: Vec<String>,
+    pub allow_domain_access: bool,
 }
 
 impl PartnerTenant {
@@ -89,6 +92,16 @@ impl PartnerTenant {
             .filter(partner_tenant::id.eq(id))
             .first(conn.conn())?;
         Ok(pt)
+    }
+
+    #[tracing::instrument("PartnerTenant::get_by_domain", skip_all)]
+    pub fn get_by_domain(conn: &mut PgConn, domain: String) -> DbResult<Option<Self>> {
+        let res = partner_tenant::table
+            .filter(partner_tenant::domains.contains(vec![domain]))
+            .filter(partner_tenant::allow_domain_access.eq(true))
+            .first(conn)
+            .optional()?;
+        Ok(res)
     }
 }
 

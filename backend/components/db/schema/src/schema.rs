@@ -708,6 +708,7 @@ diesel::table! {
         e_private_key -> Bytea,
         supported_auth_methods -> Nullable<Array<Nullable<Text>>>,
         domains -> Array<Nullable<Text>>,
+        allow_domain_access -> Bool,
     }
 }
 

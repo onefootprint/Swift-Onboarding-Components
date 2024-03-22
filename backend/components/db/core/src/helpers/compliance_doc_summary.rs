@@ -256,6 +256,7 @@ mod tests {
                 e_private_key: EncryptedVaultPrivateKey(vec![]),
                 supported_auth_methods: None,
                 domains: vec!["example bank dot com".to_owned()],
+                allow_domain_access: false,
             },
         )
         .unwrap();
@@ -267,6 +268,7 @@ mod tests {
                 e_private_key: EncryptedVaultPrivateKey(vec![]),
                 supported_auth_methods: None,
                 domains: vec!["example bank dot com".to_owned()],
+                allow_domain_access: false,
             },
         )
         .unwrap();

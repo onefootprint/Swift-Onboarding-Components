@@ -85,6 +85,7 @@ async fn post(
                         e_private_key: e_priv_key,
                         supported_auth_methods: None,
                         domains: vec![],
+                        allow_domain_access: false,
                     };
                     PartnerTenant::create(conn, new_partner_tenant)?
                 }
