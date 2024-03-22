@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { D2PStatus } from '@onefootprint/types';
 import cx from 'classnames';
 import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
