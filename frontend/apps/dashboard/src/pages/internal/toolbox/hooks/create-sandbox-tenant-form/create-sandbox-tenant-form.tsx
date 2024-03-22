@@ -5,6 +5,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
+import type { ToolFormProps } from '../../toolbox';
 import useCreateSandboxTenant from './hooks/use-create-sandbox-tenant';
 
 type CreateSandboxTenantFormData = {
@@ -12,12 +13,7 @@ type CreateSandboxTenantFormData = {
   domain: string;
 };
 
-type RetriggerKYCFormProps = {
-  formId: string;
-  onClose: () => void;
-};
-
-const CleanUpUserForm = ({ formId }: RetriggerKYCFormProps) => {
+const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
   const createSandboxTenantMutation = useCreateSandboxTenant();
   const toast = useToast();
   const methods = useForm<CreateSandboxTenantFormData>();
@@ -47,7 +43,7 @@ const CleanUpUserForm = ({ formId }: RetriggerKYCFormProps) => {
     });
   };
 
-  return (
+  const component = (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
         <Text variant="label-3">
@@ -69,9 +65,13 @@ const CleanUpUserForm = ({ formId }: RetriggerKYCFormProps) => {
       </StyledForm>
     </FormProvider>
   );
+  return {
+    component,
+    isLoading: createSandboxTenantMutation.isLoading,
+  };
 };
 
-export default CleanUpUserForm;
+export default useCleanUpUserForm;
 
 const StyledForm = styled.form`
   ${({ theme }) => css`

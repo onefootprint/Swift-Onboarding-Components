@@ -9,7 +9,7 @@ type CreateSandboxTenantRequest = {
   domains: string[];
 };
 
-const submitCleanUpRqequest = async (
+const submitCreateSandboxTenantRequest = async (
   authHeaders: AuthHeaders,
   data: CreateSandboxTenantRequest,
 ) => {
@@ -22,15 +22,15 @@ const submitCleanUpRqequest = async (
   return response.data;
 };
 
-const useCleanUp = () => {
+const useCreateSandboxTenant = () => {
   const showErrorToast = useRequestErrorToast();
   const { authHeaders } = useSession();
 
   return useMutation({
     mutationFn: (data: CreateSandboxTenantRequest) =>
-      submitCleanUpRqequest(authHeaders, data),
+      submitCreateSandboxTenantRequest(authHeaders, data),
     onError: showErrorToast,
   });
 };
 
-export default useCleanUp;
+export default useCreateSandboxTenant;

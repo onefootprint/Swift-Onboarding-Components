@@ -9,14 +9,24 @@ import { DEFAULT_PRIVATE_ROUTE } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
 
 import Button from './components/button';
-import CleanUpUserForm from './components/clean-up-user-form';
-import CreateSandboxTenantForm from './components/create-sandbox-tenant-form';
+import useCleanUpUserForm from './hooks/clean-up-user-form';
+import useCreateSandboxTenantForm from './hooks/create-sandbox-tenant-form';
+
+export type ToolFormProps = {
+  formId: string;
+  onClose: () => void;
+};
+
+export type DialogComponentOutput = {
+  component: React.ReactNode;
+  isLoading: boolean;
+};
 
 type Tool = {
   title: string;
   subtitle: string;
   // When specified, selecting this tool opens a dialog with the provided component
-  dialogComponent?: React.ReactNode;
+  useDialogComponent?: (props: ToolFormProps) => DialogComponentOutput;
   // When specified, selecting this tool performs the provided operation
   onClick?: () => void;
   icon: Icon;
@@ -57,25 +67,18 @@ const Tenants = () => {
       title: 'Clean up user',
       subtitle: 'Delete a vault belonging to an employee and all its data',
       icon: IcoDatabase24,
-      dialogComponent: (
-        <CleanUpUserForm formId="tool-form" onClose={handleDialogClose} />
-      ),
+      useDialogComponent: useCleanUpUserForm,
     },
     {
       title: 'Create sandbox tenant',
       subtitle: `Before a sales demo, pre-create a tenant for the target customer's company`,
       icon: IcoStore24,
-      dialogComponent: (
-        <CreateSandboxTenantForm
-          formId="tool-form"
-          onClose={handleDialogClose}
-        />
-      ),
+      useDialogComponent: useCreateSandboxTenantForm,
     },
   ];
 
   const handleSelectTool = (tool: Tool) => () => {
-    if (tool.dialogComponent) {
+    if (tool.useDialogComponent) {
       setSelectedTool(tool);
     } else if (tool.onClick) {
       tool.onClick();
@@ -105,21 +108,45 @@ const Tenants = () => {
         ))}
       </Stack>
       {selectedTool && (
-        <Dialog
-          size="compact"
-          title={selectedTool?.title}
-          onClose={handleDialogClose}
-          open={!!selectedTool}
-          primaryButton={{
-            form: 'tool-form',
-            label: t('submit'),
-            type: 'submit',
-          }}
-        >
-          {selectedTool?.dialogComponent}
-        </Dialog>
+        <SelectedToolDialog
+          selectedTool={selectedTool}
+          handleDialogClose={handleDialogClose}
+        />
       )}
     </>
+  );
+};
+
+const SelectedToolDialog = ({
+  selectedTool,
+  handleDialogClose,
+}: {
+  selectedTool: Tool;
+  handleDialogClose: () => void;
+}) => {
+  if (!selectedTool.useDialogComponent) {
+    return null;
+  }
+  const { component, isLoading } = selectedTool.useDialogComponent({
+    formId: 'tool-form',
+    onClose: handleDialogClose,
+  });
+
+  return (
+    <Dialog
+      size="compact"
+      title={selectedTool?.title}
+      onClose={handleDialogClose}
+      open={!!selectedTool}
+      primaryButton={{
+        form: 'tool-form',
+        label: 'Submit',
+        type: 'submit',
+        loading: isLoading,
+      }}
+    >
+      {component}
+    </Dialog>
   );
 };
 

@@ -3,6 +3,7 @@ import React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
+import type { ToolFormProps } from '../../toolbox';
 import useCleanUp from './hooks/use-clean-up';
 
 enum IdentifierType {
@@ -20,12 +21,7 @@ const makeOption = (value: string) => ({
   value,
 });
 
-type RetriggerKYCFormProps = {
-  formId: string;
-  onClose: () => void;
-};
-
-const CleanUpUserForm = ({ formId, onClose }: RetriggerKYCFormProps) => {
+const useCleanUpUserForm = ({ formId, onClose }: ToolFormProps) => {
   const cleanUpMutation = useCleanUp();
   const toast = useToast();
   const methods = useForm<CleanUpUserFormData>({
@@ -61,7 +57,7 @@ const CleanUpUserForm = ({ formId, onClose }: RetriggerKYCFormProps) => {
     });
   };
 
-  return (
+  const component = (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
         <Text variant="label-3">
@@ -96,9 +92,13 @@ const CleanUpUserForm = ({ formId, onClose }: RetriggerKYCFormProps) => {
       </StyledForm>
     </FormProvider>
   );
+  return {
+    component,
+    isLoading: cleanUpMutation.isLoading,
+  };
 };
 
-export default CleanUpUserForm;
+export default useCleanUpUserForm;
 
 const StyledForm = styled.form`
   ${({ theme }) => css`
