@@ -71,7 +71,7 @@ describe('<Router />', () => {
 
         // Who to onboard
         const title = screen.getByText(
-          "What type of playbook would you like to create?",
+          'What type of playbook would you like to create?',
         );
         expect(title).toBeInTheDocument();
       });
@@ -203,7 +203,7 @@ describe('<Router />', () => {
 
         // Who to onboard
         const title = screen.getByText(
-          "What type of playbook would you like to create?",
+          'What type of playbook would you like to create?',
         );
         expect(title).toBeInTheDocument();
       });
