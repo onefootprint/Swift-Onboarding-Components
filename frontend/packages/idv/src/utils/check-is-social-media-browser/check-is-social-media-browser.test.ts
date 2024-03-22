@@ -1,4 +1,4 @@
-import { checkIsUaSocialMediaBrowser } from './check-is-social-media-browser';
+import { socialMediaCheck } from './check-is-social-media-browser';
 
 const SocialMedia = [
   // => iOS
@@ -31,14 +31,70 @@ const NotSocialMedia = [
 describe('checkIsSocialMedia', () => {
   SocialMedia.forEach(ua => {
     it(`should return true for ${ua}`, () => {
-      expect(checkIsUaSocialMediaBrowser(ua)).toBe(true);
+      expect(socialMediaCheck({ ua })).toBe(true);
     });
   });
 
   NotSocialMedia.forEach(ua => {
     it(`should return false for ${ua}
     `, () => {
-      expect(checkIsUaSocialMediaBrowser(ua)).toBe(false);
+      expect(socialMediaCheck({ ua })).toBe(false);
     });
+  });
+
+  it('should evaluate based on browser info', () => {
+    // Flexcar user running in social media app (facebook)
+    expect(
+      socialMediaCheck({
+        ua: 'Mozilla/5.0 (Linux; Android 14; SM-S916U Build/UP1A.231005.007; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.106 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/455.0.0.44.88;]',
+        browserVersion: '455.0.0.44.88',
+        browserName: 'Facebook',
+        isIframe: true,
+        isMobile: true,
+      }),
+    ).toBe(true);
+
+    // Flexcar user running in social media app
+    expect(
+      socialMediaCheck({
+        ua: 'Mozilla/5.0 (Linux; Android 14; SM-S916U Build/UP1A.231005.007; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/122.0.6261.106 Mobile Safari/537.36',
+        browserVersion: 'WebView',
+        browserName: 'Chrome WebView',
+        isIframe: true,
+        isMobile: true,
+      }),
+    ).toBe(true);
+
+    // Trayd user from expo sdk running in webview
+    expect(
+      socialMediaCheck({
+        ua: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36',
+        browserName: 'Chrome',
+        isMobile: true,
+        browserVersion: '122.0.0.0',
+      }),
+    ).toBe(false);
+
+    // Bloom user from react native sdk running in webview
+    expect(
+      socialMediaCheck({
+        ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1',
+        browserName: 'Mobile',
+        isIframe: false,
+        isMobile: true,
+        browserVersion: 'Safari',
+      }),
+    ).toBe(false);
+
+    // Trayd user running JS sdk (in iframe) on desktop
+    expect(
+      socialMediaCheck({
+        ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        browserName: 'Chrome',
+        isIframe: true,
+        isMobile: false,
+        browserVersion: '122.0.0.0',
+      }),
+    ).toBe(false);
   });
 });
