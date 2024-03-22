@@ -172,9 +172,10 @@ pub async fn call_start_onboarding(
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
     configuration_id: IncodeConfigurationId,
+    environment: IncodeEnvironment,
 ) -> ApiResult<OnboardingStartResponse> {
     let request = IncodeStartOnboardingRequest {
-        credentials: tvc.incode_credentials(IncodeEnvironment::Production),
+        credentials: tvc.incode_credentials(environment),
         configuration_id,
         session_id: None,
         custom_name_fields: None, // TODO: this will be dropped from IncodeStartOnboardingRequest altogether. Was originally for doc scan but we decided we don't need even there

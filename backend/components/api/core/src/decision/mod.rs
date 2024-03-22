@@ -34,6 +34,8 @@ pub enum Error {
     FixtureVresNotFound,
     #[error("Decision not found")]
     DecisionNotFound,
+    #[error("CURP validation error")]
+    CurpError(#[from] CurpValidationError),
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -56,4 +58,10 @@ pub enum RuleError {
     AssertionError(String),
     #[error("No rules found for playbook {0}")]
     NoRulesForPlaybook(ObConfigurationId),
+}
+
+#[derive(thiserror::Error, Debug, PartialEq, Eq)]
+pub enum CurpValidationError {
+    #[error("No document collected in workflow")]
+    NoDocumentFoundForWorkflow,
 }

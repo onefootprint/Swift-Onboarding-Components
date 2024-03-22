@@ -1,4 +1,5 @@
 pub mod common;
+pub mod curp_validation;
 pub mod incode_watchlist;
 mod state;
 mod state_machine;

@@ -1,8 +1,12 @@
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::{document_request, document_upload, identity_document};
+use db_schema::schema::{document_request, document_upload, identity_document, incode_verification_session};
 
-use diesel::{dsl::count_star, prelude::*, Insertable, Queryable};
+use diesel::{
+    dsl::{count_star, not},
+    prelude::*,
+    Insertable, Queryable,
+};
 use std::collections::HashMap;
 
 use newtypes::{
@@ -221,6 +225,26 @@ impl IdentityDocument {
             .inner_join(document_request::table)
             .filter(document_request::workflow_id.eq(wf_id))
             .select((identity_document::all_columns, document_request::all_columns))
+            .get_results(conn)?;
+
+        Ok(results)
+    }
+
+    #[tracing::instrument("IdentityDocument::list_sent_to_incode_by_wf_id", skip_all)]
+    pub fn list_completed_sent_to_incode_by_wf_id(
+        conn: &mut PgConn,
+        wf_id: &WorkflowId,
+    ) -> DbResult<Vec<Self>> {
+        let results = identity_document::table
+            .inner_join(document_request::table)
+            .filter(document_request::workflow_id.eq(wf_id))
+            // only completed
+            .filter(not(identity_document::completed_seqno.is_null()))
+            // only docs that went to incode
+            .inner_join(incode_verification_session::table)
+            .select(identity_document::all_columns)
+            // latest is first
+            .order_by(identity_document::completed_seqno.desc())
             .get_results(conn)?;
 
         Ok(results)

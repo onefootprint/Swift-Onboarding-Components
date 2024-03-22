@@ -172,7 +172,16 @@ pub async fn make_watchlist_result_call(
 ) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
     // TODO: upstream this somewhere based on OBC, maybe not even necessary for watchlist
     let config_id = IncodeConfigurationId::from("65023dbdc221a0aba52791be".to_string());
-    let res = call_start_onboarding(state, tvc, sv_id, di_id, user_vault_public_key, config_id).await?;
+    let res = call_start_onboarding(
+        state,
+        tvc,
+        sv_id,
+        di_id,
+        user_vault_public_key,
+        config_id,
+        IncodeEnvironment::Production,
+    )
+    .await?;
 
     let token = res.token;
     let incode_credentials = IncodeCredentialsWithToken {
