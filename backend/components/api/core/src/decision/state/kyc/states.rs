@@ -15,7 +15,7 @@ use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus,
-    RiskSignalGroupKind, RuleAction, RuleSetResultKind, StepUpInfo, VerificationResultId,
+    RiskSignalGroupKind, RuleAction, RuleSetResultKind, StepUpInfo, VendorAPI, VerificationResultId,
 };
 
 use super::{
@@ -28,7 +28,7 @@ use crate::{
         features::{
             self,
             risk_signals::{
-                fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result,
+                fetch_latest_risk_signals_map, parse_reason_codes, parse_reason_codes_from_vendor_result,
                 risk_signal_group_struct::{Aml, Kyc},
                 save_risk_signals, RiskSignalGroupStruct,
             },
@@ -199,16 +199,30 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             kyc_vendor_result,
             aml_vendor_result,
             ff_client,
-            _curp_result,
+            curp_result,
         ) = async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
+        let curp_reason_codes = curp_result.map(|v| {
+            let vendor_api: VendorAPI = (&v.response.response).into();
+            let vres_id = v.verification_result_id.clone();
+            parse_reason_codes(v, false, false)
+                .into_iter()
+                .map(|frc| (frc, vendor_api, vres_id.clone()))
+                .collect()
+        });
+        let new_doc_reason_codes: Vec<NewRiskSignalInfo> = vec![ocr_reason_codes, curp_reason_codes]
+            .into_iter()
+            .flatten()
+            .flatten()
+            .collect();
+
         // Save OCR risk signals for doc-first OBC if necessary
-        if let Some(ocr_reason_codes) = ocr_reason_codes {
+        if !new_doc_reason_codes.is_empty() {
             // We save under the same RSG created during the incode state machine if it ran so we
             // don't invalidate the old RSG
             let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Doc)?;
-            RiskSignal::bulk_add(conn, ocr_reason_codes, false, rsg.id)?;
+            RiskSignal::bulk_add(conn, new_doc_reason_codes, false, rsg.id)?;
         }
 
         let fixture_decision =

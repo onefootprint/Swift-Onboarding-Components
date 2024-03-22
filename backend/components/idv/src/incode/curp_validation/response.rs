@@ -67,6 +67,12 @@ pub struct CurpError {
     pub message: Option<PiiString>,
 }
 
+impl CurpError {
+    pub fn curp_not_found(&self) -> bool {
+        self.codigo_error == Some("06".into())
+    }
+}
+
 
 impl IncodeClientErrorCustomFailureReasons for CurpValidationResponse {
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {

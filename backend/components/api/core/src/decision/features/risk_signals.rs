@@ -7,7 +7,7 @@ use newtypes::{
     VerificationResultId,
 };
 
-use super::{experian, idology_expectid, lexis};
+use super::{curp_validation, experian, idology_expectid, lexis};
 use crate::{
     decision::vendor::vendor_result::VendorResult, errors::ApiResult, utils::vault_wrapper::VaultWrapper,
     ApiError,
@@ -73,10 +73,13 @@ pub fn parse_reason_codes_from_vendor_result(
 ) -> ApiResult<ParsedFootprintReasonCodes> {
     let vendor_api: VendorAPI = (&vendor_result.response.response).into();
     let vres_id = vendor_result.verification_result_id.clone();
+    let dob_submitted = vw.has_field(IdentityDataKind::Dob);
+    let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
 
-    let (aml_frcs, kyc_frcs): (Vec<_>, Vec<_>) = parse_reason_codes(vendor_result.clone(), vw)
-        .into_iter()
-        .partition(|frc| frc.is_aml());
+    let (aml_frcs, kyc_frcs): (Vec<_>, Vec<_>) =
+        parse_reason_codes(vendor_result.clone(), dob_submitted, ssn_submitted)
+            .into_iter()
+            .partition(|frc| frc.is_aml());
 
     let kyc = RiskSignalGroupStruct {
         footprint_reason_codes: kyc_frcs
@@ -98,9 +101,11 @@ pub fn parse_reason_codes_from_vendor_result(
     Ok(res)
 }
 
-fn parse_reason_codes(vendor_result: VendorResult, vw: &VaultWrapper) -> Vec<FootprintReasonCode> {
-    let dob_submitted = vw.has_field(IdentityDataKind::Dob);
-    let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
+pub fn parse_reason_codes(
+    vendor_result: VendorResult,
+    dob_submitted: bool,
+    ssn_submitted: bool,
+) -> Vec<FootprintReasonCode> {
     match vendor_result.response.response {
         ParsedResponse::IDologyExpectID(r) => {
             idology_expectid::footprint_reason_codes(r, dob_submitted, ssn_submitted)
@@ -109,6 +114,9 @@ fn parse_reason_codes(vendor_result: VendorResult, vw: &VaultWrapper) -> Vec<Foo
         ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, ssn_submitted)
             .into_iter()
             .collect(),
+        ParsedResponse::IncodeCurpValidation(ref r) => {
+            curp_validation::footprint_reason_codes(r).into_iter().collect()
+        }
         _ => vec![],
     }
 }

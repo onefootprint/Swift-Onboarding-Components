@@ -985,6 +985,22 @@ footprint_reason_code_enum! {
         #[note = "OCR number check digit does not match barcode", severity = SignalSeverity::Medium,  description = "The document number check digit from the MRZ does not match what was in the document number OCR result"]
         DocumentNumberCheckDigitDoesNotMatch,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "CURP is not valid", severity = SignalSeverity::High,  description = "CURP was not validated"]
+        CurpNotValid,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "CURP not found", severity = SignalSeverity::High,  description = "CURP was not found in the renapo database"]
+        CurpNotFound,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "CURP is valid", severity = SignalSeverity::Info,  description = "CURP was validated"]
+        CurpValid,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "CURP could not be validate", severity = SignalSeverity::Medium,  description = "CURP could not be validated"]
+        CurpCouldNotValidate,
+
         // ~~~~~ Info ~~~~~~~~
         // These are present if:
         //   !IdNotLocated && specific other reason codes are not present
