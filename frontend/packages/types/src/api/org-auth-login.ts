@@ -2,7 +2,7 @@ import type { Member, Organization } from '../data';
 
 export type OrgAuthLoginRequest = {
   code: string;
-  requestedOrgId?: string;
+  requestOrgId?: string;
 };
 
 export type OrgAuthLoginResponse = {
