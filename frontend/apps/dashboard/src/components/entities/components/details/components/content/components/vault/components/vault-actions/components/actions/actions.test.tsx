@@ -84,12 +84,6 @@ describe('<Actions />', () => {
           });
           await userEvent.type(noteTextArea, 'Lorem ipsum');
 
-          expect(
-            screen.getByText(
-              "We'll send an email with a link with your request to the user's email address on file.",
-            ),
-          ).toBeInTheDocument();
-
           const nextButton = screen.getByRole('button', {
             name: 'Next',
           });
@@ -145,12 +139,6 @@ describe('<Actions />', () => {
             name: 'Note for user (optional)',
           });
           await userEvent.type(noteTextArea, 'Lorem ipsum');
-
-          expect(
-            screen.getByText(
-              "We'll send an SMS with a link with your request to the user's phone number on file.",
-            ),
-          ).toBeInTheDocument();
 
           const nextButton = screen.getByRole('button', {
             name: 'Next',

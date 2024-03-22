@@ -137,7 +137,9 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
           onSubmit={handleGenerateLink}
         />
       ) : (
-        <LinkDisplay link={submitRetriggerKYCMutation.data?.link || ''} />
+        submitRetriggerKYCMutation.data && (
+          <LinkDisplay linkData={submitRetriggerKYCMutation.data || ''} />
+        )
       )}
     </Dialog>
   );

@@ -1,5 +1,4 @@
 import {
-  IdDI,
   OnboardingConfigKind,
   OrgFrequentNoteKind,
   TriggerKind,
@@ -8,7 +7,6 @@ import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
 import type { SelectOption } from '@onefootprint/ui';
 import {
   Checkbox,
-  Divider,
   Radio,
   Select,
   Shimmer,
@@ -44,7 +42,6 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
-  const userHasPhone = entity.data?.attributes?.includes(IdDI.phoneNumber);
   const { data: playbooksData } = usePlaybookOptions({
     kinds: [
       OnboardingConfigKind.document,
@@ -165,12 +162,6 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
           label={t('form.note-for-user.label')}
           placeholder={t('form.note-for-user.placeholder')}
         />
-        <Divider />
-        <Text variant="body-3" color="tertiary">
-          {userHasPhone
-            ? t('form.description-phone')
-            : t('form.description-email')}
-        </Text>
       </StyledForm>
     </FormProvider>
   );
