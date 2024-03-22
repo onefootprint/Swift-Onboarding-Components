@@ -61,7 +61,6 @@ const PinForm = ({
         autoFocus
       />
       <Stack
-        height="32px"
         direction="column"
         width="100%"
         align="center"

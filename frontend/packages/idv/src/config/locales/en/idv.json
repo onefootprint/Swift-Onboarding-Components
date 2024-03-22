@@ -186,7 +186,7 @@
         "success": "Success!",
         "resend-button": {
           "cta": "Resend code",
-          "disabled": "Please wait {{seconds}} seconds to resend it..."
+          "disabled": "Please wait {{seconds}} seconds to resend..."
         },
         "toast": {
           "success": {

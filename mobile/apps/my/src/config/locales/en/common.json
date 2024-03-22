@@ -300,7 +300,7 @@
         "success": "Success!",
         "resend-button": {
           "cta": "Resend code",
-          "disabled": "Please wait {{seconds}} seconds to resend it..."
+          "disabled": "Please wait {{seconds}} seconds to resend..."
         },
         "error": {
           "title": "We couldn't authenticate using sms"
