@@ -113,7 +113,7 @@
   "pin-verification": {
     "incorrect-code": "Incorrect code",
     "new-code-sent-description": "We sent you a new code.",
-    "resend-countdown": "Please wait {{seconds}} to resend...",
+    "resend-countdown": "Please wait {{seconds}} seconds to resend...",
     "resend-cta": "Resend code",
     "success": "Success!",
     "verifying": "Verifying..."
