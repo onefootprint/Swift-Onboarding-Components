@@ -77,6 +77,12 @@ export const EMBEDDED_COMPONENTS_BASE_URL = createGetProjectUrl({
   prodAlias: 'components',
 })(env, branchName);
 
+export const DOCS_BASE_URL = createGetProjectUrl({
+  port: '3009',
+  previewAlias: 'docs',
+  prodAlias: 'docs',
+})(env, branchName);
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD =
   process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD;

@@ -5,6 +5,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { OPTION_HEIGHT } from '../../../../nav-dropdown.constants';
+
 type TenantItemProps = {
   tenant: GetAuthRolesOrg;
   onClick: () => void;
@@ -42,9 +44,13 @@ const TenantItem = ({ tenant, onClick, isSelected }: TenantItemProps) => {
 };
 
 const ItemContainer = styled(Dropdown.Item)`
-  span {
-    width: 100%;
-  }
+  ${({ theme }) => css`
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
+    height: ${OPTION_HEIGHT};
+    span {
+      width: 100%;
+    }
+  `}
 `;
 
 const TenantCheckmarkContainer = styled.div`

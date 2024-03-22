@@ -1,14 +1,16 @@
-import { IcoLogOut24 } from '@onefootprint/icons';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
-import { Dropdown, Text } from '@onefootprint/ui';
+import { Dropdown } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import OverflowButton from 'src/components/overflow-button';
 import type { UserSession } from 'src/hooks/use-session';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
+import HelpLinks from './components/help-links';
+import Logout from './components/log-out';
 import TenantsList from './components/tenants-list';
+import UserName from './components/user-name/user-name';
 
 type NavDropdownProps = {
   tenants: GetAuthRolesOrg[];
@@ -37,38 +39,21 @@ const NavDropdown = ({
       <Dropdown.Root>
         <OverflowButton ariaLabel="Account" />
         <Dropdown.Portal>
-          <NavDropdownContent align="start" sideOffset={8}>
-            <UserDropdownItem>
-              <Text variant="label-3" tag="div">
-                {`${user.firstName} ${user.lastName}`}
-              </Text>
-              <Text variant="body-3" color="secondary" tag="div">
-                {user.email}
-              </Text>
-            </UserDropdownItem>
-            {tenants?.length && (
-              <>
-                <Dropdown.Divider />
-                <Text
-                  variant="label-3"
-                  color="tertiary"
-                  paddingLeft={5}
-                  paddingTop={3}
-                >
-                  {t('tenants-list.title')}
-                </Text>
-                <TenantsList
-                  tenants={tenants}
-                  currTenantId={currTenantId}
-                  onClick={tenantId => onAssumeTenant(tenantId)}
-                />
-              </>
+          <NavDropdownContent>
+            <UserName
+              name={user.firstName}
+              lastName={user.lastName}
+              email={user.email}
+            />
+            {tenants?.length > 1 && (
+              <TenantsList
+                tenants={tenants}
+                currTenantId={currTenantId}
+                onClick={tenantId => onAssumeTenant(tenantId)}
+              />
             )}
-            <Dropdown.Divider />
-            <LogoutDropdownItem onSelect={handleLogout}>
-              <IcoLogOut24 />
-              {t('log-out')}
-            </LogoutDropdownItem>
+            <HelpLinks />
+            <Logout onSelect={handleLogout}>{t('log-out')}</Logout>
           </NavDropdownContent>
         </Dropdown.Portal>
       </Dropdown.Root>
@@ -81,30 +66,9 @@ const Container = styled.div`
   display: flex;
 `;
 
-const UserDropdownItem = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    pointer-events: none;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-
-    div {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  `};
-`;
-
 const NavDropdownContent = styled(Dropdown.Content)`
   width: 260px;
-`;
-
-const LogoutDropdownItem = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    gap: ${theme.spacing[3]};
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  `};
+  overflow: hidden;
 `;
 
 export default NavDropdown;

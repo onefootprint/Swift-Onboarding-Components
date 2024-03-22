@@ -1,10 +1,10 @@
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { LinkButton } from '@onefootprint/ui';
-import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
+import SectionContainer from '../section-container';
+import SectionTitle from '../section-title';
 import TenantItem from './components/tenant-item';
 
 type TenantsListProps = {
@@ -35,17 +35,16 @@ const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
   };
 
   return (
-    <>
-      <TenantsListContainer>
-        {displayList.map(tenant => (
-          <TenantItem
-            key={tenant.id}
-            tenant={tenant}
-            onClick={() => handleClick(tenant.id)}
-            isSelected={tenant.id === selectedTenant}
-          />
-        ))}
-      </TenantsListContainer>
+    <SectionContainer>
+      <SectionTitle>{t('tenants-list.title')}</SectionTitle>
+      {displayList.map(tenant => (
+        <TenantItem
+          key={tenant.id}
+          tenant={tenant}
+          onClick={() => handleClick(tenant.id)}
+          isSelected={tenant.id === selectedTenant}
+        />
+      ))}
       {tenants.length > NUM_TENANTS_IN_DROPDOWN && (
         <LinkButton $paddingLeft={5} $paddingBottom={3} onClick={toggleShowAll}>
           {t(
@@ -55,18 +54,8 @@ const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
           )}
         </LinkButton>
       )}
-    </>
+    </SectionContainer>
   );
 };
-
-const TenantsListContainer = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[3]} 0;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    ${createFontStyles('body-3')};
-  `};
-`;
 
 export default TenantsList;

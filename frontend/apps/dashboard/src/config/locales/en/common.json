@@ -546,6 +546,13 @@
         "internal": "Internal",
         "tenants": "Tenants",
         "toolbox": "Toolbox",
+        "help-links": {
+          "title": "Help",
+          "documentation": "Documentation",
+          "support": "Support",
+          "api-reference": "API reference",
+          "risk-signals-glossary": "Risk signals glossary"
+        },
         "tenants-list": {
           "title": "Tenants",
           "show-all": "Show all",
