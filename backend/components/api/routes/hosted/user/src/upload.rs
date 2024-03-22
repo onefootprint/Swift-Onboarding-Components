@@ -32,6 +32,7 @@ pub async fn post(
         &request,
         Some(kind.accepted_mime_types()),
         MAX_DOC_SIZE_BYTES,
+        0,
     )
     .await?;
 

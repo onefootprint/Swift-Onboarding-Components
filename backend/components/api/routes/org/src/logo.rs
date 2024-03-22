@@ -35,6 +35,7 @@ pub async fn put(
         &request,
         Some(vec![mime::IMAGE_PNG, mime::IMAGE_SVG, mime::IMAGE_JPEG]),
         MAX_IMAGE_SIZE_BYTES,
+        0,
     )
     .await?;
 

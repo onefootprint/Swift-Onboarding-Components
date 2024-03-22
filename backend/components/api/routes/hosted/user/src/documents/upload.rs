@@ -2,9 +2,8 @@ use crate::{auth::user::UserAuthGuard, decision, types::response::ResponseData, 
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::{
-    auth::user::UserWfAuthContext, decision::document::meta_headers::MetaHeaders,
-    errors::error_with_code::ErrorWithCode, telemetry::RootSpan, types::JsonApiResponse,
-    utils::file_upload::handle_file_upload,
+    auth::user::UserWfAuthContext, decision::document::meta_headers::MetaHeaders, telemetry::RootSpan,
+    types::JsonApiResponse, utils::file_upload::handle_file_upload,
 };
 use api_wire_types::DocumentResponse;
 
@@ -28,21 +27,20 @@ pub async fn post(
     meta: MetaHeaders,
     root_span: RootSpan,
 ) -> JsonApiResponse<DocumentResponse> {
-    let file = handle_file_upload(&mut payload, &request, None, MAX_DOCUMENT_SIZE_IN_BYTES).await?;
+    let file = handle_file_upload(
+        &mut payload,
+        &request,
+        None,
+        MAX_DOCUMENT_SIZE_IN_BYTES,
+        MIN_DOCUMENT_SIZE_IN_BYTES,
+    )
+    .await?;
 
     let (document_id, side) = args.into_inner();
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let wf = user_auth.workflow().clone();
     let tenant_id = user_auth.tenant().id.clone();
-    // don't use header content length so we actually enforce the min size of the document directly
-    let file_size: usize = file.bytes.leak_slice().len();
-    if (user_auth.scoped_user.is_live || tenant_id.is_integration_test_tenant())
-        && file_size <= MIN_DOCUMENT_SIZE_IN_BYTES
-    {
-        Err(ErrorWithCode::FileTooSmall(MIN_DOCUMENT_SIZE_IN_BYTES))?;
-    }
-
 
     let wf_id = wf.id.clone();
     let su_id = user_auth.scoped_user.id.clone();

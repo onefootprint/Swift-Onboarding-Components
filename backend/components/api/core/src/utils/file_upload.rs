@@ -59,12 +59,14 @@ pub async fn handle_file_upload(
     request: &HttpRequest,
     restrict_to_mime_types: Option<Vec<Mime>>,
     max_allowed_file_size_in_bytes: usize,
+    must_be_gt_file_size_in_bytes: usize,
 ) -> ApiResult<FileUpload> {
     let fut = handle_file_upload_inner(
         payload,
         request,
         restrict_to_mime_types,
         max_allowed_file_size_in_bytes,
+        must_be_gt_file_size_in_bytes,
     );
 
     // If there's no response deadline, don't apply a timeout. This wouldn't happen as long as the
@@ -92,6 +94,7 @@ async fn handle_file_upload_inner(
     request: &HttpRequest,
     restrict_to_mime_types: Option<Vec<Mime>>,
     max_allowed_file_size_in_bytes: usize,
+    must_be_gt_file_size_in_bytes: usize,
 ) -> ApiResult<FileUpload> {
     let request_content_length: usize =
         crate::utils::headers::get_required_header(CONTENT_LENGTH.as_str(), request.headers())?
@@ -134,6 +137,12 @@ async fn handle_file_upload_inner(
         }
 
         bytes.put(chunk);
+    }
+
+    // wait until we've actually read the file in to determine the size since content length header
+    // includes other aspects of the request
+    if bytes.len() <= must_be_gt_file_size_in_bytes {
+        return Err(ErrorWithCode::FileTooSmall(must_be_gt_file_size_in_bytes))?;
     }
 
     let bytes = PiiBytes::new(bytes.to_vec());
