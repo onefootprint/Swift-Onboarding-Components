@@ -1,5 +1,6 @@
 use crate::{error::Error, response::message::Status};
 use newtypes::{sms_message::SmsMessage, PiiString};
+use rand::Rng;
 use request::send_message::SendMessage;
 use reqwest::{IntoUrl, Method};
 use reqwest_middleware::{ClientWithMiddleware, RequestBuilder};
@@ -7,14 +8,12 @@ use reqwest_tracing::TracingMiddleware;
 use response::{decode_response, lookup::LookupResponse, message::Message};
 use std::time::Duration;
 
+
 pub mod error;
 pub mod request;
 pub mod response;
 
-use tokio_retry::{
-    strategy::{jitter, FixedInterval},
-    Retry,
-};
+use tokio_retry::{strategy::FixedInterval, Retry};
 
 #[derive(Clone)]
 pub struct TwilioConfig {
@@ -190,7 +189,7 @@ impl Client {
 
     async fn check_status(&self, message_uri: String) -> crate::response::Result<Message> {
         // We want to check every 500ms for 5s if there's been an error/success.
-        let retry_strategy = FixedInterval::from_millis(500).map(jitter).take(10);
+        let retry_strategy = FixedInterval::from_millis(500).map(jitter_10p).take(10);
         let result = Retry::spawn(retry_strategy, move || {
             self._check_status_inner(message_uri.clone())
         })
@@ -248,4 +247,11 @@ impl Client {
         let message = decode_response(response).await?;
         Ok(message)
     }
+}
+
+
+/// Add jitter of +- 10%
+pub fn jitter_10p(duration: Duration) -> Duration {
+    let jitter = rand::thread_rng().gen_range(0.9..1.1);
+    duration.mul_f64(jitter)
 }

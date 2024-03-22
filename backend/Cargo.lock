@@ -8317,6 +8317,7 @@ name = "twilio"
 version = "0.1.0"
 dependencies = [
  "newtypes",
+ "rand 0.8.5",
  "reqwest",
  "reqwest-middleware",
  "reqwest-tracing",
