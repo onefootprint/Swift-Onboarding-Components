@@ -77,10 +77,18 @@ export type Entity<TStatus = EntityStatus> = {
   decryptedAttributes: EntityVault;
 };
 
+export enum WorkflowStatus {
+  pass = 'pass',
+  fail = 'fail',
+  incomplete = 'incomplete',
+  pending = 'pending',
+}
+
 export type EntityWorkflow = {
   createdAt: string;
   playbookId: string;
   insightEvent?: InsightEvent;
+  status?: WorkflowStatus;
 };
 
 export const hasEntityUsLegalStatus = (entity: Entity) =>

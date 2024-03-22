@@ -425,4 +425,5 @@ export {
   VisaKind,
   WatchlistCheckReasonCode,
   WatchlistCheckStatus,
+  WorkflowStatus,
 } from './data';

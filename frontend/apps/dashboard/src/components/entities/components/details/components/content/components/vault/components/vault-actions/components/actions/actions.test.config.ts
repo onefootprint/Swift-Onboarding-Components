@@ -6,7 +6,6 @@ export const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 export const entityWithPhoneFixture: Entity = {
   id: entityId,
   isIdentifiable: true,
-  workflows: [],
   kind: EntityKind.person,
   data: [],
   attributes: [IdDI.phoneNumber],
@@ -19,6 +18,12 @@ export const entityWithPhoneFixture: Entity = {
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
   label: null,
+  workflows: [
+    {
+      createdAt: '2023-03-27T14:43:47.444716Z',
+      playbookId: 'obc_123',
+    },
+  ],
 };
 
 export const entityWithoutPhoneFixture: Entity = {

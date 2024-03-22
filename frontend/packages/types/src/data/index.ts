@@ -81,6 +81,7 @@ export {
   hasEntityDocuments,
   hasEntityInvestorProfile,
   hasEntityUsLegalStatus,
+  WorkflowStatus,
 } from './entity';
 export type { EntityCard } from './entity-cards';
 export type { FootprintAppearance } from './footprint-appearance';

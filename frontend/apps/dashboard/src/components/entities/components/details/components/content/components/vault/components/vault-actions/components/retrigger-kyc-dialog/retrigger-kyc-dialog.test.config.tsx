@@ -1,11 +1,17 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { Entity } from '@onefootprint/types';
-import { EntityKind, EntityStatus } from '@onefootprint/types';
+import { EntityKind, EntityStatus, WorkflowStatus } from '@onefootprint/types';
 
 export const entityFixture: Entity = {
   id: 'fp_id_yCZehsWNeywHnk5JqL20u',
   isIdentifiable: true,
-  workflows: [],
+  workflows: [
+    {
+      createdAt: '2023-03-27T14:43:47.444716Z',
+      status: WorkflowStatus.pass,
+      playbookId: 'obc_id_123',
+    },
+  ],
   kind: EntityKind.person,
   attributes: [],
   data: [],

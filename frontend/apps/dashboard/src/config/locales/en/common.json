@@ -1281,7 +1281,7 @@
           "send-request": "Send request",
           "next": "Next",
           "cancel": "Cancel",
-          "prompt": "What would you like to request from user?",
+          "prompt": "What would you like to request from this user?",
           "form": {
             "id-photo": {
               "title": "Re-upload ID photo",
@@ -1302,7 +1302,7 @@
               "label": "Note for user (optional)",
               "placeholder": "We need you to check if there's a typo in the address information you provided..."
             },
-            "cannot-reonboard-user": "Cannot reonboard the user since they haven't onboarded onto any playbook",
+            "cannot-request-info": "Cannot request more info from this user until they onboard onto a playbook",
             "error": "You need to select an option before requesting more information from a user."
           },
           "link": {

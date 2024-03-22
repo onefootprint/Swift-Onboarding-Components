@@ -74,6 +74,14 @@ describe('<RetriggerKYCDialog />', () => {
   describe('on link page', () => {
     beforeEach(() => {
       mockRequest({
+        method: 'get',
+        path: `/org/onboarding_configs`,
+        statusCode: 200,
+        response: {
+          data: [{ id: 'obc_id_123', name: 'Test playbook' }],
+        },
+      });
+      mockRequest({
         method: 'post',
         path: `/entities/${entityFixture.id}/triggers`,
         statusCode: 200,
@@ -90,9 +98,12 @@ describe('<RetriggerKYCDialog />', () => {
       renderDialog({ onClose: onCloseMockFn });
 
       const option = screen.getByRole('radio', {
-        name: 'Upload proof of SSN',
+        name: 'Onboard onto playbook',
       });
       await userEvent.click(option);
+      await waitFor(() => {
+        expect(screen.getByText('Test playbook')).toBeInTheDocument();
+      });
 
       const nextButton = screen.getByRole('button', {
         name: 'Next',
@@ -129,9 +140,12 @@ describe('<RetriggerKYCDialog />', () => {
 
       renderDialog({ onClose: jest.fn() });
       const option = screen.getByRole('radio', {
-        name: 'Upload proof of SSN',
+        name: 'Onboard onto playbook',
       });
       await userEvent.click(option);
+      await waitFor(() => {
+        expect(screen.getByText('Test playbook')).toBeInTheDocument();
+      });
       const nextButton = screen.getByRole('button', {
         name: 'Next',
       });

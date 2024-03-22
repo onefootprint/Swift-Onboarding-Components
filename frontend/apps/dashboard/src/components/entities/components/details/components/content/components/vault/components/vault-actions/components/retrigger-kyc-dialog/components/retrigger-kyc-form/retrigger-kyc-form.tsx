@@ -2,6 +2,7 @@ import {
   OnboardingConfigKind,
   OrgFrequentNoteKind,
   TriggerKind,
+  WorkflowStatus,
 } from '@onefootprint/types';
 import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
 import type { SelectOption } from '@onefootprint/ui';
@@ -12,6 +13,7 @@ import {
   Shimmer,
   Stack,
   Text,
+  Tooltip,
 } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -76,6 +78,10 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
     }
     setValue('playbook', defaultPlaybookValue);
   }, [playbooksData, selectedPlaybook, setValue, entity]);
+  const hasPriorOnboarding = !!entity.data?.workflows.some(
+    wf =>
+      wf.status === WorkflowStatus.pass || wf.status === WorkflowStatus.fail,
+  );
 
   const handleBeforeSubmit = (data: TriggerFormData) => {
     onSubmit(data);
@@ -87,11 +93,18 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
         <Text variant="label-3">{t('prompt')}</Text>
         <Stack paddingBottom={2} direction="column" gap={4}>
           <div>
-            <Radio
-              value={TriggerKind.IdDocument}
-              label={t('form.id-photo.title')}
-              {...register('kind', { required: true })}
-            />
+            <Tooltip
+              disabled={hasPriorOnboarding}
+              position="left"
+              text={t('form.cannot-request-info')}
+            >
+              <Radio
+                value={TriggerKind.IdDocument}
+                label={t('form.id-photo.title')}
+                disabled={!hasPriorOnboarding}
+                {...register('kind', { required: true })}
+              />
+            </Tooltip>
             <AnimatedContainer
               isExpanded={triggerKind === TriggerKind.IdDocument}
               marginLeft={8}
@@ -103,16 +116,30 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
               />
             </AnimatedContainer>
           </div>
-          <Radio
-            value={TriggerKind.ProofOfSsn}
-            label={t('form.proof-of-ssn.title')}
-            {...register('kind', { required: true })}
-          />
-          <Radio
-            value={TriggerKind.ProofOfAddress}
-            label={t('form.proof-of-address.title')}
-            {...register('kind', { required: true })}
-          />
+          <Tooltip
+            disabled={hasPriorOnboarding}
+            position="left"
+            text={t('form.cannot-request-info')}
+          >
+            <Radio
+              value={TriggerKind.ProofOfSsn}
+              label={t('form.proof-of-ssn.title')}
+              disabled={!hasPriorOnboarding}
+              {...register('kind', { required: true })}
+            />
+          </Tooltip>
+          <Tooltip
+            disabled={hasPriorOnboarding}
+            position="left"
+            text={t('form.cannot-request-info')}
+          >
+            <Radio
+              value={TriggerKind.ProofOfAddress}
+              label={t('form.proof-of-address.title')}
+              disabled={!hasPriorOnboarding}
+              {...register('kind', { required: true })}
+            />
+          </Tooltip>
           <div>
             <Radio
               value={TriggerKind.Onboard}

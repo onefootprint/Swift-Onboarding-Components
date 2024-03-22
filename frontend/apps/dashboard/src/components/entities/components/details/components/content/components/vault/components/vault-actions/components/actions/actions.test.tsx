@@ -1,6 +1,7 @@
 import {
   createUseRouterSpy,
   customRender,
+  mockRequest,
   screen,
   userEvent,
   waitFor,
@@ -48,6 +49,14 @@ describe('<Actions />', () => {
         id: entityId,
       },
     });
+    mockRequest({
+      method: 'get',
+      path: `/org/onboarding_configs`,
+      statusCode: 200,
+      response: {
+        data: [{ id: 'obc_123', name: 'Test playbook' }],
+      },
+    });
     asAdminUser();
   });
 
@@ -75,9 +84,12 @@ describe('<Actions />', () => {
             name: 'Request more information',
           });
           const reuploadPhotoRadio = screen.getByRole('radio', {
-            name: 'Re-upload ID photo',
+            name: 'Onboard onto playbook',
           });
           await userEvent.click(reuploadPhotoRadio);
+          await waitFor(() => {
+            expect(screen.getByText('Test playbook')).toBeInTheDocument();
+          });
 
           const noteTextArea = screen.getByRole('textbox', {
             name: 'Note for user (optional)',
@@ -131,9 +143,12 @@ describe('<Actions />', () => {
             name: 'Request more information',
           });
           const reuploadPhotoRadio = screen.getByRole('radio', {
-            name: 'Re-upload ID photo',
+            name: 'Onboard onto playbook',
           });
           await userEvent.click(reuploadPhotoRadio);
+          await waitFor(() => {
+            expect(screen.getByText('Test playbook')).toBeInTheDocument();
+          });
 
           const noteTextArea = screen.getByRole('textbox', {
             name: 'Note for user (optional)',
@@ -184,9 +199,12 @@ describe('<Actions />', () => {
         await userEvent.click(dropdownItem);
 
         const reuploadPhotoRadio = screen.getByRole('radio', {
-          name: 'Re-upload ID photo',
+          name: 'Onboard onto playbook',
         });
         await userEvent.click(reuploadPhotoRadio);
+        await waitFor(() => {
+          expect(screen.getByText('Test playbook')).toBeInTheDocument();
+        });
 
         const nextButton = screen.getByRole('button', {
           name: 'Next',

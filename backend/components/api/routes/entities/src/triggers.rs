@@ -125,7 +125,12 @@ fn validate(trigger_info: TriggerKind, scoped_vault: &ScopedVault) -> ApiResult<
     match trigger_info {
         TriggerKind::RedoKyc | TriggerKind::Onboard { .. } => Ok(()),
         TriggerKind::IdDocument | TriggerKind::ProofOfSsn | TriggerKind::ProofOfAddress => {
-            // if docs only or we have a decision
+            // Since the proceeding workflow would overwrite the scoped vault's status, we don't
+            // to allow running a document workflow unless the user has already onboarded onto
+            // another playbook and hopefully has a KYC status/risk signals.
+            // Otherwise, the a document workflow could change a user's status to pass before any
+            // KYC is run.
+            // The frontend also disables these options.
             // TODO: theoretically we should be checking risk signals here too or that there's an FP decision, but maybe not
             if scoped_vault.status.map(|d| d.has_decision()).unwrap_or(false) {
                 Ok(())
