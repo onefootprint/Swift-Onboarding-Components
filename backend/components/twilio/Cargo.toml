@@ -20,5 +20,6 @@ tokio = { workspace = true }
 thiserror = { workspace = true }
 tokio-retry = "0.3"
 strum_macros = { workspace = true }
+rand = { workspace = true }
 
 newtypes = { path = "../newtypes" }
