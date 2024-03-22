@@ -2641,9 +2641,9 @@
           },
           "data-collection-title": "Data collection",
           "id-doc": {
-            "title": "ID Document only",
-            "description": "Users will upload and validate images of their ID documents (Passport, ID, etc.), but identity verification will not be conducted.",
-            "disabled-tooltip": "You are not configured to create production Auth playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
+            "title": "ID Document & Selfie only",
+            "description": "Users will upload and validate images of their ID documents (passport, driver's license, etc.) and optionally if requested, collect a selfie and verify it matches the document.",
+            "disabled-tooltip": "You are not configured to create production ID Document playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
           }
         },
         "residency": {

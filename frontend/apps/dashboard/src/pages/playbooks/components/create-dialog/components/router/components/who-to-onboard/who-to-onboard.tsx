@@ -100,8 +100,7 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
                       description: t('id-doc.description'),
                       value: PlaybookKind.IdDoc,
                       IconComponent: IcoIdCard24,
-                      disabled:
-                        org?.isLive && org?.isProdAuthPlaybookRestricted,
+                      disabled: org?.isLive && org?.isProdKycPlaybookRestricted,
                       disabledHint: t('id-doc.disabled-tooltip'),
                     },
                   ],
