@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS unique_active_data_lifetime_per_scoped_vault_kind ON data_lifetime(scoped_vault_id, kind) WHERE deactivated_seqno IS NULL;

@@ -167,7 +167,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 },
             ],
         ),
-        // Add speculative Dob at tenant 1
+        // // Add speculative Dob at tenant 1
         (
             &su.id,
             false,
@@ -195,6 +195,8 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     for (su_id, portablize, data) in data {
         let seqno = DataLifetime::get_next_seqno(conn).unwrap();
         let source = DataLifetimeSource::Unknown;
+        let kinds = data.iter().map(|d| d.kind.clone()).collect_vec();
+        DataLifetime::bulk_deactivate_kinds(conn, su_id, kinds, seqno).unwrap();
         let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, source, None).unwrap();
         if portablize {
             let ids = vds.into_iter().map(|vd| vd.lifetime_id).collect();
