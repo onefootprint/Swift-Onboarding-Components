@@ -6,6 +6,7 @@ import {
   Stack,
   Text,
 } from '@onefootprint/ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
 export type ResendButtonProps = {
@@ -82,11 +83,19 @@ const ResendButton = ({
           </LinkButton>
         )}
       </Box>
-      {resendClicked && countdown > 0 && (
-        <Text variant="body-4" color="tertiary" marginTop={3}>
-          {texts.resendCountDown.replace('{{seconds}}', String(countdown))}
-        </Text>
-      )}
+      <AnimatePresence>
+        {resendClicked && countdown > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+          >
+            <Text variant="body-4" color="tertiary" marginTop={3}>
+              {texts.resendCountDown.replace('{{seconds}}', String(countdown))}
+            </Text>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Stack>
   );
 };
