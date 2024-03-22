@@ -57,6 +57,7 @@ pub struct ObConfiguration {
     /// Will still collect all data if it's missing, but skips confirm.
     pub skip_confirm: bool,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
+    pub curp_validation_enabled: bool,
 }
 
 
@@ -353,6 +354,7 @@ struct NewObConfiguration {
     skip_kyb: bool,
     skip_confirm: bool,
     document_types_and_countries: Option<DocumentAndCountryConfiguration>,
+    curp_validation_enabled: bool,
 }
 
 #[derive(Debug)]
@@ -630,6 +632,7 @@ impl ObConfiguration {
             skip_kyb,
             skip_confirm,
             document_types_and_countries,
+            curp_validation_enabled: false,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -796,6 +799,7 @@ mod tests {
             skip_kyb: false,
             skip_confirm: false,
             document_types_and_countries: None,
+            curp_validation_enabled: false,
         };
 
         assert_have_same_elements(
@@ -841,6 +845,7 @@ mod tests {
             skip_kyb: false,
             skip_confirm: false,
             document_types_and_countries: None,
+            curp_validation_enabled: false,
         }
     }
 
@@ -1090,6 +1095,7 @@ mod tests {
             skip_kyb: false,
             skip_confirm: false,
             document_types_and_countries: None,
+            curp_validation_enabled: false,
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
@@ -1134,6 +1140,7 @@ mod tests {
             skip_kyb: false,
             skip_confirm: false,
             document_types_and_countries: None,
+            curp_validation_enabled: false,
         };
 
         let mapping = obc.supported_country_mapping_for_document(residential_country).0;
@@ -1213,6 +1220,7 @@ mod tests {
             skip_confirm: false,
             // TESTING THIS
             document_types_and_countries: Some(doc_config),
+            curp_validation_enabled: false,
         };
 
         let mapping = obc_with_supported_countries_set
@@ -1266,6 +1274,7 @@ mod tests {
             skip_confirm: false,
             // TESTING THIS
             document_types_and_countries: Some(doc_config),
+            curp_validation_enabled: false,
         };
 
         // Despite configuring document_types_and_countries on the OBC, we respect the alpaca overrides
