@@ -23,14 +23,11 @@ export const createLivenessMachine = () =>
               {
                 target: 'register',
                 actions: 'assignContext',
-                cond: (context, event) => {
+                cond: (_, event) => {
                   const {
-                    isTransfer,
                     device: { hasSupportForWebauthn },
                   } = event.payload;
-                  return (
-                    (isTransfer || !checkIsIframe()) && !!hasSupportForWebauthn
-                  );
+                  return !checkIsIframe() && !!hasSupportForWebauthn;
                 },
               },
               {
