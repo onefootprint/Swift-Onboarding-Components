@@ -35,8 +35,7 @@ use crate::{
         },
         state::{
             actions::{Authorize, WorkflowActions},
-            common::{self},
-            DocCollected, OnAction, WorkflowState,
+            common, DocCollected, OnAction, WorkflowState,
         },
         utils::should_execute_rules_for_document_only,
         vendor::vendor_result::VendorResult,
@@ -123,6 +122,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         Option<VendorResult>,
         Option<(VerificationResultId, WatchlistResultResponse)>,
         Arc<dyn FeatureFlagClient>,
+        Option<VendorResult>,
     );
 
     #[tracing::instrument(
@@ -157,6 +157,15 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             (None, vec![])
         };
 
+        //
+        // Run Additional Checks
+        //
+        let curp_result = if obc.curp_validation_enabled {
+            common::run_curp_check(state, &self.wf_id).await?
+        } else {
+            None
+        };
+
         let aml_vendor_result = match obc.enhanced_aml {
             EnhancedAmlOption::No => None,
             EnhancedAmlOption::Yes { .. } => {
@@ -173,6 +182,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             kyc_vendor_result,
             aml_vendor_result,
             state.feature_flag_client.clone(),
+            curp_result,
         ))
     }
 
@@ -183,8 +193,14 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        let (ocr_reason_codes, user_input_risk_signals, kyc_vendor_result, aml_vendor_result, ff_client) =
-            async_res;
+        let (
+            ocr_reason_codes,
+            user_input_risk_signals,
+            kyc_vendor_result,
+            aml_vendor_result,
+            ff_client,
+            _curp_result,
+        ) = async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
         // Save OCR risk signals for doc-first OBC if necessary

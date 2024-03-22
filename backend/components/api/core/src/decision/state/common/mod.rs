@@ -23,7 +23,7 @@ use crate::{
         utils::FixtureDecision,
         vendor::{
             self,
-            incode::incode_watchlist::WatchlistCheckKind,
+            incode::{curp_validation::run_curp_validation_check, incode_watchlist::WatchlistCheckKind},
             vendor_api::{
                 vendor_api_response::build_vendor_response_map_from_vendor_results,
                 vendor_api_struct::IncodeFetchOCR,
@@ -84,6 +84,26 @@ pub async fn run_kyc_vendor_calls(
         vendor::kyc::waterfall::run_kyc_waterfall(state, &di, &wf.id).await
     }
 }
+
+#[tracing::instrument(skip(state))]
+pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> ApiResult<Option<VendorResult>> {
+    let wfid = wf_id.clone();
+    let (wf, di) = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
+            let di = DecisionIntent::get_or_create_for_workflow(
+                conn,
+                &wf.scoped_vault_id,
+                &wfid,
+                DecisionIntentKind::OnboardingKyc,
+            )?;
+            Ok((wf, di))
+        })
+        .await?;
+    run_curp_validation_check(state, &di, &wf.id).await
+}
+
 
 // TODO: code share/new abstraction to consolidate this with run_kyc_vendor_calls
 #[tracing::instrument(skip(state))]
