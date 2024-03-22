@@ -2619,7 +2619,7 @@
         },
         "who-to-onboard": {
           "nav": "Playbook type",
-          "title": "What type of playbook you'd like to create?",
+          "title": "What type of playbook would you like to create?",
           "subtitle": "This helps us better recommend which data to collect.",
           "auth-title": "Authentication",
           "auth": {
