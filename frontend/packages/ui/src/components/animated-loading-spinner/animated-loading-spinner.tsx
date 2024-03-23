@@ -14,8 +14,8 @@ export type AnimatedLoadingSpinnerProps = {
 
 const getSpinnerVariants = (size: number) => ({
   animate: {
-    strokeDashoffset: [size, (size * 11) / 16, size],
-    rotate: 360,
+    strokeDashoffset: [0, size / 4, 0],
+    rotate: [0, 360],
     transition: {
       repeat: Infinity,
       duration: 2,
@@ -23,7 +23,7 @@ const getSpinnerVariants = (size: number) => ({
     },
   },
   initial: {
-    strokeDashoffset: size,
+    strokeDashoffset: 0,
     rotate: 0,
   },
 });
@@ -42,7 +42,7 @@ const AnimatedLoadingSpinner = ({
   const radius = (size - strokeWidth) / 3;
   const circumference = radius * 2 * Math.PI;
   const adjustedCircumference = circumference * 0.75;
-  const spinnerVariants = getSpinnerVariants(size);
+  const spinnerVariants = getSpinnerVariants(adjustedCircumference);
 
   return (
     <Container
