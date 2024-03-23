@@ -98,7 +98,7 @@ impl WebauthnConfig {
             Some(UserVerificationPolicy::Required),
             None,
             None,
-            COSEAlgorithm::secure_algs(),
+            COSEAlgorithm::all_possible_algs(),
             false,
             Some(AuthenticatorAttachment::Platform),
             false,
