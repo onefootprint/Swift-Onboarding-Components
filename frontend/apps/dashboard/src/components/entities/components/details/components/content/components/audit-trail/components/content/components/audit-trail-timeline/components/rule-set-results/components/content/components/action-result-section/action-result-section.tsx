@@ -38,6 +38,12 @@ const ActionResultSection = ({
     RuleAction.stepUpPoA,
     RuleAction.stepUpIdentity,
   ];
+  const textColors: Record<string, Color> = {
+    fail: 'error',
+    'step-up': 'info',
+    'manual-review': 'warning',
+    'pass-with-manual-review': 'success',
+  };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -56,10 +62,7 @@ const ActionResultSection = ({
       aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
     >
       <Stack align="center" justify="space-between">
-        <Text
-          variant="label-3"
-          color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
-        >
+        <Text variant="label-3" color={textColors[actionName]}>
           {t(`${actionName}.title` as ParseKeys<'common'>)}
         </Text>
         <Dropdown.Root open={isDropdownOpen} onOpenChange={toggleDropdown}>
