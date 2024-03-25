@@ -19,53 +19,51 @@ describe('<CreateDialog />', () => {
     customRender(<CreateDialog open onClose={onClose} onCreate={onCreate} />);
   };
 
-  describe('successful get lists call', () => {
-    beforeEach(() => {
-      withLists();
-      withCreateList();
+  beforeEach(() => {
+    withLists();
+    withCreateList();
+  });
+
+  describe('submitting or closing the form', () => {
+    it('should call onclose when closing', async () => {
+      const onClose = jest.fn();
+      renderCreateDialog({ onClose });
+
+      const closeButton = screen.getByRole('button', { name: 'Close' });
+      await userEvent.click(closeButton);
+
+      await waitFor(() => {
+        expect(onClose).toHaveBeenCalled();
+      });
     });
 
-    describe('when submitting an invalid form', () => {
-      it('should call onclose when closing', async () => {
-        const onClose = jest.fn();
-        renderCreateDialog({ onClose });
+    it('should display an error message', async () => {
+      renderCreateDialog({});
 
-        const closeButton = screen.getByRole('button', { name: 'Close' });
-        await userEvent.click(closeButton);
+      const submitButton = screen.getByRole('button', { name: 'Create' });
+      await userEvent.click(submitButton);
 
-        await waitFor(() => {
-          expect(onClose).toHaveBeenCalled();
-        });
+      await waitFor(() => {
+        const errorMessage = screen.getByText(
+          'Please enter a name for the list.',
+        );
+        expect(errorMessage).toBeInTheDocument();
       });
+    });
 
-      it('should display an error message', async () => {
-        renderCreateDialog({});
+    it('should error if we fail to submit a kind', async () => {
+      renderCreateDialog({});
 
-        const submitButton = screen.getByRole('button', { name: 'Create' });
-        await userEvent.click(submitButton);
+      const listName = screen.getByPlaceholderText('e.g. Blocked users');
+      await userEvent.click(listName);
+      await userEvent.type(listName, 'test name');
 
-        await waitFor(() => {
-          const errorMessage = screen.getByText(
-            'Please enter a name for the list.',
-          );
-          expect(errorMessage).toBeInTheDocument();
-        });
-      });
+      const submitButton = screen.getByRole('button', { name: 'Create' });
+      await userEvent.click(submitButton);
 
-      it('should error if we fail to submit a kind', async () => {
-        renderCreateDialog({});
-
-        const listName = screen.getByPlaceholderText('e.g. Blocked users');
-        await userEvent.click(listName);
-        await userEvent.type(listName, 'test name');
-
-        const submitButton = screen.getByRole('button', { name: 'Create' });
-        await userEvent.click(submitButton);
-
-        await waitFor(() => {
-          const errorMessage = screen.getByText('Please select a type.');
-          expect(errorMessage).toBeInTheDocument();
-        });
+      await waitFor(() => {
+        const errorMessage = screen.getByText('Please select a type.');
+        expect(errorMessage).toBeInTheDocument();
       });
     });
 
@@ -95,6 +93,225 @@ describe('<CreateDialog />', () => {
 
       await waitFor(() => {
         expect(onCreate).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('when entering invalid entries', () => {
+    it('when kind is email addresses', async () => {
+      renderCreateDialog({});
+
+      const listName = screen.getByPlaceholderText('e.g. Blocked users');
+      await userEvent.click(listName);
+      await userEvent.type(listName, 'test name');
+
+      const kindSelect = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.select(kindSelect, 'Email address');
+
+      const entriesTextArea = screen.getByLabelText(
+        'Enter values manually',
+      ) as HTMLInputElement;
+      await userEvent.click(entriesTextArea);
+      await userEvent.type(entriesTextArea, 'invalid email');
+      expect(entriesTextArea.value).toBe('invalid email');
+
+      const submitButton = screen.getByRole('button', { name: 'Create' });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Please enter a valid email address.'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.click(entriesTextArea);
+      await userEvent.clear(entriesTextArea);
+      await userEvent.type(entriesTextArea, 'piip@onefootprint.com');
+
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Please enter a valid email address.'),
+        ).toBeNull();
+      });
+    });
+
+    it('when kind is email domain', async () => {
+      renderCreateDialog({});
+
+      const listName = screen.getByPlaceholderText('e.g. Blocked users');
+      await userEvent.click(listName);
+      await userEvent.type(listName, 'test name');
+
+      const kindSelect = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.select(kindSelect, 'Email domain');
+
+      const entriesTextArea = screen.getByLabelText('Enter values manually');
+      await userEvent.click(entriesTextArea);
+      await userEvent.type(entriesTextArea, 'invalid');
+
+      const submitButton = screen.getByRole('button', { name: 'Create' });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Please enter a valid email domain.'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.click(entriesTextArea);
+      await userEvent.clear(entriesTextArea);
+      await userEvent.type(entriesTextArea, 'onefootprint.com');
+
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Please enter a valid email domain.'),
+        ).toBeNull();
+      });
+    });
+
+    it('when kind is ssn9', async () => {
+      renderCreateDialog({});
+
+      const listName = screen.getByPlaceholderText('e.g. Blocked users');
+      await userEvent.click(listName);
+      await userEvent.type(listName, 'test name');
+
+      const kindSelect = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.select(kindSelect, 'SSN');
+
+      const entriesTextArea = screen.getByLabelText('Enter values manually');
+      await userEvent.click(entriesTextArea);
+      await userEvent.type(entriesTextArea, 'invalid');
+
+      const submitButton = screen.getByRole('button', { name: 'Create' });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Please enter a valid SSN.'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.click(entriesTextArea);
+      await userEvent.clear(entriesTextArea);
+      await userEvent.type(entriesTextArea, '123456789');
+
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Please enter a valid SSN9.')).toBeNull();
+      });
+    });
+
+    it('when kind is phone number', async () => {
+      renderCreateDialog({});
+
+      const listName = screen.getByPlaceholderText('e.g. Blocked users');
+      await userEvent.click(listName);
+      await userEvent.type(listName, 'test name');
+
+      const kindSelect = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.select(kindSelect, 'Phone number');
+
+      const entriesTextArea = screen.getByLabelText('Enter values manually');
+      await userEvent.click(entriesTextArea);
+      await userEvent.type(entriesTextArea, 'invalid');
+
+      const submitButton = screen.getByRole('button', { name: 'Create' });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Please enter a valid phone number.'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.click(entriesTextArea);
+      await userEvent.clear(entriesTextArea);
+      await userEvent.type(entriesTextArea, '+12122229999, +12122229999');
+
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Please enter a valid phone number.'),
+        ).toBeNull();
+      });
+    });
+
+    it('when kind is phone country code', async () => {
+      renderCreateDialog({});
+
+      const listName = screen.getByPlaceholderText('e.g. Blocked users');
+      await userEvent.click(listName);
+      await userEvent.type(listName, 'test name');
+
+      const kindSelect = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.select(kindSelect, 'Phone country code');
+
+      const entriesTextArea = screen.getByLabelText('Enter values manually');
+      await userEvent.click(entriesTextArea);
+      await userEvent.type(entriesTextArea, 'invalid');
+
+      const submitButton = screen.getByRole('button', { name: 'Create' });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Please enter a valid phone country code.'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.click(entriesTextArea);
+      await userEvent.clear(entriesTextArea);
+      await userEvent.type(entriesTextArea, '1,2,3');
+
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Please enter a valid phone country code.'),
+        ).toBeNull();
+      });
+    });
+
+    it('when kind is ip address', async () => {
+      renderCreateDialog({});
+
+      const listName = screen.getByPlaceholderText('e.g. Blocked users');
+      await userEvent.click(listName);
+      await userEvent.type(listName, 'test name');
+
+      const kindSelect = screen.getByRole('button', { name: 'Select' });
+      await selectEvents.select(kindSelect, 'IP address');
+
+      const entriesTextArea = screen.getByLabelText('Enter values manually');
+      await userEvent.click(entriesTextArea);
+      await userEvent.type(entriesTextArea, 'invalid');
+
+      const submitButton = screen.getByRole('button', { name: 'Create' });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Please enter a valid IP address.'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.click(entriesTextArea);
+      await userEvent.clear(entriesTextArea);
+      await userEvent.type(entriesTextArea, '11.11.22.11');
+
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Please enter a valid IP address.'),
+        ).toBeNull();
       });
     });
   });

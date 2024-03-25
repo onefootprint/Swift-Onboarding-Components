@@ -13,6 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import useCreateList from './hooks/use-create-list';
+import useValidateListEntries from './hooks/use-validate-list-entries';
 
 export type CreateDialogProps = {
   open: boolean;
@@ -37,9 +38,11 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
     register,
     watch,
     handleSubmit,
+    setValue,
     formState: { errors },
     control,
   } = useForm<FormData>();
+  const validateEntries = useValidateListEntries();
 
   const handleCancel = () => {
     reset();
@@ -72,7 +75,9 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
   }));
 
   const listName = watch('name');
-  const getAliasForName = (name: string) =>
+  const kind = watch('kind');
+  const entries = watch('entries');
+  const getAliasForName = (name: string = '') =>
     `@${name.replace(/[^a-z0-9_]/g, '_').toLowerCase()}`;
 
   const getNameHint = () => {
@@ -82,6 +87,18 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
     const alias = getAliasForName(listName);
     return t('form.name.hint', { alias });
   };
+
+  const getEntriesHint = () => {
+    if (errors.entries) {
+      if (!entries?.length) {
+        return t('form.entries.errors.required');
+      }
+      return errors.entries.message;
+    }
+    return t('form.entries.hint');
+  };
+
+  const getEntriesHasError = () => !!errors.entries;
 
   return (
     <Dialog
@@ -129,7 +146,10 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
                 hint={select.fieldState.error && t('form.kind.errors.required')}
                 options={kindOptions}
                 onBlur={select.field.onBlur}
-                onChange={select.field.onChange}
+                onChange={nextOption => {
+                  setValue('entries', '');
+                  select.field.onChange(nextOption);
+                }}
                 value={select.field.value}
                 placeholder={t('form.kind.placeholder')}
               />
@@ -138,13 +158,12 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
           <TextArea
             label={t('form.entries.label')}
             placeholder={t('form.entries.placeholder')}
-            hasError={!!errors.entries}
-            hint={
-              errors.entries
-                ? t('form.entries.errors.required')
-                : t('form.entries.hint')
-            }
-            {...register('entries', { required: true })}
+            hasError={getEntriesHasError()}
+            hint={getEntriesHint()}
+            {...register('entries', {
+              required: true,
+              validate: val => validateEntries(kind.value, val),
+            })}
           />
         </Grid.Container>
       </form>

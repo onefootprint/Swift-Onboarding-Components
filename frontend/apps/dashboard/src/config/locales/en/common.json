@@ -2354,10 +2354,16 @@
           },
           "entries": {
             "label": "Enter values manually",
-            "placeholder": "jane.doe@acme.com,joe.doe@acme.com",
+            "placeholder": "List entries",
             "hint": "Separated by commas",
             "errors": {
-              "required": "Please enter at least one entry for the list."
+              "required": "Please enter at least one entry for the list.",
+              "email-address-invalid": "Please enter a valid email address.",
+              "email-domain-invalid": "Please enter a valid email domain.",
+              "ssn9-invalid": "Please enter a valid SSN.",
+              "phone-number-invalid": "Please enter a valid phone number.",
+              "phone-country-code-invalid": "Please enter a valid phone country code.",
+              "ip-address-invalid": "Please enter a valid IP address."
             }
           }
         },
