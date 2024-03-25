@@ -12,7 +12,7 @@ pub struct ComplianceDocTemplateVersion {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
 
-    pub created_by_partner_tenant_user_id: TenantUserId,
+    pub created_by_partner_tenant_user_id: Option<TenantUserId>,
     pub template_id: ComplianceDocTemplateId,
 
     pub name: String,
@@ -25,7 +25,7 @@ pub struct ComplianceDocTemplateVersion {
 #[diesel(table_name = compliance_doc_template_version)]
 pub struct NewComplianceDocTemplateVersion<'a> {
     pub created_at: DateTime<Utc>,
-    pub created_by_partner_tenant_user_id: &'a TenantUserId,
+    pub created_by_partner_tenant_user_id: Option<&'a TenantUserId>,
     pub template_id: &'a ComplianceDocTemplateId,
     pub name: &'a str,
     pub description: &'a str,

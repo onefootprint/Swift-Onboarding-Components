@@ -39,7 +39,7 @@ pub struct ComplianceDocTemplateVersion {
     pub template_id: ComplianceDocTemplateId,
 
     pub created_at: DateTime<Utc>,
-    pub created_by_partner_tenant_user: LiteOrgMember,
+    pub created_by_partner_tenant_user: Option<LiteOrgMember>,
 
     pub name: String,
     pub description: String,

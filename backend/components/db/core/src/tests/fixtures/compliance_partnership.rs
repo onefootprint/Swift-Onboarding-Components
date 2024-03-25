@@ -81,7 +81,7 @@ pub fn create_resources<'a>(
             &t1,
             NewComplianceDocTemplateVersion {
                 created_at: Utc::now(),
-                created_by_partner_tenant_user_id: &pt_user.id,
+                created_by_partner_tenant_user_id: Some(&pt_user.id),
                 template_id: &t1.id,
                 name: "Privacy Policy",
                 description: "The privacy policy",
@@ -99,7 +99,7 @@ pub fn create_resources<'a>(
             &t2,
             NewComplianceDocTemplateVersion {
                 created_at: Utc::now(),
-                created_by_partner_tenant_user_id: &pt_user.id,
+                created_by_partner_tenant_user_id: Some(&pt_user.id),
                 template_id: &t2.id,
                 name: "Audited Financials",
                 description: "The audited financials",
@@ -117,7 +117,7 @@ pub fn create_resources<'a>(
             &t3,
             NewComplianceDocTemplateVersion {
                 created_at: Utc::now(),
-                created_by_partner_tenant_user_id: &pt_user.id,
+                created_by_partner_tenant_user_id: Some(&pt_user.id),
                 template_id: &t3.id,
                 name: "Information Security Policy",
                 description: "The information security policy",

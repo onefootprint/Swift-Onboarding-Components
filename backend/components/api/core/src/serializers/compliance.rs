@@ -65,10 +65,20 @@ impl TryDbToApi<&ComplianceDocSummary> for api_wire_types::ListComplianceDocumen
     }
 }
 
-impl DbToApi<(ComplianceDocTemplate, ComplianceDocTemplateVersion, TenantUser)>
-    for api_wire_types::ComplianceDocTemplate
+impl
+    DbToApi<(
+        ComplianceDocTemplate,
+        ComplianceDocTemplateVersion,
+        Option<TenantUser>,
+    )> for api_wire_types::ComplianceDocTemplate
 {
-    fn from_db(target: (ComplianceDocTemplate, ComplianceDocTemplateVersion, TenantUser)) -> Self {
+    fn from_db(
+        target: (
+            ComplianceDocTemplate,
+            ComplianceDocTemplateVersion,
+            Option<TenantUser>,
+        ),
+    ) -> Self {
         let (template, template_version, created_by_partner_tenant_user) = target;
 
         api_wire_types::ComplianceDocTemplate {
@@ -81,17 +91,18 @@ impl DbToApi<(ComplianceDocTemplate, ComplianceDocTemplateVersion, TenantUser)>
     }
 }
 
-impl DbToApi<(ComplianceDocTemplateVersion, TenantUser)> for api_wire_types::ComplianceDocTemplateVersion {
-    fn from_db(target: (ComplianceDocTemplateVersion, TenantUser)) -> Self {
+impl DbToApi<(ComplianceDocTemplateVersion, Option<TenantUser>)>
+    for api_wire_types::ComplianceDocTemplateVersion
+{
+    fn from_db(target: (ComplianceDocTemplateVersion, Option<TenantUser>)) -> Self {
         let (template_version, created_by_partner_tenant_user) = target;
 
         api_wire_types::ComplianceDocTemplateVersion {
             id: template_version.id,
             template_id: template_version.template_id,
             created_at: template_version.created_at,
-            created_by_partner_tenant_user: api_wire_types::LiteOrgMember::from_db(
-                created_by_partner_tenant_user,
-            ),
+            created_by_partner_tenant_user: created_by_partner_tenant_user
+                .map(api_wire_types::LiteOrgMember::from_db),
             name: template_version.name,
             description: template_version.description,
         }

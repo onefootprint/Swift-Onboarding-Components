@@ -245,7 +245,7 @@ diesel::table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        created_by_partner_tenant_user_id -> Text,
+        created_by_partner_tenant_user_id -> Nullable<Text>,
         template_id -> Text,
         name -> Text,
         description -> Text,

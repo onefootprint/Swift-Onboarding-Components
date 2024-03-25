@@ -39,7 +39,7 @@ pub async fn get(
 
             let user_ids = templates_with_latest_version
                 .iter()
-                .map(|(_, tplv)| &tplv.created_by_partner_tenant_user_id)
+                .flat_map(|(_, tplv)| &tplv.created_by_partner_tenant_user_id)
                 .collect_vec();
 
             let users = TenantUser::get_bulk(conn, user_ids)?;
@@ -51,10 +51,16 @@ pub async fn get(
     let templates = templates_with_latest_version
         .into_iter()
         .map(|(tpl, tplv)| {
-            let user = users
-                .get(&tplv.created_by_partner_tenant_user_id)
-                .ok_or(AssertionError("missing tenant user ID after get_bulk"))?
-                .clone();
+            let user = tplv
+                .created_by_partner_tenant_user_id
+                .as_ref()
+                .map(|u| -> ApiResult<_> {
+                    Ok(users
+                        .get(u)
+                        .ok_or(AssertionError("missing tenant user ID after get_bulk"))?
+                        .clone())
+                })
+                .transpose()?;
 
             Ok(api_wire_types::ComplianceDocTemplate::from_db((tpl, tplv, user)))
         })
@@ -93,7 +99,7 @@ pub async fn post(
                 &template,
                 NewComplianceDocTemplateVersion {
                     created_at: Utc::now(),
-                    created_by_partner_tenant_user_id: &created_by_partner_tenant_user_id,
+                    created_by_partner_tenant_user_id: Some(&created_by_partner_tenant_user_id),
                     template_id: &template.id,
                     name: &req.name,
                     description: &req.description,
@@ -105,7 +111,7 @@ pub async fn post(
             Ok((
                 template.into_inner(),
                 template_version,
-                created_by_partner_tenant_user,
+                Some(created_by_partner_tenant_user),
             ))
         })
         .await?;
@@ -144,7 +150,7 @@ pub async fn put(
                 &template,
                 NewComplianceDocTemplateVersion {
                     created_at: Utc::now(),
-                    created_by_partner_tenant_user_id: &created_by_partner_tenant_user_id,
+                    created_by_partner_tenant_user_id: Some(&created_by_partner_tenant_user_id),
                     template_id: &template.id,
                     name: &req.name,
                     description: &req.description,
@@ -156,7 +162,7 @@ pub async fn put(
             Ok((
                 template.into_inner(),
                 template_version,
-                created_by_partner_tenant_user,
+                Some(created_by_partner_tenant_user),
             ))
         })
         .await?;
