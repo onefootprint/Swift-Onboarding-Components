@@ -8,17 +8,20 @@ use crate::{
     State,
 };
 use api_core::auth::session::tenant::{TenantRbSession, WorkOsSession};
-use api_wire_types::{OrgLoginRequest, OrgLoginResponse, Organization, OrganizationMember};
+use api_wire_types::{
+    OrgLoginRequest, OrgLoginResponse, OrgLoginTarget, Organization, OrganizationMember, PartnerOrganization,
+};
 use chrono::Duration;
 use db::{
     helpers::TenantOrPartnerTenant,
     models::{
+        partner_tenant::{NewPartnerTenant, PartnerTenant},
         tenant::{NewTenant, Tenant},
         tenant_rolebinding::TenantRolebinding,
         tenant_user::TenantUser,
     },
 };
-use newtypes::{OrgMemberEmail, TenantScope, WorkosAuthMethod};
+use newtypes::{OrgMemberEmail, TenantKind, TenantOrPartnerTenantIdRef, TenantScope, WorkosAuthMethod};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::{
     sso::{
@@ -50,7 +53,15 @@ async fn handler(
     state: web::Data<State>,
     request: web::Json<OrgLoginRequest>,
 ) -> actix_web::Result<Json<ResponseData<OrgLoginResponse>>, ApiError> {
-    let OrgLoginRequest { code, request_org_id } = request.into_inner();
+    let OrgLoginRequest {
+        code,
+        request_org_id,
+        login_target,
+    } = request.into_inner();
+
+    if request_org_id.is_some() && login_target != OrgLoginTarget::TenantDashboard {
+        return Err(TenantError::IncompatibleLoginTarget.into());
+    }
 
     let GetProfileAndTokenResponse { profile, .. } = &state
         .workos_client
@@ -67,7 +78,7 @@ async fn handler(
     let auth_method = get_auth_method(&profile.connection_type)?;
 
     //
-    // Get all tenant rolebindings associated with this user
+    // Get all tenant rolebindings associated with this user and the given login target.
     //
 
     let (user, matching_rolebindings) = state
@@ -79,9 +90,12 @@ async fn handler(
                 TenantUser::get_and_update_or_create(conn, email, profile2.first_name, profile2.last_name)?;
             let matching_rolebindings: Vec<_> = TenantRolebinding::list_by_user(conn, &user.id)?
                 .into_iter()
-                .filter_map(|(rb, t_or_pt)| match t_or_pt {
-                    TenantOrPartnerTenant::Tenant(t) => Some((rb, t)),
-                    TenantOrPartnerTenant::PartnerTenant(_) => None,
+                .filter(|(_, t_pt)| {
+                    // Filter down to rolebindings that match the login target (e.g. partner tenant
+                    // rolebindings for the partner dashboard).
+                    let rb_kind: TenantKind = t_pt.into();
+                    let target_kind: TenantKind = login_target.into();
+                    rb_kind == target_kind
                 })
                 .collect();
             Ok((user, matching_rolebindings))
@@ -95,17 +109,28 @@ async fn handler(
     let (matching_rolebindings, created_new_tenant) = if !matching_rolebindings.is_empty() {
         (matching_rolebindings, false)
     } else if request_org_id.is_none() {
-        let (tenant, created_new_tenant) = find_or_create_tenant(&state, profile).await?;
+        let (t_pt, created_new_tenant): (TenantOrPartnerTenant, IsNewTenant) = match login_target {
+            OrgLoginTarget::TenantDashboard => {
+                let (tenant, created_new_tenant) = find_or_create_tenant(&state, profile).await?;
+                (tenant.into(), created_new_tenant)
+            }
+            OrgLoginTarget::PartnerTenantDashboard => {
+                let (partner_tenant, created_new_tenant) =
+                    find_or_create_partner_tenant(&state, profile).await?;
+                (partner_tenant.into(), created_new_tenant)
+            }
+        };
+
         // If there are no rolebindings for this user, make one.
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
         let user_id = user.id.clone();
-        let tenant_id = tenant.id.clone();
+        let t_pt_id = t_pt.id().clone_into();
         let rb = state
             .db_pool
-            .db_transaction(move |conn| TenantRolebinding::create_for_login(conn, user_id, &tenant_id))
+            .db_transaction(move |conn| TenantRolebinding::create_for_login(conn, user_id, &t_pt_id))
             .await?;
-        (vec![(rb, tenant)], created_new_tenant)
+        (vec![(rb, t_pt)], created_new_tenant)
     } else {
         (vec![], false)
     };
@@ -114,11 +139,11 @@ async fn handler(
     // Determine if there's only one rolebinding to log into
     //
 
-    let single_rb_and_tenant = if let Some(org_id) = request_org_id {
+    let single_rb_and_t_pt = if let Some(org_id) = request_org_id {
         // If a specific tenant ID was requested, only log into that tenant
-        matching_rolebindings
-            .into_iter()
-            .find(|(_, tenant)| tenant.id == org_id)
+        matching_rolebindings.into_iter().find(
+            |(_, t_pt)| matches!(t_pt.id(), TenantOrPartnerTenantIdRef::TenantId(t_id) if *t_id == org_id),
+        )
     } else {
         // If there's only one rolebinding for this user, log into it
         (matching_rolebindings.len() == 1)
@@ -131,24 +156,39 @@ async fn handler(
     // that allows selecting amongst a list of available rolebindings
     //
 
-    let data = if let Some((rb, tenant)) = single_rb_and_tenant {
+    let data = if let Some((rb, t_pt)) = single_rb_and_t_pt {
         // Log into the single user, updating the last_login_at and name (if new)
         let ((tenant_user, rb, tenant_role, _), is_first_login) = state
             .db_pool
             .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id))
             .await?;
 
-        let session = TenantRbSession::create(&tenant, rb.id.clone(), auth_method)?.into();
+        let session = TenantRbSession::create(&t_pt, rb.id.clone(), auth_method)?.into();
         let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
-        let requires_onboarding = tenant_role.scopes.contains(&TenantScope::Admin)
-            && (tenant.website_url.is_none() || tenant.company_size.is_none());
+
+        let requires_onboarding = match &t_pt {
+            TenantOrPartnerTenant::Tenant(tenant) => {
+                tenant_role.scopes.contains(&TenantScope::Admin)
+                    && (tenant.website_url.is_none() || tenant.company_size.is_none())
+            }
+            TenantOrPartnerTenant::PartnerTenant(_) => false,
+        };
+
+        let (tenant, partner_tenant) = match t_pt {
+            TenantOrPartnerTenant::Tenant(tenant) => (Some(Organization::from_db(tenant)), None),
+            TenantOrPartnerTenant::PartnerTenant(partner_tenant) => {
+                (None, Some(PartnerOrganization::from_db(partner_tenant)))
+            }
+        };
+
         OrgLoginResponse {
             auth_token,
             created_new_tenant,
             is_first_login,
             requires_onboarding,
             user: Some(OrganizationMember::from_db((tenant_user, rb, tenant_role))),
-            tenant: Some(Organization::from_db(tenant)),
+            tenant,
+            partner_tenant,
         }
     } else {
         // If not exactly one rolebinding, create a WorkOsSession that just shows the email that
@@ -166,13 +206,14 @@ async fn handler(
             requires_onboarding: false,
             user: None,
             tenant: None,
+            partner_tenant: None,
         }
     };
     ResponseData { data }.json()
 }
 
 type IsNewTenant = bool;
-async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tenant, IsNewTenant), ApiError> {
+async fn find_or_create_tenant(state: &State, profile: &Profile) -> ApiResult<(Tenant, IsNewTenant)> {
     // process domain
     let domain = email_domain::parse_private_email_domain(profile.email.as_str());
 
@@ -210,4 +251,41 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
         .db_transaction(move |conn| Tenant::create(conn, new_tenant))
         .await?;
     Ok((tenant, true))
+}
+
+async fn find_or_create_partner_tenant(
+    state: &State,
+    profile: &Profile,
+) -> ApiResult<(PartnerTenant, IsNewTenant)> {
+    let domain = email_domain::parse_private_email_domain(profile.email.as_str());
+
+    if let Some(domain) = domain.as_ref() {
+        // Check if partner tenant already exists for user's domain. If so, automatically add new tenant user.
+        let domain = domain.clone();
+        let tenant = state
+            .db_pool
+            .db_query(move |conn| PartnerTenant::get_by_domain(conn, domain.as_str()))
+            .await?;
+        if let Some(partner_tenant) = tenant {
+            return Ok((partner_tenant, false));
+        }
+    };
+
+    tracing::info!("Creating new partner tenant with domain {:?}", domain);
+    let name = domain.clone().unwrap_or_else(|| profile.email.to_string());
+    let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
+
+    let new_partner_tenant = NewPartnerTenant {
+        name,
+        public_key,
+        e_private_key,
+        supported_auth_methods: None,
+        domains: domain.into_iter().collect(),
+        allow_domain_access: false, // false by default on creation
+    };
+    let partner_tenant = state
+        .db_pool
+        .db_transaction(move |conn| PartnerTenant::create(conn, new_partner_tenant))
+        .await?;
+    Ok((partner_tenant, true))
 }

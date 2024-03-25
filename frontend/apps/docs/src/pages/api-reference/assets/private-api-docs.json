@@ -18855,13 +18855,21 @@
                     "code": {
                         "type": "string"
                     },
+                    "login_target": {
+                        "type": "string",
+                        "enum": [
+                            "tenant_dashboard",
+                            "partner_tenant_dashboard"
+                        ]
+                    },
                     "request_org_id": {
                         "description": "Optionally request to log into the provided tenant, if the user has a rolebinding at this tenant.",
                         "type": "string"
                     }
                 },
                 "required": [
-                    "code"
+                    "code",
+                    "login_target"
                 ]
             },
             "OrgLoginResponse": {
@@ -18878,6 +18886,33 @@
                     "is_first_login": {
                         "description": "Whether this user has logged into this tenant before",
                         "type": "boolean"
+                    },
+                    "partner_tenant": {
+                        "description": "Partner Organization",
+                        "type": "object",
+                        "properties": {
+                            "allow_domain_access": {
+                                "type": "boolean"
+                            },
+                            "domains": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "allow_domain_access",
+                            "domains",
+                            "id",
+                            "name"
+                        ]
                     },
                     "requires_onboarding": {
                         "description": "Whether tenant onboarding is still incomplete and we need to collect more info on the tenant from the user",

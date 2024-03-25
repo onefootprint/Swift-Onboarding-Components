@@ -58,3 +58,14 @@ impl<'a> TenantOrPartnerTenantIdRef<'a> {
         }
     }
 }
+
+impl<'a> From<&'a TenantOrPartnerTenantId> for TenantOrPartnerTenantIdRef<'a> {
+    fn from(value: &'a TenantOrPartnerTenantId) -> Self {
+        match value {
+            TenantOrPartnerTenantId::TenantId(t_id) => TenantOrPartnerTenantIdRef::TenantId(t_id),
+            TenantOrPartnerTenantId::PartnerTenantId(pt_id) => {
+                TenantOrPartnerTenantIdRef::PartnerTenantId(pt_id)
+            }
+        }
+    }
+}

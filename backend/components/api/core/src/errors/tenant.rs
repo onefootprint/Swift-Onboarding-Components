@@ -61,4 +61,6 @@ pub enum TenantError {
     AllowedOriginsMustBeHttpsInLive,
     #[error("Invalid tenant role kind")]
     InvalidTenantRoleKind,
+    #[error("Login target incompatible with other login request fields")]
+    IncompatibleLoginTarget,
 }

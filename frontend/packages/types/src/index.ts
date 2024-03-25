@@ -199,6 +199,7 @@ export {
   getRequirement,
   IdentifyTokenScope,
   OnboardingRequirementKind,
+  OrgAuthLoginTarget,
   SANDBOX_ID_HEADER,
   TokenKind,
   TriggerKind,

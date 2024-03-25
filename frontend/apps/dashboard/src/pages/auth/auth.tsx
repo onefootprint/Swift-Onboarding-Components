@@ -1,4 +1,8 @@
-import type { OrgAuthLoginResponse } from '@onefootprint/types';
+import type {
+  OrgAuthLoginRequest,
+  OrgAuthLoginResponse,
+} from '@onefootprint/types';
+import { OrgAuthLoginTarget } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -35,9 +39,10 @@ const Auth = () => {
 
   useWorkosParams({
     onCodeFound: (code: string) => {
-      const requestData = {
+      const requestData: OrgAuthLoginRequest = {
         code,
         requestOrgId: data?.orgId,
+        loginTarget: OrgAuthLoginTarget.TenantDashboard,
       };
       loginMutation.mutate(requestData, {
         onSuccess: async ({

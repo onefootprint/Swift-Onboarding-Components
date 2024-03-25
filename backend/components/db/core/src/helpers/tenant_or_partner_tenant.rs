@@ -1,4 +1,5 @@
 use crate::{
+    helpers::WorkosAuthIdentity,
     models::{partner_tenant::PartnerTenant, tenant::Tenant},
     DbError,
 };
@@ -21,8 +22,8 @@ impl TenantOrPartnerTenant {
     }
 }
 
-impl From<TenantOrPartnerTenant> for TenantKind {
-    fn from(value: TenantOrPartnerTenant) -> Self {
+impl From<&TenantOrPartnerTenant> for TenantKind {
+    fn from(value: &TenantOrPartnerTenant) -> Self {
         match value {
             TenantOrPartnerTenant::Tenant(_) => TenantKind::Tenant,
             TenantOrPartnerTenant::PartnerTenant(_) => TenantKind::PartnerTenant,
@@ -44,5 +45,16 @@ impl TryFrom<(Option<Tenant>, Option<PartnerTenant>)> for TenantOrPartnerTenant 
             }
         };
         Ok(ret)
+    }
+}
+
+impl WorkosAuthIdentity for TenantOrPartnerTenant {
+    fn supports_auth_method(&self, auth_method: newtypes::WorkosAuthMethod) -> bool {
+        match self {
+            TenantOrPartnerTenant::Tenant(tenant) => tenant.supports_auth_method(auth_method),
+            TenantOrPartnerTenant::PartnerTenant(partner_tenant) => {
+                partner_tenant.supports_auth_method(auth_method)
+            }
+        }
     }
 }

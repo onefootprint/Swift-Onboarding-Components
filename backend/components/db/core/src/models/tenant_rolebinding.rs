@@ -302,7 +302,7 @@ impl TenantRolebinding {
             match role.kind {
                 TenantRoleKindDiscriminant::DashboardUser
                 | TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
-                    if role.kind.tenant_kind() != t_pt.into() {
+                    if role.kind.tenant_kind() != (&t_pt).into() {
                         return Err(DbError::IncorrectTenantRoleKind);
                     }
                 }

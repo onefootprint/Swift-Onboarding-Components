@@ -95,7 +95,7 @@ impl PartnerTenant {
     }
 
     #[tracing::instrument("PartnerTenant::get_by_domain", skip_all)]
-    pub fn get_by_domain(conn: &mut PgConn, domain: String) -> DbResult<Option<Self>> {
+    pub fn get_by_domain(conn: &mut PgConn, domain: &str) -> DbResult<Option<Self>> {
         let res = partner_tenant::table
             .filter(partner_tenant::domains.contains(vec![domain]))
             .filter(partner_tenant::allow_domain_access.eq(true))

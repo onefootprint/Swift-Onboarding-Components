@@ -20,6 +20,7 @@ mod organization_frequent_note;
 mod organization_member;
 mod organization_role;
 mod organization_rolebinding;
+mod partner_organization;
 mod private_tenant;
 mod proxy_config;
 mod risk_signal;
@@ -36,3 +37,4 @@ mod workflow_request;
 
 pub use business_owner::BusinessOwnerInfo;
 pub use organization::*;
+pub use partner_organization::*;

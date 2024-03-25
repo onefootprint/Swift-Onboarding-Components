@@ -164,6 +164,7 @@ export type {
   OrgAuthLoginRequest,
   OrgAuthLoginResponse,
 } from './org-auth-login';
+export { OrgAuthLoginTarget } from './org-auth-login';
 export type {
   OrgAuthMagicLinkRequest,
   OrgAuthMagicLinkResponse,

@@ -1,9 +1,8 @@
 use crate::*;
-use newtypes::{CompanySize, TenantId};
+use newtypes::{CompanySize, PartnerTenantId, TenantId};
 
 /// Organization
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
-
 pub struct Organization {
     pub id: TenantId,
     pub name: String,
@@ -25,4 +24,13 @@ pub struct Organization {
     pub support_email: Option<String>,
     pub support_phone: Option<String>,
     pub support_website: Option<String>,
+}
+
+/// Partner Organization
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct PartnerOrganization {
+    pub id: PartnerTenantId,
+    pub name: String,
+    pub domains: Vec<String>,
+    pub allow_domain_access: bool,
 }
