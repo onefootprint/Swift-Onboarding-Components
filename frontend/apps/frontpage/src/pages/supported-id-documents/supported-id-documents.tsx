@@ -1,20 +1,47 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoCheckSmall16, IcoInfo16 } from '@onefootprint/icons';
-import { Button, Grid, media, Stack, Text, Tooltip } from '@onefootprint/ui';
+import {
+  createFontStyles,
+  Grid,
+  media,
+  Stack,
+  Text,
+  Tooltip,
+} from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
+import ContactUsBanner from './components/contact-us-banner/contact-us-banner';
 
 const SupportedIdDocuments = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.supported-id-documents',
   });
 
-  const handleClick = () => {
-    window.open('mailto:hello@onefootprint.com');
-  };
+  const columnDimensions =
+    'minmax(116px, 2fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)';
+
+  const headerOptions = [
+    {
+      key: 'country',
+      value: t('table-headers.country'),
+    },
+    {
+      key: 'passport',
+      value: t('table-headers.passport'),
+    },
+    {
+      key: 'id-card',
+      value: t('table-headers.id-card.text'),
+      tooltip: t('table-headers.id-card.tooltip'),
+    },
+    {
+      key: 'drivers-license',
+      value: t('table-headers.drivers-license'),
+    },
+  ];
 
   return (
     <>
@@ -32,61 +59,39 @@ const SupportedIdDocuments = () => {
           borderColor="tertiary"
           borderWidth={1}
           borderRadius="default"
-          gap={5}
           marginBottom={11}
           overflow="hidden"
         >
           <Grid.Container
-            as="th"
             height="40px"
             backgroundColor="secondary"
-            columns={[
-              'minmax(116px, 2fr)',
-              'minmax(80px, 1fr)',
-              'minmax(80px, 1fr)',
-              'minmax(80px, 1fr)',
-            ]}
+            columns={[columnDimensions]}
             borderPosition="bottom"
             borderWidth={1}
             borderColor="tertiary"
-            align="center"
           >
-            <HeaderCell data-align="left">
-              <Text variant="caption-3" color="secondary" tag="h4">
-                {t('table-headers.country')}
-              </Text>
-            </HeaderCell>
-            <HeaderCell>
-              <Text variant="caption-3" color="secondary" tag="h4">
-                {t('table-headers.passport')}
-              </Text>
-            </HeaderCell>
-            <HeaderCell>
-              <Text variant="caption-3" color="secondary" tag="h4">
-                {t('table-headers.id-card.text')}
-              </Text>
-              <Tooltip
-                text={t('table-headers.id-card.tooltip')}
-                position="bottom"
+            {headerOptions.map(({ key, value, tooltip }) => (
+              <HeaderElement
+                key={key}
+                data-align={value === 'country' ? 'left' : undefined}
+                tag="th"
               >
-                <Stack>
-                  <IcoInfo16 color="secondary" />
-                </Stack>
-              </Tooltip>
-            </HeaderCell>
-            <HeaderCell>
-              <Text variant="caption-3" color="secondary" tag="h4">
-                {t('table-headers.drivers-license')}
-              </Text>
-            </HeaderCell>
+                {value}
+                {tooltip && (
+                  <Tooltip text={tooltip} position="bottom">
+                    <Stack>
+                      <IcoInfo16 color="secondary" />
+                    </Stack>
+                  </Tooltip>
+                )}
+              </HeaderElement>
+            ))}
           </Grid.Container>
           {COUNTRIES.map(({ label, passport, idCard, driversLicense }) => (
             <TableRow
               as="tr"
               height="40px"
-              columns={[
-                'minmax(116px, 2fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)',
-              ]}
+              columns={[columnDimensions]}
               key={label}
               borderPosition="bottom"
               borderWidth={1}
@@ -104,21 +109,11 @@ const SupportedIdDocuments = () => {
             </TableRow>
           ))}
         </Grid.Container>
-        <ContactContainer
-          align="center"
-          direction="column"
-          marginBottom={10}
-          textAlign="center"
-          backgroundColor="primary"
-        >
-          <Text variant="label-1" marginBottom={3}>
-            {t('contact.title')}
-          </Text>
-          <Text color="secondary" variant="body-2" marginBottom={7}>
-            {t('contact.subtitle')}
-          </Text>
-          <Button onClick={handleClick}>{t('contact.cta')}</Button>
-        </ContactContainer>
+        <ContactUsBanner
+          title={t('contact.title')}
+          subtitle={t('contact.subtitle')}
+          cta={t('contact.cta')}
+        />
       </Container>
     </>
   );
@@ -147,9 +142,6 @@ const TableCell = styled.td`
     display: flex;
     justify-content: center;
     align-items: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 
     &[data-align='left'] {
       justify-content: flex-start;
@@ -162,17 +154,18 @@ const TableCell = styled.td`
   `}
 `;
 
-const HeaderCell = styled.div`
+const HeaderElement = styled(Grid.Item)`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
+    ${createFontStyles('caption-3')}
+    text-transform: uppercase;
     gap: ${theme.spacing[2]};
     justify-content: center;
     text-align: center;
-
-    h4 {
-      text-transform: uppercase;
-    }
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &[data-align='left'] {
       justify-content: flex-start;
@@ -183,14 +176,6 @@ const HeaderCell = styled.div`
         padding-left: ${theme.spacing[6]};
       `}
     }
-  `}
-`;
-
-const ContactContainer = styled(Stack)`
-  ${({ theme }) => css`
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[11]};
-    `};
   `}
 `;
 
