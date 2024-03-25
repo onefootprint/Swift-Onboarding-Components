@@ -49,6 +49,8 @@ pub enum Error {
     InvalidDate,
     #[error("The entered date of birth results in an improbable age")]
     ImprobableDob,
+    #[error("Invalid date of birth year: please provide year in YYYY format")]
+    InvalidDobYear,
     #[error("The entered date of birth results in an improbably young age")]
     ImprobableDobTooYoung,
     #[error("The entered address is a PO Box")]

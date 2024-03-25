@@ -75,6 +75,10 @@ fn clean_and_validate_date(input: PiiString) -> VResult<PiiString> {
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
     let dob = NaiveDate::parse_from_str(input.leak(), DATE_FORMAT).map_err(|_| Error::InvalidDate)?;
     if for_bifrost {
+        // if someone adds date like `2006-01-01` as "01/01/06" in bifrost
+        if dob.year() < 1000 {
+            return Err(Error::InvalidDobYear);
+        }
         if dob.year() < 1900 {
             return Err(Error::ImprobableDob);
         }
@@ -241,6 +245,7 @@ mod test {
     }
 
     #[test_case(Dob, "1876-12-25" => None)]
+    #[test_case(Dob, "06-12-25" => None; "2 character date")]
     // too young
     #[test_case(Dob, "2015-01-01" => None)]
     #[test_case(Dob, "2009-01-01" => Some("2009-01-01".to_owned()))]
