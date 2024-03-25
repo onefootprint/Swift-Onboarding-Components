@@ -1,3 +1,4 @@
+export { default as dateToIso8601 } from './transforms/date-to-iso-8601';
 export {
   default as isDob,
   isDobInTheFuture,

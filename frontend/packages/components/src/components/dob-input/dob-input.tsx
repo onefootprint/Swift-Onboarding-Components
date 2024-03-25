@@ -4,7 +4,8 @@ import {
   isDobTooYoung,
 } from '@onefootprint/core';
 import cx from 'classnames';
-import React from 'react';
+import Cleave from 'cleave.js';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFootprint } from '../../hooks/use-footprint';
@@ -22,6 +23,18 @@ const DobInput = ({ className, ...props }: DobInputProps) => {
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'dob' });
   const error = errors.dob;
+
+  useEffect(() => {
+    const cleave = new Cleave('.fp-dob-input', {
+      date: true,
+      datePattern: ['m', 'd', 'Y'],
+      delimiter: '/',
+      numericOnly: true,
+    });
+    return () => {
+      cleave.destroy();
+    };
+  });
 
   return (
     <Input

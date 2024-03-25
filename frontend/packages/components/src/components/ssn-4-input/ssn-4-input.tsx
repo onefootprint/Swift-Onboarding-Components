@@ -1,6 +1,7 @@
 import { isSsn4 } from '@onefootprint/core';
 import cx from 'classnames';
-import React from 'react';
+import Cleave from 'cleave.js';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFootprint } from '../../hooks/use-footprint';
@@ -18,6 +19,16 @@ const SSN4Input = ({ className, ...props }: SSN4InputProps) => {
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'ssn-4' });
   const error = errors.ssn4;
+
+  useEffect(() => {
+    const cleave = new Cleave('.fp-ssn-9-input', {
+      numericOnly: true,
+      blocks: [4],
+    });
+    return () => {
+      cleave.destroy();
+    };
+  });
 
   return (
     <Input

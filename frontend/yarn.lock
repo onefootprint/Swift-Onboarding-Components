@@ -2170,11 +2170,6 @@
   dependencies:
     happy-dom "^13.4.1"
 
-"@hookform/resolvers@^3.3.2":
-  version "3.3.4"
-  resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-3.3.4.tgz#de9b668c2835eb06892290192de6e2a5c906229b"
-  integrity sha512-o5cgpGOuJYrd+iMKvkttOclgwRW86EsWJZZRC23prf0uU2i48Htq4PuT73AVb9ionFyZrwYEITuOFGF+BydEtQ==
-
 "@humanwhocodes/config-array@^0.11.13":
   version "0.11.14"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.14.tgz#d78e481a039f7566ecc9660b4ea7fe6b1fec442b"
@@ -8834,6 +8829,11 @@ clean-stack@^2.0.0:
   version "2.2.0"
   resolved "https://registry.npmjs.org/clean-stack/-/clean-stack-2.2.0.tgz"
   integrity sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==
+
+cleave-zen@^0.0.17:
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/cleave-zen/-/cleave-zen-0.0.17.tgz#c9ba1739531e24cb7cb522328a90c8e9f7b785d0"
+  integrity sha512-SLuad6RaACsONu3Fr4F3sE9YXxMlMv6AiaZ8qkwfdV9Ex+TJ+ip3rLFsdrqvnp0YGlslfzAfw8q8MwQJW3yHdg==
 
 "cleave.js@https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9":
   version "1.6.0"
@@ -21326,11 +21326,6 @@ yoga-wasm-web@^0.3.0:
   version "0.3.3"
   resolved "https://registry.npmjs.org/yoga-wasm-web/-/yoga-wasm-web-0.3.3.tgz"
   integrity sha512-N+d4UJSJbt/R3wqY7Coqs5pcV0aUj2j9IaQ3rNj9bVCLld8tTGKRa2USARjnvZJWVx1NDmQev8EknoczaOQDOA==
-
-zod@^3.22.4:
-  version "3.22.4"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-3.22.4.tgz#f31c3a9386f61b1f228af56faa9255e845cf3fff"
-  integrity sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==
 
 zustand@^4.3.2:
   version "4.3.7"

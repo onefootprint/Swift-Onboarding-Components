@@ -1,4 +1,4 @@
-import { isEmail, isPhoneNumber } from '@onefootprint/core';
+import { dateToIso8601, isEmail, isPhoneNumber } from '@onefootprint/core';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -19,11 +19,12 @@ export const useFootprint = () => {
 
   const getVaultFormData = (): UserData => {
     const values = form.getValues();
+
     return {
       'id.first_name': values.firstName,
       'id.middle_name': values.middleName,
       'id.last_name': values.lastName,
-      'id.dob': values.dob,
+      'id.dob': values.dob ? dateToIso8601(values.dob) : undefined,
       'id.ssn4': values.ssn4,
       'id.ssn9': values.ssn9,
       'id.address_line1': values.addressLine1,
