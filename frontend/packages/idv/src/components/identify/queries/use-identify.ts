@@ -33,12 +33,16 @@ const requestFn = async ({
   });
 
   if (response.data.user?.scrubbedEmail) {
-    response.data.user.scrubbedEmail =
-      response.data.user.scrubbedEmail.replaceAll('*', '•');
+    response.data.user.scrubbedEmail = response.data.user.scrubbedEmail.replace(
+      /\*/g,
+      '•',
+    );
   }
   if (response.data.user?.scrubbedPhone) {
-    response.data.user.scrubbedPhone =
-      response.data.user.scrubbedPhone.replaceAll('*', '•');
+    response.data.user.scrubbedPhone = response.data.user.scrubbedPhone.replace(
+      /\*/g,
+      '•',
+    );
   }
 
   return response.data;
