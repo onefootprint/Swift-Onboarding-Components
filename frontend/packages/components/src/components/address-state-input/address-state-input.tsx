@@ -9,15 +9,25 @@ import Input from '../internal/input';
 export type AddressStateInputProps = InputProps;
 
 const AddressStateInput = ({ className, ...props }: AddressStateInputProps) => {
-  const { form } = useFootprint();
-  const { t } = useTranslation('common');
+  const {
+    form: {
+      register,
+      formState: { errors },
+    },
+  } = useFootprint();
+  const { t } = useTranslation('common', { keyPrefix: 'state' });
+  const error = errors.state;
 
   return (
     <Input
       className={cx('fp-state-input', className)}
-      label={t('state.label')}
+      hasError={!!error}
+      label={t('label')}
+      message={error?.message}
       {...props}
-      {...form.register('id.state')}
+      {...register('state', {
+        required: t('errors.required'),
+      })}
     />
   );
 };

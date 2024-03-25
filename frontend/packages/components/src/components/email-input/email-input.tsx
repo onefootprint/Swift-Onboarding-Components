@@ -1,3 +1,4 @@
+import { isEmail } from '@onefootprint/core';
 import cx from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,17 +10,28 @@ import Input from '../internal/input';
 export type EmailInputProps = InputProps;
 
 const EmailInput = ({ className, ...props }: EmailInputProps) => {
-  const { form } = useFootprint();
-  const { t } = useTranslation('common');
+  const {
+    form: {
+      register,
+      formState: { errors },
+    },
+  } = useFootprint();
+  const { t } = useTranslation('common', { keyPrefix: 'email' });
+  const error = errors.email;
 
   return (
     <Input
       autoComplete="email"
       className={cx('fp-email-input', className)}
-      label={t('email.label')}
+      hasError={!!error}
+      label={t('label')}
+      message={error?.message}
       type="email"
       {...props}
-      {...form.register('id.email', { required: true })}
+      {...register('email', {
+        required: t('errors.required'),
+        validate: (value = '') => isEmail(value) || t('errors.invalid'),
+      })}
     />
   );
 };

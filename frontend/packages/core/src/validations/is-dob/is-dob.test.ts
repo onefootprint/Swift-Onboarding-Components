@@ -1,6 +1,34 @@
-import isDob, { isDobInTheFuture, isDobTooOld, isDobTooYoung } from './is-dob';
+import isDob, {
+  isDobInTheFuture,
+  isDobTooOld,
+  isDobTooYoung,
+  isValidDate,
+} from './is-dob';
 
 describe('DOB Validator', () => {
+  describe('isValidDate', () => {
+    it('should return true for valid dates', () => {
+      const validDates = [
+        '2024-01-01',
+        '2024-12-31',
+        '2024-02-29',
+        '2024-02-28',
+      ];
+
+      validDates.forEach(date => {
+        expect(isValidDate(date)).toBe(true);
+      });
+    });
+
+    it('should return false for invalid dates', () => {
+      const invalidDates = ['2024-13-01', '2024-01-32'];
+
+      invalidDates.forEach(date => {
+        expect(isValidDate(date)).toBe(false);
+      });
+    });
+  });
+
   describe('isTooOld', () => {
     it('should return true for ages over the maximum age limit', () => {
       const today = new Date('2024-01-01');

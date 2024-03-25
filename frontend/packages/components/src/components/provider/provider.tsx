@@ -7,7 +7,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type { UserData } from '../../@types';
+import type { FormData, UserData } from '../../@types';
 import configureI18n from '../../config/initializers/i18next';
 
 configureI18n();
@@ -52,7 +52,7 @@ const FootprintProvider = ({
   sandboxId,
   userData,
 }: ProviderProps) => {
-  const methods = useForm<UserData>({});
+  const methods = useForm<FormData>();
   const [context, setContext] = useState<ContextData>({
     authToken,
     publicKey,

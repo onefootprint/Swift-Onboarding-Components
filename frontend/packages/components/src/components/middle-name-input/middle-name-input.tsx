@@ -1,3 +1,4 @@
+import { isName } from '@onefootprint/core';
 import cx from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,16 +10,27 @@ import Input from '../internal/input';
 export type MiddleNameInputProps = InputProps;
 
 const MiddleNameInput = ({ className, ...props }: MiddleNameInputProps) => {
-  const { form } = useFootprint();
-  const { t } = useTranslation('common');
+  const {
+    form: {
+      register,
+      formState: { errors },
+    },
+  } = useFootprint();
+  const { t } = useTranslation('common', { keyPrefix: 'middle-name' });
+  const error = errors.middleName;
 
   return (
     <Input
       autoComplete="additional-name"
       className={cx('fp-middle-name-input', className)}
-      label={t('middle-name.label')}
+      hasError={!!error}
+      label={t('label')}
+      message={error?.message}
       {...props}
-      {...form.register('id.middle_name')}
+      {...register('middleName', {
+        validate: (value = '') =>
+          value === '' || isName(value) || t('errors.invalid'),
+      })}
     />
   );
 };

@@ -17,12 +17,12 @@ const AddressInput = ({ className }: AddressInputProps) => {
   const { form } = useFootprint();
 
   const handleCountryChange = () => {
-    form.resetField('id.address_line1');
-    form.resetField('id.address_line2');
-    form.resetField('id.city');
-    form.resetField('id.state');
-    form.resetField('id.zip');
-    form.setFocus('id.address_line1');
+    form.resetField('addressLine1');
+    form.resetField('addressLine2');
+    form.resetField('city');
+    form.resetField('state');
+    form.resetField('zip');
+    form.setFocus('addressLine1');
   };
 
   return (

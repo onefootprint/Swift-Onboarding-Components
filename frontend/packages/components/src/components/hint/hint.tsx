@@ -9,7 +9,7 @@ export type HintProps = {
 
 const Hint = ({ className, hasError, ...props }: HintProps) => (
   <p
-    className={cx('fp-hint', className)}
+    className={cx('fp-message', className)}
     aria-invalid={hasError ? 'true' : 'false'}
     {...props}
   />

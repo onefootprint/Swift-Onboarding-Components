@@ -13,16 +13,24 @@ const AddressCountryInput = ({
   onChange,
   ...props
 }: AddressCountryInputProps) => {
-  const { form } = useFootprint();
-  const { t } = useTranslation('common');
+  const {
+    form: {
+      register,
+      formState: { errors },
+    },
+  } = useFootprint();
+  const { t } = useTranslation('common', { keyPrefix: 'country' });
+  const error = errors.country;
 
   return (
     <Select
       autoComplete="country"
       className={cx('fp-country-input', className)}
-      label={t('country.label')}
+      hasError={!!error}
+      label={t('label')}
+      message={error?.message}
       {...props}
-      {...form.register('id.country', { onChange })}
+      {...register('country', { onChange, required: t('errors.required') })}
     >
       <option value="US">United States</option>
     </Select>

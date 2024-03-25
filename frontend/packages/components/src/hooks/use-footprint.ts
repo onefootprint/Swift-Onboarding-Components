@@ -2,7 +2,7 @@ import { isEmail, isPhoneNumber } from '@onefootprint/core';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import type { UserData } from '../@types';
+import type { FormData, UserData } from '../@types';
 import { Context } from '../components/provider';
 import createD2pToken from '../queries/create-d2p-token';
 import getD2PStatusReq from '../queries/get-d2p-status';
@@ -12,24 +12,33 @@ import identifyReq from '../queries/identify-user';
 import saveReq from '../queries/save';
 import createSignupChallenge from '../queries/signup';
 import createHandoffUrlUtil from '../utils/create-handoff-url';
-import flattenFormData from '../utils/flatten-form-data';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
-  const form = useFormContext<UserData>();
+  const form = useFormContext<FormData>();
 
-  const getVaultFormData = () => {
+  const getVaultFormData = (): UserData => {
     const values = form.getValues();
-    const formValues = flattenFormData(values);
-    delete formValues['id.email'];
-    delete formValues['id.phone_number'];
-    return formValues;
+    return {
+      'id.first_name': values.firstName,
+      'id.middle_name': values.middleName,
+      'id.last_name': values.lastName,
+      'id.dob': values.dob,
+      'id.ssn4': values.ssn4,
+      'id.ssn9': values.ssn9,
+      'id.address_line1': values.addressLine1,
+      'id.address_line2': values.addressLine2,
+      'id.city': values.city,
+      'id.state': values.state,
+      'id.zip': values.zip,
+      'id.country': values.country,
+    };
   };
 
   const identify = async () => {
     const payload = {
-      email: form.getValues('id.email'),
-      phoneNumber: form.getValues('id.phone_number'),
+      email: form.getValues('email'),
+      phoneNumber: form.getValues('phoneNumber'),
       scope: 'onboarding',
       sandboxId: context.sandboxId,
       obConfigAuth: context.publicKey,
@@ -44,8 +53,8 @@ export const useFootprint = () => {
     // TODO: do sign-in
     if (!identifyRes.user) {
       const payload = {
-        email: form.getValues('id.email'),
-        phoneNumber: form.getValues('id.phone_number'),
+        email: form.getValues('email'),
+        phoneNumber: form.getValues('phoneNumber'),
         scope: 'onboarding',
         sandboxId: context.sandboxId,
         obConfigAuth: context.publicKey,
@@ -61,8 +70,8 @@ export const useFootprint = () => {
   };
 
   const canInitiateOtpValidation = () => {
-    const email = form.getValues('id.email');
-    const phoneNumber = form.getValues('id.phone_number');
+    const email = form.getValues('email') || '';
+    const phoneNumber = form.getValues('phoneNumber') || '';
     return isEmail(email) || isPhoneNumber(phoneNumber);
   };
 

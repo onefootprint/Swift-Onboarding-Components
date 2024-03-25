@@ -1,2 +1,2 @@
 export type { AppearanceVariables } from './appearance';
-export type { UserData } from './user-data';
+export type { FormData, UserData } from './user-data';

@@ -9,16 +9,26 @@ import Input from '../internal/input';
 export type AddressZipInputProps = InputProps;
 
 const AddressZipInput = ({ className, ...props }: AddressZipInputProps) => {
-  const { form } = useFootprint();
-  const { t } = useTranslation('common');
+  const {
+    form: {
+      register,
+      formState: { errors },
+    },
+  } = useFootprint();
+  const { t } = useTranslation('common', { keyPrefix: 'zip' });
+  const error = errors.zip;
 
   return (
     <Input
       autoComplete="postal-code"
       className={cx('fp-zip-input', className)}
-      label={t('zip.label')}
+      hasError={!!error}
+      label={t('label')}
+      message={error?.message}
       {...props}
-      {...form.register('id.zip')}
+      {...register('zip', {
+        required: t('errors.required'),
+      })}
     />
   );
 };

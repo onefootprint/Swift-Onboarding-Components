@@ -9,16 +9,26 @@ import Input from '../internal/input';
 export type AddressCityInputProps = InputProps;
 
 const AddressCityInput = ({ className, ...props }: AddressCityInputProps) => {
-  const { form } = useFootprint();
-  const { t } = useTranslation('common');
+  const {
+    form: {
+      register,
+      formState: { errors },
+    },
+  } = useFootprint();
+  const { t } = useTranslation('common', { keyPrefix: 'city' });
+  const error = errors.city;
 
   return (
     <Input
       autoComplete="address-level2"
       className={cx('fp-city-input', className)}
-      label={t('city.label')}
+      hasError={!!error}
+      label={t('label')}
+      message={error?.message}
       {...props}
-      {...form.register('id.city')}
+      {...register('city', {
+        required: t('errors.required'),
+      })}
     />
   );
 };
