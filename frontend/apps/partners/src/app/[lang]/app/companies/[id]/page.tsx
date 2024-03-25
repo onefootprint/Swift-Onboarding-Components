@@ -2,9 +2,9 @@ import React from 'react';
 
 import { PartnerDocumentStatus } from '@/config/types';
 
-import Content from './content';
+import CompanyPageContent from './content';
 
-const Company = () => {
+const CompanyPage = () => {
   // TODO: Integrate with backend
   const documents = [
     {
@@ -103,7 +103,7 @@ const Company = () => {
     dataEndToEndEncryption: true,
   };
   return (
-    <Content
+    <CompanyPageContent
       documents={documents}
       documentsStatus={documentsStatus}
       securityChecks={securityChecks}
@@ -111,4 +111,4 @@ const Company = () => {
   );
 };
 
-export default Company;
+export default CompanyPage;

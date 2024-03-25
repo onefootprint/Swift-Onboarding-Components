@@ -4,8 +4,7 @@ import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import SideNav from './components/side-nav';
-import TopBar from './components/top-bar';
+import { SideNav, TopBar } from './components';
 
 const AppLayoutClient = ({ children }: React.PropsWithChildren) => (
   <Stack direction="column" height="100vh">

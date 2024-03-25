@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Content from './components/content';
+import Content from './content';
 
-const Companies = () => {
+const CompaniesPage = () => {
   const list = [
     {
       id: '1',
@@ -36,4 +36,4 @@ const Companies = () => {
   return <Content companies={list} />;
 };
 
-export default Companies;
+export default CompaniesPage;

@@ -5,10 +5,11 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import NavLink from './components/nav-link';
-import useRoutes from './hooks/use-routes/use-routes';
+import useRoutes from '@/hooks/use-routes/use-routes';
 
-const Nav = () => {
+import NavLink from './components/nav-link';
+
+const SideNav = () => {
   const routes = useRoutes();
   const pathname = usePathname();
   const userName = 'John Wick';
@@ -98,4 +99,4 @@ const User = styled.div`
   `}
 `;
 
-export default Nav;
+export default SideNav;

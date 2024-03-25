@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 
 const BADGE_MAX_COUNT = 99;
 
-export type NavLinkProps = {
+type NavLinkProps = {
   badgeCount?: number;
   href: string;
   icon: Icon;

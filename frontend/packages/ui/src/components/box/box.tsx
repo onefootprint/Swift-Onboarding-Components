@@ -92,7 +92,7 @@ const SB = styled.div<
         if (prop === 'elevation') {
           return `box-shadow: ${theme.elevation[value as Elevation]};`;
         }
-        if (value !== undefined && value) {
+        if (value != null) {
           return `${toKebabCase(prop)}: ${value};`;
         }
         return '';

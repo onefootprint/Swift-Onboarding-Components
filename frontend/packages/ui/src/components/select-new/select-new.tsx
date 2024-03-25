@@ -54,6 +54,7 @@ const StyledContent = styled(Select.Content)<{
     background-color: ${theme.backgroundColor.primary};
     box-shadow: ${theme.elevation[3]};
     padding: ${theme.spacing[2]};
+    z-index: ${theme.zIndex.dialog + 1};
 
     ${width === 'full' &&
     css`

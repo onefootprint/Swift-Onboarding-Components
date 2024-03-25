@@ -61,7 +61,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   onBlur,
   onChange,
   OptionComponent = Option,
-  options,
+  options = [],
   renderTrigger,
   searchPlaceholder,
   size = 'default',

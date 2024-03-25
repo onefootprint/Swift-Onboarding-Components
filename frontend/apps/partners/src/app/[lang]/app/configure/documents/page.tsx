@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Content from './components/content';
+import ConfigureDocumentsContent from './content';
 
-const DocumentsPage = () => {
+const ConfigureDocumentsPage = () => {
   const templates = [
     {
       id: '1',
@@ -75,7 +75,7 @@ const DocumentsPage = () => {
       lastUpdated: '2021-08-12T14:00:00Z',
     },
   ];
-  return <Content templates={templates} />;
+  return <ConfigureDocumentsContent templates={templates} />;
 };
 
-export default DocumentsPage;
+export default ConfigureDocumentsPage;
