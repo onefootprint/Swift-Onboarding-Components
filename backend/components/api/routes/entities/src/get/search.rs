@@ -74,6 +74,7 @@ pub async fn post(
         show_all,
         is_created_via_api,
         has_outstanding_workflow_request,
+        playbook_ids,
         labels,
     } = filters;
     let cursor = pagination.cursor.as_ref().map(|c| c.into());
@@ -94,7 +95,7 @@ pub async fn post(
         kind,
         only_visible: !show_all.unwrap_or_default(),
         is_created_via_api,
-        playbook_id: None,
+        playbook_ids,
         has_outstanding_workflow_request,
         external_id: None,
         labels,

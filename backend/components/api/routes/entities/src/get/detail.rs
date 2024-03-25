@@ -40,7 +40,7 @@ pub async fn get(
         // Show these entities in detail view
         only_visible: false,
         is_created_via_api: None,
-        playbook_id: None,
+        playbook_ids: None,
         has_outstanding_workflow_request: None,
         external_id: None,
         labels: vec![],

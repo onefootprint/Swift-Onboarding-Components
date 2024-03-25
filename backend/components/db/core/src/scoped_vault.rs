@@ -29,7 +29,7 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     /// Temporary - only show vaults that are visible to be shown in search
     pub only_visible: bool,
     pub is_created_via_api: Option<bool>,
-    pub playbook_id: Option<ObConfigurationId>,
+    pub playbook_ids: Option<Vec<ObConfigurationId>>,
     pub has_outstanding_workflow_request: Option<bool>,
     pub external_id: Option<ExternalId>,
     pub labels: Vec<LabelKind>,
@@ -63,7 +63,7 @@ impl ScopedVaultListQueryParams {
             kind,
             only_visible,
             is_created_via_api,
-            playbook_id,
+            playbook_ids,
             has_outstanding_workflow_request,
             external_id,
             labels,
@@ -89,7 +89,7 @@ impl ScopedVaultListQueryParams {
             kind,
             only_visible,
             is_created_via_api,
-            playbook_id,
+            playbook_ids,
             has_outstanding_workflow_request,
             external_id,
             labels,
@@ -201,9 +201,9 @@ macro_rules! list_query {
             query = query.filter(vault::kind.eq(kind))
         }
 
-        if let Some(playbook_id) = $params.playbook_id.as_ref() {
+        if let Some(playbook_ids) = $params.playbook_ids.as_ref() {
             let matching_ids = workflow::table
-                .filter(workflow::ob_configuration_id.eq(playbook_id))
+                .filter(workflow::ob_configuration_id.eq_any(playbook_ids))
                 .select(workflow::scoped_vault_id)
                 .distinct();
             query = query.filter(scoped_vault::id.eq_any(matching_ids))

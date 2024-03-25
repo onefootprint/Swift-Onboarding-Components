@@ -44,7 +44,7 @@ async fn get(
             only_visible: true,
             is_created_via_api: None,
             statuses,
-            playbook_id: playbook_id.clone(),
+            playbook_ids: playbook_id.clone().map(|playbook_id| vec![playbook_id]),
             has_outstanding_workflow_request: None,
             external_id: None,
             labels: vec![],

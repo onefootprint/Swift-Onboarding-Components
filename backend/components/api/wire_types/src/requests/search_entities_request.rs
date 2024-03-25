@@ -1,5 +1,6 @@
 use newtypes::{
-    input::deserialize_stringified_list, ExternalId, LabelKind, OnboardingStatusFilter, PiiString, VaultKind,
+    input::deserialize_stringified_list, ExternalId, LabelKind, ObConfigurationId, OnboardingStatusFilter,
+    PiiString, VaultKind,
 };
 
 use crate::*;
@@ -22,6 +23,7 @@ pub struct SearchEntitiesRequest {
     pub has_outstanding_workflow_request: Option<bool>,
     #[serde(default)]
     pub labels: Vec<LabelKind>,
+    pub playbook_ids: Option<Vec<ObConfigurationId>>,
 }
 
 #[derive(Deserialize, Apiv2Schema)]
