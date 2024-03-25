@@ -1,8 +1,8 @@
-import { Container, EmptyState } from '@onefootprint/ui';
+import { EmptyState, Stack } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
 
@@ -11,7 +11,7 @@ const Page404 = () => {
   return (
     <>
       <SEO title={t('html-title')} />
-      <StyledContainer>
+      <Container width="100%" justifyContent="center" alignItems="center">
         <EmptyState
           title={t('title')}
           description={t('description')}
@@ -25,20 +25,16 @@ const Page404 = () => {
             />
           )}
         />
-      </StyledContainer>
+      </Container>
     </>
   );
 };
 
-const StyledContainer = styled(Container)`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - var(--desktop-header-height) - 16px);
-  justify-content: center;
-  text-align: center;
-  width: 100%;
-  padding-top: 0;
+const Container = styled(Stack)`
+  ${({ theme }) => css`
+    height: calc(100vh - ${theme.spacing[15]});
+    margin-top: -54px;
+  `}
 `;
 
 export default Page404;

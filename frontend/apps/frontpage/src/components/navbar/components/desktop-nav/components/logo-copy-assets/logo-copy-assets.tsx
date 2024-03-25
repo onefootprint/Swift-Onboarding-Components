@@ -106,6 +106,7 @@ const Trigger = styled.button<{ $isOnDarkSection?: boolean }>`
     min-width: fit-content;
     height: 100%;
     background-color: ${theme.backgroundColor.transparent};
+    margin-right: ${theme.spacing[3]};
 
     &:hover {
       && {
@@ -121,6 +122,8 @@ const Trigger = styled.button<{ $isOnDarkSection?: boolean }>`
 
     & {
       svg {
+        transform: scale(0.95);
+        margin-bottom: 3px;
         path {
            {
             fill: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
