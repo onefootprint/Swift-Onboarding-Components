@@ -16,8 +16,6 @@ export type VerificationChecksProps = {
   isLoading: boolean;
   requiresDoc?: boolean;
   allowInternationalResident?: boolean;
-  allowUSResident?: boolean;
-  allowUSTerritories?: boolean;
   onBack: () => void;
   onSubmit: (formData: VerificationChecksFormData) => void;
 };
@@ -27,8 +25,6 @@ const VerificationChecks = ({
   isLoading,
   requiresDoc,
   allowInternationalResident,
-  allowUSResident,
-  allowUSTerritories,
   onBack,
   onSubmit,
 }: VerificationChecksProps) => {
@@ -36,8 +32,7 @@ const VerificationChecks = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.verification-checks',
   });
-  const canRunKyc =
-    !allowInternationalResident && (allowUSResident || allowUSTerritories);
+  const canRunKyc = !allowInternationalResident;
   const formMethods = useForm<VerificationChecksFormData>({
     defaultValues: {
       skipKyc: !canRunKyc,
@@ -45,6 +40,7 @@ const VerificationChecks = ({
     },
   });
   const { watch, handleSubmit } = formMethods;
+
   const isAmlChecked = watch('amlFormData.enhancedAml');
   const ofac = watch('amlFormData.ofac');
   const pep = watch('amlFormData.pep');
