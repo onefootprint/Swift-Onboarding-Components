@@ -3,7 +3,6 @@ import React, { useEffect } from 'react';
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import Register from '../register';
-import Retry from '../retry';
 import Unavailable from '../unavailable';
 
 type RouterProps = {
@@ -23,9 +22,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('register')) {
     return <Register />;
-  }
-  if (state.matches('retry')) {
-    return <Retry />;
   }
   if (state.matches('unavailable')) {
     return <Unavailable />;

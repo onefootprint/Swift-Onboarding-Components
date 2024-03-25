@@ -2,7 +2,7 @@ import { Text } from '@onefootprint/ui';
 import AnimatedSuccessCheck from '@onefootprint/ui/src/components/animated-success-check';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 const LivenessSuccess = () => {
   const { t } = useTranslation('idv', {
@@ -20,15 +20,11 @@ const LivenessSuccess = () => {
 };
 
 const IconContainer = styled.form`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: ${theme.spacing[8]};
-    gap: ${theme.spacing[2]};
-  `}
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default LivenessSuccess;

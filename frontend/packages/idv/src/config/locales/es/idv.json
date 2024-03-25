@@ -988,15 +988,17 @@
       "register": {
         "title": "Agrega tu passkey",
         "subtitle": "El proceso de configuración puede variar según su navegador.",
-        "cta": "Iniciar verificación"
-      },
-      "retry": {
-        "title": "No pudimos agregar tu passkey",
-        "subtitle": "Puedes intentarlo de nuevo o agregarlo la próxima vez que uses Footprint.",
-        "success-title": "¡Éxito!",
-        "success-subtitle": "Tu passkey ha sido registrado.",
-        "cta": "Intentar de nuevo",
-        "skip": "Hacerlo más tarde"
+        "cta": "Iniciar verificación",
+        "success": {
+          "title": "¡Éxito!",
+          "subtitle": "Tu passkey ha sido registrado."
+        },
+        "retry": {
+          "title": "No pudimos agregar tu passkey",
+          "subtitle": "Puedes intentarlo de nuevo o agregarlo la próxima vez que uses Footprint.",
+          "cta": "Intentar de nuevo",
+          "skip": "Hacerlo más tarde"
+        }
       }
     }
   },

@@ -39,19 +39,6 @@ export const createLivenessMachine = () =>
         },
         register: {
           on: {
-            failed: {
-              target: 'retry',
-            },
-            succeeded: {
-              target: 'completed',
-            },
-          },
-        },
-        retry: {
-          on: {
-            failed: {
-              target: 'retry',
-            },
             skipped: {
               target: 'completed',
             },
