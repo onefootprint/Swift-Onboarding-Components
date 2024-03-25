@@ -163,107 +163,14 @@
     }
   },
   "identify": {
-    "components": {
-      "sandbox-outcome-footer": {
-        "outcome": {
-          "label": "Resultado de la prueba:",
-          "options": {
-            "success": "Éxito",
-            "fail": "Fracaso",
-            "manual-review": "Revisión manual",
-            "document-decision": "Decisión sobre el documento de identificación",
-            "step-up": "Decisión sobre el documento de identificación"
-          }
-        },
-        "testID": "ID de prueba"
-      },
-      "legal-footer": {
-        "label": "Al continuar, acepto los <termsLink>Términos de servicio</termsLink> y reconozco la <privacyPolicyLink>Política de privacidad</privacyPolicyLink>."
-      },
-      "pin-verification": {
-        "error": "Código incorrecto",
-        "verifying": "Verificando...",
-        "success": "¡Éxito!",
-        "resend-button": {
-          "cta": "Reenviar código",
-          "disabled": "Espere {{seconds}} segundos para reenviar el código..."
-        },
-        "toast": {
-          "success": {
-            "title": "Éxito",
-            "description": "Te hemos enviado un nuevo código."
-          }
-        }
-      },
-      "log-in-different-account": {
-        "label": "Iniciar sesión con otra cuenta",
-        "or": "o"
-      }
-    },
     "pages": {
-      "auth-token-invalid": {
-        "title": "El enlace es inválido",
-        "subtitle": "Por favor, contacta a la empresa que te lo envió para solicitarle uno nuevo."
-      },
-      "email-identification": {
-        "header": {
-          "title": "¡Hola! 👋",
-          "subtitle": "Introduce tu correo electrónico para empezar."
-        },
-        "form": {
-          "email": {
-            "label": "Correo electrónico",
-            "placeholder": "jane.doe@acme.com",
-            "errors": {
-              "required": "Correo electrónico es un campo requerido"
-            }
-          },
-          "cta": "Continuar"
-        }
-      },
-      "phone-identification": {
-        "title": "¡Hola! 👋",
-        "subtitle": "Introduce tu número de teléfono para continuar.",
-        "email-card": {
-          "cta": "Cambiar"
-        },
-        "form": {
-          "phone": {
-            "label": "Número de teléfono",
-            "placeholder": "(123) 123-1234",
-            "errors": {
-              "required": "No se puede dejar el número de teléfono en blanco",
-              "invalid": "Número de teléfono inválido"
-            }
-          },
-          "cta": "Verificar enviando un SMS"
-        }
-      },
       "sms-challenge": {
-        "label": "SMS",
         "title": "Verifica tu número de teléfono",
-        "welcome-back-title": "¡Bienvenido de nuevo! 🎉",
-        "prompt-with-phone": "Introduce el código de 6 dígitos que enviamos a {{scrubbedPhoneNumber}}.",
-        "prompt-without-phone": "Introduce el código de 6 dígitos que enviamos a tu teléfono."
+        "prompt-with-phone": "Introduce el código de 6 dígitos que enviamos a {{scrubbedPhoneNumber}}."
       },
       "email-challenge": {
-        "label": "Correo electrónico",
         "title": "Verifica tu correo electrónico",
-        "welcome-back-title": "¡Bienvenido de nuevo! 🎉",
-        "prompt-with-email": "Introduce el código de 6 dígitos que enviamos a {{email}}.",
-        "prompt-without-email": "Introduce el código de 6 dígitos que enviamos a tu correo electrónico."
-      },
-      "biometric-challenge": {
-        "label": "passkey",
-        "loading": "Procesando...",
-        "success": "¡Éxito!",
-        "cta": "Iniciar sesión con passkey",
-        "title": "¡Bienvenido de nuevo! 🎉",
-        "login-with-sms": "Iniciar sesión con SMS",
-        "passkey-error": {
-          "title": "Algo salió mal",
-          "description": "Esto puede deberse a que no tiene los permisos necesarios en tu dispositivo. Por favor, intenta iniciar sesión con SMS."
-        }
+        "prompt-with-email": "Introduce el código de 6 dígitos que enviamos a {{email}}."
       }
     }
   },
@@ -298,7 +205,6 @@
           "ssn9": "SSN",
           "dob": "Fecha de nacimiento",
           "address-full": "Dirección",
-          "address-partial": "País y código postal",
           "nationality": "Nacionalidad",
           "us-legal-status": "Situación legal en EE.UU.",
           "id-card": "Documento de identificación",
