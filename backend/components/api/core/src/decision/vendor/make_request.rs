@@ -7,8 +7,8 @@ use super::{vendor_trait::VendorAPIResponse, *};
 use crate::{errors::ApiError, vendor_clients::VendorClient, State};
 use db::{
     models::{
-        insight_event::InsightEvent, ob_configuration::ObConfiguration,
-        socure_device_session::SocureDeviceSession, vault::Vault, verification_request::VerificationRequest,
+        ob_configuration::ObConfiguration,
+        vault::Vault, verification_request::VerificationRequest,
         verification_result::VerificationResult,
     },
     DbError,
@@ -84,11 +84,6 @@ pub async fn make_idv_vendor_call_save_vreq(
     )
     .await?;
 
-    let socure_data = SocureData {
-        device_session_id: None,
-        ip_address: None,
-    }; // TODO: rm socure from send_idv_request- we aren't using any more and SocureData is annoying
-
     Ok((
         vreq,
         send_idv_request(
@@ -96,20 +91,18 @@ pub async fn make_idv_vendor_call_save_vreq(
             tvc,
             vendor_api,
             idv_data,
-            socure_data,
             ob_configuration_key,
         )
         .await,
     ))
 }
 
-#[tracing::instrument(skip(state, tvc, idv_data, socure_data))]
+#[tracing::instrument(skip(state, tvc, idv_data))]
 pub async fn send_idv_request(
     state: &State,
     tvc: &TenantVendorControl,
     vendor_api: VendorAPI,
     idv_data: IdvData,
-    socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
 ) -> Result<VendorResponse, VendorAPIError> {
     let is_production = state.config.service_config.is_production();
@@ -130,6 +123,12 @@ pub async fn send_idv_request(
             send_twilio_lookupv2_request(idv_data, state.vendor_clients.twilio_lookup_v2.clone()).await
         }
         VendorAPI::SocureIdPlus => {
+            tracing::error!("Socure called in `make_request`");
+            // if we ever add this back, we need to fetch device_id and ip_address
+            let socure_data = SocureData {
+                device_session_id: None,
+                ip_address: None,
+            };
             send_socure_idv_request(
                 idv_data,
                 socure_data,
@@ -364,7 +363,6 @@ pub async fn make_idv_request(
     tvc: &TenantVendorControl,
     vendor_api: VendorAPI,
     idv_data: IdvData,
-    socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
     wf_id: &WorkflowId, // TODO: remove, only used in this random log here
 ) -> Result<VendorResponse, VendorAPIError> {
@@ -379,7 +377,6 @@ pub async fn make_idv_request(
         tvc,
         vendor_api,
         idv_data,
-        socure_data,
         ob_configuration_key,
     )
     .await?;
@@ -406,27 +403,17 @@ pub async fn make_vendor_requests(
 
     let wfid = wf_id.clone();
 
-    let (socure_device_session_id, ip_address, obc_key) = state
+    let obc_key = state
         .db_pool
         .db_query(
-            move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
-                let socure_device_session_id =
-                    SocureDeviceSession::latest(conn, &wfid)?.map(|d| d.device_session_id);
-
-                // TODO this is stale
-                let ip_address =
-                    InsightEvent::get(conn, &wfid)?.and_then(|ie| ie.ip_address.map(PiiString::from));
-
+            move |conn| -> Result<ObConfigurationKey, DbError> {
                 let obc_key = ObConfiguration::get(conn, &wfid)?.0.key;
 
-                Ok((socure_device_session_id, ip_address, obc_key))
+                Ok(obc_key)
             },
         )
         .await?;
-    let socure_data = SocureData {
-        device_session_id: socure_device_session_id,
-        ip_address,
-    };
+
     let raw_futures_with_vendors = requests_with_data.into_iter().map(|(r, data)| {
         (
             r.clone(),
@@ -435,7 +422,6 @@ pub async fn make_vendor_requests(
                 &tvc,
                 r.vendor_api,
                 data,
-                socure_data.clone(),
                 obc_key.clone(),
                 wf_id,
             ),
