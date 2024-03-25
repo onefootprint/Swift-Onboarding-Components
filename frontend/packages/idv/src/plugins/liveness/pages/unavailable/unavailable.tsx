@@ -1,4 +1,8 @@
 import { getErrorMessage } from '@onefootprint/request';
+import {
+  SkipLivenessClientType,
+  SkipLivenessReason,
+} from '@onefootprint/types/src/api/skip-liveness';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
@@ -19,8 +23,14 @@ const Unavailable = () => {
       return;
     }
 
+    const context = {
+      reason: SkipLivenessReason.unavailable,
+      clientType: SkipLivenessClientType.web,
+      numAttempts: 0,
+      attempts: [],
+    };
     skipLivenessMutation.mutate(
-      { authToken },
+      { authToken, context },
       {
         onSuccess: () => {
           send({

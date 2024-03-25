@@ -1,5 +1,10 @@
 import { IcoPasskey40, IcoWarning40 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
+import type { PasskeyAttemptContext } from '@onefootprint/types/src/api/skip-liveness';
+import {
+  SkipLivenessClientType,
+  SkipLivenessReason,
+} from '@onefootprint/types/src/api/skip-liveness';
 import { Box, Button, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +20,9 @@ import {
 import Logger from '../../../../utils/logger';
 import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
-import useBiometricInit from '../../hooks/use-register-biometric';
+import useBiometricInit, {
+  isRegisterPasskeyError,
+} from '../../hooks/use-register-biometric';
 
 const SUCCESS_TRANSITION_DELAY_MS = 1500;
 
@@ -26,10 +33,9 @@ const Register = () => {
   const biometricInitMutation = useBiometricInit();
   const skipLivenessMutation = useSkipLiveness();
 
-  // TODO in future PR, send this context to the backend, and more
-  const [passkeyFailureReasons, setPasskeyFailureReasons] = useState<string[]>(
-    [],
-  );
+  const [passkeyRegisterAttempts, setPasskeyRegisterAttempts] = useState<
+    PasskeyAttemptContext[]
+  >([]);
 
   const handleRegister = () => {
     if (!authToken || biometricInitMutation.isLoading) {
@@ -48,12 +54,29 @@ const Register = () => {
           }, SUCCESS_TRANSITION_DELAY_MS);
         },
         onError(error: unknown) {
-          const errorMessage = getErrorMessage(error);
+          // Extract context from RegisterPasskeyError if relevant
+          let e = error;
+          let elapsedTimeInOsPromptMs;
+          if (isRegisterPasskeyError(error)) {
+            e = error.error;
+            elapsedTimeInOsPromptMs = error.elapsedTimeInOsPromptMs;
+          }
+
+          const errorMessage = getErrorMessage(e);
           Logger.error(
             `Failed to register passkeys for user: ${errorMessage}`,
             'liveness-register',
           );
-          setPasskeyFailureReasons([...passkeyFailureReasons, errorMessage]);
+          // Keep track of each failed attempt to register a passkey.
+          // We will send this to the backend
+          const passkeyFailure = {
+            errorMessage,
+            elapsedTimeInOsPromptMs,
+          };
+          setPasskeyRegisterAttempts([
+            ...passkeyRegisterAttempts,
+            passkeyFailure,
+          ]);
         },
       },
     );
@@ -63,8 +86,14 @@ const Register = () => {
     if (!authToken || skipLivenessMutation.isLoading) {
       return;
     }
+    const context = {
+      reason: SkipLivenessReason.failed,
+      clientType: SkipLivenessClientType.web,
+      numAttempts: passkeyRegisterAttempts.length,
+      attempts: passkeyRegisterAttempts,
+    };
     skipLivenessMutation.mutate(
-      { authToken },
+      { authToken, context },
       {
         onSuccess: () => {
           send({ type: 'skipped' });
@@ -91,7 +120,7 @@ const Register = () => {
     icon = <IcoPasskey40 />;
     headerTitle = t('success.title');
     headerSubtitle = t('success.subtitle');
-  } else if (!passkeyFailureReasons.length) {
+  } else if (!passkeyRegisterAttempts.length) {
     // First attempt - show normal copy
     icon = <IcoPasskey40 />;
     headerTitle = t('title');

@@ -43,6 +43,16 @@ const registerPasskeyOnDevice = async (challenge: string) => {
   return JSON.stringify(pk);
 };
 
+/// A special kind of error returned when we fail to register a passkey in the OS prompt
+type RegisterPasskeyError = {
+  kind: 'registerPasskeyError';
+  elapsedTimeInOsPromptMs: number;
+  error: unknown;
+};
+
+export const isRegisterPasskeyError = (e: unknown): e is RegisterPasskeyError =>
+  (e as RegisterPasskeyError)?.kind === 'registerPasskeyError';
+
 const useBiometricInit = () => {
   const userChallengeMut = useUserChallenge();
   const userChallengeVerifyMut = useUserChallengeVerify();
@@ -61,9 +71,21 @@ const useBiometricInit = () => {
       throw new Error('No biometric challenge JSON when registering passkey');
     }
 
-    const challengeResponse = await registerPasskeyOnDevice(
-      biometricChallengeJson,
-    );
+    const startPasskeyRegister = new Date();
+    let challengeResponse;
+    try {
+      challengeResponse = await registerPasskeyOnDevice(biometricChallengeJson);
+    } catch (error) {
+      const endPasskeyRegister = new Date();
+      const elapsedTimeInOsPromptMs =
+        endPasskeyRegister.getTime() - startPasskeyRegister.getTime();
+      const e: RegisterPasskeyError = {
+        kind: 'registerPasskeyError',
+        elapsedTimeInOsPromptMs,
+        error,
+      };
+      return Promise.reject(e);
+    }
 
     const response = await userChallengeVerifyMut.mutateAsync({
       authToken,
