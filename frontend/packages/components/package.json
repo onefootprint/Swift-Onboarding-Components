@@ -31,6 +31,7 @@
     "publish:local": "yarn && yarn build && yalc publish"
   },
   "devDependencies": {
+    "@onefootprint/footprint-js": "3.10.0",
     "@onefootprint/core": "*",
     "@onefootprint/types": "*",
     "@types/classnames": "^2.3.1",

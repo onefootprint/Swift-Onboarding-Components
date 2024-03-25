@@ -1,17 +1,15 @@
 import { dateToIso8601, isEmail, isPhoneNumber } from '@onefootprint/core';
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import type { FormData, UserData } from '../@types';
 import { Context } from '../components/provider';
-import createD2pToken from '../queries/create-d2p-token';
-import getD2PStatusReq from '../queries/get-d2p-status';
 import getOnboardingStatusReq from '../queries/get-onboarding-status';
 import identifyAndStartReq from '../queries/identify-and-start';
 import identifyReq from '../queries/identify-user';
 import saveReq from '../queries/save';
 import createSignupChallenge from '../queries/signup';
-import createHandoffUrlUtil from '../utils/create-handoff-url';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
@@ -129,39 +127,38 @@ export const useFootprint = () => {
     await getMissingRequirements(authToken);
   };
 
-  const createHandoffUrl = async () => {
-    const { authToken, onboardingConfig } = context;
-    if (!authToken || !onboardingConfig) {
-      throw new Error('No authToken or onboardingConfig found');
-    }
-    const res = await createD2pToken({
-      authToken,
-      meta: {
-        opener: 'unknown',
-      },
-    });
-    setContext(prev => ({ ...prev, scopedAuthToken: res.authToken }));
-    const url = createHandoffUrlUtil({
-      authToken: res.authToken,
-      onboardingConfig,
-    });
-    return { url, scopedAuthToken: res.authToken };
-  };
-
-  const getD2PStatus = async () => {
-    const { scopedAuthToken } = context;
-    if (!scopedAuthToken) {
+  const handoff = (handlers: {
+    onSuccess?: (validationToken: string) => void;
+    onError?: (error: unknown) => void;
+    onCancel?: () => void;
+  }) => {
+    if (!context.authToken) {
       throw new Error('No authToken found');
     }
-    return getD2PStatusReq({ scopedAuthToken });
+    const f = footprint.init({
+      authToken: context.authToken,
+      kind: FootprintComponentKind.Verify,
+      onCancel: () => {
+        handlers.onCancel?.();
+        context.onCancel?.();
+      },
+      onComplete: (validationToken: string) => {
+        handlers.onSuccess?.(validationToken);
+        context.onComplete?.(validationToken);
+      },
+      onError: (error: unknown) => {
+        handlers.onError?.(error);
+        context.onError?.(error);
+      },
+    });
+    f.render();
   };
 
   const methods = {
     canInitiateOtpValidation,
-    createHandoffUrl,
     getAuthToken,
-    getD2PStatus,
     getMissingRequirements,
+    handoff,
     identify,
     identifyAndAuthenticate,
     identifyAndStart,

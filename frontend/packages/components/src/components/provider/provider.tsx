@@ -14,25 +14,26 @@ configureI18n();
 
 type ContextData = {
   authToken?: string;
-  publicKey: string;
-  sandboxId?: string;
-  userData?: UserData;
-  signupChallenge: SignupChallengeResponse | null;
   missingRequirements: OnboardingRequirement[];
   onboardingConfig: PublicOnboardingConfig | null;
-  scopedAuthToken: string | null;
+  onCancel?: () => void;
+  onComplete?: (validationToken: string) => void;
+  onError?: (error: unknown) => void;
+  publicKey: string;
+  sandboxId?: string;
+  signupChallenge: SignupChallengeResponse | null;
+  userData?: UserData;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
 
 const Context = createContext<[ContextData, UpdateContext]>([
   {
-    publicKey: '',
-    userData: {},
-    signupChallenge: null,
     missingRequirements: [],
     onboardingConfig: null,
-    scopedAuthToken: null,
+    publicKey: '',
+    signupChallenge: null,
+    userData: {},
   },
   () => {},
 ]);
@@ -40,6 +41,9 @@ const Context = createContext<[ContextData, UpdateContext]>([
 export type ProviderProps = {
   authToken?: string;
   children: React.ReactNode;
+  onCancel?: () => void;
+  onComplete?: (validationToken: string) => void;
+  onError?: (error: unknown) => void;
   publicKey: string;
   sandboxId?: string;
   userData?: UserData;
@@ -48,6 +52,9 @@ export type ProviderProps = {
 const FootprintProvider = ({
   authToken,
   children,
+  onCancel,
+  onComplete,
+  onError,
   publicKey,
   sandboxId,
   userData,
@@ -55,13 +62,15 @@ const FootprintProvider = ({
   const methods = useForm<FormData>();
   const [context, setContext] = useState<ContextData>({
     authToken,
-    publicKey,
-    sandboxId,
-    userData,
-    signupChallenge: null,
     missingRequirements: [],
     onboardingConfig: null,
-    scopedAuthToken: null,
+    onCancel,
+    onComplete,
+    onError,
+    publicKey,
+    sandboxId,
+    signupChallenge: null,
+    userData,
   });
 
   const value = useMemo<[ContextData, UpdateContext]>(
