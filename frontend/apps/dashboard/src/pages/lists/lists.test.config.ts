@@ -2,8 +2,6 @@ import { mockRequest } from '@onefootprint/test-utils';
 import type { List } from '@onefootprint/types';
 import { ActorKind, ListKind } from '@onefootprint/types';
 
-import { playbooksFixture } from '../home/home.test.config';
-
 export const listsFixture: List[] = [
   {
     id: '1',
@@ -14,6 +12,8 @@ export const listsFixture: List[] = [
     createdAt: 'date',
     kind: ListKind.emailAddress,
     name: 'Email List',
+    entriesCount: 0,
+    usedInRules: false,
   },
   {
     id: '2',
@@ -24,6 +24,8 @@ export const listsFixture: List[] = [
     createdAt: 'date',
     kind: ListKind.ssn9,
     name: 'SSN List',
+    entriesCount: 0,
+    usedInRules: false,
   },
 ];
 
@@ -31,13 +33,7 @@ export const withLists = () =>
   mockRequest({
     method: 'get',
     path: '/org/lists',
-    response: {
-      data: listsFixture,
-      meta: {
-        nextPage: 0,
-        count: playbooksFixture.length,
-      },
-    },
+    response: listsFixture,
   });
 
 export const withListsError = () =>

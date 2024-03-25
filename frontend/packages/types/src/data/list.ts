@@ -13,6 +13,8 @@ export type List = {
   id: string;
   actor: Actor;
   alias: string;
+  entriesCount: number;
+  usedInRules: boolean;
   createdAt: string;
   kind: ListKind;
   name: string;

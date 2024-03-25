@@ -1,17 +1,35 @@
+import { useIntl } from '@onefootprint/hooks';
 import type { List } from '@onefootprint/types';
+import { Badge } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type RowProps = {
   list: List;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const Row = ({ list }: RowProps) => (
-  // TODO: implement
-  <div>
-    <div>{list.name}</div>
-    <div>{list.kind}</div>
-    <div>{list.alias}</div>
-  </div>
-);
+const Row = ({ list }: RowProps) => {
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.lists.table.row',
+  });
+  const { name, alias, entriesCount, usedInRules, createdAt } = list;
+  const { formatDateWithTime } = useIntl();
+
+  return (
+    <>
+      <td>{name}</td>
+      <td>{alias}</td>
+      <td>{entriesCount ?? 0}</td>
+      <td>
+        {usedInRules ? (
+          <Badge variant="success">{t('used-in-rules.yes')}</Badge>
+        ) : (
+          <Badge variant="error">{t('used-in-rules.no')}</Badge>
+        )}
+      </td>
+      <td>{formatDateWithTime(new Date(createdAt))}</td>
+    </>
+  );
+};
+
 export default Row;

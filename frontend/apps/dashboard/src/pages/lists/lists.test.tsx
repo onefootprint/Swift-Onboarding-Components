@@ -31,42 +31,32 @@ describe('<Lists />', () => {
     });
   };
 
-  describe('when the request to fetch playbooks succeeds', () => {
+  describe('when the request to fetch lists succeeds', () => {
     beforeEach(() => {
       withLists();
     });
 
     it.each([
-      [
-        {
-          name: 'Email List',
-          kind: 'email_address',
-          alias: 'my_list',
-        },
-        {
-          name: 'SSN List',
-          kind: 'ssn9',
-          alias: 'my_list2',
-        },
-      ],
-    ])(
-      'should render the name, kind and alias',
-      async ({ name, kind, alias }) => {
-        await renderListsAndWait();
-
-        const rowName = screen.getByText(name);
-        expect(rowName).toBeInTheDocument();
-
-        const rowKind = screen.getByText(kind);
-        expect(rowKind).toBeInTheDocument();
-
-        const rowAlias = screen.getByText(alias);
-        expect(rowAlias).toBeInTheDocument();
+      {
+        name: 'Email List',
+        alias: 'my_list',
       },
-    );
+      {
+        name: 'SSN List',
+        alias: 'my_list2',
+      },
+    ])(`should render the name and alias`, async ({ name, alias }) => {
+      await renderListsAndWait();
+
+      const rowName = screen.getByText(name);
+      expect(rowName).toBeInTheDocument();
+
+      const rowAlias = screen.getByText(alias);
+      expect(rowAlias).toBeInTheDocument();
+    });
   });
 
-  describe('when the request to fetch playbooks fails', () => {
+  describe('when the request to fetch lists fails', () => {
     beforeEach(() => {
       withListsError();
     });
