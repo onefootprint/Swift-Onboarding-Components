@@ -1,4 +1,9 @@
 import { IcoFaceid40 } from '@onefootprint/icons';
+import type { PasskeyAttemptContext } from '@onefootprint/types';
+import {
+  SkipLivenessClientType,
+  SkipLivenessReason,
+} from '@onefootprint/types';
 import { Box, Button, Container, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { Passkey } from 'react-native-passkey';
@@ -7,22 +12,17 @@ import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
-import useRegisterPasskey from './hooks/use-register-passkey';
+import useRegisterPasskey, {
+  isRegisterPasskeyError,
+} from './hooks/use-register-passkey';
 import useSkipPasskey from './hooks/use-skip-passkey';
 
 export type PasskeysProps = {
   authToken: string;
-  onDone?: (deviceResponseJson?: string | null) => void;
+  onDone: (deviceResponseJson?: string | null) => void;
 };
 
 const RegisterPasskey = ({ authToken, onDone }: PasskeysProps) => {
-  const handleOnDoneSuccess = (deviceResponseJson: string) => {
-    onDone?.(deviceResponseJson);
-  };
-  const handleOnDoneSkip = () => {
-    onDone?.(null);
-  };
-
   const { t } = useTranslation('components.passkeys.register');
   const { t: tRetry } = useTranslation('components.passkeys.retry');
   const { getErrorMessage } = useRequestError();
@@ -31,9 +31,9 @@ const RegisterPasskey = ({ authToken, onDone }: PasskeysProps) => {
   const analytics = useAnalytics();
   const isSupported = Passkey.isSupported();
 
-  const [passkeyRegisterErrors, setPasskeyRegisterErrors] = useState<string[]>(
-    [],
-  );
+  const [passkeyRegisterAttempts, setPasskeyRegisterAttempts] = useState<
+    PasskeyAttemptContext[]
+  >([]);
 
   const handleRegister = () => {
     analytics.track(Events.PasskeysRegistrationStarted);
@@ -41,28 +41,57 @@ const RegisterPasskey = ({ authToken, onDone }: PasskeysProps) => {
       onSuccess: deviceResponseJson => {
         analytics.track(Events.PasskeyRegistrationSucceeded);
         analytics.track(Events.FPasskeyCompleted, { result: 'success' });
-        handleOnDoneSuccess(deviceResponseJson);
+        onDone(deviceResponseJson);
       },
       onError: (error: unknown) => {
-        const message = getErrorMessage(error);
+        // Extract context from RegisterPasskeyError if relevant
+        let e = error;
+        let elapsedTimeInOsPromptMs;
+        if (isRegisterPasskeyError(error)) {
+          e = error.error;
+          elapsedTimeInOsPromptMs = error.elapsedTimeInOsPromptMs;
+        }
+
+        const message = getErrorMessage(e);
         analytics.track(Events.PasskeyRegistrationFailed, {
           message,
         });
-        setPasskeyRegisterErrors([...passkeyRegisterErrors, message]);
+
+        // Keep track of each failed attempt to register a passkey.
+        // We will send this to the backend
+        const passkeyFailure = {
+          errorMessage: message,
+          elapsedTimeInOsPromptMs,
+        };
+        setPasskeyRegisterAttempts([
+          ...passkeyRegisterAttempts,
+          passkeyFailure,
+        ]);
       },
     });
   };
 
-  const handleSkip = () => {
+  const skipPasskeyRegister = (reason: SkipLivenessReason) => {
+    const context = {
+      reason,
+      clientType: SkipLivenessClientType.mobile,
+      numAttempts: passkeyRegisterAttempts.length,
+      attempts: passkeyRegisterAttempts,
+    };
+    const onSuccess = () => {
+      onDone(null);
+    };
+    skipMutation.mutate({ authToken, context }, { onSuccess });
+  };
+  const handleDoLater = () => {
     analytics.track(Events.PasskeyRegistrationSkipped);
     analytics.track(Events.FPasskeyCompleted, { result: 'skip' });
-    skipMutation.mutate({ authToken }, { onSuccess: handleOnDoneSkip });
+    skipPasskeyRegister(SkipLivenessReason.failed);
   };
-
   const handleNotSupported = () => {
     analytics.track(Events.PasskeyRegistrationNotSupported);
     analytics.track(Events.FPasskeyCompleted, { result: 'not_supported' });
-    skipMutation.mutate({ authToken }, { onSuccess: handleOnDoneSkip });
+    skipPasskeyRegister(SkipLivenessReason.unavailableOnDevice);
   };
 
   useEffect(() => {
@@ -76,7 +105,7 @@ const RegisterPasskey = ({ authToken, onDone }: PasskeysProps) => {
   let subtitle;
   let primaryButtonText;
   let secondaryButtonText;
-  if (!passkeyRegisterErrors.length) {
+  if (!passkeyRegisterAttempts.length) {
     // First attempt
     title = t('title');
     subtitle = t('subtitle');
@@ -108,7 +137,7 @@ const RegisterPasskey = ({ authToken, onDone }: PasskeysProps) => {
         </Button>
         {secondaryButtonText && (
           <Button
-            onPress={handleSkip}
+            onPress={handleDoLater}
             loading={skipMutation.isLoading}
             disabled={skipMutation.isLoading || registerMutation.isLoading}
             variant="secondary"

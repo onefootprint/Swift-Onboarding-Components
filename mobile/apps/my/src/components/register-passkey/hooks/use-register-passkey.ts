@@ -96,6 +96,16 @@ const register = async ({
   return response;
 };
 
+/// A special kind of error returned when we fail to register a passkey in the OS prompt
+type RegisterPasskeyError = {
+  kind: 'registerPasskeyError';
+  elapsedTimeInOsPromptMs: number;
+  error: unknown;
+};
+
+export const isRegisterPasskeyError = (e: unknown): e is RegisterPasskeyError =>
+  (e as RegisterPasskeyError)?.kind === 'registerPasskeyError';
+
 const registerPasskey = async (authToken: string) => {
   const { challengeToken, biometricChallengeJson } = await biometricInit(
     authToken,
@@ -103,7 +113,23 @@ const registerPasskey = async (authToken: string) => {
   const challenge = JSON.parse(
     biometricChallengeJson,
   ) as BiometricRegisterChallengeJson;
-  const challengeResponse = await generateDeviceResponse(challenge);
+
+  const startPasskeyRegister = new Date();
+  let challengeResponse;
+  try {
+    challengeResponse = await generateDeviceResponse(challenge);
+  } catch (error) {
+    const endPasskeyRegister = new Date();
+    const elapsedTimeInOsPromptMs =
+      endPasskeyRegister.getTime() - startPasskeyRegister.getTime();
+    const e: RegisterPasskeyError = {
+      kind: 'registerPasskeyError',
+      elapsedTimeInOsPromptMs,
+      error,
+    };
+    return Promise.reject(e);
+  }
+
   await register({
     authToken,
     challengeToken,

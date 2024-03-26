@@ -1,3 +1,7 @@
+import {
+  SkipLivenessClientType,
+  SkipLivenessReason,
+} from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -22,8 +26,15 @@ const SkipLiveness = ({
       return;
     }
 
+    const context = {
+      clientType: SkipLivenessClientType.mobile,
+      // TODO should track and populate these when the verify app is actually used
+      reason: SkipLivenessReason.unknown,
+      numAttempts: 0,
+      attempts: [],
+    };
     skipLivenessMutation.mutate(
-      { authToken },
+      { authToken, context },
       {
         onSuccess: onComplete,
         onError,
