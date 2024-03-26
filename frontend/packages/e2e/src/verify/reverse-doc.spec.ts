@@ -56,7 +56,7 @@ test('reverse-doc #ci', async ({ browserName, browser, page, isMobile }) => {
   }
 
   await page.waitForLoadState();
-  await continueOnDesktop({ frame, browser });
+  await continueOnDesktop({ frame });
   await page.waitForLoadState();
 
   const scanText = frame.getByText(/scan or upload/i).first();

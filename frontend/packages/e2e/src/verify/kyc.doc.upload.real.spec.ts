@@ -100,7 +100,7 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await continueOnDesktop({ frame, browser });
+  await continueOnDesktop({ frame });
   await page.waitForLoadState();
 
   await clickOnContinue({ frame });

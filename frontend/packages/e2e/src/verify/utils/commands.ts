@@ -385,7 +385,7 @@ export const confirmData = async (
 };
 
 /** When running on desktop, the user is prompted to transfer to a mobile device for the id doc and
- * liveness requirements are transferred to a mobile device.
+ * liveness requirements.
  * This transfers to a mobile device and handles the liveness requirement.
  */
 export const doTransferFromDesktop = async ({
@@ -508,13 +508,12 @@ export const doTransferFromMobile = async ({
 };
 
 /** When running on desktop, the user is prompted to transfer to a mobile device for the id doc and
- * liveness requirements are transferred to a mobile device.
- * This continues on desktop, which transfers only the liveness requirement to a new window, and
- * then allows handling id doc requirements in the current browser.
+ * liveness requirements.
+ * This continues on desktop instead of doing the transfer. We then end up handling the liveness and
+ * ID doc requirements in the current browser.
  */
 export const continueOnDesktop = async ({
   frame,
-  browser,
 }: {
   frame: FrameLocator;
   browser: Browser;
@@ -527,33 +526,4 @@ export const continueOnDesktop = async ({
   if (!success) {
     await clickOn(/continue on desktop/i, { frame });
   }
-
-  // After continuing on desktop, we'll be asked to open a new tab to handle passkey registration
-  const context = browser.contexts()[0];
-  const pagePromise = context.waitForEvent('page');
-  const button = frame
-    .getByRole('button', {
-      name: 'Open new browser tab',
-      disabled: false,
-      exact: true,
-    })
-    .first();
-  await button
-    .waitFor({ state: 'attached', timeout: 10000 })
-    .then(() => button.click())
-    .then(() => true)
-    .catch(() => false);
-
-  const newPage = await pagePromise;
-  await newPage.waitForLoadState();
-
-  const header = newPage.getByText(/add a passkey/i).first();
-  await header
-    .waitFor({ state: 'attached', timeout: 10000 })
-    .then(() => true)
-    .catch(() => false);
-  await clickOn(/launch verification/i, { frame: newPage });
-  await clickOn(/do it later/i, { frame: newPage });
-
-  return newPage;
 };

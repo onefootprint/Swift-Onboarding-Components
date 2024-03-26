@@ -109,7 +109,9 @@ const createTransferMachine = (initialContext: MachineContext) =>
                 target: 'newTabRequest',
                 actions: ['assignIsContinuingOnDesktop'],
                 cond: ctx =>
-                  !!ctx.missingRequirements.liveness && ctx.isInIframe,
+                  !!ctx.missingRequirements.liveness &&
+                  ctx.isInIframe &&
+                  ctx.device.hasSupportForWebauthn,
                 description:
                   'If the user wants to continue on desktop, and we have a passkey requirement in an iframe, open a new tab',
               },
@@ -126,7 +128,9 @@ const createTransferMachine = (initialContext: MachineContext) =>
                 target: 'newTabRequest',
                 actions: ['assignIsContinuingOnDesktop'],
                 cond: ctx =>
-                  !!ctx.missingRequirements.liveness && ctx.isInIframe,
+                  !!ctx.missingRequirements.liveness &&
+                  ctx.isInIframe &&
+                  ctx.device.hasSupportForWebauthn,
                 description:
                   'If the user wants to continue on desktop, and we have a passkey requirement in an iframe, open a new tab',
               },

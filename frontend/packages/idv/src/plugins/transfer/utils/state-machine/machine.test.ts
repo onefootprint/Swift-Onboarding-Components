@@ -42,7 +42,7 @@ const getDesktopArgs = (args: Partial<MachineContext>) => ({
   scopedAuthToken: '',
   device: {
     type: 'desktop',
-    hasSupportForWebauthn: false,
+    hasSupportForWebauthn: true,
     osName: 'Windows',
     browser: 'Chrome',
   },
@@ -320,6 +320,38 @@ describe('Transfer machine tests', () => {
           type: 'continueOnDesktop',
         },
       ]);
+      expect(state.value).toBe('complete');
+    });
+
+    it('continue on desktop does not open transfer for liveness when device doesnt support webauthn', () => {
+      const machine = interpret(
+        createTransferMachine(
+          getDesktopArgs({
+            device: {
+              type: 'desktop',
+              hasSupportForWebauthn: false,
+              osName: 'Windows',
+              browser: 'Chrome',
+            },
+          }),
+        ),
+      );
+      machine.start();
+      let state = machine.send([
+        {
+          type: 'scopedAuthTokenGenerated',
+          payload: {
+            scopedAuthToken: 'tok_456',
+          },
+        },
+        {
+          type: 'continueOnDesktop',
+        },
+      ]);
+      expect(state.value).toBe('confirmContinueOnDesktop');
+      state = machine.send({
+        type: 'continueOnDesktop',
+      });
       expect(state.value).toBe('complete');
     });
   });
