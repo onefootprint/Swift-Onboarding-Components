@@ -8,20 +8,20 @@ import Header from './components/header';
 import Playbooks from './components/playbooks';
 
 const Content = () => (
-  <Box tag="section" testID="entity-content">
+  <Box tag="section" testID="list-content">
     <Box marginBottom={7}>
       <Breadcrumb />
     </Box>
-    <Box marginBottom={5}>
+    <Box marginBottom={7}>
       <Header />
     </Box>
-    <Box marginBottom={5}>
+    <Box marginBottom={7}>
       <Entries />
     </Box>
-    <Box marginBottom={9}>
+    <Box marginBottom={7}>
       <Playbooks />
     </Box>
-    <Box marginBottom={9}>
+    <Box marginBottom={7}>
       <ActivityLog />
     </Box>
   </Box>

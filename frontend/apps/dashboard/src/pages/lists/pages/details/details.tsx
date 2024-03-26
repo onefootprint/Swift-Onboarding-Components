@@ -5,18 +5,30 @@ import { Error } from 'src/components';
 
 import Content from './components/content';
 import Loading from './components/loading';
-import useListDetails from './hooks/use-list-details';
+import useList from './hooks/use-list';
+import useListEntries from './hooks/use-list-entries';
 
 const Details = () => {
   const router = useRouter();
   const id = router.query.id as string;
-  const { isLoading, error, data } = useListDetails(id);
+  const { isLoading: listLoading, error: listError, data: list } = useList(id);
+  const {
+    isLoading: entriesLoading,
+    error: entriesError,
+    data: entries,
+  } = useListEntries(id);
+
+  const isLoading = listLoading || entriesLoading;
+  const hasError =
+    (listError || entriesError) && !listLoading && !entriesLoading;
+  const hasData =
+    !hasError && list && entries && !listLoading && !entriesLoading;
 
   return (
-    <Box aria-busy={isLoading}>
+    <Box aria-busy={entriesLoading}>
       {isLoading && <Loading />}
-      {error && !isLoading ? <Error error={error} /> : null}
-      {data && !isLoading && <Content />}
+      {hasError ? <Error error={entriesError} /> : null}
+      {hasData && <Content />}
     </Box>
   );
 };

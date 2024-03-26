@@ -2384,6 +2384,33 @@
             "description": "Something went wrong, please try again."
           }
         }
+      },
+      "details": {
+        "breadcrumb": {
+          "title": "Lists",
+          "details": "Details"
+        },
+        "header": {
+          "kind": "Match type:",
+          "edit": "Edit"
+        },
+        "entries": {
+          "title": "Entries",
+          "search-placeholder": "Find...",
+          "entries-more": "{{count}} entries more",
+          "show-all": "Show all",
+          "show-less": "Show fewer entries",
+          "add": "Add entry",
+          "empty": "No entries found"
+        },
+        "playbooks": {
+          "title": "Playbooks using {{alias}}",
+          "empty": "There are no playbooks using this list"
+        },
+        "activity-log": {
+          "title": "Activity log",
+          "empty": "No activity found"
+        }
       }
     },
     "playbooks": {

@@ -31,7 +31,8 @@
       "@/proxy-configs/*": ["src/pages/proxy-configs/*"],
       "@/entities/*": ["./src/components/entities/*"],
       "@/entity/*": ["./src/components/entities/components/details/*"],
-      "@/playbooks/*": ["./src/pages/playbooks/*"]
+      "@/playbooks/*": ["./src/pages/playbooks/*"],
+      "@/lists/*": ["./src/pages/lists/*"]
     }
   }
 }

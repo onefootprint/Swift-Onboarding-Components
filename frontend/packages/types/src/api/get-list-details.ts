@@ -1,6 +1,4 @@
-import type { Actor } from '../data';
-
-export type GetListDetailsRequest = {
+export type GetListEntriesRequest = {
   listId: string;
   authHeaders: {
     'x-fp-dashboard-authorization': string;
@@ -8,11 +6,4 @@ export type GetListDetailsRequest = {
   };
 };
 
-export type GetListDetailsResponse = {
-  actor: Actor;
-  createdAt: string;
-  id: string;
-  data: {
-    entries: string[];
-  };
-};
+export type GetListEntriesResponse = string[];

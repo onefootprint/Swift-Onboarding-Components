@@ -1,5 +1,21 @@
+import { Breadcrumb as UIBreadcrumb } from '@onefootprint/ui';
+import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const Breadcrumb = () => <div>TODO</div>;
+const Breadcrumb = () => {
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.lists.details.breadcrumb',
+  });
+
+  return (
+    <UIBreadcrumb.List aria-label={t('title')}>
+      <UIBreadcrumb.Item href="/lists" as={Link}>
+        {t('title')}
+      </UIBreadcrumb.Item>
+      <UIBreadcrumb.Item>{t('details')}</UIBreadcrumb.Item>
+    </UIBreadcrumb.List>
+  );
+};
 
 export default Breadcrumb;

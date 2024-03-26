@@ -70,8 +70,8 @@ export type {
 } from './get-entity-rule-set-result';
 export type { GetListRequest, GetListResponse } from './get-list';
 export type {
-  GetListDetailsRequest,
-  GetListDetailsResponse,
+  GetListEntriesRequest,
+  GetListEntriesResponse,
 } from './get-list-details';
 export type { GetListsResponse } from './get-lists';
 export type { GetLivenessRequest, GetLivenessResponse } from './get-liveness';

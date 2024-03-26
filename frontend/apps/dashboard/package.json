@@ -103,7 +103,8 @@
       "@/proxy-configs/(.*)": "<rootDir>/src/pages/developers/components/proxy-configs/$1",
       "@/entities/(.*)": "<rootDir>/src/components/entities/$1",
       "@/entity/(.*)": "<rootDir>/src/components/entities/components/details/$1",
-      "@/playbooks/(.*)": "<rootDir>/src/pages/playbooks/$1"
+      "@/playbooks/(.*)": "<rootDir>/src/pages/playbooks/$1",
+      "@/lists/(.*)": "<rootDir>/src/pages/lists/$1"
     }
   }
 }
