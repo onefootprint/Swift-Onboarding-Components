@@ -14,7 +14,6 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
 import Logger from '../../../../../../utils/logger';
-import Error from '../../../../components/error';
 import {
   isDocCdo,
   isInvestorProfileCdo,
@@ -36,7 +35,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'onboarding.pages.authorize',
   });
-  const [state] = useOnboardingRequirementsMachine();
+  const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken, config, overallOutcome },
     requirements,
@@ -53,8 +52,6 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const processMutation = useOnboardingProcess();
   const isLoading =
     onboardingAuthorizeMutation.isLoading || processMutation.isLoading;
-  const isError =
-    onboardingAuthorizeMutation.isError || processMutation.isError;
   const toast = useToast();
 
   if (!authorizeRequirement) {
@@ -98,6 +95,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
             )}`,
             'onboarding-authorize',
           );
+          send('error');
         },
       },
     );
@@ -124,14 +122,13 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
             description: t('onboarding-complete-error.description'),
             variant: 'error',
           });
+          send('error');
         },
       },
     );
   };
 
-  return isError ? (
-    <Error />
-  ) : (
+  return (
     <Container>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <HeaderTitle

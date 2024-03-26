@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import Logger from '../../../../../../utils/logger';
-import Error from '../../../../components/error';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 import useOnboardingProcess from '../../hooks/use-onboarding-process';
 
@@ -14,12 +13,11 @@ export type ProcessProps = {
 };
 
 const Process = ({ onDone }: ProcessProps) => {
-  const [state] = useOnboardingRequirementsMachine();
+  const [state, send] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken, overallOutcome },
   } = state.context;
   const processMutation = useOnboardingProcess();
-  const { isError } = processMutation;
 
   useEffectOnce(() => {
     if (!authToken || processMutation.isLoading) {
@@ -36,14 +34,13 @@ const Process = ({ onDone }: ProcessProps) => {
             )}`,
             'onboarding-process',
           );
+          send('error');
         },
       },
     );
   });
 
-  return isError ? (
-    <Error />
-  ) : (
+  return (
     <Container>
       <AnimatedLoadingSpinner animationStart />
     </Container>

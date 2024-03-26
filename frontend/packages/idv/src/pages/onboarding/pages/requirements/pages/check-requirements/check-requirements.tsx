@@ -2,13 +2,12 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 import { OnboardingRequirementKind } from '@onefootprint/types';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useGetOnboardingStatus } from '../../../../../../hooks/api';
 import Logger from '../../../../../../utils/logger';
-import Error from '../../../../components/error';
 import useOnboardingProcess from '../../hooks/use-onboarding-process';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import useOnboarding from './hooks/use-onboarding';
@@ -21,7 +20,6 @@ const CheckRequirements = () => {
     onboardingContext: { authToken, isTransfer, overallOutcome },
     collectedKycData,
   } = state.context;
-  const [error, setError] = useState(false);
   const onboardingMutation = useOnboarding();
   const processMutation = useOnboardingProcess();
   const onboardingInitialized =
@@ -40,7 +38,7 @@ const CheckRequirements = () => {
             `Error while initiating onboarding. ${getErrorMessage(err)}`,
             'onboarding-check-requirements',
           );
-          setError(true);
+          send('error');
         },
       },
     );
@@ -72,7 +70,7 @@ const CheckRequirements = () => {
               'Error while running process from check-requirements page',
               getErrorMessage(processErr),
             );
-            setError(true);
+            send('error');
           },
         },
       );
@@ -91,7 +89,7 @@ const CheckRequirements = () => {
       )}`,
       'onboarding-check-requirements',
     );
-    setError(true);
+    send('error');
   };
 
   const { refetch } = useGetOnboardingStatus({
@@ -103,9 +101,7 @@ const CheckRequirements = () => {
     },
   });
 
-  return error ? (
-    <Error />
-  ) : (
+  return (
     <Container>
       <AnimatedLoadingSpinner animationStart />
     </Container>

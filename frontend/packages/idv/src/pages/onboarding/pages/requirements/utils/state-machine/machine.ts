@@ -59,6 +59,11 @@ const createOnboardingRequirementsMachine = ({
         startedDataCollection: false,
         isTransferOnDesktopDisabled,
       },
+      on: {
+        error: {
+          target: 'error',
+        },
+      },
       states: {
         checkRequirements: {
           on: {
@@ -100,6 +105,9 @@ const createOnboardingRequirementsMachine = ({
         },
         process: {
           on: RequirementCompletedTransition,
+        },
+        error: {
+          type: 'final',
         },
         success: {
           type: 'final',

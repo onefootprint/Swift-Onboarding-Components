@@ -35,6 +35,9 @@ export type MachineContext = {
 
 export type MachineEvents =
   | {
+      type: 'error';
+    }
+  | {
       type: 'requirementCompleted';
     }
   | {

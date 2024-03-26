@@ -11,6 +11,7 @@ import {
   Transfer,
 } from '../../../../../../plugins';
 import Logger from '../../../../../../utils/logger';
+import Error from '../../../../components/error';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
@@ -174,6 +175,9 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('process')) {
     return <Process onDone={handleRequirementCompleted} />;
+  }
+  if (state.matches('error')) {
+    return <Error />;
   }
 
   return null;

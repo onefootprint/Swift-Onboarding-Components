@@ -15,9 +15,9 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignRequirements: 'onboardingRequirementsReceived';
-    markCollectedKycData: 'xstate.stop';
-    markDidRunTransfer: 'xstate.stop';
-    startDataCollection: 'xstate.stop';
+    markCollectedKycData: 'error' | 'xstate.stop';
+    markDidRunTransfer: 'error' | 'xstate.stop';
+    startDataCollection: 'error' | 'xstate.stop';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -25,6 +25,7 @@ export interface Typegen0 {
   matchesStates:
     | 'authorize'
     | 'checkRequirements'
+    | 'error'
     | 'idDoc'
     | 'investorProfile'
     | 'kybData'
