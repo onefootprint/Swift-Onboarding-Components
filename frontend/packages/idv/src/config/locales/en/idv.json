@@ -986,7 +986,7 @@
     "pages": {
       "register": {
         "title": "Add a passkey",
-        "subtitle": "The setup process may vary depending on your browser.",
+        "subtitle": "A passkey is a password replacement that validates your identity using your device’s biometric authentication, password, or PIN code. It is securely stored in your device’s password manager. The setup process may differ depending on your browser.",
         "cta": "Launch registration",
         "success": {
           "title": "Success!",
