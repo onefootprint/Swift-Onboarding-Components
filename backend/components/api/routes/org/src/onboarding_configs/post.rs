@@ -237,6 +237,14 @@ impl CreateOnboardingConfigurationRequest {
         Ok(())
     }
 
+    fn get_enhanced_aml(&self, tenant_id: &TenantId) -> EnhancedAmlOption {
+        self.enhanced_aml
+            .clone()
+            .map(|r| r.into())
+            .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
+            .unwrap_or(EnhancedAmlOption::No)
+    }
+
     fn validate_kind(&self, kind: ObConfigurationKind) -> ApiResult<()> {
         // Check for required fields based on playbook kind
         let required_fields = match kind {
@@ -358,6 +366,57 @@ impl CreateOnboardingConfigurationRequest {
         Ok(())
     }
 
+    fn validate_for_cip(&self, kind: CipKind, enhanced_aml: EnhancedAmlOption) -> Result<(), TenantError> {
+        validate_must_collect_for_cip(kind, &self.must_collect_data)?;
+
+        // Residency
+        if self.allow_international_residents {
+            return Err(TenantError::ValidationError(
+                "Cannot create Alpaca playbook with allow_international_residents=true".to_owned(),
+            ));
+        };
+
+        if !(self.allow_us_residents.unwrap_or(false) && self.allow_us_territories.unwrap_or(false)) {
+            return Err(TenantError::ValidationError(
+                "Cannot create Alpaca playbook without allow_us_residents=true && allow_us_territories=true"
+                    .to_owned(),
+            ));
+        };
+
+        // Document
+        let doc_cdo = self
+            .must_collect_data
+            .iter()
+            .find(|cdo| matches!(cdo, CDO::Document(_)));
+
+        if doc_cdo.is_some() {
+            return Err(TenantError::ValidationError(
+                "Cannot collect document for Alpaca playbook".to_owned(),
+            ));
+        }
+        // AML
+        match enhanced_aml {
+            EnhancedAmlOption::No => Err(TenantError::ValidationError(
+                "Must choose EnhancedAmlOption Alpaca playbook".to_owned(),
+            )),
+            EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring: _,
+                adverse_media_lists: _,
+            } => {
+                if !(ofac && pep && adverse_media) {
+                    Err(TenantError::ValidationError(
+                        "Must run OFAC/PEP/AdverseMedia for Alpaca playbook".to_owned(),
+                    ))
+                } else {
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn validate_flags(&self, state: &State, tenant_id: &TenantId) -> ApiResult<()> {
         if matches!(self.kind, Some(ObConfigurationKind::Auth)) {
             // Not strictly necessary, but just a warm-up for better per-config-kind validation
@@ -392,7 +451,7 @@ impl CreateOnboardingConfigurationRequest {
         // TODO: throw error if is_alpaca_tenant and another cip_kind sent up? TODO: restrict cip_kind to integration tenants now?
         let cip_kind = self.cip_kind.or(is_alpaca_tenant.then_some(CipKind::Alpaca));
         if let Some(cip_kind) = cip_kind {
-            validate_for_cip(cip_kind, &self.must_collect_data)?
+            self.validate_for_cip(cip_kind, self.get_enhanced_aml(tenant_id))?
         }
 
         let can_make_no_phone_obc = !state.config.service_config.is_production()
@@ -448,7 +507,7 @@ pub async fn post(
         international_country_restrictions,
         skip_kyc,
         doc_scan_for_optional_ssn,
-        enhanced_aml,
+        enhanced_aml: _,
         allow_us_residents,
         allow_us_territories,
         kind,
@@ -492,11 +551,6 @@ pub async fn post(
             .feature_flag_client
             .flag(BoolFlag::IsSkipKycTenant(&tenant_id));
 
-    let enhanced_aml = enhanced_aml
-        .map(|r| r.into())
-        .or(hardcoded_tenant_enhanced_aml_option(&tenant_id))
-        .unwrap_or(EnhancedAmlOption::No);
-
     let actor = auth.actor().into();
     let ff_client = state.feature_flag_client.clone();
     let (obc, actor, rs) = state
@@ -506,7 +560,7 @@ pub async fn post(
             let obc: ObConfiguration = ObConfiguration::create(
                 conn,
                 name,
-                tenant_id,
+                tenant_id.clone(),
                 must_collect_data,
                 optional_data.unwrap_or(vec![]),
                 can_access_data,
@@ -519,7 +573,7 @@ pub async fn post(
                 actor,
                 skip_kyc,
                 doc_scan_for_optional_ssn,
-                enhanced_aml,
+                request.get_enhanced_aml(&tenant_id),
                 // TODO: remove these once frontend is merged
                 allow_us_residents.unwrap_or(true),
                 allow_us_territories.unwrap_or(false),
@@ -541,7 +595,7 @@ pub async fn post(
     )))
 }
 
-fn validate_for_cip(kind: CipKind, must_collect_data: &[CDO]) -> Result<(), TenantError> {
+fn validate_must_collect_for_cip(kind: CipKind, must_collect_data: &[CDO]) -> Result<(), TenantError> {
     let missing_cdos = kind
         .required_cdos()
         .into_iter()
@@ -730,6 +784,6 @@ mod test {
     #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::Nationality] => false)]
     #[test_case(CipKind::Apex, vec![] => true)]
     fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
-        validate_for_cip(kind, &must_collect_data).is_ok()
+        validate_must_collect_for_cip(kind, &must_collect_data).is_ok()
     }
 }
