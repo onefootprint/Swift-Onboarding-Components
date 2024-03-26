@@ -1,18 +1,16 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { IdDI, TokenKind, TriggerKind } from '@onefootprint/types';
+import { TriggerKind } from '@onefootprint/types';
 import type { DialogButton } from '@onefootprint/ui';
-import { Dialog, useToast } from '@onefootprint/ui';
+import { Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useEntity from 'src/components/entities/components/details/hooks/use-entity';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import useSendTokenLinkMutation from '../../hooks/use-send-token-link';
 import useRetriggerKYC from '../actions/components/hooks/use-retrigger-kyc';
-import LinkDisplay from './components/link-display/link-display';
 import RetriggerKYCForm from './components/retrigger-kyc-form';
 import type { TriggerFormData } from './components/retrigger-kyc-form/retrigger-kyc-form';
+import useDisplayLinkDialog from './hooks/use-display-link-dialog';
 
 export type RetriggerKYCDialogProps = {
   open: boolean;
@@ -29,13 +27,8 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
     keyPrefix: 'pages.entity.actions.retrigger-kyc',
   });
   const submitRetriggerKYCMutation = useRetriggerKYC();
-  const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const entityId = useEntityId();
-  const userHasPhone = useEntity(entityId).data?.attributes?.includes(
-    IdDI.phoneNumber,
-  );
-  const sendLinkMutation = useSendTokenLinkMutation();
   // This dialog has two states: one that collects info on what kind of link to generate,
   // and another that displays the link with an option to send it via SMS
   const [dialogState, setDialogState] = useState<DialogState>(DialogState.form);
@@ -44,6 +37,10 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
     setDialogState(DialogState.form);
     onClose();
   };
+  const displayLinkDialogProps = useDisplayLinkDialog({
+    linkData: submitRetriggerKYCMutation.data,
+    onClose: handleClose,
+  });
 
   const handleGenerateLink = (data: TriggerFormData) => {
     const { kind, collectSelfie, note, playbook } = data;
@@ -79,6 +76,8 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
 
   let primaryButton: DialogButton;
   let secondaryButton: DialogButton;
+  let component: React.ReactNode;
+
   if (dialogState === DialogState.form) {
     primaryButton = {
       form: 'retrigger-kyc-form',
@@ -92,34 +91,14 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
       onClick: handleClose,
       disabled: submitRetriggerKYCMutation.isLoading,
     };
+    component = (
+      <RetriggerKYCForm
+        formId="retrigger-kyc-form"
+        onSubmit={handleGenerateLink}
+      />
+    );
   } else {
-    const handleSendLink = () => {
-      sendLinkMutation.mutate({
-        entityId,
-        kind: TokenKind.inherit,
-        onDone: handleClose,
-      });
-    };
-    const handleCopyLink = () => {
-      const link = submitRetriggerKYCMutation.data?.link || '';
-      navigator.clipboard.writeText(link);
-      toast.show({
-        title: t('link.copied.header'),
-        description: t('link.copied.description'),
-      });
-      handleClose();
-    };
-    primaryButton = {
-      label: t('link.copy-link'),
-      disabled: sendLinkMutation.isLoading,
-      onClick: handleCopyLink,
-    };
-    secondaryButton = {
-      label: userHasPhone ? t('link.send-link-sms') : t('link.send-link-email'),
-      onClick: handleSendLink,
-      loading: sendLinkMutation.isLoading,
-      disabled: sendLinkMutation.isLoading,
-    };
+    ({ primaryButton, secondaryButton, component } = displayLinkDialogProps);
   }
 
   return (
@@ -131,16 +110,7 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
       primaryButton={primaryButton}
       secondaryButton={secondaryButton}
     >
-      {dialogState === DialogState.form ? (
-        <RetriggerKYCForm
-          formId="retrigger-kyc-form"
-          onSubmit={handleGenerateLink}
-        />
-      ) : (
-        submitRetriggerKYCMutation.data && (
-          <LinkDisplay linkData={submitRetriggerKYCMutation.data || ''} />
-        )
-      )}
+      {component}
     </Dialog>
   );
 };

@@ -1,5 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type {
+  Entity,
   GetEntityRuleSetResultResponse,
   RuleResult,
   Timeline,
@@ -9,7 +10,10 @@ import {
   ActorKind,
   CollectedKycDataOption,
   DecisionStatus,
+  EntityKind,
   EntityLabel,
+  EntityStatus,
+  IdDI,
   LivenessIssuer,
   LivenessSource,
   OnboardingDecisionRuleAction,
@@ -23,6 +27,29 @@ import { WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline'
 
 export const entityIdFixure = 'fp_id_cDsFPmDwz784hdwovghMqt';
 export const obcIdFixure = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
+
+export const entityFixture: Entity = {
+  id: entityIdFixure,
+  isIdentifiable: true,
+  kind: EntityKind.person,
+  data: [],
+  attributes: [IdDI.phoneNumber],
+  decryptableAttributes: [],
+  startTimestamp: '2023-03-27T14:43:47.444716Z',
+  lastActivityAt: '2023-03-27T14:43:47.444716Z',
+  requiresManualReview: false,
+  status: EntityStatus.pass,
+  decryptedAttributes: {},
+  watchlistCheck: null,
+  hasOutstandingWorkflowRequest: false,
+  label: null,
+  workflows: [
+    {
+      createdAt: '2023-03-27T14:43:47.444716Z',
+      playbookId: 'obc_123',
+    },
+  ],
+};
 
 export const TimelineFixture: Timeline = [
   {

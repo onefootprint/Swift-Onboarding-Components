@@ -1,13 +1,16 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
+import { getErrorMessage } from '@onefootprint/request';
 import type {
   Annotation,
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
 import { TokenKind } from '@onefootprint/types';
-import { LinkButton, Stack, Text, Tooltip } from '@onefootprint/ui';
+import { Dialog, LinkButton, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useDisplayLinkDialog from '../../../../../../../vault/components/vault-actions/components/retrigger-kyc-dialog/hooks/use-display-link-dialog';
 import useGenerateTokenRequest from '../../../../../../../vault/components/vault-actions/hooks/use-generate-token';
 import AnnotationNote from '../annotation-note';
 import EventBodyEntry from '../event-body-entry';
@@ -17,10 +20,6 @@ type WorkflowTriggeredEventBodyProps = {
   entityId: string;
 };
 
-const HIDE_TIMEOUT = 1000;
-
-let confirmationTimeout: null | ReturnType<typeof setTimeout> = null;
-
 const WorkflowTriggeredEventBody = ({
   data,
   entityId,
@@ -29,36 +28,25 @@ const WorkflowTriggeredEventBody = ({
     keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
   });
   const generateTokenMutation = useGenerateTokenRequest();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const handleClose = () => {
+    setIsDialogOpen(false);
+  };
+  const showErrorToast = useRequestErrorToast();
+  const { title, primaryButton, secondaryButton, component } =
+    useDisplayLinkDialog({
+      linkData: generateTokenMutation.data,
+      onClose: handleClose,
+    });
 
-  const [confirmationTooltipMessage, setConfirmationTooltipMessage] = useState<
-    string | null
-  >(null);
   const shouldShowCopyButton = data.request?.isDeactivated === false;
 
-  const clearTooltipTimeout = () => {
-    if (confirmationTimeout) {
-      clearTimeout(confirmationTimeout);
-      confirmationTimeout = null;
-    }
-  };
-
-  const scheduleToHideConfirmation = (timeout: number) => {
-    confirmationTimeout = setTimeout(() => {
-      setConfirmationTooltipMessage(null);
-    }, timeout);
-  };
-
-  const showTooltipMessage = (msg: string, timeout = HIDE_TIMEOUT) => {
-    clearTooltipTimeout();
-    setConfirmationTooltipMessage(msg);
-    scheduleToHideConfirmation(timeout);
-  };
-
-  const generateLinkAndCopyToClipboard = () => {
+  const openLinkDialog = () => {
     const triggerId = data.request?.id;
     if (!triggerId) {
       return;
     }
+    setIsDialogOpen(true);
     generateTokenMutation.mutate(
       {
         entityId,
@@ -66,71 +54,77 @@ const WorkflowTriggeredEventBody = ({
         sendLink: false,
       },
       {
-        onSuccess: ({ link }) => {
-          navigator.clipboard.writeText(link);
-          showTooltipMessage(t('tooltip.copied'));
-        },
-        onError: () => {
-          showTooltipMessage(t('tooltip.couldnt-copy'), 3000);
+        onError: (error: unknown) => {
+          console.error(
+            `Generating new link for requested info failed`,
+            getErrorMessage(error),
+          );
+          showErrorToast(error);
+          setIsDialogOpen(false);
         },
       },
     );
   };
 
   return (
-    <Stack direction="column">
-      {data.note && (
-        <AnnotationNote
-          annotation={
-            {
-              id: '',
-              note: data.note,
-              isPinned: false,
-              source: data.actor,
-              timestamp: '',
-            } as Annotation
-          }
-          hidePinToggle
-        />
-      )}
-      <EventBodyEntry
-        iconComponent={IcoInfo16}
-        testID="workflow-triggered-event-body"
-        content={
-          <Stack gap={2}>
-            <Text variant="body-3" tag="span">
-              {t('link-sent')}
-            </Text>
-            {shouldShowCopyButton && (
-              <>
-                <Stack
-                  align="center"
-                  justify="center"
-                  marginLeft={1}
-                  marginRight={1}
-                >
-                  ·
-                </Stack>
-                <Tooltip
-                  position="right"
-                  alignment="center"
-                  text={confirmationTooltipMessage || ''}
-                  open={!!confirmationTooltipMessage}
-                >
+    <>
+      <Stack direction="column">
+        {data.note && (
+          <AnnotationNote
+            annotation={
+              {
+                id: '',
+                note: data.note,
+                isPinned: false,
+                source: data.actor,
+                timestamp: '',
+              } as Annotation
+            }
+            hidePinToggle
+          />
+        )}
+        <EventBodyEntry
+          iconComponent={IcoInfo16}
+          testID="workflow-triggered-event-body"
+          content={
+            <Stack gap={2}>
+              <Text variant="body-3" tag="span">
+                {t('link-generated')}
+              </Text>
+              {shouldShowCopyButton && (
+                <>
+                  <Stack
+                    align="center"
+                    justify="center"
+                    marginLeft={1}
+                    marginRight={1}
+                  >
+                    ·
+                  </Stack>
                   <LinkButton
-                    onClick={generateLinkAndCopyToClipboard}
+                    onClick={openLinkDialog}
                     disabled={generateTokenMutation.isLoading}
                     variant="label-4"
                   >
-                    {t('copy-link')}
+                    {t('create-link')}
                   </LinkButton>
-                </Tooltip>
-              </>
-            )}
-          </Stack>
-        }
-      />
-    </Stack>
+                </>
+              )}
+            </Stack>
+          }
+        />
+      </Stack>
+      <Dialog
+        size="compact"
+        title={title}
+        onClose={handleClose}
+        open={isDialogOpen}
+        primaryButton={primaryButton}
+        secondaryButton={secondaryButton}
+      >
+        {component}
+      </Dialog>
+    </>
   );
 };
 
