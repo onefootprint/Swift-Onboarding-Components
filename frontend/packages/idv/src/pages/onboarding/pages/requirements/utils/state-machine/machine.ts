@@ -44,7 +44,7 @@ const createOnboardingRequirementsMachine = ({
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'checkRequirements',
+      initial: 'init',
       context: {
         onboardingContext: {
           config,
@@ -65,6 +65,22 @@ const createOnboardingRequirementsMachine = ({
         },
       },
       states: {
+        init: {
+          always: [
+            {
+              target: 'startOnboarding',
+              cond: ctx => !ctx.onboardingContext.isTransfer,
+            },
+            { target: 'checkRequirements' },
+          ],
+        },
+        startOnboarding: {
+          on: {
+            initialized: {
+              target: 'checkRequirements',
+            },
+          },
+        },
         checkRequirements: {
           on: {
             onboardingRequirementsReceived: {

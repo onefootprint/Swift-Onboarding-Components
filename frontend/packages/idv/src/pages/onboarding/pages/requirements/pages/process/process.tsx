@@ -1,7 +1,4 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { AnimatedLoadingSpinner } from '@onefootprint/ui';
-import React from 'react';
-import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import Logger from '../../../../../../utils/logger';
@@ -40,21 +37,8 @@ const Process = ({ onDone }: ProcessProps) => {
     );
   });
 
-  return (
-    <Container>
-      <AnimatedLoadingSpinner animationStart />
-    </Container>
-  );
+  // The parent machine will take care of the loading state
+  return null;
 };
-
-const Container = styled.div`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: var(--loading-container-min-height);
-  justify-content: center;
-  text-align: center;
-`;
 
 export default Process;

@@ -27,12 +27,14 @@ export interface Typegen0 {
     | 'checkRequirements'
     | 'error'
     | 'idDoc'
+    | 'init'
     | 'investorProfile'
     | 'kybData'
     | 'kycData'
     | 'liveness'
     | 'process'
     | 'router'
+    | 'startOnboarding'
     | 'success'
     | 'transfer';
   tags: never;

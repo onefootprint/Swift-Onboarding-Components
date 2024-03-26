@@ -16,6 +16,7 @@ import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-require
 import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
 import Process from '../process';
+import StartOnboarding from '../start-onboarding';
 import getKycBootstrapData from './utils/get-kyc-bootstrap-data';
 
 type RouterProps = {
@@ -73,6 +74,9 @@ const Router = ({ onDone }: RouterProps) => {
     });
   };
 
+  if (state.matches('startOnboarding')) {
+    return <StartOnboarding />;
+  }
   if (state.matches('checkRequirements')) {
     return <CheckRequirements />;
   }

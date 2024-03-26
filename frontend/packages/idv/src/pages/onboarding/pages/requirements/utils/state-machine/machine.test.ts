@@ -106,6 +106,11 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       machine.start();
       let { state } = machine;
+      expect(state.value).toBe('startOnboarding');
+
+      state = machine.send({
+        type: 'initialized',
+      });
       expect(state.value).toBe('checkRequirements');
       const { requirements, startedDataCollection, onboardingContext } =
         state.context;
@@ -150,6 +155,13 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       machine.start();
       let { state } = machine;
+      expect(state.value).toBe('startOnboarding');
+
+      state = machine.send({
+        type: 'initialized',
+      });
+      expect(state.value).toBe('checkRequirements');
+
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: [kycRequirement, livenessRequirement, authorizeRequirement],
@@ -159,7 +171,6 @@ describe('Onboarding Requirements Machine Tests', () => {
         livenessRequirement,
         authorizeRequirement,
       ]);
-
       expect(state.value).toBe('kycData');
 
       state = machine.send({
@@ -222,6 +233,12 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       machine.start();
       let { state } = machine;
+      expect(state.value).toBe('startOnboarding');
+
+      state = machine.send({
+        type: 'initialized',
+      });
+      expect(state.value).toBe('checkRequirements');
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
@@ -251,6 +268,27 @@ describe('Onboarding Requirements Machine Tests', () => {
       ]);
 
       expect(state.value).toBe('liveness');
+    });
+
+    it('Skips initializing onboarding for transfer', () => {
+      const machine = interpret(
+        createMachine({
+          device: {
+            type: 'mobile',
+            hasSupportForWebauthn: true,
+            osName: 'unknown',
+            browser: 'Safari',
+          },
+          isTransfer: true,
+          authToken: 'token',
+          config: NoPhoneOnboardingConfig,
+        }),
+      );
+
+      machine.start();
+      const { state } = machine;
+
+      expect(state.value).toBe('checkRequirements');
     });
   });
 });
