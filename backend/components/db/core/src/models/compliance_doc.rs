@@ -33,3 +33,16 @@ impl<'a> NewComplianceDoc<'a> {
             .get_result(conn.conn())?)
     }
 }
+
+impl ComplianceDoc {
+    pub fn get(
+        conn: &mut TxnPgConn,
+        id: &ComplianceDocId,
+        partnership_id: &TenantCompliancePartnershipId,
+    ) -> DbResult<ComplianceDoc> {
+        Ok(compliance_doc::table
+            .filter(compliance_doc::id.eq(id))
+            .filter(compliance_doc::tenant_compliance_partnership_id.eq(partnership_id))
+            .first(conn.conn())?)
+    }
+}

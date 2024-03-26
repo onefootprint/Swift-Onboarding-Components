@@ -33,3 +33,10 @@ pub struct CreateComplianceDocRequest {
     pub name: String,
     pub description: String,
 }
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ReuploadComplianceDocRequest {
+    pub name: String,
+    pub description: String,
+}

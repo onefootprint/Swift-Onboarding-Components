@@ -90,6 +90,19 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["name"] == "ad-hoc template name"
     assert doc["description"] == "ad-hoc template description"
 
+    # Request re-upload of the ad-hoc document.
+    doc_id = doc["id"]
+    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reupload", {
+        "name": "edited ad-hoc name 2",
+        "description": "edited ad-hoc description 2",
+    }, *partner_tenant.db_auths)
+    # New names are used in the document list and the status is updated.
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
+    assert doc["status"] == "waiting_for_upload"
+    assert doc["name"] == "edited ad-hoc name 2"
+    assert doc["description"] == "edited ad-hoc description 2"
+
     # Requesting a document from the same template yields an error.
     post(f"compliance/partners/{partnership_id}/documents", {
         "template_version_id": template["latest_version"]["id"],

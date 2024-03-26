@@ -667,6 +667,62 @@
                 ]
             }
         },
+        "/compliance/partners/{partnership_id}/documents/{document_id}/reupload": {
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Request reupload of a document.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "document_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReuploadComplianceDocRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/compliance/partners/{partnership_id}/requests/{request_id}": {
             "delete": {
                 "tags": [
@@ -20649,6 +20705,21 @@
                 "required": [
                     "<key>",
                     "<value>"
+                ]
+            },
+            "ReuploadComplianceDocRequest": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "description",
+                    "name"
                 ]
             },
             "RiskSignal": {

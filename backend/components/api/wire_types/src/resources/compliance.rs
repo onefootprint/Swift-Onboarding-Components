@@ -52,3 +52,15 @@ pub struct ComplianceDocTemplateVersion {
     pub name: String,
     pub description: String,
 }
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocRequest {
+    pub id: ComplianceDocRequestId,
+    pub created_at: DateTime<Utc>,
+    pub name: String,
+    pub description: String,
+    pub requested_by_partner_tenant_user: LiteOrgMember,
+    pub assigned_to_tenant_user: Option<LiteOrgMember>,
+    pub compliance_doc_id: ComplianceDocId,
+}
