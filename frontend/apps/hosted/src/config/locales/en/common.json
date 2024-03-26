@@ -65,9 +65,8 @@
       "subtitle": "Please contact the business that sent you this link."
     },
     "complete": {
-      "title": "Submission completed!",
-      "subtitle-with-kyb": "Thanks for using Footprint to verify your business and your identity.",
-      "subtitle": "Thanks for using Footprint to verify your identity."
+      "title": "Your submission is complete!",
+      "subtitle": "Thanks for using Footprint."
     },
     "expired": {
       "title": "Session expired",

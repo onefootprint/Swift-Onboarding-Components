@@ -3,14 +3,10 @@ import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHostedMachine } from 'src/components/hosted-machine-provider';
 import styled from 'styled-components';
 
 const Complete = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.complete' });
-  const [state] = useHostedMachine();
-  const { onboardingConfig } = state.context;
-  const isKyb = onboardingConfig?.isKyb;
 
   return (
     <Container>
@@ -20,7 +16,7 @@ const Complete = () => {
       <HeaderTitle
         sx={{ display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3 }}
         title={t('title')}
-        subtitle={isKyb ? t('subtitle-with-kyb') : t('subtitle')}
+        subtitle={t('subtitle')}
       />
       <Box />
     </Container>

@@ -65,8 +65,7 @@
       "subtitle": "Por favor, contacta a la empresa que te lo envió e inténtalo de nuevo."
     },
     "complete": {
-      "title": "¡Verificación finalizada!",
-      "subtitle-with-kyb": "Gracias por usar Footprint.",
+      "title": "¡Tu envío está completo!",
       "subtitle": "Gracias por usar Footprint."
     },
     "expired": {

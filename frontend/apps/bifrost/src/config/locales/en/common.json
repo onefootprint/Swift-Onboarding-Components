@@ -5,9 +5,8 @@
       "invalid-config-description": "It seems like the Verify with Footprint integration is using an invalid or expired integration key. Please contact the owner of this product."
     },
     "complete": {
-      "title": "Submission completed!",
-      "subtitle-with-kyb": "Thanks for using Footprint to verify your business and your identity.",
-      "subtitle": "Thanks for using Footprint to verify your identity.",
+      "title": "Your submission is complete!",
+      "subtitle": "Thanks for using Footprint.",
       "cta": {
         "browser": "Return to site",
         "webview": "Continue on the app"

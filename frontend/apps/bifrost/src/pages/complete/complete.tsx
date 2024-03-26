@@ -21,8 +21,7 @@ const Complete = () => {
   const fpProvider = useFootprintProvider();
   const [state] = useBifrostMachine();
   const isWebview = !checkIsIframe() && checkIsMobile();
-  const { config, idvCompletePayload } = state.context;
-  const isKyb = config?.isKyb;
+  const { idvCompletePayload } = state.context;
 
   const handleComplete = (delay?: number) => {
     Logger.info(
@@ -50,7 +49,7 @@ const Complete = () => {
       <HeaderTitle
         sx={{ display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3 }}
         title={t('title')}
-        subtitle={isKyb ? t('subtitle-with-kyb') : t('subtitle')}
+        subtitle={t('subtitle')}
       />
       <Box />
       <Box marginTop={7}>
