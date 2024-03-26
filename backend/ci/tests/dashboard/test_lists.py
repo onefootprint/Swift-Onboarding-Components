@@ -77,6 +77,12 @@ def test_list(sandbox_tenant):
     assert lists[1]["name"] == f"My Super List 2 {nonce}"
     assert lists[2]["name"] == f"My Super List 1 {nonce}"
 
+    list = get(f"/org/lists/{lists[0]['id']}", None, *sandbox_tenant.db_auths)
+    assert list["name"] == f"My Super List 3 {nonce}"
+
+    list = get(f"/org/lists/{lists[1]['id']}", None, *sandbox_tenant.db_auths)
+    assert list["name"] == f"My Super List 2 {nonce}"
+
 
 def test_delete_list(sandbox_tenant):
     nonce = _gen_random_str(5)
