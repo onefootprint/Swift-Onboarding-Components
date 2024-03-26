@@ -10,12 +10,13 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { NavigationHeader } from '../../../../components';
 import { useSkipLiveness } from '../../../../hooks';
+import checkIsIframe from '../../../../utils/check-is-in-iframe';
 import Logger from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 
 const Unavailable = () => {
   const [state, send] = useLivenessMachine();
-  const { authToken } = state.context;
+  const { authToken, device } = state.context;
   const skipLivenessMutation = useSkipLiveness();
 
   useEffectOnce(() => {
@@ -23,8 +24,17 @@ const Unavailable = () => {
       return;
     }
 
+    let reason;
+    if (checkIsIframe()) {
+      reason = SkipLivenessReason.unavailableInIframe;
+    } else if (!device?.hasSupportForWebauthn) {
+      reason = SkipLivenessReason.unavailableOnDevice;
+    } else {
+      reason = SkipLivenessReason.unknown;
+    }
+
     const context = {
-      reason: SkipLivenessReason.unavailable,
+      reason,
       clientType: SkipLivenessClientType.web,
       numAttempts: 0,
       attempts: [],

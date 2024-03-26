@@ -16,8 +16,10 @@ export type PasskeyAttemptContext = {
 };
 
 export enum SkipLivenessReason {
-  unavailable = 'unavailable',
+  unavailableInIframe = 'unavailable_in_iframe',
+  unavailableOnDevice = 'unavailable_on_device',
   failed = 'failed',
+  unknown = 'unknown',
 }
 
 export enum SkipLivenessClientType {
