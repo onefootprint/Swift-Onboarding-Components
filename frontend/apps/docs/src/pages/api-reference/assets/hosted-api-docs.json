@@ -5761,8 +5761,8 @@
                             "client_type": {
                                 "type": "string",
                                 "enum": [
-                                    "Web",
-                                    "Mobile"
+                                    "web",
+                                    "mobile"
                                 ]
                             },
                             "num_attempts": {
@@ -5770,11 +5770,7 @@
                                 "format": "int64"
                             },
                             "reason": {
-                                "type": "string",
-                                "enum": [
-                                    "Unavailable",
-                                    "Failed"
-                                ]
+                                "type": "string"
                             }
                         },
                         "required": [

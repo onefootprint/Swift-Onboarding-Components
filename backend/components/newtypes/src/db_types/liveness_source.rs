@@ -59,18 +59,9 @@ pub enum LivenessIssuer {
     Footprint,
 }
 
-
 #[derive(Display, Clone, EnumString, Debug, SerializeDisplay, DeserializeFromStr, Apiv2Schema, SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
-#[serde(serialize_all = "snake_case")]
-pub enum SkipLivenessReason {
-    Unavailable,
-    Failed,
-}
-
-#[derive(Display, Clone, EnumString, Debug, SerializeDisplay, DeserializeFromStr, Apiv2Schema, SerdeAttr)]
-#[strum(serialize_all = "snake_case")]
-#[serde(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum SkipLivenessClientType {
     Web,
     Mobile,
@@ -78,7 +69,7 @@ pub enum SkipLivenessClientType {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema, AsJsonb)]
 pub struct SkipLivenessContext {
-    pub reason: SkipLivenessReason,
+    pub reason: String,
     pub client_type: SkipLivenessClientType,
     pub num_attempts: i64,
     pub attempts: Vec<RegisterPasskeyAttemptContext>,

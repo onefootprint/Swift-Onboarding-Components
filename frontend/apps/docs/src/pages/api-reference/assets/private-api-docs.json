@@ -7261,7 +7261,6 @@
                         },
                         "required": [
                             "created_at",
-                            "created_by_partner_tenant_user",
                             "description",
                             "id",
                             "name",
