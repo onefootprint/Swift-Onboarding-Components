@@ -24,6 +24,7 @@ pub async fn delete(
     let pt_id = pt.id.clone();
 
     let (partnership_id, request_id) = args.into_inner();
+    let deactivated_by_user_id = auth.actor().tenant_user_id()?.clone();
 
     state
         .db_pool
@@ -42,7 +43,7 @@ pub async fn delete(
                 )));
             }
 
-            ComplianceDocRequest::deactivate(conn, req)?;
+            ComplianceDocRequest::deactivate(conn, req, &deactivated_by_user_id)?;
             Ok(())
         })
         .await?;

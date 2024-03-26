@@ -24,6 +24,8 @@ pub struct ComplianceDocRequest {
     pub assigned_to_tenant_user_id: Option<TenantUserId>,
 
     pub compliance_doc_id: ComplianceDocId,
+
+    pub deactivated_by_partner_tenant_user_id: Option<TenantUserId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -77,11 +79,18 @@ impl ComplianceDocRequest {
         Ok(Locked::new(req))
     }
 
-    pub fn deactivate(conn: &mut TxnPgConn, req: Locked<ComplianceDocRequest>) -> DbResult<()> {
+    pub fn deactivate(
+        conn: &mut TxnPgConn,
+        req: Locked<ComplianceDocRequest>,
+        deactivated_by: &TenantUserId,
+    ) -> DbResult<()> {
         diesel::update(compliance_doc_request::table)
             .filter(compliance_doc_request::id.eq(&req.id))
             .filter(compliance_doc_request::deactivated_at.is_null())
-            .set(compliance_doc_request::deactivated_at.eq(Some(Utc::now())))
+            .set((
+                compliance_doc_request::deactivated_at.eq(Some(Utc::now())),
+                compliance_doc_request::deactivated_by_partner_tenant_user_id.eq(Some(deactivated_by)),
+            ))
             .execute(conn.conn())?;
 
         Ok(())
