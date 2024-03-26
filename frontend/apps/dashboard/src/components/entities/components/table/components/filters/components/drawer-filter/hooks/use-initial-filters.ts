@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import useFilters from '../../../../../../../hooks/use-filters';
-import type { Filters } from '../drawer-filter.type';
+import type { Filters, FormData } from '../drawer-filter.type';
 import { FiltersDateRange } from '../drawer-filter.type';
 
 const useInitialFilters = (now = new Date()) => {
@@ -13,21 +13,32 @@ const useInitialFilters = (now = new Date()) => {
     now.getDate() + 7,
   );
 
-  const initialValues = {
+  const initialValues: FormData = {
     labels: [],
     others: [],
     period: 'all-time',
     customDate: { from: today, to: nextWeek },
+    playbooks: {},
   };
 
   const defaultValues = useMemo(() => {
     const defaultData: Filters = {
       labels: [],
       others: [],
+      playbooks: {},
       ...getFormDefaultValue(values.dateRange, { from: today, to: nextWeek }),
     };
     if (requestParams.labels) {
       defaultData.labels = values.labels;
+    }
+    if (requestParams.playbook_ids) {
+      defaultData.playbooks = requestParams.playbook_ids.reduce(
+        (acc, id) => {
+          acc[id] = true;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
     }
     if (defaultData.others) {
       if (requestParams.watchlist_hit) {
@@ -41,7 +52,7 @@ const useInitialFilters = (now = new Date()) => {
       }
     }
     return defaultData;
-  }, []);
+  }, [values]);
 
   return { initialValues, defaultValues };
 };

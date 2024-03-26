@@ -23,6 +23,7 @@ export type EntitiesQueryParams = {
   has_outstanding_workflow_request?: string;
   show_unverified?: string;
   labels?: string[];
+  playbook_ids?: string[];
 };
 
 const defaultQueryParams: EntitiesQueryParams = {
@@ -37,6 +38,7 @@ const defaultQueryParams: EntitiesQueryParams = {
   has_outstanding_workflow_request: undefined,
   show_unverified: undefined,
   labels: undefined,
+  playbook_ids: undefined,
 };
 
 const useFilters = () => {
@@ -96,6 +98,9 @@ const useFilters = () => {
         filters.query.has_outstanding_workflow_request,
       ),
       show_unverified: queryToBoolean(filters.query.show_unverified),
+      playbook_ids: filters.query.playbook_ids
+        ? queryToArray(filters.query.playbook_ids)
+        : undefined,
     }),
     [filters.query],
   );
@@ -114,6 +119,7 @@ const useFilters = () => {
     has_outstanding_workflow_request: values.has_outstanding_workflow_request,
     show_unverified: values.show_unverified,
     show_all: values.show_unverified,
+    playbook_ids: values.playbook_ids,
     ...getStatusAndManualReviewParams(values.state, values.verification),
   };
   const searchParams = getSearchParams({
@@ -128,6 +134,7 @@ const useFilters = () => {
     has_outstanding_workflow_request:
       filters.query.has_outstanding_workflow_request,
     show_unverified: filters.query.show_unverified,
+    playbook_ids: filters.query.playbook_ids,
   });
 
   const filtersCount = useMemo(() => {
@@ -149,6 +156,9 @@ const useFilters = () => {
       if (!isDefault) {
         count += 1;
       }
+    }
+    if (values.playbook_ids?.length) {
+      count += values.playbook_ids.length;
     }
     return count;
   }, [values]);

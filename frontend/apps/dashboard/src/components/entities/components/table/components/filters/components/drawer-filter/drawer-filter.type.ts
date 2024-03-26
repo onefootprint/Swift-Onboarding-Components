@@ -1,6 +1,7 @@
 export type Filters = {
   labels?: string[];
   others?: string[];
+  playbooks: Record<string, boolean>;
 };
 
 export enum FiltersDateRange {
@@ -16,4 +17,5 @@ export type FormData = {
   others?: string[];
   period: string;
   customDate: { from: Date; to: Date };
+  playbooks: Record<string, boolean>;
 };

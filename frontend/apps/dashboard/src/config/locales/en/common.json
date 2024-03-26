@@ -887,6 +887,12 @@
               "other": "Offboard (Other)"
             }
           },
+          "playbooks": {
+            "label": "Playbooks",
+            "show-more": "Show more",
+            "show-less": "Show less",
+            "error": "There was an error loading the playbooks filter, please refresh the page."
+          },
           "created": {
             "label": "Created"
           },

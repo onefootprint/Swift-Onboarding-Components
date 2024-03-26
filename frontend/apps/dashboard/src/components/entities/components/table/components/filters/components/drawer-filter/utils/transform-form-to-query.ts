@@ -6,6 +6,7 @@ const transformFormDataToQuery = ({
   others,
   period,
   customDate,
+  playbooks,
 }: FormData) => {
   const getPeriod = () => {
     if (period === FiltersDateRange.Custom) {
@@ -21,12 +22,15 @@ const transformFormDataToQuery = ({
     return others.includes(key).toString();
   };
 
+  const playbookIds = Object.keys(playbooks).filter(key => playbooks[key]);
+
   return {
     labels,
     date_range: getPeriod(),
     watchlist_hit: has('watchlist_hit'),
     has_outstanding_workflow_request: has('has_outstanding_workflow_request'),
     show_unverified: has('show_unverified'),
+    playbook_ids: playbookIds,
   };
 };
 
