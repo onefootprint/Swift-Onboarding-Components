@@ -39,6 +39,7 @@ pub enum WrappedVendorAPI {
     AwsRekognition,
     AwsTextract,
     LexisFlexId,
+    NeuroIdAnalytics,
 }
 impl From<VendorAPI> for WrappedVendorAPI {
     fn from(value: VendorAPI) -> Self {
@@ -72,6 +73,7 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::LexisFlexId => Self::LexisFlexId,
             VendorAPI::IncodeCurpValidation => Self::IncodeCurpValidation,
             VendorAPI::IncodeIneData => Self::IncodeIneData,
+            VendorAPI::NeuroIdAnalytics => Self::NeuroIdAnalytics,
         }
     }
 }
@@ -108,6 +110,7 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::LexisFlexId => VendorAPI::LexisFlexId,
             WrappedVendorAPI::IncodeCurpValidation => VendorAPI::IncodeCurpValidation,
             WrappedVendorAPI::IncodeIneData => VendorAPI::IncodeIneData,
+            WrappedVendorAPI::NeuroIdAnalytics => VendorAPI::NeuroIdAnalytics,
         }
     }
 }

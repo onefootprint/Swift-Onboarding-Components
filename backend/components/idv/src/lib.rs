@@ -72,6 +72,7 @@ pub enum ParsedResponse {
     LexisFlexId(FlexIdResponse),
     IncodeCurpValidation(CurpValidationResponse),
     IncodeIneData(PiiJsonValue),
+    NeuroIdAnalytics(PiiJsonValue),
 }
 
 impl ParsedResponse {
@@ -305,6 +306,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::LexisFlexId(_) => VendorAPI::LexisFlexId,
             ParsedResponse::IncodeCurpValidation(_) => VendorAPI::IncodeCurpValidation,
             ParsedResponse::IncodeIneData(_) => VendorAPI::IncodeIneData,
+            ParsedResponse::NeuroIdAnalytics(_) => VendorAPI::NeuroIdAnalytics,
         }
     }
 }

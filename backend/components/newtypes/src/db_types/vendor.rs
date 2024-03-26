@@ -38,6 +38,7 @@ pub enum Vendor {
     Middesk,
     Incode,
     Stytch,
+    NeuroId,
 }
 
 impl_enum_str_diesel!(Vendor);
@@ -92,6 +93,7 @@ pub enum VendorAPI {
     AwsRekognition,
     AwsTextract,
     LexisFlexId,
+    NeuroIdAnalytics,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -127,6 +129,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::AwsRekognition => Self::Footprint,
             VendorAPI::AwsTextract => Self::Footprint,
             VendorAPI::LexisFlexId => Self::Lexis,
+            VendorAPI::NeuroIdAnalytics => Self::NeuroId,
         }
     }
 }
@@ -169,6 +172,7 @@ impl VendorAPI {
             | VendorAPI::AwsTextract
             | VendorAPI::LexisFlexId
             | VendorAPI::IncodeCurpValidation
+            | VendorAPI::NeuroIdAnalytics
             | VendorAPI::IncodeIneData => false,
         }
     }

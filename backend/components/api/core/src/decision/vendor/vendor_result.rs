@@ -227,6 +227,7 @@ fn deserialize_from_vendor_api(
         VendorAPI::LexisFlexId => ParsedResponse::from_lexis_flex_id(raw_response)?,
         VendorAPI::IncodeCurpValidation => ParsedResponse::from_incode_curp_validation(raw_response)?,
         VendorAPI::IncodeIneData => ParsedResponse::IncodeIneData(raw_response.into()),
+        VendorAPI::NeuroIdAnalytics => ParsedResponse::NeuroIdAnalytics(raw_response.into()),
     };
 
     Ok(res)

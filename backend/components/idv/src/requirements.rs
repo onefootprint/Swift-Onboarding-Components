@@ -113,6 +113,7 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::LexisFlexId => lexis_flex_id_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::IncodeCurpValidation => false,
         VendorAPI::IncodeIneData => false,
+        VendorAPI::NeuroIdAnalytics => false,
     }
 }
 
@@ -127,35 +128,36 @@ pub fn available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -
 /// Is the API one we want to call for our onboarding KYC verificaiton
 fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
     match vendor_api {
-        VendorAPI::IdologyExpectId => true,
-        VendorAPI::IdologyPa => false,
-        VendorAPI::TwilioLookupV2 => true,
-        VendorAPI::SocureIdPlus => true,
-        VendorAPI::ExperianPreciseId => true,
-        VendorAPI::MiddeskCreateBusiness => false,
-        VendorAPI::MiddeskBusinessUpdateWebhook => false,
-        VendorAPI::MiddeskTinRetriedWebhook => false,
-        VendorAPI::MiddeskGetBusiness => false,
-        VendorAPI::IncodeStartOnboarding => false,
-        VendorAPI::IncodeAddFront => false,
-        VendorAPI::IncodeAddBack => false,
-        VendorAPI::IncodeProcessId => false,
-        VendorAPI::IncodeFetchScores => false,
-        VendorAPI::IncodeAddPrivacyConsent => false,
-        VendorAPI::IncodeAddMlConsent => false,
-        VendorAPI::IncodeFetchOcr => false,
-        VendorAPI::IncodeAddSelfie => false,
-        VendorAPI::IncodeWatchlistCheck => false,
-        VendorAPI::IncodeUpdatedWatchlistResult => false,
-        VendorAPI::IncodeGetOnboardingStatus => false,
-        VendorAPI::IncodeProcessFace => false,
-        VendorAPI::StytchLookup => false,
-        VendorAPI::FootprintDeviceAttestation => false,
-        VendorAPI::AwsRekognition => false,
-        VendorAPI::AwsTextract => false,
-        VendorAPI::LexisFlexId => true,
-        VendorAPI::IncodeCurpValidation => false,
-        VendorAPI::IncodeIneData => false,
+        VendorAPI::TwilioLookupV2
+        | VendorAPI::SocureIdPlus
+        | VendorAPI::ExperianPreciseId
+        | VendorAPI::IdologyExpectId
+        | VendorAPI::LexisFlexId => true,
+        VendorAPI::MiddeskCreateBusiness
+        | VendorAPI::MiddeskBusinessUpdateWebhook
+        | VendorAPI::MiddeskTinRetriedWebhook
+        | VendorAPI::MiddeskGetBusiness
+        | VendorAPI::IncodeStartOnboarding
+        | VendorAPI::IncodeAddFront
+        | VendorAPI::IncodeAddBack
+        | VendorAPI::IncodeProcessId
+        | VendorAPI::IncodeFetchScores
+        | VendorAPI::IncodeAddPrivacyConsent
+        | VendorAPI::IncodeAddMlConsent
+        | VendorAPI::IncodeFetchOcr
+        | VendorAPI::IncodeAddSelfie
+        | VendorAPI::IncodeWatchlistCheck
+        | VendorAPI::IncodeUpdatedWatchlistResult
+        | VendorAPI::IncodeGetOnboardingStatus
+        | VendorAPI::IncodeProcessFace
+        | VendorAPI::StytchLookup
+        | VendorAPI::FootprintDeviceAttestation
+        | VendorAPI::AwsRekognition
+        | VendorAPI::AwsTextract
+        | VendorAPI::IncodeCurpValidation
+        | VendorAPI::IncodeIneData
+        | VendorAPI::NeuroIdAnalytics
+        | VendorAPI::IdologyPa => false,
     }
 }
 
