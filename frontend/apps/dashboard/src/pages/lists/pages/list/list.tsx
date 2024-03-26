@@ -10,7 +10,7 @@ import CreateDialog from './components/create-dialog';
 import Table from './components/table';
 import useLists from './hooks/use-lists';
 
-const Lists = () => {
+const List = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.lists' });
   const [dialogOpen, setDialogOpen] = useState(false);
   const { data: response, errorMessage, isLoading } = useLists();
@@ -92,4 +92,4 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-export default Lists;
+export default List;

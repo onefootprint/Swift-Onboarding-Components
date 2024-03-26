@@ -1,7 +1,9 @@
 import type { List } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import useSession from 'src/hooks/use-session';
 
 import useFilters from '../../hooks/use-filters';
 import Row from './components/row';
@@ -14,6 +16,8 @@ type TableProps = {
 
 const Table = ({ data, isLoading, errorMessage }: TableProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.lists' });
+  const session = useSession();
+  const router = useRouter();
   const filters = useFilters();
   const columns = [
     { id: 'name', text: t('table.header.name'), width: '20%' },
@@ -28,7 +32,11 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
   ];
 
   const handleRowClick = (list: List) => {
-    filters.push({ id: list.id });
+    const mode = session.isLive ? 'live' : 'sandbox';
+    router.push({
+      pathname: `/lists/${list.id}`,
+      query: { ...filters.query, mode },
+    });
   };
 
   return (

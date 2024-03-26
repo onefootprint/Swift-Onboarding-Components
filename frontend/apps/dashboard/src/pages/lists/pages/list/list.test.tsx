@@ -6,12 +6,12 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Lists from './lists';
-import { withLists, withListsError } from './lists.test.config';
+import List from './list';
+import { withLists, withListsError } from './list.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<Lists />', () => {
+describe('<List />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/lists',
@@ -19,10 +19,10 @@ describe('<Lists />', () => {
     });
   });
 
-  const renderLists = () => customRender(<Lists />);
+  const renderList = () => customRender(<List />);
 
-  const renderListsAndWait = async () => {
-    renderLists();
+  const renderListAndWait = async () => {
+    renderList();
 
     await waitFor(() => {
       const table = screen.getByRole('table');
@@ -46,7 +46,7 @@ describe('<Lists />', () => {
         alias: 'my_list2',
       },
     ])(`should render the name and alias`, async ({ name, alias }) => {
-      await renderListsAndWait();
+      await renderListAndWait();
 
       const rowName = screen.getByText(name);
       expect(rowName).toBeInTheDocument();
@@ -62,7 +62,7 @@ describe('<Lists />', () => {
     });
 
     it('should show an error message', async () => {
-      renderLists();
+      renderList();
 
       await waitFor(() => {
         const feedback = screen.getByText('Something went wrong');
