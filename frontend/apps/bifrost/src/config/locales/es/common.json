@@ -5,7 +5,7 @@
       "invalid-config-description": "Parece que la integración con Footprint está utilizando una clave inválida o caducada. Por favor, contacta al propietario y asegúrate de que la clave usada sea la correcta."
     },
     "complete": {
-      "title": "¡Tu envío está completo!",
+      "title": "¡Enviado con éxito!",
       "subtitle": "Gracias por usar Footprint.",
       "cta": {
         "browser": "Volver al sitio",
