@@ -72,13 +72,11 @@ impl ObConfiguration {
                 CipKind::Alpaca => {
                     // In the general case, we need to accept a document that might have address
                     let alpaca_doc_types = vec![IdDocKind::DriversLicense, IdDocKind::IdCard];
-                    let residential_country_is_pr = residential_country
-                        .as_ref()
-                        .map(|c| *c == Iso3166TwoDigitCountryCode::PR)
-                        .unwrap_or(false);
+                    // Alpaca supports territories: https://www.notion.so/onefootprint/Alpaca-US-Territory-31c04ec7d2b64cc5ad9cbbde0c026af2?pvs=4
+                    // Allow docs from 1) the US or 2) from the territory the person said they were living in
                     let alpaca_allowed_countries: Vec<Iso3166TwoDigitCountryCode> = vec![
                         Some(Iso3166TwoDigitCountryCode::US),
-                        residential_country_is_pr.then_some(Iso3166TwoDigitCountryCode::PR),
+                        residential_country.and_then(|c| c.is_us_territory().then_some(c)),
                     ]
                     .into_iter()
                     .flatten()
@@ -1105,6 +1103,7 @@ mod tests {
     #[test_case(None, Some(Iso3166TwoDigitCountryCode::US))]
     #[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::US))]
     #[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::PR))]
+    #[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::GU))]
     #[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::CA))]
     fn test_cip_kind_documents(
         cip: Option<CipKind>,
@@ -1147,14 +1146,14 @@ mod tests {
         if let Some(c) = cip {
             match c {
                 CipKind::Alpaca => match residential_country {
-                    Some(Iso3166TwoDigitCountryCode::PR) => {
+                    Some(country) if country.is_us_territory() => {
                         assert!(mapping.keys().len() == 2);
                         assert_eq!(
                             mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
                             vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
                         );
                         assert_eq!(
-                            mapping.get(&Iso3166TwoDigitCountryCode::PR).unwrap().clone(),
+                            mapping.get(&country).unwrap().clone(),
                             vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
                         );
                     }

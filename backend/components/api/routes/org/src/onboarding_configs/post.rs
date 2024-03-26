@@ -507,7 +507,7 @@ pub async fn post(
         international_country_restrictions,
         skip_kyc,
         doc_scan_for_optional_ssn,
-        enhanced_aml: _,
+        enhanced_aml: _, // validated/set elsewhere
         allow_us_residents,
         allow_us_territories,
         kind,
