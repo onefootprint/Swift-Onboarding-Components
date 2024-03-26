@@ -302,7 +302,8 @@
               "invalid": "Date of birth cannot be empty or is invalid",
               "future-date": "Date of birth cannot be in the future",
               "too-young": "Must be at least 18 years old",
-              "too-old": "Date of birth cannot be before than 1900"
+              "too-old": "Date of birth cannot be before than 1900",
+              "incorrect-format": "Date of birth must be formatted {{format}}"
             }
           },
           "nationality": {

@@ -302,7 +302,8 @@
               "invalid": "La fecha de nacimiento no puede quedar vacía o ser inválida",
               "future-date": "La fecha de nacimiento no puede estar en el futuro",
               "too-young": "Debe tener al menos 18 años de edad",
-              "too-old": "La fecha de nacimiento no puede ser anterior a 1900"
+              "too-old": "La fecha de nacimiento no puede ser anterior a 1900",
+              "incorrect-format": "La fecha de nacimiento debe tener el formato {{format}}"
             }
           },
           "nationality": {

@@ -1,6 +1,6 @@
 import type { SupportedLocale } from '@onefootprint/types';
 
-type Mask = {
+export type Mask = {
   dob: {
     date: boolean;
     datePattern: ['m', 'd', 'Y'] | ['d', 'm', 'Y'];

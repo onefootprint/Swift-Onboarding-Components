@@ -1,4 +1,5 @@
 import { useInputMask } from '@onefootprint/hooks';
+import type { Mask } from '@onefootprint/hooks/src/use-input-mask';
 import { TextInput } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import React from 'react';
@@ -20,12 +21,16 @@ const getErrorMessage = (
   t: T,
   getValues: UseFormGetValues<FieldValues>,
   errors: FieldErrors<FieldValues>,
+  masks: Mask,
 ) => {
   const errorByValidationError: Record<DobValidationError, string> = {
     [DobValidationError.INVALID]: t('error.invalid'),
     [DobValidationError.FUTURE_DATE]: t('error.future-date'),
     [DobValidationError.TOO_YOUNG]: t('error.too-young'),
     [DobValidationError.TOO_OLD]: t('error.too-old'),
+    [DobValidationError.INCORRECT_FORMAT]: t('error.incorrect-format', {
+      format: masks.dob.placeholder,
+    }),
   };
   if (!errors.dob) {
     return undefined;
@@ -34,7 +39,7 @@ const getErrorMessage = (
   if (message && typeof message === 'string') {
     return message;
   }
-  const validationError = validateDob(getValues('dob'));
+  const validationError = validateDob(getValues('dob'), masks);
   return errorByValidationError[validationError ?? DobValidationError.INVALID];
 };
 
@@ -55,7 +60,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
       data-private
       disabled={disabled}
       hasError={!!errors.dob}
-      hint={getErrorMessage(t, getValues, errors)}
+      hint={getErrorMessage(t, getValues, errors, inputMasks)}
       label={t('label')}
       inputMode="numeric"
       mask={inputMasks.dob}
@@ -63,7 +68,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
       value={getValues('dob')}
       {...register('dob', {
         required: true,
-        validate: (value: string) => !validateDob(value),
+        validate: (value: string) => !validateDob(value, inputMasks),
       })}
     />
   );
