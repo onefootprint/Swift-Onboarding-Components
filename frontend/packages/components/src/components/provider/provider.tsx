@@ -49,7 +49,7 @@ export type ProviderProps = {
   userData?: UserData;
 };
 
-const FootprintProvider = ({
+const Provider = ({
   authToken,
   children,
   onCancel,
@@ -87,5 +87,5 @@ const FootprintProvider = ({
   );
 };
 
-export default FootprintProvider;
+export default Provider;
 export { Context };

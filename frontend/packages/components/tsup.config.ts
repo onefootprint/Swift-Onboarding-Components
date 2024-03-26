@@ -19,5 +19,20 @@ export default defineConfig(options => {
         ? 'https://handoff.preview.onefootprint.com'
         : 'https://handoff.onefootprint.com',
     },
+    outExtension({ format }) {
+      if (format === 'cjs') {
+        return {
+          js: '.cjs',
+        };
+      }
+      if (format === 'iife') {
+        return {
+          js: '.umd.js',
+        };
+      }
+      return {
+        js: '.js',
+      };
+    },
   };
 });
