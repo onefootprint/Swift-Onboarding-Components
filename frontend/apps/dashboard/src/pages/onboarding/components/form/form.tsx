@@ -52,7 +52,7 @@ const Form = ({ onComplete }: FormProps) => {
         <Stepper
           options={options}
           onChange={handleChange}
-          value={step}
+          value={{ option: step }}
           aria-label={t('stepper.aria-label')}
         />
       </StepperContainer>

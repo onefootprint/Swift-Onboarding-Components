@@ -17,7 +17,7 @@ const renderStepper = (props: Partial<StepperProps> = {}) => {
     <Stepper
       aria-label={props['aria-label'] || 'stepper'}
       options={props.options || defaultOptions}
-      value={props.value || defaultOptions[0]}
+      value={props.value || { option: defaultOptions[0] }}
       onChange={props.onChange}
     />,
   );
@@ -26,7 +26,7 @@ const renderStepper = (props: Partial<StepperProps> = {}) => {
 describe('<Stepper />', () => {
   it('should highlight the selected option', () => {
     renderStepper({
-      value: { label: 'Step 2', value: 'step2' },
+      value: { option: { label: 'Step 2', value: 'step2' } },
     });
     const selectedOption = screen.getByText('Step 2').closest('li');
     expect(selectedOption).toHaveAttribute('data-selected', 'true');
@@ -34,7 +34,7 @@ describe('<Stepper />', () => {
 
   it('should display completed options', () => {
     renderStepper({
-      value: { label: 'Step 3', value: 'step3' },
+      value: { option: { label: 'Step 3', value: 'step3' } },
     });
     const completedOption = screen.getByText('Step 1').closest('li');
     expect(completedOption).toHaveAttribute('data-completed', 'true');
@@ -42,7 +42,7 @@ describe('<Stepper />', () => {
 
   it('should display next options', () => {
     renderStepper({
-      value: { label: 'Step 2', value: 'step2' },
+      value: { option: { label: 'Step 2', value: 'step2' } },
     });
     const nextOption = screen.getByText('Step 3').closest('li');
     expect(nextOption).toHaveAttribute('data-next', 'true');

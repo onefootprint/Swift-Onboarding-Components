@@ -132,7 +132,7 @@ const Router = ({ onCreate }: RouterProps) => {
               send('summarySelected');
             }
           }}
-          value={stepperValue}
+          value={{ option: stepperValue }}
           aria-label={t('stepper.aria-label')}
         />
       </StepperContainer>

@@ -38,14 +38,19 @@ const Template: Story<StepperProps> = ({
 }: StepperProps) => {
   const [options, setOptions] = useState(defaultOptions);
   const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
   const value = options[index];
+  const subValue = value.options?.[subIndex];
 
   return (
     <Box>
       <Stepper
         aria-label={ariaLabel}
         options={options}
-        value={value}
+        value={{
+          option: value,
+          subOption: subValue,
+        }}
         onChange={newValue => {
           const nextIndex = options.findIndex(
             option => option.value === newValue.value,
@@ -75,22 +80,16 @@ const Template: Story<StepperProps> = ({
         </Button>
         <Button
           onClick={() => {
-            const nextIndex = index + 1;
-            if (nextIndex >= options.length) return;
-            const [first] = options;
-
-            if (nextIndex === 1 && !first.options) {
-              setOptions([
-                {
-                  label: 'Who to onboard',
-                  value: 'who-to-onboard',
-                  options: [{ label: 'Residency', value: 'residency' }],
-                },
-                { label: 'Your Playbook', value: 'your-playbook' },
-                { label: 'Name your Playbook', value: 'name-your-playbook' },
-              ]);
-              return;
+            let nextIndex = index + 1;
+            const subOptions = options[index].options;
+            const numSubOptions = subOptions?.length ?? 0;
+            if (subIndex + 1 < numSubOptions) {
+              setSubIndex(subIndex + 1);
+              nextIndex = index;
+            } else {
+              setSubIndex(0);
             }
+            if (nextIndex >= options.length) return;
             setIndex(nextIndex);
             onChange?.(options[nextIndex]);
           }}
@@ -108,6 +107,32 @@ Base.args = {
   options: [
     { label: 'Who to onboard', value: 'who-to-onboard' },
     { label: 'Your Playbook', value: 'your-playbook' },
+    { label: 'Name your Playbook', value: 'name-your-playbook' },
+  ],
+  value: undefined,
+  onChange: console.log,
+};
+
+export const WithSubOptions = Template.bind({});
+WithSubOptions.args = {
+  'aria-label': 'Select',
+  options: [
+    {
+      label: 'Who to onboard',
+      value: 'who-to-onboard',
+      options: [
+        { label: 'Option 1', value: 'value 1' },
+        { label: 'Option 2', value: 'value 2' },
+      ],
+    },
+    {
+      label: 'Your Playbook',
+      value: 'your-playbook',
+      options: [
+        { label: 'Option 1', value: 'value 1' },
+        { label: 'Option 2', value: 'value 2' },
+      ],
+    },
     { label: 'Name your Playbook', value: 'name-your-playbook' },
   ],
   value: undefined,

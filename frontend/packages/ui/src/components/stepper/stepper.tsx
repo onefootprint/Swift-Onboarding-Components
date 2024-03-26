@@ -17,17 +17,21 @@ export type StepperProps = {
   'aria-label': string;
   onChange?: (option: StepperOption) => void;
   options: StepperOption[];
-  value: StepperOption;
+  value: { option: StepperOption; subOption?: StepperOption };
 };
 
 const Stepper = ({
   'aria-label': ariaLabel,
   onChange,
   options,
-  value: selectedOption,
+  value: selected,
 }: StepperProps) => {
+  const { option: selectedOption, subOption: selectedSubOption } = selected;
   const valueIndex = options.findIndex(
     option => option.value === selectedOption.value,
+  );
+  const subValueIndex = selectedOption.options?.findIndex(
+    option => option.value === selectedSubOption?.value,
   );
 
   const handleClick = (option: StepperOption) => () => {
@@ -79,31 +83,43 @@ const Stepper = ({
                 />
               )}
               {showSubOptions && (
-                <>
-                  <ul>
-                    {subOptions.map(suboption => (
-                      <SubItem key={suboption.value}>
-                        <IconContainer>
-                          <SmallDot />
-                        </IconContainer>
-                        <button
-                          type="button"
-                          onClick={handleClick(option)}
-                          disabled={isNext}
+                <ul>
+                  {subOptions.map((suboption, subIndex) => {
+                    const isSubOptionSelected =
+                      selectedSubOption?.value === suboption.value;
+                    const isSubOptionCompleted =
+                      (subValueIndex ?? 0) > subIndex;
+                    const isSubOptionNext = (subValueIndex ?? 0) < subIndex;
+                    return (
+                      <>
+                        <SubItem
+                          key={suboption.value}
+                          data-completed={isSubOptionCompleted}
+                          data-next={isSubOptionNext}
+                          data-selected={isSubOptionSelected}
                         >
-                          {suboption.label}
-                        </button>
-                      </SubItem>
-                    ))}
-                  </ul>
-                  {isLast ? null : (
-                    <Connector
-                      data-completed={isCompleted}
-                      data-next={isNext}
-                      data-selected={isSelected}
-                    />
-                  )}
-                </>
+                          <IconContainer>
+                            <SmallDot />
+                          </IconContainer>
+                          <button
+                            type="button"
+                            onClick={handleClick(option)}
+                            disabled={isNext}
+                          >
+                            {suboption.label}
+                          </button>
+                        </SubItem>
+                        {isLast ? null : (
+                          <Connector
+                            data-completed={isCompleted}
+                            data-next={isNext}
+                            data-selected={isSelected}
+                          />
+                        )}
+                      </>
+                    );
+                  })}
+                </ul>
               )}
             </React.Fragment>
           );
@@ -224,9 +240,36 @@ const SubItem = styled.li`
     height: calc(${theme.spacing[5]} + 1px);
     margin-top: calc(${theme.spacing[3]} * -1);
 
-    button {
-      color: ${theme.color.accent};
-      ${createFontStyles('label-3')};
+    &[data-next='true'] {
+      button {
+        ${createFontStyles('body-3')};
+        color: ${theme.color.primary};
+      }
+    }
+
+    &[data-completed='true'] {
+      button {
+        ${createFontStyles('body-3')};
+        color: ${theme.color.primary};
+        cursor: pointer;
+      }
+
+      &:hover button {
+        opacity: 0.7;
+      }
+    }
+
+    &[data-selected='true'] {
+      button {
+        ${createFontStyles('label-3')};
+        color: ${theme.color.accent};
+        cursor: pointer;
+      }
+
+      &:hover button {
+        opacity: 0.75;
+      }
+    }
   `};
 `;
 
