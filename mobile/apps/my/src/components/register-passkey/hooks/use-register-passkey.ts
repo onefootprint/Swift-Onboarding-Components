@@ -96,7 +96,7 @@ const register = async ({
   return response;
 };
 
-const registerPasskeys = async (authToken: string) => {
+const registerPasskey = async (authToken: string) => {
   const { challengeToken, biometricChallengeJson } = await biometricInit(
     authToken,
   );
@@ -112,6 +112,6 @@ const registerPasskeys = async (authToken: string) => {
   return challengeResponse;
 };
 
-const useRegisterPasskeys = () => useMutation(registerPasskeys);
+const useRegisterPasskey = () => useMutation(registerPasskey);
 
-export default useRegisterPasskeys;
+export default useRegisterPasskey;

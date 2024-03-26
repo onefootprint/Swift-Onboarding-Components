@@ -65,9 +65,6 @@
         "subtitle": "No pudimos agregar tu passkey. Por favor, inténtalo de nuevo.",
         "cta": "Iniciar verificación",
         "skip": "Hacerlo más tarde"
-      },
-      "success": {
-        "title": "Verificación biométrica exitosa!"
       }
     }
   },

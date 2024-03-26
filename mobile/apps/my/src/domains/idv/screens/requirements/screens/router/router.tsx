@@ -2,7 +2,7 @@ import { useMachine } from '@xstate/react';
 import React, { useEffect } from 'react';
 
 import IdDoc from '@/components/id-doc';
-import Passkeys from '@/components/passkeys';
+import RegisterPasskey from '@/components/register-passkey';
 
 import CheckRequirements from '../check-requirements';
 import useAttestDevice from './hooks/use-attest-device';
@@ -46,7 +46,7 @@ const Router = ({ authToken, onDone }: RouterProps) => {
         />
       )}
       {state.matches('passkeys') && (
-        <Passkeys
+        <RegisterPasskey
           authToken={authToken}
           onDone={deviceResponseJson => {
             if (deviceResponseJson) {

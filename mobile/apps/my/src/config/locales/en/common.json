@@ -65,9 +65,6 @@
         "subtitle": "Passkey registration failed. Try again or complete later.",
         "cta": "Launch registration",
         "skip": "Do later"
-      },
-      "success": {
-        "title": "Biometric authentication successful!"
       }
     }
   },
