@@ -10,13 +10,14 @@ use db::{
         ob_configuration::TenantObConfigCounts, tenant_user::TenantUser,
     },
 };
+use newtypes::{ComplianceDocId, ComplianceDocStatus};
 
 impl TryDbToApi<(&ComplianceDocSummary, &TenantObConfigCounts)> for api_wire_types::ComplianceCompanySummary {
     fn try_from_db(target: (&ComplianceDocSummary, &TenantObConfigCounts)) -> ApiResult<Self> {
         let (summary, counts) = target;
 
         let num_controls_complete = summary.num_controls_complete()?;
-        let num_controls_total = summary.num_controls_total();
+        let num_controls_total = summary.num_controls_total()?;
         let num_active_playbooks = counts.get(&summary.tenant.id).copied().unwrap_or(0);
 
         Ok(api_wire_types::ComplianceCompanySummary {
@@ -34,36 +35,60 @@ impl TryDbToApi<&ComplianceDocSummary> for api_wire_types::ListComplianceDocumen
         let documents = summary
             .docs
             .keys()
-            .map(|doc_id| {
-                let (req, sub, _) = summary.newest_resources_for_doc(doc_id)?;
-                let status = summary.status_for_doc(doc_id)?;
-
-                let assigned_to = sub
-                    .and_then(|sub| sub.assigned_to_partner_tenant_user_id.as_ref())
-                    .map(|user_id| -> ApiResult<_> {
-                        let user = summary
-                            .users
-                            .get(user_id)
-                            .ok_or(AssertionError("user not present in ComplianceDocSummary"))?;
-                        Ok(api_wire_types::LiteOrgMember::from_db(user.clone()))
-                    })
-                    .transpose()?;
-
-                let last_updated = summary.last_updated(doc_id)?;
-
-                Ok(api_wire_types::ComplianceDocSummary {
-                    id: doc_id.clone(),
-                    name: req.name.clone(),
-                    status,
-                    assigned_to,
-                    last_updated,
-                })
-            })
+            .map(|doc_id| api_wire_types::ComplianceDocSummary::try_from_db((summary, doc_id)))
             .collect::<ApiResult<Vec<_>>>()?;
 
         Ok(documents)
     }
 }
+
+impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::ComplianceDocSummary {
+    fn try_from_db(target: (&ComplianceDocSummary, &ComplianceDocId)) -> ApiResult<Self> {
+        let (summary, doc_id) = target;
+        let (req, sub, rev) = summary.newest_active_resources_for_doc(doc_id)?;
+        let status = summary.status_for_doc(doc_id)?;
+
+        let assigned_to = sub
+            .and_then(|sub| sub.assigned_to_partner_tenant_user_id.as_ref())
+            .map(|user_id| -> ApiResult<_> {
+                let user = summary
+                    .users
+                    .get(user_id)
+                    .ok_or(AssertionError("user not present in ComplianceDocSummary"))?;
+                Ok(api_wire_types::LiteOrgMember::from_db(user.clone()))
+            })
+            .transpose()?;
+
+        let last_updated = summary.last_updated(doc_id)?;
+
+        let (name, description) = match &req {
+            Some(req) => (req.name.clone(), req.description.clone()),
+            None => {
+                // Fall back on the name for the latest deactivated request if there are no active
+                // requests. This should only happen if the document was requested and immediately
+                // retracted.
+                if status != ComplianceDocStatus::NotRequested {
+                    tracing::error!("no active requests for active compliance doc");
+                }
+                let deactivated_req = summary.newest_request_for_doc(doc_id)?;
+                (deactivated_req.name.clone(), deactivated_req.description.clone())
+            }
+        };
+
+        Ok(api_wire_types::ComplianceDocSummary {
+            id: doc_id.clone(),
+            name,
+            description,
+            status,
+            assigned_to,
+            last_updated,
+            latest_request_id: req.map(|req| req.id.clone()),
+            latest_submission_id: sub.map(|sub| sub.id.clone()),
+            latest_review_id: rev.map(|rev| rev.id.clone()),
+        })
+    }
+}
+
 
 impl
     DbToApi<(

@@ -1,15 +1,24 @@
 use crate::{types::JsonApiResponse, State};
 use api_core::{
     auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::ApiResult,
+    errors::{ApiResult, AssertionError},
     types::ResponseData,
     utils::db2api::TryDbToApi,
     ApiError, ApiErrorKind,
 };
 use api_wire_types::ListComplianceDocumentsResponse;
-use db::helpers::ComplianceDocSummary;
+use chrono::Utc;
+use db::{
+    helpers::ComplianceDocSummary,
+    models::{
+        compliance_doc::NewComplianceDoc, compliance_doc_request::NewComplianceDocRequest,
+        compliance_doc_template_version::ComplianceDocTemplateVersion,
+        tenant_compliance_partnership::TenantCompliancePartnership,
+    },
+};
 use newtypes::TenantCompliancePartnershipId;
 use paperclip::actix::{self, api_v2_operation, web};
+
 
 #[api_v2_operation(
     description = "Returns a list of documents for a company partned with the authorized compliance partner.",
@@ -30,7 +39,7 @@ pub async fn get(
     let summary = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(partnership_id), None)?
+            let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), None)?
                 .into_values()
                 .next()
                 .ok_or(ApiError::from(ApiErrorKind::ResourceNotFound))?;
@@ -39,5 +48,78 @@ pub async fn get(
         .await?;
 
     let resp = api_wire_types::ListComplianceDocumentsResponse::try_from_db(&summary)?;
+    ResponseData::ok(resp).json()
+}
+
+#[api_v2_operation(description = "Creates a new document.", tags(Compliance, Private))]
+#[actix::post("/compliance/partners/{partnership_id}/documents")]
+pub async fn post(
+    state: web::Data<State>,
+    auth: PartnerTenantSessionAuth,
+    partnership_id: web::Path<TenantCompliancePartnershipId>,
+    request: web::Json<api_wire_types::CreateComplianceDocRequest>,
+) -> JsonApiResponse<api_wire_types::ComplianceDocSummary> {
+    let auth = auth.check_guard(PartnerTenantGuard::ManageReviews)?;
+    let pt = auth.partner_tenant();
+    let pt_id = pt.id.clone();
+
+    let partnership_id = partnership_id.into_inner();
+
+    let template_version_id = request.template_version_id.clone();
+    let name = request.name.clone();
+    let description = request.description.clone();
+    let requested_by_partner_tenant_user_id = auth.actor().tenant_user_id()?.clone();
+
+    let (summary, doc_id) = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            // Check that the authorized partner tenant owns the partnership.
+            TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;
+
+            // Get the template ID for the given template vertsion ID, while ensuring that the
+            // template version is owned by the authorized partner tenant.
+            let template_id = template_version_id
+                .as_ref()
+                .map(|id| ComplianceDocTemplateVersion::get(conn, id, &pt_id))
+                .transpose()?
+                .map(|t| t.template_id);
+
+            // Create a new compliance doc.
+            let doc = NewComplianceDoc {
+                tenant_compliance_partnership_id: &partnership_id,
+                template_id: template_id.as_ref(),
+            }
+            .create(conn)
+            .map_err(|e| {
+                if e.is_unique_constraint_violation() {
+                    ApiError::from(ApiErrorKind::ValidationError(
+                        "A compliance document request already exists for this template".to_owned(),
+                    ))
+                } else {
+                    e.into()
+                }
+            })?;
+
+            // Implicitly create a request for the new doc.
+            NewComplianceDocRequest {
+                created_at: Utc::now(),
+                name: name.as_str(),
+                description: description.as_str(),
+                requested_by_partner_tenant_user_id: &requested_by_partner_tenant_user_id,
+                assigned_to_tenant_user_id: None,
+                compliance_doc_id: &doc.id,
+            }
+            .create(conn)?;
+
+            let mut summaries =
+                ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), Some(&doc.id))?;
+            let summary = summaries.remove(&partnership_id).ok_or(AssertionError(
+                "no ComplianceDocSummary for requested partnership ID",
+            ))?;
+            Ok((summary, doc.id))
+        })
+        .await?;
+
+    let resp = api_wire_types::ComplianceDocSummary::try_from_db((&summary, &doc_id))?;
     ResponseData::ok(resp).json()
 }

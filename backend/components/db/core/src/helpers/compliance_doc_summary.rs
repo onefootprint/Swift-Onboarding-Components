@@ -37,8 +37,8 @@ impl ComplianceDocSummary {
     pub fn filter<'a>(
         conn: &mut PgConn,
         t_pt_id: impl Into<TenantOrPartnerTenantIdRef<'a>>,
-        p_id: Option<TenantCompliancePartnershipId>,
-        doc_id: Option<ComplianceDocId>,
+        p_id: Option<&TenantCompliancePartnershipId>,
+        doc_id: Option<&ComplianceDocId>,
     ) -> DbResult<HashMap<TenantCompliancePartnershipId, ComplianceDocSummary>> {
         let t_pt_id: TenantOrPartnerTenantIdRef<'a> = t_pt_id.into();
 
@@ -123,6 +123,15 @@ impl ComplianceDocSummary {
         Ok(summaries)
     }
 
+    pub fn newest_active_request_for_doc(&self, doc_id: &ComplianceDocId) -> Option<&ComplianceDocRequest> {
+        self.doc_requests
+            .values()
+            .filter(|r| r.deactivated_at.is_none())
+            .filter(|r| r.compliance_doc_id == *doc_id)
+            .max_by_key(|r| r.created_at)
+    }
+
+    // The newest request may be deactivated.
     pub fn newest_request_for_doc(&self, doc_id: &ComplianceDocId) -> DbResult<&ComplianceDocRequest> {
         let req = self
             .doc_requests
@@ -160,64 +169,69 @@ impl ComplianceDocSummary {
 
     pub fn num_controls_complete(&self) -> DbResult<i64> {
         let mut count = 0;
-        for doc in self.docs.values() {
-            let (_, _, review) = self.newest_resources_for_doc(&doc.id)?;
-            if let Some(review) = review {
-                if review.decision == ComplianceDocReviewDecision::Accepted {
-                    count += 1;
-                }
+        for doc_id in self.docs.keys() {
+            let status = self.status_for_doc(doc_id)?;
+            if status == ComplianceDocStatus::Accepted {
+                count += 1;
             }
         }
         Ok(count)
     }
 
-    pub fn num_controls_total(&self) -> i64 {
-        self.docs.len() as i64
+    pub fn num_controls_total(&self) -> DbResult<i64> {
+        let mut count = 0;
+        for doc_id in self.docs.keys() {
+            let status = self.status_for_doc(doc_id)?;
+            if status != ComplianceDocStatus::NotRequested {
+                count += 1;
+            }
+        }
+        Ok(count)
     }
 
-    pub fn newest_resources_for_doc(
+    pub fn newest_active_resources_for_doc(
         &self,
         doc_id: &ComplianceDocId,
     ) -> DbResult<(
-        &ComplianceDocRequest,
+        Option<&ComplianceDocRequest>,
         Option<&ComplianceDocSubmission>,
         Option<&ComplianceDocReview>,
     )> {
-        let req = self.newest_request_for_doc(doc_id)?;
-        let sub = self.newest_submission_for_request(&req.id);
+        let req = self.newest_active_request_for_doc(doc_id);
+        let sub = req.and_then(|r| self.newest_submission_for_request(&r.id));
         let rev = sub.and_then(|s| self.newest_review_for_submission(&s.id));
         Ok((req, sub, rev))
     }
 
     pub fn status_for_doc(&self, doc_id: &ComplianceDocId) -> DbResult<ComplianceDocStatus> {
-        let (_, sub, rev) = self.newest_resources_for_doc(doc_id)?;
+        let (request, submission, review) = self.newest_active_resources_for_doc(doc_id)?;
 
-        let status = match (sub, rev) {
-            (None, None) => ComplianceDocStatus::WaitingForUpload,
-            (Some(_), None) => ComplianceDocStatus::WaitingForReview,
-            (Some(_), Some(rev)) => match rev.decision {
-                ComplianceDocReviewDecision::Accepted => ComplianceDocStatus::Accepted,
-                ComplianceDocReviewDecision::Rejected => {
-                    return Err(DbError::AssertionError(
-                        "invalid state: review rejected without new request".to_owned(),
-                    ));
+        if request.is_none() {
+            return Ok(ComplianceDocStatus::NotRequested);
+        }
+
+        let status = if submission.is_some() {
+            if let Some(review) = review {
+                match review.decision {
+                    ComplianceDocReviewDecision::Accepted => ComplianceDocStatus::Accepted,
+                    ComplianceDocReviewDecision::Rejected => ComplianceDocStatus::Rejected,
                 }
-            },
-            (None, Some(_)) => {
-                return Err(DbError::AssertionError(
-                    "invalid state: review without submission".to_owned(),
-                ));
+            } else {
+                ComplianceDocStatus::WaitingForReview
             }
+        } else {
+            ComplianceDocStatus::WaitingForUpload
         };
+
         Ok(status)
     }
 
     pub fn last_updated(&self, doc_id: &ComplianceDocId) -> DbResult<Option<DateTime<Utc>>> {
-        let (req, sub, rev) = self.newest_resources_for_doc(doc_id)?;
+        let (req, sub, rev) = self.newest_active_resources_for_doc(doc_id)?;
 
         let dates = [
-            Some(req.created_at),
-            req.deactivated_at,
+            req.map(|r| r.created_at),
+            req.and_then(|r| r.deactivated_at),
             sub.map(|s| s.created_at),
             rev.map(|r| r.created_at),
         ];

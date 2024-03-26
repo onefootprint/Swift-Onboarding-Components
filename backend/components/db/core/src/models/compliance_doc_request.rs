@@ -1,8 +1,10 @@
-use crate::{DbResult, PgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::compliance_doc_request;
+use db_schema::schema::{compliance_doc, compliance_doc_request};
 use diesel::prelude::*;
-use newtypes::{ComplianceDocId, ComplianceDocRequestId, TenantUserId};
+use newtypes::{
+    ComplianceDocId, ComplianceDocRequestId, Locked, TenantCompliancePartnershipId, TenantUserId,
+};
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -44,5 +46,44 @@ impl<'a> NewComplianceDocRequest<'a> {
         Ok(diesel::insert_into(compliance_doc_request::table)
             .values(self)
             .get_result(conn)?)
+    }
+}
+
+impl ComplianceDocRequest {
+    pub fn lock_active(
+        conn: &mut TxnPgConn,
+        id: &ComplianceDocRequestId,
+        partnership_id: &TenantCompliancePartnershipId,
+    ) -> DbResult<Locked<ComplianceDocRequest>> {
+        // Diesel doesn't support the `FOR UPDATE ON <table>` syntax for obtaining a lock on a
+        // single table out of a join, so we have to make two queries.
+        //
+        // Check that the request is associated with the given partnership ID.
+        let req = compliance_doc::table
+            .inner_join(compliance_doc_request::table)
+            .filter(compliance_doc::tenant_compliance_partnership_id.eq(partnership_id))
+            .filter(compliance_doc_request::id.eq(id))
+            .select(ComplianceDocRequest::as_select())
+            .first(conn.conn())?;
+
+        // Check that the request is active and obtain a lock on the row.
+        let req = compliance_doc_request::table
+            .filter(compliance_doc_request::id.eq(req.id))
+            .filter(compliance_doc_request::deactivated_at.is_null())
+            .for_no_key_update()
+            .select(ComplianceDocRequest::as_select())
+            .first(conn.conn())?;
+
+        Ok(Locked::new(req))
+    }
+
+    pub fn deactivate(conn: &mut TxnPgConn, req: Locked<ComplianceDocRequest>) -> DbResult<()> {
+        diesel::update(compliance_doc_request::table)
+            .filter(compliance_doc_request::id.eq(&req.id))
+            .filter(compliance_doc_request::deactivated_at.is_null())
+            .set(compliance_doc_request::deactivated_at.eq(Some(Utc::now())))
+            .execute(conn.conn())?;
+
+        Ok(())
     }
 }

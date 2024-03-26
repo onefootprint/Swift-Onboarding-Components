@@ -1,5 +1,5 @@
 use crate::*;
-use newtypes::{PartnerTenantId, TenantId};
+use newtypes::{ComplianceDocTemplateVersionId, PartnerTenantId, TenantId};
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -22,6 +22,14 @@ pub struct CreateComplianceDocTemplateRequest {
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct UpdateComplianceDocTemplateRequest {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct CreateComplianceDocRequest {
+    pub template_version_id: Option<ComplianceDocTemplateVersionId>,
     pub name: String,
     pub description: String,
 }

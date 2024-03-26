@@ -1,7 +1,9 @@
 use chrono::{DateTime, Utc};
-use db_schema::schema::compliance_doc_template_version;
+use db_schema::schema::{compliance_doc_template, compliance_doc_template_version};
 use diesel::prelude::*;
-use newtypes::{ComplianceDocTemplateId, ComplianceDocTemplateVersionId, TenantUserId};
+use newtypes::{ComplianceDocTemplateId, ComplianceDocTemplateVersionId, PartnerTenantId, TenantUserId};
+
+use crate::{DbResult, PgConn};
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = compliance_doc_template_version)]
@@ -29,4 +31,19 @@ pub struct NewComplianceDocTemplateVersion<'a> {
     pub template_id: &'a ComplianceDocTemplateId,
     pub name: &'a str,
     pub description: &'a str,
+}
+
+impl ComplianceDocTemplateVersion {
+    pub fn get(
+        conn: &mut PgConn,
+        id: &ComplianceDocTemplateVersionId,
+        pt_id: &PartnerTenantId,
+    ) -> DbResult<ComplianceDocTemplateVersion> {
+        Ok(compliance_doc_template::table
+            .inner_join(compliance_doc_template_version::table)
+            .filter(compliance_doc_template_version::id.eq(id))
+            .filter(compliance_doc_template::partner_tenant_id.eq(pt_id))
+            .select(ComplianceDocTemplateVersion::as_select())
+            .first(conn)?)
+    }
 }

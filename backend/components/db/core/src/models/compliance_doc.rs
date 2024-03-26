@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn};
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc;
 use diesel::prelude::*;
@@ -27,9 +27,9 @@ pub struct NewComplianceDoc<'a> {
 
 impl<'a> NewComplianceDoc<'a> {
     #[tracing::instrument("NewComplianceDoc::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<ComplianceDoc> {
+    pub fn create(self, conn: &mut TxnPgConn) -> DbResult<ComplianceDoc> {
         Ok(diesel::insert_into(compliance_doc::table)
             .values(self)
-            .get_result(conn)?)
+            .get_result(conn.conn())?)
     }
 }

@@ -1,5 +1,6 @@
 use newtypes::{
-    ComplianceDocId, ComplianceDocStatus, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
+    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocStatus,
+    ComplianceDocSubmissionId, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
     TenantCompliancePartnershipId,
 };
 
@@ -20,9 +21,14 @@ pub struct ComplianceCompanySummary {
 pub struct ComplianceDocSummary {
     pub id: ComplianceDocId,
     pub name: String,
+    pub description: String,
     pub status: ComplianceDocStatus,
     pub assigned_to: Option<LiteOrgMember>,
     pub last_updated: Option<DateTime<Utc>>,
+
+    pub latest_request_id: Option<ComplianceDocRequestId>,
+    pub latest_submission_id: Option<ComplianceDocSubmissionId>,
+    pub latest_review_id: Option<ComplianceDocReviewId>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]

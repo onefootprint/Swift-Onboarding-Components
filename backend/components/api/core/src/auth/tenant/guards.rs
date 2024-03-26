@@ -64,6 +64,7 @@ pub enum PartnerTenantGuard {
     Admin,
     Read,
     ManageTemplates,
+    ManageReviews,
 }
 
 impl PartnerTenantGuard {
@@ -73,6 +74,7 @@ impl PartnerTenantGuard {
             Self::Admin => TenantScope::CompliancePartnerAdmin,
             Self::Read => TenantScope::CompliancePartnerRead,
             Self::ManageTemplates => TenantScope::CompliancePartnerManageTemplates,
+            Self::ManageReviews => TenantScope::CompliancePartnerManageReviews,
         }
     }
 }

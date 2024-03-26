@@ -95,6 +95,7 @@ pub enum TenantScope {
     CompliancePartnerRead,
     CompliancePartnerAdmin,
     CompliancePartnerManageTemplates,
+    CompliancePartnerManageReviews,
 }
 
 impl TenantScope {
@@ -129,6 +130,7 @@ impl TenantScope {
             Self::CompliancePartnerRead => vec![CompliancePartnerDashboardUser],
             Self::CompliancePartnerAdmin => vec![CompliancePartnerDashboardUser],
             Self::CompliancePartnerManageTemplates => vec![CompliancePartnerDashboardUser],
+            Self::CompliancePartnerManageReviews => vec![CompliancePartnerDashboardUser],
         }
     }
 }

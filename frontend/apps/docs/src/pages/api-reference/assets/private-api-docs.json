@@ -620,6 +620,97 @@
                         "Dashboard Token": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Creates a new document.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateComplianceDocRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ComplianceDocSummary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/compliance/partners/{partnership_id}/requests/{request_id}": {
+            "delete": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Retracts a document request.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "request_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
             }
         },
         "/entities/client_token": {
@@ -6406,7 +6497,8 @@
                                                 "label_and_tag",
                                                 "compliance_partner_read",
                                                 "compliance_partner_admin",
-                                                "compliance_partner_manage_templates"
+                                                "compliance_partner_manage_templates",
+                                                "compliance_partner_manage_reviews"
                                             ]
                                         }
                                     }
@@ -6732,7 +6824,8 @@
                                 "label_and_tag",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
-                                "compliance_partner_manage_templates"
+                                "compliance_partner_manage_templates",
+                                "compliance_partner_manage_reviews"
                             ]
                         }
                     },
@@ -7190,6 +7283,9 @@
                             "id"
                         ]
                     },
+                    "description": {
+                        "type": "string"
+                    },
                     "id": {
                         "type": "string"
                     },
@@ -7197,19 +7293,31 @@
                         "type": "string",
                         "format": "date-time"
                     },
+                    "latest_request_id": {
+                        "type": "string"
+                    },
+                    "latest_review_id": {
+                        "type": "string"
+                    },
+                    "latest_submission_id": {
+                        "type": "string"
+                    },
                     "name": {
                         "type": "string"
                     },
                     "status": {
                         "type": "string",
                         "enum": [
+                            "NotRequested",
                             "WaitingForUpload",
                             "WaitingForReview",
-                            "Accepted"
+                            "Accepted",
+                            "Rejected"
                         ]
                     }
                 },
                 "required": [
+                    "description",
                     "id",
                     "name",
                     "status"
@@ -7301,6 +7409,24 @@
                 "required": [
                     "name",
                     "role_id"
+                ]
+            },
+            "CreateComplianceDocRequest": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "template_version_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "description",
+                    "name"
                 ]
             },
             "CreateComplianceDocTemplateRequest": {
@@ -8414,7 +8540,8 @@
                                 "label_and_tag",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
-                                "compliance_partner_manage_templates"
+                                "compliance_partner_manage_templates",
+                                "compliance_partner_manage_reviews"
                             ]
                         }
                     }
@@ -17971,7 +18098,8 @@
                                                     "label_and_tag",
                                                     "compliance_partner_read",
                                                     "compliance_partner_admin",
-                                                    "compliance_partner_manage_templates"
+                                                    "compliance_partner_manage_templates",
+                                                    "compliance_partner_manage_reviews"
                                                 ]
                                             }
                                         }
@@ -18097,7 +18225,8 @@
                                             "label_and_tag",
                                             "compliance_partner_read",
                                             "compliance_partner_admin",
-                                            "compliance_partner_manage_templates"
+                                            "compliance_partner_manage_templates",
+                                            "compliance_partner_manage_reviews"
                                         ]
                                     }
                                 }
@@ -18229,7 +18358,8 @@
                                                     "label_and_tag",
                                                     "compliance_partner_read",
                                                     "compliance_partner_admin",
-                                                    "compliance_partner_manage_templates"
+                                                    "compliance_partner_manage_templates",
+                                                    "compliance_partner_manage_reviews"
                                                 ]
                                             }
                                         }
@@ -19074,7 +19204,8 @@
                                                 "label_and_tag",
                                                 "compliance_partner_read",
                                                 "compliance_partner_admin",
-                                                "compliance_partner_manage_templates"
+                                                "compliance_partner_manage_templates",
+                                                "compliance_partner_manage_reviews"
                                             ]
                                         }
                                     }
@@ -19306,7 +19437,8 @@
                                         "label_and_tag",
                                         "compliance_partner_read",
                                         "compliance_partner_admin",
-                                        "compliance_partner_manage_templates"
+                                        "compliance_partner_manage_templates",
+                                        "compliance_partner_manage_reviews"
                                     ]
                                 }
                             }
@@ -19399,7 +19531,8 @@
                                 "label_and_tag",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
-                                "compliance_partner_manage_templates"
+                                "compliance_partner_manage_templates",
+                                "compliance_partner_manage_reviews"
                             ]
                         }
                     }
@@ -21567,7 +21700,8 @@
                                         "label_and_tag",
                                         "compliance_partner_read",
                                         "compliance_partner_admin",
-                                        "compliance_partner_manage_templates"
+                                        "compliance_partner_manage_templates",
+                                        "compliance_partner_manage_reviews"
                                     ]
                                 }
                             }
@@ -21900,7 +22034,8 @@
                                 "label_and_tag",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
-                                "compliance_partner_manage_templates"
+                                "compliance_partner_manage_templates",
+                                "compliance_partner_manage_reviews"
                             ]
                         }
                     }

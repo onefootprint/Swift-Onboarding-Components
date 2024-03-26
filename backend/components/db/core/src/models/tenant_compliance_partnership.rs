@@ -48,3 +48,17 @@ impl<'a> NewTenantCompliancePartnership<'a> {
         Ok((p, true))
     }
 }
+
+impl TenantCompliancePartnership {
+    pub fn get(
+        conn: &mut TxnPgConn,
+        id: &TenantCompliancePartnershipId,
+        pt_id: &PartnerTenantId,
+    ) -> DbResult<TenantCompliancePartnership> {
+        Ok(tenant_compliance_partnership::table
+            .filter(tenant_compliance_partnership::id.eq(id))
+            .filter(tenant_compliance_partnership::partner_tenant_id.eq(pt_id))
+            .select(TenantCompliancePartnership::as_select())
+            .first(conn.conn())?)
+    }
+}

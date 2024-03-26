@@ -48,7 +48,9 @@ pub enum ComplianceDocData {
 #[derive(Debug, Clone, Eq, PartialEq, Apiv2Schema, SerializeDisplay, Display)]
 #[strum(serialize_all = "snake_case")]
 pub enum ComplianceDocStatus {
+    NotRequested,
     WaitingForUpload,
     WaitingForReview,
     Accepted,
+    Rejected,
 }

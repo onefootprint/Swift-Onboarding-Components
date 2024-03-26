@@ -2,7 +2,9 @@ use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_submission;
 use diesel::prelude::*;
-use newtypes::{ComplianceDocData, ComplianceDocRequestId, ComplianceDocSubmissionId, TenantUserId};
+use newtypes::{ComplianceDocData, ComplianceDocRequestId, ComplianceDocSubmissionId, Locked, TenantUserId};
+
+use super::compliance_doc_request::ComplianceDocRequest;
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -36,6 +38,15 @@ impl<'a> NewComplianceDocSubmission<'a> {
     pub fn create(self, conn: &mut PgConn) -> DbResult<ComplianceDocSubmission> {
         Ok(diesel::insert_into(compliance_doc_submission::table)
             .values(self)
+            .get_result(conn)?)
+    }
+}
+
+impl ComplianceDocSubmission {
+    pub fn count_for_request(conn: &mut PgConn, req: &Locked<ComplianceDocRequest>) -> DbResult<i64> {
+        Ok(compliance_doc_submission::table
+            .filter(compliance_doc_submission::request_id.eq(&req.id))
+            .count()
             .get_result(conn)?)
     }
 }
