@@ -7314,6 +7314,9 @@
                             "Accepted",
                             "Rejected"
                         ]
+                    },
+                    "template_id": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -17229,6 +17232,12 @@
                                 "type": "integer",
                                 "format": "int64"
                             }
+                        }
+                    },
+                    "playbook_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
                         }
                     },
                     "requires_manual_review": {

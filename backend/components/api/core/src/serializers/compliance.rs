@@ -45,6 +45,10 @@ impl TryDbToApi<&ComplianceDocSummary> for api_wire_types::ListComplianceDocumen
 impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::ComplianceDocSummary {
     fn try_from_db(target: (&ComplianceDocSummary, &ComplianceDocId)) -> ApiResult<Self> {
         let (summary, doc_id) = target;
+        let doc = summary
+            .docs
+            .get(doc_id)
+            .ok_or(AssertionError("doc not present in ComplianceDocSummary"))?;
         let (req, sub, rev) = summary.newest_active_resources_for_doc(doc_id)?;
         let status = summary.status_for_doc(doc_id)?;
 
@@ -85,6 +89,7 @@ impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::C
             latest_request_id: req.map(|req| req.id.clone()),
             latest_submission_id: sub.map(|sub| sub.id.clone()),
             latest_review_id: rev.map(|rev| rev.id.clone()),
+            template_id: doc.template_id.clone(),
         })
     }
 }

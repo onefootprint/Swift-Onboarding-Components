@@ -62,6 +62,7 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["name"] == "edited template name"
     assert doc["description"] == "edited template description"
     assert doc["status"] == "waiting_for_upload"
+    assert doc["template_id"] == template["id"]
 
     # Request a document ad-hoc.
     ad_hoc_doc = post(f"compliance/partners/{partnership_id}/documents", {
@@ -75,6 +76,7 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["name"] == "ad-hoc template name"
     assert doc["description"] == "ad-hoc template description"
     assert doc["status"] == "waiting_for_upload"
+    assert doc["template_id"] is None
 
     # Delete the ad-hoc request.
     req_id = doc["latest_request_id"]

@@ -29,6 +29,8 @@ pub struct ComplianceDocSummary {
     pub latest_request_id: Option<ComplianceDocRequestId>,
     pub latest_submission_id: Option<ComplianceDocSubmissionId>,
     pub latest_review_id: Option<ComplianceDocReviewId>,
+
+    pub template_id: Option<ComplianceDocTemplateId>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
