@@ -1,9 +1,15 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import LivenessMachine from '../../utils/state-machine/machine';
+import type { MachineContext } from '../../utils/state-machine';
+import { createLivenessMachine } from '../../utils/state-machine/machine';
 
-const useLocalLivenessMachine = () => useMachine(LivenessMachine);
+type MachineArgs = {
+  initialContext: MachineContext;
+};
+
+const useLocalLivenessMachine = ({ initialContext }: MachineArgs) =>
+  useMachine(() => createLivenessMachine(initialContext));
 
 export const [MachineProvider, useLivenessMachine] = constate(
   useLocalLivenessMachine,

@@ -1,76 +1,58 @@
-import { assign, createMachine } from 'xstate';
+import { createMachine } from 'xstate';
 
 import checkIsIframe from '../../../../utils/check-is-in-iframe';
 import type { MachineContext, MachineEvents } from './types';
 
-export const createLivenessMachine = () =>
-  createMachine(
-    {
-      predictableActionArguments: true,
-      id: 'liveness',
-      schema: {
-        context: {} as MachineContext,
-        events: {} as MachineEvents,
+export const createLivenessMachine = (initialContext: MachineContext) =>
+  createMachine({
+    predictableActionArguments: true,
+    id: 'liveness',
+    schema: {
+      context: {} as MachineContext,
+      events: {} as MachineEvents,
+    },
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    tsTypes: {} as import('./machine.typegen').Typegen0,
+    initial: 'init',
+    context: { ...initialContext },
+    states: {
+      init: {
+        always: [
+          {
+            target: 'register',
+            cond: ctx => {
+              const {
+                device: { hasSupportForWebauthn },
+              } = ctx;
+              return !checkIsIframe() && !!hasSupportForWebauthn;
+            },
+          },
+          {
+            target: 'unavailable',
+          },
+        ],
       },
-      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'init',
-      context: {},
-      states: {
-        init: {
-          on: {
-            receivedContext: [
-              {
-                target: 'register',
-                actions: 'assignContext',
-                cond: (_, event) => {
-                  const {
-                    device: { hasSupportForWebauthn },
-                  } = event.payload;
-                  return !checkIsIframe() && !!hasSupportForWebauthn;
-                },
-              },
-              {
-                target: 'unavailable',
-                actions: 'assignContext',
-              },
-            ],
+      register: {
+        on: {
+          skipped: {
+            target: 'completed',
+          },
+          succeeded: {
+            target: 'completed',
           },
         },
-        register: {
-          on: {
-            skipped: {
-              target: 'completed',
-            },
-            succeeded: {
-              target: 'completed',
-            },
+      },
+      unavailable: {
+        on: {
+          completed: {
+            target: 'completed',
           },
         },
-        unavailable: {
-          on: {
-            completed: {
-              target: 'completed',
-            },
-          },
-        },
-        completed: {
-          type: 'final',
-        },
+      },
+      completed: {
+        type: 'final',
       },
     },
-    {
-      actions: {
-        assignContext: assign((context, event) => ({
-          ...context,
-          isTransfer: event.payload.isTransfer,
-          authToken: event.payload.authToken,
-          device: event.payload.device,
-        })),
-      },
-    },
-  );
+  });
 
-const LivenessMachine = createLivenessMachine();
-
-export default LivenessMachine;
+export default createLivenessMachine;

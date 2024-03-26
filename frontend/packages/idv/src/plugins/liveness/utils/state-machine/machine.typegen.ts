@@ -12,9 +12,7 @@ export interface Typegen0 {
     guards: never;
     services: never;
   };
-  eventsCausingActions: {
-    assignContext: 'receivedContext';
-  };
+  eventsCausingActions: {};
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
