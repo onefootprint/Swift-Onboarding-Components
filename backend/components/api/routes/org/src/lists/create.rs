@@ -65,5 +65,5 @@ pub async fn create_list(
         .await?;
 
 
-    ResponseData::ok(api_wire_types::List::from_db((list, false, entries_count))).json()
+    ResponseData::ok(api_wire_types::List::from_db((list, vec![], entries_count))).json()
 }

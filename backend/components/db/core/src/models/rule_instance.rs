@@ -367,6 +367,43 @@ impl RuleInstance {
             .get_results(conn)?;
         Ok(res)
     }
+
+    #[tracing::instrument("Rule::list", skip_all)]
+    pub fn list_by_playbook(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> DbResult<Vec<(ObConfiguration, Vec<Self>)>> {
+        let rules: Vec<(ObConfigurationId, RuleInstance)> = rule_instance::table
+            .inner_join(ob_configuration::table)
+            .filter(ob_configuration::tenant_id.eq(tenant_id))
+            .filter(ob_configuration::is_live.eq(is_live))
+            .filter(rule_instance::deactivated_at.is_null())
+            .select((ob_configuration::id, rule_instance::all_columns))
+            .order_by((
+                ob_configuration::id,
+                rule_instance::created_at.asc(),
+                rule_instance::id,
+            ))
+            .get_results(conn)?;
+
+        let mut obcs = ObConfiguration::get_bulk(conn, rules.iter().map(|(obc, _)| obc.clone()).collect())?;
+        let res = rules
+            .into_iter()
+            .into_group_map()
+            .into_iter()
+            .map(|(obc_id, rules)| {
+                obcs.remove(&obc_id)
+                    .ok_or(DbError::RelatedObjectNotFound)
+                    .map(|o| (o, rules))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+            .into_iter()
+            .sorted_by_key(|(obc, _)| -obc.created_at.timestamp_millis())
+            .collect();
+
+        Ok(res)
+    }
 }
 
 #[cfg(test)]
