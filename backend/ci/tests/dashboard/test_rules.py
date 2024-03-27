@@ -1,6 +1,6 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config, get, post, patch, delete
+from tests.utils import _gen_random_str, create_ob_config, get, post, patch, delete
 
 
 @pytest.fixture(scope="function")
@@ -397,3 +397,72 @@ def test_multi_edit(sandbox_tenant, obc):
         *sandbox_tenant.db_auths,
     )
     assert obc["rule_set"]["version"] == 2
+
+
+def test_blocklist_rules(sandbox_tenant, obc):
+    nonce = _gen_random_str(5)
+    list = post(
+        f"/org/lists",
+        dict(
+            name=f"Some Real Baddies {nonce}",
+            alias=f"some_real_baddies_{nonce}",
+            kind="ssn9",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # creating a blocklist rule using the newly created list's id works
+    rules = patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=1,
+            add=[
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "id.ssn9",
+                            "op": "is_in",
+                            "value": list["id"],
+                        }
+                    ],
+                )
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    assert rules[-1]["rule_expression"] == [
+        {"field": "id.ssn9", "op": "is_in", "value": list["id"]}
+    ]
+
+    # error if an unknown list id is given
+    patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=1,
+            add=[
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "ip.ssn9",
+                            "op": "is_in",
+                            "value": list["id"],
+                        }
+                    ],
+                ),
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "ip.ssn9",
+                            "op": "is_in",
+                            "value": "lst_abc123",
+                        }
+                    ],
+                ),
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )

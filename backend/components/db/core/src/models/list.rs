@@ -85,6 +85,21 @@ impl List {
         Ok(res)
     }
 
+    #[tracing::instrument("List::bulk_get", skip_all)]
+    pub fn bulk_get(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        is_live: bool,
+        list_ids: &[ListId],
+    ) -> DbResult<Vec<Self>> {
+        let res = list::table
+            .filter(list::tenant_id.eq(tenant_id))
+            .filter(list::is_live.eq(is_live))
+            .filter(list::id.eq_any(list_ids))
+            .get_results(conn)?;
+        Ok(res)
+    }
+
     /// Find for tenant by case insensitively querying on name or alias
     #[tracing::instrument("List::find", skip_all)]
     pub fn find(

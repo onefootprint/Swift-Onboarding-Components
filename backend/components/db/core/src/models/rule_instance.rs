@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
-use super::{ob_configuration::ObConfiguration, rule_set_version::RuleSetVersion};
+use super::{list::List, ob_configuration::ObConfiguration, rule_set_version::RuleSetVersion};
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{ob_configuration, rule_instance};
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, DbActor, Locked, ObConfigurationId, RuleAction, RuleExpression, RuleId,
-    RuleInstanceId, TenantId,
+    output::Csv, DataLifetimeSeqno, DbActor, Locked, ObConfigurationId, RuleAction, RuleExpression,
+    RuleExpressionCondition, RuleId, RuleInstanceId, TenantId, VaultOperation,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -129,6 +129,45 @@ impl RuleInstance {
         } = update;
 
         let (_, seqno, now) = RuleSetVersion::create(conn, obc, expected_rule_set_version, actor.clone())?;
+
+        let list_ids = new_rules
+            .iter()
+            .map(|nr| nr.rule_expression.clone())
+            .chain(updates.iter().filter_map(|u| u.rule_expression.clone()))
+            .flat_map(|re| re.0)
+            .filter_map(|re| match re {
+                RuleExpressionCondition::VaultData(VaultOperation::IsIn {
+                    field: _,
+                    op: _,
+                    value,
+                }) => Some(value),
+                _ => None,
+            })
+            .collect_vec();
+        let lists = List::bulk_get(conn, &obc.tenant_id, obc.is_live, &list_ids)?;
+        let deactivated_lists = lists
+            .iter()
+            .filter(|l| l.deactivated_seqno.is_some())
+            .map(|l| l.id.clone())
+            .collect_vec();
+        if !deactivated_lists.is_empty() {
+            return Err(DbError::ValidationError(format!(
+                "Cannot use deactivated lists in rules: {}",
+                Csv::from(deactivated_lists)
+            )));
+        }
+
+        let found_list_ids = lists.into_iter().map(|l| l.id).collect_vec();
+        let unknown_list_ids = list_ids
+            .into_iter()
+            .filter(|l| !found_list_ids.contains(l))
+            .collect_vec();
+        if !unknown_list_ids.is_empty() {
+            return Err(DbError::ValidationError(format!(
+                "Unknown list_ids: {}",
+                Csv::from(unknown_list_ids)
+            )));
+        }
 
         let mut new_rule_instances = vec![];
         if !new_rules.is_empty() {
