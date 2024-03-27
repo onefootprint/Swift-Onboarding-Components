@@ -31,9 +31,10 @@ const SSN4 = ({ disabled }: SSN4Props) => {
   return (
     <TextInput
       autoFocus
+      data-attribute="ssn4"
       data-private
-      hasError={!!errors.ssn4}
       disabled={disabled}
+      hasError={!!errors.ssn4}
       hint={getHint()}
       label={t('form.label')}
       mask={inputMasks.lastFourSsn}
