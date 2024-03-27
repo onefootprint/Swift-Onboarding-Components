@@ -89,6 +89,9 @@ pub enum TenantScope {
     /// Create labels and tags
     LabelAndTag,
 
+    /// Allows tenants to submit compliance documents.
+    SubmitComplianceDocs,
+
     //
     // Compliance Partner Dashboard Scopes
     //
@@ -126,6 +129,8 @@ impl TenantScope {
             Self::Onboarding => vec![ApiKey],
 
             Self::LabelAndTag => vec![ApiKey, DashboardUser],
+
+            Self::SubmitComplianceDocs => vec![DashboardUser],
 
             Self::CompliancePartnerRead => vec![CompliancePartnerDashboardUser],
             Self::CompliancePartnerAdmin => vec![CompliancePartnerDashboardUser],

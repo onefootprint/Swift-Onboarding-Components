@@ -4454,6 +4454,44 @@
                 ]
             }
         },
+        "/org/lists/{id}": {
+            "get": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns a blocklist.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/List"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/lists/{list_id}": {
             "delete": {
                 "tags": [
@@ -5443,6 +5481,62 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Rule"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/partners/{partnership_id}/documents/{document_id}/submissions": {
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Submit an external URL in response to a request",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "document_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubmitExternalUrlRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
                                 }
                             }
                         }
@@ -6551,6 +6645,7 @@
                                                 "decrypt_all",
                                                 "write_entities",
                                                 "label_and_tag",
+                                                "submit_compliance_docs",
                                                 "compliance_partner_read",
                                                 "compliance_partner_admin",
                                                 "compliance_partner_manage_templates",
@@ -6878,6 +6973,7 @@
                                 "decrypt_all",
                                 "write_entities",
                                 "label_and_tag",
+                                "submit_compliance_docs",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
                                 "compliance_partner_manage_templates",
@@ -7576,6 +7672,12 @@
                 "properties": {
                     "alias": {
                         "type": "string"
+                    },
+                    "entries": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "kind": {
                         "type": "string",
@@ -8597,6 +8699,7 @@
                                 "decrypt_all",
                                 "write_entities",
                                 "label_and_tag",
+                                "submit_compliance_docs",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
                                 "compliance_partner_manage_templates",
@@ -17223,6 +17326,10 @@
                         "type": "string",
                         "format": "date-time"
                     },
+                    "entries_count": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
                     "id": {
                         "type": "string"
                     },
@@ -17239,15 +17346,20 @@
                     },
                     "name": {
                         "type": "string"
+                    },
+                    "used_in_playbook": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
                     "actor",
                     "alias",
                     "created_at",
+                    "entries_count",
                     "id",
                     "kind",
-                    "name"
+                    "name",
+                    "used_in_playbook"
                 ]
             },
             "ListEntitiesSearchRequest": {
@@ -18161,6 +18273,7 @@
                                                     "decrypt_all",
                                                     "write_entities",
                                                     "label_and_tag",
+                                                    "submit_compliance_docs",
                                                     "compliance_partner_read",
                                                     "compliance_partner_admin",
                                                     "compliance_partner_manage_templates",
@@ -18288,6 +18401,7 @@
                                             "decrypt_all",
                                             "write_entities",
                                             "label_and_tag",
+                                            "submit_compliance_docs",
                                             "compliance_partner_read",
                                             "compliance_partner_admin",
                                             "compliance_partner_manage_templates",
@@ -18421,6 +18535,7 @@
                                                     "decrypt_all",
                                                     "write_entities",
                                                     "label_and_tag",
+                                                    "submit_compliance_docs",
                                                     "compliance_partner_read",
                                                     "compliance_partner_admin",
                                                     "compliance_partner_manage_templates",
@@ -19267,6 +19382,7 @@
                                                 "decrypt_all",
                                                 "write_entities",
                                                 "label_and_tag",
+                                                "submit_compliance_docs",
                                                 "compliance_partner_read",
                                                 "compliance_partner_admin",
                                                 "compliance_partner_manage_templates",
@@ -19500,6 +19616,7 @@
                                         "decrypt_all",
                                         "write_entities",
                                         "label_and_tag",
+                                        "submit_compliance_docs",
                                         "compliance_partner_read",
                                         "compliance_partner_admin",
                                         "compliance_partner_manage_templates",
@@ -19594,6 +19711,7 @@
                                 "decrypt_all",
                                 "write_entities",
                                 "label_and_tag",
+                                "submit_compliance_docs",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
                                 "compliance_partner_manage_templates",
@@ -21778,6 +21896,7 @@
                                         "decrypt_all",
                                         "write_entities",
                                         "label_and_tag",
+                                        "submit_compliance_docs",
                                         "compliance_partner_read",
                                         "compliance_partner_admin",
                                         "compliance_partner_manage_templates",
@@ -21810,6 +21929,21 @@
                     "name",
                     "role",
                     "status"
+                ]
+            },
+            "SubmitExternalUrlRequest": {
+                "type": "object",
+                "properties": {
+                    "request_id": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "request_id",
+                    "url"
                 ]
             },
             "TenantAndroidAppMeta": {
@@ -22112,6 +22246,7 @@
                                 "decrypt_all",
                                 "write_entities",
                                 "label_and_tag",
+                                "submit_compliance_docs",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
                                 "compliance_partner_manage_templates",

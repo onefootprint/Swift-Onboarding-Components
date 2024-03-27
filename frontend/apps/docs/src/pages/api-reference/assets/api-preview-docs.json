@@ -1547,7 +1547,8 @@
                                 "twilio",
                                 "middesk",
                                 "incode",
-                                "stytch"
+                                "stytch",
+                                "neuro_id"
                             ]
                         }
                     },
@@ -1578,7 +1579,8 @@
                                 "twilio",
                                 "middesk",
                                 "incode",
-                                "stytch"
+                                "stytch",
+                                "neuro_id"
                             ]
                         }
                     },
@@ -1644,7 +1646,8 @@
                                 "twilio",
                                 "middesk",
                                 "incode",
-                                "stytch"
+                                "stytch",
+                                "neuro_id"
                             ]
                         }
                     },

@@ -2,7 +2,7 @@ use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_compliance_partnership;
 use diesel::prelude::*;
-use newtypes::{PartnerTenantId, TenantCompliancePartnershipId, TenantId};
+use newtypes::{PartnerTenantId, TenantCompliancePartnershipId, TenantId, TenantOrPartnerTenantIdRef};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Queryable, Selectable, Identifiable, Serialize)]
@@ -50,14 +50,26 @@ impl<'a> NewTenantCompliancePartnership<'a> {
 }
 
 impl TenantCompliancePartnership {
-    pub fn get(
+    pub fn get<'a>(
         conn: &mut TxnPgConn,
         id: &TenantCompliancePartnershipId,
-        pt_id: &PartnerTenantId,
+        t_pt_id: impl Into<TenantOrPartnerTenantIdRef<'a>>,
     ) -> DbResult<TenantCompliancePartnership> {
-        Ok(tenant_compliance_partnership::table
+        let query = tenant_compliance_partnership::table
             .filter(tenant_compliance_partnership::id.eq(id))
-            .filter(tenant_compliance_partnership::partner_tenant_id.eq(pt_id))
+            .into_boxed();
+
+        let t_pt_id: TenantOrPartnerTenantIdRef<'a> = t_pt_id.into();
+        let query = match t_pt_id {
+            TenantOrPartnerTenantIdRef::TenantId(t_id) => {
+                query.filter(tenant_compliance_partnership::tenant_id.eq(t_id))
+            }
+            TenantOrPartnerTenantIdRef::PartnerTenantId(pt_id) => {
+                query.filter(tenant_compliance_partnership::partner_tenant_id.eq(pt_id))
+            }
+        };
+
+        Ok(query
             .select(TenantCompliancePartnership::as_select())
             .first(conn.conn())?)
     }
