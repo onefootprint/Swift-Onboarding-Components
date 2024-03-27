@@ -35,6 +35,8 @@ const guidelineKeys: Partial<{
   ],
 };
 
+const docTypesWithAlertMessage = [SupportedIdDocTypes.proofOfAddress];
+
 const IdDocUploadFirstPrompt = () => {
   const { t } = useTranslation('idv', {
     keyPrefix: `id-doc.pages.id-doc-upload-first-prompt`,
@@ -125,6 +127,11 @@ const IdDocUploadFirstPrompt = () => {
       )
     : [];
 
+  const alertMessage = docTypesWithAlertMessage.includes(docType)
+    ? // @ts-ignore:next-line
+      (t(`${docType}.alert-messages` as ParseKeys<`idv`>) as string)
+    : undefined;
+
   const handleComplete = (
     imageFile: File | Blob,
     extraCompressed: boolean,
@@ -167,6 +174,8 @@ const IdDocUploadFirstPrompt = () => {
           description={t(`${docType}.description` as ParseKeys<`idv`>)}
           // @ts-ignore:next-line
           guidelines={guidelines}
+          // @ts-ignore:next-line
+          alertMessage={alertMessage}
         />
         <IdDocPhotoButtons
           onComplete={handleComplete}

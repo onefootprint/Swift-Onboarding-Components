@@ -1489,8 +1489,8 @@
       },
       "id-doc-upload-first-prompt": {
         "proof_of_address": {
-          "title": "Upload a proof of address",
-          "description": "We need to verify your address. Please upload a document that shows your name and address.",
+          "title": "We need to verify your address",
+          "description": "Please upload one of the following documents.",
           "guidelines": {
             "gas-water-electricity-bill": "Recent gas, water or electricity bills",
             "bank-credit-card-statement": "Recent bank or credit card statements",
@@ -1498,7 +1498,8 @@
             "rental-agreement": "Rental lease agreement",
             "insurance": "Health or card insurance",
             "phone-internet-bill": "Recent phone number or internet bills"
-          }
+          },
+          "alert-messages": "Document should show your name and address"
         },
         "issued-in": "Must be issued in"
       }

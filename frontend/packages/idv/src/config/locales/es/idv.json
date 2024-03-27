@@ -1490,8 +1490,8 @@
       },
       "id-doc-upload-first-prompt": {
         "proof_of_address": {
-          "title": "Sube un comprobante de domicilio",
-          "description": "Necesitamos verificar tu dirección. Por favor, carga un documento que muestre tu nombre y dirección.",
+          "title": "Necesitamos verificar su dirección",
+          "description": "Por favor, cargue uno de los siguientes documentos.",
           "guidelines": {
             "gas-water-electricity-bill": "Facturas de gas, agua o electricidad",
             "bank-credit-card-statement": "Extractos bancarios o de tarjetas de crédito",
@@ -1499,7 +1499,8 @@
             "rental-agreement": "Contrato de arrendamiento",
             "insurance": "Tarjeta de seguro médico",
             "phone-internet-bill": "Facturas recientes de teléfono o internet"
-          }
+          },
+          "alert-messages": "El documento debe mostrar su nombre y dirección"
         },
         "issued-in": "Debe estar emitido en"
       }
