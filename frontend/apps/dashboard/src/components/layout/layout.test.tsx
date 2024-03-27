@@ -25,7 +25,7 @@ describe('<Layout />', () => {
 
   describe('when the user is NOT logged', () => {
     beforeEach(() => {
-      useRouterSpy({ pathname: '/login', query: {} });
+      useRouterSpy({ pathname: '/authentication/sign-in', query: {} });
       useStore.setState(originalState);
     });
 

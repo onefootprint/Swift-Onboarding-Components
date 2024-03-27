@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner, Box, Text } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,7 +6,7 @@ const Loading = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.organizations' });
 
   return (
-    <Box testID="organizations-loading" width="100%">
+    <Stack testID="organizations-loading" center direction="column">
       <Text
         variant="label-1"
         color="primary"
@@ -17,7 +17,7 @@ const Loading = () => {
         {t('title')}
       </Text>
       <AnimatedLoadingSpinner animationStart />
-    </Box>
+    </Stack>
   );
 };
 

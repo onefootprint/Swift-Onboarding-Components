@@ -324,7 +324,6 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				4BF3F4B5EC074364BDEAEA4E /* Embed App Clips */,
 				266C27EE7F62632F79B1CA6D /* Headers */,
-				DBD7D6A2E3BDA4518258DE00 /* [CP] Embed Pods Frameworks */,
 				EDF83839DE99ACB8D170C16B /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -348,7 +347,6 @@
 				9D643F47B6C4422A85481A83 /* Frameworks */,
 				03767D9C516140C6998A3D91 /* Resources */,
 				8C5F27298C2A47D78EECD38C /* Bundle React Native code and images */,
-				BAE8847B1AB8705C3564AC20 /* [CP] Embed Pods Frameworks */,
 				82F2DD270AB384E914D3DD4E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -510,42 +508,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n export ENTRY_FILE=\"$PROJECT_ROOT\"/index.appclip.js\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh index.appclip.js'\"`\n\n";
-		};
-		BAE8847B1AB8705C3564AC20 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-myClip/Pods-myClip-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-myClip/Pods-myClip-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		DBD7D6A2E3BDA4518258DE00 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-my/Pods-my-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-my/Pods-my-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
 		};
 		E1A0228ADDD21DF2063B8CC1 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

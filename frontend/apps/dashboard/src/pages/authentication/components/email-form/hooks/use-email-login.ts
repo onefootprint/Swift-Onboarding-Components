@@ -5,7 +5,7 @@ import type {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-const loginEmailRequest = async (payload: OrgAuthMagicLinkRequest) => {
+const login = async (payload: OrgAuthMagicLinkRequest) => {
   const response = await request<OrgAuthMagicLinkResponse>({
     method: 'POST',
     url: '/org/auth/magic_link',
@@ -14,6 +14,6 @@ const loginEmailRequest = async (payload: OrgAuthMagicLinkRequest) => {
   return response.data;
 };
 
-const useLoginEmail = () => useMutation(loginEmailRequest);
+const useEmailLogin = () => useMutation(login);
 
-export default useLoginEmail;
+export default useEmailLogin;

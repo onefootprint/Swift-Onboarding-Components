@@ -1,0 +1,40 @@
+{
+  "sign-in": {
+    "page-title": "Footprint | Sign in to the Footprint",
+    "illustration-alt": "Penguin",
+    "title": "Sign in to Footprint",
+    "sign-up": "Sign up",
+    "or": "or",
+    "do-not-have-an-account": "Don't have an account?"
+  },
+  "sign-up": {
+    "page-title": "Footprint | Sign up to the Footprint",
+    "illustration-alt": "Penguin",
+    "title": "Create your account",
+    "or": "or",
+    "already-have-an-account": "Already have an account?",
+    "sign-in": "Sign in",
+    "terms": "By continuing you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>."
+  },
+  "link-sent": {
+    "page-title": "Footprint | Magic link sent!",
+    "illustration-alt": "Penguin",
+    "title": "Magic link sent!",
+    "instructions": "We just sent an email to <b>{{email}}</b>. Click that link to proceed. It’s secure and lightning fast!"
+  },
+  "social-buttons": {
+    "google": "Continue with Google"
+  },
+  "email": {
+    "form": {
+      "email": {
+        "label": "Email address",
+        "placeholder": "your.email@email.com",
+        "errors": {
+          "required": "Email address is required"
+        }
+      }
+    },
+    "cta": "Continue with email"
+  }
+}

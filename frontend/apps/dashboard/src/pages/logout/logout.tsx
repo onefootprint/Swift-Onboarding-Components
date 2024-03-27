@@ -8,7 +8,7 @@ const Logout = () => {
 
   useEffectOnce(() => {
     session.logOut();
-    router.push('/login');
+    router.push('/authentication/sign-in');
   });
 
   return null;

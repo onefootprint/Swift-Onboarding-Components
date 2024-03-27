@@ -85,7 +85,7 @@ const Auth = () => {
         description: t('workos-error.description'),
         variant: 'error',
       });
-      router.push('/login');
+      router.push('/authentication/login');
     },
     onError: (openedByInvite: boolean) => {
       if (openedByInvite) {
@@ -101,7 +101,7 @@ const Auth = () => {
           variant: 'error',
         });
       }
-      router.push('/login');
+      router.push('/authentication/login');
     },
   });
 

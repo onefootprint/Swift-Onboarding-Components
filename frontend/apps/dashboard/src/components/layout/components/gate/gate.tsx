@@ -40,7 +40,7 @@ const Gate = ({ children }: GateProps) => {
       },
       onError: ({ isLoggedIn, requiresOnboarding }) => {
         if (!isLoggedIn) {
-          redirect('/login');
+          redirect('/authentication/sign-in');
           return;
         }
         if (requiresOnboarding) {

@@ -38,7 +38,7 @@ const useLogin = () => {
         description,
         variant: 'error',
       });
-      router.replace('/login');
+      router.replace('/authentication/sign-in');
     },
   });
 };

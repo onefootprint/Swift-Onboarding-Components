@@ -2,6 +2,7 @@ import { enUiJson as ui } from '@onefootprint/ui';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import authentication from '../locales/en/authentication.json';
 import businesses from '../locales/en/businesses.json';
 import common from '../locales/en/common.json';
 import domainRestrictions from '../locales/en/domain-restrictions.json';
@@ -14,6 +15,7 @@ const configureReactI18next = () => {
     resources: {
       en: {
         common,
+        authentication,
         businesses,
         internal,
         lists,
@@ -26,6 +28,7 @@ const configureReactI18next = () => {
     defaultNS: 'common',
     ns: [
       'common',
+      'authentication',
       'businesses',
       'internal',
       'lists',

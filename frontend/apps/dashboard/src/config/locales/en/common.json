@@ -662,23 +662,6 @@
         "alt": "An image of a penguin using a smartphone"
       }
     },
-    "sign-up": {
-      "page-title": "Footprint | Sign up to the Footprint",
-      "title": "Create your account",
-      "google": "Continue with Google",
-      "email": "Continue with email"
-    },
-    "login": {
-      "page-title": "Footprint | Log in to the Footprint",
-      "title": "Log into Footprint",
-      "google": "Continue with Google",
-      "email": "Continue with email",
-      "login-errors": {
-        "title": "Login failed",
-        "google-description": "Google login failed. Please try again or use a different method.",
-        "email-description": "Email login failed. Please try again or use a different method."
-      }
-    },
     "organizations": {
       "page-title": "Footprint Login | Select an Organization",
       "title": "Select an organization",
@@ -688,27 +671,6 @@
         "no-auth-token": "No auth token provided. Please, log in again.",
         "auth-method-not-supported": "{{orgName}} has disabled the ability to log in using this auth method. Please retry using another method."
       }
-    },
-    "email-login": {
-      "page-title": "Footprint Login | Sign in to the Footprint Dashboard",
-      "title": "Sign up or Log in",
-      "instructions": "No passwords, no problems. We'll send you an email with a direct login link for a seamless and secure experience.",
-      "form": {
-        "email": {
-          "label": "Email",
-          "errors": {
-            "required": "Please enter an email",
-            "pattern": "Email is not valid"
-          }
-        },
-        "cta": "Continue"
-      }
-    },
-    "link-sent": {
-      "page-title": "Footprint Login | Logging in to the Footprint Dashboard",
-      "title": "Magic link sent!",
-      "instructions": "We just sent you an email to {{email}}. Click that link to log in. It's secure and lightning fast!",
-      "cta": "Back home"
     },
     "auth": {
       "loading-aria-label": "Loading",

@@ -19,7 +19,10 @@ const App = ({ Component, pageProps }: AppProps) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
-  const isResponsive = router.pathname === '/onboarding';
+
+  const isResponsive =
+    router.pathname === '/onboarding' ||
+    router.pathname.startsWith('/authentication/');
 
   return (
     <>
@@ -29,7 +32,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       <ObserveCollectorProvider appName="dashboard">
         <CustomDesignSystemProvider>
           <ReactQueryProvider>
-            <GlobalStyle hasMinWidth={!isResponsive} />
+            <GlobalStyle $hasMinWidth={!isResponsive} />
             <ErrorBoundary>
               <Layout name={pageProps.layout}>
                 <Component />
@@ -43,8 +46,8 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 };
 
-const GlobalStyle = createGlobalStyle<{ hasMinWidth: boolean }>`
-  ${({ theme, hasMinWidth }) => css`
+const GlobalStyle = createGlobalStyle<{ $hasMinWidth: boolean }>`
+  ${({ theme, $hasMinWidth }) => css`
     :root {
       --side-nav-width: 240px;
       --main-content-max-width: 1600px;
@@ -57,7 +60,7 @@ const GlobalStyle = createGlobalStyle<{ hasMinWidth: boolean }>`
     }
 
     body {
-      ${hasMinWidth &&
+      ${$hasMinWidth &&
       css`
         min-width: ${theme.grid.container.maxWidth.md}px;
       `}

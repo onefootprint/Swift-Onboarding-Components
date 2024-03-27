@@ -1,6 +1,7 @@
 import type { enRequestJson as requestResource } from '@onefootprint/request';
 import type { enUiJson as uiResource } from '@onefootprint/ui';
 
+import type authentication from '../config/locales/en/authentication.json';
 import type businessesResource from '../config/locales/en/businesses.json';
 import type commonResource from '../config/locales/en/common.json';
 import type domainRestrictionsResource from '../config/locales/en/domain-restrictions.json';
@@ -13,6 +14,7 @@ declare module 'i18next' {
     defaultNS: 'common';
     fallbackNS: 'common';
     resources: {
+      authentication: typeof authentication;
       ui: typeof uiResource;
       common: typeof commonResource;
       businesses: typeof businessesResource;
