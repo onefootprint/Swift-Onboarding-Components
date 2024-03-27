@@ -31,6 +31,7 @@ use idv::{
         client::MiddeskClient, MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse,
         MiddeskGetBusinessRequest, MiddeskGetBusinessResponse,
     },
+    neuro_id::{response::NeuroApiResponse, NeuroIdAnalyticsRequest},
     socure::{client::SocureClient, SocureIDPlusAPIResponse, SocureIDPlusRequest},
     stytch::{client::StytchClient, StytchLookupRequest, StytchLookupResponse},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
@@ -211,6 +212,7 @@ pub struct VendorClients {
         VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>,
     pub idology_pa: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
     pub stytch_lookup: VendorClient<StytchLookupRequest, StytchLookupResponse, idv::stytch::error::Error>,
+    pub neuro_id: VendorClient<NeuroIdAnalyticsRequest, NeuroApiResponse, idv::neuro_id::error::Error>,
     pub incode: IncodeClients,
 }
 
@@ -235,6 +237,7 @@ impl VendorClients {
             idology_expect_id: footprint_client.clone(),
             idology_pa: footprint_client.clone(),
             stytch_lookup: Arc::new(stytch_client),
+            neuro_id: footprint_client.clone(),
             incode: IncodeClients::new(footprint_client),
         }
     }
@@ -288,6 +291,11 @@ impl VendorClients {
                 StytchLookupRequest,
                 StytchLookupResponse,
                 idv::stytch::error::Error,
+            >::new()),
+            neuro_id: Arc::new(MockVendorAPICall::<
+                NeuroIdAnalyticsRequest,
+                NeuroApiResponse,
+                idv::neuro_id::error::Error,
             >::new()),
             incode: IncodeClients::new_with_mocks(),
         }

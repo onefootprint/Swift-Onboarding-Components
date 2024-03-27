@@ -1,0 +1,41 @@
+use super::{VendorAPICall, VendorAPIResponse};
+use async_trait::async_trait;
+use idv::{
+    footprint_http_client::FootprintVendorHttpClient,
+    neuro_id::{client::NeuroIdClient, response::NeuroApiResponse, NeuroIdAnalyticsRequest},
+    ParsedResponse,
+};
+use newtypes::VendorAPI;
+
+#[async_trait]
+impl VendorAPICall<NeuroIdAnalyticsRequest, NeuroApiResponse, idv::neuro_id::error::Error>
+    for FootprintVendorHttpClient
+{
+    #[tracing::instrument("make_request", skip_all, fields(request = "NeuroIdAnalyticsRequest"))]
+    async fn make_request(
+        &self,
+        request: NeuroIdAnalyticsRequest,
+    ) -> Result<NeuroApiResponse, idv::neuro_id::error::Error> {
+        let NeuroIdAnalyticsRequest { credentials, id } = request;
+        let neuro_client = NeuroIdClient::new(credentials)?;
+        let response = neuro_client.get_profile(self, &id).await?;
+
+
+        Ok(NeuroApiResponse::from_response(response).await)
+    }
+}
+
+
+impl VendorAPIResponse for NeuroApiResponse {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
+        VendorAPI::NeuroIdAnalytics
+    }
+
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
+    }
+
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::NeuroIdAnalytics(self.raw_response.clone())
+    }
+}

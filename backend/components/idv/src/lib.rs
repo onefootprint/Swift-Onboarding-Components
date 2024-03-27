@@ -271,6 +271,8 @@ pub enum Error {
     AwsRekognitionError(#[from] selfie_doc::AwsSelfieDocError),
     #[error("LexisError: {0}")]
     LexisError(#[from] lexis::Error),
+    #[error("NeuroIdError: {0}")]
+    NeuroIdError(#[from] neuro_id::error::Error),
 }
 
 impl From<&ParsedResponse> for VendorAPI {
