@@ -17,16 +17,26 @@ const isUpdateLoginMethodsVariant = (
 ): v is IdentifyVariant.updateLoginMethods =>
   v === IdentifyVariant.updateLoginMethods;
 
-const hasMultipleChallenges = (device: DeviceInfo, user?: User): boolean => {
-  if (!user) return false;
-  let { availableChallengeKinds } = user;
+const availableChallengeKinds = (device: DeviceInfo, user: User) => {
+  if (!user) return [];
+  let { availableChallengeKinds: challengeKinds } = user;
   // Check if device supports biometric challenge
   if (!device.hasSupportForWebauthn) {
-    availableChallengeKinds = availableChallengeKinds.filter(
-      kind => kind !== Kind.biometric,
-    );
+    challengeKinds = challengeKinds.filter(kind => kind !== Kind.biometric);
   }
-  return availableChallengeKinds.length > 1;
+  return challengeKinds;
+};
+
+const hasMultipleChallenges = (device: DeviceInfo, user?: User): boolean =>
+  availableChallengeKinds(device, user).length > 1;
+
+export const isUserFoundWithSingleChallenge = (
+  device: DeviceInfo,
+  user: User | undefined,
+  kind: Kind,
+): boolean => {
+  const challengeKinds = availableChallengeKinds(device, user);
+  return challengeKinds?.length === 1 && challengeKinds[0] === kind;
 };
 
 export const hasBootstrapTruthyValue = (c: IdentifyMachineContext): boolean =>
@@ -41,14 +51,6 @@ export const shouldShowChallengeSelector = (
 ): boolean =>
   isUpdateLoginMethodsVariant(context.variant) ||
   hasMultipleChallenges(context.device, user);
-
-export const isUserFoundWithSingleChallenge = (
-  user: User,
-  kind: Kind,
-): boolean =>
-  !!user &&
-  user?.availableChallengeKinds?.length === 1 &&
-  user?.availableChallengeKinds[0] === kind;
 
 export const isPrevSmsChallenge = (_: unknown, ev: NavigatedToPrevPage) =>
   ev.payload?.prev === 'smsChallenge';

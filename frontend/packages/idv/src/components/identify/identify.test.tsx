@@ -815,32 +815,63 @@ describe('<Identify />', () => {
       });
     });
 
-    it('passkey is hidden on unsupported device', async () => {
-      withLoginChallenge(ChallengeKind.sms);
-      const onDone = jest.fn();
-      renderIdentify({
-        config: liveOnboardingConfigFixture,
-        device: {
-          type: 'desktop',
-          hasSupportForWebauthn: false,
-          osName: 'windows vista',
-        },
-        onDone,
-      });
+    describe('device doesnt support passkey', () => {
+      it('passkey is hidden on challenge selector screen', async () => {
+        withLoginChallenge(ChallengeKind.sms);
+        const onDone = jest.fn();
+        renderIdentify({
+          config: liveOnboardingConfigFixture,
+          device: {
+            type: 'desktop',
+            hasSupportForWebauthn: false,
+            osName: 'windows vista',
+          },
+          onDone,
+        });
 
-      await fillIdentifyEmail();
-      await waitFor(() => {
+        await fillIdentifyEmail();
+        await waitFor(() => {
+          expect(
+            screen.getByText('Log in using one of the options below.'),
+          ).toBeInTheDocument();
+        });
         expect(
-          screen.getByText('Log in using one of the options below.'),
-        ).toBeInTheDocument();
-      });
-      expect(screen.queryByText('Log in with passkey')).not.toBeInTheDocument();
-      await userEvent.click(screen.getByText('Send code via SMS'));
-      await userEvent.click(screen.getByText('Continue'));
-      await fillChallengePin();
+          screen.queryByText('Log in with passkey'),
+        ).not.toBeInTheDocument();
+        await userEvent.click(screen.getByText('Send code via SMS'));
+        await userEvent.click(screen.getByText('Continue'));
+        await fillChallengePin();
 
-      await waitFor(() => {
-        expect(onDone).toHaveBeenCalled();
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+
+      it('skip straight to sms challenge when it is the only one available', async () => {
+        withIdentify(true, [ChallengeKind.sms, ChallengeKind.biometric]);
+        withLoginChallenge(ChallengeKind.sms);
+        const onDone = jest.fn();
+        renderIdentify({
+          config: liveOnboardingConfigFixture,
+          device: {
+            type: 'desktop',
+            hasSupportForWebauthn: false,
+            osName: 'windows vista',
+          },
+          onDone,
+        });
+
+        await fillIdentifyEmail();
+        // Since passkey isn't available on this device, we'll skip the challenge selector screen
+        // and go straight to the SMS challenge screen
+        await waitFor(() => {
+          expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
+        });
+        await fillChallengePin();
+
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
       });
     });
   });

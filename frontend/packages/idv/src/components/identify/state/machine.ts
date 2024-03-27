@@ -63,13 +63,14 @@ const CHALLENGE_SELECTION_TRANSITIONS: TransitionsFor<IdentifiedEvent> = [
   },
   // Otherwise, go directly to the SMS or phone screen
   {
-    cond: (_, ev) =>
-      isUserFoundWithSingleChallenge(ev.payload.user, Kind.email),
+    cond: (c, ev) =>
+      isUserFoundWithSingleChallenge(c.device, ev.payload.user, Kind.email),
     target: 'emailChallenge',
     actions: ['assignIdentifySuccessResult'],
   },
   {
-    cond: (_, ev) => isUserFoundWithSingleChallenge(ev.payload.user, Kind.sms),
+    cond: (c, ev) =>
+      isUserFoundWithSingleChallenge(c.device, ev.payload.user, Kind.sms),
     target: 'smsChallenge',
     actions: ['assignIdentifySuccessResult'],
   },
