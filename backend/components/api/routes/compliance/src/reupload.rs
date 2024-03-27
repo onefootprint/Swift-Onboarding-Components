@@ -36,8 +36,9 @@ pub async fn post(
             // Check that the authorized partner tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;
 
-            // Check that the document is associated with the given partnership ID.
-            let doc = ComplianceDoc::get(conn, &document_id, &partnership_id)?;
+            // Check that the document is associated with the given partnership ID and lock the
+            // document.
+            let doc = ComplianceDoc::lock(conn, &document_id, &partnership_id)?;
 
             // Create a request for the new doc.
             NewComplianceDocRequest {
@@ -46,9 +47,9 @@ pub async fn post(
                 description: description.as_str(),
                 requested_by_partner_tenant_user_id: &requested_by_partner_tenant_user_id,
                 assigned_to_tenant_user_id: None,
-                compliance_doc_id: &doc.id,
+                compliance_doc_id: &document_id,
             }
-            .create(conn)?;
+            .create(conn, &doc)?;
 
             Ok(())
         })

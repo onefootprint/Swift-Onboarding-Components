@@ -76,7 +76,7 @@ pub async fn post(
             // Check that the authorized partner tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;
 
-            // Get the template ID for the given template vertsion ID, while ensuring that the
+            // Get the template ID for the given template version ID, while ensuring that the
             // template version is owned by the authorized partner tenant.
             let template_id = template_version_id
                 .as_ref()
@@ -109,14 +109,15 @@ pub async fn post(
                 assigned_to_tenant_user_id: None,
                 compliance_doc_id: &doc.id,
             }
-            .create(conn)?;
+            .create(conn, &doc)?;
 
             let mut summaries =
                 ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), Some(&doc.id))?;
             let summary = summaries.remove(&partnership_id).ok_or(AssertionError(
                 "no ComplianceDocSummary for requested partnership ID",
             ))?;
-            Ok((summary, doc.id))
+
+            Ok((summary, doc.into_inner().id))
         })
         .await?;
 

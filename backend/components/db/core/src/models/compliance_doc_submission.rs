@@ -4,7 +4,7 @@ use db_schema::schema::compliance_doc_submission;
 use diesel::prelude::*;
 use newtypes::{ComplianceDocData, ComplianceDocRequestId, ComplianceDocSubmissionId, Locked, TenantUserId};
 
-use super::compliance_doc_request::ComplianceDocRequest;
+use super::{compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest};
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -35,7 +35,11 @@ pub struct NewComplianceDocSubmission<'a> {
 
 impl<'a> NewComplianceDocSubmission<'a> {
     #[tracing::instrument("NewComplianceDocSubmission::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<ComplianceDocSubmission> {
+    pub fn create(
+        self,
+        conn: &mut PgConn,
+        _lock: &Locked<ComplianceDoc>,
+    ) -> DbResult<ComplianceDocSubmission> {
         Ok(diesel::insert_into(compliance_doc_submission::table)
             .values(self)
             .get_result(conn)?)
@@ -43,7 +47,11 @@ impl<'a> NewComplianceDocSubmission<'a> {
 }
 
 impl ComplianceDocSubmission {
-    pub fn count_for_request(conn: &mut PgConn, req: &Locked<ComplianceDocRequest>) -> DbResult<i64> {
+    pub fn count_for_request(
+        conn: &mut PgConn,
+        req: &ComplianceDocRequest,
+        _lock: &Locked<ComplianceDoc>,
+    ) -> DbResult<i64> {
         Ok(compliance_doc_submission::table
             .filter(compliance_doc_submission::request_id.eq(&req.id))
             .count()

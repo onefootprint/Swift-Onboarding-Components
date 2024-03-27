@@ -1,0 +1,1 @@
+DROP INDEX compliance_doc_request_compliance_doc_id_unique_active;

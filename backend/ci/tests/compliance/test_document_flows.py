@@ -102,13 +102,38 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["status"] == "waiting_for_upload"
     assert doc["name"] == "edited ad-hoc name 2"
     assert doc["description"] == "edited ad-hoc description 2"
+    old_latest_request_id = doc["latest_request_id"]
+
+    # Request another re-upload of the ad-hoc document.
+    doc_id = doc["id"]
+    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reupload", {
+        "name": "edited ad-hoc name 2",
+        "description": "edited ad-hoc description 2",
+    }, *partner_tenant.db_auths)
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
+    latest_request_id = doc["latest_request_id"]
+    assert latest_request_id != old_latest_request_id
+
+    # We shouldn't be able to delete the old request.
+    resp = delete(f"compliance/partners/{partnership_id}/requests/{old_latest_request_id}", {}, *partner_tenant.db_auths, status_code=400)
+    assert resp["error"]["message"] == "Cannot retract this compliance document request since there is a newer request for this document"
+
+    # We can delete the most recent requests.
+    delete(f"compliance/partners/{partnership_id}/requests/{latest_request_id}", {}, *partner_tenant.db_auths)
+
+    # There should now be no requests for the ad-hoc document.
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
+    assert doc["latest_request_id"] is None
 
     # Requesting a document from the same template yields an error.
-    post(f"compliance/partners/{partnership_id}/documents", {
+    resp = post(f"compliance/partners/{partnership_id}/documents", {
         "template_version_id": template["latest_version"]["id"],
         "name": "edited template name 2",
         "description": "edited template description 2",
     }, *partner_tenant.db_auths, status_code=400)
+    assert resp["error"]["message"] == "A compliance document request already exists for this template"
 
     # Delete the template
     delete(f"compliance/doc_templates/{template_id}", {}, *partner_tenant.db_auths)

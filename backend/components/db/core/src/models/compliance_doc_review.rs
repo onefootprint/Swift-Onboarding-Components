@@ -2,7 +2,11 @@ use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_review;
 use diesel::prelude::*;
-use newtypes::{ComplianceDocReviewDecision, ComplianceDocReviewId, ComplianceDocSubmissionId, TenantUserId};
+use newtypes::{
+    ComplianceDocReviewDecision, ComplianceDocReviewId, ComplianceDocSubmissionId, Locked, TenantUserId,
+};
+
+use super::compliance_doc::ComplianceDoc;
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -35,7 +39,7 @@ pub struct NewComplianceDocReview<'a> {
 
 impl<'a> NewComplianceDocReview<'a> {
     #[tracing::instrument("NewComplianceDocReview::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<ComplianceDocReview> {
+    pub fn create(self, conn: &mut PgConn, _lock: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocReview> {
         Ok(diesel::insert_into(compliance_doc_review::table)
             .values(self)
             .get_result(conn)?)

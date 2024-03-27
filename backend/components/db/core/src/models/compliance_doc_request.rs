@@ -1,10 +1,10 @@
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::{compliance_doc, compliance_doc_request};
+use db_schema::schema::compliance_doc_request;
 use diesel::prelude::*;
-use newtypes::{
-    ComplianceDocId, ComplianceDocRequestId, Locked, TenantCompliancePartnershipId, TenantUserId,
-};
+use newtypes::{ComplianceDocId, ComplianceDocRequestId, Locked, TenantUserId};
+
+use super::compliance_doc::ComplianceDoc;
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -44,52 +44,47 @@ pub struct NewComplianceDocRequest<'a> {
 
 impl<'a> NewComplianceDocRequest<'a> {
     #[tracing::instrument("NewComplianceDocRequest::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<ComplianceDocRequest> {
+    pub fn create(self, conn: &mut TxnPgConn, doc: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocRequest> {
+        // Deactivate existing request if one exists.
+        if let Some(prev_req) = ComplianceDocRequest::get_active(conn, doc)? {
+            ComplianceDocRequest::deactivate(conn, &prev_req.id, None, doc)?;
+        }
+
         Ok(diesel::insert_into(compliance_doc_request::table)
             .values(self)
-            .get_result(conn)?)
+            .get_result(conn.conn())?)
     }
 }
 
 impl ComplianceDocRequest {
-    pub fn lock_active(
+    pub fn get_active(
         conn: &mut TxnPgConn,
-        id: &ComplianceDocRequestId,
-        partnership_id: &TenantCompliancePartnershipId,
-    ) -> DbResult<Locked<ComplianceDocRequest>> {
-        // Diesel doesn't support the `FOR UPDATE ON <table>` syntax for obtaining a lock on a
-        // single table out of a join, so we have to make two queries.
-        //
-        // Check that the request is associated with the given partnership ID.
-        let req = compliance_doc::table
-            .inner_join(compliance_doc_request::table)
-            .filter(compliance_doc::tenant_compliance_partnership_id.eq(partnership_id))
-            .filter(compliance_doc_request::id.eq(id))
-            .select(ComplianceDocRequest::as_select())
-            .first(conn.conn())?;
-
-        // Check that the request is active and obtain a lock on the row.
+        doc: &Locked<ComplianceDoc>,
+    ) -> DbResult<Option<ComplianceDocRequest>> {
         let req = compliance_doc_request::table
-            .filter(compliance_doc_request::id.eq(req.id))
+            .filter(compliance_doc_request::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_request::deactivated_at.is_null())
-            .for_no_key_update()
             .select(ComplianceDocRequest::as_select())
-            .first(conn.conn())?;
+            .first(conn.conn())
+            .optional()?;
 
-        Ok(Locked::new(req))
+        Ok(req)
     }
 
+    // Deactivate the request. Passing a tenant_user_id indicates it was a manual deactivation
+    // rather than an implicit deactivation from a re-request.
     pub fn deactivate(
         conn: &mut TxnPgConn,
-        req: Locked<ComplianceDocRequest>,
-        deactivated_by: &TenantUserId,
+        req_id: &ComplianceDocRequestId,
+        deactivated_by: Option<&TenantUserId>,
+        _lock: &Locked<ComplianceDoc>,
     ) -> DbResult<()> {
         diesel::update(compliance_doc_request::table)
-            .filter(compliance_doc_request::id.eq(&req.id))
+            .filter(compliance_doc_request::id.eq(req_id))
             .filter(compliance_doc_request::deactivated_at.is_null())
             .set((
                 compliance_doc_request::deactivated_at.eq(Some(Utc::now())),
-                compliance_doc_request::deactivated_by_partner_tenant_user_id.eq(Some(deactivated_by)),
+                compliance_doc_request::deactivated_by_partner_tenant_user_id.eq(deactivated_by),
             ))
             .execute(conn.conn())?;
 

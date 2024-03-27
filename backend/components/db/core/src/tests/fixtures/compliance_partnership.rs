@@ -148,9 +148,9 @@ pub fn create_resources<'a>(
                     assigned_to_tenant_user_id: Some(&tenant_user.id),
                     compliance_doc_id: &doc.id,
                 }
-                .create(conn)
+                .create(conn, &doc)
                 .unwrap();
-                requests.push(req);
+                requests.push((req, doc));
             }
 
             // Create an ad-hoc request.
@@ -168,9 +168,9 @@ pub fn create_resources<'a>(
                 assigned_to_tenant_user_id: Some(&tenant_user.id),
                 compliance_doc_id: &doc.id,
             }
-            .create(conn)
+            .create(conn, &doc)
             .unwrap();
-            requests.push(req);
+            requests.push((req, doc));
         }
 
         // For each partnership, there will be a document in each of the following four states:
@@ -182,34 +182,34 @@ pub fn create_resources<'a>(
         // Submit docs in response to some of the request.
         assert_eq!(requests.len() % 4, 0);
         let subs: Vec<_> = requests
-            .iter()
+            .into_iter()
             .zip((0..=3).cycle())
-            .map(|(req, i)| {
+            .map(|((req, doc), i)| {
                 if i == 3 {
                     return None;
                 }
 
-                Some(
-                    NewComplianceDocSubmission {
-                        created_at: Utc::now(),
+                let sub = NewComplianceDocSubmission {
+                    created_at: Utc::now(),
 
-                        request_id: &req.id,
-                        submitted_by_tenant_user_id: req.assigned_to_tenant_user_id.as_ref().unwrap(),
-                        assigned_to_partner_tenant_user_id: Some(&req.requested_by_partner_tenant_user_id),
-                        doc_data: &ComplianceDocData::SealedUpload {
-                            s3_url: S3Url::from("the url".to_owned()),
-                            e_data_key: SealedVaultDataKey(vec![]),
-                        },
-                    }
-                    .create(conn)
-                    .unwrap(),
-                )
+                    request_id: &req.id,
+                    submitted_by_tenant_user_id: req.assigned_to_tenant_user_id.as_ref().unwrap(),
+                    assigned_to_partner_tenant_user_id: Some(&req.requested_by_partner_tenant_user_id),
+                    doc_data: &ComplianceDocData::SealedUpload {
+                        s3_url: S3Url::from("the url".to_owned()),
+                        e_data_key: SealedVaultDataKey(vec![]),
+                    },
+                }
+                .create(conn, &doc)
+                .unwrap();
+
+                Some((sub, doc))
             })
             .collect();
 
         // Review the first two docs for each partnership.
         assert_eq!(subs.len() % 4, 0);
-        subs.iter()
+        subs.into_iter()
             .zip(
                 [
                     Some((ComplianceDocReviewDecision::Accepted, "accepting this")),
@@ -220,16 +220,17 @@ pub fn create_resources<'a>(
                 .iter()
                 .cycle(),
             )
-            .for_each(|(sub, dn)| {
+            .for_each(|(sub_and_doc, dn)| {
                 if let Some((decision, note)) = dn {
+                    let (sub, doc) = sub_and_doc.unwrap();
                     NewComplianceDocReview {
                         created_at: Utc::now(),
-                        submission_id: &sub.as_ref().unwrap().id,
+                        submission_id: &sub.id,
                         reviewed_by_partner_tenant_user_id: &pt_user.id,
                         decision: *decision,
                         note,
                     }
-                    .create(conn)
+                    .create(conn, &doc)
                     .unwrap();
                 }
             });
