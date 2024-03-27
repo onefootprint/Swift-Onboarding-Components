@@ -43,6 +43,13 @@ struct NewList<'a> {
     e_data_key: SealedVaultDataKey,
 }
 
+#[derive(AsChangeset)]
+#[diesel(table_name = list)]
+struct ListUpdate {
+    name: String,
+    alias: ListAlias,
+}
+
 impl List {
     #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("List::create", skip_all)]
@@ -145,6 +152,26 @@ impl List {
             .for_no_key_update()
             .get_result(conn.conn())?;
         Ok(Locked::new(result))
+    }
+
+    #[tracing::instrument("List::update", skip_all)]
+    pub fn update(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        is_live: bool,
+        id: &ListId,
+        name: String,
+        alias: ListAlias,
+    ) -> DbResult<Self> {
+        let update = ListUpdate { name, alias };
+        let result = diesel::update(list::table)
+            .filter(list::tenant_id.eq(tenant_id))
+            .filter(list::is_live.eq(is_live))
+            .filter(list::id.eq(&id))
+            .filter(list::deactivated_seqno.is_null())
+            .set(update)
+            .get_result(conn)?;
+        Ok(result)
     }
 
     #[tracing::instrument("List::deactivate", skip_all)]

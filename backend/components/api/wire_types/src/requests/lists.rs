@@ -13,3 +13,9 @@ pub struct CreateListRequest {
 pub struct CreateListEntryRequest {
     pub entries: Vec<PiiString>,
 }
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct UpdateListRequest {
+    pub name: String,
+    pub alias: ListAlias,
+}

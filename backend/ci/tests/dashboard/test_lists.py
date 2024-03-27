@@ -1,4 +1,11 @@
-from tests.utils import _gen_random_str, create_ob_config, patch, post, get, delete
+from tests.utils import (
+    _gen_random_str,
+    create_ob_config,
+    post,
+    patch,
+    get,
+    delete,
+)
 
 
 def test_create(sandbox_tenant):
@@ -184,6 +191,48 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     assert list["entries_count"] == 0
     assert list["used_in_playbook"] == False
     assert len(list["playbooks"]) == 0
+
+
+def test_update(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    list = post(
+        f"/org/lists",
+        dict(
+            name=f"Some Real Baddies {nonce}",
+            alias=f"some_real_baddies_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    list2 = post(
+        f"/org/lists",
+        dict(
+            name=f"Some Real Baddies 2 {nonce}",
+            alias=f"some_real_baddies_2_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # update name and alias
+    patch(
+        f"/org/lists/{list['id']}",
+        dict(name=f"Super Duper Baddies {nonce}", alias=f"super_duper_baddies_{nonce}"),
+        *sandbox_tenant.db_auths,
+    )
+
+    list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
+    assert list["name"] == f"Super Duper Baddies {nonce}"
+    assert list["alias"] == f"super_duper_baddies_{nonce}"
+
+    # updating to a name and alias that already exist fails
+    patch(
+        f"/org/lists/{list['id']}",
+        dict(name=f"Some Real Baddies 2 {nonce}", alias=f"some_real_baddies_2_{nonce}"),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
 
 
 def test_delete_list(sandbox_tenant):

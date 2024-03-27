@@ -125,7 +125,7 @@ impl ListEntry {
         Ok(Locked::new(result))
     }
 
-    #[tracing::instrument("List::deactivate", skip_all)]
+    #[tracing::instrument("ListEntry::deactivate", skip_all)]
     pub fn deactivate(conn: &mut TxnPgConn, list_entry: Locked<Self>) -> DbResult<Self> {
         if list_entry.deactivated_seqno.is_some() {
             return Err(DbError::ListEntryAlreadyDeactivated);
