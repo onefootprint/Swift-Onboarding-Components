@@ -113,7 +113,7 @@ impl VaultDataForRules {
             .iter()
             .flat_map(|r| &(r.rule_expression.0))
             .flat_map(|rc| match rc {
-                RuleExpressionCondition::VaultData { di, op: _, value: _ } => Some(di),
+                RuleExpressionCondition::VaultData(vd) => Some(vd.field()),
                 _ => None,
             })
             .cloned()

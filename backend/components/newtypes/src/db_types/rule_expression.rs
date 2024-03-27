@@ -1,4 +1,4 @@
-use crate::{DataIdentifier, FootprintReasonCode};
+use crate::{DataIdentifier, FootprintReasonCode, ListId};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -16,11 +16,7 @@ pub enum RuleExpressionCondition {
         op: BooleanOperator,
         value: bool,
     },
-    VaultData {
-        di: DataIdentifier,
-        op: BooleanOperator, // TODO: just starting with this to POC the rules engine refactor for vault data. but this design will change a little so we can support a wide variety of operators
-        value: String,
-    },
+    VaultData(VaultOperation),
     // just a proof of concept, not used. would have #[cfg(test)] but vscode is annoying with that
     RiskScore {
         field: RiskScore,
@@ -28,6 +24,58 @@ pub enum RuleExpressionCondition {
         value: i64,
     },
 }
+
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+#[serde(untagged)]
+pub enum VaultOperation {
+    Equals {
+        field: DataIdentifier,
+        op: Equals,
+        value: String,
+    },
+    IsIn {
+        field: DataIdentifier,
+        op: IsIn,
+        value: ListId,
+    },
+}
+
+impl VaultOperation {
+    pub fn field(&self) -> &DataIdentifier {
+        match self {
+            VaultOperation::Equals {
+                field,
+                op: _,
+                value: _,
+            } => field,
+            VaultOperation::IsIn {
+                field,
+                op: _,
+                value: _,
+            } => field,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Equals {
+    #[serde(rename = "eq")]
+    Equals,
+    #[serde(rename = "not_eq")]
+    DoesNotEqual,
+}
+
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum IsIn {
+    IsIn,
+    IsNotIn,
+}
+
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -57,7 +105,7 @@ pub enum RiskScore {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::FootprintReasonCode as FRC;
+    use crate::{FootprintReasonCode as FRC, IdentityDataKind};
     use serde_json::json;
 
     #[test]
@@ -97,6 +145,48 @@ mod test {
             json
         );
 
+        assert_eq!(re, serde_json::from_value(json).unwrap());
+    }
+
+    #[test]
+    fn test_deser_vault_data_equals() {
+        let re = RuleExpression(vec![RuleExpressionCondition::VaultData(VaultOperation::Equals {
+            field: DataIdentifier::Id(IdentityDataKind::FirstName),
+            op: Equals::Equals,
+            value: "Bob".to_owned(),
+        })]);
+
+        let json = serde_json::to_value(re.clone()).unwrap();
+
+        assert_eq!(
+            json!(
+                [
+                    {"field":"id.first_name","op":"eq","value":"Bob"},
+                ]
+            ),
+            json
+        );
+        assert_eq!(re, serde_json::from_value(json).unwrap());
+    }
+
+    #[test]
+    fn test_deser_vault_data_isin() {
+        let re = RuleExpression(vec![RuleExpressionCondition::VaultData(VaultOperation::IsIn {
+            field: DataIdentifier::Id(IdentityDataKind::Ssn9),
+            op: IsIn::IsIn,
+            value: ListId::from("lst_123".to_string()),
+        })]);
+
+        let json = serde_json::to_value(re.clone()).unwrap();
+
+        assert_eq!(
+            json!(
+                [
+                    {"field":"id.ssn9","op":"is_in","value":"lst_123"},
+                ]
+            ),
+            json
+        );
         assert_eq!(re, serde_json::from_value(json).unwrap());
     }
 }

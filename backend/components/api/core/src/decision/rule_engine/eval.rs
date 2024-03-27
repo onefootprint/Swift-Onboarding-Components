@@ -1,8 +1,7 @@
 use db::models::rule_instance::RuleInstance;
 use itertools::Itertools;
 use newtypes::{
-    BooleanOperator, DocumentRequestKind, FootprintReasonCode, RuleAction, RuleExpression, RuleExpressionCondition,
-    StepUpKind,
+    BooleanOperator, DocumentRequestKind, Equals, FootprintReasonCode, RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, VaultOperation
 };
 use strum::IntoEnumIterator;
 
@@ -131,14 +130,17 @@ fn evaluate_condition(cond: &RuleExpressionCondition, input: &[FootprintReasonCo
                 BooleanOperator::DoesNotEqual => field_value != *value,
             }
         }
-        RuleExpressionCondition::VaultData { di, op, value } => {
-            let Some(field_value) = vault_data.get_di(di.clone()).ok() else {
+        RuleExpressionCondition::VaultData(vo) => {
+            let Some(field_value) = vault_data.get_di(vo.field().clone()).ok() else {
                 // if vault data is missing, never evaluate to true
                 return false
             };
-            match op {
-                BooleanOperator::Equals => field_value.leak_to_string() == *value,
-                BooleanOperator::DoesNotEqual => field_value.leak_to_string() != *value,
+            match vo {
+                VaultOperation::Equals { field:_, op, value } => match op {
+                    Equals::Equals => field_value.leak_to_string() == *value,
+                    Equals::DoesNotEqual => field_value.leak_to_string() != *value,
+                },
+                VaultOperation::IsIn { field:_, op: _, value: _ } => unimplemented!(),
             }
         },
         RuleExpressionCondition::RiskScore { field:_, op:_, value:_ } => unimplemented!(),
@@ -435,17 +437,17 @@ pub mod tests {
         };
         let vd = VaultDataForRules::new(vault_data);
 
-        assert!(evaluate_condition(&REC::VaultData {
-            di: DataIdentifier::Id(IdentityDataKind::FirstName),
-            op: BooleanOperator::Equals,
+        assert!(evaluate_condition(&REC::VaultData(VaultOperation::Equals {
+            field: DataIdentifier::Id(IdentityDataKind::FirstName),
+            op: Equals::Equals,
             value: "Bob".to_owned(),
-        }, &Vec::<FRC>::new(), &vd));
-
-        assert!(!evaluate_condition(&REC::VaultData {
-            di: DataIdentifier::Id(IdentityDataKind::FirstName),
-            op: BooleanOperator::Equals,
+        }), &Vec::<FRC>::new(), &vd));
+        
+        assert!(!evaluate_condition(&REC::VaultData(VaultOperation::Equals {
+            field: DataIdentifier::Id(IdentityDataKind::FirstName),
+            op: Equals::Equals,
             value: "Alice".to_owned(),
-        }, &Vec::<FRC>::new(), &vd));
+        }), &Vec::<FRC>::new(), &vd));
     }
 
 }
