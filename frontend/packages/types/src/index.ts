@@ -38,6 +38,8 @@ export type {
   DecryptRiskSignalAmlHitsResponse,
   DecryptUserRequest,
   DecryptUserResponse,
+  DeleteListEntryRequest,
+  DeleteListEntryResponse,
   DeleteRuleRequest,
   DeleteRuleResponse,
   EditRequest,

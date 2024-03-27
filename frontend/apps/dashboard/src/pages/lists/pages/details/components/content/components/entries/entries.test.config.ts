@@ -1,9 +1,9 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import { ActorKind, ListKind } from '@onefootprint/types';
 
-const entriesFixture = [
+export const entriesFixture = [
   {
-    id: 'lst_JSO43Z80R3R5c1R47PRMZC',
+    id: 'entry_1',
     data: 'test@onefootprint.com',
     created_at: '2024-03-27T04:11:01.168287Z',
     actor: {
@@ -14,7 +14,7 @@ const entriesFixture = [
     },
   },
   {
-    id: 'lst_692BYzICGJmIDxF6hrZLtt',
+    id: 'entry_2',
     data: 'test2@onefootprint.com',
     created_at: '2024-03-27T04:11:01.168287Z',
     actor: {
@@ -27,7 +27,7 @@ const entriesFixture = [
 ];
 
 const listFixture = {
-  id: '1',
+  id: 'list_1',
   actor: {
     kind: ActorKind.footprint,
   },
@@ -39,6 +39,25 @@ const listFixture = {
   usedInRules: false,
 };
 
+export const withDeleteError = (listId: string, entryId: string) =>
+  mockRequest({
+    method: 'delete',
+    path: `/org/lists/${listId}/entries/${entryId}`,
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withDelete = (listId: string, entryId: string) =>
+  mockRequest({
+    method: 'delete',
+    path: `/org/lists/${listId}/entries/${entryId}`,
+    response: {},
+  });
+
 export const withList = (listId: string) =>
   mockRequest({
     method: 'get',
@@ -46,11 +65,11 @@ export const withList = (listId: string) =>
     response: listFixture,
   });
 
-export const withListEntries = (listId: string) =>
+export const withListEntries = (listId: string, data = entriesFixture) =>
   mockRequest({
     method: 'get',
     path: `/org/lists/${listId}/entries`,
-    response: entriesFixture,
+    response: data,
   });
 
 export const withListEntriesError = (listId: string) =>

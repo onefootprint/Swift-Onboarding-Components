@@ -1,21 +1,66 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { createFontStyles, Stack } from '@onefootprint/ui';
+import type { ListEntry } from '@onefootprint/types';
+import {
+  AnimatedLoadingSpinner,
+  createFontStyles,
+  Stack,
+  useToast,
+} from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import useDeleteListEntry from './hooks/use-delete-list-entry';
+
 type EntryChipProps = {
-  label: string;
-  onDelete: () => void;
+  entry: ListEntry;
 };
 
-const EntryChip = ({ label, onDelete }: EntryChipProps) => (
-  <Container>
-    <Label>{label}</Label>
-    <Close onClick={onDelete}>
-      <IcoCloseSmall16 />
-    </Close>
-  </Container>
-);
+const EntryChip = ({ entry }: EntryChipProps) => {
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'details.entries',
+  });
+  const router = useRouter();
+  const listId = router.query.id as string;
+  const deleteListEntryMutation = useDeleteListEntry(listId);
+  const showRequestErrorToast = useRequestErrorToast();
+  const toast = useToast();
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const { data, id } = entry;
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    await deleteListEntryMutation
+      .mutateAsync({ entryId: id })
+      .then(() => {
+        toast.show({
+          title: t('deleted-toast.title'),
+          description: t('deleted-toast.description'),
+        });
+      })
+      .catch(err => {
+        showRequestErrorToast(err);
+      });
+    setIsDeleting(false);
+  };
+
+  return (
+    <Container>
+      <Label>{data}</Label>
+      {isDeleting ? (
+        <Close aria-label={`Deleting ${data}`}>
+          <AnimatedLoadingSpinner animationStart size={16} />
+        </Close>
+      ) : (
+        <Close aria-label={`Delete ${data}`} onClick={handleDelete}>
+          <IcoCloseSmall16 />
+        </Close>
+      )}
+    </Container>
+  );
+};
 
 const Container = styled(Stack)`
   ${({ theme }) => css`

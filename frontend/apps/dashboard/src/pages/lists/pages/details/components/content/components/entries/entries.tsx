@@ -13,25 +13,38 @@ import SectionTitle from '../section-title';
 import AddEntriesDialog from './components/add-entries-dialog';
 import EntryChip from './components/entry-chip';
 
-const MAX_ENTRIES = 5;
+const MAX_ENTRIES = 30;
 
 const Entries = () => {
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.entries',
   });
   const router = useRouter();
-  const id = router.query.id as string;
-  const { isLoading, error, data } = useListEntries(id);
+  const listId = router.query.id as string;
+  const { isLoading, error, data } = useListEntries(listId);
   const filters = useListDetailsFilters();
   const [showAllEntries, setShowAllEntries] = useState(false);
-  const shouldShowAllButton = data && data?.length > MAX_ENTRIES;
   const toggleExpanded = () => setShowAllEntries(!showAllEntries);
   const [showAddEntryDialog, setShowAddEntryDialog] = useState(false);
 
+  const filteredEntries: ListEntry[] = useMemo(() => {
+    if (filters.values.search) {
+      return (data || []).filter((entry: ListEntry) =>
+        entry.data.includes(filters.values.search),
+      );
+    }
+    return data || [];
+  }, [data, filters.values]);
+
   const displayedEntries: ListEntry[] = useMemo(() => {
-    const entries = data || [];
-    return entries.slice(0, showAllEntries ? entries.length : MAX_ENTRIES);
-  }, [data, showAllEntries]);
+    if (showAllEntries) {
+      return filteredEntries;
+    }
+    return filteredEntries.slice(0, MAX_ENTRIES);
+  }, [filteredEntries, showAllEntries]);
+
+  const shouldShowAllButton = filteredEntries.length > MAX_ENTRIES;
+  const allCount = filteredEntries.length - displayedEntries.length;
 
   const handleAddEntry = () => {
     setShowAddEntryDialog(true);
@@ -43,12 +56,6 @@ const Entries = () => {
 
   const handleNewEntryAdded = () => {
     setShowAddEntryDialog(false);
-  };
-
-  const handleDeleteEntry = (entryId: string) => {
-    // TODO: implement
-    // eslint-disable-next-line no-console
-    console.log('Delete entry', entryId);
   };
 
   if (error) {
@@ -71,13 +78,7 @@ const Entries = () => {
           />
           <EntriesContainer>
             {displayedEntries.map(entry => (
-              <EntryChip
-                key={entry.id}
-                label={entry.data}
-                onDelete={() => {
-                  handleDeleteEntry(entry.id);
-                }}
-              />
+              <EntryChip key={entry.id} entry={entry} />
             ))}
           </EntriesContainer>
         </>
@@ -96,7 +97,7 @@ const Entries = () => {
             <>
               <Text variant="caption-1" color="quaternary">
                 {t('entries-more', {
-                  count: data.length - displayedEntries.length,
+                  count: allCount,
                 })}
               </Text>
               <Text tag="span" variant="caption-1" color="quaternary">

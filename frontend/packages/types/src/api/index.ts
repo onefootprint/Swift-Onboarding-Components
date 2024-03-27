@@ -33,6 +33,10 @@ export type {
   DecryptRiskSignalAmlHitsResponse,
 } from './decrypt-risk-signal-aml-hits';
 export type { DecryptUserRequest, DecryptUserResponse } from './decrypt-user';
+export type {
+  DeleteListEntryRequest,
+  DeleteListEntryResponse,
+} from './delete-list-entry';
 export type { DeleteRuleRequest, DeleteRuleResponse } from './delete-rule';
 export type { EditRequest, EditResponse } from './edit';
 export type { EditRuleRequest, EditRuleResponse } from './edit-rule';
