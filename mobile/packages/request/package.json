@@ -12,14 +12,24 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@react-native-async-storage/async-storage": "1.19.3",
     "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.0",
     "eslint-config-footprint": "*",
+    "react-native-device-info": "^10.11.0",
+    "react-native": "^0.71.15",
     "tsconfig": "*",
     "typescript": "^5"
   },
   "dependencies": {
     "@onefootprint/types": "*",
+    "axios-case-converter": "^0.9.0",
     "axios": "^1.6.0",
-    "axios-case-converter": "^0.9.0"
+    "uuid": "^9.0.0"
+  },
+  "peerDependencies": {
+    "react-native": "> 0.70",
+    "react-native-device-info": "> 10",
+    "@react-native-async-storage/async-storage": "> 1.19"
   }
 }

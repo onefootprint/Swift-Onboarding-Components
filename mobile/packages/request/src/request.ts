@@ -1,7 +1,12 @@
 import { DataIdentifierKeys } from '@onefootprint/types';
-import type { AxiosError, AxiosRequestConfig as RequestConfig } from 'axios';
+import type { AxiosError, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
+
+import getVersion from './utils/get-version';
+import getSessionId from './utils/session-id';
+
+const version = getVersion();
 
 export type FootprintServerError = {
   message: string;
@@ -53,30 +58,35 @@ export const getErrorMessage = (error?: unknown | Error): string => {
   return 'Something went wrong';
 };
 
-const getRequestOptions = (requestConfig: RequestConfig) => {
+const getRequestOptions = async (requestConfig: AxiosRequestConfig) => {
+  const sessionId = await getSessionId();
+
   return {
     baseURL: process.env.API_BASE_URL ?? 'https://api.onefootprint.com',
     timeout: 60000,
     withCredentials: true,
     ...requestConfig,
     headers: {
+      'x-fp-session-id': sessionId,
+      'x-fp-client-version': version,
       ...requestConfig.headers,
     },
   };
 };
 
-export const client = applyCaseMiddleware(axios.create(), { preservedKeys });
-
-const request = <Response = any>(requestConfig: RequestConfig = {}) => {
-  const options = getRequestOptions(requestConfig);
+const request = async <Response = any>(
+  requestConfig: AxiosRequestConfig = {},
+) => {
+  const client = applyCaseMiddleware(axios.create(), { preservedKeys });
+  const options = await getRequestOptions(requestConfig); // Await the requestOptions
   return client.request<Response>(options);
 };
 
-export const requestWithoutCaseConverter = <Response = unknown>(
-  requestConfig: RequestConfig = {},
+export const requestWithoutCaseConverter = async <Response = unknown>(
+  requestConfig: AxiosRequestConfig = {},
 ) => {
   const clientWithCaseApplied = axios.create();
-  const options = getRequestOptions(requestConfig);
+  const options = await getRequestOptions(requestConfig);
   return clientWithCaseApplied.request<Response>(options);
 };
 
