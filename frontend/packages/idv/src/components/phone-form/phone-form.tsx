@@ -73,6 +73,7 @@ const PhoneForm = ({
         }) => (
           <PhoneInput
             autoFocus
+            data-name="phone-number"
             data-private
             hasError={!!error}
             hint={hint}

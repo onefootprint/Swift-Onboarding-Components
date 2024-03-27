@@ -25,14 +25,15 @@ const PhoneField = ({ disabled }: EmailFieldProps) => {
 
   return (
     <TextInput
+      data-name="phone-number"
       data-private
-      type="tel"
-      hasError={!!errors.phoneNumber}
+      defaultValue={getValues('phoneNumber')}
       disabled={disabled}
+      hasError={!!errors.phoneNumber}
       hint={getErrorHint(errors)}
       label={t('form.phone.label')}
       placeholder={t('form.phone.placeholder')}
-      defaultValue={getValues('phoneNumber')}
+      type="tel"
       {...register('phoneNumber', {
         required: {
           value: true,
