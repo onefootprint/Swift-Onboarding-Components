@@ -8,6 +8,7 @@ import useListEntries from '@/lists/pages/details/hooks/use-list-entries';
 
 import useListDetailsFilters from '../../hooks/use-list-details-filters';
 import SectionTitle from '../section-title';
+// import EntryChip from './components/entry-chip';
 
 const MAX_ENTRIES = 5;
 
@@ -52,6 +53,7 @@ const Entries = () => {
         </Button>
       </Stack>
       {/* TODO: implement showing the entries */}
+      {/* <EntryChip onDelete={() => {}}>jane@doe.com</EntryChip> */}
       {data.length === 0 && (
         <Text variant="body-3" color="tertiary">
           {t('empty')}
