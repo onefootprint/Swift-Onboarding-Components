@@ -1,9 +1,11 @@
-import { Button, Stack, Text } from '@onefootprint/ui';
+import { Button, Shimmer, Stack, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useList from '@/lists/pages/details/hooks/use-list';
+
+import EditDialog from './components/edit-dialog';
 
 const Header = () => {
   const router = useRouter();
@@ -12,10 +14,19 @@ const Header = () => {
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.header',
   });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   if (isLoading || error || !data) {
     return null;
   }
+
+  const launchDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
 
   return (
     <Stack
@@ -25,13 +36,21 @@ const Header = () => {
     >
       <Stack display="flex" direction="column">
         <Stack gap={3}>
-          <Text variant="label-1">{data.name}</Text>
+          {data.name ? (
+            <Text variant="label-1">{data.name}</Text>
+          ) : (
+            <Shimmer sx={{ height: '27px', width: '75px' }} />
+          )}
           <Text tag="span" variant="label-1">
             •
           </Text>
-          <Text variant="label-1" color="tertiary">
-            {data.alias}
-          </Text>
+          {data.alias ? (
+            <Text variant="label-1" color="tertiary">
+              {data.alias}
+            </Text>
+          ) : (
+            <Shimmer sx={{ height: '27px', width: '75px' }} />
+          )}
         </Stack>
         <Stack align="center" gap={2}>
           <Text variant="body-4" color="secondary">
@@ -43,8 +62,15 @@ const Header = () => {
         </Stack>
       </Stack>
       <Stack align="center" gap={3}>
-        <Button variant="secondary">{t('edit')}</Button>
+        <Button variant="secondary" onClick={launchDialog}>
+          {t('edit')}
+        </Button>
       </Stack>
+      <EditDialog
+        open={isDialogOpen}
+        onClose={closeDialog}
+        onEdit={closeDialog}
+      />
     </Stack>
   );
 };

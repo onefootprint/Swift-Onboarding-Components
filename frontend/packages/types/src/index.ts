@@ -168,6 +168,7 @@ export type {
   UpdateClientSecurityConfigResponse,
   UpdateD2PStatusRequest,
   UpdateD2PStatusResponse,
+  UpdateListRequest,
   UpdateMemberRequest,
   UpdateMemberResponse,
   UpdateOrgRequest,

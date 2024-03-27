@@ -240,6 +240,7 @@ export type {
   UpdateD2PStatusRequest,
   UpdateD2PStatusResponse,
 } from './update-d2p-status';
+export type { UpdateListRequest } from './update-list';
 export type {
   UpdateMemberRequest,
   UpdateMemberResponse,

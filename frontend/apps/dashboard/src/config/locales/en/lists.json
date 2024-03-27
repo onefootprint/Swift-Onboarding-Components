@@ -83,7 +83,37 @@
     },
     "header": {
       "kind": "Match type:",
-      "edit": "Edit"
+      "edit": "Edit",
+      "edit-dialog": {
+        "title": "Edit list",
+        "cta": {
+          "save": {
+            "label": "Save",
+            "aria-label": "Save"
+          },
+          "cancel": "Cancel"
+        },
+        "feedback": {
+          "success": {
+            "title": "Success",
+            "description": "List updated successfully."
+          },
+          "error": {
+            "title": "Error updating list",
+            "description": "Something went wrong, please try again."
+          }
+        },
+        "form": {
+          "name": {
+            "label": "List name",
+            "placeholder": "e.g. Blocked users",
+            "hint": "Will appear in rules as \"{{alias}}\"",
+            "errors": {
+              "required": "Please enter a name for the list."
+            }
+          }
+        }
+      }
     },
     "entries": {
       "title": "Entries",
