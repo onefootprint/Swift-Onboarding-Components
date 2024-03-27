@@ -10,4 +10,8 @@ pub enum Error {
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
     #[error("error sending request to neuro api: {0}")]
     SendError(String),
+    #[error("No status found when calling neuro api")]
+    UnknownStatus,
+    #[error("Neuro API Error: {0}")]
+    APIResponseError(super::response::NeuroIdAnalyticsResponseError),
 }

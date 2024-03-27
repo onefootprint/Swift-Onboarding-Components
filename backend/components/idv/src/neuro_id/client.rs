@@ -50,7 +50,12 @@ impl NeuroIdClient {
 
 #[cfg(test)]
 mod tests {
-    use crate::footprint_http_client::FpVendorClientArgs;
+    use itertools::Itertools;
+
+    use crate::{
+        footprint_http_client::FpVendorClientArgs,
+        neuro_id::response::{NeuroApiResponse, Status},
+    };
 
     use super::*;
 
@@ -64,6 +69,7 @@ mod tests {
             NeuroIdentityId::from("example-response-2".to_string()),
         )
     }
+
     #[ignore]
     #[tokio::test]
     async fn test_neuro_client() {
@@ -71,13 +77,24 @@ mod tests {
         let n_client = NeuroIdClient::new(creds).unwrap();
         let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
 
-        let resp = n_client
-            .get_profile(&fp_client, &id)
+        let response = n_client.get_profile(&fp_client, &id).await.unwrap();
+
+        let resp = NeuroApiResponse::from_response(response)
             .await
-            .unwrap()
-            .json::<serde_json::Value>()
-            .await
+            .result
+            .into_success()
             .unwrap();
-        println!("{}", resp);
+
+        assert_eq!(resp.status(), Status::Success);
+        assert_eq!(
+            resp.profile
+                .unwrap()
+                .signals
+                .into_iter()
+                .flatten()
+                .collect_vec()
+                .len(),
+            5
+        )
     }
 }
