@@ -9,6 +9,8 @@ pub struct List {
     pub kind: ListKind,
     pub created_at: DateTime<Utc>,
     pub actor: DbActor,
+    pub used_in_playbook: bool,
+    pub entries_count: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

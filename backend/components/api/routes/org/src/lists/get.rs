@@ -5,7 +5,8 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
-use db::models::list::List;
+
+use db::models::{list::List, list_entry::ListEntry};
 use newtypes::ListId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -20,13 +21,15 @@ async fn get_detail(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
-    let list = state
+    let (list, entries_count) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
-            Ok(list)
+            let entries = ListEntry::list(conn, &list_id)?;
+            Ok((list, entries.len()))
         })
         .await?;
 
-    ResponseData::ok(api_wire_types::List::from_db(list)).json()
+    // TODO (belce): implement the logic to get whether list is used in playbook
+    ResponseData::ok(api_wire_types::List::from_db((list, false, entries_count))).json()
 }

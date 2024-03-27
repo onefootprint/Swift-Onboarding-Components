@@ -2,8 +2,10 @@ use crate::utils::db2api::DbToApi;
 use db::models::{list::List, list_entry::ListEntry};
 use newtypes::PiiString;
 
-impl DbToApi<List> for api_wire_types::List {
-    fn from_db(list: List) -> Self {
+pub type ListInfo = (List, bool, usize);
+
+impl DbToApi<ListInfo> for api_wire_types::List {
+    fn from_db((list, used_in_playbook, entries_count): ListInfo) -> Self {
         let List {
             id,
             created_at,
@@ -21,6 +23,8 @@ impl DbToApi<List> for api_wire_types::List {
             kind,
             created_at,
             actor,
+            entries_count,
+            used_in_playbook,
         }
     }
 }

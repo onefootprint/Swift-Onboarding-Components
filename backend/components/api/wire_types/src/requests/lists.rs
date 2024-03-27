@@ -6,6 +6,7 @@ pub struct CreateListRequest {
     pub name: String,
     pub alias: ListAlias,
     pub kind: ListKind,
+    pub entries: Option<Vec<PiiString>>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

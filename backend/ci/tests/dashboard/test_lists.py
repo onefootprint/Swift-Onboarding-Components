@@ -16,6 +16,8 @@ def test_create(sandbox_tenant):
     assert list["alias"] == f"some_real_baddies_{nonce}"
     assert list["kind"] == "email_domain"
     assert list["actor"]["kind"] == "tenant_user"
+    assert list["entries_count"] == 0
+    assert list["used_in_playbook"] == False
 
     # Trying to use a name that already exists fails
     post(
@@ -50,6 +52,7 @@ def test_list(sandbox_tenant):
             name=f"My Super List 1 {nonce}",
             alias=f"my_super_list_1_{nonce}",
             kind="ip_address",
+            entries=[],
         ),
         *sandbox_tenant.db_auths,
     )
@@ -59,6 +62,7 @@ def test_list(sandbox_tenant):
             name=f"My Super List 2 {nonce}",
             alias=f"my_super_list_2_{nonce}",
             kind="email_address",
+            entries=["bobertotech.com", "badppl.org", "somethingelseketchy.net"],
         ),
         *sandbox_tenant.db_auths,
     )
@@ -68,6 +72,7 @@ def test_list(sandbox_tenant):
             name=f"My Super List 3 {nonce}",
             alias=f"my_super_list_3_{nonce}",
             kind="phone_country_code",
+            entries=["+1", "+44"],
         ),
         *sandbox_tenant.db_auths,
     )
@@ -79,9 +84,18 @@ def test_list(sandbox_tenant):
 
     list = get(f"/org/lists/{lists[0]['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 3 {nonce}"
+    assert list["entries_count"] == 2
+    assert list["used_in_playbook"] == False
 
     list = get(f"/org/lists/{lists[1]['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 2 {nonce}"
+    assert list["entries_count"] == 3
+    assert list["used_in_playbook"] == False
+
+    list = get(f"/org/lists/{lists[2]['id']}", None, *sandbox_tenant.db_auths)
+    assert list["name"] == f"My Super List 1 {nonce}"
+    assert list["entries_count"] == 0
+    assert list["used_in_playbook"] == False
 
 
 def test_delete_list(sandbox_tenant):
@@ -171,6 +185,9 @@ def test_create_list_entry(sandbox_tenant):
     assert entries[0]["data"] == "protonmail.com"
     assert entries[0]["actor"]["kind"] == "tenant_user"
 
+    list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
+    assert list["entries_count"] == 1
+
     # add multiple
     entries = post(
         f"/org/lists/{list['id']}/entries",
@@ -181,6 +198,9 @@ def test_create_list_entry(sandbox_tenant):
     assert entries[0]["data"] == "bobertotech.com"
     assert entries[1]["data"] == "badppl.org"
     assert entries[2]["data"] == "somethingelseketchy.net"
+
+    list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
+    assert list["entries_count"] == 4
 
 
 def test_list_list_entries(sandbox_tenant):

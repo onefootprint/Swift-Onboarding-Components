@@ -1,8 +1,11 @@
+use std::collections::HashMap;
+
 use super::data_lifetime::DataLifetime;
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::list_entry;
 use diesel::{prelude::*, Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::{DataLifetimeSeqno, DbActor, ListEntryId, ListId, Locked, SealedVaultBytes};
 
 #[derive(Debug, Clone, Queryable)]
@@ -97,6 +100,19 @@ impl ListEntry {
             .filter(list_entry::deactivated_seqno.is_null())
             .order_by(list_entry::created_at.desc())
             .get_results(conn)?;
+        Ok(res)
+    }
+
+    #[allow(clippy::self_named_constructors)]
+    #[tracing::instrument("ListEntry::list_bulk", skip_all)]
+    pub fn list_bulk(conn: &mut PgConn, ids: Vec<&ListId>) -> DbResult<HashMap<ListId, Vec<Self>>> {
+        let res = list_entry::table
+            .filter(list_entry::list_id.eq_any(ids))
+            .filter(list_entry::deactivated_seqno.is_null())
+            .order_by(list_entry::created_at.desc())
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .into_group_map_by(|e| e.list_id.clone());
         Ok(res)
     }
 
