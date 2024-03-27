@@ -6,7 +6,7 @@ use crate::{
     types::ResponseData,
     State,
 };
-use api_core::decision;
+use api_core::decision::{self, rule_engine::engine::VaultDataForRules};
 use api_wire_types::{Counts, EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
 use db::{
     models::{ob_configuration::ObConfiguration, rule_set_result::RuleSetResult},
@@ -46,6 +46,7 @@ pub async fn evaluate_rule(
             let backtest_rule_result = decision::rule_engine::eval::evaluate_rule_expression(
                 &rule_expression,
                 &rs.into_iter().map(|r| r.reason_code).collect_vec(),
+                &VaultDataForRules::empty(), // TODO
             );
             api_wire_types::RuleEvalResult {
                 fp_id: sv.fp_id,

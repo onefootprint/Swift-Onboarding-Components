@@ -24,6 +24,7 @@ use crate::{
     decision::{
         self,
         features::risk_signals::fetch_latest_risk_signals_map,
+        rule_engine::engine::VaultDataForRules,
         state::{
             actions::{DocCollected, WorkflowActions},
             common, OnAction, WorkflowState,
@@ -187,6 +188,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             let (rule_set_result, decision) = common::evaluate_rules(
                 conn,
                 risk_signals,
+                &VaultDataForRules::empty(), // TODO
                 &wf,
                 fixture_decision.is_some(),
                 RuleSetResultKind::WorkflowDecision,

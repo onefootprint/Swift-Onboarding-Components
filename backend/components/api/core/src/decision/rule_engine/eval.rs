@@ -6,6 +6,8 @@ use newtypes::{
 };
 use strum::IntoEnumIterator;
 
+use super::engine::VaultDataForRules;
+
 // pub struct Rule(pub RuleExpression, pub RuleAction);
 
 pub trait HasRule {
@@ -86,6 +88,7 @@ impl Default for RuleEvalConfig {
 pub fn evaluate_rule_set<T: HasRule>(
     rules: Vec<T>,
     input: &[FootprintReasonCode],
+    vault_data: &VaultDataForRules, // TODO: for waterfall, we won't execute on vault data based rules so should probs more explicitly handle that vs having it pass in an empty DUR here
     // a bit annoying to have to put this here, but this is our one case currently where a ruleset is evaluated but a particular action is not allowed. If we have already collected a document or already step'd up, we want to ensure that we don't chose that action again
     // maybe soon we'll put StepUp rules in a separate group and evaluate those separately and then can remove this from here
     rule_config: &RuleEvalConfig,
@@ -93,7 +96,7 @@ pub fn evaluate_rule_set<T: HasRule>(
     let rule_results = rules
         .into_iter()
         .map(|r| {
-            let eval = evaluate_rule_expression(&r.expression(), input);
+            let eval = evaluate_rule_expression(&r.expression(), input, vault_data);
             (r, eval)
         })
         .collect_vec();
@@ -112,14 +115,14 @@ pub fn evaluate_rule_set<T: HasRule>(
     (rule_results, action_triggered)
 }
 
-pub fn evaluate_rule_expression(rule_expression: &RuleExpression, input: &[FootprintReasonCode]) -> bool {
+pub fn evaluate_rule_expression(rule_expression: &RuleExpression, input: &[FootprintReasonCode], vault_data: &VaultDataForRules) -> bool {
     // Conditions in a Rule are all AND'd together
     // Empty rule_expression's with no conditions shouldn't be possible (should fail validation), but should one of these sneak into existence (ie a bad manual PG fiddle) then we'd want to default to evaluate to false there, not true
-    !rule_expression.0.is_empty() && rule_expression.0.iter().all(|c| evaluate_condition(c, input))
+    !rule_expression.0.is_empty() && rule_expression.0.iter().all(|c| evaluate_condition(c, input, vault_data))
 }
 
 // TODO: maybe use a Set here later but honestly at small N its probably moot
-fn evaluate_condition(cond: &RuleExpressionCondition, input: &[FootprintReasonCode]) -> bool {
+fn evaluate_condition(cond: &RuleExpressionCondition, input: &[FootprintReasonCode], vault_data: &VaultDataForRules) -> bool {
     match cond {
         RuleExpressionCondition::RiskSignal { field, op, value } => {
             let field_value = input.contains(field);
@@ -128,15 +131,29 @@ fn evaluate_condition(cond: &RuleExpressionCondition, input: &[FootprintReasonCo
                 BooleanOperator::DoesNotEqual => field_value != *value,
             }
         }
+        RuleExpressionCondition::VaultData { di, op, value } => {
+            let Some(field_value) = vault_data.get_di(di.clone()).ok() else {
+                // if vault data is missing, never evaluate to true
+                return false
+            };
+            match op {
+                BooleanOperator::Equals => field_value.leak_to_string() == *value,
+                BooleanOperator::DoesNotEqual => field_value.leak_to_string() != *value,
+            }
+        },
+        RuleExpressionCondition::RiskScore { field:_, op:_, value:_ } => unimplemented!(),
     }
 }
 
 #[cfg(test)]
 pub mod tests {
+    use std::collections::HashMap;
+
+    use crate::{decision::rule_engine::engine::VaultDataForRules, utils::vault_wrapper::{DecryptUncheckedResult, EnclaveDecryptOperation}};
+
     use super::*;
     use newtypes::{
-        BooleanOperator as BO, FootprintReasonCode as FRC, RuleAction as RA, RuleExpression as RE,
-        RuleExpressionCondition as REC,
+        BooleanOperator as BO, DataIdentifier, FootprintReasonCode as FRC, IdentityDataKind, InvestorProfileKind, PiiString, RuleAction as RA, RuleExpression as RE, RuleExpressionCondition as REC
     };
     use test_case::test_case;
 
@@ -276,7 +293,7 @@ pub mod tests {
         docs_collected: Vec<DocumentRequestKind>,
     ) -> (Vec<bool>, Option<RuleAction>) {
         let config = RuleEvalConfig::new(docs_collected);
-        let (rule_results, action) = evaluate_rule_set(rules, &input, &config);
+        let (rule_results, action) = evaluate_rule_set(rules, &input, &VaultDataForRules::empty(), &config); // TODO: tests with vault data
         (rule_results.into_iter().map(|(_, e)| e).collect_vec(), action)
     }
 
@@ -323,7 +340,7 @@ pub mod tests {
         value: true,
     }]), vec![FRC::IdNotLocated, FRC::NameDoesNotMatch, FRC::SsnNotProvided]  => true)]
     pub fn test_evaluate_rule_expression(re: RE, input: Vec<FRC>) -> bool {
-        evaluate_rule_expression(&re, &input)
+        evaluate_rule_expression(&re, &input, &VaultDataForRules::empty()) // TODO: vault data rules
     }
 
     #[test_case(REC::RiskSignal {
@@ -367,7 +384,7 @@ pub mod tests {
         value: false,
     }, vec![]  => false)]
     pub fn test_evaluate_condition(cond: REC, input: Vec<FRC>) -> bool {
-        evaluate_condition(&cond, &input)
+        evaluate_condition(&cond, &input, &VaultDataForRules::empty()) // TODO: vault data condition
     }
 
 
@@ -403,4 +420,32 @@ pub mod tests {
         RuleAction::all_rule_actions().iter().filter(|ra| !expected_disallowed_rule_actions.contains(ra))
             .for_each(|a| assert!(rc.action_is_allowed(a)));  
     }
+
+    #[test]
+    pub fn test_basic_vault_data_setup() {
+        let results: HashMap<EnclaveDecryptOperation, PiiString> = HashMap::from_iter([
+            (DataIdentifier::Id(IdentityDataKind::FirstName).into(), "Bob".into()),
+            (DataIdentifier::InvestorProfile(InvestorProfileKind::Declarations).into(), "[\"affiliated_with_us_broker\"]".into()),
+            (DataIdentifier::InvestorProfile(InvestorProfileKind::InvestmentGoals).into(), "[\"buy_a_home\", \"speculation\"]".into()),
+        ]);
+        let decrypted_dis = results.keys().cloned().collect();
+        let vault_data = DecryptUncheckedResult {
+            results,
+            decrypted_dis,
+        };
+        let vd = VaultDataForRules::new(vault_data);
+
+        assert!(evaluate_condition(&REC::VaultData {
+            di: DataIdentifier::Id(IdentityDataKind::FirstName),
+            op: BooleanOperator::Equals,
+            value: "Bob".to_owned(),
+        }, &Vec::<FRC>::new(), &vd));
+
+        assert!(!evaluate_condition(&REC::VaultData {
+            di: DataIdentifier::Id(IdentityDataKind::FirstName),
+            op: BooleanOperator::Equals,
+            value: "Alice".to_owned(),
+        }, &Vec::<FRC>::new(), &vd));
+    }
+
 }

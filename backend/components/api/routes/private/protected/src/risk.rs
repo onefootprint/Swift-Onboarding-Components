@@ -8,7 +8,7 @@ use api_core::{
         self, engine,
         features::risk_signals::{fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result},
         onboarding::Decision,
-        rule_engine::eval::RuleEvalConfig,
+        rule_engine::{engine::VaultDataForRules, eval::RuleEvalConfig},
         vendor::{
             get_vendor_apis_for_verification_requests, tenant_vendor_control::TenantVendorControl,
             vendor_result::VendorResult,
@@ -112,8 +112,12 @@ async fn make_vendor_calls(
             .into_iter()
             .map(|(frc, _, _)| frc)
             .collect_vec();
-    let (rule_results, action_triggered) =
-        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, &RuleEvalConfig::default());
+    let (rule_results, action_triggered) = decision::rule_engine::eval::evaluate_rule_set(
+        rules,
+        &reason_codes,
+        &VaultDataForRules::empty(),
+        &RuleEvalConfig::default(),
+    ); // TODO
 
     Ok(Json(ResponseData::ok(MakeVendorCallsResponse {
         new_vendor_request_ids: vec![vendor_result.verification_request_id],
@@ -158,6 +162,7 @@ async fn make_decision(
             let (rule_set_result, decision) = decision::state::common::evaluate_rules(
                 conn,
                 risk_signals,
+                &VaultDataForRules::empty(), // TODO
                 &wf,
                 false,
                 RuleSetResultKind::Adhoc,
@@ -274,8 +279,12 @@ async fn shadow_run(
             .into_iter()
             .map(|(frc, _, _)| frc)
             .collect_vec();
-    let (_, action_triggered) =
-        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, &RuleEvalConfig::default());
+    let (_, action_triggered) = decision::rule_engine::eval::evaluate_rule_set(
+        rules,
+        &reason_codes,
+        &VaultDataForRules::empty(),
+        &RuleEvalConfig::default(),
+    );
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: action_triggered.into(),

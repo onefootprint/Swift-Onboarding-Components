@@ -6,7 +6,9 @@ use super::{
 };
 use crate::{
     decision::{onboarding::Decision, RuleError},
+    enclave_client::EnclaveClient,
     errors::ApiResult,
+    utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper},
 };
 use db::{
     models::{
@@ -21,7 +23,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    DocumentRequestKind, ObConfigurationId, RiskSignalGroupKind, RuleSetResultKind, ScopedVaultId, WorkflowId,
+    DocumentRequestKind, ObConfigurationId, RiskSignalGroupKind, RuleExpressionCondition, RuleSetResultKind,
+    ScopedVaultId, WorkflowId,
 };
 
 #[allow(clippy::too_many_arguments)]
@@ -33,6 +36,7 @@ pub fn evaluate_workflow_decision(
     wf_id: &WorkflowId,
     kind: RuleSetResultKind,
     risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
+    vault_data: &VaultDataForRules,
     is_fixture: bool,
 ) -> ApiResult<(RuleSetResult, Decision)> {
     let doc_reqs = DocumentRequest::get_all(conn, wf_id)?;
@@ -63,6 +67,7 @@ pub fn evaluate_workflow_decision(
         Some(wf_id),
         kind,
         &risk_signals,
+        vault_data,
         &rule_eval_config,
     )?;
 
@@ -77,6 +82,7 @@ pub fn evaluate_workflow_decision(
     let (_, should_commit_action) = eval::evaluate_rule_set(
         should_commit_rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
+        vault_data,
         &rule_eval_config,
     );
     let decision = Decision {
@@ -91,6 +97,45 @@ pub fn evaluate_workflow_decision(
     Ok((rule_set_result, decision))
 }
 
+#[derive(derive_more::Deref)]
+pub struct VaultDataForRules {
+    vault_data: DecryptUncheckedResult, // at this point could mb even just have this be HashMap<K,V> where we type up which K's correspond to which V's and V's encode the type like String vs Date vs etc
+}
+
+impl VaultDataForRules {
+    pub async fn decrypt_for_rules(
+        enclave_client: &EnclaveClient,
+        vw: VaultWrapper,
+        rules: &[RuleInstance],
+    ) -> ApiResult<Self> {
+        // could mb query for the VW here too..? gotta somehow use this ish for bulk flow too tho
+        let dis = rules
+            .iter()
+            .flat_map(|r| &(r.rule_expression.0))
+            .flat_map(|rc| match rc {
+                RuleExpressionCondition::VaultData { di, op: _, value: _ } => Some(di),
+                _ => None,
+            })
+            .cloned()
+            .collect_vec();
+
+        let vault_data = vw.decrypt_unchecked(enclave_client, &dis).await?;
+        Ok(Self { vault_data })
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            vault_data: DecryptUncheckedResult::default(),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn new(vault_data: DecryptUncheckedResult) -> Self {
+        Self { vault_data }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all)]
 pub fn evaluate_rules(
     conn: &mut TxnPgConn,
@@ -99,6 +144,7 @@ pub fn evaluate_rules(
     wf_id: Option<&WorkflowId>,
     kind: RuleSetResultKind,
     risk_signals: &[RiskSignal],
+    vault_data: &VaultDataForRules,
     rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
 ) -> ApiResult<(RuleSetResult, Vec<RuleResult>)> {
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
@@ -110,6 +156,7 @@ pub fn evaluate_rules(
     let (rule_results, action_triggered) = eval::evaluate_rule_set(
         rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
+        vault_data,
         rule_eval_config,
     );
 
@@ -236,6 +283,7 @@ mod tests {
             None,
             RuleSetResultKind::Adhoc,
             &risk_signals,
+            &VaultDataForRules::empty(), // TODO add tests for vd rules
             &config,
         )
         .unwrap();

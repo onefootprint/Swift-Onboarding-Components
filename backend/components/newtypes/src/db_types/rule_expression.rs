@@ -1,4 +1,4 @@
-use crate::FootprintReasonCode;
+use crate::{DataIdentifier, FootprintReasonCode};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -16,8 +16,12 @@ pub enum RuleExpressionCondition {
         op: BooleanOperator,
         value: bool,
     },
-    // just a proof of concept, for now we only support RiskSignal based conditions
-    #[cfg(test)]
+    VaultData {
+        di: DataIdentifier,
+        op: BooleanOperator, // TODO: just starting with this to POC the rules engine refactor for vault data. but this design will change a little so we can support a wide variety of operators
+        value: String,
+    },
+    // just a proof of concept, not used. would have #[cfg(test)] but vscode is annoying with that
     RiskScore {
         field: RiskScore,
         op: NumberOperator,
@@ -34,7 +38,6 @@ pub enum BooleanOperator {
     DoesNotEqual,
 }
 
-#[cfg(test)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NumberOperator {
@@ -44,7 +47,6 @@ pub enum NumberOperator {
     LessThan,
 }
 
-#[cfg(test)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum RiskScore {

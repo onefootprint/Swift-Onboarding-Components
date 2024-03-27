@@ -19,7 +19,7 @@ use crate::{
             risk_signals::{risk_signal_group_struct::Aml, RiskSignalGroupStruct, RiskSignalsForDecision},
         },
         onboarding::Decision,
-        rule_engine,
+        rule_engine::{self, engine::VaultDataForRules},
         utils::FixtureDecision,
         vendor::{
             self,
@@ -194,6 +194,7 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ap
 pub fn evaluate_rules(
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
+    vault_data: &VaultDataForRules,
     wf: &Workflow,
     is_fixture: bool,
     rule_result_kind: RuleSetResultKind,
@@ -207,6 +208,7 @@ pub fn evaluate_rules(
         &wf.id,
         rule_result_kind,
         risk_signals.risk_signals,
+        vault_data,
         is_fixture,
     )
 }

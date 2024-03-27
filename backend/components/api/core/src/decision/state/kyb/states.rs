@@ -8,7 +8,7 @@ use crate::{
     decision::{
         self,
         onboarding::Decision,
-        rule_engine::eval::RuleEvalConfig,
+        rule_engine::{engine::VaultDataForRules, eval::RuleEvalConfig},
         state::{
             actions::{Authorize, WorkflowActions},
             common, AsyncVendorCallsCompleted, BoKycCompleted, MakeDecision, MakeVendorCalls, OnAction,
@@ -18,14 +18,17 @@ use crate::{
         RuleError,
     },
     errors::ApiResult,
+    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
     State,
 };
 use async_trait::async_trait;
 use db::models::{
+    data_lifetime::DataLifetime,
     ob_configuration::ObConfiguration,
     onboarding_decision::OnboardingDecision,
     risk_signal::RiskSignal,
     risk_signal_group::RiskSignalGroup,
+    rule_instance::RuleInstance,
     scoped_vault::ScopedVault,
     vault::Vault,
     workflow::{Workflow as DbWorkflow, WorkflowUpdate},
@@ -367,7 +370,7 @@ impl KybDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, KybState> for KybDecisioning {
-    type AsyncRes = Arc<dyn FeatureFlagClient>;
+    type AsyncRes = (Arc<dyn FeatureFlagClient>, VaultDataForRules);
 
     #[tracing::instrument(
         "KybDecisioning#OnAction<MakeDecision, KybState>::execute_async_idempotent_actions",
@@ -378,7 +381,22 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(state.feature_flag_client.clone())
+        let wfid = self.wf_id.clone();
+        let (rules, vw) = state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let wf = DbWorkflow::get(conn, &wfid)?;
+                let (obc, _) = ObConfiguration::get(conn, &wfid)?;
+                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
+
+                let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling a new seqno inside the RSR write itself
+                let vw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&wf.scoped_vault_id, seqno))?;
+
+                Ok((rules, vw))
+            })
+            .await?;
+        let vault_data = VaultDataForRules::decrypt_for_rules(&state.enclave_client, vw, &rules).await?;
+        Ok((state.feature_flag_client.clone(), vault_data))
     }
 
     #[tracing::instrument("KybDecisioning#OnAction<MakeDecision, KybState>::on_commit", skip_all)]
@@ -388,7 +406,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KybState> {
-        let ff_client = async_res;
+        let (ff_client, vault_data) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
@@ -419,6 +437,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 Some(&self.wf_id),
                 RuleSetResultKind::WorkflowDecision,
                 &kyb_rs,
+                &vault_data,
                 &RuleEvalConfig::default(),
             )?;
             (
