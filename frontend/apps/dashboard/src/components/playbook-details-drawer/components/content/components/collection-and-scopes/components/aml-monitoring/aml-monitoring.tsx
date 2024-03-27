@@ -19,6 +19,8 @@ const AmlMonitoring = ({
     keyPrefix: 'pages.playbooks.details.aml-monitoring',
   });
 
+  const monitorAml = enhancedAml || ofac || pep || adverseMedia;
+
   return (
     <Container>
       <CollectedInformation
@@ -30,13 +32,17 @@ const AmlMonitoring = ({
           adverseMedia,
         }}
       />
-      <Divider variant="secondary" />
-      <Text variant="body-3" color="tertiary">
-        <Text variant="body-3" color="primary" tag="span">
-          {t('footer.label')}{' '}
-        </Text>
-        {t('footer.content')}
-      </Text>
+      {monitorAml && (
+        <>
+          <Divider variant="secondary" />
+          <Text variant="body-3" color="tertiary">
+            <Text variant="body-3" color="primary" tag="span">
+              {t('footer.label')}{' '}
+            </Text>
+            {t('footer.content')}
+          </Text>
+        </>
+      )}
     </Container>
   );
 };
