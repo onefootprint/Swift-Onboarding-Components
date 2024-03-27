@@ -71,6 +71,7 @@ const AddressLines = () => {
   return (
     <>
       <AddressInput
+        data-attribute="address-line-1"
         autoFocus
         data-private
         country={country.value}
@@ -90,6 +91,7 @@ const AddressLines = () => {
       />
       <TextInput
         data-private
+        data-attribute="address-line-2"
         autoComplete="address-line2"
         label={
           isCountryUs

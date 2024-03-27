@@ -31,7 +31,7 @@ const SSN4 = ({ disabled }: SSN4Props) => {
   return (
     <TextInput
       autoFocus
-      data-attribute="ssn4"
+      data-nid-target="ssn4"
       data-private
       disabled={disabled}
       hasError={!!errors.ssn4}

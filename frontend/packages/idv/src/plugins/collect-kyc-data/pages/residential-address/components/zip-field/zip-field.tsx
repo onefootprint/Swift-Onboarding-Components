@@ -22,13 +22,14 @@ const ZipField = () => {
 
   return (
     <TextInput
-      data-private
       autoComplete="postal-code"
+      data-nid-target="zip"
+      data-private
+      defaultValue={getValues('zip')}
       hasError={!!errors.zip}
       hint={errors.zip && t('error')}
       label={t('label')}
       placeholder={t('placeholder')}
-      defaultValue={getValues('zip')}
       {...register('zip', {
         required: isCountryUs,
         validate: isCountryUs

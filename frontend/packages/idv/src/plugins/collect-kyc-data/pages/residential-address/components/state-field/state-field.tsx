@@ -39,6 +39,7 @@ const StateField = () => {
         const value = typeof field.value === 'object' ? field.value : undefined;
         return (
           <Select
+            data-nid-target="state"
             isPrivate
             label={t('label')}
             onBlur={field.onBlur}
@@ -56,8 +57,9 @@ const StateField = () => {
     />
   ) : (
     <TextInput
-      data-private
       autoComplete="address-level1"
+      data-nid-target="state"
+      data-private
       hasError={!!errors.state}
       hint={errors.state && t('error')}
       label={t('international-label')}

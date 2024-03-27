@@ -92,7 +92,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
     <>
       <Row columns={2}>
         <TextInput
-          data-name="first-name"
+          data-nid-target="first-name"
           autoFocus
           data-private
           disabled={disabled}
@@ -106,7 +106,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
           })}
         />
         <TextInput
-          data-name="middle-name"
+          data-nid-target="middle-name"
           data-private
           disabled={disabled}
           hasError={!!errors.middleName}
@@ -121,7 +121,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
       </Row>
       <Row columns={1}>
         <TextInput
-          data-name="last-name"
+          data-nid-target="last-name"
           data-private
           disabled={disabled}
           hasError={!!errors.lastName}

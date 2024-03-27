@@ -23,7 +23,7 @@ const EmailField = ({ disabled }: EmailFieldProps) => {
 
   return (
     <TextInput
-      data-name="email"
+      data-nid-target="email"
       data-private
       defaultValue={getValues('email')}
       disabled={disabled}

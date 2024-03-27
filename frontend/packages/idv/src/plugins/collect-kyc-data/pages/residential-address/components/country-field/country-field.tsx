@@ -35,6 +35,7 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
       name="country"
       render={({ field }) => (
         <CountrySelect
+          data-nid-target="country"
           hint={
             shouldDisable && country
               ? t('disabled-hint', { countryName: country.label })

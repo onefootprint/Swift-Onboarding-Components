@@ -16,8 +16,9 @@ const CityField = () => {
 
   return (
     <TextInput
-      data-private
       autoComplete="address-level2"
+      data-nid-target="city"
+      data-private
       hasError={!!errors.city}
       hint={errors.city && t('error')}
       label={t('label')}
