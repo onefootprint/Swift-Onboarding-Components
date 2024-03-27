@@ -7,8 +7,8 @@ import useList from '../../../../hooks/use-list';
 import SectionTitle from '../section-title';
 
 const ActivityLog = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.lists.details.activity-log',
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'details.activity-log',
   });
   const router = useRouter();
   const id = router.query.id as string;

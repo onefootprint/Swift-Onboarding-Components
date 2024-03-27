@@ -11,7 +11,7 @@ import Table from './components/table';
 import useLists from './hooks/use-lists';
 
 const List = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.lists' });
+  const { t } = useTranslation('lists', { keyPrefix: 'list' });
   const [dialogOpen, setDialogOpen] = useState(false);
   const { data: response, errorMessage, isLoading } = useLists();
 

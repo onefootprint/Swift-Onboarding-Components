@@ -15,7 +15,7 @@ type TableProps = {
 };
 
 const Table = ({ data, isLoading, errorMessage }: TableProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.lists' });
+  const { t } = useTranslation('lists', { keyPrefix: 'list' });
   const session = useSession();
   const router = useRouter();
   const filters = useFilters();

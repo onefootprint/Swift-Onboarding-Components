@@ -4,8 +4,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Breadcrumb = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.lists.details.breadcrumb',
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'details.breadcrumb',
   });
 
   return (

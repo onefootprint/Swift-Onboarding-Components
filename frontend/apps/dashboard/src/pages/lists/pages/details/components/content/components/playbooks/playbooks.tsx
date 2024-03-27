@@ -7,8 +7,8 @@ import useList from '../../../../hooks/use-list';
 import SectionTitle from '../section-title';
 
 const Playbooks = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.lists.details.playbooks',
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'details.playbooks',
   });
   const router = useRouter();
   const id = router.query.id as string;

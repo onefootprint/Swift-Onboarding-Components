@@ -9,8 +9,8 @@ import isPhoneNumber from './utils/is-phone-number';
 import isSSN9 from './utils/is-ssn-9';
 
 const useValidateListEntries = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.lists.dialog.form.entries.errors',
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'list.dialog.form.entries.errors',
   });
 
   const validate = (kind: ListKind, entries: string) => {

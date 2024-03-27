@@ -1,4 +1,4 @@
-import { Button, LinkButton, SearchInput, Stack, Text } from '@onefootprint/ui';
+import { LinkButton, SearchInput, Stack, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,8 +13,8 @@ import SectionTitle from '../section-title';
 const MAX_ENTRIES = 5;
 
 const Entries = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.lists.details.entries',
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'details.entries',
   });
   const router = useRouter();
   const id = router.query.id as string;
@@ -40,18 +40,16 @@ const Entries = () => {
 
   return (
     <Stack gap={4} direction="column">
-      <SectionTitle title={t('title')} />
-      <Stack justify="space-between" direction="row">
-        <SearchInput
-          placeholder={t('search-placeholder')}
-          width="300px"
-          onChangeText={value => filters.push({ search: value })}
-          value={filters.query.search || ''}
-        />
-        <Button variant="secondary" onClick={handleAddEntry}>
-          {t('add')}
-        </Button>
-      </Stack>
+      <SectionTitle
+        title={t('title')}
+        button={{ label: t('add'), onClick: handleAddEntry }}
+      />
+      <SearchInput
+        placeholder={t('search-placeholder')}
+        width="300px"
+        onChangeText={value => filters.push({ search: value })}
+        value={filters.query.search || ''}
+      />
       {/* TODO: implement showing the entries */}
       {/* <EntryChip onDelete={() => {}}>jane@doe.com</EntryChip> */}
       {data.length === 0 && (

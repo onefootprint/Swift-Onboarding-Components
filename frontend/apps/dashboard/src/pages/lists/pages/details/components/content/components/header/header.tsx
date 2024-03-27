@@ -9,8 +9,8 @@ const Header = () => {
   const router = useRouter();
   const id = router.query.id as string;
   const { isLoading, error, data } = useList(id);
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.lists.details.header',
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'details.header',
   });
 
   if (isLoading || error || !data) {

@@ -29,8 +29,8 @@ type FormData = {
 
 const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
   const createListMutation = useCreateList();
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.lists.dialog',
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'list.dialog',
   });
   const toast = useToast();
   const {

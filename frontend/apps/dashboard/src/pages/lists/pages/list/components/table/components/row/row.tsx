@@ -9,8 +9,8 @@ export type RowProps = {
 };
 
 const Row = ({ list }: RowProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.lists.table.row',
+  const { t } = useTranslation('lists', {
+    keyPrefix: 'list.table.row',
   });
   const { name, alias, entriesCount, usedInRules, createdAt } = list;
   const { formatDateWithTime } = useIntl();

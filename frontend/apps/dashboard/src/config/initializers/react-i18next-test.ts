@@ -6,6 +6,7 @@ import businesses from '../locales/en/businesses.json';
 import common from '../locales/en/common.json';
 import domainRestrictions from '../locales/en/domain-restrictions.json';
 import internal from '../locales/en/internal.json';
+import lists from '../locales/en/lists.json';
 import users from '../locales/en/users.json';
 
 i18next.use(initReactI18next).init({
@@ -16,6 +17,7 @@ i18next.use(initReactI18next).init({
       businesses,
       common,
       users,
+      lists,
       ui,
     },
   },
@@ -25,6 +27,7 @@ i18next.use(initReactI18next).init({
     'common',
     'businesses',
     'internal',
+    'lists',
     'users',
     'domain-restrictions',
     'ui',
