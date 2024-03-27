@@ -57,6 +57,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
 
   return (
     <TextInput
+      data-name="dob"
       data-private
       disabled={disabled}
       hasError={!!errors.dob}
