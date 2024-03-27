@@ -23,14 +23,15 @@ const EmailField = ({ disabled }: EmailFieldProps) => {
 
   return (
     <TextInput
+      data-name="email"
       data-private
-      type="email"
-      hasError={!!errors.email}
+      defaultValue={getValues('email')}
       disabled={disabled}
+      hasError={!!errors.email}
       hint={getErrorHint(errors)}
       label={t('email.label')}
       placeholder={t('email.placeholder')}
-      defaultValue={getValues('email')}
+      type="email"
       {...register('email', {
         required: {
           value: true,

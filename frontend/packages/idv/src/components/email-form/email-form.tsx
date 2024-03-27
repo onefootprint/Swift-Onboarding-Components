@@ -35,6 +35,7 @@ const EmailForm = ({
       <Box marginBottom={7} marginTop={5}>
         <TextInput
           autoFocus
+          data-name="email"
           data-private
           defaultValue={getValues('email')}
           hasError={hasError}

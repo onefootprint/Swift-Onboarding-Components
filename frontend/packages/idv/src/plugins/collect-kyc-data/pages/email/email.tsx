@@ -88,13 +88,14 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
       <Grid.Container gap={7} as="form" onSubmit={handleSubmit(onSubmitForm)}>
         <Stack direction="column" gap={5}>
           <TextInput
+            data-name="email"
             data-private
-            type="email"
+            defaultValue={getValues('email')}
             hasError={!!errors.email}
             hint={errors.email?.message}
             label={t('email.label')}
             placeholder={t('email.placeholder')}
-            defaultValue={getValues('email')}
+            type="email"
             {...register('email', {
               required: {
                 value: true,

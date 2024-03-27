@@ -27,6 +27,7 @@ const EmailInput = ({ className, ...props }: EmailInputProps) => {
       label={t('label')}
       message={error?.message}
       type="email"
+      data-name="email"
       {...props}
       {...register('email', {
         required: t('errors.required'),
