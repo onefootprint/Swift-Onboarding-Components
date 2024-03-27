@@ -6657,3 +6657,50 @@ pub fn incode_curp_validation_bad_curp() -> serde_json::Value {
         "renapo_valid": false
     })
 }
+
+
+pub fn neuro_id_success_response() -> serde_json::Value {
+    serde_json::json!({
+        "message": "success",
+        "moreInfo": null,
+        "profile": {
+            "clientId": "example-response-2",
+            "funnel": "unknown",
+            "id": "example-response-2",
+            "signals": [
+                {
+                    "label": "low",
+                    "model": "familiarity",
+                    "score": 97.68,
+                    "version": "2.5.0"
+                },
+                {
+                    "label": "true",
+                    "model": "fraud_ring_indicator",
+                    "score": 1.0,
+                    "version": "1.0"
+                },
+                {
+                    "label": "true",
+                    "model": "automated_activity",
+                    "score": 1.0,
+                    "version": "1.0"
+                },
+                {
+                    "label": "risky",
+                    "model": "combined_digital_intent",
+                    "score": 0.0,
+                    "version": "1.0"
+                },
+                {
+                    "label": "false",
+                    "model": "risky_device",
+                    "score": 0.0,
+                    "version": "1.0"
+                }
+            ],
+            "siteId": "form_neuro300"
+        },
+        "status": "SUCCESS"
+    })
+}

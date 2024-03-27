@@ -40,6 +40,12 @@ pub struct LexisCredentials {
     pub password: PiiString,
 }
 
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct NeuroIdCredentials {
+    pub api_key: PiiString,
+    pub site_id: PiiString,
+}
+
 /// The bulk of experian credentials are shared across requests for different tenants
 /// All that is different is the subscriber code
 impl ExperianCredentialBuilder {
