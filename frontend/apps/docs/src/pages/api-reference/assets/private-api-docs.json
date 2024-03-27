@@ -4490,6 +4490,52 @@
                         "Dashboard Token": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Organization",
+                    "Private",
+                    "Lists"
+                ],
+                "description": "Updates an existing list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateListRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
             }
         },
         "/org/lists/{list_id}": {
@@ -17347,6 +17393,67 @@
                     "name": {
                         "type": "string"
                     },
+                    "playbooks": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "key": {
+                                    "type": "string"
+                                },
+                                "rules": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "action": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "PassWithManualReview",
+                                                    "ManualReview",
+                                                    "Fail"
+                                                ]
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "is_shadow": {
+                                                "type": "boolean"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "rule_expression": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "rule_id": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "action",
+                                            "created_at",
+                                            "is_shadow",
+                                            "rule_expression",
+                                            "rule_id"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "key",
+                                "rules"
+                            ]
+                        }
+                    },
                     "used_in_playbook": {
                         "type": "boolean"
                     }
@@ -17359,6 +17466,7 @@
                     "id",
                     "kind",
                     "name",
+                    "playbooks",
                     "used_in_playbook"
                 ]
             },
@@ -22086,6 +22194,21 @@
                 },
                 "required": [
                     "description",
+                    "name"
+                ]
+            },
+            "UpdateListRequest": {
+                "type": "object",
+                "properties": {
+                    "alias": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "alias",
                     "name"
                 ]
             },
