@@ -1,3 +1,7 @@
+export type {
+  AddListEntriesRequest,
+  AddListEntriesResponse,
+} from './add-list-entries';
 export type { AddRuleRequest, AddRuleResponse } from './add-rule';
 export type {
   BiometricRegisterRequest,

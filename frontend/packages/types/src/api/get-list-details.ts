@@ -1,3 +1,5 @@
+import type { ListEntry } from '../data';
+
 export type GetListEntriesRequest = {
   listId: string;
   authHeaders: {
@@ -6,4 +8,4 @@ export type GetListEntriesRequest = {
   };
 };
 
-export type GetListEntriesResponse = string[];
+export type GetListEntriesResponse = ListEntry[];

@@ -12,8 +12,9 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import useValidateListEntries from '@/lists/hooks/use-validate-list-entries';
+
 import useCreateList from './hooks/use-create-list';
-import useValidateListEntries from './hooks/use-validate-list-entries';
 
 export type CreateDialogProps = {
   open: boolean;
@@ -31,6 +32,9 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
   const createListMutation = useCreateList();
   const { t } = useTranslation('lists', {
     keyPrefix: 'list.dialog',
+  });
+  const { t: entriesErrorT } = useTranslation('lists', {
+    keyPrefix: 'entries-validation',
   });
   const toast = useToast();
   const {
@@ -91,14 +95,12 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
   const getEntriesHint = () => {
     if (errors.entries) {
       if (!entries?.length) {
-        return t('form.entries.errors.required');
+        return entriesErrorT('required');
       }
       return errors.entries.message;
     }
     return t('form.entries.hint');
   };
-
-  const getEntriesHasError = () => !!errors.entries;
 
   return (
     <Dialog
@@ -158,7 +160,7 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
           <TextArea
             label={t('form.entries.label')}
             placeholder={t('form.entries.placeholder')}
-            hasError={getEntriesHasError()}
+            hasError={!!errors.entries}
             hint={getEntriesHint()}
             {...register('entries', {
               required: true,

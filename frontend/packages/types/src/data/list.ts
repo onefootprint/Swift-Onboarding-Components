@@ -19,3 +19,10 @@ export type List = {
   kind: ListKind;
   name: string;
 };
+
+export type ListEntry = {
+  id: string;
+  data: string;
+  createdAt: string;
+  actor: Actor;
+};

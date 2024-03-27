@@ -18,8 +18,8 @@ const getList = async ({ authHeaders, id }: GetListRequest) => {
 };
 
 const useList = (id = '') => {
-  const { authHeaders, isLive } = useSession();
-  const query = useQuery<List>(['lists', id, isLive], () =>
+  const { authHeaders } = useSession();
+  const query = useQuery<List>(['lists', id, authHeaders], () =>
     getList({ authHeaders, id }),
   );
   const { error } = query;

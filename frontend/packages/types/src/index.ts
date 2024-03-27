@@ -1,4 +1,6 @@
 export type {
+  AddListEntriesRequest,
+  AddListEntriesResponse,
   AddRuleRequest,
   AddRuleResponse,
   AuthorizeFields,
@@ -275,6 +277,7 @@ export type {
   LabelAddedEvent,
   LabelAddedEventData,
   List,
+  ListEntry,
   Liveness,
   LivenessAttestation,
   LivenessAttestationDeviceType,

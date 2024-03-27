@@ -61,16 +61,7 @@
         "entries": {
           "label": "Enter values manually",
           "placeholder": "List entries",
-          "hint": "Separated by commas",
-          "errors": {
-            "required": "Please enter at least one entry for the list.",
-            "email-address-invalid": "Please enter a valid email address.",
-            "email-domain-invalid": "Please enter a valid email domain.",
-            "ssn9-invalid": "Please enter a valid SSN.",
-            "phone-number-invalid": "Please enter a valid phone number.",
-            "phone-country-code-invalid": "Please enter a valid phone country code.",
-            "ip-address-invalid": "Please enter a valid IP address."
-          }
+          "hint": "Separated by commas"
         }
       },
       "feedback": {
@@ -101,7 +92,37 @@
       "show-all": "Show all",
       "show-less": "Show fewer entries",
       "add": "Add entry",
-      "empty": "No entries found"
+      "empty": "No entries found",
+      "add-entries-dialog": {
+        "title": "New entries",
+        "form": {
+          "entries": {
+            "label": "Add entries",
+            "placeholder": "List entries",
+            "hint": "Separated by commas",
+            "errors": {
+              "required": "Please enter at least one entry for the list."
+            }
+          }
+        },
+        "cta": {
+          "save": {
+            "label": "Save",
+            "aria-label": "Save"
+          },
+          "cancel": "Cancel"
+        },
+        "feedback": {
+          "success": {
+            "title": "Success",
+            "description": "Entries added successfully."
+          },
+          "error": {
+            "title": "Error adding entries",
+            "description": "Something went wrong, please try again."
+          }
+        }
+      }
     },
     "playbooks": {
       "title": "Playbooks using {{alias}}",
@@ -111,5 +132,14 @@
       "title": "Activity log",
       "empty": "No activity found"
     }
+  },
+  "entries-validation": {
+    "required": "Please enter at least one entry for the list.",
+    "email-address-invalid": "Please enter a valid email address.",
+    "email-domain-invalid": "Please enter a valid email domain.",
+    "ssn9-invalid": "Please enter a valid SSN.",
+    "phone-number-invalid": "Please enter a valid phone number.",
+    "phone-country-code-invalid": "Please enter a valid phone country code.",
+    "ip-address-invalid": "Please enter a valid IP address."
   }
 }

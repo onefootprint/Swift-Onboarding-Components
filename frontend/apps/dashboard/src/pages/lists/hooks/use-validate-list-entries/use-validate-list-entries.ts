@@ -10,7 +10,7 @@ import isSSN9 from './utils/is-ssn-9';
 
 const useValidateListEntries = () => {
   const { t } = useTranslation('lists', {
-    keyPrefix: 'list.dialog.form.entries.errors',
+    keyPrefix: 'entries-validation',
   });
 
   const validate = (kind: ListKind, entries: string) => {

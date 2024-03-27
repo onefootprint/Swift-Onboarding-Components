@@ -4,13 +4,13 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 type EntryChipProps = {
-  children: string;
+  label: string;
   onDelete: () => void;
 };
 
-const EntryChip = ({ children, onDelete }: EntryChipProps) => (
+const EntryChip = ({ label, onDelete }: EntryChipProps) => (
   <Container>
-    <Label>{children}</Label>
+    <Label>{label}</Label>
     <Close onClick={onDelete}>
       <IcoCloseSmall16 />
     </Close>

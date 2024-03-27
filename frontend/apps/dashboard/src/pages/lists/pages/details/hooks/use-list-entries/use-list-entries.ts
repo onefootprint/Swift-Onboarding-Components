@@ -23,7 +23,7 @@ const useListEntries = (listId = '') => {
   const { authHeaders } = useSession();
 
   return useQuery(
-    ['list', listId],
+    ['list-entries', listId, authHeaders],
     () => getListEntries({ authHeaders, listId }),
     {
       enabled: !!listId,
