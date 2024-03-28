@@ -143,7 +143,7 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
         *sandbox_tenant.db_auths,
     )
 
-    lists = get(f"/org/lists", None, *sandbox_tenant.db_auths)
+    lists = get(f"/org/lists", None, *sandbox_tenant.db_auths)["data"]
     assert lists[0]["name"] == f"My Super List 3 {nonce}"
     assert lists[1]["name"] == f"My Super List 2 {nonce}"
     assert lists[2]["name"] == f"My Super List 1 {nonce}"
@@ -263,7 +263,7 @@ def test_delete_list(sandbox_tenant):
     )
 
     list_ids = set(
-        [l["id"] for l in get(f"/org/lists", None, *sandbox_tenant.db_auths)]
+        [l["id"] for l in get(f"/org/lists", None, *sandbox_tenant.db_auths)["data"]]
     )
     assert (
         set([list1["id"], list2["id"], list3["id"]]) <= list_ids
@@ -272,7 +272,7 @@ def test_delete_list(sandbox_tenant):
     # delete list2
     delete(f"/org/lists/{list2['id']}", None, *sandbox_tenant.db_auths)
     list_ids = set(
-        [l["id"] for l in get(f"/org/lists", None, *sandbox_tenant.db_auths)]
+        [l["id"] for l in get(f"/org/lists", None, *sandbox_tenant.db_auths)["data"]]
     )
 
     assert set([list1["id"], list3["id"]]) <= list_ids
@@ -284,7 +284,7 @@ def test_delete_list(sandbox_tenant):
     # delete list3
     delete(f"/org/lists/{list3['id']}", None, *sandbox_tenant.db_auths)
     list_ids = set(
-        [l["id"] for l in get(f"/org/lists", None, *sandbox_tenant.db_auths)]
+        [l["id"] for l in get(f"/org/lists", None, *sandbox_tenant.db_auths)["data"]]
     )
     assert set([list1["id"]]) <= list_ids
     assert list3["id"] not in list_ids
@@ -292,7 +292,7 @@ def test_delete_list(sandbox_tenant):
     # delete list1
     delete(f"/org/lists/{list1['id']}", None, *sandbox_tenant.db_auths)
     list_ids = set(
-        [l["id"] for l in get(f"/org/lists", None, *sandbox_tenant.db_auths)]
+        [l["id"] for l in get(f"/org/lists", None, *sandbox_tenant.db_auths)["data"]]
     )
     assert list1["id"] not in list_ids
 
