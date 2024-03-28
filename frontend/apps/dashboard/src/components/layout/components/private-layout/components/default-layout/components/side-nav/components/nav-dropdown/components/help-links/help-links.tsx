@@ -74,11 +74,6 @@ const StyledLink = styled(Dropdown.Item)`
     cursor: pointer;
     height: ${OPTION_HEIGHT};
 
-    &:hover {
-      color: ${theme.color.primary};
-      background-color: ${theme.backgroundColor.secondary};
-    }
-
     svg {
       margin-top: 2px;
     }

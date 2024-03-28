@@ -1,4 +1,4 @@
-import { Dropdown, Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -21,7 +21,7 @@ const UserName = ({ name, lastName, email }: UserNameProps) => (
   </UserDropdownItem>
 );
 
-const UserDropdownItem = styled(Dropdown.Item)`
+const UserDropdownItem = styled(Stack)`
   ${({ theme }) => css`
     pointer-events: none;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};

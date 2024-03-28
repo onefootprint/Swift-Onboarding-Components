@@ -107,13 +107,12 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
     align-items: center;
     justify-content: left;
 
-    @media (hover: hover) {
-      &:hover {
-        ${createOverlayBackground('darken-1', 'primary')};
-      }
+    &:hover {
+      background-color: ${theme.backgroundColor.secondary};
     }
+
     &:focus {
-      ${createOverlayBackground('darken-1', 'primary')};
+      background-color: ${theme.backgroundColor.secondary};
     }
 
     &[data-disabled] {

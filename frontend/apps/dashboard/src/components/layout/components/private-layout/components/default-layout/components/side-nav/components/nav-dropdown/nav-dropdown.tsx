@@ -39,7 +39,7 @@ const NavDropdown = ({
       <Dropdown.Root>
         <OverflowButton ariaLabel="Account" />
         <Dropdown.Portal>
-          <NavDropdownContent>
+          <NavDropdownContent sideOffset={4}>
             <UserName
               name={user.firstName}
               lastName={user.lastName}
