@@ -12,29 +12,26 @@ import type { IdDocProps } from './types';
 import { getCountryCodeFromLocale } from './utils/get-country-from-code';
 import type { MachineContext } from './utils/state-machine';
 
-const App = ({ context, onDone }: IdDocProps) => {
+const App = ({ idvContext, context, onDone }: IdDocProps) => {
   const l10n = useL10nContext();
-  const { authToken, device, customData } = context;
-  if (!customData) {
-    return null;
-  }
+  const { authToken, device } = idvContext;
 
-  const { sandboxOutcome } = customData;
-  const { shouldCollectSelfie: isSelfieRequired } = customData.requirement;
+  const { sandboxOutcome } = context;
+  const { shouldCollectSelfie: isSelfieRequired } = context.requirement;
 
   const initialContext: MachineContext = {
     authToken,
     device,
-    orgId: customData.orgId,
+    orgId: context.orgId,
     currSide: IdDocImageTypes.front,
-    requirement: customData.requirement,
+    requirement: context.requirement,
     idDoc: {
       country: getCountryCodeFromLocale(l10n?.locale),
       type: undefined,
     },
     sandboxOutcome,
     supportedCountryAndDocTypes: {
-      ...customData.requirement.supportedCountryAndDocTypes,
+      ...context.requirement.supportedCountryAndDocTypes,
     },
   };
 

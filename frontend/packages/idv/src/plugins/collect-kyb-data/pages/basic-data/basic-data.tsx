@@ -29,7 +29,12 @@ const BasicData = ({
   onCancel,
 }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, config, data, kybRequirement } = state.context;
+  const {
+    idvContext: { authToken },
+    config,
+    data,
+    kybRequirement,
+  } = state.context;
   const { missingAttributes } = kybRequirement || {};
   const { mutation, syncData } = useSyncData();
   const { t } = useTranslation('idv');
@@ -52,9 +57,6 @@ const BasicData = ({
       );
     };
 
-    if (!authToken) {
-      return;
-    }
     syncData({
       authToken,
       data: basicData,

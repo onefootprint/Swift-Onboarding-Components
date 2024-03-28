@@ -1,10 +1,20 @@
 import { InvestorProfileDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
+import type { DeviceInfo } from '../../../../hooks';
 import type { MachineContext, MachineEvents } from './types';
 
-const createCollectInvestorProfileDataMachine = () =>
+export type CreateInvestorProfileArgs = {
+  device?: DeviceInfo;
+  authToken?: string;
+  showTransition?: boolean;
+};
+
+const createCollectInvestorProfileDataMachine = ({
+  device,
+  authToken,
+  showTransition,
+}: CreateInvestorProfileArgs) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -13,20 +23,16 @@ const createCollectInvestorProfileDataMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
-      initial: 'init',
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'employment',
       context: {
+        device,
+        authToken,
+        showTransition,
         data: {},
       },
       states: {
-        init: {
-          on: {
-            receivedContext: {
-              target: 'employment',
-              actions: 'assignInitialContext',
-            },
-          },
-        },
         employment: {
           on: {
             employmentSubmitted: [
@@ -105,10 +111,6 @@ const createCollectInvestorProfileDataMachine = () =>
     },
     {
       actions: {
-        assignInitialContext: assign((context, event) => ({
-          ...context,
-          ...event.payload,
-        })),
         assignData: assign((context, event) => ({
           ...context,
           data: {

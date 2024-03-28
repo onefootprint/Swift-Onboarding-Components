@@ -5,16 +5,12 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
-import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { CommonIdvContext } from '../../../../utils/state-machine';
 
 export type MachineContext = {
   config: PublicOnboardingConfig;
-  device: DeviceInfo;
-  authToken: string;
+  idvContext: CommonIdvContext;
   bootstrapData: IdDIData; // TODO: generalize this more in the next iteration
-  isTransfer?: boolean;
-  isComponentsSdk?: boolean;
-  isInIframe?: boolean;
   validationToken?: string;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;

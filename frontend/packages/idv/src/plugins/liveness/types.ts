@@ -1,5 +1,6 @@
-import type { BasePluginProps } from '../base-plugin';
+import type { CommonIdvContext } from '../../utils/state-machine';
 
-export type LivenessProps = BasePluginProps<{
-  isInIframe: boolean;
-}>;
+export type LivenessProps = {
+  idvContext: CommonIdvContext;
+  onDone: () => void;
+};

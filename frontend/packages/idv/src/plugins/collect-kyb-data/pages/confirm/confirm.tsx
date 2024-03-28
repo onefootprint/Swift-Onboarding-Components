@@ -14,7 +14,10 @@ const Confirm = () => {
     keyPrefix: 'kyb.pages.confirm.summary',
   });
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data } = state.context;
+  const {
+    idvContext: { authToken },
+    data,
+  } = state.context;
   const { mutation, syncData } = useSyncData();
   const { isLoading } = mutation;
 

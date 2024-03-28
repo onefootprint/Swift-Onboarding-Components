@@ -17,11 +17,10 @@ const BeneficialOwnerKyc = () => {
     kycRequirement,
     kycBootstrapData,
     data,
-    authToken,
-    device,
+    idvContext,
     config,
   } = state.context;
-  if (!authToken || !device || !config || !kycRequirement) {
+  if (!config || !kycRequirement) {
     throw new Error('Missing collect-kyc-data props in kyb');
   }
 
@@ -51,15 +50,12 @@ const BeneficialOwnerKyc = () => {
 
   return (
     <CollectKycData
+      idvContext={idvContext}
       context={{
-        authToken,
-        device,
-        customData: {
-          disabledFields: [IdDI.firstName, IdDI.middleName, IdDI.lastName],
-          bootstrapData,
-          requirement: kycRequirement,
-          config,
-        },
+        disabledFields: [IdDI.firstName, IdDI.middleName, IdDI.lastName],
+        bootstrapData,
+        requirement: kycRequirement,
+        config,
       }}
       onDone={handleDone}
     />

@@ -57,22 +57,22 @@ export const NextRequirementTargets: TransitionConfig<
 
 const shouldRunCollectKybData = (context: MachineContext) =>
   context.requirements[0]?.kind === OnboardingRequirementKind.collectKybData &&
-  !context.onboardingContext.isTransfer;
+  !context.idvContext.isTransfer;
 
 const shouldRunCollectKycData = (context: MachineContext) =>
   context.requirements[0]?.kind === OnboardingRequirementKind.collectKycData &&
-  !context.onboardingContext.isTransfer;
+  !context.idvContext.isTransfer;
 
 const shouldRunCollectInvestorProfile = (context: MachineContext) =>
   context.requirements[0]?.kind === OnboardingRequirementKind.investorProfile &&
-  !context.onboardingContext.isTransfer;
+  !context.idvContext.isTransfer;
 
 const shouldRunLiveness = (context: MachineContext) =>
   context.requirements[0]?.kind === OnboardingRequirementKind.registerPasskey;
 
 const shouldRunIdDoc = (context: MachineContext) => {
   const {
-    onboardingContext: { isTransfer, device },
+    idvContext: { isTransfer, device },
   } = context;
   const isMobile = device.type === 'mobile' || device.type === 'tablet';
   if (isTransfer && !isMobile) {
@@ -85,7 +85,7 @@ const shouldRunIdDoc = (context: MachineContext) => {
 
 const shouldShowAuthorize = (context: MachineContext) => {
   const {
-    onboardingContext: { isTransfer },
+    idvContext: { isTransfer },
   } = context;
   return (
     !isTransfer &&
@@ -95,7 +95,7 @@ const shouldShowAuthorize = (context: MachineContext) => {
 
 const shouldShowProcess = (context: MachineContext) => {
   const {
-    onboardingContext: { isTransfer },
+    idvContext: { isTransfer },
   } = context;
   return (
     !isTransfer &&
@@ -109,10 +109,12 @@ const isLivenessKind = (x: unknown) =>
 
 const shouldRunTransfer = (context: MachineContext): boolean => {
   const {
-    onboardingContext: {
+    idvContext: {
       isTransfer,
-      config: { isNoPhoneFlow },
       device: { type: deviceType },
+    },
+    onboardingContext: {
+      config: { isNoPhoneFlow },
     },
     didRunTransfer,
     requirements,
@@ -122,7 +124,7 @@ const shouldRunTransfer = (context: MachineContext): boolean => {
 
   // When running natively (not in an iframe) on mobile, we can register the passkey without transferring.
   // If we're on desktop, we should still attempt to transfer
-  if (!context.onboardingContext.isInIframe && isMobile) return false;
+  if (!context.idvContext.isInIframe && isMobile) return false;
 
   if (isTransferOnDesktopDisabled) return false;
   if (didRunTransfer) return false;

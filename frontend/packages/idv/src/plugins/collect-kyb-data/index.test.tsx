@@ -25,11 +25,7 @@ import {
 import React from 'react';
 import { Layout } from 'src/components/layout';
 
-import type { PluginContext } from '../base-plugin';
-import type {
-  CollectKybDataContext,
-  CollectKybDataProps,
-} from './collect-kyb-data.types';
+import type { CollectKybDataProps } from './collect-kyb-data.types';
 import CollectKybData from './index';
 import {
   withBusinessVault,
@@ -89,9 +85,18 @@ describe.skip('<CollectKybData />', () => {
   const getContext = (
     kycAttributes: CollectedKycDataOption[],
     kybAttributes: CollectedKybDataOption[],
-  ): PluginContext<CollectKybDataContext> => ({
-    authToken: 'token',
-    customData: {
+    onDone: () => void,
+  ): CollectKybDataProps => ({
+    idvContext: {
+      authToken: 'token',
+      device: {
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+        osName: 'iOS',
+        browser: 'Mobile Safari',
+      },
+    },
+    context: {
       config: onboardingConfig,
       kybRequirement: {
         kind: OnboardingRequirementKind.collectKybData,
@@ -109,15 +114,10 @@ describe.skip('<CollectKybData />', () => {
         [IdDI.email]: 'piip@onefootprint.com',
       },
     },
-    device: {
-      type: 'mobile',
-      hasSupportForWebauthn: true,
-      osName: 'iOS',
-      browser: 'Mobile Safari',
-    },
+    onDone,
   });
 
-  const renderPlugin = ({ context, onDone }: CollectKybDataProps) =>
+  const renderPlugin = ({ idvContext, context, onDone }: CollectKybDataProps) =>
     render(
       <React.StrictMode>
         <ObserveCollectorProvider appName="test">
@@ -125,7 +125,11 @@ describe.skip('<CollectKybData />', () => {
             <DesignSystemProvider theme={themes.footprint.light}>
               <ToastProvider>
                 <Layout>
-                  <CollectKybData context={context} onDone={onDone} />
+                  <CollectKybData
+                    idvContext={idvContext}
+                    context={context}
+                    onDone={onDone}
+                  />
                 </Layout>
               </ToastProvider>
             </DesignSystemProvider>
@@ -147,9 +151,8 @@ describe.skip('<CollectKybData />', () => {
 
     it('takes user through all of the pages', async () => {
       const onDone = jest.fn();
-
-      renderPlugin({
-        context: getContext(
+      renderPlugin(
+        getContext(
           [
             CollectedKycDataOption.name,
             CollectedKycDataOption.dob,
@@ -160,9 +163,9 @@ describe.skip('<CollectKybData />', () => {
             CollectedKybDataOption.tin,
             CollectedKybDataOption.beneficialOwners,
           ],
+          onDone,
         ),
-        onDone,
-      });
+      );
 
       await waitFor(() => {
         expect(

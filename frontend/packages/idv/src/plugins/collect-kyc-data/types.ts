@@ -5,7 +5,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
-import type { BasePluginProps } from '../base-plugin';
+import type { CommonIdvContext } from '../../utils/state-machine';
 
 export type VerifiedMethods = {
   isLoading: boolean;
@@ -20,4 +20,8 @@ export type CollectKycDataContext = {
   disabledFields?: IdDI[]; // To disable inputs, like when KYC'ing the first BO
 };
 
-export type CollectKycDataProps = BasePluginProps<CollectKycDataContext>;
+export type CollectKycDataProps = {
+  context: CollectKycDataContext;
+  idvContext: CommonIdvContext;
+  onDone: () => void;
+};

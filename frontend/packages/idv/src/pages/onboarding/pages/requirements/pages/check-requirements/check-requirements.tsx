@@ -10,7 +10,7 @@ const CheckRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     startedDataCollection,
-    onboardingContext: { authToken, isTransfer },
+    idvContext: { authToken, isTransfer },
     collectedKycData,
   } = state.context;
 

@@ -5,18 +5,21 @@ import type {
   RegisterPasskeyRequirement,
 } from '@onefootprint/types';
 
-import type { BasePluginProps } from '../base-plugin';
+import type { CommonIdvContext } from '../../utils/state-machine';
 
 export type TransferRequirements = {
   liveness?: RegisterPasskeyRequirement;
   idDoc?: IdDocRequirement;
 };
 
-export type TransferCustomData = {
+export type TransferContext = {
   config: PublicOnboardingConfig;
   missingRequirements: TransferRequirements;
   idDocOutcome?: IdDocOutcome;
-  isInIframe: boolean;
 };
 
-export type TransferProps = BasePluginProps<TransferCustomData>;
+export type TransferProps = {
+  context: TransferContext;
+  idvContext: CommonIdvContext;
+  onDone: () => void;
+};

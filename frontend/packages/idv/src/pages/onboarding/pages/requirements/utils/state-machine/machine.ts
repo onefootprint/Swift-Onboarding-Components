@@ -6,7 +6,7 @@ import type {
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
+import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 import {
   NextRequirementTargets,
   RequirementCompletedTransition,
@@ -15,12 +15,8 @@ import type { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
   config: PublicOnboardingConfig;
-  device: DeviceInfo;
-  authToken: string;
+  idvContext: CommonIdvContext;
   bootstrapData?: IdvBootstrapData;
-  isTransfer?: boolean;
-  isComponentsSdk?: boolean;
-  isInIframe?: boolean;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
   isTransferOnDesktopDisabled?: boolean;
@@ -28,12 +24,8 @@ export type OnboardingRequirementsMachineArgs = {
 
 const createOnboardingRequirementsMachine = ({
   config,
-  device,
-  authToken,
   bootstrapData,
-  isTransfer,
-  isComponentsSdk,
-  isInIframe,
+  idvContext,
   idDocOutcome,
   overallOutcome,
   isTransferOnDesktopDisabled,
@@ -50,13 +42,9 @@ const createOnboardingRequirementsMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
+        idvContext,
         onboardingContext: {
           config,
-          device,
-          authToken,
-          isTransfer,
-          isComponentsSdk,
-          isInIframe,
           bootstrapData,
           idDocOutcome,
           overallOutcome,
@@ -75,7 +63,7 @@ const createOnboardingRequirementsMachine = ({
           always: [
             {
               target: 'startOnboarding',
-              cond: ctx => !ctx.onboardingContext.isTransfer,
+              cond: ctx => !ctx.idvContext.isTransfer,
             },
             { target: 'checkRequirements' },
           ],

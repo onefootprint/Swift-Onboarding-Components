@@ -20,7 +20,6 @@ export interface Typegen0 {
       | 'investmentGoalsSubmitted'
       | 'netWorthSubmitted'
       | 'riskToleranceSubmitted';
-    assignInitialContext: 'receivedContext';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -30,7 +29,6 @@ export interface Typegen0 {
     | 'declarations'
     | 'employment'
     | 'income'
-    | 'init'
     | 'investmentGoals'
     | 'netWorth'
     | 'riskTolerance';

@@ -5,22 +5,16 @@ import { MachineProvider } from './components/machine-provider';
 import Router from './pages/router';
 import type { MachineContext } from './utils/state-machine';
 
-const App = ({ context, onDone }: CollectKybDataProps) => {
-  const { authToken, customData, device } = context;
-  if (!customData) {
-    return null;
-  }
-
+const App = ({ idvContext, context, onDone }: CollectKybDataProps) => {
   const {
     config,
     kybRequirement,
     // TODO: add support for kyb bootstrap data in the future
     kycRequirement,
     kycBootstrapData,
-  } = customData;
+  } = context;
   const initContext: MachineContext = {
-    device,
-    authToken,
+    idvContext,
     config,
     kybRequirement,
     kycRequirement,

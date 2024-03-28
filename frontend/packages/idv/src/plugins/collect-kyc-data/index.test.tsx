@@ -25,7 +25,6 @@ import React from 'react';
 import FootprintProvider from 'src/components/footprint-provider';
 import { Layout } from 'src/components/layout';
 
-import type { PluginContext } from '../base-plugin';
 import CollectKycData from './index';
 import {
   mockFootprintProviderClient,
@@ -34,7 +33,7 @@ import {
   withUserToken,
   withUserVault,
 } from './index.test.config';
-import type { CollectKycDataContext, CollectKycDataProps } from './types';
+import type { CollectKycDataProps } from './types';
 
 describe('<CollectKycData />', () => {
   const useRouterSpy = createUseRouterSpy();
@@ -63,7 +62,7 @@ describe('<CollectKycData />', () => {
     });
   });
 
-  const renderPlugin = ({ context, onDone }: CollectKycDataProps) =>
+  const renderPlugin = ({ idvContext, context, onDone }: CollectKycDataProps) =>
     render(
       <React.StrictMode>
         <ObserveCollectorProvider appName="test">
@@ -72,7 +71,11 @@ describe('<CollectKycData />', () => {
               <FootprintProvider client={mockFootprintProviderClient}>
                 <ToastProvider>
                   <Layout>
-                    <CollectKycData context={context} onDone={onDone} />
+                    <CollectKycData
+                      idvContext={idvContext}
+                      context={context}
+                      onDone={onDone}
+                    />
                   </Layout>
                 </ToastProvider>
               </FootprintProvider>
@@ -101,10 +104,19 @@ describe('<CollectKycData />', () => {
   };
 
   const getContext = (
-    attributes?: CollectedKycDataOption[],
-  ): PluginContext<CollectKycDataContext> => ({
-    authToken: 'token',
-    customData: {
+    attributes: CollectedKycDataOption[],
+    onDone: () => void,
+  ): CollectKycDataProps => ({
+    idvContext: {
+      authToken: 'token',
+      device: {
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+        osName: 'iOS',
+        browser: 'Mobile Safari',
+      },
+    },
+    context: {
       requirement: {
         kind: OnboardingRequirementKind.collectKycData,
         isMet: false,
@@ -117,12 +129,7 @@ describe('<CollectKycData />', () => {
       },
       config: onboardingConfig,
     },
-    device: {
-      type: 'mobile',
-      hasSupportForWebauthn: true,
-      osName: 'iOS',
-      browser: 'Mobile Safari',
-    },
+    onDone,
   });
 
   describe('when there are missing attributes', () => {
@@ -136,14 +143,16 @@ describe('<CollectKycData />', () => {
     it('takes user through all of the pages', async () => {
       const onDone = jest.fn();
 
-      renderPlugin({
-        context: getContext([
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.dob,
-          CollectedKycDataOption.ssn4,
-        ]),
-        onDone,
-      });
+      renderPlugin(
+        getContext(
+          [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.dob,
+            CollectedKycDataOption.ssn4,
+          ],
+          onDone,
+        ),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Basic Data')).toBeInTheDocument();

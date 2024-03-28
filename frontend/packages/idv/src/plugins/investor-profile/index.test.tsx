@@ -54,26 +54,28 @@ describe('<InvestorProfile />', () => {
     withUserVault();
   });
 
-  const getContext = () => ({
-    authToken: 'token',
-    customData: {},
-    device: {
-      type: 'mobile',
-      hasSupportForWebauthn: true,
-      osName: 'iOS',
-      browser: 'Mobile Safari',
-    },
-  });
-
-  const renderPlugin = ({ onDone }: Pick<InvestorProfileProps, 'onDone'>) =>
-    render(
+  const renderPlugin = ({ onDone }: Pick<InvestorProfileProps, 'onDone'>) => {
+    const idvContext = {
+      authToken: 'token',
+      device: {
+        type: 'mobile',
+        hasSupportForWebauthn: true,
+        osName: 'iOS',
+        browser: 'Mobile Safari',
+      },
+    };
+    return render(
       <React.StrictMode>
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
             <DesignSystemProvider theme={themes.footprint.light}>
               <ToastProvider>
                 <Layout>
-                  <InvestorProfile context={getContext()} onDone={onDone} />
+                  <InvestorProfile
+                    idvContext={idvContext}
+                    context={{}}
+                    onDone={onDone}
+                  />
                 </Layout>
               </ToastProvider>
             </DesignSystemProvider>
@@ -81,6 +83,7 @@ describe('<InvestorProfile />', () => {
         </ObserveCollectorProvider>
       </React.StrictMode>,
     );
+  };
 
   it('takes user through all of the pages', async () => {
     const onDone = jest.fn();

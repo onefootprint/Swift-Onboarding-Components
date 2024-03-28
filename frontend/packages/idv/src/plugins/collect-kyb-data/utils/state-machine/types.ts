@@ -7,7 +7,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
-import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { CommonIdvContext } from '../../../../utils/state-machine';
 
 export type BasicData = Required<
   Pick<BusinessDIData, BusinessDI.name | BusinessDI.tin>
@@ -41,8 +41,7 @@ export type MachineContext = {
   kybRequirement: CollectKybDataRequirement;
   kycRequirement?: CollectKycDataRequirement;
   kycBootstrapData?: KycBootstrapData;
-  device?: DeviceInfo;
-  authToken?: string;
+  idvContext: CommonIdvContext;
   config?: PublicOnboardingConfig;
   // Machine generated
   data: BusinessDIData;

@@ -12,7 +12,8 @@ export type ProcessProps = {
 const Process = ({ onDone }: ProcessProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken, overallOutcome },
+    idvContext: { authToken },
+    onboardingContext: { overallOutcome },
   } = state.context;
   const processMutation = useOnboardingProcess();
 

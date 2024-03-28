@@ -32,7 +32,7 @@ const BeneficialOwners = ({
 }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
   const {
-    authToken,
+    idvContext: { authToken },
     data,
     kybRequirement: { missingAttributes },
     kycBootstrapData,

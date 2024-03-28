@@ -1,9 +1,7 @@
-import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { CommonIdvContext } from '../../../../utils/state-machine';
 
 export type MachineContext = {
-  device: DeviceInfo;
-  authToken: string;
-  isInIframe: boolean;
+  idvContext: CommonIdvContext;
 };
 
 export type MachineEvents =

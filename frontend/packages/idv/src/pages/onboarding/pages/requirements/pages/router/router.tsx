@@ -26,15 +26,8 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: {
-      authToken,
-      bootstrapData,
-      config,
-      device,
-      idDocOutcome,
-      isTransfer,
-      isInIframe,
-    },
+    idvContext,
+    onboardingContext: { bootstrapData, config, idDocOutcome },
     collectedKycData,
     requirements,
   } = state.context;
@@ -84,15 +77,12 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('kybData') && kyb) {
     return (
       <CollectKybData
+        idvContext={idvContext}
         context={{
-          authToken,
-          device,
-          customData: {
-            kybRequirement: kyb,
-            kycRequirement: kyc,
-            kycBootstrapData,
-            config,
-          },
+          kybRequirement: kyb,
+          kycRequirement: kyc,
+          kycBootstrapData,
+          config,
         }}
         onDone={handleRequirementCompleted}
       />
@@ -101,14 +91,11 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('kycData') && kyc) {
     return (
       <CollectKycData
+        idvContext={idvContext}
         context={{
-          authToken,
-          device,
-          customData: {
-            requirement: kyc,
-            bootstrapData: kycBootstrapData,
-            config,
-          },
+          requirement: kyc,
+          bootstrapData: kycBootstrapData,
+          config,
         }}
         onDone={handleRequirementCompleted}
       />
@@ -117,12 +104,9 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('investorProfile')) {
     return (
       <InvestorProfile
+        idvContext={idvContext}
         context={{
-          authToken,
-          device,
-          customData: {
-            showTransition: !!collectedKycData,
-          },
+          showTransition: !!collectedKycData,
         }}
         onDone={handleRequirementCompleted}
       />
@@ -131,18 +115,14 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('transfer')) {
     return (
       <Transfer
+        idvContext={idvContext}
         context={{
-          authToken,
-          device,
-          customData: {
-            config,
-            missingRequirements: {
-              liveness,
-              idDoc,
-            },
-            idDocOutcome,
-            isInIframe: !!isInIframe,
+          config,
+          missingRequirements: {
+            liveness,
+            idDoc,
           },
+          idDocOutcome,
         }}
         onDone={handleRequirementCompleted}
       />
@@ -150,30 +130,17 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('liveness')) {
     return (
-      <Liveness
-        context={{
-          isTransfer,
-          authToken,
-          device,
-          customData: {
-            isInIframe: !!isInIframe,
-          },
-        }}
-        onDone={handleRequirementCompleted}
-      />
+      <Liveness idvContext={idvContext} onDone={handleRequirementCompleted} />
     );
   }
   if (state.matches('idDoc') && idDoc) {
     return (
       <IdDoc
+        idvContext={idvContext}
         context={{
-          authToken,
-          device,
-          customData: {
-            requirement: idDoc,
-            sandboxOutcome: idDocOutcome,
-            orgId,
-          },
+          requirement: idDoc,
+          sandboxOutcome: idDocOutcome,
+          orgId,
         }}
         onDone={handleRequirementCompleted}
       />

@@ -8,7 +8,7 @@ import type { OnboardingProps } from './types';
 const Onboarding = ({ onDone, l10n, ...args }: OnboardingProps) => (
   <OnboardingMachineProvider args={args} l10n={l10n}>
     <Router onDone={onDone} />
-    <DeviceSignals fpAuthToken={args.authToken} />
+    <DeviceSignals fpAuthToken={args.idvContext.authToken} />
   </OnboardingMachineProvider>
 );
 

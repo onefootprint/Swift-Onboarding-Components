@@ -5,7 +5,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
-import type { BasePluginProps } from '../base-plugin';
+import type { CommonIdvContext } from '../../utils/state-machine';
 
 export type CollectKybDataContext = {
   config: PublicOnboardingConfig;
@@ -14,4 +14,8 @@ export type CollectKybDataContext = {
   kycBootstrapData?: KycBootstrapData;
 };
 
-export type CollectKybDataProps = BasePluginProps<CollectKybDataContext>;
+export type CollectKybDataProps = {
+  context: CollectKybDataContext;
+  idvContext: CommonIdvContext;
+  onDone: () => void;
+};

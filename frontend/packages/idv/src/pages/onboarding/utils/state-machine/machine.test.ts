@@ -37,14 +37,15 @@ describe('Onboarding Machine Tests', () => {
   };
 
   const createMachine = ({
-    authToken = 'token',
     bootstrapData = defaultBootstrapData,
   }: Partial<OnboardingMachineArgs> = {}) => {
     const machine = interpret(
       createOnboardingMachine({
         bootstrapData,
-        authToken,
-        device: testDevice,
+        idvContext: {
+          device: testDevice,
+          authToken: 'token',
+        },
         config: testOnboardingConfig,
       }),
     );
@@ -57,9 +58,11 @@ describe('Onboarding Machine Tests', () => {
     let { state } = machine;
     expect(state.value).toEqual('requirements');
     expect(state.context).toEqual({
-      device: testDevice,
+      idvContext: {
+        device: testDevice,
+        authToken: 'token',
+      },
       config: testOnboardingConfig,
-      authToken: 'token',
       bootstrapData: defaultBootstrapData,
       validationToken: undefined,
     });
@@ -78,9 +81,11 @@ describe('Onboarding Machine Tests', () => {
     expect(state.value).toEqual('complete');
 
     expect(state.context).toEqual({
-      device: testDevice,
+      idvContext: {
+        device: testDevice,
+        authToken: 'token',
+      },
       config: testOnboardingConfig,
-      authToken: 'token',
       bootstrapData: defaultBootstrapData,
       validationToken: 'token',
     });

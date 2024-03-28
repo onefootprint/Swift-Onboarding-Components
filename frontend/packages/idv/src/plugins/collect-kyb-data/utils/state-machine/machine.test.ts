@@ -43,8 +43,10 @@ describe('Collect KYB Data Machine Tests', () => {
     },
   ) => {
     const initialContext: MachineContext = {
-      authToken: 'authToken',
-      device,
+      idvContext: {
+        authToken: 'authToken',
+        device,
+      },
       config: { ...TestOnboardingConfig },
       kybRequirement: {
         kind: OnboardingRequirementKind.collectKybData,

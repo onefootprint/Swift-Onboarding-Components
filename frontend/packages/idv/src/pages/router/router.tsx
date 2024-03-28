@@ -148,12 +148,14 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
       {state.matches('onboarding') && authToken && config && device ? (
         <Onboarding
           config={config}
-          device={device}
-          authToken={authToken}
+          idvContext={{
+            device,
+            authToken,
+            isTransfer,
+            isComponentsSdk,
+            isInIframe,
+          }}
           bootstrapData={bootstrapData}
-          isTransfer={isTransfer}
-          isComponentsSdk={isComponentsSdk}
-          isInIframe={isInIframe}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onClose={onClose}

@@ -10,7 +10,9 @@ import { useOnboardingMachine } from '../../components/machine-provider';
 
 const Validate = () => {
   const [state, send] = useOnboardingMachine();
-  const { authToken } = state.context;
+  const {
+    idvContext: { authToken },
+  } = state.context;
   const onboardingValidateMutation = useOnboardingValidate();
   const { isError } = onboardingValidateMutation;
 

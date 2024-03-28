@@ -90,13 +90,15 @@ describe('Onboarding Requirements Machine Tests', () => {
     it('successfully completes when requirements are empty', () => {
       const machine = interpret(
         createMachine({
-          device: {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-            osName: 'unknown',
-            browser: 'Safari',
+          idvContext: {
+            device: {
+              type: 'mobile',
+              hasSupportForWebauthn: true,
+              osName: 'unknown',
+              browser: 'Safari',
+            },
+            authToken: 'token',
           },
-          authToken: 'token',
           config: TestOnboardingConfig,
           bootstrapData: {
             [IdDI.email]: 'piip@onefootprint.com',
@@ -112,11 +114,21 @@ describe('Onboarding Requirements Machine Tests', () => {
         type: 'initialized',
       });
       expect(state.value).toBe('checkRequirements');
-      const { requirements, startedDataCollection, onboardingContext } =
-        state.context;
+      const {
+        requirements,
+        startedDataCollection,
+        onboardingContext,
+        idvContext,
+      } = state.context;
       expect(requirements).toEqual([]);
       expect(startedDataCollection).toBe(false);
       expect(onboardingContext).toEqual({
+        config: TestOnboardingConfig,
+        bootstrapData: {
+          [IdDI.email]: 'piip@onefootprint.com',
+        },
+      });
+      expect(idvContext).toEqual({
         device: {
           type: 'mobile',
           hasSupportForWebauthn: true,
@@ -124,10 +136,6 @@ describe('Onboarding Requirements Machine Tests', () => {
           browser: 'Safari',
         },
         authToken: 'token',
-        config: TestOnboardingConfig,
-        bootstrapData: {
-          [IdDI.email]: 'piip@onefootprint.com',
-        },
       });
 
       state = machine.send({
@@ -142,13 +150,15 @@ describe('Onboarding Requirements Machine Tests', () => {
     it('successfully completes requirements and step up with id doc', () => {
       const machine = interpret(
         createMachine({
-          device: {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-            osName: 'unknown',
-            browser: 'Safari',
+          idvContext: {
+            device: {
+              type: 'mobile',
+              hasSupportForWebauthn: true,
+              osName: 'unknown',
+              browser: 'Safari',
+            },
+            authToken: 'token',
           },
-          authToken: 'token',
           config: TestOnboardingConfig,
         }),
       );
@@ -220,13 +230,15 @@ describe('Onboarding Requirements Machine Tests', () => {
     it('Skips transfer when it is a no phone flow', () => {
       const machine = interpret(
         createMachine({
-          device: {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-            osName: 'unknown',
-            browser: 'Safari',
+          idvContext: {
+            device: {
+              type: 'mobile',
+              hasSupportForWebauthn: true,
+              osName: 'unknown',
+              browser: 'Safari',
+            },
+            authToken: 'token',
           },
-          authToken: 'token',
           config: NoPhoneOnboardingConfig,
         }),
       );
@@ -273,14 +285,16 @@ describe('Onboarding Requirements Machine Tests', () => {
     it('Skips initializing onboarding for transfer', () => {
       const machine = interpret(
         createMachine({
-          device: {
-            type: 'mobile',
-            hasSupportForWebauthn: true,
-            osName: 'unknown',
-            browser: 'Safari',
+          idvContext: {
+            device: {
+              type: 'mobile',
+              hasSupportForWebauthn: true,
+              osName: 'unknown',
+              browser: 'Safari',
+            },
+            authToken: 'token',
+            isTransfer: true,
           },
-          isTransfer: true,
-          authToken: 'token',
           config: NoPhoneOnboardingConfig,
         }),
       );

@@ -5,14 +5,9 @@ import { TransferMachineProvider } from './components/machine-provider.tsx';
 import Router from './pages/router';
 import type { TransferProps } from './types';
 
-const AppWithMachine = ({ context, onDone }: TransferProps) => {
-  const { device, authToken, customData } = context;
-  const {
-    config,
-    missingRequirements = {},
-    idDocOutcome,
-    isInIframe,
-  } = customData || {};
+const AppWithMachine = ({ idvContext, context, onDone }: TransferProps) => {
+  const { device, authToken, isInIframe } = idvContext;
+  const { config, missingRequirements = {}, idDocOutcome } = context;
 
   return (
     <TransferMachineProvider

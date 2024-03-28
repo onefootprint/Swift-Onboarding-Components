@@ -1,14 +1,18 @@
 import type { IdDocOutcome, IdDocRequirement } from '@onefootprint/types';
 
-import type { BasePluginProps } from '../base-plugin';
+import type { CommonIdvContext } from '../../utils/state-machine';
 
-export type IdDocCustomData = {
+export type IdDocContext = {
   requirement: IdDocRequirement;
   orgId: string;
   sandboxOutcome?: IdDocOutcome;
 };
 
-export type IdDocProps = BasePluginProps<IdDocCustomData>;
+export type IdDocProps = {
+  context: IdDocContext;
+  idvContext: CommonIdvContext;
+  onDone: () => void;
+};
 
 type Heic2any = {
   blob: Blob;

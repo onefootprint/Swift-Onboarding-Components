@@ -8,7 +8,7 @@ import useOnboarding from './hooks/use-onboarding';
 const StartOnboarding = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken },
+    idvContext: { authToken },
   } = state.context;
   const onboardingMutation = useOnboarding();
 

@@ -29,7 +29,9 @@ const SUCCESS_TRANSITION_DELAY_MS = 1500;
 const Register = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'liveness.pages.register' });
   const [state, send] = useLivenessMachine();
-  const { authToken } = state.context;
+  const {
+    idvContext: { authToken },
+  } = state.context;
   const biometricInitMutation = useBiometricInit();
   const skipLivenessMutation = useSkipLiveness();
 
@@ -38,7 +40,7 @@ const Register = () => {
   >([]);
 
   const handleRegister = () => {
-    if (!authToken || biometricInitMutation.isLoading) {
+    if (biometricInitMutation.isLoading) {
       return;
     }
 
@@ -83,7 +85,7 @@ const Register = () => {
   };
 
   const handleSkip = () => {
-    if (!authToken || skipLivenessMutation.isLoading) {
+    if (skipLivenessMutation.isLoading) {
       return;
     }
     const context = {

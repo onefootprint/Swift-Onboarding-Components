@@ -37,7 +37,8 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   });
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken, config, overallOutcome },
+    idvContext: { authToken },
+    onboardingContext: { config, overallOutcome },
     requirements,
   } = state.context;
   const authorizeRequirement = getRequirement(

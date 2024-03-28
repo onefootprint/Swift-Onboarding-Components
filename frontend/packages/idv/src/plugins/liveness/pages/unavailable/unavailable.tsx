@@ -15,7 +15,9 @@ import useLivenessMachine from '../../hooks/use-liveness-machine';
 
 const Unavailable = () => {
   const [state, send] = useLivenessMachine();
-  const { authToken, device, isInIframe } = state.context;
+  const {
+    idvContext: { authToken, device, isInIframe },
+  } = state.context;
   const skipLivenessMutation = useSkipLiveness();
 
   useEffectOnce(() => {

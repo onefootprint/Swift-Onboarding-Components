@@ -18,16 +18,12 @@ const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingMachine();
   useLogStateMachine('onboarding', state);
   const {
-    device,
     config,
-    authToken,
+    idvContext,
     bootstrapData,
-    isTransfer,
     overallOutcome,
     validationToken,
     idDocOutcome,
-    isComponentsSdk,
-    isInIframe,
   } = state.context;
   const { IdvTransferFromDesktopDisabled } = useFlags();
   const orgIds = new Set<string>(IdvTransferFromDesktopDisabled);
@@ -46,13 +42,9 @@ const Router = ({ onDone }: RouterProps) => {
     <>
       {state.matches('requirements') && (
         <Requirements
-          device={device}
           config={config}
-          authToken={authToken}
+          idvContext={idvContext}
           bootstrapData={bootstrapData}
-          isTransfer={isTransfer}
-          isComponentsSdk={isComponentsSdk}
-          isInIframe={isInIframe}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onDone={() => send({ type: 'requirementsCompleted' })}

@@ -12,6 +12,15 @@ import type {
   DeviceResponseJsonPayload,
 } from './utils/custom-listener';
 
+/** These constant properties are often passed around to other idv machines */
+export type CommonIdvContext = {
+  device: DeviceInfo;
+  authToken: string;
+  isTransfer?: boolean;
+  isComponentsSdk?: boolean;
+  isInIframe?: boolean;
+};
+
 export type CompletePayload = {
   validationToken?: string;
   authToken?: string; // auth token used for onboarding flow

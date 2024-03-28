@@ -28,7 +28,10 @@ const BusinessAddress = ({
     keyPrefix: 'kyb.pages.business-address',
   });
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data } = state.context;
+  const {
+    idvContext: { authToken },
+    data,
+  } = state.context;
   const { mutation, syncData } = useSyncData();
 
   const handleSubmit = (businessAddress: BusinessAddressData) => {
@@ -49,9 +52,6 @@ const BusinessAddress = ({
       );
     };
 
-    if (!authToken) {
-      return;
-    }
     syncData({
       authToken,
       data: businessAddress,

@@ -7,18 +7,14 @@ import type {
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { CommonIdvContext } from '../../../../utils/state-machine';
 import type { MachineContext, MachineEvents } from './types';
 import validateBootstrapData from './utils/validate-bootstrap-data';
 
 export type OnboardingMachineArgs = {
   config: PublicOnboardingConfig;
-  device: DeviceInfo;
-  authToken: string;
   bootstrapData?: IdDIData; // TODO: generalize this more in the next iteration
-  isTransfer?: boolean;
-  isComponentsSdk?: boolean;
-  isInIframe?: boolean;
+  idvContext: CommonIdvContext;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
   onClose?: () => void;
@@ -27,12 +23,8 @@ export type OnboardingMachineArgs = {
 const createOnboardingMachine = (
   {
     config,
-    device,
-    authToken,
     bootstrapData = {},
-    isTransfer,
-    isComponentsSdk,
-    isInIframe,
+    idvContext,
     idDocOutcome,
     overallOutcome,
     onClose,
@@ -52,12 +44,8 @@ const createOnboardingMachine = (
       initial: 'requirements',
       context: {
         config,
-        device,
-        authToken,
         bootstrapData: validateBootstrapData(bootstrapData, l10n?.locale),
-        isTransfer,
-        isComponentsSdk,
-        isInIframe,
+        idvContext,
         idDocOutcome,
         overallOutcome,
         onClose,
@@ -69,7 +57,7 @@ const createOnboardingMachine = (
               // Transfer app doesn't get validation token
               {
                 target: 'complete',
-                cond: context => !!context.isTransfer,
+                cond: context => !!context.idvContext.isTransfer,
               },
               {
                 target: 'validate',

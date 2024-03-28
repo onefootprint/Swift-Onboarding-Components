@@ -21,8 +21,10 @@ export const createLivenessMachine = (initialContext: MachineContext) =>
             target: 'register',
             cond: ctx => {
               const {
-                device: { hasSupportForWebauthn },
-                isInIframe,
+                idvContext: {
+                  isInIframe,
+                  device: { hasSupportForWebauthn },
+                },
               } = ctx;
               return !isInIframe && !!hasSupportForWebauthn;
             },
