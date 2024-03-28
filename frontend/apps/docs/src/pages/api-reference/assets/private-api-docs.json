@@ -723,7 +723,7 @@
                 ]
             }
         },
-        "/compliance/partners/{partnership_id}/documents/{document_id}/review": {
+        "/compliance/partners/{partnership_id}/documents/{document_id}/reviews": {
             "post": {
                 "tags": [
                     "Compliance",
@@ -755,62 +755,6 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/CreateReviewRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
-        "/compliance/partners/{partnership_id}/documents/{document_id}/submit_external_url": {
-            "post": {
-                "tags": [
-                    "Compliance",
-                    "Private"
-                ],
-                "description": "Submit an external URL in response to a request",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "partnership_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
-                    {
-                        "in": "path",
-                        "name": "document_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SubmitExternalUrlRequest"
                             }
                         }
                     },
@@ -17545,70 +17489,8 @@
                     "name": {
                         "type": "string"
                     },
-                    "playbooks": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string"
-                                },
-                                "key": {
-                                    "type": "string"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "rules": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "action": {
-                                                "type": "string",
-                                                "enum": [
-                                                    "PassWithManualReview",
-                                                    "ManualReview",
-                                                    "Fail"
-                                                ]
-                                            },
-                                            "created_at": {
-                                                "type": "string",
-                                                "format": "date-time"
-                                            },
-                                            "is_shadow": {
-                                                "type": "boolean"
-                                            },
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "rule_expression": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "rule_id": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "action",
-                                            "created_at",
-                                            "is_shadow",
-                                            "rule_expression",
-                                            "rule_id"
-                                        ]
-                                    }
-                                }
-                            },
-                            "required": [
-                                "id",
-                                "key",
-                                "name",
-                                "rules"
-                            ]
-                        }
+                    "used_in_playbook": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -17619,7 +17501,7 @@
                     "id",
                     "kind",
                     "name",
-                    "playbooks"
+                    "used_in_playbook"
                 ]
             },
             "ListEntitiesSearchRequest": {
@@ -17939,70 +17821,8 @@
                                 "name": {
                                     "type": "string"
                                 },
-                                "playbooks": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "id": {
-                                                "type": "string"
-                                            },
-                                            "key": {
-                                                "type": "string"
-                                            },
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "rules": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "action": {
-                                                            "type": "string",
-                                                            "enum": [
-                                                                "PassWithManualReview",
-                                                                "ManualReview",
-                                                                "Fail"
-                                                            ]
-                                                        },
-                                                        "created_at": {
-                                                            "type": "string",
-                                                            "format": "date-time"
-                                                        },
-                                                        "is_shadow": {
-                                                            "type": "boolean"
-                                                        },
-                                                        "name": {
-                                                            "type": "string"
-                                                        },
-                                                        "rule_expression": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "rule_id": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "action",
-                                                        "created_at",
-                                                        "is_shadow",
-                                                        "rule_expression",
-                                                        "rule_id"
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        "required": [
-                                            "id",
-                                            "key",
-                                            "name",
-                                            "rules"
-                                        ]
-                                    }
+                                "used_in_playbook": {
+                                    "type": "boolean"
                                 }
                             },
                             "required": [
@@ -18013,7 +17833,7 @@
                                 "id",
                                 "kind",
                                 "name",
-                                "playbooks"
+                                "used_in_playbook"
                             ]
                         }
                     },
@@ -18096,6 +17916,13 @@
                                             "Card"
                                         ]
                                     }
+                                },
+                                "cip_kind": {
+                                    "type": "string",
+                                    "enum": [
+                                        "alpaca",
+                                        "apex"
+                                    ]
                                 },
                                 "created_at": {
                                     "type": "string",
@@ -19051,6 +18878,13 @@
                                 "Card"
                             ]
                         }
+                    },
+                    "cip_kind": {
+                        "type": "string",
+                        "enum": [
+                            "alpaca",
+                            "apex"
+                        ]
                     },
                     "created_at": {
                         "type": "string",
