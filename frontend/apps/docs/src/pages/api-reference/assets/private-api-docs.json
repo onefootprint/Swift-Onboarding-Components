@@ -4397,16 +4397,33 @@
                     "Lists"
                 ],
                 "description": "Retrieves all Lists for the Tenant",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/List"
-                                    }
+                                    "$ref": "#/components/schemas/OffsetPaginatedList"
                                 }
                             }
                         }
@@ -17742,6 +17759,153 @@
                 },
                 "required": [
                     "expected_rule_set_version"
+                ]
+            },
+            "OffsetPaginatedList": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "actor": {
+                                    "type": "string",
+                                    "enum": [
+                                        "footprint"
+                                    ]
+                                },
+                                "alias": {
+                                    "type": "string"
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                },
+                                "entries_count": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "enum": [
+                                        "email_address",
+                                        "email_domain",
+                                        "ssn9",
+                                        "phone_number",
+                                        "phone_country_code",
+                                        "ip_address"
+                                    ]
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "playbooks": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "key": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "rules": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "action": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "PassWithManualReview",
+                                                                "ManualReview",
+                                                                "Fail"
+                                                            ]
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        },
+                                                        "is_shadow": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "rule_expression": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "rule_id": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "action",
+                                                        "created_at",
+                                                        "is_shadow",
+                                                        "rule_expression",
+                                                        "rule_id"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "key",
+                                            "name",
+                                            "rules"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "actor",
+                                "alias",
+                                "created_at",
+                                "entries_count",
+                                "id",
+                                "kind",
+                                "name",
+                                "playbooks"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "count": {
+                                "example": 10000,
+                                "description": "The total number of results",
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        },
+                        "required": [
+                            "count"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
                 ]
             },
             "OffsetPaginatedOnboardingConfiguration": {

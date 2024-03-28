@@ -1,8 +1,8 @@
 use super::{data_lifetime::DataLifetime, ob_configuration::IsLive};
-use crate::{DbError, DbResult, PgConn, TxnPgConn};
+use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::list;
-use diesel::{prelude::*, Insertable, Queryable};
+use db_schema::schema::list::{self, BoxedQuery};
+use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use newtypes::{
     DataLifetimeSeqno, DbActor, ListAlias, ListId, ListKind, Locked, SealedVaultDataKey, TenantId,
 };
@@ -126,16 +126,37 @@ impl List {
         Ok(res)
     }
 
-    #[allow(clippy::self_named_constructors)]
-    #[tracing::instrument("List::list", skip_all)]
-    pub fn list(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Vec<Self>> {
-        let res = list::table
+    fn list_query(tenant_id: &TenantId, is_live: bool) -> BoxedQuery<Pg> {
+        let query = list::table
             .filter(list::tenant_id.eq(tenant_id))
             .filter(list::is_live.eq(is_live))
             .filter(list::deactivated_seqno.is_null())
+            .into_boxed();
+        query
+    }
+
+    #[allow(clippy::self_named_constructors)]
+    #[tracing::instrument("List::list", skip_all)]
+    pub fn list(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        is_live: bool,
+        pagination: OffsetPagination,
+    ) -> DbResult<(Vec<Self>, NextPage)> {
+        let mut query = Self::list_query(tenant_id, is_live)
             .order_by(list::created_at.desc())
-            .get_results(conn)?;
-        Ok(res)
+            .limit(pagination.limit());
+        if let Some(offset) = pagination.offset() {
+            query = query.offset(offset)
+        }
+        let res = query.get_results(conn)?;
+        Ok(pagination.results(res))
+    }
+
+    #[tracing::instrument("List::count", skip_all)]
+    pub fn count(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<i64> {
+        let count = Self::list_query(tenant_id, is_live).count().get_result(conn)?;
+        Ok(count)
     }
 
     #[tracing::instrument("List::lock", skip_all)]
@@ -226,14 +247,16 @@ mod tests {
     fn test_deactivate(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
         let list = tests::fixtures::list::create(conn, &t.id);
-        assert_eq!(1, List::list(conn, &t.id, true).unwrap().len());
+        let pagination = OffsetPagination::new(None, 10);
+        assert_eq!(1, List::list(conn, &t.id, true, pagination).unwrap().0.len());
 
         let list = List::lock(conn, &t.id, true, &list.id).unwrap();
         let list = List::deactivate(conn, list).unwrap();
         assert!(list.deactivated_at.is_some());
         assert!(list.deactivated_seqno.is_some());
 
-        assert_eq!(0, List::list(conn, &t.id, true).unwrap().len());
+        let pagination = OffsetPagination::new(None, 10);
+        assert_eq!(0, List::list(conn, &t.id, true, pagination).unwrap().0.len());
         let list = List::lock(conn, &t.id, true, &list.id).unwrap();
         assert!(matches!(
             List::deactivate(conn, list).unwrap_err(),
