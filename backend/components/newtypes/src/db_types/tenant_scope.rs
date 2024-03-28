@@ -46,6 +46,8 @@ pub enum TenantScope {
     ManualReview,
     /// Create and update onboarding configurations
     OnboardingConfiguration,
+    /// Edit lists and entries
+    WriteLists,
     /// Update org settings, roles, and users
     OrgSettings,
 
@@ -120,6 +122,7 @@ impl TenantScope {
             Self::ManualReview => vec![DashboardUser],
             Self::OnboardingConfiguration => vec![DashboardUser],
             Self::OrgSettings => vec![DashboardUser],
+            Self::WriteLists => vec![DashboardUser],
 
             Self::CipIntegration => vec![ApiKey],
             Self::InvokeVaultProxy { .. } => vec![ApiKey],
@@ -152,6 +155,7 @@ mod tests {
     #[test_case(TenantScope::Read => "{\"kind\":\"read\"}")]
     #[test_case(TenantScope::Admin => "{\"kind\":\"admin\"}")]
     #[test_case(TenantScope::OnboardingConfiguration => "{\"kind\":\"onboarding_configuration\"}")]
+    #[test_case(TenantScope::WriteLists => "{\"kind\":\"write_lists\"}")]
     #[test_case(TenantScope::ApiKeys => "{\"kind\":\"api_keys\"}")]
     #[test_case(TenantScope::OrgSettings => "{\"kind\":\"org_settings\"}")]
     #[test_case(TenantScope::DecryptCustom => "{\"kind\":\"decrypt_custom\"}")]
@@ -168,6 +172,7 @@ mod tests {
     #[test_case("{\"kind\": \"read\"}" => TenantScope::Read)]
     #[test_case("{\"kind\": \"admin\"}" => TenantScope::Admin)]
     #[test_case("{\"kind\": \"onboarding_configuration\"}" => TenantScope::OnboardingConfiguration)]
+    #[test_case("{\"kind\": \"write_lists\"}" => TenantScope::WriteLists)]
     #[test_case("{\"kind\": \"api_keys\"}" => TenantScope::ApiKeys)]
     #[test_case("{\"kind\": \"org_settings\"}" => TenantScope::OrgSettings)]
     #[test_case("{\"kind\": \"decrypt_custom\"}" => TenantScope::DecryptCustom)]

@@ -44,6 +44,20 @@ def test_create(sandbox_tenant):
     )
 
 
+def test_create_no_permissions(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    post(
+        f"/org/lists",
+        dict(
+            name=f"Some Real Baddies {nonce}",
+            alias=f"some_real_baddies_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.ro_db_auths,
+        status_code=401,
+    )
+
+
 @pytest.mark.skip()
 def test_list(sandbox_tenant):
     nonce = _gen_random_str(5)
@@ -65,7 +79,7 @@ def test_list(sandbox_tenant):
             kind="email_address",
             entries=["bobertotech.com", "badppl.org", "somethingelseketchy.net"],
         ),
-        *sandbox_tenant.db_auths,
+        *sandbox_tenant.ro_auth_token,
     )
     post(
         f"/org/lists",
@@ -112,7 +126,7 @@ def test_update(sandbox_tenant):
         *sandbox_tenant.db_auths,
     )
 
-    list2 = post(
+    post(
         f"/org/lists",
         dict(
             name=f"Some Real Baddies 2 {nonce}",
@@ -140,6 +154,29 @@ def test_update(sandbox_tenant):
         *sandbox_tenant.db_auths,
         status_code=400,
     )
+
+
+def test_update_no_permissions(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    list = post(
+        f"/org/lists",
+        dict(
+            name=f"Some Real Baddies {nonce}",
+            alias=f"some_real_baddies_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    patch(
+        f"/org/lists/{list['id']}",
+        dict(name=f"Super Duper Baddies {nonce}", alias=f"super_duper_baddies_{nonce}"),
+        *sandbox_tenant.ro_db_auths,
+        status_code=401,
+    )
+
+    list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
+    assert list["name"] == f"Some Real Baddies {nonce}"
 
 
 @pytest.mark.skip()
@@ -208,6 +245,26 @@ def test_delete_list(sandbox_tenant):
     assert list1["id"] not in list_ids
 
 
+def test_delete_no_permissions(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    list = post(
+        f"/org/lists",
+        dict(
+            name=f"Some Real Baddies {nonce}",
+            alias=f"some_real_baddies_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    delete(
+        f"/org/lists/{list['id']}", None, *sandbox_tenant.ro_db_auths, status_code=401
+    )
+
+    list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
+    assert list["name"] == f"Some Real Baddies {nonce}"
+
+
 @pytest.mark.skip()
 def test_create_list_entry(sandbox_tenant):
     nonce = _gen_random_str(5)
@@ -247,6 +304,29 @@ def test_create_list_entry(sandbox_tenant):
 
     list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
     assert list["entries_count"] == 4
+
+
+def test_create_list_entry_no_permissions(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    list = post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List {nonce}",
+            alias=f"my_super_list_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    post(
+        f"/org/lists/{list['id']}/entries",
+        dict(entries=["protonmail.com"]),
+        *sandbox_tenant.ro_db_auths,
+        status_code=401,
+    )
+
+    list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
+    assert list["entries_count"] == 0
 
 
 @pytest.mark.skip()
@@ -362,3 +442,33 @@ def test_delete_list_entries(sandbox_tenant):
         len(get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths))
         == 0
     )
+
+
+def test_delete_list_entries_no_permissions(sandbox_tenant):
+    nonce = _gen_random_str(5)
+    list = post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List {nonce}",
+            alias=f"my_super_list_{nonce}",
+            kind="email_domain",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    entry1 = post(
+        f"/org/lists/{list['id']}/entries",
+        dict(entries=["protonmail.com"]),
+        *sandbox_tenant.db_auths,
+    )
+
+    delete(
+        f"/org/lists/{list['id']}/entries/{entry1[0]['id']}",
+        None,
+        *sandbox_tenant.ro_db_auths,
+        status_code=401,
+    )
+
+    entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
+    assert len(entries) == 1
+    assert entries[0]["data"] == entry1[0]["data"]

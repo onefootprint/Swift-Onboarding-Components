@@ -18,7 +18,7 @@ pub async fn patch(
     path: web::Path<ListId>,
     request: web::Json<UpdateListRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_guard(TenantGuard::Read)?;
+    let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let id = path.into_inner();

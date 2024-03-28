@@ -21,7 +21,7 @@ pub async fn create_list_entry(
     list_id: web::Path<ListId>,
     request: Json<CreateListEntryRequest>,
 ) -> ApiResult<Json<ResponseData<Vec<api_wire_types::ListEntry>>>> {
-    let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?; // TODO: new guard for this + /rules probably
+    let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let actor = auth.actor();

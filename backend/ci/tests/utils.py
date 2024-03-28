@@ -7,7 +7,7 @@ import arrow
 import time
 import os
 from tests.headers import TenantSecretAuth
-from tests.types import ObConfiguration, PartnerTenant, SecretApiKey, Tenant
+from tests.types import ObConfiguration, SecretApiKey, Tenant
 from tests.headers import DashboardAuth, IsLive
 from tests.constants import (
     CUSTODIAN_AUTH,
@@ -241,6 +241,7 @@ def create_tenant(org_data, ob_conf_data):
 
     return try_until_success(inner, 10)
 
+
 def create_ob_config(
     tenant,
     name,
@@ -351,10 +352,12 @@ def override_webauthn_attestation(attestation):
 def file_path(filename):
     return os.path.join(os.path.dirname(__file__), "resources/", filename)
 
+
 # returns a fn that will return a buffered reader
 def open_multipart_file(filename, mime_type):
     def multi_part_inner():
         return {"upload_file": (filename, open(file_path(filename), "rb"), mime_type)}
+
     return multi_part_inner
 
 

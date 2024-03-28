@@ -16,7 +16,7 @@ pub async fn deactivate_list(
     auth: TenantSessionAuth,
     list_id: web::Path<ListId>,
 ) -> ApiResult<Json<ResponseData<EmptyResponse>>> {
-    let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?; // TODO: new guard for this + /rules probably
+    let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
