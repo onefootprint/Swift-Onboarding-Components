@@ -17404,6 +17404,9 @@
                                 "key": {
                                     "type": "string"
                                 },
+                                "name": {
+                                    "type": "string"
+                                },
                                 "rules": {
                                     "type": "array",
                                     "items": {
@@ -17450,12 +17453,10 @@
                             "required": [
                                 "id",
                                 "key",
+                                "name",
                                 "rules"
                             ]
                         }
-                    },
-                    "used_in_playbook": {
-                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -17466,8 +17467,7 @@
                     "id",
                     "kind",
                     "name",
-                    "playbooks",
-                    "used_in_playbook"
+                    "playbooks"
                 ]
             },
             "ListEntitiesSearchRequest": {
