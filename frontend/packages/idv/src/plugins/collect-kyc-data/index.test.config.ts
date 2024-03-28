@@ -58,6 +58,7 @@ export const withIdentify = () =>
 
 export const mockFootprintProviderClient = {
   auth: jest.fn(),
+  relayToComponents: jest.fn(),
   load: jest.fn(),
   cancel: jest.fn(),
   close: jest.fn(),

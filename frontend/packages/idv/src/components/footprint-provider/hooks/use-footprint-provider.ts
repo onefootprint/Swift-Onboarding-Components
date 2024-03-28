@@ -28,6 +28,7 @@ const useFootprintProvider = ({
 
   return {
     auth: client.auth,
+    relayToComponents: client.relayToComponents,
     cancel: client.cancel,
     close: client.close,
     complete: client.complete,

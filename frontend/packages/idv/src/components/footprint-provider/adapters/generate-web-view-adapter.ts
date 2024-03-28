@@ -79,6 +79,7 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
 
   return {
     auth: () => undefined,
+    relayToComponents: () => undefined,
     setSendResultCallback,
     load,
     cancel,

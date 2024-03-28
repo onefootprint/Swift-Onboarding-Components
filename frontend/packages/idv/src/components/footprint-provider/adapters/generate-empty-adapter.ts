@@ -11,6 +11,10 @@ const generateEmptyAdapter = (): EmptyAdapterReturn => {
     Logger.info('Challenge token authentication from empty adapter');
   };
 
+  const relayToComponents = (): void => {
+    Logger.info('relayToComponents from empty adapter');
+  };
+
   const close = (): void => {
     Logger.info('Closing footprint from empty adapter');
   };
@@ -29,6 +33,7 @@ const generateEmptyAdapter = (): EmptyAdapterReturn => {
 
   return {
     load,
+    relayToComponents,
     auth,
     cancel,
     close,

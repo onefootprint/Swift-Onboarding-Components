@@ -13,8 +13,9 @@ import type {
 } from '../types';
 import generateEventEmitter from '../utils/generate-event-emitter';
 
-const { auth, canceled, closed, completed } = FootprintPublicEvent;
-const { propsReceived, started } = FootprintPrivateEvent;
+const { auth, canceled, closed, completed, relayToComponents } =
+  FootprintPublicEvent;
+const { propsReceived, started, relayFromComponents } = FootprintPrivateEvent;
 const { logInfo, logWarn } = getLogger('bifrost-iframe-adapter');
 
 const getSpecificEvent = (
@@ -52,6 +53,9 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
       [propsReceived]: (props: FootprintProps) => {
         eventEmitter.emit(propsReceived, props);
       },
+      [relayFromComponents]: () => {
+        eventEmitter.emit(relayFromComponents);
+      },
     };
 
     try {
@@ -80,6 +84,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
 
   return {
     auth: (token: string) => sendEvent(auth, token),
+    relayToComponents: (token: string) => sendEvent(relayToComponents, token),
     cancel: () => sendEvent(canceled),
     close: () => sendEvent(closed),
     complete,
