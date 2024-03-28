@@ -45,6 +45,9 @@ pub struct VerifyV1SdkArgs {
     pub options: Option<VerifyV1Options>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub l10n: Option<L10nV1>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// The components SDK wraps the verify SDK with the same args
+    pub is_components_sdk: Option<bool>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
@@ -305,6 +308,8 @@ mod test {
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234", "public_key": "ob_1234", "user_data": {"id.first_name": "Hayes", "id.citizenships": ["US", "NO"], "id.state": "Invalid"}, "options": {"show_completion_page": true, "show_logo": false}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234"}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
+    #[test_case(json!({"kind": "verify_v1", "data": {"public_key": "ob_1234", "is_components_sdk": false}}))]
+    #[test_case(json!({"kind": "verify_v1", "data": {"public_key": "ob_1234", "is_components_sdk": true}}))]
     #[test_case(json!({"kind": "verify_result_v1", "data": {"auth_token": "tok_1234", "device_response": "123"}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US", "language": "en"}}}))]

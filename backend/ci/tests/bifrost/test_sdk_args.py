@@ -61,7 +61,10 @@ def test_sdk_args_fail_validation():
 def test_sdk_args(sandbox_tenant):
     obc_key = sandbox_tenant.default_ob_config.key.value
     TESTS = [
-        {"kind": "verify_v1", "data": {"auth_token": "tok_12345"}},
+        {
+            "kind": "verify_v1",
+            "data": {"auth_token": "tok_12345"},
+        },
         {
             "kind": "verify_v1",
             "data": {"public_key": obc_key},
@@ -77,17 +80,23 @@ def test_sdk_args(sandbox_tenant):
                     "id.citizenships": ["US", "TR"],
                 },
                 "options": {"show_completion_page": True},
+                "is_components_sdk": False,
             },
         },
         {
             "kind": "verify_v1",
-            "data": {"public_key": obc_key, "l10n": {"locale": "en-US"}},
+            "data": {
+                "public_key": obc_key,
+                "l10n": {"locale": "en-US"},
+                "is_components_sdk": False,
+            },
         },
         {
             "kind": "verify_v1",
             "data": {
                 "public_key": obc_key,
                 "l10n": {"locale": "en-US", "language": "es"},
+                "is_components_sdk": False,
             },
         },
         {
@@ -95,6 +104,14 @@ def test_sdk_args(sandbox_tenant):
             "data": {
                 "public_key": obc_key,
                 "l10n": {"language": "en"},
+                "is_components_sdk": False,
+            },
+        },
+        {
+            "kind": "verify_v1",
+            "data": {
+                "public_key": obc_key,
+                "is_components_sdk": True,
             },
         },
         {
@@ -203,7 +220,7 @@ def test_sdk_args_ob_config(sandbox_tenant):
     TESTS = [
         {
             "kind": "verify_v1",
-            "data": {"public_key": obc_key},
+            "data": {"public_key": obc_key, "is_components_sdk": False},
         },
         {
             "kind": "auth_v1",
