@@ -141,7 +141,7 @@ describe('<SandboxOutcome/>', () => {
       const testIdInfoIcon = screen.getByTestId('infoIcon');
       expect(testIdInfoIcon).toBeInTheDocument();
 
-      const testIdInput = screen.getByRole('textbox');
+      const testIdInput = screen.getByTestId('test-id-input');
       expect(testIdInput).toBeInTheDocument();
 
       const copyButton = screen.getByLabelText('Copy');
@@ -190,7 +190,7 @@ describe('<SandboxOutcome/>', () => {
       const testIdInfoIcon = screen.getByTestId('infoIcon');
       expect(testIdInfoIcon).toBeInTheDocument();
 
-      const testIdInput = screen.getByRole('textbox');
+      const testIdInput = screen.getByTestId('test-id-input');
       expect(testIdInput).toBeInTheDocument();
 
       const copyButton = screen.getByLabelText('Copy');
@@ -416,7 +416,9 @@ describe('<SandboxOutcome/>', () => {
   describe('Test id input and buttons interactions works as expected', () => {
     it('id input already contains a random id', () => {
       renderSandbox({ requiresIdDoc: true });
-      const testIdInput = screen.getByRole('textbox') as HTMLInputElement;
+      const testIdInput = screen.getByTestId(
+        'test-id-input',
+      ) as HTMLInputElement;
       expect(testIdInput.value).not.toEqual('');
     });
 
@@ -435,7 +437,9 @@ describe('<SandboxOutcome/>', () => {
 
     it('can edit only after the edit button is clicked', async () => {
       renderSandbox({ requiresIdDoc: true });
-      const testIdInput = screen.getByRole('textbox') as HTMLInputElement;
+      const testIdInput = screen.getByTestId(
+        'test-id-input',
+      ) as HTMLInputElement;
       const editButton = screen.getByLabelText('Edit');
       expect(testIdInput.disabled).toBeTruthy();
 
@@ -449,7 +453,9 @@ describe('<SandboxOutcome/>', () => {
 
     it('can save/lock new id input', async () => {
       renderSandbox({ requiresIdDoc: true });
-      const testIdInput = screen.getByRole('textbox') as HTMLInputElement;
+      const testIdInput = screen.getByTestId(
+        'test-id-input',
+      ) as HTMLInputElement;
       const editButton = screen.getByLabelText('Edit');
       await userEvent.click(editButton);
       const defaultInputVal = testIdInput.value;
@@ -463,7 +469,9 @@ describe('<SandboxOutcome/>', () => {
 
     it('can reset to old input', async () => {
       renderSandbox({ requiresIdDoc: true });
-      const testIdInput = screen.getByRole('textbox') as HTMLInputElement;
+      const testIdInput = screen.getByTestId(
+        'test-id-input',
+      ) as HTMLInputElement;
       const editButton = screen.getByLabelText('Edit');
       await userEvent.click(editButton);
       const defaultInputVal = testIdInput.value;
@@ -475,7 +483,9 @@ describe('<SandboxOutcome/>', () => {
 
     it('special characters shows error hint, disables continue, and save buttons', async () => {
       renderSandbox({ requiresIdDoc: true });
-      const testIdInput = screen.getByRole('textbox') as HTMLInputElement;
+      const testIdInput = screen.getByTestId(
+        'test-id-input',
+      ) as HTMLInputElement;
       const editButton = screen.getByLabelText('Edit');
       const defaultInputVal = testIdInput.value;
       await userEvent.click(editButton);

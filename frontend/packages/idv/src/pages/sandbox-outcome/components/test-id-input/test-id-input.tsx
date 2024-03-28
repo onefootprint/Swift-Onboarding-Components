@@ -61,6 +61,7 @@ const TestIdInput = () => {
           <TextInput
             hasError={!!errors.testID}
             placeholder={t('test-id.placeholder')}
+            testID="test-id-input"
             sx={{
               color: idInputLocked ? 'quaternary' : 'primary',
             }}

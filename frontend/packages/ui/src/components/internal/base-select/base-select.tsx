@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePopper } from 'react-popper';
 import type { OptionProps } from 'react-select';
@@ -87,6 +87,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
     closeDropdown();
   };
   useOnClickOutside(containerRef, handleClickOutside);
+  const [updatedValue, setUpdatedValue] = useState<Option | undefined>(value);
 
   const closeDropdown = () => {
     setOpen(false);
@@ -96,7 +97,12 @@ const BaseSelect = <Option extends BaseSelectOption>({
     setOpen(currentOpen => !currentOpen);
   };
 
+  useEffect(() => {
+    setUpdatedValue(value);
+  }, [value]);
+
   const handleChange = (newOption: Option) => {
+    setUpdatedValue(newOption);
     onChange?.(newOption);
     closeDropdown();
   };
@@ -116,11 +122,24 @@ const BaseSelect = <Option extends BaseSelectOption>({
           {label}
         </Label>
       )}
+      {/* This input (invisible on the UI) helps make the browser autofill  work */}
+      <input
+        value={updatedValue?.value}
+        onChange={ev => {
+          const newVal = ev.target.value;
+          const option = options.find(opt => opt.value === newVal);
+          if (option && !disabled) {
+            setUpdatedValue(option);
+            onChange?.(option);
+          }
+        }}
+        style={{ height: 0, width: 0, opacity: 0, position: 'absolute' }}
+      />
       <div ref={setReferenceElement}>
         {renderTrigger?.({
           isOpen,
           onClick: toggleDropdown,
-          selectedOption: value,
+          selectedOption: updatedValue,
           size,
           testID: internalId,
         })}
@@ -193,7 +212,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
               searchPlaceholder ??
               t('components.internal.base-select.search-placeholder-default')
             }
-            value={value}
+            value={updatedValue}
           />
         </div>
       )}
