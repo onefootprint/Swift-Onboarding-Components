@@ -12,7 +12,7 @@ const Row = ({ list }: RowProps) => {
   const { t } = useTranslation('lists', {
     keyPrefix: 'list.table.row',
   });
-  const { name, alias, entriesCount, playbooks, createdAt } = list;
+  const { name, alias, entriesCount, usedInPlaybook, createdAt } = list;
   const { formatDateWithTime } = useIntl();
 
   return (
@@ -21,7 +21,7 @@ const Row = ({ list }: RowProps) => {
       <td>{alias}</td>
       <td>{entriesCount ?? 0}</td>
       <td>
-        {playbooks.length ? (
+        {usedInPlaybook ? (
           <Badge variant="success">{t('used-in-rules.yes')}</Badge>
         ) : (
           <Badge variant="error">{t('used-in-rules.no')}</Badge>

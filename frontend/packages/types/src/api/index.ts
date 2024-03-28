@@ -76,7 +76,7 @@ export type {
   GetEntityRuleSetResultRequest,
   GetEntityRuleSetResultResponse,
 } from './get-entity-rule-set-result';
-export type { GetListRequest, GetListResponse } from './get-list';
+export type { GetListDetailsRequest, GetListDetailsResponse } from './get-list';
 export type {
   GetListEntriesRequest,
   GetListEntriesResponse,

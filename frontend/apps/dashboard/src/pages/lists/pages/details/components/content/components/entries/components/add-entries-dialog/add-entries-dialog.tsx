@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import useListDetails from 'src/pages/lists/pages/details/hooks/use-list-details';
 
 import useValidateListEntries from '@/lists/hooks/use-validate-list-entries';
-import useList from '@/lists/pages/details/hooks/use-list';
 
 import useAddEntries from './hooks/use-add-entries';
 
@@ -26,7 +26,7 @@ const AddEntriesDialog = ({ open, onClose, onAdd }: AddEntriesDialogProps) => {
   const toast = useToast();
   const router = useRouter();
   const id = router.query.id as string;
-  const { data: list } = useList(id);
+  const { data: list } = useListDetails(id);
   const validateEntries = useValidateListEntries();
   const addEntriesMutation = useAddEntries(id);
   const {

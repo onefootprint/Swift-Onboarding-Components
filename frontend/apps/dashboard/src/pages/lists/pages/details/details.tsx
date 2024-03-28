@@ -5,13 +5,17 @@ import { Error } from 'src/components';
 
 import Content from './components/content';
 import Loading from './components/loading';
-import useList from './hooks/use-list';
+import useListDetails from './hooks/use-list-details';
 import useListEntries from './hooks/use-list-entries';
 
 const Details = () => {
   const router = useRouter();
   const id = router.query.id as string;
-  const { isLoading: listLoading, error: listError, data: list } = useList(id);
+  const {
+    isLoading: listLoading,
+    error: listError,
+    data: list,
+  } = useListDetails(id);
   const {
     isLoading: entriesLoading,
     error: entriesError,

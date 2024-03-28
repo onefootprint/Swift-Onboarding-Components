@@ -22,6 +22,7 @@ import {
   entityWithoutPhoneFixture,
   entityWithPhoneFixture,
   withEntity,
+  withLists,
   withTokenSendLink,
   withTrigger,
   withTriggerError,
@@ -42,6 +43,7 @@ describe('<Actions />', () => {
   beforeEach(() => {
     withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
     withPlaybooks();
+    withLists();
     useRouterSpy({
       asPath: `/entities/${entityId}&mode=sandbox`,
       pathname: '/users/[id]',

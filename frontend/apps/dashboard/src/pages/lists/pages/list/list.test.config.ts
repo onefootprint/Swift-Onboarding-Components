@@ -1,9 +1,7 @@
-import type { PaginatedRequestResponse } from '@onefootprint/request/src';
 import { mockRequest } from '@onefootprint/test-utils';
-import type { List } from '@onefootprint/types';
 import { ActorKind, ListKind } from '@onefootprint/types';
 
-export const listsFixture: PaginatedRequestResponse<List[]> = {
+export const listsFixture = {
   data: [
     {
       id: '1',
@@ -11,11 +9,11 @@ export const listsFixture: PaginatedRequestResponse<List[]> = {
         kind: ActorKind.footprint,
       },
       alias: 'my_list',
-      createdAt: 'date',
+      created_at: 'date',
       kind: ListKind.emailAddress,
       name: 'Email List',
-      entriesCount: 0,
-      playbooks: [],
+      entries_count: 0,
+      used_in_playbook: false,
     },
     {
       id: '2',
@@ -23,11 +21,11 @@ export const listsFixture: PaginatedRequestResponse<List[]> = {
         kind: ActorKind.footprint,
       },
       alias: 'my_list2',
-      createdAt: 'date',
+      created_at: 'date',
       kind: ListKind.ssn9,
       name: 'SSN List',
-      entriesCount: 0,
-      playbooks: [],
+      entries_count: 0,
+      used_in_playbook: false,
     },
   ],
   meta: {

@@ -10,7 +10,8 @@ describe('hasDataForListKind', () => {
         [IdDI.email]: 'piip@onefootprint.com',
       },
       decryptableAttributes: [IdDI.email],
-    } as Entity;
+      workflows: [],
+    } as unknown as Entity;
 
     expect(hasDataForListKind(ListKind.emailAddress, entity)).toBe(true);
     expect(hasDataForListKind(ListKind.emailDomain, entity)).toBe(true);
@@ -26,7 +27,8 @@ describe('hasDataForListKind', () => {
         [IdDI.phoneNumber]: '+16504444440',
       },
       decryptableAttributes: [IdDI.phoneNumber],
-    } as Entity;
+      workflows: [],
+    } as unknown as Entity;
 
     expect(hasDataForListKind(ListKind.emailAddress, userEntity)).toBe(false);
     expect(hasDataForListKind(ListKind.emailDomain, userEntity)).toBe(false);
@@ -42,7 +44,8 @@ describe('hasDataForListKind', () => {
         [BusinessDI.phoneNumber]: '+16504444440',
       },
       decryptableAttributes: [BusinessDI.phoneNumber],
-    } as Entity;
+      workflows: [],
+    } as unknown as Entity;
 
     expect(hasDataForListKind(ListKind.emailAddress, businessEntity)).toBe(
       false,
@@ -64,7 +67,8 @@ describe('hasDataForListKind', () => {
         [IdDI.ssn9]: '123456789',
       },
       decryptableAttributes: [IdDI.ssn9],
-    } as Entity;
+      workflows: [],
+    } as unknown as Entity;
 
     expect(hasDataForListKind(ListKind.emailAddress, entity)).toBe(false);
     expect(hasDataForListKind(ListKind.emailDomain, entity)).toBe(false);
@@ -76,6 +80,8 @@ describe('hasDataForListKind', () => {
 
   it('should return true for ip address', () => {
     const entity = {
+      decryptedAttributes: {},
+      decryptableAttributes: [],
       workflows: [
         {
           insightEvent: [

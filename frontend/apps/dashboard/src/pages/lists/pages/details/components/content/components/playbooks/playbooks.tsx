@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Error } from 'src/components';
 
-import useList from '../../../../hooks/use-list';
+import useListDetails from '../../../../hooks/use-list-details';
 import SectionTitle from '../section-title';
 
 const Playbooks = () => {
@@ -13,7 +13,7 @@ const Playbooks = () => {
   });
   const router = useRouter();
   const id = router.query.id as string;
-  const { isLoading, error, data } = useList(id);
+  const { isLoading, error, data } = useListDetails(id);
 
   if (error) {
     return <Error error={error} />;

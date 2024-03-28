@@ -8,9 +8,9 @@ import React from 'react';
 
 import Playbooks from './playbooks';
 import {
-  withList,
+  withListDetails,
+  withListDetailsNoPlaybooks,
   withListError,
-  withListNoPlaybooks,
 } from './playbooks.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -41,7 +41,7 @@ describe('<Playbooks />', () => {
 
   describe('when list playbooks are empty', () => {
     beforeEach(() => {
-      withListNoPlaybooks(listId);
+      withListDetailsNoPlaybooks(listId);
     });
 
     it('should show an empty message', async () => {
@@ -57,7 +57,7 @@ describe('<Playbooks />', () => {
 
   describe('when rendering playbooks', () => {
     beforeEach(() => {
-      withList(listId);
+      withListDetails(listId);
     });
 
     it('should render the playbooks', async () => {

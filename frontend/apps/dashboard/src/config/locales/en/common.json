@@ -1313,6 +1313,9 @@
                 "required": "Please select one list"
               }
             },
+            "ip-addresses": {
+              "label": "Available IP addresses"
+            },
             "save": "Add to list",
             "cancel": "Cancel"
           },

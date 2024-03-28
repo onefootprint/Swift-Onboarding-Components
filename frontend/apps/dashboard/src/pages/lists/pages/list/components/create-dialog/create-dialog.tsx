@@ -11,6 +11,7 @@ import {
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import getAliasForListName from 'src/pages/lists/utils/get-alias-for-list-name';
 
 import useValidateListEntries from '@/lists/hooks/use-validate-list-entries';
 
@@ -60,7 +61,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
         .split(',')
         .map(entry => entry.trim())
         .filter(entry => entry),
-      alias: getAliasForName(formData.name),
+      alias: getAliasForListName(formData.name),
     };
     createListMutation.mutate(data, {
       onSuccess: () => {
@@ -83,14 +84,12 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   const listName = watch('name');
   const kind = watch('kind');
   const entries = watch('entries');
-  const getAliasForName = (name: string = '') =>
-    `@${name.replace(/[^a-z0-9_]/g, '_').toLowerCase()}`;
 
   const getNameHint = () => {
     if (!listName?.length) {
       return errors?.name?.message;
     }
-    const alias = getAliasForName(listName);
+    const alias = getAliasForListName(listName);
     return t('form.name.hint', { alias });
   };
 

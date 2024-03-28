@@ -12,11 +12,13 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 import { AUDIT_TRAILS_ID } from '@/entity/constants';
 
 import AuditTrail from './audit-trail';
+import mockFrequentNotes from './audit-trail.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
 describe('<AuditTrail />', () => {
   beforeEach(() => {
+    mockFrequentNotes();
     asAdminUser();
   });
 

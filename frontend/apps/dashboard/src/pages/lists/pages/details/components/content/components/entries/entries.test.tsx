@@ -12,7 +12,7 @@ import {
   entriesFixture,
   withDelete,
   withDeleteError,
-  withList,
+  withListDetails,
   withListEntries,
   withListEntriesError,
 } from './entries.test.config';
@@ -25,7 +25,7 @@ describe('<Entries />', () => {
   const entryId = 'entry_1';
 
   beforeEach(() => {
-    withList(listId);
+    withListDetails(listId);
   });
 
   describe('When clearing filter', () => {

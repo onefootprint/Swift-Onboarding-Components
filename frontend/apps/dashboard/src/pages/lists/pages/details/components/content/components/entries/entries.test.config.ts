@@ -26,16 +26,15 @@ export const entriesFixture = [
   },
 ];
 
-const listFixture = {
+const listDetailsFixture = {
   id: 'list_1',
   actor: {
     kind: ActorKind.footprint,
   },
   alias: 'my_list',
-  createdAt: 'date',
+  created_at: 'date',
   kind: ListKind.emailAddress,
   name: 'Email List',
-  entriesCount: 0,
   playbooks: [],
 };
 
@@ -58,11 +57,11 @@ export const withDelete = (listId: string, entryId: string) =>
     response: {},
   });
 
-export const withList = (listId: string) =>
+export const withListDetails = (listId: string) =>
   mockRequest({
     method: 'get',
     path: `/org/lists/${listId}`,
-    response: listFixture,
+    response: listDetailsFixture,
   });
 
 export const withListEntries = (listId: string, data = entriesFixture) =>

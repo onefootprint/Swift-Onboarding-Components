@@ -10,7 +10,7 @@ import React from 'react';
 import type { EditDialogProps } from './edit-dialog';
 import EditDialog from './edit-dialog';
 import {
-  withList,
+  withListDetails,
   withListUpdate,
   withListUpdateError,
 } from './edit-dialog.test.config';
@@ -27,7 +27,7 @@ describe('<EditDialog />', () => {
     customRender(<EditDialog open onClose={onClose} onEdit={onEdit} />);
 
   beforeEach(() => {
-    withList(listId);
+    withListDetails(listId);
     useRouterSpy({
       pathname: `/lists/${listId}`,
       query: { id: listId },

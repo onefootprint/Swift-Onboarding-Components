@@ -1,6 +1,6 @@
-import type { List } from '../data/list';
+import type { ListDetails } from '../data/list';
 
-export type GetListRequest = {
+export type GetListDetailsRequest = {
   id: string;
   authHeaders: {
     'x-fp-dashboard-authorization': string;
@@ -8,4 +8,4 @@ export type GetListRequest = {
   };
 };
 
-export type GetListResponse = List;
+export type GetListDetailsResponse = ListDetails;

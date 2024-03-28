@@ -1,33 +1,44 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { List } from '@onefootprint/types';
 import { ActorKind, ListKind } from '@onefootprint/types';
 
-export const getListsFixture: List[] = [
-  {
-    id: '1',
-    actor: {
-      kind: ActorKind.footprint,
+export const getListsFixture = {
+  data: [
+    {
+      id: '1',
+      actor: {
+        kind: ActorKind.footprint,
+      },
+      name: 'List 1',
+      created_at: '2022-09-19T16:24:35.367322Z',
+      alias: 'my_list',
+      kind: ListKind.emailAddress,
+      entries_count: 0,
+      used_in_playbook: false,
     },
-    name: 'List 1',
-    createdAt: '2022-09-19T16:24:35.367322Z',
-    alias: 'my_list',
-    kind: ListKind.emailAddress,
-    entriesCount: 0,
-    playbooks: [],
+  ],
+  meta: {
+    count: 10,
   },
-];
+};
 
-export const createdListFixture: List = {
-  id: '2',
-  actor: {
-    kind: ActorKind.footprint,
+export const createdListFixture = {
+  data: [
+    {
+      id: '2',
+      actor: {
+        kind: ActorKind.footprint,
+      },
+      name: 'List 2',
+      created_at: '2023-01-06T05:11:08.415924Z',
+      kind: ListKind.ssn9,
+      alias: 'my_list2',
+      entries_count: 0,
+      used_in_playbook: false,
+    },
+  ],
+  meta: {
+    count: 10,
   },
-  name: 'List 2',
-  createdAt: '2023-01-06T05:11:08.415924Z',
-  kind: ListKind.ssn9,
-  alias: 'my_list2',
-  entriesCount: 0,
-  playbooks: [],
 };
 
 export const withLists = (data = getListsFixture) =>

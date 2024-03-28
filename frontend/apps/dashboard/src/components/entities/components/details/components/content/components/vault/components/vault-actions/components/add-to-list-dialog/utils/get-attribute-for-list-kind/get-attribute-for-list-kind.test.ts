@@ -115,7 +115,7 @@ describe('getEntityDataForListKind', () => {
     expect(getEntityDataForListKind(ListKind.phoneCountryCode, entity)).toEqual(
       undefined,
     );
-    expect(getEntityDataForListKind(ListKind.ssn9, entity)).toEqual(undefined);
+    expect(getEntityDataForListKind(ListKind.ssn9, entity)).toEqual(IdDI.ssn9);
     expect(getEntityDataForListKind(ListKind.ipAddress, entity)).toEqual(
       undefined,
     );

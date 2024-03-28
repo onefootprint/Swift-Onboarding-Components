@@ -1,29 +1,27 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import { ActorKind, ListKind } from '@onefootprint/types';
 
-const listWithNoPlaybooksFixture = {
+const listDetailsWithNoPlaybooksFixture = {
   id: 'list_1',
   actor: {
     kind: ActorKind.footprint,
   },
   alias: 'my_list',
-  createdAt: 'date',
+  created_at: 'date',
   kind: ListKind.emailAddress,
   name: 'Email List',
-  entriesCount: 0,
   playbooks: [],
 };
 
-const listFixture = {
+const listDetailsFixture = {
   id: 'list_1',
   actor: {
     kind: ActorKind.footprint,
   },
   alias: 'my_list',
-  createdAt: 'date',
+  created_at: 'date',
   kind: ListKind.emailAddress,
   name: 'Email List',
-  entriesCount: 0,
   playbooks: [
     {
       id: 'playbook_1',
@@ -60,18 +58,18 @@ const listFixture = {
   ],
 };
 
-export const withList = (listId: string) =>
+export const withListDetails = (listId: string) =>
   mockRequest({
     method: 'get',
     path: `/org/lists/${listId}`,
-    response: listFixture,
+    response: listDetailsFixture,
   });
 
-export const withListNoPlaybooks = (listId: string) =>
+export const withListDetailsNoPlaybooks = (listId: string) =>
   mockRequest({
     method: 'get',
     path: `/org/lists/${listId}`,
-    response: listWithNoPlaybooksFixture,
+    response: listDetailsWithNoPlaybooksFixture,
   });
 
 export const withListError = (listId: string) =>

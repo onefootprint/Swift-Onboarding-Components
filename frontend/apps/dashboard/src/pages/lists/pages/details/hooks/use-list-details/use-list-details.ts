@@ -1,14 +1,14 @@
 import request, { getErrorMessage } from '@onefootprint/request';
 import type {
-  GetListRequest,
-  GetListResponse,
-  List,
+  GetListDetailsRequest,
+  GetListDetailsResponse,
+  ListDetails,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 
-const getList = async ({ authHeaders, id }: GetListRequest) => {
-  const response = await request<GetListResponse>({
+const getListDetails = async ({ authHeaders, id }: GetListDetailsRequest) => {
+  const response = await request<GetListDetailsResponse>({
     method: 'GET',
     url: `/org/lists/${id}`,
     headers: authHeaders,
@@ -17,10 +17,10 @@ const getList = async ({ authHeaders, id }: GetListRequest) => {
   return response.data;
 };
 
-const useList = (id = '') => {
+const useListDetails = (id = '') => {
   const { authHeaders } = useSession();
-  const query = useQuery<List>(['lists', id, authHeaders], () =>
-    getList({ authHeaders, id }),
+  const query = useQuery<ListDetails>(['lists', id, authHeaders], () =>
+    getListDetails({ authHeaders, id }),
   );
   const { error } = query;
   const errorMessage = error ? getErrorMessage(error) : undefined;
@@ -31,4 +31,4 @@ const useList = (id = '') => {
   };
 };
 
-export default useList;
+export default useListDetails;

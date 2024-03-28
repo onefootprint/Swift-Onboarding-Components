@@ -1,9 +1,7 @@
-import type {
-  EntityVault,
-  EntityWorkflow,
-  InsightEvent,
-} from '@onefootprint/types';
+import type { EntityVault, EntityWorkflow } from '@onefootprint/types';
 import { BusinessDI, EntityKind, IdDI, ListKind } from '@onefootprint/types';
+
+import getIpAddressesFromWorkflows from '../get-ip-addresses-from-workflows';
 
 const getEntityDataForListKind = (
   listKind?: ListKind,
@@ -54,15 +52,7 @@ const getEntityDataForListKind = (
     }
 
     case ListKind.ipAddress: {
-      const insightEvents = (
-        workflows
-          .map(wf => wf.insightEvent)
-          .filter(ie => !!ie) as InsightEvent[]
-      ).flat();
-      const ipAddresses = insightEvents
-        .map(event => event.ipAddress)
-        .filter(ip => !!ip) as string[];
-      return ipAddresses;
+      return getIpAddressesFromWorkflows(workflows);
     }
 
     default:

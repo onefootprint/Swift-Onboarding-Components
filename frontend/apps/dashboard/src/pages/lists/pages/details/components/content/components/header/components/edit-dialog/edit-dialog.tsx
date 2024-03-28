@@ -3,8 +3,8 @@ import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-
-import useList from '@/lists/pages/details/hooks/use-list';
+import useListDetails from 'src/pages/lists/pages/details/hooks/use-list-details';
+import getAliasforListName from 'src/pages/lists/utils/get-alias-for-list-name';
 
 import useUpdateList from './hooks/use-update-list';
 
@@ -25,7 +25,7 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.header.edit-dialog',
   });
-  const { data } = useList(id);
+  const { data } = useListDetails(id);
   const defaultName = data?.name;
   const toast = useToast();
   const {
@@ -46,7 +46,7 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
     updateListMutation.mutate(
       {
         name: formData.name,
-        alias: getAliasForName(formData.name),
+        alias: getAliasforListName(formData.name),
       },
       {
         onSuccess: () => {
@@ -62,14 +62,12 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
   };
 
   const listName = watch('name');
-  const getAliasForName = (name: string = '') =>
-    `@${name.replace(/[^a-z0-9_]/g, '_').toLowerCase()}`;
 
   const getNameHint = () => {
     if (!listName?.length) {
       return errors?.name?.message;
     }
-    const alias = getAliasForName(listName);
+    const alias = getAliasforListName(listName);
     return t('form.name.hint', { alias });
   };
 

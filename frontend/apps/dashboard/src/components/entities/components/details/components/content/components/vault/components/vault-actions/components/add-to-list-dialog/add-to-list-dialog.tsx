@@ -1,10 +1,11 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { IcoArrowTopRight16 } from '@onefootprint/icons';
+import { IcoArrowTopRight16, IcoInfo16 } from '@onefootprint/icons';
 import { type DecryptResponse, type List, ListKind } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import {
   Dialog,
   LinkButton,
+  MultiSelect,
   Select,
   Stack,
   Text,
@@ -21,10 +22,12 @@ import useLists from '@/lists/pages/list/hooks/use-lists';
 import useDecrypt from '../../hooks/use-decrypt-controls/hooks/use-decrypt-fields/hooks/use-decrypt';
 import getAttributeForListKind from './utils/get-attribute-for-list-kind';
 import getEntityDataForListKind from './utils/get-entity-data-for-list-kind';
+import getIpAddressesFromWorkflows from './utils/get-ip-addresses-from-workflows';
 import hasDataForListKind from './utils/has-data-for-list-kind';
 
 type FormData = {
   list: SelectOption<string>;
+  ipAddresses?: SelectOption<string>[];
 };
 
 type AddToListDialogProps = {
@@ -44,13 +47,35 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
   const addEntriesMutation = useAddEntries(listId);
   const decryptMutation = useDecrypt();
   const isLoading = addEntriesMutation.isLoading || decryptMutation.isLoading;
-  const { reset, handleSubmit, control } = useForm<FormData>();
+  const { reset, handleSubmit, watch, control } = useForm<FormData>();
 
   // Filter lists based on attributes the entity has
-  const lists: List[] = useMemo(
-    () => (data?.data || []).filter(l => hasDataForListKind(l.kind, entity)),
-    [data, entity],
-  );
+  const listById: Record<string, List> = useMemo(() => {
+    const applicableLists = (data?.data || []).filter(l =>
+      hasDataForListKind(l.kind, entity),
+    );
+    return Object.fromEntries(applicableLists.map(l => [l.id, l]));
+  }, [data, entity]);
+
+  const listOptions = Object.values(listById).map(l => ({
+    label: l.name,
+    value: l.id,
+  }));
+
+  const selectedList = watch('list');
+  const selectedListKind = listById[selectedList?.value]?.kind;
+  const showIpAddressSelect = selectedListKind === ListKind.ipAddress;
+  const ipAddressOptions: SelectOption<string>[] = useMemo(() => {
+    if (!entity) {
+      return [];
+    }
+    return getIpAddressesFromWorkflows(entity.workflows).map(
+      (ipAddress: string) => ({
+        label: ipAddress,
+        value: ipAddress,
+      }),
+    );
+  }, [entity]);
 
   const addEntries = (list: List, entries: string[]) => {
     addEntriesMutation.mutate(
@@ -75,7 +100,7 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
 
   const handleBeforeSubmit = (formData: FormData) => {
     const formListId = formData.list.value;
-    const list = lists.find(l => l.id === formListId);
+    const list = listById[formListId];
     if (!list || !entity) {
       console.error('List or entity not found');
       showRequestErrorToast();
@@ -129,11 +154,6 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
     onClose();
   };
 
-  const listOptions = lists.map(l => ({
-    label: l.name,
-    value: l.id,
-  }));
-
   return (
     <Dialog
       size="compact"
@@ -153,7 +173,7 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
       }}
     >
       <form onSubmit={handleSubmit(handleBeforeSubmit)} id="add-to-list-form">
-        <Stack gap={3} direction="column">
+        <Stack gap={7} direction="column">
           <Controller
             control={control}
             name="list"
@@ -174,7 +194,23 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
               />
             )}
           />
-          <Stack gap={3} direction="row">
+          {showIpAddressSelect && (
+            <Controller
+              control={control}
+              name="ipAddresses"
+              render={({ field }) => (
+                <MultiSelect
+                  label={t('form.ip-addresses.label')}
+                  onBlur={field.onBlur}
+                  onChange={field.onChange}
+                  value={field.value}
+                  options={ipAddressOptions}
+                />
+              )}
+            />
+          )}
+          <Stack gap={2} direction="row" alignItems="center">
+            <IcoInfo16 color="tertiary" />
             <Text variant="body-3" color="tertiary">
               {t('description')}
             </Text>

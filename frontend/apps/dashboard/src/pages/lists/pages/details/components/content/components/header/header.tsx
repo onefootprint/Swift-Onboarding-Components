@@ -2,8 +2,7 @@ import { Button, Shimmer, Stack, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import useList from '@/lists/pages/details/hooks/use-list';
+import useListDetails from 'src/pages/lists/pages/details/hooks/use-list-details';
 
 import Actions from './components/actions';
 import EditDialog from './components/edit-dialog';
@@ -11,7 +10,7 @@ import EditDialog from './components/edit-dialog';
 const Header = () => {
   const router = useRouter();
   const id = router.query.id as string;
-  const { isLoading, error, data } = useList(id);
+  const { isLoading, error, data } = useListDetails(id);
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.header',
   });

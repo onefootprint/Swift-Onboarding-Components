@@ -22,10 +22,20 @@ export type List = {
   actor: Actor;
   alias: string;
   entriesCount: number;
-  playbooks: ListPlaybookUsage[];
+  usedInPlaybook: boolean;
   createdAt: string;
   kind: ListKind;
   name: string;
+};
+
+export type ListDetails = {
+  id: string;
+  actor: Actor;
+  alias: string;
+  createdAt: string;
+  kind: ListKind;
+  name: string;
+  playbooks: ListPlaybookUsage[];
 };
 
 export type ListEntry = {

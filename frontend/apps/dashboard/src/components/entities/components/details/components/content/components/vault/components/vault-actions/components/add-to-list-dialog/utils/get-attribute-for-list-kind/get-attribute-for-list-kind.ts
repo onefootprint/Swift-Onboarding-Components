@@ -12,40 +12,41 @@ const getAttributeForListKind = (
 
   switch (listKind) {
     case ListKind.emailAddress: {
-      const attribute = decryptableAttributes.includes(IdDI.email)
+      return decryptableAttributes.includes(IdDI.email)
         ? IdDI.email
         : undefined;
-      return attribute;
     }
 
     case ListKind.emailDomain: {
-      const attribute = decryptableAttributes.includes(IdDI.email)
+      return decryptableAttributes.includes(IdDI.email)
         ? IdDI.email
         : undefined;
-      return attribute;
     }
 
     case ListKind.phoneNumber: {
-      const attribute =
+      const rawAttribute =
         kind === EntityKind.business
           ? BusinessDI.phoneNumber
           : IdDI.phoneNumber;
+      const attribute = decryptableAttributes.includes(rawAttribute)
+        ? rawAttribute
+        : undefined;
       return attribute;
     }
 
     case ListKind.phoneCountryCode: {
-      const attribute =
+      const rawAttribute =
         kind === EntityKind.business
           ? BusinessDI.phoneNumber
           : IdDI.phoneNumber;
+      const attribute = decryptableAttributes.includes(rawAttribute)
+        ? rawAttribute
+        : undefined;
       return attribute;
     }
 
     case ListKind.ssn9: {
-      const attribute = decryptableAttributes.includes(IdDI.ssn9)
-        ? IdDI.ssn9
-        : undefined;
-      return attribute;
+      return decryptableAttributes.includes(IdDI.ssn9) ? IdDI.ssn9 : undefined;
     }
 
     case ListKind.ipAddress: {
