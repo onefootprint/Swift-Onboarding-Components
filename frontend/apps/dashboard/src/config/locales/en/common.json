@@ -1299,6 +1299,28 @@
             "title": "Request sent"
           }
         },
+        "add-to-list": {
+          "label": "Add to list",
+          "title": "Add to list",
+          "description": "Add, edit, and remove lists from",
+          "lists": "Lists section",
+          "decrypt-reason": "Decrypting user data to add to list",
+          "form": {
+            "list": {
+              "label": "Available lists",
+              "placeholder": "Select a list...",
+              "errors": {
+                "required": "Please select one list"
+              }
+            },
+            "save": "Add to list",
+            "cancel": "Cancel"
+          },
+          "success-toast": {
+            "title": "Success!",
+            "description": "Successfully added to list."
+          }
+        },
         "update-auth-methods": {
           "label": "Allow updating login methods",
           "title": "Allowing updating login methods",

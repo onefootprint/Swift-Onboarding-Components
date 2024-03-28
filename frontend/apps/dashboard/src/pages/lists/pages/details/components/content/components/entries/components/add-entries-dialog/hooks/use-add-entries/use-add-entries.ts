@@ -23,7 +23,7 @@ const addEntries = async (
   return response.data;
 };
 
-const useAddEntries = (listId: string) => {
+const useAddEntries = (listId: string = '') => {
   const showErrorToast = useRequestErrorToast();
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();

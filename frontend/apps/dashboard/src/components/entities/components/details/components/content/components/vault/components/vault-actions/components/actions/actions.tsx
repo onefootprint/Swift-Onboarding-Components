@@ -8,12 +8,14 @@ import styled, { css } from 'styled-components';
 
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
+import AddToListDialog from '../add-to-list-dialog';
 import RetriggerKYCDialog from '../retrigger-kyc-dialog';
 import UpdateAuthDialog from '../update-auth-dialog';
 
 enum ActionDialog {
   auth,
   retrigger,
+  addToList,
 }
 
 const Actions = ({ entity }: WithEntityProps) => {
@@ -32,6 +34,9 @@ const Actions = ({ entity }: WithEntityProps) => {
   const handleOpenAuthMethodsDialog = () => {
     setOpenDialog(ActionDialog.auth);
   };
+  // const handleOpenAddToListDialog = () => {
+  //   setOpenDialog(ActionDialog.addToList);
+  // };
 
   return shouldShowActionsDropdown ? (
     <>
@@ -64,6 +69,10 @@ const Actions = ({ entity }: WithEntityProps) => {
               {t('update-auth-methods.label')}
             </Dropdown.Item>
           </PermissionGate>
+          {/* TODO: uncomment when releasing lists */}
+          {/* <Dropdown.Item onSelect={handleOpenAddToListDialog}>
+            {t('add-to-list.label')}
+          </Dropdown.Item> */}
         </Dropdown.Content>
       </Dropdown.Root>
       <RetriggerKYCDialog
@@ -72,6 +81,10 @@ const Actions = ({ entity }: WithEntityProps) => {
       />
       <UpdateAuthDialog
         open={openDialog === ActionDialog.auth}
+        onClose={handleCloseDialog}
+      />
+      <AddToListDialog
+        open={openDialog === ActionDialog.addToList}
         onClose={handleCloseDialog}
       />
     </>

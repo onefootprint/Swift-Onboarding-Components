@@ -259,6 +259,7 @@ export type {
   Entity,
   EntityCard,
   EntityVault,
+  EntityWorkflow,
   ExternalIntegrationCalledData,
   ExternalIntegrationCalledEvent,
   FootprintAppearance,
