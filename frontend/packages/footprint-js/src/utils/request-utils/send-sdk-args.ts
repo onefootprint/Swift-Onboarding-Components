@@ -46,13 +46,14 @@ const getSdkKind = (props: Props): SdkKind =>
 const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
   const { kind } = props;
 
-  if (kind === ComponentKind.Verify) {
+  if (kind === ComponentKind.Verify || kind === ComponentKind.Components) {
     return {
       publicKey: props.publicKey,
       authToken: props.authToken,
       userData: props.userData,
       options: props.options,
       l10n: props.l10n,
+      isComponentsSdk: kind === ComponentKind.Components,
     } as VerifyDataProps;
   }
   if (kind === ComponentKind.UpdateLoginMethods) {

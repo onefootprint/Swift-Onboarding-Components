@@ -2,6 +2,7 @@ import { ComponentCallbacksByEvent } from '../../constants/callbacks';
 import RefsByComponent from '../../constants/refs';
 import type {
   AuthProps,
+  ComponentsSdkProps,
   FormProps,
   Props,
   RenderProps,
@@ -17,7 +18,8 @@ type PossibleCallbacks = ExtractOnProps<AuthProps> &
   ExtractOnProps<FormProps> &
   ExtractOnProps<RenderProps> &
   ExtractOnProps<VerifyButtonProps> &
-  ExtractOnProps<VerifyProps>;
+  ExtractOnProps<VerifyProps> &
+  ExtractOnProps<ComponentsSdkProps>;
 
 const VariantsByKind: Record<ComponentKind, Variant[]> = {
   [ComponentKind.Auth]: ['modal', 'drawer'],
@@ -25,6 +27,7 @@ const VariantsByKind: Record<ComponentKind, Variant[]> = {
   [ComponentKind.Render]: ['inline'],
   [ComponentKind.UpdateLoginMethods]: ['modal', 'drawer'],
   [ComponentKind.Verify]: ['modal', 'drawer'],
+  [ComponentKind.Components]: ['modal'],
   [ComponentKind.VerifyButton]: ['inline'],
 };
 

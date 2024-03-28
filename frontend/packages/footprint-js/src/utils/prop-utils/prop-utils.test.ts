@@ -159,7 +159,7 @@ describe('validateComponentKind', () => {
     const fn2 = () =>
       validateComponentKind('banana' as unknown as ComponentKind);
     expect(fn2).toThrow(
-      'Invalid kind: banana. Valid kinds are: auth, form, render, update_login_methods, verify, verify-button',
+      'Invalid kind: banana. Valid kinds are: auth, form, render, update_login_methods, verify, components, verify-button',
     );
   });
 });

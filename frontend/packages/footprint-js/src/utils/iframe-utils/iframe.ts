@@ -3,14 +3,16 @@ import Postmate from '@onefootprint/postmate';
 import { version } from '../../../package.json';
 import type { FormRef, Props } from '../../types/components';
 import { ComponentKind } from '../../types/components';
-import { PrivateEvent } from '../../types/events';
+import { PrivateEvent, PublicEvent } from '../../types/events';
 import {
   createInlineContainer,
   createLoader,
   createOverlay,
   createOverlayContainer,
+  hideContainer,
   removeDOMElements,
   removeLoader,
+  showContainer,
 } from '../dom-utils';
 import getUniqueId from '../get-unique-id';
 import { logError, logWarn } from '../logger';
@@ -184,6 +186,13 @@ const initIframe = (rawProps: Props): Iframe => {
     registerCallbackProps();
     parentApi?.on(started, () => setUpFormRefs());
     parentApi?.on(`${initId}:${started}`, setUpFormRefs);
+
+    // For the components SDK, we should hide the iframe as soon as it hands off to us
+    if (props.kind === ComponentKind.Components) {
+      parentApi?.on(`${initId}:${PublicEvent.relayToComponents}`, () => {
+        hideContainer(initId);
+      });
+    }
   };
 
   // Only called from parent iframe manager, never to be called inside this iframe.ts file
@@ -209,7 +218,15 @@ const initIframe = (rawProps: Props): Iframe => {
     onRenderSecondary = callback;
   };
 
+  const relayFromComponents = () => {
+    if (parentApi) {
+      parentApi.call(PrivateEvent.relayFromComponents);
+      showContainer(initId);
+    }
+  };
+
   return {
+    relayFromComponents,
     props,
     isRendered,
     render,

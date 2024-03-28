@@ -16,6 +16,7 @@ describe('isAuthOrVerifyOrUpdateLogin', () => {
     { kind: 'update_login_methods', x: true },
     { kind: 'verify-button', x: false },
     { kind: 'verify', x: true },
+    { kind: 'components', x: true },
   ])('case %#', ({ kind, x }) => {
     expect(isAuthOrVerifyOrUpdateLogin(kind)).toEqual(x);
   });

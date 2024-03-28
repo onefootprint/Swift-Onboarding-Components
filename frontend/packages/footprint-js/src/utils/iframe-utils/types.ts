@@ -8,6 +8,7 @@ export type Iframe = {
   isRendered: boolean;
   render: () => Promise<void>;
   destroy: () => Promise<void>;
+  relayFromComponents: () => void;
   registerOnDestroy: (callback: OnDestroy) => void;
   registerOnRenderSecondary: (callback: OnRenderSecondary) => void;
 };

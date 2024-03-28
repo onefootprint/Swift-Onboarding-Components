@@ -1,6 +1,13 @@
 import './styles.css';
 
-import type { Component, Footprint, Props } from './types/components';
+import type {
+  AdditionalComponentsSdkFunctionality,
+  Component,
+  ComponentsSdkProps,
+  Footprint,
+  Props,
+} from './types/components';
+import { ComponentKind } from './types/components';
 import initIframe from './utils/iframe-utils/iframe';
 import initIframeManager from './utils/iframe-utils/iframe-manager';
 import type { Iframe } from './utils/iframe-utils/types';
@@ -37,9 +44,21 @@ const getFootprint = (): Footprint => {
       await iframe.render();
     };
 
+    // The components SDK requires a few more utilities to interact with the footprint-js iframe
+    let addlFunctionality: AdditionalComponentsSdkFunctionality = {};
+    if (isComponentsSdkProps(props)) {
+      const relayFromComponents = () => {
+        iframe.relayFromComponents();
+      };
+      addlFunctionality = {
+        relayFromComponents,
+      };
+    }
+
     return {
       render,
       destroy,
+      ...addlFunctionality,
     };
   };
 
@@ -47,6 +66,9 @@ const getFootprint = (): Footprint => {
     init,
   };
 };
+
+const isComponentsSdkProps = (p: Props): p is ComponentsSdkProps =>
+  p.kind === ComponentKind.Components;
 
 const footprint = getFootprint();
 export default footprint;

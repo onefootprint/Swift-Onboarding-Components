@@ -27,6 +27,13 @@ export const ComponentCallbacksByEvent: Record<
     [PublicEvent.closed]: 'onClose',
     [PublicEvent.completed]: 'onComplete',
   },
+  [ComponentKind.Components]: {
+    [PublicEvent.auth]: 'onAuth',
+    [PublicEvent.canceled]: 'onCancel',
+    [PublicEvent.closed]: 'onClose',
+    [PublicEvent.completed]: 'onComplete',
+    [PublicEvent.relayToComponents]: 'onRelayToComponents',
+  },
   [ComponentKind.VerifyButton]: {
     [PublicEvent.auth]: 'onAuth',
     [PublicEvent.canceled]: 'onCancel',
@@ -43,5 +50,6 @@ export const RequiredCallbacksByComponent: Record<ComponentKind, string[]> = {
   [ComponentKind.Render]: [],
   [ComponentKind.UpdateLoginMethods]: [],
   [ComponentKind.Verify]: [],
+  [ComponentKind.Components]: [],
   [ComponentKind.VerifyButton]: [],
 };

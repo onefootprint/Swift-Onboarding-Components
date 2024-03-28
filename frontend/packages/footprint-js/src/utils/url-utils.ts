@@ -34,6 +34,7 @@ const getURL = (props: Props, token: string): string => {
 
   switch (kind) {
     case ComponentKind.Verify:
+    case ComponentKind.Components:
       url = process.env.BIFROST_URL;
       break;
     case ComponentKind.Auth:

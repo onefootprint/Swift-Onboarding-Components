@@ -6,6 +6,7 @@ export enum PublicEvent {
   clicked = 'clicked',
   closed = 'closed',
   completed = 'completed',
+  relayToComponents = 'relayToComponents',
 }
 
 // Events sent from parent -> child or parent <- child
@@ -15,6 +16,7 @@ export enum PrivateEvent {
   formSaved = 'formSaved', // triggered by tenant to save the form via ref
   propsReceived = 'propsReceived',
   started = 'started',
+  relayFromComponents = 'relayFromComponents',
 }
 
 export type CallbackKeys =
@@ -22,7 +24,8 @@ export type CallbackKeys =
   | 'onCancel'
   | 'onClick'
   | 'onClose'
-  | 'onComplete';
+  | 'onComplete'
+  | 'onRelayToComponents';
 
 export type ExtractOnProps<T> = {
   [K in keyof T as K extends `on${string}` ? K : never]: Function;

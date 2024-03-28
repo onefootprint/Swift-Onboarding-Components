@@ -21,4 +21,5 @@ export const SdkKindByComponentKind: Record<ComponentKind, SdkKind> = {
   [ComponentKind.UpdateLoginMethods]: SdkKind.UpdateAuthMethodsV1,
   [ComponentKind.Verify]: SdkKind.VerifyV1,
   [ComponentKind.VerifyButton]: SdkKind.VerifyButtonV1,
+  [ComponentKind.Components]: SdkKind.VerifyV1,
 };

@@ -7,6 +7,7 @@ export enum ComponentKind {
   Render = 'render',
   UpdateLoginMethods = 'update_login_methods',
   Verify = 'verify',
+  Components = 'components',
   VerifyButton = 'verify-button',
 }
 
@@ -16,8 +17,16 @@ export type L10n = { locale?: SupportedLocale; language?: SupportedLanguage };
 export type Options = { showCompletionPage?: boolean; showLogo?: boolean };
 export type Variant = 'modal' | 'drawer' | 'inline';
 
-export type Component = { destroy: () => void; render: () => Promise<void> };
-export type Footprint = { init: (props: Props) => Component };
+export type AdditionalComponentsSdkFunctionality = {
+  relayFromComponents?: () => void;
+};
+export type Component = {
+  destroy: () => void;
+  render: () => Promise<void>;
+} & AdditionalComponentsSdkFunctionality;
+export type Footprint = {
+  init: (props: Props) => Component;
+};
 
 export type Props =
   | AuthProps
@@ -25,7 +34,8 @@ export type Props =
   | RenderProps
   | UpdateLoginMethodsProps
   | VerifyButtonProps
-  | VerifyProps;
+  | VerifyProps
+  | ComponentsSdkProps;
 
 export type PropsBase = {
   readonly appearance?: Appearance;
@@ -40,30 +50,42 @@ export type PropsBase = {
 export type VerifyAuthToken = { authToken: string; publicKey?: never };
 export type VerifyPublicKey = { publicKey: string; authToken?: never };
 type VerifyVariant = 'modal' | 'drawer';
-type VerifyPropsBase = PropsBase & {
-  readonly onAuth?: (authToken: string) => void;
+type VerifyPropsBase<TAuth> = PropsBase & {
+  readonly onAuth?: (validationToken: string) => void;
   readonly onCancel?: () => void;
   readonly onClose?: () => void;
   readonly onComplete?: (validationToken: string) => void;
   readonly options?: Options;
   readonly userData?: UserData;
-} & (VerifyAuthToken | VerifyPublicKey);
+} & TAuth;
 
-export type VerifyProps = VerifyPropsBase & {
+export type VerifyProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
   readonly kind: ComponentKind.Verify;
   readonly variant?: VerifyVariant;
 };
 
-export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys>;
 type VerifyDataKeys =
   | 'publicKey'
   | 'userData'
   | 'options'
   | 'authToken'
   | 'l10n';
+// The subset of VerifyProps that are sent to the iframe via sdk_args
+export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys> & {
+  isComponentsSdk?: boolean;
+};
+
+/** Components SDK. Just a subset of Verify */
+export type ComponentsSdkProps = VerifyPropsBase<VerifyPublicKey> & {
+  readonly onRelayToComponents?: (authToken: string) => void;
+  readonly kind: ComponentKind.Components;
+  readonly variant?: VerifyVariant;
+};
 
 /** verify-button */
-export type VerifyButtonProps = VerifyPropsBase & {
+export type VerifyButtonProps = VerifyPropsBase<
+  VerifyAuthToken | VerifyPublicKey
+> & {
   readonly containerId: string;
   readonly dialogVariant?: VerifyVariant;
   readonly kind: ComponentKind.VerifyButton;

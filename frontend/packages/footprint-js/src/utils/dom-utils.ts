@@ -7,6 +7,9 @@ const INLINE_CONTAINER_ID_PREFIX = INLINE_CONTAINER_CLASS;
 const OVERLAY_ID_PREFIX = OVERLAY_CLASS;
 const LOADING_INDICATOR_ID_PREFIX = 'footprint-loading-indicator';
 
+export const getOverlayContainerId = (uniqueId: string) =>
+  `${OVERLAY_CONTAINER_ID_PREFIX}-${uniqueId}`;
+
 export const getDomElementId = (elementId: string, uniqueId: string) =>
   `${elementId}-${uniqueId}`;
 
@@ -17,7 +20,7 @@ export const removeDOMElements = async (uniqueId: string) => {
 };
 
 export const createOverlayContainer = (uniqueId: string): HTMLElement => {
-  const id = getDomElementId(OVERLAY_CONTAINER_ID_PREFIX, uniqueId);
+  const id = getOverlayContainerId(uniqueId);
   const possibleContainer = document.getElementById(id);
   if (possibleContainer) {
     return possibleContainer;
@@ -29,7 +32,7 @@ export const createOverlayContainer = (uniqueId: string): HTMLElement => {
 };
 
 const removeOverlayContainer = async (uniqueId: string) => {
-  const id = getDomElementId(OVERLAY_CONTAINER_ID_PREFIX, uniqueId);
+  const id = getOverlayContainerId(uniqueId);
   const overlayContainer = document.getElementById(id);
   if (!overlayContainer) {
     return;
@@ -127,4 +130,21 @@ const createLoadingIndicator = (id: string) => {
   inner.appendChild(loader);
   container.appendChild(inner);
   return container;
+};
+
+// TODO we could make these transitions prettier
+export const showContainer = (id: string) => {
+  const container = document.getElementById(getOverlayContainerId(id));
+  if (container) {
+    container.style.opacity = '1';
+    container.style.display = 'block';
+  }
+};
+
+export const hideContainer = (id: string) => {
+  const container = document.getElementById(getOverlayContainerId(id));
+  if (container) {
+    container.style.opacity = '0';
+    container.style.display = 'none';
+  }
 };

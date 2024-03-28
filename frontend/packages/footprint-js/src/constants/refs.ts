@@ -7,6 +7,7 @@ const RefsByComponent: Record<ComponentKind, string[]> = {
   [ComponentKind.UpdateLoginMethods]: [],
   [ComponentKind.Verify]: [],
   [ComponentKind.VerifyButton]: [],
+  [ComponentKind.Components]: [],
 };
 
 export default RefsByComponent;

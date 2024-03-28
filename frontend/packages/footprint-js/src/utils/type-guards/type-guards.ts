@@ -10,8 +10,11 @@ const isVerify = (x: unknown): x is ComponentKind.Verify =>
 const isUpdateLogin = (x: unknown): x is ComponentKind.UpdateLoginMethods =>
   x === ComponentKind.UpdateLoginMethods;
 
+const isComoponentsSdk = (x: unknown): x is ComponentKind.Components =>
+  x === ComponentKind.Components;
+
 export const isAuthOrVerifyOrUpdateLogin = (x: unknown) =>
-  [isAuth, isVerify, isUpdateLogin].some(fn => fn(x));
+  [isAuth, isVerify, isComoponentsSdk, isUpdateLogin].some(fn => fn(x));
 
 export const isValidString = (x: unknown) =>
   typeof x === 'string' && x.length > 0;
