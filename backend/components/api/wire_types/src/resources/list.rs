@@ -1,7 +1,5 @@
 use crate::*;
-use newtypes::{
-    DbActor, ListAlias, ListEntryId, ListId, ListKind, ObConfigurationId, ObConfigurationKey, PiiString,
-};
+use newtypes::{DbActor, ListAlias, ListEntryId, ListId, ListKind, PiiString};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct List {
@@ -11,7 +9,7 @@ pub struct List {
     pub kind: ListKind,
     pub created_at: DateTime<Utc>,
     pub actor: DbActor,
-    pub playbooks: Vec<ListPlaybookUsage>,
+    pub used_in_playbook: bool,
     pub entries_count: usize,
 }
 
@@ -21,13 +19,4 @@ pub struct ListEntry {
     pub data: PiiString,
     pub created_at: DateTime<Utc>,
     pub actor: DbActor,
-}
-
-
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
-pub struct ListPlaybookUsage {
-    pub id: ObConfigurationId,
-    pub key: ObConfigurationKey,
-    pub name: String,
-    pub rules: Vec<Rule>,
 }

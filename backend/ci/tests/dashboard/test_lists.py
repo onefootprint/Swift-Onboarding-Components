@@ -1,11 +1,4 @@
-from tests.utils import (
-    _gen_random_str,
-    create_ob_config,
-    post,
-    patch,
-    get,
-    delete,
-)
+from tests.utils import _gen_random_str, post, get, delete, patch
 
 
 def test_create(sandbox_tenant):
@@ -24,7 +17,6 @@ def test_create(sandbox_tenant):
     assert list["kind"] == "email_domain"
     assert list["actor"]["kind"] == "tenant_user"
     assert list["entries_count"] == 0
-    assert len(list["playbooks"]) == 0
 
     # Trying to use a name that already exists fails
     post(
@@ -51,7 +43,7 @@ def test_create(sandbox_tenant):
     )
 
 
-def test_list(sandbox_tenant, must_collect_data, can_access_data):
+def test_list(sandbox_tenant):
     nonce = _gen_random_str(5)
     post(
         f"/org/lists",
@@ -63,7 +55,7 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
         ),
         *sandbox_tenant.db_auths,
     )
-    list2 = post(
+    post(
         f"/org/lists",
         dict(
             name=f"My Super List 2 {nonce}",
@@ -73,72 +65,13 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
         ),
         *sandbox_tenant.db_auths,
     )
-    list3 = post(
+    post(
         f"/org/lists",
         dict(
             name=f"My Super List 3 {nonce}",
             alias=f"my_super_list_3_{nonce}",
             kind="phone_country_code",
             entries=["+1", "+44"],
-        ),
-        *sandbox_tenant.db_auths,
-    )
-
-    obc1 = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
-    )
-    obc2 = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
-    )
-
-    # use list2 in a rule in obc1
-    patch(
-        f"/org/onboarding_configs/{obc1.id}/rules",
-        dict(
-            expected_rule_set_version=1,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.email",
-                            "op": "is_in",
-                            "value": list2["id"],
-                        }
-                    ],
-                ),
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-    )
-
-    # use list2 and list3 in a rule in obc2
-    patch(
-        f"/org/onboarding_configs/{obc2.id}/rules",
-        dict(
-            expected_rule_set_version=1,
-            add=[
-                dict(
-                    rule_action="fail",
-                    rule_expression=[
-                        {
-                            "field": "id.email",
-                            "op": "is_in",
-                            "value": list2["id"],
-                        }
-                    ],
-                ),
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.phone_number",
-                            "op": "is_in",
-                            "value": list3["id"],
-                        }
-                    ],
-                ),
-            ],
         ),
         *sandbox_tenant.db_auths,
     )
@@ -151,43 +84,17 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     list = get(f"/org/lists/{lists[0]['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 3 {nonce}"
     assert list["entries_count"] == 2
-    assert len(list["playbooks"]) == 1
-    assert list["playbooks"][0]["id"] == obc2.id
-    assert list["playbooks"][0]["name"] == obc2.name
-    assert len(list["playbooks"][0]["rules"]) == 1
-    assert list["playbooks"][0]["rules"][0]["rule_expression"] == [
-        {
-            "field": "id.phone_number",
-            "op": "is_in",
-            "value": list3["id"],
-        }
-    ]
+    assert list["used_in_playbook"] == False
 
     list = get(f"/org/lists/{lists[1]['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 2 {nonce}"
     assert list["entries_count"] == 3
-    assert len(list["playbooks"]) == 2
-
-    assert list["playbooks"][0]["id"] == obc2.id
-    assert list["playbooks"][0]["name"] == obc2.name
-    assert len(list["playbooks"][0]["rules"]) == 1
-    assert list["playbooks"][0]["rules"][0]["action"] == "fail"
-    assert list["playbooks"][0]["rules"][0]["rule_expression"] == [
-        {"field": "id.email", "op": "is_in", "value": list2["id"]}
-    ]
-
-    assert list["playbooks"][1]["id"] == obc1.id
-    assert list["playbooks"][1]["name"] == obc1.name
-    assert len(list["playbooks"][1]["rules"]) == 1
-    assert list["playbooks"][1]["rules"][0]["action"] == "manual_review"
-    assert list["playbooks"][1]["rules"][0]["rule_expression"] == [
-        {"field": "id.email", "op": "is_in", "value": list2["id"]}
-    ]
+    assert list["used_in_playbook"] == False
 
     list = get(f"/org/lists/{lists[2]['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 1 {nonce}"
     assert list["entries_count"] == 0
-    assert len(list["playbooks"]) == 0
+    assert list["used_in_playbook"] == False
 
 
 def test_update(sandbox_tenant):
