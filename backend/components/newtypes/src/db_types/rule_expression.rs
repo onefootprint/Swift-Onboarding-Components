@@ -1,4 +1,4 @@
-use crate::{DataIdentifier, FootprintReasonCode, ListId};
+use crate::{DataIdentifier, FootprintReasonCode, ListId, PiiString};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -33,7 +33,7 @@ pub enum VaultOperation {
     Equals {
         field: DataIdentifier,
         op: Equals,
-        value: String,
+        value: PiiString,
     },
     IsIn {
         field: DataIdentifier,
@@ -153,7 +153,7 @@ mod test {
         let re = RuleExpression(vec![RuleExpressionCondition::VaultData(VaultOperation::Equals {
             field: DataIdentifier::Id(IdentityDataKind::FirstName),
             op: Equals::Equals,
-            value: "Bob".to_owned(),
+            value: "Bob".into(),
         })]);
 
         let json = serde_json::to_value(re.clone()).unwrap();

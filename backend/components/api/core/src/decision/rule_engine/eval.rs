@@ -137,8 +137,8 @@ fn evaluate_condition(cond: &RuleExpressionCondition, input: &[FootprintReasonCo
             };
             match vo {
                 VaultOperation::Equals { field:_, op, value } => match op {
-                    Equals::Equals => field_value.leak_to_string() == *value,
-                    Equals::DoesNotEqual => field_value.leak_to_string() != *value,
+                    Equals::Equals => field_value.leak_to_string() == *value.leak_to_string(),
+                    Equals::DoesNotEqual => field_value.leak_to_string() != *value.leak_to_string(),
                 },
                 VaultOperation::IsIn { field:_, op: _, value: _ } => unimplemented!(),
             }
@@ -440,13 +440,13 @@ pub mod tests {
         assert!(evaluate_condition(&REC::VaultData(VaultOperation::Equals {
             field: DataIdentifier::Id(IdentityDataKind::FirstName),
             op: Equals::Equals,
-            value: "Bob".to_owned(),
+            value: "Bob".into(),
         }), &Vec::<FRC>::new(), &vd));
         
         assert!(!evaluate_condition(&REC::VaultData(VaultOperation::Equals {
             field: DataIdentifier::Id(IdentityDataKind::FirstName),
             op: Equals::Equals,
-            value: "Alice".to_owned(),
+            value: "Alice".into(),
         }), &Vec::<FRC>::new(), &vd));
     }
 
