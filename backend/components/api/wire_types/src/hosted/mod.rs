@@ -6,4 +6,5 @@ pub mod onboarding;
 pub mod onboarding_status;
 pub mod socure_device;
 pub mod stytch;
+pub mod tokens;
 pub mod validate;

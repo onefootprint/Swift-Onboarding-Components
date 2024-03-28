@@ -26,7 +26,7 @@ use crate::{
         user::UserAuth,
         AuthError, IsGuardMet, SessionContext,
     },
-    errors::{ApiError, ApiResult},
+    errors::{ApiError, ApiResult, ValidationError},
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::UserAuthScope;
@@ -105,6 +105,35 @@ impl UserSessionContext {
             context,
             scopes,
             auth_events,
+        };
+        UserSession::make(args)
+    }
+
+    pub fn replace_scopes(self, new_scopes: Vec<UserAuthScope>) -> ApiResult<AuthSessionData> {
+        let context = NewUserSessionContext {
+            su_id: self.scoped_user.map(|su| su.id),
+            sb_id: self.sb_id,
+            bo_id: self.bo_id,
+            obc_id: self.obc_id,
+            wf_id: self.wf_id,
+            wfr_id: self.wfr_id,
+            is_implied_auth: self.is_implied_auth,
+            kba: self.kba,
+        };
+        if new_scopes.iter().any(|s| !self.scopes.contains(s)) {
+            // The only use case of this today is to request a token with _fewer_ scopes.
+            // It could be dangerous to allow a user to request a token with _more_ scopes,
+            // particularly for tokens given to the components SDK that intentially have
+            // fewer scopes than their auth methods allow.
+            // Do not remove this validation unless you know what you're doing.
+            return ValidationError("Cannot use replace_scopes to add additional scopes").into();
+        }
+        let args = NewUserSessionArgs {
+            user_vault_id: self.user.id,
+            purpose: self.purpose,
+            context,
+            scopes: new_scopes,
+            auth_events: self.auth_events,
         };
         UserSession::make(args)
     }

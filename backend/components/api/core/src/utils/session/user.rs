@@ -16,6 +16,12 @@ pub struct AuthSession {
     pub data: AuthSessionData,
 }
 
+#[derive(derive_more::From)]
+pub enum Expiry {
+    ExpiresIn(Duration),
+    ExpiresAt(DateTime<Utc>),
+}
+
 impl AuthSession {
     pub async fn get(state: &State, auth_token: &SessionAuthToken) -> ApiResult<Self> {
         let key = auth_token.id();
@@ -76,12 +82,15 @@ impl AuthSession {
         conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
-        expires_in: Duration,
+        expiry: impl Into<Expiry>,
     ) -> DbResult<(SessionAuthToken, Session)> {
         let token = SessionAuthToken::generate((&data).into());
         let auth_token_hash = token.id();
         tracing::info!(%auth_token_hash, "Token created");
-        let expires_at = Utc::now() + expires_in;
+        let expires_at = match expiry.into() {
+            Expiry::ExpiresIn(expires_in) => Utc::now() + expires_in,
+            Expiry::ExpiresAt(expires_at) => expires_at,
+        };
         let kind = data.session_kind();
         let sealed_data = data.seal(session_sealing_key)?;
         let session = Session::update_or_create(conn, token.id(), sealed_data.0, kind, expires_at)?;

@@ -124,7 +124,6 @@ class IdentifyClient:
         self.challenge_kind = None
         self.challenge_data = None
 
-        print("verified", auth_token.value)
         return auth_token
 
     def create_user(self, scope="onboarding"):

@@ -7,7 +7,7 @@ use crate::{
 use api_core::{
     auth::{
         user::{UserAuthContext, UserAuthGuard, UserWfAuthContext},
-        AuthError,
+        AuthError, IsGuardMet,
     },
     utils::vault_wrapper::{Any, Person, VwArgs},
 };
@@ -37,7 +37,8 @@ async fn parse_auth(
     // TODO We should move this to only take UserWfAuth at some point, but the client makes one request
     // to this API before POST /hosted/onboarding to add the email to a vault after it's created
     let result = if let Some(user_wf_auth) = user_wf_auth {
-        let user_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp)?;
+        // TODO migrate to only VaultData permissions once all tokens have it
+        let user_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::VaultData))?;
         user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
         let user = user_auth.user().clone();
         let su_id = user_auth.scoped_user.id.clone();
@@ -45,7 +46,9 @@ async fn parse_auth(
         let wf_info = Some((user_auth.ob_config()?.clone(), user_auth.workflow().clone()));
         (user, su_id, tenant, wf_info)
     } else {
-        let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+        tracing::info!("Vault API called without user_wf_auth");
+        // TODO migrate to only VaultData permissions once all tokens have it
+        let user_auth = user_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::VaultData))?;
         let user = user_auth.user.clone();
         let su_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
         let su_id2 = su_id.clone();

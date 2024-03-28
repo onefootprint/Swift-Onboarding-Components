@@ -170,7 +170,7 @@ pub async fn post(
             };
             let event = AuthEvent::save(ae_args, conn)?;
 
-            let scopes = allowed_user_scopes(vec![event.kind], scope, true);
+            let scopes = allowed_user_scopes(vec![event.kind], scope.into(), true);
 
             let ae = AssociatedAuthEvent::explicit(event.id);
             // Add the new scopes and args to the existing scopes and context on the auth token

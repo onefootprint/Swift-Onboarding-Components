@@ -39,3 +39,25 @@ impl IdentifyScope {
 }
 
 crate::util::impl_enum_string_diesel!(IdentifyScope);
+
+#[derive(
+    Debug, Display, Clone, Copy, EnumString, serde_with::DeserializeFromStr, macros::SerdeAttr, Apiv2Schema,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum RequestedTokenScope {
+    Auth,
+    Onboarding,
+    My1fp,
+    OnboardingComponents,
+}
+
+impl From<IdentifyScope> for RequestedTokenScope {
+    fn from(value: IdentifyScope) -> Self {
+        match value {
+            IdentifyScope::Auth => Self::Auth,
+            IdentifyScope::Onboarding => Self::Onboarding,
+            IdentifyScope::My1fp => Self::My1fp,
+        }
+    }
+}

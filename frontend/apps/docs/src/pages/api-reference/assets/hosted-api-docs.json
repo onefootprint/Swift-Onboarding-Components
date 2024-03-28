@@ -1339,7 +1339,43 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TokenResponse"
+                                    "$ref": "#/components/schemas/GetUserTokenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/user/tokens": {
+            "post": {
+                "tags": [
+                    "User",
+                    "Hosted"
+                ],
+                "description": "Create a new token with the requested scopes using the permissions granted by the existing token. Used to create a secondary token with more limited scope. The new token's expiry time is the same as the old token's",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserTokenRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateUserTokenResponse"
                                 }
                             }
                         }
@@ -2669,6 +2705,40 @@
                     "token"
                 ]
             },
+            "CreateUserTokenRequest": {
+                "type": "object",
+                "properties": {
+                    "requested_scope": {
+                        "type": "string",
+                        "enum": [
+                            "auth",
+                            "onboarding",
+                            "my1fp",
+                            "onboarding_components"
+                        ]
+                    }
+                },
+                "required": [
+                    "requested_scope"
+                ]
+            },
+            "CreateUserTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "token"
+                ]
+            },
             "D2pGenerateRequest": {
                 "type": "object",
                 "properties": {
@@ -3608,6 +3678,36 @@
                     "args"
                 ]
             },
+            "GetUserTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "scopes": {
+                        "type": "array",
+                        "items": {
+                            "description": "Auto-generated discriminant enum variants",
+                            "type": "string",
+                            "enum": [
+                                "sign_up",
+                                "auth",
+                                "basic_profile",
+                                "sensitive_profile",
+                                "handoff",
+                                "vault_data",
+                                "explicit_auth",
+                                "never"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "scopes"
+                ]
+            },
             "HostedBusiness": {
                 "type": "object",
                 "properties": {
@@ -4016,13 +4116,14 @@
                                     "description": "Auto-generated discriminant enum variants",
                                     "type": "string",
                                     "enum": [
-                                        "SignUp",
-                                        "Auth",
-                                        "BasicProfile",
-                                        "SensitiveProfile",
-                                        "Handoff",
-                                        "ExplicitAuth",
-                                        "Never"
+                                        "sign_up",
+                                        "auth",
+                                        "basic_profile",
+                                        "sensitive_profile",
+                                        "handoff",
+                                        "vault_data",
+                                        "explicit_auth",
+                                        "never"
                                     ]
                                 }
                             }
@@ -5802,35 +5903,6 @@
                 },
                 "required": [
                     "telemetry_id"
-                ]
-            },
-            "TokenResponse": {
-                "type": "object",
-                "properties": {
-                    "expires_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "scopes": {
-                        "type": "array",
-                        "items": {
-                            "description": "Auto-generated discriminant enum variants",
-                            "type": "string",
-                            "enum": [
-                                "SignUp",
-                                "Auth",
-                                "BasicProfile",
-                                "SensitiveProfile",
-                                "Handoff",
-                                "ExplicitAuth",
-                                "Never"
-                            ]
-                        }
-                    }
-                },
-                "required": [
-                    "expires_at",
-                    "scopes"
                 ]
             },
             "UserChallengeRequest": {

@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 pub use newtypes::UserAuthGuard;
-use newtypes::{AuthEventKind, IdentifyScope, UserAuthScope, VaultId};
+use newtypes::{AuthEventKind, RequestedTokenScope, UserAuthScope, VaultId};
 
 mod session;
 pub use session::*;
@@ -22,13 +22,18 @@ pub trait UserAuth {
 /// The result is the intersection of the scopes requested and the scopes allowed by the auth methods
 pub fn allowed_user_scopes(
     auth_events: Vec<AuthEventKind>,
-    scope: IdentifyScope,
+    scope: RequestedTokenScope,
     is_explicit_auth: bool,
 ) -> Vec<UserAuthScope> {
     let requested_scopes = match scope {
-        IdentifyScope::Auth => vec![UserAuthScope::Auth],
-        IdentifyScope::Onboarding => vec![UserAuthScope::SignUp, UserAuthScope::SensitiveProfile],
-        IdentifyScope::My1fp => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile],
+        RequestedTokenScope::Auth => vec![UserAuthScope::Auth],
+        RequestedTokenScope::OnboardingComponents => vec![UserAuthScope::VaultData],
+        RequestedTokenScope::Onboarding => vec![
+            UserAuthScope::SignUp,
+            UserAuthScope::VaultData,
+            UserAuthScope::SensitiveProfile,
+        ],
+        RequestedTokenScope::My1fp => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile],
     };
     let allowed_scopes: HashSet<_> = auth_events
         .iter()
@@ -52,12 +57,14 @@ fn auth_event_to_scopes(k: &AuthEventKind) -> Vec<UserAuthScope> {
             UserAuthScope::SignUp,
             UserAuthScope::Auth,
             UserAuthScope::BasicProfile,
+            UserAuthScope::VaultData,
             UserAuthScope::Handoff,
         ],
         AuthEventKind::Passkey | AuthEventKind::ThirdParty => vec![
             UserAuthScope::SignUp,
             UserAuthScope::Auth,
             UserAuthScope::BasicProfile,
+            UserAuthScope::VaultData,
             UserAuthScope::SensitiveProfile,
             UserAuthScope::Handoff,
         ],
@@ -66,8 +73,8 @@ fn auth_event_to_scopes(k: &AuthEventKind) -> Vec<UserAuthScope> {
 
 #[cfg(test)]
 mod test {
-    use super::UserAuthScope;
-    use newtypes::{AuthEventKind, IdentifyScope};
+    use super::{RequestedTokenScope, UserAuthScope};
+    use newtypes::AuthEventKind;
     use test_case::test_case;
 
     #[test]
@@ -87,23 +94,24 @@ mod test {
         assert_eq!(serialized, modern_value_str)
     }
 
-    #[test_case(vec![AuthEventKind::Sms], IdentifyScope::My1fp, true => vec![UserAuthScope::BasicProfile, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Email], IdentifyScope::My1fp, true => vec![UserAuthScope::BasicProfile, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Passkey], IdentifyScope::My1fp, true => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], IdentifyScope::My1fp, true => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Sms], IdentifyScope::Auth, true => vec![UserAuthScope::Auth, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Email], IdentifyScope::Auth, true => vec![UserAuthScope::Auth, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Passkey], IdentifyScope::Auth, true => vec![UserAuthScope::Auth, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], IdentifyScope::Auth, true => vec![UserAuthScope::Auth, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Sms], IdentifyScope::Onboarding, true => vec![UserAuthScope::SignUp, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Email], IdentifyScope::Onboarding, true => vec![UserAuthScope::SignUp, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Passkey], IdentifyScope::Onboarding, true => vec![UserAuthScope::SignUp, UserAuthScope::SensitiveProfile, UserAuthScope::ExplicitAuth])]
-    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], IdentifyScope::Onboarding, true => vec![UserAuthScope::SignUp, UserAuthScope::SensitiveProfile, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Sms], RequestedTokenScope::My1fp, true => vec![UserAuthScope::BasicProfile, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Email], RequestedTokenScope::My1fp, true => vec![UserAuthScope::BasicProfile, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Passkey], RequestedTokenScope::My1fp, true => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], RequestedTokenScope::My1fp, true => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Sms], RequestedTokenScope::Auth, true => vec![UserAuthScope::Auth, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Email], RequestedTokenScope::Auth, true => vec![UserAuthScope::Auth, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Passkey], RequestedTokenScope::Auth, true => vec![UserAuthScope::Auth, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], RequestedTokenScope::Auth, true => vec![UserAuthScope::Auth, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Sms], RequestedTokenScope::Onboarding, true => vec![UserAuthScope::SignUp, UserAuthScope::VaultData, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Email], RequestedTokenScope::Onboarding, true => vec![UserAuthScope::SignUp, UserAuthScope::VaultData, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Passkey], RequestedTokenScope::Onboarding, true => vec![UserAuthScope::SignUp, UserAuthScope::VaultData, UserAuthScope::SensitiveProfile, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Passkey], RequestedTokenScope::OnboardingComponents, true => vec![UserAuthScope::VaultData, UserAuthScope::ExplicitAuth])]
+    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], RequestedTokenScope::Onboarding, true => vec![UserAuthScope::SignUp, UserAuthScope::VaultData, UserAuthScope::SensitiveProfile, UserAuthScope::ExplicitAuth])]
     // Even with passkey auth, if auth is inherited, can't get sensitive profile
-    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], IdentifyScope::Onboarding, false => vec![UserAuthScope::SignUp])]
+    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], RequestedTokenScope::Onboarding, false => vec![UserAuthScope::SignUp, UserAuthScope::VaultData])]
     fn test_allowed_scopes(
         kinds: Vec<AuthEventKind>,
-        scope: IdentifyScope,
+        scope: RequestedTokenScope,
         is_explicit_auth: bool,
     ) -> Vec<UserAuthScope> {
         super::allowed_user_scopes(kinds, scope, is_explicit_auth)

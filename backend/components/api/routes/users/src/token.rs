@@ -26,7 +26,7 @@ use db::models::{
 };
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{AuthEventKind, IdentifyScope, PreviewApi};
+use newtypes::{AuthEventKind, IdentifyScope, PreviewApi, RequestedTokenScope};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -159,7 +159,7 @@ pub async fn post(
 
             // Request Onboarding scopes, but if the user hasn't authed to the tenant recently, we
             // will be granted no scopes and the user will be required to re-auth
-            let scopes = allowed_user_scopes(kinds, IdentifyScope::Onboarding, false);
+            let scopes = allowed_user_scopes(kinds, RequestedTokenScope::Onboarding, false);
 
             let args = CreateTokenArgs {
                 sv,
