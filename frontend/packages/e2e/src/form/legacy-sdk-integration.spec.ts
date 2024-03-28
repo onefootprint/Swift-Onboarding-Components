@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  createUser,
   decryptData,
   fillCardData,
   findMissingConfig,
@@ -25,7 +26,7 @@ test.describe('/components/form', () => {
   }) => {
     expect(missingConfig, missingConfig?.message).toBe(undefined);
     test.setTimeout(120000);
-    const fpUserId = 'fp_id_test_LY6hjzRiEQNCsObp4HnNM7'; // From prod acme inc.
+    const fpUserId = await createUser({ api: 'prod', request }); // From prod acme inc.
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
     await page.goto(

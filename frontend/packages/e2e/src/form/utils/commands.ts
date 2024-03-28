@@ -66,6 +66,26 @@ export const fillCardData = async ({
   await frame.getByLabel('Zip code').first().fill(data.zip);
 };
 
+export const createUser = async ({
+  api = 'dev',
+  request,
+}: {
+  api?: 'dev' | 'prod';
+  request: APIRequestContext;
+}) => {
+  const response = await request.post(
+    `${api === 'dev' ? API_BASE_URL_DEV : API_BASE_URL_PROD}/users`,
+    {
+      headers: {
+        'X-Footprint-Secret-Key':
+          api == 'dev' ? API_SECRET_KEY_DEV : API_SECRET_KEY_PROD,
+      },
+    },
+  );
+  const body = await response.json();
+  return body.id;
+};
+
 export const decryptData = async ({
   api = 'dev',
   request,

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { clickOn } from '../verify/utils/commands';
 import {
+  createUser,
   decryptData,
   fillCardData,
   findMissingConfig,
@@ -22,7 +23,7 @@ test.describe('/components/form', () => {
   test('form.errors #ci', async ({ browserName, page, request }) => {
     expect(missingConfig, missingConfig?.message).toBe(undefined);
     test.setTimeout(120000);
-    const fpUserId = 'fp_id_test_xeOIJs8bGpBVfeu1qma1QY';
+    const fpUserId = await createUser({ request });
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
     await page.goto(`/components/form?flow=${flowId}`);
     await page.waitForLoadState();

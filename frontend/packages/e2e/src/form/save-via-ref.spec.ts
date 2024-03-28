@@ -7,6 +7,7 @@ import {
   initializeForm,
   saveFormViaRef,
   waitForFormLoad,
+  createUser,
 } from './utils/commands';
 
 const name = 'Piip Penguin';
@@ -21,7 +22,7 @@ test.describe('/components/form', () => {
   test('form.save-via-ref #ci', async ({ browserName, page, request }) => {
     expect(missingConfig, missingConfig?.message).toBe(undefined);
     test.setTimeout(120000);
-    const fpUserId = 'fp_id_test_xeOIJs8bGpBVfeu1qma1QY';
+    const fpUserId = await createUser({ request });
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
     await page.goto(`/components/form?flow=${flowId}`);
     await page.waitForLoadState();
