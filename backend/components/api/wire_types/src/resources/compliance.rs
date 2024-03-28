@@ -23,7 +23,8 @@ pub struct ComplianceDocSummary {
     pub name: String,
     pub description: String,
     pub status: ComplianceDocStatus,
-    pub assigned_to: Option<LiteOrgMember>,
+    pub partner_tenant_assignee: Option<LiteOrgMember>,
+    pub tenant_assignee: Option<LiteOrgMember>,
     pub last_updated: Option<DateTime<Utc>>,
 
     pub active_request_id: Option<ComplianceDocRequestId>,
@@ -61,6 +62,5 @@ pub struct ComplianceDocRequest {
     pub name: String,
     pub description: String,
     pub requested_by_partner_tenant_user: LiteOrgMember,
-    pub assigned_to_tenant_user: Option<LiteOrgMember>,
     pub compliance_doc_id: ComplianceDocId,
 }

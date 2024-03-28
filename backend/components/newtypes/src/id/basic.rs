@@ -276,6 +276,11 @@ define_newtype_id!(
 );
 define_newtype_id!(ComplianceDocId, String, "Identifier for a compliance document");
 define_newtype_id!(
+    ComplianceDocAssignmentId,
+    String,
+    "Identifier for a compliance document assignment"
+);
+define_newtype_id!(
     ComplianceDocTemplateId,
     String,
     "Identifier for a compliance document template"

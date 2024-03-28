@@ -46,7 +46,6 @@ pub async fn post(
                 name: name.as_str(),
                 description: description.as_str(),
                 requested_by_partner_tenant_user_id: &requested_by_partner_tenant_user_id,
-                assigned_to_tenant_user_id: None,
                 compliance_doc_id: &document_id,
             }
             .create(conn, &doc)?;

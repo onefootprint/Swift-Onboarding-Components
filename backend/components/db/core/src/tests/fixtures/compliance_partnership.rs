@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::{
     models::{
         compliance_doc::NewComplianceDoc,
+        compliance_doc_assignment::NewComplianceDocAssignment,
         compliance_doc_request::NewComplianceDocRequest,
         compliance_doc_review::NewComplianceDocReview,
         compliance_doc_submission::NewComplianceDocSubmission,
@@ -18,7 +19,7 @@ use crate::{
 use chrono::Utc;
 use newtypes::{
     ComplianceDocData, ComplianceDocReviewDecision, OrgMemberEmail, PartnerTenantId, S3Url,
-    SealedVaultDataKey, TenantId,
+    SealedVaultDataKey, TenantId, TenantKind,
 };
 use std::iter::zip;
 
@@ -140,17 +141,26 @@ pub fn create_resources<'a>(
                 .create(conn)
                 .unwrap();
 
+                let assignment = NewComplianceDocAssignment {
+                    created_at: Utc::now(),
+                    compliance_doc_id: &doc.id,
+                    kind: TenantKind::Tenant,
+                    assigned_to_tenant_user_id: Some(&tenant_user.id),
+                    assigned_by_tenant_user_id: &tenant_user.id,
+                }
+                .create(conn, &doc)
+                .unwrap();
+
                 let req = NewComplianceDocRequest {
                     created_at: Utc::now(),
                     name: &tv.name,
                     description: &tv.description,
                     requested_by_partner_tenant_user_id: &pt_user.id,
-                    assigned_to_tenant_user_id: Some(&tenant_user.id),
                     compliance_doc_id: &doc.id,
                 }
                 .create(conn, &doc)
                 .unwrap();
-                requests.push((req, doc));
+                requests.push((req, assignment, doc));
             }
 
             // Create an ad-hoc request.
@@ -160,17 +170,25 @@ pub fn create_resources<'a>(
             }
             .create(conn)
             .unwrap();
+            let assignment = NewComplianceDocAssignment {
+                created_at: Utc::now(),
+                compliance_doc_id: &doc.id,
+                kind: TenantKind::Tenant,
+                assigned_to_tenant_user_id: Some(&tenant_user.id),
+                assigned_by_tenant_user_id: &tenant_user.id,
+            }
+            .create(conn, &doc)
+            .unwrap();
             let req = NewComplianceDocRequest {
                 created_at: Utc::now(),
                 name: "An ad-hoc request",
                 description: "This is an ad-hoc request",
                 requested_by_partner_tenant_user_id: &pt_user.id,
-                assigned_to_tenant_user_id: Some(&tenant_user.id),
                 compliance_doc_id: &doc.id,
             }
             .create(conn, &doc)
             .unwrap();
-            requests.push((req, doc));
+            requests.push((req, assignment, doc));
         }
 
         // For each partnership, there will be a document in each of the following four states:
@@ -184,7 +202,7 @@ pub fn create_resources<'a>(
         let subs: Vec<_> = requests
             .into_iter()
             .zip((0..=3).cycle())
-            .map(|((req, doc), i)| {
+            .map(|((req, assignment, doc), i)| {
                 if i == 3 {
                     return None;
                 }
@@ -193,8 +211,7 @@ pub fn create_resources<'a>(
                     created_at: Utc::now(),
 
                     request_id: &req.id,
-                    submitted_by_tenant_user_id: req.assigned_to_tenant_user_id.as_ref().unwrap(),
-                    assigned_to_partner_tenant_user_id: Some(&req.requested_by_partner_tenant_user_id),
+                    submitted_by_tenant_user_id: assignment.assigned_to_tenant_user_id.as_ref().unwrap(),
                     doc_data: &ComplianceDocData::SealedUpload {
                         s3_url: S3Url::from("the url".to_owned()),
                         e_data_key: SealedVaultDataKey(vec![]),

@@ -1,0 +1,34 @@
+use crate::util::impl_enum_str_diesel;
+use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use paperclip::actix::Apiv2Schema;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum_macros::{AsRefStr, Display, EnumString};
+
+#[derive(
+    Debug,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Hash,
+    Clone,
+    Copy,
+    Display,
+    DeserializeFromStr,
+    SerializeDisplay,
+    Apiv2Schema,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    AsRefStr,
+)]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum TenantKind {
+    // A Footprint tenant for vaulting, KYC, etc.
+    Tenant,
+    // A Compliance Partner of a Tenant.
+    PartnerTenant,
+}
+
+impl_enum_str_diesel!(TenantKind);

@@ -1,23 +1,23 @@
 use crate::{
     models::{
-        compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest,
-        compliance_doc_review::ComplianceDocReview, compliance_doc_submission::ComplianceDocSubmission,
-        partner_tenant::PartnerTenant, tenant::Tenant,
+        compliance_doc::ComplianceDoc, compliance_doc_assignment::ComplianceDocAssignment,
+        compliance_doc_request::ComplianceDocRequest, compliance_doc_review::ComplianceDocReview,
+        compliance_doc_submission::ComplianceDocSubmission, partner_tenant::PartnerTenant, tenant::Tenant,
         tenant_compliance_partnership::TenantCompliancePartnership, tenant_user::TenantUser,
     },
     DbError, DbResult, PgConn,
 };
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
-    compliance_doc, compliance_doc_request, compliance_doc_review, compliance_doc_submission, partner_tenant,
-    tenant, tenant_compliance_partnership,
+    compliance_doc, compliance_doc_assignment, compliance_doc_request, compliance_doc_review,
+    compliance_doc_submission, partner_tenant, tenant, tenant_compliance_partnership,
 };
 use diesel::prelude::*;
 use itertools::chain;
 use newtypes::{
-    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocReviewId,
-    ComplianceDocStatus, ComplianceDocSubmissionId, TenantCompliancePartnershipId,
-    OrgIdentifierRef, TenantUserId,
+    ComplianceDocAssignmentId, ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision,
+    ComplianceDocReviewId, ComplianceDocStatus, ComplianceDocSubmissionId, OrgIdentifierRef,
+    TenantCompliancePartnershipId, TenantKind, TenantUserId,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -30,7 +30,16 @@ pub struct ComplianceDocSummary {
     pub doc_requests: HashMap<ComplianceDocRequestId, ComplianceDocRequest>,
     pub doc_submissions: HashMap<ComplianceDocSubmissionId, ComplianceDocSubmission>,
     pub doc_reviews: HashMap<ComplianceDocReviewId, ComplianceDocReview>,
+    pub doc_assignments: HashMap<ComplianceDocAssignmentId, ComplianceDocAssignment>,
     pub users: HashMap<TenantUserId, TenantUser>,
+}
+
+pub struct ActiveDocResources<'a> {
+    pub request: Option<&'a ComplianceDocRequest>,
+    pub submission: Option<&'a ComplianceDocSubmission>,
+    pub review: Option<&'a ComplianceDocReview>,
+    pub partner_tenant_assignment: Option<&'a ComplianceDocAssignment>,
+    pub tenant_assignment: Option<&'a ComplianceDocAssignment>,
 }
 
 impl ComplianceDocSummary {
@@ -91,18 +100,26 @@ impl ComplianceDocSummary {
                 .load(conn)?;
             let doc_reviews: HashMap<_, _> = doc_reviews.into_iter().map(|r| (r.id.clone(), r)).collect();
 
+            let doc_assignments: Vec<ComplianceDocAssignment> = compliance_doc_assignment::table
+                .filter(compliance_doc_assignment::compliance_doc_id.eq_any(docs.keys()))
+                .select(ComplianceDocAssignment::as_select())
+                .load(conn)?;
+            let doc_assignments: HashMap<_, _> =
+                doc_assignments.into_iter().map(|r| (r.id.clone(), r)).collect();
+
             let user_ids: HashSet<&TenantUserId> = chain!(
-                doc_requests.values().flat_map(|r| chain!(
-                    Some(&r.requested_by_partner_tenant_user_id),
-                    r.assigned_to_tenant_user_id.as_ref(),
-                )),
-                doc_submissions.values().flat_map(|s| chain!(
-                    Some(&s.submitted_by_tenant_user_id),
-                    s.assigned_to_partner_tenant_user_id.as_ref(),
-                )),
+                doc_requests
+                    .values()
+                    .map(|r| &r.requested_by_partner_tenant_user_id,),
+                doc_submissions.values().map(|s| &s.submitted_by_tenant_user_id,),
                 doc_reviews
                     .values()
                     .map(|r| &r.reviewed_by_partner_tenant_user_id),
+                doc_assignments
+                    .values()
+                    .flat_map(
+                        |a| chain!(&a.assigned_to_tenant_user_id, Some(&a.assigned_by_tenant_user_id),)
+                    ),
             )
             .collect();
             let users = TenantUser::get_bulk(conn, user_ids.into_iter().collect())?;
@@ -115,6 +132,7 @@ impl ComplianceDocSummary {
                 doc_requests,
                 doc_submissions,
                 doc_reviews,
+                doc_assignments,
                 users,
             };
             summaries.insert(summary.partnership.id.clone(), summary);
@@ -166,6 +184,28 @@ impl ComplianceDocSummary {
             .find(|r| r.deactivated_at.is_none())
     }
 
+    pub fn active_partner_tenant_assignment_for_doc(
+        &self,
+        doc_id: &ComplianceDocId,
+    ) -> Option<&ComplianceDocAssignment> {
+        self.doc_assignments
+            .values()
+            .filter(|a| a.compliance_doc_id == *doc_id)
+            .filter(|a| a.kind == TenantKind::PartnerTenant)
+            .find(|a| a.deactivated_at.is_none())
+    }
+
+    pub fn active_tenant_assignment_for_doc(
+        &self,
+        doc_id: &ComplianceDocId,
+    ) -> Option<&ComplianceDocAssignment> {
+        self.doc_assignments
+            .values()
+            .filter(|a| a.compliance_doc_id == *doc_id)
+            .filter(|a| a.kind == TenantKind::Tenant)
+            .find(|a| a.deactivated_at.is_none())
+    }
+
     pub fn num_controls_complete(&self) -> DbResult<i64> {
         let mut count = 0;
         for doc_id in self.docs.keys() {
@@ -188,22 +228,32 @@ impl ComplianceDocSummary {
         Ok(count)
     }
 
-    pub fn active_resources_for_doc(
-        &self,
+    pub fn active_resources_for_doc<'a>(
+        &'a self,
         doc_id: &ComplianceDocId,
-    ) -> DbResult<(
-        Option<&ComplianceDocRequest>,
-        Option<&ComplianceDocSubmission>,
-        Option<&ComplianceDocReview>,
-    )> {
-        let req = self.active_request_for_doc(doc_id);
-        let sub = req.and_then(|r| self.active_submission_for_request(&r.id));
-        let rev = sub.and_then(|s| self.active_review_for_submission(&s.id));
-        Ok((req, sub, rev))
+    ) -> DbResult<ActiveDocResources<'a>> {
+        let request = self.active_request_for_doc(doc_id);
+        let submission = request.and_then(|r| self.active_submission_for_request(&r.id));
+        let review = submission.and_then(|s| self.active_review_for_submission(&s.id));
+        let partner_tenant_assignment = self.active_partner_tenant_assignment_for_doc(doc_id);
+        let tenant_assignment = self.active_tenant_assignment_for_doc(doc_id);
+
+        Ok(ActiveDocResources {
+            request,
+            submission,
+            review,
+            partner_tenant_assignment,
+            tenant_assignment,
+        })
     }
 
     pub fn status_for_doc(&self, doc_id: &ComplianceDocId) -> DbResult<ComplianceDocStatus> {
-        let (request, submission, review) = self.active_resources_for_doc(doc_id)?;
+        let ActiveDocResources {
+            request,
+            submission,
+            review,
+            ..
+        } = self.active_resources_for_doc(doc_id)?;
 
         if request.is_none() {
             return Ok(ComplianceDocStatus::NotRequested);
@@ -225,17 +275,22 @@ impl ComplianceDocSummary {
 
     pub fn last_updated(&self, doc_id: &ComplianceDocId) -> DbResult<Option<DateTime<Utc>>> {
         let newest_req = self.newest_request_for_doc(doc_id)?;
-        let (req, sub, rev) = self.active_resources_for_doc(doc_id)?;
+        let ActiveDocResources {
+            request,
+            submission,
+            review,
+            ..
+        } = self.active_resources_for_doc(doc_id)?;
 
         let dates = [
             Some(newest_req.created_at),
             newest_req.deactivated_at,
-            req.map(|r| r.created_at),
-            req.and_then(|r| r.deactivated_at),
-            sub.map(|s| s.created_at),
-            sub.and_then(|s| s.deactivated_at),
-            rev.map(|r| r.created_at),
-            rev.and_then(|r| r.deactivated_at),
+            request.map(|r| r.created_at),
+            request.and_then(|r| r.deactivated_at),
+            submission.map(|s| s.created_at),
+            submission.and_then(|s| s.deactivated_at),
+            review.map(|r| r.created_at),
+            review.and_then(|r| r.deactivated_at),
         ];
 
         Ok(dates.iter().flatten().max().copied())

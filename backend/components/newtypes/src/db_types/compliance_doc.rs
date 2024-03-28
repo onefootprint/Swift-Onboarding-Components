@@ -4,7 +4,7 @@ use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use serde_json;
-use serde_with::SerializeDisplay;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, Display, EnumString};
 
 #[derive(
@@ -16,14 +16,15 @@ use strum_macros::{AsRefStr, Display, EnumString};
     Hash,
     Clone,
     Copy,
-    Deserialize,
     Display,
+    DeserializeFromStr,
     SerializeDisplay,
     Apiv2Schema,
     AsExpression,
     FromSqlRow,
     EnumString,
     AsRefStr,
+    macros::SerdeAttr,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
@@ -46,7 +47,18 @@ pub enum ComplianceDocData {
     },
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Apiv2Schema, Display, SerializeDisplay, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Eq,
+    PartialEq,
+    Apiv2Schema,
+    Display,
+    SerializeDisplay,
+    DeserializeFromStr,
+    EnumString,
+    macros::SerdeAttr,
+)]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum ComplianceDocStatus {

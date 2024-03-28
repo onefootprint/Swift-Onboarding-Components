@@ -64,7 +64,6 @@ pub async fn post(
                 created_at: Utc::now(),
                 request_id: &active_req.id,
                 submitted_by_tenant_user_id: &submitted_by_tenant_user_id,
-                assigned_to_partner_tenant_user_id: None,
                 doc_data: &doc_data,
             }
             .create(conn, &doc)?;

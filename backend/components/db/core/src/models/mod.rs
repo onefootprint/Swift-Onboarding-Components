@@ -8,6 +8,7 @@ pub mod billing_event;
 pub mod billing_profile;
 pub mod business_owner;
 pub mod compliance_doc;
+pub mod compliance_doc_assignment;
 pub mod compliance_doc_request;
 pub mod compliance_doc_review;
 pub mod compliance_doc_submission;

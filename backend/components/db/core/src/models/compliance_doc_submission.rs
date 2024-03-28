@@ -17,7 +17,6 @@ pub struct ComplianceDocSubmission {
 
     pub request_id: ComplianceDocRequestId,
     pub submitted_by_tenant_user_id: TenantUserId,
-    pub assigned_to_partner_tenant_user_id: Option<TenantUserId>,
     pub doc_data: ComplianceDocData,
 
     pub deactivated_at: Option<DateTime<Utc>>,
@@ -30,7 +29,6 @@ pub struct NewComplianceDocSubmission<'a> {
 
     pub request_id: &'a ComplianceDocRequestId,
     pub submitted_by_tenant_user_id: &'a TenantUserId,
-    pub assigned_to_partner_tenant_user_id: Option<&'a TenantUserId>,
     pub doc_data: &'a ComplianceDocData,
 }
 

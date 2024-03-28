@@ -83,7 +83,6 @@ pub async fn post(
                     name: active_req.name.as_str(),
                     description: active_req.description.as_str(),
                     requested_by_partner_tenant_user_id: &tenant_user_id,
-                    assigned_to_tenant_user_id: active_req.assigned_to_tenant_user_id.as_ref(),
                     compliance_doc_id: &document_id,
                 }
                 .create(conn, &doc)?;

@@ -7545,7 +7545,20 @@
                     "active_submission_id": {
                         "type": "string"
                     },
-                    "assigned_to": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "last_updated": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "partner_tenant_assignee": {
                         "description": "Limited information about member of organization\n\n Intended to be non-sensitive information only, that may be shared between tenants/partner\n tenants.",
                         "type": "object",
                         "properties": {
@@ -7563,19 +7576,6 @@
                             "id"
                         ]
                     },
-                    "description": {
-                        "type": "string"
-                    },
-                    "id": {
-                        "type": "string"
-                    },
-                    "last_updated": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
                     "status": {
                         "type": "string",
                         "enum": [
@@ -7588,6 +7588,24 @@
                     },
                     "template_id": {
                         "type": "string"
+                    },
+                    "tenant_assignee": {
+                        "description": "Limited information about member of organization\n\n Intended to be non-sensitive information only, that may be shared between tenants/partner\n tenants.",
+                        "type": "object",
+                        "properties": {
+                            "first_name": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "last_name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id"
+                        ]
                     }
                 },
                 "required": [

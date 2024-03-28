@@ -181,6 +181,22 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    compliance_doc_assignment (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        compliance_doc_id -> Text,
+        kind -> Text,
+        assigned_to_tenant_user_id -> Nullable<Text>,
+        assigned_by_tenant_user_id -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     compliance_doc_request (id) {
         id -> Text,
         created_at -> Timestamptz,
@@ -190,7 +206,6 @@ diesel::table! {
         name -> Text,
         description -> Text,
         requested_by_partner_tenant_user_id -> Text,
-        assigned_to_tenant_user_id -> Nullable<Text>,
         compliance_doc_id -> Text,
         deactivated_by_partner_tenant_user_id -> Nullable<Text>,
     }
@@ -222,7 +237,6 @@ diesel::table! {
         _updated_at -> Timestamptz,
         request_id -> Text,
         submitted_by_tenant_user_id -> Text,
-        assigned_to_partner_tenant_user_id -> Nullable<Text>,
         doc_data -> Jsonb,
         deactivated_at -> Nullable<Timestamptz>,
     }
@@ -1503,10 +1517,12 @@ diesel::joinable!(billing_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(billing_profile -> tenant (tenant_id));
 diesel::joinable!(compliance_doc -> compliance_doc_template (template_id));
 diesel::joinable!(compliance_doc -> tenant_compliance_partnership (tenant_compliance_partnership_id));
+diesel::joinable!(compliance_doc_assignment -> compliance_doc (compliance_doc_id));
 diesel::joinable!(compliance_doc_request -> compliance_doc (compliance_doc_id));
 diesel::joinable!(compliance_doc_review -> compliance_doc_submission (submission_id));
 diesel::joinable!(compliance_doc_review -> tenant_user (reviewed_by_partner_tenant_user_id));
 diesel::joinable!(compliance_doc_submission -> compliance_doc_request (request_id));
+diesel::joinable!(compliance_doc_submission -> tenant_user (submitted_by_tenant_user_id));
 diesel::joinable!(compliance_doc_template -> partner_tenant (partner_tenant_id));
 diesel::joinable!(compliance_doc_template_version -> compliance_doc_template (template_id));
 diesel::joinable!(compliance_doc_template_version -> tenant_user (created_by_partner_tenant_user_id));
@@ -1620,6 +1636,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     billing_profile,
     business_owner,
     compliance_doc,
+    compliance_doc_assignment,
     compliance_doc_request,
     compliance_doc_review,
     compliance_doc_submission,
