@@ -15,6 +15,7 @@ export type MachineContext = {
   showLogo?: boolean;
   l10n?: L10n;
   idvCompletePayload?: IdvCompletePayload;
+  isComponentsSdk?: boolean;
 };
 
 export type MachineEvents =
@@ -28,6 +29,7 @@ export type MachineEvents =
         l10n?: L10n;
         authToken?: string;
         publicKey?: string;
+        isComponentsSdk?: boolean;
       };
     }
   | { type: 'configRequestFailed' }

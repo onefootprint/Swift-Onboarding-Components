@@ -65,6 +65,7 @@ export const createBifrostMachine = () =>
             showLogo,
             authToken,
             publicKey,
+            isComponentsSdk,
           } = event.payload;
 
           context.config = isUndefined(config) ? context.config : config;
@@ -89,6 +90,10 @@ export const createBifrostMachine = () =>
           context.publicKey = isUndefined(publicKey)
             ? context.publicKey
             : publicKey;
+
+          context.isComponentsSdk = isUndefined(isComponentsSdk)
+            ? context.isComponentsSdk
+            : isComponentsSdk;
 
           return context;
         }),

@@ -17,6 +17,7 @@ export type IdvMachineArgs = {
   obConfigAuth?: ObConfigAuth;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
+  isComponentsSdk?: boolean;
   device?: DeviceInfo;
   idDocOutcome?: IdDocOutcome;
   showLogo?: boolean;

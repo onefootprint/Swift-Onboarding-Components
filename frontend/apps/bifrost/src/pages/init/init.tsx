@@ -125,6 +125,7 @@ const Init = ({ fpProvider }: InitProps) => {
         l10n = {},
         authToken = '',
         publicKey = '',
+        isComponentsSdk = false,
       } = props;
       const { showCompletionPage = false, showLogo = false } = options || {};
       send({
@@ -136,6 +137,7 @@ const Init = ({ fpProvider }: InitProps) => {
           l10n,
           authToken,
           publicKey,
+          isComponentsSdk,
         },
       });
     },

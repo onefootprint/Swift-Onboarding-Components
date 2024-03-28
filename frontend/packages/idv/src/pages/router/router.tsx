@@ -37,6 +37,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     authToken,
     bootstrapData,
     isTransfer,
+    isComponentsSdk,
     showLogo,
     validationToken,
     obConfigAuth,
@@ -150,6 +151,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
           authToken={authToken}
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
+          isComponentsSdk={isComponentsSdk}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onClose={onClose}

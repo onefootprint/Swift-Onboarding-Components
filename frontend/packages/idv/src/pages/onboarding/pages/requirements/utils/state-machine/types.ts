@@ -14,6 +14,7 @@ export type MachineContext = {
     device: DeviceInfo;
     authToken: string;
     isTransfer?: boolean;
+    isComponentsSdk?: boolean;
     bootstrapData?: IdvBootstrapData;
     idDocOutcome?: IdDocOutcome;
     overallOutcome?: OverallOutcome;

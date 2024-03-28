@@ -19,6 +19,7 @@ export type OnboardingRequirementsMachineArgs = {
   authToken: string;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
+  isComponentsSdk?: boolean;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
   isTransferOnDesktopDisabled?: boolean;
@@ -30,6 +31,7 @@ const createOnboardingRequirementsMachine = ({
   authToken,
   bootstrapData,
   isTransfer,
+  isComponentsSdk,
   idDocOutcome,
   overallOutcome,
   isTransferOnDesktopDisabled,
@@ -51,6 +53,7 @@ const createOnboardingRequirementsMachine = ({
           device,
           authToken,
           isTransfer,
+          isComponentsSdk,
           bootstrapData,
           idDocOutcome,
           overallOutcome,

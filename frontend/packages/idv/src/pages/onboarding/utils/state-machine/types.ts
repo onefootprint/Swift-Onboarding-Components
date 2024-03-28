@@ -13,6 +13,7 @@ export type MachineContext = {
   authToken: string;
   bootstrapData: IdDIData; // TODO: generalize this more in the next iteration
   isTransfer?: boolean;
+  isComponentsSdk?: boolean;
   validationToken?: string;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;

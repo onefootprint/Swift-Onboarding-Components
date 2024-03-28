@@ -25,6 +25,7 @@ export type MachineContext = {
   authToken?: string;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
+  isComponentsSdk?: boolean;
   obConfigAuth?: ObConfigAuth;
   validationToken?: string;
   showLogo?: boolean;

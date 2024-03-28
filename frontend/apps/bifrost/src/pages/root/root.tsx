@@ -1,6 +1,6 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { useObserveCollector } from '@onefootprint/dev-tools';
-import type { FootprintVariant } from '@onefootprint/footprint-js';
+import { type FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import type { IdvCompletePayload } from '@onefootprint/idv';
 import Idv, {
@@ -39,6 +39,7 @@ const Root = ({ variant }: RootProps) => {
     showLogo,
     authToken,
     publicKey,
+    isComponentsSdk,
   } = state.context;
   const obConfigAuth = publicKey
     ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey }
@@ -120,6 +121,7 @@ const Root = ({ variant }: RootProps) => {
             onClose={handleClose}
             onIdentifyDone={handleIdentifyCompletion}
             showLogo={showLogo}
+            isComponentsSdk={isComponentsSdk}
             l10n={l10n}
           />
         )}

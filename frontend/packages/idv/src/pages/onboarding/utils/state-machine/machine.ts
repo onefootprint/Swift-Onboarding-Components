@@ -17,6 +17,7 @@ export type OnboardingMachineArgs = {
   authToken: string;
   bootstrapData?: IdDIData; // TODO: generalize this more in the next iteration
   isTransfer?: boolean;
+  isComponentsSdk?: boolean;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
   onClose?: () => void;
@@ -29,6 +30,7 @@ const createOnboardingMachine = (
     authToken,
     bootstrapData = {},
     isTransfer,
+    isComponentsSdk,
     idDocOutcome,
     overallOutcome,
     onClose,
@@ -52,6 +54,7 @@ const createOnboardingMachine = (
         authToken,
         bootstrapData: validateBootstrapData(bootstrapData, l10n?.locale),
         isTransfer,
+        isComponentsSdk,
         idDocOutcome,
         overallOutcome,
         onClose,
