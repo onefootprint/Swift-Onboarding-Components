@@ -1,3 +1,9 @@
+use self::{challenge::ChallengeError, error_with_code::ErrorWithCode, handoff::HandoffError};
+use crate::{
+    decision::vendor::{middesk, VendorAPIError},
+    types::error::{ApiResponseError, FpResponseErrorInfo},
+    utils::body_bytes::InvalidBodyError,
+};
 use actix_web::{
     error::{JsonPayloadError, QueryPayloadError, UrlencodedError},
     http::StatusCode,
@@ -10,7 +16,9 @@ use newtypes::{output::Csv, ContactInfoKind, DataIdentifier, ErrorMessage, Filte
 use paperclip::actix::api_v2_errors;
 use strum::EnumMessage;
 use thiserror::Error;
+use twilio::error::Error as TwilioError;
 use webauthn_rs_core::error::WebauthnError;
+
 pub mod business;
 pub mod challenge;
 pub mod cip_error;
@@ -28,15 +36,6 @@ pub mod workos;
 pub use utils::*;
 mod dry_run;
 pub use dry_run::*;
-
-use crate::{
-    decision::vendor::{middesk, VendorAPIError},
-    types::error::{ApiResponseError, FpResponseErrorInfo},
-    utils::body_bytes::InvalidBodyError,
-};
-use twilio::error::Error as TwilioError;
-
-use self::{challenge::ChallengeError, error_with_code::ErrorWithCode, handoff::HandoffError};
 
 pub type ApiResult<T> = Result<T, ApiError>;
 
