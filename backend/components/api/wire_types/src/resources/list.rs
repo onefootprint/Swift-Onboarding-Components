@@ -11,7 +11,6 @@ pub struct List {
     pub kind: ListKind,
     pub created_at: DateTime<Utc>,
     pub actor: DbActor,
-    pub used_in_playbook: bool,
     pub playbooks: Vec<ListPlaybookUsage>,
     pub entries_count: usize,
 }
@@ -29,5 +28,6 @@ pub struct ListEntry {
 pub struct ListPlaybookUsage {
     pub id: ObConfigurationId,
     pub key: ObConfigurationKey,
+    pub name: String,
     pub rules: Vec<Rule>,
 }

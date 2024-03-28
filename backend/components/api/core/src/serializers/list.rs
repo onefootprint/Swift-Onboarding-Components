@@ -24,10 +24,10 @@ impl DbToApi<ListInfo> for api_wire_types::List {
             .map(|(obc, rules)| ListPlaybookUsage {
                 id: obc.id,
                 key: obc.key,
+                name: obc.name,
                 rules: rules.into_iter().map(api_wire_types::Rule::from_db).collect(),
             })
             .collect();
-        let used_in_playbook = !playbooks.is_empty();
 
         Self {
             id,
@@ -38,7 +38,6 @@ impl DbToApi<ListInfo> for api_wire_types::List {
             actor,
             entries_count,
             playbooks,
-            used_in_playbook,
         }
     }
 }

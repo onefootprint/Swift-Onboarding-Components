@@ -24,7 +24,7 @@ def test_create(sandbox_tenant):
     assert list["kind"] == "email_domain"
     assert list["actor"]["kind"] == "tenant_user"
     assert list["entries_count"] == 0
-    assert list["used_in_playbook"] == False
+    assert len(list["playbooks"]) == 0
 
     # Trying to use a name that already exists fails
     post(
@@ -145,18 +145,15 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
 
     lists = get(f"/org/lists", None, *sandbox_tenant.db_auths)
     assert lists[0]["name"] == f"My Super List 3 {nonce}"
-    assert lists[0]["used_in_playbook"] == True
     assert lists[1]["name"] == f"My Super List 2 {nonce}"
-    assert lists[1]["used_in_playbook"] == True
     assert lists[2]["name"] == f"My Super List 1 {nonce}"
-    assert lists[2]["used_in_playbook"] == False
 
     list = get(f"/org/lists/{lists[0]['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 3 {nonce}"
     assert list["entries_count"] == 2
-    assert list["used_in_playbook"] == True
     assert len(list["playbooks"]) == 1
     assert list["playbooks"][0]["id"] == obc2.id
+    assert list["playbooks"][0]["name"] == obc2.name
     assert len(list["playbooks"][0]["rules"]) == 1
     assert list["playbooks"][0]["rules"][0]["rule_expression"] == [
         {
@@ -169,10 +166,10 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     list = get(f"/org/lists/{lists[1]['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 2 {nonce}"
     assert list["entries_count"] == 3
-    assert list["used_in_playbook"] == True
     assert len(list["playbooks"]) == 2
 
     assert list["playbooks"][0]["id"] == obc2.id
+    assert list["playbooks"][0]["name"] == obc2.name
     assert len(list["playbooks"][0]["rules"]) == 1
     assert list["playbooks"][0]["rules"][0]["action"] == "fail"
     assert list["playbooks"][0]["rules"][0]["rule_expression"] == [
@@ -180,6 +177,7 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     ]
 
     assert list["playbooks"][1]["id"] == obc1.id
+    assert list["playbooks"][1]["name"] == obc1.name
     assert len(list["playbooks"][1]["rules"]) == 1
     assert list["playbooks"][1]["rules"][0]["action"] == "manual_review"
     assert list["playbooks"][1]["rules"][0]["rule_expression"] == [
@@ -189,7 +187,6 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     list = get(f"/org/lists/{lists[2]['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 1 {nonce}"
     assert list["entries_count"] == 0
-    assert list["used_in_playbook"] == False
     assert len(list["playbooks"]) == 0
 
 
