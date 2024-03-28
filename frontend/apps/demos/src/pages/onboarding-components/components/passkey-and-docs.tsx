@@ -1,17 +1,13 @@
 import { useFootprint } from '@onefootprint/components';
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PasskeysAndDocs = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
-
-  useEffect(() => {
-    fp.handoff({
-      onSuccess: validationToken => {
-        alert(validationToken);
-        onDone();
-      },
-    });
-  }, []);
+  useEffectOnce(() => {
+    fp.handoff();
+  });
 
   return (
     <div>

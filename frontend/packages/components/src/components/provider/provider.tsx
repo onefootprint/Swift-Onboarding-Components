@@ -1,3 +1,4 @@
+import type { Component } from '@onefootprint/footprint-js/src/types/components';
 import type {
   OnboardingRequirement,
   PublicOnboardingConfig,
@@ -12,7 +13,7 @@ import configureI18n from '../../config/initializers/i18next';
 
 configureI18n();
 
-type ContextData = {
+export type ContextData = {
   authToken?: string;
   missingRequirements: OnboardingRequirement[];
   onboardingConfig: PublicOnboardingConfig | null;
@@ -23,6 +24,7 @@ type ContextData = {
   sandboxId?: string;
   signupChallenge: SignupChallengeResponse | null;
   userData?: UserData;
+  fpInstance: Component | null;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -34,6 +36,7 @@ const Context = createContext<[ContextData, UpdateContext]>([
     publicKey: '',
     signupChallenge: null,
     userData: {},
+    fpInstance: null,
   },
   () => {},
 ]);
@@ -71,6 +74,7 @@ const Provider = ({
     sandboxId,
     signupChallenge: null,
     userData,
+    fpInstance: null,
   });
 
   const value = useMemo<[ContextData, UpdateContext]>(

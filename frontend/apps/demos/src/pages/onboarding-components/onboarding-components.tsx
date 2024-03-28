@@ -3,16 +3,13 @@ import React, { useState } from 'react';
 
 import CollectData from './components/collect-data';
 import Identify from './components/identify';
-import Otp from './components/otp';
-import PasskeysAndDocs from './components/passkeys-and-docs';
+import PasskeysAndDocs from './components/passkey-and-docs';
 
 const Demo = () => {
   const [step, setStep] = useState({
     identification: true,
-    otp: false,
     data: false,
     passkeysAndDocs: false,
-    process: false,
     success: false,
   });
 
@@ -23,21 +20,6 @@ const Demo = () => {
           setStep(prev => ({
             ...prev,
             identification: false,
-            otp: true,
-          }));
-        }}
-      />
-    );
-  }
-
-  if (step.otp) {
-    return (
-      <Otp
-        onDone={() => {
-          console.log('done!');
-          setStep(prev => ({
-            ...prev,
-            otp: false,
             data: true,
           }));
         }}
@@ -60,7 +42,17 @@ const Demo = () => {
   }
 
   if (step.passkeysAndDocs) {
-    return <PasskeysAndDocs onDone={() => {}} />;
+    return (
+      <PasskeysAndDocs
+        onDone={() => {
+          setStep(prev => ({
+            ...prev,
+            passkeysAndDocs: false,
+            success: true,
+          }));
+        }}
+      />
+    );
   }
 
   return null;
@@ -68,7 +60,7 @@ const Demo = () => {
 
 const DemoWithProvider = () => (
   <Provider
-    publicKey="pb_test_cE5s4US9KsFYVveetNnVFy"
+    publicKey="pb_test_GjMHPDNuDS4QIw7GEdfgl7"
     sandboxId={Math.random().toString(36).substring(7)}
   >
     <Demo />

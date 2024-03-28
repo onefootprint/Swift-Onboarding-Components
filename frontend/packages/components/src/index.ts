@@ -25,7 +25,6 @@ export type { LastNameInputProps } from './components/last-name-input';
 export { default as LastNameInput } from './components/last-name-input';
 export type { MiddleNameInputProps } from './components/middle-name-input';
 export { default as MiddleNameInput } from './components/middle-name-input';
-export { default as OtpVerification } from './components/otp';
 export type { PhoneInputProps } from './components/phone-input';
 export { default as PhoneInput } from './components/phone-input';
 export { default as Provider } from './components/provider';

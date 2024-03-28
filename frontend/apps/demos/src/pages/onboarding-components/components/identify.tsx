@@ -6,15 +6,12 @@ import {
 } from '@onefootprint/components';
 import React from 'react';
 
-import useRequest from '../hooks/use-request';
 import s from '../onboarding-components.module.css';
 
 const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
-  const identifyMutation = useRequest(fp.identifyAndAuthenticate);
-
   const handleSubmit = async () => {
-    identifyMutation.mutate({ onSuccess: onDone });
+    fp.launchIdentify(onDone);
   };
 
   return (
@@ -24,9 +21,7 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
         <Form onSubmit={handleSubmit} className={s.form}>
           <EmailInput name="email" />
           <PhoneInput name="phone" />
-          <button type="submit">
-            {identifyMutation.loading ? 'Loading...' : 'Submit'}
-          </button>
+          <button type="submit">Submit</button>
         </Form>
       </fieldset>
     </div>

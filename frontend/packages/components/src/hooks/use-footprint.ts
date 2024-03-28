@@ -1,4 +1,4 @@
-import { dateToIso8601, isEmail, isPhoneNumber } from '@onefootprint/core';
+import { dateToIso8601 } from '@onefootprint/core';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -6,10 +6,8 @@ import { useFormContext } from 'react-hook-form';
 import type { FormData, UserData } from '../@types';
 import { Context } from '../components/provider';
 import getOnboardingStatusReq from '../queries/get-onboarding-status';
-import identifyAndStartReq from '../queries/identify-and-start';
 import identifyReq from '../queries/identify-user';
 import saveReq from '../queries/save';
-import createSignupChallenge from '../queries/signup';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
@@ -46,32 +44,34 @@ export const useFootprint = () => {
     return response;
   };
 
-  const identifyAndAuthenticate = async () => {
-    const identifyRes = await identify();
-
-    // TODO: do sign-in
-    if (!identifyRes.user) {
-      const payload = {
-        email: form.getValues('email'),
-        phoneNumber: form.getValues('phoneNumber'),
-        scope: 'onboarding',
-        sandboxId: context.sandboxId,
-        obConfigAuth: context.publicKey,
-      };
-      const response = await createSignupChallenge(payload);
-      setContext(prev => ({
-        ...prev,
-        signupChallenge: response,
-      }));
-      return response;
-    }
-    return null;
-  };
-
-  const canInitiateOtpValidation = () => {
-    const email = form.getValues('email') || '';
-    const phoneNumber = form.getValues('phoneNumber') || '';
-    return isEmail(email) || isPhoneNumber(phoneNumber);
+  const launchIdentify = (onDone: () => void) => {
+    const fp = footprint.init({
+      publicKey: context.publicKey,
+      userData: {
+        'id.phone_number': form.getValues('phoneNumber'),
+        'id.email': form.getValues('email'),
+      },
+      kind: FootprintComponentKind.Components,
+      onRelayToComponents: (authToken: string) => {
+        setContext(prev => ({ ...prev, authToken }));
+        onDone();
+      },
+      onCancel: () => {
+        console.error('onCancel');
+      },
+      onComplete: (validationToken: string) => {
+        // eslint-disable-next-line no-alert
+        alert(validationToken);
+      },
+      onError: (error: unknown) => {
+        console.error('onError', error);
+      },
+    });
+    setContext({
+      ...context,
+      fpInstance: fp,
+    });
+    fp.render();
   };
 
   const getAuthToken = () => context.authToken;
@@ -94,29 +94,6 @@ export const useFootprint = () => {
     throw new Error('No authToken found');
   };
 
-  const identifyAndStart = async ({
-    token,
-    challengeResponse,
-    challengeToken,
-  }: {
-    challengeResponse: string;
-    challengeToken: string;
-    token: string;
-  }) => {
-    const response = await identifyAndStartReq({
-      challengeResponse,
-      challengeToken,
-      authToken: token,
-      scope: 'onboarding',
-    });
-    setContext(prev => ({
-      ...prev,
-      missingRequirements: response.missingRequirements,
-      onboardingConfig: response.onboardingConfig,
-      authToken: response.authToken,
-    }));
-  };
-
   const save = async () => {
     const { authToken } = context;
     if (!authToken) {
@@ -127,41 +104,18 @@ export const useFootprint = () => {
     await getMissingRequirements(authToken);
   };
 
-  const handoff = (handlers: {
-    onSuccess?: (validationToken: string) => void;
-    onError?: (error: unknown) => void;
-    onCancel?: () => void;
-  }) => {
-    if (!context.authToken) {
-      throw new Error('No authToken found');
+  const handoff = () => {
+    if (!context.fpInstance) {
+      throw new Error('No fpInstance found');
     }
-    const f = footprint.init({
-      authToken: context.authToken,
-      kind: FootprintComponentKind.Verify,
-      onCancel: () => {
-        handlers.onCancel?.();
-        context.onCancel?.();
-      },
-      onComplete: (validationToken: string) => {
-        handlers.onSuccess?.(validationToken);
-        context.onComplete?.(validationToken);
-      },
-      onError: (error: unknown) => {
-        handlers.onError?.(error);
-        context.onError?.(error);
-      },
-    });
-    f.render();
+    context.fpInstance.relayFromComponents?.();
   };
 
   const methods = {
-    canInitiateOtpValidation,
     getAuthToken,
-    getMissingRequirements,
     handoff,
     identify,
-    identifyAndAuthenticate,
-    identifyAndStart,
+    launchIdentify,
     save,
   };
 

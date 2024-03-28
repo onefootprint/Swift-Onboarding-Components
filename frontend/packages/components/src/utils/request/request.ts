@@ -1,9 +1,10 @@
 import { keysToCamelCase, keysToSnakeCase } from './utils/transform-data';
 
 const API_BASE_URL =
-  process.env.NODE_ENV === 'development'
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  (process.env.NODE_ENV === 'development'
     ? 'https://api.dev.onefootprint.com'
-    : 'https://api.onefootprint.com';
+    : 'https://api.onefootprint.com');
 
 type Options = Omit<RequestInit, 'headers'> & {
   baseURL?: string;
