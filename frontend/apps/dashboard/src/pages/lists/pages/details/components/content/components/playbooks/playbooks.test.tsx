@@ -5,6 +5,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser } from 'src/config/tests';
 
 import Playbooks from './playbooks';
 import {
@@ -20,6 +21,7 @@ describe('<Playbooks />', () => {
   const renderPlaybooks = () => customRender(<Playbooks />);
 
   beforeEach(() => {
+    asAdminUser();
     useRouterSpy({
       pathname: `/lists/${listId}`,
       query: { id: listId },

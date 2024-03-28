@@ -16,9 +16,10 @@ import useDeleteListEntry from './hooks/use-delete-list-entry';
 
 type EntryChipProps = {
   entry: ListEntry;
+  disabled?: boolean; // injected by the PermissionsGate
 };
 
-const EntryChip = ({ entry }: EntryChipProps) => {
+const EntryChip = ({ entry, disabled }: EntryChipProps) => {
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.entries',
   });
@@ -50,11 +51,15 @@ const EntryChip = ({ entry }: EntryChipProps) => {
     <Container>
       <Label>{data}</Label>
       {isDeleting ? (
-        <Close aria-label={`Deleting ${data}`}>
+        <Close aria-label={`Deleting ${data}`} data-disabled={disabled}>
           <AnimatedLoadingSpinner animationStart size={16} />
         </Close>
       ) : (
-        <Close aria-label={`Delete ${data}`} onClick={handleDelete}>
+        <Close
+          aria-label={`Delete ${data}`}
+          onClick={disabled ? undefined : handleDelete}
+          data-disabled={disabled}
+        >
           <IcoCloseSmall16 />
         </Close>
       )}
@@ -109,7 +114,7 @@ const Close = styled.button`
       background-color: ${theme.borderColor.tertiary};
     }
 
-    &:hover {
+    &:not([data-disabled='true']):hover {
       background-color: ${theme.backgroundColor.senary};
 
       svg {

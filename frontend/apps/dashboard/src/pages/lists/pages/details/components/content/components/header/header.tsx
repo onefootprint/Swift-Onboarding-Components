@@ -1,7 +1,9 @@
+import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Shimmer, Stack, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import PermissionGate from 'src/components/permission-gate';
 import useListDetails from 'src/pages/lists/pages/details/hooks/use-list-details';
 
 import Actions from './components/actions';
@@ -62,10 +64,20 @@ const Header = () => {
         </Stack>
       </Stack>
       <Stack align="center" gap={3}>
-        <Button variant="secondary" onClick={launchEditDialog}>
-          {t('edit')}
-        </Button>
-        <Actions />
+        <PermissionGate
+          fallbackText={t('cta-edit-not-allowed')}
+          scopeKind={RoleScopeKind.writeLists}
+        >
+          <Button variant="secondary" onClick={launchEditDialog}>
+            {t('edit')}
+          </Button>
+        </PermissionGate>
+        <PermissionGate
+          fallbackText={t('cta-delete-not-allowed')}
+          scopeKind={RoleScopeKind.writeLists}
+        >
+          <Actions />
+        </PermissionGate>
       </Stack>
       <EditDialog
         open={isEditDialogOpen}

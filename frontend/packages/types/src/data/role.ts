@@ -8,6 +8,7 @@ export enum RoleScopeKind {
   orgSettings = 'org_settings',
   manualReview = 'manual_review',
   writeEntities = 'write_entities',
+  writeLists = 'write_lists',
   invokeVaultProxy = 'invoke_vault_proxy',
   decryptAll = 'decrypt_all',
   decryptDocuments = 'decrypt_document_and_selfie',
@@ -43,6 +44,7 @@ export const supportedRoleKinds: Record<RoleScopeKind, RoleKind[]> = {
   [RoleScopeKind.manualReview]: [RoleKind.dashboardUser],
   [RoleScopeKind.onboardingConfiguration]: [RoleKind.dashboardUser],
   [RoleScopeKind.orgSettings]: [RoleKind.dashboardUser],
+  [RoleScopeKind.writeLists]: [RoleKind.dashboardUser],
 
   [RoleScopeKind.cipIntegration]: [RoleKind.apiKey],
   [RoleScopeKind.invokeVaultProxy]: [RoleKind.apiKey],

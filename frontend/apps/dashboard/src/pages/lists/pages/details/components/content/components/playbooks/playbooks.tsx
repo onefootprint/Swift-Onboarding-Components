@@ -33,7 +33,7 @@ const Playbooks = () => {
   return (
     <Stack gap={4} direction="column">
       <SectionTitle title={t('title', { alias: data.alias })} />
-      {data.playbooks.map(playbook => (
+      {data.playbooks?.map(playbook => (
         <Stack gap={3} direction="row" key={playbook.id}>
           <Stack gap={2} direction="column">
             <Text variant="label-2">{playbook.name}</Text>
@@ -72,7 +72,7 @@ const Playbooks = () => {
           </Stack>
         </Stack>
       ))}
-      {!data.playbooks.length && (
+      {!data.playbooks?.length && (
         <Text variant="body-3" color="tertiary">
           {t('empty')}
         </Text>

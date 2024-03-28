@@ -7,7 +7,11 @@ import styled, { css } from 'styled-components';
 
 import useDeleteList from './hooks/use-delete-list';
 
-const Actions = () => {
+type ActionsProps = {
+  disabled?: boolean; // injected by the PermissionsGate
+};
+
+const Actions = ({ disabled }: ActionsProps) => {
   const router = useRouter();
   const id = router.query.id as string;
   const { t } = useTranslation('lists', {
@@ -42,7 +46,7 @@ const Actions = () => {
 
   return (
     <Dropdown.Root>
-      <StyledTrigger $asButton aria-label={t('delete')}>
+      <StyledTrigger $asButton aria-label={t('delete')} disabled={disabled}>
         <IcoDotsHorizontal24 />
       </StyledTrigger>
       <Dropdown.Content align="end" sideOffset={8}>
@@ -60,10 +64,13 @@ const StyledTrigger = styled(Dropdown.Trigger)`
     return css`
       cursor: pointer;
       transition: all 0.2s;
-      box-shadow: ${button.variant.secondary.boxShadow};
 
-      &:hover {
-        box-shadow: ${button.variant.secondary.hover.boxShadow};
+      &:not([disabled]) {
+        box-shadow: ${button.variant.secondary.boxShadow};
+      }
+
+      &:not([disabled]):hover {
+        background-color: ${button.variant.secondary.hover.bg};
       }
     `;
   }}

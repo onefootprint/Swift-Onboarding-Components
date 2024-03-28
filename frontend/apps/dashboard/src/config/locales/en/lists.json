@@ -84,6 +84,8 @@
     "header": {
       "kind": "Match type:",
       "edit": "Edit name",
+      "cta-edit-not-allowed": "You're not allowed to edit lists",
+      "cta-delete-not-allowed": "You're not allowed to delete lists",
       "actions": {
         "delete": "Delete",
         "delete-confirmation": {
@@ -143,6 +145,8 @@
       "show-all": "Show all",
       "show-less": "Show fewer entries",
       "add": "Add entry",
+      "cta-not-allowed": "You're not allowed to add entries to this list",
+      "delete-not-allowed": "You're not allowed to delete entries",
       "empty": "No entries found",
       "add-entries-dialog": {
         "title": "New entries",

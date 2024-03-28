@@ -70,9 +70,14 @@ const Actions = ({ entity }: WithEntityProps) => {
             </Dropdown.Item>
           </PermissionGate>
           {/* TODO: uncomment when releasing lists */}
-          {/* <Dropdown.Item onSelect={handleOpenAddToListDialog}>
-            {t('add-to-list.label')}
-          </Dropdown.Item> */}
+          {/* <PermissionGate
+            scopeKind={RoleScopeKind.writeLists}
+            fallbackText={t('add-to-list.not-allowed')}
+          >
+            <Dropdown.Item onSelect={handleOpenAddToListDialog}>
+              {t('add-to-list.label')}
+            </Dropdown.Item>
+          </PermissionGate> */}
         </Dropdown.Content>
       </Dropdown.Root>
       <RetriggerKYCDialog

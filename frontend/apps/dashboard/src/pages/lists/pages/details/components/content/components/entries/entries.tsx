@@ -1,9 +1,10 @@
-import type { ListEntry } from '@onefootprint/types';
+import { type ListEntry, RoleScopeKind } from '@onefootprint/types';
 import { LinkButton, SearchInput, Stack, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Error } from 'src/components';
+import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
 import useListEntries from '@/lists/pages/details/hooks/use-list-entries';
@@ -66,7 +67,14 @@ const Entries = () => {
     <Stack gap={4} direction="column">
       <SectionTitle
         title={t('title')}
-        button={{ label: t('add'), onClick: handleAddEntry }}
+        button={{
+          label: t('add'),
+          onClick: handleAddEntry,
+          role: {
+            scopeKind: RoleScopeKind.writeLists,
+            fallbackText: t('cta-not-allowed'),
+          },
+        }}
       />
       {data && data.length > 0 ? (
         <>
@@ -78,7 +86,13 @@ const Entries = () => {
           />
           <EntriesContainer>
             {displayedEntries.map(entry => (
-              <EntryChip key={entry.id} entry={entry} />
+              <PermissionGate
+                key={entry.id}
+                scopeKind={RoleScopeKind.writeLists}
+                fallbackText={t('delete-not-allowed')}
+              >
+                <EntryChip key={entry.id} entry={entry} />
+              </PermissionGate>
             ))}
           </EntriesContainer>
         </>

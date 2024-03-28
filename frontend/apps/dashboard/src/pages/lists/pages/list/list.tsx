@@ -38,7 +38,8 @@ const List = () => {
         <Wrapper>
           <PermissionGate
             fallbackText={t('cta-not-allowed')}
-            scopeKind={RoleScopeKind.onboardingConfiguration}
+            scopeKind={RoleScopeKind.writeLists}
+            tooltipPosition="left"
           >
             <Button onClick={handleOpen}>{t('create-button')}</Button>
           </PermissionGate>

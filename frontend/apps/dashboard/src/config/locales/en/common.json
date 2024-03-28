@@ -1303,6 +1303,7 @@
           "label": "Add to list",
           "title": "Add to list",
           "description": "Add, edit, and remove lists from",
+          "not-allowed": "You're not allowed to add entries to lists",
           "lists": "Lists section",
           "decrypt-reason": "Decrypting user data to add to list",
           "form": {

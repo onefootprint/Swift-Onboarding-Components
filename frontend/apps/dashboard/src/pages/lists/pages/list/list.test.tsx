@@ -5,6 +5,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser } from 'src/config/tests';
 
 import List from './list';
 import { withLists, withListsError } from './list.test.config';
@@ -13,6 +14,7 @@ const useRouterSpy = createUseRouterSpy();
 
 describe('<List />', () => {
   beforeEach(() => {
+    asAdminUser();
     useRouterSpy({
       pathname: '/lists',
       query: {},

@@ -6,6 +6,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser } from 'src/config/tests';
 
 import type { EditDialogProps } from './edit-dialog';
 import EditDialog from './edit-dialog';
@@ -27,6 +28,7 @@ describe('<EditDialog />', () => {
     customRender(<EditDialog open onClose={onClose} onEdit={onEdit} />);
 
   beforeEach(() => {
+    asAdminUser();
     withListDetails(listId);
     useRouterSpy({
       pathname: `/lists/${listId}`,

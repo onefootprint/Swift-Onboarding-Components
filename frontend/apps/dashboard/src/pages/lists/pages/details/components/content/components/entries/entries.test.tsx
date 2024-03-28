@@ -6,6 +6,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser } from 'src/config/tests';
 
 import Entries from './entries';
 import {
@@ -25,6 +26,7 @@ describe('<Entries />', () => {
   const entryId = 'entry_1';
 
   beforeEach(() => {
+    asAdminUser();
     withListDetails(listId);
   });
 

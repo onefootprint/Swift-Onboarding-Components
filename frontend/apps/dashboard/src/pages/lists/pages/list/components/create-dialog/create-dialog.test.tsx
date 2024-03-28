@@ -6,6 +6,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import { asAdminUser } from 'src/config/tests';
 
 import type { CreateDialogProps } from './create-dialog';
 import CreateDialog from './create-dialog';
@@ -19,6 +20,7 @@ describe('<CreateDialog />', () => {
   };
 
   beforeEach(() => {
+    asAdminUser();
     withLists();
     withCreateList();
   });
