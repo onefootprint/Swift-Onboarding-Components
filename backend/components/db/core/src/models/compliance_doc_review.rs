@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn};
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_review;
 use diesel::prelude::*;
@@ -23,6 +23,8 @@ pub struct ComplianceDocReview {
 
     pub decision: ComplianceDocReviewDecision,
     pub note: String,
+
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -39,9 +41,44 @@ pub struct NewComplianceDocReview<'a> {
 
 impl<'a> NewComplianceDocReview<'a> {
     #[tracing::instrument("NewComplianceDocReview::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn, _lock: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocReview> {
+    pub fn create(self, conn: &mut TxnPgConn, lock: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocReview> {
+        // Deactivate existing review if one exists.
+        if let Some(prev_rev) = ComplianceDocReview::get_active(conn, self.submission_id, lock)? {
+            ComplianceDocReview::deactivate(conn, &prev_rev.id, lock)?;
+        }
+
         Ok(diesel::insert_into(compliance_doc_review::table)
             .values(self)
-            .get_result(conn)?)
+            .get_result(conn.conn())?)
+    }
+}
+
+
+impl ComplianceDocReview {
+    pub fn get_active(
+        conn: &mut TxnPgConn,
+        sub_id: &ComplianceDocSubmissionId,
+        _lock: &Locked<ComplianceDoc>,
+    ) -> DbResult<Option<ComplianceDocReview>> {
+        Ok(compliance_doc_review::table
+            .filter(compliance_doc_review::submission_id.eq(sub_id))
+            .filter(compliance_doc_review::deactivated_at.is_null())
+            .select(ComplianceDocReview::as_select())
+            .first(conn.conn())
+            .optional()?)
+    }
+
+    pub fn deactivate(
+        conn: &mut TxnPgConn,
+        rev_id: &ComplianceDocReviewId,
+        _lock: &Locked<ComplianceDoc>,
+    ) -> DbResult<()> {
+        diesel::update(compliance_doc_review::table)
+            .filter(compliance_doc_review::id.eq(rev_id))
+            .filter(compliance_doc_review::deactivated_at.is_null())
+            .set(compliance_doc_review::deactivated_at.eq(Some(Utc::now())))
+            .execute(conn.conn())?;
+
+        Ok(())
     }
 }

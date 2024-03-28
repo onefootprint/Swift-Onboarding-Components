@@ -1,9 +1,8 @@
 use crate::{types::JsonApiResponse, State};
 use api_core::{
     auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::ApiResult,
+    errors::{ApiResult, ValidationError},
     types::{EmptyResponse, ResponseData},
-    ApiError, ApiErrorKind,
 };
 use db::models::{
     compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest,
@@ -39,23 +38,23 @@ pub async fn delete(
 
             // Ensure the given request is the latest active request.
             let Some(req) = ComplianceDocRequest::get_active(conn, &doc)? else {
-                return Err(ApiError::from(ApiErrorKind::ValidationError(
-                    "Cannot retract this compliance document request since there are no active requests for this document".to_owned(),
-                )));
+                return ValidationError(
+                    "Cannot retract this compliance document request since there are no active requests for this document",
+                ).into();
             };
 
             if req.id != request_id {
-                return Err(ApiError::from(ApiErrorKind::ValidationError(
-                    "Cannot retract this compliance document request since there is a newer request for this document".to_owned(),
-                )));
+                return ValidationError(
+                    "Cannot retract this compliance document request since there is a newer request for this document",
+                ).into();
+
             }
 
             // Ensure there are no submissions for this request.
-            let sub_count = ComplianceDocSubmission::count_for_request(conn, &req, &doc)?;
-            if sub_count > 0 {
-                return Err(ApiError::from(ApiErrorKind::ValidationError(
-                    "Cannot retract a compliance document request with submissions".to_owned(),
-                )));
+            if ComplianceDocSubmission::get_active(conn, &request_id, &doc)?.is_some() {
+                return ValidationError(
+                    "Cannot retract a compliance document request with submissions",
+                ).into();
             }
 
             ComplianceDocRequest::deactivate(conn, &req.id, Some(&deactivated_by_user_id), &doc)?;

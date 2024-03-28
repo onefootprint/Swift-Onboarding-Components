@@ -7480,6 +7480,15 @@
             "ComplianceDocSummary": {
                 "type": "object",
                 "properties": {
+                    "active_request_id": {
+                        "type": "string"
+                    },
+                    "active_review_id": {
+                        "type": "string"
+                    },
+                    "active_submission_id": {
+                        "type": "string"
+                    },
                     "assigned_to": {
                         "description": "Limited information about member of organization\n\n Intended to be non-sensitive information only, that may be shared between tenants/partner\n tenants.",
                         "type": "object",
@@ -7507,15 +7516,6 @@
                     "last_updated": {
                         "type": "string",
                         "format": "date-time"
-                    },
-                    "latest_request_id": {
-                        "type": "string"
-                    },
-                    "latest_review_id": {
-                        "type": "string"
-                    },
-                    "latest_submission_id": {
-                        "type": "string"
                     },
                     "name": {
                         "type": "string"

@@ -79,7 +79,7 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["template_id"] is None
 
     # Delete the ad-hoc request.
-    req_id = doc["latest_request_id"]
+    req_id = doc["active_request_id"]
     delete(f"compliance/partners/{partnership_id}/requests/{req_id}", {}, *partner_tenant.db_auths)
 
     # The ad-hoc document should be in the "not_requested" state.
@@ -102,7 +102,7 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["status"] == "waiting_for_upload"
     assert doc["name"] == "edited ad-hoc name 2"
     assert doc["description"] == "edited ad-hoc description 2"
-    old_latest_request_id = doc["latest_request_id"]
+    old_active_request_id = doc["active_request_id"]
 
     # Request another re-upload of the ad-hoc document.
     doc_id = doc["id"]
@@ -112,28 +112,28 @@ def test_partner_document_flow(tenant, partner_tenant):
     }, *partner_tenant.db_auths)
     documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
-    latest_request_id = doc["latest_request_id"]
-    assert latest_request_id != old_latest_request_id
+    active_request_id = doc["active_request_id"]
+    assert active_request_id != old_active_request_id
 
     # We shouldn't be able to delete the old request.
-    resp = delete(f"compliance/partners/{partnership_id}/requests/{old_latest_request_id}", {}, *partner_tenant.db_auths, status_code=400)
+    resp = delete(f"compliance/partners/{partnership_id}/requests/{old_active_request_id}", {}, *partner_tenant.db_auths, status_code=400)
     assert resp["error"]["message"] == "Cannot retract this compliance document request since there is a newer request for this document"
 
     # We shouldn't be able to submit a document for the old request.
     doc_id = doc["id"]
     resp = post(f"org/partners/{partnership_id}/documents/{doc_id}/submissions", {
-        "request_id": old_latest_request_id,
+        "request_id": old_active_request_id,
         "url": "https://example.com",
     }, *tenant.db_auths, status_code=400)
     assert resp["error"]["message"] == "Cannot submit this compliance document since there is a newer request for this document"
 
     # We can delete the most recent requests.
-    delete(f"compliance/partners/{partnership_id}/requests/{latest_request_id}", {}, *partner_tenant.db_auths)
+    delete(f"compliance/partners/{partnership_id}/requests/{active_request_id}", {}, *partner_tenant.db_auths)
 
     # There should now be no requests for the ad-hoc document.
     documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
-    assert doc["latest_request_id"] is None
+    assert doc["active_request_id"] is None
 
     # Requesting a document from the same template yields an error.
     resp = post(f"compliance/partners/{partnership_id}/documents", {
@@ -145,7 +145,7 @@ def test_partner_document_flow(tenant, partner_tenant):
 
     # Submit an external URL for the template document.
     doc_id = template_doc["id"]
-    request_id = template_doc["latest_request_id"]
+    request_id = template_doc["active_request_id"]
     post(f"org/partners/{partnership_id}/documents/{doc_id}/submissions", {
         "request_id": request_id,
         "url": "https://example.com",

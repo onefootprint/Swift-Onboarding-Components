@@ -123,12 +123,11 @@ impl ComplianceDocSummary {
         Ok(summaries)
     }
 
-    pub fn newest_active_request_for_doc(&self, doc_id: &ComplianceDocId) -> Option<&ComplianceDocRequest> {
+    pub fn active_request_for_doc(&self, doc_id: &ComplianceDocId) -> Option<&ComplianceDocRequest> {
         self.doc_requests
             .values()
-            .filter(|r| r.deactivated_at.is_none())
             .filter(|r| r.compliance_doc_id == *doc_id)
-            .max_by_key(|r| r.created_at)
+            .find(|r| r.deactivated_at.is_none())
     }
 
     // The newest request may be deactivated.
@@ -147,24 +146,24 @@ impl ComplianceDocSummary {
         Ok(req)
     }
 
-    pub fn newest_submission_for_request(
+    pub fn active_submission_for_request(
         &self,
         request_id: &ComplianceDocRequestId,
     ) -> Option<&ComplianceDocSubmission> {
         self.doc_submissions
             .values()
             .filter(|s| s.request_id == *request_id)
-            .max_by_key(|s| s.created_at)
+            .find(|s| s.deactivated_at.is_none())
     }
 
-    pub fn newest_review_for_submission(
+    pub fn active_review_for_submission(
         &self,
         submission_id: &ComplianceDocSubmissionId,
     ) -> Option<&ComplianceDocReview> {
         self.doc_reviews
             .values()
             .filter(|r| r.submission_id == *submission_id)
-            .max_by_key(|r| r.created_at)
+            .find(|r| r.deactivated_at.is_none())
     }
 
     pub fn num_controls_complete(&self) -> DbResult<i64> {
@@ -189,7 +188,7 @@ impl ComplianceDocSummary {
         Ok(count)
     }
 
-    pub fn newest_active_resources_for_doc(
+    pub fn active_resources_for_doc(
         &self,
         doc_id: &ComplianceDocId,
     ) -> DbResult<(
@@ -197,43 +196,46 @@ impl ComplianceDocSummary {
         Option<&ComplianceDocSubmission>,
         Option<&ComplianceDocReview>,
     )> {
-        let req = self.newest_active_request_for_doc(doc_id);
-        let sub = req.and_then(|r| self.newest_submission_for_request(&r.id));
-        let rev = sub.and_then(|s| self.newest_review_for_submission(&s.id));
+        let req = self.active_request_for_doc(doc_id);
+        let sub = req.and_then(|r| self.active_submission_for_request(&r.id));
+        let rev = sub.and_then(|s| self.active_review_for_submission(&s.id));
         Ok((req, sub, rev))
     }
 
     pub fn status_for_doc(&self, doc_id: &ComplianceDocId) -> DbResult<ComplianceDocStatus> {
-        let (request, submission, review) = self.newest_active_resources_for_doc(doc_id)?;
+        let (request, submission, review) = self.active_resources_for_doc(doc_id)?;
 
         if request.is_none() {
             return Ok(ComplianceDocStatus::NotRequested);
         }
 
-        let status = if submission.is_some() {
-            if let Some(review) = review {
-                match review.decision {
-                    ComplianceDocReviewDecision::Accepted => ComplianceDocStatus::Accepted,
-                    ComplianceDocReviewDecision::Rejected => ComplianceDocStatus::Rejected,
-                }
-            } else {
-                ComplianceDocStatus::WaitingForReview
-            }
-        } else {
-            ComplianceDocStatus::WaitingForUpload
+        if submission.is_none() {
+            return Ok(ComplianceDocStatus::WaitingForUpload);
+        }
+
+        let Some(review) = review else {
+            return Ok(ComplianceDocStatus::WaitingForReview);
         };
 
-        Ok(status)
+        Ok(match review.decision {
+            ComplianceDocReviewDecision::Accepted => ComplianceDocStatus::Accepted,
+            ComplianceDocReviewDecision::Rejected => ComplianceDocStatus::Rejected,
+        })
     }
 
     pub fn last_updated(&self, doc_id: &ComplianceDocId) -> DbResult<Option<DateTime<Utc>>> {
-        let (req, sub, rev) = self.newest_active_resources_for_doc(doc_id)?;
+        let newest_req = self.newest_request_for_doc(doc_id)?;
+        let (req, sub, rev) = self.active_resources_for_doc(doc_id)?;
 
         let dates = [
+            Some(newest_req.created_at),
+            newest_req.deactivated_at,
             req.map(|r| r.created_at),
             req.and_then(|r| r.deactivated_at),
             sub.map(|s| s.created_at),
+            sub.and_then(|s| s.deactivated_at),
             rev.map(|r| r.created_at),
+            rev.and_then(|r| r.deactivated_at),
         ];
 
         Ok(dates.iter().flatten().max().copied())

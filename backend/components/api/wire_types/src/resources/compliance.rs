@@ -26,9 +26,9 @@ pub struct ComplianceDocSummary {
     pub assigned_to: Option<LiteOrgMember>,
     pub last_updated: Option<DateTime<Utc>>,
 
-    pub latest_request_id: Option<ComplianceDocRequestId>,
-    pub latest_submission_id: Option<ComplianceDocSubmissionId>,
-    pub latest_review_id: Option<ComplianceDocReviewId>,
+    pub active_request_id: Option<ComplianceDocRequestId>,
+    pub active_submission_id: Option<ComplianceDocSubmissionId>,
+    pub active_review_id: Option<ComplianceDocReviewId>,
 
     pub template_id: Option<ComplianceDocTemplateId>,
 }

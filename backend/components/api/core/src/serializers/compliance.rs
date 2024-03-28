@@ -49,7 +49,7 @@ impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::C
             .docs
             .get(doc_id)
             .ok_or(AssertionError("doc not present in ComplianceDocSummary"))?;
-        let (req, sub, rev) = summary.newest_active_resources_for_doc(doc_id)?;
+        let (req, sub, rev) = summary.active_resources_for_doc(doc_id)?;
         let status = summary.status_for_doc(doc_id)?;
 
         let assigned_to = sub
@@ -86,9 +86,9 @@ impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::C
             status,
             assigned_to,
             last_updated,
-            latest_request_id: req.map(|req| req.id.clone()),
-            latest_submission_id: sub.map(|sub| sub.id.clone()),
-            latest_review_id: rev.map(|rev| rev.id.clone()),
+            active_request_id: req.map(|req| req.id.clone()),
+            active_submission_id: sub.map(|sub| sub.id.clone()),
+            active_review_id: rev.map(|rev| rev.id.clone()),
             template_id: doc.template_id.clone(),
         })
     }

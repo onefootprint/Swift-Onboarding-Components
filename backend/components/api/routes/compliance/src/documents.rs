@@ -1,7 +1,7 @@
 use crate::{types::JsonApiResponse, State};
 use api_core::{
     auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::{ApiResult, AssertionError},
+    errors::{ApiResult, AssertionError, ValidationError},
     types::ResponseData,
     utils::db2api::TryDbToApi,
     ApiError, ApiErrorKind,
@@ -90,11 +90,9 @@ pub async fn post(
                 template_id: template_id.as_ref(),
             }
             .create(conn)
-            .map_err(|e| {
+            .map_err(|e| -> ApiError {
                 if e.is_unique_constraint_violation() {
-                    ApiError::from(ApiErrorKind::ValidationError(
-                        "A compliance document request already exists for this template".to_owned(),
-                    ))
+                    ValidationError("A compliance document request already exists for this template").into()
                 } else {
                     e.into()
                 }

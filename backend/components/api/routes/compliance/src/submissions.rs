@@ -1,9 +1,8 @@
 use crate::{types::JsonApiResponse, State};
 use api_core::{
     auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiResult,
+    errors::{ApiResult, ValidationError},
     types::{EmptyResponse, ResponseData},
-    ApiError, ApiErrorKind,
 };
 use chrono::Utc;
 use db::models::{
@@ -46,23 +45,24 @@ pub async fn post(
             let doc = ComplianceDoc::lock(conn, &document_id, &partnership_id)?;
 
             // Only allow submissions for the newest request.
-            let Some(req) = ComplianceDocRequest::get_active(conn, &doc)? else {
-                return Err(ApiError::from(ApiErrorKind::ValidationError(
-                    "Cannot submit this compliance document since the request has been retracted".to_owned(),
-                )));
+            let Some(active_req) = ComplianceDocRequest::get_active(conn, &doc)? else {
+                return ValidationError(
+                    "Cannot submit this compliance document since the request has been retracted",
+                )
+                .into();
             };
 
-            if req.id != request_id {
-                return Err(ApiError::from(ApiErrorKind::ValidationError(
-                    "Cannot submit this compliance document since there is a newer request for this document"
-                        .to_owned(),
-                )));
+            if active_req.id != request_id {
+                return ValidationError(
+                    "Cannot submit this compliance document since there is a newer request for this document",
+                )
+                .into();
             }
 
             let doc_data = ComplianceDocData::ExternalUrl(url);
             NewComplianceDocSubmission {
                 created_at: Utc::now(),
-                request_id: &req.id,
+                request_id: &active_req.id,
                 submitted_by_tenant_user_id: &submitted_by_tenant_user_id,
                 assigned_to_partner_tenant_user_id: None,
                 doc_data: &doc_data,

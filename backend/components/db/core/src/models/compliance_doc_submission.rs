@@ -1,10 +1,9 @@
-use crate::{DbResult, PgConn};
+use super::compliance_doc::ComplianceDoc;
+use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_submission;
 use diesel::prelude::*;
 use newtypes::{ComplianceDocData, ComplianceDocRequestId, ComplianceDocSubmissionId, Locked, TenantUserId};
-
-use super::{compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest};
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -20,6 +19,8 @@ pub struct ComplianceDocSubmission {
     pub submitted_by_tenant_user_id: TenantUserId,
     pub assigned_to_partner_tenant_user_id: Option<TenantUserId>,
     pub doc_data: ComplianceDocData,
+
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -37,24 +38,45 @@ impl<'a> NewComplianceDocSubmission<'a> {
     #[tracing::instrument("NewComplianceDocSubmission::create", skip_all)]
     pub fn create(
         self,
-        conn: &mut PgConn,
-        _lock: &Locked<ComplianceDoc>,
+        conn: &mut TxnPgConn,
+        lock: &Locked<ComplianceDoc>,
     ) -> DbResult<ComplianceDocSubmission> {
+        // Deactivate existing submission if one exists.
+        if let Some(prev_sub) = ComplianceDocSubmission::get_active(conn, self.request_id, lock)? {
+            ComplianceDocSubmission::deactivate(conn, &prev_sub.id, lock)?;
+        }
+
         Ok(diesel::insert_into(compliance_doc_submission::table)
             .values(self)
-            .get_result(conn)?)
+            .get_result(conn.conn())?)
     }
 }
 
 impl ComplianceDocSubmission {
-    pub fn count_for_request(
-        conn: &mut PgConn,
-        req: &ComplianceDocRequest,
+    pub fn get_active(
+        conn: &mut TxnPgConn,
+        request_id: &ComplianceDocRequestId,
         _lock: &Locked<ComplianceDoc>,
-    ) -> DbResult<i64> {
+    ) -> DbResult<Option<ComplianceDocSubmission>> {
         Ok(compliance_doc_submission::table
-            .filter(compliance_doc_submission::request_id.eq(&req.id))
-            .count()
-            .get_result(conn)?)
+            .filter(compliance_doc_submission::request_id.eq(request_id))
+            .filter(compliance_doc_submission::deactivated_at.is_null())
+            .select(ComplianceDocSubmission::as_select())
+            .first(conn.conn())
+            .optional()?)
+    }
+
+    pub fn deactivate(
+        conn: &mut TxnPgConn,
+        sub_id: &ComplianceDocSubmissionId,
+        _lock: &Locked<ComplianceDoc>,
+    ) -> DbResult<()> {
+        diesel::update(compliance_doc_submission::table)
+            .filter(compliance_doc_submission::id.eq(sub_id))
+            .filter(compliance_doc_submission::deactivated_at.is_null())
+            .set(compliance_doc_submission::deactivated_at.eq(Some(Utc::now())))
+            .execute(conn.conn())?;
+
+        Ok(())
     }
 }

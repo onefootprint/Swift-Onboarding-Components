@@ -208,6 +208,7 @@ diesel::table! {
         reviewed_by_partner_tenant_user_id -> Text,
         decision -> Text,
         note -> Text,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 
@@ -223,6 +224,7 @@ diesel::table! {
         submitted_by_tenant_user_id -> Text,
         assigned_to_partner_tenant_user_id -> Nullable<Text>,
         doc_data -> Jsonb,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 
