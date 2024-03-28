@@ -1,6 +1,9 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { useObserveCollector } from '@onefootprint/dev-tools';
-import { type FootprintVariant } from '@onefootprint/footprint-js';
+import {
+  FootprintPrivateEvent,
+  type FootprintVariant,
+} from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import type { IdvCompletePayload } from '@onefootprint/idv';
 import Idv, {
@@ -107,6 +110,15 @@ const Root = ({ variant }: RootProps) => {
     fpProvider.close();
   };
 
+  let componentsSdkContext;
+  if (isComponentsSdk) {
+    componentsSdkContext = {
+      onRelayFromComponents: (cb: () => void) =>
+        fpProvider.on(FootprintPrivateEvent.relayFromComponents, cb),
+      relayToComponents: fpProvider.relayToComponents,
+    };
+  }
+
   return (
     <Layout variant={variant}>
       <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
@@ -121,7 +133,7 @@ const Root = ({ variant }: RootProps) => {
             onClose={handleClose}
             onIdentifyDone={handleIdentifyCompletion}
             showLogo={showLogo}
-            isComponentsSdk={isComponentsSdk}
+            componentsSdkContext={componentsSdkContext}
             l10n={l10n}
           />
         )}

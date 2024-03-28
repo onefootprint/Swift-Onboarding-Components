@@ -19,9 +19,7 @@ const useEffectOnceStrictDev = (effect: EffectCallback) => {
   }, [effect]);
 };
 
-const useEffectOnce = (effect: EffectCallback) => {
-  useEffect(effect, []); // eslint-disable-line react-hooks/exhaustive-deps
-};
+const useEffectOnce = (effect: EffectCallback) => useEffect(effect, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 export default isProd || !isAuthPackage
   ? useEffectOnce

@@ -55,13 +55,3 @@ export const withIdentify = () =>
       },
     },
   });
-
-export const mockFootprintProviderClient = {
-  auth: jest.fn(),
-  relayToComponents: jest.fn(),
-  load: jest.fn(),
-  cancel: jest.fn(),
-  close: jest.fn(),
-  complete: jest.fn(),
-  on: jest.fn(),
-};

@@ -12,12 +12,17 @@ import type {
   DeviceResponseJsonPayload,
 } from './utils/custom-listener';
 
+export type ComponentsSdkContext = {
+  onRelayFromComponents: (cb: () => void) => () => void;
+  relayToComponents: (authToken: string) => void;
+};
+
 /** These constant properties are often passed around to other idv machines */
 export type CommonIdvContext = {
   device: DeviceInfo;
   authToken: string;
   isTransfer?: boolean;
-  isComponentsSdk?: boolean;
+  componentsSdkContext?: ComponentsSdkContext;
   isInIframe?: boolean;
 };
 
@@ -34,7 +39,7 @@ export type MachineContext = {
   authToken?: string;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
-  isComponentsSdk?: boolean;
+  componentsSdkContext?: ComponentsSdkContext;
   isInIframe?: boolean;
   obConfigAuth?: ObConfigAuth;
   validationToken?: string;

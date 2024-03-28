@@ -1,16 +1,22 @@
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 import { OnboardingRequirementKind } from '@onefootprint/types';
 
-type AlreadyDisplayedRequirements = {
-  collectedKycData: boolean;
+type MachineContext = {
+  hasRunCollectedKycData: boolean;
+  startedDataCollection: boolean;
+  isTransfer: boolean;
+  isComponentsSdk: boolean;
 };
 
 /// Given the list of requirements from the backend and some information about which requirements
 /// we've already displayed, computes the frontend
 const computeRequirementsToShow = (
-  isTransfer: boolean,
-  startedDataCollection: boolean,
-  { collectedKycData }: AlreadyDisplayedRequirements,
+  {
+    hasRunCollectedKycData,
+    startedDataCollection,
+    isTransfer,
+    isComponentsSdk,
+  }: MachineContext,
   response: OnboardingStatusResponse,
 ) => {
   const { allRequirements } = response;
@@ -33,8 +39,11 @@ const computeRequirementsToShow = (
     // There are special, requirement-kind-specific cases where we show a met requirement
     if (
       r.kind === OnboardingRequirementKind.collectKycData &&
-      !collectedKycData &&
-      // TODO: Oooof need to make sure we show this if on transfer and we collected doc on transfer...
+      // Don't render the confirm screen if we've already run the collect KYC data machine
+      !hasRunCollectedKycData &&
+      // Don't show confirm if we're in the components SDK
+      !isComponentsSdk &&
+      // Don't show the confirm screen on the transfer app
       !isTransfer
     ) {
       // Show the CollectKycData plugin one time, even if it's met, to make sure we show the

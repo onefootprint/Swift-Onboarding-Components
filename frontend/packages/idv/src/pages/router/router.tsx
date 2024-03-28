@@ -37,7 +37,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     authToken,
     bootstrapData,
     isTransfer,
-    isComponentsSdk,
+    componentsSdkContext,
     isInIframe,
     showLogo,
     validationToken,
@@ -152,7 +152,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
             device,
             authToken,
             isTransfer,
-            isComponentsSdk,
+            componentsSdkContext,
             isInIframe,
           }}
           bootstrapData={bootstrapData}

@@ -22,12 +22,10 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import React from 'react';
-import FootprintProvider from 'src/components/footprint-provider';
 import { Layout } from 'src/components/layout';
 
 import CollectKycData from './index';
 import {
-  mockFootprintProviderClient,
   withIdentify,
   withOnboardingConfig,
   withUserToken,
@@ -68,17 +66,15 @@ describe('<CollectKycData />', () => {
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
             <DesignSystemProvider theme={themes.footprint.light}>
-              <FootprintProvider client={mockFootprintProviderClient}>
-                <ToastProvider>
-                  <Layout>
-                    <CollectKycData
-                      idvContext={idvContext}
-                      context={context}
-                      onDone={onDone}
-                    />
-                  </Layout>
-                </ToastProvider>
-              </FootprintProvider>
+              <ToastProvider>
+                <Layout>
+                  <CollectKycData
+                    idvContext={idvContext}
+                    context={context}
+                    onDone={onDone}
+                  />
+                </Layout>
+              </ToastProvider>
             </DesignSystemProvider>
           </QueryClientProvider>
         </ObserveCollectorProvider>

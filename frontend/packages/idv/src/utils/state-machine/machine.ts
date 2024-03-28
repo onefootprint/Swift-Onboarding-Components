@@ -7,7 +7,12 @@ import { IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks/ui/use-device-info';
-import type { CompletePayload, MachineContext, MachineEvents } from './types';
+import type {
+  CompletePayload,
+  ComponentsSdkContext,
+  MachineContext,
+  MachineEvents,
+} from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldShowIdentify from './utils/should-show-identify';
 import shouldShowSandbox from './utils/should-show-sandbox';
@@ -17,7 +22,7 @@ export type IdvMachineArgs = {
   obConfigAuth?: ObConfigAuth;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
-  isComponentsSdk?: boolean;
+  componentsSdkContext?: ComponentsSdkContext;
   isInIframe?: boolean;
   device?: DeviceInfo;
   idDocOutcome?: IdDocOutcome;

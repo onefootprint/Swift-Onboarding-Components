@@ -173,6 +173,16 @@ export const withIdentifyVerify = () =>
     },
   });
 
+export const withCreateDownscopedToken = () => {
+  mockRequest({
+    method: 'post',
+    path: '/hosted/user/tokens',
+    response: {
+      token: 'downscoped_token_xxxx',
+    },
+  });
+};
+
 export const withUserVault = () =>
   mockRequest({
     method: 'patch',

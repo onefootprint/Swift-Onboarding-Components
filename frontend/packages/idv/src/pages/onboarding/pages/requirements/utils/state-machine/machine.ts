@@ -70,9 +70,19 @@ const createOnboardingRequirementsMachine = ({
         },
         startOnboarding: {
           on: {
-            initialized: {
-              target: 'checkRequirements',
-            },
+            initialized: [
+              {
+                target: 'waitForComponentsSdk',
+                cond: ctx =>
+                  !!ctx.idvContext.isInIframe &&
+                  !!ctx.idvContext.componentsSdkContext,
+                description:
+                  'If we are running bifrost for the components SDK, wait for the components SDK to finish handling its requirements',
+              },
+              {
+                target: 'checkRequirements',
+              },
+            ],
           },
         },
         checkRequirements: {
@@ -98,6 +108,9 @@ const createOnboardingRequirementsMachine = ({
         },
         kycData: {
           exit: ['markCollectedKycData'],
+          on: RequirementCompletedTransition,
+        },
+        waitForComponentsSdk: {
           on: RequirementCompletedTransition,
         },
         transfer: {

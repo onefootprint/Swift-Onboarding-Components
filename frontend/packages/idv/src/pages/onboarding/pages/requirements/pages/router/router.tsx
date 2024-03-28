@@ -12,6 +12,7 @@ import {
 } from '../../../../../../plugins';
 import Logger from '../../../../../../utils/logger';
 import Error from '../../../../components/error';
+import WaitForComponentsSdk from '../../components/wait-for-components-sdk';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
@@ -70,6 +71,9 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('startOnboarding')) {
     return <StartOnboarding />;
+  }
+  if (state.matches('waitForComponentsSdk')) {
+    return <WaitForComponentsSdk onDone={handleRequirementCompleted} />;
   }
   if (state.matches('checkRequirements')) {
     return <CheckRequirements />;

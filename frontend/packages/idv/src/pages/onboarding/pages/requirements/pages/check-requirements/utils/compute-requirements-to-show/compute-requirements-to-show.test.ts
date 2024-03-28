@@ -42,14 +42,15 @@ describe('computeRequirementsToShow', () => {
       // Not used
       obConfiguration: {} as PublicOnboardingConfig,
     };
-    it('should return KYC requirement when not yet shown', () => {
-      const alreadyDisplayedRequirements = {
-        collectedKycData: false,
+    it('should return met KYC requirement when not yet shown', () => {
+      const context = {
+        isTransfer: false,
+        startedDataCollection: true,
+        hasRunCollectedKycData: false,
+        isComponentsSdk: false,
       };
       const remainingRequirements = computeRequirementsToShow(
-        false,
-        true,
-        alreadyDisplayedRequirements,
+        context,
         requirementsResponse,
       );
       expect(
@@ -58,14 +59,15 @@ describe('computeRequirementsToShow', () => {
         ),
       ).toBeTruthy();
     });
-    it('should return KYC requirement when not yet shown havent started collecting data', () => {
-      const alreadyDisplayedRequirements = {
-        collectedKycData: false,
+    it('should return met KYC requirement when not yet shown and havent started collecting data', () => {
+      const context = {
+        isTransfer: false,
+        startedDataCollection: false,
+        hasRunCollectedKycData: false,
+        isComponentsSdk: false,
       };
       const remainingRequirements = computeRequirementsToShow(
-        false,
-        false,
-        alreadyDisplayedRequirements,
+        context,
         requirementsResponse,
       );
       expect(
@@ -74,14 +76,15 @@ describe('computeRequirementsToShow', () => {
         ),
       ).toBeTruthy();
     });
-    it('should not return KYC requirement when in transfer', () => {
-      const alreadyDisplayedRequirements = {
-        collectedKycData: false,
+    it('should not return met KYC requirement when in transfer', () => {
+      const context = {
+        isTransfer: true,
+        startedDataCollection: false,
+        hasRunCollectedKycData: false,
+        isComponentsSdk: false,
       };
       const remainingRequirements = computeRequirementsToShow(
-        true,
-        false,
-        alreadyDisplayedRequirements,
+        context,
         requirementsResponse,
       );
       expect(
@@ -90,14 +93,32 @@ describe('computeRequirementsToShow', () => {
         ),
       ).toBeFalsy();
     });
-    it('should not return KYC requirement when already shown', () => {
-      const alreadyDisplayedRequirements = {
-        collectedKycData: true,
+    it('should not return met KYC requirement when already shown', () => {
+      const context = {
+        isTransfer: false,
+        startedDataCollection: false,
+        hasRunCollectedKycData: true,
+        isComponentsSdk: false,
       };
       const remainingRequirements = computeRequirementsToShow(
-        false,
-        false,
-        alreadyDisplayedRequirements,
+        context,
+        requirementsResponse,
+      );
+      expect(
+        remainingRequirements.some(
+          r => r.kind === OnboardingRequirementKind.collectKycData,
+        ),
+      ).toBeFalsy();
+    });
+    it('should not return met KYC requirement when in components sdk', () => {
+      const context = {
+        isTransfer: false,
+        startedDataCollection: false,
+        hasRunCollectedKycData: false,
+        isComponentsSdk: true,
+      };
+      const remainingRequirements = computeRequirementsToShow(
+        context,
         requirementsResponse,
       );
       expect(
@@ -114,13 +135,14 @@ describe('computeRequirementsToShow', () => {
       obConfiguration: {} as PublicOnboardingConfig,
     };
     it('should not return KYC requirement on initial fetch', () => {
-      const alreadyDisplayedRequirements = {
-        collectedKycData: false,
+      const context = {
+        isTransfer: false,
+        startedDataCollection: false,
+        hasRunCollectedKycData: false,
+        isComponentsSdk: false,
       };
       const remainingRequirements = computeRequirementsToShow(
-        false,
-        false,
-        alreadyDisplayedRequirements,
+        context,
         requirementsResponse,
       );
       expect(

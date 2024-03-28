@@ -9,6 +9,7 @@ const isLoadingState = (state: StateValue) => {
   const loadingStates = [
     'init',
     'startOnboarding',
+    'waitForComponentsSdk',
     'checkRequirements',
     'router',
     'process',

@@ -10,7 +10,7 @@ const CheckRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     startedDataCollection,
-    idvContext: { authToken, isTransfer },
+    idvContext: { authToken, isTransfer, componentsSdkContext },
     collectedKycData,
   } = state.context;
 
@@ -20,12 +20,13 @@ const CheckRequirements = () => {
       onSuccess: (response: OnboardingStatusResponse) => {
         Logger.info(`Onboarding requirements: ${JSON.stringify(response)}`);
 
-        const payload = computeRequirementsToShow(
-          !!isTransfer,
+        const context = {
+          isTransfer: !!isTransfer,
           startedDataCollection,
-          { collectedKycData: !!collectedKycData },
-          response,
-        );
+          hasRunCollectedKycData: !!collectedKycData,
+          isComponentsSdk: !!componentsSdkContext,
+        };
+        const payload = computeRequirementsToShow(context, response);
 
         send({
           type: 'onboardingRequirementsReceived',

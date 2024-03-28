@@ -36,6 +36,7 @@ export interface Typegen0 {
     | 'router'
     | 'startOnboarding'
     | 'success'
-    | 'transfer';
+    | 'transfer'
+    | 'waitForComponentsSdk';
   tags: never;
 }
