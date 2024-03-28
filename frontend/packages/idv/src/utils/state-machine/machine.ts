@@ -18,6 +18,7 @@ export type IdvMachineArgs = {
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
   isComponentsSdk?: boolean;
+  isInIframe?: boolean;
   device?: DeviceInfo;
   idDocOutcome?: IdDocOutcome;
   showLogo?: boolean;

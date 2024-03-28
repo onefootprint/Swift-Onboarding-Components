@@ -27,6 +27,7 @@ const Router = ({ onDone }: RouterProps) => {
     validationToken,
     idDocOutcome,
     isComponentsSdk,
+    isInIframe,
   } = state.context;
   const { IdvTransferFromDesktopDisabled } = useFlags();
   const orgIds = new Set<string>(IdvTransferFromDesktopDisabled);
@@ -51,6 +52,7 @@ const Router = ({ onDone }: RouterProps) => {
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
           isComponentsSdk={isComponentsSdk}
+          isInIframe={isInIframe}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onDone={() => send({ type: 'requirementsCompleted' })}

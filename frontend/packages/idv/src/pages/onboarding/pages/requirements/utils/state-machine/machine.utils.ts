@@ -1,7 +1,6 @@
 import { OnboardingRequirementKind } from '@onefootprint/types';
 import type { TransitionConfig, TransitionsConfig } from 'xstate';
 
-import { checkIsInIframe } from '../../../../../../utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export const RequirementCompletedTransition: TransitionsConfig<
@@ -123,7 +122,7 @@ const shouldRunTransfer = (context: MachineContext): boolean => {
 
   // When running natively (not in an iframe) on mobile, we can register the passkey without transferring.
   // If we're on desktop, we should still attempt to transfer
-  if (!checkIsInIframe() && isMobile) return false;
+  if (!context.onboardingContext.isInIframe && isMobile) return false;
 
   if (isTransferOnDesktopDisabled) return false;
   if (didRunTransfer) return false;

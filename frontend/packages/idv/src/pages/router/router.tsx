@@ -38,6 +38,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     bootstrapData,
     isTransfer,
     isComponentsSdk,
+    isInIframe,
     showLogo,
     validationToken,
     obConfigAuth,
@@ -152,6 +153,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
           isComponentsSdk={isComponentsSdk}
+          isInIframe={isInIframe}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onClose={onClose}

@@ -8,25 +8,31 @@ import { MachineProvider } from './components/machine-provider';
 import { GOOGLE_MAPS_KEY } from './config/constants';
 import Router from './pages/router';
 import type { IdvProps } from './types';
+import { checkIsInIframe } from './utils';
 
 type RouterProps = ComponentProps<typeof Router>;
 type AppProps = IdvProps & RouterProps;
 
-const App = ({ l10n, onIdentifyDone, ...props }: AppProps) => (
-  <>
-    <L10nContextProvider l10n={l10n}>
-      <MachineProvider args={props}>
-        <GlobalStyle />
-        <Router l10n={l10n} onIdentifyDone={onIdentifyDone} />
-      </MachineProvider>
-    </L10nContextProvider>
-    <Script
-      async
-      src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&loading=async&libraries=places&callback=Function.prototype`}
-      strategy="lazyOnload"
-    />
-  </>
-);
+const App = ({ l10n, onIdentifyDone, isInIframe, ...props }: AppProps) => {
+  const newIsInIframe =
+    isInIframe === undefined ? checkIsInIframe() : isInIframe;
+  const args = { ...props, isInIframe: newIsInIframe };
+  return (
+    <>
+      <L10nContextProvider l10n={l10n}>
+        <MachineProvider args={args}>
+          <GlobalStyle />
+          <Router l10n={l10n} onIdentifyDone={onIdentifyDone} />
+        </MachineProvider>
+      </L10nContextProvider>
+      <Script
+        async
+        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&loading=async&libraries=places&callback=Function.prototype`}
+        strategy="lazyOnload"
+      />
+    </>
+  );
+};
 
 const GlobalStyle = createGlobalStyle`
   html {

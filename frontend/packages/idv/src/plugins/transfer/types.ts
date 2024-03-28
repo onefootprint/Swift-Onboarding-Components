@@ -16,6 +16,7 @@ export type TransferCustomData = {
   config: PublicOnboardingConfig;
   missingRequirements: TransferRequirements;
   idDocOutcome?: IdDocOutcome;
+  isInIframe: boolean;
 };
 
 export type TransferProps = BasePluginProps<TransferCustomData>;

@@ -33,6 +33,7 @@ const Router = ({ onDone }: RouterProps) => {
       device,
       idDocOutcome,
       isTransfer,
+      isInIframe,
     },
     collectedKycData,
     requirements,
@@ -140,6 +141,7 @@ const Router = ({ onDone }: RouterProps) => {
               idDoc,
             },
             idDocOutcome,
+            isInIframe: !!isInIframe,
           },
         }}
         onDone={handleRequirementCompleted}
@@ -153,6 +155,9 @@ const Router = ({ onDone }: RouterProps) => {
           isTransfer,
           authToken,
           device,
+          customData: {
+            isInIframe: !!isInIframe,
+          },
         }}
         onDone={handleRequirementCompleted}
       />

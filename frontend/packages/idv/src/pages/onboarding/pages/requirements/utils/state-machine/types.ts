@@ -15,6 +15,7 @@ export type MachineContext = {
     authToken: string;
     isTransfer?: boolean;
     isComponentsSdk?: boolean;
+    isInIframe?: boolean;
     bootstrapData?: IdvBootstrapData;
     idDocOutcome?: IdDocOutcome;
     overallOutcome?: OverallOutcome;

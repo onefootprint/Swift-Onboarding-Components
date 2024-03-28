@@ -18,6 +18,7 @@ export type OnboardingMachineArgs = {
   bootstrapData?: IdDIData; // TODO: generalize this more in the next iteration
   isTransfer?: boolean;
   isComponentsSdk?: boolean;
+  isInIframe?: boolean;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
   onClose?: () => void;
@@ -31,6 +32,7 @@ const createOnboardingMachine = (
     bootstrapData = {},
     isTransfer,
     isComponentsSdk,
+    isInIframe,
     idDocOutcome,
     overallOutcome,
     onClose,
@@ -55,6 +57,7 @@ const createOnboardingMachine = (
         bootstrapData: validateBootstrapData(bootstrapData, l10n?.locale),
         isTransfer,
         isComponentsSdk,
+        isInIframe,
         idDocOutcome,
         overallOutcome,
         onClose,

@@ -26,6 +26,7 @@ export type MachineContext = {
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
   isComponentsSdk?: boolean;
+  isInIframe?: boolean;
   obConfigAuth?: ObConfigAuth;
   validationToken?: string;
   showLogo?: boolean;

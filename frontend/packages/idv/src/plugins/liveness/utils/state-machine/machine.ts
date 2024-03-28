@@ -1,6 +1,5 @@
 import { createMachine } from 'xstate';
 
-import checkIsIframe from '../../../../utils/check-is-in-iframe';
 import type { MachineContext, MachineEvents } from './types';
 
 export const createLivenessMachine = (initialContext: MachineContext) =>
@@ -23,8 +22,9 @@ export const createLivenessMachine = (initialContext: MachineContext) =>
             cond: ctx => {
               const {
                 device: { hasSupportForWebauthn },
+                isInIframe,
               } = ctx;
-              return !checkIsIframe() && !!hasSupportForWebauthn;
+              return !isInIframe && !!hasSupportForWebauthn;
             },
           },
           {
