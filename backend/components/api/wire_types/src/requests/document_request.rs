@@ -130,6 +130,7 @@ impl From<IncodeFailureReason> for DocumentImageError {
             IncodeFailureReason::SelfieBadImageCompression => Self::SelfieBadImageCompression,
             IncodeFailureReason::DriversLicensePermitNotAllowed => Self::DriversLicensePermitNotAllowed,
             IncodeFailureReason::FaceNotFound => Self::FaceNotFound,
+            IncodeFailureReason::ProcessIdCouldNotProcess => Self::DocumentNotReadable, // close enough
         }
     }
 }

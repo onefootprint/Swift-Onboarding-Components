@@ -114,12 +114,15 @@ pub enum IncodeFailureReason {
     DriversLicensePermitNotAllowed,
     DocumentGlare,
     DocumentSharpness,
+    ProcessIdCouldNotProcess,
     Other(String),
 }
 
 impl IncodeFailureReason {
     pub fn can_ignore(&self) -> bool {
-        !matches!(self, Self::IdTypeNotAcceptable)
+        // IdTypeNotAcceptable => military IDs which incode cannot process (nor can we)
+        // ProcessIdCouldNotProcess => something is up with the image and incode can't run it's ML models
+        !matches!(self, Self::IdTypeNotAcceptable | Self::ProcessIdCouldNotProcess)
     }
 
     pub fn reason_code(&self) -> Option<FootprintReasonCode> {

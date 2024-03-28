@@ -120,8 +120,15 @@ pub struct ProcessIdResponse {
 }
 
 impl IncodeClientErrorCustomFailureReasons for ProcessIdResponse {
-    fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
-        None
+    fn custom_failure_reasons(error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        let e = match error.status {
+            // incode will not proceed and user gets stuck if error 6000 is returned from here
+            // so we need to put user in DocUploadFailed
+            6000 => vec![IncodeFailureReason::ProcessIdCouldNotProcess],
+            _ => vec![IncodeFailureReason::UnexpectedErrorOccurred],
+        };
+
+        Some(e)
     }
 }
 
