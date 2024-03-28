@@ -1,8 +1,8 @@
 use crate::*;
 use newtypes::{
-    ApiKeyStatus, AppClipExperienceId, AuthMethodKind, CollectedDataOption, DocumentAndCountryConfiguration,
-    EnhancedAml, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind,
-    TenantId,
+    ApiKeyStatus, AppClipExperienceId, AuthMethodKind, CipKind, CollectedDataOption,
+    DocumentAndCountryConfiguration, EnhancedAml, Iso3166TwoDigitCountryCode, ObConfigurationId,
+    ObConfigurationKey, ObConfigurationKind, TenantId,
 };
 
 /// OnboardingConfiguration that was created
@@ -32,6 +32,7 @@ pub struct OnboardingConfiguration {
     pub is_rules_enabled: bool,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     pub rule_set: Option<RuleSet>, // theoretically we have a RuleSet for every OBC but this might not always be the case (ie mb Auth playbooks won't always have this?) and just to be a bit more defensive about a super important model here we make it optional (avoid nasty potential errors in inner joining on rule_set on OBC queries and such which is a wide blast radius for just this rule set version stuff here)
+    pub cip_kind: Option<CipKind>,
 }
 
 /// The public onboarding configuration

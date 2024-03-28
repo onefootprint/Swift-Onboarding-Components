@@ -97,6 +97,7 @@ impl ObConfigurationKind {
     AsRefStr,
     Display,
     serde_with::DeserializeFromStr,
+    serde_with::SerializeDisplay,
     Apiv2Schema,
     macros::SerdeAttr,
 )]

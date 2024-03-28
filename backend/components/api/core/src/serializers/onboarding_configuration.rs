@@ -135,6 +135,7 @@ impl
             kind,
             tenant_id,
             document_types_and_countries,
+            cip_kind,
             ..
         } = ob_config;
 
@@ -164,6 +165,7 @@ impl
             is_rules_enabled,
             document_types_and_countries,
             rule_set: rule_set.map(|rs| api_wire_types::RuleSet { version: rs.version }),
+            cip_kind,
         }
     }
 }
