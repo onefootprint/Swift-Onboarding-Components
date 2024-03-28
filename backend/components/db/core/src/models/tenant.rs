@@ -20,7 +20,7 @@ use newtypes::{
 };
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable, Selectable)]
 #[diesel(table_name = tenant)]
 pub struct Tenant {
     pub id: TenantId,

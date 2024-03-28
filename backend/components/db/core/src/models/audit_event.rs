@@ -25,8 +25,8 @@ use newtypes::{
     TenantApiKeyId, TenantId, TenantRoleId, TenantUserId,
 };
 
-#[derive(Debug, Clone, Queryable)]
-#[diesel(table_name = tenant_frequent_note)]
+#[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
+#[diesel(table_name = audit_event)]
 pub struct AuditEvent {
     pub id: AuditEventId,
     pub _created_at: DateTime<Utc>,
@@ -263,7 +263,19 @@ impl AuditEvent {
         }
 
 
-        let results: Vec<DieselJoinedAuditEvent> = results.load(conn.conn())?;
+        let results: Vec<DieselJoinedAuditEvent> = results
+            .select((
+                AuditEvent::as_select(),
+                Tenant::as_select(),
+                InsightEvent::as_select(),
+                scoped_vault::all_columns.nullable(),
+                ob_configuration::all_columns.nullable(),
+                document_data::all_columns.nullable(),
+                tenant_api_key::all_columns.nullable(),
+                tenant_user::all_columns.nullable(),
+                tenant_role::all_columns.nullable(),
+            ))
+            .load(conn.conn())?;
         let saturated_results = saturate_actors(conn, results)?;
 
         let events = saturated_results

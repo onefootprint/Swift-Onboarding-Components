@@ -4,7 +4,7 @@ use db_schema::schema::{insight_event, workflow};
 use diesel::{prelude::*, Insertable, Queryable, RunQueryDsl};
 use newtypes::{InsightEventId, WorkflowId};
 
-#[derive(Debug, Clone, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable, Selectable)]
 #[diesel(table_name = insight_event)]
 pub struct InsightEvent {
     pub id: InsightEventId,
