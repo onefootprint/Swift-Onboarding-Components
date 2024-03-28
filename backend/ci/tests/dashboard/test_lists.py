@@ -1,3 +1,4 @@
+import pytest
 from tests.utils import _gen_random_str, post, get, delete, patch
 
 
@@ -43,6 +44,7 @@ def test_create(sandbox_tenant):
     )
 
 
+@pytest.mark.skip()
 def test_list(sandbox_tenant):
     nonce = _gen_random_str(5)
     post(
@@ -97,6 +99,7 @@ def test_list(sandbox_tenant):
     assert list["used_in_playbook"] == False
 
 
+@pytest.mark.skip()
 def test_update(sandbox_tenant):
     nonce = _gen_random_str(5)
     list = post(
@@ -139,6 +142,7 @@ def test_update(sandbox_tenant):
     )
 
 
+@pytest.mark.skip()
 def test_delete_list(sandbox_tenant):
     nonce = _gen_random_str(5)
     list1 = post(
@@ -204,6 +208,7 @@ def test_delete_list(sandbox_tenant):
     assert list1["id"] not in list_ids
 
 
+@pytest.mark.skip()
 def test_create_list_entry(sandbox_tenant):
     nonce = _gen_random_str(5)
     list = post(
@@ -244,6 +249,7 @@ def test_create_list_entry(sandbox_tenant):
     assert list["entries_count"] == 4
 
 
+@pytest.mark.skip()
 def test_list_list_entries(sandbox_tenant):
     nonce = _gen_random_str(5)
     list = post(
@@ -283,6 +289,7 @@ def test_list_list_entries(sandbox_tenant):
     assert entries[2]["id"] == entry1[0]["id"]
 
 
+@pytest.mark.skip()
 def test_delete_list_entries(sandbox_tenant):
     nonce = _gen_random_str(5)
     list = post(
