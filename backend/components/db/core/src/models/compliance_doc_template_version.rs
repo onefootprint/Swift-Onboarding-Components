@@ -34,6 +34,7 @@ pub struct NewComplianceDocTemplateVersion<'a> {
 }
 
 impl ComplianceDocTemplateVersion {
+    #[tracing::instrument("ComplianceDocTemplateVersion::create", skip_all)]
     pub fn get(
         conn: &mut PgConn,
         id: &ComplianceDocTemplateVersionId,

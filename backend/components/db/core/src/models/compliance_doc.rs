@@ -44,6 +44,7 @@ pub enum ComplianceDocIdentifier<'a> {
 }
 
 impl ComplianceDoc {
+    #[tracing::instrument("ComplianceDoc::lock", skip_all)]
     pub fn lock<'a>(
         conn: &mut TxnPgConn,
         id: impl Into<ComplianceDocIdentifier<'a>>,

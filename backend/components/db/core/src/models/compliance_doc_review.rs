@@ -55,6 +55,7 @@ impl<'a> NewComplianceDocReview<'a> {
 
 
 impl ComplianceDocReview {
+    #[tracing::instrument("ComplianceDocReview::get_active", skip_all)]
     pub fn get_active(
         conn: &mut TxnPgConn,
         sub_id: &ComplianceDocSubmissionId,
@@ -68,6 +69,7 @@ impl ComplianceDocReview {
             .optional()?)
     }
 
+    #[tracing::instrument("ComplianceDocReview::deactivate", skip_all)]
     pub fn deactivate(
         conn: &mut TxnPgConn,
         rev_id: &ComplianceDocReviewId,

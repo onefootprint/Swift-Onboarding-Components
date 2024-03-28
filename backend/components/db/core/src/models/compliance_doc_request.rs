@@ -57,6 +57,7 @@ impl<'a> NewComplianceDocRequest<'a> {
 }
 
 impl ComplianceDocRequest {
+    #[tracing::instrument("ComplianceDocRequest::get_active", skip_all)]
     pub fn get_active(
         conn: &mut TxnPgConn,
         doc: &Locked<ComplianceDoc>,
@@ -73,6 +74,7 @@ impl ComplianceDocRequest {
 
     // Deactivate the request. Passing a tenant_user_id indicates it was a manual deactivation
     // rather than an implicit deactivation from a re-request.
+    #[tracing::instrument("ComplianceDocRequest::deactivate", skip_all)]
     pub fn deactivate(
         conn: &mut TxnPgConn,
         req_id: &ComplianceDocRequestId,
