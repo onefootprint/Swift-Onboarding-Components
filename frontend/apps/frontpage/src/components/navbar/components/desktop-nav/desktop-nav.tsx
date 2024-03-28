@@ -49,13 +49,18 @@ const DesktopNav = ({ entries, $isOnDarkSection }: DesktopNavProps) => {
       </MainNav>
       <SecondaryNav>
         <Login
-          href={`${DASHBOARD_BASE_URL}/login`}
+          href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}
           $isOnDarkSection={$isOnDarkSection}
         >
           {t('login')}
         </Login>
         <StyledButton
-          onClick={() => window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')}
+          onClick={() =>
+            window.open(
+              `${DASHBOARD_BASE_URL}/authentication/sign-up`,
+              '_blank',
+            )
+          }
           size="compact"
           $isOnDarkSection={$isOnDarkSection}
         >

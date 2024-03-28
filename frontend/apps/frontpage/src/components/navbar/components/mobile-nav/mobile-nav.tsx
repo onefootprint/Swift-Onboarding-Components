@@ -100,10 +100,10 @@ const MobileNav = ({
               </LinkList>
             </NavigationMenu.Root>
             <CtaContainer>
-              <LoginLink href={`${DASHBOARD_BASE_URL}/login`}>
+              <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>
                 {t('login')}
               </LoginLink>
-              <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+              <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>
                 {t('sign-up')}
               </LinkButton>
             </CtaContainer>
