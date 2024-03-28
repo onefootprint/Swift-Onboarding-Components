@@ -181,7 +181,11 @@
     },
     "playbooks": {
       "title": "Playbooks using {{alias}}",
-      "empty": "There are no playbooks using this list"
+      "empty": "There are no playbooks using this list",
+      "details": "See details",
+      "in-rule": "In rule",
+      "if": "if",
+      "and": "and"
     },
     "activity-log": {
       "title": "Activity log",

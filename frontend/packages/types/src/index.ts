@@ -281,6 +281,7 @@ export type {
   LabelAddedEventData,
   List,
   ListEntry,
+  ListPlaybookUsage,
   Liveness,
   LivenessAttestation,
   LivenessAttestationDeviceType,

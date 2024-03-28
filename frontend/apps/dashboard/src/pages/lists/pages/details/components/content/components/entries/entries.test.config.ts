@@ -36,7 +36,7 @@ const listFixture = {
   kind: ListKind.emailAddress,
   name: 'Email List',
   entriesCount: 0,
-  usedInRules: false,
+  playbooks: [],
 };
 
 export const withDeleteError = (listId: string, entryId: string) =>

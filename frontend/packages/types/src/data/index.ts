@@ -114,7 +114,7 @@ export {
 } from './investor-data-attribute';
 export type { InvestorProfileData } from './investor-profile-data';
 export type { L10n, SupportedLocale } from './l10n';
-export type { List, ListEntry } from './list';
+export type { List, ListEntry, ListPlaybookUsage } from './list';
 export { ListKind } from './list';
 export type {
   InstantAppMetadata,

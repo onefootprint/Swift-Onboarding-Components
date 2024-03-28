@@ -13,7 +13,7 @@ export const getListsFixture: List[] = [
     alias: 'my_list',
     kind: ListKind.emailAddress,
     entriesCount: 0,
-    usedInRules: false,
+    playbooks: [],
   },
 ];
 
@@ -27,7 +27,7 @@ export const createdListFixture: List = {
   kind: ListKind.ssn9,
   alias: 'my_list2',
   entriesCount: 0,
-  usedInRules: false,
+  playbooks: [],
 };
 
 export const withLists = (data = getListsFixture) =>

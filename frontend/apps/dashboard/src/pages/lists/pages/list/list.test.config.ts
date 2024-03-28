@@ -13,7 +13,7 @@ export const listsFixture: List[] = [
     kind: ListKind.emailAddress,
     name: 'Email List',
     entriesCount: 0,
-    usedInRules: false,
+    playbooks: [],
   },
   {
     id: '2',
@@ -25,7 +25,7 @@ export const listsFixture: List[] = [
     kind: ListKind.ssn9,
     name: 'SSN List',
     entriesCount: 0,
-    usedInRules: false,
+    playbooks: [],
   },
 ];
 

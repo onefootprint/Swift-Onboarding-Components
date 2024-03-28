@@ -1,4 +1,5 @@
 import type { Actor } from './actor';
+import type { Rule } from './rule';
 
 export enum ListKind {
   emailAddress = 'email_address',
@@ -9,12 +10,19 @@ export enum ListKind {
   ipAddress = 'ip_address',
 }
 
+export type ListPlaybookUsage = {
+  id: string;
+  key: string;
+  name: string;
+  rules: Rule[];
+};
+
 export type List = {
   id: string;
   actor: Actor;
   alias: string;
   entriesCount: number;
-  usedInRules: boolean;
+  playbooks: ListPlaybookUsage[];
   createdAt: string;
   kind: ListKind;
   name: string;
