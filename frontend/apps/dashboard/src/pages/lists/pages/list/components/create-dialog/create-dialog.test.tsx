@@ -14,9 +14,8 @@ import { withCreateList, withLists } from './create-dialog.test.config';
 describe('<CreateDialog />', () => {
   const renderCreateDialog = ({
     onClose = jest.fn(),
-    onCreate = jest.fn(),
   }: Partial<CreateDialogProps>) => {
-    customRender(<CreateDialog open onClose={onClose} onCreate={onCreate} />);
+    customRender(<CreateDialog open onClose={onClose} />);
   };
 
   beforeEach(() => {
@@ -68,8 +67,7 @@ describe('<CreateDialog />', () => {
     });
 
     it('should succeed when we submit a valid form', async () => {
-      const onCreate = jest.fn();
-      renderCreateDialog({ onCreate });
+      renderCreateDialog({});
 
       const listName = screen.getByPlaceholderText('e.g. Blocked users');
       await userEvent.click(listName);
@@ -89,10 +87,6 @@ describe('<CreateDialog />', () => {
         expect(
           screen.getByText('List created successfully.'),
         ).toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(onCreate).toHaveBeenCalled();
       });
     });
   });

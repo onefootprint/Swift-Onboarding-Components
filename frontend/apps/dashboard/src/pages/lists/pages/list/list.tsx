@@ -23,10 +23,6 @@ const List = () => {
     setDialogOpen(false);
   };
 
-  const handleCreate = () => {
-    setDialogOpen(false);
-  };
-
   return (
     <Container>
       <Head>
@@ -55,11 +51,7 @@ const List = () => {
           isLoading={isLoading}
         />
       </Stack>
-      <CreateDialog
-        open={dialogOpen}
-        onClose={handleClose}
-        onCreate={handleCreate}
-      />
+      <CreateDialog open={dialogOpen} onClose={handleClose} />
     </Container>
   );
 };

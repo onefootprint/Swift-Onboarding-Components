@@ -83,7 +83,7 @@
     },
     "header": {
       "kind": "Match type:",
-      "edit": "Edit",
+      "edit": "Edit name",
       "actions": {
         "delete": "Delete",
         "delete-confirmation": {

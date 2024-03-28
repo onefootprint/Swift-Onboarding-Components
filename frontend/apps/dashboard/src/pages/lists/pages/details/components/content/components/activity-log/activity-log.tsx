@@ -21,11 +21,9 @@ const ActivityLog = () => {
     <Stack gap={4} direction="column">
       <SectionTitle title={t('title', { alias: data.alias })} />
       {/* TODO: implement */}
-      {!data.entriesCount && (
-        <Text variant="body-3" color="tertiary">
-          {t('empty')}
-        </Text>
-      )}
+      <Text variant="body-3" color="tertiary">
+        {t('empty')}
+      </Text>
     </Stack>
   );
 };

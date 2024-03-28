@@ -19,7 +19,6 @@ import useCreateList from './hooks/use-create-list';
 export type CreateDialogProps = {
   open: boolean;
   onClose: () => void;
-  onCreate: () => void;
 };
 
 type FormData = {
@@ -28,7 +27,7 @@ type FormData = {
   entries: string;
 };
 
-const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
+const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   const createListMutation = useCreateList();
   const { t } = useTranslation('lists', {
     keyPrefix: 'list.dialog',
@@ -57,7 +56,10 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
     const data = {
       name: formData.name,
       kind: formData.kind.value,
-      entries: formData.entries,
+      entries: formData.entries
+        .split(',')
+        .map(entry => entry.trim())
+        .filter(entry => entry),
       alias: getAliasForName(formData.name),
     };
     createListMutation.mutate(data, {
@@ -67,7 +69,7 @@ const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
           description: t('feedback.success.description'),
         });
         reset();
-        onCreate();
+        onClose();
       },
     });
   };

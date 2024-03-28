@@ -3,7 +3,6 @@ import request, { getErrorMessage } from '@onefootprint/request';
 import type {
   CreateListRequest,
   CreateListResponse,
-  List,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -36,12 +35,8 @@ const useCreateList = () => {
         // Clear out all the results in case the request did create the list
         queryClient.invalidateQueries(['lists', authHeaders]);
       },
-      onSuccess: response => {
-        // Insert the newly created list into the top of the returned entries list. This nicely
-        // helps to show the most recent value as soon as it is created
-        queryClient.setQueryData(['lists', authHeaders], (prevList?: List[]) =>
-          [response].concat(prevList || []),
-        );
+      onSuccess: () => {
+        queryClient.invalidateQueries(['lists', authHeaders]);
       },
     },
   );
