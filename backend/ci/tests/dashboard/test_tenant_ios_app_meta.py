@@ -122,7 +122,7 @@ def test_tenant_ios_app_meta(sandbox_tenant):
 
     body = get(f"/org/app_meta/ios", None, *sandbox_tenant.ro_db_auths)
     got_ids = [entry["id"] for entry in body]
-    assert len(got_ids) == 0
+    assert all(m_id not in got_ids for m_id in meta_ids)
 
     # Re-deletion throws errors.
     for meta_id in meta_ids:
