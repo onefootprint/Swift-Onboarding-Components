@@ -12,7 +12,7 @@ use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
 use derive_more::From;
 use diesel::{dsl::not, prelude::*, Queryable};
 use newtypes::{
-    PartnerTenantId, TenantId, TenantOrPartnerTenantIdRef, TenantRoleId, TenantRoleKind,
+    PartnerTenantId, TenantId, OrgIdentifierRef, TenantRoleId, TenantRoleKind,
     TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId,
 };
 
@@ -47,7 +47,7 @@ macro_rules! list_query {
     ($params: ident) => {{
         let mut query = tenant_user::table
             .inner_join(tenant_rolebinding::table.inner_join(tenant_role::table))
-            .filter(TenantRole::tenant_or_partner_tenant_id_eq($params.t_pt_id))
+            .filter(TenantRole::tenant_or_partner_tenant_id_eq($params.org_id))
             .into_boxed();
 
         if $params.only_active {
@@ -83,19 +83,19 @@ impl TenantRolebinding {
         conn: &mut TxnPgConn,
         tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
-        t_pt_id: impl Into<TenantOrPartnerTenantIdRef<'a>>,
+        org_id: impl Into<OrgIdentifierRef<'a>>,
     ) -> DbResult<(Self, TenantRole)> {
-        let t_pt_id: TenantOrPartnerTenantIdRef<'a> = t_pt_id.into();
+        let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
-        let tenant_role = TenantRole::lock_active(conn, &tenant_role_id, t_pt_id)?;
+        let tenant_role = TenantRole::lock_active(conn, &tenant_role_id, org_id)?;
 
         // Validate the given role's kind.
         match tenant_role.kind {
             TenantRoleKindDiscriminant::DashboardUser
             | TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
-                if tenant_role.kind.tenant_kind() != t_pt_id.into() {
+                if tenant_role.kind.tenant_kind() != org_id.into() {
                     return Err(DbError::IncorrectTenantKind);
                 }
             }
@@ -134,30 +134,30 @@ impl TenantRolebinding {
     pub fn create_for_login<'a>(
         conn: &mut TxnPgConn,
         user_id: TenantUserId,
-        t_pt_id: impl Into<TenantOrPartnerTenantIdRef<'a>>,
+        org_id: impl Into<OrgIdentifierRef<'a>>,
     ) -> DbResult<Self> {
-        let t_pt_id: TenantOrPartnerTenantIdRef<'a> = t_pt_id.into();
+        let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         // Get the default admin and read-only role for this tenant/partner tenant.
-        let (tenant_role_kind, admin_role_kind, ro_role_kind) = match t_pt_id {
-            TenantOrPartnerTenantIdRef::TenantId(_) => (
+        let (tenant_role_kind, admin_role_kind, ro_role_kind) = match org_id {
+            OrgIdentifierRef::TenantId(_) => (
                 TenantRoleKind::DashboardUser,
                 ImmutableRoleKind::Admin,
                 ImmutableRoleKind::ReadOnly,
             ),
-            TenantOrPartnerTenantIdRef::PartnerTenantId(_) => (
+            OrgIdentifierRef::PartnerTenantId(_) => (
                 TenantRoleKind::CompliancePartnerDashboardUser,
                 ImmutableRoleKind::CompliancePartnerAdmin,
                 ImmutableRoleKind::CompliancePartnerReadOnly,
             ),
         };
-        let admin_role = TenantRole::get_immutable(conn, t_pt_id, admin_role_kind, tenant_role_kind)?;
-        let ro_role = TenantRole::get_immutable(conn, t_pt_id, ro_role_kind, tenant_role_kind)?;
+        let admin_role = TenantRole::get_immutable(conn, org_id, admin_role_kind, tenant_role_kind)?;
+        let ro_role = TenantRole::get_immutable(conn, org_id, ro_role_kind, tenant_role_kind)?;
 
         // If the tenant was just created and has no users, give the user admin perms.
         // Otherwise, read-only perms
         let filters = TenantRolebindingFilters {
-            t_pt_id,
+            org_id,
             only_active: false,
             role_ids: None,
             search: None,
@@ -167,7 +167,7 @@ impl TenantRolebinding {
         let (users, _) = TenantRolebinding::list(conn, &filters, pagination)?;
         let are_no_users = users.is_empty();
         let role_id = if are_no_users { admin_role.id } else { ro_role.id };
-        let (rb, _) = TenantRolebinding::create(conn, user_id, role_id, t_pt_id)?;
+        let (rb, _) = TenantRolebinding::create(conn, user_id, role_id, org_id)?;
         Ok(rb)
     }
 
@@ -378,7 +378,7 @@ pub struct TenantRolebindingUpdate {
 }
 
 pub struct TenantRolebindingFilters<'a> {
-    pub t_pt_id: TenantOrPartnerTenantIdRef<'a>,
+    pub org_id: OrgIdentifierRef<'a>,
     pub only_active: bool,
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub search: Option<String>,

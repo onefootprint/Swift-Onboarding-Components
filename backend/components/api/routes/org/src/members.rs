@@ -45,7 +45,7 @@ async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let filters = TenantRolebindingFilters {
-                t_pt_id: (&tenant_id).into(),
+                org_id: (&tenant_id).into(),
                 only_active: true,
                 role_ids,
                 search,

@@ -17,7 +17,7 @@ use itertools::chain;
 use newtypes::{
     ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocReviewId,
     ComplianceDocStatus, ComplianceDocSubmissionId, TenantCompliancePartnershipId,
-    TenantOrPartnerTenantIdRef, TenantUserId,
+    OrgIdentifierRef, TenantUserId,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -36,11 +36,11 @@ pub struct ComplianceDocSummary {
 impl ComplianceDocSummary {
     pub fn filter<'a>(
         conn: &mut PgConn,
-        t_pt_id: impl Into<TenantOrPartnerTenantIdRef<'a>>,
+        org_id: impl Into<OrgIdentifierRef<'a>>,
         p_id: Option<&TenantCompliancePartnershipId>,
         doc_id: Option<&ComplianceDocId>,
     ) -> DbResult<HashMap<TenantCompliancePartnershipId, ComplianceDocSummary>> {
-        let t_pt_id: TenantOrPartnerTenantIdRef<'a> = t_pt_id.into();
+        let org_id: OrgIdentifierRef<'a> = org_id.into();
 
         let mut query = tenant_compliance_partnership::table
             .inner_join(tenant::table)
@@ -49,11 +49,11 @@ impl ComplianceDocSummary {
         if let Some(p_id) = p_id {
             query = query.filter(tenant_compliance_partnership::id.eq(p_id));
         }
-        match t_pt_id {
-            TenantOrPartnerTenantIdRef::TenantId(ref id) => {
+        match org_id {
+            OrgIdentifierRef::TenantId(ref id) => {
                 query = query.filter(tenant_compliance_partnership::tenant_id.eq(id))
             }
-            TenantOrPartnerTenantIdRef::PartnerTenantId(ref id) => {
+            OrgIdentifierRef::PartnerTenantId(ref id) => {
                 query = query.filter(tenant_compliance_partnership::partner_tenant_id.eq(id))
             }
         }

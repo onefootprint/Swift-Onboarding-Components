@@ -28,43 +28,43 @@ impl TenantId {
 }
 
 #[derive(Debug, Clone, Copy, From)]
-pub enum TenantOrPartnerTenantIdRef<'a> {
+pub enum OrgIdentifierRef<'a> {
     TenantId(&'a TenantId),
     PartnerTenantId(&'a PartnerTenantId),
 }
 
 #[derive(Debug, Clone, From)]
-pub enum TenantOrPartnerTenantId {
+pub enum OrgIdentifier {
     TenantId(TenantId),
     PartnerTenantId(PartnerTenantId),
 }
 
-impl<'a> From<TenantOrPartnerTenantIdRef<'a>> for TenantKind {
-    fn from(value: TenantOrPartnerTenantIdRef<'a>) -> Self {
+impl<'a> From<OrgIdentifierRef<'a>> for TenantKind {
+    fn from(value: OrgIdentifierRef<'a>) -> Self {
         match value {
-            TenantOrPartnerTenantIdRef::TenantId(_) => TenantKind::Tenant,
-            TenantOrPartnerTenantIdRef::PartnerTenantId(_) => TenantKind::PartnerTenant,
+            OrgIdentifierRef::TenantId(_) => TenantKind::Tenant,
+            OrgIdentifierRef::PartnerTenantId(_) => TenantKind::PartnerTenant,
         }
     }
 }
 
-impl<'a> TenantOrPartnerTenantIdRef<'a> {
-    pub fn clone_into(&self) -> TenantOrPartnerTenantId {
+impl<'a> OrgIdentifierRef<'a> {
+    pub fn clone_into(&self) -> OrgIdentifier {
         match *self {
-            TenantOrPartnerTenantIdRef::TenantId(t_id) => TenantOrPartnerTenantId::TenantId(t_id.clone()),
-            TenantOrPartnerTenantIdRef::PartnerTenantId(pt_id) => {
-                TenantOrPartnerTenantId::PartnerTenantId(pt_id.clone())
+            OrgIdentifierRef::TenantId(t_id) => OrgIdentifier::TenantId(t_id.clone()),
+            OrgIdentifierRef::PartnerTenantId(pt_id) => {
+                OrgIdentifier::PartnerTenantId(pt_id.clone())
             }
         }
     }
 }
 
-impl<'a> From<&'a TenantOrPartnerTenantId> for TenantOrPartnerTenantIdRef<'a> {
-    fn from(value: &'a TenantOrPartnerTenantId) -> Self {
+impl<'a> From<&'a OrgIdentifier> for OrgIdentifierRef<'a> {
+    fn from(value: &'a OrgIdentifier) -> Self {
         match value {
-            TenantOrPartnerTenantId::TenantId(t_id) => TenantOrPartnerTenantIdRef::TenantId(t_id),
-            TenantOrPartnerTenantId::PartnerTenantId(pt_id) => {
-                TenantOrPartnerTenantIdRef::PartnerTenantId(pt_id)
+            OrgIdentifier::TenantId(t_id) => OrgIdentifierRef::TenantId(t_id),
+            OrgIdentifier::PartnerTenantId(pt_id) => {
+                OrgIdentifierRef::PartnerTenantId(pt_id)
             }
         }
     }

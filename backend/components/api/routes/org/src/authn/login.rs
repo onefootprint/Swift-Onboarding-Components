@@ -21,7 +21,7 @@ use db::{
         tenant_user::TenantUser,
     },
 };
-use newtypes::{OrgMemberEmail, TenantKind, TenantOrPartnerTenantIdRef, TenantScope, WorkosAuthMethod};
+use newtypes::{OrgMemberEmail, TenantKind, OrgIdentifierRef, TenantScope, WorkosAuthMethod};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::{
     sso::{
@@ -125,10 +125,10 @@ async fn handler(
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
         let user_id = user.id.clone();
-        let t_pt_id = t_pt.id().clone_into();
+        let org_id = t_pt.id().clone_into();
         let rb = state
             .db_pool
-            .db_transaction(move |conn| TenantRolebinding::create_for_login(conn, user_id, &t_pt_id))
+            .db_transaction(move |conn| TenantRolebinding::create_for_login(conn, user_id, &org_id))
             .await?;
         (vec![(rb, t_pt)], created_new_tenant)
     } else {
@@ -142,7 +142,7 @@ async fn handler(
     let single_rb_and_t_pt = if let Some(org_id) = request_org_id {
         // If a specific tenant ID was requested, only log into that tenant
         matching_rolebindings.into_iter().find(
-            |(_, t_pt)| matches!(t_pt.id(), TenantOrPartnerTenantIdRef::TenantId(t_id) if *t_id == org_id),
+            |(_, t_pt)| matches!(t_pt.id(), OrgIdentifierRef::TenantId(t_id) if *t_id == org_id),
         )
     } else {
         // If there's only one rolebinding for this user, log into it
