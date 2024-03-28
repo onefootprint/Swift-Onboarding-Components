@@ -25,6 +25,7 @@ export type SummaryFormData = {
 export type SummaryMeta = {
   kind: PlaybookKind;
   residency?: ResidencyFormData;
+  onboardingTemplate?: OnboardingTemplate;
 };
 
 export type NameFormData = {
@@ -59,6 +60,12 @@ export const defaultResidencyFormData: ResidencyFormData = {
   restrictCountries: CountryRestriction.all,
 };
 
+export const defaultResidencyFormDataAlpaca: ResidencyFormData = {
+  allowUsResidents: true,
+  allowUsTerritories: true,
+  allowInternationalResidents: false,
+};
+
 export type VerificationChecksFormData = {
   skipKyc?: boolean;
   amlFormData: AMLFormData;
@@ -76,6 +83,20 @@ export const defaultAmlFormData: AMLFormData = {
   ofac: false,
   pep: false,
   adverseMedia: false,
+};
+
+export const defaultAmlFormDataAlpaca: AMLFormData = {
+  enhancedAml: true,
+  ofac: true,
+  pep: true,
+  adverseMedia: true,
+};
+
+export type DefaultValues = {
+  aml: AMLFormData;
+  name: NameFormData;
+  playbook: SummaryFormData;
+  residency: ResidencyFormData;
 };
 
 export type Personal = {
@@ -160,6 +181,25 @@ export const defaultPlaybookValuesKYC: SummaryFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
+export const defaultPlaybookValuesAlpaca: SummaryFormData = {
+  kind: PlaybookKind.Kyc,
+  personal: {
+    [CollectedKycDataOption.address]: true,
+    [CollectedKycDataOption.dob]: true,
+    [CollectedKycDataOption.phoneNumber]: true,
+    [CollectedKycDataOption.usLegalStatus]: true,
+    email: true,
+    idDoc: false,
+    idDocKind: [],
+    countrySpecificIdDocKind: {},
+    selfie: false,
+    ssn: true,
+    ssnDocScanStepUp: false,
+    ssnKind: CollectedKycDataOption.ssn9,
+  },
+  [CollectedInvestorProfileDataOption.investorProfile]: false,
+};
+
 export const defaultPlaybookValuesIdDoc: SummaryFormData = {
   kind: PlaybookKind.IdDoc,
   personal: {
@@ -183,11 +223,14 @@ export const defaultPlaybookValuesKYB: SummaryFormData = {
   businessInformation: defaultBusinessInformation,
 };
 
+export type OnboardingTemplate = 'alpaca' | 'custom';
+
 export type MachineContext = {
   kind: PlaybookKind;
   nameForm?: NameFormData;
   playbook?: SummaryFormData;
   residencyForm?: ResidencyFormData;
+  onboardingTemplate?: OnboardingTemplate;
   verificationChecksForm?: VerificationChecksFormData;
 };
 
@@ -196,10 +239,17 @@ export type MachineEvents =
   | { type: 'nameYourPlaybookSelected' }
   | { type: 'whoToOnboardSelected' }
   | { type: 'summarySelected' }
+  | { type: 'templateSelected' }
   | { type: 'whoToOnboardSubmitted'; payload: { kind: PlaybookKind } }
   | { type: 'nameYourPlaybookSubmitted'; payload: { formData: NameFormData } }
   | { type: 'residencySubmitted'; payload: { formData: ResidencyFormData } }
   | { type: 'playbookSubmitted'; payload: { formData: SummaryFormData } }
+  | {
+      type: 'onboardingTemplatesSelected';
+      payload: {
+        onboardingTemplate: OnboardingTemplate;
+      };
+    }
   | {
       type: 'verificationChecksSubmitted';
       payload: { formData: VerificationChecksFormData };

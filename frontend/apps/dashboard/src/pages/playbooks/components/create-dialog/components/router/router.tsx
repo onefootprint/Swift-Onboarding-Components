@@ -5,6 +5,7 @@ import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { getAlpacaPlaybookContext } from 'src/pages/playbooks/utils/kind/alpaca';
 import { getDocPlaybookContext } from 'src/pages/playbooks/utils/kind/id-doc';
 import styled, { css } from 'styled-components';
 
@@ -17,13 +18,14 @@ import type {
 } from '@/playbooks/utils/machine/types';
 
 import Name from './components/name-your-playbook';
+import OnboardingTemplates from './components/onboarding-templates';
 import Residency from './components/residency';
 import Summary from './components/summary';
 import VerificationChecks from './components/verification-checks';
 import WhoToOnboard from './components/who-to-onboard';
 import useDefaultValues from './hooks/use-default-values';
 import useOptions from './hooks/use-options';
-import getStep from './utils/get-step';
+import getCurrentOption from './utils/get-current-option';
 import processPlaybook from './utils/process-playbook';
 import useCreatePlaybook from './utils/use-create-playbook';
 
@@ -33,18 +35,21 @@ export type RouterProps = {
 
 const Router = ({ onCreate }: RouterProps) => {
   const [state, send] = useMachine(playbookMachine);
-  const { kind } = state.context;
+  const { kind, onboardingTemplate } = state.context;
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog',
   });
   const toast = useToast();
   const showRequestError = useRequestErrorToast();
   const mutation = useCreatePlaybook();
-  const allOptions = useOptions();
+  const allOptions = useOptions({
+    template: onboardingTemplate,
+  });
   const options = allOptions[kind];
-  const step = getStep({ value: state.value as string });
-  const isLastStep = step === options.length - 1;
-  const stepperValue = options[step];
+  const { currentOption, currentSubOption, isLastStep } = getCurrentOption({
+    value: state.value as string,
+    options,
+  });
   const defaultValues = useDefaultValues(state.context);
   const idDocKinds = state.context.playbook?.personal.idDocKind;
   const countrySpecificIdDocKinds =
@@ -52,6 +57,7 @@ const Router = ({ onCreate }: RouterProps) => {
   const requiresIdDoc =
     (idDocKinds ?? []).length > 0 ||
     Object.keys(countrySpecificIdDocKinds ?? {}).length > 0;
+  const isAlpaca = onboardingTemplate === 'alpaca';
 
   const createPlaybook = (
     context: MachineContext,
@@ -77,11 +83,13 @@ const Router = ({ onCreate }: RouterProps) => {
       skipConfirm,
       docScanForOptionalSsn,
       documentTypesAndCountries,
+      cipKind,
     } = processPlaybook({
       kind,
       nameForm,
       playbook,
       residencyForm,
+      template: onboardingTemplate,
     });
     mutation.mutate(
       {
@@ -101,6 +109,7 @@ const Router = ({ onCreate }: RouterProps) => {
         skipKyc,
         skipConfirm,
         documentTypesAndCountries,
+        cipKind,
       },
       {
         onSuccess: () => {
@@ -130,9 +139,11 @@ const Router = ({ onCreate }: RouterProps) => {
               send('whoToOnboardSelected');
             } else if (option.value === 'summary') {
               send('summarySelected');
+            } else if (option.value === 'onboardingTemplates') {
+              send('templateSelected');
             }
           }}
-          value={{ option: stepperValue }}
+          value={{ option: currentOption, subOption: currentSubOption }}
           aria-label={t('stepper.aria-label')}
         />
       </StepperContainer>
@@ -142,6 +153,20 @@ const Router = ({ onCreate }: RouterProps) => {
             defaultKind={state.context.kind}
             onSubmit={payload => {
               send('whoToOnboardSubmitted', { payload });
+            }}
+          />
+        )}
+        {state.matches('onboardingTemplates') && (
+          <OnboardingTemplates
+            onSubmit={formdata => {
+              const { template } = formdata;
+              send({
+                type: 'onboardingTemplatesSelected',
+                payload: { onboardingTemplate: template },
+              });
+            }}
+            onBack={() => {
+              send('navigationBackward');
             }}
           />
         )}
@@ -184,8 +209,9 @@ const Router = ({ onCreate }: RouterProps) => {
           <Summary
             defaultValues={defaultValues.playbook}
             meta={{
-              kind: state.context.kind,
-              residency: state.context.residencyForm,
+              kind: state.context.kind || defaultValues.playbook.kind,
+              residency: state.context.residencyForm || defaultValues.residency,
+              onboardingTemplate,
             }}
             onBack={() => {
               send('navigationBackward');
@@ -210,6 +236,22 @@ const Router = ({ onCreate }: RouterProps) => {
                 const payload = getAuthFixedPayload({ nameForm, ...formData });
                 const { verificationChecks, ...ctx } = payload;
                 createPlaybook(ctx, verificationChecks);
+                return;
+              }
+
+              if (isAlpaca && nameForm) {
+                const verificationChecksForm = {
+                  skipKyc: false,
+                  amlFormData: defaultValues.aml,
+                };
+
+                const alpacaContext = getAlpacaPlaybookContext(
+                  state.context,
+                  formData,
+                  verificationChecksForm,
+                  defaultValues,
+                );
+                createPlaybook(alpacaContext, verificationChecksForm);
                 return;
               }
 

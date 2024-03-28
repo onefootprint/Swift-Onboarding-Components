@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { isAuth, isIdDoc } from '@/playbooks/utils/kind';
-import {
-  PlaybookKind,
-  type SummaryFormData,
-  type SummaryMeta,
+import type {
+  SummaryFormData,
+  SummaryMeta,
 } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 
@@ -42,7 +42,13 @@ const Summary = ({
     if (isIdDoc(meta.kind)) {
       return t('title.id-doc');
     }
-    return t('title.default');
+    const internationalOnly =
+      meta.residency?.allowInternationalResidents &&
+      !meta.residency.allowUsResidents;
+    const canEdit = !internationalOnly && meta.onboardingTemplate !== 'alpaca';
+    return canEdit
+      ? t('title.default-editable')
+      : t('title.default-non-editable');
   };
 
   const getSubtitle = (): string => {
@@ -53,9 +59,9 @@ const Summary = ({
       meta.residency?.allowInternationalResidents &&
       !meta.residency.allowUsResidents;
 
-    return internationalOnly
-      ? t('subtitle.international-only')
-      : t('subtitle.default');
+    if (internationalOnly) return t('subtitle.international-only');
+    if (meta.onboardingTemplate === 'alpaca') return t('subtitle.alpaca');
+    return t(`subtitle.default`);
   };
 
   const formMethods = useForm<SummaryFormData>({ defaultValues });

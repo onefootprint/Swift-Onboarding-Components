@@ -32,6 +32,9 @@ describe('<Router />', () => {
         // Who to onboard
         await moveForward();
 
+        // Templates
+        await moveForward();
+
         // Residency
         await moveForward();
 
@@ -55,6 +58,57 @@ describe('<Router />', () => {
         await waitFor(() => {
           expect(onCreate).toHaveBeenCalled();
         });
+      });
+    });
+
+    describe('when in the "Templates" step', () => {
+      it('should go to "Who to onboard" when clicking "Back"', async () => {
+        renderRouter({ onCreate: jest.fn() });
+
+        // Who to onboard
+        await moveForward();
+
+        // Templates
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        // Who to onboard
+        const title = screen.getByText(
+          'What type of playbook would you like to create?',
+        );
+        expect(title).toBeInTheDocument();
+      });
+
+      it('should go to "Residency" when clicking "Next" with "custom" selected', async () => {
+        renderRouter({ onCreate: jest.fn() });
+
+        // Who to onboard
+        await moveForward();
+
+        // Templates
+        const next = screen.getByRole('button', { name: 'Next' });
+        await userEvent.click(next);
+
+        // Residency
+        const title = screen.getByText(
+          'Select the countries from which your users may onboard.',
+        );
+        expect(title).toBeInTheDocument();
+      });
+
+      it('should go to "Name your playbook" when clicking "Next" with "alpaca" selected', async () => {
+        renderRouter({ onCreate: jest.fn() });
+
+        // Who to onboard
+        await moveForward();
+
+        // Templates
+        await userEvent.click(screen.getByText('Alpaca'));
+        await moveForward();
+
+        // Name
+        const title = screen.getByText('Name your playbook');
+        expect(title).toBeInTheDocument();
       });
     });
 
@@ -84,6 +138,9 @@ describe('<Router />', () => {
         // Who to onboard
         await moveForward();
 
+        // Templates
+        await moveForward();
+
         // Residency
         await moveForward();
 
@@ -97,6 +154,27 @@ describe('<Router />', () => {
         );
         expect(title).toBeInTheDocument();
       });
+
+      it('should go to "Templates" when clicking "Back" if Alpaca was selected', async () => {
+        renderRouter({ onCreate: jest.fn() });
+
+        // Who to onboard
+        await moveForward();
+
+        // Templates
+        await userEvent.click(screen.getByText('Alpaca'));
+        await moveForward();
+
+        // Name
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        // Templates
+        const title = screen.getByText(
+          'Configure your own KYC settings or select a pre-defined template from an external provider.',
+        );
+        expect(title).toBeInTheDocument();
+      });
     });
 
     describe('when in the "Summary" step', () => {
@@ -104,6 +182,9 @@ describe('<Router />', () => {
         renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
+        await moveForward();
+
+        // Templates
         await moveForward();
 
         // Residency
@@ -128,6 +209,9 @@ describe('<Router />', () => {
         renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
+        await moveForward();
+
+        // Templates
         await moveForward();
 
         // Residency
@@ -162,6 +246,9 @@ describe('<Router />', () => {
           name: 'Onboard businesses and their beneficial owners',
         });
         await userEvent.click(option);
+        await moveForward();
+
+        // Templates
         await moveForward();
 
         // Residency
@@ -239,6 +326,9 @@ describe('<Router />', () => {
         renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
+        await moveForward();
+
+        // Templates
         await moveForward();
 
         // Residency

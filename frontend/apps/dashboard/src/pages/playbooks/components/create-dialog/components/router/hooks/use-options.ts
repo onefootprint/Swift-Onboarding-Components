@@ -1,8 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
+import type { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
-const useOptions = () => {
+type UseOptionsProps = {
+  template?: OnboardingTemplate;
+};
+
+const useOptions = ({ template }: UseOptionsProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
 
   const defaultOptions = [
@@ -15,12 +20,26 @@ const useOptions = () => {
     {
       value: 'whoToOnboard',
       label: t('dialog.who-to-onboard.nav'),
-      options: [{ value: 'residency', label: t('dialog.residency.nav') }],
+      options: [
+        {
+          value: 'onboardingTemplates',
+          label: t('dialog.onboarding-templates.nav'),
+        },
+      ],
     },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
     { value: 'summary', label: t('dialog.summary.nav') },
-    { value: 'verificationChecks', label: t('dialog.verification-checks.nav') },
   ];
+  if (template === 'custom') {
+    kycOptions[0].options?.push({
+      value: 'residency',
+      label: t('dialog.residency.nav'),
+    });
+    kycOptions.push({
+      value: 'verificationChecks',
+      label: t('dialog.verification-checks.nav'),
+    });
+  }
   const authOptions = [
     {
       value: 'whoToOnboard',

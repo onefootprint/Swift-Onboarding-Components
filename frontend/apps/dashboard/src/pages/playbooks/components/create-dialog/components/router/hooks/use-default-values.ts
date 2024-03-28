@@ -1,16 +1,23 @@
 import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
-import type { MachineContext } from '@/playbooks/utils/machine/types';
+import type {
+  DefaultValues,
+  MachineContext,
+} from '@/playbooks/utils/machine/types';
 import {
   defaultAmlFormData,
+  defaultAmlFormDataAlpaca,
   defaultNameFormData,
+  defaultPlaybookValuesAlpaca,
   defaultPlaybookValuesAuth,
   defaultPlaybookValuesIdDoc,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
   defaultResidencyFormData,
+  defaultResidencyFormDataAlpaca,
 } from '@/playbooks/utils/machine/types';
 
-const useDefaultValues = (context: MachineContext) => {
+const useDefaultValues = (context: MachineContext): DefaultValues => {
+  const isAlpacaPlaybook = context.onboardingTemplate === 'alpaca';
   if (isAuth(context.kind)) {
     return {
       ...defaultPlaybookValuesAuth,
@@ -26,15 +33,26 @@ const useDefaultValues = (context: MachineContext) => {
   if (isIdDoc(context.kind)) {
     defaultValues = defaultPlaybookValuesIdDoc;
   }
+  if (isAlpacaPlaybook) {
+    defaultValues = defaultPlaybookValuesAlpaca;
+  }
+
+  let defaultAml = defaultAmlFormData;
+  if (isAlpacaPlaybook) defaultAml = defaultAmlFormDataAlpaca;
+
+  let residency = defaultResidencyFormData;
+  if (isKyc(context.kind) && context.residencyForm) {
+    residency = context.residencyForm;
+  }
+  if (isAlpacaPlaybook) {
+    residency = defaultResidencyFormDataAlpaca;
+  }
 
   return {
-    aml: context.verificationChecksForm?.amlFormData || defaultAmlFormData,
+    aml: context.verificationChecksForm?.amlFormData || defaultAml,
     name: context.nameForm || defaultNameFormData,
     playbook: context.playbook || defaultValues,
-    residency:
-      isKyc(context.kind) && context.residencyForm
-        ? context.residencyForm
-        : defaultResidencyFormData,
+    residency,
   };
 };
 

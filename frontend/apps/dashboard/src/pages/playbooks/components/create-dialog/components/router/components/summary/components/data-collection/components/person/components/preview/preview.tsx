@@ -1,5 +1,12 @@
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
-import { Checkbox, LinkButton, Text, Tooltip } from '@onefootprint/ui';
+import {
+  Box,
+  Checkbox,
+  Divider,
+  LinkButton,
+  Text,
+  Tooltip,
+} from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +44,8 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     values.idDocKind.length > 0 ||
     Object.keys(values.countrySpecificIdDocKind).length > 0;
   const [showIdDocEditor, setShowIdDocEditor] = useState(false);
+  const canEdit = !internationalOnly && meta.onboardingTemplate !== 'alpaca';
+  const allowUsTerritoryResidents = meta.residency?.allowUsTerritories;
 
   return (
     <Container>
@@ -55,7 +64,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
         ) : (
           <Text variant="label-3">{t('title.kyc')}</Text>
         )}
-        {internationalOnly ? null : (
+        {canEdit && (
           <LinkButton
             iconComponent={IcoPencil16}
             iconPosition="left"
@@ -140,6 +149,19 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
             {...register('personal.idDocFirst')}
           />
         </Subsection>
+      )}
+      {allowUsTerritoryResidents && (
+        <footer>
+          <Box marginTop={5} marginBottom={5}>
+            <Divider variant="secondary" />
+          </Box>
+          <Text variant="label-3" color="primary">
+            {t('us-territories.label')}{' '}
+            <Text variant="label-3" color="tertiary" tag="span">
+              {t('us-territories.content')}
+            </Text>
+          </Text>
+        </footer>
       )}
     </Container>
   );

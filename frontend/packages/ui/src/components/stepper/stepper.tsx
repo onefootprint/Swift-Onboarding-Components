@@ -103,8 +103,8 @@ const Stepper = ({
                           </IconContainer>
                           <button
                             type="button"
-                            onClick={handleClick(option)}
-                            disabled={isNext}
+                            onClick={handleClick(suboption)}
+                            disabled={isSubOptionNext}
                           >
                             {suboption.label}
                           </button>

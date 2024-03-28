@@ -14,17 +14,23 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignNameYourPlaybook: 'nameYourPlaybookSubmitted';
+    assignOnboardingTemplate: 'onboardingTemplatesSelected';
     assignPlaybook: 'playbookSubmitted';
     assignResidency: 'residencySubmitted';
     assignVerificationChecks: 'verificationChecksSubmitted';
     assignWhoToOnboard: 'whoToOnboardSubmitted';
     resetKind: 'navigationBackward' | 'whoToOnboardSelected';
+    resetOnboardingTemplate:
+      | 'navigationBackward'
+      | 'templateSelected'
+      | 'whoToOnboardSelected';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
     | 'nameYourPlaybook'
+    | 'onboardingTemplates'
     | 'residency'
     | 'summary'
     | 'verificationChecks'

@@ -27,6 +27,7 @@ export type OrgOnboardingConfigCreateRequest = {
   skipKyc?: boolean;
   skipConfirm?: boolean;
   documentTypesAndCountries: DocumentTypesAndCountries;
+  cipKind?: string;
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

@@ -23,7 +23,7 @@ export const createPlaybookMachine = () =>
           on: {
             whoToOnboardSubmitted: [
               {
-                target: 'residency',
+                target: 'onboardingTemplates',
                 actions: ['assignWhoToOnboard'],
                 cond: (_, event) => event.payload.kind === PlaybookKind.Kyc,
               },
@@ -34,19 +34,43 @@ export const createPlaybookMachine = () =>
             ],
           },
         },
+        onboardingTemplates: {
+          on: {
+            onboardingTemplatesSelected: [
+              {
+                target: 'residency',
+                actions: ['assignOnboardingTemplate'],
+                cond: (_, event) =>
+                  event.payload.onboardingTemplate === 'custom',
+              },
+              {
+                target: 'nameYourPlaybook',
+                actions: ['assignOnboardingTemplate'],
+              },
+            ],
+            navigationBackward: {
+              target: 'whoToOnboard',
+              actions: ['resetKind'],
+            },
+          },
+        },
         residency: {
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
-              actions: ['resetKind'],
+              actions: ['resetKind', 'resetOnboardingTemplate'],
+            },
+            templateSelected: {
+              target: 'onboardingTemplates',
+              actions: ['resetOnboardingTemplate'],
             },
             residencySubmitted: {
               target: 'nameYourPlaybook',
               actions: ['assignResidency'],
             },
             navigationBackward: {
-              target: 'whoToOnboard',
-              actions: ['resetKind'],
+              target: 'onboardingTemplates',
+              actions: ['resetOnboardingTemplate'],
             },
           },
         },
@@ -54,11 +78,18 @@ export const createPlaybookMachine = () =>
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
-              actions: ['resetKind'],
+              actions: ['resetKind', 'resetOnboardingTemplate'],
             },
             navigationBackward: [
               {
                 target: 'residency',
+                cond: context =>
+                  context.kind === PlaybookKind.Kyc &&
+                  context.onboardingTemplate === 'custom',
+              },
+              {
+                target: 'onboardingTemplates',
+                actions: ['resetOnboardingTemplate'],
                 cond: context => context.kind === PlaybookKind.Kyc,
               },
               {
@@ -75,7 +106,7 @@ export const createPlaybookMachine = () =>
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
-              actions: ['resetKind'],
+              actions: ['resetKind', 'resetOnboardingTemplate'],
             },
             nameYourPlaybookSelected: {
               target: 'nameYourPlaybook',
@@ -93,7 +124,7 @@ export const createPlaybookMachine = () =>
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
-              actions: ['resetKind'],
+              actions: ['resetKind', 'resetOnboardingTemplate'],
             },
             nameYourPlaybookSelected: {
               target: 'nameYourPlaybook',
@@ -136,6 +167,27 @@ export const createPlaybookMachine = () =>
         assignVerificationChecks: assign((context, event) => ({
           ...context,
           verificationChecksForm: event.payload.formData,
+        })),
+        assignOnboardingTemplate: assign((context, event) => {
+          const template = event.payload.onboardingTemplate;
+          if (template === 'custom') {
+            return {
+              ...context,
+              onboardingTemplate: template,
+            };
+          }
+          return {
+            ...context,
+            onboardingTemplate: template,
+            residencyForm: undefined,
+            nameForm: undefined,
+            playbook: undefined,
+            verificationChecksForm: undefined,
+          };
+        }),
+        resetOnboardingTemplate: assign(context => ({
+          ...context,
+          onboardingTemplate: undefined,
         })),
       },
     },

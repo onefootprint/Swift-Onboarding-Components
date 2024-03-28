@@ -9,6 +9,7 @@ import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
   BusinessInformation,
   NameFormData,
+  OnboardingTemplate,
   PlaybookKind,
   ResidencyFormData,
   SummaryFormData,
@@ -20,6 +21,7 @@ type ProcessPlaybookProps = {
   kind: PlaybookKind;
   residencyForm?: ResidencyFormData;
   nameForm: NameFormData;
+  template?: OnboardingTemplate;
 };
 
 const getRequiredKybCollectFields = () => [
@@ -41,6 +43,7 @@ const processPlaybook = ({
   nameForm,
   playbook,
   residencyForm,
+  template,
 }: ProcessPlaybookProps) => {
   const mustCollectData: CollectedDataOption[] = [];
   const optionalData: CollectedDataOption[] = [];
@@ -144,6 +147,7 @@ const processPlaybook = ({
     docScanForOptionalSsn,
     documentTypesAndCountries,
     ...getResidency(residencyForm),
+    cipKind: template === 'alpaca' ? 'alpaca' : undefined,
   };
 };
 

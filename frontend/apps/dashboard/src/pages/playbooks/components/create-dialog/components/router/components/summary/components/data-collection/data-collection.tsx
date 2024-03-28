@@ -20,6 +20,7 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.summary.data-collection',
   });
+  const isAlpaca = meta.onboardingTemplate === 'alpaca';
 
   if (isAuth(meta.kind)) {
     return (
@@ -41,7 +42,7 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
     <Container>
       {isKyb(meta.kind) && <Business />}
       <Person meta={meta} />
-      {isKyc(meta.kind) && <Investor />}
+      {isKyc(meta.kind) && !isAlpaca && <Investor />}
       {isKyb(meta.kind) && (
         <InlineAlert variant="info">{t('alert')}</InlineAlert>
       )}

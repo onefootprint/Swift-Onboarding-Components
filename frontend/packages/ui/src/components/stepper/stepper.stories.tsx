@@ -52,10 +52,24 @@ const Template: Story<StepperProps> = ({
           subOption: subValue,
         }}
         onChange={newValue => {
-          const nextIndex = options.findIndex(
-            option => option.value === newValue.value,
-          );
+          let nextIndex = 0;
+          let nextSubIndex = 0;
+          options.forEach((option, i) => {
+            if (option.value === newValue.value) {
+              nextIndex = i;
+              nextSubIndex = 0;
+            } else if (option.options) {
+              const subOptionIndex = option.options.findIndex(
+                subOption => subOption.value === newValue.value,
+              );
+              if (subOptionIndex !== -1) {
+                nextIndex = i;
+                nextSubIndex = subOptionIndex;
+              }
+            }
+          });
           setIndex(nextIndex);
+          setSubIndex(nextSubIndex);
           onChange?.(newValue);
         }}
       />
@@ -129,8 +143,8 @@ WithSubOptions.args = {
       label: 'Your Playbook',
       value: 'your-playbook',
       options: [
-        { label: 'Option 1', value: 'value 1' },
-        { label: 'Option 2', value: 'value 2' },
+        { label: 'Option A', value: 'value A' },
+        { label: 'Option B', value: 'value B' },
       ],
     },
     { label: 'Name your Playbook', value: 'name-your-playbook' },
