@@ -1,5 +1,5 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Box, Divider, Stack, Text } from '@onefootprint/ui';
+import { Box, Divider, media, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import Blur from '../components/blur';
+import ContainerBox from '../components/container-box';
 import EmailForm from '../components/email-form';
 import Layout from '../components/layout';
 import SocialButtons from '../components/social-buttons';
@@ -23,25 +24,12 @@ const Login = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Layout>
-        <Box position="relative">
+        <Container position="relative" width="100%">
           <PenguinImageContainer>
             <SkatingPenguin />
           </PenguinImageContainer>
           <StyledBlur />
-          <Stack
-            width="414px"
-            direction="column"
-            gap={7}
-            zIndex={1}
-            position="relative"
-            backgroundColor="primary"
-            borderRadius="lg"
-            borderWidth={1}
-            borderStyle="solid"
-            borderColor="tertiary"
-            padding={8}
-            elevation={1}
-          >
+          <ContainerBox>
             <ThemedLogoFpCompact color="primary" />
             <Text variant="label-2">{t('title')}</Text>
             <SocialButtons />
@@ -62,12 +50,21 @@ const Login = () => {
               <span>{t('do-not-have-an-account')}</span>
               <Link href="/authentication/sign-up">{t('sign-up')}</Link>
             </Text>
-          </Stack>
-        </Box>
+          </ContainerBox>
+        </Container>
       </Layout>
     </>
   );
 };
+
+const Container = styled(Box)`
+  position: relative;
+  width: 100%;
+
+  ${media.greaterThan('sm')`
+    width: 410px;
+  `}
+`;
 
 const PenguinImageContainer = styled(Box)`
   width: 100px;

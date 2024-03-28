@@ -1,11 +1,12 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Box, Stack, Text } from '@onefootprint/ui';
+import { Box, media, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import ContainerBox from '../components/container-box';
 import Layout from '../components/layout';
 import PenguinWink from './components/penguin-wink';
 
@@ -19,17 +20,8 @@ const LinkSent = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Layout>
-        <Box
-          backgroundColor="primary"
-          borderRadius="lg"
-          borderWidth={1}
-          borderStyle="solid"
-          borderColor="tertiary"
-          padding={8}
-          elevation={1}
-          position="relative"
-        >
-          <Stack width="398px" direction="column" gap={7}>
+        <Container>
+          <ContainerBox>
             <ThemedLogoFpCompact color="primary" />
             <Stack center gap={5} direction="column" align="center">
               <Text variant="label-2">{t('title')}</Text>
@@ -49,15 +41,24 @@ const LinkSent = () => {
                 />
               </Text>
             </Stack>
-          </Stack>
+          </ContainerBox>
           <PenguinImageContainer>
             <PenguinWink />
           </PenguinImageContainer>
-        </Box>
+        </Container>
       </Layout>
     </>
   );
 };
+
+const Container = styled(Box)`
+  position: relative;
+  width: 100%;
+
+  ${media.greaterThan('sm')`
+    width: 410px;
+  `}
+`;
 
 const PenguinImageContainer = styled(Box)`
   width: 140px;
