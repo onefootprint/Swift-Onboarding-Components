@@ -25,6 +25,7 @@ use strum_macros::{AsRefStr, Display, EnumString};
     EnumString,
     AsRefStr,
 )]
+#[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum ComplianceDocReviewDecision {
@@ -45,7 +46,8 @@ pub enum ComplianceDocData {
     },
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Apiv2Schema, SerializeDisplay, Display)]
+#[derive(Debug, Clone, Eq, PartialEq, Apiv2Schema, Display, SerializeDisplay, Deserialize)]
+#[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum ComplianceDocStatus {
     NotRequested,

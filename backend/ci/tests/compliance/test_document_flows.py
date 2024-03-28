@@ -158,6 +158,47 @@ def test_partner_document_flow(tenant, partner_tenant):
     # We shouldn't be able to delete a document that has submissions.
     delete(f"compliance/partners/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths, status_code=400)
 
+    # Accept the submission.
+    sub_id = doc["active_submission_id"]
+    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
+        "submission_id": sub_id,
+        "decision": "accepted",
+        "note": "lgtm",
+    }, *partner_tenant.db_auths)
+    # The document should now be accepted.
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
+    assert doc["status"] == "accepted"
+
+    # Re-review the latest submission.
+    prev_request_id = doc["active_request_id"]
+    sub_id = doc["active_submission_id"]
+    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
+        "submission_id": sub_id,
+        "decision": "rejected",
+        "note": "try again",
+    }, *partner_tenant.db_auths)
+    # The document should be waiting for upload.
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
+    # There should be a new request issued.
+    assert doc["active_request_id"] != prev_request_id
+    assert doc["status"] == "waiting_for_upload"
+
+    # We shouldn't be able to review the old submission.
+    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
+        "submission_id": sub_id,
+        "decision": "rejected",
+        "note": "this won't work",
+    }, *partner_tenant.db_auths, status_code=400)
+
+    # Deleting the latest request should put the document in the "not_requested" state.
+    request_id = doc["active_request_id"]
+    delete(f"compliance/partners/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths)
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
+    assert doc["status"] == "not_requested"
+
     # Delete the template
     delete(f"compliance/doc_templates/{template_id}", {}, *partner_tenant.db_auths)
 
@@ -170,4 +211,4 @@ def test_partner_document_flow(tenant, partner_tenant):
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["name"] == "edited template name"
     assert doc["description"] == "edited template description"
-    assert doc["status"] == "waiting_for_review"
+    assert doc["status"] == "not_requested"

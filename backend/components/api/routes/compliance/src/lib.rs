@@ -6,6 +6,7 @@ mod members;
 mod partners;
 mod request;
 mod reupload;
+mod reviews;
 mod submissions;
 
 use api_core::*;
@@ -22,4 +23,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config.service(request::delete);
     config.service(reupload::post);
     config.service(submissions::post);
+    config.service(reviews::post);
 }

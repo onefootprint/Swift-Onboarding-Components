@@ -723,6 +723,118 @@
                 ]
             }
         },
+        "/compliance/partners/{partnership_id}/documents/{document_id}/review": {
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Submit an external URL in response to a request",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "document_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateReviewRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/compliance/partners/{partnership_id}/documents/{document_id}/submit_external_url": {
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Submit an external URL in response to a request",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "document_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubmitExternalUrlRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/compliance/partners/{partnership_id}/requests/{request_id}": {
             "delete": {
                 "tags": [
@@ -7523,11 +7635,11 @@
                     "status": {
                         "type": "string",
                         "enum": [
-                            "NotRequested",
-                            "WaitingForUpload",
-                            "WaitingForReview",
-                            "Accepted",
-                            "Rejected"
+                            "not_requested",
+                            "waiting_for_upload",
+                            "waiting_for_review",
+                            "accepted",
+                            "rejected"
                         ]
                     },
                     "template_id": {
@@ -8640,6 +8752,29 @@
                     "pinned_server_certificates",
                     "secret_headers",
                     "url"
+                ]
+            },
+            "CreateReviewRequest": {
+                "type": "object",
+                "properties": {
+                    "decision": {
+                        "type": "string",
+                        "enum": [
+                            "accepted",
+                            "rejected"
+                        ]
+                    },
+                    "note": {
+                        "type": "string"
+                    },
+                    "submission_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "decision",
+                    "note",
+                    "submission_id"
                 ]
             },
             "CreateRuleRequest": {
