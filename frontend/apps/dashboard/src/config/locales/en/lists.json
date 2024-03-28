@@ -84,6 +84,27 @@
     "header": {
       "kind": "Match type:",
       "edit": "Edit",
+      "actions": {
+        "delete": "Delete",
+        "delete-confirmation": {
+          "title": "Delete list",
+          "description": "Are you sure you want to delete this list?",
+          "cta": {
+            "delete": "Delete",
+            "cancel": "Cancel"
+          },
+          "feedback": {
+            "success": {
+              "title": "Success",
+              "description": "List deleted successfully."
+            },
+            "error": {
+              "title": "Error deleting list",
+              "description": "Something went wrong, please try again."
+            }
+          }
+        }
+      },
       "edit-dialog": {
         "title": "Edit list",
         "cta": {

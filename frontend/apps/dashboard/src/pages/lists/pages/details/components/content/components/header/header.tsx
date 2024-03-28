@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import useList from '@/lists/pages/details/hooks/use-list';
 
+import Actions from './components/actions';
 import EditDialog from './components/edit-dialog';
 
 const Header = () => {
@@ -14,18 +15,18 @@ const Header = () => {
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.header',
   });
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   if (isLoading || error || !data) {
     return null;
   }
 
-  const launchDialog = () => {
-    setIsDialogOpen(true);
+  const launchEditDialog = () => {
+    setIsEditDialogOpen(true);
   };
 
   const closeDialog = () => {
-    setIsDialogOpen(false);
+    setIsEditDialogOpen(false);
   };
 
   return (
@@ -62,12 +63,13 @@ const Header = () => {
         </Stack>
       </Stack>
       <Stack align="center" gap={3}>
-        <Button variant="secondary" onClick={launchDialog}>
+        <Button variant="secondary" onClick={launchEditDialog}>
           {t('edit')}
         </Button>
+        <Actions />
       </Stack>
       <EditDialog
-        open={isDialogOpen}
+        open={isEditDialogOpen}
         onClose={closeDialog}
         onEdit={closeDialog}
       />
