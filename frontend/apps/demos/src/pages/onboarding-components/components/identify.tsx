@@ -11,7 +11,7 @@ import s from '../onboarding-components.module.css';
 const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
   const handleSubmit = async () => {
-    fp.launchIdentify(onDone);
+    fp.launchIdentify({ onDone });
   };
 
   return (

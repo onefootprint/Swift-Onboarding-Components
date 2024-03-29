@@ -14,7 +14,6 @@ export const useFootprint = () => {
 
   const getVaultFormData = (): UserData => {
     const values = form.getValues();
-
     return {
       'id.first_name': values.firstName,
       'id.middle_name': values.middleName,
@@ -31,15 +30,26 @@ export const useFootprint = () => {
     };
   };
 
-  const launchIdentify = (onDone: () => void) => {
+  const launchIdentify = ({
+    email,
+    phoneNumber,
+    onDone,
+  }: {
+    email?: string;
+    phoneNumber?: string;
+    onDone: () => void;
+  }) => {
     const fp = footprint.init({
       appearance: context.appearance,
       publicKey: context.publicKey,
       userData: {
-        'id.phone_number': form.getValues('phoneNumber'),
-        'id.email': form.getValues('email'),
+        'id.phone_number': phoneNumber || form.getValues('phoneNumber'),
+        'id.email': email || form.getValues('email'),
       },
       kind: FootprintComponentKind.Components,
+      onComplete: context.onComplete,
+      onError: context.onError,
+      onCancel: context.onCancel,
       onRelayToComponents: (authToken: string) => {
         setContext(prev => ({ ...prev, authToken }));
         onDone();
@@ -71,9 +81,13 @@ export const useFootprint = () => {
     if (!authToken) {
       throw new Error('No authToken found');
     }
-    const data = getVaultFormData();
-    await saveReq({ data, authToken });
-    await getMissingRequirements(authToken);
+    try {
+      const data = getVaultFormData();
+      await saveReq({ data, authToken });
+      await getMissingRequirements(authToken);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handoff = () => {
