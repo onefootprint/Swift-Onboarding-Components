@@ -174,7 +174,7 @@ pub async fn post(
 
             let ae = AssociatedAuthEvent::explicit(event.id);
             // Add the new scopes and args to the existing scopes and context on the auth token
-            let data = user_auth.data.clone().update(context, scopes, Some(ae))?;
+            let data = user_auth.data.session.clone().update(context, scopes, Some(ae))?;
             let duration = scope.token_ttl();
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             let obc = user_auth.ob_config().cloned();

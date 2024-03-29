@@ -43,7 +43,10 @@ pub async fn handler(
         .db_query(move |conn| -> ApiResult<_> {
             let expires_in = Duration::minutes(30);
             let args = NewUserSessionContext::default();
-            let data = user_auth.data.update(args, vec![UserAuthScope::Handoff], None)?;
+            let data = user_auth
+                .data
+                .session
+                .update(args, vec![UserAuthScope::Handoff], None)?;
             let (auth_token, _) = AuthSession::create_sync(conn, &session_sealing_key, data, expires_in)?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on
             // a hash of the auth token so both handoff clients can look up the status

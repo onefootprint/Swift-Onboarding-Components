@@ -110,7 +110,7 @@ pub async fn post(
                 sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };
-            let data = user_auth.data.clone().update(args, vec![], None)?;
+            let data = user_auth.data.session.clone().update(args, vec![], None)?;
             user_auth.update_session(conn, &session_key, data)?;
 
             Ok(())

@@ -100,7 +100,7 @@ pub async fn post(
     let v_id = vw.vault.id.clone();
     let (token, token_scopes) = if let Some(user_auth) = user_auth {
         // Don't issue a new identified token
-        (user_auth.auth_token, user_auth.data.scopes)
+        (user_auth.auth_token, user_auth.data.session.scopes)
     } else {
         create_identified_token(&state, v_id, scope, sv, ob_context).await?
     };

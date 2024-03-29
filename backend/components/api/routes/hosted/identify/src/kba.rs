@@ -9,7 +9,6 @@ use api_core::{
     },
 };
 use api_wire_types::KbaResponse;
-use chrono::Duration;
 use itertools::Itertools;
 use newtypes::{put_data_request::RawDataRequest, DataIdentifier, IdentityDataKind as IDK, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -69,11 +68,9 @@ pub async fn post(
                 kba: successful_kba,
                 ..Default::default()
             };
-            let data = user_auth.data.clone().update(context, vec![], None)?;
-
-            // TODO infer duration from token purpose
-            let duration = Duration::hours(1);
-            let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            let expires_at = user_auth.expires_at();
+            let data = user_auth.data.session.update(context, vec![], None)?;
+            let (token, _) = AuthSession::create_sync(conn, &session_key, data, expires_at)?;
             Ok(token)
         })
         .await?;

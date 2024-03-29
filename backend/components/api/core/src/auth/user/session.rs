@@ -8,45 +8,32 @@ use db::{
     PgConn,
 };
 use itertools::Itertools;
-use newtypes::{
-    AuthEventKind, BoId, DataIdentifier, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId,
-    WorkflowRequestId,
-};
+use newtypes::{AuthEventKind, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId};
 use paperclip::actix::Apiv2Security;
 
 use crate::{
     auth::{
         session::{
-            user::{
-                AssociatedAuthEvent, AssociatedAuthEventKind, NewUserSessionArgs, NewUserSessionContext,
-                UserSession, UserSessionPurpose,
-            },
+            user::{AssociatedAuthEvent, AssociatedAuthEventKind, UserSession},
             AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
         },
         user::UserAuth,
         AuthError, IsGuardMet, SessionContext,
     },
-    errors::{ApiError, ApiResult, ValidationError},
+    errors::{ApiError, ApiResult},
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::UserAuthScope;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_more::Deref)]
 pub struct UserSessionContext {
     pub user: Vault,
-    pub scopes: Vec<UserAuthScope>,
-    pub purpose: UserSessionPurpose,
     pub(super) obc: Option<ObConfiguration>,
     pub(super) tenant: Option<Tenant>,
     pub(super) scoped_user: Option<ScopedVault>,
-    pub(super) sb_id: Option<ScopedVaultId>,
-    pub bo_id: Option<BoId>,
-    pub(super) obc_id: Option<ObConfigurationId>,
-    pub(super) wf_id: Option<WorkflowId>,
-    pub wfr_id: Option<WorkflowRequestId>,
-    pub(super) is_implied_auth: bool,
-    pub auth_events: Vec<AssociatedAuthEvent>,
-    pub kba: Vec<DataIdentifier>,
+    #[deref]
+    /// The underlying session data that's stored in the database
+    pub session: UserSession,
 }
 
 impl UserSessionContext {
@@ -80,64 +67,6 @@ impl UserAuth for UserSessionContext {
 impl AllowSessionUpdate for UserSessionContext {}
 
 impl UserSessionContext {
-    pub fn update(
-        self,
-        new_ctx: NewUserSessionContext,
-        new_scopes: Vec<UserAuthScope>,
-        new_auth_event: Option<AssociatedAuthEvent>,
-    ) -> ApiResult<AuthSessionData> {
-        // Merge context, scopes, and auth factors and create a new session with these merged fields
-        let context = NewUserSessionContext {
-            su_id: new_ctx.su_id.or(self.scoped_user.map(|su| su.id)),
-            sb_id: new_ctx.sb_id.or(self.sb_id),
-            bo_id: new_ctx.bo_id.or(self.bo_id),
-            obc_id: new_ctx.obc_id.or(self.obc_id),
-            wf_id: new_ctx.wf_id.or(self.wf_id),
-            wfr_id: new_ctx.wfr_id.or(self.wfr_id),
-            is_implied_auth: new_ctx.is_implied_auth || self.is_implied_auth,
-            kba: new_ctx.kba.into_iter().chain(self.kba).unique().collect(),
-        };
-        let scopes = self.scopes.into_iter().chain(new_scopes).unique().collect();
-        let auth_events = self.auth_events.into_iter().chain(new_auth_event).collect();
-        let args = NewUserSessionArgs {
-            user_vault_id: self.user.id,
-            purpose: self.purpose,
-            context,
-            scopes,
-            auth_events,
-        };
-        UserSession::make(args)
-    }
-
-    pub fn replace_scopes(self, new_scopes: Vec<UserAuthScope>) -> ApiResult<AuthSessionData> {
-        let context = NewUserSessionContext {
-            su_id: self.scoped_user.map(|su| su.id),
-            sb_id: self.sb_id,
-            bo_id: self.bo_id,
-            obc_id: self.obc_id,
-            wf_id: self.wf_id,
-            wfr_id: self.wfr_id,
-            is_implied_auth: self.is_implied_auth,
-            kba: self.kba,
-        };
-        if new_scopes.iter().any(|s| !self.scopes.contains(s)) {
-            // The only use case of this today is to request a token with _fewer_ scopes.
-            // It could be dangerous to allow a user to request a token with _more_ scopes,
-            // particularly for tokens given to the components SDK that intentially have
-            // fewer scopes than their auth methods allow.
-            // Do not remove this validation unless you know what you're doing.
-            return ValidationError("Cannot use replace_scopes to add additional scopes").into();
-        }
-        let args = NewUserSessionArgs {
-            user_vault_id: self.user.id,
-            purpose: self.purpose,
-            context,
-            scopes: new_scopes,
-            auth_events: self.auth_events,
-        };
-        UserSession::make(args)
-    }
-
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
         self.scoped_user.as_ref().map(|su| su.id.clone())
     }
@@ -209,30 +138,17 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
     ) -> Result<Self, ApiError> {
         match value {
             AuthSessionData::User(data) => {
-                let UserSession {
-                    user_vault_id,
-                    purpose,
-                    su_id,
-                    sb_id,
-                    bo_id,
-                    wf_id,
-                    wfr_id,
-                    obc_id,
-                    scopes,
-                    auth_events,
-                    is_implied_auth,
-                    kba,
-                } = data;
-                let vault = Vault::get(conn, &user_vault_id)?;
+                let vault = Vault::get(conn, &data.user_vault_id)?;
                 if vault.kind != VaultKind::Person {
                     return Err(AuthError::NonPersonVault.into());
                 }
-                let scoped_user = su_id
+                let scoped_user = data.su_id
                     .as_ref()
                     // Conservatively confirm that the onboarding in the auth token belongs to the user
                     .map(|id| ScopedVault::get(conn, (id, &vault.id)))
                     .transpose()?;
-                let (obc, tenant) = obc_id
+                let (obc, tenant) = data
+                    .obc_id
                     .as_ref()
                     .map(|id| ObConfiguration::get(conn, id))
                     .transpose()?
@@ -256,19 +172,10 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
 
                 let data = UserSessionContext {
                     user: vault,
-                    purpose,
-                    sb_id,
-                    bo_id,
-                    wf_id,
-                    wfr_id,
                     scoped_user,
                     obc,
                     tenant,
-                    obc_id,
-                    scopes,
-                    auth_events,
-                    is_implied_auth,
-                    kba,
+                    session: data,
                 };
                 Ok(ParsedUserSessionContext(data))
             }

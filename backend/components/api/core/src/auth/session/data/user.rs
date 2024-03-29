@@ -1,9 +1,10 @@
+use itertools::Itertools;
 use newtypes::{
     AuthEventId, AuthMethodKind, BoId, ContactInfoId, DataIdentifier, IdentifyScope, ObConfigurationId,
     ScopedVaultId, UserAuthScope, VaultId, WorkflowId, WorkflowRequestId,
 };
 
-use crate::errors::{user::UserError, ApiResult};
+use crate::errors::{user::UserError, ApiResult, ValidationError};
 
 use super::AuthSessionData;
 
@@ -36,6 +37,7 @@ pub struct UserSession {
     /// When true, the auth events that occurred at this tenant were inherited to form this token,
     /// rather than proof of auth being exchanged physically
     /// rm?
+    /// // TODO can i rm this now?
     #[serde(default)]
     #[allow(unused)]
     pub is_implied_auth: bool,
@@ -179,6 +181,64 @@ impl UserSession {
             kba,
         });
         Ok(session)
+    }
+
+    pub fn update(
+        self,
+        new_ctx: NewUserSessionContext,
+        new_scopes: Vec<UserAuthScope>,
+        new_auth_event: Option<AssociatedAuthEvent>,
+    ) -> ApiResult<AuthSessionData> {
+        // Merge context, scopes, and auth factors and create a new session with these merged fields
+        let context = NewUserSessionContext {
+            su_id: new_ctx.su_id.or(self.su_id),
+            sb_id: new_ctx.sb_id.or(self.sb_id),
+            bo_id: new_ctx.bo_id.or(self.bo_id),
+            obc_id: new_ctx.obc_id.or(self.obc_id),
+            wf_id: new_ctx.wf_id.or(self.wf_id),
+            wfr_id: new_ctx.wfr_id.or(self.wfr_id),
+            is_implied_auth: new_ctx.is_implied_auth || self.is_implied_auth,
+            kba: new_ctx.kba.into_iter().chain(self.kba).unique().collect(),
+        };
+        let scopes = self.scopes.into_iter().chain(new_scopes).unique().collect();
+        let auth_events = self.auth_events.into_iter().chain(new_auth_event).collect();
+        let args = NewUserSessionArgs {
+            user_vault_id: self.user_vault_id,
+            purpose: self.purpose,
+            context,
+            scopes,
+            auth_events,
+        };
+        UserSession::make(args)
+    }
+
+    pub fn replace_scopes(self, new_scopes: Vec<UserAuthScope>) -> ApiResult<AuthSessionData> {
+        let context = NewUserSessionContext {
+            su_id: self.su_id,
+            sb_id: self.sb_id,
+            bo_id: self.bo_id,
+            obc_id: self.obc_id,
+            wf_id: self.wf_id,
+            wfr_id: self.wfr_id,
+            is_implied_auth: self.is_implied_auth,
+            kba: self.kba,
+        };
+        if new_scopes.iter().any(|s| !self.scopes.contains(s)) {
+            // The only use case of this today is to request a token with _fewer_ scopes.
+            // It could be dangerous to allow a user to request a token with _more_ scopes,
+            // particularly for tokens given to the components SDK that intentially have
+            // fewer scopes than their auth methods allow.
+            // Do not remove this validation unless you know what you're doing.
+            return ValidationError("Cannot use replace_scopes to add additional scopes").into();
+        }
+        let args = NewUserSessionArgs {
+            user_vault_id: self.user_vault_id,
+            purpose: self.purpose,
+            context,
+            scopes: new_scopes,
+            auth_events: self.auth_events,
+        };
+        UserSession::make(args)
     }
 }
 
