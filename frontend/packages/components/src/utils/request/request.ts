@@ -1,3 +1,4 @@
+import { ApiError } from '../../@types';
 import { keysToCamelCase, keysToSnakeCase } from './utils/transform-data';
 
 const API_BASE_URL =
@@ -64,7 +65,11 @@ async function request<T>(options: Options): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(response.statusText);
+    const errorBody = await response.json();
+    if (errorBody.error) {
+      throw new ApiError(response.statusText, errorBody.error);
+    }
+    throw Error(response.statusText);
   }
 
   const jsonResponse = await response.json();

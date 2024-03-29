@@ -3,10 +3,16 @@ import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import type { FormData, UserData } from '../@types';
+import {
+  ApiError,
+  type FormData,
+  type UserData,
+  type UserDataError,
+} from '../@types';
 import { Context } from '../components/provider';
 import getOnboardingStatusReq from '../queries/get-onboarding-status';
 import saveReq from '../queries/save';
+import userToFormData from '../utils/user-to-form-data';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
@@ -84,10 +90,24 @@ export const useFootprint = () => {
     try {
       const data = getVaultFormData();
       await saveReq({ data, authToken });
-      await getMissingRequirements(authToken);
-    } catch (e) {
-      console.error(e);
+    } catch (error: unknown) {
+      if (error instanceof ApiError) {
+        const apiError = error as ApiError<UserDataError>;
+
+        Object.entries(apiError.details.message).forEach(([key, value]) => {
+          const formDataKey = userToFormData(key);
+          if (!formDataKey || typeof value !== 'string') return;
+          form.setError(
+            formDataKey,
+            { type: 'manual', message: value },
+            { shouldFocus: true },
+          );
+        });
+      }
+
+      throw error;
     }
+    await getMissingRequirements(authToken);
   };
 
   const handoff = () => {
