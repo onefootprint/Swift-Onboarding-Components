@@ -15,6 +15,7 @@ configureI18n();
 
 export type ContextData = {
   authToken?: string;
+  fpInstance: Component | null;
   missingRequirements: OnboardingRequirement[];
   onboardingConfig: PublicOnboardingConfig | null;
   onCancel?: () => void;
@@ -24,19 +25,18 @@ export type ContextData = {
   sandboxId?: string;
   signupChallenge: SignupChallengeResponse | null;
   userData?: UserData;
-  fpInstance: Component | null;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
 
 const Context = createContext<[ContextData, UpdateContext]>([
   {
+    fpInstance: null,
     missingRequirements: [],
     onboardingConfig: null,
     publicKey: '',
     signupChallenge: null,
     userData: {},
-    fpInstance: null,
   },
   () => {},
 ]);
@@ -65,6 +65,7 @@ const Provider = ({
   const methods = useForm<FormData>();
   const [context, setContext] = useState<ContextData>({
     authToken,
+    fpInstance: null,
     missingRequirements: [],
     onboardingConfig: null,
     onCancel,
@@ -74,7 +75,6 @@ const Provider = ({
     sandboxId,
     signupChallenge: null,
     userData,
-    fpInstance: null,
   });
 
   const value = useMemo<[ContextData, UpdateContext]>(

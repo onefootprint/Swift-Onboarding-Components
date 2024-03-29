@@ -6,7 +6,6 @@ import { useFormContext } from 'react-hook-form';
 import type { FormData, UserData } from '../@types';
 import { Context } from '../components/provider';
 import getOnboardingStatusReq from '../queries/get-onboarding-status';
-import identifyReq from '../queries/identify-user';
 import saveReq from '../queries/save';
 
 export const useFootprint = () => {
@@ -32,18 +31,6 @@ export const useFootprint = () => {
     };
   };
 
-  const identify = async () => {
-    const payload = {
-      email: form.getValues('email'),
-      phoneNumber: form.getValues('phoneNumber'),
-      scope: 'onboarding',
-      sandboxId: context.sandboxId,
-      obConfigAuth: context.publicKey,
-    };
-    const response = await identifyReq(payload);
-    return response;
-  };
-
   const launchIdentify = (onDone: () => void) => {
     const fp = footprint.init({
       publicKey: context.publicKey,
@@ -56,25 +43,10 @@ export const useFootprint = () => {
         setContext(prev => ({ ...prev, authToken }));
         onDone();
       },
-      onCancel: () => {
-        console.error('onCancel');
-      },
-      onComplete: (validationToken: string) => {
-        // eslint-disable-next-line no-alert
-        alert(validationToken);
-      },
-      onError: (error: unknown) => {
-        console.error('onError', error);
-      },
-    });
-    setContext({
-      ...context,
-      fpInstance: fp,
     });
     fp.render();
+    setContext({ ...context, fpInstance: fp });
   };
-
-  const getAuthToken = () => context.authToken;
 
   const getMissingRequirements = async (token?: string) => {
     const authToken = token || context.authToken;
@@ -90,7 +62,6 @@ export const useFootprint = () => {
       }
       return [];
     }
-
     throw new Error('No authToken found');
   };
 
@@ -112,9 +83,7 @@ export const useFootprint = () => {
   };
 
   const methods = {
-    getAuthToken,
     handoff,
-    identify,
     launchIdentify,
     save,
   };

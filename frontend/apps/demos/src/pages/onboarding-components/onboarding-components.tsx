@@ -59,10 +59,7 @@ const Demo = () => {
 };
 
 const DemoWithProvider = () => (
-  <Provider
-    publicKey="pb_test_GjMHPDNuDS4QIw7GEdfgl7"
-    sandboxId={Math.random().toString(36).substring(7)}
-  >
+  <Provider publicKey="pb_test_B1Q1ubKxYEpx3uKdGaXLQ2">
     <Demo />
   </Provider>
 );
