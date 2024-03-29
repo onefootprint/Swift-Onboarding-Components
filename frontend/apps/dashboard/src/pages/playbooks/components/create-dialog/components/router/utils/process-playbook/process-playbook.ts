@@ -28,7 +28,7 @@ const getRequiredKybCollectFields = () => [
   CollectedKybDataOption.name,
   CollectedKybDataOption.address,
   CollectedKybDataOption.tin,
-  CollectedKybDataOption.beneficialOwners,
+  CollectedKybDataOption.kycedBeneficialOwners,
 ];
 
 const getRequiredKycCollectFields = () => [

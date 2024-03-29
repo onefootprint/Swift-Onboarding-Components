@@ -65,7 +65,9 @@ describe('processPlaybook', () => {
     expect(mustCollectData).toContain(CollectedKybDataOption.name);
     expect(mustCollectData).toContain(CollectedKybDataOption.address);
     expect(mustCollectData).toContain(CollectedKybDataOption.tin);
-    expect(mustCollectData).toContain(CollectedKybDataOption.beneficialOwners);
+    expect(mustCollectData).toContain(
+      CollectedKybDataOption.kycedBeneficialOwners,
+    );
   });
 
   it('should include full SSN in optional data but not mustCollectData if it is optional', () => {
