@@ -29,7 +29,7 @@ const Text = forwardRef<HTMLParagraphElement, TextProps>(
 
 const StyledText = styled(Box)`
   ${({ theme }) => css`
-    &[data-trucate='true'] {
+    &[data-truncate='true'] {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
