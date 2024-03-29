@@ -36,6 +36,7 @@ impl VendorAPIResponse for NeuroApiResponse {
     }
 
     fn parsed_response(&self) -> ParsedResponse {
-        ParsedResponse::NeuroIdAnalytics(self.raw_response.clone())
+        // this is wrong but we don't need this here
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }

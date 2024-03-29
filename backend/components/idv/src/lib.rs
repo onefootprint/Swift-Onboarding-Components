@@ -20,6 +20,7 @@ use middesk::response::{
     business::BusinessResponse,
     webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse},
 };
+use neuro_id::response::NeuroIdAnalyticsResponse;
 use newtypes::{PiiJsonValue, VendorAPI};
 use socure::response::SocureIDPlusResponse;
 
@@ -72,7 +73,7 @@ pub enum ParsedResponse {
     LexisFlexId(FlexIdResponse),
     IncodeCurpValidation(CurpValidationResponse),
     IncodeIneData(PiiJsonValue),
-    NeuroIdAnalytics(PiiJsonValue),
+    NeuroIdAnalytics(NeuroIdAnalyticsResponse),
 }
 
 impl ParsedResponse {

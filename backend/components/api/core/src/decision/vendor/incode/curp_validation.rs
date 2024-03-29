@@ -1,8 +1,6 @@
 use db::models::{
-    decision_intent::DecisionIntent,
-    identity_document::IdentityDocument,
-    scoped_vault::ScopedVault,
-    verification_request::{RequestAndMaybeResult, VerificationRequest},
+    decision_intent::DecisionIntent, identity_document::IdentityDocument, scoped_vault::ScopedVault,
+    verification_request::VerificationRequest,
 };
 use idv::{
     incode::curp_validation::{response::CurpValidationResponse, IncodeCurpValidationRequest},
@@ -14,7 +12,6 @@ use newtypes::{
     IncodeEnvironment, OcrDataKind, PiiJsonValue, PiiString, ScopedVaultId, TenantId, VaultPublicKey,
     VendorAPI, WorkflowId,
 };
-use std::collections::HashMap;
 
 use super::common::call_start_onboarding;
 use crate::{
@@ -23,7 +20,7 @@ use crate::{
         vendor::{
             map_to_api_error,
             tenant_vendor_control::TenantVendorControl,
-            vendor_result::{RequestAndMaybeHydratedResult, VendorResult},
+            vendor_result::VendorResult,
             verification_result::{self, SaveVerificationResultArgs, ShouldSaveVerificationRequest},
         },
     },
@@ -61,7 +58,8 @@ pub async fn run_curp_validation_check(
 
     // If we already have a successful curp validation for this DI, we return early
     let existing_vendor_result =
-        get_successful_response(state, latest_results, &vw, VendorAPI::IncodeCurpValidation).await?;
+        VendorResult::get_successful_response(state, latest_results, &vw, VendorAPI::IncodeCurpValidation)
+            .await?;
     if existing_vendor_result.is_some() {
         return Ok(existing_vendor_result);
     }
@@ -211,25 +209,6 @@ async fn get_curp_for_check(
             decision::CurpValidationError::NoDocumentFoundForWorkflow,
         )))
     }
-}
-
-#[tracing::instrument(skip_all)]
-async fn get_successful_response(
-    state: &State,
-    latest_results: Vec<RequestAndMaybeResult>,
-    vw: &VaultWrapper,
-    vendor_api_to_check: VendorAPI,
-) -> ApiResult<Option<VendorResult>> {
-    let vendor_api_to_latest_result: HashMap<VendorAPI, RequestAndMaybeHydratedResult> =
-        VendorResult::hydrate_vendor_results(latest_results, &state.enclave_client, &vw.vault.e_private_key)
-            .await?
-            .into_iter()
-            .map(|r| (r.vreq.vendor_api, r))
-            .collect();
-
-    Ok(vendor_api_to_latest_result
-        .get(&vendor_api_to_check)
-        .and_then(|r| r.clone().into_vendor_result()))
 }
 
 #[tracing::instrument(skip_all)]

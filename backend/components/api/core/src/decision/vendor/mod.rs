@@ -14,6 +14,7 @@ pub mod incode;
 pub mod kyc;
 pub mod make_request;
 pub mod middesk;
+pub mod neuro_id;
 pub mod tenant_vendor_control;
 pub mod vendor_api;
 pub mod vendor_result;

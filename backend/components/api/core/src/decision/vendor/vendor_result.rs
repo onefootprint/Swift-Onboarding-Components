@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{enclave_client::EnclaveClient, errors::ApiError};
+use crate::{enclave_client::EnclaveClient, errors::ApiError, utils::vault_wrapper::VaultWrapper, State};
 
 use crate::errors::ApiResult;
 use db::{
@@ -177,6 +177,29 @@ impl VendorResult {
 
         parsed.into()
     }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn get_successful_response(
+        state: &State,
+        latest_results: Vec<RequestAndMaybeResult>,
+        vw: &VaultWrapper,
+        vendor_api_to_check: VendorAPI,
+    ) -> ApiResult<Option<VendorResult>> {
+        let vendor_api_to_latest_result: HashMap<VendorAPI, RequestAndMaybeHydratedResult> =
+            VendorResult::hydrate_vendor_results(
+                latest_results,
+                &state.enclave_client,
+                &vw.vault.e_private_key,
+            )
+            .await?
+            .into_iter()
+            .map(|r| (r.vreq.vendor_api, r))
+            .collect();
+
+        Ok(vendor_api_to_latest_result
+            .get(&vendor_api_to_check)
+            .and_then(|r| r.clone().into_vendor_result()))
+    }
 }
 
 /// Not all
@@ -227,7 +250,9 @@ fn deserialize_from_vendor_api(
         VendorAPI::LexisFlexId => ParsedResponse::from_lexis_flex_id(raw_response)?,
         VendorAPI::IncodeCurpValidation => ParsedResponse::from_incode_curp_validation(raw_response)?,
         VendorAPI::IncodeIneData => ParsedResponse::IncodeIneData(raw_response.into()),
-        VendorAPI::NeuroIdAnalytics => ParsedResponse::NeuroIdAnalytics(raw_response.into()),
+        VendorAPI::NeuroIdAnalytics => {
+            ParsedResponse::NeuroIdAnalytics(serde_json::from_value(raw_response)?)
+        }
     };
 
     Ok(res)
