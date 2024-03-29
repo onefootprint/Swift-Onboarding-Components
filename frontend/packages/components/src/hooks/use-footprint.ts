@@ -33,6 +33,7 @@ export const useFootprint = () => {
 
   const launchIdentify = (onDone: () => void) => {
     const fp = footprint.init({
+      appearance: context.appearance,
       publicKey: context.publicKey,
       userData: {
         'id.phone_number': form.getValues('phoneNumber'),

@@ -8,12 +8,13 @@ import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type { FormData, UserData } from '../../@types';
+import type { Appearance, FormData, UserData } from '../../@types';
 import configureI18n from '../../config/initializers/i18next';
 
 configureI18n();
 
 export type ContextData = {
+  appearance?: Appearance;
   authToken?: string;
   fpInstance: Component | null;
   missingRequirements: OnboardingRequirement[];
@@ -42,6 +43,7 @@ const Context = createContext<[ContextData, UpdateContext]>([
 ]);
 
 export type ProviderProps = {
+  appearance?: Appearance;
   authToken?: string;
   children: React.ReactNode;
   onCancel?: () => void;
@@ -53,6 +55,7 @@ export type ProviderProps = {
 };
 
 const Provider = ({
+  appearance,
   authToken,
   children,
   onCancel,
@@ -81,6 +84,7 @@ const Provider = ({
     },
   });
   const [context, setContext] = useState<ContextData>({
+    appearance,
     authToken,
     fpInstance: null,
     missingRequirements: [],
