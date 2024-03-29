@@ -150,7 +150,7 @@ const MultiSelect = <
         inputId={id}
         isDisabled={disabled}
         isMulti
-        menuPlacement="auto"
+        menuPlacement="bottom"
         name={name}
         noOptionsMessage={getNoOptionsMessage}
         onBlur={onBlur}

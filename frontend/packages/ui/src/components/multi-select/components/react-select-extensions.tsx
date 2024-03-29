@@ -22,11 +22,36 @@ export const ClearIndicator = <
   Group extends GroupBase<Option>,
 >(
   props: ClearIndicatorProps<Option, IsMulti, Group>,
-) => (
-  <components.ClearIndicator {...props}>
-    <IcoCloseSmall16 color="quaternary" />
-  </components.ClearIndicator>
-);
+) => {
+  const { innerProps, ...restProps } = props;
+  const {
+    onMouseDown: originalOnMouseDown,
+    onTouchEnd: originalOnTouchEnd,
+    ...restInnerProps
+  } = innerProps || {};
+  const onMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    event.stopPropagation();
+    if (originalOnMouseDown) {
+      originalOnMouseDown(event);
+    }
+  };
+
+  const onTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    if (originalOnTouchEnd) {
+      originalOnTouchEnd(event);
+    }
+  };
+
+  return (
+    <components.ClearIndicator
+      {...restProps}
+      innerProps={{ ...restInnerProps, onMouseDown, onTouchEnd }}
+    >
+      <IcoCloseSmall16 color="primary" />
+    </components.ClearIndicator>
+  );
+};
 
 export const IndicatorSeparator = <
   Option,
@@ -49,7 +74,6 @@ export const DropdownIndicator = <
 }: DropdownIndicatorProps<Option, IsMulti, Group>) => (
   <div {...innerProps}>{children || <IcoChevronDown16 color="primary" />}</div>
 );
-
 export const MultiValueRemove = <
   Option,
   IsMulti extends boolean,
@@ -62,7 +86,6 @@ export const MultiValueRemove = <
     {children || <IcoCloseSmall16 color="tertiary" />}
   </div>
 );
-
 export const Option = <
   Option,
   IsMulti extends boolean,
