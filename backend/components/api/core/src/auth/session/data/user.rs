@@ -219,6 +219,7 @@ impl UserSession {
         new_purpose: TokenCreationPurpose,
         new_auth_event: Option<AssociatedAuthEvent>,
     ) -> ApiResult<AuthSessionData> {
+        self.validate_not_derived_from_components()?;
         // Merge context, scopes, and auth factors and create a new session with these merged fields
         let context = NewUserSessionContext {
             su_id: new_ctx.su_id.or(self.su_id),
@@ -243,11 +244,12 @@ impl UserSession {
         UserSession::make(args)
     }
 
-    pub fn replace_scopes(
+    pub fn reduce_scopes(
         self,
         new_scopes: Vec<UserAuthScope>,
         new_purpose: TokenCreationPurpose,
     ) -> ApiResult<AuthSessionData> {
+        self.validate_not_derived_from_components()?;
         let context = NewUserSessionContext {
             su_id: self.su_id,
             sb_id: self.sb_id,
@@ -264,7 +266,7 @@ impl UserSession {
             // particularly for tokens given to the components SDK that intentially have
             // fewer scopes than their auth methods allow.
             // Do not remove this validation unless you know what you're doing.
-            return ValidationError("Cannot use replace_scopes to add additional scopes").into();
+            return ValidationError("Cannot use reduce_scopes to add additional scopes").into();
         }
         let args = NewUserSessionArgs {
             user_vault_id: self.user_vault_id,
@@ -275,6 +277,20 @@ impl UserSession {
             auth_events: self.auth_events,
         };
         UserSession::make(args)
+    }
+
+    /// We don't want to allow any token given to the components SDK to ever be used to derive
+    /// a new auth token.
+    fn validate_not_derived_from_components(&self) -> ApiResult<()> {
+        if self
+            .purposes
+            .iter()
+            .any(|p| matches!(p, TokenCreationPurpose::BifrostComponentsSdk))
+        {
+            return ValidationError("Cannot create a new token from one issued for the components SDK")
+                .into();
+        }
+        Ok(())
     }
 }
 

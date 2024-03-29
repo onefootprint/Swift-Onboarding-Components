@@ -67,7 +67,7 @@ pub async fn post(
             let expires_at = user_auth.expires_at();
             let purpose = requested_scope.into();
             let session = user_auth.data.session;
-            let session = session.replace_scopes(new_scopes, purpose)?;
+            let session = session.reduce_scopes(new_scopes, purpose)?;
             let (token, session) = AuthSession::create_sync(conn, &session_key, session, expires_at)?;
             Ok((token, session))
         })
