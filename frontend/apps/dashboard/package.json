@@ -17,7 +17,7 @@
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "typecheck": "yarn tsc --build",
+    "typecheck": "NODE_OPTIONS=--max-old-space-size=9216 yarn tsc --build",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },
@@ -57,7 +57,7 @@
     "isemail": "^3.2.0",
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.1",
-    "next": "14.1.0",
+    "next": "14.1.4",
     "next-themes": "^0.2.1",
     "react": "^18",
     "react-calendly": "^4.1.1",

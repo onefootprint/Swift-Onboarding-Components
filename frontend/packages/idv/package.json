@@ -89,7 +89,7 @@
     "webpack": "*"
   },
   "peerDependencies": {
-    "next": "13.x",
+    "next": "14.x",
     "react": "18.x",
     "react-dom": "18.x"
   },
