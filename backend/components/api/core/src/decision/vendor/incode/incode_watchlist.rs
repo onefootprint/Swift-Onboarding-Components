@@ -29,22 +29,20 @@ use newtypes::{
 use crate::{
     decision::vendor::{
         build_request,
-        incode::common::{
-            call_start_onboarding, map_to_api_err, save_incode_verification_result,
-            SaveVerificationResultArgs, ShouldSaveVerificationRequest,
-        },
+        incode::common::call_start_onboarding,
+        map_to_api_error,
         tenant_vendor_control::TenantVendorControl,
         vendor_api::{
             vendor_api_response::build_vendor_response_map_from_vendor_results,
             vendor_api_struct::{IncodeUpdatedWatchlistResult, IncodeWatchlistCheck},
         },
         vendor_result::VendorResult,
-        verification_result,
+        verification_result::{self, SaveVerificationResultArgs, ShouldSaveVerificationRequest},
     },
     enclave_client::EnclaveClient,
     errors::ApiResult,
     utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
-    ApiError, State,
+    State,
 };
 
 
@@ -71,7 +69,7 @@ async fn save_verification_result_for_watchlist_check<
         ShouldSaveVerificationRequest::No(vreq_id),
     );
 
-    let (vres_id, _) = save_incode_verification_result(db_pool, args).await?;
+    let (vres_id, _) = args.save(db_pool).await?;
 
     Ok(vres_id)
 }
@@ -122,10 +120,10 @@ async fn call_watchlist_result(
             )
             .await?;
             let res = res
-                .map_err(map_to_api_err)?
+                .map_err(map_to_api_error)?
                 .result
                 .into_success()
-                .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+                .map_err(map_to_api_error)?;
             (vres_id, res)
         }
 
@@ -149,10 +147,10 @@ async fn call_watchlist_result(
             )
             .await?;
             let res = res
-                .map_err(map_to_api_err)?
+                .map_err(map_to_api_error)?
                 .result
                 .into_success()
-                .map_err(|e| ApiError::from(idv::Error::from(e)))?
+                .map_err(map_to_api_error)?
                 .0;
             (vres_id, res)
         }

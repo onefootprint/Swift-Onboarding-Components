@@ -1,9 +1,12 @@
 use super::{AddConsent, IncodeStateTransition, VerificationSession};
 use crate::{
-    decision::vendor::incode::{
-        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
-        state::{IncodeState, TransitionResult},
-        IncodeContext,
+    decision::vendor::{
+        incode::{
+            state::{IncodeState, TransitionResult},
+            IncodeContext,
+        },
+        map_to_api_error,
+        verification_result::SaveVerificationResultArgs,
     },
     errors::ApiResult,
     vendor_clients::IncodeClients,
@@ -87,10 +90,10 @@ async fn add_selfie_inner(
 
     // Save our result
     let args = SaveVerificationResultArgs::from(&request_result, VendorAPI::IncodeAddSelfie, ctx);
-    save_incode_verification_result(db_pool, args).await?;
+    args.save(db_pool).await?;
 
     // Now ensure we don't have an error
-    let response = request_result.map_err(map_to_api_err)?.result;
+    let response = request_result.map_err(map_to_api_error)?.result;
 
     let failure_reasons = match response.safe_into_success() {
         // Incode returns 200 for upload failures, so catch these here

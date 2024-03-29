@@ -1,8 +1,7 @@
 use super::{AddFront, IncodeStateTransition};
 use crate::{
-    decision::vendor::incode::{
-        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
-        IncodeContext,
+    decision::vendor::{
+        incode::IncodeContext, map_to_api_error, verification_result::SaveVerificationResultArgs,
     },
     errors::ApiResult,
     State,
@@ -51,15 +50,15 @@ impl StartOnboarding {
         // Save our result
         //
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeStartOnboarding, ctx);
-        save_incode_verification_result(&state.db_pool, args).await?;
+        args.save(&state.db_pool).await?;
 
         // Now ensure we don't have an error
         // If we get an error here, the response does not include interviewId or anything else, so we just error here and will restart
         let successful_response = res
-            .map_err(map_to_api_err)?
+            .map_err(map_to_api_error)?
             .result
             .into_success()
-            .map_err(map_to_api_err)?;
+            .map_err(map_to_api_error)?;
 
         state
             .db_pool

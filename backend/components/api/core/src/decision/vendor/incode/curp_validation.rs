@@ -16,17 +16,15 @@ use newtypes::{
 };
 use std::collections::HashMap;
 
-use super::common::{
-    call_start_onboarding, map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs,
-    ShouldSaveVerificationRequest,
-};
+use super::common::call_start_onboarding;
 use crate::{
     decision::{
         self,
         vendor::{
+            map_to_api_error,
             tenant_vendor_control::TenantVendorControl,
             vendor_result::{RequestAndMaybeHydratedResult, VendorResult},
-            verification_result,
+            verification_result::{self, SaveVerificationResultArgs, ShouldSaveVerificationRequest},
         },
     },
     enclave_client::EnclaveClient,
@@ -112,11 +110,11 @@ pub async fn run_curp_validation_check(
                 vw.vault.public_key.clone(),
                 ShouldSaveVerificationRequest::Yes(VendorAPI::IncodeCurpValidation),
             );
-            let (vres_id, vreq_id) = save_incode_verification_result(&state.db_pool, args).await?;
-            let curp_response = res.map_err(map_to_api_err)?;
+            let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
+            let curp_response = res.map_err(map_to_api_error)?;
             let raw_response = curp_response.raw_response.clone();
             let parsed: CurpValidationResponse =
-                curp_response.result.into_success().map_err(map_to_api_err)?;
+                curp_response.result.into_success().map_err(map_to_api_error)?;
 
             let vendor_result = VendorResult {
                 response: VendorResponse {

@@ -8,15 +8,16 @@ use crate::{
 use chrono::Utc;
 use db::{
     models::{
-        verification_request::VerificationRequest,
+        verification_request::{NewVerificationRequestArgs, VerificationRequest},
         verification_result::{NewVerificationResult, VerificationResult},
     },
-    DbError, PgConn,
+    DbError, DbPool, PgConn,
 };
 use idv::VendorResponse;
 use newtypes::{
-    DecisionIntentId, EncryptedVaultPrivateKey, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue,
-    SealedVaultBytes, VaultPublicKey,
+    DecisionIntentId, EncryptedVaultPrivateKey, IdentityDocumentId, PiiJsonValue, ScopedVaultId,
+    ScrubbedPiiJsonValue, SealedVaultBytes, VaultPublicKey, VendorAPI, VerificationRequestId,
+    VerificationResultId,
 };
 
 use super::{
@@ -175,6 +176,70 @@ pub fn save_vres(
         }
     }
 }
+
+// For some Incode APIs we save the VReq first still (e.g. IncodeWatchlistCheck)
+pub enum ShouldSaveVerificationRequest {
+    Yes(VendorAPI),
+    No(VerificationRequestId),
+}
+/// Struct to make sure we handle the different cases Vendor call errors we may see
+pub struct SaveVerificationResultArgs {
+    pub is_error: bool,
+    pub raw_response: PiiJsonValue,
+    pub scrubbed_response: ScrubbedPiiJsonValue,
+    pub vault_public_key: VaultPublicKey,
+    pub should_save_verification_request: ShouldSaveVerificationRequest,
+    pub decision_intent_id: DecisionIntentId,
+    pub scoped_vault_id: ScopedVaultId,
+    pub identity_document_id: Option<IdentityDocumentId>,
+}
+impl SaveVerificationResultArgs {
+    pub async fn save(self, db_pool: &DbPool) -> ApiResult<(VerificationResultId, VerificationRequestId)> {
+        let SaveVerificationResultArgs {
+            scrubbed_response,
+            raw_response,
+            is_error,
+            should_save_verification_request,
+            decision_intent_id,
+            vault_public_key,
+            scoped_vault_id,
+            identity_document_id,
+        } = self;
+        let e_response = encrypt_verification_result_response(&raw_response, &vault_public_key)?;
+        let result = db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                // This is interesting - we make the VReq and VRes at the same time.
+                // In other vendor APIs, the only bookkeeping we have for an outstanding vendor request
+                // is a VReq without a VRes - for the document workflow, we have the incode state
+                // machine that tells us what state we're in.
+                let vreq_id = match should_save_verification_request {
+                    ShouldSaveVerificationRequest::Yes(vendor_api) => {
+                        let args = NewVerificationRequestArgs {
+                            scoped_vault_id: &scoped_vault_id,
+                            identity_document_id: identity_document_id.as_ref(),
+                            decision_intent_id: &decision_intent_id,
+                            vendor_api,
+                        };
+                        let vreq = VerificationRequest::create(conn, args)?;
+                        vreq.id
+                    }
+                    ShouldSaveVerificationRequest::No(vreq_id) => vreq_id,
+                };
+                let res = VerificationResult::create(
+                    conn,
+                    vreq_id.clone(),
+                    scrubbed_response,
+                    e_response,
+                    is_error,
+                )?;
+
+                Ok((res.id, vreq_id))
+            })
+            .await?;
+        Ok(result)
+    }
+}
+
 
 #[cfg(test)]
 mod test {

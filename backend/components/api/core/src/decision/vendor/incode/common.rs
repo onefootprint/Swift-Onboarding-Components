@@ -1,47 +1,23 @@
-use db::{
-    models::{
-        verification_request::{NewVerificationRequestArgs, VerificationRequest},
-        verification_result::VerificationResult,
-    },
-    DbPool,
-};
 use idv::incode::{
     response::OnboardingStartResponse, IncodeClientErrorCustomFailureReasons, IncodeResponse,
     IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    DecisionIntentId, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment, PiiJsonValue,
-    ScopedVaultId, ScrubbedPiiJsonValue, VaultPublicKey, VendorAPI, VerificationRequestId,
-    VerificationResultId,
+    DecisionIntentId, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment, ScopedVaultId,
+    VaultPublicKey, VendorAPI,
 };
 
 use crate::{
     decision::vendor::{
-        tenant_vendor_control::TenantVendorControl, verification_result::encrypt_verification_result_response,
+        map_to_api_error,
+        tenant_vendor_control::TenantVendorControl,
+        verification_result::{SaveVerificationResultArgs, ShouldSaveVerificationRequest},
     },
     errors::ApiResult,
-    ApiError, State,
+    State,
 };
 
 use super::IncodeContext;
-
-
-// For some Incode APIs we save the VReq first still (e.g. IncodeWatchlistCheck)
-pub enum ShouldSaveVerificationRequest {
-    Yes(VendorAPI),
-    No(VerificationRequestId),
-}
-/// Struct to make sure we handle the different cases of Incode vendor call errors we may see
-pub struct SaveVerificationResultArgs {
-    is_error: bool,
-    raw_response: PiiJsonValue,
-    scrubbed_response: ScrubbedPiiJsonValue,
-    vault_public_key: VaultPublicKey,
-    should_save_verification_request: ShouldSaveVerificationRequest,
-    decision_intent_id: DecisionIntentId,
-    scoped_vault_id: ScopedVaultId,
-    identity_document_id: Option<IdentityDocumentId>,
-}
 
 impl SaveVerificationResultArgs {
     pub fn new<T>(
@@ -62,7 +38,7 @@ impl SaveVerificationResultArgs {
                 let scrubbed_response = response
                     .result
                     .scrub()
-                    .map_err(map_to_api_err)
+                    .map_err(map_to_api_error)
                     .unwrap_or(serde_json::json!("").into());
 
                 Self {
@@ -116,54 +92,6 @@ impl SaveVerificationResultArgs {
     }
 }
 
-pub async fn save_incode_verification_result(
-    db_pool: &DbPool,
-    args: SaveVerificationResultArgs,
-) -> ApiResult<(VerificationResultId, VerificationRequestId)> {
-    let SaveVerificationResultArgs {
-        scrubbed_response,
-        raw_response,
-        is_error,
-        should_save_verification_request,
-        decision_intent_id,
-        vault_public_key,
-        scoped_vault_id,
-        identity_document_id,
-    } = args;
-    let e_response = encrypt_verification_result_response(&raw_response, &vault_public_key)?;
-    let result = db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            // This is interesting - we make the VReq and VRes at the same time.
-            // In other vendor APIs, the only bookkeeping we have for an outstanding vendor request
-            // is a VReq without a VRes - for the document workflow, we have the incode state
-            // machine that tells us what state we're in.
-            let vreq_id = match should_save_verification_request {
-                ShouldSaveVerificationRequest::Yes(vendor_api) => {
-                    let args = NewVerificationRequestArgs {
-                        scoped_vault_id: &scoped_vault_id,
-                        identity_document_id: identity_document_id.as_ref(),
-                        decision_intent_id: &decision_intent_id,
-                        vendor_api,
-                    };
-                    let vreq = VerificationRequest::create(conn, args)?;
-                    vreq.id
-                }
-                ShouldSaveVerificationRequest::No(vreq_id) => vreq_id,
-            };
-            let res =
-                VerificationResult::create(conn, vreq_id.clone(), scrubbed_response, e_response, is_error)?;
-
-            Ok((res.id, vreq_id))
-        })
-        .await?;
-    Ok(result)
-}
-
-pub fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
-    ApiError::from(idv::Error::from(e))
-}
-
-
 #[tracing::instrument(skip(state, user_vault_public_key, tvc))]
 pub async fn call_start_onboarding(
     state: &State,
@@ -196,12 +124,12 @@ pub async fn call_start_onboarding(
         ShouldSaveVerificationRequest::Yes(VendorAPI::IncodeStartOnboarding),
     );
 
-    save_incode_verification_result(&state.db_pool, args).await?;
+    args.save(&state.db_pool).await?;
 
     let res = res
-        .map_err(map_to_api_err)?
+        .map_err(map_to_api_error)?
         .result
         .into_success()
-        .map_err(map_to_api_err)?;
+        .map_err(map_to_api_error)?;
     Ok(res)
 }

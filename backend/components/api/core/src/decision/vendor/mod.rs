@@ -1,6 +1,9 @@
 use std::fmt::Display;
 
-use crate::errors::{ApiErrorKind, ApiResult};
+use crate::{
+    errors::{ApiErrorKind, ApiResult},
+    ApiError,
+};
 use newtypes::{DecisionIntentId, IdentityDataKind, ScopedVaultId, VendorAPI};
 
 use self::tenant_vendor_control::TenantVendorControl;
@@ -46,4 +49,8 @@ impl Display for VendorAPIError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.error)
     }
+}
+
+pub fn map_to_api_error<E: Into<idv::Error>>(e: E) -> ApiError {
+    ApiError::from(e.into())
 }

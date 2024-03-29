@@ -7,11 +7,11 @@ use crate::{
         features::incode_docv::IncodeOcrComparisonDataFields,
         vendor::{
             incode::{
-                common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
                 state::{IncodeState, TransitionResult},
                 IncodeContext,
             },
-            verification_result::save_vreq_and_vres,
+            map_to_api_error,
+            verification_result::{save_vreq_and_vres, SaveVerificationResultArgs},
             VendorAPIError,
         },
     },
@@ -70,14 +70,14 @@ impl IncodeStateTransition for FetchScores {
 
         // Save our result
         let score_args = SaveVerificationResultArgs::from(&scores_res, VendorAPI::IncodeFetchScores, ctx);
-        let (score_vres_id, _) = save_incode_verification_result(db_pool, score_args).await?;
+        let (score_vres_id, _) = score_args.save(db_pool).await?;
 
         // Now ensure we don't have an error
         let score_response = scores_res
-            .map_err(map_to_api_err)?
+            .map_err(map_to_api_error)?
             .result
             .into_success()
-            .map_err(map_to_api_err)?;
+            .map_err(map_to_api_error)?;
 
         let (overall_score, overall_status) = score_response.document_score();
         if overall_score.is_none() || overall_status.is_none() {
@@ -92,14 +92,14 @@ impl IncodeStateTransition for FetchScores {
 
         // Save our result
         let ocr_args = SaveVerificationResultArgs::from(&ocr_res, VendorAPI::IncodeFetchOcr, ctx);
-        let (ocr_vres_id, _) = save_incode_verification_result(db_pool, ocr_args).await?;
+        let (ocr_vres_id, _) = ocr_args.save(db_pool).await?;
 
         // Now ensure we don't have an error
         let ocr_response = ocr_res
-            .map_err(map_to_api_err)?
+            .map_err(map_to_api_error)?
             .result
             .into_success()
-            .map_err(map_to_api_err)?;
+            .map_err(map_to_api_error)?;
 
         let wf_id = ctx.wf_id.clone();
         let sv_id = ctx.sv_id.clone();
@@ -328,15 +328,15 @@ async fn run_aws_inner(
 
 async fn mark_status_as_complete(credentials: IncodeCredentialsWithToken) -> ApiResult<reqwest::Response> {
     let http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())?;
-    let client = IncodeClientAdapter::new(credentials.credentials).map_err(map_to_api_err)?;
+    let client = IncodeClientAdapter::new(credentials.credentials).map_err(map_to_api_error)?;
     let authenticated_client =
         AuthenticatedIncodeClientAdapter::new(client, credentials.authentication_token)
-            .map_err(map_to_api_err)?;
+            .map_err(map_to_api_error)?;
 
     let res = authenticated_client
         .mark_session_complete(&http_client)
         .await
-        .map_err(map_to_api_err)?;
+        .map_err(map_to_api_error)?;
 
     Ok(res)
 }

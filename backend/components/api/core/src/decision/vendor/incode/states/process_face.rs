@@ -1,9 +1,12 @@
 use super::{GetOnboardingStatus, IncodeStateTransition, VerificationSession};
 use crate::{
-    decision::vendor::incode::{
-        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
-        state::{IncodeState, TransitionResult},
-        IncodeContext,
+    decision::vendor::{
+        incode::{
+            state::{IncodeState, TransitionResult},
+            IncodeContext,
+        },
+        map_to_api_error,
+        verification_result::SaveVerificationResultArgs,
     },
     errors::ApiResult,
     vendor_clients::IncodeClients,
@@ -56,13 +59,13 @@ pub async fn process_face_inner(
 
     // Save our result
     let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessFace, ctx);
-    save_incode_verification_result(db_pool, args).await?;
+    args.save(db_pool).await?;
 
     // Now ensure we don't have an error
-    res.map_err(map_to_api_err)?
+    res.map_err(map_to_api_error)?
         .result
         .into_success()
-        .map_err(map_to_api_err)?;
+        .map_err(map_to_api_error)?;
 
     Ok(())
 }

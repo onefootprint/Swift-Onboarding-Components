@@ -1,9 +1,12 @@
 use super::{AddConsent, AddSelfie, AddSideResponseHelper, IncodeStateTransition, VerificationSession};
 use crate::{
-    decision::vendor::incode::{
-        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
-        state::{IncodeState, TransitionResult},
-        IncodeContext,
+    decision::vendor::{
+        incode::{
+            state::{IncodeState, TransitionResult},
+            IncodeContext,
+        },
+        map_to_api_error,
+        verification_result::SaveVerificationResultArgs,
     },
     errors::ApiResult,
     vendor_clients::IncodeClients,
@@ -45,10 +48,10 @@ impl IncodeStateTransition for AddBack {
 
         // Save our result
         let args = SaveVerificationResultArgs::from(&request_result, VendorAPI::IncodeAddBack, ctx);
-        save_incode_verification_result(db_pool, args).await?;
+        args.save(db_pool).await?;
 
         // TODO: fix this
-        let response = request_result.map_err(map_to_api_err)?.result;
+        let response = request_result.map_err(map_to_api_error)?.result;
 
         let (
             type_of_id,

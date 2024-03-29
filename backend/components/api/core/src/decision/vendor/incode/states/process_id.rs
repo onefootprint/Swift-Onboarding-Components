@@ -1,9 +1,12 @@
 use super::{GetOnboardingStatus, IncodeStateTransition, ProcessFace, VerificationSession};
 use crate::{
-    decision::vendor::incode::{
-        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
-        state::{IncodeState, TransitionResult},
-        IncodeContext,
+    decision::vendor::{
+        incode::{
+            state::{IncodeState, TransitionResult},
+            IncodeContext,
+        },
+        map_to_api_error,
+        verification_result::SaveVerificationResultArgs,
     },
     errors::ApiResult,
     vendor_clients::IncodeClients,
@@ -62,9 +65,9 @@ async fn process_id_inner(
 
     // Save our result
     let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessId, ctx);
-    save_incode_verification_result(db_pool, args).await?;
+    args.save(db_pool).await?;
 
-    let res = res.map_err(map_to_api_err)?.result;
+    let res = res.map_err(map_to_api_error)?.result;
 
     // If we get the "Id already processed" error, then we ignore this an continue
     // else we throw other kinds of errors as usual
@@ -84,10 +87,10 @@ async fn process_id_inner(
                 "Received expected error in process_id response"
             );
         } else {
-            res.into_success().map_err(map_to_api_err)?;
+            res.into_success().map_err(map_to_api_error)?;
         }
     } else {
-        res.into_success().map_err(map_to_api_err)?;
+        res.into_success().map_err(map_to_api_error)?;
     }
 
     Ok(())

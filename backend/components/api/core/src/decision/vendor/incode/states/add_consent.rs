@@ -1,9 +1,12 @@
 use super::{IncodeStateTransition, ProcessId, VerificationSession};
 use crate::{
-    decision::vendor::incode::{
-        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
-        state::{IncodeState, TransitionResult},
-        IncodeContext,
+    decision::vendor::{
+        incode::{
+            state::{IncodeState, TransitionResult},
+            IncodeContext,
+        },
+        map_to_api_error,
+        verification_result::SaveVerificationResultArgs,
     },
     errors::{ApiResult, AssertionError},
     vendor_clients::IncodeClients,
@@ -72,21 +75,21 @@ impl IncodeStateTransition for AddConsent {
             SaveVerificationResultArgs::from(&privacy_res, VendorAPI::IncodeAddPrivacyConsent, ctx);
         let ml_args = SaveVerificationResultArgs::from(&ml_res, VendorAPI::IncodeAddMlConsent, ctx);
 
-        save_incode_verification_result(db_pool, privacy_args).await?;
-        save_incode_verification_result(db_pool, ml_args).await?;
+        privacy_args.save(db_pool).await?;
+        ml_args.save(db_pool).await?;
 
         // Now ensure we don't have an error
         privacy_res
-            .map_err(map_to_api_err)?
+            .map_err(map_to_api_error)?
             .result
             .into_success()
-            .map_err(map_to_api_err)?;
+            .map_err(map_to_api_error)?;
 
         ml_res
-            .map_err(map_to_api_err)?
+            .map_err(map_to_api_error)?
             .result
             .into_success()
-            .map_err(map_to_api_err)?;
+            .map_err(map_to_api_error)?;
         Ok(Some(Self {}))
     }
 

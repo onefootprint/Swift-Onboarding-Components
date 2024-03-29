@@ -1,9 +1,12 @@
 use super::{FetchScores, IncodeStateTransition, VerificationSession};
 use crate::{
-    decision::vendor::incode::{
-        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
-        state::{IncodeState, TransitionResult},
-        IncodeContext,
+    decision::vendor::{
+        incode::{
+            state::{IncodeState, TransitionResult},
+            IncodeContext,
+        },
+        map_to_api_error,
+        verification_result::SaveVerificationResultArgs,
     },
     errors::ApiResult,
     vendor_clients::IncodeClients,
@@ -38,11 +41,11 @@ impl IncodeStateTransition for GetOnboardingStatus {
 
         // Save our result
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeGetOnboardingStatus, ctx);
-        save_incode_verification_result(db_pool, args).await?;
+        args.save(db_pool).await?;
 
         match res {
             Ok(res) => {
-                res.result.into_success().map_err(map_to_api_err)?;
+                res.result.into_success().map_err(map_to_api_error)?;
                 Ok(Some(Self {}))
             }
             Err(e) => {
@@ -54,7 +57,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
                     );
                     Ok(None)
                 } else {
-                    Err(map_to_api_err(e))?
+                    Err(map_to_api_error(e))?
                 }
             }
         }

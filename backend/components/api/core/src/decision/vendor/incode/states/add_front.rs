@@ -2,10 +2,13 @@ use super::{
     AddBack, AddConsent, AddSelfie, AddSideResponseHelper, IncodeStateTransition, VerificationSession,
 };
 use crate::{
-    decision::vendor::incode::{
-        common::{map_to_api_err, save_incode_verification_result, SaveVerificationResultArgs},
-        state::{IncodeState, TransitionResult},
-        IncodeContext,
+    decision::vendor::{
+        incode::{
+            state::{IncodeState, TransitionResult},
+            IncodeContext,
+        },
+        map_to_api_error,
+        verification_result::SaveVerificationResultArgs,
     },
     errors::ApiResult,
     vendor_clients::IncodeClients,
@@ -54,9 +57,9 @@ impl IncodeStateTransition for AddFront {
         // Save our result
 
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeAddFront, ctx);
-        save_incode_verification_result(db_pool, args).await?;
+        args.save(db_pool).await?;
 
-        let response = res.map_err(map_to_api_err)?.result;
+        let response = res.map_err(map_to_api_error)?.result;
 
         let (
             type_of_id,
