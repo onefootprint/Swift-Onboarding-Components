@@ -40,7 +40,6 @@ members = [
     "components/selfie_doc",
     "external_tools/ditto",
     "external_tools/hooky",
-    "internal_tools/scripts/workos",
 ]
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }
@@ -81,7 +80,12 @@ rust_decimal = "1.32"
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
 
 # diesel
-diesel = { version = "2.0.2", features = ["extras", "uuid", "postgres", "i-implement-a-third-party-backend-and-opt-into-breaking-changes"] }
+diesel = { version = "2.0.2", features = [
+    "extras",
+    "uuid",
+    "postgres",
+    "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
+] }
 diesel_migrations = "2.0.0"
 
 diesel-derive-enum = { rev = "e6aa69856245f083645a0087527236a6bff42c18", git = "https://github.com/adwhit/diesel-derive-enum", features = [
@@ -127,7 +131,13 @@ reqwest-retry = "0.2.2"
 reqwest-tracing = "0.4.5"
 retry-policies = "0.1.2"
 # Matched to version used by reqwest
-hyper = {version = "0.14.18", default-features = false, features = ["tcp", "http1", "http2", "client", "runtime"]}
+hyper = { version = "0.14.18", default-features = false, features = [
+    "tcp",
+    "http1",
+    "http2",
+    "client",
+    "runtime",
+] }
 
 aws-types = "1.0.0"
 aws-config = { version = "1.0.0", features = ["behavior-version-latest"] }

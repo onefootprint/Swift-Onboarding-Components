@@ -15,7 +15,6 @@ export interface Config {
   s3: S3;
   sendgrid: Sendgrid;
   sentryUrl: string;
-  airplane: Airplane;
   apple: Apple;
   google: Google;
 }
@@ -86,10 +85,6 @@ export interface S3 {
 
 export interface Sendgrid {
   fromEmail: string;
-}
-
-export interface Airplane {
-  teamId: string;
 }
 
 export interface Enclave {

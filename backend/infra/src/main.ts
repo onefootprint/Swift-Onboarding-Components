@@ -23,7 +23,6 @@ import {
 } from './stack_metadata';
 import * as nitroService from './nitro_service';
 import * as dns from './dns';
-import * as airplane from './airplane';
 import * as assets from './asset_cdn';
 import { DatabaseOutput } from './db';
 import { ConfigureAlerts } from './alerts';
@@ -153,9 +152,6 @@ export default async function main() {
     assetCdn,
   };
 
-  // create airplane agent
-  const airplaneOutput = airplane.CreateAirplaneAgentStack(globalState);
-
   const service = await createCoreService(globalState);
 
   ConfigureAlerts(globalState, stackMetadata);
@@ -164,7 +160,6 @@ export default async function main() {
     service,
     apiUrl: `https://${dnsConfig.apiDomain}`,
     databaseUrl: database.databaseUrl,
-    airplaneEnvSlug: airplaneOutput.envSlug,
     shortStackName: stackMetadata.shortStackName,
   };
 }

@@ -3,10 +3,6 @@ encryptedkey: AQICAHierjVilfttqs7gag2b9al8BtcDNoSoVbmhJTJW+UU0GgGJuMYg+vgtHDUvKo
 config:
   aws:region: us-east-1
   infra:constants:
-    airplane:
-      apiToken:
-        secure: v1:87RDKonGk+sxikjQ:HDZ9lz9jGhBb1oQmYdyHvGX2BVGq6kkpGZ0MK5eLMgiAT9TnrZ/jUd/ZeoP5Jac3T9sW+rdDEaU=
-      teamId: tea20220706zs7g4auu0i6
     apple:
       deviceCheckPrivateKey:
         secure: v1:s7NbeVTk3C4I0YwL:m1UVvIk/x6tFafyU5lvrRhMwbjENM11OImtnaNyx0epPsxyKb/bsTjoAljd3FSdFVhu6LbZZAAgkcZja41iBlE3w1r4paxOswHRi+CjokBjevEFDCiM4DS+CqqP28BLu2sCRKAAjMeohlynPxnYln06TITB1E/voo46A/zvdIw6C6MN4N4Ur562wveFtwqhLYlcIxthrTKiZ69p18yOA6Z6Tq04x1Y2FWGAEMNa9lgbMbw8c8GDIbUS7LDPpixENLTVl4YFf0USGtcNFEyxVRKHdQl8cyhB8OaxNumAAlNYiUFFxvgMjeaqZQQbQBnSveiLCujX0qkdLYuR0ICxx5ELIhR7GxTRUIGKMtHdqWAFN

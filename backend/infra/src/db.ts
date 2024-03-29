@@ -120,14 +120,7 @@ export async function CreateDB(
           sourceSecurityGroupId: coreSecurityGroups.jumpboxReadOnly.id,
           description:
             'Allows inbound DB connections from the jumpbox (readonly)',
-        },
-        {
-          protocol: '-1',
-          fromPort: 5432,
-          toPort: 5432,
-          sourceSecurityGroupId: coreSecurityGroups.airplane.id,
-          description: 'Allows inbound DB connections from the airplane-agent',
-        },
+        },       
         {
           protocol: '-1',
           fromPort: 5432,
