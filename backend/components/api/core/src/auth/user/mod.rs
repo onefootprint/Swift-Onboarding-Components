@@ -85,8 +85,7 @@ mod test {
             UserAuthScope::Handoff,
         ];
 
-        // Obviously should be able to deserialize OrgOnboarding into OrgOnboarding
-        let modern_value_str = "[\"SignUp\",\"BasicProfile\",\"Handoff\"]";
+        let modern_value_str = "[\"sign_up\",\"basic_profile\",\"handoff\"]";
         let modern_value: Vec<UserAuthScope> = serde_json::de::from_str(modern_value_str).unwrap();
         assert_eq!(modern_value, expected_parsed);
 
