@@ -36,6 +36,7 @@ async fn parse_auth(
 ) -> ApiResult<(Vault, ScopedVaultId, Tenant, Option<(ObConfiguration, Workflow)>)> {
     // TODO We should move this to only take UserWfAuth at some point, but the client makes one request
     // to this API before POST /hosted/onboarding to add the email to a vault after it's created
+    tracing::info!(has_wf_auth=%user_wf_auth.is_some(), "Vault API called");
     let result = if let Some(user_wf_auth) = user_wf_auth {
         // TODO migrate to only VaultData permissions once all tokens have it
         let user_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::VaultData))?;
@@ -46,7 +47,6 @@ async fn parse_auth(
         let wf_info = Some((user_auth.ob_config()?.clone(), user_auth.workflow().clone()));
         (user, su_id, tenant, wf_info)
     } else {
-        tracing::info!("Vault API called without user_wf_auth");
         // TODO migrate to only VaultData permissions once all tokens have it
         let user_auth = user_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::VaultData))?;
         let user = user_auth.user.clone();

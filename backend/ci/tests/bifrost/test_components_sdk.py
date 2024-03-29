@@ -10,6 +10,9 @@ def test_components_sdk(sandbox_tenant):
     obc = sandbox_tenant.default_ob_config
     token = IdentifyClient(obc.key, sandbox_id).create_user()
 
+    # Start the onboarding
+    bifrost = BifrostClient.raw_auth(obc, token, sandbox_id)
+
     # Create a down-scoped token specifically for use by the components SDK
     data = dict(requested_scope="onboarding_components")
     body = post("hosted/user/tokens", data, token)
@@ -54,7 +57,6 @@ def test_components_sdk(sandbox_tenant):
     )
 
     # Then finish the rest of onboarding in normal Bifrost
-    bifrost = BifrostClient.raw_auth(obc, token, sandbox_id)
     bifrost.run()
     # Should already have collect_data requirement met, from downscoped_token
     assert [i["kind"] for i in bifrost.handled_requirements] == ["liveness", "process"]
