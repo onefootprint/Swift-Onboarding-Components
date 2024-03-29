@@ -125,6 +125,13 @@ export async function CreateDB(
           protocol: '-1',
           fromPort: 5432,
           toPort: 5432,
+          sourceSecurityGroupId: coreSecurityGroups.airplane.id,
+          description: 'Allows inbound DB connections from the airplane-agent',
+        },
+        {
+          protocol: '-1',
+          fromPort: 5432,
+          toPort: 5432,
           sourceSecurityGroupId: coreSecurityGroups.cron.id,
           description: 'Allows inbound DB connections from cron jobs',
         },
