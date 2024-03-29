@@ -15,10 +15,11 @@ export type TextProps = {
 const Text = forwardRef<HTMLParagraphElement, TextProps>(
   ({ tag = 'p', children, truncate, variant, ...props }: TextProps, ref) => (
     <StyledText
-      tag={tag || variantMapping[variant] || 'p'}
+      data-truncate={truncate}
+      data-variant={variant}
       ref={ref}
+      tag={tag || variantMapping[variant] || 'p'}
       typography={variant}
-      $truncate={truncate}
       {...props}
     >
       {children}
@@ -26,14 +27,13 @@ const Text = forwardRef<HTMLParagraphElement, TextProps>(
   ),
 );
 
-const StyledText = styled(Box)<{ $truncate?: boolean }>`
-  ${({ theme, $truncate }) => css`
-    ${$truncate &&
-    css`
+const StyledText = styled(Box)`
+  ${({ theme }) => css`
+    &[data-trucate='true'] {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    `}
+    }
 
     a {
       color: ${theme.components.link.color};
