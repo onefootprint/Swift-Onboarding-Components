@@ -1,7 +1,7 @@
-use crate::{models::list_entry::ListEntry, PgConn};
+use crate::{models::list_entry::ListEntry, TxnPgConn};
 use newtypes::{DbActor, ListId, SealedVaultBytes};
 
-pub fn create(conn: &mut PgConn, list_id: &ListId) -> ListEntry {
+pub fn create(conn: &mut TxnPgConn, list_id: &ListId) -> ListEntry {
     ListEntry::create(
         conn,
         list_id,

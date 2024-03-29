@@ -602,6 +602,21 @@ diesel::table! {
         actor -> Jsonb,
         e_data -> Bytea,
         deactivated_by -> Nullable<Jsonb>,
+        list_entry_creation_id -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    list_entry_creation (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        created_seqno -> Int8,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        list_id -> Text,
+        actor -> Jsonb,
     }
 }
 
@@ -1552,6 +1567,8 @@ diesel::joinable!(incode_verification_session_event -> identity_document (identi
 diesel::joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));
 diesel::joinable!(list -> tenant (tenant_id));
 diesel::joinable!(list_entry -> list (list_id));
+diesel::joinable!(list_entry -> list_entry_creation (list_entry_creation_id));
+diesel::joinable!(list_entry_creation -> list (list_id));
 diesel::joinable!(liveness_event -> insight_event (insight_event_id));
 diesel::joinable!(liveness_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
@@ -1664,6 +1681,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     insight_event,
     list,
     list_entry,
+    list_entry_creation,
     liveness_event,
     manual_review,
     middesk_request,

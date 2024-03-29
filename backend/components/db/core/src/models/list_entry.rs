@@ -1,12 +1,14 @@
 use std::collections::HashMap;
 
-use super::data_lifetime::DataLifetime;
+use super::{data_lifetime::DataLifetime, list_entry_creation::ListEntryCreation};
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::list_entry;
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{DataLifetimeSeqno, DbActor, ListEntryId, ListId, Locked, SealedVaultBytes};
+use newtypes::{
+    DataLifetimeSeqno, DbActor, ListEntryCreationId, ListEntryId, ListId, Locked, SealedVaultBytes,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = list_entry)]
@@ -24,6 +26,7 @@ pub struct ListEntry {
     pub actor: DbActor,
     pub e_data: SealedVaultBytes,
     pub deactivated_by: Option<DbActor>,
+    pub list_entry_creation_id: Option<ListEntryCreationId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -34,29 +37,20 @@ struct NewListEntry<'a> {
     list_id: &'a ListId,
     actor: DbActor,
     e_data: &'a SealedVaultBytes,
+    list_entry_creation_id: &'a ListEntryCreationId,
 }
 
 impl ListEntry {
     #[tracing::instrument("ListEntry::create", skip_all)]
     pub fn create(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         list_id: &ListId,
         actor: DbActor,
         e_data: &SealedVaultBytes,
     ) -> DbResult<Self> {
-        let created_seqno = DataLifetime::get_current_seqno(conn)?;
-        let new_list_entry = NewListEntry {
-            created_at: Utc::now(),
-            created_seqno,
-            list_id,
-            actor,
-            e_data,
-        };
-
-        let res = diesel::insert_into(list_entry::table)
-            .values(new_list_entry)
-            .get_result::<Self>(conn)?;
-        Ok(res)
+        Self::bulk_create(conn, list_id, actor, vec![e_data.clone()])?
+            .pop()
+            .ok_or(DbError::IncorrectNumberOfRowsUpdated)
     }
 
     #[tracing::instrument("ListEntry::bulk_create", skip_all)]
@@ -68,6 +62,9 @@ impl ListEntry {
     ) -> DbResult<Vec<Self>> {
         let created_at = Utc::now();
         let created_seqno = DataLifetime::get_current_seqno(conn)?;
+
+        let lec = ListEntryCreation::create(conn, created_seqno, created_at, list_id, &actor)?;
+
         let new_list_entries: Vec<_> = e_data
             .iter()
             .map(|e| NewListEntry {
@@ -76,6 +73,7 @@ impl ListEntry {
                 list_id,
                 actor: actor.clone(),
                 e_data: e,
+                list_entry_creation_id: &lec.id,
             })
             .collect();
 
@@ -150,6 +148,7 @@ impl ListEntry {
 mod tests {
     use super::*;
     use crate::tests::prelude::*;
+    use db_schema::schema::list_entry_creation;
     use macros::db_test;
     use newtypes::DbActor;
 
@@ -167,6 +166,17 @@ mod tests {
         .unwrap();
         assert_eq!(DbActor::Footprint, le1.actor);
         assert_eq!(SealedVaultBytes(vec![1, 2, 3]), le1.e_data);
+
+        // list_entry_creation created
+        let lec: ListEntryCreation = list_entry_creation::table
+            .filter(list_entry_creation::id.eq(le1.list_entry_creation_id.unwrap()))
+            .get_result(conn.conn())
+            .unwrap();
+
+        assert_eq!(le1.created_at, lec.created_at);
+        assert_eq!(le1.created_seqno, lec.created_seqno);
+        assert_eq!(le1.list_id, lec.list_id);
+        assert_eq!(le1.actor, lec.actor);
     }
 
     #[db_test]

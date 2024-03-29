@@ -30,6 +30,7 @@ pub mod incode_verification_session_event;
 pub mod insight_event;
 pub mod list;
 pub mod list_entry;
+pub mod list_entry_creation;
 pub mod liveness_event;
 pub mod manual_review;
 pub mod middesk_request;
