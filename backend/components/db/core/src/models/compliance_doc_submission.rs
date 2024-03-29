@@ -3,7 +3,10 @@ use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_submission;
 use diesel::prelude::*;
-use newtypes::{ComplianceDocData, ComplianceDocRequestId, ComplianceDocSubmissionId, Locked, TenantUserId};
+use newtypes::{
+    ComplianceDocData, ComplianceDocId, ComplianceDocRequestId, ComplianceDocSubmissionId, Locked,
+    TenantUserId,
+};
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -20,6 +23,8 @@ pub struct ComplianceDocSubmission {
     pub doc_data: ComplianceDocData,
 
     pub deactivated_at: Option<DateTime<Utc>>,
+    // TODO: make required
+    pub compliance_doc_id: Option<ComplianceDocId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -30,6 +35,8 @@ pub struct NewComplianceDocSubmission<'a> {
     pub request_id: &'a ComplianceDocRequestId,
     pub submitted_by_tenant_user_id: &'a TenantUserId,
     pub doc_data: &'a ComplianceDocData,
+    // TODO: make required
+    pub compliance_doc_id: Option<&'a ComplianceDocId>,
 }
 
 impl<'a> NewComplianceDocSubmission<'a> {

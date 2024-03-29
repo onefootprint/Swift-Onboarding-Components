@@ -3,7 +3,8 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_review;
 use diesel::prelude::*;
 use newtypes::{
-    ComplianceDocReviewDecision, ComplianceDocReviewId, ComplianceDocSubmissionId, Locked, TenantUserId,
+    ComplianceDocId, ComplianceDocReviewDecision, ComplianceDocReviewId, ComplianceDocSubmissionId, Locked,
+    TenantUserId,
 };
 
 use super::compliance_doc::ComplianceDoc;
@@ -25,6 +26,8 @@ pub struct ComplianceDocReview {
     pub note: String,
 
     pub deactivated_at: Option<DateTime<Utc>>,
+    // TODO: make required
+    pub compliance_doc_id: Option<ComplianceDocId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -37,6 +40,8 @@ pub struct NewComplianceDocReview<'a> {
 
     pub decision: ComplianceDocReviewDecision,
     pub note: &'a str,
+    // TODO: make required
+    pub compliance_doc_id: Option<&'a ComplianceDocId>,
 }
 
 impl<'a> NewComplianceDocReview<'a> {

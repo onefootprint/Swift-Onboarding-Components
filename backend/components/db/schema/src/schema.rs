@@ -224,6 +224,7 @@ diesel::table! {
         decision -> Text,
         note -> Text,
         deactivated_at -> Nullable<Timestamptz>,
+        compliance_doc_id -> Nullable<Text>,
     }
 }
 
@@ -239,6 +240,7 @@ diesel::table! {
         submitted_by_tenant_user_id -> Text,
         doc_data -> Jsonb,
         deactivated_at -> Nullable<Timestamptz>,
+        compliance_doc_id -> Nullable<Text>,
     }
 }
 
@@ -1519,8 +1521,10 @@ diesel::joinable!(compliance_doc -> compliance_doc_template (template_id));
 diesel::joinable!(compliance_doc -> tenant_compliance_partnership (tenant_compliance_partnership_id));
 diesel::joinable!(compliance_doc_assignment -> compliance_doc (compliance_doc_id));
 diesel::joinable!(compliance_doc_request -> compliance_doc (compliance_doc_id));
+diesel::joinable!(compliance_doc_review -> compliance_doc (compliance_doc_id));
 diesel::joinable!(compliance_doc_review -> compliance_doc_submission (submission_id));
 diesel::joinable!(compliance_doc_review -> tenant_user (reviewed_by_partner_tenant_user_id));
+diesel::joinable!(compliance_doc_submission -> compliance_doc (compliance_doc_id));
 diesel::joinable!(compliance_doc_submission -> compliance_doc_request (request_id));
 diesel::joinable!(compliance_doc_submission -> tenant_user (submitted_by_tenant_user_id));
 diesel::joinable!(compliance_doc_template -> partner_tenant (partner_tenant_id));

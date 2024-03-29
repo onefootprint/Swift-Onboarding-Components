@@ -216,6 +216,7 @@ pub fn create_resources<'a>(
                         s3_url: S3Url::from("the url".to_owned()),
                         e_data_key: SealedVaultDataKey(vec![]),
                     },
+                    compliance_doc_id: Some(&doc.id),
                 }
                 .create(conn, &doc)
                 .unwrap();
@@ -246,6 +247,7 @@ pub fn create_resources<'a>(
                         reviewed_by_partner_tenant_user_id: &pt_user.id,
                         decision: *decision,
                         note,
+                        compliance_doc_id: Some(&doc.id),
                     }
                     .create(conn, &doc)
                     .unwrap();
