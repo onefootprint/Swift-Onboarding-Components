@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use newtypes::{
     AuthEventId, AuthMethodKind, BoId, ContactInfoId, DataIdentifier, IdentifyScope, ObConfigurationId,
-    ScopedVaultId, UserAuthScope, VaultId, WorkflowId, WorkflowRequestId,
+    RequestedTokenScope, ScopedVaultId, UserAuthScope, VaultId, WorkflowId, WorkflowRequestId,
 };
 
 use crate::errors::{user::UserError, ApiResult, ValidationError};
@@ -14,8 +14,14 @@ use super::AuthSessionData;
 pub struct UserSession {
     pub user_vault_id: VaultId,
     /// Context on the purpose for which this user session was created.
-    /// If a session is created by stepping up an old sesion, we'll keep the old purpose
-    pub purpose: UserSessionPurpose,
+    /// If a session is created by stepping up an old session, we'll keep the old purpose
+    /// TODO: rm purpose
+    pub purpose: TokenCreationPurpose,
+    /// The list of creation reasons throughout the history of this session.
+    /// Since one auth token can be used to create another, we append the creation purpose to this
+    /// list every time we make a new token. So, this list will show the whole history of why
+    /// tokens were created
+    pub purposes: Vec<TokenCreationPurpose>,
     /// The tenant-scoped user for the auth session. Only null for my1fp
     pub su_id: Option<ScopedVaultId>,
     /// The scoped business for the auth session, if any
@@ -36,8 +42,7 @@ pub struct UserSession {
     pub auth_events: Vec<AssociatedAuthEvent>,
     /// When true, the auth events that occurred at this tenant were inherited to form this token,
     /// rather than proof of auth being exchanged physically
-    /// rm?
-    /// // TODO can i rm this now?
+    /// // TODO: can i rm this now?
     #[serde(default)]
     #[allow(unused)]
     pub is_implied_auth: bool,
@@ -64,10 +69,18 @@ pub struct NewUserSessionContext {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
-pub enum UserSessionPurpose {
+pub enum TokenCreationPurpose {
     Auth,
     Bifrost,
     My1fp,
+    /// This token was created for the bifrost Components SDK and should have limited scope
+    BifrostComponentsSdk,
+    /// This token was created as a handoff token
+    Handoff,
+    /// This token was created after adding a Kba response
+    Kba,
+    /// This token was created after adding a workflow
+    AddWorkflow,
     ApiOnboard,
     ApiReonboard,
     ApiInherit,
@@ -77,17 +90,24 @@ pub enum UserSessionPurpose {
     },
 }
 
-impl From<IdentifyScope> for UserSessionPurpose {
+impl From<IdentifyScope> for TokenCreationPurpose {
     fn from(value: IdentifyScope) -> Self {
+        RequestedTokenScope::from(value).into()
+    }
+}
+
+impl From<RequestedTokenScope> for TokenCreationPurpose {
+    fn from(value: RequestedTokenScope) -> Self {
         match value {
-            IdentifyScope::Auth => Self::Auth,
-            IdentifyScope::My1fp => Self::My1fp,
-            IdentifyScope::Onboarding => Self::Bifrost,
+            RequestedTokenScope::Auth => Self::Auth,
+            RequestedTokenScope::My1fp => Self::My1fp,
+            RequestedTokenScope::Onboarding => Self::Bifrost,
+            RequestedTokenScope::OnboardingComponents => Self::BifrostComponentsSdk,
         }
     }
 }
 
-impl UserSessionPurpose {
+impl TokenCreationPurpose {
     /// When true, the purpose was created via API rather than via a hosted Footprint flow.
     pub fn is_from_api(&self) -> bool {
         match self {
@@ -96,7 +116,13 @@ impl UserSessionPurpose {
             | Self::ApiInherit
             | Self::ApiUser
             | Self::ApiUpdateAuthMethods { .. } => true,
-            Self::Bifrost | Self::Auth | Self::My1fp => false,
+            Self::Bifrost
+            | Self::Auth
+            | Self::My1fp
+            | Self::BifrostComponentsSdk
+            | Self::Handoff
+            | Self::AddWorkflow
+            | Self::Kba => false,
         }
     }
 }
@@ -136,7 +162,8 @@ impl AssociatedAuthEvent {
 pub struct NewUserSessionArgs {
     pub user_vault_id: VaultId,
     pub context: NewUserSessionContext,
-    pub purpose: UserSessionPurpose,
+    pub purpose: TokenCreationPurpose,
+    pub purposes: Vec<TokenCreationPurpose>,
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
 }
@@ -147,6 +174,7 @@ impl UserSession {
             user_vault_id,
             context,
             purpose,
+            purposes,
             scopes,
             auth_events,
         } = args;
@@ -168,7 +196,8 @@ impl UserSession {
         } = context;
         let session = AuthSessionData::User(Self {
             user_vault_id,
-            purpose,
+            purpose: purpose.clone(),
+            purposes,
             su_id,
             sb_id,
             bo_id,
@@ -187,6 +216,7 @@ impl UserSession {
         self,
         new_ctx: NewUserSessionContext,
         new_scopes: Vec<UserAuthScope>,
+        new_purpose: TokenCreationPurpose,
         new_auth_event: Option<AssociatedAuthEvent>,
     ) -> ApiResult<AuthSessionData> {
         // Merge context, scopes, and auth factors and create a new session with these merged fields
@@ -205,6 +235,7 @@ impl UserSession {
         let args = NewUserSessionArgs {
             user_vault_id: self.user_vault_id,
             purpose: self.purpose,
+            purposes: self.purposes.into_iter().chain(Some(new_purpose)).collect(),
             context,
             scopes,
             auth_events,
@@ -212,7 +243,11 @@ impl UserSession {
         UserSession::make(args)
     }
 
-    pub fn replace_scopes(self, new_scopes: Vec<UserAuthScope>) -> ApiResult<AuthSessionData> {
+    pub fn replace_scopes(
+        self,
+        new_scopes: Vec<UserAuthScope>,
+        new_purpose: TokenCreationPurpose,
+    ) -> ApiResult<AuthSessionData> {
         let context = NewUserSessionContext {
             su_id: self.su_id,
             sb_id: self.sb_id,
@@ -234,6 +269,7 @@ impl UserSession {
         let args = NewUserSessionArgs {
             user_vault_id: self.user_vault_id,
             purpose: self.purpose,
+            purposes: self.purposes.into_iter().chain(Some(new_purpose)).collect(),
             context,
             scopes: new_scopes,
             auth_events: self.auth_events,

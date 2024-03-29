@@ -3,7 +3,7 @@ use crate::{
     types::response::ResponseData,
 };
 use api_core::{
-    auth::{session::user::UserSessionPurpose, IsGuardMet},
+    auth::{session::user::TokenCreationPurpose, IsGuardMet},
     types::JsonApiResponse,
     utils::identify::get_user_challenge_context,
     State,
@@ -21,7 +21,7 @@ pub async fn get(
 ) -> JsonApiResponse<Vec<api_wire_types::AuthMethod>> {
     let user_auth = user_auth.check_guard(UserAuthGuard::Auth.or(UserAuthGuard::SignUp))?;
     let limit_auth_methods =
-        if let UserSessionPurpose::ApiUpdateAuthMethods { limit_auth_methods } = &user_auth.data.purpose {
+        if let TokenCreationPurpose::ApiUpdateAuthMethods { limit_auth_methods } = &user_auth.data.purpose {
             limit_auth_methods.clone()
         } else {
             None

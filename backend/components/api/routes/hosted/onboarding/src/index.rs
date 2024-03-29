@@ -10,7 +10,10 @@ use crate::{
     State,
 };
 use api_core::{
-    auth::{ob_config::ObConfigAuth, session::user::NewUserSessionContext},
+    auth::{
+        ob_config::ObConfigAuth,
+        session::user::{NewUserSessionContext, TokenCreationPurpose},
+    },
     types::JsonApiResponse,
     utils::{
         db2api::DbToApi,
@@ -110,8 +113,9 @@ pub async fn post(
                 sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };
-            let data = user_auth.data.session.clone().update(args, vec![], None)?;
-            user_auth.update_session(conn, &session_key, data)?;
+            let session = user_auth.data.session.clone();
+            let session = session.update(args, vec![], TokenCreationPurpose::AddWorkflow, None)?;
+            user_auth.update_session(conn, &session_key, session)?;
 
             Ok(())
         })

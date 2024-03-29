@@ -1,6 +1,10 @@
 use crate::State;
 use api_core::{
-    auth::{session::user::NewUserSessionContext, user::UserAuthContext, Any},
+    auth::{
+        session::user::{NewUserSessionContext, TokenCreationPurpose},
+        user::UserAuthContext,
+        Any,
+    },
     errors::{ApiResult, ValidationError},
     types::{JsonApiResponse, ResponseData},
     utils::{
@@ -69,8 +73,9 @@ pub async fn post(
                 ..Default::default()
             };
             let expires_at = user_auth.expires_at();
-            let data = user_auth.data.session.update(context, vec![], None)?;
-            let (token, _) = AuthSession::create_sync(conn, &session_key, data, expires_at)?;
+            let session = user_auth.data.session;
+            let session = session.update(context, vec![], TokenCreationPurpose::Kba, None)?;
+            let (token, _) = AuthSession::create_sync(conn, &session_key, session, expires_at)?;
             Ok(token)
         })
         .await?;

@@ -1,7 +1,7 @@
 use super::session::AuthSession;
 use crate::{
     auth::session::user::{
-        AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, UserSession, UserSessionPurpose,
+        AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, TokenCreationPurpose, UserSession,
     },
     errors::{onboarding::OnboardingError, ApiResult, ValidationError},
 };
@@ -64,7 +64,7 @@ pub fn create_token(
 
     // Determine arguments for the auth token based on the requested operation
     let (purpose, obc_id, wfr) = match kind {
-        TokenOperationKind::User => (UserSessionPurpose::ApiUser, None, None),
+        TokenOperationKind::User => (TokenCreationPurpose::ApiUser, None, None),
         TokenOperationKind::Inherit => {
             // Inherit the WorkflowRequest
             let wfr = WorkflowRequest::get_active(conn, &sv.id)?
@@ -72,13 +72,13 @@ pub fn create_token(
             // Do we want to replace the obc.id on the auth token?
 
             let obc_id = wfr.ob_configuration_id.clone();
-            (UserSessionPurpose::ApiInherit, Some(obc_id), Some(wfr))
+            (TokenCreationPurpose::ApiInherit, Some(obc_id), Some(wfr))
         }
         TokenOperationKind::Reonboard => {
             let (_, obc) = Workflow::latest(conn, &sv.id, true)?.ok_or(ValidationError(
                 "Cannot reonboard user - user has no complete onboardings.",
             ))?;
-            (UserSessionPurpose::ApiReonboard, Some(obc.id), None)
+            (TokenCreationPurpose::ApiReonboard, Some(obc.id), None)
         }
         TokenOperationKind::Onboard => {
             let key = key.ok_or(ValidationError(
@@ -88,10 +88,10 @@ pub fn create_token(
             if !obc.kind.can_onboard() {
                 return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
             }
-            (UserSessionPurpose::ApiOnboard, Some(obc.id), None)
+            (TokenCreationPurpose::ApiOnboard, Some(obc.id), None)
         }
         TokenOperationKind::UpdateAuthMethods => (
-            UserSessionPurpose::ApiUpdateAuthMethods { limit_auth_methods },
+            TokenCreationPurpose::ApiUpdateAuthMethods { limit_auth_methods },
             None,
             None,
         ),
@@ -106,7 +106,8 @@ pub fn create_token(
     };
     let args = NewUserSessionArgs {
         user_vault_id: sv.vault_id,
-        purpose,
+        purpose: purpose.clone(),
+        purposes: vec![purpose],
         context,
         scopes,
         auth_events,

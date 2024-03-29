@@ -2,7 +2,7 @@ use super::RegisterChallengeData;
 use crate::{challenge::RegisterChallenge, State};
 use api_core::{
     auth::{
-        session::user::{AssociatedAuthEventKind, UserSessionPurpose},
+        session::user::{AssociatedAuthEventKind, TokenCreationPurpose},
         user::{load_auth_events, UserAuthContext, UserAuthGuard},
         IsGuardMet,
     },
@@ -53,7 +53,7 @@ pub async fn post(
     if !allowed_challenge_kinds.contains(&kind) {
         return ValidationError(&format!("Cannot initiate challenge of kind {}", kind)).into();
     }
-    if let UserSessionPurpose::ApiUpdateAuthMethods {
+    if let TokenCreationPurpose::ApiUpdateAuthMethods {
         limit_auth_methods: Some(limit_auth_methods),
     } = &user_auth.data.purpose
     {

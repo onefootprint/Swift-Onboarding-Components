@@ -4,7 +4,7 @@ use crate::{
     State,
 };
 use api_core::{
-    auth::session::user::{NewUserSessionArgs, NewUserSessionContext, UserSession, UserSessionPurpose},
+    auth::session::user::{NewUserSessionArgs, NewUserSessionContext, TokenCreationPurpose, UserSession},
     config::LinkKind,
     errors::{tenant::TenantError, user::UserError, ApiResult, ValidationError},
     utils::{fp_id_path::FpIdPath, session::AuthSession},
@@ -87,7 +87,8 @@ pub async fn post(
             let duration = Duration::days(3);
             let args = NewUserSessionArgs {
                 user_vault_id: sv.vault_id.clone(),
-                purpose: UserSessionPurpose::ApiInherit,
+                purpose: TokenCreationPurpose::ApiInherit,
+                purposes: vec![TokenCreationPurpose::ApiInherit],
                 context,
                 scopes: vec![],
                 auth_events: vec![],

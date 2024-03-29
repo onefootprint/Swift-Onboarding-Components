@@ -156,6 +156,8 @@ pub async fn post(
                 root_span.record("is_live", su.is_live);
             }
 
+            let obc = user_auth.ob_config().cloned();
+
             // record the new auth event
             let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
             let ae_args = NewAuthEventArgs {
@@ -171,13 +173,12 @@ pub async fn post(
             let event = AuthEvent::save(ae_args, conn)?;
 
             let scopes = allowed_user_scopes(vec![event.kind], scope.into(), true);
-
             let ae = AssociatedAuthEvent::explicit(event.id);
             // Add the new scopes and args to the existing scopes and context on the auth token
-            let data = user_auth.data.session.clone().update(context, scopes, Some(ae))?;
+            let session = user_auth.data.session;
+            let session = session.update(context, scopes, scope.into(), Some(ae))?;
             let duration = scope.token_ttl();
-            let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-            let obc = user_auth.ob_config().cloned();
+            let (token, _) = AuthSession::create_sync(conn, &session_key, session, duration)?;
             let portable_vw = if new_su {
                 Some(VaultWrapper::<Any>::build_portable(conn, &uv_id)?)
             } else {

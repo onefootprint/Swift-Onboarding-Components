@@ -65,8 +65,10 @@ pub async fn post(
                 return ValidationError("Cannot request additional scopes").into();
             }
             let expires_at = user_auth.expires_at();
-            let data = user_auth.data.session.replace_scopes(new_scopes)?;
-            let (token, session) = AuthSession::create_sync(conn, &session_key, data, expires_at)?;
+            let purpose = requested_scope.into();
+            let session = user_auth.data.session;
+            let session = session.replace_scopes(new_scopes, purpose)?;
+            let (token, session) = AuthSession::create_sync(conn, &session_key, session, expires_at)?;
             Ok((token, session))
         })
         .await?;

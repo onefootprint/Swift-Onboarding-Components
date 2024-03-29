@@ -190,6 +190,7 @@ pub(super) async fn create_identified_token(
             let args = NewUserSessionArgs {
                 user_vault_id: v_id,
                 purpose: scope.into(),
+                purposes: vec![scope.into()],
                 context,
                 scopes: scopes.clone(),
                 auth_events: vec![],
