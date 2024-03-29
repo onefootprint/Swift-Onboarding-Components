@@ -224,7 +224,7 @@ diesel::table! {
         decision -> Text,
         note -> Text,
         deactivated_at -> Nullable<Timestamptz>,
-        compliance_doc_id -> Nullable<Text>,
+        compliance_doc_id -> Text,
     }
 }
 
@@ -240,7 +240,7 @@ diesel::table! {
         submitted_by_tenant_user_id -> Text,
         doc_data -> Jsonb,
         deactivated_at -> Nullable<Timestamptz>,
-        compliance_doc_id -> Nullable<Text>,
+        compliance_doc_id -> Text,
     }
 }
 

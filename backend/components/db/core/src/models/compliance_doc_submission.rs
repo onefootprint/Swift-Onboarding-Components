@@ -23,8 +23,7 @@ pub struct ComplianceDocSubmission {
     pub doc_data: ComplianceDocData,
 
     pub deactivated_at: Option<DateTime<Utc>>,
-    // TODO: make required
-    pub compliance_doc_id: Option<ComplianceDocId>,
+    pub compliance_doc_id: ComplianceDocId,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -35,8 +34,7 @@ pub struct NewComplianceDocSubmission<'a> {
     pub request_id: &'a ComplianceDocRequestId,
     pub submitted_by_tenant_user_id: &'a TenantUserId,
     pub doc_data: &'a ComplianceDocData,
-    // TODO: make required
-    pub compliance_doc_id: Option<&'a ComplianceDocId>,
+    pub compliance_doc_id: &'a ComplianceDocId,
 }
 
 impl<'a> NewComplianceDocSubmission<'a> {

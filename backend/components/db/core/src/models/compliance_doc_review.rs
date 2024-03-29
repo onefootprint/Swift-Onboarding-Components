@@ -26,8 +26,7 @@ pub struct ComplianceDocReview {
     pub note: String,
 
     pub deactivated_at: Option<DateTime<Utc>>,
-    // TODO: make required
-    pub compliance_doc_id: Option<ComplianceDocId>,
+    pub compliance_doc_id: ComplianceDocId,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -40,8 +39,7 @@ pub struct NewComplianceDocReview<'a> {
 
     pub decision: ComplianceDocReviewDecision,
     pub note: &'a str,
-    // TODO: make required
-    pub compliance_doc_id: Option<&'a ComplianceDocId>,
+    pub compliance_doc_id: &'a ComplianceDocId,
 }
 
 impl<'a> NewComplianceDocReview<'a> {

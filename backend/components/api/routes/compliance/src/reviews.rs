@@ -74,7 +74,7 @@ pub async fn post(
                 reviewed_by_partner_tenant_user_id: &tenant_user_id,
                 decision,
                 note: note.as_str(),
-                compliance_doc_id: Some(&doc.id),
+                compliance_doc_id: &doc.id,
             }.create(conn, &doc)?;
 
             // Create a reupload request upon rejection.

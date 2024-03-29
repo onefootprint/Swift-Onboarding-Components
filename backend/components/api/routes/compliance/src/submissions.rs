@@ -65,7 +65,7 @@ pub async fn post(
                 request_id: &active_req.id,
                 submitted_by_tenant_user_id: &submitted_by_tenant_user_id,
                 doc_data: &doc_data,
-                compliance_doc_id: Some(&doc.id),
+                compliance_doc_id: &doc.id,
             }
             .create(conn, &doc)?;
 
