@@ -20,6 +20,7 @@ import {
   withOrgAssumeRole,
   withOrgAssumeRoleError,
   withOrgAuthRolesError,
+  withRiskSignals,
   withSevenOrgAuthRoles,
   withTwoOrgAuthRoles,
 } from './side-nav.test.config';
@@ -30,12 +31,11 @@ const AUTH_METHOD_NOT_SUPPORTED_TEXT = (tenantName: string) =>
 
 describe('<SideNav />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/',
-    });
+    useRouterSpy({ pathname: '/' });
     withEntities();
     withTwoOrgAuthRoles();
     asAdminUserInLive();
+    withRiskSignals();
   });
 
   afterAll(() => {

@@ -10,12 +10,12 @@ import TenantItem from './components/tenant-item';
 type TenantsListProps = {
   tenants: GetAuthRolesOrg[];
   currTenantId: string;
-  onClick?: (tenantId: string) => void;
+  onSelect?: (tenantId: string) => void;
 };
 
 const NUM_TENANTS_IN_DROPDOWN = 5;
 
-const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
+const TenantsList = ({ tenants, currTenantId, onSelect }: TenantsListProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.private-layout.nav',
   });
@@ -27,7 +27,7 @@ const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
 
   const handleClick = (tenantId: string) => {
     setSelectedTenant(tenantId);
-    onClick?.(tenantId);
+    onSelect?.(tenantId);
   };
 
   const toggleShowAll = () => {

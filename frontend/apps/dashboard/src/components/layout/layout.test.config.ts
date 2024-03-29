@@ -69,3 +69,10 @@ export const withOrgAuthRoles = () =>
     path: '/org/auth/roles',
     response: getOrgAuthRoleFixture,
   });
+
+export const withRiskSignals = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/risk_signals',
+    response: { data: [], meta: { count: 0 } },
+  });

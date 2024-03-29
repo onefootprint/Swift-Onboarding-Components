@@ -46,7 +46,7 @@ describe('<Row />', () => {
     expect(screen.getByText('1234')).toBeInTheDocument();
   });
 
-  it('should render the active dashboard useres', () => {
+  it('should render the active dashboard users', () => {
     renderRow({ role: { ...roleFixture, numActiveUsers: 4321 } });
     expect(screen.getByText('4321')).toBeInTheDocument();
   });

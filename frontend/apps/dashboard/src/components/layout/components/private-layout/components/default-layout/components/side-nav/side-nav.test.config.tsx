@@ -107,6 +107,13 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
   },
 ];
 
+export const withRiskSignals = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/risk_signals',
+    response: { data: [], meta: { count: 0 } },
+  });
+
 export const withEntities = () =>
   mockRequest({
     method: 'post',

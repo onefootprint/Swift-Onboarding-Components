@@ -76,29 +76,25 @@ const ActionResultSection = ({
               </Stack>
             </Stack>
           </CustomDropdownTrigger>
-          <Dropdown.Content
-            align="end"
-            sideOffset={4}
-            style={{
-              padding: '0',
-            }}
-          >
-            <DropdownInner>
-              {Object.values(RuleResultGroup).map(group => (
-                <DropdownOption
-                  key={group}
-                  role="option"
-                  aria-label={t(kebabCase(group) as ParseKeys<'common'>)}
-                  onClick={() => selectResultGroup(group)}
-                >
-                  <Text variant="body-3">
-                    {t(kebabCase(group) as ParseKeys<'common'>)}
-                  </Text>
-                  {group === selectedResultGroup && <IcoCheck16 />}
-                </DropdownOption>
-              ))}
-            </DropdownInner>
-          </Dropdown.Content>
+          <Dropdown.Portal>
+            <Dropdown.Content align="end" sideOffset={4} asChild>
+              <DropdownInner>
+                {Object.values(RuleResultGroup).map(group => (
+                  <DropdownOption
+                    key={group}
+                    role="option"
+                    aria-label={t(kebabCase(group) as ParseKeys<'common'>)}
+                    onClick={() => selectResultGroup(group)}
+                  >
+                    <Text variant="body-3">
+                      {t(kebabCase(group) as ParseKeys<'common'>)}
+                    </Text>
+                    {group === selectedResultGroup && <IcoCheck16 />}
+                  </DropdownOption>
+                ))}
+              </DropdownInner>
+            </Dropdown.Content>
+          </Dropdown.Portal>
         </Dropdown.Root>
       </Stack>
       {actionSection === RuleActionSection.stepUp ? (
@@ -144,7 +140,7 @@ const DropdownInner = styled.div`
   `};
 `;
 
-const DropdownOption = styled.div`
+const DropdownOption = styled(Dropdown.Item)`
   ${({ theme }) => css`
     display: flex;
     justify-content: space-between;

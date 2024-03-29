@@ -17,7 +17,11 @@ import {
 } from 'src/config/tests';
 
 import DefaultLayout from './default-layout';
-import { withEntities, withOrgAuthRoles } from './default-layout.test.config';
+import {
+  withEntities,
+  withOrgAuthRoles,
+  withRiskSignals,
+} from './default-layout.test.config';
 
 const renderDefaultLayout = () =>
   customRender(
@@ -48,6 +52,7 @@ describe('<DefaultLayout />', () => {
     });
     withEntities();
     withOrgAuthRoles();
+    withRiskSignals();
   });
 
   describe('when its restricted to use only the sandbox mode', () => {

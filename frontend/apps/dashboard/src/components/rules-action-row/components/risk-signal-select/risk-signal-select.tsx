@@ -25,7 +25,7 @@ import {
 } from 'react-virtualized';
 import styled, { css } from 'styled-components';
 
-import useRiskSignals from './hooks/use-risk-signals';
+import useRiskSignals from '../../../../hooks/use-risk-signals';
 
 const ITEM_HEIGHT = 64;
 

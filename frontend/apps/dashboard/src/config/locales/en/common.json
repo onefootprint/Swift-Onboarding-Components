@@ -466,6 +466,12 @@
     "native_device": "Native Device"
   },
   "components": {
+    "risk-signals-glossary": {
+      "title": "Risk Signals Glossary",
+      "description": "Learn more about the risk signals that we use to evaluate your users.",
+      "search": "Search risk signals",
+      "no-results": "No results found"
+    },
     "frequent-notes": {
       "title": "Frequent Notes",
       "edit": "Edit",

@@ -2,7 +2,7 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { Role } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, Stack } from '@onefootprint/ui';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
@@ -20,20 +20,25 @@ const Actions = ({ role }: ActionsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.settings.roles.table.actions',
   });
+  const [openDropdown, setOpenDropdown] = useState(false);
   const removeRef = useRef<RemoveHandler>(null);
   const editRef = useRef<EditHandler>(null);
 
-  const handleEdit = () => {
+  const handleEdit = (event: Event) => {
+    event.preventDefault();
     editRef.current?.edit();
+    setOpenDropdown(false);
   };
 
-  const handleRemove = () => {
+  const handleRemove = (event: Event) => {
+    event.preventDefault();
     removeRef.current?.remove();
+    setOpenDropdown(false);
   };
 
   return (
     <Stack justify="flex-end">
-      <Dropdown.Root>
+      <Dropdown.Root open={openDropdown} onOpenChange={setOpenDropdown}>
         <PermissionGate
           scopeKind={RoleScopeKind.orgSettings}
           fallbackText={t('not-allowed')}

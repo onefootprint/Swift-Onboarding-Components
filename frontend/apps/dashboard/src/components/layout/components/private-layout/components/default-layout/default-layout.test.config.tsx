@@ -45,3 +45,10 @@ export const withEntities = () =>
     path: '/entities/search',
     response: { data: [] },
   });
+
+export const withRiskSignals = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/risk_signals',
+    response: { data: [], meta: { count: 0 } },
+  });

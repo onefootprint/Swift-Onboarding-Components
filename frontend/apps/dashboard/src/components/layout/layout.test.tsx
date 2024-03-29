@@ -9,7 +9,11 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 import { useStore } from '../../hooks/use-session';
 import type { LayoutProps } from './layout';
 import Layout from './layout';
-import { withEntities, withOrgAuthRoles } from './layout.test.config';
+import {
+  withEntities,
+  withOrgAuthRoles,
+  withRiskSignals,
+} from './layout.test.config';
 
 const originalState = useStore.getState();
 
@@ -21,6 +25,7 @@ describe('<Layout />', () => {
 
   beforeAll(() => {
     withEntities();
+    withRiskSignals();
   });
 
   describe('when the user is NOT logged', () => {
