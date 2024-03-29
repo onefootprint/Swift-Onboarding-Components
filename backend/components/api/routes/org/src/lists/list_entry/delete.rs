@@ -20,13 +20,14 @@ pub async fn deactivate_list_entry(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let (list_id, list_entry_id) = ids.into_inner();
+    let actor = auth.actor();
 
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             List::get(conn, &tenant_id, is_live, &list_id)?;
             let list_entry = ListEntry::lock(conn, &list_entry_id)?;
-            ListEntry::deactivate(conn, list_entry)?;
+            ListEntry::deactivate(conn, list_entry, &actor.into())?;
             Ok(())
         })
         .await?;

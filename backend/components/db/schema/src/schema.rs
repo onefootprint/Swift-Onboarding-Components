@@ -601,6 +601,7 @@ diesel::table! {
         list_id -> Text,
         actor -> Jsonb,
         e_data -> Bytea,
+        deactivated_by -> Nullable<Jsonb>,
     }
 }
 

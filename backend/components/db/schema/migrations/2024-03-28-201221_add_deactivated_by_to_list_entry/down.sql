@@ -1,0 +1,1 @@
+ALTER TABLE list_entry DROP COLUMN deactivated_by;

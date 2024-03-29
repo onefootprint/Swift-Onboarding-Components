@@ -23,6 +23,7 @@ pub struct ListEntry {
     pub list_id: ListId,
     pub actor: DbActor,
     pub e_data: SealedVaultBytes,
+    pub deactivated_by: Option<DbActor>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -126,7 +127,7 @@ impl ListEntry {
     }
 
     #[tracing::instrument("ListEntry::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut TxnPgConn, list_entry: Locked<Self>) -> DbResult<Self> {
+    pub fn deactivate(conn: &mut TxnPgConn, list_entry: Locked<Self>, actor: &DbActor) -> DbResult<Self> {
         if list_entry.deactivated_seqno.is_some() {
             return Err(DbError::ListEntryAlreadyDeactivated);
         }
@@ -138,6 +139,7 @@ impl ListEntry {
             .set((
                 list_entry::deactivated_at.eq(now),
                 list_entry::deactivated_seqno.eq(seqno),
+                list_entry::deactivated_by.eq(actor),
             ))
             .get_result(conn.conn())?;
         Ok(res)
@@ -176,14 +178,14 @@ mod tests {
         assert_eq!(1, ListEntry::list(conn, &list.id).unwrap().len());
 
         let le = ListEntry::lock(conn, &le.id).unwrap();
-        let le = ListEntry::deactivate(conn, le).unwrap();
+        let le = ListEntry::deactivate(conn, le, &DbActor::Footprint).unwrap();
         assert!(le.deactivated_at.is_some());
         assert!(le.deactivated_seqno.is_some());
 
         assert_eq!(0, ListEntry::list(conn, &list.id).unwrap().len());
         let le = ListEntry::lock(conn, &le.id).unwrap();
         assert!(matches!(
-            ListEntry::deactivate(conn, le).unwrap_err(),
+            ListEntry::deactivate(conn, le, &DbActor::Footprint).unwrap_err(),
             DbError::ListEntryAlreadyDeactivated
         ));
     }

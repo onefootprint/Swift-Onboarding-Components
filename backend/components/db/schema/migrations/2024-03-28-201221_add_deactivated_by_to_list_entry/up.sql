@@ -1,0 +1,1 @@
+ALTER TABLE list_entry ADD COLUMN deactivated_by JSONB;
