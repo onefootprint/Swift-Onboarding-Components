@@ -93,6 +93,7 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
+            tracing::info!(playbook_key=%obc.key, "Post /kyb with playbook");
             if obc.kind != ObConfigurationKind::Kyb {
                 return Err(ValidationError("Must use playbook of kind KYB").into());
             }
