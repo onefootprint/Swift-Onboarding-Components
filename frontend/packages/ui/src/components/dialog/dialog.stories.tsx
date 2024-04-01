@@ -1,125 +1,314 @@
+import { IcoClose24, icos } from '@onefootprint/icons';
 import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import Box from '../box';
 import Button from '../button';
+import Text from '../text';
+import type { DialogProps } from './dialog';
 import Dialog from './dialog';
-import type { DialogProps } from './dialog.types';
 
 export default {
-  title: 'Components/Dialog',
   component: Dialog,
+  title: 'Components/Dialog',
   argTypes: {
     title: {
+      control: 'text',
+      table: {
+        type: { summary: 'string', required: true },
+      },
       description: 'The header text of the dialog',
     },
-    description: {
+    headerIconComponent: {
+      control: 'select',
+      description: 'Close icon',
+      options: Object.keys(icos),
+    },
+    headerIconAriaLabel: {
       control: 'text',
-      description: 'The description text of the dialog',
+      table: {
+        type: { summary: 'string', required: false },
+        defaultValue: { summary: 'Close' },
+      },
+      description: 'The aria label for the close button',
+    },
+    headerIconOnClick: {
+      control: 'function',
+      description:
+        'Function called when the user clicks on the header icon (usually dialog close action, but not always)',
+      table: {
+        type: { summary: 'function', required: false },
+      },
+    },
+    onClose: {
+      control: 'function',
+      description: 'Function called when the user closes the dialog',
+      table: {
+        type: { summary: 'function', required: false },
+      },
+    },
+    children: {
+      control: 'text',
+      table: {
+        type: { summary: 'string', required: true },
+      },
+      description: 'The dialog content',
+    },
+    testID: {
+      control: 'text',
+      table: {
+        type: { summary: 'string', required: false },
+      },
+      description: 'Append an attribute data-testid for testing purposes',
     },
     open: {
       control: 'boolean',
-      description: 'Whether the dialog is open',
+      description: 'Show/Hide the dialog',
+      table: {
+        type: { summary: 'string', required: false },
+        defaultValue: { summary: 'false' },
+      },
     },
     size: {
       control: 'select',
-      options: ['compact', 'default', 'large', 'full-screen'],
       description: 'The size of the dialog',
+      options: ['default', 'compact', 'large', 'full-screen'],
+      table: {
+        type: { summary: 'string', required: false },
+        defaultValue: { summary: 'default' },
+      },
+    },
+    primaryButton: {
+      control: 'object',
+      description: 'The primary button',
+      table: {
+        type: { summary: 'object', required: true },
+      },
+    },
+    secondaryButton: {
+      control: 'object',
+      description: 'The secondary button',
+      table: {
+        type: { summary: 'object', required: true },
+      },
+    },
+    linkButton: {
+      control: 'object',
+      description: 'The link button, which is rendered on the left',
+      table: {
+        type: { summary: 'object', required: true },
+      },
     },
     isConfirmation: {
       control: 'boolean',
       description: 'Whether the dialog is a confirmation dialog',
-    },
-    primaryButton: {
-      control: 'object',
-      description: 'Primary button configuration',
-    },
-    secondaryButton: {
-      control: 'object',
-      description: 'Secondary button configuration',
-    },
-    linkButton: {
-      control: 'object',
-      description: 'Link button configuration',
+      table: {
+        type: { summary: 'boolean', required: false },
+      },
     },
   },
 } as Meta;
 
 const Template: Story<DialogProps> = ({
-  title,
-  open,
+  children,
+  onClose,
+  headerIcon: {
+    component: HeaderIconComponent = IcoClose24,
+    onClick: onHeaderIconClick = onClose,
+    ariaLabel: headerIconAriaLabel = 'Close',
+  } = {
+    component: IcoClose24,
+    onClick: onClose,
+    ariaLabel: 'Close',
+  },
+  open: initialOpen,
+  primaryButton = { label: 'Primary' },
+  secondaryButton = { label: 'Secondary' },
   size,
+  testID,
+  title,
   isConfirmation,
-  primaryButton,
-  secondaryButton,
-  linkButton,
-}) => {
-  const [isOpen, setOpen] = useState(open);
+}: DialogProps) => {
+  const [open, setOpen] = useState(initialOpen);
+  const SelectedIcon =
+    typeof HeaderIconComponent === 'string'
+      ? icos[HeaderIconComponent]
+      : HeaderIconComponent;
+
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Open Dialog</Button>
       <Dialog
-        title={title}
-        open={isOpen}
-        size={size}
-        isConfirmation={isConfirmation}
+        headerIcon={{
+          component: SelectedIcon,
+          onClick: () => {
+            setOpen(false);
+            onHeaderIconClick();
+          },
+          ariaLabel: headerIconAriaLabel,
+        }}
+        linkButton={undefined}
+        onClose={() => {
+          setOpen(false);
+          onClose();
+        }}
+        open={open}
         primaryButton={primaryButton}
         secondaryButton={secondaryButton}
-        linkButton={linkButton}
-        onClose={() => setOpen(false)}
+        size={size}
+        testID={testID}
+        title={title}
+        isConfirmation={isConfirmation}
       >
-        <Box minHeight="80px" />
+        <Text variant="body-4">{children}</Text>
       </Dialog>
+      <Button onClick={() => setOpen(true)} size="default">
+        Open dialog
+      </Button>
     </>
   );
 };
 
-export const Default = Template.bind({});
-Default.args = {
-  title: 'Dialog Title',
-  open: false,
-};
-
-export const WithButtons = Template.bind({});
-WithButtons.args = {
-  title: 'Dialog Title',
+export const Base = Template.bind({});
+Base.args = {
+  children: 'Content',
+  headerIcon: {
+    component: IcoClose24,
+    onClick: () => console.log('close'), // eslint-disable-line no-console
+    ariaLabel: 'Close',
+  },
+  onClose: () => console.log('close'), // eslint-disable-line no-console
   open: false,
   primaryButton: {
-    label: 'Confirm',
-    onClick: () => alert('Confirmed'),
+    label: 'Primary',
+    onClick: () => alert('Primary button clicked'), // eslint-disable-line no-alert
   },
   secondaryButton: {
-    label: 'Cancel',
-    onClick: () => alert('Cancelled'),
+    label: 'Secondary',
+    onClick: () => alert('Secondary button clicked'), // eslint-disable-line no-alert
   },
-  linkButton: {
-    label: 'Learn More',
-    onClick: () => alert('Learn More Clicked'),
-  },
+  size: 'default',
+  testID: 'dialog-test-id',
+  title: 'Title',
+  isConfirmation: false,
 };
 
-export const FullScreen = Template.bind({});
-FullScreen.args = {
-  title: 'Dialog Title',
+const OnlyPrimaryTemplate: Story<DialogProps> = ({
+  children,
+  onClose,
+  headerIcon: {
+    component: HeaderIconComponent = IcoClose24,
+    onClick: onHeaderIconClick = onClose,
+    ariaLabel: headerIconAriaLabel = 'Close',
+  } = {
+    component: IcoClose24,
+    onClick: onClose,
+    ariaLabel: 'Close',
+  },
+  open: initialOpen,
+  primaryButton = { label: 'Primary' },
+  size,
+  testID,
+  title,
+  isConfirmation,
+}: DialogProps) => {
+  const [open, setOpen] = useState(initialOpen);
+  const SelectedIcon =
+    typeof HeaderIconComponent === 'string'
+      ? icos[HeaderIconComponent]
+      : HeaderIconComponent;
+
+  return (
+    <>
+      <Dialog
+        linkButton={undefined}
+        headerIcon={{
+          component: SelectedIcon,
+          onClick: onHeaderIconClick,
+          ariaLabel: headerIconAriaLabel,
+        }}
+        onClose={() => {
+          setOpen(false);
+          onClose();
+        }}
+        open={open}
+        primaryButton={primaryButton}
+        size={size}
+        testID={testID}
+        title={title}
+        isConfirmation={isConfirmation}
+      >
+        <Text variant="body-4">{children}</Text>
+      </Dialog>
+      <Button onClick={() => setOpen(true)} size="default">
+        Open dialog
+      </Button>
+    </>
+  );
+};
+
+export const OnlyPrimary = OnlyPrimaryTemplate.bind({});
+OnlyPrimary.args = {
   open: false,
-  size: 'full-screen',
+  size: 'default',
+  title: 'Title',
   primaryButton: {
-    label: 'Confirm',
-    onClick: () => alert('Confirmed'),
+    label: 'Primary',
   },
-  secondaryButton: {
-    label: 'Cancel',
-    onClick: () => alert('Cancelled'),
+  onClose: () => {
+    console.log('close'); // eslint-disable-line no-console
   },
-  linkButton: {
-    label: 'Learn More',
-    onClick: () => alert('Learn More Clicked'),
-  },
+  isConfirmation: false,
 };
 
-export const ConfirmationDialog = Template.bind({});
-ConfirmationDialog.args = {
-  title: 'Are you sure?',
+const LinkTemplate: Story<DialogProps> = ({
+  title,
+  onClose,
+  primaryButton = { label: 'Primary' },
+  linkButton = { label: 'Link' },
+  size,
+  testID,
+  isConfirmation = false,
+  open: initialVisibility,
+}: DialogProps) => {
+  const [open, setOpen] = useState(initialVisibility);
+
+  return (
+    <>
+      <Dialog
+        title={title}
+        headerIcon={{}}
+        onClose={() => {
+          setOpen(false);
+          onClose();
+        }}
+        primaryButton={primaryButton}
+        linkButton={linkButton}
+        secondaryButton={undefined}
+        size={size}
+        testID={testID}
+        open={open}
+        isConfirmation={isConfirmation}
+      >
+        <Text variant="body-4">Content</Text>
+      </Dialog>
+      <Button onClick={() => setOpen(true)} size="default">
+        Open dialog
+      </Button>
+    </>
+  );
+};
+
+export const PrimaryAndLink = LinkTemplate.bind({});
+PrimaryAndLink.args = {
   open: false,
-  isConfirmation: true,
+  size: 'default',
+  title: 'Title',
+  primaryButton: {
+    label: 'Primary',
+  },
+  linkButton: {
+    label: 'Link button',
+  },
+  onClose: () => {
+    console.log('close'); // eslint-disable-line no-console
+  },
 };

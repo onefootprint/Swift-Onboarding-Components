@@ -55,9 +55,9 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(
 
     return (
       <Dialog
-        open={open}
         size="compact"
         title={t(`${playbook.kind}.title` as ParseKeys<'common'>)}
+        open={open}
         onClose={handleClose}
       >
         <Content>

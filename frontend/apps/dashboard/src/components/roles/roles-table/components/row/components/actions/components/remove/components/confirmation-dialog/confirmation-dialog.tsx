@@ -20,12 +20,13 @@ const ConfirmationDialog = ({
   title,
 }: ConfirmationDialogProps) => {
   const { t } = useTranslation();
+
   return (
     <Dialog
       size="compact"
       open={open}
+      onClose={onClose}
       title={title}
-      isConfirmation
       primaryButton={{
         label: t('confirm.cta'),
         loading: isLoading,
@@ -36,7 +37,6 @@ const ConfirmationDialog = ({
         label: t('confirm.cancel'),
         onClick: onClose,
       }}
-      onClose={onClose}
     >
       <Text variant="body-2" color="secondary" textAlign="center">
         {children}

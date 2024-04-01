@@ -105,7 +105,7 @@ const getNextConfig = () => {
       '@onefootprint/request',
       '@onefootprint/types',
       '@onefootprint/dev-tools',
-      '@radix-ui',
+      '@radix-ui/react-dialog',
     ],
     async redirects() {
       return [

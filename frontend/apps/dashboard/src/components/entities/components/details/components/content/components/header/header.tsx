@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Tags from 'src/components/entities/components/tags';
 import StatusBadge from 'src/components/status-badge';
 import useSession from 'src/hooks/use-session';
-import { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
@@ -22,12 +22,7 @@ const Header = ({ entity }: HeaderProps) => {
   const theme = useTheme();
 
   return (
-    <Stack
-      direction="column"
-      gap={2}
-      aria-label={t(`${kind}.title` as ParseKeys<'common'>)}
-      tag="header"
-    >
+    <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)}>
       <Stack align="center" gap={3}>
         <Text variant="label-1">
           {t(`${kind}.title` as ParseKeys<'common'>)}
@@ -70,8 +65,16 @@ const Header = ({ entity }: HeaderProps) => {
           <div id={HEADER_ACTIONS_ID} />
         </Stack>
       </Stack>
-    </Stack>
+    </HeaderContainer>
   );
 };
+
+const HeaderContainer = styled.header`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[2]};
+  `};
+`;
 
 export default Header;

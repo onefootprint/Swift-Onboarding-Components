@@ -88,7 +88,7 @@ module.exports = withPlugins([withMDX], {
     '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
-    '@radix-ui',
+    '@radix-ui/react-dialog',
   ],
   images: {
     remotePatterns: [

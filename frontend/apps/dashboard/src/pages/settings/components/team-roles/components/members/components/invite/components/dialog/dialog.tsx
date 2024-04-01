@@ -31,6 +31,7 @@ const Dialog = ({ onClose, open }: DialogProps) => {
   return (
     <FPDialog
       title={t('title')}
+      onClose={onClose}
       open={open}
       primaryButton={{
         form: 'members-invite-form',
@@ -44,7 +45,6 @@ const Dialog = ({ onClose, open }: DialogProps) => {
         disabled: inviteMembersMutation.isLoading,
         onClick: onClose,
       }}
-      onClose={onClose}
     >
       <>
         {rolesQuery.isLoading && <Loading />}

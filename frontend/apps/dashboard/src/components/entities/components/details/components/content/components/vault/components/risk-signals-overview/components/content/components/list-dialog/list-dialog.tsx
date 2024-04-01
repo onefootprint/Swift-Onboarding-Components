@@ -45,8 +45,8 @@ const ListDialog = ({ riskSignals, renderCta }: ListDialogProps) => {
       <Dialog
         title={t('risks.list-dialog.title')}
         size="compact"
-        open={open}
         onClose={handleClose}
+        open={open}
       >
         <Text variant="body-3" marginBottom={6}>
           {t('risks.list-dialog.description')}

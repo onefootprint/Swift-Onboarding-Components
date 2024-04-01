@@ -57,7 +57,6 @@ const ManualReviewDialog = ({
 
   return (
     <Dialog
-      open={open}
       size="compact"
       title={t('dialog.title')}
       primaryButton={{
@@ -72,6 +71,7 @@ const ManualReviewDialog = ({
         disabled: submitReviewMutation.isLoading,
       }}
       onClose={onClose}
+      open={open}
     >
       <ManualNoteEntryForm
         formId="manual-review-form"

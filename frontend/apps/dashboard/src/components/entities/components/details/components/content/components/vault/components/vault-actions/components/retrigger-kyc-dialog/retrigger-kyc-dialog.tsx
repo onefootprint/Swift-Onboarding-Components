@@ -105,10 +105,10 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
     <Dialog
       size="compact"
       title={t('title')}
+      onClose={handleClose}
       open={open}
       primaryButton={primaryButton}
       secondaryButton={secondaryButton}
-      onClose={handleClose}
     >
       {component}
     </Dialog>
