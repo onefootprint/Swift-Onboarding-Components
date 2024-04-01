@@ -66,6 +66,7 @@ mod tests {
                 timestamp: chrono::Utc::now(),
                 status: OnboardingStatus::Fail,
                 requires_manual_review: true,
+                is_live: sv.is_live,
             }),
         };
 

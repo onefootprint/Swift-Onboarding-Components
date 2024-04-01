@@ -646,6 +646,7 @@ impl Workflow {
                     timestamp: Utc::now(),
                     status: new_status,
                     requires_manual_review: requires_manual_review_after_update,
+                    is_live: sv.is_live,
                 });
                 let task_data = TaskData::FireWebhook(FireWebhookArgs {
                     scoped_vault_id: wf.scoped_vault_id.clone(),
@@ -688,6 +689,7 @@ impl Workflow {
                     timestamp: Utc::now(),
                     new_status,
                     requires_manual_review: requires_manual_review_after_update,
+                    is_live: sv.is_live,
                 });
                 let task_data = TaskData::FireWebhook(FireWebhookArgs {
                     scoped_vault_id: wf.scoped_vault_id.clone(),

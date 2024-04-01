@@ -14,6 +14,7 @@ fn test_raw() {
         timestamp: Utc::now(),
         status: OnboardingStatus::Pass,
         requires_manual_review: false,
+        is_live: false,
     });
 
     assert_eq!(evt.event_type().as_str(), "footprint.onboarding.completed");

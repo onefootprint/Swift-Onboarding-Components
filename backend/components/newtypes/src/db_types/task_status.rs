@@ -130,6 +130,7 @@ pub struct OnboardingCompletedPayload {
     pub timestamp: DateTime<Utc>,
     pub status: OnboardingStatus,
     pub requires_manual_review: bool,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -139,6 +140,7 @@ pub struct OnboardingStatusChangedPayload {
     pub timestamp: DateTime<Utc>,
     pub new_status: OnboardingStatus,
     pub requires_manual_review: bool,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -149,4 +151,5 @@ pub struct WatchlistCheckCompletedPayload {
     pub timestamp: DateTime<Utc>,
     pub status: WatchlistCheckStatusKind,
     pub error: Option<WatchlistCheckError>,
+    pub is_live: bool,
 }

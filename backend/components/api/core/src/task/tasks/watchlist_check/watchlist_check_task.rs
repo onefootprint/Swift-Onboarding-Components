@@ -231,6 +231,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     timestamp: Utc::now(),
                     status: wc.status,
                     error,
+                    is_live: sv.is_live,
                 });
                 let task_data = TaskData::FireWebhook(FireWebhookArgs {
                     scoped_vault_id: sv.id.clone(),

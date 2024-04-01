@@ -48,6 +48,7 @@ mod payloads {
         #[schemars(with = "OnboardingStatusShadow")]
         pub status: OnboardingStatus,
         pub requires_manual_review: bool,
+        pub is_live: bool,
     }
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
@@ -65,6 +66,7 @@ mod payloads {
         #[schemars(with = "OnboardingStatusShadow")]
         pub new_status: OnboardingStatus,
         pub requires_manual_review: bool,
+        pub is_live: bool,
     }
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
@@ -83,6 +85,7 @@ mod payloads {
         pub status: WatchlistCheckStatusKind,
         #[schemars(with = "Option<WatchlistCheckErrorShadow>")]
         pub error: Option<WatchlistCheckError>,
+        pub is_live: bool,
     }
 
     // This is just a copy of the remote data structure that Schemars can use to
@@ -141,6 +144,7 @@ mod examples {
                 timestamp: Utc::now(),
                 status: Default::default(),
                 requires_manual_review: false,
+                is_live: false,
             }
         }
     }
@@ -153,6 +157,7 @@ mod examples {
                 timestamp: Utc::now(),
                 new_status: Default::default(),
                 requires_manual_review: false,
+                is_live: false,
             }
         }
     }
@@ -165,6 +170,7 @@ mod examples {
                 timestamp: Utc::now(),
                 status: Default::default(),
                 error: None,
+                is_live: false,
             }
         }
     }
@@ -194,6 +200,7 @@ impl From<NTOnboardingCompletedPayload> for OnboardingCompletedPayload {
             timestamp: value.timestamp,
             status: value.status,
             requires_manual_review: value.requires_manual_review,
+            is_live: value.is_live,
         }
     }
 }
@@ -206,6 +213,7 @@ impl From<NTOnboardingStatusChangedPayload> for OnboardingStatusChangedPayload {
             timestamp: value.timestamp,
             new_status: value.new_status,
             requires_manual_review: value.requires_manual_review,
+            is_live: value.is_live,
         }
     }
 }
@@ -218,6 +226,7 @@ impl From<NTWatchlistCheckCompletedPayload> for WatchlistCheckCompletedPayload {
             timestamp: value.timestamp,
             status: value.status,
             error: value.error,
+            is_live: value.is_live,
         }
     }
 }
