@@ -208,6 +208,105 @@ export const UsaAddressFixture4 = {
   ],
 };
 
+export const UsaAddressFixture5 = {
+  mainText: '10344 104th Street',
+  secondaryText: 'Ozone Park, NY, USA',
+  addressComponents: [
+    {
+      long_name: '10344',
+      short_name: '10344',
+      types: ['street_number'],
+    },
+    {
+      long_name: '104th Street',
+      short_name: '104th St',
+      types: ['route'],
+    },
+    {
+      long_name: 'Ozone Park',
+      short_name: 'Ozone Park',
+      types: ['neighborhood', 'political'],
+    },
+    {
+      long_name: 'Queens',
+      short_name: 'Queens',
+      types: ['sublocality_level_1', 'sublocality', 'political'],
+    },
+    {
+      long_name: 'Queens County',
+      short_name: 'Queens County',
+      types: ['administrative_area_level_2', 'political'],
+    },
+    {
+      long_name: 'New York',
+      short_name: 'NY',
+      types: ['administrative_area_level_1', 'political'],
+    },
+    {
+      long_name: 'United States',
+      short_name: 'US',
+      types: ['country', 'political'],
+    },
+    {
+      long_name: '11417',
+      short_name: '11417',
+      types: ['postal_code'],
+    },
+    {
+      long_name: '2221',
+      short_name: '2221',
+      types: ['postal_code_suffix'],
+    },
+  ],
+};
+
+export const UsaAddressFixture6 = {
+  mainText: '10344 104th Street',
+  secondaryText: 'Jamaica, NY, USA',
+  addressComponents: [
+    {
+      long_name: '103-44',
+      short_name: '103-44',
+      types: ['street_number'],
+    },
+    {
+      long_name: '104th Street',
+      short_name: '104th St',
+      types: ['route'],
+    },
+    {
+      long_name: 'Jamaica',
+      short_name: 'Jamaica',
+      types: ['neighborhood', 'political'],
+    },
+    {
+      long_name: 'Queens',
+      short_name: 'Queens',
+      types: ['sublocality_level_1', 'sublocality', 'political'],
+    },
+    {
+      long_name: 'Queens County',
+      short_name: 'Queens County',
+      types: ['administrative_area_level_2', 'political'],
+    },
+    {
+      long_name: 'New York',
+      short_name: 'NY',
+      types: ['administrative_area_level_1', 'political'],
+    },
+    {
+      long_name: 'United States',
+      short_name: 'US',
+      types: ['country', 'political'],
+    },
+    {
+      long_name: '11417',
+      short_name: '11417',
+      types: ['postal_code'],
+    },
+  ],
+};
+
 export const MexicoAddressFixture1 = {
   mainText: 'VILLA PATRICIA',
   secondaryText: 'Mismaloya, Jalisco, Mexico',

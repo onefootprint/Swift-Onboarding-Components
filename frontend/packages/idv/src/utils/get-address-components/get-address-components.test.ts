@@ -20,6 +20,8 @@ import {
   UsaAddressFixture2,
   UsaAddressFixture3,
   UsaAddressFixture4,
+  UsaAddressFixture5,
+  UsaAddressFixture6,
   withGoogleMaps,
   withGoogleMapsError,
 } from './get-address-components.test.config';
@@ -113,6 +115,34 @@ describe('getAddressComponents', () => {
         state: 'Massachusetts',
         zip: '02118',
       });
+
+      expect(
+        getAddressParts(
+          UsaAddressFixture5.mainText,
+          UsaAddressFixture5.addressComponents,
+          UsaAddressFixture5.secondaryText,
+        ),
+      ).toEqual({
+        addressLine1: '10344 104th Street',
+        addressLine2: undefined,
+        city: 'Ozone Park',
+        state: 'New York',
+        zip: '11417',
+      });
+
+      expect(
+        getAddressParts(
+          UsaAddressFixture6.mainText,
+          UsaAddressFixture6.addressComponents,
+          UsaAddressFixture6.secondaryText,
+        ),
+      ).toEqual({
+        addressLine1: '10344 104th Street',
+        addressLine2: undefined,
+        city: 'Jamaica',
+        state: 'New York',
+        zip: '11417',
+      });
     });
 
     it('can extract Mexican addresses correctly', () => {
@@ -200,7 +230,7 @@ describe('getAddressComponents', () => {
         ),
       ).toEqual({
         addressLine1: 'Yunjian Greenland Villa, Jin Xiu Dong Lu',
-        addressLine2: 'Pu Dong Xin Qu',
+        addressLine2: undefined,
         city: 'Pu Dong Xin Qu',
         state: 'Shang Hai Shi',
         zip: '200135',
@@ -216,8 +246,8 @@ describe('getAddressComponents', () => {
         ),
       ).toEqual({
         addressLine1: '33 Hip Wo Street',
-        addressLine2: 'Kwun Tong',
-        city: 'Kowloon',
+        addressLine2: undefined,
+        city: 'Kwun Tong',
         state: undefined,
         zip: undefined,
       });
@@ -230,8 +260,8 @@ describe('getAddressComponents', () => {
         ),
       ).toEqual({
         addressLine1: 'Li Po Chun United World College, Sai Sha Road',
-        addressLine2: 'Ma On Shan',
-        city: 'New Territories',
+        addressLine2: undefined,
+        city: 'Ma On Shan',
         state: undefined,
         zip: undefined,
       });
@@ -323,8 +353,8 @@ describe('getAutoCompleteCity', () => {
     { obj: BrazilAddressFixture2, x: 'Brasília' },
     { obj: CanadaAddressFixture1, x: 'Edmonton' },
     { obj: ChinaAddressFixture1, x: 'Pu Dong Xin Qu' },
-    { obj: HongKongAddressFixture1, x: 'Kowloon' },
-    { obj: HongKongAddressFixture2, x: 'New Territories' },
+    { obj: HongKongAddressFixture1, x: 'Kwun Tong' },
+    { obj: HongKongAddressFixture2, x: 'Ma On Shan' },
     { obj: MexicoAddressFixture1, x: 'Mismaloya' },
     { obj: MexicoAddressFixture2, x: 'Ciudad de México' },
     { obj: MexicoAddressFixture3, x: 'La Paz' },
@@ -333,6 +363,8 @@ describe('getAutoCompleteCity', () => {
     { obj: UsaAddressFixture2, x: 'San Francisco' },
     { obj: UsaAddressFixture3, x: 'Boston' },
     { obj: UsaAddressFixture4, x: 'Brooklyn' },
+    { obj: UsaAddressFixture5, x: 'Ozone Park' },
+    { obj: UsaAddressFixture6, x: 'Jamaica' },
   ])('case %#', ({ obj, x }) => {
     const { addressComponents } = obj;
     const { secondaryText } = obj;

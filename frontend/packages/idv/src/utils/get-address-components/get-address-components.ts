@@ -68,12 +68,15 @@ export const getAutoCompleteCity = (
 ) => {
   const countryCode = getCountryCode(addressComponents);
   const hasStateOrProvince = getHasStateOrProvince(countryCode);
-  const locality: string | undefined = hasStateOrProvince
-    ? getLongName('locality', addressComponents) ||
-      getLongName('administrative_area_level_2', addressComponents)
-    : getLongName('administrative_area_level_1', addressComponents) ||
-      getLongName('locality', addressComponents) ||
-      getLongName('administrative_area_level_2', addressComponents);
+
+  const localitiesNames = hasStateOrProvince
+    ? ['locality', 'administrative_area_level_2']
+    : [
+        'administrative_area_level_1',
+        'locality',
+        'administrative_area_level_2',
+      ];
+  const localities = getLongNamesByKeys(localitiesNames, addressComponents);
 
   const sublocalities = getLongNamesByKeys(
     [
@@ -86,11 +89,15 @@ export const getAutoCompleteCity = (
     addressComponents,
   );
 
-  const localityFromSecondaryText = secondaryText
-    ? [locality, ...sublocalities].find(s => s && secondaryText.includes(s))
+  const neighborhood = getLongNamesByKeys(['neighborhood'], addressComponents);
+
+  const cityFromSecondaryText = secondaryText
+    ? [...localities, ...sublocalities, ...neighborhood].find(
+        s => s && secondaryText.includes(s),
+      )
     : undefined;
 
-  return localityFromSecondaryText || locality || sublocalities.pop();
+  return cityFromSecondaryText || sublocalities.pop() || localities.pop();
 };
 
 const getAddressLine1 = (
@@ -138,15 +145,23 @@ export const getAddressParts = (
   mainText: string,
   addressComponents: AddressComponent[],
   secondaryText?: string,
-) => ({
-  addressLine1: getAddressLine1(mainText, addressComponents),
-  addressLine2: getAddressLine2(addressComponents),
-  city: getAutoCompleteCity(addressComponents, secondaryText),
-  state: getStateLongName(addressComponents),
-  zip: getLongName('postal_code', addressComponents),
-});
+) => {
+  const parts = {
+    addressLine1: getAddressLine1(mainText, addressComponents),
+    addressLine2: getAddressLine2(addressComponents),
+    city: getAutoCompleteCity(addressComponents, secondaryText),
+    state: getStateLongName(addressComponents),
+    zip: getLongName('postal_code', addressComponents),
+  };
 
-export const getAddressComponent = async (prediction: Prediction) => {
+  // Don't repeat city in addressLine2
+  if (parts.addressLine2 === parts.city) {
+    parts.addressLine2 = undefined;
+  }
+  return parts;
+};
+
+const getAddressComponent = async (prediction: Prediction) => {
   let addressComponents: AddressComponent[] = [];
   try {
     const result = await getDetails({ placeId: prediction.place_id });
