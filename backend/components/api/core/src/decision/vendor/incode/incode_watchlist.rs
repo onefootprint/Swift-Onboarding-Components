@@ -273,8 +273,7 @@ pub async fn run_watchlist_check(
             &vw.vault.public_key,
             kind,
         )
-        .await
-        .map(|(vres_id, wr)| (vres_id, wr)) //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
+        .await //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
     } else {
         save_canned_response(
             state,

@@ -79,9 +79,7 @@ async fn ditto(
                 .headers
                 .into_iter()
                 .filter_map(|(name, val)| {
-                    let Some(name) = name else {
-                        return None;
-                    };
+                    let name = name?;
 
                     if name.as_str().starts_with("fly-") {
                         return None;

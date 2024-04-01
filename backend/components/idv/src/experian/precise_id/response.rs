@@ -170,7 +170,7 @@ impl PreciseIDAPIResponse {
             .and_then(|ps: &PhoneMatch| ps.phone.as_ref())
             .and_then(|pmi| {
                 pmi.clone()
-                    .get(0)
+                    .first()
                     .and_then(|item| item.summary.as_ref())
                     .and_then(|s| s.verification_result.as_ref())
                     .and_then(|mr| mr.code.as_ref())

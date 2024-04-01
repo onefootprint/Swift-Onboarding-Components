@@ -70,7 +70,7 @@ pub async fn parse_search(
 
     // Fingerprint for website
     let dis = vec![Business(BDK::Website)];
-    let websites = vec![
+    let websites = [
         PiiString::from(format!("https://{}", search_str.leak())),
         search_str.clone(),
     ];

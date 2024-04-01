@@ -1,4 +1,4 @@
-name: "Run local server"
+name: 'Run local server'
 inputs:
   aws_access_key_id:
     required: true
@@ -8,72 +8,72 @@ inputs:
     required: true
 outputs:
   server_pid:
-    description: "This composite action will leave the server running under this PID. Use this PID to kill the server when you are done talking to it"
+    description: 'This composite action will leave the server running under this PID. Use this PID to kill the server when you are done talking to it'
     value: ${{ steps.run_server.outputs.server_pid }}
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
-      - name: Install libpq + libssl
-        shell: bash
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libssl-dev libpq-dev
+    - name: Install libpq + libssl
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libssl-dev libpq-dev
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ inputs.aws_access_key_id }}
-          aws-region: ${{ inputs.aws_region }}
-          aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-region: ${{ inputs.aws_region }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
 
-      - name: Create footprint db
-        shell: bash
-        run: |
-          psql -h localhost -c 'create database footprint_db;'
+    - name: Create footprint db
+      shell: bash
+      run: |
+        psql -h localhost -c 'create database footprint_db;'
 
-      - name: Set dot env
-        working-directory: ./backend
-        shell: bash
-        run: make set-dot-env
+    - name: Set dot env
+      working-directory: ./backend
+      shell: bash
+      run: make set-dot-env
 
-      - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@1.74.0
+    - name: rust-toolchain
+      uses: dtolnay/rust-toolchain@1.77.0
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@dd05243424bd5c0e585e4b55eb2d7615cdd32f1f
-        with:
-          workspaces: |
-            backend
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@dd05243424bd5c0e585e4b55eb2d7615cdd32f1f
+      with:
+        workspaces: |
+          backend
 
-      - uses: rui314/setup-mold@7f56dbde35ee02a3fe0287e7ddd310922eb5f553
-        with:
-          mold-version: 2.0.0
-          make-default: false
+    - uses: rui314/setup-mold@7f56dbde35ee02a3fe0287e7ddd310922eb5f553
+      with:
+        mold-version: 2.0.0
+        make-default: false
 
-      - name: Run server
-        id: run_server
-        working-directory: ./backend
-        shell: bash
-        run: |
-          cargo build -p enclave
-          cargo build -p enclave_proxy
-          cargo build -p api_server
+    - name: Run server
+      id: run_server
+      working-directory: ./backend
+      shell: bash
+      run: |
+        cargo build -p enclave
+        cargo build -p enclave_proxy
+        cargo build -p api_server
 
-          make run-local &> server_output.txt &
-          server_pid=$!
-          echo "server_pid=$server_pid" >> "$GITHUB_OUTPUT"
+        make run-local &> server_output.txt &
+        server_pid=$!
+        echo "server_pid=$server_pid" >> "$GITHUB_OUTPUT"
 
-          attempt_counter=0
-          max_attempts=6
+        attempt_counter=0
+        max_attempts=6
 
-          until $(curl --output /dev/null --silent --fail http://localhost:8000); do
-              if [ ${attempt_counter} -eq ${max_attempts} ];then
-                echo "Max attempts reached"
-                cat server_output.txt
-                exit 1
-              fi
+        until $(curl --output /dev/null --silent --fail http://localhost:8000); do
+            if [ ${attempt_counter} -eq ${max_attempts} ];then
+              echo "Max attempts reached"
+              cat server_output.txt
+              exit 1
+            fi
 
-              printf '.'
-              attempt_counter=$(($attempt_counter+1))
-              sleep 10
-          done
+            printf '.'
+            attempt_counter=$(($attempt_counter+1))
+            sleep 10
+        done

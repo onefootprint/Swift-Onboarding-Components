@@ -46,7 +46,7 @@ createdb footprint_db
 curl https://sh.rustup.rs -sSf | sh -s -- -y 
 source "$HOME/.cargo/env"
 rustup install stable
-rustup default 1.74.0
+rustup default 1.77.0
 rustup component add rustfmt
 rustup component add clippy 
 

@@ -5,7 +5,7 @@ branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r '
 commit := "$(branch)-$(shell git rev-parse --short HEAD)"
 commit_full := "$(shell git rev-parse HEAD)"
 
-RUST_VERSION := "1.74.0"
+RUST_VERSION := "1.77.0"
 
 # Builds the API crate into a musl binary
 api-release:

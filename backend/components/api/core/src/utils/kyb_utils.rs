@@ -38,7 +38,7 @@ pub async fn decrypt_basic_business_info(
 
     // TODO: could this differ from the actual primary BO's first name + last name?
     // I don't think so by the client, but maybe on the backend we should compare and enforce
-    let primary_bo = bos.get(0).ok_or(BusinessError::NoBos)?.clone();
+    let primary_bo = bos.first().ok_or(BusinessError::NoBos)?.clone();
     let secondary_bos = bos
         .into_iter()
         .skip(1)

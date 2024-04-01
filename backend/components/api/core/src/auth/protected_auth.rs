@@ -12,7 +12,9 @@ use actix_web::FromRequest;
 use futures_util::Future;
 
 /// Auth that allows either the airplane API key or a risk ops firm employee to perform the action
-pub struct ProtectedAuth(Either<ProtectedCustodianAuthContext, SessionContext<FirmEmployeeAuth>>);
+pub struct ProtectedAuth(
+    #[allow(unused)] Either<ProtectedCustodianAuthContext, SessionContext<FirmEmployeeAuth>>,
+);
 
 impl FromRequest for ProtectedAuth {
     type Error = ApiError;

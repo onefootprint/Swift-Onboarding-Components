@@ -35,7 +35,7 @@ pub async fn post(
     let data = request.into_inner().clean_and_validate(args)?.updates;
 
     // Limit which fields can be used for KBA
-    let allowable_kba_dis = vec![DataIdentifier::Id(IDK::PhoneNumber)];
+    let allowable_kba_dis = [DataIdentifier::Id(IDK::PhoneNumber)];
     if let Some(k) = data.keys().find(|k| !allowable_kba_dis.iter().contains(k)) {
         return ValidationError(&format!("KBA not allowed for {}", k)).into();
     }

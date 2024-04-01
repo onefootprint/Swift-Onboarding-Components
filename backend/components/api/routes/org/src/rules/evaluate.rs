@@ -55,13 +55,13 @@ pub async fn evaluate_rule(
                 backtest_rule_result,
             }
         })
-        .collect();
+        .collect::<Vec<_>>();
 
     let stats = get_stats(&results);
     ResponseData::ok(api_wire_types::RuleEvalResults { results, stats }).json()
 }
 
-fn get_stats(results: &Vec<RuleEvalResult>) -> RuleEvalStats {
+fn get_stats(results: &[RuleEvalResult]) -> RuleEvalStats {
     let mut cnts = results.iter().map(|r| r.backtest_rule_result).counts();
     let counts = Counts::new(cnts.remove(&true).unwrap_or(0), cnts.remove(&false).unwrap_or(0));
 

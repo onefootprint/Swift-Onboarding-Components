@@ -1,6 +1,8 @@
 use std::{collections::HashMap, marker::PhantomData};
 
+#[allow(unused_imports)]
 pub use accessors::*;
+
 use db::{
     models::{
         data_lifetime::DataLifetime, document_data::DocumentData, vault::Vault,

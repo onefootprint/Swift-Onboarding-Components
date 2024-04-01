@@ -35,8 +35,8 @@ pub mod verify;
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub(crate) enum CreateChallengeRequest {
-    Email(String),
-    PhoneNumber(String),
+    Email(#[allow(unused)] String),
+    PhoneNumber(#[allow(unused)] String),
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

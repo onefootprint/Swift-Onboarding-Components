@@ -21,7 +21,7 @@ pub async fn decrypt_tenant_business_info(
     tbi: &TenantBusinessInfo,
 ) -> ApiResult<newtypes::TenantBusinessInfo> {
     let private_key = tenant.e_private_key.clone();
-    let encryped_fields = vec![
+    let encryped_fields = [
         (BusinessInfoField::CompanyName, tbi.company_name.clone()),
         (BusinessInfoField::AddressLine1, tbi.address_line1.clone()),
         (BusinessInfoField::City, tbi.city.clone()),

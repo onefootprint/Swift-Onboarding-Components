@@ -5,7 +5,7 @@ use std::rc::Rc;
 /// This works because Rc is not Send/Sync (since it's non-atomically counting references which is amenable to race conditions across threads)
 /// TODO: impl !Sync for Locked<T> once this feature is out of rust nightly
 #[derive(Debug, Clone)]
-pub struct NotSyncMarker(Rc<()>);
+pub struct NotSyncMarker(#[allow(unused)] Rc<()>);
 
 impl NotSyncMarker {
     fn new() -> Self {
@@ -35,7 +35,7 @@ impl NotSyncMarker {
 /// let _: Box<Locked<i32>> = Box::new(Locked::new(1));
 /// ```
 #[derive(Debug, derive_more::Deref)]
-pub struct Locked<T>(#[deref] T, NotSyncMarker);
+pub struct Locked<T>(#[deref] T, #[allow(unused)] NotSyncMarker);
 
 impl<T> Locked<T> {
     pub fn new(t: T) -> Self {

@@ -162,7 +162,7 @@ pub fn get_fixture_reason_codes_alpaca(
         }
         // #stepup
         (DecisionStatus::StepUp, _) => {
-            let mismatch_reason_codes = vec![
+            let mismatch_reason_codes = [
                 FootprintReasonCode::AddressDoesNotMatch,
                 FootprintReasonCode::DobDoesNotMatch,
                 FootprintReasonCode::NameMatches,

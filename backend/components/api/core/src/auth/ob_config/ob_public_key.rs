@@ -44,8 +44,7 @@ impl FromRequest for PublicOnboardingContext {
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
         Box::pin(async move {
-            let key = newtypes::ObConfigurationKey::try_from(config_key?)
-                .map_err(|_| AuthError::InvalidHeader(HEADER_NAME.to_owned()))?;
+            let key = newtypes::ObConfigurationKey::from(config_key?);
             let key2 = key.clone();
             let (ob_config, tenant) = state
                 .db_pool
