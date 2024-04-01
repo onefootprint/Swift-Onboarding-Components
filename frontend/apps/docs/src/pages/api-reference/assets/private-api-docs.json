@@ -527,6 +527,76 @@
                 ]
             }
         },
+        "/compliance/members": {
+            "get": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Returns a list of dashboard members for the partner tenant.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "is_invite_pending",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "role_ids",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedOrganizationMember"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/compliance/org/members": {
             "post": {
                 "tags": [

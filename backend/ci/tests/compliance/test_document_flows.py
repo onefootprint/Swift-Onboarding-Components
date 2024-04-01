@@ -261,3 +261,8 @@ def test_partner_document_flow(tenant, partner_tenant):
     documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["tenant_assignee"] is None
+
+    # Assign the document to a partner tenant user
+    assignee = get("compliance/members", {}, *partner_tenant.ro_db_auths)["data"][0]
+    # TODO: actually assign it
+

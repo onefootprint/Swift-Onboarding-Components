@@ -19,6 +19,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config.service(doc_templates::put);
     config.service(documents::get);
     config.service(documents::post);
+    config.service(members::get);
     config.service(members::post);
     config.service(partners::get);
     config.service(request::delete);
