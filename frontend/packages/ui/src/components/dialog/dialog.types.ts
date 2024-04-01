@@ -1,5 +1,24 @@
 import type { Icon } from '@onefootprint/icons';
 
+import type { ButtonSize, ButtonVariant } from '../button/button.types';
+
+export type DialogProps = {
+  onClose: () => void;
+  open: boolean;
+  size?: DialogSize;
+  title: string;
+  ariaLabel?: string;
+  isConfirmation?: boolean;
+  headerIcon?: DialogHeaderIcon;
+  primaryButton?: DialogButton;
+  secondaryButton?: DialogButton;
+  linkButton?: DialogButton;
+  disableResponsiveness?: boolean;
+  onClickOutside?: () => void;
+  children?: React.ReactNode;
+  testID?: string;
+};
+
 export type DialogButton = {
   disabled?: boolean;
   form?: string;
@@ -8,6 +27,8 @@ export type DialogButton = {
   loadingAriaLabel?: string;
   onClick?: (dataSubmitted?: unknown) => void;
   type?: 'button' | 'submit' | 'reset';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 };
 
 export type DialogHeaderIcon = {
@@ -25,32 +46,15 @@ export type DialogLinkButton = {
 
 export type DialogSize = 'compact' | 'default' | 'large' | 'full-screen';
 
-export type DialogOnlyPrimaryButton = {
-  primaryButton: DialogButton;
-  secondaryButton?: never;
-  linkButton?: never;
-};
-
-export type DialogOnlyButtons = {
-  primaryButton: DialogButton;
-  secondaryButton: DialogButton;
-  linkButton?: never;
-};
-
-export type DialogPrimaryAndLinkButtons = {
-  primaryButton: DialogButton;
-  secondaryButton?: never;
-  linkButton: DialogLinkButton;
-};
-
-export type DialogNoButtons = {
-  primaryButton?: never;
-  secondaryButton?: never;
-  linkButton?: never;
-};
-
-export type DialogAllButtons = {
-  primaryButton: DialogButton;
-  secondaryButton: DialogButton;
+export type FooterProps = {
+  primaryButton?: DialogButton;
+  secondaryButton?: DialogButton;
   linkButton?: DialogButton;
 };
+
+export type HeaderProps = {
+  headerIcon?: DialogHeaderIcon;
+  title?: string;
+};
+
+export type DialogSizeWidthMap = Record<DialogSize, string>;

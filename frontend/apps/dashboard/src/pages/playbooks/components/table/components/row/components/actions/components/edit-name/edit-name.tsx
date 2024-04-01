@@ -79,6 +79,7 @@ const EditName = forwardRef<EditNameHandler, EditNameProps>(
 
     return (
       <Dialog
+        open={open}
         size="compact"
         title={t('title')}
         primaryButton={{
@@ -91,7 +92,6 @@ const EditName = forwardRef<EditNameHandler, EditNameProps>(
           onClick: handleClose,
         }}
         onClose={handleClose}
-        open={open}
       >
         <form
           onSubmit={handleSubmit(handleBeforeSubmit)}

@@ -21,7 +21,6 @@ const PlayPermissionDialog = ({
     <Dialog
       open={!!open}
       title={t('title')}
-      onClose={hide}
       size="compact"
       primaryButton={{
         label: t('cta'),
@@ -29,6 +28,7 @@ const PlayPermissionDialog = ({
       }}
       isConfirmation
       disableResponsiveness
+      onClose={hide}
     >
       <Text variant="body-2" color="secondary" textAlign="center">
         {t('description')}
