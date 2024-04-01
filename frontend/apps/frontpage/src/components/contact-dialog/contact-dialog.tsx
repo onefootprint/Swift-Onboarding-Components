@@ -36,10 +36,9 @@ const ContactDialog = ({ url, open, onClose }: ContactDialogProps) => {
 
   return (
     <Dialog
+      open={open}
       size="compact"
       title={t('title')}
-      onClose={onClose}
-      open={open}
       primaryButton={{
         label: t('send-button'),
         form: formId,
@@ -53,6 +52,7 @@ const ContactDialog = ({ url, open, onClose }: ContactDialogProps) => {
         type: 'reset',
         disabled: submitFormMutation.isLoading,
       }}
+      onClose={onClose}
     >
       {submitFormMutation.isError && (
         <>

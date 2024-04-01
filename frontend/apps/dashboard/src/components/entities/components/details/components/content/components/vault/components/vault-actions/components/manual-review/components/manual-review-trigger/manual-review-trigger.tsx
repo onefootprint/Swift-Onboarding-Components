@@ -1,7 +1,7 @@
 import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
 import { Button, Dropdown } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -18,6 +18,7 @@ const ManualReviewTrigger = ({
   onSelect,
   disabled,
 }: ManualReviewTriggerProps) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.manual-review',
   });
@@ -25,7 +26,7 @@ const ManualReviewTrigger = ({
   const fail = t(`status.${ReviewStatus.fail}` as ParseKeys<'common'>);
 
   return (
-    <Dropdown.Root>
+    <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownTrigger asChild disabled={disabled}>
         <Button>
           {kind === EntityKind.person
@@ -33,32 +34,38 @@ const ManualReviewTrigger = ({
             : t('button.review-business')}
         </Button>
       </DropdownTrigger>
-      <Dropdown.Portal>
-        <DropdownContent align="end" sideOffset={12}>
-          <DropdownItem
-            onClick={() => {
-              onSelect(ReviewStatus.pass);
-            }}
-          >
-            <div>
-              {status === EntityStatus.pass
-                ? t('dropdown.keep-as', { status: pass })
-                : t('dropdown.mark-as', { status: pass })}
-            </div>
-          </DropdownItem>
-          <DropdownItem
-            onClick={() => {
-              onSelect(ReviewStatus.fail);
-            }}
-          >
-            <div>
-              {status === EntityStatus.failed
-                ? t('dropdown.keep-as', { status: fail })
-                : t('dropdown.mark-as', { status: fail })}
-            </div>
-          </DropdownItem>
-        </DropdownContent>
-      </Dropdown.Portal>
+      {dropdownOpen && (
+        <Dropdown.Portal forceMount>
+          <DropdownContent align="end" sideOffset={12} forceMount>
+            <DropdownItem
+              onClick={e => {
+                e.preventDefault();
+                onSelect(ReviewStatus.pass);
+                setDropdownOpen(false);
+              }}
+            >
+              <div>
+                {status === EntityStatus.pass
+                  ? t('dropdown.keep-as', { status: pass })
+                  : t('dropdown.mark-as', { status: pass })}
+              </div>
+            </DropdownItem>
+            <DropdownItem
+              onClick={e => {
+                e.preventDefault();
+                onSelect(ReviewStatus.fail);
+                setDropdownOpen(false);
+              }}
+            >
+              <div>
+                {status === EntityStatus.failed
+                  ? t('dropdown.keep-as', { status: fail })
+                  : t('dropdown.mark-as', { status: fail })}
+              </div>
+            </DropdownItem>
+          </DropdownContent>
+        </Dropdown.Portal>
+      )}
     </Dropdown.Root>
   );
 };

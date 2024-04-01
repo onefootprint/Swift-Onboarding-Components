@@ -93,7 +93,6 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
     <Dialog
       size="compact"
       title={t('title')}
-      onClose={handleClose}
       open={open}
       primaryButton={{
         label: t('copy-link'),
@@ -106,6 +105,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
         disabled: sendLinkMutation.isLoading || generateTokenMutation.isLoading,
         loading: sendLinkMutation.isLoading,
       }}
+      onClose={handleClose}
     >
       <Stack gap={3} direction="column">
         <Text variant="label-3">{t('header')}</Text>

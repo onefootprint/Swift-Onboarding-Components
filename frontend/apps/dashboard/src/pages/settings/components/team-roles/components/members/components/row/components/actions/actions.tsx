@@ -68,8 +68,8 @@ const Actions = ({ member }: ActionsProps) => {
         <Dialog
           size="compact"
           open={open}
-          onClose={hideConfirmation}
           title={t('remove.confirmation.title')}
+          isConfirmation
           primaryButton={{
             loading: removeMemberMutation.isLoading,
             label: allT('confirm.cta'),
@@ -80,6 +80,7 @@ const Actions = ({ member }: ActionsProps) => {
             label: allT('confirm.cancel'),
             onClick: hideConfirmation,
           }}
+          onClose={hideConfirmation}
         >
           <Text variant="body-2" color="secondary" textAlign="center">
             <Trans

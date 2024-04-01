@@ -70,7 +70,6 @@ const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
         component: isFirstStep ? IcoClose24 : IcoChevronLeftBig24,
         onClick: isFirstStep ? onClose : goBack,
       }}
-      onClose={isFirstStep ? onClose : confirmBeforeClosing}
       open={open}
       size="compact"
       title={t('title')}
@@ -88,6 +87,7 @@ const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
         label: allT('cancel'),
         onClick: isFirstStep ? onClose : confirmBeforeClosing,
       }}
+      onClose={isFirstStep ? onClose : confirmBeforeClosing}
     >
       <FormWizard
         Component={Component}

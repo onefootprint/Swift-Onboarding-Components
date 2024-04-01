@@ -51,6 +51,7 @@ const CreateDialog = ({
 
   return (
     <Dialog
+      open={open}
       size="compact"
       title={t('create-dialog.title')}
       primaryButton={{
@@ -65,7 +66,6 @@ const CreateDialog = ({
         onClick: onClose,
       }}
       onClose={onClose}
-      open={open}
     >
       <Form onSubmit={handleSubmit} />
     </Dialog>

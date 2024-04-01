@@ -106,7 +106,6 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   return (
     <Dialog
       size="compact"
-      testID="create-dialog"
       onClose={onClose}
       open={open}
       title={t('title')}

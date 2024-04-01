@@ -137,7 +137,7 @@ module.exports = {
     '@onefootprint/types',
     '@onefootprint/global-constants',
     '@onefootprint/appearance',
-    '@radix-ui/react-dialog',
+    '@radix-ui',
   ],
   env: {
     CI: process.env.CI,
