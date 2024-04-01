@@ -14,6 +14,7 @@ describe('<SearchInput />', () => {
     placeholder = 'Search...',
     testID = 'search-input-test-id',
     value = '',
+    size,
   }: Partial<SearchInputProps>) =>
     customRender(
       <SearchInput
@@ -23,6 +24,7 @@ describe('<SearchInput />', () => {
         placeholder={placeholder}
         testID={testID}
         value={value}
+        size={size}
       />,
     );
 

@@ -63,6 +63,7 @@ const SecurityLogs = () => {
           width="232px"
           onChangeText={value => filters.push({ search: value })}
           value={filters.query.search || ''}
+          size="compact"
         />
         <SecurityLogsFilters />
       </FiltersContainer>

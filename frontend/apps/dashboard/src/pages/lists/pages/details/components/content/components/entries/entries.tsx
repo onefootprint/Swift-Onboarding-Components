@@ -83,6 +83,7 @@ const Entries = () => {
             width="300px"
             onChangeText={value => filters.push({ search: value })}
             value={filters.query.search || ''}
+            size="compact"
           />
           <EntriesContainer>
             {displayedEntries.map(entry => (

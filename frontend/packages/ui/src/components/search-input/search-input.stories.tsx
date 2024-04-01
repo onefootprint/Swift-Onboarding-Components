@@ -34,6 +34,11 @@ export default {
       control: 'text',
       description: 'Controlled value',
     },
+    size: {
+      control: 'select',
+      description: 'Size of the input',
+      options: ['compact', 'default'],
+    },
   },
 } as Meta;
 
@@ -44,6 +49,7 @@ const Template: Story<SearchInputProps> = ({
   placeholder,
   testID,
   value: initialValue = '',
+  size,
 }: SearchInputProps) => {
   const [value, setValue] = useState<string>(initialValue);
   const handleChangeText = (text: string) => {
@@ -58,6 +64,7 @@ const Template: Story<SearchInputProps> = ({
       placeholder={placeholder}
       testID={testID}
       value={value}
+      size={size}
     />
   );
 };

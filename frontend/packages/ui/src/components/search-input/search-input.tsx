@@ -24,6 +24,7 @@ export type SearchInputProps = BaseProps & {
   clearButtonAriaLabel?: string;
   onReset?: () => void;
   placeholder?: string;
+  size?: 'compact' | 'default';
 };
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
@@ -36,6 +37,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       placeholder,
       sx,
       value,
+      size = 'default',
       ...remainingProps
     }: SearchInputProps,
     ref,
@@ -71,7 +73,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           ...sx,
         }}
         ref={ref}
-        size="compact"
+        size={size}
         suffixComponent={renderSuffix()}
         value={value}
       />

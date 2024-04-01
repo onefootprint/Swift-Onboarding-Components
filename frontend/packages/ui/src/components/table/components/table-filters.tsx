@@ -45,6 +45,7 @@ const TableFilter = ({
         placeholder={placeholder}
         value={search}
         width="330px"
+        size="compact"
       />
       {children}
     </TableFilterContainer>
