@@ -70,7 +70,7 @@ const App = ({ Component, pageProps }: AppProps) => (
         async
         data-api-key={UNIFY_API_KEY}
         id="unifytag"
-        src="https://cdn.unifygtm.com/tag/v1/unify-tag-script.js"
+        src="https://tag.unifyintent.com/v1/K5zspsc6a9Zt7KHQdwat3t/script.js"
         type="module"
       />
     )}
