@@ -83,6 +83,8 @@ pub enum BoolFlag<'a> {
     IsVaultProxyPreConfiguredEndpointEnabled(&'a TenantId),
     #[strum(to_string = "IsVaultProxyJitEndpointEnabled")]
     IsVaultProxyJitEndpointEnabled(&'a TenantId),
+    #[strum(to_string = "IsNeuroEnabledForObc")]
+    IsNeuroEnabledForObc(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -132,6 +134,7 @@ impl<'a> BoolFlag<'a> {
             Self::MakeLexisCall(k) => Some(k.to_string()),
             Self::IsVaultProxyPreConfiguredEndpointEnabled(k) => Some(k.to_string()),
             Self::IsVaultProxyJitEndpointEnabled(k) => Some(k.to_string()),
+            Self::IsNeuroEnabledForObc(k) => Some(k.to_string()),
         }
     }
 
@@ -177,6 +180,7 @@ impl<'a> BoolFlag<'a> {
             Self::MakeLexisCall(_) => false,
             Self::IsVaultProxyPreConfiguredEndpointEnabled(_) => false,
             Self::IsVaultProxyJitEndpointEnabled(_) => false,
+            Self::IsNeuroEnabledForObc(_) => false,
         }
     }
 }

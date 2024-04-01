@@ -13,7 +13,7 @@ use db::models::{
     workflow::{Workflow as DbWorkflow, WorkflowUpdate},
 };
 
-use feature_flag::FeatureFlagClient;
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus,
@@ -120,14 +120,15 @@ impl KycVendorCalls {
 
 #[async_trait]
 impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
-    type AsyncRes = (
+    type AsyncRes = Box<(
         Option<Vec<NewRiskSignalInfo>>,
         Vec<NewRiskSignalInfo>,
         Option<VendorResult>,
         Option<(VerificationResultId, WatchlistResultResponse)>,
         Arc<dyn FeatureFlagClient>,
         Option<VendorResult>,
-    );
+        Option<VendorResult>,
+    )>;
 
     #[tracing::instrument(
         "OnAction<MakeVendorCalls, KycState>::execute_async_idempotent_actions",
@@ -170,6 +171,21 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
+        let is_neuro_enabled = state
+            .feature_flag_client
+            .flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
+        let neuro_result = if is_neuro_enabled {
+            match common::run_neuro_check(state, &self.wf_id).await {
+                Ok(res) => res,
+                Err(err) => {
+                    tracing::error!(?err, wf_id=?self.wf_id, "error running NeuroID");
+                    None
+                }
+            }
+        } else {
+            None
+        };
+
         let aml_vendor_result = match obc.enhanced_aml {
             EnhancedAmlOption::No => None,
             EnhancedAmlOption::Yes { .. } => {
@@ -180,14 +196,15 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         let ocr_reason_codes =
             common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id, &vw).await?;
 
-        Ok((
+        Ok(Box::new((
             ocr_reason_codes,
             user_input_reason_codes,
             kyc_vendor_result,
             aml_vendor_result,
             state.feature_flag_client.clone(),
             curp_result,
-        ))
+            neuro_result,
+        )))
     }
 
     #[tracing::instrument("OnAction<MakeVendorCalls, KycState>::on_commit", skip_all)]
@@ -204,7 +221,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             aml_vendor_result,
             ff_client,
             curp_result,
-        ) = async_res;
+            _neuro_result,
+        ) = *async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
         let curp_reason_codes = curp_result.map(|v| {

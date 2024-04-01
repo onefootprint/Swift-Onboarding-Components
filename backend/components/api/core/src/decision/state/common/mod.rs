@@ -24,6 +24,7 @@ use crate::{
         vendor::{
             self,
             incode::{curp_validation::run_curp_validation_check, incode_watchlist::WatchlistCheckKind},
+            neuro_id::run_neuro_call,
             vendor_api::{
                 vendor_api_response::build_vendor_response_map_from_vendor_results,
                 vendor_api_struct::IncodeFetchOCR,
@@ -102,6 +103,25 @@ pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> ApiResult<Opti
         })
         .await?;
     run_curp_validation_check(state, &di, &wf.id).await
+}
+
+#[tracing::instrument(skip(state))]
+pub async fn run_neuro_check(state: &State, wf_id: &WorkflowId) -> ApiResult<Option<VendorResult>> {
+    let wfid = wf_id.clone();
+    let (wf, di) = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
+            let di = DecisionIntent::get_or_create_for_workflow(
+                conn,
+                &wf.scoped_vault_id,
+                &wfid,
+                DecisionIntentKind::OnboardingKyc,
+            )?;
+            Ok((wf, di))
+        })
+        .await?;
+    run_neuro_call(state, &di, &wf.id).await
 }
 
 

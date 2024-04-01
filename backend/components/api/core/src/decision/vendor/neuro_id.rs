@@ -64,7 +64,7 @@ impl SaveVerificationResultArgs {
 
 
 #[tracing::instrument(skip(state, di))]
-pub async fn run_neuro_check(
+pub async fn run_neuro_call(
     state: &State,
     di: &DecisionIntent,
     wf_id: &WorkflowId,
