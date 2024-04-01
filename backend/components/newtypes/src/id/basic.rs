@@ -315,3 +315,14 @@ define_newtype_id!(ListEntryId, String, "Identifier for a ListEntry");
 define_newtype_id!(RuleSetVersionId, String, "Identifier for a RuleSetVersion");
 define_newtype_id!(NeuroIdentityId, String, "Identifier for a NeuroID User");
 define_newtype_id!(ListEntryCreationId, String, "Identifier for a ListEntryCreation");
+
+impl From<WorkflowId> for NeuroIdentityId {
+    fn from(value: WorkflowId) -> Self {
+        let id = crypto::base64::encode_config(
+            crypto::sha256(format!("{}{}", "neuro", value).as_bytes()),
+            crypto::base64::URL_SAFE_NO_PAD,
+        );
+
+        NeuroIdentityId::from(id)
+    }
+}

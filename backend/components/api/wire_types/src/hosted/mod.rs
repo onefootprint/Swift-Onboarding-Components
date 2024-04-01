@@ -2,6 +2,7 @@ pub mod business;
 pub mod consent;
 pub mod device_attestation;
 pub mod fingerprint_visit;
+pub mod neuro_id;
 pub mod onboarding;
 pub mod onboarding_status;
 pub mod socure_device;

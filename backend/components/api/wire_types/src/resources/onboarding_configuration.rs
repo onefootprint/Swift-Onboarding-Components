@@ -76,4 +76,6 @@ pub struct PublicOnboardingConfiguration {
 
     /// When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nid_enabled: Option<bool>,
 }

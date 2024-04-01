@@ -5,6 +5,7 @@ mod authorize;
 mod config;
 mod fingerprint_visit;
 mod index;
+mod neuro_id;
 mod pat;
 mod process;
 mod skip_passkey_register;
@@ -27,7 +28,9 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(process::post)
         .service(validate::post)
         .service(stytch::post)
+        .service(neuro_id::get)
         .service(config::get);
+
 
     config::configure_get_aliases(config);
 }
