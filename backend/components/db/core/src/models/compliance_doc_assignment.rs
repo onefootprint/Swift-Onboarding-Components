@@ -1,4 +1,4 @@
-use crate::{DbResult, TxnPgConn};
+use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_assignment;
 use diesel::prelude::*;
@@ -43,11 +43,17 @@ impl<'a> NewComplianceDocAssignment<'a> {
     pub fn create(
         self,
         conn: &mut TxnPgConn,
-        _lock: &Locked<ComplianceDoc>,
+        doc: &Locked<ComplianceDoc>,
     ) -> DbResult<ComplianceDocAssignment> {
+        if doc.id != *self.compliance_doc_id {
+            return Err(DbError::AssertionError(
+                "locked document does not match new assignment".to_string(),
+            ));
+        }
+
         // Deactivate existing assignment if one exists.
-        if let Some(prev_assignment) = ComplianceDocAssignment::get_active(conn, self.kind, _lock)? {
-            ComplianceDocAssignment::deactivate(conn, &prev_assignment.id, _lock)?;
+        if let Some(prev_assignment) = ComplianceDocAssignment::get_active(conn, self.kind, doc)? {
+            ComplianceDocAssignment::deactivate(conn, &prev_assignment.id, doc)?;
         }
 
         Ok(diesel::insert_into(compliance_doc_assignment::table)
@@ -78,10 +84,11 @@ impl ComplianceDocAssignment {
     pub fn deactivate(
         conn: &mut TxnPgConn,
         id: &ComplianceDocAssignmentId,
-        _lock: &Locked<ComplianceDoc>,
+        doc: &Locked<ComplianceDoc>,
     ) -> DbResult<()> {
         diesel::update(compliance_doc_assignment::table)
             .filter(compliance_doc_assignment::id.eq(id))
+            .filter(compliance_doc_assignment::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_assignment::deactivated_at.is_null())
             .set(compliance_doc_assignment::deactivated_at.eq(Some(Utc::now())))
             .execute(conn.conn())?;

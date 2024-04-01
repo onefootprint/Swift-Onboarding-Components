@@ -44,25 +44,15 @@ pub async fn post(
             // document.
             let doc = ComplianceDoc::lock(conn, &document_id, &partnership_id)?;
 
-            // Only allow submissions for the newest request.
-            let Some(active_req) = ComplianceDocRequest::get_active(conn, &doc)? else {
-                return ValidationError(
-                    "Cannot submit this compliance document since the request has been retracted",
-                )
-                .into();
+            let Some(req) = ComplianceDocRequest::get_active(conn, &doc)?.filter(|req| req.id == request_id)
+            else {
+                return ValidationError("Can only submit documents for the latest request").into();
             };
-
-            if active_req.id != request_id {
-                return ValidationError(
-                    "Cannot submit this compliance document since there is a newer request for this document",
-                )
-                .into();
-            }
 
             let doc_data = ComplianceDocData::ExternalUrl(url);
             NewComplianceDocSubmission {
                 created_at: Utc::now(),
-                request_id: &active_req.id,
+                request_id: &req.id,
                 submitted_by_tenant_user_id: &submitted_by_tenant_user_id,
                 doc_data: &doc_data,
                 compliance_doc_id: &doc.id,

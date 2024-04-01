@@ -36,28 +36,18 @@ pub async fn delete(
             // document.
             let doc = ComplianceDoc::lock(conn, &request_id, &partnership_id)?;
 
-            // Ensure the given request is the latest active request.
-            let Some(req) = ComplianceDocRequest::get_active(conn, &doc)? else {
-                return ValidationError(
-                    "Cannot retract this compliance document request since there are no active requests for this document",
-                ).into();
+            let Some(req) = ComplianceDocRequest::get_active(conn, &doc)?.filter(|req| req.id == request_id)
+            else {
+                return ValidationError("Can only retract the latest active request").into();
             };
 
-            if req.id != request_id {
-                return ValidationError(
-                    "Cannot retract this compliance document request since there is a newer request for this document",
-                ).into();
-
-            }
-
             // Ensure there are no submissions for this request.
-            if ComplianceDocSubmission::get_active(conn, &request_id, &doc)?.is_some() {
-                return ValidationError(
-                    "Cannot retract a compliance document request with submissions",
-                ).into();
+            if ComplianceDocSubmission::get_active(conn, &doc)?.is_some() {
+                return ValidationError("Cannot retract a compliance document request with submissions")
+                    .into();
             }
 
-            ComplianceDocRequest::deactivate(conn, &req.id, Some(&deactivated_by_user_id), &doc)?;
+            ComplianceDocRequest::deactivate(conn, &req.id, &doc, Some(&deactivated_by_user_id))?;
             Ok(())
         })
         .await?;

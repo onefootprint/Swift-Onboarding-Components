@@ -1,7 +1,7 @@
 use crate::{types::JsonApiResponse, State};
 use api_core::{
     auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::{ApiResult, ValidationError},
+    errors::{ApiResult, AssertionError, ValidationError},
     types::{EmptyResponse, ResponseData},
 };
 use chrono::Utc;
@@ -47,42 +47,32 @@ pub async fn post(
             // document.
             let doc = ComplianceDoc::lock(conn, &document_id, &partnership_id)?;
 
-            // Only allow reviews on an active submission for an active request.
-            let Some(active_req) = ComplianceDocRequest::get_active(conn, &doc)? else {
-                return ValidationError(
-                    "Cannot submit a review since there is no active request for this compliance document",
-                )
-                .into();
+            let Some(sub) =
+                ComplianceDocSubmission::get_active(conn, &doc)?.filter(|sub| sub.id == submission_id)
+            else {
+                return ValidationError("Can only review the latest submission").into();
             };
-
-            let Some(active_sub) = ComplianceDocSubmission::get_active(conn, &active_req.id, &doc)? else {
-                return ValidationError(
-                    "Cannot submit a review since there is no submission for this compliance document",
-                )
-                .into();
-            };
-
-            if active_sub.id != submission_id {
-                return ValidationError(
-                    "Cannot review this submission since there is a newer submission for this compliance document",
-                ).into();
-            }
 
             NewComplianceDocReview {
                 created_at: Utc::now(),
-                submission_id: &active_sub.id,
+                submission_id: &sub.id,
                 reviewed_by_partner_tenant_user_id: &tenant_user_id,
                 decision,
                 note: note.as_str(),
                 compliance_doc_id: &doc.id,
-            }.create(conn, &doc)?;
+            }
+            .create(conn, &doc)?;
 
             // Create a reupload request upon rejection.
-            if decision == ComplianceDocReviewDecision::Rejected{
+            let Some(req) = ComplianceDocRequest::get_active(conn, &doc)? else {
+                return AssertionError("Found active submission but no active request").into();
+            };
+
+            if decision == ComplianceDocReviewDecision::Rejected {
                 NewComplianceDocRequest {
                     created_at: Utc::now(),
-                    name: active_req.name.as_str(),
-                    description: active_req.description.as_str(),
+                    name: req.name.as_str(),
+                    description: req.description.as_str(),
                     requested_by_partner_tenant_user_id: &tenant_user_id,
                     compliance_doc_id: &document_id,
                 }

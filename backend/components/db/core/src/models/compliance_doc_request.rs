@@ -1,4 +1,4 @@
-use crate::{DbResult, TxnPgConn};
+use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_request;
 use diesel::prelude::*;
@@ -46,19 +46,22 @@ pub struct NewComplianceDocRequest<'a> {
 impl<'a> NewComplianceDocRequest<'a> {
     #[tracing::instrument("NewComplianceDocRequest::create", skip_all)]
     pub fn create(self, conn: &mut TxnPgConn, doc: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocRequest> {
-        // Deactivate all previous requests, submissions, and reviews for this doc.
-        if let Some(prev_req) = ComplianceDocRequest::get_active(conn, doc)? {
-            ComplianceDocRequest::deactivate(conn, &prev_req.id, None, doc)?;
-
-            if let Some(prev_sub) = ComplianceDocSubmission::get_active(conn, &prev_req.id, doc)? {
-                ComplianceDocSubmission::deactivate(conn, &prev_sub.id, doc)?;
-
-                if let Some(prev_rev) = ComplianceDocReview::get_active(conn, &prev_sub.id, doc)? {
-                    ComplianceDocReview::deactivate(conn, &prev_rev.id, doc)?;
-                }
-            }
+        if doc.id != *self.compliance_doc_id {
+            return Err(DbError::AssertionError(
+                "locked document does not match new request".to_string(),
+            ));
         }
 
+        // Deactivate any existing request, submission, and review.
+        if let Some(prev_req) = ComplianceDocRequest::get_active(conn, doc)? {
+            ComplianceDocRequest::deactivate(conn, &prev_req.id, doc, None)?;
+        }
+        if let Some(prev_sub) = ComplianceDocSubmission::get_active(conn, doc)? {
+            ComplianceDocSubmission::deactivate(conn, &prev_sub.id, doc)?;
+        }
+        if let Some(prev_rev) = ComplianceDocReview::get_active(conn, doc)? {
+            ComplianceDocReview::deactivate(conn, &prev_rev.id, doc)?;
+        }
 
         Ok(diesel::insert_into(compliance_doc_request::table)
             .values(self)
@@ -88,11 +91,12 @@ impl ComplianceDocRequest {
     pub fn deactivate(
         conn: &mut TxnPgConn,
         req_id: &ComplianceDocRequestId,
+        doc: &Locked<ComplianceDoc>,
         deactivated_by: Option<&TenantUserId>,
-        _lock: &Locked<ComplianceDoc>,
     ) -> DbResult<()> {
         diesel::update(compliance_doc_request::table)
             .filter(compliance_doc_request::id.eq(req_id))
+            .filter(compliance_doc_request::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_request::deactivated_at.is_null())
             .set((
                 compliance_doc_request::deactivated_at.eq(Some(Utc::now())),

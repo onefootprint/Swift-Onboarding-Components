@@ -1,9 +1,12 @@
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::{compliance_doc, compliance_doc_request};
+use db_schema::schema::{
+    compliance_doc, compliance_doc_request, compliance_doc_review, compliance_doc_submission,
+};
 use diesel::prelude::*;
 use newtypes::{
-    ComplianceDocId, ComplianceDocRequestId, ComplianceDocTemplateId, Locked, TenantCompliancePartnershipId,
+    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocSubmissionId,
+    ComplianceDocTemplateId, Locked, TenantCompliancePartnershipId,
 };
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -41,6 +44,8 @@ impl<'a> NewComplianceDoc<'a> {
 pub enum ComplianceDocIdentifier<'a> {
     ComplianceDocId(&'a ComplianceDocId),
     ComplianceDocRequestId(&'a ComplianceDocRequestId),
+    ComplianceDocSubmissionId(&'a ComplianceDocSubmissionId),
+    ComplianceDocReviewId(&'a ComplianceDocReviewId),
 }
 
 impl ComplianceDoc {
@@ -57,6 +62,16 @@ impl ComplianceDoc {
             ComplianceDocIdentifier::ComplianceDocRequestId(request_id) => compliance_doc_request::table
                 .filter(compliance_doc_request::id.eq(request_id))
                 .select(compliance_doc_request::compliance_doc_id)
+                .first(conn.conn())?,
+            ComplianceDocIdentifier::ComplianceDocSubmissionId(submission_id) => {
+                compliance_doc_submission::table
+                    .filter(compliance_doc_submission::id.eq(submission_id))
+                    .select(compliance_doc_submission::compliance_doc_id)
+                    .first(conn.conn())?
+            }
+            ComplianceDocIdentifier::ComplianceDocReviewId(review_id) => compliance_doc_review::table
+                .filter(compliance_doc_review::id.eq(review_id))
+                .select(compliance_doc_review::compliance_doc_id)
                 .first(conn.conn())?,
         };
 

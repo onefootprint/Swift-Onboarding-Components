@@ -117,7 +117,7 @@ def test_partner_document_flow(tenant, partner_tenant):
 
     # We shouldn't be able to delete the old request.
     resp = delete(f"compliance/partners/{partnership_id}/requests/{old_active_request_id}", {}, *partner_tenant.db_auths, status_code=400)
-    assert resp["error"]["message"] == "Cannot retract this compliance document request since there is a newer request for this document"
+    assert resp["error"]["message"] == "Can only retract the latest active request"
 
     # We shouldn't be able to submit a document for the old request.
     doc_id = doc["id"]
@@ -125,7 +125,7 @@ def test_partner_document_flow(tenant, partner_tenant):
         "request_id": old_active_request_id,
         "url": "https://example.com",
     }, *tenant.db_auths, status_code=400)
-    assert resp["error"]["message"] == "Cannot submit this compliance document since there is a newer request for this document"
+    assert resp["error"]["message"] == "Can only submit documents for the latest request"
 
     # We can delete the most recent requests.
     delete(f"compliance/partners/{partnership_id}/requests/{active_request_id}", {}, *partner_tenant.db_auths)
@@ -148,6 +148,19 @@ def test_partner_document_flow(tenant, partner_tenant):
     request_id = template_doc["active_request_id"]
     post(f"org/partners/{partnership_id}/documents/{doc_id}/submissions", {
         "request_id": request_id,
+        "url": "https://example.com/oops",
+    }, *tenant.db_auths)
+    # The document should now be waiting for review.
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
+    assert doc["status"] == "waiting_for_review"
+    old_submission_id = doc["active_submission_id"]
+
+    # Re-submit for the template document, as if the tenant is fixing a mistake.
+    doc_id = template_doc["id"]
+    request_id = template_doc["active_request_id"]
+    post(f"org/partners/{partnership_id}/documents/{doc_id}/submissions", {
+        "request_id": request_id,
         "url": "https://example.com",
     }, *tenant.db_auths)
     # The document should now be waiting for review.
@@ -156,7 +169,16 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["status"] == "waiting_for_review"
 
     # We shouldn't be able to delete a document that has submissions.
-    delete(f"compliance/partners/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths, status_code=400)
+    resp = delete(f"compliance/partners/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths, status_code=400)
+    assert resp["error"]["message"] == "Cannot retract a compliance document request with submissions"
+
+    # We shouldn't be able to review an old submission.
+    resp = post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
+        "submission_id": old_submission_id,
+        "decision": "accepted",
+        "note": "lgtm",
+    }, *partner_tenant.db_auths, status_code=400)
+    assert resp["error"]["message"] == "Can only review the latest submission"
 
     # Accept the submission.
     sub_id = doc["active_submission_id"]

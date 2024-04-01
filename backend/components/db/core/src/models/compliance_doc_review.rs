@@ -1,4 +1,4 @@
-use crate::{DbResult, TxnPgConn};
+use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_review;
 use diesel::prelude::*;
@@ -44,10 +44,16 @@ pub struct NewComplianceDocReview<'a> {
 
 impl<'a> NewComplianceDocReview<'a> {
     #[tracing::instrument("NewComplianceDocReview::create", skip_all)]
-    pub fn create(self, conn: &mut TxnPgConn, lock: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocReview> {
-        // Deactivate existing review if one exists.
-        if let Some(prev_rev) = ComplianceDocReview::get_active(conn, self.submission_id, lock)? {
-            ComplianceDocReview::deactivate(conn, &prev_rev.id, lock)?;
+    pub fn create(self, conn: &mut TxnPgConn, doc: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocReview> {
+        if doc.id != *self.compliance_doc_id {
+            return Err(DbError::AssertionError(
+                "locked document does not match new review".to_string(),
+            ));
+        }
+
+        // Deactivate any existing review.
+        if let Some(prev_rev) = ComplianceDocReview::get_active(conn, doc)? {
+            ComplianceDocReview::deactivate(conn, &prev_rev.id, doc)?;
         }
 
         Ok(diesel::insert_into(compliance_doc_review::table)
@@ -61,11 +67,10 @@ impl ComplianceDocReview {
     #[tracing::instrument("ComplianceDocReview::get_active", skip_all)]
     pub fn get_active(
         conn: &mut TxnPgConn,
-        sub_id: &ComplianceDocSubmissionId,
-        _lock: &Locked<ComplianceDoc>,
+        doc: &Locked<ComplianceDoc>,
     ) -> DbResult<Option<ComplianceDocReview>> {
         Ok(compliance_doc_review::table
-            .filter(compliance_doc_review::submission_id.eq(sub_id))
+            .filter(compliance_doc_review::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_review::deactivated_at.is_null())
             .select(ComplianceDocReview::as_select())
             .first(conn.conn())
@@ -76,10 +81,11 @@ impl ComplianceDocReview {
     pub fn deactivate(
         conn: &mut TxnPgConn,
         rev_id: &ComplianceDocReviewId,
-        _lock: &Locked<ComplianceDoc>,
+        doc: &Locked<ComplianceDoc>,
     ) -> DbResult<()> {
         diesel::update(compliance_doc_review::table)
             .filter(compliance_doc_review::id.eq(rev_id))
+            .filter(compliance_doc_review::compliance_doc_id.eq(&doc.id))
             .filter(compliance_doc_review::deactivated_at.is_null())
             .set(compliance_doc_review::deactivated_at.eq(Some(Utc::now())))
             .execute(conn.conn())?;
