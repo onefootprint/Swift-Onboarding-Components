@@ -39,13 +39,22 @@ pub struct NeuroProfile {
     pub site_id: Option<String>,
 }
 
+impl NeuroProfile {
+    pub fn get_signal_for_model(&self, model: Model) -> Option<NeuroSignal> {
+        self.signals
+            .as_ref()
+            .and_then(|ss| ss.iter().find(|s| s.model() == model))
+            .cloned()
+    }
+}
+
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct NeuroSignal {
     /// The classification label for the signal. E.g., for the Intent signal, the possible labels are genuine, neutral, risky, and insufficient data
     pub label: Option<String>,
     /// The name of the signal.
-    pub model: Option<String>,
+    model: Option<String>,
     pub score: Option<f32>,
     pub version: Option<String>,
     // The lower-level data elements used to arrive at the classification for a signal.
@@ -53,6 +62,21 @@ pub struct NeuroSignal {
     // A block of associated attributes are added to each element in the signals array under the heading attributes.
     // The keys of this map are strings, while the values could be different data types.
     pub attributes: Option<serde_json::Value>,
+}
+
+impl NeuroSignal {
+    fn model(&self) -> Model {
+        self.model
+            .as_ref()
+            .map(|s| match Model::try_from(s.as_str()) {
+                Ok(r) => r,
+                Err(err) => {
+                    tracing::error!(?err, status=%s, "Error parsing NeuroSignal model ");
+                    Model::Other("unknown".into())
+                }
+            })
+            .unwrap_or(Model::Other("missing".into()))
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq, Debug)]
@@ -114,6 +138,17 @@ pub enum Status {
     // Api key not correct
     UnauthorizedAccess,
     Unknown,
+}
+
+#[derive(Clone, Debug, Display, EnumString, DeserializeFromStr, Eq, PartialEq, Serialize)]
+#[strum(serialize_all = "snake_case")]
+pub enum Model {
+    Familiarity,
+    FraudRingIndicator,
+    AutomatedActivity,
+    CombinedDigitalIntent,
+    RiskDevice,
+    Other(String),
 }
 
 // T isn't needed here since it isn't an incode-style multi-endpoint request

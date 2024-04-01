@@ -7,7 +7,7 @@ use newtypes::{
     VerificationResultId,
 };
 
-use super::{curp_validation, experian, idology_expectid, lexis};
+use super::{curp_validation, experian, idology_expectid, lexis, neuro_id};
 use crate::{
     decision::vendor::vendor_result::VendorResult, errors::ApiResult, utils::vault_wrapper::VaultWrapper,
     ApiError,
@@ -117,6 +117,7 @@ pub fn parse_reason_codes(
         ParsedResponse::IncodeCurpValidation(ref r) => {
             curp_validation::footprint_reason_codes(r).into_iter().collect()
         }
+        ParsedResponse::NeuroIdAnalytics(ref r) => neuro_id::footprint_reason_codes(r).into_iter().collect(),
         _ => vec![],
     }
 }
@@ -222,6 +223,7 @@ pub enum WrappedRiskSignalGroupKind {
     Device,
     NativeDevice,
     Aml,
+    Behavior,
 }
 use risk_signal_group_struct::*;
 
@@ -234,6 +236,7 @@ impl From<RiskSignalGroupKind> for WrappedRiskSignalGroupKind {
             RiskSignalGroupKind::WebDevice => Self::Device,
             RiskSignalGroupKind::NativeDevice => Self::NativeDevice,
             RiskSignalGroupKind::Aml => Self::Aml,
+            RiskSignalGroupKind::Behavior => Self::Behavior,
         }
     }
 }
@@ -247,6 +250,7 @@ impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
             WrappedRiskSignalGroupKind::Device => Self::WebDevice,
             WrappedRiskSignalGroupKind::NativeDevice => Self::NativeDevice,
             WrappedRiskSignalGroupKind::Aml => Self::Aml,
+            WrappedRiskSignalGroupKind::Behavior => Self::Behavior,
         }
     }
 }

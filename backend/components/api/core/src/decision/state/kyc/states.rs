@@ -221,7 +221,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             aml_vendor_result,
             ff_client,
             curp_result,
-            _neuro_result,
+            neuro_result,
         ) = *async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
@@ -245,6 +245,18 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             // don't invalidate the old RSG
             let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Doc)?;
             RiskSignal::bulk_add(conn, new_doc_reason_codes, false, rsg.id)?;
+        }
+
+        if let Some(neuro_res) = neuro_result {
+            let vendor_api: VendorAPI = (&neuro_res.response.response).into();
+            let vres_id = neuro_res.verification_result_id.clone();
+            let neuro_frc = parse_reason_codes(neuro_res, false, false)
+                .into_iter()
+                .map(|frc| (frc, vendor_api, vres_id.clone()))
+                .collect();
+
+            let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Behavior)?;
+            RiskSignal::bulk_add(conn, neuro_frc, false, rsg.id)?;
         }
 
         let fixture_decision =
