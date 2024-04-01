@@ -10,12 +10,12 @@ RUST_VERSION := "1.77.0"
 # Builds the API crate into a musl binary
 api-release:
 	@echo "building release mode"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p api_server --release
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p api_server --release
 	@cp ./target/x86_64-unknown-linux-musl/release/api_server ./out/api_server
 
 api-debug:
 	@echo "building debug mode"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p api_server
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p api_server
 	@cp ./target/x86_64-unknown-linux-musl/debug/api_server ./out/api_server
 
 # Builds the builder that will help us build enclave docker images
@@ -59,7 +59,7 @@ run-enclave:
 # Builds our enclave_proxy_binary
 build-enclave-proxy-release:
 	@echo "[release] building enclave-proxy"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p enclave_proxy --features vsock --release
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p enclave_proxy --features vsock --release
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave_proxy ./out/enclave_proxy
 
 get-named-commit:
