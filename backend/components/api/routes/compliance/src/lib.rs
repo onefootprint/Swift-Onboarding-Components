@@ -8,6 +8,7 @@ mod request;
 mod reupload;
 mod reviews;
 mod submissions;
+mod tenant_assignment;
 
 use api_core::*;
 
@@ -21,6 +22,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config.service(members::post);
     config.service(partners::get);
     config.service(request::delete);
+    config.service(tenant_assignment::post);
     config.service(reupload::post);
     config.service(submissions::post);
     config.service(reviews::post);

@@ -729,7 +729,7 @@
                     "Compliance",
                     "Private"
                 ],
-                "description": "Submit an external URL in response to a request",
+                "description": "Submit a review for a compliance document submissions",
                 "parameters": [
                     {
                         "in": "path",
@@ -5612,6 +5612,62 @@
                 ]
             }
         },
+        "/org/partners/{partnership_id}/documents/{document_id}/assignments": {
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Assigns a compliance document to a tenant user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "document_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateComplianceDocAssignmentRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/partners/{partnership_id}/documents/{document_id}/submissions": {
             "post": {
                 "tags": [
@@ -6752,6 +6808,7 @@
                                                 "manage_webhooks",
                                                 "manual_review",
                                                 "onboarding_configuration",
+                                                "write_lists",
                                                 "org_settings",
                                                 "cip_integration",
                                                 "trigger_kyb",
@@ -6764,7 +6821,7 @@
                                                 "decrypt_all",
                                                 "write_entities",
                                                 "label_and_tag",
-                                                "submit_compliance_docs",
+                                                "manage_compliance_doc_submission",
                                                 "compliance_partner_read",
                                                 "compliance_partner_admin",
                                                 "compliance_partner_manage_templates",
@@ -7080,6 +7137,7 @@
                                 "manage_webhooks",
                                 "manual_review",
                                 "onboarding_configuration",
+                                "write_lists",
                                 "org_settings",
                                 "cip_integration",
                                 "trigger_kyb",
@@ -7092,7 +7150,7 @@
                                 "decrypt_all",
                                 "write_entities",
                                 "label_and_tag",
-                                "submit_compliance_docs",
+                                "manage_compliance_doc_submission",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
                                 "compliance_partner_manage_templates",
@@ -8847,6 +8905,7 @@
                                 "manage_webhooks",
                                 "manual_review",
                                 "onboarding_configuration",
+                                "write_lists",
                                 "org_settings",
                                 "cip_integration",
                                 "trigger_kyb",
@@ -8859,7 +8918,7 @@
                                 "decrypt_all",
                                 "write_entities",
                                 "label_and_tag",
-                                "submit_compliance_docs",
+                                "manage_compliance_doc_submission",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
                                 "compliance_partner_manage_templates",
@@ -18513,6 +18572,7 @@
                                                     "manage_webhooks",
                                                     "manual_review",
                                                     "onboarding_configuration",
+                                                    "write_lists",
                                                     "org_settings",
                                                     "cip_integration",
                                                     "trigger_kyb",
@@ -18525,7 +18585,7 @@
                                                     "decrypt_all",
                                                     "write_entities",
                                                     "label_and_tag",
-                                                    "submit_compliance_docs",
+                                                    "manage_compliance_doc_submission",
                                                     "compliance_partner_read",
                                                     "compliance_partner_admin",
                                                     "compliance_partner_manage_templates",
@@ -18641,6 +18701,7 @@
                                             "manage_webhooks",
                                             "manual_review",
                                             "onboarding_configuration",
+                                            "write_lists",
                                             "org_settings",
                                             "cip_integration",
                                             "trigger_kyb",
@@ -18653,7 +18714,7 @@
                                             "decrypt_all",
                                             "write_entities",
                                             "label_and_tag",
-                                            "submit_compliance_docs",
+                                            "manage_compliance_doc_submission",
                                             "compliance_partner_read",
                                             "compliance_partner_admin",
                                             "compliance_partner_manage_templates",
@@ -18775,6 +18836,7 @@
                                                     "manage_webhooks",
                                                     "manual_review",
                                                     "onboarding_configuration",
+                                                    "write_lists",
                                                     "org_settings",
                                                     "cip_integration",
                                                     "trigger_kyb",
@@ -18787,7 +18849,7 @@
                                                     "decrypt_all",
                                                     "write_entities",
                                                     "label_and_tag",
-                                                    "submit_compliance_docs",
+                                                    "manage_compliance_doc_submission",
                                                     "compliance_partner_read",
                                                     "compliance_partner_admin",
                                                     "compliance_partner_manage_templates",
@@ -19629,6 +19691,7 @@
                                                 "manage_webhooks",
                                                 "manual_review",
                                                 "onboarding_configuration",
+                                                "write_lists",
                                                 "org_settings",
                                                 "cip_integration",
                                                 "trigger_kyb",
@@ -19641,7 +19704,7 @@
                                                 "decrypt_all",
                                                 "write_entities",
                                                 "label_and_tag",
-                                                "submit_compliance_docs",
+                                                "manage_compliance_doc_submission",
                                                 "compliance_partner_read",
                                                 "compliance_partner_admin",
                                                 "compliance_partner_manage_templates",
@@ -19863,6 +19926,7 @@
                                         "manage_webhooks",
                                         "manual_review",
                                         "onboarding_configuration",
+                                        "write_lists",
                                         "org_settings",
                                         "cip_integration",
                                         "trigger_kyb",
@@ -19875,7 +19939,7 @@
                                         "decrypt_all",
                                         "write_entities",
                                         "label_and_tag",
-                                        "submit_compliance_docs",
+                                        "manage_compliance_doc_submission",
                                         "compliance_partner_read",
                                         "compliance_partner_admin",
                                         "compliance_partner_manage_templates",
@@ -19958,6 +20022,7 @@
                                 "manage_webhooks",
                                 "manual_review",
                                 "onboarding_configuration",
+                                "write_lists",
                                 "org_settings",
                                 "cip_integration",
                                 "trigger_kyb",
@@ -19970,7 +20035,7 @@
                                 "decrypt_all",
                                 "write_entities",
                                 "label_and_tag",
-                                "submit_compliance_docs",
+                                "manage_compliance_doc_submission",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
                                 "compliance_partner_manage_templates",
@@ -22143,6 +22208,7 @@
                                         "manage_webhooks",
                                         "manual_review",
                                         "onboarding_configuration",
+                                        "write_lists",
                                         "org_settings",
                                         "cip_integration",
                                         "trigger_kyb",
@@ -22155,7 +22221,7 @@
                                         "decrypt_all",
                                         "write_entities",
                                         "label_and_tag",
-                                        "submit_compliance_docs",
+                                        "manage_compliance_doc_submission",
                                         "compliance_partner_read",
                                         "compliance_partner_admin",
                                         "compliance_partner_manage_templates",
@@ -22333,6 +22399,15 @@
                     "allowed_origins"
                 ]
             },
+            "UpdateComplianceDocAssignmentRequest": {
+                "type": "object",
+                "properties": {
+                    "user_id": {
+                        "description": "Pass none/null to unassign.",
+                        "type": "string"
+                    }
+                }
+            },
             "UpdateComplianceDocTemplateRequest": {
                 "type": "object",
                 "properties": {
@@ -22508,6 +22583,7 @@
                                 "manage_webhooks",
                                 "manual_review",
                                 "onboarding_configuration",
+                                "write_lists",
                                 "org_settings",
                                 "cip_integration",
                                 "trigger_kyb",
@@ -22520,7 +22596,7 @@
                                 "decrypt_all",
                                 "write_entities",
                                 "label_and_tag",
-                                "submit_compliance_docs",
+                                "manage_compliance_doc_submission",
                                 "compliance_partner_read",
                                 "compliance_partner_admin",
                                 "compliance_partner_manage_templates",

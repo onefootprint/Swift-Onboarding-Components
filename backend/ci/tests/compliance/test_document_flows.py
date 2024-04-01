@@ -234,3 +234,30 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["name"] == "edited template name"
     assert doc["description"] == "edited template description"
     assert doc["status"] == "not_requested"
+
+    # Assign the document to a tenant user.
+    doc_id = doc["id"]
+    assignee = get("org/members", {}, *tenant.ro_db_auths)["data"][0]
+    post(f"org/partners/{partnership_id}/documents/{doc_id}/assignments", {
+        "user_id": assignee["id"],
+    }, *tenant.db_auths)
+    # TODO: use a tenant-facing GET API once we make one
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
+    assert doc["tenant_assignee"]["id"] == assignee["id"]
+    assert doc["tenant_assignee"]["first_name"] == assignee["first_name"]
+    assert doc["tenant_assignee"]["last_name"] == assignee["last_name"]
+
+    # Assigning a bogus user ID should fail.
+    resp = post(f"org/partners/{partnership_id}/documents/{doc_id}/assignments", {
+        "user_id": "testing",
+    }, *tenant.db_auths, status_code=400)
+    assert resp["error"]["message"] == "User not a member of tenant"
+
+    # Remove the assignment.
+    post(f"org/partners/{partnership_id}/documents/{doc_id}/assignments", {
+        "user_id": None,
+    }, *tenant.db_auths)
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
+    assert doc["tenant_assignee"] is None

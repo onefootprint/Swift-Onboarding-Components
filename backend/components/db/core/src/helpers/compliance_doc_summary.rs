@@ -279,18 +279,18 @@ impl ComplianceDocSummary {
             request,
             submission,
             review,
-            ..
+            partner_tenant_assignment,
+            tenant_assignment,
         } = self.active_resources_for_doc(doc_id)?;
 
         let dates = [
             Some(newest_req.created_at),
             newest_req.deactivated_at,
             request.map(|r| r.created_at),
-            request.and_then(|r| r.deactivated_at),
             submission.map(|s| s.created_at),
-            submission.and_then(|s| s.deactivated_at),
             review.map(|r| r.created_at),
-            review.and_then(|r| r.deactivated_at),
+            partner_tenant_assignment.map(|a| a.created_at),
+            tenant_assignment.map(|a| a.created_at),
         ];
 
         Ok(dates.iter().flatten().max().copied())

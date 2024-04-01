@@ -1,7 +1,7 @@
 use crate::*;
 use newtypes::{
     ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocSubmissionId,
-    ComplianceDocTemplateVersionId, PartnerTenantId, TenantId,
+    ComplianceDocTemplateVersionId, PartnerTenantId, TenantId, TenantUserId,
 };
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
@@ -57,4 +57,11 @@ pub struct CreateReviewRequest {
     pub submission_id: ComplianceDocSubmissionId,
     pub decision: ComplianceDocReviewDecision,
     pub note: String,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct UpdateComplianceDocAssignmentRequest {
+    /// Pass none/null to unassign.
+    pub user_id: Option<TenantUserId>,
 }

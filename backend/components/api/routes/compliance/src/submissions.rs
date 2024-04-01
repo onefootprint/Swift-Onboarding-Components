@@ -24,7 +24,7 @@ pub async fn post(
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocId)>,
     request: web::Json<api_wire_types::SubmitExternalUrlRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_guard(TenantGuard::SubmitComplianceDocs)?;
+    let auth = auth.check_guard(TenantGuard::ManageComplianceDocSubmission)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
 

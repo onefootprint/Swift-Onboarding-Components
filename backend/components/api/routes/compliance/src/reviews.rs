@@ -16,7 +16,7 @@ use newtypes::{ComplianceDocId, ComplianceDocReviewDecision, TenantCompliancePar
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    description = "Submit an external URL in response to a request",
+    description = "Submit a review for a compliance document submissions",
     tags(Compliance, Private)
 )]
 #[actix::post("/compliance/partners/{partnership_id}/documents/{document_id}/reviews")]

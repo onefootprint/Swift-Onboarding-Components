@@ -27,7 +27,7 @@ impl TenantId {
     }
 }
 
-#[derive(Debug, Clone, Copy, From)]
+#[derive(Debug, Clone, Copy, From, PartialEq, Eq)]
 pub enum OrgIdentifierRef<'a> {
     TenantId(&'a TenantId),
     PartnerTenantId(&'a PartnerTenantId),
@@ -52,9 +52,7 @@ impl<'a> OrgIdentifierRef<'a> {
     pub fn clone_into(&self) -> OrgIdentifier {
         match *self {
             OrgIdentifierRef::TenantId(t_id) => OrgIdentifier::TenantId(t_id.clone()),
-            OrgIdentifierRef::PartnerTenantId(pt_id) => {
-                OrgIdentifier::PartnerTenantId(pt_id.clone())
-            }
+            OrgIdentifierRef::PartnerTenantId(pt_id) => OrgIdentifier::PartnerTenantId(pt_id.clone()),
         }
     }
 }
@@ -63,9 +61,7 @@ impl<'a> From<&'a OrgIdentifier> for OrgIdentifierRef<'a> {
     fn from(value: &'a OrgIdentifier) -> Self {
         match value {
             OrgIdentifier::TenantId(t_id) => OrgIdentifierRef::TenantId(t_id),
-            OrgIdentifier::PartnerTenantId(pt_id) => {
-                OrgIdentifierRef::PartnerTenantId(pt_id)
-            }
+            OrgIdentifier::PartnerTenantId(pt_id) => OrgIdentifierRef::PartnerTenantId(pt_id),
         }
     }
 }

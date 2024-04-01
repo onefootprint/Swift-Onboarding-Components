@@ -28,7 +28,7 @@ pub enum TenantGuard {
     ManageWebhooks,
     Onboarding,
     LabelAndTag,
-    SubmitComplianceDocs,
+    ManageComplianceDocSubmission,
 }
 
 impl TenantGuard {
@@ -51,7 +51,7 @@ impl TenantGuard {
             Self::ManageWebhooks => TenantScope::ManageWebhooks,
             Self::Onboarding => TenantScope::Onboarding,
             Self::LabelAndTag => TenantScope::LabelAndTag,
-            Self::SubmitComplianceDocs => TenantScope::SubmitComplianceDocs,
+            Self::ManageComplianceDocSubmission => TenantScope::ManageComplianceDocSubmission,
         }
     }
 }
