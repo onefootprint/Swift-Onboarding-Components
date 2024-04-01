@@ -1,4 +1,4 @@
-use super::compliance_doc::ComplianceDoc;
+use super::{compliance_doc::ComplianceDoc, compliance_doc_review::ComplianceDocReview};
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_submission;
@@ -42,11 +42,15 @@ impl<'a> NewComplianceDocSubmission<'a> {
     pub fn create(
         self,
         conn: &mut TxnPgConn,
-        lock: &Locked<ComplianceDoc>,
+        doc: &Locked<ComplianceDoc>,
     ) -> DbResult<ComplianceDocSubmission> {
-        // Deactivate existing submission if one exists.
-        if let Some(prev_sub) = ComplianceDocSubmission::get_active(conn, self.request_id, lock)? {
-            ComplianceDocSubmission::deactivate(conn, &prev_sub.id, lock)?;
+        // Deactivate all previous submissions and reviews for this doc.
+        if let Some(prev_sub) = ComplianceDocSubmission::get_active(conn, self.request_id, doc)? {
+            ComplianceDocSubmission::deactivate(conn, &prev_sub.id, doc)?;
+
+            if let Some(prev_rev) = ComplianceDocReview::get_active(conn, &prev_sub.id, doc)? {
+                ComplianceDocReview::deactivate(conn, &prev_rev.id, doc)?;
+            }
         }
 
         Ok(diesel::insert_into(compliance_doc_submission::table)

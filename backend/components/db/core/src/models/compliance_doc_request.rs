@@ -4,7 +4,10 @@ use db_schema::schema::compliance_doc_request;
 use diesel::prelude::*;
 use newtypes::{ComplianceDocId, ComplianceDocRequestId, Locked, TenantUserId};
 
-use super::compliance_doc::ComplianceDoc;
+use super::{
+    compliance_doc::ComplianceDoc, compliance_doc_review::ComplianceDocReview,
+    compliance_doc_submission::ComplianceDocSubmission,
+};
 
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -43,10 +46,19 @@ pub struct NewComplianceDocRequest<'a> {
 impl<'a> NewComplianceDocRequest<'a> {
     #[tracing::instrument("NewComplianceDocRequest::create", skip_all)]
     pub fn create(self, conn: &mut TxnPgConn, doc: &Locked<ComplianceDoc>) -> DbResult<ComplianceDocRequest> {
-        // Deactivate existing request if one exists.
+        // Deactivate all previous requests, submissions, and reviews for this doc.
         if let Some(prev_req) = ComplianceDocRequest::get_active(conn, doc)? {
             ComplianceDocRequest::deactivate(conn, &prev_req.id, None, doc)?;
+
+            if let Some(prev_sub) = ComplianceDocSubmission::get_active(conn, &prev_req.id, doc)? {
+                ComplianceDocSubmission::deactivate(conn, &prev_sub.id, doc)?;
+
+                if let Some(prev_rev) = ComplianceDocReview::get_active(conn, &prev_sub.id, doc)? {
+                    ComplianceDocReview::deactivate(conn, &prev_rev.id, doc)?;
+                }
+            }
         }
+
 
         Ok(diesel::insert_into(compliance_doc_request::table)
             .values(self)
