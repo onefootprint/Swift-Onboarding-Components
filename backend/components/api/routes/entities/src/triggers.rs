@@ -87,7 +87,6 @@ pub async fn post(
             let duration = Duration::days(3);
             let args = NewUserSessionArgs {
                 user_vault_id: sv.vault_id.clone(),
-                purpose: TokenCreationPurpose::ApiInherit,
                 purposes: vec![TokenCreationPurpose::ApiInherit],
                 context,
                 scopes: vec![],

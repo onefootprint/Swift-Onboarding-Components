@@ -19,30 +19,18 @@ use strum_macros::EnumDiscriminants;
 // WARNING: changing this could break existing user auth sessions
 pub enum UserAuthScope {
     /// For adding new data in bifrost
-    #[serde(alias = "SignUp")]
     SignUp,
     /// For adding auth data
-    #[serde(alias = "Auth")]
     Auth,
     // We don't currently issue a token with this - was for my1fp
-    #[serde(alias = "BasicProfile")]
     BasicProfile,
-    #[serde(alias = "SensitiveProfile")]
     SensitiveProfile,
-    #[serde(alias = "Handoff")]
     Handoff,
     /// Only for vaulting data
-    #[serde(alias = "VaultData")]
     VaultData,
 
     /// Granted when the auth token was generated using explicit (not implicit) auth
-    #[serde(alias = "ExplicitAuth")]
     ExplicitAuth,
-
-    /// This scope should never be issued to a token - it is used to gate certain actions that
-    /// should never be done by a user
-    #[serde(alias = "Never")]
-    Never,
 }
 
 
@@ -60,14 +48,9 @@ mod test {
             UserAuthScope::Handoff,
             UserAuthScope::VaultData,
             UserAuthScope::ExplicitAuth,
-            UserAuthScope::Never,
         ];
 
-        let legacy_value = r#"["SignUp", "Auth", "BasicProfile", "SensitiveProfile", "Handoff", "VaultData", "ExplicitAuth", "Never"]"#;
-        let deserialized = serde_json::de::from_str::<Vec<UserAuthScope>>(legacy_value).unwrap();
-        assert_eq!(expected_scopes, deserialized);
-
-        let modern_value = r#"["sign_up","auth","basic_profile","sensitive_profile","handoff","vault_data","explicit_auth","never"]"#;
+        let modern_value = r#"["sign_up","auth","basic_profile","sensitive_profile","handoff","vault_data","explicit_auth"]"#;
         let deserialized = serde_json::de::from_str::<Vec<UserAuthScope>>(modern_value).unwrap();
         assert_eq!(expected_scopes, deserialized);
 
@@ -86,7 +69,6 @@ mod test {
             UserAuthGuard::Handoff,
             UserAuthGuard::VaultData,
             UserAuthGuard::ExplicitAuth,
-            UserAuthGuard::Never,
         ];
         let guards_str = serde_json::ser::to_string(&guards).unwrap();
         assert_eq!(guards_str, scopes_str);

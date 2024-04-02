@@ -23,7 +23,6 @@ pub struct CreateTokenArgs {
     pub key: Option<ObConfigurationKey>,
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
-    pub is_implied_auth: bool,
     pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
 }
 
@@ -46,7 +45,6 @@ pub fn create_token(
         key,
         scopes,
         auth_events,
-        is_implied_auth,
         limit_auth_methods,
     } = args;
 
@@ -100,13 +98,11 @@ pub fn create_token(
     let context = NewUserSessionContext {
         su_id: Some(sv.id),
         obc_id,
-        is_implied_auth,
         wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
         ..Default::default()
     };
     let args = NewUserSessionArgs {
         user_vault_id: sv.vault_id,
-        purpose: purpose.clone(),
         purposes: vec![purpose],
         context,
         scopes,

@@ -65,7 +65,7 @@ pub async fn post(
         action_kind,
         is_register_challenge,
     } = Challenge::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
-    if action_kind == ActionKind::Replace && !user_auth.data.purpose.is_from_api() {
+    if action_kind == ActionKind::Replace && !user_auth.data.is_from_api() {
         return ValidationError("Can only replace auth methods using auth issued via API").into();
     }
     if !is_register_challenge {

@@ -13,10 +13,6 @@ use super::AuthSessionData;
 // WARNING: changing this could break existing user auth sessions
 pub struct UserSession {
     pub user_vault_id: VaultId,
-    /// Context on the purpose for which this user session was created.
-    /// If a session is created by stepping up an old session, we'll keep the old purpose
-    /// TODO: rm purpose
-    pub purpose: TokenCreationPurpose,
     /// The list of creation reasons throughout the history of this session.
     /// Since one auth token can be used to create another, we append the creation purpose to this
     /// list every time we make a new token. So, this list will show the whole history of why
@@ -40,12 +36,6 @@ pub struct UserSession {
     /// The auth events that give this token its permissions
     #[serde(default)]
     pub auth_events: Vec<AssociatedAuthEvent>,
-    /// When true, the auth events that occurred at this tenant were inherited to form this token,
-    /// rather than proof of auth being exchanged physically
-    /// // TODO: can i rm this now?
-    #[serde(default)]
-    #[allow(unused)]
-    pub is_implied_auth: bool,
     /// The list of DataIdentifiers whose knowledge has been proven during this session
     #[serde(default)]
     pub kba: Vec<DataIdentifier>,
@@ -60,7 +50,6 @@ pub struct NewUserSessionContext {
     pub obc_id: Option<ObConfigurationId>,
     pub wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
-    pub is_implied_auth: bool,
     pub kba: Vec<DataIdentifier>,
 }
 
@@ -162,7 +151,6 @@ impl AssociatedAuthEvent {
 pub struct NewUserSessionArgs {
     pub user_vault_id: VaultId,
     pub context: NewUserSessionContext,
-    pub purpose: TokenCreationPurpose,
     pub purposes: Vec<TokenCreationPurpose>,
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
@@ -173,7 +161,6 @@ impl UserSession {
         let NewUserSessionArgs {
             user_vault_id,
             context,
-            purpose,
             purposes,
             scopes,
             auth_events,
@@ -191,12 +178,10 @@ impl UserSession {
             obc_id,
             wf_id,
             wfr_id,
-            is_implied_auth,
             kba,
         } = context;
         let session = AuthSessionData::User(Self {
             user_vault_id,
-            purpose: purpose.clone(),
             purposes,
             su_id,
             sb_id,
@@ -206,7 +191,6 @@ impl UserSession {
             wfr_id,
             scopes,
             auth_events,
-            is_implied_auth,
             kba,
         });
         Ok(session)
@@ -228,14 +212,12 @@ impl UserSession {
             obc_id: new_ctx.obc_id.or(self.obc_id),
             wf_id: new_ctx.wf_id.or(self.wf_id),
             wfr_id: new_ctx.wfr_id.or(self.wfr_id),
-            is_implied_auth: new_ctx.is_implied_auth || self.is_implied_auth,
             kba: new_ctx.kba.into_iter().chain(self.kba).unique().collect(),
         };
         let scopes = self.scopes.into_iter().chain(new_scopes).unique().collect();
         let auth_events = self.auth_events.into_iter().chain(new_auth_event).collect();
         let args = NewUserSessionArgs {
             user_vault_id: self.user_vault_id,
-            purpose: self.purpose,
             purposes: self.purposes.into_iter().chain(Some(new_purpose)).collect(),
             context,
             scopes,
@@ -257,7 +239,6 @@ impl UserSession {
             obc_id: self.obc_id,
             wf_id: self.wf_id,
             wfr_id: self.wfr_id,
-            is_implied_auth: self.is_implied_auth,
             kba: self.kba,
         };
         if new_scopes.iter().any(|s| !self.scopes.contains(s)) {
@@ -270,7 +251,6 @@ impl UserSession {
         }
         let args = NewUserSessionArgs {
             user_vault_id: self.user_vault_id,
-            purpose: self.purpose,
             purposes: self.purposes.into_iter().chain(Some(new_purpose)).collect(),
             context,
             scopes: new_scopes,
@@ -291,6 +271,11 @@ impl UserSession {
                 .into();
         }
         Ok(())
+    }
+
+    /// Returns true if any token from which this token was derived was issued via tenant-facing API.
+    pub fn is_from_api(&self) -> bool {
+        self.purposes.iter().any(|p| p.is_from_api())
     }
 }
 

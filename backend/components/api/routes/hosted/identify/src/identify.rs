@@ -59,7 +59,7 @@ pub async fn post(
         IdentifyScope::Onboarding
     };
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
-    let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.purpose.is_from_api());
+    let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.is_from_api());
 
     // Look up existing user vault by identifier
     let identifiers = vec![
@@ -189,7 +189,6 @@ pub(super) async fn create_identified_token(
             };
             let args = NewUserSessionArgs {
                 user_vault_id: v_id,
-                purpose: scope.into(),
                 purposes: vec![scope.into()],
                 context,
                 scopes: scopes.clone(),

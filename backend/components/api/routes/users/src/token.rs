@@ -149,7 +149,6 @@ pub async fn post(
                     vec![]
                 }
             };
-            let is_implied_auth = !implied_auth_events.is_empty();
             let kinds = implied_auth_events.iter().map(|e| e.kind).collect();
             // All auth events associated with the token made here are implicit
             let auth_events = implied_auth_events
@@ -167,7 +166,6 @@ pub async fn post(
                 key,
                 scopes,
                 auth_events,
-                is_implied_auth,
                 limit_auth_methods,
             };
             let ttl_min = ttl_min.unwrap_or(60);

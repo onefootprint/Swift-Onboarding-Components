@@ -18,7 +18,8 @@ pub trait UserAuth {
 /// Computes the list of scopes to be granted to an auth token for a user.
 /// - `auth_events`: the auths that this user has performed
 /// - `scope`: the requested IdentifyScope
-/// - `is_implied_auth`: whether the auth events at this tenant were inherited virtually rather than physically
+/// - `is_explicit_auth`: whether the auth events at this tenant were performed explicitly and not
+///   implicitly inherited.
 /// The result is the intersection of the scopes requested and the scopes allowed by the auth methods
 pub fn allowed_user_scopes(
     auth_events: Vec<AuthEventKind>,

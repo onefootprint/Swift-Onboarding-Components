@@ -36,7 +36,7 @@ pub async fn post(
         kind,
         action_kind,
     } = request.into_inner();
-    if action_kind == ActionKind::Replace && !user_auth.data.purpose.is_from_api() {
+    if action_kind == ActionKind::Replace && !user_auth.data.is_from_api() {
         return ValidationError("Can only replace auth methods using auth issued via API").into();
     }
 
@@ -53,13 +53,17 @@ pub async fn post(
     if !allowed_challenge_kinds.contains(&kind) {
         return ValidationError(&format!("Cannot initiate challenge of kind {}", kind)).into();
     }
-    if let TokenCreationPurpose::ApiUpdateAuthMethods {
-        limit_auth_methods: Some(limit_auth_methods),
-    } = &user_auth.data.purpose
-    {
-        if !limit_auth_methods.contains(&kind) {
-            return ValidationError(&format!("Token cannot initiate challenge of kind {}", kind)).into();
-        }
+    let limit_auth_methods = user_auth
+        .data
+        .purposes
+        .iter()
+        .filter_map(|p| match p {
+            TokenCreationPurpose::ApiUpdateAuthMethods { limit_auth_methods } => limit_auth_methods.clone(),
+            _ => None,
+        })
+        .reduce(|a, b| a.into_iter().filter(|i| b.contains(i)).collect_vec());
+    if limit_auth_methods.is_some_and(|l| !l.contains(&kind)) {
+        return ValidationError(&format!("Token cannot initiate challenge of kind {}", kind)).into();
     }
 
     let tenant = user_auth.tenant();

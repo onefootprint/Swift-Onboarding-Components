@@ -8,6 +8,7 @@ use api_core::{
     utils::identify::get_user_challenge_context,
     State,
 };
+use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -20,12 +21,15 @@ pub async fn get(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<Vec<api_wire_types::AuthMethod>> {
     let user_auth = user_auth.check_guard(UserAuthGuard::Auth.or(UserAuthGuard::SignUp))?;
-    let limit_auth_methods =
-        if let TokenCreationPurpose::ApiUpdateAuthMethods { limit_auth_methods } = &user_auth.data.purpose {
-            limit_auth_methods.clone()
-        } else {
-            None
-        };
+    let limit_auth_methods = user_auth
+        .data
+        .purposes
+        .iter()
+        .filter_map(|p| match p {
+            TokenCreationPurpose::ApiUpdateAuthMethods { limit_auth_methods } => limit_auth_methods.clone(),
+            _ => None,
+        })
+        .reduce(|a, b| a.into_iter().filter(|i| b.contains(i)).collect_vec());
 
     let ctx = get_user_challenge_context(&state, user_auth.user_identifier(), Some(user_auth)).await?;
     let auth_methods = ctx

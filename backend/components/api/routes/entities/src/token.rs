@@ -56,7 +56,6 @@ pub async fn post(
                 key,
                 scopes: vec![],
                 auth_events: vec![],
-                is_implied_auth: false,
                 limit_auth_methods: None,
             };
             let res = create_token(conn, &session_key, args, Duration::days(3))?;
