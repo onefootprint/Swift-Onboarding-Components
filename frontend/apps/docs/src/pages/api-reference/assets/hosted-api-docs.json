@@ -688,6 +688,32 @@
                 ]
             }
         },
+        "/hosted/onboarding/nid": {
+            "get": {
+                "tags": [
+                    "Onboarding",
+                    "Hosted"
+                ],
+                "description": "Retrieve identifier used for NeuroId",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NeuroIdentityIdResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/onboarding/privacy_pass": {
             "get": {
                 "tags": [
@@ -3354,6 +3380,9 @@
                             "name": {
                                 "type": "string"
                             },
+                            "nid_enabled": {
+                                "type": "boolean"
+                            },
                             "org_id": {
                                 "type": "string"
                             },
@@ -4305,6 +4334,17 @@
                     "challenge_data"
                 ]
             },
+            "NeuroIdentityIdResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
             "OnboardingResponse": {
                 "type": "object",
                 "properties": {
@@ -4369,6 +4409,9 @@
                             },
                             "name": {
                                 "type": "string"
+                            },
+                            "nid_enabled": {
+                                "type": "boolean"
                             },
                             "org_id": {
                                 "type": "string"
@@ -4773,6 +4816,9 @@
                             "name": {
                                 "type": "string"
                             },
+                            "nid_enabled": {
+                                "type": "boolean"
+                            },
                             "org_id": {
                                 "type": "string"
                             },
@@ -5174,6 +5220,9 @@
                     },
                     "name": {
                         "type": "string"
+                    },
+                    "nid_enabled": {
+                        "type": "boolean"
                     },
                     "org_id": {
                         "type": "string"

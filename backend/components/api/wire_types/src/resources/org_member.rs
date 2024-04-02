@@ -48,3 +48,9 @@ pub struct LiteOrgMember {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
 }
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+pub struct LiteUserAndOrg {
+    pub user: LiteOrgMember,
+    pub org: String,
+}

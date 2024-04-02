@@ -658,7 +658,7 @@
                     "Compliance",
                     "Private"
                 ],
-                "description": "Returns a list of documents for a company partned with the authorized compliance partner.",
+                "description": "Returns a list of documents for a company partnered with the authorized compliance partner.",
                 "parameters": [
                     {
                         "in": "path",
@@ -781,6 +781,55 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/compliance/partners/{partnership_id}/documents/{document_id}/events": {
+            "get": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Returns a list of timeline events for the given document",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "document_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ComplianceDocEvent"
+                                    }
                                 }
                             }
                         }
@@ -7715,6 +7764,53 @@
                     "num_active_playbooks",
                     "num_controls_complete",
                     "num_controls_total"
+                ]
+            },
+            "ComplianceDocEvent": {
+                "type": "object",
+                "properties": {
+                    "actor": {
+                        "type": "object",
+                        "properties": {
+                            "org": {
+                                "type": "string"
+                            },
+                            "user": {
+                                "description": "Limited information about member of organization\n\n Intended to be non-sensitive information only, that may be shared between tenants/partner\n tenants.",
+                                "type": "object",
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "org",
+                            "user"
+                        ]
+                    },
+                    "event": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "actor",
+                    "event",
+                    "timestamp"
                 ]
             },
             "ComplianceDocSummary": {

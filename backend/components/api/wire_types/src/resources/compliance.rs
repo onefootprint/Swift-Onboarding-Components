@@ -1,7 +1,7 @@
 use newtypes::{
-    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocStatus,
-    ComplianceDocSubmissionId, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
-    TenantCompliancePartnershipId,
+    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocReviewId,
+    ComplianceDocStatus, ComplianceDocSubmissionId, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
+    TenantCompliancePartnershipId, TenantKind,
 };
 
 use crate::*;
@@ -63,4 +63,54 @@ pub struct ComplianceDocRequest {
     pub description: String,
     pub requested_by_partner_tenant_user: LiteOrgMember,
     pub compliance_doc_id: ComplianceDocId,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocEvent {
+    pub timestamp: DateTime<Utc>,
+    pub actor: LiteUserAndOrg,
+    pub event: ComplianceDocEventType,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema, macros::SerdeAttr)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "kind", content = "data")]
+pub enum ComplianceDocEventType {
+    Requested(ComplianceDocEventRequested),
+    RequestRetracted {},
+    Submitted(ComplianceDocEventSubmitted),
+    Reviewed(ComplianceDocEventReviewed),
+    Assigned(ComplianceDocEventAssigned),
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocEventRequested {
+    pub template_id: Option<ComplianceDocTemplateId>,
+
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocEventSubmitted {
+    // TODO: add submission metadata
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocEventReviewed {
+    pub decision: ComplianceDocReviewDecision,
+    pub note: String,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocEventAssigned {
+    pub kind: TenantKind,
+
+    /// None if the doc is unassigned.
+    pub assigned_to: Option<LiteUserAndOrg>,
 }

@@ -285,3 +285,43 @@ def test_partner_document_flow(tenant, partner_tenant):
     documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["partner_tenant_assignee"] is None
+
+    # Get timeline events for the document.
+    events = get(f"compliance/partners/{partnership_id}/documents/{doc_id}/events", {}, *partner_tenant.ro_db_auths)
+    events = iter(events)
+
+    assert next(events)["event"]["kind"] == "requested"
+    assert next(events)["event"]["kind"] == "submitted"
+    assert next(events)["event"]["kind"] == "submitted"
+
+    e = next(events)
+    assert e["event"]["kind"] == "reviewed"
+    assert e["event"]["data"]["decision"] == "accepted"
+
+    e = next(events)
+    assert e["event"]["kind"] == "reviewed"
+    assert e["event"]["data"]["decision"] == "rejected"
+
+    assert next(events)["event"]["kind"] == "requested"
+    assert next(events)["event"]["kind"] == "request_retracted"
+
+    e = next(events)
+    assert e["event"]["kind"] == "assigned"
+    assert e["event"]["data"]["kind"] == "tenant"
+    assert e["event"]["data"]["assigned_to"] is not None
+    e = next(events)
+    assert e["event"]["kind"] == "assigned"
+    assert e["event"]["data"]["kind"] == "tenant"
+    assert e["event"]["data"]["assigned_to"] is None
+
+    e = next(events)
+    assert e["event"]["kind"] == "assigned"
+    assert e["event"]["data"]["kind"] == "partner_tenant"
+    assert e["event"]["data"]["assigned_to"] is not None
+    e = next(events)
+    assert e["event"]["kind"] == "assigned"
+    assert e["event"]["data"]["kind"] == "partner_tenant"
+    assert e["event"]["data"]["assigned_to"] is None
+
+    # There should be no more events.
+    assert len(list(events)) == 0

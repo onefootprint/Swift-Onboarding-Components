@@ -1,5 +1,6 @@
 use paperclip::actix::web;
 
+mod doc_events;
 mod doc_templates;
 mod documents;
 mod members;
@@ -14,6 +15,7 @@ mod tenant_assignment;
 use api_core::*;
 
 pub fn routes(config: &mut web::ServiceConfig) {
+    config.service(doc_events::get);
     config.service(doc_templates::delete);
     config.service(doc_templates::get);
     config.service(doc_templates::post);
@@ -22,11 +24,11 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config.service(documents::post);
     config.service(members::get);
     config.service(members::post);
-    config.service(partners::get);
-    config.service(tenant_assignment::post);
-    config.service(requests::delete);
     config.service(partner_tenant_assignment::post);
+    config.service(partners::get);
+    config.service(requests::delete);
     config.service(reupload::post);
-    config.service(submissions::post);
     config.service(reviews::post);
+    config.service(submissions::post);
+    config.service(tenant_assignment::post);
 }

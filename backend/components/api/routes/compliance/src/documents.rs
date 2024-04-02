@@ -21,7 +21,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 
 
 #[api_v2_operation(
-    description = "Returns a list of documents for a company partned with the authorized compliance partner.",
+    description = "Returns a list of documents for a company partnered with the authorized compliance partner.",
     tags(Compliance, Private)
 )]
 #[actix::get("/compliance/partners/{partnership_id}/documents")]
