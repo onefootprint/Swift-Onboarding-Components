@@ -30,7 +30,7 @@ jobs:
           # This data can be any valid JSON from a previous step in the GitHub Action
           payload: |
             {
-              "user": "${{ github.event.head_commit.author.name }}",
+              "user": "${{ github.event.head_commit.author.username }}",
               "url": "https://github.com/onefootprint/monorepo/commit/${{ github.sha }}/checks"
             }
         env:
