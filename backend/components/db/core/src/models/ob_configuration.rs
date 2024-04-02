@@ -490,7 +490,7 @@ impl ObConfiguration {
         let counts: Vec<_> = ob_configuration::table
             .filter(ob_configuration::is_live.eq(is_live))
             .filter(ob_configuration::tenant_id.eq_any(&tenant_ids))
-            .group_by(ob_configuration::id)
+            .group_by(ob_configuration::tenant_id)
             .select((
                 ob_configuration::tenant_id,
                 diesel::dsl::count(ob_configuration::id),
