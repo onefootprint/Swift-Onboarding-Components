@@ -30,6 +30,10 @@ export type PaginatedRequestResponse<T> = {
 const uuidPattern =
   /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g;
 
+const clientVersion = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
+  ? `frontend-${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`
+  : 'unknown';
+
 const LOGOUT_ERROR_CODES = ['E117', 'E118', 'E119'];
 // TODO (belce): retire matching on exact error string
 const LOGOUT_ERRORS = [
@@ -186,6 +190,7 @@ const getRequestOptions = (
     ...requestConfig,
     headers: {
       'x-fp-session-id': extraOptions.omitSessionId ? undefined : sessionId,
+      'x-fp-client-version': clientVersion,
       ...requestConfig.headers,
     },
   };
