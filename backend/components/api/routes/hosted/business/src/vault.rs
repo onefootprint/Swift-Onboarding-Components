@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::{
-    auth::user::UserAuthGuard,
+    auth::user::UserAuthScope,
     errors::ApiResult,
     types::{EmptyResponse, JsonApiResponse},
     utils::vault_wrapper::{Business, VaultWrapper},
@@ -32,7 +32,7 @@ pub async fn post_validate(
     user_auth: UserWfAuthContext,
     request: Json<RawDataRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let mut request = request.into_inner();
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
@@ -68,7 +68,7 @@ pub async fn patch(
     request: Json<RawDataRequest>,
     user_auth: UserWfAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
 

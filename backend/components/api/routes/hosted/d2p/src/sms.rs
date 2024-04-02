@@ -6,7 +6,7 @@ use crate::{
     State,
 };
 use api_core::{
-    auth::user::UserAuthGuard, errors::user::UserError, utils::vault_wrapper::Person, ApiErrorKind,
+    auth::user::UserAuthScope, errors::user::UserError, utils::vault_wrapper::Person, ApiErrorKind,
 };
 use newtypes::{sms_message::SmsMessage, ContactInfoKind, PhoneNumber, PiiString};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -32,7 +32,7 @@ pub async fn handler(
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<D2pSmsResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Handoff)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let uvw = state
         .db_pool

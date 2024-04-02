@@ -21,11 +21,10 @@ pub fn get(
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<GetUserTokenResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(Any)?;
-    let scopes = user_auth.scopes.iter().map(|x| x.into()).collect();
 
     Ok(Json(ResponseData::ok(GetUserTokenResponse {
         expires_at: user_auth.expires_at(),
-        scopes,
+        scopes: user_auth.data.session.scopes,
     })))
 }
 

@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
-pub use newtypes::UserAuthGuard;
-use newtypes::{AuthEventKind, RequestedTokenScope, UserAuthScope, VaultId};
+pub use newtypes::UserAuthScope;
+use newtypes::{AuthEventKind, RequestedTokenScope, VaultId};
 
 mod session;
 pub use session::*;

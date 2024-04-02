@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuthContext, UserAuthGuard},
+    auth::user::{UserAuthContext, UserAuthScope},
     types::response::ResponseData,
 };
 use api_core::{
@@ -20,7 +20,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<Vec<api_wire_types::AuthMethod>> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Auth.or(UserAuthGuard::SignUp))?;
+    let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
     let limit_auth_methods = user_auth
         .data
         .purposes

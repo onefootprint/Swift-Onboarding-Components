@@ -1,4 +1,4 @@
-use crate::{auth::user::UserAuthGuard, types::response::ResponseData};
+use crate::{auth::user::UserAuthScope, types::response::ResponseData};
 use api_core::{auth::user::UserWfAuthContext, decision, types::JsonApiResponse, State};
 use api_wire_types::DocumentResponse;
 use newtypes::{IdentityDocumentId, WorkflowGuard};
@@ -14,7 +14,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     doc_id: web::Path<IdentityDocumentId>,
 ) -> JsonApiResponse<DocumentResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let t_id = user_auth.scoped_user.tenant_id.clone();
     let wf = user_auth.workflow();

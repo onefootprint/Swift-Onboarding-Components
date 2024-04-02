@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::UserAuthGuard,
+    auth::user::UserAuthScope,
     errors::{ApiError, ApiResult},
     types::response::{EmptyResponse, ResponseData},
     utils::{self, file_upload, vault_wrapper::VaultWrapper},
@@ -24,7 +24,7 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let kind = DocumentKind::try_from(document_identifier.into_inner())?;
 
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     // Specifically check for AddData permission here since this is used only for investor profile
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let file = file_upload::handle_file_upload(

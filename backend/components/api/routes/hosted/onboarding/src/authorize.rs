@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::UserAuthGuard,
+    auth::user::UserAuthScope,
     errors::{onboarding::OnboardingError, ApiResult},
     types::response::ResponseData,
     State,
@@ -20,7 +20,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 )]
 #[actix::post("/hosted/onboarding/authorize")]
 pub async fn post(user_auth: UserWfAuthContext, state: web::Data<State>) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let span = tracing::Span::current();
     span.record("tenant_id", &format!("{:?}", user_auth.tenant().id.as_str()));

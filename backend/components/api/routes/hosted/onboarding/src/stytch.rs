@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuthContext, UserAuthGuard},
+    auth::user::{UserAuthContext, UserAuthScope},
     types::{EmptyResponse, JsonApiResponse},
     State,
 };
@@ -43,7 +43,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     telemetry_headers: TelemetryHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let StytchTelemetryRequest { telemetry_id } = request.into_inner();
 
     let req = StytchLookupRequest { telemetry_id };

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{challenge::RegisterChallenge, State};
 use api_core::{
     auth::{
-        user::{CheckedUserAuthContext, UserAuth, UserAuthContext, UserAuthGuard},
+        user::{CheckedUserAuthContext, UserAuth, UserAuthContext, UserAuthScope},
         IsGuardMet,
     },
     errors::{error_with_code::ErrorWithCode, ApiResult, AssertionError, ValidationError},
@@ -48,7 +48,7 @@ pub async fn post(
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth
-        .check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth.or(UserAuthGuard::SignUp)))?;
+        .check_guard(UserAuthScope::ExplicitAuth.and(UserAuthScope::Auth.or(UserAuthScope::SignUp)))?;
     let sv_id = user_auth
         .scoped_user_id()
         .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;

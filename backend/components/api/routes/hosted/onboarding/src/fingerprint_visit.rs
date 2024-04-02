@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuth, UserAuthContext, UserAuthGuard},
+    auth::user::{UserAuth, UserAuthContext, UserAuthScope},
     errors::ApiError,
     types::{EmptyResponse, JsonApiResponse},
     utils::headers::TelemetryHeaders,
@@ -21,7 +21,7 @@ pub async fn post(
     telemetry_headers: TelemetryHeaders,
     request: Json<FingerprintVisitRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let FingerprintVisitRequest {
         visitor_id,

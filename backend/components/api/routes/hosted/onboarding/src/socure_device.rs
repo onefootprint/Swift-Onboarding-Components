@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::UserAuthGuard,
+    auth::user::UserAuthScope,
     errors::ApiError,
     types::{EmptyResponse, JsonApiResponse},
     State,
@@ -20,7 +20,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     request: Json<SocureDeviceSessionIdRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let wf_id = user_auth.workflow().id.clone();
 
     let SocureDeviceSessionIdRequest { device_session_id } = request.into_inner();

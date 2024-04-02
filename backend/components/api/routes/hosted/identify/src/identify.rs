@@ -104,7 +104,6 @@ pub async fn post(
     } else {
         create_identified_token(&state, v_id, scope, sv, ob_context).await?
     };
-    let token_scopes = token_scopes.into_iter().map(|x| x.into()).collect();
 
     let dis = vec![
         DataIdentifier::Id(IDK::PhoneNumber),

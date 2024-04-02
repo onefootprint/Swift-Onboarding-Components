@@ -1,12 +1,12 @@
 use crate::{
-    auth::user::UserAuthGuard, decision, errors::onboarding::OnboardingError, types::response::ResponseData,
+    auth::user::UserAuthScope, decision, errors::onboarding::OnboardingError, types::response::ResponseData,
     State,
 };
 use api_core::{
     auth::user::{CheckUserWfAuthContext, UserWfAuthContext},
     decision::state::{
-        actions::WorkflowActions, document::DocumentState, kyc::KycState,
-        DocCollected, RunIncodeMachineAndWorkflowResult, WorkflowKind, WorkflowWrapper,
+        actions::WorkflowActions, document::DocumentState, kyc::KycState, DocCollected,
+        RunIncodeMachineAndWorkflowResult, WorkflowKind, WorkflowWrapper,
     },
     errors::{workflow::WorkflowError, ApiResult},
     types::{EmptyResponse, JsonApiResponse},
@@ -35,7 +35,7 @@ pub async fn post(
     state: web::Data<State>,
     request: OptionalJson<ProcessRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
 
     // Verify there are no unmet requirements

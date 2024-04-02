@@ -1,7 +1,7 @@
 use crate::{
     auth::{
         session::UpdateSession,
-        user::{UserAuth, UserAuthContext, UserAuthGuard},
+        user::{UserAuth, UserAuthContext, UserAuthScope},
         AuthError,
     },
     errors::{onboarding::OnboardingError, ApiError},
@@ -39,7 +39,7 @@ pub async fn post(
     ob_pk_auth: Option<ObConfigAuth>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<OnboardingResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let scoped_user_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
     let uv_id = user_auth.user_vault_id().clone();

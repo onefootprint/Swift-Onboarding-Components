@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuth, UserAuthContext, UserAuthGuard},
+    auth::user::{UserAuth, UserAuthContext, UserAuthScope},
     types::response::ResponseData,
     utils::db2api::DbToApi,
     State,
@@ -19,7 +19,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<AuthorizedOrgsResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::BasicProfile)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::BasicProfile)?;
 
     // TODO this could return duplicate tenants if the user onboarded onto multiple OBCs
     let obs = state

@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::UserAuthGuard, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi, State,
+    auth::user::UserAuthScope, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi, State,
 };
 use api_core::{auth::user::UserWfAuthContext, utils::requirements::GetRequirementsArgs};
 use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse};
@@ -15,7 +15,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
         &state,

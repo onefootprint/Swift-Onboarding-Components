@@ -4,7 +4,7 @@ use api_core::{
     types::{JsonApiResponse, ResponseData},
 };
 use api_wire_types::hosted::neuro_id::NeuroIdentityIdResponse;
-use newtypes::{NeuroIdentityId, UserAuthGuard};
+use newtypes::{NeuroIdentityId, UserAuthScope};
 use paperclip::actix::{self, api_v2_operation, web};
 
 
@@ -14,7 +14,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 )]
 #[actix::get("/hosted/onboarding/nid")]
 pub async fn get(user_auth: UserAuthContext) -> JsonApiResponse<NeuroIdentityIdResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let wf_id = user_auth
         .workflow_id()

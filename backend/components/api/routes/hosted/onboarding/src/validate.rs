@@ -1,6 +1,6 @@
 use api_core::{
     auth::{
-        user::{load_auth_events, UserAuthContext, UserAuthGuard, UserIdentifier, UserWfAuthContext},
+        user::{load_auth_events, UserAuthContext, UserAuthScope, UserIdentifier, UserWfAuthContext},
         IsGuardMet,
     },
     errors::{onboarding::OnboardingError, AssertionError},
@@ -30,7 +30,7 @@ pub async fn post(
 ) -> JsonApiResponse<HostedValidateResponse> {
     let (wf, sv_id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
         // We're generating a token after onboarding has finished
-        let user_wf_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp)?;
+        let user_wf_auth = user_wf_auth.check_guard(UserAuthScope::SignUp)?;
 
         // Verify there are no unmet requirements
         let args = GetRequirementsArgs::from(&user_wf_auth)?;
@@ -46,7 +46,7 @@ pub async fn post(
         (Some(wf), sv_id, user_wf_auth.data.user_session)
     } else {
         // We're generating a token after auth has finished
-        let user_auth = user_auth.check_guard(UserAuthGuard::Auth.or(UserAuthGuard::SignUp))?;
+        let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
         let sv_id = user_auth
             .scoped_user_id()
             .ok_or(AssertionError("No scoped user associated with auth session"))?;

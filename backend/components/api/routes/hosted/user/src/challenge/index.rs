@@ -3,7 +3,7 @@ use crate::{challenge::RegisterChallenge, State};
 use api_core::{
     auth::{
         session::user::{AssociatedAuthEventKind, TokenCreationPurpose},
-        user::{load_auth_events, UserAuthContext, UserAuthGuard},
+        user::{load_auth_events, UserAuthContext, UserAuthScope},
         IsGuardMet,
     },
     errors::{AssertionError, ValidationError},
@@ -29,7 +29,7 @@ pub async fn post(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<UserChallengeResponse> {
     let user_auth = user_auth
-        .check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth.or(UserAuthGuard::SignUp)))?;
+        .check_guard(UserAuthScope::ExplicitAuth.and(UserAuthScope::Auth.or(UserAuthScope::SignUp)))?;
     let UserChallengeRequest {
         phone_number,
         email,

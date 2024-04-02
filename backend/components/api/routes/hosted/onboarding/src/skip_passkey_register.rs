@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::UserAuthGuard,
+    auth::user::UserAuthScope,
     errors::ApiError,
     types::{EmptyResponse, JsonApiResponse},
     utils::headers::InsightHeaders,
@@ -22,7 +22,7 @@ pub async fn post(
     insights: InsightHeaders,
     request: OptionalJson<SkipPasskeyRegisterRequest, true>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let skip_context = request.0.and_then(|r| r.context);
     // Will use this to make sure all clients are sending context before we make required

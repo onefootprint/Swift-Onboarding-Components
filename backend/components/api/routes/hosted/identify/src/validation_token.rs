@@ -1,6 +1,6 @@
 use api_core::{
     auth::{
-        user::{UserAuthContext, UserAuthGuard},
+        user::{UserAuthContext, UserAuthScope},
         IsGuardMet,
     },
     errors::ValidationError,
@@ -21,7 +21,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<HostedValidateResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Auth.or(UserAuthGuard::SignUp))?;
+    let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
 
     if let Some(obc) = user_auth.ob_config() {
         if obc.kind == ObConfigurationKind::Auth {

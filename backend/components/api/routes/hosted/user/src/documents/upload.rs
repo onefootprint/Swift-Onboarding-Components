@@ -1,4 +1,4 @@
-use crate::{auth::user::UserAuthGuard, decision, types::response::ResponseData, State};
+use crate::{auth::user::UserAuthScope, decision, types::response::ResponseData, State};
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::{
@@ -37,7 +37,7 @@ pub async fn post(
     .await?;
 
     let (document_id, side) = args.into_inner();
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let wf = user_auth.workflow().clone();
     let tenant_id = user_auth.tenant().id.clone();

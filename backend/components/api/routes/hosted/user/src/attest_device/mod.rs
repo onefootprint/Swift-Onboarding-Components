@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuthContext, UserAuthGuard},
+    auth::user::{UserAuthContext, UserAuthScope},
     errors::ApiError,
     types::{EmptyResponse, JsonApiResponse},
     State,
@@ -49,7 +49,7 @@ pub async fn post_challenge(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<DeviceAttestationChallengeResponse> {
-    let _ = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let _ = user_auth.check_guard(UserAuthScope::SignUp)?;
     let GetDeviceAttestationChallengeRequest {
         device_type,
         ios_bundle_id,
@@ -91,7 +91,7 @@ pub async fn post_attestation(
     user_auth: UserAuthContext,
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let CreateDeviceAttestationRequest {
         attestation,

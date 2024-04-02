@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::UserAuthGuard,
+    auth::user::UserAuthScope,
     errors::{ApiError, ApiResult},
     types::{response::ResponseData, EmptyResponse},
     utils::headers::InsightHeaders,
@@ -22,7 +22,7 @@ pub async fn post(
     insight: InsightHeaders,
     request: Json<ConsentRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let wf_id = user_auth.workflow().clone();
 
     let ConsentRequest {

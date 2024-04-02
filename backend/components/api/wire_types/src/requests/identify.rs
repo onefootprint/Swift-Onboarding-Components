@@ -1,6 +1,6 @@
 use newtypes::{
     email::Email, AuthMethodKind, ChallengeKind, ChallengeToken, DataIdentifier, IdentifyScope, PhoneNumber,
-    PiiString, SessionAuthToken, UserAuthGuard,
+    PiiString, SessionAuthToken, UserAuthScope,
 };
 
 use crate::*;
@@ -35,7 +35,7 @@ pub struct IdentifyResponse {
 pub struct IdentifiedUser {
     pub token: SessionAuthToken,
     /// The scopes of the returned token
-    pub token_scopes: Vec<UserAuthGuard>,
+    pub token_scopes: Vec<UserAuthScope>,
     pub available_challenge_kinds: Vec<ChallengeKind>,
     pub auth_methods: Vec<IdentifyAuthMethod>,
     /// Signals that one or more biometric credentials support syncing and may be available to use on desktop/other devices

@@ -1,8 +1,5 @@
 use crate::{
-    auth::{
-        user::{UserAuthContext, UserAuthGuard},
-        AuthError,
-    },
+    auth::{user::UserAuthContext, AuthError},
     errors::ApiError,
     types::response::ResponseData,
     utils::session::{AuthSession, HandoffRecord, JsonSession},
@@ -34,8 +31,8 @@ pub async fn handler(
     request: Option<web::Json<D2pGenerateRequest>>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<D2pGenerateResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
-    if UserAuthGuard::Handoff.is_met(&user_auth.data.scopes) {
+    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+    if UserAuthScope::Handoff.is_met(&user_auth.data.scopes) {
         // Don't allow making a handoff token with an existing handoff token. This allows subverting
         // token expiry by constantly just making a new one
         return Err(AuthError::CannotCreateMultipleHandoffTokens.into());

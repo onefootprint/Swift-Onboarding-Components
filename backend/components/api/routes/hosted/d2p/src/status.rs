@@ -5,7 +5,7 @@ use crate::{
     utils::session::{HandoffRecord, JsonSession},
     State,
 };
-use api_core::{auth::user::UserAuthGuard, errors::error_with_code::ErrorWithCode};
+use api_core::{auth::user::UserAuthScope, errors::error_with_code::ErrorWithCode};
 use api_wire_types::{D2pStatusResponse, D2pUpdateStatusRequest};
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
@@ -19,7 +19,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<D2pStatusResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Handoff)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let session = state
         .db_pool
@@ -45,7 +45,7 @@ pub async fn post(
     request: Json<D2pUpdateStatusRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Handoff)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let D2pUpdateStatusRequest { status } = request.into_inner();
     state

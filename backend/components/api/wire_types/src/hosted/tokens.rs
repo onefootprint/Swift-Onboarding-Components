@@ -1,11 +1,10 @@
 use chrono::{DateTime, Utc};
-use newtypes::{RequestedTokenScope, SessionAuthToken, UserAuthGuard};
+use newtypes::{RequestedTokenScope, SessionAuthToken, UserAuthScope};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct GetUserTokenResponse {
-    // NOTE: this must be UserAuthGuard, UserAuthScope's serialization is messed up.
-    pub scopes: Vec<UserAuthGuard>,
+    pub scopes: Vec<UserAuthScope>,
     pub expires_at: DateTime<Utc>,
 }
 
