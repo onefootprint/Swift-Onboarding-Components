@@ -106,7 +106,11 @@ pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> ApiResult<Opti
 }
 
 #[tracing::instrument(skip(state))]
-pub async fn run_neuro_check(state: &State, wf_id: &WorkflowId) -> ApiResult<Option<VendorResult>> {
+pub async fn run_neuro_check(
+    state: &State,
+    wf_id: &WorkflowId,
+    t_id: &TenantId,
+) -> ApiResult<Option<VendorResult>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
         .db_pool
@@ -121,7 +125,7 @@ pub async fn run_neuro_check(state: &State, wf_id: &WorkflowId) -> ApiResult<Opt
             Ok((wf, di))
         })
         .await?;
-    run_neuro_call(state, &di, &wf.id).await
+    run_neuro_call(state, &di, &wf.id, t_id).await
 }
 
 

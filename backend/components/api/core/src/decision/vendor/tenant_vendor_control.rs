@@ -31,7 +31,6 @@ pub struct TenantVendorControl {
     tenant_id: TenantId,
     tenant_name: String,
     tbi: Option<newtypes::TenantBusinessInfo>,
-    #[allow(unused)]
     neuro_id_api_key: NeuroIdApiKey,
 }
 
@@ -89,6 +88,10 @@ impl TenantVendorControl {
 
     pub fn tenant_business_info(&self) -> Option<newtypes::TenantBusinessInfo> {
         self.tbi.clone()
+    }
+
+    pub fn neuro_api_key(&self) -> NeuroIdApiKey {
+        self.neuro_id_api_key.clone()
     }
 
     // Requests

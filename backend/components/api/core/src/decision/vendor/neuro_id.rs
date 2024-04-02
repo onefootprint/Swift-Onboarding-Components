@@ -5,13 +5,20 @@ use crate::{
 };
 use db::models::{decision_intent::DecisionIntent, verification_request::VerificationRequest};
 use idv::{
-    neuro_id::response::{NeuroAPIResult, NeuroApiResponse, NeuroIdAnalyticsResponse},
+    neuro_id::{
+        response::{NeuroApiResponse, NeuroIdAnalyticsResponse},
+        NeuroIdAnalyticsRequest,
+    },
     ParsedResponse, VendorResponse,
 };
-use newtypes::{DecisionIntentId, ScopedVaultId, VaultPublicKey, VendorAPI, WorkflowId};
+use newtypes::{
+    vendor_credentials::{NeuroIdCredentials, NeuroIdSiteId},
+    DecisionIntentId, NeuroIdentityId, ScopedVaultId, TenantId, VaultPublicKey, VendorAPI, WorkflowId,
+};
 
 use super::{
     map_to_api_error,
+    tenant_vendor_control::TenantVendorControl,
     vendor_result::VendorResult,
     verification_result::{SaveVerificationResultArgs, ShouldSaveVerificationRequest},
 };
@@ -68,6 +75,7 @@ pub async fn run_neuro_call(
     state: &State,
     di: &DecisionIntent,
     wf_id: &WorkflowId,
+    t_id: &TenantId,
 ) -> ApiResult<Option<VendorResult>> {
     let di_id = di.id.clone();
     let svid = di.scoped_vault_id.clone();
@@ -91,25 +99,17 @@ pub async fn run_neuro_call(
         return Ok(existing_vendor_result);
     }
 
-    // TODO: add to TVC and actually make call
-    // let credentials = NeuroIdCredentials {
-    //     api_key: "test".into(),
-    //     site_id: "form_humor717".into(),
-    // };
-    // let id = NeuroIdentityId::try_from(wf_id.clone())
-    //     .map_err(|_| ApiErrorKind::AssertionError("could not convert wf_id to NeuroIdentityId".into()))?;
+    let tvc =
+        TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.config, &state.enclave_client).await?;
+    // TODO: get this site_id from a playbook config somewhere
+    let credentials = NeuroIdCredentials::new(tvc.neuro_api_key(), NeuroIdSiteId("form_humor717".into()));
+    let id = NeuroIdentityId::from(di.scoped_vault_id.clone());
 
-    // let res = state
-    //     .vendor_clients
-    //     .neuro_id
-    //     .make_request(NeuroIdAnalyticsRequest { credentials, id })
-    //     .await;
-    let raw_response = idv::test_fixtures::neuro_id_success_response();
-    let deser = serde_json::from_value(raw_response.clone())?;
-    let res = Ok(NeuroApiResponse {
-        result: NeuroAPIResult::Success(deser),
-        raw_response: raw_response.into(),
-    });
+    let res = state
+        .vendor_clients
+        .neuro_id
+        .make_request(NeuroIdAnalyticsRequest { credentials, id })
+        .await;
 
     let args = SaveVerificationResultArgs::new_for_neuro(
         &res,

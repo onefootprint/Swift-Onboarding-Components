@@ -175,7 +175,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             .feature_flag_client
             .flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
         let neuro_result = if is_neuro_enabled {
-            match common::run_neuro_check(state, &self.wf_id).await {
+            match common::run_neuro_check(state, &self.wf_id, &self.t_id).await {
                 Ok(res) => res,
                 Err(err) => {
                     tracing::error!(?err, wf_id=?self.wf_id, "error running NeuroID");
