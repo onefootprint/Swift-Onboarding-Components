@@ -84,6 +84,13 @@ pub async fn patch(
     let updates = updates.build_fingerprints(&state.enclave_client, t_id).await?;
 
     let su_id = user_auth.scoped_user.id.clone();
+    // TODO one day have a separate source for bootstrap too
+    let source = if user_auth.user_session.is_derived_from_components() {
+        // Denote when data was added via components SDK, since it could be tampered with
+        DataLifetimeSource::ComponentsSdk
+    } else {
+        DataLifetimeSource::Hosted
+    };
     let new_ci = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -91,9 +98,7 @@ pub async fn patch(
 
             // Even though this accepts id.phone_number, it will always error at runtime if we
             // provide id.phone_number since we only allow a vault to have one phone number
-            let new_contact_info = uvw
-                .patch_data(conn, updates, DataLifetimeSource::Hosted, None)?
-                .new_ci;
+            let new_contact_info = uvw.patch_data(conn, updates, source, None)?.new_ci;
             Ok(new_contact_info)
         })
         .await?;

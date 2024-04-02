@@ -157,6 +157,7 @@ impl VaultWrapper<Person> {
             .flatten()
             .collect();
         let request = request.manual_fingerprints(fingerprints);
+        // TODO this could be bootstrapped
         let source = DataLifetimeSource::Hosted;
         let result = uvw.patch_data(conn, request, source, None)?;
 

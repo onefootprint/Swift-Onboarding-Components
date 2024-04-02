@@ -36,6 +36,8 @@ pub enum DataLifetimeSource {
     Ocr,
     /// Vaulted via portable data from another tenant
     Prefill,
+    /// Vaulted via an auth token issued for the components SDK
+    ComponentsSdk,
     /// Just for events that aren't backfilled
     Unknown,
 }
