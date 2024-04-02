@@ -927,13 +927,13 @@
       "requirements": {
         "title": {
           "liveness": "Agrega tu passkey",
-          "id-doc": "Sube una imagen de tu identificación",
+          "id-doc": "Sube una imagen de {{documentKind}}",
           "liveness-with-id-doc": "Continúa en tu teléfono"
         },
         "subtitle": {
           "liveness": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar tu passkey.",
-          "id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para subir una imagen de tu ID.",
-          "liveness-with-id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar tu passkey y subir una imagen de tu ID."
+          "id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para subir tu {{documentKind}}.",
+          "liveness-with-id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar tu passkey y subir una imagen de tu {{documentKind}}."
         }
       }
     },
@@ -1004,6 +1004,12 @@
     }
   },
   "id-doc": {
+    "document-request-kind": {
+      "identity": "identificación",
+      "proof_of_address": "comprobante de domicilio",
+      "proof_of_ssn": "tarjeta de SSN",
+      "unknown": "documento"
+    },
     "components": {
       "media-errors": {
         "not-found": "No pudimos encontrar una cámara en tu dispositivo. Por favor, usa uno que tenga cámara para continuar la verificación.",
@@ -1257,10 +1263,7 @@
         }
       },
       "country-and-type-selection": {
-        "title": {
-          "id": "Escanear o subir tu identificación",
-          "poa": "Escanee o cargue su comprobante de domicilio."
-        },
+        "title": "Escanear o subir tu {{documentKind}}",
         "subtitle": "Necesitamos más información sobre tu identidad.",
         "form": {
           "country": "País",

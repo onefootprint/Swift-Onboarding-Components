@@ -451,7 +451,7 @@ describe('<Idv />', () => {
       });
       expect(
         screen.getByText(
-          'Open the link sent to your phone and follow the prompts to upload an ID document.',
+          'Open the link sent to your phone and follow the prompts to upload your ID document.',
         ),
       ).toBeInTheDocument();
     });
@@ -498,10 +498,12 @@ describe('<Idv />', () => {
 
       // Should render id doc requirement
       await waitFor(() => {
-        expect(screen.getByText('Scan or upload your ID')).toBeInTheDocument();
+        expect(
+          screen.getByText('Scan or upload your ID document'),
+        ).toBeInTheDocument();
       });
       expect(
-        screen.getByText('We need some more information about your identity.'),
+        screen.getByText('We need some more information from you.'),
       ).toBeInTheDocument();
     });
   });

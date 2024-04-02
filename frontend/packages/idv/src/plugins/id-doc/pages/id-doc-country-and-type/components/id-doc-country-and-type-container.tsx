@@ -26,6 +26,7 @@ import useIdvRequestErrorToast from '../../../../../hooks/ui/use-idv-request-err
 import Logger from '../../../../../utils/logger';
 import ConsentMobile from '../../../components/id-doc-photo-prompt/components/consent-mobile';
 import { useIdDocMachine } from '../../../components/machine-provider';
+import useGetDocumentRequestLabel from '../../../hooks/use-get-document-request-label';
 import useSubmitDocType from '../../../hooks/use-submit-doc-type';
 import detectWebcam from '../../../utils/detect-webcam';
 import { getCountryFromCode } from '../../../utils/get-country-from-code';
@@ -74,7 +75,7 @@ const IdDocCountryAndTypeContainer = ({
     sandboxOutcome,
     device,
     supportedCountryAndDocTypes,
-    requirement: { shouldCollectConsent: consentRequired },
+    requirement: { shouldCollectConsent: consentRequired, documentRequestKind },
   } = state.context;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
   const supportedCountries = new Set(
@@ -93,10 +94,11 @@ const IdDocCountryAndTypeContainer = ({
   const [country, setCountry] = useState<CountryRecord>(
     getCountryFromCode(defaultCountry) ?? defaultSupportedCountry,
   );
+  const getDocumentRequestLabel = useGetDocumentRequestLabel();
+  const documentKind = getDocumentRequestLabel(documentRequestKind);
 
   const types: SupportedIdDocTypes[] =
     supportedCountryAndDocTypes[country.value] ?? [];
-  const isPoA = types.includes(SupportedIdDocTypes.proofOfAddress);
   const firstTypeFromOptions = types.length
     ? types[0]
     : SupportedIdDocTypes.passport;
@@ -184,7 +186,7 @@ const IdDocCountryAndTypeContainer = ({
         }
       />
       <HeaderTitle
-        title={isPoA ? t('title.poa') : t('title.id')}
+        title={t('title', { documentKind })}
         subtitle={t('subtitle')}
       />
       <InputsContainer>

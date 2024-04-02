@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import useGetDocumentRequestLabel from '../../id-doc/hooks/use-get-document-request-label';
 import type { TransferRequirements } from '../types';
 
 const useRequirementsTitle = (
@@ -9,6 +10,7 @@ const useRequirementsTitle = (
   const { t } = useTranslation('idv', {
     keyPrefix: 'transfer.components.requirements',
   });
+  const getDocumentRequestLabel = useGetDocumentRequestLabel();
   const { liveness, idDoc } = missingRequirements;
 
   const transferringLiveness = !!liveness;
@@ -16,20 +18,24 @@ const useRequirementsTitle = (
   const transferringIdDoc = !!idDoc && !isContinuingOnDesktop;
 
   if (transferringLiveness && transferringIdDoc) {
+    const documentKind = getDocumentRequestLabel(idDoc.documentRequestKind);
     return {
-      title: t('title.liveness-with-id-doc'),
-      linkSentToPhoneSubtitle: t('subtitle.liveness-with-id-doc'),
+      title: t('title.liveness-with-id-doc', { documentKind }),
+      linkSentToPhoneSubtitle: t('subtitle.liveness-with-id-doc', {
+        documentKind,
+      }),
     };
   }
-  if (transferringLiveness) {
+  if (transferringIdDoc) {
+    const documentKind = getDocumentRequestLabel(idDoc.documentRequestKind);
     return {
-      title: t('title.liveness'),
-      linkSentToPhoneSubtitle: t('subtitle.liveness'),
+      title: t('title.id-doc', { documentKind }),
+      linkSentToPhoneSubtitle: t('subtitle.id-doc', { documentKind }),
     };
   }
   return {
-    title: t('title.id-doc'),
-    linkSentToPhoneSubtitle: t('subtitle.id-doc'),
+    title: t('title.liveness'),
+    linkSentToPhoneSubtitle: t('subtitle.liveness'),
   };
 };
 

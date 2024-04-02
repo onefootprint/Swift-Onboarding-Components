@@ -21,6 +21,7 @@ const DesktopHeader = ({ type, imageType, country }: DesktopHeaderProps) => {
 
   const side = getImageSideLabel(imageType, type);
 
+  // TODO: these probably need to be translated
   const typeLabel = type ? IdDocTypeToLabel[type] : '';
   const countryName = getCountryFromCode(country)?.label;
   const docName = t('title.doc-name.id-doc', {

@@ -926,13 +926,13 @@
       "requirements": {
         "title": {
           "liveness": "Add a passkey",
-          "id-doc": "Scan or upload ID document",
+          "id-doc": "Scan or upload {{documentKind}}",
           "liveness-with-id-doc": "Continue on your mobile phone"
         },
         "subtitle": {
           "liveness": "Open the link sent to your phone and follow the prompts to register a passkey.",
-          "id-doc": "Open the link sent to your phone and follow the prompts to upload an ID document.",
-          "liveness-with-id-doc": "Open the link sent to your phone and follow the prompts to upload your ID document and register your passkey."
+          "id-doc": "Open the link sent to your phone and follow the prompts to upload your {{documentKind}}.",
+          "liveness-with-id-doc": "Open the link sent to your phone and follow the prompts to upload your {{documentKind}} and register your passkey."
         }
       }
     },
@@ -1003,6 +1003,12 @@
     }
   },
   "id-doc": {
+    "document-request-kind": {
+      "identity": "ID document",
+      "proof_of_address": "proof of address",
+      "proof_of_ssn": "proof of SSN",
+      "unknown": "document"
+    },
     "components": {
       "media-errors": {
         "not-found": "We couldn't find a camera on your device. Please use another device.",
@@ -1256,11 +1262,8 @@
         }
       },
       "country-and-type-selection": {
-        "title": {
-          "id": "Scan or upload your ID",
-          "poa": "Scan or upload your proof of address"
-        },
-        "subtitle": "We need some more information about your identity.",
+        "title": "Scan or upload your {{documentKind}}",
+        "subtitle": "We need some more information from you.",
         "form": {
           "country": "Country",
           "hint": {
