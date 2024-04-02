@@ -3,6 +3,10 @@
     "errors": {}
   },
   "components": {
+    "case-study-banner": {
+      "text": "Footprint helps Bloom make an additional $500k/year.",
+      "cta": "Read case study"
+    },
     "developer-experience": {
       "title": "Developer experience like no other",
       "subtitle": "Just five lines of code, Footprint is quick and easy to integrate into your product",
@@ -122,9 +126,9 @@
             }
           }
         },
-        "compare": {
-          "text": "Compare",
-          "href": "/compare"
+        "case-studies": {
+          "text": "Case studies",
+          "href": "/case-studies"
         },
         "pricing": {
           "text": "Pricing",

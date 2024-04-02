@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { CASE_STUDY_BANNER_PORTAL_ID } from '../layout/case-study-banner';
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
 import type { NavEntry } from './types';
@@ -53,7 +54,10 @@ const Navbar = () => {
         },
       ],
     },
-    { text: t('entries.compare.text'), href: t('entries.compare.href') },
+    // {
+    //   text: t('entries.case-studies.text'),
+    //   href: t('entries.case-studies.href'),
+    // },
     { text: t('entries.pricing.text'), href: t('entries.pricing.href') },
     { text: t('entries.docs.text'), href: t('entries.docs.href') },
     {
@@ -109,6 +113,7 @@ const Navbar = () => {
       isFloating={hasScroll && isFloatingEnabled}
       $isOnDarkSection={isOnDarkSection}
     >
+      <div id={CASE_STUDY_BANNER_PORTAL_ID} />
       <Container>
         <Inner id="navbar">
           <MobileNav

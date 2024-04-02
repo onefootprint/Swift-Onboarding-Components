@@ -1,0 +1,74 @@
+import { CaseStudyLayout } from './components/case-study-layout';
+import { IcoMountain24, IcoLightBulb24 } from '@onefootprint/icons';
+import { Stack } from '@onefootprint/ui';
+import { Challenge } from './components/challenge';
+import { IconTitle } from './components/icon-title';
+import { Banner } from './components/banner';
+import { Result } from './components/result';
+import { Quote } from './components/quote';
+import SEO from 'src/components/seo';
+
+<SEO
+  title="Bloom Case Study"
+  description="Bloom is an investment and education platform to help GenZ build wealth. The company offers engaging and interactive lessons paired with a brokerage account to let teens and college students learn how to invest. Recognized as an industry leader, Bloom has over one million users and more than 25 thousand five-star reviews on the app store. They have been highlighted by publications such as Forbes, Fast Company, and Yahoo Finance for their work to transform how younger people int his country view and interact with their wealth."
+  image="/customer-stories/bloom-og.png"
+/>
+
+<CaseStudyLayout
+  companyDetails={{
+    name: 'Bloom',
+    industry: "Investment Platform",
+    website: "https://www.bloomapp.com/",
+    logo: "/customer-stories/bloom-logo.png",
+    customerSince: "2023",
+    title: "Footprint helps Bloom increase onboarding completions by 150%",
+    subtitle: "Through Footprint's integration, Bloom significantly enhanced its onboarding process, leading to an increase in completions and earning recognition from top publications."
+}}>
+
+Bloom is an investment and education platform to help GenZ build wealth. The company offers engaging and interactive lessons paired with a brokerage account to let teens and college students learn how to invest. Recognized as an industry leader, Bloom has over one million users and more than 25 thousand five-star reviews on the app store. They have been highlighted by publications such as Forbes, Fast Company, and Yahoo Finance for their work to transform how younger people int his country view and interact with their wealth.
+
+<Challenge>
+  - Investment platforms have some of the most complex CIPs and onboarding flows, often requiring step-ups to secondary documents. These stem from the broker-dealers they work with. Bloom works with [Alpaca](https://alpaca.markets).
+  - Bloom, previously using a third-party solution that packaged Trulioo and Onfido, saw auto-approval rates hover in the 60% range, preventing them from onboarding potential users
+  - More than half of users who failed initial non-documentary KYC and required identity document collection, would not come back to the platform
+  - Bloom needed a platform that could bring together KYC, document scanning, case management, and PII Security into an easy-to-use solution
+
+</Challenge>
+
+#### Integrating with Footprint
+
+Integrating KYC, Identity Document Verification, and Security tools is often a cumbersome process. We try to be different. Bloom co-founder and CPO Sam Yang called Footprint his “best integration experience since Stripe.” Footprint is a fully built onboarding component optimized for conversion and compliance. With Footprint, you do not need to code the logic to launch a document scanner or ask a user for an SSN card. Instead, you configure Footprint with what data to collect and rules to apply and we will do the rest.
+
+In the case of onboarding your users to an investment platform, Footprint works with several Broker Dealers to automatically generate and apply the proper rules to satisfy a given CIP and then allows you to proxy the results to the BD with the same integration.
+
+#### Navigating Broker Dealer CIPs
+
+Footprint’s onboarding UX seamlessly integrates with broker-dealer endpoints. The platform dynamically collects all information (including Drivers Licenses, Passports, and SSN Cards) and proxies the end result for approval to the Broker-Dealer. For Bloom, this means a direct integration directly with Alpaca’s Account creation and CIP APIs to make account opening secure and reporting verification results easy. Before Footprint, Bloom had to:
+
+- Build the frontend onboarding flow (compliantly)
+- Securely store PII like SSNs
+- Integrate with various KYC and AML backend APIs
+- Collect and verify identity documents + selfies when certain conditions were met (like DOB or address mismatch)
+- Ensure that the collection and verification logic is properly compliant with Alpaca’s CIP and data validation rules
+- Perform manual reviews for cases like potential OFAC hits and reviewing supplementary documents
+- Onboard customers to Alpaca by creating and sending complex Alpaca “CIP” objects that describe how and why a user was approved and include a detailed breakdown of the verification results.
+
+All of these elements are handled natively by Footprint in a single, simple integration.
+
+#### Results
+
+<Result>
+
+- The solution was integrated in a week, and within a month auto-approval rates had risen to over 90%
+- Whereas Bloom previously saw a 60% abandonment rate, now 90% of users that required identity document collection successfully completed the onboarding and uploaded documents - **_a 150% increase_**.
+- Because Footprint supports dynamic collection of documents like proof of SSN/Address documents, **5K+ users a year** (annualized) will be able to onboard to the Bloom platform that otherwise wouldn’t have been able to.
+- **These improvements represent close to $500k of extra LTV a year brought to Bloom.**
+
+</Result>
+
+<Banner cta="Get a demo" title="Ready to start?">
+  If you're looking to onboard customers quickly and securely store their
+  sensitive data, we'd love to help.
+</Banner>
+
+</CaseStudyLayout>

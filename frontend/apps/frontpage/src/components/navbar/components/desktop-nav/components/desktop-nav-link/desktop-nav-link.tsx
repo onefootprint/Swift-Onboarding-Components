@@ -26,6 +26,7 @@ const StyledLink = styled(NavigationMenu.Link)<{ $isOnDarkSection?: boolean }>`
     display: flex;
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     transition: opacity 0.2s ease-in;
+    white-space: nowrap;
 
     @media (hover: hover) {
       :hover {
