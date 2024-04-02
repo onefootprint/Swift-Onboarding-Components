@@ -5,18 +5,12 @@ use crate::{
     State,
 };
 use api_core::{
-    auth::{
-        user::{UserAuthContext, UserAuthScope, UserWfAuthContext},
-        AuthError,
-    },
+    auth::user::{UserAuthScope, UserWfAuthContext},
     utils::vault_wrapper::{Any, Person, VwArgs},
 };
 use db::models::{
     document_request::{DocumentRequest, NewDocumentRequestArgs},
     ob_configuration::ObConfiguration,
-    tenant::Tenant,
-    vault::Vault,
-    workflow::Workflow,
 };
 use newtypes::{
     email::Email,
@@ -27,39 +21,6 @@ use newtypes::{
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
 
-/// Short-term solution to support normal UserAuthContext in addition to UserWfAuth - there's one
-/// client codepath that makes a request to this endpoint before a workflow exists
-async fn parse_auth(
-    state: &State,
-    user_auth: UserAuthContext,
-    user_wf_auth: Option<UserWfAuthContext>,
-) -> ApiResult<(Vault, ScopedVaultId, Tenant, Option<(ObConfiguration, Workflow)>)> {
-    // TODO We should move this to only take UserWfAuth at some point, but the client makes one request
-    // to this API before POST /hosted/onboarding to add the email to a vault after it's created
-    tracing::info!(has_wf_auth=%user_wf_auth.is_some(), "Vault API called");
-    let result = if let Some(user_wf_auth) = user_wf_auth {
-        let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
-        user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
-        let user = user_auth.user().clone();
-        let su_id = user_auth.scoped_user.id.clone();
-        let tenant = user_auth.tenant().clone();
-        let wf_info = Some((user_auth.ob_config()?.clone(), user_auth.workflow().clone()));
-        (user, su_id, tenant, wf_info)
-    } else {
-        let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
-        let user = user_auth.user.clone();
-        let su_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
-        let su_id2 = su_id.clone();
-        let tenant = state
-            .db_pool
-            .db_query(move |conn| Tenant::get(conn, &su_id2))
-            .await?;
-        let wf_info = None;
-        (user, su_id, tenant, wf_info)
-    };
-    Ok(result)
-}
-
 #[api_v2_operation(
     description = "Checks if provided vault data is valid before adding it to the vault",
     tags(Vault, Hosted, Users)
@@ -68,20 +29,21 @@ async fn parse_auth(
 pub async fn post_validate(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
-    user_auth: UserAuthContext,
-    user_wf_auth: Option<UserWfAuthContext>,
+    user_wf_auth: UserWfAuthContext,
     allow_extra_fields: AllowExtraFieldsHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let (user, su_id, _, _) = parse_auth(&state, user_auth, user_wf_auth).await?;
+    let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
+    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
 
     let opts = ValidateArgs {
         ignore_luhn_validation: false,
         for_bifrost: true,
         allow_dangling_keys: *allow_extra_fields,
-        is_live: user.is_live,
+        is_live: user_auth.user().is_live,
     };
     let PatchDataRequest { updates, .. } = request.into_inner().clean_and_validate(opts)?;
     let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
+    let su_id = user_auth.scoped_user.id.clone();
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -100,16 +62,15 @@ pub async fn post_validate(
 pub async fn patch(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
-    // We should move this to UserWfAuth at some point, but the client makes one request to this
-    // API before POST /hosted/onboarding to add the email to a vault after it's created
-    user_auth: UserAuthContext,
-    user_wf_auth: Option<UserWfAuthContext>,
+    user_wf_auth: UserWfAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let (user, su_id, tenant, wf_info) = parse_auth(&state, user_auth, user_wf_auth).await?;
-    let sv_id2 = su_id.clone();
+    let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
+    user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
+    let t_id = &user_auth.tenant().id;
+
     let PatchDataRequest { updates, .. } = request
         .into_inner()
-        .clean_and_validate(ValidateArgs::for_bifrost(user.is_live))?;
+        .clean_and_validate(ValidateArgs::for_bifrost(user_auth.user().is_live))?;
 
     let email = updates
         .get(&IDK::Email.into())
@@ -120,10 +81,9 @@ pub async fn patch(
         .get(&IDK::Country.into())
         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
 
-    let updates = updates
-        .build_fingerprints(&state.enclave_client, &tenant.id)
-        .await?;
+    let updates = updates.build_fingerprints(&state.enclave_client, t_id).await?;
 
+    let su_id = user_auth.scoped_user.id.clone();
     let new_ci = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -144,7 +104,7 @@ pub async fn patch(
             .into_iter()
             .find(|(di, _)| di == &DataIdentifier::from(IDK::Email))
         {
-            if let Err(err) = send_email_challenge(&state, &tenant.id, ci.id, &email.email).await {
+            if let Err(err) = send_email_challenge(&state, t_id, ci.id, &email.email).await {
                 // For now, we don't want to block vault updates on these async email verifications.
                 // We don't do anything with them today. But maybe we'll want to be more strict
                 // about this in the future
@@ -153,26 +113,25 @@ pub async fn patch(
         }
     }
 
-    // wf_info is only ever None for the singular request that adds an email to the vault before
-    // onboarding has started
-    if let Some((obc, wf)) = wf_info {
-        if let Some(address) = residential_address {
-            // if we allow international and haven't requested a doc, we need to create a doc req
-            if obc.allow_international_residents
-                && obc.document_cdo().is_none()
-                && !address.is_us_including_territories()
-            {
-                tracing::info!(scoped_vault_id=%sv_id2, wf_id=%wf.id, "creating doc request for international onboarding");
+    if let Some(address) = residential_address {
+        // if we allow international and haven't requested a doc, we need to create a doc req
+        let obc = user_auth.ob_config()?;
+        let wf = user_auth.workflow();
+        let sv_id = &user_auth.scoped_user.id;
+        if obc.allow_international_residents
+            && obc.document_cdo().is_none()
+            && !address.is_us_including_territories()
+        {
+            tracing::info!(scoped_vault_id=%sv_id, wf_id=%wf.id, "creating doc request for international onboarding");
 
-                let args = default_identity_doc_args(&sv_id2, true, &wf.id);
-                // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
-                state
-                    .db_pool
-                    .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
-                    .await?;
-            } else if address.is_us_including_territories() {
-                handle_ssn_skipped(&state, obc.clone(), sv_id2.clone(), wf.id.clone()).await?
-            }
+            let args = default_identity_doc_args(sv_id, true, &wf.id);
+            // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
+            state
+                .db_pool
+                .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
+                .await?;
+        } else if address.is_us_including_territories() {
+            handle_ssn_skipped(&state, obc.clone(), sv_id.clone(), wf.id.clone()).await?
         }
     }
 
