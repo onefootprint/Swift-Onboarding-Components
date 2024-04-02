@@ -1,13 +1,21 @@
+import pytest
 from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
-from tests.utils import _gen_random_sandbox_id, _gen_random_ssn, get, post, patch
+from tests.utils import (
+    HttpError,
+    _gen_random_sandbox_id,
+    _gen_random_ssn,
+    get,
+    post,
+    patch,
+)
 from tests.headers import FpAuth
-from tests.constants import ID_DATA
+from tests.constants import ID_DATA, FIXTURE_EMAIL
 
 
-def test_components_sdk(sandbox_tenant):
+def create_user_with_components_token(tenant):
     sandbox_id = _gen_random_sandbox_id()
-    obc = sandbox_tenant.default_ob_config
+    obc = tenant.default_ob_config
     token = IdentifyClient(obc.key, sandbox_id).create_user()
 
     # Start the onboarding
@@ -16,47 +24,86 @@ def test_components_sdk(sandbox_tenant):
     # Create a down-scoped token specifically for use by the components SDK
     data = dict(requested_scope="onboarding_components")
     body = post("hosted/user/tokens", data, token)
-    downscoped_token = FpAuth(body["token"])
-    assert downscoped_token.value != token.value
+    components_token = FpAuth(body["token"])
+    assert components_token.value != token.value
 
     # Ensure that the new token's scopes are less than the original and it expires at the same time
     token_body = get("hosted/user/token", None, token)
-    downscoped_token_body = get("hosted/user/token", None, downscoped_token)
+    downscoped_token_body = get("hosted/user/token", None, components_token)
     assert set(downscoped_token_body["scopes"]) < set(token_body["scopes"])
     assert downscoped_token_body["expires_at"] == token_body["expires_at"]
     assert set(downscoped_token_body["scopes"]) == {"vault_data", "explicit_auth"}
 
-    # Ensure that we cant use the downscoped_token to create a token with more permissions
+    # Ensure that we cant use the components_token to create a token with more permissions
     data = dict(requested_scope="onboarding")
-    body = post("hosted/user/tokens", data, downscoped_token, status_code=400)
+    body = post("hosted/user/tokens", data, components_token, status_code=400)
     assert body["error"]["message"] == "Cannot request additional scopes"
 
-    # Vault some data using the downscoped_token and verify it was saved
-    data = {
+    return (components_token, token, bifrost)
+
+
+def test_components_sdk(sandbox_tenant):
+    (components_token, token, bifrost) = create_user_with_components_token(
+        sandbox_tenant
+    )
+
+    # Vault some data using the components_token and verify it was saved
+    vault_data = {
         **ID_DATA,
         "id.ssn9": _gen_random_ssn(),
     }
-    patch("hosted/user/vault", data, downscoped_token)
+    patch("hosted/user/vault", vault_data, components_token)
     body = post("hosted/user/vault/decrypt", dict(fields=[k for k in ID_DATA]), token)
     assert all(body[k] == v.strip() for k, v in ID_DATA.items())
 
-    # Make sure we can't use downscoped_token to decrypt or add login credentials
-    # TODO should we make sure the downscoped token also can't be used in the identify flow?
+    # Make sure we can't use components_token to decrypt or add login credentials
     data = dict(fields=["id.first_name"])
-    body = post("hosted/user/vault/decrypt", data, downscoped_token, status_code=401)
+    body = post("hosted/user/vault/decrypt", data, components_token, status_code=401)
     assert (
         body["error"]["message"]
         == "Not allowed: required permission is missing: CanDecrypt<id.first_name>"
     )
 
+    # Make sure we can't use components_token in the identify flow
+    with pytest.raises(
+        HttpError,
+        match="Cannot create a new token from one issued for the components SDK",
+    ) as e:
+        IdentifyClient.from_token(components_token).inherit()
+
     data = dict(kind="email", action_kind="add_primary")
-    body = post("hosted/user/challenge", data, downscoped_token, status_code=401)
+    body = post("hosted/user/challenge", data, components_token, status_code=401)
     assert (
         body["error"]["message"]
         == "Not allowed: required permission is missing: And<explicit_auth,Or<auth,sign_up>>"
     )
 
     # Then finish the rest of onboarding in normal Bifrost
-    bifrost.run()
-    # Should already have collect_data requirement met, from downscoped_token
+    user = bifrost.run()
+    # Should already have collect_data requirement met, from components_token
     assert [i["kind"] for i in bifrost.handled_requirements] == ["liveness", "process"]
+
+    # Ensure that the source of the saved data is components
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert all(
+        d["source"] == "components_sdk"
+        for d in body["data"]
+        if d["identifier"] in vault_data
+    )
+
+    # Ensure that we can log into the user we just created
+    IdentifyClient.from_user(user).inherit()
+
+
+def test_components_sdk_auth_methods(sandbox_tenant):
+    (components_token, token, _) = create_user_with_components_token(sandbox_tenant)
+
+    # We should be able to log in via unverified email
+    body = post("hosted/identify", dict(scope="onboarding"), token)
+    assert any(i["kind"] == "email" for i in body["user"]["auth_methods"])
+
+    # Add a new email using the components SDK and then verify we can't use it to log in
+    data = {"id.email": FIXTURE_EMAIL}
+    patch("hosted/user/vault", data, components_token)
+    body = post("hosted/identify", dict(scope="onboarding"), token)
+    assert not any(i["kind"] == "email" for i in body["user"]["auth_methods"])

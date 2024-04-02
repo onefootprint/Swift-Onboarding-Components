@@ -7,7 +7,8 @@ use crate::{
 use db::models::{contact_info::ContactInfo, webauthn_credential::WebauthnCredential};
 use itertools::Itertools;
 use newtypes::{
-    AuthMethodKind, ChallengeKind, ContactInfoKind, DataIdentifier as DI, IdentityDataKind as IDK,
+    AuthMethodKind, ChallengeKind, ContactInfoKind, DataIdentifier as DI, DataLifetimeSource,
+    IdentityDataKind as IDK,
 };
 
 use super::vault_wrapper::Person;
@@ -70,6 +71,11 @@ pub async fn get_user_challenge_context(
     }
     let auth_methods = cis
         .iter()
+        // Do not allow logging in using any data that was vaulting via the components SDK token.
+        // We normally don't vault login methods using the components SDK, so if there is one, it
+        // could be nefarious.
+        .filter(|(_, _, dl)| dl.source != DataLifetimeSource::ComponentsSdk)
+        // TODO one day, don't allow logging in via data added via bootstrap?
         .map(|(cik, ci, _)| AuthMethod {
             kind: AuthMethodKind::from(*cik),
             is_verified: ci.is_otp_verified,
