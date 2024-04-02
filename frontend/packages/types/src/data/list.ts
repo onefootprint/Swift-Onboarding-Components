@@ -44,3 +44,42 @@ export type ListEntry = {
   createdAt: string;
   actor: Actor;
 };
+
+export enum ListTimelineEventKind {
+  listCreated = 'list_created',
+  listUpdated = 'list_updated',
+  listEntryCreated = 'list_entry_created',
+  listEntryDeleted = 'list_entry_deleted',
+}
+
+// TODO: fill these based on API types
+export type ListCreatedEvent = {
+  kind: ListTimelineEventKind.listCreated;
+  data: unknown;
+};
+
+export type ListUpdatedEvent = {
+  kind: ListTimelineEventKind.listUpdated;
+  data: unknown;
+};
+
+export type ListEntryCreatedEvent = {
+  kind: ListTimelineEventKind.listEntryCreated;
+  data: unknown;
+};
+
+export type ListEntryDeletedEvent = {
+  kind: ListTimelineEventKind.listEntryDeleted;
+  data: unknown;
+};
+
+export type ListTimelineEvent = {
+  event:
+    | ListCreatedEvent
+    | ListUpdatedEvent
+    | ListEntryCreatedEvent
+    | ListEntryDeletedEvent;
+  timestamp: string;
+};
+
+export type ListTimeline = ListTimelineEvent[];

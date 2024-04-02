@@ -114,7 +114,19 @@ export {
 } from './investor-data-attribute';
 export type { InvestorProfileData } from './investor-profile-data';
 export type { L10n, SupportedLocale } from './l10n';
-export type { List, ListDetails, ListEntry, ListPlaybookUsage } from './list';
+export type {
+  List,
+  ListCreatedEvent,
+  ListDetails,
+  ListEntry,
+  ListEntryCreatedEvent,
+  ListEntryDeletedEvent,
+  ListPlaybookUsage,
+  ListTimeline,
+  ListTimelineEvent,
+  ListUpdatedEvent,
+} from './list';
+export { ListTimelineEventKind } from './list';
 export { ListKind } from './list';
 export type {
   InstantAppMetadata,

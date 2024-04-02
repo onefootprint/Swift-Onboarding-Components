@@ -86,6 +86,10 @@ export type {
   GetListEntriesRequest,
   GetListEntriesResponse,
 } from './get-list-details';
+export type {
+  GetListTimelineRequest,
+  GetListTimelineResponse,
+} from './get-list-timeline';
 export type { GetListsResponse } from './get-lists';
 export type { GetLivenessRequest, GetLivenessResponse } from './get-liveness';
 export type { GetMembersRequest, GetMembersResponse } from './get-members';
