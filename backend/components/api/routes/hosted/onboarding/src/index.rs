@@ -113,8 +113,7 @@ pub async fn post(
                 sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };
-            let session = user_auth.data.session.clone();
-            let session = session.update(args, vec![], TokenCreationPurpose::AddWorkflow, None)?;
+            let session = user_auth.update(args, vec![], TokenCreationPurpose::AddWorkflow, None)?;
             user_auth.update_session(conn, &session_key, session)?;
 
             Ok(())

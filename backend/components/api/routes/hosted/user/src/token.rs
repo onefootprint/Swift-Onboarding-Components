@@ -6,7 +6,6 @@ use api_core::{
         Any,
     },
     errors::{ApiResult, ValidationError},
-    utils::session::AuthSession,
     State,
 };
 use api_wire_types::hosted::tokens::{CreateUserTokenRequest, CreateUserTokenResponse, GetUserTokenResponse};
@@ -43,7 +42,7 @@ pub async fn post(
     let CreateUserTokenRequest { requested_scope } = request.into_inner();
 
     let session_key = state.session_sealing_key.clone();
-    let (token, session) = state
+    let (token, expires_at) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let aes = load_auth_events(conn, &user_auth.auth_events)?
@@ -63,17 +62,15 @@ pub async fn post(
                 // Do not remove this validation unless you know what you're doing.
                 return ValidationError("Cannot request additional scopes").into();
             }
-            let expires_at = user_auth.expires_at();
             let purpose = requested_scope.into();
-            let session = user_auth.data.session;
-            let session = session.reduce_scopes(new_scopes, purpose)?;
-            let (token, session) = AuthSession::create_sync(conn, &session_key, session, expires_at)?;
-            Ok((token, session))
+            let session = user_auth.reduce_scopes(new_scopes, purpose)?;
+            let (token, expires_at) = user_auth.create_derived(conn, &session_key, session, None)?;
+            Ok((token, expires_at))
         })
         .await?;
 
     Ok(Json(ResponseData::ok(CreateUserTokenResponse {
-        expires_at: session.expires_at,
+        expires_at,
         token,
     })))
 }

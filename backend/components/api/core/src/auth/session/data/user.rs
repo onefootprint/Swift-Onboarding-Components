@@ -197,28 +197,29 @@ impl UserSession {
     }
 
     pub fn update(
-        self,
+        &self,
         new_ctx: NewUserSessionContext,
         new_scopes: Vec<UserAuthScope>,
         new_purpose: TokenCreationPurpose,
         new_auth_event: Option<AssociatedAuthEvent>,
     ) -> ApiResult<AuthSessionData> {
         self.validate_not_derived_from_components()?;
+        let old = self.clone();
         // Merge context, scopes, and auth factors and create a new session with these merged fields
         let context = NewUserSessionContext {
-            su_id: new_ctx.su_id.or(self.su_id),
-            sb_id: new_ctx.sb_id.or(self.sb_id),
-            bo_id: new_ctx.bo_id.or(self.bo_id),
-            obc_id: new_ctx.obc_id.or(self.obc_id),
-            wf_id: new_ctx.wf_id.or(self.wf_id),
-            wfr_id: new_ctx.wfr_id.or(self.wfr_id),
-            kba: new_ctx.kba.into_iter().chain(self.kba).unique().collect(),
+            su_id: new_ctx.su_id.or(old.su_id),
+            sb_id: new_ctx.sb_id.or(old.sb_id),
+            bo_id: new_ctx.bo_id.or(old.bo_id),
+            obc_id: new_ctx.obc_id.or(old.obc_id),
+            wf_id: new_ctx.wf_id.or(old.wf_id),
+            wfr_id: new_ctx.wfr_id.or(old.wfr_id),
+            kba: new_ctx.kba.into_iter().chain(old.kba).unique().collect(),
         };
-        let scopes = self.scopes.into_iter().chain(new_scopes).unique().collect();
-        let auth_events = self.auth_events.into_iter().chain(new_auth_event).collect();
+        let scopes = old.scopes.into_iter().chain(new_scopes).unique().collect();
+        let auth_events = old.auth_events.into_iter().chain(new_auth_event).collect();
         let args = NewUserSessionArgs {
-            user_vault_id: self.user_vault_id,
-            purposes: self.purposes.into_iter().chain(Some(new_purpose)).collect(),
+            user_vault_id: old.user_vault_id,
+            purposes: old.purposes.into_iter().chain(Some(new_purpose)).collect(),
             context,
             scopes,
             auth_events,
@@ -227,21 +228,22 @@ impl UserSession {
     }
 
     pub fn reduce_scopes(
-        self,
+        &self,
         new_scopes: Vec<UserAuthScope>,
         new_purpose: TokenCreationPurpose,
     ) -> ApiResult<AuthSessionData> {
         self.validate_not_derived_from_components()?;
+        let old = self.clone();
         let context = NewUserSessionContext {
-            su_id: self.su_id,
-            sb_id: self.sb_id,
-            bo_id: self.bo_id,
-            obc_id: self.obc_id,
-            wf_id: self.wf_id,
-            wfr_id: self.wfr_id,
-            kba: self.kba,
+            su_id: old.su_id,
+            sb_id: old.sb_id,
+            bo_id: old.bo_id,
+            obc_id: old.obc_id,
+            wf_id: old.wf_id,
+            wfr_id: old.wfr_id,
+            kba: old.kba,
         };
-        if new_scopes.iter().any(|s| !self.scopes.contains(s)) {
+        if new_scopes.iter().any(|s| !old.scopes.contains(s)) {
             // The only use case of this today is to request a token with _fewer_ scopes.
             // It could be dangerous to allow a user to request a token with _more_ scopes,
             // particularly for tokens given to the components SDK that intentially have
@@ -250,11 +252,11 @@ impl UserSession {
             return ValidationError("Cannot use reduce_scopes to add additional scopes").into();
         }
         let args = NewUserSessionArgs {
-            user_vault_id: self.user_vault_id,
-            purposes: self.purposes.into_iter().chain(Some(new_purpose)).collect(),
+            user_vault_id: old.user_vault_id,
+            purposes: old.purposes.into_iter().chain(Some(new_purpose)).collect(),
             context,
             scopes: new_scopes,
-            auth_events: self.auth_events,
+            auth_events: old.auth_events,
         };
         UserSession::make(args)
     }

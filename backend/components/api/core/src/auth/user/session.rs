@@ -1,5 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
+use chrono::{DateTime, Duration, Utc};
+use crypto::aead::ScopedSealingKey;
 use db::{
     models::{
         auth_event::AuthEvent, ob_configuration::ObConfiguration, scoped_vault::ScopedVault, tenant::Tenant,
@@ -8,7 +10,9 @@ use db::{
     PgConn,
 };
 use itertools::Itertools;
-use newtypes::{AuthEventKind, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId};
+use newtypes::{
+    AuthEventKind, ObConfigurationId, ScopedVaultId, SessionAuthToken, VaultId, VaultKind, WorkflowId,
+};
 use paperclip::actix::Apiv2Security;
 
 use crate::{
@@ -21,6 +25,7 @@ use crate::{
         AuthError, IsGuardMet, SessionContext,
     },
     errors::{ApiError, ApiResult},
+    utils::session::AuthSession,
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::UserAuthScope;
@@ -213,5 +218,27 @@ impl UserAuthContext {
         } else {
             Err(AuthError::MissingUserPermission(requested_permission_str))
         }
+    }
+}
+
+impl CheckedUserAuthContext {
+    /// Creates a new auth token with an expiry derived off of the current auth token.
+    /// This function guarantees that we won't create a derived token that expires after the source
+    /// token.
+    pub fn create_derived(
+        &self,
+        conn: &mut db::PgConn,
+        session_key: &ScopedSealingKey,
+        session: AuthSessionData,
+        max_duration: Option<Duration>,
+    ) -> ApiResult<(SessionAuthToken, DateTime<Utc>)> {
+        let current_expires_at = self.expires_at();
+        let expires_at = if let Some(duration) = max_duration {
+            current_expires_at.min(Utc::now() + duration)
+        } else {
+            current_expires_at
+        };
+        let (token, session) = AuthSession::create_sync(conn, session_key, session, expires_at)?;
+        Ok((token, session.expires_at))
     }
 }

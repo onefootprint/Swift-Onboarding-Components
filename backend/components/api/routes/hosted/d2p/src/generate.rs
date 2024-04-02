@@ -1,19 +1,16 @@
 use crate::{
-    auth::{user::UserAuthContext, AuthError},
+    auth::user::UserAuthContext,
     errors::ApiError,
     types::response::ResponseData,
-    utils::session::{AuthSession, HandoffRecord, JsonSession},
+    utils::session::{HandoffRecord, JsonSession},
     State,
 };
 use api_core::{
-    auth::{
-        session::user::{NewUserSessionContext, TokenCreationPurpose},
-        IsGuardMet,
-    },
+    auth::session::user::{NewUserSessionContext, TokenCreationPurpose},
     errors::ApiResult,
 };
 use api_wire_types::{D2pGenerateRequest, D2pGenerateResponse};
-use chrono::{Duration, Utc};
+use chrono::Duration;
 use newtypes::{D2pSessionStatus, UserAuthScope};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -32,25 +29,20 @@ pub async fn handler(
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<D2pGenerateResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    if UserAuthScope::Handoff.is_met(&user_auth.data.scopes) {
-        // Don't allow making a handoff token with an existing handoff token. This allows subverting
-        // token expiry by constantly just making a new one
-        return Err(AuthError::CannotCreateMultipleHandoffTokens.into());
-    }
-    let session_sealing_key = state.session_sealing_key.clone();
+    let session_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let expires_in = Duration::minutes(30);
+            let limit_ttl = Duration::minutes(30);
             let args = NewUserSessionContext::default();
-            let session = user_auth.data.session;
-            let session = session.update(
+            let session = user_auth.update(
                 args,
                 vec![UserAuthScope::Handoff],
                 TokenCreationPurpose::Handoff,
                 None,
             )?;
-            let (auth_token, _) = AuthSession::create_sync(conn, &session_sealing_key, session, expires_in)?;
+            let (auth_token, expires_at) =
+                user_auth.create_derived(conn, &session_key, session, Some(limit_ttl))?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on
             // a hash of the auth token so both handoff clients can look up the status
             let handoff_record = HandoffRecord {
@@ -58,8 +50,7 @@ pub async fn handler(
                 // Allow embedding extra metadata in the backend session
                 meta: request.and_then(|r| r.into_inner().meta),
             };
-            let now = Utc::now();
-            JsonSession::update_or_create(conn, &auth_token, &handoff_record, now + expires_in)?;
+            JsonSession::update_or_create(conn, &auth_token, &handoff_record, expires_at)?;
             Ok(auth_token)
         })
         .await?;

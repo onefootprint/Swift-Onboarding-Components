@@ -17,7 +17,6 @@ use api_core::{
         challenge::Challenge,
         headers::InsightHeaders,
         passkey::WebauthnConfig,
-        session::AuthSession,
         vault_wrapper::{Person, PrefillKind, VaultWrapper, WriteableVw},
     },
 };
@@ -174,11 +173,10 @@ pub async fn post(
 
             let scopes = allowed_user_scopes(vec![event.kind], scope.into(), true);
             let ae = AssociatedAuthEvent::explicit(event.id);
-            // Add the new scopes and args to the existing scopes and context on the auth token
-            let session = user_auth.data.session;
-            let session = session.update(context, scopes, scope.into(), Some(ae))?;
-            let duration = scope.token_ttl();
-            let (token, _) = AuthSession::create_sync(conn, &session_key, session, duration)?;
+            // Create a new token derived from the provided one, adding new scopes and context
+            let session = user_auth.update(context, scopes, scope.into(), Some(ae))?;
+            let (token, _) =
+                user_auth.create_derived(conn, &session_key, session, Some(scope.token_ttl()))?;
             let portable_vw = if new_su {
                 Some(VaultWrapper::<Any>::build_portable(conn, &uv_id)?)
             } else {

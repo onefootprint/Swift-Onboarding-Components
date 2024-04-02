@@ -7,10 +7,7 @@ use api_core::{
     },
     errors::{ApiResult, ValidationError},
     types::{JsonApiResponse, ResponseData},
-    utils::{
-        session::AuthSession,
-        vault_wrapper::{VaultWrapper, VwArgs},
-    },
+    utils::vault_wrapper::{VaultWrapper, VwArgs},
 };
 use api_wire_types::KbaResponse;
 use itertools::Itertools;
@@ -72,10 +69,8 @@ pub async fn post(
                 kba: successful_kba,
                 ..Default::default()
             };
-            let expires_at = user_auth.expires_at();
-            let session = user_auth.data.session;
-            let session = session.update(context, vec![], TokenCreationPurpose::Kba, None)?;
-            let (token, _) = AuthSession::create_sync(conn, &session_key, session, expires_at)?;
+            let session = user_auth.update(context, vec![], TokenCreationPurpose::Kba, None)?;
+            let (token, _) = user_auth.create_derived(conn, &session_key, session, None)?;
             Ok(token)
         })
         .await?;
