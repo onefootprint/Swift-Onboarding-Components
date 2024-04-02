@@ -42,6 +42,8 @@ pub enum Error {
     UserNamePasswordError,
     #[error("Incorrect PreciseID Version (model or precise match)")]
     IncorrectPreciseIdVersion,
+    #[error("Experian http error {0} for service {1}")]
+    HttpError(u16, String),
 }
 
 impl Error {
@@ -50,6 +52,30 @@ impl Error {
             error: self,
             response: response.into(),
         }))
+    }
+
+    pub fn is_retryable_error(&self) -> bool {
+        match self {
+            Error::JwtTokenNeedsRefresh
+            | Error::UnknownError
+            | Error::UserNamePasswordError
+            | Error::ReqwestError(_)
+            | Error::HttpError(_, _)
+            | Error::OtherPreciseIdServerError => true,
+            Error::InvalidHeader(_)
+            | Error::SerdeJsonError(_)
+            | Error::SendError(_)
+            | Error::Base64EncodeError(_)
+            | Error::ConversionError(_)
+            | Error::ResponseError(_)
+            | Error::StringParseError(_)
+            | Error::ScoreNotFound
+            | Error::MissingPreciseIDResponse
+            | Error::InvalidScore(_)
+            | Error::ValidationError(_)
+            | Error::ErrorWithResponse(_)
+            | Error::IncorrectPreciseIdVersion => false,
+        }
     }
 }
 

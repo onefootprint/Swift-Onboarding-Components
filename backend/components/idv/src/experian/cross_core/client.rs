@@ -112,7 +112,6 @@ impl ExperianClientAdapter {
         }
     }
 
-    #[allow(dead_code)]
     pub(self) async fn send_token_request(
         &self,
         client: &FootprintVendorHttpClient,
@@ -122,7 +121,7 @@ impl ExperianClientAdapter {
         // A global unique identifier. When submitting a token request, an X-Correlation-Id must be populated with a globally unique identifier
         let correlation_id = Uuid::new_v4().to_string();
 
-        let raw_response = client
+        let response = client
             .post(url)
             .body(req)
             .header("X-Correlation-Id", correlation_id.as_str())
@@ -130,13 +129,17 @@ impl ExperianClientAdapter {
             .header("X-User-Domain", REQUIRED_X_USER_DOMAIN_HEADER_VAL)
             .send()
             .await
-            .map_err(|err| Error::SendError(err.to_string()))?
-            .json::<serde_json::Value>()
-            .await?;
+            .map_err(|err| Error::SendError(err.to_string()))?;
 
-        let response: JwtTokenResponse = serde_json::from_value(raw_response)?;
-
-        Ok(response)
+        let (cl, http_status) = (response.content_length(), response.status());
+        if http_status.is_success() {
+            let json = response.json::<serde_json::Value>().await?;
+            let response: JwtTokenResponse = serde_json::from_value(json)?;
+            Ok(response)
+        } else {
+            tracing::info!(http_status=%http_status, content_length=?cl, service=?"token", "experian error response");
+            Err(Error::HttpError(http_status.as_u16(), "TokenRequest".into()))
+        }
     }
 }
 use tokio_retry::RetryIf;
@@ -164,67 +167,68 @@ impl ExperianClientAdapter {
             .header("Content-Type", "application/json")
             .send()
             .await
-            .map_err(|err| Error::SendError(err.to_string()))?
-            .json::<serde_json::Value>()
-            .await?;
+            .map_err(|err| Error::SendError(err.to_string()))?;
 
-        // catch any weird error relating to tokens
-        match serde_json::from_value::<CCErrorResponse>(response.clone()) {
-            Ok(e) => {
-                let err = match e.code.as_str() {
-                    "401-000" => {
-                        let err = Error::JwtTokenNeedsRefresh;
-                        tracing::info!(error=%err, error_code=%&e.code, "send_precise_id_request error");
-                        err
-                    }
-                    _ => {
-                        let err = Error::UnknownError;
-                        tracing::info!(?err, error_code=%&e.code, "send_precise_id_request error");
-                        err
-                    }
-                };
 
-                Err(err)
-            }
-            Err(_) => Ok(()),
-        }?;
+        let (cl, http_status) = (response.content_length(), response.status());
+        if !http_status.is_success() {
+            tracing::info!(http_status=%http_status, content_length=?cl, service=?"precise_id", "experian error response");
+            Err(Error::HttpError(http_status.as_u16(), "PreciseId".into()))
+        } else {
+            let json = response.json::<serde_json::Value>().await?;
 
-        // Catch errors from cc itself
-        match serde_json::from_value::<CrossCoreAPIResponse>(response.clone()) {
-            Ok(c) => {
-                let codes = c.error_codes();
-
-                if !codes.is_empty() {
-                    let err = if codes.contains(&"709".to_string()) {
-                        Error::UserNamePasswordError
-                    } else if codes.contains(&"720".to_string()) {
-                        Error::OtherPreciseIdServerError
-                    } else {
-                        Error::UnknownError
+            // catch any weird error relating to tokens
+            match serde_json::from_value::<CCErrorResponse>(json.clone()) {
+                Ok(e) => {
+                    let err = match e.code.as_str() {
+                        "401-000" => {
+                            let err = Error::JwtTokenNeedsRefresh;
+                            tracing::info!(error=%err, error_code=%&e.code, "send_precise_id_request error");
+                            err
+                        }
+                        _ => {
+                            let err = Error::UnknownError;
+                            tracing::info!(?err, error_code=%&e.code, "send_precise_id_request error");
+                            err
+                        }
                     };
 
-                    tracing::info!(?err, ?codes, "send_precise_id_request error");
                     Err(err)
-                } else {
-                    Ok(())
                 }
-            }
-            // we handle this elsewhere
-            Err(_) => Ok(()),
-        }?;
+                Err(_) => Ok(()),
+            }?;
 
-        Ok(response)
+            // Catch errors from cc itself
+            match serde_json::from_value::<CrossCoreAPIResponse>(json.clone()) {
+                Ok(c) => {
+                    let codes = c.error_codes();
+
+                    if !codes.is_empty() {
+                        let err = if codes.contains(&"709".to_string()) {
+                            Error::UserNamePasswordError
+                        } else if codes.contains(&"720".to_string()) {
+                            Error::OtherPreciseIdServerError
+                        } else {
+                            Error::UnknownError
+                        };
+
+                        tracing::info!(?err, ?codes, "send_precise_id_request error");
+                        Err(err)
+                    } else {
+                        Ok(())
+                    }
+                }
+                // we handle this elsewhere
+                Err(_) => Ok(()),
+            }?;
+
+            Ok(json)
+        }
     }
 
     #[tracing::instrument]
     fn should_retry(error: &Error) -> bool {
-        matches!(
-            error,
-            Error::JwtTokenNeedsRefresh
-                | Error::UnknownError
-                | Error::UserNamePasswordError
-                | Error::ReqwestError(_)
-        )
+        error.is_retryable_error()
     }
 
     pub(crate) async fn send_precise_id_request_with_retries(
@@ -232,7 +236,7 @@ impl ExperianClientAdapter {
         client: &FootprintVendorHttpClient,
         validated_idv_data: ValidatedIdvData,
     ) -> Result<serde_json::Value, Error> {
-        let retry_strategy = FixedInterval::from_millis(300).take(3);
+        let retry_strategy = FixedInterval::from_millis(200).take(3);
 
         // TODO the HTTP client already retries, so this could cause many retries
         // Would be cool if we could pass in an Extension that had a lambda retry policy
