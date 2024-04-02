@@ -57,12 +57,6 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  useEffect(() => {
-    if (state.value === 'kycData' && collectedKycData) {
-      Logger.error(`User is stuck on collecting KYC data`, 'requirements');
-    }
-  }, [collectedKycData, state.value]);
-
   const handleRequirementCompleted = () => {
     send({
       type: 'requirementCompleted',

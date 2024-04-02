@@ -1,5 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import {
+  DocumentRequestKind,
   IdDocImageTypes,
   OnboardingRequirementKind,
   SupportedIdDocTypes,
@@ -38,6 +39,7 @@ export const initialContextDL: MachineContext = {
         SupportedIdDocTypes.passport,
       ],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   idDoc: {
     country: 'US',

@@ -1,4 +1,5 @@
 import {
+  DocumentRequestKind,
   IdDocImageTypes,
   OnboardingRequirementKind,
   SupportedIdDocTypes,
@@ -37,6 +38,7 @@ const contextDesktopConsent: MachineContext = {
         SupportedIdDocTypes.passport,
       ],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   idDoc: {
     country: 'US',

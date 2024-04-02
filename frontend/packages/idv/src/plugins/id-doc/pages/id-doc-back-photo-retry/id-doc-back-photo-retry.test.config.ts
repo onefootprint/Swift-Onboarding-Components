@@ -1,4 +1,5 @@
 import {
+  DocumentRequestKind,
   IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocImageUploadError,
@@ -39,6 +40,7 @@ const contextWithErrors: MachineContext = {
         SupportedIdDocTypes.passport,
       ],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   errors: [
     { errorType: IdDocImageProcessingError.countryCodeMismatch },

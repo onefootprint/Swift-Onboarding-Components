@@ -206,6 +206,7 @@ export {
   ALLOW_EXTRA_FIELDS_HEADER,
   AUTH_HEADER,
   ContactInfoKind,
+  DocumentRequestKind,
   getRequirement,
   IdentifyTokenScope,
   OnboardingRequirementKind,

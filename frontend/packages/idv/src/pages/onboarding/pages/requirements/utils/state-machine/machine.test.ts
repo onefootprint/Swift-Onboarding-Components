@@ -7,6 +7,7 @@ import type {
 } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
+  DocumentRequestKind,
   IdDI,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
@@ -40,6 +41,7 @@ const idDocRequirement: IdDocRequirement = {
       SupportedIdDocTypes.passport,
     ],
   },
+  documentRequestKind: DocumentRequestKind.Identity,
 };
 
 const kycRequirement: CollectKycDataRequirement = {

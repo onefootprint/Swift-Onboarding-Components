@@ -1,5 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import {
+  DocumentRequestKind,
   IdDocImageTypes,
   OnboardingRequirementKind,
   SupportedIdDocTypes,
@@ -39,6 +40,7 @@ export const initialContextAllDocTypes: MachineContext = {
         SupportedIdDocTypes.passport,
       ],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   idDoc: {
     country: undefined,
@@ -86,6 +88,7 @@ export const initialContextSomeDocTypes: MachineContext = {
       ],
       ca: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   idDoc: {
     country: undefined,
@@ -124,6 +127,7 @@ export const initialContextOnlyUS: MachineContext = {
         SupportedIdDocTypes.passport,
       ],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   idDoc: {
     country: 'US',
@@ -157,6 +161,7 @@ export const initialContextBD: MachineContext = {
     supportedCountryAndDocTypes: {
       bd: [SupportedIdDocTypes.passport],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   idDoc: {
     country: 'BD',
@@ -190,6 +195,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
         SupportedIdDocTypes.passport,
       ],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   idDoc: {
     country: 'SG',

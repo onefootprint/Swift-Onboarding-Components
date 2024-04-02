@@ -1,5 +1,6 @@
 import type { IdDocRequirement } from '@onefootprint/types';
 import {
+  DocumentRequestKind,
   IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocImageUploadError,
@@ -27,6 +28,7 @@ export const requirement: IdDocRequirement = {
       SupportedIdDocTypes.passport,
     ],
   },
+  documentRequestKind: DocumentRequestKind.Identity,
 };
 
 export const argsRegularMobile: MachineContext = {

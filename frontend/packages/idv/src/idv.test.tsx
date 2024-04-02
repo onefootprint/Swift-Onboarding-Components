@@ -15,6 +15,7 @@ import {
   CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
   D2PStatus,
+  DocumentRequestKind,
   IdDI,
   OnboardingRequirementKind,
   SupportedIdDocTypes,
@@ -101,6 +102,7 @@ const idDocRequirement: OnboardingRequirement = {
       SupportedIdDocTypes.passport,
     ],
   },
+  documentRequestKind: DocumentRequestKind.Identity,
 };
 
 describe('<Idv />', () => {

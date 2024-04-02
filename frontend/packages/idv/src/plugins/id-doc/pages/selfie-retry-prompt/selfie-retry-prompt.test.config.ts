@@ -1,4 +1,5 @@
 import {
+  DocumentRequestKind,
   IdDocImageProcessingError,
   IdDocImageTypes,
   OnboardingRequirementKind,
@@ -38,6 +39,7 @@ const contextWithSelfieErrors: MachineContext = {
         SupportedIdDocTypes.passport,
       ],
     },
+    documentRequestKind: DocumentRequestKind.Identity,
   },
   errors: [{ errorType: IdDocImageProcessingError.selfieGlare }],
   idDoc: {

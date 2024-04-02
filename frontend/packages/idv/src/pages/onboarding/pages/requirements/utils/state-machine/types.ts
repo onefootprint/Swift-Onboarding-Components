@@ -27,6 +27,8 @@ export type MachineContext = {
   // don't render transfer again
   didRunTransfer?: boolean;
   requirements: OnboardingRequirement[];
+  // The last requirement whose respective machine was handled
+  lastHandledRequirement?: OnboardingRequirement;
   // We have a feature flag to disable transfers on desktops for some customers
   isTransferOnDesktopDisabled?: boolean;
 };

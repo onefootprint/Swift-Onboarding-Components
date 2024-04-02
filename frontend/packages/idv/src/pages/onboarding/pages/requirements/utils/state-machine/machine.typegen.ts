@@ -17,6 +17,7 @@ export interface Typegen0 {
     assignRequirements: 'onboardingRequirementsReceived';
     markCollectedKycData: 'error' | 'xstate.stop';
     markDidRunTransfer: 'error' | 'xstate.stop';
+    markLastHandledRequirement: 'error' | 'xstate.stop';
     startDataCollection: 'error' | 'xstate.stop';
   };
   eventsCausingDelays: {};

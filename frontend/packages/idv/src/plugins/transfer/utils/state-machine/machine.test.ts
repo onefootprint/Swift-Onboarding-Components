@@ -2,7 +2,10 @@ import type {
   IdDocRequirement,
   RegisterPasskeyRequirement,
 } from '@onefootprint/types';
-import { OnboardingRequirementKind } from '@onefootprint/types';
+import {
+  DocumentRequestKind,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createTransferMachine from './machine';
@@ -19,6 +22,7 @@ const getIdDocReq = (): IdDocRequirement => ({
   shouldCollectConsent: true,
   uploadMode: 'default',
   supportedCountryAndDocTypes: {},
+  documentRequestKind: DocumentRequestKind.Identity,
 });
 
 const getMobileArgs = () => ({

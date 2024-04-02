@@ -6,7 +6,9 @@ import type {
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import Logger from '../../../../../../utils/logger';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
+import isRepeatRequirement from '../is-repeat-requirement';
 import {
   NextRequirementTargets,
   RequirementCompletedTransition,
@@ -100,14 +102,15 @@ const createOnboardingRequirementsMachine = ({
         },
         kybData: {
           // Since we also collect KYC data inside the KYB plugin, mark KYC data collected
-          exit: ['markCollectedKycData'],
+          exit: ['markCollectedKycData', 'markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         investorProfile: {
+          exit: ['markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         kycData: {
-          exit: ['markCollectedKycData'],
+          exit: ['markCollectedKycData', 'markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         waitForComponentsSdk: {
@@ -118,15 +121,19 @@ const createOnboardingRequirementsMachine = ({
           on: RequirementCompletedTransition,
         },
         liveness: {
+          exit: ['markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         idDoc: {
+          exit: ['markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         authorize: {
+          exit: ['markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         process: {
+          exit: ['markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         error: {
@@ -139,9 +146,27 @@ const createOnboardingRequirementsMachine = ({
     },
     {
       actions: {
-        assignRequirements: assign((context, event) => ({
+        assignRequirements: assign((context, event) => {
+          const isRepeat = isRepeatRequirement(
+            context.lastHandledRequirement,
+            event.payload[0],
+          );
+          if (isRepeat) {
+            // If the highest priority requirement hasn't changed after a refetch, the user is
+            // stuck on a screen
+            Logger.error(
+              `User is stuck on ${context.lastHandledRequirement?.kind} requirement`,
+              'requirements',
+            );
+          }
+          return {
+            ...context,
+            requirements: [...event.payload],
+          };
+        }),
+        markLastHandledRequirement: assign(context => ({
           ...context,
-          requirements: [...event.payload],
+          lastHandledRequirement: context.requirements[0],
         })),
         markDidRunTransfer: assign(context => ({
           ...context,

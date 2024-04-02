@@ -44,7 +44,14 @@ export type IdDocRequirement = {
   shouldCollectConsent: boolean;
   supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
   uploadMode: 'default' | 'allow_upload';
+  documentRequestKind: DocumentRequestKind;
 };
+
+export enum DocumentRequestKind {
+  Identity = 'identity',
+  ProofOfSsn = 'proof_of_ssn',
+  ProofOfAddress = 'proof_of_address',
+}
 
 export type RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey;
