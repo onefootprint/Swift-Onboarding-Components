@@ -7,7 +7,11 @@ import type { TransferProps } from './types';
 
 const AppWithMachine = ({ idvContext, context, onDone }: TransferProps) => {
   const { device, authToken, isInIframe } = idvContext;
-  const { config, missingRequirements = {}, idDocOutcome } = context;
+  const {
+    config,
+    missingRequirements = { documents: [] },
+    idDocOutcome,
+  } = context;
 
   return (
     <TransferMachineProvider

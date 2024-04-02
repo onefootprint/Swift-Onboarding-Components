@@ -9,7 +9,7 @@ import type { CommonIdvContext } from '../../utils/state-machine';
 
 export type TransferRequirements = {
   liveness?: RegisterPasskeyRequirement;
-  idDoc?: IdDocRequirement;
+  documents: IdDocRequirement[];
 };
 
 export type TransferContext = {

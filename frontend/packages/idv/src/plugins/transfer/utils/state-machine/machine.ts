@@ -52,7 +52,7 @@ const createTransferMachine = (initialContext: MachineContext) =>
             {
               target: 'sms',
               description: 'If running in social media',
-              cond: context => !!context.missingRequirements.idDoc,
+              cond: context => !!context.missingRequirements.documents.length,
             },
             {
               target: 'complete',
@@ -101,7 +101,7 @@ const createTransferMachine = (initialContext: MachineContext) =>
             continueOnDesktop: [
               {
                 target: 'confirmContinueOnDesktop',
-                cond: ctx => !!ctx.missingRequirements.idDoc,
+                cond: ctx => !!ctx.missingRequirements.documents.length,
                 description:
                   'The document upload experience is better on mobile, so if the user is trying to upload on desktop, warn them we recommend they continue on mobile.',
               },

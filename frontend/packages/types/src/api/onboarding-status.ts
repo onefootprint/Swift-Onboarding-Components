@@ -113,7 +113,12 @@ export type RequirementForKind<K> =
 export const getRequirement = <K extends OnboardingRequirementKind>(
   reqs: OnboardingRequirement[],
   kind: K,
+) => getRequirements(reqs, kind)[0];
+
+export const getRequirements = <K extends OnboardingRequirementKind>(
+  reqs: OnboardingRequirement[],
+  kind: K,
 ) => {
-  const found = reqs.find(req => req.kind === kind);
-  return found as RequirementForKind<K> | undefined;
+  const found = reqs.filter(req => req.kind === kind);
+  return found as RequirementForKind<K>[];
 };

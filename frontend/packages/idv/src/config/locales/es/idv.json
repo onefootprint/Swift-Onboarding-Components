@@ -934,7 +934,8 @@
           "liveness": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar tu passkey.",
           "id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para subir tu {{documentKind}}.",
           "liveness-with-id-doc": "Abre el enlace que enviamos a tu número de teléfono y sigue las instrucciones para agregar tu passkey y subir una imagen de tu {{documentKind}}."
-        }
+        },
+        "documents": "documentos"
       }
     },
     "pages": {

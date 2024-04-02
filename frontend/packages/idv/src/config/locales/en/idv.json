@@ -933,7 +933,8 @@
           "liveness": "Open the link sent to your phone and follow the prompts to register a passkey.",
           "id-doc": "Open the link sent to your phone and follow the prompts to upload your {{documentKind}}.",
           "liveness-with-id-doc": "Open the link sent to your phone and follow the prompts to upload your {{documentKind}} and register your passkey."
-        }
+        },
+        "documents": "documents"
       }
     },
     "pages": {

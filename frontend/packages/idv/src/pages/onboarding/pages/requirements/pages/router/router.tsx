@@ -1,4 +1,5 @@
 import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
+import { getRequirements } from '@onefootprint/types/src/api/onboarding-status';
 import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../../../hooks/ui/use-log-state-machine';
@@ -45,7 +46,10 @@ const Router = ({ onDone }: RouterProps) => {
     requirements,
     OnboardingRequirementKind.registerPasskey,
   );
-  const idDoc = getRequirement(requirements, OnboardingRequirementKind.idDoc);
+  const idDocReqs = getRequirements(
+    requirements,
+    OnboardingRequirementKind.idDoc,
+  );
   const isDone = state.matches('success');
   useLogStateMachine('onboarding-requirements', state);
   const kycBootstrapData = getKycBootstrapData(bootstrapData);
@@ -118,7 +122,7 @@ const Router = ({ onDone }: RouterProps) => {
           config,
           missingRequirements: {
             liveness,
-            idDoc,
+            documents: idDocReqs,
           },
           idDocOutcome,
         }}
@@ -131,12 +135,12 @@ const Router = ({ onDone }: RouterProps) => {
       <Liveness idvContext={idvContext} onDone={handleRequirementCompleted} />
     );
   }
-  if (state.matches('idDoc') && idDoc) {
+  if (state.matches('idDoc') && idDocReqs.length) {
     return (
       <IdDoc
         idvContext={idvContext}
         context={{
-          requirement: idDoc,
+          requirement: idDocReqs[0],
           sandboxOutcome: idDocOutcome,
           orgId,
         }}

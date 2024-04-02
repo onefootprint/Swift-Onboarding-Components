@@ -11,11 +11,11 @@ import { interpret } from 'xstate';
 import createTransferMachine from './machine';
 import type { MachineContext } from './types';
 
-const getLivenessReq = (): RegisterPasskeyRequirement => ({
+const livenessReq: RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey,
   isMet: false,
-});
-const getIdDocReq = (): IdDocRequirement => ({
+};
+const idDocReq: IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc,
   isMet: false,
   shouldCollectSelfie: true,
@@ -23,7 +23,7 @@ const getIdDocReq = (): IdDocRequirement => ({
   uploadMode: 'default',
   supportedCountryAndDocTypes: {},
   documentRequestKind: DocumentRequestKind.Identity,
-});
+};
 
 const getMobileArgs = () => ({
   authToken: 'tok_123',
@@ -35,8 +35,8 @@ const getMobileArgs = () => ({
     browser: 'Mobile Safari',
   },
   missingRequirements: {
-    liveness: getLivenessReq(),
-    idDoc: getIdDocReq(),
+    liveness: livenessReq,
+    documents: [idDocReq],
   },
   isInIframe: true,
 });
@@ -51,8 +51,8 @@ const getDesktopArgs = (args: Partial<MachineContext>) => ({
     browser: 'Chrome',
   },
   missingRequirements: {
-    liveness: getLivenessReq(),
-    idDoc: getIdDocReq(),
+    liveness: livenessReq,
+    documents: [idDocReq],
   },
   isInIframe: true,
   ...args,
@@ -99,8 +99,8 @@ describe('Transfer machine tests', () => {
         createTransferMachine(
           getDesktopArgs({
             missingRequirements: {
-              liveness: getLivenessReq(),
-              idDoc: undefined,
+              liveness: livenessReq,
+              documents: [],
             },
           }),
         ),
@@ -205,7 +205,7 @@ describe('Transfer machine tests', () => {
           getDesktopArgs({
             missingRequirements: {
               liveness: undefined,
-              idDoc: getIdDocReq(),
+              documents: [idDocReq],
             },
           }),
         ),
@@ -367,7 +367,8 @@ describe('Transfer machine tests', () => {
           createTransferMachine({
             ...getMobileArgs(),
             missingRequirements: {
-              liveness: getLivenessReq(),
+              liveness: livenessReq,
+              documents: [],
             },
             isSocialMediaBrowser: true,
           }),
@@ -421,7 +422,7 @@ describe('Transfer machine tests', () => {
         createTransferMachine({
           ...getMobileArgs(),
           missingRequirements: {
-            idDoc: getIdDocReq(),
+            documents: [idDocReq],
           },
         }),
       ).onTransition(state => {
