@@ -51,6 +51,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
 
   return (
     <Dialog
+      testID="create-dialog"
       title={t('title')}
       primaryButton={{
         form: 'create-secret-key-form',
@@ -64,8 +65,8 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
         label: t('cancel'),
         onClick: handleClose,
       }}
-      open={open}
       onClose={handleClose}
+      open={open}
     >
       <form
         onSubmit={handleSubmit(handleBeforeSubmit)}

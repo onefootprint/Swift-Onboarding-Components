@@ -29,9 +29,11 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
       {confirmationDialog && (
         <Dialog
           open
+          disableResponsiveness
           isConfirmation
           size="compact"
           title={confirmationDialog.title}
+          onClose={hide}
           primaryButton={{
             label: confirmationDialog.primaryButton.label,
             onClick: handleButtonClick(
@@ -44,7 +46,6 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
               confirmationDialog.secondaryButton.onClick,
             ),
           }}
-          onClose={hide}
         >
           <Text variant="body-2" color="secondary" textAlign="center">
             {confirmationDialog.description}

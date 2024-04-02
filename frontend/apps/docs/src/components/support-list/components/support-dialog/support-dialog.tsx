@@ -74,6 +74,7 @@ const SupportDialog = ({
     <Dialog
       size="compact"
       title={title}
+      onClose={onClose}
       open={open}
       primaryButton={{
         label: t('form.send-button'),
@@ -88,7 +89,6 @@ const SupportDialog = ({
         type: 'reset',
         disabled: submitFormMutation.isLoading,
       }}
-      onClose={onClose}
     >
       <Grid.Container
         as="form"

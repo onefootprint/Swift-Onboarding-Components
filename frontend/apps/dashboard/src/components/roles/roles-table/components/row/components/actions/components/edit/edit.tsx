@@ -62,6 +62,7 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
 
   return (
     <Dialog
+      onClose={handleClose}
       open={open}
       title={t('title')}
       size="compact"
@@ -76,7 +77,6 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
         label: allT('cancel'),
         onClick: handleClose,
       }}
-      onClose={handleClose}
     >
       <Form
         onSubmit={handleSubmit}

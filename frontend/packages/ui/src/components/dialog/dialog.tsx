@@ -1,121 +1,308 @@
-import * as DialogPrimitive from '@radix-ui/react-dialog';
-import React, { useEffect } from 'react';
-import styled, { css, keyframes } from 'styled-components';
+'use client';
 
+import { IcoClose24 } from '@onefootprint/icons';
+import FocusTrap from 'focus-trap-react';
+import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
+import { useElementSize, useLockedBody } from 'usehooks-ts';
+
+import { useEventListener, useOnClickOutside } from '../../hooks';
+import media from '../../utils/media';
+import Box from '../box';
+import Button from '../button';
+import Fade from '../fade';
+import IconButton from '../icon-button';
+import LinkButton from '../link-button';
 import Overlay from '../overlay';
+import Portal from '../portal';
 import ScrollArea from '../scroll-area';
-import type { DialogProps, DialogSize } from './dialog.types';
-import {
-  useDialogPosition,
-  useDialogSize,
-  useDialogZIndex,
-} from './dialog.utils';
-import DialogFooter from './dialog-footer';
-import DialogHeader from './dialog-header';
+import Text from '../text';
+import type {
+  DialogAllButtons,
+  DialogHeaderIcon,
+  DialogNoButtons,
+  DialogOnlyButtons,
+  DialogOnlyPrimaryButton,
+  DialogPrimaryAndLinkButtons,
+  DialogSize,
+} from './dialog.types';
+
+export type DialogProps = {
+  children?: React.ReactNode;
+  headerIcon?: DialogHeaderIcon;
+  onClose: () => void;
+  open?: boolean;
+  size?: DialogSize;
+  testID?: string;
+  title: string;
+  isConfirmation?: boolean;
+  disableResponsiveness?: boolean;
+} & (
+  | DialogOnlyPrimaryButton
+  | DialogOnlyButtons
+  | DialogPrimaryAndLinkButtons
+  | DialogNoButtons
+  | DialogAllButtons
+);
 
 const Dialog = ({
   children,
   onClose,
+  headerIcon: {
+    component: HeaderIconComponent = IcoClose24,
+    onClick: onHeaderIconClick = onClose,
+    ariaLabel: headerIconAriaLabel,
+  } = {
+    component: IcoClose24,
+    onClick: onClose,
+  },
+  linkButton = undefined,
   open,
-  size = 'default',
-  title,
-  isConfirmation = false,
-  disableResponsiveness = false,
-  headerIcon,
   primaryButton,
-  secondaryButton,
-  linkButton,
-  ariaLabel,
+  secondaryButton = undefined,
+  size = 'default',
+  testID,
+  title,
+  disableResponsiveness = false,
+  isConfirmation = false,
 }: DialogProps) => {
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
+  const { t } = useTranslation('ui');
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useLockedBody(open);
+  useOnClickOutside(dialogRef, onClose);
+  useEventListener('keydown', event => {
+    if (event.key === 'Escape') {
       onClose();
     }
-  };
+  });
 
-  useEffect(() => {
-    if (!open) {
-      setTimeout(() => {
-        document.body.style.pointerEvents = '';
-      }, 500);
-    }
-  }, [open]);
+  const [footerRef, { height: footerHeight }] = useElementSize();
 
-  return (
-    <DialogPrimitive.Root open={open} onOpenChange={handleOpenChange}>
-      <DialogPrimitive.Portal>
-        <DialogContent
-          isConfirmation={isConfirmation}
+  return open ? (
+    <Portal selector="#footprint-portal">
+      <FocusTrap>
+        <DialogContainer
+          role="dialog"
+          aria-label={title}
+          testID={testID}
+          isVisible={open}
+          from="center"
+          to="center"
           size={size}
           disableResponsiveness={disableResponsiveness}
-          onEscapeKeyDown={onClose}
-          onPointerDownOutside={onClose}
-          aria-label={ariaLabel || title}
-          role="dialog"
+          onClick={(event: React.MouseEvent<HTMLDivElement>) => {
+            event.stopPropagation();
+          }}
+          isConfirmation={isConfirmation}
+          ref={dialogRef}
         >
-          <DialogHeader
-            title={title}
-            headerIcon={headerIcon}
-            onClose={onClose}
-          />
-          <ScrollArea padding={7}>{children}</ScrollArea>
-          <DialogFooter
-            primaryButton={primaryButton}
-            secondaryButton={secondaryButton}
-            linkButton={linkButton}
-          />
-        </DialogContent>
-        <DialogPrimitive.Overlay asChild>
-          <Overlay isVisible={open} />
-        </DialogPrimitive.Overlay>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
-  );
+          <Header>
+            <CloseContainer>
+              <IconButton
+                aria-label={
+                  headerIconAriaLabel ??
+                  t('components.dialog.header-icon.aria-label-default')
+                }
+                onClick={onHeaderIconClick}
+              >
+                <HeaderIconComponent />
+              </IconButton>
+            </CloseContainer>
+            <Text variant="label-2">{title}</Text>
+          </Header>
+          <ScrollArea
+            paddingTop={7}
+            paddingBottom={5}
+            paddingLeft={7}
+            paddingRight={7}
+            maxHeight={`calc(100% - ${footerHeight}px)`}
+          >
+            {children}
+          </ScrollArea>
+          {linkButton || primaryButton || secondaryButton ? (
+            <Footer ref={footerRef}>
+              <Box>
+                {linkButton && (
+                  <LinkButton
+                    onClick={linkButton.onClick}
+                    type={linkButton.type}
+                    form={linkButton.form}
+                  >
+                    {linkButton.label}
+                  </LinkButton>
+                )}
+              </Box>
+              <ButtonsContainer>
+                {secondaryButton && (
+                  <Button
+                    disabled={secondaryButton.disabled}
+                    form={secondaryButton.form}
+                    loading={secondaryButton.loading}
+                    loadingAriaLabel={secondaryButton.loadingAriaLabel}
+                    onClick={secondaryButton.onClick}
+                    type={secondaryButton.type}
+                    variant="secondary"
+                  >
+                    {secondaryButton.label}
+                  </Button>
+                )}
+                {primaryButton && (
+                  <Button
+                    disabled={primaryButton.disabled}
+                    form={primaryButton.form}
+                    loading={primaryButton.loading}
+                    loadingAriaLabel={primaryButton.loadingAriaLabel}
+                    onClick={primaryButton.onClick}
+                    type={primaryButton.type}
+                    variant="primary"
+                  >
+                    {primaryButton.label}
+                  </Button>
+                )}
+              </ButtonsContainer>
+            </Footer>
+          ) : null}
+        </DialogContainer>
+      </FocusTrap>
+      <StyledOverlay isVisible={open} isConfirmation={isConfirmation} />
+    </Portal>
+  ) : null;
 };
 
-const DialogContent = styled(DialogPrimitive.Content)<{
-  isConfirmation?: boolean;
+const getSize = (size: DialogSize, isConfirmation: boolean) => {
+  if (isConfirmation) {
+    switch (size) {
+      case 'compact':
+        return '468px';
+      case 'large':
+        return '800px';
+      case 'full-screen':
+        return '100vw';
+      default:
+        return '650px';
+    }
+  } else {
+    switch (size) {
+      case 'compact':
+        return '500px';
+      case 'large':
+        return '800px';
+      case 'full-screen':
+        return '100vw';
+      default:
+        return '650px';
+    }
+  }
+};
+
+const getDistanceFromTop = (isConfirmation: boolean, size: DialogSize) => {
+  if (isConfirmation) {
+    return '50%';
+  }
+  if (size === 'full-screen') {
+    return '0';
+  }
+  return false;
+};
+
+const DialogContainer = styled(Fade)<{
   size: DialogSize;
-  disableResponsiveness?: boolean;
+  disableResponsiveness: boolean;
+  isConfirmation: boolean;
+  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }>`
-  ${({ isConfirmation, size, theme, disableResponsiveness }) => css`
+  ${({ theme, disableResponsiveness, size, isConfirmation }) => css`
+    background-color: ${theme.surfaceColor[2]};
     display: flex;
     flex-direction: column;
+    isolation: isolate;
+    justify-content: stretch;
     position: fixed;
-    background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default};
-    box-shadow: ${theme.elevation[3]};
-    z-index: 1000;
-    ${useDialogSize(size, disableResponsiveness, isConfirmation)};
-    ${useDialogPosition(size, isConfirmation)};
-    ${useDialogZIndex(isConfirmation)};
+    z-index: ${isConfirmation
+      ? theme.zIndex.confirmationDialog
+      : theme.zIndex.dialog};
+    width: ${getSize(size, isConfirmation)};
+    max-width: ${size !== 'full-screen' ? '90%' : '100%'};
+    height: ${size === 'full-screen' ? '100vh' : 'inherit'};
+    max-height: ${size !== 'full-screen'
+      ? `calc(100vh - 2 * ${theme.spacing[9]})`
+      : 'inherit'};
+    border-radius: ${size === 'full-screen' ? 0 : theme.borderRadius.default};
+    top: ${getDistanceFromTop(isConfirmation, size) || theme.spacing[9]};
+    left: 50%;
+    transform: ${isConfirmation
+      ? 'translate(-50%, -50%)'
+      : 'translate(-50%, 0%)'} !important;
+    z-index: ${isConfirmation
+      ? theme.zIndex.confirmationDialog
+      : theme.zIndex.dialog};
 
-    &[data-state='open'] {
-      animation: ${enter} 0.2s ease-in;
-    }
-
-    &[data-state='closed'] {
-      animation: ${leave} 0.2s ease-out;
-    }
+    ${!disableResponsiveness &&
+    media.lessThan('sm')`
+        top: 0;
+        max-height: none;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    `};
   `}
 `;
 
-const enter = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+const Header = styled.header`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    justify-content: center;
+    padding: 0 ${theme.spacing[5]};
+    height: 48px;
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+    z-index: 1;
+  `}
 `;
 
-const leave = keyframes`
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+const CloseContainer = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    left: ${theme.spacing[5]};
+  `}
+`;
+
+const Footer = styled.footer`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: ${theme.spacing[4]} ${theme.spacing[7]} ${theme.spacing[5]}
+      ${theme.spacing[7]};
+    flex-shrink: 0;
+    background-color: ${theme.surfaceColor[2]};
+    width: 100%;
+    z-index: 1;
+    position: sticky;
+    bottom: 0;
+    border-radius: 0 0 ${theme.borderRadius.default}
+      ${theme.borderRadius.default};
+  `}
+`;
+
+const ButtonsContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[4]};
+  `}
+`;
+
+const StyledOverlay = styled(Overlay)<{ isConfirmation: boolean }>`
+  ${({ theme, isConfirmation }) => css`
+    ${isConfirmation &&
+    `
+      z-index: ${theme.zIndex.confirmationOverlay};
+    `};
+  `}
 `;
 
 export default Dialog;

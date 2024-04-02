@@ -25,6 +25,7 @@ const ConfirmationDialog = ({
     <Dialog
       size="compact"
       open={open}
+      onClose={onClose}
       title={title}
       primaryButton={{
         label: t('confirm.cta'),
@@ -36,7 +37,6 @@ const ConfirmationDialog = ({
         label: t('confirm.cancel'),
         onClick: onClose,
       }}
-      onClose={onClose}
     >
       <Text variant="body-2" color="secondary" textAlign="center">
         {children}

@@ -27,9 +27,10 @@ const FormDialog = ({
 
   return (
     <Dialog
-      open={open}
       size="compact"
       title={title}
+      onClose={onClose}
+      open={open}
       primaryButton={{
         form: id,
         label: t('save'),
@@ -50,7 +51,6 @@ const FormDialog = ({
             }
           : undefined
       }
-      onClose={onClose}
     >
       {children}
     </Dialog>

@@ -12,7 +12,6 @@ const nextConfig = {
     '@onefootprint/styled',
     '@onefootprint/types',
     '@onefootprint/ui',
-    '@radix-ui',
   ],
 };
 

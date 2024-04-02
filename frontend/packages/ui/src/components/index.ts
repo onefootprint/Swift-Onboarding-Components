@@ -30,9 +30,15 @@ export { default as CountrySelect } from './country-select';
 export type { DateRangeInputProps } from './date-range-input';
 export { default as DateRangeInput } from './date-range-input';
 export type {
+  DialogAllButtons,
   DialogButton,
   DialogHeaderIcon,
   DialogLinkButton,
+  DialogNoButtons,
+  DialogOnlyButtons,
+  DialogOnlyPrimaryButton,
+  DialogPrimaryAndLinkButtons,
+  DialogProps,
   DialogSize,
 } from './dialog';
 export { default as Dialog } from './dialog';

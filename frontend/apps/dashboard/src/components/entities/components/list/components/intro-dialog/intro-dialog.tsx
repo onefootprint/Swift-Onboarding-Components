@@ -34,6 +34,7 @@ const IntroDialog = () => {
     <Dialog
       title={t('dialog.heading')}
       open={isDialogOpen}
+      onClose={onClose}
       size="compact"
       primaryButton={{
         label: t('dialog.cta'),
@@ -47,7 +48,6 @@ const IntroDialog = () => {
           setIsDialogOpen(false);
         },
       }}
-      onClose={onClose}
     >
       <Title>
         <Text variant="label-2" tag="h1">

@@ -50,7 +50,6 @@ const FreeFormNoteEntryDialog = ({
 
   return (
     <Dialog
-      open={open}
       size="compact"
       title={t('dialog.title')}
       primaryButton={{
@@ -65,6 +64,7 @@ const FreeFormNoteEntryDialog = ({
         disabled: submitFreeFormMutation.isLoading,
       }}
       onClose={onClose}
+      open={open}
     >
       <ManualNoteEntryForm
         formId="free-form-note-form"
