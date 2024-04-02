@@ -2396,16 +2396,19 @@
       },
       "details": {
         "title": "Playbook details",
-        "basics": {
-          "title": "Playbook basics",
+        "breadcrumb": {
+          "title": "playbook details breadcrumb",
+          "playbooks": "Playbooks",
+          "users": "Users",
+          "user-details": "User details",
+          "playbook-details": "Playbook details"
+        },
+        "header": {
           "edit-name": {
-            "title": "Playbook basics",
-            "cta": "Edit Playbook name",
+            "cta": "Edit playbook name",
             "cta-not-allowed": "You're not allowed to edit Playbooks",
             "form": {
-              "label": "Playbook name",
-              "cancel": "Cancel",
-              "save": "Save"
+              "label": "Playbook name"
             }
           },
           "type": {
@@ -2478,6 +2481,8 @@
           }
         },
         "rules": {
+          "title": "Rules",
+          "description": "Define the onboarding logic for your playbook.",
           "empty-rules": "This playbook does not have rules.",
           "alerts": {
             "kyb-alert": "These rules are only applied when verifying a Business Owner's identity.",

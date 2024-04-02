@@ -4,7 +4,7 @@ import {
   type EditRuleResponse,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { GET_QUERY_KEY } from 'src/components/playbook-details-drawer/components/content/components/collection-and-scopes/components/rules/hooks/use-rules';
+import { GET_QUERY_KEY } from 'src/components/playbook-details/components/content/components/collection-and-scopes/components/rules/hooks/use-rules';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 

@@ -5,7 +5,7 @@ import {
 import { Shimmer, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import usePlaybook from 'src/components/playbook-details-drawer/hooks/use-playbook';
+import usePlaybook from 'src/components/playbook-details/hooks/use-playbook';
 
 import Actor from '../actor/actor';
 import PlaybookLink from '../playbook-link';
@@ -43,9 +43,7 @@ const PlaybookContext = ({ data }: WorkflowTriggeredEventHeaderProps) => {
   const actionHasPlaybook =
     workflowKind === TriggerKind.Onboard ||
     workflowKind === TriggerKind.RedoKyc;
-  const { data: playbook, isError } = usePlaybook(
-    (actionHasPlaybook && data.request?.playbookId) || '',
-  );
+  const { data: playbook, isError } = usePlaybook();
   if (!actionHasPlaybook) {
     return null;
   }

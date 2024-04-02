@@ -26,7 +26,7 @@ import {
 import { WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline';
 
 export const entityIdFixure = 'fp_id_cDsFPmDwz784hdwovghMqt';
-export const obcIdFixure = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
+export const obcIdFixture = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
 
 export const entityFixture: Entity = {
   id: entityIdFixure,
@@ -223,7 +223,7 @@ export const WorkflowTriggeredWithLinkEvent: TimelineEvent = {
       request: {
         id: 'wfr_id',
         isDeactivated: false,
-        playbookId: 'obc_123',
+        playbookId: obcIdFixture,
       },
       actor: {
         kind: ActorKind.organization,
@@ -333,7 +333,7 @@ export const ruleResultsFixture: RuleResult[] = [
 export const ruleResultFixture: GetEntityRuleSetResultResponse = {
   actionTriggered: OnboardingDecisionRuleAction.fail,
   createdAt: '2024-01-05T23:37:22.943740Z',
-  obConfigurationId: obcIdFixure,
+  obConfigurationId: obcIdFixture,
   ruleResults: ruleResultsFixture,
 };
 

@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
+import usePlaybookId from '../use-playbook-id';
+
 const getPlaybook = async (authHeaders: AuthHeaders, id: string) => {
   const response = await request<GetOnboardingConfigResponse>({
     method: 'GET',
@@ -14,7 +16,8 @@ const getPlaybook = async (authHeaders: AuthHeaders, id: string) => {
   return response.data;
 };
 
-const usePlaybook = (id: string = '') => {
+const usePlaybook = () => {
+  const id = usePlaybookId();
   const { authHeaders } = useSession();
 
   const onboardingConfigQuery = useQuery(

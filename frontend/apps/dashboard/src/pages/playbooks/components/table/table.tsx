@@ -1,5 +1,6 @@
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +15,7 @@ type TableProps = {
 
 const Table = ({ data, isLoading, errorMessage }: TableProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
+  const router = useRouter();
   const filters = useFilters();
   const columns = [
     { id: 'name', text: t('table.header.name'), width: '25%' },
@@ -25,7 +27,10 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
   ];
 
   const handleRowClick = (config: OnboardingConfig) => {
-    filters.push({ onboarding_config_id: config.id });
+    router.push({
+      pathname: `/playbooks/${config.id}`,
+      query: { ...filters.query },
+    });
   };
 
   return (

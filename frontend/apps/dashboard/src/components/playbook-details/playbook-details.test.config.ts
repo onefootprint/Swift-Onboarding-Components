@@ -6,6 +6,8 @@ import {
 } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
+export const entityIdFixture: string = 'fp_id_wL6XIWe26cRinucZrRK1yn';
+
 export const playbookDetailsFixture: OnboardingConfig = {
   author: {
     kind: 'organization',

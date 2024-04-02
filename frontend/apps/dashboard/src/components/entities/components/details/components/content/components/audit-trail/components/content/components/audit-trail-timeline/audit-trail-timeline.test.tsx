@@ -17,6 +17,7 @@ import {
   DocumentWorkflowStarted,
   entityFixture,
   entityIdFixure,
+  obcIdFixture,
   TimelineFixture,
   withRuleSetResult,
   WorkflowTriggeredWithLinkEvent,
@@ -31,7 +32,13 @@ describe('<AuditTrailTimeline />', () => {
       pathname: `/entities/${entityIdFixure}`,
       query: {
         id: entityIdFixure,
+        playbook_id: obcIdFixture,
       },
+    });
+    mockRequest({
+      method: 'get',
+      path: `/org/onboarding_configs/${obcIdFixture}`,
+      response: { name: 'My playbook' },
     });
     withRuleSetResult();
   });
@@ -123,13 +130,8 @@ describe('<AuditTrailTimeline />', () => {
       it('should be able to generate a new link', async () => {
         const { writeTestMockFn } = createClipboardSpy();
         mockRequest({
-          method: 'get',
-          path: '/org/onboarding_configs/obc_123',
-          response: { name: 'My playbook' },
-        });
-        mockRequest({
           method: 'post',
-          path: `/entities/${entityFixture.id}/token`,
+          path: `/entities/${entityIdFixure}/token`,
           response: { link: 'https://mylink' },
         });
 

@@ -4,7 +4,6 @@ import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
-import PlaybookDetailsDrawer from 'src/components/playbook-details-drawer';
 import WaveAnimation from 'src/components/wave-animation';
 import styled, { css } from 'styled-components';
 
@@ -84,7 +83,6 @@ const Playbooks = () => {
           />
         )}
       </Stack>
-      <PlaybookDetailsDrawer />
       <CreateDialog
         open={dialogOpen}
         onClose={handleClose}
