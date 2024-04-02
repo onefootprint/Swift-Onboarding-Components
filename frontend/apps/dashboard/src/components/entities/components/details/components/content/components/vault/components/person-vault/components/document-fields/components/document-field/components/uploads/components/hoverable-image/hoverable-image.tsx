@@ -39,7 +39,7 @@ const HoverableImage = ({
   return isPDF ? (
     <Stack direction="column" gap={5}>
       <PdfThumbnail src={src} />
-      <PdfViewer src={src} documentName={documentName} />
+      <PdfViewer base64Src={src} documentName={documentName} />
     </Stack>
   ) : (
     <ImageContainer
