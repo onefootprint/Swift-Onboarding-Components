@@ -11,6 +11,7 @@ import {
 import type { TimelineEvent } from '@onefootprint/types';
 import React from 'react';
 import { withEntity } from 'src/components/entities/components/details/details.test.config';
+import { asAdminUser } from 'src/config/tests';
 
 import AuditTrailTimeline from './audit-trail-timeline';
 import {
@@ -41,6 +42,7 @@ describe('<AuditTrailTimeline />', () => {
       response: { name: 'My playbook' },
     });
     withRuleSetResult();
+    asAdminUser();
   });
 
   const renderAuditTrailTimeline = (timeline: TimelineEvent[]) =>

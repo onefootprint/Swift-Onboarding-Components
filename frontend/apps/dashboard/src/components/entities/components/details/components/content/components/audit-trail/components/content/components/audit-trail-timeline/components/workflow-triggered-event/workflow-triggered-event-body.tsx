@@ -4,10 +4,11 @@ import type {
   Annotation,
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
-import { TokenKind } from '@onefootprint/types';
+import { RoleScopeKind, TokenKind } from '@onefootprint/types';
 import { Dialog, LinkButton, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import PermissionGate from 'src/components/permission-gate';
 
 import useDisplayLinkDialog from '../../../../../../../vault/components/vault-actions/components/retrigger-kyc-dialog/hooks/use-display-link-dialog';
 import useGenerateTokenRequest from '../../../../../../../vault/components/vault-actions/hooks/use-generate-token';
@@ -96,13 +97,19 @@ const WorkflowTriggeredEventBody = ({
                   >
                     ·
                   </Stack>
-                  <LinkButton
-                    onClick={openLinkDialog}
-                    disabled={generateTokenMutation.isLoading}
-                    variant="label-4"
+                  <PermissionGate
+                    scopeKind={RoleScopeKind.manualReview}
+                    fallbackText={t('create-link.no-permission')}
+                    tooltipPosition="left"
                   >
-                    {t('create-link')}
-                  </LinkButton>
+                    <LinkButton
+                      onClick={openLinkDialog}
+                      disabled={generateTokenMutation.isLoading}
+                      variant="label-4"
+                    >
+                      {t('create-link.label')}
+                    </LinkButton>
+                  </PermissionGate>
                 </>
               )}
             </Stack>

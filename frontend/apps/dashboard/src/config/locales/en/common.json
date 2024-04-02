@@ -1555,7 +1555,10 @@
               "proof_of_address": "provide proof of address"
             },
             "link-generated": "Generated a link for the user to complete this task",
-            "create-link": "Create new link",
+            "create-link": {
+              "label": "Create new link",
+              "no-permission": "You don't have permissions to generate a new link"
+            },
             "tooltip": {
               "copied": "Copied!",
               "couldnt-copy": "Couldn't copy..."
