@@ -113,6 +113,7 @@ const BasicInformation = ({
       data: checkPhoneEmailBeforeSubmit(
         initialData,
         convertFormData(formData),
+        requirement,
         verifiedMethods,
       ),
       onError: handleSyncDataError,

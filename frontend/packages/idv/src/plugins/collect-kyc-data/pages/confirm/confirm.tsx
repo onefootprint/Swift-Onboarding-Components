@@ -48,7 +48,12 @@ const Confirm = () => {
 
   const handleConfirm = () => {
     syncData({
-      data: checkPhoneEmailBeforeSubmit(initialData, data, verifiedMethods),
+      data: checkPhoneEmailBeforeSubmit(
+        initialData,
+        data,
+        requirement,
+        verifiedMethods,
+      ),
       onSuccess: () => send({ type: 'confirmed' }),
       onError: (fieldErrors: SyncDataFieldErrors) => {
         // We can't show the error messages as hints unless the sub-forms are in edit mode

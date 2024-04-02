@@ -1,9 +1,10 @@
 import type {
+  CollectKycDataRequirement,
   InvestorProfileDI,
   UserDataError,
   VaultValue,
 } from '@onefootprint/types';
-import { IdDI } from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { AxiosError } from 'axios';
 import omit from 'lodash/omit';
@@ -136,22 +137,36 @@ export const omitPhoneAndEmail = <T extends ObjWithValue>(data: T) =>
 export const checkPhoneEmailBeforeSubmit = <T extends ObjWithValue>(
   initial: T,
   current: T,
+  requirement: CollectKycDataRequirement,
   verifiedMethods?: { phone?: string | false; email?: string | false },
 ) => {
   const propsToRemove = [];
 
+  const hasVerified = {
+    email: Boolean(verifiedMethods?.email),
+    phone: Boolean(verifiedMethods?.phone),
+  };
+  const valueHasNotChanged = {
+    email:
+      String(initial[IdDI.email]?.value).trim() ===
+      String(current[IdDI.email]?.value).trim(),
+    phone:
+      onlyNumericAndPlus(initial[IdDI.phoneNumber]?.value) ===
+      onlyNumericAndPlus(current[IdDI.phoneNumber]?.value),
+  };
+
+  // If a piece of data hasn't changed or the backend already has it verified, remove it from the
+  // data we'll send to the backend as long as the backend isn't explicitly requesting it.
   if (
-    Boolean(verifiedMethods?.email) ||
-    String(initial[IdDI.email]?.value).trim() ===
-      String(current[IdDI.email]?.value).trim()
+    (hasVerified.email || valueHasNotChanged.email) &&
+    !requirement.missingAttributes.includes(CollectedKycDataOption.email)
   ) {
     propsToRemove.push(IdDI.email);
   }
 
   if (
-    Boolean(verifiedMethods?.phone) ||
-    onlyNumericAndPlus(initial[IdDI.phoneNumber]?.value) ===
-      onlyNumericAndPlus(current[IdDI.phoneNumber]?.value)
+    (hasVerified.phone || valueHasNotChanged.phone) &&
+    !requirement.missingAttributes.includes(CollectedKycDataOption.phoneNumber)
   ) {
     propsToRemove.push(IdDI.phoneNumber);
   }
