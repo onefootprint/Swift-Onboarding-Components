@@ -15,11 +15,11 @@ impl NeuroIdClient {
         let mut headers = header::HeaderMap::new();
         headers.insert(
             "API-KEY",
-            header::HeaderValue::from_str(credentials.api_key.leak())?,
+            header::HeaderValue::from_str(credentials.api_key().leak())?,
         );
 
         Ok(Self {
-            site_id: credentials.site_id,
+            site_id: credentials.site_id(),
             default_headers: headers,
         })
     }
@@ -51,6 +51,7 @@ impl NeuroIdClient {
 #[cfg(test)]
 mod tests {
     use itertools::Itertools;
+    use newtypes::vendor_credentials::{NeuroIdApiKey, NeuroIdSiteId};
 
     use crate::{
         footprint_http_client::FpVendorClientArgs,
@@ -62,10 +63,10 @@ mod tests {
     fn example_neuro_creds() -> (NeuroIdCredentials, NeuroIdentityId) {
         // https://neuro-id.readme.io/reference/api-test-cases
         (
-            NeuroIdCredentials {
-                site_id: "form_neuro300".into(),
-                api_key: PiiString::from(dotenv::var("NEURO_TEST_API_KEY").unwrap()),
-            },
+            NeuroIdCredentials::new(
+                NeuroIdApiKey(PiiString::from(dotenv::var("NEURO_TEST_API_KEY").unwrap())),
+                NeuroIdSiteId("form_neuro300".into()),
+            ),
             NeuroIdentityId::from("example-response-2".to_string()),
         )
     }

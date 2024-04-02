@@ -41,10 +41,33 @@ pub struct LexisCredentials {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct NeuroIdApiKey(pub PiiString);
+
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct NeuroIdSiteId(pub PiiString);
+
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct NeuroIdCredentials {
-    pub api_key: PiiString,
-    pub site_id: PiiString,
+    // we get this from api Config
+    api_key: NeuroIdApiKey,
+    // we might get this from playbook or per-tenant configurations
+    site_id: NeuroIdSiteId,
 }
+
+impl NeuroIdCredentials {
+    pub fn new(api_key: NeuroIdApiKey, site_id: NeuroIdSiteId) -> Self {
+        Self { api_key, site_id }
+    }
+
+    pub fn api_key(&self) -> PiiString {
+        self.api_key.0.clone()
+    }
+
+    pub fn site_id(&self) -> PiiString {
+        self.site_id.0.clone()
+    }
+}
+
 
 /// The bulk of experian credentials are shared across requests for different tenants
 /// All that is different is the subscriber code
