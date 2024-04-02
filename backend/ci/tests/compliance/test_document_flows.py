@@ -248,13 +248,12 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["tenant_assignee"]["first_name"] == assignee["first_name"]
     assert doc["tenant_assignee"]["last_name"] == assignee["last_name"]
 
-    # Assigning a bogus user ID should fail.
+    # Assigning a bogus partner user ID should fail.
     resp = post(f"org/partners/{partnership_id}/documents/{doc_id}/assignments", {
         "user_id": "testing",
-    }, *tenant.db_auths, status_code=400)
-    assert resp["error"]["message"] == "User not a member of tenant"
+    }, *tenant.db_auths, status_code=404)
 
-    # Remove the assignment.
+    # Remove the tenant assignment.
     post(f"org/partners/{partnership_id}/documents/{doc_id}/assignments", {
         "user_id": None,
     }, *tenant.db_auths)
@@ -262,7 +261,27 @@ def test_partner_document_flow(tenant, partner_tenant):
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["tenant_assignee"] is None
 
-    # Assign the document to a partner tenant user
+    # Assign the document to a partner tenant user.
+    doc_id = doc["id"]
     assignee = get("compliance/members", {}, *partner_tenant.ro_db_auths)["data"][0]
-    # TODO: actually assign it
+    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/assignments", {
+        "user_id": assignee["id"],
+    }, *partner_tenant.db_auths)
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
+    assert doc["partner_tenant_assignee"]["id"] == assignee["id"]
+    assert doc["partner_tenant_assignee"]["first_name"] == assignee["first_name"]
+    assert doc["partner_tenant_assignee"]["last_name"] == assignee["last_name"]
 
+    # Assigning a bogus tenant user ID should fail.
+    resp = post(f"org/partners/{partnership_id}/documents/{doc_id}/assignments", {
+        "user_id": "testing",
+    }, *tenant.db_auths, status_code=404)
+
+    # Remove the partner assignment.
+    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/assignments", {
+        "user_id": None,
+    }, *partner_tenant.db_auths)
+    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
+    assert doc["partner_tenant_assignee"] is None
