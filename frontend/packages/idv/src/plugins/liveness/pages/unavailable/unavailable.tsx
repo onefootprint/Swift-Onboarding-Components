@@ -27,14 +27,14 @@ const Unavailable = () => {
     }
 
     let reason;
-    if (isInIframe) {
+    if (!device?.hasSupportForWebauthn) {
+      reason = SkipLivenessReason.unavailableOnDevice;
+    } else if (isInIframe) {
       if (checkIsSocialMediaBrowser()) {
         reason = SkipLivenessReason.unavailableInSocialIframe;
       } else {
         reason = SkipLivenessReason.unavailableInIframe;
       }
-    } else if (!device?.hasSupportForWebauthn) {
-      reason = SkipLivenessReason.unavailableOnDevice;
     } else {
       reason = SkipLivenessReason.unknown;
     }
