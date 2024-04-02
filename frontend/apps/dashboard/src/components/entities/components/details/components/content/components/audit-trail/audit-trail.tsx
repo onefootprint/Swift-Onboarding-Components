@@ -1,6 +1,6 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Error } from 'src/components';
+import { useTranslation } from 'react-i18next';
 
 import { AUDIT_TRAILS_ID } from '@/entity/constants';
 import useCurrentEntityTimeline from '@/entity/hooks/use-current-entity-timeline';
