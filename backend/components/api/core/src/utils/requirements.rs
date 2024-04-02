@@ -18,6 +18,7 @@ use db::{
     },
     PgConn,
 };
+use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     AlpacaKycState, AuthorizeFields, CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration,
@@ -76,6 +77,11 @@ impl DecryptUncheckedResultForReqs {
     }
 }
 
+#[derive(Default)]
+pub struct RequirementOpts {
+    pub require_capture_on_stepup: Option<bool>,
+}
+
 #[tracing::instrument(skip_all)]
 /// Gets a list of requirements for the Person Vault for the onboarding.
 /// If the Person Vault is the Primary BO of some ongoing Business onboarding, then this also includes the requirements of that Business Vault
@@ -125,11 +131,25 @@ pub async fn get_requirements_for_person_and_maybe_business(
         None
     };
 
+    let person_requirement_opts = RequirementOpts {
+        require_capture_on_stepup: Some(
+            state
+                .feature_flag_client
+                .flag(BoolFlag::RequireCaptureOnStepUp(&person_obc.key)),
+        ),
+    };
+
     let requirements = state
         .db_pool
         .db_query(move |conn| -> ApiResult<Vec<_>> {
-            let person_requirements =
-                get_requirements_inner(conn, uvw, &person_obc, &person_workflow, person_decrypted_values)?;
+            let person_requirements = get_requirements_inner(
+                conn,
+                uvw,
+                &person_obc,
+                &person_workflow,
+                person_decrypted_values,
+                person_requirement_opts,
+            )?;
 
             let business_requirements =
                 if let Some((bvw, business_workflow, business_decrypted_values)) = bvw_wf_decrypted_values {
@@ -140,6 +160,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
                         &person_obc,
                         &business_workflow,
                         business_decrypted_values,
+                        RequirementOpts::default(),
                     )?
                 } else {
                     vec![]
@@ -273,6 +294,7 @@ pub fn get_requirements_inner(
     obc: &ObConfiguration,
     wf: &Workflow,
     decrypted_values: DecryptUncheckedResultForReqs,
+    opts: RequirementOpts,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     // Depending on the workflow that we are running, we only want to show a subset of requirements
     let relevant_requirement_kinds = wf.state.relevant_requirements();
@@ -281,7 +303,7 @@ pub fn get_requirements_inner(
     // necessary
     let requirements = relevant_requirement_kinds
         .into_iter()
-        .map(|k| get_requirement_inner(k, conn, &vw, obc, wf, &decrypted_values))
+        .map(|k| get_requirement_inner(k, conn, &vw, obc, wf, &decrypted_values, &opts))
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .flatten()
@@ -331,6 +353,7 @@ fn get_requirement_inner(
     obc: &ObConfiguration,
     wf: &Workflow,
     decrypted_values: &DecryptUncheckedResultForReqs,
+    opts: &RequirementOpts,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let req = match k {
         OnboardingRequirementKind::CollectData => {
@@ -428,7 +451,7 @@ fn get_requirement_inner(
                     if should_render {
                         let req = match dr.kind {
                             DocumentRequestKind::Identity => {
-                                identity_doc_requirement(conn, &wf.id, &dr, obc, decrypted_values)?
+                                identity_doc_requirement(conn, &wf.id, &dr, obc, decrypted_values, opts)?
                             }
                             DocumentRequestKind::ProofOfSsn => proof_of_ssn_requirement(&dr, obc),
                             DocumentRequestKind::ProofOfAddress => {
@@ -515,19 +538,27 @@ fn identity_doc_requirement(
     dr: &DocumentRequest,
     obc: &ObConfiguration,
     decrypted_values: &DecryptUncheckedResult,
+    opts: &RequirementOpts,
 ) -> ApiResult<OnboardingRequirement> {
     let user_consent = UserConsent::get_for_workflow(conn, wf_id)?;
     let country = decrypted_values
         .get(&IDK::Country.into())
         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
     let supported_country_and_doc_types = obc.supported_country_mapping_for_document(country);
+    // if FF'd into require capture only
+    // TODO: this will come from rule configuration table at some point in future
+    let upload_mode = if opts.require_capture_on_stepup.unwrap_or(false) {
+        DocumentUploadMode::CaptureOnly
+    } else {
+        DocumentUploadMode::Default
+    };
 
     Ok(OnboardingRequirement::CollectDocument {
         document_request_id: dr.id.clone(),
         should_collect_selfie: dr.should_collect_selfie,
         should_collect_consent: user_consent.is_none(),
         supported_country_and_doc_types: supported_country_and_doc_types.0,
-        upload_mode: DocumentUploadMode::Default,
+        upload_mode,
         document_request_kind: dr.kind,
     })
 }

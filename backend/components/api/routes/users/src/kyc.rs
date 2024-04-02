@@ -12,7 +12,7 @@ use api_core::{
         db2api::DbToApi,
         fp_id_path::FpIdPath,
         onboarding::NewOnboardingArgs,
-        requirements::{get_requirements_inner, GetRequirementsArgs},
+        requirements::{get_requirements_inner, GetRequirementsArgs, RequirementOpts},
         vault_wrapper::{Any, VaultWrapper, VwArgs},
     },
 };
@@ -154,7 +154,8 @@ pub async fn post(
 
             // /kyc endpoint currently does not properly handle IPK doc requirements!
             // Also does not check any requirements for the Business vault if this person is a primary BO for a Business
-            let reqs = get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values)?;
+            let reqs =
+                get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, RequirementOpts::default())?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()

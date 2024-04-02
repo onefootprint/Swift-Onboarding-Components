@@ -10,7 +10,7 @@ use api_core::{
     utils::{
         db2api::DbToApi,
         fp_id_path::FpIdPath,
-        requirements::GetRequirementsArgs,
+        requirements::{GetRequirementsArgs, RequirementOpts},
         vault_wrapper::{Any, VaultWrapper, VwArgs},
     },
 };
@@ -130,6 +130,7 @@ pub async fn post(
                 &obc,
                 &biz_wf,
                 decrypted_values,
+                RequirementOpts::default(),
             )?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs

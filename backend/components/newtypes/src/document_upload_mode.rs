@@ -10,4 +10,5 @@ pub enum DocumentUploadMode {
     Default,
     // For document types that are likely to be uploaded (proof of address, leases, bank statements)
     AllowUpload,
+    CaptureOnly,
 }
