@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -138,10 +138,6 @@ const useSession = () => {
       // If we can't fetch the user from the backend, just log out and display a toast
       logOut();
       showRequestErrorToast(error);
-      console.error(
-        'Failed to fetch user from backend',
-        getErrorMessage(error),
-      );
     }
   };
 

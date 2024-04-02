@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
-import { getErrorMessage } from '@onefootprint/request';
 import type {
   Annotation,
   WorkflowTriggeredEventData,
@@ -55,10 +54,6 @@ const WorkflowTriggeredEventBody = ({
       },
       {
         onError: (error: unknown) => {
-          console.error(
-            `Generating new link for requested info failed`,
-            getErrorMessage(error),
-          );
           showErrorToast(error);
           setIsDialogOpen(false);
         },

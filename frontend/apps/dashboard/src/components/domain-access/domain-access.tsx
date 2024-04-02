@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
-import { getErrorMessage } from '@onefootprint/request';
 import type { Organization } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Divider, Text, Toggle, Tooltip } from '@onefootprint/ui';
@@ -39,10 +38,6 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
           },
           {
             onError: (error: unknown) => {
-              console.error(
-                'Updating org domain access failed',
-                getErrorMessage(error),
-              );
               showRequestErrorToast(error);
             },
           },

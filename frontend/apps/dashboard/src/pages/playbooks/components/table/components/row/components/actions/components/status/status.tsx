@@ -1,5 +1,4 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigStatus } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
@@ -44,11 +43,6 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
       {
         onSuccess: hideConfirmation,
         onError: (error: unknown) => {
-          console.error(
-            `Failed to edit playbook status to ${status}`,
-            error,
-            getErrorMessage(error),
-          );
           showErrorToast(error);
         },
       },

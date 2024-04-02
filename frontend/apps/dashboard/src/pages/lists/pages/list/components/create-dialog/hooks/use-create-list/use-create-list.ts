@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type {
   CreateListRequest,
   CreateListResponse,
@@ -30,7 +30,6 @@ const useCreateList = () => {
     (data: CreateListRequest) => createList(authHeaders, data),
     {
       onError: e => {
-        console.error('Creating list failed', getErrorMessage(e));
         showErrorToast(e);
         // Clear out all the results in case the request did create the list
         queryClient.invalidateQueries(['lists', authHeaders]);

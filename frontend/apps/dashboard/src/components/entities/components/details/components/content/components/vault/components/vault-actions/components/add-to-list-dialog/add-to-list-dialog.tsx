@@ -102,7 +102,6 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
     const formListId = formData.list.value;
     const list = listById[formListId];
     if (!list || !entity) {
-      console.error('List or entity not found');
       showRequestErrorToast();
       return;
     }
@@ -114,7 +113,6 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
         entity.workflows,
       );
       if (!entries.length) {
-        console.error('Found empty entries for IP address list kind');
         showRequestErrorToast();
         return;
       }
@@ -124,7 +122,6 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
 
     const attribute = getAttributeForListKind(list.kind, entity);
     if (!attribute) {
-      console.error('Attribute not found');
       showRequestErrorToast();
       return;
     }

@@ -1,5 +1,4 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import { OrgFrequentNoteKind, type ReviewStatus } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
@@ -45,10 +44,6 @@ const ManualReviewDialog = ({
           onClose();
         },
         onError: (error: unknown) => {
-          console.error(
-            'Submitting manual review failed.',
-            getErrorMessage(error),
-          );
           showRequestErrorToast(error);
         },
       },

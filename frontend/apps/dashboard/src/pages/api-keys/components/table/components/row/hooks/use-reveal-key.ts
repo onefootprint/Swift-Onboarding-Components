@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type {
   ApiKey,
   OrgApiKeyRevealRequest,
@@ -35,7 +35,6 @@ const useRevealKey = (apiKey: ApiKey) => {
         updateApiCache(response);
       },
       onError: (error: unknown) => {
-        console.error('Revealing key failed', getErrorMessage(error));
         showRequestError(error);
       },
     },

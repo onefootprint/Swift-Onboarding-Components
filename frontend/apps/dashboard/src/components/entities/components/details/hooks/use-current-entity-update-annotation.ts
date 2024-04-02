@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type {
   UpdateAnnotationRequest,
   UpdateAnnotationResponse,
@@ -42,10 +42,6 @@ const useCurrentEntityUpdateAnnotation = () => {
         queryClient.refetchQueries();
       },
       onError: (error: unknown) => {
-        console.error(
-          `Updating entity with id ${id} failed`,
-          getErrorMessage(error),
-        );
         showErrorToast(error);
       },
     },

@@ -28,12 +28,15 @@ const Actions = ({ entity }: WithEntityProps) => {
   const handleCloseDialog = () => {
     setOpenDialog(null);
   };
+
   const handleOpenRetriggerKycDialog = () => {
     setOpenDialog(ActionDialog.retrigger);
   };
+
   const handleOpenAuthMethodsDialog = () => {
     setOpenDialog(ActionDialog.auth);
   };
+
   // const handleOpenAddToListDialog = () => {
   //   setOpenDialog(ActionDialog.addToList);
   // };
@@ -95,6 +98,7 @@ const Actions = ({ entity }: WithEntityProps) => {
     </>
   ) : null;
 };
+
 const StyledTrigger = styled(Dropdown.Trigger)`
   ${({ theme }) => {
     const { button } = theme.components;

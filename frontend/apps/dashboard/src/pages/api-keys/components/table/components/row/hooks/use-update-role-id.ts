@@ -1,4 +1,4 @@
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type {
   ApiKey,
   OrgApiKeyUpdateRequest,
@@ -48,7 +48,6 @@ const useUpdateRoleId = () => {
         return { previousApiKeys };
       },
       onError: (err, updatedApiKey, context) => {
-        console.error('Updating role id failed', getErrorMessage(err));
         if (context?.previousApiKeys) {
           queryClient.setQueryData(
             ['api-keys', authHeaders],

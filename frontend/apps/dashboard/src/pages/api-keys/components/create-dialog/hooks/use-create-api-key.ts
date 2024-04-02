@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type {
   ApiKey,
   OrgCreateApiKeyRequest,
@@ -31,7 +31,6 @@ const useCreateApiKey = () => {
     (data: OrgCreateApiKeyRequest) => createApiKey(authHeaders, data),
     {
       onError: e => {
-        console.error('Creating api key failed', getErrorMessage(e));
         showErrorToast(e);
         // Clear out all the results in case the request did create the API key
         queryClient.invalidateQueries(['api-keys', authHeaders]);

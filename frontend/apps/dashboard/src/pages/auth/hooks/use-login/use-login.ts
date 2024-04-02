@@ -1,5 +1,5 @@
 import type { RequestError } from '@onefootprint/request';
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type {
   OrgAuthLoginRequest,
   OrgAuthLoginResponse,
@@ -32,7 +32,6 @@ const useLogin = () => {
       } else {
         description = t('workos-error.description');
       }
-      console.error(`Login failed`, getErrorMessage(e));
       toast.show({
         title: t('workos-error.title'),
         description,
