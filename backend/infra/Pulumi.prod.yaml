@@ -10,6 +10,20 @@ config:
     containers:
       apiVersion: latest
       enclaveVersion: latest
+    cronTasks:
+    - args:
+      - create-overdue-watchlist-check-tasks
+      - --limit=1000
+      cpuUnits: 1024
+      memoryMB: 2048
+      name: overdue-watchlist
+      schedule: cron(0 17 * * ? *)
+    - args:
+      - generate-invoices
+      cpuUnits: 1024
+      memoryMB: 2048
+      name: generate-invoices
+      schedule: cron(0 * * * ? *)
     db:
       deletionProtection: true
       maxAcus: 64
@@ -107,6 +121,9 @@ config:
         secure: v1:dzUFaOSpvPFI9Tpt:8DtlgXBFIuL7FzuS7uhGLjD4BWbi6T8NJqy1YUe9eKblujsFyHkRbCAqHQ==
       webhookSecret:
         secure: v1:JwLRbuAPf0pSaGKC:UXrgvZZ1LmLXmmeJcWGekg40tnmEvCkKhj/cYVcVu4jRmHDxppMyTpZArO/D3Picu1rEGh2UgiAMTKZfSFzBTZo=
+    neuro:
+      apiKey:
+        secure: v1:iKIx28wCAXMwkjAB:LsdkiIu8bqhWS4zX9TEGr/935oL8qaFinKeT5Tdi5eY5TFfXPtmG1nsDZufxHhkA+g==
     resources:
       cpuUnits: 4096
       maxInstances: 50
@@ -114,22 +131,6 @@ config:
       minInstances: 6
       targetCpuUtilization: 60
       targetMemoryUtilization: 60
-    cronTasks:
-      - name: overdue-watchlist
-        memoryMB: 2048
-        cpuUnits: 1024
-        schedule: "cron(0 17 * * ? *)" # Once per day at 17:00 UTC
-        args: ["create-overdue-watchlist-check-tasks", "--limit=1000"]
-      - name: generate-invoices
-        memoryMB: 2048
-        cpuUnits: 1024
-        schedule: "cron(0 * * * ? *)" # Hourly
-        args: ["generate-invoices"]
-    workerTasks:
-      - name: execute-tasks
-        memoryMB: 2048
-        cpuUnits: 1024
-        args: ["execute-tasks", "--batch-size=50", "--poll-period-ms=500"]
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents
@@ -164,8 +165,8 @@ config:
       apiKeySecret:
         secure: v1:6Sct1OQ1Y3A0QapO:dA7CqK0HR3NsmSDgJAR/kicJY7+i7k5KLfugEoCHIn1MqTsQ6BFOv0qKbqVWWT27
       phoneNumber: "+14152129648"
-      whatsappSenderId: "MGf4b90d6bc32195702ba16a4606f049bf"
-      whatsappOtpTemplateId: "HX728369d784be2b98babfae0e399b8d1f"
+      whatsappOtpTemplateId: HX728369d784be2b98babfae0e399b8d1f
+      whatsappSenderId: MGf4b90d6bc32195702ba16a4606f049bf
     twilioBackup:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
@@ -173,8 +174,16 @@ config:
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
       phoneNumber: "+15105883668"
-      whatsappSenderId: "MG25d83f1f121913d74d8bc2ea96e35db6"
-      whatsappOtpTemplateId: "HXeb04132acb5883c98bf6ff80dbeeb2b6"
+      whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
+      whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
+    workerTasks:
+    - args:
+      - execute-tasks
+      - --batch-size=50
+      - --poll-period-ms=500
+      cpuUnits: 1024
+      memoryMB: 2048
+      name: execute-tasks
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

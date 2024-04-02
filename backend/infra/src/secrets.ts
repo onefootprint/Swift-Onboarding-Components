@@ -67,6 +67,7 @@ export interface StaticSecrets {
   googlePlayIntegrityDecryptionKey: aws.ssm.Parameter;
   lexisUserId: aws.ssm.Parameter;
   lexisPassword: aws.ssm.Parameter;
+  neuroIdApiKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -90,6 +91,7 @@ interface SecretConstants {
   apple: Apple;
   google: Google;
   lexis: Lexis;
+  neuro: Neuro;
 }
 
 interface ElasticSecrets {
@@ -188,6 +190,10 @@ interface Google {
 interface Lexis {
   userId: string;
   password: string;
+}
+
+interface Neuro {
+  apiKey: string;
 }
 
 export async function LoadSecrets(
@@ -471,6 +477,10 @@ export async function LoadSecrets(
     lexisPassword: createSecretParameter(
       `lexisPassword-${stack}`,
       secretConstants.lexis.password,
+    ),
+    neuroIdApiKey: createSecretParameter(
+      `neuroApiKey-${stack}`,
+      secretConstants.neuro.apiKey,
     ),
   };
 }

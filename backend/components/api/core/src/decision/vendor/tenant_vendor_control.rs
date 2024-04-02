@@ -13,7 +13,7 @@ use idv::{
 use newtypes::{
     vendor_credentials::{
         ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials, IncodeCredentials,
-        LexisCredentials, MiddeskCredentials,
+        LexisCredentials, MiddeskCredentials, NeuroIdApiKey,
     },
     IdvData, IncodeEnvironment, PiiString, TenantId, Vendor, VendorAPI,
 };
@@ -21,8 +21,6 @@ use newtypes::{
 #[derive(Clone, Debug, Default)]
 /// A struct for adapting db::models::TenantVendorControl for use in the api crate
 pub struct TenantVendorControl {
-    #[allow(dead_code)]
-    vendor_control: Option<DbTenantVendorControl>, // TODO: not needed here?
     idology_credentials: IdologyCredentials,
     experian_credentials: ExperianCredentials,
     lexis_credentials: LexisCredentials,
@@ -33,6 +31,8 @@ pub struct TenantVendorControl {
     tenant_id: TenantId,
     tenant_name: String,
     tbi: Option<newtypes::TenantBusinessInfo>,
+    #[allow(unused)]
+    neuro_id_api_key: NeuroIdApiKey,
 }
 
 impl TenantVendorControl {
@@ -126,6 +126,8 @@ impl TenantVendorControl {
     ) -> ApiResult<Self> {
         // As of 2023-06-28 we just use our default idology credentials for all tenants
         let idology_credentials = IdologyCredentials::from(config);
+        // TODO: we'll likely need to have diff site_ids in the future that we store on playbooks so we will refactor then
+        let neuro_id_api_key = NeuroIdApiKey::from(config);
 
         // For experian, we use the bulk of the same credentials, just need to update subscriber code
         let experian_credential_builder = ExperianCredentialBuilder::from(config);
@@ -172,7 +174,6 @@ impl TenantVendorControl {
 
         // eventually we'll want to do some validations here, like checking the db is configured for at least 1 KYC vendor, but for now let's not validate in constructor
         let control = Self {
-            vendor_control,
             idology_credentials,
             experian_credentials,
             lexis_credentials,
@@ -183,6 +184,7 @@ impl TenantVendorControl {
             tenant_name: tenant.name,
             tenant_id: tenant.id,
             tbi,
+            neuro_id_api_key,
         };
 
         Ok(control)
@@ -300,6 +302,12 @@ impl From<&Config> for MiddeskCredentials {
         MiddeskCredentials {
             api_key: config.middesk_config.middesk_api_key.clone(),
         }
+    }
+}
+
+impl From<&Config> for NeuroIdApiKey {
+    fn from(config: &Config) -> Self {
+        NeuroIdApiKey(config.neuro_id_config.api_key.clone())
     }
 }
 

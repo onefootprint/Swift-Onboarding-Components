@@ -153,6 +153,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub lexis_config: LexisConfig,
+
+    #[envconfig(nested = true)]
+    pub neuro_id_config: NeuroIdConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T> {
@@ -451,4 +454,10 @@ pub struct LexisConfig {
 
     #[envconfig(from = "LEXIS_PASSWORD")]
     pub password: PiiString,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct NeuroIdConfig {
+    #[envconfig(from = "NEUROID_API_KEY")]
+    pub api_key: PiiString,
 }

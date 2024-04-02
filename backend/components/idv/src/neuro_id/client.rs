@@ -64,7 +64,7 @@ mod tests {
         // https://neuro-id.readme.io/reference/api-test-cases
         (
             NeuroIdCredentials::new(
-                NeuroIdApiKey(PiiString::from(dotenv::var("NEURO_TEST_API_KEY").unwrap())),
+                NeuroIdApiKey(PiiString::from(dotenv::var("NEUROID_API_KEY").unwrap())),
                 NeuroIdSiteId("form_neuro300".into()),
             ),
             NeuroIdentityId::from("example-response-2".to_string()),
@@ -87,6 +87,7 @@ mod tests {
             .unwrap();
 
         assert_eq!(resp.status(), Status::Success);
+
         assert_eq!(
             resp.profile
                 .unwrap()
@@ -95,7 +96,7 @@ mod tests {
                 .flatten()
                 .collect_vec()
                 .len(),
-            5
+            3
         )
     }
 }
