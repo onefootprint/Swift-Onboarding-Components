@@ -1,7 +1,0 @@
-resources: []
-configVars:
-  DATABASE_URL: postgresql://postgres@localhost/footprint_db
-  DASHBOARD_URL: http://localhost:3001
-  FPC_PRIVATE_PROECTED_TOKEN: abc
-  API_URL: https://api.dev.onefootprint.com
-envVars: {}

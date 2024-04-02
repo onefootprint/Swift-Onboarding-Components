@@ -1,6 +1,0 @@
-slug: stuck_users_query
-name: Stuck users query
-description: "Query for workflows that are stuck"
-sql:
-  resource: "prod_ro_db"
-  entrypoint: stuck_users.sql
