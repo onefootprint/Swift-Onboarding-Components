@@ -511,6 +511,7 @@ diesel::table! {
         deactivated_at -> Nullable<Timestamptz>,
         incode_environment -> Nullable<Text>,
         latest_hard_error -> Nullable<Text>,
+        purpose -> Text,
     }
 }
 

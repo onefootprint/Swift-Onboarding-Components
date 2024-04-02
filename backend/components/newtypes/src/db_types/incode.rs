@@ -151,20 +151,8 @@ impl IncodeFailureReason {
 }
 
 #[derive(
-    Debug,
-    Display,
-    Clone,
-    Copy,
-    Eq,
-    PartialEq,
-    AsExpression,
-    FromSqlRow,
-    EnumString,
-    EnumIter,
-    AsRefStr,
-    macros::SerdeAttr,
+    Debug, Display, Clone, Copy, Eq, PartialEq, AsExpression, FromSqlRow, EnumString, EnumIter, AsRefStr,
 )]
-#[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum IncodeVerificationSessionKind {
@@ -209,3 +197,37 @@ pub enum IncodeEnvironment {
 }
 
 crate::util::impl_enum_str_diesel!(IncodeEnvironment);
+
+
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Eq,
+    PartialEq,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    EnumIter,
+    AsRefStr,
+    macros::SerdeAttr,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum IncodeVerificationSessionPurpose {
+    Identity,
+    CurpValidation,
+}
+
+crate::util::impl_enum_str_diesel!(IncodeVerificationSessionPurpose);
+
+impl From<IncodeVerificationSessionKind> for IncodeVerificationSessionPurpose {
+    fn from(value: IncodeVerificationSessionKind) -> Self {
+        match value {
+            IncodeVerificationSessionKind::IdDocument => IncodeVerificationSessionPurpose::Identity,
+            IncodeVerificationSessionKind::Selfie => IncodeVerificationSessionPurpose::Identity,
+        }
+    }
+}

@@ -8,7 +8,7 @@ use diesel::{pg::Pg, prelude::*};
 use newtypes::{
     DocumentSide, IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeEnvironment,
     IncodeFailureReason, IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
-    IncodeVerificationSessionState, Locked, WorkflowId,
+    IncodeVerificationSessionPurpose, IncodeVerificationSessionState, Locked, WorkflowId,
 };
 
 use super::incode_verification_session_event::IncodeVerificationSessionEvent;
@@ -40,6 +40,8 @@ pub struct IncodeVerificationSession {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub incode_environment: Option<IncodeEnvironment>,
     pub latest_hard_error: Option<String>,
+    // The purpose of this session as a whole (identity verification, curp validation, government validation. )
+    pub purpose: IncodeVerificationSessionPurpose,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -53,6 +55,7 @@ struct NewIncodeVerificationSession {
     latest_failure_reasons: Vec<IncodeFailureReason>,
     ignored_failure_reasons: Vec<IncodeFailureReason>,
     incode_environment: Option<IncodeEnvironment>,
+    purpose: IncodeVerificationSessionPurpose,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -129,6 +132,7 @@ impl IncodeVerificationSession {
             latest_failure_reasons: vec![],
             ignored_failure_reasons: vec![],
             incode_environment,
+            purpose: IncodeVerificationSessionPurpose::Identity,
         };
 
         let res: IncodeVerificationSession = diesel::insert_into(incode_verification_session::table)

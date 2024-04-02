@@ -1,0 +1,1 @@
+ALTER TABLE incode_verification_session ADD COLUMN purpose TEXT NOT NULL DEFAULT 'identity';
