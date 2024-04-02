@@ -27,10 +27,10 @@ pub enum Product {
     VaultsWithNonPci,
     /// Number of vaults with card or custom data
     VaultsWithPci,
-    /// Number of vaults with decrypts this month
-    HotVaults,
     /// Number of vaults with proxy decrypts this month
     HotProxyVaults,
+    /// Number of vaults with decrypts this month
+    HotVaults,
 }
 
 impl Product {
