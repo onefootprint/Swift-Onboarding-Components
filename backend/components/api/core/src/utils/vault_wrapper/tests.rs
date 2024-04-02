@@ -65,7 +65,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let source = DataLifetimeSource::Unknown;
+    let source = DataLifetimeSource::Hosted;
     let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, source, None).unwrap();
 
     // Portablize the phone as happens in prod
@@ -194,7 +194,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     ];
     for (su_id, portablize, data) in data {
         let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-        let source = DataLifetimeSource::Unknown;
+        let source = DataLifetimeSource::Hosted;
         let kinds = data.iter().map(|d| d.kind.clone()).collect_vec();
         DataLifetime::bulk_deactivate_kinds(conn, su_id, kinds, seqno).unwrap();
         let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, source, None).unwrap();
@@ -269,7 +269,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let source = DataLifetimeSource::Unknown;
+    let source = DataLifetimeSource::Hosted;
     VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno, source, None).unwrap();
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();

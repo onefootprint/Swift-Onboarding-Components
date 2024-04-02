@@ -14,7 +14,7 @@ pub fn build<T: Into<DataIdentifier>>(
     deactivated_seqno: Option<DataLifetimeSeqno>,
     kind: T,
 ) -> DataLifetime {
-    let s = DataLifetimeSource::Unknown;
+    let s = DataLifetimeSource::Hosted;
     let args = NewDataLifetimeArgs {
         kind: kind.into(),
         origin_id: None,

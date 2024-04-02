@@ -178,7 +178,7 @@ mod test {
             } else {
                 request.no_fingerprints_for_validation()
             };
-            let source = DataLifetimeSource::Unknown;
+            let source = DataLifetimeSource::Hosted;
             let new_ci = self.patch_data(conn, request, source, None)?.new_ci;
             Ok(new_ci)
         }

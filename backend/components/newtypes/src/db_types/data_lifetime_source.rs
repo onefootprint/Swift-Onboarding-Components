@@ -3,6 +3,10 @@ use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{Display, EnumIter, EnumString};
 
+// NOTE: we backfilled all DataLifetimeSources in prod that were created before
+// 2023-08-25 19:53:43.944937+00 using a heuristic.
+// https://onefootprint.slack.com/archives/C04RHCM8FU0/p1712076032662629
+
 #[derive(
     Debug,
     Eq,
@@ -38,8 +42,6 @@ pub enum DataLifetimeSource {
     Prefill,
     /// Vaulted via an auth token issued for the components SDK
     ComponentsSdk,
-    /// Just for events that aren't backfilled
-    Unknown,
 }
 
 crate::util::impl_enum_string_diesel!(DataLifetimeSource);

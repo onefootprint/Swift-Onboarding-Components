@@ -173,7 +173,7 @@ mod test {
                 deactivated_at: None,
                 _created_at: Utc::now(),
                 _updated_at: Utc::now(),
-                source: DataLifetimeSource::Unknown,
+                source: DataLifetimeSource::Hosted,
                 actor: None,
                 origin_id: None,
             })
