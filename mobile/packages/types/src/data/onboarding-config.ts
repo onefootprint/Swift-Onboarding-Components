@@ -35,6 +35,7 @@ export type PublicOnboardingConfig = {
   canMakeRealDocScanCallsInSandbox?: boolean;
   isStepupEnabled?: boolean;
   kind?: 'auth' | 'kyb' | 'kyc';
+  nidEnabled?: boolean;
 };
 
 // Used in the dashboard context

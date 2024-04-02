@@ -48,6 +48,7 @@ export type PublicOnboardingConfig = {
   supportPhone?: string;
   supportWebsite?: string;
   requiredAuthMethods?: AuthMethodKind[];
+  nidEnabled?: boolean;
 };
 
 // Used in the dashboard context
