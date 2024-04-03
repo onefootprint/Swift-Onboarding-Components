@@ -12,6 +12,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import PdfThumbnail from './components/pdf-thumbnail';
+
 type PdfViewerProps = {
   base64Src: string;
   documentName: string;
@@ -26,7 +28,10 @@ const PdfViewer = ({ base64Src, documentName }: PdfViewerProps) => {
     <Dialog.Root>
       <Stack>
         <Dialog.Trigger asChild>
-          <LinkButton>{t('expand')}</LinkButton>
+          <Stack direction="column" gap={5}>
+            <PdfThumbnail src={base64Src} />
+            <LinkButton>{t('expand')}</LinkButton>
+          </Stack>
         </Dialog.Trigger>
       </Stack>
       <Dialog.Portal>

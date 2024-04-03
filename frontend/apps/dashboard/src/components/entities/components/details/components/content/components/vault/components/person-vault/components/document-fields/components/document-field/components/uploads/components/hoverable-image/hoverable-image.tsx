@@ -11,7 +11,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import PdfThumbnail from './components/pdf-thumbnail';
 import PdfViewer from './components/pdf-viewer';
 
 type HoverableImageProps = {
@@ -38,7 +37,6 @@ const HoverableImage = ({
 
   return isPDF ? (
     <Stack direction="column" gap={5}>
-      <PdfThumbnail src={src} />
       <PdfViewer base64Src={src} documentName={documentName} />
     </Stack>
   ) : (
