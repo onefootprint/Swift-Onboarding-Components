@@ -126,9 +126,12 @@ const shouldRunTransfer = (context: MachineContext): boolean => {
   // If we're on desktop, we should still attempt to transfer
   if (!context.idvContext.isInIframe && isMobile) return false;
 
-  if (isTransferOnDesktopDisabled) return false;
-  if (didRunTransfer) return false;
+  // We've disabled transfer on desktop for certain tenants to reduce friction
+  if (isTransferOnDesktopDisabled && !isMobile) return false;
+
   if (isNoPhoneFlow) return false;
+
+  if (didRunTransfer) return false;
   if (isTransfer) return false;
 
   const firstKind = requirements[0]?.kind;
