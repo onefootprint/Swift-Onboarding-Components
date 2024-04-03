@@ -79,7 +79,12 @@ const DrawerFilter = () => {
       <Drawer title={t('title')} open={open} onClose={close}>
         <FormProvider {...methods}>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Stack direction="column" justify="space-between" height="100%">
+            <Stack
+              direction="column"
+              justify="space-between"
+              height="100%"
+              gap={7}
+            >
               <Stack direction="column" gap={7}>
                 <fieldset>
                   <Legend>{t('labels.label')}</Legend>
