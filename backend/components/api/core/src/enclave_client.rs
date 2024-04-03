@@ -346,6 +346,7 @@ impl EnclaveClient {
         e_data_key: &SealedVaultDataKey,
         s3_url: &S3Url,
     ) -> ApiResult<PiiBytes> {
+        #[allow(clippy::let_unit_value)]
         let key = ();
         let documents = vec![(key, (e_private_key, e_data_key, s3_url))]
             .into_iter()
