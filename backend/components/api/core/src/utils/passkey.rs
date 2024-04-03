@@ -14,6 +14,7 @@ use db::{
 use newtypes::{AttestationType, InsightEventId, LivenessAttributes, LivenessInfo, LivenessIssuer, VaultId};
 use serde::{Deserialize, Serialize};
 use webauthn_rs_core::{
+    error::WebauthnError,
     proto::{AttestationCaList, AttestationMetadata, Credential, RegistrationState},
     AttestationFormat, WebauthnCore,
 };
@@ -115,7 +116,17 @@ impl WebauthnConfig {
         let reg: RegisterPublicKeyCredential = serde_json::from_str(&challenge_response)?;
 
         // Validate the challenge response
-        let cred = self.register_credential(&reg, &reg_state, &cas)?;
+        let cred = match self.register_credential(&reg, &reg_state, &cas) {
+            Ok(cred) => cred,
+            Err(err) => match err.kind() {
+                // temporary addition to detect some webauthn issues on windows devices
+                crate::ApiErrorKind::Webauthn(WebauthnError::ParseNOMFailure) => {
+                    tracing::info!(challenge_response=%challenge_response, "webauthn parse NOM failure");
+                    return Err(err);
+                }
+                _ => return Err(err),
+            },
+        };
 
         // Compose attestation data
         let attestation_data_to_save = SavedAttestationData {
