@@ -102,7 +102,7 @@ impl NewAuditEvent {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct FilterQueryParams {
     pub cursor: Option<(DateTime<Utc>, AuditEventId)>,
     pub tenant_id: TenantId,

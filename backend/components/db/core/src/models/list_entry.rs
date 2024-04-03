@@ -117,12 +117,27 @@ impl ListEntry {
         Ok(res)
     }
 
+    #[tracing::instrument("ListEntry::get", skip_all)]
+    pub fn bulk_get(
+        conn: &mut PgConn,
+        list_entry_ids: &[ListEntryId],
+    ) -> DbResult<HashMap<ListEntryId, ListEntry>> {
+        let res = list_entry::table
+            .filter(list_entry::id.eq_any(list_entry_ids))
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .map(|e| (e.id.clone(), e))
+            .collect();
+        Ok(res)
+    }
+
     #[allow(clippy::self_named_constructors)]
     #[tracing::instrument("ListEntry::list", skip_all)]
     pub fn list(conn: &mut PgConn, list_id: &ListId) -> DbResult<Vec<Self>> {
         let res = list_entry::table
             .filter(list_entry::list_id.eq(list_id))
             .filter(list_entry::deactivated_seqno.is_null())
+            // TODO: limit/paginate here 
             .order_by(list_entry::created_at.desc())
             .get_results(conn)?;
         Ok(res)
@@ -138,6 +153,28 @@ impl ListEntry {
             .get_results::<Self>(conn)?
             .into_iter()
             .into_group_map_by(|e| e.list_id.clone());
+        Ok(res)
+    }
+
+    /// Retrieves all ListEntry's for all input ListEntryCreationId's
+    /// Note that this could potentially have a very large result set and we are not doing any limiting here. We are relying on the implicit assumptions that (1) any single ListEntryCreation has a reasonably bounded number of ListEntry's associated with it (ie because we have an API max payload size or we explicilty limit how many entries can be added at once) and (2) we would only call this with a reasonable number of ListEntryCreationId's (ie because we call this from a pagination list events endpoint and never retrieve more than a reasonable number of events at once)
+    #[tracing::instrument("ListEntry::bulk_list_by_creation_id", skip_all)]
+    pub fn bulk_list_by_creation_id(
+        conn: &mut PgConn,
+        lec_ids: &[ListEntryCreationId],
+    ) -> DbResult<HashMap<ListEntryCreationId, Vec<Self>>> {
+        let res = list_entry::table
+            .filter(list_entry::list_entry_creation_id.eq_any(lec_ids))
+            .order_by((list_entry::list_entry_creation_id, list_entry::id))
+            .get_results::<ListEntry>(conn)?
+            .into_iter()
+            .filter_map(|le| {
+                le.list_entry_creation_id
+                    .clone()
+                    .map(|lec_id| (lec_id.clone(), le))
+            })
+            .into_group_map();
+
         Ok(res)
     }
 
