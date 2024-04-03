@@ -6,7 +6,8 @@ use diesel::{prelude::*, Queryable};
 use itertools::Itertools;
 use newtypes::{
     DataIdentifier, DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId,
-    FingerprintScopeKind, FingerprintVersion, FpId, IdentityDataKind as IDK, ScopedVaultId, VaultId,
+    FingerprintScopeKind, FingerprintVersion, FpId, IdentityDataKind as IDK, ScopedVaultId, TenantId,
+    VaultId,
 };
 
 use crate::{DbResult, PgConn, TxnPgConn};
@@ -59,15 +60,25 @@ const DUPLICATE_FINGERPRINT_KINDS: [DI; 3] =
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct FingerprintDupe {
     pub fp_id: FpId,
+    pub tenant_id: TenantId,
     pub vault_id: VaultId,
     pub kind: DataIdentifier,
     pub scope: FingerprintScopeKind,
 }
 
-impl From<(FpId, VaultId, DataIdentifier, FingerprintScopeKind)> for FingerprintDupe {
-    fn from((fp_id, vault_id, kind, scope): (FpId, VaultId, DataIdentifier, FingerprintScopeKind)) -> Self {
+impl From<(FpId, TenantId, VaultId, DataIdentifier, FingerprintScopeKind)> for FingerprintDupe {
+    fn from(
+        (fp_id, tenant_id, vault_id, kind, scope): (
+            FpId,
+            TenantId,
+            VaultId,
+            DataIdentifier,
+            FingerprintScopeKind,
+        ),
+    ) -> Self {
         Self {
             fp_id,
+            tenant_id,
             vault_id,
             kind,
             scope,
@@ -161,11 +172,12 @@ impl Fingerprint {
             .filter(sv1.field(scoped_vault::id).eq(sv_id))
             .select((
                 sv2.field(scoped_vault::fp_id),
+                sv2.field(scoped_vault::tenant_id),
                 sv2.field(scoped_vault::vault_id),
                 f1.field(fingerprint::kind),
                 f1.field(fingerprint::scope),
             ))
-            .get_results::<(FpId, VaultId, DataIdentifier, FingerprintScopeKind)>(conn)?
+            .get_results::<(FpId, TenantId, VaultId, DataIdentifier, FingerprintScopeKind)>(conn)?
             .into_iter()
             .map(FingerprintDupe::from)
             .collect();

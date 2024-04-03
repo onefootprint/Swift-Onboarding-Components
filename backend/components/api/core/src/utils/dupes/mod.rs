@@ -4,7 +4,7 @@ use db::{
 };
 use either::Either;
 use itertools::Itertools;
-use newtypes::{DupeKind, Dupes, OtherTenantDupe, SameTenantDupe, ScopedVaultId};
+use newtypes::{DupeKind, Dupes, OtherTenantDupes, SameTenantDupe, ScopedVaultId, TenantId};
 
 use crate::errors::ApiResult;
 
@@ -26,8 +26,8 @@ fn get_dupe_kinds(dupes: &[FingerprintDupe]) -> Vec<DupeKind> {
 
 /// turn a single vault's set of FingerprintDupe's into either:
 /// - SameTenantDupe if there is at least 1 tenant-scoped fingerprint dupe
-/// - OtherTenantDupe otherwise
-fn fingerprint_dupes_to_dupe(dupes: Vec<FingerprintDupe>) -> Either<SameTenantDupe, OtherTenantDupe> {
+/// - otherwise: Vec<TenantId> representing the unique set of tenant's that the vault has duplicative data on
+fn fingerprint_dupes_to_dupe(dupes: Vec<FingerprintDupe>) -> Either<SameTenantDupe, Vec<TenantId>> {
     let (same_tenant, other_tenant): (Vec<_>, Vec<_>) =
         dupes.into_iter().partition(|fpd| fpd.scope.is_tenant());
 
@@ -37,9 +37,8 @@ fn fingerprint_dupes_to_dupe(dupes: Vec<FingerprintDupe>) -> Either<SameTenantDu
             dupe_kinds: get_dupe_kinds(&same_tenant),
         })
     } else {
-        Either::Right(OtherTenantDupe {
-            dupe_kinds: get_dupe_kinds(&other_tenant),
-        })
+        let tenants = other_tenant.into_iter().map(|fd| fd.tenant_id).collect();
+        Either::Right(tenants)
     }
 }
 
@@ -54,7 +53,10 @@ pub fn get_dupes(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<Dupes> {
 
     let dupes = Dupes {
         same_tenant,
-        other_tenant,
+        other_tenant: OtherTenantDupes {
+            num_matches: other_tenant.len(),
+            num_tenants: other_tenant.iter().flatten().unique().count(),
+        },
     };
 
     Ok(dupes)
@@ -108,7 +110,7 @@ mod tests {
     #[derive(Debug, Clone, Default)]
     struct ExpectedDupes {
         same_tenant: Vec<(V, T, Vec<DupeKind>)>,
-        other_tenant: Vec<Vec<DupeKind>>, // todo: later assert using sv.created, probs have to jitter the vault creations which is wierd but
+        other_tenant: OtherTenantDupes,
     }
 
     type InputData = (V, T, Vec<(IDK, &'static str)>);
@@ -117,7 +119,10 @@ mod tests {
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
     ], ExpectedDupes {
         same_tenant: vec![],
-        other_tenant: vec![]
+        other_tenant: OtherTenantDupes {
+            num_matches: 0,
+            num_tenants: 0
+        }
     }; "no other vaults")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
@@ -125,21 +130,30 @@ mod tests {
         (V::V3, T::T1, vec![(IDK::Ssn9, "323456789")]),
     ], ExpectedDupes {
         same_tenant: vec![],
-        other_tenant: vec![]
+        other_tenant: OtherTenantDupes {
+            num_matches: 0,
+            num_tenants: 0
+        }
     }; "no matching vaults")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
         (V::V2, T::T1, vec![(IDK::Ssn9, "123456789")]),
     ], ExpectedDupes {
         same_tenant: vec![(V::V2, T::T1, vec![DK::Ssn9])],
-        other_tenant: vec![]
+        other_tenant: OtherTenantDupes {
+            num_matches: 0,
+            num_tenants: 0
+        }
     }; "one matching vault, same tenant")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
         (V::V2, T::T2, vec![(IDK::Ssn9, "123456789")]),
     ], ExpectedDupes {
         same_tenant: vec![],
-        other_tenant: vec![vec![DK::Ssn9]]
+        other_tenant: OtherTenantDupes {
+            num_matches: 1,
+            num_tenants: 1
+        }
     }; "one matching vault, different tenant")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
@@ -147,7 +161,10 @@ mod tests {
         (V::V3, T::T1, vec![(IDK::Ssn9, "123456789")]),
     ], ExpectedDupes {
         same_tenant: vec![(V::V2, T::T1, vec![DK::Ssn9]), (V::V3, T::T1, vec![DK::Ssn9])],
-        other_tenant: vec![]
+        other_tenant: OtherTenantDupes {
+            num_matches: 0,
+            num_tenants: 0
+        }
     }; "two matching vaults, same tenant")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
@@ -155,7 +172,10 @@ mod tests {
         (V::V3, T::T2, vec![(IDK::Ssn9, "123456789")]),
     ], ExpectedDupes {
         same_tenant: vec![],
-        other_tenant: vec![vec![DK::Ssn9], vec![DK::Ssn9]]
+        other_tenant: OtherTenantDupes {
+            num_matches: 2,
+            num_tenants: 1
+        }
     }; "two matching vaults, different tenants")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
@@ -163,14 +183,20 @@ mod tests {
         (V::V3, T::T2, vec![(IDK::Ssn9, "123456789")]),
     ], ExpectedDupes {
         same_tenant: vec![(V::V2, T::T1, vec![DK::Ssn9])],
-        other_tenant: vec![vec![DK::Ssn9]]
+        other_tenant: OtherTenantDupes {
+            num_matches: 1,
+            num_tenants: 1
+        }
     }; "two matching vaults, same and different tenants")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789"), (IDK::Email, "bob@boberto.com")]),
         (V::V2, T::T1, vec![(IDK::Ssn9, "123456789"), (IDK::Email, "bob@boberto.com")]),
     ], ExpectedDupes {
         same_tenant: vec![(V::V2, T::T1, vec![DK::Ssn9, DK::Email])],
-        other_tenant: vec![]
+        other_tenant: OtherTenantDupes {
+            num_matches: 0,
+            num_tenants: 0
+        }
     }; "one matching vault, same tenant, multiple kinds")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789"), (IDK::Email, "bob@boberto.com")]),
@@ -180,7 +206,10 @@ mod tests {
         (V::V5, T::T2, vec![(IDK::Ssn9, "123456789"), (IDK::Email, "bob@boberto.com")]),
         ], ExpectedDupes {
             same_tenant: vec![(V::V2, T::T1, vec![DK::Ssn9, DK::Email]), (V::V3, T::T1, vec![DK::Email])],
-            other_tenant: vec![vec![DK::Ssn9], vec![DK::Ssn9, DK::Email]]
+            other_tenant: OtherTenantDupes {
+                num_matches: 2,
+                num_tenants: 1
+            }
     }; "multiple matching vaults, multiple tenants, multiple kinds")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
@@ -189,7 +218,10 @@ mod tests {
         (V::V2, T::T3, vec![(IDK::Ssn9, "123456789")]),
         ], ExpectedDupes {
             same_tenant: vec![(V::V2, T::T1, vec![DK::Ssn9])],
-            other_tenant: vec![]
+            other_tenant: OtherTenantDupes {
+                num_matches: 0,
+                num_tenants: 0
+            }
     }; "matching vault with multiple one clicks")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
@@ -198,7 +230,10 @@ mod tests {
         (V::V2, T::T4, vec![(IDK::Ssn9, "123456789")]),
         ], ExpectedDupes {
             same_tenant: vec![],
-            other_tenant: vec![vec![DK::Ssn9]]
+            other_tenant: OtherTenantDupes {
+                num_matches: 1,
+                num_tenants: 3
+            }
     }; "matching vault with multiple one clicks on only other tenants")]
     #[test_state_case(vec![
         (V::V1, T::T1, vec![(IDK::Ssn9, "123456789")]),
@@ -206,10 +241,13 @@ mod tests {
         (V::V2, T::T1, vec![(IDK::Ssn9, "222222222")]),
     ], ExpectedDupes {
         same_tenant: vec![],
-        other_tenant: vec![]
+        other_tenant: OtherTenantDupes {
+            num_matches: 0,
+            num_tenants: 0
+        }
     }; "only latest data is considered")]
     #[tokio::test]
-    async fn valid_action(state: &mut State, data: Vec<InputData>, expected: ExpectedDupes) {
+    async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: ExpectedDupes) {
         // get_dupes queried for (V1, T1)
 
         // create an obc for every tenant and create a T->OBC mapping
@@ -277,14 +315,9 @@ mod tests {
                 dupe_kinds: dks,
             })
             .collect();
-        let expected_other_tenant = expected
-            .other_tenant
-            .into_iter()
-            .map(|dks| OtherTenantDupe { dupe_kinds: dks })
-            .collect();
 
         assert_have_same_elements(expected_same_tenant, dupes.same_tenant); // have to do it this way for now because we aren't sorting the vec's
-        assert_have_same_elements(expected_other_tenant, dupes.other_tenant);
+        assert_eq!(expected.other_tenant, dupes.other_tenant);
     }
 
     pub async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>) {

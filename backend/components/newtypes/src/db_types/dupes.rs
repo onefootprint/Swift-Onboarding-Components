@@ -27,7 +27,7 @@ pub enum DupeKind {
 #[derive(Debug, Clone, Default, Eq, PartialEq)]
 pub struct Dupes {
     pub same_tenant: Vec<SameTenantDupe>,
-    pub other_tenant: Vec<OtherTenantDupe>,
+    pub other_tenant: OtherTenantDupes,
 }
 
 #[derive(Debug, Clone, Default, Eq, PartialEq)]
@@ -41,12 +41,9 @@ pub struct SameTenantDupe {
 }
 
 #[derive(Debug, Clone, Default, Eq, PartialEq)]
-pub struct OtherTenantDupe {
-    pub dupe_kinds: Vec<DupeKind>,
-    // TODO: more fields
-    // pub status: OnboardingStatus,
-    // pub created: DateTime<Utc>,
-    // pub name: PiiString, // hmm where to do this decryption?
+pub struct OtherTenantDupes {
+    pub num_matches: usize, // number of distinct vaults that (1) have any sort of dupe match and (2) have not onboarded onto the same tenant as the the scoped_vault for which dupes are being queried for
+    pub num_tenants: usize, // number of distinct tenants from the vaults described above ^
 }
 
 impl TryFrom<DataIdentifier> for DupeKind {
