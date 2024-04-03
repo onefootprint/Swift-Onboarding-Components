@@ -1,5 +1,6 @@
 import { isPhoneNumber } from '@onefootprint/core';
 import cx from 'classnames';
+import get from 'lodash/get';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -9,6 +10,8 @@ import Input from '../internal/input';
 
 export type PhoneInputProps = InputProps;
 
+const identifier = 'id.phone_number';
+
 const PhoneInput = ({ className, ...props }: PhoneInputProps) => {
   const {
     form: {
@@ -17,7 +20,7 @@ const PhoneInput = ({ className, ...props }: PhoneInputProps) => {
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'phone' });
-  const error = errors.phoneNumber;
+  const error = get(errors, identifier);
 
   return (
     <Input
@@ -29,9 +32,9 @@ const PhoneInput = ({ className, ...props }: PhoneInputProps) => {
       placeholder={t('placeholder')}
       type="tel"
       {...props}
-      {...register('phoneNumber', {
+      {...register(identifier, {
         required: t('errors.required'),
-        validate: (value = '') => isPhoneNumber(value) || t('errors.invalid'),
+        validate: value => isPhoneNumber(value) || t('errors.invalid'),
       })}
     />
   );

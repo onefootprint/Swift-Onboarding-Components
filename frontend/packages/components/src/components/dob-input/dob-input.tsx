@@ -5,6 +5,7 @@ import {
 } from '@onefootprint/core';
 import cx from 'classnames';
 import Cleave from 'cleave.js';
+import get from 'lodash/get';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +15,8 @@ import Input from '../internal/input';
 
 export type DobInputProps = InputProps;
 
+const identifier = 'id.dob';
+
 const DobInput = ({ className, ...props }: DobInputProps) => {
   const {
     form: {
@@ -22,7 +25,7 @@ const DobInput = ({ className, ...props }: DobInputProps) => {
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'dob' });
-  const error = errors.dob;
+  const error = get(errors, identifier);
 
   useEffect(() => {
     const cleave = new Cleave('.fp-dob-input', {
@@ -44,10 +47,11 @@ const DobInput = ({ className, ...props }: DobInputProps) => {
       inputMode="numeric"
       label={t('label')}
       message={error?.message}
+      placeholder={t('placeholder')}
       {...props}
-      {...register('dob', {
+      {...register(identifier, {
         required: t('errors.required'),
-        validate: (value = '') => {
+        validate: value => {
           if (isDobInTheFuture(value)) {
             return t('errors.future-date');
           }

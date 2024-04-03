@@ -1,5 +1,6 @@
 import { isName } from '@onefootprint/core';
 import cx from 'classnames';
+import get from 'lodash/get';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -9,6 +10,8 @@ import Input from '../internal/input';
 
 export type LastNameInputProps = InputProps;
 
+const identifier = 'id.last_name';
+
 const LastNameInput = ({ className, ...props }: LastNameInputProps) => {
   const {
     form: {
@@ -17,7 +20,7 @@ const LastNameInput = ({ className, ...props }: LastNameInputProps) => {
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'last-name' });
-  const error = errors.lastName;
+  const error = get(errors, identifier);
 
   return (
     <Input
@@ -26,10 +29,11 @@ const LastNameInput = ({ className, ...props }: LastNameInputProps) => {
       hasError={!!error}
       label={t('label')}
       message={error?.message}
+      placeholder={t('placeholder')}
       {...props}
-      {...register('lastName', {
+      {...register(identifier, {
         required: t('errors.required'),
-        validate: (value = '') => isName(value) || t('errors.invalid'),
+        validate: value => isName(value) || t('errors.invalid'),
       })}
     />
   );

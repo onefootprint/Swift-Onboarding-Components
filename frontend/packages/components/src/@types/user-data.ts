@@ -18,21 +18,5 @@ export type UserData = Partial<{
   'id.citizenships': string[]; // array of 2 letter country codes
   'id.visa_kind': string;
   'id.visa_expiration_date': string;
-}>;
-
-export type FormData = Partial<{
-  phoneNumber: string;
-  email: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  dob: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  country: string;
-  zip: string;
-  ssn9: string;
-  ssn4: string;
-}>;
+}> &
+  Record<string, string>;

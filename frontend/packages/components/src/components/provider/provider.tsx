@@ -8,7 +8,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type { Appearance, FormData, UserData } from '../../@types';
+import type { Appearance, UserData } from '../../@types';
 import configureI18n from '../../config/initializers/i18next';
 
 configureI18n();
@@ -65,23 +65,8 @@ const Provider = ({
   sandboxId,
   userData = {},
 }: ProviderProps) => {
-  const methods = useForm<FormData>({
-    defaultValues: {
-      email: userData['id.email'],
-      phoneNumber: userData['id.phone_number'],
-      firstName: userData['id.first_name'],
-      middleName: userData['id.middle_name'],
-      lastName: userData['id.last_name'],
-      dob: userData['id.dob'],
-      ssn4: userData['id.ssn4'],
-      ssn9: userData['id.ssn9'],
-      addressLine1: userData['id.address_line1'],
-      addressLine2: userData['id.address_line2'],
-      city: userData['id.city'],
-      state: userData['id.state'],
-      zip: userData['id.zip'],
-      country: userData['id.country'],
-    },
+  const methods = useForm<UserData>({
+    defaultValues: userData,
   });
   const [context, setContext] = useState<ContextData>({
     appearance,

@@ -24,6 +24,7 @@
   },
   "dob": {
     "label": "Date of Birth",
+    "placeholder": "MM/DD/YYYY",
     "errors": {
       "required": "Date of birth cannot be empty",
       "invalid": "Date of birth cannot be empty or is invalid",

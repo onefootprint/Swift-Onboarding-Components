@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import get from 'lodash/get';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +9,8 @@ import Input from '../internal/input';
 
 export type AddressCityInputProps = InputProps;
 
+const identifier = 'id.city';
+
 const AddressCityInput = ({ className, ...props }: AddressCityInputProps) => {
   const {
     form: {
@@ -16,7 +19,7 @@ const AddressCityInput = ({ className, ...props }: AddressCityInputProps) => {
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'city' });
-  const error = errors.city;
+  const error = get(errors, identifier);
 
   return (
     <Input
@@ -25,8 +28,9 @@ const AddressCityInput = ({ className, ...props }: AddressCityInputProps) => {
       hasError={!!error}
       label={t('label')}
       message={error?.message}
+      placeholder={t('placeholder')}
       {...props}
-      {...register('city', {
+      {...register('id.city', {
         required: t('errors.required'),
       })}
     />

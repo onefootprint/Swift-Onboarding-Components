@@ -1,40 +1,21 @@
-import { dateToIso8601 } from '@onefootprint/core';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import {
-  ApiError,
-  type FormData,
-  type UserData,
-  type UserDataError,
-} from '../@types';
+import { ApiError, type UserData, type UserDataError } from '../@types';
 import { Context } from '../components/provider';
 import getOnboardingStatusReq from '../queries/get-onboarding-status';
 import saveReq from '../queries/save';
 import { lockBody, unlockBody } from '../utils/dom-utils';
-import userToFormData from '../utils/user-to-form-data';
+import getVaultData from '../utils/get-vault-data/get-vault-data';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
-  const form = useFormContext<FormData>();
+  const form = useFormContext<UserData>();
 
-  const getVaultFormData = (): UserData => {
+  const getVaultFormData = () => {
     const values = form.getValues();
-    return {
-      'id.first_name': values.firstName,
-      'id.middle_name': values.middleName,
-      'id.last_name': values.lastName,
-      'id.dob': values.dob ? dateToIso8601(values.dob) : undefined,
-      'id.ssn4': values.ssn4,
-      'id.ssn9': values.ssn9,
-      'id.address_line1': values.addressLine1,
-      'id.address_line2': values.addressLine2,
-      'id.city': values.city,
-      'id.state': values.state,
-      'id.zip': values.zip,
-      'id.country': values.country,
-    };
+    return getVaultData(values);
   };
 
   const launchIdentify = ({
@@ -50,8 +31,8 @@ export const useFootprint = () => {
       appearance: context.appearance,
       publicKey: context.publicKey,
       userData: {
-        'id.phone_number': phoneNumber || form.getValues('phoneNumber'),
-        'id.email': email || form.getValues('email'),
+        'id.phone_number': phoneNumber || form.getValues('id.phone_number'),
+        'id.email': email || form.getValues('id.email'),
       },
       kind: FootprintComponentKind.Components,
       onComplete: context.onComplete,
@@ -87,16 +68,10 @@ export const useFootprint = () => {
   const handleError = (error: unknown) => {
     if (error instanceof ApiError) {
       const apiError = error as ApiError<UserDataError>;
-
       Object.entries(apiError.details.message).forEach(([key, value]) => {
-        const formDataKey = userToFormData(key);
-        if (!formDataKey || typeof value !== 'string') return;
-
-        form.setError(
-          formDataKey,
-          { type: 'manual', message: value },
-          { shouldFocus: true },
-        );
+        if (typeof value === 'string') {
+          form.setError(key, { message: value });
+        }
       });
     }
   };

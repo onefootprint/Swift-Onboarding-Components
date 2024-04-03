@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import get from 'lodash/get';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +9,8 @@ import Input from '../internal/input';
 
 export type AddressStateInputProps = InputProps;
 
+const identifier = 'id.state';
+
 const AddressStateInput = ({ className, ...props }: AddressStateInputProps) => {
   const {
     form: {
@@ -16,7 +19,7 @@ const AddressStateInput = ({ className, ...props }: AddressStateInputProps) => {
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'state' });
-  const error = errors.state;
+  const error = get(errors, identifier);
 
   return (
     <Input
@@ -24,8 +27,9 @@ const AddressStateInput = ({ className, ...props }: AddressStateInputProps) => {
       hasError={!!error}
       label={t('label')}
       message={error?.message}
+      placeholder={t('placeholder')}
       {...props}
-      {...register('state', {
+      {...register(identifier, {
         required: t('errors.required'),
       })}
     />

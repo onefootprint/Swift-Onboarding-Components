@@ -1,6 +1,7 @@
 import { isSsn4 } from '@onefootprint/core';
 import cx from 'classnames';
 import Cleave from 'cleave.js';
+import get from 'lodash/get';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +11,8 @@ import Input from '../internal/input';
 
 export type SSN4InputProps = InputProps;
 
+const identifier = 'id.ssn4';
+
 const SSN4Input = ({ className, ...props }: SSN4InputProps) => {
   const {
     form: {
@@ -18,7 +21,7 @@ const SSN4Input = ({ className, ...props }: SSN4InputProps) => {
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'ssn-4' });
-  const error = errors.ssn4;
+  const error = get(errors, identifier);
 
   useEffect(() => {
     const cleave = new Cleave('.fp-ssn-9-input', {
@@ -37,10 +40,11 @@ const SSN4Input = ({ className, ...props }: SSN4InputProps) => {
       label={t('label')}
       maxLength={4}
       message={error?.message}
+      placeholder={t('placeholder')}
       {...props}
-      {...register('ssn4', {
+      {...register(identifier, {
         required: t('errors.required'),
-        validate: (value = '') => isSsn4(value) || t('errors.invalid'),
+        validate: value => isSsn4(value) || t('errors.invalid'),
       })}
     />
   );

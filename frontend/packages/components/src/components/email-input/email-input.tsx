@@ -1,5 +1,6 @@
 import { isEmail } from '@onefootprint/core';
 import cx from 'classnames';
+import get from 'lodash/get';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -9,6 +10,8 @@ import Input from '../internal/input';
 
 export type EmailInputProps = InputProps;
 
+const identifier = 'id.email';
+
 const EmailInput = ({ className, ...props }: EmailInputProps) => {
   const {
     form: {
@@ -17,7 +20,7 @@ const EmailInput = ({ className, ...props }: EmailInputProps) => {
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'email' });
-  const error = errors.email;
+  const error = get(errors, identifier);
 
   return (
     <Input
@@ -30,9 +33,9 @@ const EmailInput = ({ className, ...props }: EmailInputProps) => {
       placeholder={t('placeholder')}
       type="email"
       {...props}
-      {...register('email', {
+      {...register(identifier, {
         required: t('errors.required'),
-        validate: (value = '') => isEmail(value) || t('errors.invalid'),
+        validate: value => isEmail(value) || t('errors.invalid'),
       })}
     />
   );

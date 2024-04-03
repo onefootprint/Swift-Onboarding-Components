@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import get from 'lodash/get';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -7,6 +8,8 @@ import type { SelectProps } from '../internal/select';
 import Select from '../internal/select';
 
 export type AddressCountryInputProps = SelectProps;
+
+const identifier = 'id.country';
 
 const AddressCountryInput = ({
   className,
@@ -20,7 +23,7 @@ const AddressCountryInput = ({
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'country' });
-  const error = errors.country;
+  const error = get(errors, identifier);
 
   return (
     <Select
@@ -30,7 +33,7 @@ const AddressCountryInput = ({
       label={t('label')}
       message={error?.message}
       {...props}
-      {...register('country', { onChange, required: t('errors.required') })}
+      {...register(identifier, { onChange, required: t('errors.required') })}
     >
       <option value="US">United States</option>
     </Select>

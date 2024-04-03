@@ -1,5 +1,6 @@
-import {
+import CustomSelect, {
   AddressInput,
+  CustomInput,
   DobInput,
   EmailInput,
   FirstNameInput,
@@ -33,8 +34,12 @@ const steps = [
     value: 'identify',
   },
   {
-    label: 'Collect Data',
-    value: 'collect-data',
+    label: 'Personal information',
+    value: 'basic-data',
+  },
+  {
+    label: 'Drive information',
+    value: 'custom-data',
   },
   {
     label: 'Confirmation',
@@ -48,7 +53,8 @@ const publicKey =
 const Demo = () => {
   const [option, setOption] = useState(steps[0]);
   const isIdentify = option.value === 'identify';
-  const isData = option.value === 'collect-data';
+  const isBasicData = option.value === 'basic-data';
+  const isCustomData = option.value === 'custom-data';
   const isSuccess = option.value === 'confirmation';
 
   return (
@@ -57,7 +63,7 @@ const Demo = () => {
       <Provider
         publicKey={publicKey}
         onComplete={() => {
-          setOption(steps[2]);
+          setOption(steps[3]);
         }}
       >
         <Header>Onboarding</Header>
@@ -77,15 +83,14 @@ const Demo = () => {
                   }}
                 />
               )}
-
-              {isData && (
-                <CollectData
+              {isBasicData && (
+                <BasicData
                   onDone={() => {
-                    setOption(steps[1]);
+                    setOption(steps[2]);
                   }}
                 />
               )}
-
+              {isCustomData && <CustomData />}
               {isSuccess && <Success />}
             </Box>
           </Stack>
@@ -122,16 +127,13 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
   );
 };
 
-const CollectData = ({ onDone }: { onDone: () => void }) => {
+const BasicData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
   const saveMutation = useRequest(fp.save);
 
   const handleSubmit = () => {
     saveMutation.mutate({
-      onSuccess: () => {
-        fp.handoff();
-        onDone();
-      },
+      onSuccess: onDone,
     });
   };
 
@@ -149,8 +151,81 @@ const CollectData = ({ onDone }: { onDone: () => void }) => {
           <MiddleNameInput />
           <LastNameInput />
           <DobInput />
+          <Divider marginBlock={3} />
           <AddressInput />
+          <Divider marginBlock={3} />
           <SSN9Input />
+          <Divider marginBlock={3} />
+          <Button type="submit" loading={saveMutation.loading}>
+            Continue
+          </Button>
+        </Stack>
+      </Form>
+    </Layout>
+  );
+};
+
+const CustomData = () => {
+  const fp = useFootprint();
+  const saveMutation = useRequest(fp.save);
+
+  const handleSubmit = () => {
+    saveMutation.mutate({
+      onSuccess: () => {
+        fp.handoff();
+      },
+    });
+  };
+
+  return (
+    <Layout>
+      <Box marginBottom={7}>
+        <Text variant="heading-3">Driver information</Text>
+        <Text variant="body-3" color="secondary">
+          Please provide some driver information
+        </Text>
+      </Box>
+      <Form onSubmit={handleSubmit}>
+        <Stack gap={4} direction="column">
+          <CustomInput
+            label="Make"
+            identifier="custom.make"
+            placeholder="Toyota, Ford, Honda"
+            validations={{
+              required: 'Make is required',
+            }}
+          />
+          <CustomInput
+            label="Model"
+            identifier="custom.model"
+            placeholder="Corolla, F-150, Civic"
+            validations={{
+              required: 'Model is required',
+            }}
+          />
+          <CustomSelect
+            label="Year"
+            identifier="custom.year"
+            placeholder="Select..."
+            validations={{
+              required: 'Year is required',
+            }}
+          >
+            {Array.from({ length: 65 }, (_, i) => 2024 - i).map(year => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </CustomSelect>
+          <CustomInput
+            identifier="custom.insurance"
+            label="Insurance policy number"
+            mask={{
+              blocks: [4, 3, 3, 4],
+            }}
+            name="insurance"
+            placeholder="Policy number"
+          />
           <Divider marginBlock={3} />
           <Button type="submit" loading={saveMutation.loading}>
             Continue

@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import get from 'lodash/get';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +9,8 @@ import Input from '../internal/input';
 
 export type AddressLine2InputProps = InputProps;
 
+const identifier = 'id.address_line2';
+
 const AddressLine2Input = ({ className, ...props }: AddressLine2InputProps) => {
   const {
     form: {
@@ -16,7 +19,7 @@ const AddressLine2Input = ({ className, ...props }: AddressLine2InputProps) => {
     },
   } = useFootprint();
   const { t } = useTranslation('common', { keyPrefix: 'address-line2' });
-  const error = errors.addressLine2;
+  const error = get(errors, identifier);
 
   return (
     <Input
@@ -25,8 +28,9 @@ const AddressLine2Input = ({ className, ...props }: AddressLine2InputProps) => {
       hasError={!!error}
       label={t('label')}
       message={error?.message}
+      placeholder={t('placeholder')}
       {...props}
-      {...register('addressLine2')}
+      {...register(identifier)}
     />
   );
 };
