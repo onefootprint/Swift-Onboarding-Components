@@ -1,11 +1,13 @@
 use crate::utils::db2api::DbToApi;
-use db::models::{list::List, list_entry::ListEntry};
+use api_wire_types::ListPlaybookUsage;
+use db::models::{
+    list::List, list_entry::ListEntry, ob_configuration::ObConfiguration, rule_instance::RuleInstance,
+};
 use newtypes::PiiString;
 
-pub type ListInfo = (List, bool, usize);
 
-impl DbToApi<ListInfo> for api_wire_types::List {
-    fn from_db((list, used_in_playbook, entries_count): ListInfo) -> Self {
+impl DbToApi<(List, usize, bool)> for api_wire_types::List {
+    fn from_db((list, entries_count, used_in_playbook): (List, usize, bool)) -> Self {
         let List {
             id,
             created_at,
@@ -25,6 +27,42 @@ impl DbToApi<ListInfo> for api_wire_types::List {
             actor,
             entries_count,
             used_in_playbook,
+        }
+    }
+}
+
+pub type ListInfo = (List, Vec<(ObConfiguration, Vec<RuleInstance>)>);
+
+impl DbToApi<ListInfo> for api_wire_types::ListDetails {
+    fn from_db((list, playbook_and_rules): ListInfo) -> Self {
+        let List {
+            id,
+            created_at,
+            actor,
+            name,
+            alias,
+            kind,
+            ..
+        } = list;
+
+        let playbooks: Vec<_> = playbook_and_rules
+            .into_iter()
+            .map(|(obc, rules)| ListPlaybookUsage {
+                id: obc.id,
+                key: obc.key,
+                name: obc.name,
+                rules: rules.into_iter().map(api_wire_types::Rule::from_db).collect(),
+            })
+            .collect();
+
+        Self {
+            id,
+            name,
+            alias,
+            kind,
+            created_at,
+            actor,
+            playbooks,
         }
     }
 }

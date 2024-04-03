@@ -145,7 +145,7 @@ impl ListEntry {
 
     #[allow(clippy::self_named_constructors)]
     #[tracing::instrument("ListEntry::list_bulk", skip_all)]
-    pub fn list_bulk(conn: &mut PgConn, ids: Vec<&ListId>) -> DbResult<HashMap<ListId, Vec<Self>>> {
+    pub fn list_bulk(conn: &mut PgConn, ids: &[ListId]) -> DbResult<HashMap<ListId, Vec<Self>>> {
         let res = list_entry::table
             .filter(list_entry::list_id.eq_any(ids))
             .filter(list_entry::deactivated_seqno.is_null())

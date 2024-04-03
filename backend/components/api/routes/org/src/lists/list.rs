@@ -6,7 +6,7 @@ use crate::{
 };
 use api_core::types::{OffsetPaginatedResponse, OffsetPaginationRequest};
 use db::{
-    models::{list::List, list_entry::ListEntry},
+    models::{list::List, list_entry::ListEntry, rule_instance::RuleInstance},
     OffsetPagination,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -28,14 +28,15 @@ pub async fn list_for_tenant(
     let page_size = pagination.page_size(&state);
     let pagination = OffsetPagination::new(page, page_size);
 
-    let (lists, next_page, count, entries) = state
+    let (lists, next_page, count, entries, list_ids_used_in_playbook) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (lists, next_page) = List::list(conn, &tenant_id, is_live, pagination)?;
             let count = List::count(conn, &tenant_id, is_live)?;
-            let list_ids = lists.iter().map(|list| &list.id).collect::<Vec<_>>();
-            let entries = ListEntry::list_bulk(conn, list_ids)?;
-            Ok((lists, next_page, count, entries))
+            let list_ids = lists.iter().map(|list| list.id.clone()).collect::<Vec<_>>();
+            let list_ids_used_in_playbook = RuleInstance::get_is_used_in_some_playbook(conn, &list_ids)?;
+            let entries = ListEntry::list_bulk(conn, &list_ids)?;
+            Ok((lists, next_page, count, entries, list_ids_used_in_playbook))
         })
         .await?;
 
@@ -43,7 +44,11 @@ pub async fn list_for_tenant(
         .into_iter()
         .map(|l| {
             let id = l.id.clone();
-            (l, false, entries.get(&id).map(|e| e.len()).unwrap_or_default())
+            (
+                l,
+                entries.get(&id).map(|e| e.len()).unwrap_or_default(),
+                list_ids_used_in_playbook.contains(&id),
+            )
         })
         .map(api_wire_types::List::from_db)
         .collect();

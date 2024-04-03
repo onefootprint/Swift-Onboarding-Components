@@ -6,7 +6,7 @@ use crate::{
     State,
 };
 
-use db::models::{list::List, list_entry::ListEntry};
+use db::models::{list::List, rule_instance::RuleInstance};
 use newtypes::ListId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -16,20 +16,19 @@ async fn get_detail(
     state: web::Data<State>,
     list_id: web::Path<ListId>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<ResponseData<api_wire_types::List>>> {
+) -> ApiResult<Json<ResponseData<api_wire_types::ListDetails>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
-    let (list, entries_count) = state
+    let (list, rules_using_list) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
-            let entries = ListEntry::list(conn, &list_id)?;
-            Ok((list, entries.len()))
+            let rules_using_list = RuleInstance::list_using_list(conn, &list.id)?;
+            Ok((list, rules_using_list))
         })
         .await?;
 
-    // TODO (belce): implement the logic to get whether list is used in playbook
-    ResponseData::ok(api_wire_types::List::from_db((list, false, entries_count))).json()
+    ResponseData::ok(api_wire_types::ListDetails::from_db((list, rules_using_list))).json()
 }

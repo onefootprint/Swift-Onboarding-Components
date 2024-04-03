@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use super::{
     list::List,
@@ -8,12 +8,12 @@ use super::{
 };
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::{ob_configuration, rule_instance};
+use db_schema::schema::{ob_configuration, rule_instance, rule_instance_references_list};
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, DataLifetimeSeqno, DbActor, Locked, ObConfigurationId, RuleAction, RuleExpression, RuleId,
-    RuleInstanceId, TenantId,
+    output::Csv, DataLifetimeSeqno, DbActor, ListId, Locked, ObConfigurationId, RuleAction, RuleExpression,
+    RuleId, RuleInstanceId, TenantId,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -386,6 +386,58 @@ impl RuleInstance {
             .select(rule_instance::all_columns)
             .order_by((rule_instance::created_at.asc(), rule_instance::id))
             .get_results(conn)?;
+        Ok(res)
+    }
+
+    // Returns (Obc, Vec<RuleInstance>) for any (active) RuleInstance that contains a condition that uses the input list_id
+    #[tracing::instrument("Rule::list_using_list", skip_all)]
+    pub fn list_using_list(
+        conn: &mut PgConn,
+        list_id: &ListId,
+    ) -> DbResult<Vec<(ObConfiguration, Vec<Self>)>> {
+        let rules: Vec<(ObConfigurationId, RuleInstance)> = rule_instance_references_list::table
+            .inner_join(rule_instance::table)
+            .filter(rule_instance_references_list::list_id.eq(list_id))
+            .filter(rule_instance::deactivated_at.is_null())
+            .select((rule_instance::ob_configuration_id, rule_instance::all_columns))
+            .order_by((
+                rule_instance::ob_configuration_id,
+                rule_instance::created_at.desc(),
+                rule_instance::id,
+            ))
+            .limit(300)
+            .get_results(conn)?;
+
+        let mut obcs = ObConfiguration::get_bulk(conn, rules.iter().map(|(obc, _)| obc.clone()).collect())?;
+        let res = rules
+            .into_iter()
+            .into_group_map()
+            .into_iter()
+            .map(|(obc_id, rules)| {
+                obcs.remove(&obc_id)
+                    .ok_or(DbError::RelatedObjectNotFound)
+                    .map(|o| (o, rules))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+            .into_iter()
+            .sorted_by_key(|(obc, _)| -obc.created_at.timestamp_millis())
+            .collect();
+
+        Ok(res)
+    }
+
+    // takes in a list of list_id's and returns those which are used in at least 1 (active) rule in 1 playbook
+    #[tracing::instrument("Rule::get_is_used_in_some_playbook", skip_all)]
+    pub fn get_is_used_in_some_playbook(conn: &mut PgConn, list_ids: &[ListId]) -> DbResult<HashSet<ListId>> {
+        let res = rule_instance_references_list::table
+            .inner_join(rule_instance::table)
+            .filter(rule_instance_references_list::list_id.eq_any(list_ids))
+            .filter(rule_instance::deactivated_at.is_null())
+            .select(rule_instance_references_list::list_id)
+            .distinct()
+            .get_results(conn)?
+            .into_iter()
+            .collect();
         Ok(res)
     }
 }
