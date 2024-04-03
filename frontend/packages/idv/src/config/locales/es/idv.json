@@ -289,7 +289,7 @@
             }
           },
           "last-name": {
-            "label": "Apellido",
+            "label": "Apellido(s)",
             "placeholder": "Doe",
             "error": {
               "empty": "El apellido no puede quedar vacío",
@@ -326,7 +326,7 @@
             "error": "La dirección no puede quedar vacía y debe ser una dirección residencial (p. ej., no puede ser un PO Box)"
           },
           "address-line-2": {
-            "international-label": "Apartamento, barrio (opcional)",
+            "international-label": "Colonia, apartamento, barrio (opcional)",
             "label": "Detalles adicionales (opcional)",
             "international-placeholder": "Nombre del barrio, número de suite, etc.",
             "placeholder": "Apartamento, suite, etc."
@@ -465,7 +465,7 @@
           "title": "Datos básicos",
           "first-name": "Nombre",
           "middle-name": "Segundo nombre",
-          "last-name": "Apellido",
+          "last-name": "Apellido(s)",
           "dob": "Fecha de nacimiento",
           "nationality": "Nacionalidad"
         },
@@ -498,7 +498,7 @@
             "email": "Correo electrónico",
             "first_name": "Nombre",
             "middle_name": "Segundo nombre",
-            "last_name": "Apellido",
+            "last_name": "Apellido(s)",
             "ssn9": "SSN (Completo)",
             "ssn4": "SSN (Últimos 4)",
             "nationality": "Nacionalidad",
@@ -676,7 +676,7 @@
               "placeholder": "Sue"
             },
             "last-name": {
-              "label": "Apellido",
+              "label": "Apellido(s)",
               "placeholder": "Doe",
               "error": "El apellido no puede quedar vacío o es inválido"
             },
@@ -752,7 +752,7 @@
           "beneficial-owner-other": "Propietario (Otro)",
           "first-name": "Nombre",
           "middle-name": "Segundo nombre",
-          "last-name": "Apellido",
+          "last-name": "Apellido(s)",
           "email": "Correo electrónico",
           "ownership-stake": "Porcentaje de propiedad"
         }
