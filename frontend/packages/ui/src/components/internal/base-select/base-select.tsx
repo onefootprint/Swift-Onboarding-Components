@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import { usePopper } from 'react-popper';
 import type { OptionProps } from 'react-select';
@@ -18,8 +19,11 @@ import Control from './components/control';
 import EmptyState from './components/empty-state';
 import MenuList from './components/menu-list';
 import Option from './components/option';
+import Picker from './components/picker';
+import type { ItemProps } from './components/picker/components/item';
 
 export type BaseSelectSize = 'compact' | 'default';
+const TOP_OFFSET = 40;
 
 export type BaseSelectProps<Option extends BaseSelectOption> = {
   disabled?: boolean;
@@ -47,6 +51,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   OptionComponent?: React.ComponentType<OptionProps<any, false, any>>;
   testID?: string;
+  MobileOptionComponent?: React.ComponentType<ItemProps>;
 };
 
 const BaseSelect = <Option extends BaseSelectOption>({
@@ -67,6 +72,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   size = 'default',
   testID,
   value,
+  MobileOptionComponent,
 }: BaseSelectProps<Option>) => {
   const { t } = useTranslation('ui');
   const internalId = useId();
@@ -88,6 +94,29 @@ const BaseSelect = <Option extends BaseSelectOption>({
   };
   useOnClickOutside(containerRef, handleClickOutside);
   const [updatedValue, setUpdatedValue] = useState<Option | undefined>(value);
+  const [mobileSheetHeight, setMobileSheetHeight] = useState(0);
+
+  useEffect(() => {
+    const body = document.querySelector('body');
+
+    const setBodyHeight = () => {
+      setMobileSheetHeight(window.innerHeight - TOP_OFFSET ?? 0); // 40px offset from the top
+    };
+
+    const resizeObserver = new ResizeObserver(setBodyHeight);
+
+    const startResizeObserve = () => {
+      if (body) resizeObserver.observe(body);
+    };
+
+    const stopResizeObserve = () => {
+      if (body) resizeObserver.unobserve(body);
+    };
+
+    startResizeObserve();
+
+    return stopResizeObserve;
+  }, [theme.breakpoint.sm]);
 
   const closeDropdown = () => {
     setOpen(false);
@@ -144,7 +173,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
           testID: internalId,
         })}
       </div>
-      {isOpen && (
+      {isOpen && !isMobile && (
         <div
           data-private
           data-testid={`select-${internalId}`}
@@ -216,7 +245,20 @@ const BaseSelect = <Option extends BaseSelectOption>({
           />
         </div>
       )}
-
+      {isMobile && (
+        <Picker
+          id={id}
+          value={updatedValue}
+          open={isOpen}
+          placeholder={searchPlaceholder}
+          onClose={closeDropdown}
+          renderEmptyState={renderEmptyState}
+          options={options}
+          onChange={option => handleChange(option as Option)}
+          height={mobileSheetHeight}
+          OptionComponent={MobileOptionComponent}
+        />
+      )}
       {hint && <Hint hasError={hasError}>{hint}</Hint>}
     </Container>
   );

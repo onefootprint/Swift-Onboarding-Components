@@ -13,6 +13,7 @@ import type {
 } from '../internal/base-select';
 import BaseSelect from '../internal/base-select';
 import BaseSelectTrigger from '../internal/base-select-trigger';
+import MobileOption from './components/mobile-option';
 import Option from './components/option';
 import type { CountrySelectOption } from './country-select.types';
 
@@ -75,6 +76,7 @@ const CountrySelect = ({
       onBlur={onBlur}
       onChange={onChange}
       OptionComponent={Option}
+      MobileOptionComponent={MobileOption}
       options={localizedOptions}
       renderTrigger={({
         isOpen,
