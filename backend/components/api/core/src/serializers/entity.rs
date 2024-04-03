@@ -5,13 +5,16 @@ use crate::{
         vault_wrapper::{Any, DecryptedData, TenantVw},
     },
 };
-use api_wire_types::{EntityAttribute, EntityStatus};
+use api_wire_types::{DataAttributeKind, EntityAttribute, EntityStatus};
 use chrono::{Duration, Utc};
-use db::models::{
-    insight_event::InsightEvent,
-    scoped_vault::{ScopedVault, SerializableEntity},
-    vault::Vault,
-    workflow::Workflow,
+use db::{
+    models::{
+        insight_event::InsightEvent,
+        scoped_vault::{ScopedVault, SerializableEntity},
+        vault::Vault,
+        workflow::Workflow,
+    },
+    VaultedData,
 };
 use itertools::Itertools;
 use newtypes::{OnboardingStatus, WorkflowKind};
@@ -60,11 +63,16 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
                     // But, nothing using this code path will provide multiple transforms today
                     .filter_map(|(op, v)| op.transforms.first().map(|t| (t.clone(), v.clone())))
                     .collect();
+                let data_kind = match vw.get(&di)?.data() {
+                    VaultedData::Sealed(..) | VaultedData::NonPrivate(..) => DataAttributeKind::VaultData,
+                    VaultedData::LargeSealed(..) => DataAttributeKind::DocumentData,
+                };
                 let attribute = EntityAttribute {
                     identifier: di,
                     source: lifetime.source,
                     is_decryptable: can_decrypt,
                     value,
+                    data_kind,
                     transforms,
                 };
                 Some(attribute)

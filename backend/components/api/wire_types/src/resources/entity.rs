@@ -54,10 +54,18 @@ pub struct EntityAttribute {
     pub identifier: DataIdentifier,
     pub source: DataLifetimeSource,
     pub is_decryptable: bool,
+    pub data_kind: DataAttributeKind,
     /// Decrypted, plaintext value if already decrypted
     pub value: Option<PiiString>,
     /// Decrypted transforms of this attribute, if already decrypted
     pub transforms: HashMap<FilterFunction, PiiString>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub enum DataAttributeKind {
+    VaultData,
+    DocumentData,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

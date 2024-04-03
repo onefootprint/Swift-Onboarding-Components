@@ -388,6 +388,7 @@ def test_entity_data(sandbox_user, sandbox_tenant):
         assert not first_name["transforms"]
         assert first_name["source"] == "hosted"
         assert first_name["is_decryptable"]
+        assert first_name["data_kind"] == "vault_data"
 
         last_name = next(d for d in user["data"] if d["identifier"] == "id.last_name")
         assert not last_name["value"]
@@ -397,6 +398,7 @@ def test_entity_data(sandbox_user, sandbox_tenant):
         )
         assert last_name["source"] == "hosted"
         assert last_name["is_decryptable"]
+        assert last_name["data_kind"] == "vault_data"
 
         phone_number = next(
             d for d in user["data"] if d["identifier"] == "id.phone_number"
@@ -405,9 +407,10 @@ def test_entity_data(sandbox_user, sandbox_tenant):
         assert not phone_number["transforms"]
         assert phone_number["source"] == "hosted"
         assert phone_number["is_decryptable"]
+        assert phone_number["data_kind"] == "vault_data"
 
 
-def test_entity_data(sandbox_user, sandbox_tenant):
+def test_missing_decrypt_permissions(sandbox_user, sandbox_tenant):
     """
     Check the a dashboard user without decrypt permissions cannot see a user's first name decrypted
     """

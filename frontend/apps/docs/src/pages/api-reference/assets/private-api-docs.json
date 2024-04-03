@@ -11065,6 +11065,13 @@
                         "items": {
                             "type": "object",
                             "properties": {
+                                "data_kind": {
+                                    "type": "string",
+                                    "enum": [
+                                        "vault_data",
+                                        "document_data"
+                                    ]
+                                },
                                 "identifier": {
                                     "type": "string",
                                     "enum": [
@@ -11341,6 +11348,7 @@
                                 }
                             },
                             "required": [
+                                "data_kind",
                                 "identifier",
                                 "is_decryptable",
                                 "source",
