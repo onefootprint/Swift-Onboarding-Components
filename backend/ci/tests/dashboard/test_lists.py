@@ -368,6 +368,19 @@ def test_list_list_entries(sandbox_tenant):
     assert entries[2]["data"] == entry1[0]["data"]
     assert entries[2]["id"] == entry1[0]["id"]
 
+    audit_events = get(
+        f"org/audit_events",
+        dict(
+            names="create_list_entry",
+            list_id=list["id"],
+            page_size=10,
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    assert (
+        len(audit_events["data"]) == 3
+    )  # TODO: later do a real assertion once we include decrypted entries in the payload
+
 
 @pytest.mark.skip()
 def test_delete_list_entries(sandbox_tenant):

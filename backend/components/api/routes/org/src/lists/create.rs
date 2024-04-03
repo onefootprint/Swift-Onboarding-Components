@@ -5,10 +5,10 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
-use api_core::errors::ValidationError;
+use api_core::{errors::ValidationError, utils::headers::InsightHeaders};
 use api_wire_types::CreateListRequest;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
-use db::models::{list::List, list_entry::ListEntry, tenant::Tenant};
+use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::ListEntry, tenant::Tenant};
 use newtypes::{DbActor, SealedVaultDataKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -18,6 +18,7 @@ pub async fn create_list(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     request: Json<CreateListRequest>,
+    insights: InsightHeaders,
 ) -> ApiResult<Json<ResponseData<api_wire_types::List>>> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?; // TODO: new guard for this + /rules probably
     let tenant_id = auth.tenant().id.clone();
@@ -32,6 +33,7 @@ pub async fn create_list(
     } = request.into_inner();
 
     let db_actor: DbActor = actor.clone().into();
+    let insight = CreateInsightEvent::from(insights);
     let (list, entries_count) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -47,6 +49,7 @@ pub async fn create_list(
             let sealed_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
             let list = List::create(conn, &tenant_id, is_live, db_actor, name, alias, kind, sealed_key)?;
 
+            let ie = insight.insert_with_conn(conn)?;
             let entries_count = match entries {
                 Some(entries) => {
                     let e_data = entries
@@ -54,7 +57,15 @@ pub async fn create_list(
                         .map(|e| sealing_key.seal_bytes(e.leak().as_bytes()).map(|b| b.into()))
                         .collect::<Result<Vec<_>, _>>()?;
 
-                    let entries_created = ListEntry::bulk_create(conn, &list.id, actor.into(), e_data)?;
+                    let entries_created = ListEntry::bulk_create(
+                        conn,
+                        &list.id,
+                        actor.into(),
+                        e_data,
+                        &tenant.id,
+                        is_live,
+                        &ie.id,
+                    )?;
                     entries_created.len()
                 }
                 None => 0,

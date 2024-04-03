@@ -20,6 +20,7 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             tenant_api_key: _,
             tenant_user: _,
             tenant_role: _,
+            list_entry_creation,
         } = event;
 
         if audit_event.name != AuditEventName::from(&audit_event.metadata) {
@@ -75,6 +76,13 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             AuditEventMetadata::UpdateOrgSettings => AuditEventDetail::UpdateOrgSettings,
             AuditEventMetadata::CreateOrgRole => AuditEventDetail::CreateOrgRole,
             AuditEventMetadata::UpdateOrgRole => AuditEventDetail::UpdateOrgRole,
+            AuditEventMetadata::CreateListEntry => AuditEventDetail::CreateListEntry {
+                list_entry_creation_id: list_entry_creation
+                    .ok_or(AssertionError(
+                        "list_entry_creation is not available for this event",
+                    ))?
+                    .id,
+            },
         };
 
         Ok(api_wire_types::AuditEvent {

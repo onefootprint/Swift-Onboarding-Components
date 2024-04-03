@@ -1,4 +1,4 @@
-use newtypes::{input::Csv, AuditEventName, DataIdentifier};
+use newtypes::{input::Csv, AuditEventName, DataIdentifier, ListId};
 
 use crate::*;
 
@@ -10,4 +10,5 @@ pub struct AuditEventRequest {
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
+    pub list_id: Option<ListId>,
 }

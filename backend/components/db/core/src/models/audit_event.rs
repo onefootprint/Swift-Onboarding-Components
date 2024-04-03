@@ -9,8 +9,8 @@ use crate::{
 };
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
-    audit_event, document_data, insight_event, ob_configuration, scoped_vault, tenant, tenant_api_key,
-    tenant_role, tenant_user,
+    audit_event, document_data, insight_event, list_entry_creation, ob_configuration, scoped_vault, tenant,
+    tenant_api_key, tenant_role, tenant_user,
 };
 use diesel::{
     dsl::sql,
@@ -21,9 +21,11 @@ use diesel::{
 use itertools::Itertools;
 use newtypes::{
     AuditEventDetail, AuditEventId, AuditEventMetadata, AuditEventName, CommonAuditEventDetail,
-    DataIdentifier, DbActor, DocumentDataId, InsightEventId, ObConfigurationId, ScopedVaultId,
-    TenantApiKeyId, TenantId, TenantRoleId, TenantUserId,
+    DataIdentifier, DbActor, DocumentDataId, InsightEventId, ListEntryCreationId, ListId, ObConfigurationId,
+    ScopedVaultId, TenantApiKeyId, TenantId, TenantRoleId, TenantUserId,
 };
+use super::list_entry::ListEntry;
+use super::list_entry_creation::ListEntryCreation;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = audit_event)]
@@ -46,6 +48,7 @@ pub struct AuditEvent {
     pub tenant_user_id: Option<TenantUserId>,
     pub tenant_role_id: Option<TenantRoleId>,
     pub is_live: Option<bool>,
+    pub list_entry_creation_id: Option<ListEntryCreationId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -67,6 +70,7 @@ struct NewAuditEventRow {
     tenant_user_id: Option<TenantUserId>,
     tenant_role_id: Option<TenantRoleId>,
     is_live: Option<bool>,
+    list_entry_creation_id: Option<ListEntryCreationId>,
 }
 
 #[derive(Debug, Clone)]
@@ -107,6 +111,7 @@ pub struct FilterQueryParams {
     pub names: Vec<AuditEventName>,
     pub targets: Vec<DataIdentifier>,
     pub is_live: bool,
+    pub list_id: Option<ListId>,
 }
 
 #[derive(Debug)]
@@ -122,6 +127,7 @@ pub struct JoinedAuditEvent {
     pub tenant_api_key: Option<TenantApiKey>,
     pub tenant_user: Option<TenantUser>,
     pub tenant_role: Option<TenantRole>,
+    pub list_entry_creation: Option<ListEntryCreation>,
 }
 
 type DieselJoinedAuditEvent = (
@@ -134,6 +140,7 @@ type DieselJoinedAuditEvent = (
     Option<TenantApiKey>,
     Option<TenantUser>,
     Option<TenantRole>,
+    Option<ListEntryCreation>,
 );
 
 impl HasActor for DieselJoinedAuditEvent {
@@ -164,6 +171,7 @@ impl AuditEvent {
                     tenant_user_id,
                     tenant_role_id,
                     is_live,
+                    list_entry_creation_id,
                 } = detail.into();
                 NewAuditEventRow {
                     id,
@@ -180,6 +188,7 @@ impl AuditEvent {
                     tenant_user_id,
                     tenant_role_id,
                     is_live,
+                    list_entry_creation_id,
                 }
             })
             .collect_vec();
@@ -208,6 +217,7 @@ impl AuditEvent {
                     .left_join(tenant_api_key::table)
                     .left_join(tenant_user::table)
                     .left_join(tenant_role::table)
+                    .left_join(list_entry_creation::table)
                     .order_by(audit_event::timestamp.desc())
                     // Secondary sort by ID to support (timestamp, id) cursor.
                     .then_order_by(audit_event::id.desc())
@@ -245,6 +255,10 @@ impl AuditEvent {
             )
         }
 
+        if let Some(list_id) = params.list_id {
+            results = results.filter(list_entry_creation::list_id.eq(list_id))
+        }
+
         if let Some(search) = params.search.as_ref() {
             let exact_match_fp_id = scoped_vault::fp_id.eq(search);
             let substr_match_tenant_name = tenant::name.ilike(format!("%{}%", search));
@@ -274,6 +288,7 @@ impl AuditEvent {
                 tenant_api_key::all_columns.nullable(),
                 tenant_user::all_columns.nullable(),
                 tenant_role::all_columns.nullable(),
+                list_entry_creation::all_columns.nullable()
             ))
             .load(conn.conn())?;
         let saturated_results = saturate_actors(conn, results)?;
@@ -292,6 +307,7 @@ impl AuditEvent {
                         tenant_api_key,
                         tenant_user,
                         tenant_role,
+                        list_entry_creation,
                     ),
                     saturated_actor,
                 )| {
@@ -306,6 +322,7 @@ impl AuditEvent {
                         tenant_api_key,
                         tenant_user,
                         tenant_role,
+                        list_entry_creation,
                     }
                 },
             )
@@ -406,6 +423,7 @@ mod tests {
                 names: vec![],
                 targets: vec![],
                 is_live: true,
+                list_id: None,
             },
             100,
         )
@@ -473,6 +491,7 @@ mod tests {
                 names: vec![],
                 targets: vec![],
                 is_live: true,
+                list_id: None,
             },
             100,
         )
@@ -502,6 +521,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![first_id.clone(), second_id.clone()],
             ),
@@ -516,6 +536,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![second_id.clone()],
             ),
@@ -533,6 +554,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![],
             ),
@@ -547,6 +569,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id1.clone()],
             ),
@@ -561,6 +584,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id1.clone(), id2.clone()],
             ),
@@ -575,6 +599,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id2.clone()],
             ),
@@ -589,6 +614,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id2.clone()],
             ),
@@ -603,6 +629,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![],
             ),
@@ -617,6 +644,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id1.clone(), id2.clone()],
             ),
@@ -631,6 +659,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id1.clone(), id2.clone()],
             ),
@@ -645,6 +674,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![],
             ),
@@ -659,6 +689,7 @@ mod tests {
                     names: vec![AuditEventName::CreateUser],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id1.clone()],
             ),
@@ -673,6 +704,7 @@ mod tests {
                     names: vec![AuditEventName::CreateUser, AuditEventName::DecryptUserData],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id1.clone(), id2.clone()],
             ),
@@ -690,6 +722,7 @@ mod tests {
                         DataIdentifier::Id(newtypes::IdentityDataKind::Email),
                     ],
                     is_live: false,
+                    list_id: None,
                 },
                 vec![id3.clone()],
             ),
@@ -704,6 +737,7 @@ mod tests {
                     names: vec![],
                     targets: vec![DataIdentifier::Id(newtypes::IdentityDataKind::Email)],
                     is_live: false,
+                    list_id: None,
                 },
                 vec![],
             ),
@@ -718,6 +752,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![id1.clone(), id2.clone()],
             ),
@@ -732,6 +767,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: true,
+                    list_id: None,
                 },
                 vec![],
             ),
@@ -746,6 +782,7 @@ mod tests {
                     names: vec![],
                     targets: vec![],
                     is_live: false,
+                    list_id: None,
                 },
                 vec![id3.clone()],
             ),
@@ -773,6 +810,7 @@ mod tests {
                 names: vec![],
                 targets: vec![],
                 is_live: true,
+                list_id: None,
             },
             100,
         )

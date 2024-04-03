@@ -7,7 +7,8 @@ use db_schema::schema::list_entry;
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, DbActor, ListEntryCreationId, ListEntryId, ListId, Locked, SealedVaultBytes,
+    DataLifetimeSeqno, DbActor, InsightEventId, ListEntryCreationId, ListEntryId, ListId, Locked,
+    SealedVaultBytes, TenantId,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -47,10 +48,21 @@ impl ListEntry {
         list_id: &ListId,
         actor: DbActor,
         e_data: &SealedVaultBytes,
+        tenant_id: &TenantId,
+        is_live: bool,
+        insight_event_id: &InsightEventId,
     ) -> DbResult<Self> {
-        Self::bulk_create(conn, list_id, actor, vec![e_data.clone()])?
-            .pop()
-            .ok_or(DbError::IncorrectNumberOfRowsUpdated)
+        Self::bulk_create(
+            conn,
+            list_id,
+            actor,
+            vec![e_data.clone()],
+            tenant_id,
+            is_live,
+            insight_event_id,
+        )?
+        .pop()
+        .ok_or(DbError::IncorrectNumberOfRowsUpdated)
     }
 
     #[tracing::instrument("ListEntry::bulk_create", skip_all)]
@@ -59,11 +71,23 @@ impl ListEntry {
         list_id: &ListId,
         actor: DbActor,
         e_data: Vec<SealedVaultBytes>,
+        tenant_id: &TenantId,
+        is_live: bool,
+        insight_event_id: &InsightEventId,
     ) -> DbResult<Vec<Self>> {
         let created_at = Utc::now();
         let created_seqno = DataLifetime::get_current_seqno(conn)?;
 
-        let lec = ListEntryCreation::create(conn, created_seqno, created_at, list_id, &actor)?;
+        let lec = ListEntryCreation::create(
+            conn,
+            created_seqno,
+            created_at,
+            list_id,
+            &actor,
+            tenant_id,
+            is_live,
+            insight_event_id,
+        )?;
 
         let new_list_entries: Vec<_> = e_data
             .iter()
@@ -157,11 +181,15 @@ mod tests {
         let t = tests::fixtures::tenant::create(conn);
         let list = tests::fixtures::list::create(conn, &t.id);
 
+        let ie = tests::fixtures::insight_event::create(conn);
         let le1 = ListEntry::create(
             conn,
             &list.id,
             DbActor::Footprint,
             &SealedVaultBytes(vec![1, 2, 3]),
+            &t.id,
+            false,
+            &ie.id,
         )
         .unwrap();
         assert_eq!(DbActor::Footprint, le1.actor);
@@ -184,7 +212,7 @@ mod tests {
         let t = tests::fixtures::tenant::create(conn);
         let list = tests::fixtures::list::create(conn, &t.id);
 
-        let le = tests::fixtures::list_entry::create(conn, &list.id);
+        let le = tests::fixtures::list_entry::create(conn, &t.id, &list.id);
         assert_eq!(1, ListEntry::list(conn, &list.id).unwrap().len());
 
         let le = ListEntry::lock(conn, &le.id).unwrap();

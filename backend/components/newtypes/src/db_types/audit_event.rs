@@ -1,6 +1,6 @@
 use crate::{
-    util::impl_enum_str_diesel, DataIdentifier, DocumentDataId, ObConfigurationId, ScopedVaultId,
-    TenantApiKeyId, TenantRoleId, TenantUserId,
+    util::impl_enum_str_diesel, DataIdentifier, DocumentDataId, ListEntryCreationId, ObConfigurationId,
+    ScopedVaultId, TenantApiKeyId, TenantRoleId, TenantUserId,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -57,6 +57,10 @@ pub enum AuditEventDetail {
     UpdateOrgSettings,
     CreateOrgRole,
     UpdateOrgRole,
+    CreateListEntry {
+        is_live: bool,
+        list_entry_creation_id: ListEntryCreationId,
+    },
 }
 
 /// Represents a projection of AuditEventDetail onto a common schema.
@@ -72,6 +76,7 @@ pub struct CommonAuditEventDetail {
     pub tenant_role_id: Option<TenantRoleId>,
 
     pub is_live: Option<bool>,
+    pub list_entry_creation_id: Option<ListEntryCreationId>,
 }
 
 impl From<AuditEventDetail> for CommonAuditEventDetail {
@@ -92,6 +97,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 tenant_user_id: None,
                 tenant_role_id: None,
                 is_live: Some(is_live),
+                list_entry_creation_id: None,
             },
             AuditEventDetail::UpdateUserData {
                 is_live,
@@ -108,6 +114,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 tenant_user_id: None,
                 tenant_role_id: None,
                 is_live: Some(is_live),
+                list_entry_creation_id: None,
             },
             AuditEventDetail::DeleteUserData {
                 is_live,
@@ -124,6 +131,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 tenant_user_id: None,
                 tenant_role_id: None,
                 is_live: Some(is_live),
+                list_entry_creation_id: None,
             },
             AuditEventDetail::DecryptUserData {
                 is_live,
@@ -142,6 +150,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 tenant_user_id: None,
                 tenant_role_id: None,
                 is_live: Some(is_live),
+                list_entry_creation_id: None,
             },
             AuditEventDetail::DeleteUser {
                 is_live,
@@ -155,6 +164,21 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 tenant_user_id: None,
                 tenant_role_id: None,
                 is_live: Some(is_live),
+                list_entry_creation_id: None,
+            },
+            AuditEventDetail::CreateListEntry {
+                is_live,
+                list_entry_creation_id,
+            } => Self {
+                metadata: AuditEventMetadata::CreateListEntry,
+                scoped_vault_id: None,
+                ob_configuration_id: None,
+                document_data_id: None,
+                tenant_api_key_id: None,
+                tenant_user_id: None,
+                tenant_role_id: None,
+                is_live: Some(is_live),
+                list_entry_creation_id: Some(list_entry_creation_id),
             },
             AuditEventDetail::CreateUserAnnotation => todo!(),
             AuditEventDetail::CompleteUserCheckLiveness => todo!(),
@@ -250,6 +274,7 @@ pub enum AuditEventMetadata {
     UpdateOrgSettings,
     CreateOrgRole,
     UpdateOrgRole,
+    CreateListEntry, // CreateListEntries ?
 }
 
 impl_enum_str_diesel!(AuditEventName);

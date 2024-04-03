@@ -5,10 +5,10 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
-use api_core::ApiError;
+use api_core::{utils::headers::InsightHeaders, ApiError};
 use api_wire_types::CreateListEntryRequest;
 use crypto::aead::{AeadSealedBytes, SealingKey};
-use db::models::{list::List, list_entry::ListEntry, tenant::Tenant};
+use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::ListEntry, tenant::Tenant};
 use itertools::Itertools;
 use newtypes::{ListId, PiiBytes};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -20,6 +20,7 @@ pub async fn create_list_entry(
     auth: TenantSessionAuth,
     list_id: web::Path<ListId>,
     request: Json<CreateListEntryRequest>,
+    insights: InsightHeaders,
 ) -> ApiResult<Json<ResponseData<Vec<api_wire_types::ListEntry>>>> {
     let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
@@ -27,11 +28,12 @@ pub async fn create_list_entry(
     let actor = auth.actor();
     let CreateListEntryRequest { entries } = request.into_inner();
 
+    let tid = tenant_id.clone();
     let (tenant, list) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let t = Tenant::get(conn, &tenant_id)?;
-            let list = List::get(conn, &tenant_id, is_live, &list_id)?;
+            let t = Tenant::get(conn, &tid)?;
+            let list = List::get(conn, &tid, is_live, &list_id)?;
             Ok((t, list))
         })
         .await?;
@@ -46,6 +48,7 @@ pub async fn create_list_entry(
 
     let list_id = list.id.clone();
     let key = decrypted_list_key.clone();
+    let insight = CreateInsightEvent::from(insights);
     let list_entries = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -55,7 +58,16 @@ pub async fn create_list_entry(
                 .into_iter()
                 .map(|e| key.seal_bytes(e.leak().as_bytes()).map(|b| b.into()))
                 .collect::<Result<Vec<_>, _>>()?;
-            Ok(ListEntry::bulk_create(conn, &list_id, actor.into(), e_data)?)
+            let ie = insight.insert_with_conn(conn)?;
+            Ok(ListEntry::bulk_create(
+                conn,
+                &list_id,
+                actor.into(),
+                e_data,
+                &tenant_id,
+                is_live,
+                &ie.id,
+            )?)
         })
         .await?;
 

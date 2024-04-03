@@ -2,7 +2,12 @@ use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::list_entry_creation;
 use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{DataLifetimeSeqno, DbActor, ListEntryCreationId, ListId};
+use newtypes::{
+    AuditEventDetail, AuditEventId, DataLifetimeSeqno, DbActor, InsightEventId, ListEntryCreationId, ListId,
+    TenantId,
+};
+
+use super::audit_event::NewAuditEvent;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = list_entry_creation)]
@@ -30,6 +35,7 @@ struct NewListEntryCreation<'a> {
 }
 
 impl ListEntryCreation {
+    #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("ListEntryCreation::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
@@ -37,6 +43,9 @@ impl ListEntryCreation {
         created_at: DateTime<Utc>,
         list_id: &ListId,
         actor: &DbActor,
+        tenant_id: &TenantId,
+        is_live: bool,
+        insight_event_id: &InsightEventId,
     ) -> DbResult<Self> {
         let new = NewListEntryCreation {
             created_at,
@@ -48,6 +57,20 @@ impl ListEntryCreation {
         let res = diesel::insert_into(list_entry_creation::table)
             .values(new)
             .get_result::<Self>(conn.conn())?;
+
+
+        NewAuditEvent {
+            id: AuditEventId::generate(),
+            tenant_id: tenant_id.clone(),
+            principal_actor: actor.clone(),
+            insight_event_id: insight_event_id.clone(),
+            detail: AuditEventDetail::CreateListEntry {
+                is_live,
+                list_entry_creation_id: res.id.clone(),
+            },
+        }
+        .create(conn)?;
+
         Ok(res)
     }
 }

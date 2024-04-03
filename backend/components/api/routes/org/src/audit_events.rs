@@ -37,6 +37,7 @@ async fn get(
         search,
         timestamp_lte,
         timestamp_gte,
+        list_id,
     } = filters.into_inner();
     let tenant = auth.tenant();
 
@@ -49,6 +50,7 @@ async fn get(
         names: names.map(Vec::<AuditEventName>::from).unwrap_or_default(),
         targets: targets.map(Vec::<DataIdentifier>::from).unwrap_or_default(),
         is_live: auth.is_live()?,
+        list_id,
     };
 
     let results = state
