@@ -45,7 +45,7 @@ pub async fn get_user_challenge_context(
 
             let ci = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
                 .into_iter()
-                .filter_map(|ci| uvw.get_lifetime(DI::from(ci)).map(|d| (ci, d.clone())))
+                .filter_map(|ci| uvw.get_lifetime(&ci.into()).map(|d| (ci, d.clone())))
                 .collect_vec();
 
             let cis = ci

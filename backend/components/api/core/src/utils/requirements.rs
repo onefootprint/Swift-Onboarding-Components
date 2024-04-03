@@ -236,7 +236,7 @@ fn is_cdo_met<Type>(
         _ => (),
     }
 
-    required_dis.into_iter().all(|di| vw.has_field(di))
+    required_dis.iter().all(|di| vw.has_field(di))
 }
 
 // these are CDOs only applicable to US
@@ -386,7 +386,7 @@ fn get_requirement_inner(
                         // The finra compliance doc is missing if any of the declarations require a doc and we don't
                         // yet have one on file
                         declarations.iter().any(|d| d.requires_finra_compliance_doc())
-                            && !vw.has_field(DocumentKind::FinraComplianceLetter)
+                            && !vw.has_field(&DocumentKind::FinraComplianceLetter.into())
                     } else {
                         false
                     };
@@ -493,9 +493,7 @@ fn get_requirement_inner(
                 .filter(|cdo| {
                     // Only include CDO's from optional_data if they were collected
                     if obc.optional_data.contains(cdo) {
-                        cdo.required_data_identifiers()
-                            .into_iter()
-                            .all(|di| vw.has_field(di))
+                        cdo.required_data_identifiers().iter().all(|di| vw.has_field(di))
                     } else {
                         true
                     }

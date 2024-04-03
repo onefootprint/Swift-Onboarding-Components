@@ -56,7 +56,7 @@ mod tests {
         tests::prelude::*,
     };
     use macros::db_test;
-    use newtypes::{DataLifetimeSource, IdentityDataKind, SealedVaultBytes, VaultDataFormat};
+    use newtypes::{DataLifetimeSource, IdentityDataKind as IDK, SealedVaultBytes, VaultDataFormat};
 
     #[db_test]
     fn test_soft_deletion(conn: &mut TestPgConn) {
@@ -70,14 +70,14 @@ mod tests {
 
                 let data = vec![
                     NewVaultData {
-                        kind: IdentityDataKind::FirstName.into(),
+                        kind: IDK::FirstName.into(),
                         e_data: SealedVaultBytes(vec![1]),
                         p_data: None,
                         format: VaultDataFormat::String,
                         origin_id: None,
                     },
                     NewVaultData {
-                        kind: IdentityDataKind::Ssn4.into(),
+                        kind: IDK::Ssn4.into(),
                         e_data: SealedVaultBytes(vec![3]),
                         p_data: None,
                         format: VaultDataFormat::String,
@@ -94,17 +94,16 @@ mod tests {
         let vw1: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[1].id).unwrap();
 
         // Delete a single field.
-        assert!(vw1.get(IdentityDataKind::Ssn4).is_some());
-        vw1.soft_delete_vault_data(conn, vec![IdentityDataKind::Ssn4.into()])
-            .unwrap();
+        assert!(vw1.get(&IDK::Ssn4.into()).is_some());
+        vw1.soft_delete_vault_data(conn, vec![IDK::Ssn4.into()]).unwrap();
         // Refetch since the VW is stale.
         let vw1: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[1].id).unwrap();
-        assert!(vw1.get(IdentityDataKind::FirstName).is_some());
-        assert!(vw1.get(IdentityDataKind::Ssn4).is_none());
+        assert!(vw1.get(&IDK::FirstName.into()).is_some());
+        assert!(vw1.get(&IDK::Ssn4.into()).is_none());
         // The other scoped vault still works properly.
         let vw0: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[0].id).unwrap();
-        assert!(vw0.get(IdentityDataKind::FirstName).is_some());
-        assert!(vw0.get(IdentityDataKind::Ssn4).is_some());
+        assert!(vw0.get(&IDK::FirstName.into()).is_some());
+        assert!(vw0.get(&IDK::Ssn4.into()).is_some());
 
         // Delete the entire scoped vault.
         vw1.soft_delete_vault(conn).unwrap();
@@ -112,7 +111,7 @@ mod tests {
         assert!(VaultWrapper::<Person>::lock_for_onboarding(conn, &scoped_vaults[1].id).is_err());
         // The other scoped vault still works properly.
         let vw0: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[0].id).unwrap();
-        assert!(vw0.get(IdentityDataKind::FirstName).is_some());
-        assert!(vw0.get(IdentityDataKind::Ssn4).is_some());
+        assert!(vw0.get(&IDK::FirstName.into()).is_some());
+        assert!(vw0.get(&IDK::Ssn4.into()).is_some());
     }
 }

@@ -34,7 +34,10 @@ pub async fn decrypt_basic_business_info(
         .await?
         .ok_or(BusinessError::NoBos)?
         .deserialize()?;
-    let business_name = bvw.get_p_data(BDK::Name).ok_or(BusinessError::NoName)?.clone();
+    let business_name = bvw
+        .get_p_data(&BDK::Name.into())
+        .ok_or(BusinessError::NoName)?
+        .clone();
 
     // TODO: could this differ from the actual primary BO's first name + last name?
     // I don't think so by the client, but maybe on the backend we should compare and enforce

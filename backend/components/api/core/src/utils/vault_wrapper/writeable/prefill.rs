@@ -97,7 +97,7 @@ impl<Type> VaultWrapper<Type> {
             .filter(|d| d.lifetime.scoped_vault_id != destination_sv.id)
             // Don't prefill data into this tenant if the exact same data has already been prefilled
             .filter(|d| {
-                let existing_dl = destination_vw.get_lifetime(d.lifetime.kind.clone());
+                let existing_dl = destination_vw.get_lifetime(&d.lifetime.kind);
                 !existing_dl.and_then(|dl| dl.origin_id.as_ref()).is_some_and(|id| &d.lifetime.id == id)
             })
             // Only autofill data into the that must be collected by the tenant's playbook
@@ -153,10 +153,7 @@ impl<Type> VaultWrapper<Type> {
             .iter()
             .map(|d| d.kind.clone())
             .filter(|di| di.is_contact_info())
-            .filter_map(|di| -> Option<_> {
-                let dl = self.get_lifetime(di)?;
-                Some((dl.kind.clone(), dl.id.clone()))
-            })
+            .filter_map(|di| self.get_lifetime(&di).map(|dl| (di, dl.id.clone())))
             .collect_vec();
         let old_ci = state
             .db_pool

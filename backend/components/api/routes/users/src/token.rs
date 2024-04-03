@@ -138,7 +138,7 @@ pub async fn post(
                 let has_prefill_data = portable_vw
                     .populated_dis()
                     .into_iter()
-                    .filter_map(|di| portable_vw.get_lifetime(di))
+                    .filter_map(|di| portable_vw.get_lifetime(&di))
                     .any(|dl| dl.scoped_vault_id != sv.id);
                 let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
                 let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);

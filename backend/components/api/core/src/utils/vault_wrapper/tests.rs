@@ -93,7 +93,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(uvw.get_e_data(attribute), expected_value.as_ref());
+        assert_eq!(uvw.get_e_data(&attribute.into()), expected_value.as_ref());
     }
 
     // build_for_user should only show the phone number
@@ -115,7 +115,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(uvw.get_e_data(attribute), expected_value.as_ref());
+        assert_eq!(uvw.get_e_data(&attribute.into()), expected_value.as_ref());
     }
 }
 
@@ -212,7 +212,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(uvw.get_e_data(attribute), expected_value.as_ref());
+        assert_eq!(uvw.get_e_data(&attribute.into()), expected_value.as_ref());
     }
 
     // Vault wrapper for tenant 2
@@ -223,7 +223,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(uvw.get_e_data(attribute), expected_value.as_ref());
+        assert_eq!(uvw.get_e_data(&attribute.into()), expected_value.as_ref());
     }
 
     // build_for_user should only show the portable data
@@ -234,7 +234,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(uvw.get_e_data(attribute), expected_value.as_ref());
+        assert_eq!(uvw.get_e_data(&attribute.into()), expected_value.as_ref());
     }
 }
 
@@ -287,9 +287,12 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     ];
     for test in tests {
         let (attribute, expected_value) = test;
-        assert_eq!(bvw.get_e_data(attribute), expected_value.as_ref());
+        assert_eq!(bvw.get_e_data(&&attribute.into()), expected_value.as_ref());
     }
-    assert_eq!(bvw.get_p_data(BDK::Name), Some(&PiiString::from("Acme Inc")));
+    assert_eq!(
+        bvw.get_p_data(&BDK::Name.into()),
+        Some(&PiiString::from("Acme Inc"))
+    );
 }
 
 #[db_test]
@@ -321,25 +324,25 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
 
     // Make the user can't see the name and email until it's portable
     let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
-    assert!(!uvw.has_field(IDK::FirstName));
-    assert!(!uvw.has_field(IDK::LastName));
-    assert!(!uvw.has_field(IDK::Email));
+    assert!(!uvw.has_field(&IDK::FirstName.into()));
+    assert!(!uvw.has_field(&IDK::LastName.into()));
+    assert!(!uvw.has_field(&IDK::Email.into()));
 
     let timeline_events = UserTimeline::list(conn, &su.id, vec![]).unwrap();
     assert!(!timeline_events.is_empty());
 
     // Commit
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    assert!(uvw.has_field(IDK::FirstName));
-    assert!(uvw.has_field(IDK::LastName));
-    assert!(uvw.has_field(IDK::Email));
+    assert!(uvw.has_field(&IDK::FirstName.into()));
+    assert!(uvw.has_field(&IDK::LastName.into()));
+    assert!(uvw.has_field(&IDK::Email.into()));
     uvw.portablize_identity_data(conn).unwrap();
 
     // Now we should see the portable name and email
     let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
-    assert!(uvw.has_field(IDK::FirstName));
-    assert!(uvw.has_field(IDK::LastName));
-    assert!(uvw.has_field(IDK::Email));
+    assert!(uvw.has_field(&IDK::FirstName.into()));
+    assert!(uvw.has_field(&IDK::LastName.into()));
+    assert!(uvw.has_field(&IDK::Email.into()));
 
     // Should have added user timeline events
     let timeline_events = UserTimeline::list(conn, &su.id, vec![]).unwrap();
@@ -370,8 +373,8 @@ fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
 
     // Make sure the vault view can't see the data until its portable
     let uvw = VaultWrapper::<Business>::build_portable(conn, &bv.id).unwrap();
-    assert!(!uvw.has_field(BDK::Name));
-    assert!(!uvw.has_field(BDK::PhoneNumber));
+    assert!(!uvw.has_field(&BDK::Name.into()));
+    assert!(!uvw.has_field(&BDK::PhoneNumber.into()));
 
     let timeline_events = UserTimeline::list(conn, &sb.id, vec![]).unwrap();
     assert!(!timeline_events.is_empty());
@@ -565,13 +568,13 @@ fn test_bvw_replacements(conn: &mut TestPgConn) {
         // Make sure fields are set
         let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
         for (di, _) in update {
-            assert!(bvw.has_field(di));
+            assert!(bvw.has_field(&di));
         }
     }
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
     // We should have cleared out dba in the last update
-    assert!(!bvw.has_field(BDK::Dba));
-    assert!(!bvw.has_field(BDK::BeneficialOwners));
+    assert!(!bvw.has_field(&BDK::Dba.into()));
+    assert!(!bvw.has_field(&BDK::BeneficialOwners.into()));
 }
 
 #[db_test]
@@ -743,8 +746,8 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     uvw.patch_data_test(conn, update, true).unwrap();
     // Get the ssn4 as was written by tenant 1
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
-    let ssn4_tenant1 = uvw.get_e_data(IDK::Ssn4);
-    assert!(!uvw.has_field(IDK::Ssn9));
+    let ssn4_tenant1 = uvw.get_e_data(&IDK::Ssn4.into());
+    assert!(!uvw.has_field(&IDK::Ssn9.into()));
 
     // Add speculative ssn9 by tenant 2
     let update = vec![(IDK::Ssn9.into(), PiiString::new("123121234".to_owned()))];
@@ -752,8 +755,8 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     uvw.patch_data_test(conn, update, true).unwrap();
     // Get the ssn4 and ssn9 as written by tenant 2
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su2.id)).unwrap();
-    let ssn4_tenant2 = uvw.get_e_data(IDK::Ssn4);
-    let ssn9_tenant2 = uvw.get_e_data(IDK::Ssn9);
+    let ssn4_tenant2 = uvw.get_e_data(&IDK::Ssn4.into());
+    let ssn9_tenant2 = uvw.get_e_data(&IDK::Ssn9.into());
     assert_ne!(ssn4_tenant1, ssn4_tenant2);
 
     // Commit data for tenant2
@@ -766,11 +769,11 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
 
     // Now, when getting portable data, we should still see the ssn9 added for tenant 2
     let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
-    assert_eq!(uvw.get_e_data(IDK::Ssn4), ssn4_tenant2);
-    assert_eq!(uvw.get_e_data(IDK::Ssn9), ssn9_tenant2);
+    assert_eq!(uvw.get_e_data(&IDK::Ssn4.into()), ssn4_tenant2);
+    assert_eq!(uvw.get_e_data(&IDK::Ssn9.into()), ssn9_tenant2);
     // But, we should still have the name that was portable by tenant 1
-    assert!(uvw.has_field(IDK::FirstName));
-    assert!(uvw.has_field(IDK::LastName));
+    assert!(uvw.has_field(&IDK::FirstName.into()));
+    assert!(uvw.has_field(&IDK::LastName.into()));
 }
 
 #[db_test]
@@ -806,12 +809,12 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
         // Make sure fields are set
         let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
         for (di, _) in update {
-            assert!(uvw.has_field(di));
+            assert!(uvw.has_field(&di));
         }
     }
     // We should have cleared out line2 in the last update
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
-    assert!(!uvw.has_field(IDK::AddressLine2));
+    assert!(!uvw.has_field(&IDK::AddressLine2.into()));
 }
 
 #[db_test]
@@ -836,14 +839,14 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
 
     // Update k1 and make sure only it changed
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    let v1 = uvw.get_e_data(k1.clone()).unwrap().clone();
-    let v2 = uvw.get_e_data(k2.clone()).unwrap().clone();
+    let v1 = uvw.get_e_data(&k1.clone().into()).unwrap().clone();
+    let v2 = uvw.get_e_data(&k2.clone().into()).unwrap().clone();
     let custom_data = vec![(k1.clone().into(), PiiString::from("MERP"))];
     uvw.patch_data_test(conn, custom_data, true).unwrap();
 
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    let new_v1 = uvw.get_e_data(k1.clone()).unwrap().clone();
-    let new_v2 = uvw.get_e_data(k2.clone()).unwrap().clone();
+    let new_v1 = uvw.get_e_data(&k1.clone().into()).unwrap().clone();
+    let new_v2 = uvw.get_e_data(&k2.clone().into()).unwrap().clone();
     assert_ne!(new_v1, v1);
     assert_eq!(new_v2, v2);
 
@@ -854,8 +857,8 @@ fn test_commit_custom_data(conn: &mut TestPgConn) {
     ];
     uvw.patch_data_test(conn, custom_data, true).unwrap();
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
-    let newest_v1 = uvw.get_e_data(k1).unwrap().clone();
-    let newest_v2 = uvw.get_e_data(k2).unwrap().clone();
+    let newest_v1 = uvw.get_e_data(&k1.into()).unwrap().clone();
+    let newest_v2 = uvw.get_e_data(&k2.into()).unwrap().clone();
     assert_ne!(newest_v1, new_v1);
     assert_ne!(newest_v2, new_v2);
 }
@@ -968,8 +971,8 @@ fn test_portable_view(conn: &mut TestPgConn) {
 
     // We should see address line2 in the portable data
     let vw = VaultWrapper::<Any>::build_portable(conn, &uv.id).unwrap();
-    assert!(vw.get(IDK::AddressLine1).is_some());
-    assert!(vw.get(IDK::AddressLine2).is_some());
+    assert!(vw.get(&IDK::AddressLine1.into()).is_some());
+    assert!(vw.get(&IDK::AddressLine2.into()).is_some());
 
     // Add address WITHOUT line2 to tenant 2
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
@@ -986,12 +989,12 @@ fn test_portable_view(conn: &mut TestPgConn) {
 
     // Compose the portable view of the VW and make sure we don't have an address line2
     let vw = VaultWrapper::<Any>::build_portable(conn, &uv.id).unwrap();
-    assert!(vw.get(IDK::AddressLine1).is_some());
-    assert!(vw.get(IDK::AddressLine2).is_none());
-    assert!(vw.get(IDK::City).is_some());
-    assert!(vw.get(IDK::State).is_some());
-    assert!(vw.get(IDK::Zip).is_some());
-    assert!(vw.get(IDK::Country).is_some());
+    assert!(vw.get(&IDK::AddressLine1.into()).is_some());
+    assert!(vw.get(&IDK::AddressLine2.into()).is_none());
+    assert!(vw.get(&IDK::City.into()).is_some());
+    assert!(vw.get(&IDK::State.into()).is_some());
+    assert!(vw.get(&IDK::Zip.into()).is_some());
+    assert!(vw.get(&IDK::Country.into()).is_some());
 
     // Then add address line2 to tenant 2
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
@@ -1009,8 +1012,8 @@ fn test_portable_view(conn: &mut TestPgConn) {
 
     // We should see address line2 in the portable data now
     let vw = VaultWrapper::<Any>::build_portable(conn, &uv.id).unwrap();
-    assert!(vw.get(IDK::AddressLine1).is_some());
-    assert!(vw.get(IDK::AddressLine2).is_some());
+    assert!(vw.get(&IDK::AddressLine1.into()).is_some());
+    assert!(vw.get(&IDK::AddressLine2.into()).is_some());
 
     // And a new address without line 2 at tenant 2, which should deactivate tenant2's line2
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
@@ -1027,6 +1030,6 @@ fn test_portable_view(conn: &mut TestPgConn) {
 
     // We should see address line2 in the portable data now
     let vw = VaultWrapper::<Any>::build_portable(conn, &uv.id).unwrap();
-    assert!(vw.get(IDK::AddressLine1).is_some());
-    assert!(vw.get(IDK::AddressLine2).is_none());
+    assert!(vw.get(&IDK::AddressLine1.into()).is_some());
+    assert!(vw.get(&IDK::AddressLine2.into()).is_none());
 }

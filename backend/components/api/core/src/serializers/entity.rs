@@ -33,7 +33,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             .populated_dis()
             .into_iter()
             .filter(|di| di.store_plaintext())
-            .flat_map(|di| vw.get_p_data(di.clone()).map(|p_data| (di, p_data.clone())))
+            .flat_map(|di| vw.get_p_data(&di).map(|p_data| (di, p_data.clone())))
             .map(|(di, d)| (di.into(), d));
         let decrypted_attrs = decrypted_attrs
             .into_iter()
@@ -45,7 +45,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             .populated_dis()
             .into_iter()
             .filter_map(|di| -> Option<_> {
-                let lifetime = vw.get_lifetime(di.clone())?;
+                let lifetime = vw.get_lifetime(&di)?;
                 // To be decryptable, two conditions must be met
                 // - The tenant must be able to decrypt the attribute (via ob config permissions)
                 // - The authed user principal at the tenant must be able to decrypt the attribute (via IAM)

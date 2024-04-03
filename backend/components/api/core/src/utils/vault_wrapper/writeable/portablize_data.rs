@@ -122,7 +122,7 @@ impl WriteableVw<Person> {
         di: DataIdentifier,
     ) -> ApiResult<IsFirstTimeVerifying> {
         let lifetime = self
-            .get_lifetime(di.clone())
+            .get_lifetime(&di)
             .ok_or(AssertionError("No lifetime for CI"))?;
         let ci = ContactInfo::get(conn, &lifetime.id)?;
         let is_first_time_verifying_ci = on_otp_verified(conn, ci, &self.scoped_vault_id, &self.vault.id)?;

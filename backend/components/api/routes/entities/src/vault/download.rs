@@ -76,7 +76,7 @@ pub async fn get(
         .await?
         .remove(&op)
         .ok_or(TenantError::DataDoesntExist(di.clone()))?;
-    let mime_type = vw.get_mime_type(di.clone());
+    let mime_type = vw.get_mime_type(&di);
 
     let mut resp = HttpResponse::build(StatusCode::OK);
     resp.insert_header(("Content-Disposition", "attachment"));

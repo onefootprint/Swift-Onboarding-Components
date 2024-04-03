@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use db::models::risk_signal::{IncludeHidden, NewRiskSignalInfo, RiskSignal};
 use idv::ParsedResponse;
 use newtypes::{
-    FootprintReasonCode, IdentityDataKind, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
+    FootprintReasonCode, IdentityDataKind as IDK, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
     VerificationResultId,
 };
 
@@ -73,8 +73,8 @@ pub fn parse_reason_codes_from_vendor_result(
 ) -> ApiResult<ParsedFootprintReasonCodes> {
     let vendor_api: VendorAPI = (&vendor_result.response.response).into();
     let vres_id = vendor_result.verification_result_id.clone();
-    let dob_submitted = vw.has_field(IdentityDataKind::Dob);
-    let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
+    let dob_submitted = vw.has_field(&IDK::Dob.into());
+    let ssn_submitted = vw.has_field(&IDK::Ssn4.into()) || vw.has_field(&IDK::Ssn9.into());
 
     let (aml_frcs, kyc_frcs): (Vec<_>, Vec<_>) =
         parse_reason_codes(vendor_result.clone(), dob_submitted, ssn_submitted)

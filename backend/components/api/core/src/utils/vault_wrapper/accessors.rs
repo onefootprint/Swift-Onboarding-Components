@@ -25,46 +25,31 @@ impl<Type> VaultWrapper<Type> {
             .collect()
     }
 
-    pub fn has_field<T>(&self, id: T) -> bool
-    where
-        T: Into<DataIdentifier>,
-    {
-        self.populated_dis().contains(&id.into())
+    pub fn has_field(&self, di: &DataIdentifier) -> bool {
+        self.populated_dis().contains(di)
     }
 
     /// Dispatch queries for a piece of data with a given identifier to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data.
-    /// TODO make this take in a reference
-    pub fn get<T>(&self, id: T) -> Option<&dyn HasLifetime>
-    where
-        T: Into<DataIdentifier> + Clone,
-    {
-        self.data(&id.into()).map(|d| d.data())
+    pub fn get(&self, di: &DataIdentifier) -> Option<&dyn HasLifetime> {
+        self.data(di).map(|d| d.data())
     }
 
     /// Returns the visible liftime for the given DI, if exists
-    pub fn get_lifetime<T: Into<DataIdentifier> + Clone>(&self, id: T) -> Option<&DataLifetime> {
-        self.data(&id.into()).map(|d| &d.lifetime)
+    pub fn get_lifetime(&self, di: &DataIdentifier) -> Option<&DataLifetime> {
+        self.data(di).map(|d| &d.lifetime)
     }
 
     /// If the provided DI is a document, return the mime type
-    pub fn get_mime_type<T>(&self, id: T) -> Option<&str>
-    where
-        T: Into<DataIdentifier> + Clone,
-    {
-        self.data(&id.into())
-            .and_then(|d| d.doc())
-            .map(|d| d.mime_type.leak())
+    pub fn get_mime_type(&self, di: &DataIdentifier) -> Option<&str> {
+        self.data(di).and_then(|d| d.doc()).map(|d| d.mime_type.leak())
     }
 
     /// Get the plaintext data for the provided data identifier.
     /// Returns None if the id doesn't exist in the vault or the id is encrypted
-    pub fn get_p_data<T>(&self, id: T) -> Option<&PiiString>
-    where
-        T: Into<DataIdentifier> + Clone,
-    {
-        self.get(id).and_then(|v| match v.data() {
+    pub fn get_p_data(&self, di: &DataIdentifier) -> Option<&PiiString> {
+        self.get(di).and_then(|v| match v.data() {
             VaultedData::NonPrivate(s, _) => Some(s),
             _ => None,
         })
@@ -75,11 +60,8 @@ impl<Type> VaultWrapper<Type> {
 impl<Type> VaultWrapper<Type> {
     /// Get the encrypted data for the provided data identifier.
     /// Returns None if the id doesn't exist in the vault
-    pub fn get_e_data<T>(&self, id: T) -> Option<&newtypes::SealedVaultBytes>
-    where
-        T: Into<DataIdentifier> + Clone,
-    {
-        self.get(id).and_then(|v| match v.data() {
+    pub fn get_e_data(&self, di: &DataIdentifier) -> Option<&newtypes::SealedVaultBytes> {
+        self.get(di).and_then(|v| match v.data() {
             VaultedData::Sealed(s, _) => Some(s),
             _ => None,
         })

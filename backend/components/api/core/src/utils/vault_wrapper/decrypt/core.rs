@@ -59,9 +59,9 @@ impl<Type> VaultWrapper<Type> {
 
     /// Get the VaultedData for the provided id, if exists. This also includes strange logic to
     /// get the mime type
-    fn get_vaulted_data(&self, di: DataIdentifier) -> Option<VaultedData> {
+    fn get_vaulted_data(&self, di: &DataIdentifier) -> Option<VaultedData> {
         // This is weird - get the mime type from the document row
-        if let &DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) = &di {
+        if let &DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) = di {
             let di: DataIdentifier = DocumentKind::from_id_doc_kind(doc_kind, side).into();
             let document = self.data(&di)?.doc()?;
             return Some(VaultedData::NonPrivate(
@@ -121,7 +121,7 @@ impl<Type> VaultWrapper<Type> {
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
         ops.into_iter()
             .flat_map(|op| {
-                self.get_vaulted_data(op.identifier.clone())
+                self.get_vaulted_data(&op.identifier)
                     .map(|d| VwDecryptRequest(&self.vault.e_private_key, op, d))
             })
             .collect_vec()

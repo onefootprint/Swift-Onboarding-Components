@@ -14,8 +14,8 @@ use db::{
 };
 use newtypes::{
     email::Email, BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, ContactInfoKind,
-    DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, KycedBusinessOwnerData, PhoneNumber,
-    PiiString, TenantId,
+    IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, KycedBusinessOwnerData, PhoneNumber, PiiString,
+    TenantId,
 };
 use std::str::FromStr;
 
@@ -25,7 +25,7 @@ impl<Type> VaultWrapper<Type> {
         state: &State,
         kind: ContactInfoKind,
     ) -> ApiResult<Option<(PiiString, ContactInfo, DataLifetime)>> {
-        if let Some(dl) = self.get_lifetime(DataIdentifier::from(kind)) {
+        if let Some(dl) = self.get_lifetime(&kind.into()) {
             let dl_id = dl.id.clone();
             let ci = state
                 .db_pool

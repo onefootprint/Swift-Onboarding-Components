@@ -91,7 +91,7 @@ pub(super) async fn compute_ocr_data<'a>(
             doc_first_id_data(r, validate_args)
                 .into_iter()
                 // Don't add OCR data to the vault that already exists
-                .filter(|(k, _)| !vw.has_field(k.clone()))
+                .filter(|(k, _)| !vw.has_field(k))
                 .collect()
         } else {
             tracing::warn!("Skipping prefilling IDK data from doc because !barcode_read_successfully");
@@ -259,9 +259,8 @@ pub fn vault_complete_images(
         .images(conn, true)?
         .into_iter()
         .map(|u| {
-            let mime_type = vw
-                .get_mime_type(DocumentKind::LatestUpload(doc_type_for_latest_upload, u.side))
-                .unwrap_or("image/png");
+            let di = DocumentKind::LatestUpload(doc_type_for_latest_upload, u.side).into();
+            let mime_type = vw.get_mime_type(&di).unwrap_or("image/png");
             let file_extension = mime_type_to_extension(mime_type).unwrap_or("png");
             let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
             NewDocument {

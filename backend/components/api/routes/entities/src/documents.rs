@@ -60,7 +60,7 @@ pub async fn get(
                     let DataIdentifier::Document(DocumentKind::LatestUpload(kind, side)) = di else {
                         return None;
                     };
-                    let dl = vw.get_lifetime(di)?.clone();
+                    let dl = vw.get_lifetime(&di)?.clone();
                     Some((kind, (side, dl)))
                 })
                 // Only take document DIs that don't have a corresponding IdDocument.

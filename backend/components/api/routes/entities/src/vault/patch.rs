@@ -114,7 +114,7 @@ async fn patch_inner(
                 Ok(vw)
             })
             .await?;
-        if uvw.get(ssn4.clone()).is_some() {
+        if uvw.get(&ssn4).is_some() {
             let existing_ssn4 = uvw
                 .decrypt_unchecked_single(&state.enclave_client, ssn4.clone())
                 .await?

@@ -201,7 +201,7 @@ pub async fn decrypt_aml_hits(
         IDK::LastName.into(),
         IDK::Dob.into(),
     ];
-    dis_searched.retain(|i| uvw.has_field(i.clone()));
+    dis_searched.retain(|i| uvw.has_field(i));
 
     // check that auth has Decrypt permissions for these DIs. Note we don't check check_ob_config_access here- this seems unnecessary and we should never allow an OBC that makes AML calls but then doesn't allow the user to view the results
     let auth = auth.check_guard(CanDecrypt::new(dis_searched.clone()))?;
@@ -305,7 +305,10 @@ async fn get_aml_hits(
 
     if let Some(vres) = vreq_vres.vres {
         if let Some(res) = vres.response {
-            if let ParsedResponse::IncodeWatchlistCheck(wc) | ParsedResponse::IncodeUpdatedWatchlistResult(UpdatedWatchlistResultResponse(wc))  = res.response {
+            if let ParsedResponse::IncodeWatchlistCheck(wc)
+            | ParsedResponse::IncodeUpdatedWatchlistResult(UpdatedWatchlistResultResponse(wc)) =
+                res.response
+            {
                 let share_url = wc
                     .content
                     .as_ref()

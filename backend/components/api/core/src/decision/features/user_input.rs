@@ -7,7 +7,7 @@ use crate::{
 use chrono::{Days, NaiveDate, Utc};
 use db::models::{ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo};
 use newtypes::{
-    AgeHelper, CollectedData, DataIdentifier, Declaration, FootprintReasonCode, IdentityDataKind,
+    AgeHelper, CollectedData, DataIdentifier, Declaration, FootprintReasonCode, IdentityDataKind as IDK,
     InvestorProfileKind, PiiString, VendorAPI, VerificationResultId, VisaKind, DATE_FORMAT,
 };
 use std::str::FromStr;
@@ -22,9 +22,9 @@ pub async fn generate_user_input_risk_signals(
     vres_id: &VerificationResultId,
 ) -> ApiResult<Vec<NewRiskSignalInfo>> {
     let fields = &[
-        DataIdentifier::Id(IdentityDataKind::VisaKind),
-        DataIdentifier::Id(IdentityDataKind::VisaExpirationDate),
-        DataIdentifier::Id(IdentityDataKind::Dob),
+        DataIdentifier::Id(IDK::VisaKind),
+        DataIdentifier::Id(IDK::VisaExpirationDate),
+        DataIdentifier::Id(IDK::Dob),
         InvestorProfileKind::Declarations.into(),
     ];
     let decrypted = vw.decrypt_unchecked(enclave_client, fields).await?;
@@ -40,8 +40,8 @@ pub async fn generate_user_input_risk_signals(
     }
 
     // Visa features
-    let kind = decrypted.get_di(IdentityDataKind::VisaKind).ok();
-    let visa_expiration = decrypted.get_di(IdentityDataKind::VisaExpirationDate).ok();
+    let kind = decrypted.get_di(IDK::VisaKind).ok();
+    let visa_expiration = decrypted.get_di(IDK::VisaExpirationDate).ok();
     let now = Utc::now().naive_utc().into();
     let visa_features = visa_features(kind, visa_expiration, now).await?;
 
@@ -101,10 +101,7 @@ pub fn ssn_optional_and_missing<T>(vw: &VaultWrapper<T>, obc: &ObConfiguration) 
     let cd = CollectedData::Ssn;
     let cdos = cd.options();
     cdos.iter().any(|cdo| {
-        !cdo.required_data_identifiers()
-            .into_iter()
-            .all(|di| vw.has_field(di))
-            && obc.optional_data.contains(cdo)
+        !cdo.required_data_identifiers().iter().all(|di| vw.has_field(di)) && obc.optional_data.contains(cdo)
     })
 }
 
@@ -121,11 +118,11 @@ pub fn user_input_based_risk_signals(
         frcs.push(FootprintReasonCode::SsnNotProvided);
     }
 
-    if !vw.has_field(IdentityDataKind::PhoneNumber) {
+    if !vw.has_field(&IDK::PhoneNumber.into()) {
         frcs.push(FootprintReasonCode::PhoneNotProvided);
     }
 
-    if let Ok(dob) = decrypted.get_di(IdentityDataKind::Dob) {
+    if let Ok(dob) = decrypted.get_di(IDK::Dob) {
         if let Ok(is_over_18) = age_gte(dob, 18) {
             if !is_over_18 {
                 frcs.push(FootprintReasonCode::DobInputAgeLessThan18)
