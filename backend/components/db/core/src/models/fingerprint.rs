@@ -170,6 +170,7 @@ impl Fingerprint {
                     .eq(dl2.field(data_lifetime::scoped_vault_id))),
             )
             .filter(sv1.field(scoped_vault::id).eq(sv_id))
+            .filter(sv1.field(scoped_vault::is_live).eq(sv2.field(scoped_vault::is_live)))
             .select((
                 sv2.field(scoped_vault::fp_id),
                 sv2.field(scoped_vault::tenant_id),
