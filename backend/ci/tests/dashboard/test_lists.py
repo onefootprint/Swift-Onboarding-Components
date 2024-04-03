@@ -382,7 +382,6 @@ def test_list_list_entries(sandbox_tenant):
     )  # TODO: later do a real assertion once we include decrypted entries in the payload
 
 
-@pytest.mark.skip()
 def test_delete_list_entries(sandbox_tenant):
     nonce = _gen_random_str(5)
     list = post(
@@ -455,6 +454,27 @@ def test_delete_list_entries(sandbox_tenant):
         len(get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths))
         == 0
     )
+
+    audit_events = get(
+        f"org/audit_events",
+        dict(
+            names="create_list_entry,delete_list_entry",
+            list_id=list["id"],
+            page_size=10,
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    # should have 3 delete events then 3 create events
+    assert all(
+        [audit_events["data"][i]["name"] == "delete_list_entry" for i in range(3)]
+    )
+    assert all(
+        [audit_events["data"][i]["name"] == "create_list_entry" for i in range(3, 6)]
+    )
+    # assert expected list_entry_id's for the deletions
+    assert audit_events["data"][0]["detail"]["data"]["list_entry_id"] == entry3[0]["id"]
+    assert audit_events["data"][1]["detail"]["data"]["list_entry_id"] == entry1[0]["id"]
+    assert audit_events["data"][2]["detail"]["data"]["list_entry_id"] == entry2[0]["id"]
 
 
 def test_delete_list_entries_no_permissions(sandbox_tenant):

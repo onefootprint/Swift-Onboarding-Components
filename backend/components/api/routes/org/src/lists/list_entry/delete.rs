@@ -4,8 +4,8 @@ use crate::{
     types::ResponseData,
     State,
 };
-use api_core::types::EmptyResponse;
-use db::models::{list::List, list_entry::ListEntry};
+use api_core::{types::EmptyResponse, utils::headers::InsightHeaders};
+use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::ListEntry};
 use newtypes::{ListEntryId, ListId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -15,6 +15,7 @@ pub async fn deactivate_list_entry(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     ids: web::Path<(ListId, ListEntryId)>,
+    insights: InsightHeaders,
 ) -> ApiResult<Json<ResponseData<EmptyResponse>>> {
     let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
@@ -22,12 +23,14 @@ pub async fn deactivate_list_entry(
     let (list_id, list_entry_id) = ids.into_inner();
     let actor = auth.actor();
 
+    let insight = CreateInsightEvent::from(insights);
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             List::get(conn, &tenant_id, is_live, &list_id)?;
             let list_entry = ListEntry::lock(conn, &list_entry_id)?;
-            ListEntry::deactivate(conn, list_entry, &actor.into())?;
+            let ie = insight.insert_with_conn(conn)?;
+            ListEntry::deactivate(conn, list_entry, &actor.into(), &tenant_id, is_live, &ie.id)?;
             Ok(())
         })
         .await?;

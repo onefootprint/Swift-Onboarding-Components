@@ -96,6 +96,7 @@ diesel::table! {
         tenant_role_id -> Nullable<Text>,
         is_live -> Nullable<Bool>,
         list_entry_creation_id -> Nullable<Text>,
+        list_entry_id -> Nullable<Text>,
     }
 }
 
@@ -1522,6 +1523,7 @@ diesel::joinable!(apple_device_attestation -> vault (vault_id));
 diesel::joinable!(apple_device_attestation -> webauthn_credential (webauthn_credential_id));
 diesel::joinable!(audit_event -> document_data (document_data_id));
 diesel::joinable!(audit_event -> insight_event (insight_event_id));
+diesel::joinable!(audit_event -> list_entry (list_entry_id));
 diesel::joinable!(audit_event -> list_entry_creation (list_entry_creation_id));
 diesel::joinable!(audit_event -> ob_configuration (ob_configuration_id));
 diesel::joinable!(audit_event -> scoped_vault (scoped_vault_id));

@@ -1,5 +1,7 @@
 use crate::*;
-use newtypes::{AuditEventId, AuditEventName, DataIdentifier, FpId, ListEntryCreationId, TenantId};
+use newtypes::{
+    AuditEventId, AuditEventName, DataIdentifier, FpId, ListEntryCreationId, ListEntryId, TenantId,
+};
 use strum_macros::Display;
 
 /// Describes an event relevant to security as seen by tenants.
@@ -70,5 +72,8 @@ pub enum AuditEventDetail {
     UpdateOrgRole,
     CreateListEntry {
         list_entry_creation_id: ListEntryCreationId,
+    },
+    DeleteListEntry {
+        list_entry_id: ListEntryId,
     },
 }

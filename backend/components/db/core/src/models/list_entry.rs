@@ -1,14 +1,16 @@
 use std::collections::HashMap;
 
-use super::{data_lifetime::DataLifetime, list_entry_creation::ListEntryCreation};
+use super::{
+    audit_event::NewAuditEvent, data_lifetime::DataLifetime, list_entry_creation::ListEntryCreation,
+};
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::list_entry;
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, DbActor, InsightEventId, ListEntryCreationId, ListEntryId, ListId, Locked,
-    SealedVaultBytes, TenantId,
+    AuditEventDetail, AuditEventId, DataLifetimeSeqno, DbActor, InsightEventId, ListEntryCreationId,
+    ListEntryId, ListId, Locked, SealedVaultBytes, TenantId,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -149,14 +151,21 @@ impl ListEntry {
     }
 
     #[tracing::instrument("ListEntry::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut TxnPgConn, list_entry: Locked<Self>, actor: &DbActor) -> DbResult<Self> {
+    pub fn deactivate(
+        conn: &mut TxnPgConn,
+        list_entry: Locked<Self>,
+        actor: &DbActor,
+        tenant_id: &TenantId,
+        is_live: bool,
+        insight_event_id: &InsightEventId,
+    ) -> DbResult<Self> {
         if list_entry.deactivated_seqno.is_some() {
             return Err(DbError::ListEntryAlreadyDeactivated);
         }
 
         let now = Utc::now();
         let seqno = DataLifetime::get_current_seqno(conn)?;
-        let res = diesel::update(list_entry::table)
+        let res: ListEntry = diesel::update(list_entry::table)
             .filter(list_entry::id.eq(&list_entry.id))
             .set((
                 list_entry::deactivated_at.eq(now),
@@ -164,6 +173,20 @@ impl ListEntry {
                 list_entry::deactivated_by.eq(actor),
             ))
             .get_result(conn.conn())?;
+
+
+        NewAuditEvent {
+            id: AuditEventId::generate(),
+            tenant_id: tenant_id.clone(),
+            principal_actor: actor.clone(),
+            insight_event_id: insight_event_id.clone(),
+            detail: AuditEventDetail::DeleteListEntry {
+                is_live,
+                list_entry_id: res.id.clone(),
+            },
+        }
+        .create(conn)?;
+
         Ok(res)
     }
 }
@@ -211,19 +234,20 @@ mod tests {
     fn test_deactivate(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
         let list = tests::fixtures::list::create(conn, &t.id);
+        let ie = tests::fixtures::insight_event::create(conn);
 
         let le = tests::fixtures::list_entry::create(conn, &t.id, &list.id);
         assert_eq!(1, ListEntry::list(conn, &list.id).unwrap().len());
 
         let le = ListEntry::lock(conn, &le.id).unwrap();
-        let le = ListEntry::deactivate(conn, le, &DbActor::Footprint).unwrap();
+        let le = ListEntry::deactivate(conn, le, &DbActor::Footprint, &t.id, list.is_live, &ie.id).unwrap();
         assert!(le.deactivated_at.is_some());
         assert!(le.deactivated_seqno.is_some());
 
         assert_eq!(0, ListEntry::list(conn, &list.id).unwrap().len());
         let le = ListEntry::lock(conn, &le.id).unwrap();
         assert!(matches!(
-            ListEntry::deactivate(conn, le, &DbActor::Footprint).unwrap_err(),
+            ListEntry::deactivate(conn, le, &DbActor::Footprint, &t.id, list.is_live, &ie.id).unwrap_err(),
             DbError::ListEntryAlreadyDeactivated
         ));
     }
