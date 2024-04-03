@@ -1,8 +1,8 @@
-use crate::{DbResult, TxnPgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_compliance_partnership;
 use diesel::prelude::*;
-use newtypes::{PartnerTenantId, TenantCompliancePartnershipId, TenantId, OrgIdentifierRef};
+use newtypes::{OrgIdentifierRef, PartnerTenantId, TenantCompliancePartnershipId, TenantId};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Queryable, Selectable, Identifiable, Serialize)]
@@ -51,7 +51,7 @@ impl<'a> NewTenantCompliancePartnership<'a> {
 
 impl TenantCompliancePartnership {
     pub fn get<'a>(
-        conn: &mut TxnPgConn,
+        conn: &mut PgConn,
         id: &TenantCompliancePartnershipId,
         org_id: impl Into<OrgIdentifierRef<'a>>,
     ) -> DbResult<TenantCompliancePartnership> {
@@ -71,6 +71,6 @@ impl TenantCompliancePartnership {
 
         Ok(query
             .select(TenantCompliancePartnership::as_select())
-            .first(conn.conn())?)
+            .first(conn)?)
     }
 }

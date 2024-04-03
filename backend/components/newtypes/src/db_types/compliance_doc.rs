@@ -1,4 +1,4 @@
-use crate::{util::impl_enum_str_diesel, S3Url, SealedVaultDataKey};
+use crate::{util::impl_enum_str_diesel, PiiString, S3Url, SealedVaultDataKey};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -40,8 +40,11 @@ impl_enum_str_diesel!(ComplianceDocReviewDecision);
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum ComplianceDocData {
-    ExternalUrl(String),
+    ExternalUrl {
+        url: PiiString,
+    },
     SealedUpload {
+        filename: String,
         s3_url: S3Url,
         e_data_key: SealedVaultDataKey,
     },

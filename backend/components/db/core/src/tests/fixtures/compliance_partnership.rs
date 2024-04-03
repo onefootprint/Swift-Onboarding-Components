@@ -213,6 +213,7 @@ pub fn create_resources<'a>(
                     request_id: &req.id,
                     submitted_by_tenant_user_id: assignment.assigned_to_tenant_user_id.as_ref().unwrap(),
                     doc_data: &ComplianceDocData::SealedUpload {
+                        filename: "example.pdf".to_owned(),
                         s3_url: S3Url::from("the url".to_owned()),
                         e_data_key: SealedVaultDataKey(vec![]),
                     },

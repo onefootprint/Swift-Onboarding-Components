@@ -11,6 +11,7 @@ mod reupload;
 mod reviews;
 mod submissions;
 mod tenant_assignment;
+mod upload;
 
 use api_core::*;
 
@@ -31,4 +32,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config.service(reviews::post);
     config.service(submissions::post);
     config.service(tenant_assignment::post);
+    config.service(upload::post);
 }

@@ -1,7 +1,7 @@
 use crate::*;
 use newtypes::{
-    ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocSubmissionId,
-    ComplianceDocTemplateVersionId, PartnerTenantId, TenantId, TenantUserId,
+    ComplianceDocReviewDecision, ComplianceDocSubmissionId, ComplianceDocTemplateVersionId, PartnerTenantId,
+    PiiString, TenantId, TenantUserId,
 };
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
@@ -47,8 +47,7 @@ pub struct ReuploadComplianceDocRequest {
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct SubmitExternalUrlRequest {
-    pub request_id: ComplianceDocRequestId,
-    pub url: String,
+    pub url: PiiString,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]

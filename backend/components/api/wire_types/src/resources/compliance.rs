@@ -1,10 +1,11 @@
+use crate::*;
 use newtypes::{
     ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision, ComplianceDocReviewId,
     ComplianceDocStatus, ComplianceDocSubmissionId, ComplianceDocTemplateId, ComplianceDocTemplateVersionId,
-    TenantCompliancePartnershipId, TenantKind,
+    PiiString, TenantCompliancePartnershipId, TenantKind,
 };
-
-use crate::*;
+use serde_with::SerializeDisplay;
+use strum::EnumDiscriminants;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -96,7 +97,8 @@ pub struct ComplianceDocEventRequested {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceDocEventSubmitted {
-    // TODO: add submission metadata
+    pub submission_id: ComplianceDocSubmissionId,
+    pub kind: ComplianceDocDataKind,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
@@ -113,4 +115,28 @@ pub struct ComplianceDocEventAssigned {
 
     /// None if the doc is unassigned.
     pub assigned_to: Option<LiteUserAndOrg>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Apiv2Schema, Serialize, EnumDiscriminants, macros::SerdeAttr)]
+#[strum_discriminants(
+    name(ComplianceDocDataKind),
+    vis(pub),
+    derive(Display, SerializeDisplay, Apiv2Schema, macros::SerdeAttr),
+    serde(rename_all = "snake_case"),
+    strum(serialize_all = "snake_case")
+)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "kind", content = "data")]
+pub enum ComplianceDocData {
+    ExternalUrl { url: PiiString },
+    FileUpload { filename: String, data: PiiString },
+}
+
+impl From<&newtypes::ComplianceDocData> for ComplianceDocDataKind {
+    fn from(data: &newtypes::ComplianceDocData) -> Self {
+        match data {
+            newtypes::ComplianceDocData::ExternalUrl { .. } => ComplianceDocDataKind::ExternalUrl,
+            newtypes::ComplianceDocData::SealedUpload { .. } => ComplianceDocDataKind::FileUpload,
+        }
+    }
 }

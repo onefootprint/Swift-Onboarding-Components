@@ -124,7 +124,10 @@ pub async fn get(
                 ))?,
                 org: summary.tenant.name.clone(),
             },
-            event: ComplianceDocEventType::Submitted(api_wire_types::ComplianceDocEventSubmitted {}),
+            event: ComplianceDocEventType::Submitted(api_wire_types::ComplianceDocEventSubmitted {
+                submission_id: sub.id.clone(),
+                kind: (&sub.doc_data).into(),
+            }),
         });
     }
 

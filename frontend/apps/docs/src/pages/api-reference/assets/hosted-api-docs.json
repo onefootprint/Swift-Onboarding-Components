@@ -1732,9 +1732,6 @@
                 },
                 "security": [
                     {
-                        "User Token": []
-                    },
-                    {
                         "User Onboarding Token": []
                     }
                 ]
@@ -1808,9 +1805,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "User Token": []
-                    },
                     {
                         "User Onboarding Token": []
                     }
@@ -3717,7 +3711,6 @@
                     "scopes": {
                         "type": "array",
                         "items": {
-                            "description": "Auto-generated discriminant enum variants",
                             "type": "string",
                             "enum": [
                                 "sign_up",
@@ -3726,8 +3719,7 @@
                                 "sensitive_profile",
                                 "handoff",
                                 "vault_data",
-                                "explicit_auth",
-                                "never"
+                                "explicit_auth"
                             ]
                         }
                     }
@@ -4142,7 +4134,6 @@
                                 "description": "The scopes of the returned token",
                                 "type": "array",
                                 "items": {
-                                    "description": "Auto-generated discriminant enum variants",
                                     "type": "string",
                                     "enum": [
                                         "sign_up",
@@ -4151,8 +4142,7 @@
                                         "sensitive_profile",
                                         "handoff",
                                         "vault_data",
-                                        "explicit_auth",
-                                        "never"
+                                        "explicit_auth"
                                     ]
                                 }
                             }

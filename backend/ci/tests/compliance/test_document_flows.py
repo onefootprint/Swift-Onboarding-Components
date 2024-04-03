@@ -1,3 +1,4 @@
+import os
 import pytest
 from tests.utils import (
     HttpError,
@@ -6,6 +7,9 @@ from tests.utils import (
     put,
     delete,
 )
+
+def _example_document_path():
+    return os.path.dirname(__file__) + "/data/example_document.txt"
 
 
 def test_partner_document_flow(tenant, partner_tenant):
@@ -119,12 +123,20 @@ def test_partner_document_flow(tenant, partner_tenant):
     resp = delete(f"compliance/partners/{partnership_id}/requests/{old_active_request_id}", {}, *partner_tenant.db_auths, status_code=400)
     assert resp["error"]["message"] == "Can only retract the latest active request"
 
-    # We shouldn't be able to submit a document for the old request.
-    doc_id = doc["id"]
-    resp = post(f"org/partners/{partnership_id}/documents/{doc_id}/submissions", {
-        "request_id": old_active_request_id,
+    # We shouldn't be able to submit an external URL for the old request.
+    resp = post(f"org/partners/{partnership_id}/requests/{old_active_request_id}/submissions", {
         "url": "https://example.com",
     }, *tenant.db_auths, status_code=400)
+    assert resp["error"]["message"] == "Can only submit documents for the latest request"
+
+    # We shouldn't be able to upload a document for the old request.
+    resp = post(f"org/partners/{partnership_id}/requests/{old_active_request_id}/submissions/upload",
+        {}, *tenant.db_auths,
+        files = {
+            "upload_file": ("example_document.txt", open(_example_document_path(), "rb"), "text/plain"),
+        },
+        status_code=400,
+    )
     assert resp["error"]["message"] == "Can only submit documents for the latest request"
 
     # We can delete the most recent requests.
@@ -144,10 +156,8 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert resp["error"]["message"] == "A compliance document request already exists for this template"
 
     # Submit an external URL for the template document.
-    doc_id = template_doc["id"]
     request_id = template_doc["active_request_id"]
-    post(f"org/partners/{partnership_id}/documents/{doc_id}/submissions", {
-        "request_id": request_id,
+    post(f"org/partners/{partnership_id}/requests/{request_id}/submissions", {
         "url": "https://example.com/oops",
     }, *tenant.db_auths)
     # The document should now be waiting for review.
@@ -156,13 +166,14 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["status"] == "waiting_for_review"
     old_submission_id = doc["active_submission_id"]
 
-    # Re-submit for the template document, as if the tenant is fixing a mistake.
-    doc_id = template_doc["id"]
+    # Re-submit for the template document, as if the tenant is fixing a mistake. This time, upload a file.
     request_id = template_doc["active_request_id"]
-    post(f"org/partners/{partnership_id}/documents/{doc_id}/submissions", {
-        "request_id": request_id,
-        "url": "https://example.com",
-    }, *tenant.db_auths)
+    post(f"org/partners/{partnership_id}/requests/{request_id}/submissions/upload",
+         {}, *tenant.db_auths,
+         files = {
+            "upload_file": ("example_document.txt", open(_example_document_path(), "rb"), "text/plain"),
+         },
+    )
     # The document should now be waiting for review.
     documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
@@ -181,6 +192,7 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert resp["error"]["message"] == "Can only review the latest submission"
 
     # Accept the submission.
+    doc_id = doc["id"]
     sub_id = doc["active_submission_id"]
     post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
         "submission_id": sub_id,
@@ -291,8 +303,14 @@ def test_partner_document_flow(tenant, partner_tenant):
     events = iter(events)
 
     assert next(events)["event"]["kind"] == "requested"
-    assert next(events)["event"]["kind"] == "submitted"
-    assert next(events)["event"]["kind"] == "submitted"
+
+    e = next(events)
+    assert e["event"]["kind"] == "submitted"
+    assert e["event"]["data"]["kind"] == "external_url"
+
+    e = next(events)
+    assert e["event"]["kind"] == "submitted"
+    assert e["event"]["data"]["kind"] == "file_upload"
 
     e = next(events)
     assert e["event"]["kind"] == "reviewed"

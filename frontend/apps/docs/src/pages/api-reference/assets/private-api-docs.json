@@ -5843,7 +5843,7 @@
                 ]
             }
         },
-        "/org/partners/{partnership_id}/documents/{document_id}/submissions": {
+        "/org/partners/{partnership_id}/requests/{request_id}/submissions": {
             "post": {
                 "tags": [
                     "Compliance",
@@ -5862,7 +5862,7 @@
                     },
                     {
                         "in": "path",
-                        "name": "document_id",
+                        "name": "request_id",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -5880,6 +5880,52 @@
                     },
                     "required": true
                 },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/partners/{partnership_id}/requests/{request_id}/submissions/upload": {
+            "post": {
+                "tags": [
+                    "Compliance",
+                    "Private"
+                ],
+                "description": "Upload a document in response to a request",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "partnership_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "request_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -11030,7 +11076,7 @@
                                         "tenant",
                                         "ocr",
                                         "prefill",
-                                        "unknown"
+                                        "components_sdk"
                                     ]
                                 },
                                 "transforms": {
@@ -22481,15 +22527,11 @@
             "SubmitExternalUrlRequest": {
                 "type": "object",
                 "properties": {
-                    "request_id": {
-                        "type": "string"
-                    },
                     "url": {
                         "type": "string"
                     }
                 },
                 "required": [
-                    "request_id",
                     "url"
                 ]
             },
