@@ -2251,7 +2251,7 @@
             "other": "Invoke {{ count }} vault proxies"
           },
           "cip_integration": "Make CIP proxy requests",
-          "org_settings": "Modify organization settings",
+          "org_settings": "Manage access control and org settings",
           "manual_review": "Perform manual review",
           "write_entities": "Create and update users",
           "trigger_kyc": "Manually initiate KYC",
@@ -2284,7 +2284,7 @@
             "manage_vault_proxy": "Create and update vault proxy configurations",
             "invoke_vault_proxy": "Invoke the specified vault proxies",
             "cip_integration": "Forward identity data to a CIP integration",
-            "org_settings": "Update org settings, roles, and users",
+            "org_settings": "Administer roles, users, and org settings",
             "manual_review": "Make new decisions, add annotations, re-trigger KYC",
             "write_entities": "Create new vaults and update existing vaults' information",
             "trigger_kyc": "Run KYC checks on an existing vaulted user",
