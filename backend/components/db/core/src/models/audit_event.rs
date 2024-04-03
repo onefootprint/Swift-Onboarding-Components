@@ -97,7 +97,7 @@ pub struct NewAuditEvent {
 
 impl NewAuditEvent {
     #[tracing::instrument("NewAuditEvent::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> DbResult<()> {
+    pub fn create(self, conn: &mut TxnPgConn) -> DbResult<()> {
         AuditEvent::bulk_create(conn, vec![self])
     }
 }
@@ -154,7 +154,7 @@ impl HasActor for DieselJoinedAuditEvent {
 
 impl AuditEvent {
     #[tracing::instrument("AuditEvent::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut PgConn, events: Vec<NewAuditEvent>) -> DbResult<()> {
+    pub fn bulk_create(conn: &mut TxnPgConn, events: Vec<NewAuditEvent>) -> DbResult<()> {
         let rows = events
             .into_iter()
             .map(|event| {
@@ -200,14 +200,14 @@ impl AuditEvent {
 
         diesel::insert_into(audit_event::table)
             .values(rows)
-            .execute(conn)?;
+            .execute(conn.conn())?;
 
         Ok(())
     }
 
     #[tracing::instrument("AuditEvent::filter", skip_all)]
     pub fn filter(
-        conn: &mut TxnPgConn<'_>,
+        conn: &mut PgConn,
         params: FilterQueryParams,
         page_size: i64,
     ) -> DbResult<Vec<JoinedAuditEvent>> {
@@ -301,44 +301,40 @@ impl AuditEvent {
                 list_entry_creation::all_columns.nullable(),
                 list_entry::all_columns.nullable(),
             ))
-            .load(conn.conn())?;
+            .load(conn)?;
         let saturated_results = saturate_actors(conn, results)?;
 
         let events = saturated_results
             .into_iter()
-            .map(
-                |(
-                    (
-                        audit_event,
-                        tenant,
-                        insight_event,
-                        scoped_vault,
-                        ob_configuration,
-                        document_data,
-                        tenant_api_key,
-                        tenant_user,
-                        tenant_role,
-                        list_entry_creation,
-                        list_entry,
-                    ),
+            .map(|(result, saturated_actor)| {
+                let (
+                    audit_event,
+                    tenant,
+                    insight_event,
+                    scoped_vault,
+                    ob_configuration,
+                    document_data,
+                    tenant_api_key,
+                    tenant_user,
+                    tenant_role,
+                    list_entry_creation,
+                    list_entry,
+                ) = result;
+                JoinedAuditEvent {
+                    audit_event,
+                    tenant,
                     saturated_actor,
-                )| {
-                    JoinedAuditEvent {
-                        audit_event,
-                        tenant,
-                        saturated_actor,
-                        insight_event,
-                        scoped_vault,
-                        ob_configuration,
-                        document_data,
-                        tenant_api_key,
-                        tenant_user,
-                        tenant_role,
-                        list_entry_creation,
-                        list_entry,
-                    }
-                },
-            )
+                    insight_event,
+                    scoped_vault,
+                    ob_configuration,
+                    document_data,
+                    tenant_api_key,
+                    tenant_user,
+                    tenant_role,
+                    list_entry_creation,
+                    list_entry,
+                }
+            })
             .collect();
 
         Ok(events)
@@ -512,7 +508,7 @@ mod tests {
         assert_eq!(events.len(), 2);
 
         let first_cursor = events
-            .get(0)
+            .first()
             .map(|event| (event.audit_event.timestamp, event.audit_event.id.clone()))
             .unwrap();
         let first_id = first_cursor.1.clone();
