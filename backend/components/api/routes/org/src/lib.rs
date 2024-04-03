@@ -13,6 +13,7 @@ mod members;
 // Weird module name, but there's a metrics module inside api_core too...
 mod metrics_api;
 mod onboarding_configs;
+mod partners;
 mod proxy_configs;
 mod risk_signals;
 mod roles;
@@ -57,6 +58,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     authn::routes(config);
     api_keys::routes(config);
     app_meta::routes(config);
+    partners::routes(config);
     proxy_configs::routes(config);
     rules::routes(config);
     lists::routes(config);

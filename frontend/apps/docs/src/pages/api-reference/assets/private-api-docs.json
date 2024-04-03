@@ -595,9 +595,7 @@
                         "Dashboard Token": []
                     }
                 ]
-            }
-        },
-        "/compliance/org/members": {
+            },
             "post": {
                 "tags": [
                     "Compliance",

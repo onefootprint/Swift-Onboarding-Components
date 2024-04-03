@@ -65,7 +65,7 @@ pub async fn get(
     description = "Creates a new IAM user for the partner tenant. Sends an invite link via WorkOs.",
     tags(Compliance, Private)
 )]
-#[actix::post("/compliance/org/members")]
+#[actix::post("/compliance/members")]
 pub async fn post(
     _state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
