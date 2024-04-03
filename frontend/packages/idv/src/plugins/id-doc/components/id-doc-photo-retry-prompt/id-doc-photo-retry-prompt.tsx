@@ -33,7 +33,13 @@ const IdDocPhotoRetryPrompt = ({
   onComplete,
 }: IdDocPhotoRetryPromptProps) => {
   const [state, send] = useIdDocMachine();
-  const { forceUpload } = state.context;
+  const {
+    forceUpload,
+    requirement: { uploadMode },
+  } = state.context;
+
+  const hideCaptureButton = !!forceUpload;
+  const hideUploadButton = uploadMode === 'capture_only' && !forceUpload;
 
   const handleClickBack = () => {
     send({
@@ -61,7 +67,8 @@ const IdDocPhotoRetryPrompt = ({
         />
         <IdDocPhotoButtons
           onComplete={onComplete}
-          hideCaptureButton={!!forceUpload}
+          hideCaptureButton={hideCaptureButton}
+          hideUploadButton={hideUploadButton}
           uploadFirst={!!forceUpload}
         />
       </PromptContainer>

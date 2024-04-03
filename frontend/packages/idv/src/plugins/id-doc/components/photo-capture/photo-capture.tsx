@@ -75,6 +75,7 @@ const PhotoCapture = ({
     orgId,
   } = state.context;
   const allowPdf = uploadMode === 'allow_upload';
+  const allowUpload = uploadMode !== 'capture_only';
   const { processImageUrl } = useProcessImage({ allowPdf });
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -229,6 +230,7 @@ const PhotoCapture = ({
         setIsCaptured={setIsCaptured}
         allowPdf={allowPdf}
         onCameraStuck={handleCameraStuck}
+        allowUpload={allowUpload}
       >
         {({
           canvasAutoCaptureRef,

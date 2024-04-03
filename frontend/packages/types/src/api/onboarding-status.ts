@@ -43,7 +43,7 @@ export type IdDocRequirement = {
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
   supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
-  uploadMode: 'default' | 'allow_upload';
+  uploadMode: 'default' | 'allow_upload' | 'capture_only';
   documentRequestKind: DocumentRequestKind;
 };
 

@@ -73,6 +73,7 @@ type CameraProps = {
   setIsCaptured: React.Dispatch<React.SetStateAction<boolean>>;
   allowPdf: boolean;
   onCameraStuck: () => void;
+  allowUpload: boolean;
 };
 
 const AUTOCAPTURE_TIMER_START_VAL = 3;
@@ -171,6 +172,7 @@ const Camera = ({
   setIsCaptured,
   allowPdf,
   onCameraStuck,
+  allowUpload,
 }: CameraProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.camera',
@@ -497,7 +499,7 @@ const Camera = ({
                   disabled={!isCameraVisible || !videoSize}
                 />
               )}
-              {isDocument(autocaptureKind) && (
+              {isDocument(autocaptureKind) && allowUpload && (
                 <UploadButton
                   onUploadBtnClick={onImageUpload}
                   onUploadChangeDone={onUploadComplete}
