@@ -1,4 +1,6 @@
 use derive_more::Display;
+use paperclip::actix::Apiv2Schema;
+use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
 use crate::{DataIdentifier, FpId};
@@ -10,27 +12,30 @@ use crate::{DataIdentifier, FpId};
     Ord,
     PartialOrd,
     Display,
-    serde_with::SerializeDisplay,
     Hash,
     Clone,
     Copy,
-    EnumString,
     AsRefStr,
+    Deserialize,
+    Serialize,
+    EnumString,
+    Apiv2Schema,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum DupeKind {
     Ssn9,
     Email,
     PhoneNumber,
 }
 
-#[derive(Debug, Clone, Default, Eq, PartialEq)]
+#[derive(Debug, Clone, Default, Eq, PartialEq, Deserialize, Serialize, Apiv2Schema)]
 pub struct Dupes {
     pub same_tenant: Vec<SameTenantDupe>,
     pub other_tenant: OtherTenantDupes,
 }
 
-#[derive(Debug, Clone, Default, Eq, PartialEq)]
+#[derive(Debug, Clone, Default, Eq, PartialEq, Deserialize, Serialize, Apiv2Schema)]
 pub struct SameTenantDupe {
     pub fp_id: FpId,
     pub dupe_kinds: Vec<DupeKind>,
@@ -40,7 +45,7 @@ pub struct SameTenantDupe {
     // pub name: PiiString, // hmm where to do this decryption?
 }
 
-#[derive(Debug, Clone, Default, Eq, PartialEq)]
+#[derive(Debug, Clone, Default, Eq, PartialEq, Deserialize, Serialize, Apiv2Schema)]
 pub struct OtherTenantDupes {
     pub num_matches: usize, // number of distinct vaults that (1) have any sort of dupe match and (2) have not onboarded onto the same tenant as the the scoped_vault for which dupes are being queried for
     pub num_tenants: usize, // number of distinct tenants from the vaults described above ^
@@ -65,26 +70,3 @@ impl TryFrom<DataIdentifier> for DupeKind {
         }
     }
 }
-
-
-// #[derive(Debug, Clone, Default, Eq, PartialEq)]
-// pub struct DupeInfo {
-//     pub same_tenant: Option<DupeInfoSameTenant>,
-//     pub other_tenant: Option<DupeInfoOtherTenant>,
-// }
-
-// #[derive(Debug, Clone, Eq, PartialEq)]
-// pub struct DupeInfoSameTenant {
-//     pub vaults: HashSet<DuplicateVault>, // maybe an ordered vec later (ie order by onboarding_time or whatnot)
-// }
-
-// #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-// pub struct DuplicateVault {
-//     pub fp_id: FpId,
-//     // status, created_at, other things we want
-// }
-
-// #[derive(Debug, Clone, Eq, PartialEq)]
-// pub struct DupeInfoOtherTenant {
-//     pub vault_count: usize,
-// }

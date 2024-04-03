@@ -177,6 +177,7 @@ impl Fingerprint {
                 f1.field(fingerprint::kind),
                 f1.field(fingerprint::scope),
             ))
+            .limit(200) // for safety
             .get_results::<(FpId, TenantId, VaultId, DataIdentifier, FingerprintScopeKind)>(conn)?
             .into_iter()
             .map(FingerprintDupe::from)

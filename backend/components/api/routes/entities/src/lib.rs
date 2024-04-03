@@ -6,6 +6,7 @@ mod auth_events;
 mod client_token;
 mod decisions;
 mod documents;
+mod dupes;
 mod get;
 mod liveness;
 mod match_signals;
@@ -38,5 +39,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(risk_signals::decrypt_aml_hits)
         .service(auth_events::get)
         .service(rule_set_result::get_latest_workflow_decision)
-        .service(rule_set_result::get);
+        .service(rule_set_result::get)
+        .service(dupes::get_dupes);
 }
