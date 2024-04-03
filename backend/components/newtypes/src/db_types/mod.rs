@@ -19,6 +19,7 @@ mod decision_status;
 mod document_request;
 mod document_scan_device_type;
 mod document_side;
+mod dupes;
 mod fingerprint;
 mod fingerprint_meta;
 mod footprint_reason_code;
@@ -64,8 +65,8 @@ pub use self::{
     attestation_type::*, audit_event::*, auth_event_kind::*, billing_event_kind::*, business_owner_kind::*,
     company_size::*, compliance_doc::*, compliance_status::*, contact_info_priority::*,
     d2p_session_status::*, data_lifetime_source::*, decision_intent_kind::*, decision_status::*,
-    document_request::*, document_scan_device_type::*, document_side::*, fingerprint::*, fingerprint_meta::*,
-    footprint_reason_code::*, identify_scope::*, identity_document_fixture_result::*,
+    document_request::*, document_scan_device_type::*, document_side::*, dupes::*, fingerprint::*,
+    fingerprint_meta::*, footprint_reason_code::*, identify_scope::*, identity_document_fixture_result::*,
     identity_document_status::*, incode::*, label::*, list::*, liveness_source::*, manual_review::*,
     middesk_request_state::*, ob_config::*, onboarding_status::*, org_member_email::*, preview_api::*,
     proxy_ingress_kind::*, risk_signal_group::*, rule_expression::*, rules::*, sealed_bytes::*,

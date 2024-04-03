@@ -25,6 +25,15 @@ pub enum FingerprintScopeKind {
     Tenant,
 }
 
+impl FingerprintScopeKind {
+    pub fn is_tenant(&self) -> bool {
+        match self {
+            FingerprintScopeKind::Global => false,
+            FingerprintScopeKind::Tenant => true,
+        }
+    }
+}
+
 #[derive(
     Debug,
     Eq,
