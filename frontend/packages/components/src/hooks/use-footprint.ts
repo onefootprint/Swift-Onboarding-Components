@@ -12,6 +12,7 @@ import {
 import { Context } from '../components/provider';
 import getOnboardingStatusReq from '../queries/get-onboarding-status';
 import saveReq from '../queries/save';
+import { lockBody, unlockBody } from '../utils/dom-utils';
 import userToFormData from '../utils/user-to-form-data';
 
 export const useFootprint = () => {
@@ -57,6 +58,7 @@ export const useFootprint = () => {
       onError: context.onError,
       onCancel: context.onCancel,
       onRelayToComponents: (authToken: string) => {
+        unlockBody();
         setContext(prev => ({ ...prev, authToken }));
         onDone();
       },
@@ -82,6 +84,23 @@ export const useFootprint = () => {
     throw new Error('No authToken found');
   };
 
+  const handleError = (error: unknown) => {
+    if (error instanceof ApiError) {
+      const apiError = error as ApiError<UserDataError>;
+
+      Object.entries(apiError.details.message).forEach(([key, value]) => {
+        const formDataKey = userToFormData(key);
+        if (!formDataKey || typeof value !== 'string') return;
+
+        form.setError(
+          formDataKey,
+          { type: 'manual', message: value },
+          { shouldFocus: true },
+        );
+      });
+    }
+  };
+
   const save = async () => {
     const { authToken } = context;
     if (!authToken) {
@@ -91,20 +110,7 @@ export const useFootprint = () => {
       const data = getVaultFormData();
       await saveReq({ data, authToken });
     } catch (error: unknown) {
-      if (error instanceof ApiError) {
-        const apiError = error as ApiError<UserDataError>;
-
-        Object.entries(apiError.details.message).forEach(([key, value]) => {
-          const formDataKey = userToFormData(key);
-          if (!formDataKey || typeof value !== 'string') return;
-          form.setError(
-            formDataKey,
-            { type: 'manual', message: value },
-            { shouldFocus: true },
-          );
-        });
-      }
-
+      handleError(error);
       throw error;
     }
     await getMissingRequirements(authToken);
@@ -114,6 +120,7 @@ export const useFootprint = () => {
     if (!context.fpInstance) {
       throw new Error('No fpInstance found');
     }
+    lockBody();
     context.fpInstance.relayFromComponents?.();
   };
 

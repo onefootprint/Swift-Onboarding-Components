@@ -23,11 +23,12 @@ const EmailInput = ({ className, ...props }: EmailInputProps) => {
     <Input
       autoComplete="email"
       className={cx('fp-email-input', className)}
+      data-nid-target="email"
       hasError={!!error}
       label={t('label')}
       message={error?.message}
+      placeholder={t('placeholder')}
       type="email"
-      data-nid-target="email"
       {...props}
       {...register('email', {
         required: t('errors.required'),

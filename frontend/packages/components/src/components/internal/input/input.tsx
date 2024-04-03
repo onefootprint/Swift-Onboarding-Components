@@ -9,17 +9,28 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
   message?: string;
   hasError?: boolean;
-  // TODO: Add mask
+  containerClassName?: string;
 };
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, message, hasError, className, id: externalId, ...props }, ref) => {
+  (
+    {
+      containerClassName,
+      label,
+      message,
+      hasError,
+      className,
+      id: externalId,
+      ...props
+    },
+    ref,
+  ) => {
     const internalId = useId();
     const id = externalId || internalId;
     const hintId = `${id}-description`;
 
     return (
-      <>
+      <div className={cx('fp-control', containerClassName)}>
         {label ? (
           <Label htmlFor={id} aria-invalid={hasError}>
             {label}
@@ -38,7 +49,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             {message}
           </Hint>
         ) : null}
-      </>
+      </div>
     );
   },
 );

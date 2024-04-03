@@ -26,7 +26,7 @@ const AddressInput = ({ className }: AddressInputProps) => {
   };
 
   return (
-    <div className={cx('fp-address-input-container', className)}>
+    <div className={cx('fp-address-container', className)}>
       <AddressCountryInput onChange={handleCountryChange} />
       <AddressLine1Input />
       <AddressLine2Input />

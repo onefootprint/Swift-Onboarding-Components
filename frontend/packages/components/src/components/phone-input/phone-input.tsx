@@ -26,6 +26,7 @@ const PhoneInput = ({ className, ...props }: PhoneInputProps) => {
       hasError={!!error}
       label={t('label')}
       message={error?.message}
+      placeholder={t('placeholder')}
       type="tel"
       {...props}
       {...register('phoneNumber', {
