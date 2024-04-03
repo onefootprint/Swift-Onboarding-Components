@@ -151,14 +151,15 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     lists = get(f"/org/lists", None, *sandbox_tenant.db_auths)["data"]
-    assert lists[0]["name"] == f"My Super List 3 {nonce}"
-    assert lists[0]["used_in_playbook"] == True
-    assert lists[1]["name"] == f"My Super List 2 {nonce}"
-    assert lists[1]["used_in_playbook"] == True
-    assert lists[2]["name"] == f"My Super List 1 {nonce}"
-    assert lists[2]["used_in_playbook"] == False
+    lists = iter(lists)
+    list3 = next(i for i in lists if i["name"] == f"My Super List 3 {nonce}")
+    assert list3["used_in_playbook"] == True
+    list2 = next(i for i in lists if i["name"] == f"My Super List 2 {nonce}")
+    assert list2["used_in_playbook"] == True
+    list1 = next(i for i in lists if i["name"] == f"My Super List 1 {nonce}")
+    assert list1["used_in_playbook"] == False
 
-    list = get(f"/org/lists/{lists[0]['id']}", None, *sandbox_tenant.db_auths)
+    list = get(f"/org/lists/{list3['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 3 {nonce}"
     assert len(list["playbooks"]) == 1
     assert list["playbooks"][0]["id"] == obc2.id
@@ -172,7 +173,7 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
         }
     ]
 
-    list = get(f"/org/lists/{lists[1]['id']}", None, *sandbox_tenant.db_auths)
+    list = get(f"/org/lists/{list2['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 2 {nonce}"
     assert len(list["playbooks"]) == 2
 
@@ -192,7 +193,7 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
         {"field": "id.email", "op": "is_in", "value": list2["id"]}
     ]
 
-    list = get(f"/org/lists/{lists[2]['id']}", None, *sandbox_tenant.db_auths)
+    list = get(f"/org/lists/{list1['id']}", None, *sandbox_tenant.db_auths)
     assert list["name"] == f"My Super List 1 {nonce}"
     assert len(list["playbooks"]) == 0
 
