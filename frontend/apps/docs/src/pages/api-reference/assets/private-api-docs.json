@@ -1952,6 +1952,47 @@
                 ]
             }
         },
+        "/entities/{fp_id}/dupes": {
+            "get": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Lists information about other vaults with duplicate information for a footprint vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Dupes"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/liveness": {
             "get": {
                 "tags": [
@@ -4192,6 +4233,14 @@
                 "parameters": [
                     {
                         "in": "query",
+                        "name": "list_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
                         "name": "names",
                         "schema": {
                             "type": "string"
@@ -4773,7 +4822,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/List"
+                                    "$ref": "#/components/schemas/ListDetails"
                                 }
                             }
                         }
@@ -4820,6 +4869,91 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/lists/{id}/timeline": {
+            "get": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns events for a List.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "cursor",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "",
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ListEvent"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Metadata required for a cursor-paginated response.",
+                                            "type": "object",
+                                            "properties": {
+                                                "count": {
+                                                    "example": 10000,
+                                                    "description": "The total number of results.",
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "next": {
+                                                    "example": 1234,
+                                                    "description": "The `cursor` parameter to provide in order to request the next page of results.",
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
                                 }
                             }
                         }
@@ -7234,7 +7368,9 @@
                             "CreateOrg",
                             "UpdateOrgSettings",
                             "CreateOrgRole",
-                            "UpdateOrgRole"
+                            "UpdateOrgRole",
+                            "CreateListEntry",
+                            "DeleteListEntry"
                         ]
                     },
                     "principal": {
@@ -10587,6 +10723,58 @@
                     "kind",
                     "upload_source",
                     "uploads"
+                ]
+            },
+            "Dupes": {
+                "type": "object",
+                "properties": {
+                    "other_tenant": {
+                        "type": "object",
+                        "properties": {
+                            "num_matches": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "num_tenants": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        },
+                        "required": [
+                            "num_matches",
+                            "num_tenants"
+                        ]
+                    },
+                    "same_tenant": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "dupe_kinds": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "ssn9",
+                                            "email",
+                                            "phone_number"
+                                        ]
+                                    }
+                                },
+                                "fp_id": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "dupe_kinds",
+                                "fp_id"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "other_tenant",
+                    "same_tenant"
                 ]
             },
             "EmptyResponse": {
@@ -17915,6 +18103,115 @@
                     "used_in_playbook"
                 ]
             },
+            "ListDetails": {
+                "type": "object",
+                "properties": {
+                    "actor": {
+                        "type": "string",
+                        "enum": [
+                            "footprint"
+                        ]
+                    },
+                    "alias": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "email_address",
+                            "email_domain",
+                            "ssn9",
+                            "phone_number",
+                            "phone_country_code",
+                            "ip_address"
+                        ]
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "playbooks": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "key": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "rules": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "action": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "PassWithManualReview",
+                                                    "ManualReview",
+                                                    "Fail"
+                                                ]
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "is_shadow": {
+                                                "type": "boolean"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "rule_expression": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "rule_id": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "action",
+                                            "created_at",
+                                            "is_shadow",
+                                            "rule_expression",
+                                            "rule_id"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "key",
+                                "name",
+                                "rules"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "actor",
+                    "alias",
+                    "created_at",
+                    "id",
+                    "kind",
+                    "name",
+                    "playbooks"
+                ]
+            },
             "ListEntitiesSearchRequest": {
                 "type": "object",
                 "properties": {
@@ -18026,6 +18323,117 @@
                     "created_at",
                     "data",
                     "id"
+                ]
+            },
+            "ListEvent": {
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "insight_event": {
+                        "description": "Describes a device insight event with locations and IP of the event",
+                        "type": "object",
+                        "properties": {
+                            "city": {
+                                "type": "string"
+                            },
+                            "country": {
+                                "type": "string"
+                            },
+                            "ip_address": {
+                                "type": "string"
+                            },
+                            "latitude": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "longitude": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "metro_code": {
+                                "type": "string"
+                            },
+                            "postal_code": {
+                                "type": "string"
+                            },
+                            "region": {
+                                "type": "string"
+                            },
+                            "region_name": {
+                                "type": "string"
+                            },
+                            "time_zone": {
+                                "type": "string"
+                            },
+                            "timestamp": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "user_agent": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "timestamp"
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "enum": [
+                            "CreateUser",
+                            "UpdateUserData",
+                            "DeleteUserData",
+                            "DecryptUserData",
+                            "DeleteUser",
+                            "CreateUserAnnotation",
+                            "CompleteUserCheckLiveness",
+                            "CompleteUserCheckWatchlist",
+                            "RequestUserData",
+                            "StartUserVerification",
+                            "CompleteUserVerification",
+                            "CollectUserDocument",
+                            "CreateOrgApiKey",
+                            "DecryptOrgApiKey",
+                            "UpdateOrgApiKey",
+                            "InviteOrgMember",
+                            "UpdateOrgMember",
+                            "LoginOrgMember",
+                            "RemoveOrgMember",
+                            "CreateOrg",
+                            "UpdateOrgSettings",
+                            "CreateOrgRole",
+                            "UpdateOrgRole",
+                            "CreateListEntry",
+                            "DeleteListEntry"
+                        ]
+                    },
+                    "principal": {
+                        "type": "string",
+                        "enum": [
+                            "footprint",
+                            "firm_employee"
+                        ]
+                    },
+                    "tenant_id": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "detail",
+                    "id",
+                    "name",
+                    "principal",
+                    "tenant_id",
+                    "timestamp"
                 ]
             },
             "LivenessEvent": {
