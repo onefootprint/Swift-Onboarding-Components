@@ -1,3 +1,4 @@
+import base64
 import os
 import pytest
 from tests.utils import (
@@ -166,6 +167,13 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["status"] == "waiting_for_review"
     old_submission_id = doc["active_submission_id"]
 
+    # Fetch the document submission.
+    submission_id = doc["active_submission_id"]
+    resp = get(f"compliance/partners/{partnership_id}/submissions/{submission_id}", {}, *partner_tenant.ro_db_auths)
+    assert resp["id"] == submission_id
+    assert resp["data"]["kind"] == "external_url"
+    assert resp["data"]["data"]["url"] == "https://example.com/oops"
+
     # Re-submit for the template document, as if the tenant is fixing a mistake. This time, upload a file.
     request_id = template_doc["active_request_id"]
     post(f"org/partners/{partnership_id}/requests/{request_id}/submissions/upload",
@@ -178,6 +186,16 @@ def test_partner_document_flow(tenant, partner_tenant):
     documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["status"] == "waiting_for_review"
+
+    # Fetch the document submission.
+    submission_id = doc["active_submission_id"]
+    resp = get(f"compliance/partners/{partnership_id}/submissions/{submission_id}", {}, *partner_tenant.ro_db_auths)
+    with open(_example_document_path(), "rb") as f:
+        expected_data = base64.urlsafe_b64encode(f.read()).decode("utf-8")
+    assert resp["id"] == submission_id
+    assert resp["data"]["kind"] == "file_upload"
+    assert resp["data"]["data"]["filename"] == "example_document.txt"
+    assert resp["data"]["data"]["data"] == expected_data
 
     # We shouldn't be able to delete a document that has submissions.
     resp = delete(f"compliance/partners/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths, status_code=400)

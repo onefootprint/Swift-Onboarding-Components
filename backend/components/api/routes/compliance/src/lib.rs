@@ -31,6 +31,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config.service(reupload::post);
     config.service(reviews::post);
     config.service(submissions::post);
+    config.service(submissions::get);
     config.service(tenant_assignment::post);
     config.service(upload::post);
 }

@@ -1,5 +1,5 @@
 use super::{compliance_doc::ComplianceDoc, compliance_doc_review::ComplianceDocReview};
-use crate::{DbError, DbResult, TxnPgConn};
+use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::compliance_doc_submission;
 use diesel::prelude::*;
@@ -65,6 +65,19 @@ impl<'a> NewComplianceDocSubmission<'a> {
 }
 
 impl ComplianceDocSubmission {
+    #[tracing::instrument("ComplianceDocSubmission::get", skip_all)]
+    pub fn get(
+        conn: &mut PgConn,
+        id: &ComplianceDocSubmissionId,
+        doc_id: &ComplianceDocId,
+    ) -> DbResult<ComplianceDocSubmission> {
+        Ok(compliance_doc_submission::table
+            .filter(compliance_doc_submission::id.eq(id))
+            .filter(compliance_doc_submission::compliance_doc_id.eq(doc_id))
+            .select(ComplianceDocSubmission::as_select())
+            .first(conn)?)
+    }
+
     #[tracing::instrument("ComplianceDocSubmission::get_active", skip_all)]
     pub fn get_active(
         conn: &mut TxnPgConn,

@@ -117,6 +117,14 @@ pub struct ComplianceDocEventAssigned {
     pub assigned_to: Option<LiteUserAndOrg>,
 }
 
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ComplianceDocSubmission {
+    pub id: ComplianceDocSubmissionId,
+    pub created_at: DateTime<Utc>,
+    pub data: ComplianceDocData,
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Apiv2Schema, Serialize, EnumDiscriminants, macros::SerdeAttr)]
 #[strum_discriminants(
     name(ComplianceDocDataKind),

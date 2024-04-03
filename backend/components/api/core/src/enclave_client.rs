@@ -21,7 +21,11 @@ use newtypes::{
 use std::{collections::HashMap, hash::Hash, sync::Arc};
 
 use crate::{
-    config::Config, errors::enclave::EnclaveError, proxy::to_data_transforms, s3::S3Client, ApiError,
+    config::Config,
+    errors::{enclave::EnclaveError, ApiResult, AssertionError},
+    proxy::to_data_transforms,
+    s3::S3Client,
+    ApiError,
 };
 
 #[derive(Debug, Clone)]
@@ -333,6 +337,25 @@ impl EnclaveClient {
         let results = keys.into_iter().zip(results).collect();
 
         Ok(results)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn decrypt_document(
+        &self,
+        e_private_key: &EncryptedVaultPrivateKey,
+        e_data_key: &SealedVaultDataKey,
+        s3_url: &S3Url,
+    ) -> ApiResult<PiiBytes> {
+        let key = ();
+        let documents = vec![(key, (e_private_key, e_data_key, s3_url))]
+            .into_iter()
+            .collect();
+
+        let results = self.batch_decrypt_documents(documents).await?;
+
+        Ok(results.into_values().next().ok_or(AssertionError(
+            "missing static key in batch_decrypt_documents result",
+        ))?)
     }
 
     #[tracing::instrument(skip_all)]
