@@ -102,6 +102,20 @@ pub enum RiskScore {
     IncodeSelfieMatchScore,
 }
 
+
+impl RuleExpressionCondition {
+    pub fn list_id(&self) -> Option<&ListId> {
+        match self {
+            RuleExpressionCondition::VaultData(VaultOperation::IsIn {
+                field: _,
+                op: _,
+                value,
+            }) => Some(value),
+            _ => None,
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

@@ -246,7 +246,7 @@ mod tests {
     #[db_test]
     fn test_deactivate(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let list = tests::fixtures::list::create(conn, &t.id);
+        let list = tests::fixtures::list::create(conn, &t.id, true);
         let pagination = OffsetPagination::new(None, 10);
         assert_eq!(1, List::list(conn, &t.id, true, pagination).unwrap().0.len());
 

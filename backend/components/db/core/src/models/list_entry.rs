@@ -202,7 +202,7 @@ mod tests {
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let list = tests::fixtures::list::create(conn, &t.id);
+        let list = tests::fixtures::list::create(conn, &t.id, true);
 
         let ie = tests::fixtures::insight_event::create(conn);
         let le1 = ListEntry::create(
@@ -233,7 +233,7 @@ mod tests {
     #[db_test]
     fn test_deactivate(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
-        let list = tests::fixtures::list::create(conn, &t.id);
+        let list = tests::fixtures::list::create(conn, &t.id, true);
         let ie = tests::fixtures::insight_event::create(conn);
 
         let le = tests::fixtures::list_entry::create(conn, &t.id, &list.id);

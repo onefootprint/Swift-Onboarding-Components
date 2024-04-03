@@ -42,6 +42,7 @@ pub mod proxy_request_log;
 pub mod risk_signal;
 pub mod risk_signal_group;
 pub mod rule_instance;
+pub mod rule_instance_references_list;
 pub mod rule_result;
 pub mod rule_set_result;
 pub mod rule_set_version;

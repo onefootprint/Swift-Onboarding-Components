@@ -891,6 +891,18 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    rule_instance_references_list (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        rule_instance_id -> Text,
+        list_id -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     rule_result (id) {
         id -> Text,
         created_at -> Timestamptz,
@@ -1599,6 +1611,8 @@ diesel::joinable!(risk_signal -> risk_signal_group (risk_signal_group_id));
 diesel::joinable!(risk_signal -> verification_result (verification_result_id));
 diesel::joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
 diesel::joinable!(rule_instance -> ob_configuration (ob_configuration_id));
+diesel::joinable!(rule_instance_references_list -> list (list_id));
+diesel::joinable!(rule_instance_references_list -> rule_instance (rule_instance_id));
 diesel::joinable!(rule_result -> rule_instance (rule_instance_id));
 diesel::joinable!(rule_result -> rule_set_result (rule_set_result_id));
 diesel::joinable!(rule_set -> ob_configuration (ob_configuration_id));
@@ -1703,6 +1717,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     risk_signal,
     risk_signal_group,
     rule_instance,
+    rule_instance_references_list,
     rule_result,
     rule_set,
     rule_set_result,

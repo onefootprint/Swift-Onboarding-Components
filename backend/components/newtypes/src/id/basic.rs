@@ -326,3 +326,9 @@ impl From<ScopedVaultId> for NeuroIdentityId {
         NeuroIdentityId::from(id)
     }
 }
+
+define_newtype_id!(
+    RuleInstanceReferencesListId,
+    String,
+    "Identifier for a RuleInstanceReferencesList"
+);

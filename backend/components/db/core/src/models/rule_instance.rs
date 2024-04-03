@@ -1,14 +1,19 @@
 use std::collections::HashMap;
 
-use super::{list::List, ob_configuration::ObConfiguration, rule_set_version::RuleSetVersion};
+use super::{
+    list::List,
+    ob_configuration::ObConfiguration,
+    rule_instance_references_list::{NewRuleInstanceReferencesList, RuleInstanceReferencesList},
+    rule_set_version::RuleSetVersion,
+};
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{ob_configuration, rule_instance};
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, DataLifetimeSeqno, DbActor, Locked, ObConfigurationId, RuleAction, RuleExpression,
-    RuleExpressionCondition, RuleId, RuleInstanceId, TenantId, VaultOperation,
+    output::Csv, DataLifetimeSeqno, DbActor, Locked, ObConfigurationId, RuleAction, RuleExpression, RuleId,
+    RuleInstanceId, TenantId,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -135,14 +140,7 @@ impl RuleInstance {
             .map(|nr| nr.rule_expression.clone())
             .chain(updates.iter().filter_map(|u| u.rule_expression.clone()))
             .flat_map(|re| re.0)
-            .filter_map(|re| match re {
-                RuleExpressionCondition::VaultData(VaultOperation::IsIn {
-                    field: _,
-                    op: _,
-                    value,
-                }) => Some(value),
-                _ => None,
-            })
+            .filter_map(|re| re.list_id().cloned())
             .collect_vec();
         let lists = List::bulk_get(conn, &obc.tenant_id, obc.is_live, &list_ids)?;
         let deactivated_lists = lists
@@ -190,7 +188,7 @@ impl RuleInstance {
         seqno: DataLifetimeSeqno,
         now: DateTime<Utc>,
     ) -> DbResult<Vec<Self>> {
-        let new_rules: Vec<_> = new_rules
+        let new_rule_instances: Vec<_> = new_rules
             .into_iter()
             .map(|r| NewRuleInstance {
                 created_at: now,
@@ -207,10 +205,7 @@ impl RuleInstance {
             })
             .collect();
 
-        let res = diesel::insert_into(rule_instance::table)
-            .values(new_rules)
-            .get_results::<Self>(conn.conn())?;
-        Ok(res)
+        Self::insert_rule_instances(conn, new_rule_instances)
     }
 
     #[tracing::instrument("RuleInstance::bulk_update", skip_all)]
@@ -266,10 +261,36 @@ impl RuleInstance {
             })
             .collect_vec();
 
-        let res = diesel::insert_into(rule_instance::table)
+        Self::insert_rule_instances(conn, new_rule_instances)
+    }
+
+    fn insert_rule_instances(
+        conn: &mut TxnPgConn,
+        new_rule_instances: Vec<NewRuleInstance<'_>>,
+    ) -> DbResult<Vec<RuleInstance>> {
+        let rule_instances = diesel::insert_into(rule_instance::table)
             .values(new_rule_instances)
             .get_results::<Self>(conn.conn())?;
-        Ok(res)
+
+        let new_list_refs: Vec<_> = rule_instances
+            .iter()
+            .flat_map(|ri| {
+                ri.rule_expression
+                    .0
+                    .iter()
+                    .flat_map(|c| c.list_id().map(|lid| (ri.id.clone(), lid)))
+            })
+            .unique()
+            .map(|(rid, lid)| NewRuleInstanceReferencesList {
+                rule_instance_id: rid,
+                list_id: lid.clone(),
+            })
+            .collect();
+
+        if !new_list_refs.is_empty() {
+            RuleInstanceReferencesList::bulk_create(conn, new_list_refs)?;
+        }
+        Ok(rule_instances)
     }
 
     #[tracing::instrument("RuleInstance::create", skip_all)]
@@ -375,7 +396,10 @@ mod tests {
     use crate::{models::rule_set_version::RuleSetVersion, tests::prelude::*};
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
-    use newtypes::{BooleanOperator, FootprintReasonCode as FRC, RuleExpressionCondition, StepUpKind};
+    use newtypes::{
+        BooleanOperator, DataIdentifier as DI, FootprintReasonCode as FRC, IdentityDataKind as IDK, IsIn,
+        RuleExpressionCondition, RuleExpressionCondition as REC, StepUpKind, VaultOperation,
+    };
     use std::collections::HashSet;
 
     #[db_test]
@@ -454,6 +478,77 @@ mod tests {
                 .unwrap()
                 .unwrap()
                 .version
+        );
+    }
+
+
+    #[db_test]
+    fn test_rule_instance_references_list(conn: &mut TestPgConn) {
+        let t = tests::fixtures::tenant::create(conn);
+        let obc = tests::fixtures::ob_configuration::create_with_opts(
+            conn,
+            &t.id,
+            ObConfigurationOpts { ..Default::default() },
+        );
+        let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
+        let list1 = tests::fixtures::list::create(conn, &t.id, obc.is_live);
+        let list2 = tests::fixtures::list::create(conn, &t.id, obc.is_live);
+
+        // r1 references both list1 and list2
+        let r1 = NewRule {
+            rule_expression: RuleExpression(vec![
+                REC::VaultData(VaultOperation::IsIn {
+                    field: DI::Id(IDK::Ssn9),
+                    op: IsIn::IsIn,
+                    value: list1.id.clone(),
+                }),
+                REC::VaultData(VaultOperation::IsIn {
+                    field: DI::Id(IDK::Ssn9),
+                    op: IsIn::IsIn,
+                    value: list2.id.clone(),
+                }),
+            ]),
+            action: RuleAction::ManualReview,
+            name: None,
+        };
+        // r2 references list2
+        let r2 = NewRule {
+            rule_expression: RuleExpression(vec![
+                REC::VaultData(VaultOperation::IsIn {
+                    field: DI::Id(IDK::Ssn9),
+                    op: IsIn::IsIn,
+                    value: list2.id.clone(),
+                }),
+                REC::VaultData(VaultOperation::IsIn {
+                    // contrived, but test that even if a single rule references a list multiple times we still only create 1 junction row
+                    field: DI::Id(IDK::Ssn4),
+                    op: IsIn::IsIn,
+                    value: list2.id.clone(),
+                }),
+            ]),
+            action: RuleAction::Fail,
+            name: None,
+        };
+        // r3 references no list
+        let r3 = NewRule {
+            rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
+                field: FRC::DeviceHighRisk,
+                op: BooleanOperator::Equals,
+                value: true,
+            }]),
+            action: RuleAction::Fail,
+            name: None,
+        };
+
+        RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
+
+        assert_eq!(
+            1,
+            RuleInstanceReferencesList::list(conn, &list1.id).unwrap().len()
+        );
+        assert_eq!(
+            2,
+            RuleInstanceReferencesList::list(conn, &list2.id).unwrap().len()
         );
     }
 
