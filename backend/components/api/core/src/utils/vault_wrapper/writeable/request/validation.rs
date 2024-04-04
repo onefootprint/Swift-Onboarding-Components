@@ -23,12 +23,12 @@ impl<Type> VaultWrapper<Type> {
         &self,
         conn: &mut PgConn,
         request: DataRequest<Fingerprints>,
-        source: DataLifetimeSource,
+        sources: DataRequestSources,
         actor: Option<AuthActor>,
         for_replacing_ci: bool,
     ) -> ApiResult<ValidatedDataRequest> {
         assert_allowed_for_vault(&request, self.vault.kind)?;
-        assert_allowed_for_source(&request, source)?;
+        assert_allowed_for_sources(&request, &sources)?;
         // Transform the request into a Vec<NewVaultData>
         let (data, json_fields, fingerprints) = request.decompose();
         let data = data
@@ -42,12 +42,12 @@ impl<Type> VaultWrapper<Type> {
                     VaultDataFormat::String
                 };
                 let vd = NewVaultData {
+                    source: sources.get(&kind),
                     kind,
                     e_data,
                     p_data,
                     format,
                     origin_id: None,
-                    source,
                 };
                 Ok(vd)
             })
@@ -233,9 +233,10 @@ pub fn assert_allowed_for_vault<T>(request: &DataRequest<T>, kind: VaultKind) ->
 }
 
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
-pub fn assert_allowed_for_source<T>(request: &DataRequest<T>, source: DataLifetimeSource) -> NtResult<()> {
+pub fn assert_allowed_for_sources<T>(request: &DataRequest<T>, sources: &DataRequestSources) -> NtResult<()> {
     let is_allowed = move |di: &DataIdentifier| -> bool {
         // Restrict the components SDK from adding phone or email
+        let source = sources.get(di);
         #[allow(clippy::match_like_matches_macro)]
         match (source, di) {
             (DataLifetimeSource::ComponentsSdk, DataIdentifier::Id(IDK::PhoneNumber)) => false,
@@ -253,4 +254,33 @@ pub fn assert_allowed_for_source<T>(request: &DataRequest<T>, source: DataLifeti
         return Err(newtypes::DataValidationError::FieldValidationError(field_errors).into());
     }
     Ok(())
+}
+
+/// Helper struct to store which pieces of data have which DL sources.
+pub struct DataRequestSources {
+    default: DataLifetimeSource,
+    overrides: HashMap<DataIdentifier, DataLifetimeSource>,
+}
+
+impl DataRequestSources {
+    pub fn single(source: DataLifetimeSource) -> Self {
+        Self {
+            default: source,
+            overrides: HashMap::new(),
+        }
+    }
+
+    pub fn overrides(
+        source: DataLifetimeSource,
+        overrides: HashMap<DataIdentifier, DataLifetimeSource>,
+    ) -> Self {
+        Self {
+            default: source,
+            overrides,
+        }
+    }
+
+    fn get(&self, di: &DataIdentifier) -> DataLifetimeSource {
+        self.overrides.get(di).copied().unwrap_or(self.default)
+    }
 }

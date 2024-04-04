@@ -2,10 +2,10 @@ use super::{get_transformer, IngressRule};
 use crate::{
     auth::tenant::TenantAuth,
     errors::ApiResult,
-    utils,
     utils::{
+        self,
         headers::InsightHeaders,
-        vault_wrapper::{Any, Person, VaultWrapper},
+        vault_wrapper::{Any, DataRequestSources, Person, VaultWrapper},
     },
     ApiError, State,
 };
@@ -176,7 +176,8 @@ pub async fn vault_pii(
                 // put our data
                 if !data.is_empty() {
                     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_vault.id)?;
-                    uvw.patch_data(conn, data, source, Some(actor.clone()))?;
+                    let sources = DataRequestSources::single(source);
+                    uvw.patch_data(conn, data, sources, Some(actor.clone()))?;
                 }
 
                 // put our documents

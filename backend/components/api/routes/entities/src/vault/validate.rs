@@ -10,7 +10,10 @@ use api_core::{
         tenant::{ClientTenantAuthContext, TenantAuth},
         CanVault,
     },
-    utils::{fp_id_path::FpIdPath, vault_wrapper::TenantVw},
+    utils::{
+        fp_id_path::FpIdPath,
+        vault_wrapper::{DataRequestSources, TenantVw},
+    },
 };
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
@@ -93,7 +96,8 @@ async fn post_inner(
         .db_query(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            uvw.validate_request(conn, updates, source, Some(actor), false)?;
+            let sources = DataRequestSources::single(source);
+            uvw.validate_request(conn, updates, sources, Some(actor), false)?;
             Ok(())
         })
         .await?;

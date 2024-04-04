@@ -21,6 +21,8 @@ use std::collections::{HashMap, HashSet};
 
 mod validation;
 
+pub use validation::DataRequestSources;
+
 /// DataRequest that has been validated through a UserVaultWrapper
 pub struct ValidatedDataRequest {
     pub(super) data: Vec<NewVaultData>,

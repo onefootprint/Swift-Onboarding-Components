@@ -4,7 +4,7 @@ use newtypes::{
     DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprints, IdentityDataKind as IDK,
 };
 
-use super::{portablize_data::on_otp_verified, PatchDataResult, WriteableVw};
+use super::{portablize_data::on_otp_verified, DataRequestSources, PatchDataResult, WriteableVw};
 
 impl<Type> WriteableVw<Type> {
     #[tracing::instrument("WriteableVw::replace_verified_ci", skip_all)]
@@ -22,7 +22,8 @@ impl<Type> WriteableVw<Type> {
         {
             return ValidationError("Can only replace_ci with phone or email").into();
         }
-        let request = self.validate_request(conn, request, source, None, true)?;
+        let sources = DataRequestSources::single(source);
+        let request = self.validate_request(conn, request, sources, None, true)?;
         let PatchDataResult { new_ci, .. } = self.internal_save_data(conn, request, None)?;
         let (_, ci) = new_ci
             .into_iter()

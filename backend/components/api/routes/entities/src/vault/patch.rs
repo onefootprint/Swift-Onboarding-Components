@@ -11,7 +11,11 @@ use api_core::{
         CanVault, Either,
     },
     errors::AssertionError,
-    utils::{fp_id_path::FpIdPath, headers::IgnoreLuhnValidation, vault_wrapper::Any},
+    utils::{
+        fp_id_path::FpIdPath,
+        headers::IgnoreLuhnValidation,
+        vault_wrapper::{Any, DataRequestSources},
+    },
 };
 use db::models::{
     access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
@@ -151,7 +155,8 @@ async fn patch_inner(
             // event with context on what was updated, deleted, and added
             let deleted_dis = uvw.soft_delete_vault_data(conn, deletions)?;
             let updated_dis = updates.keys().cloned().collect_vec();
-            uvw.patch_data(conn, updates, source, Some(actor.clone()))?;
+            let sources = DataRequestSources::single(source);
+            uvw.patch_data(conn, updates, sources, Some(actor.clone()))?;
 
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let principal: DbActor = actor.into();

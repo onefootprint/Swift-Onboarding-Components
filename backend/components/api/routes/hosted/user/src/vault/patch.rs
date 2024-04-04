@@ -6,7 +6,7 @@ use crate::{
 };
 use api_core::{
     auth::user::{UserAuthScope, UserWfAuthContext},
-    utils::vault_wrapper::{Any, Person, VwArgs},
+    utils::vault_wrapper::{Any, DataRequestSources, Person, VwArgs},
 };
 use db::models::{
     document_request::{DocumentRequest, NewDocumentRequestArgs},
@@ -49,7 +49,8 @@ pub async fn post_validate(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let vw = VaultWrapper::<Person>::build_for_tenant(conn, &su_id)?;
-            vw.validate_request(conn, updates, source, None, false)?;
+            let sources = DataRequestSources::single(source);
+            vw.validate_request(conn, updates, sources, None, false)?;
             Ok(())
         })
         .await?;
@@ -93,7 +94,8 @@ pub async fn patch(
 
             // Even though this accepts id.phone_number, it will always error at runtime if we
             // provide id.phone_number since we only allow a vault to have one phone number
-            let new_contact_info = uvw.patch_data(conn, updates, source, None)?.new_ci;
+            let sources = DataRequestSources::single(source);
+            let new_contact_info = uvw.patch_data(conn, updates, sources, None)?.new_ci;
             Ok(new_contact_info)
         })
         .await?;

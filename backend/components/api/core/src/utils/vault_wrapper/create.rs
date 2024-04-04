@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use super::{Any, PatchDataResult, Person, VaultWrapper};
+use super::{Any, DataRequestSources, PatchDataResult, Person, VaultWrapper, WriteableVw};
 use crate::{
     enclave_client::VaultKeyPair,
     errors::{user::UserError, ApiResult, AssertionError},
@@ -157,9 +157,10 @@ impl VaultWrapper<Person> {
             .flatten()
             .collect();
         let request = request.manual_fingerprints(fingerprints);
-        // TODO this could be bootstrapped
-        let source = DataLifetimeSource::Hosted;
-        let result = uvw.patch_data(conn, request, source, None)?;
+        // TODO: Source per piece of data? each piece of data could have a different source here
+        let sources = DataRequestSources::single(DataLifetimeSource::Hosted);
+        let request = VaultWrapper::validate_request(&uvw, conn, request, sources, None, false)?;
+        let result = WriteableVw::<Any>::internal_save_data(&uvw, conn, request, None)?;
 
         Ok((uv, su, result))
     }
