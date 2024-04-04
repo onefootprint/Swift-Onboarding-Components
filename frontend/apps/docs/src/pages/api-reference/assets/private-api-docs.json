@@ -527,100 +527,6 @@
                 ]
             }
         },
-        "/compliance/members": {
-            "get": {
-                "tags": [
-                    "Compliance",
-                    "Private"
-                ],
-                "description": "Returns a list of dashboard members for the partner tenant.",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "is_invite_pending",
-                        "schema": {
-                            "type": "boolean"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "role_ids",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "search",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "page_size",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OffsetPaginatedOrganizationMember"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Compliance",
-                    "Private"
-                ],
-                "description": "Creates a new IAM user for the partner tenant. Sends an invite link via WorkOs.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
         "/compliance/partners": {
             "get": {
                 "tags": [
@@ -5235,7 +5141,7 @@
                     "OrgSettings",
                     "Private"
                 ],
-                "description": "Returns a list of dashboard members for the tenant.",
+                "description": "Returns a list of dashboard members for the tenant or partner tenant.",
                 "parameters": [
                     {
                         "in": "query",
@@ -5295,6 +5201,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Dashboard Token": []
                     }
                 ]
             },
@@ -5328,6 +5237,9 @@
                     }
                 },
                 "security": [
+                    {
+                        "Dashboard Token": []
+                    },
                     {
                         "Dashboard Token": []
                     }
@@ -5378,6 +5290,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Dashboard Token": []
                     }
                 ]
             }
@@ -5414,6 +5329,9 @@
                     }
                 },
                 "security": [
+                    {
+                        "Dashboard Token": []
+                    },
                     {
                         "Dashboard Token": []
                     }
@@ -6331,7 +6249,7 @@
                     "OrgSettings",
                     "Private"
                 ],
-                "description": "Returns a list of IAM roles for the tenant.",
+                "description": "Returns a list of IAM roles for the tenant or partner tenant.",
                 "parameters": [
                     {
                         "in": "query",
@@ -6388,6 +6306,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Dashboard Token": []
                     }
                 ]
             },
@@ -6397,7 +6318,7 @@
                     "OrgSettings",
                     "Private"
                 ],
-                "description": "Create a new IAM role for the tenant.",
+                "description": "Create a new IAM role for the tenant or partner tenant.",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -6421,6 +6342,9 @@
                     }
                 },
                 "security": [
+                    {
+                        "Dashboard Token": []
+                    },
                     {
                         "Dashboard Token": []
                     }
@@ -6471,6 +6395,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Dashboard Token": []
                     }
                 ]
             }
@@ -6507,6 +6434,9 @@
                     }
                 },
                 "security": [
+                    {
+                        "Dashboard Token": []
+                    },
                     {
                         "Dashboard Token": []
                     }

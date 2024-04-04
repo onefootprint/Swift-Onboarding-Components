@@ -17,15 +17,6 @@ def test_partner_tenant_iam(tenant, partner_tenant):
     get("compliance/partners", {}, *tenant.db_auths, status_code=401)
     get("compliance/partners", {}, *tenant.ro_db_auths, status_code=401)
 
-    # Should be able to access a admin compliance API only with partner
-    # admin auth.
-    post("compliance/members", {}, *partner_tenant.db_auths)
-    post("compliance/members", {}, *partner_tenant.ro_db_auths, status_code=401)
-
-    # Regular tenant should not be able to access the admin partner APIs.
-    post("compliance/members", {}, *tenant.db_auths, status_code=401)
-    post("compliance/members", {}, *tenant.ro_db_auths, status_code=401)
-
     # Should be able to access APIs that accept either tenant or partner tenant auth.
     get("org/roles", {}, *partner_tenant.db_auths)
     get("org/roles", {}, *partner_tenant.ro_db_auths)

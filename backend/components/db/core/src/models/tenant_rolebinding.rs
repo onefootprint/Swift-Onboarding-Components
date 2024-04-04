@@ -12,8 +12,8 @@ use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
 use derive_more::From;
 use diesel::{dsl::not, prelude::*, Queryable};
 use newtypes::{
-    PartnerTenantId, TenantId, OrgIdentifierRef, TenantRoleId, TenantRoleKind,
-    TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId,
+    OrgIdentifierRef, PartnerTenantId, TenantId, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant,
+    TenantRolebindingId, TenantUserId,
 };
 
 #[derive(Debug, Clone, Queryable, Selectable)]
@@ -40,6 +40,7 @@ pub enum TenantRolebindingIdentifier<'a> {
     Tenant(&'a TenantRolebindingId, &'a TenantId),
     User(&'a TenantUserId, &'a TenantId),
     PartnerTenantUser(&'a TenantUserId, &'a PartnerTenantId),
+    OrgUser(&'a TenantUserId, OrgIdentifierRef<'a>),
 }
 
 // It's hard to type this query in Rust, so we use a macro to share its logic
@@ -236,6 +237,17 @@ impl TenantRolebinding {
                 query = query
                     .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
                     .filter(tenant_role::partner_tenant_id.eq(pt_id));
+            }
+            TenantRolebindingIdentifier::OrgUser(user_id, org_ident) => {
+                query = query.filter(tenant_rolebinding::tenant_user_id.eq(user_id));
+                match org_ident {
+                    OrgIdentifierRef::TenantId(t_id) => {
+                        query = query.filter(tenant_role::tenant_id.eq(t_id));
+                    }
+                    OrgIdentifierRef::PartnerTenantId(pt_id) => {
+                        query = query.filter(tenant_role::partner_tenant_id.eq(pt_id));
+                    }
+                }
             }
         }
         let (user, (rb, (role, tenant, partner_tenant))) = query.first::<(

@@ -293,7 +293,7 @@ def test_partner_document_flow(tenant, partner_tenant):
 
     # Assign the document to a partner tenant user.
     doc_id = doc["id"]
-    assignee = get("compliance/members", {}, *partner_tenant.ro_db_auths)["data"][0]
+    assignee = get("org/members", {}, *partner_tenant.ro_db_auths)["data"][0]
     post(f"compliance/partners/{partnership_id}/documents/{doc_id}/assignments", {
         "user_id": assignee["id"],
     }, *partner_tenant.db_auths)

@@ -1,35 +1,37 @@
 use crate::{
-    auth::tenant::{AuthActor, CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    auth::tenant::{AuthActor, TenantGuard},
     errors::{tenant::TenantError, ApiResult},
     types::{EmptyResponse, JsonApiResponse, OffsetPaginatedResponse, OffsetPaginationRequest, ResponseData},
     utils::{db2api::DbToApi, magic_link::create_magic_link},
     State,
 };
+use api_core::auth::tenant::{PartnerTenantGuard, TenantOrPartnerTenantSessionAuth};
 use api_wire_types::OrgMemberFilters;
 use chrono::Utc;
 use db::{
+    helpers::TenantOrPartnerTenantRef,
     models::{
         tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters, TenantRolebindingUpdate},
         tenant_user::TenantUser,
     },
     OffsetPagination,
 };
-use newtypes::{email::Email, OrgMemberEmail, TenantRoleId, TenantUserId};
+use newtypes::{email::Email, OrgIdentifierRef, OrgMemberEmail, TenantRoleId, TenantUserId};
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json, Apiv2Schema};
 
 #[api_v2_operation(
     tags(Members, OrgSettings, Private),
-    description = "Returns a list of dashboard members for the tenant."
+    description = "Returns a list of dashboard members for the tenant or partner tenant."
 )]
 #[get("/org/members")]
 async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgMemberFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
-    auth: TenantSessionAuth,
+    auth: TenantOrPartnerTenantSessionAuth,
 ) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
-    let auth = auth.check_guard(TenantGuard::Read)?;
-    let tenant = auth.tenant();
+    let auth = auth.check_guard(TenantGuard::Read, PartnerTenantGuard::Read)?;
+    let authed_org_ident = auth.org_identifier().clone_into();
 
     let page = pagination.page;
     let page_size = pagination.page_size(&state);
@@ -40,12 +42,11 @@ async fn get(
     } = filters.into_inner();
     let role_ids = role_ids.map(|r_ids| r_ids.0);
 
-    let tenant_id = tenant.id.clone();
     let (results, next_page, count) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let filters = TenantRolebindingFilters {
-                org_id: (&tenant_id).into(),
+                org_id: (&authed_org_ident).into(),
                 only_active: true,
                 role_ids,
                 search,
@@ -85,13 +86,18 @@ struct CreateTenantUserRequest {
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantUserRequest>,
-    auth: TenantSessionAuth,
+    auth: TenantOrPartnerTenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
-    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
-    let tenant = auth.tenant();
+    let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
+    let authed_org_ident = auth.org_identifier().clone_into();
+    let actor = auth.actor();
+    let org_name = match auth.org() {
+        TenantOrPartnerTenantRef::Tenant(t) => t.name.clone(),
+        TenantOrPartnerTenantRef::PartnerTenant(pt) => pt.name.clone(),
+    };
 
-    let user_id = auth.actor().tenant_user_id()?.clone();
-    let tenant_id = tenant.id.clone();
+    let user_id = actor.tenant_user_id()?.clone();
+
     let CreateTenantUserRequest {
         email,
         role_id,
@@ -108,7 +114,7 @@ async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let inviter = TenantUser::get(conn, &user_id)?;
             let user = TenantUser::get_and_update_or_create(conn, email2, first_name, last_name)?;
-            let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, &tenant_id)?;
+            let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, &authed_org_ident)?;
             Ok((inviter, user, rb, role))
         })
         .await?;
@@ -118,7 +124,7 @@ async fn post(
         let inviter = inviter.first_name.unwrap_or(inviter.email.0);
         state
             .sendgrid_client
-            .send_dashboard_invite_email(&state, email.0, inviter, tenant.name.clone(), link)
+            .send_dashboard_invite_email(&state, email.0, inviter, org_name, link)
             .await?;
     }
 
@@ -140,14 +146,16 @@ async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRolebindingRequest>,
     tu_id: web::Path<TenantUserId>,
-    auth: TenantSessionAuth,
+    auth: TenantOrPartnerTenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
-    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
-    let tenant_id = auth.tenant().id.clone();
+    let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
+    let authed_org_ident = auth.org_identifier().clone_into();
+    let actor = auth.actor();
+
     let tu_id = tu_id.into_inner();
     let UpdateTenantRolebindingRequest { role_id } = request.into_inner();
 
-    if let AuthActor::TenantUser(tenant_user_id) = auth.actor() {
+    if let AuthActor::TenantUser(tenant_user_id) = actor {
         if tenant_user_id == tu_id {
             return Err(TenantError::CannotEditCurrentUser.into());
         }
@@ -160,8 +168,9 @@ async fn patch(
     let (user, rb, role) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (user, _, role, _) = TenantRolebinding::get(conn, (&tu_id, &tenant_id))?;
-            let rb = TenantRolebinding::update(conn, (&tu_id, &tenant_id), rolebinding_update)?;
+            let org_ref: OrgIdentifierRef<'_> = (&authed_org_ident).into();
+            let (user, _, role, _) = TenantRolebinding::get(conn, (&tu_id, org_ref))?;
+            let rb = TenantRolebinding::update(conn, (&tu_id, org_ref), rolebinding_update)?;
             Ok((user, rb, role))
         })
         .await?;
@@ -178,12 +187,14 @@ async fn patch(
 async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
-    auth: TenantSessionAuth,
+    auth: TenantOrPartnerTenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
-    let tenant_id = auth.tenant().id.clone();
+    let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
+    let authed_org_ident = auth.org_identifier().clone_into();
+    let actor = auth.actor();
+
     let tu_id = tu_id.into_inner();
-    if let AuthActor::TenantUser(tenant_user_id) = auth.actor() {
+    if let AuthActor::TenantUser(tenant_user_id) = actor {
         if tenant_user_id == tu_id {
             return Err(TenantError::CannotEditCurrentUser.into());
         }
@@ -196,7 +207,8 @@ async fn deactivate(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            TenantRolebinding::update(conn, (&tu_id, &tenant_id), update)?;
+            let org_ref: OrgIdentifierRef<'_> = (&authed_org_ident).into();
+            TenantRolebinding::update(conn, (&tu_id, org_ref), update)?;
             Ok(())
         })
         .await?;

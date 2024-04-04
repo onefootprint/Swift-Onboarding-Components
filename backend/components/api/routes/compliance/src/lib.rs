@@ -4,7 +4,6 @@ mod assignments;
 mod doc_events;
 mod doc_templates;
 mod documents;
-mod members;
 mod partners;
 mod requests;
 mod reupload;
@@ -22,8 +21,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config.service(doc_templates::put);
     config.service(documents::get);
     config.service(documents::post);
-    config.service(members::get);
-    config.service(members::post);
     config.service(partners::get);
     config.service(requests::delete);
     config.service(reupload::post);
