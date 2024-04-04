@@ -1,10 +1,8 @@
 import type {
-  ListCreatedEvent,
   ListEntryCreatedEvent,
   ListEntryDeletedEvent,
   ListTimeline,
   ListTimelineEvent,
-  ListUpdatedEvent,
 } from '@onefootprint/types';
 import { ListTimelineEventKind } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
@@ -13,10 +11,8 @@ import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 
-import ListCreatedEventHeader from './components/list-created-event-header';
 import ListEntryCreatedHeader from './components/list-entry-created-event-header';
 import ListEntryDeletedHeader from './components/list-entry-deleted-event-header';
-import ListUpdatedEventHeader from './components/list-updated-event-header';
 
 type ContentProps = {
   timeline: ListTimeline;
@@ -28,35 +24,49 @@ const Content = ({ timeline }: ContentProps) => {
   });
 
   const items: TimelineItem[] = [];
-  timeline.forEach(({ event, timestamp }: ListTimelineEvent) => {
-    const { kind, data } = event;
+  timeline.forEach(({ timestamp, principal, detail }: ListTimelineEvent) => {
+    const { kind } = detail;
 
-    if (kind === ListTimelineEventKind.listCreated) {
+    // TODO: uncomment when backend adds support for these event types
+    // if (kind === ListTimelineEventKind.createList) {
+    //   items.push({
+    //     time: { timestamp },
+    //     headerComponent: (
+    //       <ListCreatedEventHeader
+    //         user={principal.member}
+    //         event={detail as ListCreatedEvent}
+    //       />
+    //     ),
+    //   });
+    // } else if (kind === ListTimelineEventKind.updateList) {
+    //   items.push({
+    //     time: { timestamp },
+    //     headerComponent: (
+    //       <ListUpdatedEventHeader
+    //         user={principal.member}
+    //         event={detail as ListUpdatedEvent}
+    //       />
+    //     ),
+    //   });
+    // } else
+    if (kind === ListTimelineEventKind.createListEntry) {
       items.push({
         time: { timestamp },
         headerComponent: (
-          <ListCreatedEventHeader data={data as ListCreatedEvent} />
+          <ListEntryCreatedHeader
+            user={principal.member}
+            event={detail as ListEntryCreatedEvent}
+          />
         ),
       });
-    } else if (kind === ListTimelineEventKind.listUpdated) {
+    } else if (kind === ListTimelineEventKind.deleteListEntry) {
       items.push({
         time: { timestamp },
         headerComponent: (
-          <ListUpdatedEventHeader data={data as ListUpdatedEvent} />
-        ),
-      });
-    } else if (kind === ListTimelineEventKind.listEntryCreated) {
-      items.push({
-        time: { timestamp },
-        headerComponent: (
-          <ListEntryCreatedHeader data={data as ListEntryCreatedEvent} />
-        ),
-      });
-    } else if (kind === ListTimelineEventKind.listEntryDeleted) {
-      items.push({
-        time: { timestamp },
-        headerComponent: (
-          <ListEntryDeletedHeader data={data as ListEntryDeletedEvent} />
+          <ListEntryDeletedHeader
+            user={principal.member}
+            event={detail as ListEntryDeletedEvent}
+          />
         ),
       });
     }

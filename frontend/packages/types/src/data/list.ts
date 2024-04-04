@@ -1,4 +1,5 @@
 import type { Actor } from './actor';
+import type { InsightEvent } from './insight-event';
 import type { Rule } from './rule';
 
 export enum ListKind {
@@ -46,40 +47,55 @@ export type ListEntry = {
 };
 
 export enum ListTimelineEventKind {
-  listCreated = 'list_created',
-  listUpdated = 'list_updated',
-  listEntryCreated = 'list_entry_created',
-  listEntryDeleted = 'list_entry_deleted',
+  createList = 'create_list',
+  updateList = 'update_list',
+  createListEntry = 'create_list_entry',
+  deleteListEntry = 'delete_list_entry',
 }
 
-// TODO: fill these based on API types
+// TODO: implement after backend is ready
 export type ListCreatedEvent = {
-  kind: ListTimelineEventKind.listCreated;
+  kind: ListTimelineEventKind.createList;
   data: unknown;
 };
 
+// TODO: implement after backend is ready
 export type ListUpdatedEvent = {
-  kind: ListTimelineEventKind.listUpdated;
+  kind: ListTimelineEventKind.updateList;
   data: unknown;
 };
 
 export type ListEntryCreatedEvent = {
-  kind: ListTimelineEventKind.listEntryCreated;
-  data: unknown;
+  kind: ListTimelineEventKind.createListEntry;
+  data: {
+    listEntryCreationId: string;
+    entries: string[];
+  };
 };
 
 export type ListEntryDeletedEvent = {
-  kind: ListTimelineEventKind.listEntryDeleted;
-  data: unknown;
+  kind: ListTimelineEventKind.deleteListEntry;
+  data: {
+    listEntryId: string;
+    entry: string;
+  };
 };
 
 export type ListTimelineEvent = {
-  event:
+  id: string;
+  timestamp: string;
+  tenantId: string;
+  name: ListTimelineEventKind;
+  principal: {
+    kind: string;
+    member: string;
+  };
+  insightEvent: InsightEvent;
+  detail:
     | ListCreatedEvent
     | ListUpdatedEvent
     | ListEntryCreatedEvent
     | ListEntryDeletedEvent;
-  timestamp: string;
 };
 
 export type ListTimeline = ListTimelineEvent[];

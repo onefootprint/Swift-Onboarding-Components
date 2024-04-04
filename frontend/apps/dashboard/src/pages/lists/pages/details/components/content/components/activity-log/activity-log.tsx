@@ -35,7 +35,7 @@ const ActivityLog = () => {
     <Stack gap={4} direction="column">
       <SectionTitle title={t('title', { alias: details?.alias })} />
       {error ? <Error error={error} /> : null}
-      {timeline && <Content timeline={timeline} />}
+      {timeline && <Content timeline={timeline?.data} />}
     </Stack>
   );
 };

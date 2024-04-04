@@ -31,6 +31,7 @@ const useUpdateList = (listId: string) => {
       onError: showErrorToast,
       onSuccess: () => {
         queryClient.invalidateQueries(['lists', listId, authHeaders]);
+        queryClient.invalidateQueries(['list-timeline', listId, authHeaders]);
       },
     },
   );

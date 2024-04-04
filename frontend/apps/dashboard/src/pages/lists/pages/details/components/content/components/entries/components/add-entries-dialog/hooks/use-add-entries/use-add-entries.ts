@@ -39,6 +39,7 @@ const useAddEntries = (listId: string = '') => {
       onSuccess: response => {
         // Insert the newly created list into the top of the returned entries list. This nicely
         // helps to show the most recent value as soon as it is created
+        queryClient.invalidateQueries(['list-timeline', listId, authHeaders]);
         queryClient.setQueryData(
           ['list-entries', listId, authHeaders],
           (prevList?: ListEntry[]) => (response || []).concat(prevList || []),

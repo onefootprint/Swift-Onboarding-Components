@@ -187,13 +187,19 @@
       "title": "Playbooks using {{alias}}",
       "empty": "There are no playbooks using this list",
       "details": "See details",
-      "in-rule": "In rule",
+      "in-rule": "In rule:",
       "if": "if",
       "and": "and"
     },
     "activity-log": {
       "title": "Activity log",
-      "empty": "No activity found"
+      "empty": "No activity found",
+      "create-list-entry": {
+        "verb": "added"
+      },
+      "delete-list-entry": {
+        "verb": "removed"
+      }
     }
   },
   "entries-validation": {

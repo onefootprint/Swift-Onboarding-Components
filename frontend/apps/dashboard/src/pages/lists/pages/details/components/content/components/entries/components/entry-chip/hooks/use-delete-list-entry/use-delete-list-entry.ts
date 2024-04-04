@@ -27,6 +27,7 @@ const useDeleteListEntry = (listId: string) => {
       deleteListEntry(listId, entryId, authHeaders),
     {
       onSuccess: () => {
+        queryClient.invalidateQueries(['list-timeline', listId, authHeaders]);
         queryClient.invalidateQueries(['list-entries', listId, authHeaders]);
       },
     },

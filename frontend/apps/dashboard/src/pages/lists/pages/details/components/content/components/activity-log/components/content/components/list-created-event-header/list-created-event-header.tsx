@@ -2,11 +2,11 @@ import type { ListCreatedEvent } from '@onefootprint/types';
 import React from 'react';
 
 type ListCreatedEventHeaderProps = {
-  data: ListCreatedEvent;
+  event: ListCreatedEvent;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ListCreatedEventHeader = ({ data }: ListCreatedEventHeaderProps) => (
+const ListCreatedEventHeader = ({ event }: ListCreatedEventHeaderProps) => (
   <div>TODO</div>
 );
 
