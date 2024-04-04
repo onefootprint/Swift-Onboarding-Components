@@ -54,8 +54,7 @@ impl<Type> WriteableVw<Type> {
         actor: Option<AuthActor>,
     ) -> ApiResult<PatchDataResult> {
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
-        request.assert_allowable_identifiers(self.vault.kind)?;
-        let request = self.validate_request(conn, request, actor.clone(), false)?;
+        let request = self.validate_request(conn, request, source, actor.clone(), false)?;
         let result = self.internal_save_data(conn, request, source, actor)?;
         self.create_bos_if_needed(conn, kyced_bos)?;
         Ok(result)

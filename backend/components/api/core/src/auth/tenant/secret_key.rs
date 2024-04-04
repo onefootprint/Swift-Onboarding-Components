@@ -138,7 +138,7 @@ impl TenantAuth for CheckedSecretTenantAuth {
         self.role.scopes.clone()
     }
 
-    fn source(&self) -> DataLifetimeSource {
+    fn dl_source(&self) -> DataLifetimeSource {
         DataLifetimeSource::Tenant
     }
 }

@@ -129,7 +129,7 @@ pub async fn vault_pii(
         )
         .await?;
 
-        let source = auth.source();
+        let source = auth.dl_source();
         let actor = auth.actor();
         state
             .db_pool

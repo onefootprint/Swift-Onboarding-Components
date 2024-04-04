@@ -141,7 +141,7 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
         self.tenant_role.scopes.clone()
     }
 
-    fn source(&self) -> DataLifetimeSource {
+    fn dl_source(&self) -> DataLifetimeSource {
         DataLifetimeSource::Tenant
     }
 }

@@ -95,7 +95,7 @@ def test_components_sdk(sandbox_tenant):
     IdentifyClient.from_user(user).inherit()
 
 
-def test_components_sdk_auth_methods(sandbox_tenant):
+def test_components_sdk_cannot_add_auth_methods(sandbox_tenant):
     (components_token, token, _) = create_user_with_components_token(sandbox_tenant)
 
     # We should be able to log in via unverified email
@@ -104,6 +104,8 @@ def test_components_sdk_auth_methods(sandbox_tenant):
 
     # Add a new email using the components SDK and then verify we can't use it to log in
     data = {"id.email": FIXTURE_EMAIL}
-    patch("hosted/user/vault", data, components_token)
-    body = post("hosted/identify", dict(scope="onboarding"), token)
-    assert not any(i["kind"] == "email" for i in body["user"]["auth_methods"])
+    body = patch("hosted/user/vault", data, components_token, status_code=400)
+    assert (
+        body["error"]["message"]["id.email"]
+        == "Not allowed to add with this type of token"
+    )

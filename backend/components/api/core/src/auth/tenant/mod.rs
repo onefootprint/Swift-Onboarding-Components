@@ -69,7 +69,7 @@ pub trait TenantAuth {
     fn is_live(&self) -> Result<bool, ApiError>;
     fn actor(&self) -> AuthActor;
     fn scopes(&self) -> Vec<TenantScope>;
-    fn source(&self) -> DataLifetimeSource;
+    fn dl_source(&self) -> DataLifetimeSource;
 }
 
 pub trait PartnerTenantAuth {

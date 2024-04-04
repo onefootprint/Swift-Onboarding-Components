@@ -87,13 +87,13 @@ async fn post_inner(
     let PatchDataRequest { updates, .. } =
         request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
     let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
+    let source = auth.dl_source();
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            updates.assert_allowable_identifiers(uvw.vault.kind)?;
-            uvw.validate_request(conn, updates, Some(actor), false)?;
+            uvw.validate_request(conn, updates, source, Some(actor), false)?;
             Ok(())
         })
         .await?;

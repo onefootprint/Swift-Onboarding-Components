@@ -149,7 +149,7 @@ impl TenantAuth for SessionContext<ClientTenantData> {
         vec![]
     }
 
-    fn source(&self) -> DataLifetimeSource {
+    fn dl_source(&self) -> DataLifetimeSource {
         DataLifetimeSource::ClientTenant
     }
 }

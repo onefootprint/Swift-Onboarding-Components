@@ -111,6 +111,8 @@ pub enum Error {
     Custom(String),
     #[error("Cannot add to this type of vault")]
     IncompatibleDataIdentifier,
+    #[error("Not allowed to add with this type of token")]
+    CannotAddDiWithSource,
     #[error("{0}")]
     EnumDotNotationError(#[from] EnumDotNotationError),
     #[error("Invalid hex string")]

@@ -1,7 +1,8 @@
 use itertools::Itertools;
 use newtypes::{
-    AuthEventId, AuthMethodKind, BoId, ContactInfoId, DataIdentifier, IdentifyScope, ObConfigurationId,
-    RequestedTokenScope, ScopedVaultId, UserAuthScope, VaultId, WorkflowId, WorkflowRequestId,
+    AuthEventId, AuthMethodKind, BoId, ContactInfoId, DataIdentifier, DataLifetimeSource, IdentifyScope,
+    ObConfigurationId, RequestedTokenScope, ScopedVaultId, UserAuthScope, VaultId, WorkflowId,
+    WorkflowRequestId,
 };
 
 use crate::errors::{user::UserError, ApiResult, ValidationError};
@@ -271,10 +272,19 @@ impl UserSession {
         Ok(())
     }
 
-    pub fn is_derived_from_components(&self) -> bool {
+    fn is_derived_from_components(&self) -> bool {
         self.purposes
             .iter()
             .any(|p| matches!(p, TokenCreationPurpose::BifrostComponentsSdk))
+    }
+
+    pub fn dl_source(&self) -> DataLifetimeSource {
+        if self.is_derived_from_components() {
+            // Denote when data was added via components SDK, since it could be tampered with
+            DataLifetimeSource::ComponentsSdk
+        } else {
+            DataLifetimeSource::Hosted
+        }
     }
 
     /// Returns true if any token from which this token was derived was issued via tenant-facing API.

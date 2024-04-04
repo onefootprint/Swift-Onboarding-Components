@@ -17,8 +17,8 @@ use api_core::{
 use db::models::{business_owner::BusinessOwner, scoped_vault::ScopedVault};
 use newtypes::{
     put_data_request::{PatchDataRequest, RawDataRequest},
-    BusinessDataKind as BDK, BusinessOwnerKind, DataLifetimeSource, KycedBusinessOwnerData, PiiJsonValue,
-    ScopedVaultId, ValidateArgs, WorkflowGuard,
+    BusinessDataKind as BDK, BusinessOwnerKind, KycedBusinessOwnerData, PiiJsonValue, ScopedVaultId,
+    ValidateArgs, WorkflowGuard,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -45,12 +45,12 @@ pub async fn post_validate(
         request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
     let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
 
+    let source = user_auth.user_session.dl_source();
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
-            updates.assert_allowable_identifiers(bvw.vault.kind)?;
-            bvw.validate_request(conn, updates, None, false)?;
+            bvw.validate_request(conn, updates, source, None, false)?;
             Ok(())
         })
         .await?;
@@ -85,11 +85,12 @@ pub async fn patch(
         .build_fingerprints(&state.enclave_client, tenant_id)
         .await?;
 
+    let source = user_auth.user_session.dl_source();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
-            bvw.patch_data(conn, updates, DataLifetimeSource::Hosted, None)?;
+            bvw.patch_data(conn, updates, source, None)?;
             Ok(())
         })
         .await?;

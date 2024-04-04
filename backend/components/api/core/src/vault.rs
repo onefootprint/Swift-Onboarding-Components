@@ -89,7 +89,7 @@ pub async fn create_non_portable_vault(
     }
 
     let actor = auth.actor();
-    let source = auth.source();
+    let source = auth.dl_source();
     let (scoped_user, vault) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {

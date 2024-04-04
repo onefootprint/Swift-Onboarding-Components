@@ -139,7 +139,7 @@ async fn patch_inner(
         .build_fingerprints(&state.enclave_client, &tenant_id)
         .await?;
 
-    let source = auth.source();
+    let source = auth.dl_source();
     let actor = auth.actor();
     state
         .db_pool

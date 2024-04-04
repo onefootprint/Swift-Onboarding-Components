@@ -41,7 +41,7 @@ pub use self::{
 };
 use crate::{
     fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, AliasId, EnumDotNotationError,
-    KvDataKey, NtResult, PiiJsonValue, PiiString, ValidateArgs, VaultKind,
+    KvDataKey, NtResult, PiiJsonValue, PiiString, ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -298,26 +298,6 @@ impl DataIdentifier {
         .into_iter()
         .flatten()
         .collect()
-    }
-
-    /// Returns true if the DI is allowed to be inserted into the specified vault kind
-    pub fn is_allowed_for(&self, vault_kind: VaultKind) -> bool {
-        // Keep full match statements here so we have to implement this any time there's a new
-        // VaultKind or DataIdentifierDiscriminant
-        match vault_kind {
-            VaultKind::Person => match self {
-                Self::Id(_)
-                | Self::Custom(_)
-                | Self::InvestorProfile(_)
-                | Self::Document(_)
-                | Self::Card(_) => true,
-                Self::Business(_) => false,
-            },
-            VaultKind::Business => match self {
-                Self::Business(_) | Self::Custom(_) => true,
-                Self::Id(_) | Self::InvestorProfile(_) | Self::Document(_) | Self::Card(_) => false,
-            },
-        }
     }
 }
 

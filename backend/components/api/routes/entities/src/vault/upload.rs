@@ -112,7 +112,7 @@ async fn post_upload_inner(
     let tenant_id: newtypes::TenantId = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let principal: DbActor = auth.actor().into();
-    let source = auth.source();
+    let source = auth.dl_source();
 
     // temporarily: block non custom/document objects
     match di {

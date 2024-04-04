@@ -140,9 +140,12 @@ impl<Type> VaultWrapper<Type> {
         &self,
         conn: &mut PgConn,
         request: DataRequest<Fingerprints>,
+        source: DataLifetimeSource,
         actor: Option<AuthActor>,
         for_replacing_ci: bool,
     ) -> ApiResult<ValidatedDataRequest> {
+        request.assert_allowed_for_vault(self.vault.kind)?;
+        request.assert_allowed_for_source(source)?;
         // Transform the request into a Vec<NewVaultData>
         let (data, json_fields, fingerprints) = request.decompose();
         let data = data

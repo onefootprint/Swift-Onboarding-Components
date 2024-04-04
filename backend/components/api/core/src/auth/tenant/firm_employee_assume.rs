@@ -193,7 +193,7 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
         self.token_scopes()
     }
 
-    fn source(&self) -> DataLifetimeSource {
+    fn dl_source(&self) -> DataLifetimeSource {
         DataLifetimeSource::Tenant
     }
 }

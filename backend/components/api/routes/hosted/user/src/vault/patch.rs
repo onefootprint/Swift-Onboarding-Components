@@ -15,8 +15,8 @@ use db::models::{
 use newtypes::{
     email::Email,
     put_data_request::{PatchDataRequest, RawDataRequest},
-    DataIdentifier, DataLifetimeSource, DocumentRequestKind, IdentityDataKind as IDK,
-    Iso3166TwoDigitCountryCode, ScopedVaultId, ValidateArgs, WorkflowGuard, WorkflowId,
+    DataIdentifier, DocumentRequestKind, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, ScopedVaultId,
+    ValidateArgs, WorkflowGuard, WorkflowId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
@@ -44,12 +44,12 @@ pub async fn post_validate(
     let PatchDataRequest { updates, .. } = request.into_inner().clean_and_validate(opts)?;
     let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
     let su_id = user_auth.scoped_user.id.clone();
+    let source = user_auth.user_session.dl_source();
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let vw = VaultWrapper::<Person>::build_for_tenant(conn, &su_id)?;
-            updates.assert_allowable_identifiers(vw.vault.kind)?;
-            vw.validate_request(conn, updates, None, false)?;
+            vw.validate_request(conn, updates, source, None, false)?;
             Ok(())
         })
         .await?;
@@ -85,12 +85,7 @@ pub async fn patch(
 
     let su_id = user_auth.scoped_user.id.clone();
     // TODO one day have a separate source for bootstrap too
-    let source = if user_auth.user_session.is_derived_from_components() {
-        // Denote when data was added via components SDK, since it could be tampered with
-        DataLifetimeSource::ComponentsSdk
-    } else {
-        DataLifetimeSource::Hosted
-    };
+    let source = user_auth.user_session.dl_source();
     let new_ci = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
