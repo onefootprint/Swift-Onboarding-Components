@@ -25,7 +25,6 @@ const RuleSetResults = ({
   <>
     {data && (
       <Content
-        obConfigurationId={data.obConfigurationId as string}
         ruleResults={
           data.ruleResults as Record<RuleAction, Record<string, Rule[]>>
         }

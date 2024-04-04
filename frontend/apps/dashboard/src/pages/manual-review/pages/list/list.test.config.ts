@@ -114,6 +114,9 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
       adverseMedia: false,
     },
     kind: OnboardingConfigKind.kyc,
+    ruleSet: {
+      version: 1,
+    },
   },
 ];
 

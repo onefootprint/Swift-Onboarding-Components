@@ -1,34 +1,51 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoFileText16 } from '@onefootprint/icons';
-import type { Rule } from '@onefootprint/types';
+import type { EditedRule, Rule } from '@onefootprint/types';
 import { RuleAction } from '@onefootprint/types';
-import { Button, Stack, Text } from '@onefootprint/ui';
+import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
+import { cloneDeep } from 'lodash';
 import kebabCase from 'lodash/kebabCase';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RulesActionRow from 'src/components/rules-action-row';
 import styled, { css } from 'styled-components';
 
+import type { AddedRuleWithId } from '../content';
 import EmptyActionRow from '../empty-action-row';
 
 export type ActionSectionProps = {
-  shouldAllowEditing: boolean;
-  playbookId: string;
+  isEditing: boolean;
   action: RuleAction;
   rules: Rule[];
+  onAdd: (rules: AddedRuleWithId[]) => void;
+  onDelete: (id: string) => void;
+  onEdit: (rule: EditedRule) => void;
+  onUndoDelete: (id: string) => void;
+  onUndoEdit: (id: string) => void;
+  onDeleteAdd: (tempId: string) => void;
 };
 
 const ActionSection = ({
-  shouldAllowEditing,
-  playbookId,
+  isEditing,
   action,
   rules,
+  onAdd,
+  onDelete,
+  onEdit,
+  onUndoDelete,
+  onUndoEdit,
+  onDeleteAdd,
 }: ActionSectionProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: `pages.playbooks.details.rules.action-section`,
   });
-  const [isAddingRule, setIsAddingRule] = useState(false);
+  const [addedRules, setAddedRules] = useState<AddedRuleWithId[]>([]);
+
+  useEffect(() => {
+    setAddedRules([]);
+  }, [rules, isEditing]);
+
   const isStepUpSubsection = [
     RuleAction.stepUpIdentity,
     RuleAction.stepUpPoA,
@@ -42,17 +59,13 @@ const ActionSection = ({
     'manual-review': 'warning',
     'pass-with-manual-review': 'success',
   };
-
-  const handleStartAdd = () => {
-    setIsAddingRule(true);
-  };
-
-  const handleEndAdd = () => {
-    setIsAddingRule(false);
-  };
-
   const actionTitle = (
-    <Stack direction="column" gap={1} textAlign="left">
+    <Stack
+      direction="column"
+      gap={1}
+      textAlign="left"
+      paddingBottom={showStepUpTitle ? 5 : 0}
+    >
       <Text variant="label-3" color={textColors[actionName]}>
         {t(`${actionName}.title` as ParseKeys<'common'>)}
       </Text>
@@ -62,70 +75,108 @@ const ActionSection = ({
     </Stack>
   );
 
-  const getRuleList = () => {
-    const emptyRow = (
-      <EmptyActionRow
-        playbookId={playbookId}
-        action={action}
-        onClick={handleEndAdd}
-      />
+  const handleAddEmptyRow = () => {
+    setAddedRules(currentRules => {
+      const newRules = cloneDeep(currentRules);
+      newRules.push({
+        tempId: `${action}_${currentRules.length}`,
+        ruleAction: action,
+        ruleExpression: [],
+      });
+      return newRules;
+    });
+  };
+
+  const handleEditEmptyRow = (rule: AddedRuleWithId) => {
+    setAddedRules(currentRules => {
+      const newRules = cloneDeep(currentRules);
+      const tempId = newRules.findIndex(
+        (r: AddedRuleWithId) => r.tempId === rule.tempId,
+      );
+      newRules[tempId] = rule;
+      onAdd(newRules);
+      return newRules;
+    });
+  };
+
+  const handleDeleteNewRow = (tempId: string) => {
+    setAddedRules(currentRules =>
+      currentRules.filter(rule => rule.tempId !== tempId),
     );
+    onDeleteAdd(tempId);
+  };
+
+  const getRuleList = () => {
+    const emptyRows = addedRules.map(rule => (
+      <EmptyActionRow
+        key={rule.tempId}
+        tempId={rule.tempId}
+        action={action}
+        onEdit={handleEditEmptyRow}
+        onDelete={handleDeleteNewRow}
+      />
+    ));
     if (rules.length) {
       return (
         <>
           {rules.map(rule => (
             <RulesActionRow
               key={JSON.stringify(rule)}
-              shouldAllowEditing={shouldAllowEditing}
-              playbookId={playbookId}
+              isEditing={isEditing}
               rule={rule}
+              onDelete={onDelete}
+              onEdit={onEdit}
+              onUndoDelete={onUndoDelete}
+              onUndoEdit={onUndoEdit}
             />
           ))}
-          {isAddingRule && emptyRow}
+          {addedRules.length > 0 && emptyRows}
         </>
       );
     }
-    return isAddingRule ? (
-      <EmptySection>{emptyRow}</EmptySection>
-    ) : (
-      <Text variant="body-4" color="tertiary">
-        {t('empty-rules')}
-      </Text>
+    return (
+      <EmptySection>
+        {addedRules.length > 0 ? (
+          emptyRows
+        ) : (
+          <Text
+            variant="body-4"
+            paddingTop={3}
+            paddingBottom={3}
+            paddingLeft={4}
+            paddingRight={4}
+          >
+            {t('empty-rules')}
+          </Text>
+        )}
+      </EmptySection>
     );
   };
 
   return (
     <Stack
       direction="column"
-      gap={2}
+      gap={1}
       role="group"
       aria-label={t(`${kebabCase(actionName)}.title` as ParseKeys<'common'>)}
     >
-      <Stack direction="column" gap={5}>
-        {showStepUpTitle && actionTitle}
-        <Stack align="center" justify="space-between">
-          {isStepUpSubsection ? (
-            <Stack align="center" gap={3}>
-              <IcoFileText16 />
-              <Text variant="label-4">
-                {t(`step-up.${kebabCase(action)}` as ParseKeys<'common'>)}
-              </Text>
-            </Stack>
-          ) : (
-            actionTitle
-          )}
-          {shouldAllowEditing && (
-            <Button
-              variant="secondary"
-              disabled={isAddingRule}
-              onClick={handleStartAdd}
-            >
-              {t('add-rule')}
-            </Button>
-          )}
-        </Stack>
-        <RuleList data-is-empty={!rules.length}>{getRuleList()}</RuleList>
+      {showStepUpTitle && actionTitle}
+      <Stack align="start" justify="space-between">
+        {isStepUpSubsection ? (
+          <Stack align="center" gap={3}>
+            <IcoFileText16 />
+            <Text variant="label-4">
+              {t(`step-up.${kebabCase(action)}` as ParseKeys<'common'>)}
+            </Text>
+          </Stack>
+        ) : (
+          actionTitle
+        )}
+        {isEditing && (
+          <LinkButton onClick={handleAddEmptyRow}>{t('add-rule')}</LinkButton>
+        )}
       </Stack>
+      <RuleList data-is-empty={!rules.length}>{getRuleList()}</RuleList>
     </Stack>
   );
 };
@@ -137,6 +188,7 @@ const RuleList = styled.div`
     &[data-is-empty='false'] {
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
       border-radius: ${theme.borderRadius.default};
+      background-color: ${theme.backgroundColor.primary};
     }
   `}
 `;
@@ -145,6 +197,7 @@ const EmptySection = styled.div`
   ${({ theme }) => css`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
+    background-color: ${theme.backgroundColor.primary};
   `}
 `;
 

@@ -9,10 +9,11 @@ import useRules from './hooks/use-rules';
 
 export type RulesProps = {
   playbook: OnboardingConfig;
+  toggleDisableHeading: (disable: boolean) => void;
 };
 
-const Rules = ({ playbook: { id, kind, isRulesEnabled } }: RulesProps) => {
-  const { response, isLoading, error } = useRules(id);
+const Rules = ({ playbook, toggleDisableHeading }: RulesProps) => {
+  const { response, isLoading, error } = useRules(playbook.id);
   const isFirmEmployee = !!useSession().data.user?.isFirmEmployee;
 
   return (
@@ -20,10 +21,10 @@ const Rules = ({ playbook: { id, kind, isRulesEnabled } }: RulesProps) => {
       {response && (
         <Content
           hasRules={response.hasRules}
-          playbookKind={kind}
-          playbookId={id}
-          shouldAllowEditing={isRulesEnabled || isFirmEmployee}
+          playbook={playbook}
+          shouldAllowEditing={playbook.isRulesEnabled || isFirmEmployee}
           actionRules={response.data}
+          toggleDisableHeading={toggleDisableHeading}
         />
       )}
       {isLoading && <Loading />}

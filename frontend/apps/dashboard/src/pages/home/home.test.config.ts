@@ -69,6 +69,9 @@ export const playbooksFixture: OnboardingConfig[] = [
       adverseMedia: false,
     },
     kind: OnboardingConfigKind.kyc,
+    ruleSet: {
+      version: 1,
+    },
   },
   {
     id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',
@@ -98,6 +101,9 @@ export const playbooksFixture: OnboardingConfig[] = [
       adverseMedia: false,
     },
     kind: OnboardingConfigKind.kyb,
+    ruleSet: {
+      version: 1,
+    },
   },
   {
     id: 'ob_config_id_m35ER0O2UEaAOHyZa0oAKR',
@@ -127,6 +133,9 @@ export const playbooksFixture: OnboardingConfig[] = [
       adverseMedia: false,
     },
     kind: OnboardingConfigKind.auth,
+    ruleSet: {
+      version: 1,
+    },
   },
 ];
 

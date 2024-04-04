@@ -37,6 +37,9 @@ export const playbookDetailsFixture: OnboardingConfig = {
   optionalData: [],
   skipKyc: false,
   status: OnboardingConfigStatus.enabled,
+  ruleSet: {
+    version: 1,
+  },
 };
 
 export const withPlaybookDetails = (

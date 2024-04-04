@@ -2492,6 +2492,15 @@
             "view-only-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access.",
             "view-only-kyb-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access. Please also note these are only applied when verifying a Business Owner's identity."
           },
+          "edit-bar": {
+            "editing-rules": "Editing rules",
+            "tooltip": "Changes will only take effect if you click \"Save changes\"",
+            "save-changes": "Save changes"
+          },
+          "success-toast": {
+            "title": "Success!",
+            "description": "Changes saved."
+          },
           "action-section": {
             "fail": {
               "title": "Fail",
@@ -2508,12 +2517,18 @@
               "step-up-proof-of-address": "Proof of Address",
               "step-up-identity": "Identity document"
             },
+            "step-up-proof-of-address": {
+              "title": "Step-up: Proof of Address"
+            },
+            "step-up-identity": {
+              "title": "Step-up: Identity document"
+            },
             "pass-with-manual-review": {
               "title": "Pass + Manual review",
               "subtitle": "User will be onboarded, but should be manually reviewed"
             },
             "add-rule": "Add rule",
-            "empty-rules": "There are no rules for this outcome."
+            "empty-rules": "No rule has been configured."
           },
           "action-row": {
             "if": "if ",
@@ -2522,22 +2537,19 @@
             "add": "and",
             "delete": "Delete rule",
             "empty-aria-label": "Empty rule",
-            "delete-confirmation": {
-              "title": "Are you sure you want to delete this rule?",
-              "confirm": "Delete"
-            },
-            "success-toast": {
-              "title": "Success!",
-              "add-description": "Rule added.",
-              "edit-description": "Rule edited.",
-              "delete-description": "Rule deleted."
-            },
             "risk-signals-select": {
               "title": "Risk signals",
               "aria-label": "Open risk signals select",
               "placeholder": "Select...",
               "delete": "Delete",
               "search": "Search by name or description"
+            },
+            "pending-change": "Pending change",
+            "pending-deletion": "Pending deletion",
+            "delete-toast": {
+              "title": "Rule is pending deletion",
+              "description": "This will only take effect if you save your changes",
+              "undo": "Undo"
             }
           }
         }

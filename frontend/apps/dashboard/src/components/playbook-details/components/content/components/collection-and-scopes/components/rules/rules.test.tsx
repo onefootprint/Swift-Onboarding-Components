@@ -16,15 +16,12 @@ import {
   isPrecededByNotBadge,
   kybPlaybookFixture,
   kycPlaybookFixture,
-  passRuleFixture,
+  manualReviewRuleFixture,
   rulesFixture,
   selectOption,
-  startAdding,
   startEditing,
   stepUpRuleFixture,
-  withAddRule,
-  withDeleteRule,
-  withEditRule,
+  withEditRules,
   withRiskSignals,
   withRules,
   withRulesError,
@@ -33,7 +30,7 @@ import {
 const renderRules = ({
   playbook = kycPlaybookFixture,
 }: Partial<RulesProps>) => {
-  customRender(<Rules playbook={playbook} />);
+  customRender(<Rules playbook={playbook} toggleDisableHeading={jest.fn()} />);
 };
 
 const renderRulesAndWaitFinishLoading = async () => {
@@ -69,13 +66,13 @@ describe('<Rules />', () => {
       it('should show all rules', async () => {
         await renderRulesAndWaitFinishLoading();
 
-        const nots = screen.queryAllByText('not');
+        const nots = screen.getAllByText('not');
         expect(nots).toHaveLength(1);
 
         const failSection = screen.getByRole('group', {
           name: 'Fail',
         });
-        const failRows = within(failSection).queryAllByRole('row');
+        const failRows = within(failSection).getAllByRole('row');
         expect(failRows).toHaveLength(3);
 
         // Check alphabetical sorting and that "not" precedes the correct field
@@ -102,7 +99,7 @@ describe('<Rules />', () => {
         const manualRevSection = screen.getByRole('group', {
           name: 'Fail + Manual review',
         });
-        const manRevRows = within(manualRevSection).queryAllByRole('row');
+        const manRevRows = within(manualRevSection).getAllByRole('row');
         expect(manRevRows).toHaveLength(1);
         expect(
           within(manRevRows[0]).getByText('watchlist_hit_ofac'),
@@ -111,7 +108,7 @@ describe('<Rules />', () => {
         const passSection = screen.getByRole('group', {
           name: 'Pass + Manual review',
         });
-        const passRows = within(passSection).queryAllByRole('row');
+        const passRows = within(passSection).getAllByRole('row');
         expect(passRows).toHaveLength(1);
         expect(
           within(passRows[0]).getByText(
@@ -120,195 +117,150 @@ describe('<Rules />', () => {
         ).toBeInTheDocument();
       });
 
-      it("should edit 'not' correctly", async () => {
-        withEditRule({
-          ...rulesFixture[2],
-          ruleExpression: [
-            {
-              field: 'id_not_located',
-              op: RuleOp.notEq,
-              value: true,
-            },
-            {
-              field: 'adverse_media_hit',
-              op: RuleOp.eq,
-              value: true,
-            },
-          ],
-        });
+      it('should change the display correctly once editing', async () => {
         await renderRulesAndWaitFinishLoading();
-        const { row } = await startEditing('Fail');
 
-        const notBadge = within(row).getByText('not');
+        expect(
+          screen.getByRole('button', {
+            name: 'Edit',
+          }),
+        ).toBeInTheDocument();
+        expect(
+          screen.queryByRole('button', {
+            name: 'Add rule',
+          }),
+        ).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('button', {
+            name: 'and',
+          }),
+        ).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('button', {
+            name: 'delete',
+          }),
+        ).not.toBeInTheDocument();
+
+        await startEditing();
+        expect(
+          screen.getAllByRole('button', {
+            name: 'Add rule',
+          }).length,
+        ).toEqual(6);
+        expect(
+          screen.getAllByRole('button', {
+            name: 'and',
+          }).length,
+        ).toEqual(5);
+        expect(
+          screen.getAllByRole('button', {
+            name: 'delete',
+          }).length,
+        ).toEqual(5);
+        expect(
+          screen.getByRole('button', {
+            name: 'Save changes',
+          }),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', {
+            name: 'Cancel',
+          }),
+        ).toBeInTheDocument();
+      });
+
+      it('should edit existing rules correctly', async () => {
+        withEditRules([
+          {
+            ...rulesFixture[2],
+            ruleExpression: [
+              {
+                field: 'address_alert_longevity',
+                op: RuleOp.notEq,
+                value: true,
+              },
+            ],
+          },
+          {
+            ...rulesFixture[4],
+            ruleExpression: [
+              {
+                field: 'document_is_permit_or_provisional_license',
+                op: RuleOp.eq,
+                value: true,
+              },
+              {
+                field: 'name_matches',
+                op: RuleOp.eq,
+                value: true,
+              },
+            ],
+          },
+        ]);
+        await renderRulesAndWaitFinishLoading();
+        await startEditing();
+
+        // Edit Fail 'id_flagged' rule's not toggle and field
+        const failSection = screen.getByRole('group', {
+          name: 'Fail',
+        });
+        const [failRow] = within(failSection).getAllByRole('row');
+
+        const notBadge = within(failRow).getByText('not');
         await userEvent.click(notBadge);
         await waitFor(() => {
           expect(notBadge).toHaveAttribute('data-is-selected', 'true');
         });
-      });
-
-      it('should edit the risk signal correctly', async () => {
-        withEditRule({
-          ...rulesFixture[2],
-          ruleExpression: [
-            {
-              field: 'id_not_located',
-              op: RuleOp.notEq,
-              value: true,
-            },
-            {
-              field: 'adverse_media_hit',
-              op: RuleOp.eq,
-              value: true,
-            },
-          ],
+        await waitFor(() => {
+          expect(
+            within(failRow).getByText('Pending change'),
+          ).toBeInTheDocument();
         });
-        await renderRulesAndWaitFinishLoading();
-        const { row } = await startEditing('Fail');
 
-        const selectTrigger = within(row).getByText('id_flagged');
-        await userEvent.click(selectTrigger);
-
+        const failSelectTrigger = within(failRow).getByText('id_flagged');
+        await userEvent.click(failSelectTrigger);
         await screen.findByRole('listbox', {
           name: 'Risk signals',
         });
         await selectOption('address_alert_longevity');
-
         await waitFor(() => {
-          const selectList = within(row).queryByRole('listbox', {
-            name: 'Risk signals',
-          });
-          expect(selectList).not.toBeInTheDocument();
-        });
-      });
-
-      it('should cancel editing the not toggle correctly', async () => {
-        await renderRulesAndWaitFinishLoading();
-        const { section, row } = await startEditing('Fail + Manual review');
-
-        const cancelButton = within(row).getByRole('button', {
-          name: 'Cancel',
-        });
-        await userEvent.click(cancelButton);
-        await waitFor(() => {
-          expect(cancelButton).not.toBeInTheDocument();
-        });
-
-        const nots = within(section).queryAllByText('not');
-        expect(nots).toHaveLength(0);
-      });
-
-      it('should cancel editing the risk signal code correctly', async () => {
-        await renderRulesAndWaitFinishLoading();
-        const { row } = await startEditing('Fail + Manual review');
-
-        const selectTrigger = within(row).getByText('watchlist_hit_ofac');
-        await userEvent.click(selectTrigger);
-
-        await screen.findByRole('listbox', {
-          name: 'Risk signals',
-        });
-        await selectOption('subject_deceased');
-        await waitFor(() => {
-          const selectList = within(row).queryByRole('listbox', {
+          const selectList = within(failRow).queryByRole('listbox', {
             name: 'Risk signals',
           });
           expect(selectList).not.toBeInTheDocument();
         });
 
-        const cancelButton = within(row).getByRole('button', {
-          name: 'Cancel',
+        // Edit Pass 'document_is_permit_or_provisional_license' rule by adding a not field
+        const passSection = screen.getByRole('group', {
+          name: 'Pass + Manual review',
         });
-        await userEvent.click(cancelButton);
-        await waitFor(() => {
-          expect(cancelButton).not.toBeInTheDocument();
+        const passRow = within(passSection).getByRole('row');
+
+        const addFieldButton = within(passRow).getByRole('button', {
+          name: 'and',
         });
-      });
-
-      it('should delete a rule correctly', async () => {
-        withDeleteRule(passRuleFixture.ruleId);
-        await renderRulesAndWaitFinishLoading();
-        const { row } = await startEditing('Pass + Manual review');
-
-        const deleteButton = within(row).getByText('Delete rule');
-        await userEvent.click(deleteButton);
-
+        await userEvent.click(addFieldButton);
         await waitFor(() => {
-          const confirmation = screen.getByText(
-            'Are you sure you want to delete this rule?',
-          );
-          expect(confirmation).toBeInTheDocument();
-        });
-
-        const deleteConfirmButton = within(row).getByText('Delete');
-        await userEvent.click(deleteConfirmButton);
-        await waitForElementToBeRemoved(deleteConfirmButton);
-
-        await waitFor(() => {
-          const toastTitle = screen.getByText('Success!');
-          expect(toastTitle).toBeInTheDocument();
+          expect(addFieldButton).toBeDisabled();
         });
         await waitFor(() => {
-          const toastMessage = screen.getByText('Rule deleted.');
-          expect(toastMessage).toBeInTheDocument();
+          expect(
+            within(failRow).getByText('Pending change'),
+          ).toBeInTheDocument();
         });
-      });
 
-      it('should cancel deleting a rule correctly', async () => {
-        withDeleteRule(passRuleFixture.ruleId);
-        await renderRulesAndWaitFinishLoading();
-        const { row } = await startEditing('Pass + Manual review');
-
-        await userEvent.click(within(row).getByText('Delete rule'));
-
+        const newNotBadge = within(passRow).getAllByText('not')[1];
+        await userEvent.click(newNotBadge);
         await waitFor(() => {
-          const confirmation = screen.getByText(
-            'Are you sure you want to delete this rule?',
-          );
-          expect(confirmation).toBeInTheDocument();
+          expect(newNotBadge).toHaveAttribute('data-is-selected', 'true');
         });
 
-        const deleteCancelButton = within(row).getByText('Cancel');
-        await userEvent.click(deleteCancelButton);
-
-        await waitFor(() => {
-          expect(within(row).getByText('Delete rule')).toBeInTheDocument();
-        });
-      });
-
-      it('should add a rule to an empty section correctly', async () => {
-        withAddRule(stepUpRuleFixture);
-        await renderRulesAndWaitFinishLoading();
-        await startAdding('Step-up');
-
-        const stepUpSection = screen.getByRole('group', {
-          name: 'Step-up',
-        });
-        const addRuleButton = within(stepUpSection).getAllByRole('button', {
-          name: 'Add rule',
-        })[0];
-        await userEvent.click(addRuleButton);
-        await waitFor(() => {
-          expect(addRuleButton).toBeDisabled();
-        });
-
-        const rows = within(stepUpSection).queryAllByRole('row');
-        expect(rows).toHaveLength(1);
-
-        const newRuleRow = rows[0];
-        const notBadge = within(newRuleRow).getByText('not');
-        await userEvent.click(notBadge);
-        await waitFor(() => {
-          expect(notBadge).toHaveAttribute('data-is-selected', 'true');
-        });
-
-        const selectTrigger = within(newRuleRow).getByText('Select...');
-        await userEvent.click(selectTrigger);
+        const passSelectTrigger = within(passRow).getByText('Select...');
+        await userEvent.click(passSelectTrigger);
         await screen.findByRole('listbox', {
           name: 'Risk signals',
         });
-
-        await selectOption('dob_does_not_match');
-
+        await selectOption('name_matches');
         await waitFor(() => {
           expect(
             screen.queryByRole('listbox', {
@@ -317,60 +269,431 @@ describe('<Rules />', () => {
           ).not.toBeInTheDocument();
         });
 
-        const saveButton = within(newRuleRow).getByRole('button', {
-          name: 'Save',
+        // Save edits
+        const saveButton = screen.getByRole('button', {
+          name: 'Save changes',
         });
         await userEvent.click(saveButton);
         await waitFor(() => {
-          expect(saveButton).not.toBeInTheDocument();
+          expect(
+            screen.queryByRole('button', {
+              name: 'Save changes',
+            }),
+          ).not.toBeInTheDocument();
+        });
+
+        // New rules are displayed
+        const editedFailSection = screen.getByRole('group', {
+          name: 'Fail',
+        });
+        const failRows = within(editedFailSection).getAllByRole('row');
+        await waitFor(() => {
+          expect(failRows).toHaveLength(3);
+        });
+        await waitFor(() => {
+          expect(
+            within(failRows[0]).getByText('address_alert_longevity'),
+          ).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          expect(
+            isPrecededByNotBadge({
+              row: failRows[0],
+              text: 'address_alert_longevity',
+            }),
+          ).toEqual(true);
+        });
+
+        const editedPassSection = screen.getByRole('group', {
+          name: 'Pass + Manual review',
+        });
+        const newPassRow = within(editedPassSection).getByRole('row');
+        await waitFor(() => {
+          expect(
+            within(newPassRow).getByText(
+              'document_is_permit_or_provisional_license',
+            ),
+          ).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          expect(
+            within(newPassRow).getByText('name_matches'),
+          ).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          expect(
+            isPrecededByNotBadge({
+              row: newPassRow,
+              text: 'name_matches',
+            }),
+          ).toEqual(true);
         });
 
         await waitFor(() => {
-          const confirmationTitle = screen.getByText('Success!');
-          expect(confirmationTitle).toBeInTheDocument();
-        });
-        await waitFor(() => {
-          const confirmationMessage = screen.getByText('Rule added.');
-          expect(confirmationMessage).toBeInTheDocument();
+          expect(screen.queryAllByText('Pending change').length).toEqual(0);
         });
       });
 
-      it('should cancel an added rule correctly', async () => {
+      it('should delete and add multiple rules correctly', async () => {
+        withEditRules([
+          ...rulesFixture.slice(1, 4),
+          stepUpRuleFixture,
+          {
+            ...manualReviewRuleFixture,
+            ruleId: 'newId',
+            ruleExpression: [
+              { field: 'id_flagged', op: RuleOp.eq, value: true },
+            ],
+          },
+        ]);
         await renderRulesAndWaitFinishLoading();
+        await startEditing();
 
-        const { section } = await startAdding('Pass + Manual review');
-        const row = within(section).queryAllByRole('row')[1];
+        // Delete Fail 'id_flagged' rule
+        const failSection = screen.getByRole('group', {
+          name: 'Fail',
+        });
+        const [failRow] = within(failSection).getAllByRole('row');
+        await userEvent.click(
+          within(failRow).getByRole('button', {
+            name: 'delete',
+          }),
+        );
+        await waitFor(() => {
+          expect(
+            within(failRow).getByText('Pending deletion'),
+          ).toBeInTheDocument();
+        });
 
-        const notBadge = within(row).getByText('not');
+        // Delete Pass 'document_is_permit_or_provisional_license' rule
+        const passSection = screen.getByRole('group', {
+          name: 'Pass + Manual review',
+        });
+        const passRow = within(passSection).getByRole('row');
+        await userEvent.click(
+          within(passRow).getByRole('button', {
+            name: 'delete',
+          }),
+        );
+        await waitFor(() => {
+          expect(
+            within(passRow).getByText('Pending deletion'),
+          ).toBeInTheDocument();
+        });
+
+        // Add 'dob_does_not_match' rule to empty Step-up section
+        const stepUpSection = screen.getByRole('group', {
+          name: 'Step-up',
+        });
+        await userEvent.click(
+          within(stepUpSection).getByRole('button', {
+            name: 'Add rule',
+          }),
+        );
+        await waitFor(() => {
+          expect(
+            within(stepUpSection).queryByText('No rule has been configured.'),
+          ).not.toBeInTheDocument();
+        });
+
+        const stepUpRow = within(stepUpSection).getByRole('row');
+        const stepUpTrigger = within(stepUpRow).getByText('Select...');
+        await userEvent.click(stepUpTrigger);
+        await screen.findByRole('listbox', {
+          name: 'Risk signals',
+        });
+        await selectOption('dob_does_not_match');
+        await waitFor(() => {
+          expect(
+            screen.queryByRole('listbox', {
+              name: 'Risk signals',
+            }),
+          ).not.toBeInTheDocument();
+        });
+
+        // Add 'id_flagged' rule to Manual review
+        const manRevSection = screen.getByRole('group', {
+          name: 'Fail + Manual review',
+        });
+        await userEvent.click(
+          within(manRevSection).getByRole('button', {
+            name: 'Add rule',
+          }),
+        );
+        await waitFor(() => {
+          expect(within(manRevSection).getAllByRole('row').length).toEqual(2);
+        });
+
+        const manRevRow = within(manRevSection).getAllByRole('row')[1];
+        const manRevTrigger = within(manRevRow).getByText('Select...');
+        await userEvent.click(manRevTrigger);
+        await screen.findByRole('listbox', {
+          name: 'Risk signals',
+        });
+        await selectOption('id_flagged');
+        await waitFor(() => {
+          expect(
+            screen.queryByRole('listbox', {
+              name: 'Risk signals',
+            }),
+          ).not.toBeInTheDocument();
+        });
+
+        // Save edits
+        const saveButton = screen.getByRole('button', {
+          name: 'Save changes',
+        });
+        await userEvent.click(saveButton);
+        await waitFor(() => {
+          expect(
+            screen.queryByRole('button', {
+              name: 'Save changes',
+            }),
+          ).not.toBeInTheDocument();
+        });
+
+        // New rules are displayed
+        const editedStepUpSection = screen.getByRole('group', {
+          name: 'Step-up',
+        });
+        expect(
+          within(within(editedStepUpSection).getByRole('row')).getByText(
+            'dob_does_not_match',
+          ),
+        ).toBeInTheDocument();
+
+        const editedManRevSection = screen.getByRole('group', {
+          name: 'Fail + Manual review',
+        });
+        const manRevRows = within(editedManRevSection).getAllByRole('row');
+        expect(manRevRows.length).toEqual(2);
+        expect(
+          within(manRevRows[1]).getByText('id_flagged'),
+        ).toBeInTheDocument();
+      });
+
+      it('should undo edits and deletions and delete added rule rows correctly', async () => {
+        await renderRulesAndWaitFinishLoading();
+        await startEditing();
+
+        // Edit Fail 'id_flagged' rule's not toggle and field, then undo
+        const failSection = screen.getByRole('group', {
+          name: 'Fail',
+        });
+        const failRows = within(failSection).getAllByRole('row');
+        const notBadge = within(failRows[0]).getByText('not');
         await userEvent.click(notBadge);
         await waitFor(() => {
           expect(notBadge).toHaveAttribute('data-is-selected', 'true');
         });
-
-        const selectTrigger = within(row).getByText('Select...');
-        await userEvent.click(selectTrigger);
+        await waitFor(() => {
+          expect(
+            within(failRows[0]).getByText('Pending change'),
+          ).toBeInTheDocument();
+        });
+        const failSelectTrigger = within(failRows[0]).getByText('id_flagged');
+        await userEvent.click(failSelectTrigger);
         await screen.findByRole('listbox', {
           name: 'Risk signals',
         });
-
-        await selectOption('name_matches');
+        await selectOption('address_alert_longevity');
         await waitFor(() => {
-          const selectList = within(row).queryByRole('listbox', {
+          const selectList = within(failRows[0]).queryByRole('listbox', {
             name: 'Risk signals',
           });
           expect(selectList).not.toBeInTheDocument();
         });
 
-        const cancelButton = within(row).getByRole('button', {
+        const undoButton1 = within(failRows[0]).getByRole('button', {
+          name: 'undo',
+        });
+        await userEvent.click(undoButton1);
+        await waitFor(() => {
+          expect(undoButton1).not.toBeInTheDocument();
+        });
+
+        // Save should be disabled since there are no edits
+        await waitFor(() => {
+          expect(
+            screen.getByRole('button', { name: 'Save changes' }),
+          ).toBeDisabled();
+        });
+
+        // Delete Fail 'subject_deceased' rule, then undo
+        await userEvent.click(
+          within(failRows[2]).getByRole('button', {
+            name: 'delete',
+          }),
+        );
+        await waitFor(() => {
+          expect(
+            within(failRows[2]).getByText('Pending deletion'),
+          ).toBeInTheDocument();
+        });
+
+        const undoButton2 = within(failRows[2]).getByRole('button', {
+          name: 'undo',
+        });
+        await userEvent.click(undoButton2);
+        await waitFor(() => {
+          expect(undoButton2).not.toBeInTheDocument();
+        });
+
+        // Save should be disabled since there are no edits
+        await waitFor(() => {
+          expect(
+            screen.getByRole('button', { name: 'Save changes' }),
+          ).toBeDisabled();
+        });
+
+        // Add rule to Manual review, then delete it before saving
+        const manRevSection = screen.getByRole('group', {
+          name: 'Fail + Manual review',
+        });
+        await userEvent.click(
+          within(manRevSection).getByRole('button', {
+            name: 'Add rule',
+          }),
+        );
+        await waitFor(() => {
+          expect(within(manRevSection).getAllByRole('row').length).toEqual(2);
+        });
+        await userEvent.click(
+          within(within(manRevSection).getAllByRole('row')[1]).getByRole(
+            'button',
+            {
+              name: 'delete',
+            },
+          ),
+        );
+        await waitFor(() => {
+          expect(within(manRevSection).getAllByRole('row').length).toEqual(1);
+        });
+
+        // Save should be disabled since there are no edits
+        await waitFor(() => {
+          expect(
+            screen.getByRole('button', { name: 'Save changes' }),
+          ).toBeDisabled();
+        });
+      });
+
+      it('should cancel edits, adds, and deletes correctly', async () => {
+        await renderRulesAndWaitFinishLoading();
+        await startEditing();
+
+        // Edit Fail 'id_flagged' rule's not toggle and field
+        const failSection = screen.getByRole('group', {
+          name: 'Fail',
+        });
+        const failRows = within(failSection).getAllByRole('row');
+
+        const notBadge = within(failRows[0]).getByText('not');
+        await userEvent.click(notBadge);
+        await waitFor(() => {
+          expect(notBadge).toHaveAttribute('data-is-selected', 'true');
+        });
+
+        const failSelectTrigger = within(failRows[0]).getByText('id_flagged');
+        await userEvent.click(failSelectTrigger);
+        await screen.findByRole('listbox', {
+          name: 'Risk signals',
+        });
+        await selectOption('address_alert_longevity');
+        await waitFor(() => {
+          const selectList = within(failRows[0]).queryByRole('listbox', {
+            name: 'Risk signals',
+          });
+          expect(selectList).not.toBeInTheDocument();
+        });
+
+        // Delete Fail 'subject_deceased' rule
+        await userEvent.click(
+          within(failRows[2]).getByRole('button', {
+            name: 'delete',
+          }),
+        );
+        await waitFor(() => {
+          expect(
+            within(failRows[2]).getByText('Pending deletion'),
+          ).toBeInTheDocument();
+        });
+
+        // Delete Pass 'document_is_permit_or_provisional_license' rule
+        const passSection = screen.getByRole('group', {
+          name: 'Pass + Manual review',
+        });
+        const passRow = within(passSection).getByRole('row');
+        await userEvent.click(
+          within(passRow).getByRole('button', {
+            name: 'delete',
+          }),
+        );
+        await waitFor(() => {
+          expect(
+            within(passRow).getByText('Pending deletion'),
+          ).toBeInTheDocument();
+        });
+
+        // Add 'dob_does_not_match' rule to empty Step-up section
+        const stepUpSection = screen.getByRole('group', {
+          name: 'Step-up',
+        });
+        await userEvent.click(
+          within(stepUpSection).getByRole('button', {
+            name: 'Add rule',
+          }),
+        );
+        await waitFor(() => {
+          expect(
+            within(stepUpSection).queryByText('No rule has been configured.'),
+          ).not.toBeInTheDocument();
+        });
+
+        const stepUpRow = within(stepUpSection).getByRole('row');
+        const stepUpTrigger = within(stepUpRow).getByText('Select...');
+        await userEvent.click(stepUpTrigger);
+        await screen.findByRole('listbox', {
+          name: 'Risk signals',
+        });
+        await selectOption('dob_does_not_match');
+        await waitFor(() => {
+          expect(
+            screen.queryByRole('listbox', {
+              name: 'Risk signals',
+            }),
+          ).not.toBeInTheDocument();
+        });
+
+        // Cancel changes
+        const cancelButton = screen.getByRole('button', {
           name: 'Cancel',
         });
         await userEvent.click(cancelButton);
         await waitFor(() => {
-          expect(cancelButton).not.toBeInTheDocument();
+          expect(
+            screen.queryByRole('button', {
+              name: 'Cancel',
+            }),
+          ).not.toBeInTheDocument();
         });
 
-        const nots = within(section).queryAllByText('not');
-        expect(nots).toHaveLength(0);
+        // No changes are made
+        expect(screen.queryAllByText('Pending change').length).toEqual(0);
+        expect(screen.queryAllByText('Pending deletion').length).toEqual(0);
+
+        expect(within(failSection).getAllByRole('row')).toHaveLength(3);
+        expect(within(failRows[0]).getByText('id_flagged')).toBeInTheDocument();
+        expect(
+          within(failRows[2]).getByText('subject_deceased'),
+        ).toBeInTheDocument();
+
+        const passRows = within(passSection).getAllByRole('row');
+        expect(passRows).toHaveLength(1);
+
+        expect(
+          within(stepUpSection).getByText('No rule has been configured.'),
+        ).toBeInTheDocument();
       });
     });
   });

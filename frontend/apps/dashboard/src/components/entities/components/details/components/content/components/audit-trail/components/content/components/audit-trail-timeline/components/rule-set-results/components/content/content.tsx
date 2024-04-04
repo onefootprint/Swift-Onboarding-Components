@@ -11,16 +11,11 @@ import styled, { css } from 'styled-components';
 import ActionResultSection from './components/action-result-section';
 
 export type ContentProps = {
-  obConfigurationId: string;
   ruleResults: Record<RuleAction, Record<string, Rule[]>>;
   actionTriggered: RuleAction;
 };
 
-const Content = ({
-  obConfigurationId,
-  ruleResults,
-  actionTriggered,
-}: ContentProps) => {
+const Content = ({ ruleResults, actionTriggered }: ContentProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
   });
@@ -53,7 +48,6 @@ const Content = ({
       {Object.values(RuleActionSection).map(actionSection => (
         <ActionResultSection
           key={actionSection}
-          obConfigurationId={obConfigurationId}
           actionSection={actionSection}
           data={ruleResults}
         />

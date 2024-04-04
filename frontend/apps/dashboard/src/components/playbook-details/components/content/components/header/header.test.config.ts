@@ -34,6 +34,9 @@ const onboardingConfigFixture: OnboardingConfig = {
   optionalData: [],
   skipKyc: false,
   status: OnboardingConfigStatus.enabled,
+  ruleSet: {
+    version: 1,
+  },
 };
 
 export default onboardingConfigFixture;

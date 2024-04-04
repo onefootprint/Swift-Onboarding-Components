@@ -9,16 +9,11 @@ import RulesActionRow from 'src/components/rules-action-row';
 import styled, { css } from 'styled-components';
 
 export type RuleListProps = {
-  obConfigurationId: string;
   rules: Rule[];
   stepUpAction?: RuleAction;
 };
 
-const RuleList = ({
-  obConfigurationId,
-  rules,
-  stepUpAction,
-}: RuleListProps) => {
+const RuleList = ({ rules, stepUpAction }: RuleListProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
   });
@@ -44,8 +39,7 @@ const RuleList = ({
           {rules.map(rule => (
             <RulesActionRow
               key={JSON.stringify(rule)}
-              shouldAllowEditing={false}
-              playbookId={obConfigurationId}
+              isEditing={false}
               rule={rule}
             />
           ))}

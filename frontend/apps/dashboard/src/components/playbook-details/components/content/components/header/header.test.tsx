@@ -4,15 +4,15 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
+import type { OnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, asUserWithScope, resetUser } from 'src/config/tests';
 
-import type { HeaderProps } from './header';
 import Header from './header';
 import onboardingConfigFixture from './header.test.config';
 
-const renderHeader = ({ playbook = onboardingConfigFixture }: HeaderProps) => {
-  customRender(<Header playbook={playbook} />);
+const renderHeader = (playbook: OnboardingConfig = onboardingConfigFixture) => {
+  customRender(<Header playbook={playbook} isDisabled={false} />);
 };
 
 describe('<InfoSection />', () => {
@@ -25,13 +25,13 @@ describe('<InfoSection />', () => {
   });
 
   it('should render edit button and no form when not editing', () => {
-    renderHeader({ playbook: onboardingConfigFixture });
+    renderHeader(onboardingConfigFixture);
     expect(screen.getByText('Edit playbook name')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
   it('should render expected basic information when not editing', () => {
-    renderHeader({ playbook: onboardingConfigFixture });
+    renderHeader(onboardingConfigFixture);
     expect(screen.getByText('KYC')).toBeInTheDocument();
     expect(screen.getByText('Test playbook')).toBeInTheDocument();
     expect(
@@ -40,7 +40,7 @@ describe('<InfoSection />', () => {
   });
 
   it('should render form with expected values when editing', async () => {
-    renderHeader({ playbook: onboardingConfigFixture });
+    renderHeader(onboardingConfigFixture);
 
     const edit = screen.getByRole('button', { name: 'Edit playbook name' });
     await userEvent.click(edit);
@@ -57,9 +57,7 @@ describe('<InfoSection />', () => {
     });
 
     it('should show a tooltip and disallow editing', async () => {
-      renderHeader({
-        playbook: onboardingConfigFixture,
-      });
+      renderHeader(onboardingConfigFixture);
 
       const edit = screen.getByText('Edit playbook name');
       await userEvent.hover(edit);

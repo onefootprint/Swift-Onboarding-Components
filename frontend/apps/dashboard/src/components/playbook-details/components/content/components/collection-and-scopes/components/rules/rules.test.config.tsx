@@ -61,6 +61,9 @@ export const kycPlaybookFixture: OnboardingConfig = {
     adverseMedia: false,
   },
   kind: OnboardingConfigKind.kyc,
+  ruleSet: {
+    version: 1,
+  },
 };
 
 export const kybPlaybookFixture: OnboardingConfig = {
@@ -113,9 +116,12 @@ export const kybPlaybookFixture: OnboardingConfig = {
     adverseMedia: false,
   },
   kind: OnboardingConfigKind.kyb,
+  ruleSet: {
+    version: 1,
+  },
 };
 
-export const multiFieldRuleFixture = {
+export const failMultiFieldRuleFixture = {
   ruleId: 'rule_Zr3KN36uSLD9hTuiHbJHVz',
   action: RuleAction.fail,
   createdAt: '2021-11-26T16:52:52.535896Z',
@@ -183,7 +189,7 @@ export const rulesFixture: Rule[] = [
     ],
     isShadow: false,
   },
-  multiFieldRuleFixture,
+  failMultiFieldRuleFixture,
   {
     ruleId: 'rule_sufY6KAthSHuaWS9bzo8xt',
     action: RuleAction.fail,
@@ -208,18 +214,18 @@ export const selectOption = async (label: string) => {
   await fireEvent.keyDown(newOption, { key: 'Enter' });
 };
 
-export const startEditing = async (title: string) => {
-  const section = screen.getByRole('group', {
-    name: title,
+export const startEditing = async () => {
+  const editButton = screen.getByRole('button', {
+    name: 'Edit',
   });
-  const [row] = within(section).queryAllByRole('row');
-
-  const editButton = within(row).getByText('Edit');
   await userEvent.click(editButton);
   await waitFor(() => {
-    expect(within(row).queryByText('Edit')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Edit',
+      }),
+    ).not.toBeInTheDocument();
   });
-  return { section, row };
 };
 
 export const startAdding = async (title: string) => {
@@ -243,7 +249,9 @@ export const isPrecededByNotBadge = ({
   row: HTMLElement;
   text: string;
 }) => {
-  const rowNodes = Array.from(Array.from(row.children)[0].children);
+  const rowNodes = Array.from(
+    Array.from(Array.from(row.children)[0].children)[0].children,
+  );
   const notBadge = within(row).getByText('not');
   const notIndex = rowNodes.indexOf(notBadge);
   const notFieldElement = within(row).getByText(text);
@@ -273,14 +281,14 @@ export const withRulesError = (playbookId: string = kycPlaybookFixture.id) =>
     },
   });
 
-export const withEditRule = (
-  response: Rule,
+export const withEditRules = (
+  response?: Rule[],
   playbookId: string = kycPlaybookFixture.id,
 ) =>
   mockRequest({
     method: 'patch',
-    path: `/org/onboarding_configs/${playbookId}/rules/${response.ruleId}`,
-    response,
+    path: `/org/onboarding_configs/${playbookId}/rules`,
+    response: response ?? [],
   });
 
 export const withDeleteRule = (

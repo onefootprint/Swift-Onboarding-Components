@@ -30,7 +30,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => (
     </Stack>
     <Content>
       <SideNav />
-      <Main>
+      <Main id="page-main">
         <Inner>{children}</Inner>
       </Main>
     </Content>

@@ -14,9 +14,15 @@ import Rules from './components/rules';
 
 export type CollectionAndScopesProps = {
   playbook: OnboardingConfig;
+  isTabsDisabled: boolean;
+  toggleDisableHeading: (disable: boolean) => void;
 };
 
-const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
+const CollectionAndScopes = ({
+  playbook,
+  isTabsDisabled,
+  toggleDisableHeading,
+}: CollectionAndScopesProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details',
   });
@@ -36,21 +42,28 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
 
   return (
     <Container>
-      <Tabs>
-        {options.map(({ value, label }) => (
-          <Tab
-            key={value}
-            onClick={() => handleChange(value)}
-            selected={tab === value}
-          >
-            {label}
-          </Tab>
-        ))}
-      </Tabs>
+      <TabsContainer data-is-disabled={isTabsDisabled}>
+        <Tabs>
+          {options.map(({ value, label }) => (
+            <Tab
+              key={value}
+              onClick={() => handleChange(value)}
+              selected={tab === value}
+            >
+              {label}
+            </Tab>
+          ))}
+        </Tabs>
+      </TabsContainer>
       {tab === 'data' && <DataCollection playbook={playbook} />}
       {tab === 'authorized-scopes' && <AuthorizedScopes playbook={playbook} />}
       {tab === 'aml-monitoring' && <AmlMonitoring playbook={playbook} />}
-      {tab === 'rules' && <Rules playbook={playbook} />}
+      {tab === 'rules' && (
+        <Rules
+          playbook={playbook}
+          toggleDisableHeading={toggleDisableHeading}
+        />
+      )}
     </Container>
   );
 };
@@ -61,6 +74,14 @@ const Container = styled.div`
     flex-direction: column;
     gap: ${theme.spacing[8]};
   `}
+`;
+
+const TabsContainer = styled.span`
+  &[data-is-disabled='true'] {
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+  }
 `;
 
 export default CollectionAndScopes;

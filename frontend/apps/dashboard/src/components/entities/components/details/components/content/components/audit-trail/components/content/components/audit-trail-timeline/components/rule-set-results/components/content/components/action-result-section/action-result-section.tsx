@@ -16,13 +16,11 @@ import styled, { css } from 'styled-components';
 import RuleList from '../rule-list';
 
 export type ActionResultSectionProps = {
-  obConfigurationId: string;
   actionSection: RuleActionSection;
   data: Record<RuleAction, Record<string, Rule[]>>;
 };
 
 const ActionResultSection = ({
-  obConfigurationId,
   actionSection,
   data,
 }: ActionResultSectionProps) => {
@@ -100,16 +98,12 @@ const ActionResultSection = ({
       {actionSection === RuleActionSection.stepUp ? (
         stepUpActions.map(action => (
           <RuleList
-            obConfigurationId={obConfigurationId}
             rules={data[action][selectedResultGroup]}
             stepUpAction={action}
           />
         ))
       ) : (
-        <RuleList
-          obConfigurationId={obConfigurationId}
-          rules={data[actionSection][selectedResultGroup]}
-        />
+        <RuleList rules={data[actionSection][selectedResultGroup]} />
       )}
     </Stack>
   );

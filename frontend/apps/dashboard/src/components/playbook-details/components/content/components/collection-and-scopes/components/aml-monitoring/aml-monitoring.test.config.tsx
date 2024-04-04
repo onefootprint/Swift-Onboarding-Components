@@ -54,6 +54,9 @@ const onboardingConfig: OnboardingConfig = {
     adverseMedia: false,
   },
   kind: OnboardingConfigKind.kyb,
+  ruleSet: {
+    version: 1,
+  },
 };
 
 export default onboardingConfig;

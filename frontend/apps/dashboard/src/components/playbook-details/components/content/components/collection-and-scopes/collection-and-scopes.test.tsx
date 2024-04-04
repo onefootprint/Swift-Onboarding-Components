@@ -1,17 +1,23 @@
 import { customRender, screen } from '@onefootprint/test-utils';
+import type { OnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 
-import type { CollectionAndScopesProps } from './collection-and-scopes';
 import CollectionAndScopes from './collection-and-scopes';
 import playbookFixture from './collection-and-scopes.test.config';
 
-const renderCollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
-  customRender(<CollectionAndScopes playbook={playbook} />);
+const renderCollectionAndScopes = (playbook: OnboardingConfig) => {
+  customRender(
+    <CollectionAndScopes
+      playbook={playbook}
+      isTabsDisabled={false}
+      toggleDisableHeading={jest.fn()}
+    />,
+  );
 };
 
 describe('<CollectionAndScopes />', () => {
   it('should render the default tabs', () => {
-    renderCollectionAndScopes({ playbook: playbookFixture });
+    renderCollectionAndScopes(playbookFixture);
 
     const dataCollection = screen.getByRole('tab', { name: 'Data collection' });
     expect(dataCollection).toBeInTheDocument();

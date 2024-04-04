@@ -185,7 +185,13 @@ export type {
 } from './role';
 export { RoleKind, RoleScopeKind, supportedRoleKinds } from './role';
 export type { Rolebinding } from './rolebinding';
-export type { Rule, RuleField, RuleResult } from './rule';
+export type {
+  AddedRule,
+  EditedRule,
+  Rule,
+  RuleField,
+  RuleResult,
+} from './rule';
 export {
   OnboardingDecisionRuleAction,
   RuleAction,

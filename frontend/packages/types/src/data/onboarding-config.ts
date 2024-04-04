@@ -86,4 +86,7 @@ export type OnboardingConfig = {
   isRulesEnabled?: boolean;
   skipConfirm?: boolean;
   documentTypesAndCountries?: DocumentTypesAndCountries;
+  ruleSet: {
+    version: number;
+  };
 };

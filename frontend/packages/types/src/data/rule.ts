@@ -44,6 +44,16 @@ export type Rule = {
   ruleId: string;
 };
 
+export type AddedRule = {
+  ruleAction: RuleAction;
+  ruleExpression: RuleField[];
+};
+
+export type EditedRule = {
+  ruleId: string;
+  ruleExpression: RuleField[];
+};
+
 export type RuleResult = {
   result: boolean;
   rule: Rule;

@@ -45,6 +45,7 @@ export type {
 export type { DeleteRuleRequest, DeleteRuleResponse } from './delete-rule';
 export type { EditRequest, EditResponse } from './edit';
 export type { EditRuleRequest, EditRuleResponse } from './edit-rule';
+export type { EditRulesRequest, EditRulesResponse } from './edit-rules';
 export type {
   EntitiesVaultDecryptRequest,
   EntitiesVaultDecryptResponse,

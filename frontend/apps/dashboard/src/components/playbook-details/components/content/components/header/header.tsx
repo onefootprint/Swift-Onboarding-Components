@@ -11,9 +11,10 @@ import EditNameDialog from './components/edit-name-dialog';
 
 export type HeaderProps = {
   playbook: OnboardingConfig;
+  isDisabled: boolean;
 };
 
-const Header = ({ playbook }: HeaderProps) => {
+const Header = ({ playbook, isDisabled }: HeaderProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.header',
   });
@@ -29,7 +30,7 @@ const Header = ({ playbook }: HeaderProps) => {
   };
 
   return (
-    <HeaderContainer>
+    <HeaderContainer data-is-disabled={isDisabled}>
       <Text variant="label-1">{playbook.name}</Text>
       <Stack
         align="center"
@@ -74,6 +75,12 @@ const HeaderContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[2]};
+
+    &[data-is-disabled='true'] {
+      opacity: 0.5;
+      pointer-events: none;
+      user-select: none;
+    }
   `}
 `;
 

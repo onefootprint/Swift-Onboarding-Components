@@ -21,9 +21,11 @@ const OpBadge = ({ defaultValue, isEditable, onClick }: OpBadgeProps) => {
   }, [defaultValue]);
 
   const handleClick = () => {
-    const newIsSelected = !isSelected;
-    onClick(newIsSelected ? RuleOp.notEq : RuleOp.eq);
-    setIsSelected(newIsSelected);
+    setIsSelected(currentIsSelected => {
+      const newIsSelected = !currentIsSelected;
+      onClick(newIsSelected ? RuleOp.notEq : RuleOp.eq);
+      return newIsSelected;
+    });
   };
 
   return isEditable || isSelected ? (
@@ -48,6 +50,8 @@ const Badge = styled.div`
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    height: 26.45px;
+    box-sizing: border-box;
 
     &[data-is-selected='true'] {
       background-color: ${theme.backgroundColor.error};
