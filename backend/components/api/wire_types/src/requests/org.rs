@@ -1,4 +1,6 @@
-use newtypes::{input::Csv, CompanySize, TenantFrequentNoteKind, TenantRoleId, TenantRoleKindDiscriminant};
+use newtypes::{
+    email::Email, input::Csv, CompanySize, TenantFrequentNoteKind, TenantRoleId, TenantRoleKindDiscriminant,
+};
 
 use crate::*;
 
@@ -76,4 +78,21 @@ pub struct UpdateTenantIosAppMetaRequest {
     pub app_bundle_ids: Option<Vec<String>>,
     pub device_check_key_id: Option<String>,
     pub device_check_private_key: Option<String>,
+}
+
+#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+pub struct CreateTenantUserRequest {
+    pub email: Email,
+    pub role_id: TenantRoleId,
+    pub redirect_url: String, // The URL to the dashboard where the invite login link should be sent
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    #[serde(default)]
+    /// A feature only used by employees to allow inviting users to a tenant without sending them an email
+    pub omit_email_invite: bool,
+}
+
+#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+pub struct UpdateTenantRolebindingRequest {
+    pub role_id: Option<TenantRoleId>,
 }

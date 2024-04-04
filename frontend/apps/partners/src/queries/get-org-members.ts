@@ -87,9 +87,14 @@ const getQueryString = (x?: GetOrgMembersArgs): string => {
  * @param {GetOrgMembersArgs} [args] - Optional arguments for the function.
  * @return {Promise<OffsetPaginatedOrganizationMember>} A promise that resolves to the organization members.
  */
-const getOrgMembers = async (authToken: string, args?: GetOrgMembersArgs) => {
+const getPartnerOrgMembers = async (
+  authToken: string,
+  args?: GetOrgMembersArgs,
+) => {
   const queryString = getQueryString(args);
-  const path = queryString ? `/org/members?${queryString}` : '/org/members';
+  const path = queryString
+    ? `/partner/members?${queryString}`
+    : '/partner/members';
 
   return authToken
     ? baseFetch<OffsetPaginatedOrganizationMember>(path, {
@@ -99,4 +104,4 @@ const getOrgMembers = async (authToken: string, args?: GetOrgMembersArgs) => {
     : Promise.reject(new TypeError('Missing auth token parameter'));
 };
 
-export default getOrgMembers;
+export default getPartnerOrgMembers;

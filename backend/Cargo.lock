@@ -1224,6 +1224,7 @@ dependencies = [
  "actix-web",
  "api_core",
  "api_wire_types",
+ "chrono",
  "db",
  "newtypes",
  "paperclip",

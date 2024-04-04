@@ -1,5 +1,5 @@
 use api_core::{
-    auth::tenant::TenantSessionAuth,
+    auth::tenant::PartnerTenantSessionAuth,
     errors::ApiResult,
     types::{EmptyResponse, JsonApiResponse, OffsetPaginatedResponse, OffsetPaginationRequest},
     State,
@@ -11,27 +11,27 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
 #[api_v2_operation(
     tags(Members, OrgSettings, Private),
-    description = "Returns a list of dashboard members for the tenant"
+    description = "Returns a list of dashboard members for the partner tenant"
 )]
-#[get("/org/members")]
+#[get("/partner/members")]
 async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgMemberFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
-    auth: TenantSessionAuth,
+    auth: PartnerTenantSessionAuth,
 ) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
     members_common::get(state, filters, pagination, auth.into()).await
 }
 
 #[api_v2_operation(
     tags(Members, OrgSettings, Private),
-    description = "Create a new IAM user for the tenant. Sends an invite link via WorkOs"
+    description = "Create a new IAM user for the partner tenant. Sends an invite link via WorkOs"
 )]
-#[post("/org/members")]
+#[post("/partner/members")]
 async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantUserRequest>,
-    auth: TenantSessionAuth,
+    auth: PartnerTenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     members_common::post(state, request, auth.into()).await
 }
@@ -40,12 +40,12 @@ async fn post(
     tags(Members, OrgSettings, Private),
     description = "Updates the provided member."
 )]
-#[patch("/org/members/{tenant_user_id}")]
+#[patch("/partner/members/{tenant_user_id}")]
 async fn patch(
     state: web::Data<State>,
     request: web::Json<api_wire_types::UpdateTenantRolebindingRequest>,
     tu_id: web::Path<TenantUserId>,
-    auth: TenantSessionAuth,
+    auth: PartnerTenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     members_common::patch(state, request, tu_id, auth.into()).await
 }
@@ -54,11 +54,11 @@ async fn patch(
     tags(Members, OrgSettings, Private),
     description = "Deactivates the provided user."
 )]
-#[post("/org/members/{tenant_user_id}/deactivate")]
+#[post("/partner/members/{tenant_user_id}/deactivate")]
 async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
-    auth: TenantSessionAuth,
+    auth: PartnerTenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
     members_common::deactivate(state, tu_id, auth.into()).await
 }

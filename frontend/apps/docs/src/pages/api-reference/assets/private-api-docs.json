@@ -5141,7 +5141,7 @@
                     "OrgSettings",
                     "Private"
                 ],
-                "description": "Returns a list of dashboard members for the tenant or partner tenant.",
+                "description": "Returns a list of dashboard members for the tenant",
                 "parameters": [
                     {
                         "in": "query",
@@ -5201,9 +5201,6 @@
                 "security": [
                     {
                         "Dashboard Token": []
-                    },
-                    {
-                        "Dashboard Token": []
                     }
                 ]
             },
@@ -5237,9 +5234,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "Dashboard Token": []
-                    },
                     {
                         "Dashboard Token": []
                     }
@@ -5290,9 +5284,6 @@
                 "security": [
                     {
                         "Dashboard Token": []
-                    },
-                    {
-                        "Dashboard Token": []
                     }
                 ]
             }
@@ -5329,9 +5320,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "Dashboard Token": []
-                    },
                     {
                         "Dashboard Token": []
                     }
@@ -6445,6 +6433,198 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/WebhookPortalResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/partner/members": {
+            "get": {
+                "tags": [
+                    "Members",
+                    "OrgSettings",
+                    "Private"
+                ],
+                "description": "Returns a list of dashboard members for the partner tenant",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "is_invite_pending",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "role_ids",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedOrganizationMember"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Members",
+                    "OrgSettings",
+                    "Private"
+                ],
+                "description": "Create a new IAM user for the partner tenant. Sends an invite link via WorkOs",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTenantUserRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationMember"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/partner/members/{tenant_user_id}": {
+            "patch": {
+                "tags": [
+                    "Members",
+                    "OrgSettings",
+                    "Private"
+                ],
+                "description": "Updates the provided member.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "tenant_user_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTenantRolebindingRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationMember"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/partner/members/{tenant_user_id}/deactivate": {
+            "post": {
+                "tags": [
+                    "Members",
+                    "OrgSettings",
+                    "Private"
+                ],
+                "description": "Deactivates the provided user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "tenant_user_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
                                 }
                             }
                         }

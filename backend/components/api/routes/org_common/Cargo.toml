@@ -15,5 +15,6 @@ api_wire_types = { path = "../../wire_types" }
 
 actix-web = { workspace = true }
 paperclip = { workspace = true }
+chrono = { workspace = true }
 
 [dev-dependencies]
