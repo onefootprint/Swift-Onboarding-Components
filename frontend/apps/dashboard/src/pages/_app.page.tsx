@@ -54,7 +54,7 @@ const GlobalStyle = createGlobalStyle<{ $hasMinWidth: boolean }>`
   ${({ theme, $hasMinWidth }) => css`
     :root {
       --side-nav-width: 240px;
-      --main-content-max-width: 1600px;
+      --main-content-max-width: 1200px;
     }
 
     #__next {
