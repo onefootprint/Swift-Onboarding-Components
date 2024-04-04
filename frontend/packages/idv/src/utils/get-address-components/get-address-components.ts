@@ -97,7 +97,7 @@ export const getAutoCompleteCity = (
       )
     : undefined;
 
-  return cityFromSecondaryText || sublocalities.pop() || localities.pop();
+  return cityFromSecondaryText || localities.pop() || sublocalities.pop();
 };
 
 const getAddressLine1 = (
