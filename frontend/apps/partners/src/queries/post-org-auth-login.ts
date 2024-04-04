@@ -1,0 +1,93 @@
+import baseFetch from './base-fetch';
+
+type OrgLoginRequest = {
+  code: string;
+  login_target: 'partner_tenant_dashboard' | 'tenant_dashboard';
+  request_org_id?: string;
+};
+export type OrgLoginResponse = {
+  authToken: string;
+  createdNewTenant: boolean;
+  isFirstLogin: boolean;
+  requiresOnboarding: boolean;
+  tenant?: {
+    allowDomainAccess: boolean;
+    companySize?:
+      | 's1_to10'
+      | 's11_to50'
+      | 's51_to100'
+      | 's101_to1000'
+      | 's1001_plus';
+    domains: Array<string>;
+    id: string;
+    isAuthMethodSupported?: boolean;
+    isDomainAlreadyClaimed?: boolean;
+    isProdAuthPlaybookRestricted: boolean;
+    isProdKybPlaybookRestricted: boolean;
+    isProdKycPlaybookRestricted: boolean;
+    isSandboxRestricted: boolean;
+    logoUrl?: string;
+    name: string;
+    supportEmail?: string;
+    supportPhone?: string;
+    supportWebsite?: string;
+    websiteUrl?: string;
+  };
+  user?: {
+    createdAt: string;
+    email: string;
+    firstName?: string;
+    id: string;
+    isFirmEmployee: boolean;
+    lastName?: string;
+    role: {
+      createdAt: string;
+      id: string;
+      isImmutable: boolean;
+      kind: 'ApiKey' | 'DashboardUser' | 'CompliancePartnerDashboardUser';
+      name: string;
+      numActiveApiKeys?: number;
+      numActiveUsers?: number;
+      scopes: Array<
+        | 'read'
+        | 'admin'
+        | 'api_keys'
+        | 'manage_vault_proxy'
+        | 'manage_webhooks'
+        | 'manual_review'
+        | 'onboarding_configuration'
+        | 'org_settings'
+        | 'cip_integration'
+        | 'trigger_kyb'
+        | 'trigger_kyc'
+        | 'auth_token'
+        | 'onboarding'
+        | 'decrypt_custom'
+        | 'decrypt_document'
+        | 'decrypt_document_and_selfie'
+        | 'decrypt_all'
+        | 'write_entities'
+        | 'label_and_tag'
+        | 'compliance_partner_read'
+        | 'compliance_partner_admin'
+        | 'compliance_partner_manage_templates'
+      >;
+    };
+    rolebinding?: { lastLoginAt?: string };
+  };
+};
+
+/**
+ * Sends a POST request to the '/org/auth/login' endpoint with the provided payload.
+ *
+ * @param {OrgLoginRequest} payload - The payload containing the login information.
+ * @return {Promise<OrgLoginResponse>} - A promise that resolves to the response from the server.
+ */
+const postOrgAuthLogin = async (payload: OrgLoginRequest) =>
+  baseFetch<OrgLoginResponse>('/org/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    next: { revalidate: 30 },
+  });
+
+export default postOrgAuthLogin;
