@@ -1,11 +1,14 @@
 use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    auth::tenant::TenantGuard,
     errors::ApiResult,
     types::{JsonApiResponse, OffsetPaginatedResponse, OffsetPaginationRequest, ResponseData},
     utils::db2api::DbToApi,
     State,
 };
-use api_core::errors::tenant::TenantError;
+use api_core::{
+    auth::tenant::{PartnerTenantGuard, TenantOrPartnerTenantSessionAuth},
+    errors::tenant::TenantError,
+};
 use api_wire_types::OrgRoleFilters;
 use db::{
     models::tenant_role::{TenantRole, TenantRoleListFilters},
@@ -18,29 +21,28 @@ type RolesResponse = Json<OffsetPaginatedResponse<api_wire_types::OrganizationRo
 
 #[api_v2_operation(
     tags(Roles, OrgSettings, Private),
-    description = "Returns a list of IAM roles for the tenant."
+    description = "Returns a list of IAM roles for the tenant or partner tenant."
 )]
 #[get("/org/roles")]
 async fn get(
     state: web::Data<State>,
     filters: web::Query<OrgRoleFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
-    auth: TenantSessionAuth,
+    auth: TenantOrPartnerTenantSessionAuth,
 ) -> ApiResult<RolesResponse> {
-    let auth = auth.check_guard(TenantGuard::Read)?;
-    let tenant = auth.tenant();
+    let auth = auth.check_guard(TenantGuard::Read, PartnerTenantGuard::Read)?;
+    let authed_org_ident = auth.org_identifier().clone_into();
     let is_live = auth.is_live()?;
 
     let page = pagination.page;
     let page_size = pagination.page_size(&state);
     let OrgRoleFilters { search, kind } = filters.into_inner();
 
-    let tenant_id = tenant.id.clone();
     let (results, next_page, count) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let filters = TenantRoleListFilters {
-                tenant_id: &tenant_id,
+                org_ident: (&authed_org_ident).into(),
                 scopes: None,
                 search,
                 kind,
@@ -69,31 +71,34 @@ struct CreateTenantRoleRequest {
 
 #[api_v2_operation(
     tags(Roles, OrgSettings, Private),
-    description = "Create a new IAM role for the tenant."
+    description = "Create a new IAM role for the tenant or partner tenant."
 )]
 #[post("/org/roles")]
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantRoleRequest>,
-    auth: TenantSessionAuth,
+    auth: TenantOrPartnerTenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
-    let tenant = auth.tenant();
+    let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
+    let authed_org_ident = auth.org_identifier().clone_into();
     let is_live = auth.is_live()?;
 
-    let tenant_id = tenant.id.clone();
     let CreateTenantRoleRequest { name, scopes, kind } = request.into_inner();
+
+    if kind.tenant_kind() != (&authed_org_ident).into() {
+        return Err(TenantError::InvalidTenantRoleKind.into());
+    }
+
     let kind = match kind {
         TenantRoleKindDiscriminant::ApiKey => TenantRoleKind::ApiKey { is_live },
         TenantRoleKindDiscriminant::DashboardUser => TenantRoleKind::DashboardUser,
         TenantRoleKindDiscriminant::CompliancePartnerDashboardUser => {
-            // Tenant principals can't create partner tenant roles.
-            return Err(TenantError::InvalidTenantRoleKind.into());
+            TenantRoleKind::CompliancePartnerDashboardUser
         }
     };
     let result = state
         .db_pool
-        .db_query(move |conn| TenantRole::create(conn, &tenant_id, &name, scopes, false, kind))
+        .db_query(move |conn| TenantRole::create(conn, &authed_org_ident, &name, scopes, false, kind))
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);
@@ -115,16 +120,15 @@ async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
-    auth: TenantSessionAuth,
+    auth: TenantOrPartnerTenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
-    let tenant = auth.tenant();
+    let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
+    let authed_org_ident = auth.org_identifier().clone_into();
 
-    let tenant_id = tenant.id.clone();
     let UpdateTenantRoleRequest { name, scopes } = request.into_inner();
     let result = state
         .db_pool
-        .db_transaction(move |conn| TenantRole::update(conn, &tenant_id, &role_id, name, scopes))
+        .db_transaction(move |conn| TenantRole::update(conn, &authed_org_ident, &role_id, name, scopes))
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);
@@ -139,15 +143,14 @@ async fn patch(
 async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
-    auth: TenantSessionAuth,
+    auth: TenantOrPartnerTenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
-    let auth = auth.check_guard(TenantGuard::OrgSettings)?;
-    let tenant = auth.tenant();
-    let tenant_id = tenant.id.clone();
+    let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
+    let authed_org_ident = auth.org_identifier().clone_into();
 
     let result = state
         .db_pool
-        .db_transaction(move |conn| TenantRole::deactivate(conn, &role_id, &tenant_id))
+        .db_transaction(move |conn| TenantRole::deactivate(conn, &role_id, &authed_org_ident))
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);

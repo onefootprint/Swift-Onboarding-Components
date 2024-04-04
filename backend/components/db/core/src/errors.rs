@@ -84,8 +84,8 @@ pub enum DbError {
     InvalidRoleIsLive,
     #[error("Cannot update an immutable role {0}")]
     CannotUpdateImmutableRole(String),
-    #[error("Tenant role scopes must include at least Read")]
-    InsufficientTenantScopes,
+    #[error("Tenant role scopes must include at least {0}")]
+    InsufficientTenantScopes(TenantScopeDiscriminants),
     #[error("Tenant role scopes must be unique")]
     NonUniqueTenantScopes,
     #[error("Tenant role of kind {0} cannot have a scope of kind {1}")]

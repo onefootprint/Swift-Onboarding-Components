@@ -12,8 +12,8 @@ use diesel::{
 };
 use itertools::Itertools;
 use newtypes::{
-    ApiKeyStatus, InvokeVaultProxyPermission, Locked, PartnerTenantId, TenantId, TenantKind,
-    OrgIdentifierRef, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantScope,
+    ApiKeyStatus, InvokeVaultProxyPermission, Locked, OrgIdentifierRef, PartnerTenantId, TenantId,
+    TenantKind, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantScope,
     TenantScopeDiscriminants,
 };
 
@@ -94,14 +94,16 @@ impl TenantRole {
         match org_id {
             OrgIdentifierRef::TenantId(_) => {
                 if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
-                    return Err(DbError::InsufficientTenantScopes);
+                    return Err(DbError::InsufficientTenantScopes(TenantScopeDiscriminants::Read));
                 }
             }
             OrgIdentifierRef::PartnerTenantId(_) => {
                 if !scopes.contains(&TenantScope::CompliancePartnerRead)
                     && !scopes.contains(&TenantScope::CompliancePartnerAdmin)
                 {
-                    return Err(DbError::InsufficientTenantScopes);
+                    return Err(DbError::InsufficientTenantScopes(
+                        TenantScopeDiscriminants::CompliancePartnerRead,
+                    ));
                 }
             }
         }
@@ -355,7 +357,6 @@ impl TenantRole {
 
     pub fn list_active_query<'a>(filters: &'a TenantRoleListFilters) -> BoxedQuery<'a, diesel::pg::Pg> {
         let mut query = tenant_role::table
-            .filter(tenant_role::tenant_id.eq(filters.tenant_id))
             .filter(tenant_role::deactivated_at.is_null())
             .filter(
                 tenant_role::is_live
@@ -364,6 +365,14 @@ impl TenantRole {
                     .or(tenant_role::is_live.is_null()),
             )
             .into_boxed();
+
+        query = match filters.org_ident {
+            OrgIdentifierRef::TenantId(tenant_id) => query.filter(tenant_role::tenant_id.eq(tenant_id)),
+            OrgIdentifierRef::PartnerTenantId(pt_id) => {
+                query.filter(tenant_role::partner_tenant_id.eq(pt_id))
+            }
+        };
+
 
         if let Some(ref scopes) = filters.scopes {
             query = query.filter(tenant_role::scopes.overlaps_with(scopes))
@@ -453,9 +462,7 @@ impl TenantRole {
         // not null.
         match org_id {
             OrgIdentifierRef::TenantId(tid) => Box::new(tenant_role::tenant_id.eq(tid)),
-            OrgIdentifierRef::PartnerTenantId(ptid) => {
-                Box::new(tenant_role::partner_tenant_id.eq(ptid))
-            }
+            OrgIdentifierRef::PartnerTenantId(ptid) => Box::new(tenant_role::partner_tenant_id.eq(ptid)),
         }
     }
 }
@@ -482,7 +489,7 @@ struct TenantRoleUpdate {
 }
 
 pub struct TenantRoleListFilters<'a> {
-    pub tenant_id: &'a TenantId,
+    pub org_ident: OrgIdentifierRef<'a>,
     pub scopes: Option<Vec<TenantScope>>,
     pub search: Option<String>,
     pub kind: Option<TenantRoleKindDiscriminant>,

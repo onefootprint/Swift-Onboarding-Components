@@ -33,6 +33,7 @@ pub enum OrgIdentifierRef<'a> {
     PartnerTenantId(&'a PartnerTenantId),
 }
 
+
 #[derive(Debug, Clone, From)]
 pub enum OrgIdentifier {
     TenantId(TenantId),
@@ -44,6 +45,15 @@ impl<'a> From<OrgIdentifierRef<'a>> for TenantKind {
         match value {
             OrgIdentifierRef::TenantId(_) => TenantKind::Tenant,
             OrgIdentifierRef::PartnerTenantId(_) => TenantKind::PartnerTenant,
+        }
+    }
+}
+
+impl From<&OrgIdentifier> for TenantKind {
+    fn from(value: &OrgIdentifier) -> Self {
+        match *value {
+            OrgIdentifier::TenantId(_) => TenantKind::Tenant,
+            OrgIdentifier::PartnerTenantId(_) => TenantKind::PartnerTenant,
         }
     }
 }

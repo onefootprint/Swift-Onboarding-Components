@@ -11,6 +11,8 @@ mod partner_tenant_rb;
 pub use self::partner_tenant_rb::*;
 mod secret_key;
 pub use secret_key::*;
+mod tenant_or_partner_tenant;
+pub use self::tenant_or_partner_tenant::*;
 mod tenant_rb;
 pub use self::tenant_rb::*;
 mod workos;
@@ -30,6 +32,8 @@ pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAssumeAuthC
 pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, TenantSessionAuth>;
 
 pub type PartnerTenantSessionAuth = PartnerTenantRbAuthContext;
+
+pub type TenantOrPartnerTenantSessionAuth = Either<TenantSessionAuth, PartnerTenantSessionAuth>;
 
 impl AnyTenantSessionAuth {
     /// The different types of session auths have very different purposes, so we have to do some
@@ -61,6 +65,19 @@ impl TenantSessionAuth {
             Either::Left(l) => l.data.0.auth_method,
             Either::Right(r) => r.data.0.auth_method,
         }
+    }
+}
+
+impl TenantOrPartnerTenantSessionAuth {
+    pub fn check_guard(
+        self,
+        t_guard: TenantGuard,
+        pt_guard: PartnerTenantGuard,
+    ) -> ApiResult<TenantOrPartnerTenantAuth> {
+        Ok(match self {
+            Either::Left(t_auth) => Either::Left(t_auth.check_guard(t_guard)?),
+            Either::Right(pt_auth) => Either::Right(pt_auth.check_guard(pt_guard)?),
+        })
     }
 }
 
