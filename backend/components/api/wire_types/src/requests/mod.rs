@@ -90,3 +90,6 @@ pub use self::compliance::*;
 
 mod skip_passkey_register;
 pub use skip_passkey_register::*;
+
+pub mod roles;
+pub use self::roles::*;

@@ -17,21 +17,19 @@ def test_partner_tenant_iam(tenant, partner_tenant):
     get("compliance/partners", {}, *tenant.db_auths, status_code=401)
     get("compliance/partners", {}, *tenant.ro_db_auths, status_code=401)
 
-    # Should be able to access APIs that accept either tenant or partner tenant auth.
-    get("org/roles", {}, *partner_tenant.db_auths)
-    get("org/roles", {}, *partner_tenant.ro_db_auths)
-    get("org/roles", {}, *tenant.db_auths)
-    get("org/roles", {}, *tenant.ro_db_auths)
+    # Should be able to access APIs stubbed out to common implementations.
+    get("partner/roles", {}, *partner_tenant.db_auths)
+    get("partner/roles", {}, *partner_tenant.ro_db_auths)
 
     # Should not be able to access an org API with either partner role.
-    get("org/client_security_config", {}, *partner_tenant.db_auths, status_code=401)
-    get("org/client_security_config", {}, *partner_tenant.ro_db_auths, status_code=401)
+    get("org/roles", {}, *partner_tenant.db_auths, status_code=401)
+    get("org/roles", {}, *partner_tenant.ro_db_auths, status_code=401)
 
 
 def test_partner_tenant_iam_roles(partner_tenant):
     # Create a role.
     name = "test " + _gen_random_str(16)
-    post("org/roles", {
+    post("partner/roles", {
       "kind": "compliance_partner_dashboard_user",
       "name": name,
       "scopes": [
@@ -42,7 +40,7 @@ def test_partner_tenant_iam_roles(partner_tenant):
     }, *partner_tenant.db_auths)
 
     # Can't create with read-only auth.
-    post("org/roles", {
+    post("partner/roles", {
       "kind": "compliance_partner_dashboard_user",
       "name": name,
       "scopes": [
@@ -53,7 +51,7 @@ def test_partner_tenant_iam_roles(partner_tenant):
     }, *partner_tenant.ro_db_auths, status_code=401)
 
     # Check that it was created.
-    resp = get("org/roles", {
+    resp = get("partner/roles", {
         "search": name,
     }, *partner_tenant.db_auths)
     assert len(resp["data"]) == 1
@@ -65,17 +63,17 @@ def test_partner_tenant_iam_roles(partner_tenant):
 
     # Update the role.
     name += _gen_random_str(16)
-    patch(f"org/roles/{role_id}", {
+    patch(f"partner/roles/{role_id}", {
         "name": name,
     }, *partner_tenant.db_auths)
 
     # Can't update with read-only auth.
-    patch(f"org/roles/{role_id}", {
+    patch(f"partner/roles/{role_id}", {
         "name": name + _gen_random_str(16),
     }, *partner_tenant.ro_db_auths, status_code=401)
 
     # Check that it was updated.
-    resp = get("org/roles", {
+    resp = get("partner/roles", {
         "search": name,
     }, *partner_tenant.db_auths)
     assert len(resp["data"]) == 1
@@ -86,13 +84,13 @@ def test_partner_tenant_iam_roles(partner_tenant):
     assert role["scopes"] == [{"kind": "compliance_partner_read"}]
 
     # Can't deactivate with read-only auth.
-    post(f"org/roles/{role_id}/deactivate", {}, *partner_tenant.ro_db_auths, status_code=401)
+    post(f"partner/roles/{role_id}/deactivate", {}, *partner_tenant.ro_db_auths, status_code=401)
 
     # Deactivate the role.
-    post(f"org/roles/{role_id}/deactivate", {}, *partner_tenant.db_auths)
+    post(f"partner/roles/{role_id}/deactivate", {}, *partner_tenant.db_auths)
 
     # Check that it was deactivated
-    resp = get("org/roles", {
+    resp = get("partner/roles", {
         "search": name,
     }, *partner_tenant.db_auths)
     assert len(resp["data"]) == 0

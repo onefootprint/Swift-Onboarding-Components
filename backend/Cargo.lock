@@ -673,25 +673,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "api_route_compliance"
-version = "0.1.0"
-dependencies = [
- "actix-multipart",
- "actix-web",
- "api_core",
- "api_wire_types",
- "chrono",
- "crypto",
- "db",
- "itertools",
- "newtypes",
- "paperclip",
- "serde",
- "serde_with",
- "tracing",
-]
-
-[[package]]
 name = "api_route_entities"
 version = "0.1.0"
 dependencies = [
@@ -1183,6 +1164,7 @@ dependencies = [
  "actix-web",
  "actix-web-httpauth",
  "api_core",
+ "api_route_org_common",
  "api_wire_types",
  "aws-config",
  "aws-sdk-kms",
@@ -1233,6 +1215,38 @@ dependencies = [
  "webauthn-rs-proto",
  "webhooks",
  "workos",
+]
+
+[[package]]
+name = "api_route_org_common"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "api_core",
+ "api_wire_types",
+ "db",
+ "newtypes",
+ "paperclip",
+]
+
+[[package]]
+name = "api_route_partner"
+version = "0.1.0"
+dependencies = [
+ "actix-multipart",
+ "actix-web",
+ "api_core",
+ "api_route_org_common",
+ "api_wire_types",
+ "chrono",
+ "crypto",
+ "db",
+ "itertools",
+ "newtypes",
+ "paperclip",
+ "serde",
+ "serde_with",
+ "tracing",
 ]
 
 [[package]]
@@ -1431,13 +1445,13 @@ name = "api_routes_root"
 version = "0.1.0"
 dependencies = [
  "api_route_businesses",
- "api_route_compliance",
  "api_route_entities",
  "api_route_hosted",
  "api_route_index",
  "api_route_integrations",
  "api_route_onboarding",
  "api_route_org",
+ "api_route_partner",
  "api_route_users",
  "api_route_vault_proxy",
  "api_route_webhooks",

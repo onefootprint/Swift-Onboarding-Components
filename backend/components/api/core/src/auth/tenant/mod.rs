@@ -81,6 +81,18 @@ impl TenantOrPartnerTenantSessionAuth {
     }
 }
 
+impl From<TenantSessionAuth> for TenantOrPartnerTenantSessionAuth {
+    fn from(t: TenantSessionAuth) -> Self {
+        Either::Left(t)
+    }
+}
+
+impl From<PartnerTenantSessionAuth> for TenantOrPartnerTenantSessionAuth {
+    fn from(pt: PartnerTenantSessionAuth) -> Self {
+        Either::Right(pt)
+    }
+}
+
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
     fn is_live(&self) -> Result<bool, ApiError>;
