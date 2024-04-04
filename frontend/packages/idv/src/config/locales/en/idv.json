@@ -988,8 +988,13 @@
     "pages": {
       "register": {
         "title": "Add a passkey",
-        "subtitle": "A passkey is a password replacement that validates your identity using your device’s biometric authentication, password, or PIN code. It is securely stored in your device’s password manager. The setup process may differ depending on your browser.",
+        "subtitle": "We use passkeys to validate your identity without the need for a password",
         "cta": "Launch registration",
+        "learn-more": {
+          "title": "More about Passkeys",
+          "cta": "Learn more",
+          "content": "Passkeys are a secure, user-friendly authentication method that replaces traditional passwords with digital keys stored on the user's device. \nBy using cryptographic techniques for authentication and eliminating complex password requirements, passkeys enhance security and simplify logins. They rely on biometric checks or device PINs for user verification, allowing seamless access across devices and platforms."
+        },
         "success": {
           "title": "Success!",
           "subtitle": "Your passkey has been registered."

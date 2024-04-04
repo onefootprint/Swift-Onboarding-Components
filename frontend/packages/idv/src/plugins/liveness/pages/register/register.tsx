@@ -5,7 +5,14 @@ import {
   SkipLivenessClientType,
   SkipLivenessReason,
 } from '@onefootprint/types/src/api/skip-liveness';
-import { Box, Button, Stack } from '@onefootprint/ui';
+import {
+  BottomSheet,
+  Box,
+  Button,
+  LinkButton,
+  Stack,
+  Text,
+} from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -28,6 +35,7 @@ const SUCCESS_TRANSITION_DELAY_MS = 1500;
 
 const Register = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'liveness.pages.register' });
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [state, send] = useLivenessMachine();
   const {
     idvContext: { authToken },
@@ -38,6 +46,14 @@ const Register = () => {
   const [passkeyRegisterAttempts, setPasskeyRegisterAttempts] = useState<
     PasskeyAttemptContext[]
   >([]);
+
+  const handleOpenBottomSheet = () => {
+    setShowBottomSheet(true);
+  };
+
+  const handleCloseBottomSheet = () => {
+    setShowBottomSheet(false);
+  };
 
   const handleRegister = () => {
     if (biometricInitMutation.isLoading) {
@@ -174,6 +190,25 @@ const Register = () => {
               {secondaryButtonText}
             </Button>
           )}
+          <Stack
+            alignItems="center"
+            width="100%"
+            justify="center"
+            paddingTop={3}
+          >
+            <LinkButton onClick={handleOpenBottomSheet}>
+              {t('learn-more.cta')}
+            </LinkButton>
+          </Stack>
+          <BottomSheet
+            open={showBottomSheet}
+            onClose={handleCloseBottomSheet}
+            title={t('learn-more.title')}
+          >
+            <Text variant="body-3" whiteSpace="pre-wrap">
+              {t('learn-more.content')}
+            </Text>
+          </BottomSheet>
         </Stack>
       </Box>
     </Container>
