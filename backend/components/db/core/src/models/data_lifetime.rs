@@ -90,6 +90,7 @@ struct NewDataLifetime {
 pub struct NewDataLifetimeArgs {
     pub kind: DataIdentifier,
     pub origin_id: Option<DataLifetimeId>,
+    pub source: DataLifetimeSource,
 }
 
 #[derive(Default, AsChangeset)]
@@ -142,7 +143,6 @@ impl DataLifetime {
         scoped_vault_id: &ScopedVaultId,
         rows: Vec<NewDataLifetimeArgs>,
         seqno: DataLifetimeSeqno,
-        source: DataLifetimeSource,
         actor: Option<DbActor>,
     ) -> DbResult<Vec<Self>> {
         let new_rows: Vec<NewDataLifetime> = rows
@@ -153,7 +153,7 @@ impl DataLifetime {
                 created_at: Utc::now(),
                 created_seqno: seqno,
                 kind: r.kind,
-                source,
+                source: r.source,
                 actor: actor.clone(),
                 origin_id: r.origin_id,
             })
@@ -178,8 +178,9 @@ impl DataLifetime {
         let args = NewDataLifetimeArgs {
             kind,
             origin_id: None,
+            source,
         };
-        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![args], seqno, source, actor)?
+        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![args], seqno, actor)?
             .into_iter()
             .next()
             .ok_or(DbError::ObjectNotFound)?;

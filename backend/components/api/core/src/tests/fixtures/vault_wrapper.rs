@@ -38,6 +38,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: IdentityDataKind::LastName.into(),
@@ -45,6 +46,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: IdentityDataKind::Ssn4.into(),
@@ -52,6 +54,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: IdentityDataKind::Email.into(),
@@ -59,6 +62,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: IdentityDataKind::PhoneNumber.into(),
@@ -66,11 +70,11 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let source = DataLifetimeSource::Hosted;
-    VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, source, None).unwrap();
+    VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, None).unwrap();
 
     (
         su.clone(),

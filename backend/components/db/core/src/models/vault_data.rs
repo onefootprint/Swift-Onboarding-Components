@@ -1,7 +1,10 @@
-use crate::{DbError, DbResult, HasLifetime, PgConn, TxnPgConn, VaultedData};
+use std::collections::HashMap;
+
+use crate::{errors::AssertionError, DbError, DbResult, HasLifetime, PgConn, TxnPgConn, VaultedData};
 use chrono::{DateTime, Utc};
 use db_schema::schema::vault_data;
 use diesel::prelude::*;
+use itertools::Itertools;
 use newtypes::{
     DataIdentifier, DataLifetimeId, DataLifetimeSeqno, DataLifetimeSource, DbActor, PiiString, ScopedVaultId,
     SealedVaultBytes, StorageType, VaultDataFormat, VaultId, VdId,
@@ -31,6 +34,7 @@ pub struct NewVaultData {
     pub p_data: Option<PiiString>,
     pub format: VaultDataFormat,
     pub origin_id: Option<DataLifetimeId>,
+    pub source: DataLifetimeSource,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -51,7 +55,6 @@ impl VaultData {
         scoped_user_id: &ScopedVaultId,
         data: Vec<NewVaultData>,
         seqno: DataLifetimeSeqno,
-        source: DataLifetimeSource,
         actor: Option<DbActor>,
     ) -> DbResult<Vec<Self>> {
         // One more sanity check that we don't store plaintext data where not desired
@@ -80,21 +83,25 @@ impl VaultData {
             .map(|d| NewDataLifetimeArgs {
                 kind: d.kind.clone(),
                 origin_id: d.origin_id.clone(),
+                source: d.source,
             })
             .collect();
-        let lifetimes =
-            DataLifetime::bulk_create(conn, user_vault_id, scoped_user_id, dl_data, seqno, source, actor)?;
+        let dls = DataLifetime::bulk_create(conn, user_vault_id, scoped_user_id, dl_data, seqno, actor)?;
+        let mut dls: HashMap<_, _> = dls.into_iter().map(|dl| (dl.kind.clone(), dl)).collect();
         let new_rows: Vec<_> = data
             .into_iter()
-            .zip(lifetimes.into_iter())
-            .map(|(new_vd, lifetime)| NewVaultDataRow {
+            .map(|vd| -> DbResult<_> {
+                let dl = dls.remove(&vd.kind).ok_or(AssertionError("No lifetime found"))?;
+                Ok((vd, dl))
+            })
+            .map_ok(|(new_vd, lifetime)| NewVaultDataRow {
                 lifetime_id: lifetime.id,
                 kind: new_vd.kind,
                 e_data: new_vd.e_data,
                 p_data: new_vd.p_data,
                 format: new_vd.format,
             })
-            .collect();
+            .collect::<DbResult<_>>()?;
         let results = diesel::insert_into(vault_data::table)
             .values(new_rows)
             .get_results(conn.conn())?;

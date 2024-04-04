@@ -164,6 +164,7 @@ impl<Type> VaultWrapper<Type> {
                     p_data,
                     format,
                     origin_id: None,
+                    source,
                 };
                 Ok(vd)
             })
@@ -221,7 +222,6 @@ impl ValidatedDataRequest {
         self,
         conn: &mut TxnPgConn,
         vw: &WriteableVw<Type>,
-        source: DataLifetimeSource,
         actor: Option<AuthActor>,
     ) -> ApiResult<SavedData> {
         if self.data.is_empty() {
@@ -256,7 +256,7 @@ impl ValidatedDataRequest {
 
         // Create the new VDs
         let actor = actor.map(|a| a.into());
-        let vd = VaultData::bulk_create(conn, v_id, sv_id, self.data, seqno, source, actor)?;
+        let vd = VaultData::bulk_create(conn, v_id, sv_id, self.data, seqno, actor)?;
 
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let fingerprints: Vec<_> = self

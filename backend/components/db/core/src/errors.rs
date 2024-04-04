@@ -181,3 +181,13 @@ impl<'a> From<ValidationError<'a>> for DbError {
         Self::ValidationError(value.0.to_string())
     }
 }
+
+#[derive(Debug)]
+/// Shorthand to make it convenient to make an HTTP 500 server error.
+pub(crate) struct AssertionError<'a>(pub &'a str);
+
+impl<'a> From<AssertionError<'a>> for DbError {
+    fn from(value: AssertionError<'a>) -> Self {
+        Self::AssertionError(value.0.to_string())
+    }
+}

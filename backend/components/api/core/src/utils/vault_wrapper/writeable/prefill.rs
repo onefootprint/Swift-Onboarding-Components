@@ -177,6 +177,7 @@ impl<Type> VaultWrapper<Type> {
                 format: vd.format,
                 // Since we're copying the data from elsewhere, save the lifetime ID
                 origin_id: Some(vd.lifetime_id.clone()),
+                source: DataLifetimeSource::Prefill,
             })
             .collect_vec();
 
@@ -201,8 +202,7 @@ impl<Type> WriteableVw<Type> {
         actor: Option<AuthActor>,
     ) -> ApiResult<PatchDataResult> {
         let request = self.validate_prefill_data_request(conn, prefill_data)?;
-        let source = DataLifetimeSource::Prefill;
-        let result = self.internal_save_data(conn, request, source, actor)?;
+        let result = self.internal_save_data(conn, request, actor)?;
         Ok(result)
     }
 }

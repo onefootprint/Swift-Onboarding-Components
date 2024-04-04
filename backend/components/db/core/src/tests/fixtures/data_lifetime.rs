@@ -14,12 +14,12 @@ pub fn build<T: Into<DataIdentifier>>(
     deactivated_seqno: Option<DataLifetimeSeqno>,
     kind: T,
 ) -> DataLifetime {
-    let s = DataLifetimeSource::Hosted;
     let args = NewDataLifetimeArgs {
         kind: kind.into(),
         origin_id: None,
+        source: DataLifetimeSource::Hosted,
     };
-    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, su_id, vec![args], created_seqno, s, None)
+    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, su_id, vec![args], created_seqno, None)
         .unwrap()
         .pop()
         .unwrap();

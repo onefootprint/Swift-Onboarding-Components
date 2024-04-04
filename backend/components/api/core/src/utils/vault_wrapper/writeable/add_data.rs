@@ -55,21 +55,20 @@ impl<Type> WriteableVw<Type> {
     ) -> ApiResult<PatchDataResult> {
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         let request = self.validate_request(conn, request, source, actor.clone(), false)?;
-        let result = self.internal_save_data(conn, request, source, actor)?;
+        let result = self.internal_save_data(conn, request, actor)?;
         self.create_bos_if_needed(conn, kyced_bos)?;
         Ok(result)
     }
 
-    pub(super) fn internal_save_data(
+    pub(in crate::utils::vault_wrapper) fn internal_save_data(
         &self,
         conn: &mut TxnPgConn,
         request: ValidatedDataRequest,
-        source: DataLifetimeSource,
         actor: Option<AuthActor>,
     ) -> ApiResult<PatchDataResult> {
         let is_prefill = request.is_prefill;
         let keys = request.data.iter().map(|d| d.kind.clone()).collect_vec();
-        let SavedData { vd, ci, seqno } = request.save(conn, self, source, actor.clone())?;
+        let SavedData { vd, ci, seqno } = request.save(conn, self, actor.clone())?;
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys, actor, is_prefill)?;
 

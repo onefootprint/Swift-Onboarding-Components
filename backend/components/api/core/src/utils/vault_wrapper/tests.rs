@@ -34,6 +34,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: IDK::LastName.into(),
@@ -41,6 +42,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: IDK::Ssn4.into(),
@@ -48,6 +50,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: IDK::Email.into(),
@@ -55,6 +58,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: IDK::PhoneNumber.into(),
@@ -62,11 +66,12 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
     let source = DataLifetimeSource::Hosted;
-    let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, source, None).unwrap();
+    let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, None).unwrap();
 
     // Portablize the phone as happens in prod
     let phone_data = vds
@@ -144,6 +149,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 p_data: None,
                 format: VaultDataFormat::String,
                 origin_id: None,
+                source: DataLifetimeSource::Hosted,
             }],
         ),
         // Add speculative Dob and Email data at tenant 2
@@ -157,6 +163,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                     p_data: None,
                     format: VaultDataFormat::String,
                     origin_id: None,
+                    source: DataLifetimeSource::Hosted,
                 },
                 NewVaultData {
                     kind: IDK::Email.into(),
@@ -164,6 +171,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                     p_data: None,
                     format: VaultDataFormat::String,
                     origin_id: None,
+                    source: DataLifetimeSource::Hosted,
                 },
             ],
         ),
@@ -177,6 +185,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 p_data: None,
                 format: VaultDataFormat::String,
                 origin_id: None,
+                source: DataLifetimeSource::Hosted,
             }],
         ),
         // Add portable Email at tenant 1
@@ -189,6 +198,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 p_data: None,
                 format: VaultDataFormat::String,
                 origin_id: None,
+                source: DataLifetimeSource::Hosted,
             }],
         ),
     ];
@@ -197,7 +207,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
         let source = DataLifetimeSource::Hosted;
         let kinds = data.iter().map(|d| d.kind.clone()).collect_vec();
         DataLifetime::bulk_deactivate_kinds(conn, su_id, kinds, seqno).unwrap();
-        let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, source, None).unwrap();
+        let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, None).unwrap();
         if portablize {
             let ids = vds.into_iter().map(|vd| vd.lifetime_id).collect();
             DataLifetime::bulk_portablize_for_tenant(conn, ids, su_id, seqno).unwrap();
@@ -252,6 +262,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: Some(PiiString::from("Acme Inc")),
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: BDK::Website.into(),
@@ -259,6 +270,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
         NewVaultData {
             kind: BDK::PhoneNumber.into(),
@@ -266,11 +278,11 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
+            source: DataLifetimeSource::Hosted,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let source = DataLifetimeSource::Hosted;
-    VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno, source, None).unwrap();
+    VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno, None).unwrap();
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
     let tests = vec![

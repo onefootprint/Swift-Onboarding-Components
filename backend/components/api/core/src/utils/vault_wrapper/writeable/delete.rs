@@ -75,6 +75,7 @@ mod tests {
                         p_data: None,
                         format: VaultDataFormat::String,
                         origin_id: None,
+                        source: DataLifetimeSource::Hosted,
                     },
                     NewVaultData {
                         kind: IDK::Ssn4.into(),
@@ -82,11 +83,11 @@ mod tests {
                         p_data: None,
                         format: VaultDataFormat::String,
                         origin_id: None,
+                        source: DataLifetimeSource::Hosted,
                     },
                 ];
                 let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-                let source = DataLifetimeSource::Hosted;
-                VaultData::bulk_create(conn, &uv.id, &sv.id, data, seqno, source, None).unwrap();
+                VaultData::bulk_create(conn, &uv.id, &sv.id, data, seqno, None).unwrap();
                 sv
             })
             .collect();
