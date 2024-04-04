@@ -71,6 +71,10 @@ jobs:
           echo "##[set-output name=url;]$(echo ${url})"
         id: extract_env_url
 
+      - name: cancel current running
+        run: pulumi cancel "${{ steps.get_stack_name.outputs.stack }}" -y || true
+        working-directory: ./backend/infra
+
       - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: refresh
