@@ -993,7 +993,8 @@
         "learn-more": {
           "title": "More about Passkeys",
           "cta": "Learn more",
-          "content": "Passkeys are a secure, user-friendly authentication method that replaces traditional passwords with digital keys stored on the user's device. \nBy using cryptographic techniques for authentication and eliminating complex password requirements, passkeys enhance security and simplify logins. They rely on biometric checks or device PINs for user verification, allowing seamless access across devices and platforms."
+          "content-1": "Passkeys are a secure, user-friendly authentication method that replaces traditional passwords with digital keys stored on the user's device.",
+          "content-2": "By using cryptographic techniques for authentication and eliminating complex password requirements, passkeys enhance security and simplify logins. They rely on biometric checks or device PINs for user verification, allowing seamless access across devices and platforms."
         },
         "success": {
           "title": "Success!",

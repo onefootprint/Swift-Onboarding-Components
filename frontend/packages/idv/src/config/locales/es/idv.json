@@ -992,9 +992,10 @@
         "subtitle": "Passkey es un reemplazo de las contraseñas convencionales. Valida tu identidad utilizando tu dispositivo, mediante datos biométricos, contraseña o código PIN. Se almacena de forma segura en el gestor de contraseñas de tu dispositivo por lo que es completamente privado. El proceso de configuración puede variar según tu navegador.",
         "cta": "Iniciar verificación",
         "learn-more": {
-          "cta": "Más sobre passkeys",
           "title": "Más sobre Passkeys",
-          "content": "Las passkeys son un método de autenticación seguro y fácil de usar que reemplaza las contraseñas tradicionales con claves digitales almacenadas en el dispositivo del usuario. \nUtilizando técnicas criptográficas para la autenticación y eliminando la necesidad de contraseñas complejas, las passkeys mejoran la seguridad y simplifican los inicios de sesión. Se basan en verificaciones biométricas o PINs del dispositivo para la verificación del usuario, permitiendo un acceso fluido a través de dispositivos y plataformas."
+          "cta": "Más sobre passkeys",
+          "content-1": "Las passkeys son un método de autenticación seguro y fácil de usar que reemplaza las contraseñas tradicionales con claves digitales almacenadas en el dispositivo del usuario.",
+          "content-2": "Utilizando técnicas criptográficas para la autenticación y eliminando la necesidad de contraseñas complejas, las passkeys mejoran la seguridad y simplifican los inicios de sesión. Se basan en verificaciones biométricas o PINs del dispositivo para la verificación del usuario, permitiendo un acceso fluido a través de dispositivos y plataformas."
         },
         "success": {
           "title": "¡Éxito!",

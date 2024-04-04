@@ -205,9 +205,14 @@ const Register = () => {
             onClose={handleCloseBottomSheet}
             title={t('learn-more.title')}
           >
-            <Text variant="body-3" whiteSpace="pre-wrap">
-              {t('learn-more.content')}
-            </Text>
+            <Stack gap={3} direction="column" marginBottom={5}>
+              <Text variant="body-3" whiteSpace="pre-wrap">
+                {t('learn-more.content-1')}
+              </Text>
+              <Text variant="body-3" whiteSpace="pre-wrap">
+                {t('learn-more.content-2')}
+              </Text>
+            </Stack>
           </BottomSheet>
         </Stack>
       </Box>
