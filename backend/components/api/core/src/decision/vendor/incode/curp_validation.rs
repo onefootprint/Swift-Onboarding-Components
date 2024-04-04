@@ -1,16 +1,16 @@
 use db::models::{
-    decision_intent::DecisionIntent, identity_document::IdentityDocument, scoped_vault::ScopedVault,
+    decision_intent::DecisionIntent, identity_document::IdentityDocument,
+    incode_verification_session::IncodeVerificationSession, scoped_vault::ScopedVault,
     verification_request::VerificationRequest,
 };
 use idv::{
     incode::curp_validation::{response::CurpValidationResponse, IncodeCurpValidationRequest},
     ParsedResponse, VendorResponse,
 };
-use itertools::Itertools;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, DocumentKind, IncodeConfigurationId,
-    IncodeEnvironment, OcrDataKind, PiiJsonValue, PiiString, ScopedVaultId, TenantId, VaultPublicKey,
-    VendorAPI, WorkflowId,
+    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, DocumentKind, IdentityDocumentId,
+    IncodeConfigurationId, IncodeEnvironment, IncodeVerificationSessionKind, OcrDataKind, PiiJsonValue,
+    PiiString, ScopedVaultId, TenantId, VaultPublicKey, VendorAPI, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -64,7 +64,7 @@ pub async fn run_curp_validation_check(
         return Ok(existing_vendor_result);
     }
 
-    let maybe_curp = get_curp_for_check(&state.enclave_client, &vw, id_documents).await?;
+    let (maybe_curp, iddoc_id) = get_curp_for_check(&state.enclave_client, &vw, id_documents).await?;
     let incode_environment = get_incode_environment(state, &tenant_id);
 
     match (maybe_curp, incode_environment) {
@@ -84,7 +84,7 @@ pub async fn run_curp_validation_check(
                 &di.scoped_vault_id,
                 &diid,
                 &vw.vault.public_key,
-                config_id,
+                config_id.clone(),
                 environment,
             )
             .await?;
@@ -113,6 +113,22 @@ pub async fn run_curp_validation_check(
             let raw_response = curp_response.raw_response.clone();
             let parsed: CurpValidationResponse =
                 curp_response.result.into_success().map_err(map_to_api_error)?;
+
+            // create an IVS record for billing/tracking
+            let _ = state
+                .db_pool
+                .db_transaction(move |conn| -> ApiResult<_> {
+                    let session = IncodeVerificationSession::create(
+                        conn,
+                        iddoc_id,
+                        config_id,
+                        IncodeVerificationSessionKind::CurpValidation,
+                        Some(environment),
+                    )?;
+
+                    Ok(session)
+                })
+                .await?;
 
             let vendor_result = VendorResult {
                 response: VendorResponse {
@@ -189,21 +205,20 @@ async fn get_curp_for_check(
     enclave_client: &EnclaveClient,
     vw: &VaultWrapper,
     id_documents: Vec<IdentityDocument>,
-) -> ApiResult<Option<PiiString>> {
-    if let Some(Some(vaulted_document_type)) = id_documents
-        .into_iter()
-        .map(|id| id.vaulted_document_type)
-        .collect_vec()
-        .first()
-    {
-        let odk = DocumentKind::OcrData(*vaulted_document_type, OcrDataKind::Curp);
+) -> ApiResult<(Option<PiiString>, IdentityDocumentId)> {
+    if let Some(id_doc) = id_documents.first() {
+        let Some(vaulted_document_type) = id_doc.vaulted_document_type else {
+            return Ok((None, id_doc.id.clone()));
+        };
+
+        let odk = DocumentKind::OcrData(vaulted_document_type, OcrDataKind::Curp);
         let decrypted_curp = vw
             .decrypt_unchecked(enclave_client, &[odk.into()])
             .await?
             .results
             .get(&odk.into())
             .cloned();
-        Ok(decrypted_curp)
+        Ok((decrypted_curp, id_doc.id.clone()))
     } else {
         Err(ApiError::from(decision::Error::from(
             decision::CurpValidationError::NoDocumentFoundForWorkflow,

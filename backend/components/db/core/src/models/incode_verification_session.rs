@@ -123,16 +123,17 @@ impl IncodeVerificationSession {
         kind: IncodeVerificationSessionKind,
         incode_environment: Option<IncodeEnvironment>,
     ) -> DbResult<Self> {
+        let purpose: IncodeVerificationSessionPurpose = kind.into();
         let new_req = NewIncodeVerificationSession {
             created_at: Utc::now(),
-            state: IncodeVerificationSessionState::StartOnboarding,
+            state: starting_state_for_purpose(&purpose),
             incode_configuration_id: configuration_id,
             identity_document_id,
             kind,
             latest_failure_reasons: vec![],
             ignored_failure_reasons: vec![],
             incode_environment,
-            purpose: IncodeVerificationSessionPurpose::Identity,
+            purpose,
         };
 
         let res: IncodeVerificationSession = diesel::insert_into(incode_verification_session::table)
@@ -260,5 +261,15 @@ impl IncodeVerificationSession {
             IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
             _ => None,
         }
+    }
+}
+
+
+fn starting_state_for_purpose(purpose: &IncodeVerificationSessionPurpose) -> IncodeVerificationSessionState {
+    match purpose {
+        IncodeVerificationSessionPurpose::Identity => IncodeVerificationSessionState::StartOnboarding, 
+        // we don't have a full state machine for curp, IVS just used for record keeping
+        IncodeVerificationSessionPurpose::CurpValidation => IncodeVerificationSessionState::Complete, 
+
     }
 }

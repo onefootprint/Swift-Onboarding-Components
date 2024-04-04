@@ -158,6 +158,7 @@ impl IncodeFailureReason {
 pub enum IncodeVerificationSessionKind {
     IdDocument,
     Selfie,
+    CurpValidation,
 }
 
 impl IncodeVerificationSessionKind {
@@ -165,6 +166,7 @@ impl IncodeVerificationSessionKind {
         match self {
             IncodeVerificationSessionKind::IdDocument => false,
             IncodeVerificationSessionKind::Selfie => true,
+            IncodeVerificationSessionKind::CurpValidation => false,
         }
     }
 }
@@ -228,6 +230,7 @@ impl From<IncodeVerificationSessionKind> for IncodeVerificationSessionPurpose {
         match value {
             IncodeVerificationSessionKind::IdDocument => IncodeVerificationSessionPurpose::Identity,
             IncodeVerificationSessionKind::Selfie => IncodeVerificationSessionPurpose::Identity,
+            IncodeVerificationSessionKind::CurpValidation => IncodeVerificationSessionPurpose::CurpValidation,
         }
     }
 }

@@ -699,6 +699,7 @@ impl GetOnboardingStatusResponse {
                             || self.onboarding_status == *"FACE_VALIDATION_FINISHED")
                 }
             }
+            IncodeVerificationSessionKind::CurpValidation => false,
         }
     }
 }
