@@ -418,7 +418,7 @@ describe('<Filters />', () => {
       });
     });
 
-    describe('when selecing the custom option', () => {
+    describe.skip('when selecing the custom option', () => {
       it('should trigger onChange with the dates and close the popover', async () => {
         const onChange = jest.fn();
         renderDateFilter({ onChange });

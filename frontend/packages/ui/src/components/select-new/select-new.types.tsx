@@ -2,14 +2,15 @@ export type SelectNewProps = {
   size?: 'compact' | 'default';
   disabled?: boolean;
   placeholder?: string;
-  value?: string;
+  initialValue?: string;
   onChange?: (value: string) => void;
   options: SelectNewOption[];
-  triggerWidth?: Width;
-  contentWidth?: Width;
+  triggerWidth?: string;
+  contentWidth?: string;
   label?: string;
   hint?: string;
   ariaLabel?: string;
+  value?: SelectNewOption['value'];
 };
 
 export type SelectNewOption = {
@@ -24,19 +25,17 @@ export type TriggerProps = {
   placeholder?: string;
   size?: SelectNewProps['size'];
   value?: string;
-  triggerWidth?: Width;
+  triggerWidth?: string;
   ariaLabel?: string;
 };
 
 export type ContentProps = {
   options: SelectNewOption[];
   size?: SelectNewProps['size'];
-  contentWidth?: Width;
+  contentWidth?: string;
 };
 
 export type ItemProps = {
   option: SelectNewOption;
   size?: SelectNewProps['size'];
 };
-
-type Width = 'full' | 'auto' | 'narrow' | 'default' | 'wide';

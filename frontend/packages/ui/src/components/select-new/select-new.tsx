@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import Label from '../label';
 import Hint from './hint';
 import Item from './item';
-import type { ContentProps, SelectNewProps } from './select-new.types';
+import type { SelectNewOption, SelectNewProps } from './select-new.types';
 import Trigger from './trigger/trigger';
 
 const SelectNew = ({
@@ -19,8 +19,10 @@ const SelectNew = ({
   onChange,
   options,
   ariaLabel = 'select',
-}: SelectNewProps) => (
-  <StyledRoot onValueChange={onChange} disabled={disabled}>
+  value,
+  className,
+}: SelectNewProps & { className?: string }) => (
+  <StyledRoot onValueChange={onChange} disabled={disabled} value={value}>
     {label && <Label>{label}</Label>}
     <Trigger
       placeholder={placeholder}
@@ -28,12 +30,14 @@ const SelectNew = ({
       disabled={disabled}
       triggerWidth={triggerWidth}
       ariaLabel={ariaLabel}
+      value={value}
+      className={className}
     />
     {hint && <Hint text={hint} />}
     <Select.Portal>
       <StyledContent sideOffset={8} width={contentWidth} position="popper">
         <Select.Viewport>
-          {options.map(option => (
+          {options.map((option: SelectNewOption) => (
             <Item key={option.value} option={option} size={size} />
           ))}
         </Select.Viewport>
@@ -47,39 +51,14 @@ const StyledRoot = styled(Select.Root)`
 `;
 
 const StyledContent = styled(Select.Content)<{
-  width?: ContentProps['contentWidth'];
+  width?: string;
 }>`
   ${({ width, theme }) => css`
     border-radius: ${theme.borderRadius.default};
     background-color: ${theme.backgroundColor.primary};
     box-shadow: ${theme.elevation[3]};
     padding: ${theme.spacing[2]};
-    z-index: ${theme.zIndex.dialog + 1};
-
-    ${width === 'full' &&
-    css`
-      width: 100%;
-    `}
-
-    ${width === 'auto' &&
-    css`
-      width: auto;
-    `}
-
-      ${width === 'narrow' &&
-    css`
-      width: 120px;
-    `}
-
-      ${width === 'default' &&
-    css`
-      width: 300px;
-    `}
-
-      ${width === 'wide' &&
-    css`
-      width: 320px;
-    `}
+    width: ${width};
   `}
 `;
 

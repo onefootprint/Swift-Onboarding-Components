@@ -12,8 +12,14 @@ const Trigger = ({
   placeholder,
   triggerWidth,
   ariaLabel,
-}: TriggerProps) => (
-  <StyledTrigger size={size} width={triggerWidth} aria-label={ariaLabel}>
+  className,
+}: TriggerProps & { className?: string }) => (
+  <StyledTrigger
+    size={size}
+    width={triggerWidth}
+    aria-label={ariaLabel}
+    className={className}
+  >
     <ValueContainer>
       <Select.Value placeholder={placeholder} />
     </ValueContainer>
@@ -37,23 +43,24 @@ const StyledTrigger = styled(Select.Trigger)<{
       justify-content: space-between;
       background-color: ${input.state.default.initial.bg};
       color: ${input.global.color};
-      border-color: ${input.state.default.initial.border};
       border-radius: ${input.global.borderRadius};
       border: ${input.global.borderWidth} solid
         ${input.state.default.initial.border};
+      width: ${width};
+      gap: ${theme.spacing[2]};
 
       ${IconContainer} {
         transition: transform 0.1s ease;
       }
 
       &[data-state='open'] {
+        border-color: ${input.state.default.focus.border};
         ${IconContainer} {
           transform: rotate(180deg);
         }
       }
 
       &:focus {
-        outline: none;
         border-color: ${input.state.default.focus.border};
       }
 
@@ -83,31 +90,6 @@ const StyledTrigger = styled(Select.Trigger)<{
         ${createFontStyles('body-3')}
         height: ${input.size.default.height};
         padding: ${theme.spacing[3]} ${theme.spacing[4]};
-      `}
-
-      ${width === 'full' &&
-      css`
-        width: 100%;
-      `}
-
-      ${width === 'auto' &&
-      css`
-        width: auto;
-      `}
-
-      ${width === 'narrow' &&
-      css`
-        width: 120px;
-      `}
-
-      ${width === 'default' &&
-      css`
-        width: 300px;
-      `}
-
-      ${width === 'wide' &&
-      css`
-        width: 320px;
       `}
     `;
   }};

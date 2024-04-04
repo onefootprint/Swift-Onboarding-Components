@@ -127,8 +127,8 @@ const DrawerFilter = () => {
                               startDate={field.value.from}
                               endDate={field.value.to}
                               onChange={(
-                                nextStartDate: Date,
-                                nextEndDate: Date,
+                                nextStartDate?: Date,
+                                nextEndDate?: Date,
                               ) => {
                                 field.onChange({
                                   from: nextStartDate,

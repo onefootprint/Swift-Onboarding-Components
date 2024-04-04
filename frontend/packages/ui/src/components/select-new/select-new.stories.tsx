@@ -96,5 +96,4 @@ Default.args = {
   size: 'default',
   disabled: false,
   placeholder: 'Select',
-  value: '',
 };

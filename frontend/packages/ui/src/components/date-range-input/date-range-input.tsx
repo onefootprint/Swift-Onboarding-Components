@@ -1,64 +1,105 @@
 'use client';
 
-import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import React, { useRef } from 'react';
-import styled, { css } from 'styled-components';
+import { format } from 'date-fns';
+import React, { useEffect, useMemo, useState } from 'react';
+import styled from 'styled-components';
 
-import type { ButtonPickerRef } from './components/button-picker';
-import ButtonPicker from './components/button-picker';
+import DateSelectorSheet from '../date-selector-sheet';
+import Input from '../internal/input';
 
 export type DateRangeInputProps = {
-  onChange?: (start: Date, end: Date) => void;
-  startDate: Date;
-  endDate: Date;
+  onChange?: (startDate: Date | undefined, endDate: Date | undefined) => void;
+  initialStartDate?: Date;
+  initialEndDate?: Date;
+  placeholder?: string;
+  size?: 'default' | 'compact';
+  onOpenChange?: (open: boolean) => void;
+  startDate?: Date;
+  endDate?: Date;
 };
 
 const DateRangeInput = ({
+  initialStartDate,
+  initialEndDate,
   startDate,
   endDate,
+  placeholder = 'Select a date range',
+  onOpenChange,
   onChange,
+  size,
 }: DateRangeInputProps) => {
-  const endButtonPickerRef = useRef<ButtonPickerRef>(null);
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
+    initialStartDate,
+  );
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
+    initialEndDate,
+  );
+  const [openDateSheet, setOpenDateSheet] = useState(false);
 
-  const opeEndDatePicker = () => {
-    endButtonPickerRef.current?.open();
-  };
-
-  const handleStartDateChange = (nextStartDate: Date) => {
-    if (onChange) {
-      const isStartGreaterThanEnd = nextStartDate > endDate;
-      onChange(nextStartDate, isStartGreaterThanEnd ? nextStartDate : endDate);
+  useEffect(() => {
+    if (startDate && endDate) {
+      setSelectedStartDate(startDate);
+      setSelectedEndDate(endDate);
     }
-    opeEndDatePicker();
+  }, [startDate, endDate]);
+
+  const formattedRange = useMemo(
+    () =>
+      selectedStartDate && selectedEndDate
+        ? `${format(selectedStartDate, 'MM/dd/yy')} \u2013 ${format(
+            selectedEndDate,
+            'MM/dd/yy',
+          )}`
+        : '',
+    [selectedStartDate, selectedEndDate],
+  );
+
+  const handleRangeChange = ({
+    startDate: newStartDate,
+    endDate: newEndDate,
+  }: {
+    startDate?: Date;
+    endDate?: Date;
+  }) => {
+    setSelectedStartDate(newStartDate);
+    setSelectedEndDate(newEndDate);
+    if (onChange) {
+      onChange(newStartDate, newEndDate);
+    }
   };
 
-  const handleEndDateChange = (nextEndDate: Date) => {
-    onChange?.(startDate, nextEndDate);
+  const handleToggleDateSheet = () => {
+    setOpenDateSheet(!openDateSheet);
   };
 
   return (
-    <InputContainer>
-      <ButtonPicker onChange={handleStartDateChange} value={startDate} />
-      <IcoArrowRightSmall16 />
-      <ButtonPicker
-        disabledDays={[{ before: startDate }]}
-        onChange={handleEndDateChange}
-        ref={endButtonPickerRef}
-        value={endDate}
-      />
-    </InputContainer>
+    <DateSelectorSheet
+      startDate={selectedStartDate}
+      endDate={selectedEndDate}
+      onOpenChange={onOpenChange}
+      onChange={handleRangeChange}
+      onClickOutside={handleToggleDateSheet}
+      open={openDateSheet}
+      asChild
+    >
+      <Trigger
+        onClick={handleToggleDateSheet}
+        type="button"
+        aria-label="Select Date Range"
+      >
+        <Input
+          placeholder={placeholder}
+          size={size}
+          value={formattedRange}
+          readOnly
+        />
+      </Trigger>
+    </DateSelectorSheet>
   );
 };
 
-const InputContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    display: inline-flex;
-    gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-  `};
+const Trigger = styled.button`
+  all: unset;
 `;
 
 export default DateRangeInput;

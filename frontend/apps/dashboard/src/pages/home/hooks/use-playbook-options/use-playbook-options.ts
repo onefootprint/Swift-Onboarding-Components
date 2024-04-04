@@ -36,6 +36,7 @@ type UsePlaybookOptionsArgs = {
 const usePlaybookOptions = ({ kinds }: UsePlaybookOptionsArgs) => {
   const { authHeaders, isLive } = useSession();
   const { isReady } = useFilters();
+
   return useQuery(
     ['insights', 'playbooks', isLive],
     () => getPlaybooks({ authHeaders, kinds }),

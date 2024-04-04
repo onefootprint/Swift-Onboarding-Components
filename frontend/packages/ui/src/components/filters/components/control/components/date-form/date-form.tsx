@@ -49,19 +49,21 @@ const DateForm = ({ onSubmit, selectedOptions }: DateFormProps) => {
         />
       ))}
       <div ref={animateCustomDate}>
+        {' '}
         {shouldShowDatePicker && (
           <Controller
             control={control}
             name="customDate"
             render={({ field }) => (
               <DateRangeInput
-                startDate={field.value.from}
-                endDate={field.value.to}
-                onChange={(nextStartDate: Date, nextEndDate: Date) => {
-                  field.onChange({
-                    from: nextStartDate,
-                    to: nextEndDate,
-                  });
+                initialStartDate={
+                  selectedOptions[0] ? new Date(selectedOptions[0]) : undefined
+                }
+                initialEndDate={
+                  selectedOptions[1] ? new Date(selectedOptions[1]) : undefined
+                }
+                onChange={(newDateStart, newDateEnd) => {
+                  field.onChange({ from: newDateStart, to: newDateEnd });
                 }}
               />
             )}

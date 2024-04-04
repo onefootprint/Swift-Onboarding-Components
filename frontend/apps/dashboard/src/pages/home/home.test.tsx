@@ -179,11 +179,6 @@ describe('<Home />', () => {
       await renderHomeAndWaitNotLoading();
 
       await waitFor(() => {
-        const sectionTitle = screen.queryByText('Onboarding metrics');
-        expect(sectionTitle).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
         const error = screen.getByText('Something went wrong.', {
           exact: false,
         });

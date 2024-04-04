@@ -1,0 +1,57 @@
+import { SelectNew, Shimmer } from '@onefootprint/ui';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+
+import ALL_PLAYBOOKS_ID from '../../constants';
+import useFilters from '../../hooks/use-filters';
+import usePlaybookOptions from '../../hooks/use-playbook-options';
+
+const PlaybooksFilter = () => {
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.home.onboarding-metrics.filters',
+  });
+  const filters = useFilters();
+  const { data, isLoading } = usePlaybookOptions({});
+
+  const allPlaybooksOption = {
+    label: t('all-playbooks'),
+    value: ALL_PLAYBOOKS_ID,
+  };
+  const playbooksData = [allPlaybooksOption, ...(data || [])];
+
+  const playbooksFilterValue = playbooksData?.find(
+    ({ value }) => value === filters.values.playbook_id,
+  ) ?? {
+    label: t('all-playbooks'),
+    value: ALL_PLAYBOOKS_ID,
+  };
+
+  const handleChange = (newPlaybook: string) => {
+    filters.push({
+      ...filters.query,
+      playbook_id: newPlaybook === ALL_PLAYBOOKS_ID ? undefined : newPlaybook,
+    });
+  };
+
+  return (
+    <>
+      {isLoading && <Loading />}
+      {data && (
+        <StyledSelect
+          disabled={playbooksData.length === 1}
+          onChange={handleChange}
+          options={playbooksData}
+          size="compact"
+          value={playbooksFilterValue.value}
+        />
+      )}
+    </>
+  );
+};
+
+const Loading = () => <Shimmer sx={{ width: '124px', height: '32px' }} />;
+
+const StyledSelect = styled(SelectNew)``;
+
+export default PlaybooksFilter;

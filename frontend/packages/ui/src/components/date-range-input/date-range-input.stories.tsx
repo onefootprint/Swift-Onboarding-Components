@@ -1,5 +1,5 @@
 import type { Meta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import React from 'react';
 
 import type { DateRangeInputProps } from './date-range-input';
 import DateRangeInput from './date-range-input';
@@ -7,33 +7,30 @@ import DateRangeInput from './date-range-input';
 export default {
   component: DateRangeInput,
   title: 'Components/DateRangeInput',
-  argTypes: {},
-} as Meta;
-
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['default', 'compact'],
+    },
+    $width: {
+      control: 'text',
+    },
+  },
+} as Meta<DateRangeInputProps>;
 const Template: Story<DateRangeInputProps> = ({
+  initialStartDate,
+  initialEndDate,
   onChange,
-  endDate: initialEndDate,
-  startDate: initialStartDate,
-}: DateRangeInputProps) => {
-  const [startDate, setStartDate] = useState<Date>(initialStartDate);
-  const [endDate, setEndDate] = useState<Date>(initialEndDate);
-
-  return (
-    <DateRangeInput
-      onChange={(nextStartDate: Date, nextEndDate: Date) => {
-        setStartDate(nextStartDate);
-        setEndDate(nextEndDate);
-        onChange?.(nextStartDate, nextEndDate);
-      }}
-      startDate={startDate}
-      endDate={endDate}
-    />
-  );
-};
+}) => (
+  <DateRangeInput
+    initialStartDate={initialStartDate}
+    initialEndDate={initialEndDate}
+    onChange={onChange}
+  />
+);
 
 export const Base = Template.bind({});
 Base.args = {
-  endDate: new Date('10/10/2021'),
-  onChange: console.log, // eslint-disable-line no-console
-  startDate: new Date('10/05/2021'),
+  initialStartDate: new Date('10/05/2024'),
+  initialEndDate: new Date('10/10/2024'),
 };
