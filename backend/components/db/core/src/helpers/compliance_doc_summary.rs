@@ -328,6 +328,8 @@ mod tests {
                 supported_auth_methods: None,
                 domains: vec!["example bank dot com".to_owned()],
                 allow_domain_access: false,
+                logo_url: None,
+                website_url: None,
             },
         )
         .unwrap();
@@ -340,6 +342,8 @@ mod tests {
                 supported_auth_methods: None,
                 domains: vec!["example bank dot com".to_owned()],
                 allow_domain_access: false,
+                logo_url: None,
+                website_url: None,
             },
         )
         .unwrap();

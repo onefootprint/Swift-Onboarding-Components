@@ -21,7 +21,7 @@ use db::{
         tenant_user::TenantUser,
     },
 };
-use newtypes::{OrgMemberEmail, TenantKind, OrgIdentifierRef, TenantScope, WorkosAuthMethod};
+use newtypes::{OrgIdentifierRef, OrgMemberEmail, TenantKind, TenantScope, WorkosAuthMethod};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::{
     sso::{
@@ -141,9 +141,9 @@ async fn handler(
 
     let single_rb_and_t_pt = if let Some(org_id) = request_org_id {
         // If a specific tenant ID was requested, only log into that tenant
-        matching_rolebindings.into_iter().find(
-            |(_, t_pt)| matches!(t_pt.id(), OrgIdentifierRef::TenantId(t_id) if *t_id == org_id),
-        )
+        matching_rolebindings
+            .into_iter()
+            .find(|(_, t_pt)| matches!(t_pt.id(), OrgIdentifierRef::TenantId(t_id) if *t_id == org_id))
     } else {
         // If there's only one rolebinding for this user, log into it
         (matching_rolebindings.len() == 1)
@@ -282,6 +282,8 @@ async fn find_or_create_partner_tenant(
         supported_auth_methods: None,
         domains: domain.into_iter().collect(),
         allow_domain_access: false, // false by default on creation
+        logo_url: None,
+        website_url: None,
     };
     let partner_tenant = state
         .db_pool

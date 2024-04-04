@@ -28,6 +28,8 @@ pub struct PartnerTenant {
     #[diesel(deserialize_as = NonNullVec<String>)]
     pub domains: Vec<String>,
     pub allow_domain_access: bool,
+    pub logo_url: Option<String>,
+    pub website_url: Option<String>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -39,6 +41,8 @@ pub struct NewPartnerTenant {
     pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
     pub domains: Vec<String>,
     pub allow_domain_access: bool,
+    pub logo_url: Option<String>,
+    pub website_url: Option<String>,
 }
 
 /// Allows creating with an application-generated PartnerTenantId rather than a DB-generated ID.
@@ -52,6 +56,8 @@ pub struct NewIntegrationTestPartnerTenant {
     pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
     pub domains: Vec<String>,
     pub allow_domain_access: bool,
+    pub logo_url: Option<String>,
+    pub website_url: Option<String>,
 }
 
 impl PartnerTenant {

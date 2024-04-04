@@ -86,6 +86,8 @@ async fn post(
                         supported_auth_methods: None,
                         domains: vec![],
                         allow_domain_access: false,
+                        logo_url: None,
+                        website_url: None,
                     };
                     PartnerTenant::create(conn, new_partner_tenant)?
                 }

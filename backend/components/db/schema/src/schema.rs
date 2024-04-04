@@ -749,6 +749,8 @@ diesel::table! {
         supported_auth_methods -> Nullable<Array<Nullable<Text>>>,
         domains -> Array<Nullable<Text>>,
         allow_domain_access -> Bool,
+        logo_url -> Nullable<Text>,
+        website_url -> Nullable<Text>,
     }
 }
 
