@@ -26,8 +26,8 @@ const Home = () => {
       <SectionTitle>
         <Text variant="label-1">{t('onboarding-metrics.title')}</Text>
         <Stack gap={4}>
-          <PlaybooksFilter />
           <DateFilter />
+          <PlaybooksFilter />
         </Stack>
       </SectionTitle>
       {metrics.isLoading && <Loading />}
