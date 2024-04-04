@@ -1,0 +1,256 @@
+use super::ValidatedDataRequest;
+use crate::{
+    auth::tenant::AuthActor,
+    errors::ApiResult,
+    utils::vault_wrapper::{PrefillData, VaultWrapper, WriteableVw},
+};
+use db::{
+    models::{contact_info::ContactInfo, vault_data::NewVaultData},
+    PgConn,
+};
+use itertools::Itertools;
+use newtypes::{
+    BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataLifetimeSource, DataRequest,
+    Error as NtError, Fingerprints, IdentityDataKind as IDK, NtResult, ScopedVaultId, ValidationError,
+    VaultDataFormat, VaultKind,
+};
+use std::collections::{HashMap, HashSet};
+
+impl<Type> VaultWrapper<Type> {
+    /// Given a DataRequest, validate some invariants before allowing it to be written to the vault.
+    /// These invariants are also a function of the data in the vault at the time
+    pub fn validate_request(
+        &self,
+        conn: &mut PgConn,
+        request: DataRequest<Fingerprints>,
+        source: DataLifetimeSource,
+        actor: Option<AuthActor>,
+        for_replacing_ci: bool,
+    ) -> ApiResult<ValidatedDataRequest> {
+        assert_allowed_for_vault(&request, self.vault.kind)?;
+        assert_allowed_for_source(&request, source)?;
+        // Transform the request into a Vec<NewVaultData>
+        let (data, json_fields, fingerprints) = request.decompose();
+        let data = data
+            .into_iter()
+            .map(|(kind, pii)| {
+                let e_data = self.vault().public_key.seal_pii(&pii)?;
+                let p_data = kind.store_plaintext().then_some(pii);
+                let format = if json_fields.contains(&kind) {
+                    VaultDataFormat::Json
+                } else {
+                    VaultDataFormat::String
+                };
+                let vd = NewVaultData {
+                    kind,
+                    e_data,
+                    p_data,
+                    format,
+                    origin_id: None,
+                    source,
+                };
+                Ok(vd)
+            })
+            .collect::<ApiResult<Vec<_>>>()?;
+
+        let new_cdos = self.validate_adding_dis(conn, &data, None, actor, for_replacing_ci)?;
+
+        let req = ValidatedDataRequest {
+            data,
+            old_ci: HashMap::new(),
+            fingerprints,
+            new_cdos,
+            is_prefill: false,
+        };
+        Ok(req)
+    }
+}
+
+
+impl<Type> WriteableVw<Type> {
+    /// Given the source user-scoped vault and destination tenant-scoped vault, assembles the
+    /// ValidatedDataRequest that will prefill portable data into the destination vault
+    pub fn validate_prefill_data_request(
+        &self,
+        conn: &mut PgConn,
+        prefill_data: PrefillData,
+    ) -> ApiResult<ValidatedDataRequest> {
+        let PrefillData {
+            data,
+            fingerprints,
+            old_ci,
+            ..
+        } = prefill_data;
+        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.scoped_vault_id), None, false)?;
+        let request = ValidatedDataRequest {
+            data,
+            old_ci,
+            new_cdos,
+            fingerprints: fingerprints.into_iter().collect(),
+            is_prefill: true,
+        };
+        Ok(request)
+    }
+}
+
+impl<Type> VaultWrapper<Type> {
+    fn validate_adding_dis(
+        &self,
+        conn: &mut PgConn,
+        data: &[NewVaultData],
+        // None if adding data not for prefill, Some with the sv_id if adding data for prefill
+        prefill_sv_id: Option<&ScopedVaultId>,
+        actor: Option<AuthActor>,
+        for_replacing_ci: bool,
+    ) -> ApiResult<HashSet<CollectedDataOption>> {
+        // Don't allow replacing some pieces of info
+        let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
+        let dis = data.iter().map(|vd| &vd.kind).collect_vec();
+
+        let irreplaceable_ci = if !for_replacing_ci {
+            vec![IDK::PhoneNumber.into(), IDK::Email.into()]
+        } else {
+            vec![]
+        };
+        for di in irreplaceable_ci {
+            let Some(d) = self.data(&di) else {
+                // If the DI doesn't exist yet, we're just adding the data, which is safe.
+                continue;
+            };
+            let ci = ContactInfo::get(conn, &d.lifetime.id)?;
+            let update_has_di = dis.contains(&&di);
+            // TODO should we disallow updating the email for any vault that is_verified?
+            if ci.is_otp_verified && update_has_di {
+                if matches!(actor, Some(AuthActor::FirmEmployee(_))) {
+                    // Don't error, allow firm employees (who already have write permissions) to
+                    // be able to replace CI
+                    tracing::error!("Firm employee is updating verified ContactInfo! Note that this won't entirely work properly - the new ContactInfo is marked as unverified, which causes weird bugs. Please repair the vault manually");
+                } else if prefill_sv_id.is_none() {
+                    validation_errors.insert(di, ValidationError::CannotReplaceVerifiedContactInfo.into());
+                } else if prefill_sv_id.is_some_and(|sv_id| sv_id == &d.lifetime.scoped_vault_id) {
+                    // With our current prefill logic that only prefills for the first WF for a SV,
+                    // we shouldn't ever get in a position where we're replacing CI.
+                    // Except for a race condition
+                    tracing::error!("Unexpected: replacing CI with prefill data");
+                }
+            }
+        }
+
+        let irreplaceable_dis = vec![BDK::KycedBeneficialOwners.into()];
+        for di in irreplaceable_dis {
+            let update_has_di = dis.iter().any(|x| *x == &di);
+            let vault_already_has_di = self.data(&di).is_some();
+            if update_has_di && vault_already_has_di {
+                validation_errors.insert(di, ValidationError::CannotReplaceData.into());
+            }
+        }
+
+        // Then, validate that we're not overwriting any full data with partial data.
+        // For example, we shouldn't let you provide an Ssn4 if we already have an Ssn9.
+        let existing_cdos = CollectedDataOption::list_from(self.populated_dis());
+        let new_cdos = CollectedDataOption::list_from(dis.iter().map(|x| (*x).clone()).collect());
+        for speculative_cdo in &new_cdos {
+            let Some(full_cdo) = speculative_cdo.full_variant() else {
+                continue;
+            };
+
+            // Some clunky logic to allow partial updates, which may need to happen while the
+            // tenant-view of the user is still built using portable data from other tenants
+            // TODO rm this after backfill. Maybe switch to dropping partial CDOs for prefill data
+            // if a full CDO already exists
+            if let Some(prefill_sv_id) = prefill_sv_id {
+                let is_full_cdo_added_by_other_tenant = full_cdo
+                    .data_identifiers()
+                    .unwrap_or_default()
+                    .into_iter()
+                    .flat_map(|di| self.data(&di))
+                    .all(|d| &d.lifetime.scoped_vault_id != prefill_sv_id);
+                if is_full_cdo_added_by_other_tenant {
+                    // If the full CDO was added by another tenant and this is prefill data, temporarily allow it
+                    continue;
+                }
+            }
+
+            // If the full CDO was added by this tenant, never want to allow replacing it
+            let speculative_cdo_would_replace_full_cdo = existing_cdos.contains(&full_cdo);
+            if speculative_cdo_would_replace_full_cdo {
+                // For each DI in this offending CDO, make a pretty error that shows that the DI
+                // would be overwriting the full CDO that already exists
+                for di in speculative_cdo
+                    .data_identifiers()
+                    .into_iter()
+                    .flatten()
+                    .filter(|di| dis.contains(&di))
+                {
+                    let err = ValidationError::PartialUpdateNotAllowed(speculative_cdo.clone()).into();
+                    validation_errors.insert(di, err);
+                }
+            }
+        }
+        if !validation_errors.is_empty() {
+            let validation_error = newtypes::DataValidationError::FieldValidationError(validation_errors);
+            return Err(newtypes::Error::from(validation_error).into());
+        }
+
+        Ok(new_cdos)
+    }
+}
+
+
+/// Enforce that this update only has the allowable set of DIs based on the vault kind
+pub fn assert_allowed_for_vault<T>(request: &DataRequest<T>, kind: VaultKind) -> NtResult<()> {
+    // Keep full match statements here so we have to implement this any time there's a new
+    // VaultKind or DataIdentifierDiscriminant
+    let is_allowed = move |di: &DataIdentifier| -> bool {
+        match kind {
+            VaultKind::Person => match di {
+                DataIdentifier::Id(_)
+                | DataIdentifier::Custom(_)
+                | DataIdentifier::InvestorProfile(_)
+                | DataIdentifier::Document(_)
+                | DataIdentifier::Card(_) => true,
+                DataIdentifier::Business(_) => false,
+            },
+            VaultKind::Business => match di {
+                DataIdentifier::Business(_) | DataIdentifier::Custom(_) => true,
+                DataIdentifier::Id(_)
+                | DataIdentifier::InvestorProfile(_)
+                | DataIdentifier::Document(_)
+                | DataIdentifier::Card(_) => false,
+            },
+        }
+    };
+
+    let disallowed_keys = request.keys().filter(|di| !is_allowed(di)).collect_vec();
+    if !disallowed_keys.is_empty() {
+        let field_errors = disallowed_keys
+            .into_iter()
+            .map(|di| (di.clone(), NtError::IncompatibleDataIdentifier))
+            .collect();
+        return Err(newtypes::DataValidationError::FieldValidationError(field_errors).into());
+    }
+    Ok(())
+}
+
+/// Enforce that this update only has the allowable set of DIs based on the vault kind
+pub fn assert_allowed_for_source<T>(request: &DataRequest<T>, source: DataLifetimeSource) -> NtResult<()> {
+    let is_allowed = move |di: &DataIdentifier| -> bool {
+        // Restrict the components SDK from adding phone or email
+        #[allow(clippy::match_like_matches_macro)]
+        match (source, di) {
+            (DataLifetimeSource::ComponentsSdk, DataIdentifier::Id(IDK::PhoneNumber)) => false,
+            (DataLifetimeSource::ComponentsSdk, DataIdentifier::Id(IDK::Email)) => false,
+            _ => true,
+        }
+    };
+
+    let disallowed_keys = request.keys().filter(|di| !is_allowed(di)).collect_vec();
+    if !disallowed_keys.is_empty() {
+        let field_errors = disallowed_keys
+            .into_iter()
+            .map(|di| (di.clone(), NtError::CannotAddDiWithSource))
+            .collect();
+        return Err(newtypes::DataValidationError::FieldValidationError(field_errors).into());
+    }
+    Ok(())
+}

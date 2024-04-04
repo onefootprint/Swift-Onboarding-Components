@@ -1,7 +1,4 @@
-use super::{
-    validated_data_request::{SavedData, ValidatedDataRequest},
-    WriteableVw,
-};
+use super::{SavedData, ValidatedDataRequest, WriteableVw};
 use crate::{
     auth::tenant::AuthActor,
     errors::{ApiResult, AssertionError},

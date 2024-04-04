@@ -9,9 +9,10 @@ mod delete;
 mod portablize_data;
 mod prefill;
 mod replace_verified_ci;
-mod validated_data_request;
+mod request;
 
 pub use prefill::PrefillKind;
+pub use request::*;
 
 #[cfg(test)]
 mod tests;

@@ -1,9 +1,8 @@
 use crate::{
     data_identifier::ValidationError,
     fingerprinter::{FingerprintScope, Fingerprinter, GlobalFingerprintKind},
-    CollectedDataOption, DataIdentifier, DataLifetimeSource, DataValidationError, Error, Fingerprint,
-    FingerprintScopeKind, IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType, TenantId,
-    Validate, VaultKind,
+    CollectedDataOption, DataIdentifier, DataValidationError, Error, Fingerprint, FingerprintScopeKind,
+    IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType, TenantId, Validate,
 };
 use either::Either::{Left, Right};
 use itertools::Itertools;
@@ -183,64 +182,6 @@ impl DataRequest<()> {
 }
 
 impl<T> DataRequest<T> {
-    /// Enforce that this update only has the allowable set of DIs based on the vault kind
-    pub fn assert_allowed_for_vault(&self, kind: VaultKind) -> NtResult<()> {
-        // Keep full match statements here so we have to implement this any time there's a new
-        // VaultKind or DataIdentifierDiscriminant
-        let is_allowed = move |di: &DataIdentifier| -> bool {
-            match kind {
-                VaultKind::Person => match di {
-                    DataIdentifier::Id(_)
-                    | DataIdentifier::Custom(_)
-                    | DataIdentifier::InvestorProfile(_)
-                    | DataIdentifier::Document(_)
-                    | DataIdentifier::Card(_) => true,
-                    DataIdentifier::Business(_) => false,
-                },
-                VaultKind::Business => match di {
-                    DataIdentifier::Business(_) | DataIdentifier::Custom(_) => true,
-                    DataIdentifier::Id(_)
-                    | DataIdentifier::InvestorProfile(_)
-                    | DataIdentifier::Document(_)
-                    | DataIdentifier::Card(_) => false,
-                },
-            }
-        };
-
-        let disallowed_keys = self.keys().filter(|di| !is_allowed(di)).collect_vec();
-        if !disallowed_keys.is_empty() {
-            let field_errors = disallowed_keys
-                .into_iter()
-                .map(|di| (di.clone(), Error::IncompatibleDataIdentifier))
-                .collect();
-            return Err(crate::DataValidationError::FieldValidationError(field_errors).into());
-        }
-        Ok(())
-    }
-
-    /// Enforce that this update only has the allowable set of DIs based on the vault kind
-    pub fn assert_allowed_for_source(&self, source: DataLifetimeSource) -> NtResult<()> {
-        let is_allowed = move |di: &DataIdentifier| -> bool {
-            // Restrict the components SDK from adding phone or email
-            #[allow(clippy::match_like_matches_macro)]
-            match (source, di) {
-                (DataLifetimeSource::ComponentsSdk, DataIdentifier::Id(IDK::PhoneNumber)) => false,
-                (DataLifetimeSource::ComponentsSdk, DataIdentifier::Id(IDK::Email)) => false,
-                _ => true,
-            }
-        };
-
-        let disallowed_keys = self.keys().filter(|di| !is_allowed(di)).collect_vec();
-        if !disallowed_keys.is_empty() {
-            let field_errors = disallowed_keys
-                .into_iter()
-                .map(|di| (di.clone(), Error::CannotAddDiWithSource))
-                .collect();
-            return Err(crate::DataValidationError::FieldValidationError(field_errors).into());
-        }
-        Ok(())
-    }
-
     /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
     /// and returns a new DataRequest with the Fingerprints populated.
     /// This gives us type safety that fingerprints are provided to the VW utils that add data to a vault
