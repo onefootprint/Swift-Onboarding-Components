@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS incode_verification_session_unique_identity_document_id_purpose ON incode_verification_session(identity_document_id, purpose) WHERE deactivated_at IS NULL;

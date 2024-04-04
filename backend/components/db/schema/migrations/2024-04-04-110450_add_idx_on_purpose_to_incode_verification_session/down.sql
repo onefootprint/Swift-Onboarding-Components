@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS incode_verification_session_unique_identity_document_id_purpose;
