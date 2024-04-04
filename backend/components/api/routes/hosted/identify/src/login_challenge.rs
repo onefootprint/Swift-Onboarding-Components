@@ -180,6 +180,7 @@ async fn initiate_passkey_login_challenge(
                     backup_eligible: cred.backup_eligible,
                     backup_state: false, // ignore
                     extensions: RegisteredExtensions::none(),
+                    transports: None,
                     attestation: ParsedAttestation {
                         data: ParsedAttestationData::None,
                         metadata: webauthn_rs_core::proto::AttestationMetadata::None,
@@ -201,7 +202,7 @@ async fn initiate_passkey_login_challenge(
     let webauthn = WebauthnConfig::new(&state.config);
     let (challenge, auth_state) = webauthn
         .webauthn()
-        .generate_challenge_authenticate_options(creds, None)?;
+        .generate_challenge_authenticate(creds, None)?;
 
     Ok(BiometricChallenge {
         state: BiometricChallengeState {

@@ -237,11 +237,11 @@ fn validate_biometric_challenge(
         .authenticate_credential(&auth_resp, &challenge_state.state)?;
 
     let credential: WebauthnCredential =
-        WebauthnCredential::get_by_credential_id(conn, &challenge_state.user_vault_id, &result.cred_id.0)?;
+        WebauthnCredential::get_by_credential_id(conn, &challenge_state.user_vault_id, &result.cred_id().0)?;
 
     // if the credential's backup state has changed:
     // update the backup state to learn that a credential is now portable across devices
-    if result.backup_state && challenge_state.non_synced_cred_ids.contains(&result.cred_id) {
+    if result.backup_state() && challenge_state.non_synced_cred_ids.contains(result.cred_id()) {
         credential.update_backup_state(conn)?;
     }
 

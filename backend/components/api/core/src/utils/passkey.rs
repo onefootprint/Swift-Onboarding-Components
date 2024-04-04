@@ -43,7 +43,7 @@ impl WebauthnConfig {
             webauthn: WebauthnCore::new_unsafe_experts_only(
                 "Footprint",
                 &config.rp_id,
-                &url,
+                vec![url],
                 Some(120 * 1000),
                 Some(true),
                 Some(true),
@@ -57,8 +57,10 @@ impl WebauthnConfig {
         WebauthnCore::new_unsafe_experts_only(
             "Footprint",
             rp_id,
-            #[allow(clippy::unwrap_used)]
-            &url::Url::parse("android:apk-key-hash:D_woKFaP1yeRthdVOKrD03l1Dx6xKjgv7cCoE13UXcg").unwrap(),
+            vec![
+                #[allow(clippy::unwrap_used)]
+                url::Url::parse("android:apk-key-hash:D_woKFaP1yeRthdVOKrD03l1Dx6xKjgv7cCoE13UXcg").unwrap(),
+            ],
             Some(120 * 1000),
             Some(false),
             Some(true),
@@ -74,13 +76,12 @@ impl WebauthnConfig {
         self,
         reg: &RegisterPublicKeyCredential,
         reg_state: &RegistrationState,
-        cas: &AttestationCaList,
+        cas: Option<&AttestationCaList>,
     ) -> ApiResult<Credential> {
         let cred = if is_android(&reg.response.client_data_json.0)? {
-            self.android_webauthn
-                .register_credential(reg, reg_state, Some(cas))?
+            self.android_webauthn.register_credential(reg, reg_state, cas)?
         } else {
-            self.webauthn.register_credential(reg, reg_state, Some(cas))?
+            self.webauthn.register_credential(reg, reg_state, cas)?
         };
         Ok(cred)
     }
@@ -112,11 +113,10 @@ impl WebauthnConfig {
         reg_state: RegistrationState,
         challenge_response: String,
     ) -> ApiResult<VerifyChallengeResult> {
-        let cas = AttestationCaList::apple_and_android();
         let reg: RegisterPublicKeyCredential = serde_json::from_str(&challenge_response)?;
 
         // Validate the challenge response
-        let cred = match self.register_credential(&reg, &reg_state, &cas) {
+        let cred = match self.register_credential(&reg, &reg_state, None) {
             Ok(cred) => cred,
             Err(err) => match err.kind() {
                 // temporary addition to detect some webauthn issues on windows devices
@@ -127,6 +127,23 @@ impl WebauthnConfig {
                 _ => return Err(err),
             },
         };
+
+        // if the attestation format is android or apple, verify the attestation chain
+        // with a trust anchor
+        if matches!(
+            cred.attestation_format,
+            AttestationFormat::AndroidKey
+                | AttestationFormat::AndroidSafetyNet
+                | AttestationFormat::AppleAnonymous
+        ) {
+            tracing::info!("verifying trust anchor for webauthn credential");
+            let _ = webauthn_rs_core::verify_attestation_ca_chain(
+                &cred.attestation.data,
+                &AttestationCaList::apple_and_android(),
+                false,
+            )?;
+            tracing::info!("successfully verified trust anchor for webauthn credential");
+        }
 
         // Compose attestation data
         let attestation_data_to_save = SavedAttestationData {
@@ -250,6 +267,8 @@ fn is_android(client_data_json: &[u8]) -> ApiResult<bool> {
 
 #[cfg(test)]
 mod tests {
+    use webauthn_rs_core::{proto::AttestationCaList, verify_attestation_ca_chain, WebauthnCore};
+
     use super::is_android;
     use crate::utils::passkey::WebauthnConfig;
 
@@ -280,6 +299,64 @@ mod tests {
           "credential_algorithms": [
             "ES256",
             "RS256"
+          ],
+          "require_resident_key": false,
+          "authenticator_attachment": "platform",
+          "extensions": {},
+          "experimental_allow_passkeys": true
+        });
+
+        let reg_state = serde_json::from_value(reg_state).unwrap();
+
+        let cred = config
+            .register_credential(&reg, &reg_state, None)
+            .expect("reg failed");
+        assert_eq!(
+            cred.attestation_format,
+            webauthn_rs_core::AttestationFormat::AndroidSafetyNet
+        );
+
+        let _ = verify_attestation_ca_chain(
+            &cred.attestation.data,
+            &AttestationCaList::apple_and_android(),
+            true,
+        )
+        .expect("failed to verify ca chain");
+    }
+
+    #[test]
+    fn test_windows_tpm() {
+        let json = serde_json::json!(
+                    {
+          "rawId": "aWOpr9uLbtBACCnjzsjVyceFIr3Pc2I_ilIUXq1gJ_E",
+          "id": "aWOpr9uLbtBACCnjzsjVyceFIr3Pc2I_ilIUXq1gJ_E",
+          "type": "public-key",
+          "response": {
+            "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNUhlUi1UZHZia0VoQ2tteUFxZFFNaVJPb2tMQmpoNHRWQlQ3bVZuWjlYTSIsIm9yaWdpbiI6Imh0dHBzOi8vaGFuZG9mZi5vbmVmb290cHJpbnQuY29tIiwiY3Jvc3NPcmlnaW4iOmZhbHNlfQ",
+            "attestationObject":"o2NmbXRjdHBtZ2F0dFN0bXSmY2FsZzn__mNzaWdZAQB3f-C5wCnYgriMBv6dxXEG_LjLo18LVb6CLr-GBk_wEGCX8EQQCaBqdX9xd3yPDJyxTjffACLYj2hUdJMpNAb6uT5fqYs7DUm5rpXxpnv5p_l20Uo0ZcteWH8lsEgXivSMfGiR4gXKHm9tpHroPgyzxzVcAF6RvOOkzKijtqrs6OIm801rVGxqlCH13jhWfSWHhGe4C5Be8jt40HvHlCvhU-YseSGijnPPZyFAycYF8X0ICKIAeCpCC41h4wLEW_Znn_r395cvAgmYCuKFP0MurRoKlvng1Lsu1WKzh4jL-S7YNebSJedjU8VjxdDR2P7C7ZfmyPmn26lgT-eiWKsoY3ZlcmMyLjBjeDVjglkFvTCCBbkwggOhoAMCAQICEAXMFNVjIkh0tJfo0-cttL4wDQYJKoZIhvcNAQELBQAwQjFAMD4GA1UEAxM3RVVTLUlOVEMtS0VZSUQtOUFBRjU5MUVFMjYzQ0FBRTEwRjU3QkEwNEZBOEQxREQ2NjEzRjlFQjAeFw0yNDAzMjAxODA5MDRaFw0yNzA2MDMxNzUwNTlaMAAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDowoFLwtDUYjF09tFhbl7XJ0BJ8qBBSjD0QiorJC25Do0c8PyRpX8l9Q0JlZWGDNmZCj33iLjCb58jcnwjt2mgViLY9y_BGujjb5dFiL82h01yrXsUsQuoa6AZRd_6bJiGT0aN9B2ASX0GdpsLp_yU2SVyHJ2E-VS4prQsrwqq12UtMgLPzCVaUK0CTv03GlYutlCjSq19tp3gI3bO5M_69tW1q6DtW_xBG_vWD3FJOuydstGm14WSA0ZtJNNh0TSREJIuloKKtWQsBdYR-Y1FV3DdIqvV01qdivtWobPOqwicZRziP21xzp2gF0gozBSrN07zry4ZS8sxSb3h8345AgMBAAGjggHrMIIB5zAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0TAQH_BAIwADBtBgNVHSABAf8EYzBhMF8GCSsGAQQBgjcVHzBSMFAGCCsGAQUFBwICMEQeQgBUAEMAUABBACAAIABUAHIAdQBzAHQAZQBkACAAIABQAGwAYQB0AGYAbwByAG0AIAAgAEkAZABlAG4AdABpAHQAeTAQBgNVHSUECTAHBgVngQUIAzBQBgNVHREBAf8ERjBEpEIwQDEWMBQGBWeBBQIBDAtpZDo0OTRFNTQ0MzEOMAwGBWeBBQICDANDTUwxFjAUBgVngQUCAwwLaWQ6MDFGNDAwMEUwHwYDVR0jBBgwFoAUiQElTXxVj2J3CcqLQJlpTKr1GH8wHQYDVR0OBBYEFKXNaYbIHamces5kjCb7MKQHOxohMIGzBggrBgEFBQcBAQSBpjCBozCBoAYIKwYBBQUHMAKGgZNodHRwOi8vYXpjc3Byb2RldXNhaWtwdWJsaXNoLmJsb2IuY29yZS53aW5kb3dzLm5ldC9ldXMtaW50Yy1rZXlpZC05YWFmNTkxZWUyNjNjYWFlMTBmNTdiYTA0ZmE4ZDFkZDY2MTNmOWViLzkzNDE3YThmLWU1YWQtNGQzNy05YjUyLTQwMWI2MmJlZDQ1ZS5jZXIwDQYJKoZIhvcNAQELBQADggIBACoVVaoBFnrraVQZjABZZQjfgVbuHyf_beSWbx0hUnh11eGgzfyPoVFwc_frhmC57FiW_rayKtdk6T2hCEO-oMCJ5zt0fQWir76G4KPypzEn6ExwFgizgGQuscjOsp3RCIRoAywWxb06DxrBkfX5YypKCeWsV9jXWiwP29g9EFm4WV3WbUuthQN1njgRE5XmoUAVfyoeUyM06c0gKhiL3h3Q5Uz0KF_CHnIpkbSc--qYwQlVSHgnFYKaCunYtAbk7ObrgbLkh1hWGjgtfq1jVrhY5vPxuWMqianlU1K6kYQ19ZqXJlmYKjrpyE1_XiacqrId793EM-YohEgRZgj5sUyNxa-yfeM6EuM7H37-jZlx0kHTjXhKejsw1Ys0Uobx1AcZz9lv0rnccSEvR8h7J9ifsRSK_KxPhPXUZMU2lxGgoAbXaqw6hF0OmO9QVP4XG9wK-nMw2y-wN_Gu3sdeD0mYY6YTTsyzTnALIrTuCCb_VngipjfzWLrtwg6BiM1X4nGe70Wcj2aZ3aivptALhCp3QN3TFKRV14R6Y7rObaHmqF7___TyiRc1eAnNxS2MsjgIztRR0cyIckwqyUPsl7e-X8YHmlrXeqO0DMXLR02w_T2-qh0pi1EjsWh11_ocGOGsb-O4iIOcRP2zWLGJhUkug8AZ9XIMNhAIYev8TcrhWQbwMIIG7DCCBNSgAwIBAgITMwAAA8w4ZURKZqrhfgAAAAADzDANBgkqhkiG9w0BAQsFADCBjDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCldhc2hpbmd0b24xEDAOBgNVBAcTB1JlZG1vbmQxHjAcBgNVBAoTFU1pY3Jvc29mdCBDb3Jwb3JhdGlvbjE2MDQGA1UEAxMtTWljcm9zb2Z0IFRQTSBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAyMDE0MB4XDTIxMDYwMzE3NTA1OVoXDTI3MDYwMzE3NTA1OVowQjFAMD4GA1UEAxM3RVVTLUlOVEMtS0VZSUQtOUFBRjU5MUVFMjYzQ0FBRTEwRjU3QkEwNEZBOEQxREQ2NjEzRjlFQjCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAIqmF4UjynTcAPsQYIH6gO0lluPZDZzIy2vmK05y3O3ego5e96nHq_xdsnfdve5qsenSfQn0Yjf5ctWJc3VNv2A2mHNqeDsiMcE7y3rpP1ThX_DSAIVjAY9BW_iIUcr3vqeERdHoVVa3lMM_3rR-jujTuDIw1uT7J_JyqrNUN3i1yf9MxM4QPPe9LGVWP_uF6R1bHLYPruFxyEYWdborFvftNPBbnhDE83CGUeMEYQjKYqUDYKNwfJThNn37JcipQgBlCpenTenlNlJcQVEZShfbDVxNVoWYdbDYM76fMtDM3OIcbi8TpGAKzeuYgwHZG9WCPCoQzG6t_1U3CIo9iOQG5XI0PYHH6ycAPJkmFVWDKAdwb1HBR-HekrwG4-QofRSVIXUT3f0-uouTDQD4VKzMdZ81_rfe7i5E8FE02K3dpviDQ95CKR7LHwSTln_RjTCyHXItGEAUuuJ6MZJAOv4tR7xyAowXgCmtTCKSYlrEdRXyXF48k8X9bqKwj0_cFRXbF-OWC5BlofN19h7mBazfEtscqI6yBKiJBZEzqjb3OrdmHh8xZv1rhQnKzINN7lyRKPgmBgXJhmZJPS3cOUv6Kz-hyZAr8IezqOYEDwBhgbGgLGGoKUKHmQxvdJihFPkMsgvvKsQkkGHQ_ZbVdh3OLJu83Xkh8dkahW2HpTETAgMBAAGjggGOMIIBijAOBgNVHQ8BAf8EBAMCAoQwGwYDVR0lBBQwEgYJKwYBBAGCNxUkBgVngQUIAzAWBgNVHSAEDzANMAsGCSsGAQQBgjcVHzASBgNVHRMBAf8ECDAGAQH_AgEAMB0GA1UdDgQWBBSJASVNfFWPYncJyotAmWlMqvUYfzAfBgNVHSMEGDAWgBR6jArOL0hiF-KU0a5VwVLscXSkVjBwBgNVHR8EaTBnMGWgY6Bhhl9odHRwOi8vd3d3Lm1pY3Jvc29mdC5jb20vcGtpb3BzL2NybC9NaWNyb3NvZnQlMjBUUE0lMjBSb290JTIwQ2VydGlmaWNhdGUlMjBBdXRob3JpdHklMjAyMDE0LmNybDB9BggrBgEFBQcBAQRxMG8wbQYIKwYBBQUHMAKGYWh0dHA6Ly93d3cubWljcm9zb2Z0LmNvbS9wa2lvcHMvY2VydHMvTWljcm9zb2Z0JTIwVFBNJTIwUm9vdCUyMENlcnRpZmljYXRlJTIwQXV0aG9yaXR5JTIwMjAxNC5jcnQwDQYJKoZIhvcNAQELBQADggIBAEJs8h_mPG-8eagAECvLVCWcw60zpc0C3vON9ulR73r2I7Col3aXHhHCjjXSSiwBMC59dwPX-bIwpp2-MpsxO6PQZemGpmMJwZtRMKhRi5s8Zb2iwqk82pxnY8Dn3boWMPgIO1qraL1s4-dLeMj1sLZDYZMABDCwvUUAI7Y14pCbtBm8Zkl4AwnNqBlVHR4OJ8caDMB-f2GST_2NcMT-M8SucBJgSh3zb-jOcv9QobYNxju_zHhji-zwQG-qunQpxYIZWikeJRmDkk5FONHZj7eH5bT_tdZCubHBHdGHjI6-mj28PPbaJjFm6u5tMWQDudfd-o_YVB5j3TcjCITm4XW-cXQa30DTuv2Ch7xXTE70_YvsLuVVKlHgDuylzI0g7MJKyTGjtKGrC1fRYEGaS2uBeJgnXt3OvUlmFzoSuh8paN3MkBjNnim4xYqUm5_bfyH29MVmjZopjIbrSg_nOIlTvyDOQzDWtQrwdMmtNCWKDscZMRsTqJagn64nd4KLZ5HNv89CZ-bgIwfmT94MyRqcezfGarYHzDSqOVcBsqWZXfH6Jzw04s-igRNun4PjDqyM6fMTF8rkVM32AsWTbR80pwIOD_OJWXRBn0ZuFkr5UJEksKB6VJC331AeNPEyVQJ7v-voZ8N8EUAd1JFvYtHt4NJjAmYfaR861TYtm-sHZ3B1YkFyZWFYdgAjAAsABAByACCd_8vzbDg65pn7mGjcbcuJ1xU4hL4oA5IsEkFYv60irgAQABAAAwAQACDoxhXSF7CLrvMuEGNK8a9HULVlEzy-zw29T7snbzSYqgAgtz6OCLFUWo2CSTXoXyRxBsSb6t4F_UBZgdAQNuGuuoJoY2VydEluZm9Yof9UQ0eAFwAiAAvBWFWvNcBM-GdjynbXpun8ToptRPzDzFfEM3-YD6VX3AAU0ZULVppEQ-zj9DTQn9wnXGeXO04AAAAA4yPI1UDOPUqHfL9YAV22cc-ieKe9ACIAC_43EIwt2RUM9cZKdKIMccDfhr1E4VfjyC88giFWH3sHACIAC6xZA-u6c-gThXykRakV1AU1YNuRthGsviHtmZbJte_QaGF1dGhEYXRhWKTmlDqmf_4K3mvM7aIqAnU2L_-NtkLStGV7eL8JBK7kCEUAAAAACJhwWMrcS4G24TDeUNy-lgAgaWOpr9uLbtBACCnjzsjVyceFIr3Pc2I_ilIUXq1gJ_GlAQIDJiABIVgg6MYV0hewi67zLhBjSvGvR1C1ZRM8vs8NvU-7J280mKoiWCC3Po4IsVRajYJJNehfJHEGxJvq3gX9QFmB0BA24a66gg",
+          }
+        });
+
+        let reg: webauthn_rs_proto::RegisterPublicKeyCredential =
+            serde_json::from_value(json).expect("invalid inner json");
+
+        let config = WebauthnCore::new_unsafe_experts_only(
+            "Footprint",
+            "onefootprint.com",
+            vec![url::Url::parse("https://onefootprint.com").unwrap()],
+            Some(120 * 1000),
+            Some(true),
+            Some(true),
+        );
+
+        let reg_state = serde_json::json!({
+          "policy": "required",
+          "exclude_credentials": [],
+          "challenge": "5HeR-TdvbkEhCkmyAqdQMiROokLBjh4tVBT7mVnZ9XM",
+          "credential_algorithms": [
+            "ES256",
+            "RS256",
+            "INSECURE_RS1"
           ],
           "require_resident_key": false,
           "authenticator_attachment": "platform",

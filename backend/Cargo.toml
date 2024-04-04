@@ -115,8 +115,8 @@ paperclip = { git = "https://github.com/onefootprint/paperclip", rev = "59f5cde9
     "rapidoc",
 ] }
 
-webauthn-rs-core = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2" }
-webauthn-rs-proto = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2" }
+webauthn-rs-core = { version = "0.4.9", features = ["insecure-rs1"] }
+webauthn-rs-proto = "0.4.9"
 
 reqwest = { version = "0.11.13", features = [
     "json",
