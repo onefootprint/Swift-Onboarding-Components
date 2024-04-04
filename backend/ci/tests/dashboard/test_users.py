@@ -376,7 +376,8 @@ def test_entity_data(sandbox_user, sandbox_tenant):
     Check the data attribute in the GET entities list and detail endpoints, including the data
     that is auto decrypted.
     """
-    body = post("entities/search", None, *sandbox_tenant.db_auths)
+    data = dict(pagination=dict(page_size=100))
+    body = post("entities/search", data, *sandbox_tenant.db_auths)
     user_list = next(u for u in body["data"] if u["id"] == sandbox_user.fp_id)
     user_detail = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_tenant.db_auths)
 
