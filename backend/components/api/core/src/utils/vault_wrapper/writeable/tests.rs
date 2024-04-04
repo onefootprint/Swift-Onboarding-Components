@@ -5,14 +5,19 @@ use crate::{
     State,
 };
 use db::{
-    models::{ob_configuration::ObConfiguration, scoped_vault::ScopedVault},
+    models::{contact_info::ContactInfo, ob_configuration::ObConfiguration, scoped_vault::ScopedVault},
     test_helpers::assert_have_same_elements,
     tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool},
     TxnPgConn,
 };
 use itertools::Itertools;
 use macros::test_state;
-use newtypes::{CollectedDataOption as CDO, FingerprintScopeKind, IdentityDataKind as IDK, PiiString};
+use newtypes::{
+    CollectedDataOption as CDO, DataIdentifier, DataLifetimeSource, DataRequest, Fingerprint,
+    FingerprintRequest, FingerprintScopeKind, IdentityDataKind, IdentityDataKind as IDK, PiiString,
+    ValidateArgs,
+};
+use std::collections::HashMap;
 
 struct TestData {
     su1: ScopedVault,
@@ -354,5 +359,50 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
         pb1,
         auth_pb2,
         pb2,
+    }
+}
+
+
+impl<Type> WriteableVw<Type> {
+    /// Shorthand to add data to a vault in tests
+    pub fn patch_data_test(
+        self,
+        conn: &mut TxnPgConn,
+        data: Vec<(DataIdentifier, PiiString)>,
+        create_fingerprints: bool,
+    ) -> ApiResult<Vec<(DataIdentifier, ContactInfo)>> {
+        let data = HashMap::from_iter(data);
+        let request =
+            DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(self.vault.is_live))?;
+        // Add fingerprints for ID data
+        let fingerprints = request
+            .iter()
+            .filter_map(|(di, pii)| match di {
+                DataIdentifier::Id(idk) => Some((idk, pii)),
+                _ => None,
+            })
+            .map(|(idk, pii)| {
+                let scope = if *idk == IdentityDataKind::PhoneNumber {
+                    FingerprintScopeKind::Global
+                } else {
+                    FingerprintScopeKind::Tenant
+                };
+                // for testing: we just do a regular hash
+                let fingerprint = Fingerprint(crypto::sha256(pii.leak().as_bytes()).to_vec());
+                FingerprintRequest {
+                    kind: (*idk).into(),
+                    fingerprint,
+                    scope,
+                }
+            })
+            .collect();
+        let request = if create_fingerprints {
+            request.manual_fingerprints(fingerprints)
+        } else {
+            request.no_fingerprints_for_validation()
+        };
+        let source = DataLifetimeSource::Hosted;
+        let new_ci = self.patch_data(conn, request, source, None)?.new_ci;
+        Ok(new_ci)
     }
 }
