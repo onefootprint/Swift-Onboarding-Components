@@ -14,7 +14,6 @@ export type TooltipProps = {
   disabled?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  sideOffset?: number;
 };
 
 const Tooltip = ({
@@ -25,7 +24,6 @@ const Tooltip = ({
   disabled,
   open: controlledOpen,
   onOpenChange,
-  sideOffset = 4,
 }: TooltipProps) => {
   const controlled = typeof controlledOpen === 'boolean';
   const [internalOpen, setInternalOpen] = useState(false);
@@ -55,11 +53,7 @@ const Tooltip = ({
           <TriggerContainer>{children}</TriggerContainer>
         </TooltipPrimitive.Trigger>
         {(open || controlledOpen) && !disabled ? (
-          <TooltipContainer
-            side={position}
-            align={alignment}
-            sideOffset={sideOffset}
-          >
+          <TooltipContainer side={position} align={alignment} sideOffset={4}>
             {text}
           </TooltipContainer>
         ) : null}
