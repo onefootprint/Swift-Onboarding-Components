@@ -128,6 +128,23 @@ impl PartnerTenant {
             .optional()?;
         Ok(res)
     }
+
+    #[tracing::instrument("PartnerTenant::is_domain_already_claimed", skip_all)]
+    /// Returns true if the domain is already claimed
+    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: &Vec<String>) -> DbResult<bool> {
+        let result = if !domains.is_empty() {
+            let existing: Option<PartnerTenantId> = partner_tenant::table
+                .filter(partner_tenant::domains.overlaps_with(domains))
+                .filter(partner_tenant::allow_domain_access.eq(true))
+                .select(partner_tenant::id)
+                .first(conn)
+                .optional()?;
+            existing.is_some()
+        } else {
+            false
+        };
+        Ok(result)
+    }
 }
 
 impl WorkosAuthIdentity for PartnerTenant {

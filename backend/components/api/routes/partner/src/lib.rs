@@ -4,6 +4,7 @@ mod assignments;
 mod doc_events;
 mod doc_templates;
 mod documents;
+mod index;
 mod logo;
 mod members;
 mod partners;
@@ -16,6 +17,7 @@ mod submissions;
 use api_core::*;
 
 pub fn routes(config: &mut web::ServiceConfig) {
+    config.service(index::get);
     config.service(assignments::post);
     config.service(doc_events::get);
     config.service(doc_templates::delete);

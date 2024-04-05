@@ -33,6 +33,9 @@ pub struct PartnerOrganization {
     pub name: String,
     pub domains: Vec<String>,
     pub allow_domain_access: bool,
+    // Only serialize in the GET /org response
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_domain_already_claimed: Option<bool>,
     pub logo_url: Option<String>,
     pub website_url: Option<String>,
 }

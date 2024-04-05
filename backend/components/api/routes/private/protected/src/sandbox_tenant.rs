@@ -32,8 +32,7 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let tenant = Tenant::get_tenant_by_domains(conn, domains.clone())?;
-            if tenant.is_some() {
+            if Tenant::is_domain_already_claimed(conn, &domains)? {
                 return ValidationError("Tenant for this domain already exists").into();
             }
             let new_tenant = NewTenant {

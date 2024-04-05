@@ -28,7 +28,7 @@ pub async fn get(
     let domains = tenant.domains.clone();
     let is_domain_already_claimed = state
         .db_pool
-        .db_query(move |conn| Tenant::is_domain_already_claimed(conn, domains))
+        .db_query(move |conn| Tenant::is_domain_already_claimed(conn, &domains))
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db((
@@ -100,7 +100,7 @@ async fn patch(
             // TODO: Enforce this better with a uniqueness constraint on claimed domains in the DB.
             if !tenant.allow_domain_access
                 && update_tenant.allow_domain_access.is_some_and(|allow| allow)
-                && Tenant::is_domain_already_claimed(conn, tenant.domains)?
+                && Tenant::is_domain_already_claimed(conn, &tenant.domains)?
             {
                 return Err(TenantError::ValidationError(
                     "Can not allow domain access: domains are already claimed".to_string(),

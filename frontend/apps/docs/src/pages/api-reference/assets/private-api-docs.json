@@ -5877,6 +5877,33 @@
                 ]
             }
         },
+        "/partner": {
+            "get": {
+                "tags": [
+                    "Organization",
+                    "OrgSettings",
+                    "Private"
+                ],
+                "description": "Returns basic info about the authed partner tenant",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PartnerOrganization"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/partner/doc_templates": {
             "get": {
                 "tags": [
@@ -20595,6 +20622,9 @@
                             "id": {
                                 "type": "string"
                             },
+                            "is_domain_already_claimed": {
+                                "type": "boolean"
+                            },
                             "logo_url": {
                                 "type": "string"
                             },
@@ -21136,6 +21166,9 @@
                     },
                     "id": {
                         "type": "string"
+                    },
+                    "is_domain_already_claimed": {
+                        "type": "boolean"
                     },
                     "logo_url": {
                         "type": "string"

@@ -289,10 +289,10 @@ impl Tenant {
         Ok(res)
     }
 
-    #[tracing::instrument("Tenant::get_tenant_by_domains", skip_all)]
-    pub fn get_tenant_by_domains(conn: &mut PgConn, domains: Vec<String>) -> DbResult<Option<Tenant>> {
+    #[tracing::instrument("Tenant::get_tenant_by_domain", skip_all)]
+    pub fn get_tenant_by_domain(conn: &mut PgConn, domain: &str) -> DbResult<Option<Tenant>> {
         let res = tenant::table
-            .filter(tenant::domains.overlaps_with(domains))
+            .filter(tenant::domains.contains(vec![domain]))
             .filter(tenant::allow_domain_access.eq(true))
             .first(conn)
             .optional()?;
@@ -301,9 +301,15 @@ impl Tenant {
 
     #[tracing::instrument("Tenant::is_domain_already_claimed", skip_all)]
     /// Returns true if the domain is already claimed
-    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: Vec<String>) -> DbResult<bool> {
+    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: &Vec<String>) -> DbResult<bool> {
         let result = if !domains.is_empty() {
-            Self::get_tenant_by_domains(conn, domains)?.is_some()
+            let existing: Option<TenantId> = tenant::table
+                .filter(tenant::domains.overlaps_with(domains))
+                .filter(tenant::allow_domain_access.eq(true))
+                .select(tenant::id)
+                .first(conn)
+                .optional()?;
+            existing.is_some()
         } else {
             false
         };

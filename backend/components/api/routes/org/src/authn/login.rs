@@ -217,12 +217,12 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> ApiResult<(T
     // process domain
     let domain = email_domain::parse_private_email_domain(profile.email.as_str());
 
-    let domain2 = domain.clone();
-    if let Some(domain) = domain2 {
+    if let Some(domain) = domain.as_ref() {
         // Check if tenant exists. If so, automatically add new tenant user
+        let domain = domain.clone();
         let tenant = state
             .db_pool
-            .db_query(move |conn| Tenant::get_tenant_by_domains(conn, vec![domain]))
+            .db_query(move |conn| Tenant::get_tenant_by_domain(conn, &domain))
             .await?;
         if let Some(tenant) = tenant {
             return Ok((tenant, false));
