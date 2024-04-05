@@ -7,7 +7,7 @@ import arrow
 import time
 import os
 from tests.headers import TenantSecretAuth
-from tests.types import ObConfiguration, SecretApiKey, Tenant
+from tests.types import ObConfiguration, SecretApiKey, Tenant, PartnerTenant
 from tests.headers import DashboardAuth, IsLive
 from tests.constants import (
     CUSTODIAN_AUTH,
@@ -239,7 +239,45 @@ def create_tenant(org_data, ob_conf_data):
         tenant = tenant._replace(default_ob_config=ob_config)
         return tenant
 
+    # Retry until success to work around the race condition caused by the
+    # get-or-create operation w/ a unique constraint on the org ID.
     return try_until_success(inner, 10)
+
+def create_partner_tenant(org_data, tenant):
+    def inner():
+        body = post("private/test_partner_tenant", org_data, CUSTODIAN_AUTH)
+        print("\n======partner org info======")
+        print(body)
+
+        auth_token = DashboardAuth(body["auth_token"])
+        ro_auth_token = DashboardAuth(body["ro_auth_token"])
+        partner_tenant = PartnerTenant(
+            id=body["partner_tenant_id"],
+            name=org_data["name"],
+            db_auths=[auth_token],
+            auth_token=auth_token,
+            ro_db_auths=[ro_auth_token],
+            ro_auth_token=ro_auth_token,
+        )
+
+        # Create Partnership between the tenant and partner tenant fixtures.
+        body = post(
+            "private/compliance/partnership",
+            {
+                "tenant_id": tenant.id,
+                "partner_tenant_id": partner_tenant.id,
+            },
+            *tenant.db_auths,
+        )
+        print("\n======tenant compliance partnership info======")
+        print(body)
+
+        return partner_tenant
+
+    # Retry until success to work around the race condition caused by the
+    # get-or-create operation w/ a unique constraint on the org ID.
+    return try_until_success(inner, 10)
+
 
 
 def create_ob_config(
