@@ -1,0 +1,45 @@
+use actix_multipart::Multipart;
+use api_core::{
+    auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
+    types::{JsonApiResponse, ResponseData},
+    utils::db2api::DbToApi,
+    State,
+};
+use db::models::partner_tenant::{PartnerTenant, UpdatePartnerTenant};
+use paperclip::actix::{
+    self, api_v2_operation, web,
+    web::{HttpRequest, Json},
+};
+
+#[api_v2_operation(
+    description = "Upload a new logo for the partner organization.",
+    tags(OrgSettings, Organization, Private)
+)]
+#[actix::put("/partner/logo")]
+pub async fn put(
+    state: web::Data<State>,
+    auth: PartnerTenantSessionAuth,
+    payload: Multipart,
+    request: HttpRequest,
+) -> JsonApiResponse<api_wire_types::PartnerOrganization> {
+    let auth = auth.check_guard(PartnerTenantGuard::Admin)?;
+    let pt_id = auth.partner_tenant().id.clone();
+
+    let logo_url =
+        api_route_org_common::logo::upload_org_logo(&state, (&pt_id).into(), payload, request).await?;
+
+    // update the partner tenant url
+    let update_pt = UpdatePartnerTenant {
+        logo_url: Some(logo_url),
+        ..Default::default()
+    };
+
+    let updated_pt = state
+        .db_pool
+        .db_transaction(move |conn| PartnerTenant::update(conn, &pt_id, update_pt))
+        .await?;
+
+    Ok(Json(ResponseData::ok(
+        api_wire_types::PartnerOrganization::from_db(updated_pt),
+    )))
+}

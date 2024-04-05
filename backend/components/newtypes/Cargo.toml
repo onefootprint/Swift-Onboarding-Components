@@ -27,7 +27,7 @@ itertools = { workspace = true }
 reqwest = { workspace = true }
 serde_with = "2.2.0"
 either = { workspace = true }
-mime = "0.3.16"
+mime = { workspace = true }
 futures-util = { workspace = true }
 futures = { workspace = true }
 card-validate = "2.3"

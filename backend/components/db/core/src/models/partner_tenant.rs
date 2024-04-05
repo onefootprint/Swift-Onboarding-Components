@@ -45,6 +45,15 @@ pub struct NewPartnerTenant {
     pub website_url: Option<String>,
 }
 
+#[derive(Debug, Clone, AsChangeset, Default)]
+#[diesel(table_name = partner_tenant)]
+pub struct UpdatePartnerTenant {
+    pub name: Option<String>,
+    pub logo_url: Option<String>,
+    pub website_url: Option<String>,
+    pub allow_domain_access: Option<bool>,
+}
+
 /// Allows creating with an application-generated PartnerTenantId rather than a DB-generated ID.
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = partner_tenant)]
@@ -98,6 +107,16 @@ impl PartnerTenant {
             .filter(partner_tenant::id.eq(id))
             .first(conn.conn())?;
         Ok(pt)
+    }
+
+    #[tracing::instrument("PartnerTenant::update", skip_all)]
+    pub fn update(conn: &mut PgConn, id: &PartnerTenantId, update_pt: UpdatePartnerTenant) -> DbResult<Self> {
+        let result = diesel::update(partner_tenant::table)
+            .filter(partner_tenant::id.eq(id))
+            .set(update_pt)
+            .get_result(conn)?;
+
+        Ok(result)
     }
 
     #[tracing::instrument("PartnerTenant::get_by_domain", skip_all)]

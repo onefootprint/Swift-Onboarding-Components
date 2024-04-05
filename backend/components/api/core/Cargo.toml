@@ -50,7 +50,7 @@ enclave_proxy = { path = "../../enclave/proxy" }
 serde_json = { workspace = true }
 serde_cbor = { workspace = true }
 paperclip = { workspace = true }
-mime = "0.3.16"
+mime = { workspace = true }
 chrono = { workspace = true }
 strum_macros = { workspace = true }
 actix-web-httpauth = "0.8.0"

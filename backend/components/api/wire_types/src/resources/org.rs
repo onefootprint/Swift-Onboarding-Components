@@ -33,4 +33,6 @@ pub struct PartnerOrganization {
     pub name: String,
     pub domains: Vec<String>,
     pub allow_domain_access: bool,
+    pub logo_url: Option<String>,
+    pub website_url: Option<String>,
 }

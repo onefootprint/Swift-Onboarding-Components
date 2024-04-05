@@ -9,6 +9,8 @@ impl DbToApi<PartnerTenant> for api_wire_types::PartnerOrganization {
             name: partner_tenant.name,
             domains: partner_tenant.domains,
             allow_domain_access: partner_tenant.allow_domain_access,
+            logo_url: partner_tenant.logo_url,
+            website_url: partner_tenant.website_url,
         }
     }
 }

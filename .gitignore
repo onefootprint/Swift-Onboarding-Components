@@ -2,3 +2,4 @@
 .graphite_repo_config
 .graphite_pr_info
 vscode-target
+.DS_Store
