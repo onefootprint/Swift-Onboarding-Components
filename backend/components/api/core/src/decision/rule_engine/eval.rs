@@ -18,7 +18,7 @@ pub trait HasRule {
     fn action(&self) -> RuleAction;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Rule {
     pub expression: RuleExpression,
     pub action: RuleAction,

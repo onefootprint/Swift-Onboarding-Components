@@ -41,15 +41,16 @@ pub struct RuleEvalResult {
     pub fp_id: FpId,
     pub current_status: Option<OnboardingStatus>,
     pub historical_action_triggered: Option<RuleAction>,
-    pub backtest_rule_result: bool,
+    pub backtest_action_triggered: Option<RuleAction>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema, PartialEq, Eq)]
 pub struct RuleEvalStats {
     pub total: usize,
-    pub counts: Counts,
-    pub counts_by_current_status: HashMap<OnboardingStatus, Counts>,
-    pub counts_by_historical_action_triggered: HashMap<RuleResultRuleAction, Counts>,
+    pub count_by_historical_action_triggered: HashMap<RuleResultRuleAction, usize>,
+    pub count_by_backtest_action_triggered: HashMap<RuleResultRuleAction, usize>,
+    pub count_by_historical_and_backtest_action_triggered:
+        HashMap<RuleResultRuleAction, HashMap<RuleResultRuleAction, usize>>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
