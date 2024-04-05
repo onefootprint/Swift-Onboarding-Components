@@ -105,6 +105,7 @@ mod tests {
     use super::*;
     use db::{
         models::{ob_configuration::ObConfiguration, scoped_vault::ScopedVault},
+        test_helpers::assert_have_same_elements,
         tests::fixtures,
     };
     use macros::test_state_case;
@@ -347,7 +348,7 @@ mod tests {
             .map(|d| d.scoped_vault.fp_id.clone())
             .collect_vec();
 
-        assert_eq!(expected_same_tenant, actual_same_tenant);
+        assert_have_same_elements(expected_same_tenant, actual_same_tenant); // have to do it this way for now because had to remove the order_by in the fingerprint query
         assert_eq!(expected.other_tenant, dupes.other_tenant);
     }
 
