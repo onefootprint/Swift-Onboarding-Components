@@ -45,6 +45,10 @@ impl PhoneNumber {
         self.number.format().mode(phonenumber::Mode::E164).into()
     }
 
+    pub fn country_code(&self) -> PiiString {
+        self.number.country().code().into()
+    }
+
     pub fn subscriber_number(&self) -> PiiString {
         self.national()
             .leak()

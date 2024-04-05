@@ -14,3 +14,21 @@ pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, list_id: &ListId) -> L
     )
     .unwrap()
 }
+
+
+pub fn create_in_memory() -> ListEntry {
+    ListEntry {
+        id: Default::default(),
+        created_at: Default::default(),
+        created_seqno: Default::default(),
+        _created_at: Default::default(),
+        _updated_at: Default::default(),
+        deactivated_at: Default::default(),
+        deactivated_seqno: Default::default(),
+        list_id: Default::default(),
+        actor: DbActor::Footprint,
+        e_data: Default::default(),
+        deactivated_by: Default::default(),
+        list_entry_creation_id: Default::default(),
+    }
+}

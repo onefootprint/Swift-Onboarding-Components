@@ -1,16 +1,17 @@
 use std::collections::HashMap;
 
 use super::{
-    audit_event::NewAuditEvent, data_lifetime::DataLifetime, list_entry_creation::ListEntryCreation,
+    audit_event::NewAuditEvent, data_lifetime::DataLifetime, list::List,
+    list_entry_creation::ListEntryCreation,
 };
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::list_entry;
+use db_schema::schema::{list, list_entry};
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     AuditEventDetail, AuditEventId, DataLifetimeSeqno, DbActor, InsightEventId, ListEntryCreationId,
-    ListEntryId, ListId, Locked, SealedVaultBytes, TenantId,
+    ListEntryId, ListId, Locked, PiiString, SealedVaultBytes, TenantId,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -42,6 +43,10 @@ struct NewListEntry<'a> {
     e_data: &'a SealedVaultBytes,
     list_entry_creation_id: &'a ListEntryCreationId,
 }
+
+pub type ListWithEntries = (List, Vec<ListEntry>);
+pub type DecryptedEntry = (ListEntry, PiiString);
+pub type ListWithDecryptedEntries = (List, Vec<DecryptedEntry>);
 
 impl ListEntry {
     #[tracing::instrument("ListEntry::create", skip_all)]
@@ -145,14 +150,24 @@ impl ListEntry {
 
     #[allow(clippy::self_named_constructors)]
     #[tracing::instrument("ListEntry::list_bulk", skip_all)]
-    pub fn list_bulk(conn: &mut PgConn, ids: &[ListId]) -> DbResult<HashMap<ListId, Vec<Self>>> {
-        let res = list_entry::table
+    pub fn list_bulk(conn: &mut PgConn, ids: &[ListId]) -> DbResult<HashMap<ListId, ListWithEntries>> {
+        let mut entries = list_entry::table
             .filter(list_entry::list_id.eq_any(ids))
             .filter(list_entry::deactivated_seqno.is_null())
             .order_by(list_entry::created_at.desc())
             .get_results::<Self>(conn)?
             .into_iter()
             .into_group_map_by(|e| e.list_id.clone());
+
+        let res = list::table
+            .filter(list::id.eq_any(ids))
+            .get_results::<List>(conn)?
+            .into_iter()
+            .map(|l| {
+                let e = entries.remove(&l.id).unwrap_or(vec![]);
+                (l.id.clone(), (l, e))
+            })
+            .collect();
         Ok(res)
     }
 

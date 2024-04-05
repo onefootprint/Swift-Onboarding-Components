@@ -1,9 +1,10 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use async_trait::async_trait;
 use db::models::{
     data_lifetime::DataLifetime,
     document_request::{DocumentRequest, NewDocumentRequestArgs},
+    list_entry::{ListEntry, ListWithDecryptedEntries},
     ob_configuration::ObConfiguration,
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
@@ -16,7 +17,7 @@ use db::models::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus,
+    DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, ListId, Locked, OnboardingStatus,
     RiskSignalGroupKind, RuleAction, RuleSetResultKind, StepUpInfo, VendorAPI, VerificationResultId,
 };
 
@@ -366,7 +367,11 @@ impl KycDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, KycState> for KycDecisioning {
-    type AsyncRes = (Arc<dyn FeatureFlagClient>, VaultDataForRules);
+    type AsyncRes = (
+        Arc<dyn FeatureFlagClient>,
+        VaultDataForRules,
+        HashMap<ListId, ListWithDecryptedEntries>,
+    );
 
     #[tracing::instrument(
         "OnAction<MakeDecision, KycState>::execute_async_idempotent_actions",
@@ -379,20 +384,29 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     ) -> ApiResult<Self::AsyncRes> {
         let svid = self.sv_id.clone();
         let wfid = self.wf_id.clone();
-        let (rules, vw) = state
+        let (tenant, rules, vw, lists) = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let (obc, _) = ObConfiguration::get(conn, &wfid)?;
+                let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
 
                 let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling a new seqno inside the RSR write itself
                 let vw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&svid, seqno))?;
 
-                Ok((rules, vw))
+                let lists = ListEntry::list_bulk(conn, &common::list_ids_from_rules(&rules))?;
+
+                Ok((tenant, rules, vw, lists))
             })
             .await?;
-        let vault_data = VaultDataForRules::decrypt_for_rules(&state.enclave_client, vw, &rules).await?;
-        Ok((state.feature_flag_client.clone(), vault_data))
+        let vault_data_for_rules =
+            VaultDataForRules::decrypt_for_rules(&state.enclave_client, vw, &rules).await?;
+        let lists_for_rules = common::saturate_list_entries(state, &tenant, lists).await?;
+
+        Ok((
+            state.feature_flag_client.clone(),
+            vault_data_for_rules,
+            lists_for_rules,
+        ))
     }
 
     #[tracing::instrument("OnAction<MakeDecision, KycState>::on_commit", skip_all)]
@@ -402,7 +416,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        let (ff_client, vault_data) = async_res;
+        let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
@@ -419,7 +433,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let (rule_set_result, decision) = common::evaluate_rules(
             conn,
             risk_signals,
-            &vault_data,
+            &vault_data_for_rules,
+            &lists_for_rules,
             &wf,
             fixture_decision.is_some(),
             RuleSetResultKind::WorkflowDecision,

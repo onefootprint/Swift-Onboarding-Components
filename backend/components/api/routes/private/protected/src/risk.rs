@@ -34,7 +34,7 @@ use newtypes::{
     DecisionIntentId, DecisionStatus, FpId, RiskSignalGroupKind, RiskSignalId, RuleAction, RuleSetResultKind,
     TenantId, Vendor, VendorAPI, VerificationRequestId, VerificationResultId, WorkflowId,
 };
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct MakeVendorCallsRequest {
@@ -115,9 +115,10 @@ async fn make_vendor_calls(
     let (rule_results, action_triggered) = decision::rule_engine::eval::evaluate_rule_set(
         rules,
         &reason_codes,
-        &VaultDataForRules::empty(),
+        &VaultDataForRules::empty(), // TODO
+        &HashMap::new(),             // TODO
         &RuleEvalConfig::default(),
-    ); // TODO
+    );
 
     Ok(Json(ResponseData::ok(MakeVendorCallsResponse {
         new_vendor_request_ids: vec![vendor_result.verification_request_id],
@@ -163,6 +164,7 @@ async fn make_decision(
                 conn,
                 risk_signals,
                 &VaultDataForRules::empty(), // TODO
+                &HashMap::new(),             // TODO
                 &wf,
                 false,
                 RuleSetResultKind::Adhoc,
@@ -282,7 +284,8 @@ async fn shadow_run(
     let (_, action_triggered) = decision::rule_engine::eval::evaluate_rule_set(
         rules,
         &reason_codes,
-        &VaultDataForRules::empty(),
+        &VaultDataForRules::empty(), // TODO
+        &HashMap::new(),             // TODO
         &RuleEvalConfig::default(),
     );
 

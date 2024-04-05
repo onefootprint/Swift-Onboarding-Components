@@ -46,7 +46,7 @@ pub async fn list_for_tenant(
             let id = l.id.clone();
             (
                 l,
-                entries.get(&id).map(|e| e.len()).unwrap_or_default(),
+                entries.get(&id).map(|(_, e)| e.len()).unwrap_or_default(),
                 list_ids_used_in_playbook.contains(&id),
             )
         })

@@ -43,19 +43,20 @@ pub async fn evaluate_rule(
     let results = historical_results
         .into_iter()
         .map(|(sv, rsr, rs)| {
-            let backtest_rule_result = decision::rule_engine::eval::evaluate_rule_expression(
+            decision::rule_engine::eval::evaluate_rule_expression(
                 &rule_expression,
                 &rs.into_iter().map(|r| r.reason_code).collect_vec(),
                 &VaultDataForRules::empty(), // TODO
-            );
-            api_wire_types::RuleEvalResult {
+                &HashMap::new(),             // TODO
+            )
+            .map(|r| api_wire_types::RuleEvalResult {
                 fp_id: sv.fp_id,
                 current_status: sv.status,
                 historical_action_triggered: rsr.action_triggered,
-                backtest_rule_result,
-            }
+                backtest_rule_result: r,
+            })
         })
-        .collect::<Vec<_>>();
+        .collect::<Result<Vec<_>, _>>()?;
 
     let stats = get_stats(&results);
     ResponseData::ok(api_wire_types::RuleEvalResults { results, stats }).json()

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use async_trait::async_trait;
 use db::{
@@ -189,6 +189,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 conn,
                 risk_signals,
                 &VaultDataForRules::empty(), // TODO
+                &HashMap::new(),             // TODO mb
                 &wf,
                 fixture_decision.is_some(),
                 RuleSetResultKind::WorkflowDecision,

@@ -1,14 +1,26 @@
+use std::collections::HashMap;
+
+use crypto::aead::{AeadSealedBytes, SealingKey};
 use db::{
     models::{
-        decision_intent::DecisionIntent, ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo,
-        rule_set_result::RuleSetResult, scoped_vault::ScopedVault, workflow::Workflow,
+        decision_intent::DecisionIntent,
+        list_entry::{ListEntry, ListWithDecryptedEntries, ListWithEntries},
+        ob_configuration::ObConfiguration,
+        risk_signal::NewRiskSignalInfo,
+        rule_instance::RuleInstance,
+        rule_set_result::RuleSetResult,
+        scoped_vault::ScopedVault,
+        tenant::Tenant,
+        workflow::Workflow,
     },
     DbPool, DbResult, TxnPgConn,
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
+use itertools::Itertools;
 use newtypes::{
-    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason, RuleSetResultId,
-    RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ListId, PiiBytes, PiiString,
+    ReviewReason, RuleExpressionCondition, RuleSetResultId, RuleSetResultKind, ScopedVaultId,
+    SealedVaultBytes, TenantId, VaultOperation, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -34,7 +46,7 @@ use crate::{
     },
     errors::ApiResult,
     utils::vault_wrapper::{VaultWrapper, VwArgs},
-    State,
+    ApiError, State,
 };
 
 #[tracing::instrument(skip(db_pool))]
@@ -219,6 +231,7 @@ pub fn evaluate_rules(
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
     vault_data: &VaultDataForRules,
+    lists: &HashMap<ListId, ListWithDecryptedEntries>,
     wf: &Workflow,
     is_fixture: bool,
     rule_result_kind: RuleSetResultKind,
@@ -233,6 +246,7 @@ pub fn evaluate_rules(
         rule_result_kind,
         risk_signals.risk_signals,
         vault_data,
+        lists,
         is_fixture,
     )
 }
@@ -378,6 +392,65 @@ pub fn get_review_reasons_inner(
     }
 
     reasons
+}
+
+pub fn list_ids_from_rules(rules: &[RuleInstance]) -> Vec<ListId> {
+    rules
+        .iter()
+        .flat_map(|ri| &ri.rule_expression.0)
+        .filter_map(|re| match re {
+            RuleExpressionCondition::VaultData(VaultOperation::IsIn {
+                field: _,
+                op: _,
+                value,
+            }) => Some(value.clone()),
+            _ => None,
+        })
+        .collect_vec()
+}
+
+pub async fn saturate_list_entries(
+    state: &State,
+    tenant: &Tenant,
+    lists: HashMap<ListId, ListWithEntries>,
+) -> ApiResult<HashMap<ListId, ListWithDecryptedEntries>> {
+    let lists = lists.values().collect_vec();
+
+    let list_keys = lists
+        .iter()
+        .map(|(list, _)| SealedVaultBytes::from(list.e_data_key.clone()))
+        .collect_vec();
+    let list_keys = list_keys
+        .iter()
+        .map(|k| (&tenant.e_private_key, k, vec![]))
+        .collect_vec();
+
+    let decrypted_keys = state
+        .enclave_client
+        .batch_decrypt_to_piibytes(list_keys)
+        .await?
+        .into_iter()
+        .map(|dk| SealingKey::new(dk.into_leak()))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    decrypted_keys
+        .into_iter()
+        .zip(lists.into_iter())
+        .map(|(key, (list, entries))| {
+            entries
+                .iter()
+                .map(|le| decrypt_list_entry(&key, le).map(|d| (le.clone(), d)))
+                .collect::<Result<Vec<_>, _>>()
+                .map(|v| (list.id.clone(), (list.clone(), v)))
+        })
+        .collect::<Result<HashMap<ListId, ListWithDecryptedEntries>, _>>()
+}
+
+fn decrypt_list_entry(key: &SealingKey, le: &ListEntry) -> ApiResult<PiiString> {
+    key.unseal_bytes(AeadSealedBytes(le.e_data.clone().0))
+        .map_err(ApiError::from)
+        .map(PiiBytes::new)
+        .and_then(|b| PiiString::try_from(b).map_err(ApiError::from))
 }
 
 #[cfg(test)]

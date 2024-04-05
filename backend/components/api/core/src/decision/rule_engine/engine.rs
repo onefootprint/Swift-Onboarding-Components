@@ -13,6 +13,7 @@ use crate::{
 use db::{
     models::{
         document_request::DocumentRequest,
+        list_entry::ListWithDecryptedEntries,
         ob_configuration::ObConfiguration,
         risk_signal::RiskSignal,
         rule_instance::RuleInstance,
@@ -23,8 +24,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    DocumentRequestKind, ObConfigurationId, RiskSignalGroupKind, RuleExpressionCondition, RuleSetResultKind,
-    ScopedVaultId, WorkflowId,
+    DocumentRequestKind, ListId, ObConfigurationId, RiskSignalGroupKind, RuleExpressionCondition,
+    RuleSetResultKind, ScopedVaultId, WorkflowId,
 };
 
 #[allow(clippy::too_many_arguments)]
@@ -37,6 +38,7 @@ pub fn evaluate_workflow_decision(
     kind: RuleSetResultKind,
     risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
     vault_data: &VaultDataForRules,
+    lists: &HashMap<ListId, ListWithDecryptedEntries>,
     is_fixture: bool,
 ) -> ApiResult<(RuleSetResult, Decision)> {
     let doc_reqs = DocumentRequest::get_all(conn, wf_id)?;
@@ -68,6 +70,7 @@ pub fn evaluate_workflow_decision(
         kind,
         &risk_signals,
         vault_data,
+        lists,
         &rule_eval_config,
     )?;
 
@@ -83,6 +86,7 @@ pub fn evaluate_workflow_decision(
         should_commit_rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
         vault_data,
+        lists,
         &rule_eval_config,
     );
     let decision = Decision {
@@ -145,6 +149,7 @@ pub fn evaluate_rules(
     kind: RuleSetResultKind,
     risk_signals: &[RiskSignal],
     vault_data: &VaultDataForRules,
+    lists: &HashMap<ListId, ListWithDecryptedEntries>,
     rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
 ) -> ApiResult<(RuleSetResult, Vec<RuleResult>)> {
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
@@ -157,6 +162,7 @@ pub fn evaluate_rules(
         rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
         vault_data,
+        lists,
         rule_eval_config,
     );
 
@@ -284,6 +290,7 @@ mod tests {
             RuleSetResultKind::Adhoc,
             &risk_signals,
             &VaultDataForRules::empty(), // TODO add tests for vd rules
+            &HashMap::new(),
             &config,
         )
         .unwrap();
