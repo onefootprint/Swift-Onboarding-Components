@@ -2,6 +2,8 @@ import type { IdentifyBootstrapData } from '@onefootprint/types';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import { validate as isEmail } from 'isemail';
 
+import type { IdentifyVaultData } from '../../state/types';
+
 const SANDBOX_NUMBER = '+1 555-555-0100';
 
 const validateBootstrapData = (bootstrapData?: IdentifyBootstrapData) => {
@@ -37,9 +39,22 @@ const validateBootstrapData = (bootstrapData?: IdentifyBootstrapData) => {
   }
 
   // Pass the email & phone along with their suffixes
+  const validatedEmail: IdentifyVaultData | undefined = isEmailValid
+    ? {
+        value: email,
+        isBootstrap: true,
+      }
+    : undefined;
+  const validatedPhone =
+    isPhoneValid && phoneNumber
+      ? {
+          value: phoneNumber,
+          isBootstrap: true,
+        }
+      : undefined;
   return {
-    email: isEmailValid ? email : undefined,
-    phoneNumber: isPhoneValid ? phoneNumber : undefined,
+    email: validatedEmail,
+    phoneNumber: validatedPhone,
   };
 };
 

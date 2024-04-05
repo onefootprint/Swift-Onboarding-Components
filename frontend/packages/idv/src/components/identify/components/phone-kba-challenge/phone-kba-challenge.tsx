@@ -55,7 +55,7 @@ const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
   return (
     <PhonePageStructure
       countries={options}
-      defaultPhone={phoneNumber}
+      defaultPhone={phoneNumber?.value}
       Header={Header}
       isLoading={mutIdentifyKba.isLoading}
       l10n={l10n}

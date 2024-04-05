@@ -5,6 +5,7 @@ export const getDisplayPhone = (
   context: Pick<IdentifyMachineContext, 'phoneNumber' | 'identify'>,
 ): string | undefined => {
   const { identify, phoneNumber } = context;
+  const value = phoneNumber?.value;
   const isLoginChallenge = !!identify.user;
   if (
     isLoginChallenge &&
@@ -23,7 +24,7 @@ export const getDisplayPhone = (
   }
   // Either we located the user with this phone number, or we're initiating a signup challenge to
   // this phone number
-  const match = phoneNumber?.match(/(\+\d{1,3} )?(.*)/);
+  const match = value?.match(/(\+\d{1,3} )?(.*)/);
   if (!match) {
     return undefined;
   }
@@ -37,6 +38,7 @@ export const getDisplayEmail = (
   context: Pick<IdentifyMachineContext, 'identify' | 'email'>,
 ): string | undefined => {
   const { identify, email } = context;
+  const value = email?.value;
   const isLoginChallenge = !!identify.user;
 
   if (
@@ -49,5 +51,5 @@ export const getDisplayEmail = (
     return identify.user?.scrubbedEmail?.replace(/\*/g, '•');
   }
   // Either we located the user with this email, or we're initiating a signup challenge to this email
-  return email;
+  return value;
 };

@@ -62,8 +62,8 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
   return (
     <PhonePageStructure
       countries={options}
-      defaultPhone={phoneNumber}
-      email={email}
+      defaultPhone={phoneNumber?.value}
+      email={email?.value}
       Header={Header}
       isLoading={mutIdentify.isLoading}
       l10n={l10n}

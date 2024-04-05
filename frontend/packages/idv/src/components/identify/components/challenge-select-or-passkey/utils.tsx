@@ -6,7 +6,10 @@ import React from 'react';
 
 import type { DeviceInfo } from '../../../../hooks';
 import { isBiometric } from '../../../../utils';
-import type { IdentifyContext } from '../../state/types';
+import type {
+  IdentifyContext,
+  IdentifyMachineContext,
+} from '../../state/types';
 import { IdentifyVariant } from '../../state/types';
 import {
   getDisplayEmail,
@@ -64,10 +67,9 @@ export const getMethods = (
 
 function getChallengeTitleEmail(
   t: T,
-  identify: IdentifyContext,
-  email?: string,
+  context: Pick<IdentifyMachineContext, 'identify' | 'email'>,
 ): string | JSX.Element {
-  const displayEmail = getDisplayEmail({ identify, email });
+  const displayEmail = getDisplayEmail(context);
   const sendTo = t('challenge-select-or-biometric.send-code-to');
   return displayEmail ? (
     <>
@@ -80,10 +82,9 @@ function getChallengeTitleEmail(
 
 const getChallengeTitlePhone = (
   t: T,
-  identify: IdentifyContext,
-  phoneNumber?: string,
+  context: Pick<IdentifyMachineContext, 'identify' | 'phoneNumber'>,
 ): string | JSX.Element => {
-  const displayPhone = getDisplayPhone({ identify, phoneNumber });
+  const displayPhone = getDisplayPhone(context);
   const sendTo = t('challenge-select-or-biometric.send-code-to');
   return displayPhone ? (
     <>
@@ -96,11 +97,9 @@ const getChallengeTitlePhone = (
 
 export const getChallengeTitleByKind = (
   t: T,
-  identify: IdentifyContext,
-  email?: string,
-  phoneNumber?: string,
+  context: Pick<IdentifyMachineContext, 'identify' | 'email' | 'phoneNumber'>,
 ): TitleMap => ({
-  [ChallengeKind.sms]: getChallengeTitlePhone(t, identify, phoneNumber),
-  [ChallengeKind.email]: getChallengeTitleEmail(t, identify, email),
+  [ChallengeKind.sms]: getChallengeTitlePhone(t, context),
+  [ChallengeKind.email]: getChallengeTitleEmail(t, context),
   [ChallengeKind.biometric]: t('challenge-select-or-biometric.passkey'),
 });

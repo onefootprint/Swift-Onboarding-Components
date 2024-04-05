@@ -8,8 +8,14 @@ describe('validateBootstrapData', () => {
         phoneNumber: '+16204623730',
       }),
     ).toEqual({
-      email: 'belce@onefootprint.com',
-      phoneNumber: '+16204623730',
+      email: {
+        value: 'belce@onefootprint.com',
+        isBootstrap: true,
+      },
+      phoneNumber: {
+        value: '+16204623730',
+        isBootstrap: true,
+      },
     });
 
     expect(
@@ -18,7 +24,10 @@ describe('validateBootstrapData', () => {
         phoneNumber: '++121313+',
       }),
     ).toEqual({
-      email: 'belce@onefootprint.com',
+      email: {
+        value: 'belce@onefootprint.com',
+        isBootstrap: true,
+      },
     });
 
     expect(
@@ -33,14 +42,24 @@ describe('validateBootstrapData', () => {
         email: 'invalid-email',
         phoneNumber: '+16204623730',
       }),
-    ).toEqual({ phoneNumber: '+16204623730' });
+    ).toEqual({
+      phoneNumber: {
+        value: '+16204623730',
+        isBootstrap: true,
+      },
+    });
 
     expect(
       validateBootstrapData({
         email: 'belce@onefootprint.com',
         phoneNumber: 'invalid-email',
       }),
-    ).toEqual({ email: 'belce@onefootprint.com' });
+    ).toEqual({
+      email: {
+        value: 'belce@onefootprint.com',
+        isBootstrap: true,
+      },
+    });
 
     expect(
       validateBootstrapData({

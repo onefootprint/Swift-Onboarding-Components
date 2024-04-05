@@ -132,8 +132,8 @@ describe('Identify Machine Tests', () => {
         user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
         identifyToken: 'utok_xxx',
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.value).toEqual('challengeSelectOrPasskey');
 
       state = machine.send({
@@ -170,8 +170,8 @@ describe('Identify Machine Tests', () => {
           user: undefined,
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: undefined,
       });
@@ -186,8 +186,8 @@ describe('Identify Machine Tests', () => {
           user: getFixtureUser([ChallengeKind.sms]),
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual('+16509878899');
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual('+16509878899');
       expect(state.context.identify).toEqual({
         successfulIdentifiers: [SuccessfulIdentifier.phone],
         user: getFixtureUser([ChallengeKind.sms]),
@@ -217,8 +217,8 @@ describe('Identify Machine Tests', () => {
           user: undefined,
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: undefined,
       });
@@ -233,8 +233,8 @@ describe('Identify Machine Tests', () => {
           user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual('+16509878899');
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual('+16509878899');
       expect(state.context.identify).toEqual({
         successfulIdentifiers: [SuccessfulIdentifier.phone],
         user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
@@ -323,8 +323,8 @@ describe('Identify Machine Tests', () => {
           user: undefined,
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: undefined,
       });
@@ -338,8 +338,8 @@ describe('Identify Machine Tests', () => {
           user: undefined,
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual('+16509878899');
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual('+16509878899');
       expect(state.context.identify).toEqual({
         user: undefined,
       });
@@ -359,8 +359,8 @@ describe('Identify Machine Tests', () => {
           user: undefined,
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual('+16509878899');
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual('+16509878899');
       expect(state.value).toEqual('smsChallenge');
     });
 
@@ -385,8 +385,8 @@ describe('Identify Machine Tests', () => {
           user: undefined,
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: undefined,
       });
@@ -413,8 +413,8 @@ describe('Identify Machine Tests', () => {
         },
       });
       const { state } = machine;
-      expect(state.context.email).toEqual(undefined);
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual(undefined);
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
 
       expect(state.value).toEqual('emailIdentification');
     });
@@ -428,8 +428,8 @@ describe('Identify Machine Tests', () => {
       });
 
       let { state } = machine;
-      expect(state.context.email).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.value).toEqual('initBootstrap');
 
       state = machine.send({
@@ -442,8 +442,8 @@ describe('Identify Machine Tests', () => {
         successfulIdentifiers: undefined,
         user: undefined,
       });
-      expect(state.context.email).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.value).toEqual('phoneIdentification');
     });
 
@@ -457,7 +457,7 @@ describe('Identify Machine Tests', () => {
 
       let { state } = machine;
       expect(state.value).toEqual('initBootstrap');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
 
       state = machine.send({
         type: 'bootstrapReceived',
@@ -469,8 +469,8 @@ describe('Identify Machine Tests', () => {
         successfulIdentifiers: undefined,
         user: undefined,
       });
-      expect(state.context.email).toEqual(undefined);
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual(undefined);
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.value).toEqual('emailIdentification');
     });
 
@@ -485,8 +485,8 @@ describe('Identify Machine Tests', () => {
 
       let { state } = machine;
       expect(state.value).toEqual('initBootstrap');
-      expect(state.context.email).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
 
       state = machine.send({
         type: 'bootstrapReceived',
@@ -498,8 +498,8 @@ describe('Identify Machine Tests', () => {
         successfulIdentifiers: undefined,
         user: undefined,
       });
-      expect(state.context.email).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.value).toEqual('smsChallenge');
 
       state = machine.send({
@@ -525,8 +525,8 @@ describe('Identify Machine Tests', () => {
       });
 
       let { state } = machine;
-      expect(state.context.email).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.value).toEqual('initBootstrap');
 
       state = machine.send({
@@ -539,8 +539,8 @@ describe('Identify Machine Tests', () => {
         successfulIdentifiers: undefined,
         user: undefined,
       });
-      expect(state.context.email).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.value).toEqual('emailChallenge');
     });
 
@@ -664,8 +664,8 @@ describe('Identify Machine Tests', () => {
         successfulIdentifiers: [SuccessfulIdentifier.email],
         identifyToken: 'utok_xxx',
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.value).toEqual('smsChallenge');
 
       // Receive challenge data from the backend
@@ -682,8 +682,8 @@ describe('Identify Machine Tests', () => {
         user: undefined,
         successfulIdentifiers: undefined,
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.challenge.challengeData).toBeTruthy();
       expect(state.value).toEqual('emailIdentification');
 
@@ -696,8 +696,8 @@ describe('Identify Machine Tests', () => {
         },
       });
       expect(state.context.identify).toEqual({});
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.value).toEqual('phoneIdentification');
       state = machine.send({
         type: 'identifyResult',
@@ -707,8 +707,8 @@ describe('Identify Machine Tests', () => {
           user: getFixtureUser([ChallengeKind.sms]),
         },
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.context.identify).toEqual({
         user: getFixtureUser([ChallengeKind.sms]),
         successfulIdentifiers: [SuccessfulIdentifier.phone],
@@ -719,8 +719,8 @@ describe('Identify Machine Tests', () => {
 
       // Make sure we can go back again. Should go back to phoneIdentification and clear found user, but not challenge data
       state = machine.send({ type: 'navigatedToPrevPage' });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.context.identify).toEqual({
         user: undefined,
         successfulIdentifiers: undefined,
@@ -764,8 +764,8 @@ describe('Identify Machine Tests', () => {
           user: getFixtureUser([ChallengeKind.email]),
         },
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: getFixtureUser([ChallengeKind.email]),
         successfulIdentifiers: [SuccessfulIdentifier.email],
@@ -783,8 +783,8 @@ describe('Identify Machine Tests', () => {
 
       // Make sure we can go back. Should clear found user but not the challenge data
       state = machine.send({ type: 'navigatedToPrevPage' });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: undefined,
         successfulIdentifiers: undefined,
@@ -830,8 +830,8 @@ describe('Identify Machine Tests', () => {
           user: getFixtureUser([ChallengeKind.email]),
         },
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: getFixtureUser([ChallengeKind.email]),
         successfulIdentifiers: [SuccessfulIdentifier.email],
@@ -868,8 +868,8 @@ describe('Identify Machine Tests', () => {
           phoneNumber: '+15555550100',
         },
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.context.identify).toEqual({
         user: getFixtureUser([ChallengeKind.email]),
         successfulIdentifiers: [SuccessfulIdentifier.email],
@@ -891,8 +891,8 @@ describe('Identify Machine Tests', () => {
         type: 'identifyResult',
         payload: identifiedPayload,
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         successfulIdentifiers: [SuccessfulIdentifier.email],
         user: getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms]),
@@ -987,8 +987,8 @@ describe('Identify Machine Tests', () => {
           user: undefined,
         },
       });
-      expect(state.context.email).toEqual('hayes2@valley.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('hayes2@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: undefined,
         successfulIdentifiers: undefined,
@@ -1074,8 +1074,8 @@ describe('Identify Machine Tests', () => {
           user,
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         successfulIdentifiers: [SuccessfulIdentifier.email],
         user,
@@ -1085,8 +1085,8 @@ describe('Identify Machine Tests', () => {
 
       // Go back, and then put in a different email that we don't identify with
       state = machine.send({ type: 'navigatedToPrevPage' });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: undefined,
         successfulIdentifiers: undefined,
@@ -1099,8 +1099,8 @@ describe('Identify Machine Tests', () => {
           user: undefined,
         },
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         user: undefined,
         successfulIdentifiers: undefined,
@@ -1116,8 +1116,8 @@ describe('Identify Machine Tests', () => {
           user,
         },
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.context.identify).toEqual({
         successfulIdentifiers: [SuccessfulIdentifier.phone],
         user,
@@ -1127,8 +1127,8 @@ describe('Identify Machine Tests', () => {
 
       // Go back - we should return to the phone input screen
       state = machine.send({ type: 'navigatedToPrevPage' });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.context.identify).toEqual({
         user: undefined,
         successfulIdentifiers: undefined,
@@ -1144,8 +1144,8 @@ describe('Identify Machine Tests', () => {
           user,
         },
       });
-      expect(state.context.email).toEqual('hayes@valley.com');
-      expect(state.context.phoneNumber).toEqual('+15555550100');
+      expect(state.context.email?.value).toEqual('hayes@valley.com');
+      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.context.identify).toEqual({
         user,
         successfulIdentifiers: [SuccessfulIdentifier.phone],
@@ -1184,8 +1184,8 @@ describe('Identify Machine Tests', () => {
           user,
         },
       });
-      expect(state.context.email).toEqual('belce@onefootprint.com');
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual('belce@onefootprint.com');
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         successfulIdentifiers: [SuccessfulIdentifier.email],
         user,
@@ -1247,8 +1247,8 @@ describe('Identify Machine Tests', () => {
           user: getFixtureUser([ChallengeKind.sms]),
         },
       });
-      expect(state.context.email).toEqual(undefined);
-      expect(state.context.phoneNumber).toEqual(undefined);
+      expect(state.context.email?.value).toEqual(undefined);
+      expect(state.context.phoneNumber?.value).toEqual(undefined);
       expect(state.context.identify).toEqual({
         successfulIdentifiers: [SuccessfulIdentifier.authToken],
         user: getFixtureUser([ChallengeKind.sms]),

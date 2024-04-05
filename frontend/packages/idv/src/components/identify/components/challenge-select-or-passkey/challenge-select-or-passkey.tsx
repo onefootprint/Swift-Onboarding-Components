@@ -40,7 +40,8 @@ const ChallengeSelectOrPasskey = ({
   });
 
   const methodOptions = useMemo(() => {
-    const titleMap = getChallengeTitleByKind(t, identify, email, phoneNumber);
+    const ctx = { identify, phoneNumber, email };
+    const titleMap = getChallengeTitleByKind(t, ctx);
     return getMethods(identify, device, titleMap);
   }, [t, identify, device, phoneNumber, email]);
 

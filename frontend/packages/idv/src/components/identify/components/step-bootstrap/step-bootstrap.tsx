@@ -26,8 +26,8 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
 
     const identifyResult = await mutIdentify
       .mutateAsync({
-        email,
-        phoneNumber,
+        email: email?.value,
+        phoneNumber: phoneNumber?.value,
       })
       .catch((error: unknown) => {
         logError(

@@ -20,17 +20,13 @@ export type { DeviceResponseJsonPayload } from './state-machine/utils/custom-lis
 export { createReceivedDeviceResponseJsonPayload } from './state-machine/utils/custom-listener';
 export {
   hasAuthMethodUnverifiedEmail,
-  hasEmailAndPhoneNumber,
   isAuth,
   isBiometric,
   isEmail,
-  isEmailIdentifier,
-  isEmailOrPhoneIdentifier,
   isError,
   isFunction,
   isObject,
   isPhone,
-  isPhoneIdentifier,
   isSms,
   isString,
   isStringValid,
@@ -41,5 +37,4 @@ export {
   hasInvalidHashFragment,
   isValidTokenFormat,
 } from './url-fragment';
-export { default as validateBootstrapData } from './validate-bootstrap-data';
 export { default as withProvider } from './with-provider';

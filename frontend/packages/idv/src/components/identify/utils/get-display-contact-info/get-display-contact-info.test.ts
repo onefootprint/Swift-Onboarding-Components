@@ -41,7 +41,7 @@ describe('getDisplayEmail', () => {
   ])('case %#', ({ identify, email, x }) => {
     const result = getDisplayEmail({
       identify: identify as IdentifyContext,
-      email,
+      email: { value: email, isBootstrap: false },
     });
     expect(result).toEqual(x);
   });
@@ -86,7 +86,7 @@ describe('getDisplayPhone', () => {
   ])('case %#', ({ identify, phoneNumber, x }) => {
     const result = getDisplayPhone({
       identify: identify as IdentifyContext,
-      phoneNumber,
+      phoneNumber: { value: phoneNumber, isBootstrap: false },
     });
     expect(result).toEqual(x);
   });

@@ -12,6 +12,11 @@ import type { EventObject, StateValue, TransitionConfigOrTarget } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
 
+export type IdentifyVaultData = {
+  value: string;
+  isBootstrap: boolean;
+};
+
 export type IdentifyMachineContext = {
   bootstrapData: IdentifyBootstrapData;
   challenge: MachineChallengeContext;
@@ -24,10 +29,10 @@ export type IdentifyMachineContext = {
   sandboxId?: string;
   /** phoneNumber -
    * The phone number entered into the identify flow */
-  phoneNumber?: string;
+  phoneNumber?: IdentifyVaultData;
   /** email -
    * The email entered into the identify flow */
-  email?: string;
+  email?: IdentifyVaultData;
   identify: IdentifyContext;
   /** initialAuthToken -
    * Optionally, the identified token used to start the flow

@@ -1,13 +1,13 @@
 import { ChallengeKind } from '@onefootprint/types';
 import React from 'react';
 
+import type { IdentifyContext } from '../../state/types';
 import { SuccessfulIdentifier } from '../../state/types';
 import { getChallengeTitleByKind, getMethods } from './utils';
 
 describe('getChallengeTitleByKind', () => {
   type Args = Parameters<typeof getChallengeTitleByKind>;
   type T = Args[0];
-  type Identify = Args[1];
 
   const t = (x: string) => x;
 
@@ -98,12 +98,22 @@ describe('getChallengeTitleByKind', () => {
       },
     },
   ])('case %#', ({ identify, email, phoneNumber, x }) => {
-    const result = getChallengeTitleByKind(
-      t as T,
-      identify as Identify,
-      email,
-      phoneNumber,
-    );
+    const context = {
+      identify: identify as IdentifyContext,
+      email: email
+        ? {
+            value: email,
+            isBootstrap: false,
+          }
+        : undefined,
+      phoneNumber: phoneNumber
+        ? {
+            value: phoneNumber,
+            isBootstrap: false,
+          }
+        : undefined,
+    };
+    const result = getChallengeTitleByKind(t as T, context);
     expect(result).toEqual(x);
   });
 });

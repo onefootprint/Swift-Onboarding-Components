@@ -8,13 +8,8 @@ import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
-import {
-  getRandomID,
-  isEmail,
-  isSms,
-  validateBootstrapData,
-} from '../../../utils';
-import { hasEmailAndPhoneNumber } from '../../../utils/type-guards';
+import { getRandomID, isEmail, isSms } from '../../../utils';
+import validateBootstrapData from '../utils/validate-bootstrap-data';
 import {
   isNoPhoneFlow,
   isPrevSmsChallenge,
@@ -199,7 +194,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
                 target: 'emailChallenge',
               },
               {
-                cond: ctx => hasEmailAndPhoneNumber(ctx),
+                cond: ctx => !!ctx.phoneNumber && !!ctx.email,
                 target: 'smsChallenge',
                 description:
                   'If we didnt locate a user but have phone and email, go straight to SMS signup challenge',
@@ -365,12 +360,15 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             return context;
           }
           const isPhoneChanged =
-            phoneNumber && context.phoneNumber !== phoneNumber;
+            phoneNumber && context.phoneNumber?.value !== phoneNumber;
           if (isPhoneChanged) {
             // challengeData becomes invalid if the phone changes
             context.challenge.challengeData = undefined;
           }
-          context.phoneNumber = phoneNumber;
+          context.phoneNumber = {
+            value: phoneNumber,
+            isBootstrap: false,
+          };
           return context;
         }),
         resetPhone: assign(context => {
@@ -393,18 +391,24 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           }
 
           // challengeData becomes invalid if the phone or email changes
-          const isEmailChanged = email && context.email !== email;
+          const isEmailChanged = email && context.email?.value !== email;
           const isPhoneChanged =
-            phoneNumber && context.phoneNumber !== phoneNumber;
+            phoneNumber && context.phoneNumber?.value !== phoneNumber;
           if (isEmailChanged || isPhoneChanged) {
             context.challenge.challengeData = undefined;
           }
 
           if (email) {
-            context.email = email;
+            context.email = {
+              value: email,
+              isBootstrap: false,
+            };
           }
           if (phoneNumber) {
-            context.phoneNumber = phoneNumber;
+            context.phoneNumber = {
+              value: phoneNumber,
+              isBootstrap: false,
+            };
           }
 
           return context;
