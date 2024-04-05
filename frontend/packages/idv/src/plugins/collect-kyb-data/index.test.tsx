@@ -110,11 +110,8 @@ describe.skip('<CollectKybData />', () => {
         populatedAttributes: [],
         optionalAttributes: [],
       },
-      kycUserData: {
-        [IdDI.email]: {
-          value: 'piip@onefootprint.com',
-          isBootstrap: true,
-        },
+      kycBootstrapData: {
+        [IdDI.email]: 'piip@onefootprint.com',
       },
     },
     onDone,

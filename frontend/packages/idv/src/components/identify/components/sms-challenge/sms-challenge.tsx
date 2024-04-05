@@ -8,7 +8,7 @@ import useGetHeaderText from '../../hooks/use-get-header-text';
 import useTryAnotherWay from '../../hooks/use-try-another-way';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';
-import { getDisplayPhone } from '../../utils/get-display-contact-info';
+import { getDisplayPhone } from '../../utils/get-display-contact-info/get-display-contact-info';
 import PinVerification from '../pin-verification';
 
 type SmsChallengeProps = { Header: (props: HeaderProps) => JSX.Element };

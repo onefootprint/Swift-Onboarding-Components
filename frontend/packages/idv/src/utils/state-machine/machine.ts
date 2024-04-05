@@ -7,7 +7,6 @@ import { IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks/ui/use-device-info';
-import type { UserData } from '../../types';
 import type {
   CompletePayload,
   ComponentsSdkContext,
@@ -32,21 +31,6 @@ export type IdvMachineArgs = {
   onComplete?: (payload: CompletePayload) => void;
 };
 
-const getIdvMachineContext = (args: IdvMachineArgs): MachineContext => {
-  const { bootstrapData, ...restOfArgs } = args;
-  const userData: UserData = {};
-  Object.entries(bootstrapData || {}).forEach(([key, value]) => {
-    if (value) {
-      // @ts-expect-error
-      userData[key as IdDI] = { value, isBootstrap: true };
-    }
-  });
-  return {
-    userData,
-    ...restOfArgs,
-  };
-};
-
 const createIdvMachine = (args: IdvMachineArgs) =>
   createMachine(
     {
@@ -59,7 +43,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: getIdvMachineContext(args),
+      context: { ...args },
       on: {
         expireSession: {
           target: 'sessionExpired',
@@ -177,13 +161,16 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           overallOutcome: event.payload.overallOutcome,
         })),
         assignIdentifyResult: assign((context, event) => {
+          context.bootstrapData = context.bootstrapData || {};
           // Pass the phone and email collected in the identify machine into the requirements
           // machine. In very few cases, the phone and email are needed in the requirements machine
+          // TODO extract whether it's bootstrap or entered manually
           if (event.payload.email) {
-            context.userData[IdDI.email] = event.payload.email;
+            context.bootstrapData[IdDI.email] = event.payload.email?.value;
           }
           if (event.payload.phoneNumber) {
-            context.userData[IdDI.phoneNumber] = event.payload.phoneNumber;
+            context.bootstrapData[IdDI.phoneNumber] =
+              event.payload.phoneNumber?.value;
           }
           return context;
         }),

@@ -75,10 +75,10 @@ describe('<Identify />', () => {
   }) => {
     const userData: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (bootstrapEmail) {
-      userData.email = bootstrapEmail;
+      userData[IdDI.email] = bootstrapEmail;
     }
     if (bootstrapPhone) {
-      userData.phoneNumber = bootstrapPhone;
+      userData[IdDI.phoneNumber] = bootstrapPhone;
     }
     return customRender(
       <Layout onClose={() => {}}>
@@ -87,9 +87,7 @@ describe('<Identify />', () => {
           config={config}
           isLive={config.isLive}
           obConfigAuth={{ [CLIENT_PUBLIC_KEY_HEADER]: 'pk' }}
-          bootstrapData={
-            bootstrapEmail || bootstrapPhone ? userData : undefined
-          }
+          userData={bootstrapEmail || bootstrapPhone ? userData : undefined}
           initialAuthToken={initialAuthToken}
           device={
             device || {

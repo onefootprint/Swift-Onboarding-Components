@@ -1,25 +1,27 @@
-import type { CollectedKycDataOption, IdDI } from '@onefootprint/types';
+import type {
+  CollectedKycDataOption,
+  IdDI,
+  IdDIData,
+} from '@onefootprint/types';
 import { CdoToAllDisMap } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
-import type { UserData } from '../../../../types';
 import type { KycData } from '../data-types';
 
 const getInitData = (
   cdos: CollectedKycDataOption[],
-  userData: UserData,
+  bootstrapData?: IdDIData,
   disabledFields?: IdDI[],
 ): KycData => {
   const data: KycData = {};
-  Object.entries(userData).forEach(([key, value]) => {
-    if (value) {
-      data[key as IdDI] = {
-        // @ts-expect-error
-        value: value.value,
-        bootstrap: value.isBootstrap,
-      };
-    }
-  });
+  if (bootstrapData) {
+    Object.entries(bootstrapData).forEach(([key, value]) => {
+      if (value) {
+        // @ts-expect-error: fix-me Type 'string' is not assignable to type 'undefined'
+        data[key as IdDI] = { value, bootstrap: true };
+      }
+    });
+  }
 
   if (disabledFields) {
     disabledFields.forEach(field => {

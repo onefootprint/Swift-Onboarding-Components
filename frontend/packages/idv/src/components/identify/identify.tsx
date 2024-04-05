@@ -1,5 +1,6 @@
 'use client';
 
+import type { FootprintUserData } from '@onefootprint/footprint-js';
 import type {
   ObConfigAuth,
   OverallOutcome,
@@ -8,14 +9,11 @@ import type {
 import React from 'react';
 
 import type { DeviceInfo } from '../../hooks';
+import { getIdentifyBootstrapData } from '../../utils/get-identify-bootstrap-data/get-identify-bootstrap-data';
 import Router from './components/router';
 import SandboxFooter from './components/sandbox-footer';
 import { IdentifyMachineProvider } from './state';
-import type {
-  IdentifyBootstrapData,
-  IdentifyVariant,
-  LogoConfig,
-} from './state/types';
+import type { IdentifyVariant, LogoConfig } from './state/types';
 import type { DoneArgs } from './types';
 
 type IdentifyProps = {
@@ -28,7 +26,7 @@ type IdentifyProps = {
   onDone: (args: DoneArgs) => void;
   overallOutcome?: OverallOutcome;
   sandboxId?: string;
-  bootstrapData?: IdentifyBootstrapData;
+  userData?: Pick<FootprintUserData, 'id.email' | 'id.phone_number'>;
   variant: IdentifyVariant;
 };
 
@@ -43,12 +41,12 @@ const Identify = ({
   onDone,
   overallOutcome,
   sandboxId,
-  bootstrapData,
+  userData,
   variant,
 }: IdentifyProps): JSX.Element | null => (
   <IdentifyMachineProvider
     args={{
-      bootstrapData,
+      bootstrapData: getIdentifyBootstrapData(userData),
       config,
       device,
       initialAuthToken,

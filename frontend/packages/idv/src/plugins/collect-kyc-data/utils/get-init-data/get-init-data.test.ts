@@ -4,31 +4,25 @@ import getInitData from './get-init-data';
 
 describe('getInitData', () => {
   it('should return an empty object if no bootstrap data is provided', () => {
-    expect(getInitData([], {})).toEqual({});
+    expect(getInitData([])).toEqual({});
     expect(getInitData([], {}, [IdDI.email, IdDI.firstName])).toEqual({});
   });
 
-  const userData = {
-    [IdDI.email]: {
-      value: 'Email',
-      isBootstrap: false,
-    },
-    [IdDI.firstName]: {
-      value: 'Name',
-      isBootstrap: true,
-    },
+  const bootstrapData = {
+    [IdDI.email]: 'Email',
+    [IdDI.firstName]: 'Name',
   };
 
   it('should return populated data if bootstrap data is provided', () => {
     expect(
       getInitData(
         [CollectedKycDataOption.email, CollectedKycDataOption.name],
-        userData,
+        bootstrapData,
       ),
     ).toEqual({
       [IdDI.email]: {
         value: 'Email',
-        bootstrap: false,
+        bootstrap: true,
       },
       [IdDI.firstName]: {
         value: 'Name',
@@ -41,13 +35,13 @@ describe('getInitData', () => {
     expect(
       getInitData(
         [CollectedKycDataOption.email, CollectedKycDataOption.name],
-        userData,
+        bootstrapData,
         [IdDI.email, IdDI.firstName],
       ),
     ).toEqual({
       [IdDI.email]: {
         value: 'Email',
-        bootstrap: false,
+        bootstrap: true,
         disabled: true,
       },
       [IdDI.firstName]: {
@@ -62,13 +56,13 @@ describe('getInitData', () => {
     expect(
       getInitData(
         [CollectedKycDataOption.email, CollectedKycDataOption.name],
-        userData,
+        bootstrapData,
         [IdDI.email, IdDI.city],
       ),
     ).toEqual({
       [IdDI.email]: {
         value: 'Email',
-        bootstrap: false,
+        bootstrap: true,
         disabled: true,
       },
       [IdDI.firstName]: {
@@ -83,22 +77,16 @@ describe('getInitData', () => {
       getInitData(
         [CollectedKycDataOption.email, CollectedKycDataOption.name],
         {
-          ...userData,
-          [IdDI.city]: {
-            value: 'City',
-            isBootstrap: true,
-          },
-          [IdDI.state]: {
-            value: 'State',
-            isBootstrap: true,
-          },
+          ...bootstrapData,
+          [IdDI.city]: 'City',
+          [IdDI.state]: 'State',
         },
         [IdDI.email, IdDI.city],
       ),
     ).toEqual({
       [IdDI.email]: {
         value: 'Email',
-        bootstrap: false,
+        bootstrap: true,
         disabled: true,
       },
       [IdDI.firstName]: {

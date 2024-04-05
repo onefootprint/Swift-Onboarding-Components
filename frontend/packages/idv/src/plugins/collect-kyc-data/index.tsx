@@ -9,9 +9,9 @@ import type { MachineContext } from './utils/state-machine';
 
 const App = ({ idvContext, context, onDone }: CollectKycDataProps) => {
   const { authToken, device } = idvContext;
-  const { config, requirement, userData, disabledFields } = context;
+  const { config, requirement, bootstrapData, disabledFields } = context;
   const cdos = allAttributes(requirement);
-  const initData = getInitData(cdos, userData, disabledFields);
+  const initData = getInitData(cdos, bootstrapData, disabledFields);
   const initContext: MachineContext = {
     authToken,
     device,

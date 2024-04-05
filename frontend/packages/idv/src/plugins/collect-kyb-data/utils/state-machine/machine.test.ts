@@ -60,7 +60,6 @@ describe('Collect KYB Data Machine Tests', () => {
         populatedAttributes: [],
         optionalAttributes: [],
       },
-      kycUserData: {},
       data: {},
     };
 

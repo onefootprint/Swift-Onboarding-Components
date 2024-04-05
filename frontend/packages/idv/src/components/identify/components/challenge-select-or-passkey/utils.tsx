@@ -14,7 +14,7 @@ import { IdentifyVariant } from '../../state/types';
 import {
   getDisplayEmail,
   getDisplayPhone,
-} from '../../utils/get-display-contact-info';
+} from '../../utils/get-display-contact-info/get-display-contact-info';
 
 type T = TFunction<'identify'>;
 type TitleMap = Record<ChallengeKind, string | JSX.Element>;

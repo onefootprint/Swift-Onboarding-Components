@@ -1,6 +1,6 @@
 import type { StateValue } from 'xstate';
 
-import type { IdentifyBootstrapData } from '../../../../state/types';
+import type { IdentifyBootstrapData } from '../../../../../../utils/get-identify-bootstrap-data';
 
 const isEmailStep = (x: StateValue) => x === 'emailIdentification';
 const isPhoneStep = (x: StateValue) => x === 'phoneIdentification';

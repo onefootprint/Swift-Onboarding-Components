@@ -1,5 +1,5 @@
-import type { UserDatum } from '../../types';
 import type { NavigationHeaderLeftButtonProps } from '../layout';
+import type { IdentifyVaultData } from './state/types';
 
 export type HeaderProps = {
   title: string | JSX.Element;
@@ -9,8 +9,8 @@ export type HeaderProps = {
 export type ObKeyHeader = { 'X-Onboarding-Config-Key': string };
 export type DoneArgs = {
   authToken: string;
-  phoneNumber?: UserDatum<string>;
-  email?: UserDatum<string>;
+  phoneNumber?: IdentifyVaultData;
+  email?: IdentifyVaultData;
 };
 export type EmailAndOrPhone = { email?: string; phoneNumber?: string };
 

@@ -1,5 +1,5 @@
 import type { L10n } from '@onefootprint/footprint-js';
-import { IdDI, SessionStatus } from '@onefootprint/types';
+import { SessionStatus } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -36,7 +36,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     config,
     device,
     authToken,
-    userData,
+    bootstrapData,
     isTransfer,
     componentsSdkContext,
     isInIframe,
@@ -128,10 +128,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
             sandboxId={sandboxId}
             initialAuthToken={authToken}
             obConfigAuth={obConfigAuth}
-            bootstrapData={{
-              email: userData?.[IdDI.email]?.value,
-              phoneNumber: userData?.[IdDI.phoneNumber]?.value,
-            }}
+            userData={bootstrapData}
             logoConfig={
               showLogo
                 ? {
@@ -159,7 +156,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
             componentsSdkContext,
             isInIframe,
           }}
-          userData={userData}
+          bootstrapData={bootstrapData}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onClose={onClose}

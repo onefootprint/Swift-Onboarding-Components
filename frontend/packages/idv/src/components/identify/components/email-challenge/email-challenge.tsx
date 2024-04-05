@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import useGetHeaderText from '../../hooks/use-get-header-text';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';
-import { getDisplayEmail } from '../../utils/get-display-contact-info';
+import { getDisplayEmail } from '../../utils/get-display-contact-info/get-display-contact-info';
 import PinVerification from '../pin-verification';
 
 const IS_TEST = typeof jest !== 'undefined';
