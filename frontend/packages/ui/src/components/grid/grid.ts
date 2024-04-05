@@ -74,7 +74,6 @@ const Container = styled('div').attrs<{ as: GridTag }>(({ as }) => ({
     max-height: ${props.maxHeight};
     visibility: ${props.visibility};
     overflow: ${props.overflow};
-    gap: ${props.gap ? theme.spacing[props.gap] : '0'};
     top: ${props.top ? theme.spacing[props.top] : undefined};
     bottom: ${props.bottom ? theme.spacing[props.bottom] : undefined};
     left: ${props.left ? theme.spacing[props.left] : undefined};
