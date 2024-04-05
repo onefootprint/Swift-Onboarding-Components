@@ -31,53 +31,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
     fn from_db((entity, vw, auth, decrypted_attrs): EntityDetail) -> Self {
         let (sv, watchlist_check, wr, label, mrs, wfs) = entity;
 
-        // Don't require any permissions to decrypt plaintext attributes - always show them
-        let plaintext_attrs = vw
-            .populated_dis()
-            .into_iter()
-            .filter(|di| di.store_plaintext())
-            .flat_map(|di| vw.get_p_data(&di).map(|p_data| (di, p_data.clone())))
-            .map(|(di, d)| (di.into(), d));
-        let decrypted_attrs = decrypted_attrs
-            .into_iter()
-            .filter_map(|(op, d)| d.to_piistring().ok().map(|d| (op, d)));
-        let mut attribute_values: HashMap<_, _> = plaintext_attrs.chain(decrypted_attrs).collect();
-
-        // Assemble all metadata and possible decrypted values for each DI in the vault
-        let data = vw
-            .populated_dis()
-            .into_iter()
-            .filter_map(|di| -> Option<_> {
-                let lifetime = vw.get_lifetime(&di)?;
-                // To be decryptable, two conditions must be met
-                // - The tenant must be able to decrypt the attribute (via ob config permissions)
-                // - The authed user principal at the tenant must be able to decrypt the attribute (via IAM)
-                let can_decrypt = vw.tenant_can_decrypt(di.clone())
-                    && CanDecrypt::single(di.clone()).is_met(&auth.scopes());
-
-                let value = attribute_values.remove(&di.clone().into());
-                let transforms = attribute_values
-                    .iter()
-                    .filter(|(op, _)| op.identifier == di)
-                    // TODO this will display incorrectly if there are multiple transforms.
-                    // But, nothing using this code path will provide multiple transforms today
-                    .filter_map(|(op, v)| op.transforms.first().map(|t| (t.clone(), v.clone())))
-                    .collect();
-                let data_kind = match vw.get(&di)?.data() {
-                    VaultedData::Sealed(..) | VaultedData::NonPrivate(..) => DataAttributeKind::VaultData,
-                    VaultedData::LargeSealed(..) => DataAttributeKind::DocumentData,
-                };
-                let attribute = EntityAttribute {
-                    identifier: di,
-                    source: lifetime.source,
-                    is_decryptable: can_decrypt,
-                    value,
-                    data_kind,
-                    transforms,
-                };
-                Some(attribute)
-            })
-            .collect_vec();
+        let data = entity_attributes(vw, auth, decrypted_attrs);
 
         //
         // All of these are derivative of the much more descriptive `data`.
@@ -208,4 +162,60 @@ impl DbToApi<(Workflow, Option<InsightEvent>)> for api_wire_types::EntityWorkflo
             insight_event,
         }
     }
+}
+
+#[allow(clippy::borrowed_box)]
+pub fn entity_attributes<'a>(
+    vw: &'a TenantVw<Any>,
+    auth: &'a Box<dyn TenantAuth>,
+    decrypted_data: DecryptedData,
+) -> Vec<EntityAttribute> {
+    // Don't require any permissions to decrypt plaintext attributes - always show them
+    let plaintext_attrs = vw
+        .populated_dis()
+        .into_iter()
+        .filter(|di| di.store_plaintext())
+        .flat_map(|di| vw.get_p_data(&di).map(|p_data| (di, p_data.clone())))
+        .map(|(di, d)| (di.into(), d));
+    let decrypted_attrs = decrypted_data
+        .into_iter()
+        .filter_map(|(op, d)| d.to_piistring().ok().map(|d| (op, d)));
+    let mut attribute_values: HashMap<_, _> = plaintext_attrs.chain(decrypted_attrs).collect();
+
+    // Assemble all metadata and possible decrypted values for each DI in the vault
+    vw.populated_dis()
+        .into_iter()
+        .filter_map(|di| -> Option<_> {
+            let lifetime = vw.get_lifetime(&di)?;
+            // To be decryptable, two conditions must be met
+            // - The tenant must be able to decrypt the attribute (via ob config permissions)
+            // - The authed user principal at the tenant must be able to decrypt the attribute (via IAM)
+            let can_decrypt =
+                vw.tenant_can_decrypt(di.clone()) && CanDecrypt::single(di.clone()).is_met(&auth.scopes());
+
+            let value = attribute_values.remove(&di.clone().into());
+            let transforms = attribute_values
+            .iter()
+            .filter(|(op, _)| op.identifier == di)
+            // TODO this will display incorrectly if there are multiple transforms.
+            // But, nothing using this code path will provide multiple transforms today
+            .filter_map(|(op, v)| op.transforms.first().map(|t| (t.clone(), v.clone())))
+            .collect();
+
+            let data_kind = match vw.get(&di)?.data() {
+                VaultedData::Sealed(..) | VaultedData::NonPrivate(..) => DataAttributeKind::VaultData,
+                VaultedData::LargeSealed(..) => DataAttributeKind::DocumentData,
+            };
+
+            let attribute = EntityAttribute {
+                identifier: di,
+                source: lifetime.source,
+                is_decryptable: can_decrypt,
+                value,
+                data_kind,
+                transforms,
+            };
+            Some(attribute)
+        })
+        .collect_vec()
 }

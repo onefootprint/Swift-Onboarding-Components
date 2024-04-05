@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
-use db_schema::schema::{data_lifetime, fingerprint, scoped_vault};
+use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault};
 use diesel::{prelude::*, Queryable};
 use itertools::Itertools;
 use newtypes::{
@@ -11,7 +11,7 @@ use newtypes::{
 
 use crate::{DbResult, PgConn, TxnPgConn};
 
-use super::scoped_vault::ScopedVault;
+use super::{scoped_vault::ScopedVault, vault::Vault};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = fingerprint)]
@@ -62,12 +62,20 @@ const DUPLICATE_FINGERPRINT_KINDS: [DI; 3] =
 pub struct FingerprintDupe {
     pub kind: DataIdentifier,
     pub scope: FingerprintScopeKind, // TODO: is this used?
-    pub sv: ScopedVault,
+    pub scoped_vault: ScopedVault,
+    pub vault: Vault,
 }
 
-impl From<(DataIdentifier, FingerprintScopeKind, ScopedVault)> for FingerprintDupe {
-    fn from((kind, scope, sv): (DataIdentifier, FingerprintScopeKind, ScopedVault)) -> Self {
-        Self { kind, scope, sv }
+impl From<(DataIdentifier, FingerprintScopeKind, ScopedVault, Vault)> for FingerprintDupe {
+    fn from(
+        (kind, scope, scoped_vault, vault): (DataIdentifier, FingerprintScopeKind, ScopedVault, Vault),
+    ) -> Self {
+        Self {
+            kind,
+            scope,
+            scoped_vault,
+            vault,
+        }
     }
 }
 
@@ -109,13 +117,14 @@ impl Fingerprint {
 
     #[tracing::instrument("Fingerprint::get_dupes", skip_all)]
     pub fn get_dupes(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<FingerprintDupe>> {
-        let (f1, dl1, sv1, f2, dl2, sv2) = diesel::alias!(
+        let (f1, dl1, sv1, f2, dl2, sv2, v2) = diesel::alias!(
             fingerprint as f1,
             data_lifetime as dl1,
             scoped_vault as sv1,
             fingerprint as f2,
             data_lifetime as dl2,
-            scoped_vault as sv2
+            scoped_vault as sv2,
+            vault as v2
         );
 
         let res = f1
@@ -154,15 +163,21 @@ impl Fingerprint {
                     .field(scoped_vault::id)
                     .eq(dl2.field(data_lifetime::scoped_vault_id))),
             )
+            .inner_join(
+                v2.on(v2
+                    .field(vault::id)
+                    .eq(sv2.field(scoped_vault::vault_id))),
+            )
             .filter(sv1.field(scoped_vault::id).eq(sv_id))
             .filter(sv1.field(scoped_vault::is_live).eq(sv2.field(scoped_vault::is_live)))
             .select((
                 f1.field(fingerprint::kind),
                 f1.field(fingerprint::scope),
-                sv2.fields(scoped_vault::all_columns)
+                sv2.fields(scoped_vault::all_columns),
+                v2.fields(vault::all_columns)
             ))
-            .limit(200) // for safety
-            .get_results::<(DataIdentifier, FingerprintScopeKind, ScopedVault)>(conn)?
+            .limit(30) // for safety
+            .get_results::<(DataIdentifier, FingerprintScopeKind, ScopedVault, Vault)>(conn)?
             .into_iter()
             .map(FingerprintDupe::from)
             .collect();

@@ -2,6 +2,7 @@ use db::{
     models::{
         fingerprint::{Fingerprint, FingerprintDupe},
         scoped_vault::ScopedVault,
+        vault::Vault,
     },
     PgConn,
 };
@@ -20,7 +21,8 @@ pub struct Dupes {
 
 #[derive(Debug, Clone)]
 pub struct SameTenantDupe {
-    pub sv: ScopedVault,
+    pub scoped_vault: ScopedVault,
+    pub vault: Vault,
     pub dupe_kinds: Vec<DupeKind>,
 }
 
@@ -55,11 +57,15 @@ fn fingerprint_dupes_to_dupe(dupes: Vec<FingerprintDupe>) -> Either<SameTenantDu
 
     if let Some(first) = same_tenant.first() {
         Either::Left(SameTenantDupe {
-            sv: first.sv.clone(),
+            scoped_vault: first.scoped_vault.clone(),
+            vault: first.vault.clone(),
             dupe_kinds: get_dupe_kinds(&same_tenant),
         })
     } else {
-        let tenants = other_tenant.into_iter().map(|fd| fd.sv.tenant_id).collect();
+        let tenants = other_tenant
+            .into_iter()
+            .map(|fd| fd.scoped_vault.tenant_id)
+            .collect();
         Either::Right(tenants)
     }
 }
@@ -69,7 +75,7 @@ pub fn get_dupes(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<Dupes> {
 
     let fp_dupes = fp_dupes
         .into_iter()
-        .into_group_map_by(|fpd| fpd.sv.vault_id.clone());
+        .into_group_map_by(|fpd| fpd.scoped_vault.vault_id.clone());
     let (same_tenant, other_tenant): (Vec<_>, Vec<_>) = fp_dupes
         .into_values()
         .map(fingerprint_dupes_to_dupe)
@@ -339,7 +345,7 @@ mod tests {
         let actual_same_tenant = dupes
             .same_tenant
             .into_iter()
-            .map(|d| d.sv.fp_id.clone())
+            .map(|d| d.scoped_vault.fp_id.clone())
             .collect_vec();
 
         assert_have_same_elements(expected_same_tenant, actual_same_tenant); // have to do it this way for now because we aren't sorting the vec's
