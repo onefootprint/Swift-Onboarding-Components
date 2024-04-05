@@ -23572,9 +23572,6 @@
                             "s1001_plus"
                         ]
                     },
-                    "logo_url": {
-                        "type": "string"
-                    },
                     "name": {
                         "type": "string"
                     },

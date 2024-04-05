@@ -9,7 +9,6 @@ pub struct UpdateTenantRequest {
     pub name: Option<String>,
     pub website_url: Option<String>,
     pub company_size: Option<CompanySize>,
-    pub logo_url: Option<String>,
     pub privacy_policy_url: Option<String>,
     pub allow_domain_access: Option<bool>,
     pub support_email: Option<String>,

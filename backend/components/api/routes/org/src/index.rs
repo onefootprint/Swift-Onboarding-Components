@@ -55,7 +55,6 @@ async fn patch(
         name,
         website_url,
         company_size,
-        logo_url,
         privacy_policy_url,
         allow_domain_access,
         support_email,
@@ -82,7 +81,7 @@ async fn patch(
 
     let update_tenant = UpdateTenant {
         name,
-        logo_url,
+        logo_url: None,
         website_url,
         company_size,
         privacy_policy_url,
