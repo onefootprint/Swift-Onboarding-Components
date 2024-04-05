@@ -35,7 +35,7 @@ const postComplianceDocTemplates = async (
   payload: CreateComplianceDocTemplateRequest,
 ) =>
   authToken && payload
-    ? baseFetch<ComplianceDocTemplate>('/compliance/doc_templates', {
+    ? baseFetch<ComplianceDocTemplate>('/partner/doc_templates', {
         headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
         method: 'POST',
         body: JSON.stringify(payload),

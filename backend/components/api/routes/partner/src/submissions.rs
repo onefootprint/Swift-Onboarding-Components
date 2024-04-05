@@ -15,7 +15,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Fetches the submission with the given ID",
     tags(Compliance, Private)
 )]
-#[actix::get("/compliance/partners/{partnership_id}/submissions/{submission_id}")]
+#[actix::get("/partner/partnerships/{partnership_id}/submissions/{submission_id}")]
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,

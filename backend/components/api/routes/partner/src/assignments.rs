@@ -16,7 +16,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Assigns a compliance document to a partner tenant user",
     tags(Compliance, Private)
 )]
-#[actix::post("/compliance/partners/{partnership_id}/documents/{document_id}/assignments")]
+#[actix::post("/partner/partnerships/{partnership_id}/documents/{document_id}/assignments")]
 pub async fn post(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,

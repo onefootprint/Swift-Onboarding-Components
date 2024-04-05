@@ -13,7 +13,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Returns a summary of partnered companies for a compliance partner.",
     tags(Compliance, Private)
 )]
-#[actix::get("/compliance/partners")]
+#[actix::get("/partner/partnerships")]
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,

@@ -15,7 +15,7 @@ def _example_document_path():
 
 def test_partner_document_flow(tenant, partner_tenant):
     # List partnerships
-    companies = get("compliance/partners", {}, *partner_tenant.ro_db_auths)
+    companies = get("partner/partnerships", {}, *partner_tenant.ro_db_auths)
 
     assert len(companies) == 1
     company = companies[0]
@@ -27,7 +27,7 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert company["num_active_playbooks"] >= 0
 
     # Create a template
-    template = post("compliance/doc_templates", {
+    template = post("partner/doc_templates", {
         "name": "name v1",
         "description": "description v1",
     }, *partner_tenant.db_auths)
@@ -37,11 +37,11 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert template["latest_version"]["description"] == "description v1"
 
     # List templates
-    templates = get("compliance/doc_templates", {}, *partner_tenant.ro_db_auths)
+    templates = get("partner/doc_templates", {}, *partner_tenant.ro_db_auths)
     assert template in templates
 
     # Update template
-    template = put(f"compliance/doc_templates/{template_id}", {
+    template = put(f"partner/doc_templates/{template_id}", {
         "name": "name v2",
         "description": "description v2",
     }, *partner_tenant.db_auths)
@@ -51,18 +51,18 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert template["latest_version"]["description"] == "description v2"
 
     # List document templates and check for update
-    templates = get("compliance/doc_templates", {}, *partner_tenant.ro_db_auths)
+    templates = get("partner/doc_templates", {}, *partner_tenant.ro_db_auths)
     assert template in templates
 
     # Request a document from the template.
-    template_doc = post(f"compliance/partners/{partnership_id}/documents", {
+    template_doc = post(f"partner/partnerships/{partnership_id}/documents", {
         "template_version_id": template["latest_version"]["id"],
         "name": "edited template name",
         "description": "edited template description",
     }, *partner_tenant.db_auths)
 
     # List documents and check that the new document is present.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["name"] == "edited template name"
     assert doc["description"] == "edited template description"
@@ -70,13 +70,13 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert doc["template_id"] == template["id"]
 
     # Request a document ad-hoc.
-    ad_hoc_doc = post(f"compliance/partners/{partnership_id}/documents", {
+    ad_hoc_doc = post(f"partner/partnerships/{partnership_id}/documents", {
         "name": "ad-hoc template name",
         "description": "ad-hoc template description",
     }, *partner_tenant.db_auths)
 
     # List documents and check that the new document is present.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
     assert doc["name"] == "ad-hoc template name"
     assert doc["description"] == "ad-hoc template description"
@@ -85,10 +85,10 @@ def test_partner_document_flow(tenant, partner_tenant):
 
     # Delete the ad-hoc request.
     req_id = doc["active_request_id"]
-    delete(f"compliance/partners/{partnership_id}/requests/{req_id}", {}, *partner_tenant.db_auths)
+    delete(f"partner/partnerships/{partnership_id}/requests/{req_id}", {}, *partner_tenant.db_auths)
 
     # The ad-hoc document should be in the "not_requested" state.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
     assert doc["status"] == "not_requested"
     # Most recent deactivated request names are used in the document list.
@@ -97,12 +97,12 @@ def test_partner_document_flow(tenant, partner_tenant):
 
     # Request re-upload of the ad-hoc document.
     doc_id = doc["id"]
-    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reupload", {
+    post(f"partner/partnerships/{partnership_id}/documents/{doc_id}/reupload", {
         "name": "edited ad-hoc name 2",
         "description": "edited ad-hoc description 2",
     }, *partner_tenant.db_auths)
     # New names are used in the document list and the status is updated.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
     assert doc["status"] == "waiting_for_upload"
     assert doc["name"] == "edited ad-hoc name 2"
@@ -111,17 +111,17 @@ def test_partner_document_flow(tenant, partner_tenant):
 
     # Request another re-upload of the ad-hoc document.
     doc_id = doc["id"]
-    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reupload", {
+    post(f"partner/partnerships/{partnership_id}/documents/{doc_id}/reupload", {
         "name": "edited ad-hoc name 2",
         "description": "edited ad-hoc description 2",
     }, *partner_tenant.db_auths)
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
     active_request_id = doc["active_request_id"]
     assert active_request_id != old_active_request_id
 
     # We shouldn't be able to delete the old request.
-    resp = delete(f"compliance/partners/{partnership_id}/requests/{old_active_request_id}", {}, *partner_tenant.db_auths, status_code=400)
+    resp = delete(f"partner/partnerships/{partnership_id}/requests/{old_active_request_id}", {}, *partner_tenant.db_auths, status_code=400)
     assert resp["error"]["message"] == "Can only retract the latest active request"
 
     # We shouldn't be able to submit an external URL for the old request.
@@ -141,15 +141,15 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert resp["error"]["message"] == "Can only submit documents for the latest request"
 
     # We can delete the most recent requests.
-    delete(f"compliance/partners/{partnership_id}/requests/{active_request_id}", {}, *partner_tenant.db_auths)
+    delete(f"partner/partnerships/{partnership_id}/requests/{active_request_id}", {}, *partner_tenant.db_auths)
 
     # There should now be no requests for the ad-hoc document.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == ad_hoc_doc["id"]), None)
     assert doc["active_request_id"] is None
 
     # Requesting a document from the same template yields an error.
-    resp = post(f"compliance/partners/{partnership_id}/documents", {
+    resp = post(f"partner/partnerships/{partnership_id}/documents", {
         "template_version_id": template["latest_version"]["id"],
         "name": "edited template name 2",
         "description": "edited template description 2",
@@ -162,14 +162,14 @@ def test_partner_document_flow(tenant, partner_tenant):
         "url": "https://example.com/oops",
     }, *tenant.db_auths)
     # The document should now be waiting for review.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["status"] == "waiting_for_review"
     old_submission_id = doc["active_submission_id"]
 
     # Fetch the document submission.
     submission_id = doc["active_submission_id"]
-    resp = get(f"compliance/partners/{partnership_id}/submissions/{submission_id}", {}, *partner_tenant.ro_db_auths)
+    resp = get(f"partner/partnerships/{partnership_id}/submissions/{submission_id}", {}, *partner_tenant.ro_db_auths)
     assert resp["id"] == submission_id
     assert resp["data"]["kind"] == "external_url"
     assert resp["data"]["data"]["url"] == "https://example.com/oops"
@@ -183,13 +183,13 @@ def test_partner_document_flow(tenant, partner_tenant):
          },
     )
     # The document should now be waiting for review.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["status"] == "waiting_for_review"
 
     # Fetch the document submission.
     submission_id = doc["active_submission_id"]
-    resp = get(f"compliance/partners/{partnership_id}/submissions/{submission_id}", {}, *partner_tenant.ro_db_auths)
+    resp = get(f"partner/partnerships/{partnership_id}/submissions/{submission_id}", {}, *partner_tenant.ro_db_auths)
     with open(_example_document_path(), "rb") as f:
         expected_data = base64.urlsafe_b64encode(f.read()).decode("utf-8")
     assert resp["id"] == submission_id
@@ -198,11 +198,11 @@ def test_partner_document_flow(tenant, partner_tenant):
     assert resp["data"]["data"]["data"] == expected_data
 
     # We shouldn't be able to delete a document that has submissions.
-    resp = delete(f"compliance/partners/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths, status_code=400)
+    resp = delete(f"partner/partnerships/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths, status_code=400)
     assert resp["error"]["message"] == "Cannot retract a compliance document request with submissions"
 
     # We shouldn't be able to review an old submission.
-    resp = post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
+    resp = post(f"partner/partnerships/{partnership_id}/documents/{doc_id}/reviews", {
         "submission_id": old_submission_id,
         "decision": "accepted",
         "note": "lgtm",
@@ -212,33 +212,33 @@ def test_partner_document_flow(tenant, partner_tenant):
     # Accept the submission.
     doc_id = doc["id"]
     sub_id = doc["active_submission_id"]
-    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
+    post(f"partner/partnerships/{partnership_id}/documents/{doc_id}/reviews", {
         "submission_id": sub_id,
         "decision": "accepted",
         "note": "lgtm",
     }, *partner_tenant.db_auths)
     # The document should now be accepted.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["status"] == "accepted"
 
     # Re-review the latest submission.
     prev_request_id = doc["active_request_id"]
     sub_id = doc["active_submission_id"]
-    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
+    post(f"partner/partnerships/{partnership_id}/documents/{doc_id}/reviews", {
         "submission_id": sub_id,
         "decision": "rejected",
         "note": "try again",
     }, *partner_tenant.db_auths)
     # The document should be waiting for upload.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     # There should be a new request issued.
     assert doc["active_request_id"] != prev_request_id
     assert doc["status"] == "waiting_for_upload"
 
     # We shouldn't be able to review the old submission.
-    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/reviews", {
+    post(f"partner/partnerships/{partnership_id}/documents/{doc_id}/reviews", {
         "submission_id": sub_id,
         "decision": "rejected",
         "note": "this won't work",
@@ -246,20 +246,20 @@ def test_partner_document_flow(tenant, partner_tenant):
 
     # Deleting the latest request should put the document in the "not_requested" state.
     request_id = doc["active_request_id"]
-    delete(f"compliance/partners/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths)
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    delete(f"partner/partnerships/{partnership_id}/requests/{request_id}", {}, *partner_tenant.db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["status"] == "not_requested"
 
     # Delete the template
-    delete(f"compliance/doc_templates/{template_id}", {}, *partner_tenant.db_auths)
+    delete(f"partner/doc_templates/{template_id}", {}, *partner_tenant.db_auths)
 
     # List document templates and check for deletion
-    templates = get("compliance/doc_templates", {}, *partner_tenant.ro_db_auths)
+    templates = get("partner/doc_templates", {}, *partner_tenant.ro_db_auths)
     assert template not in templates
 
     # The template doc is still present after deleting the template.
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["name"] == "edited template name"
     assert doc["description"] == "edited template description"
@@ -272,7 +272,7 @@ def test_partner_document_flow(tenant, partner_tenant):
         "user_id": assignee["id"],
     }, *tenant.db_auths)
     # TODO: use a tenant-facing GET API once we make one
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["tenant_assignee"]["id"] == assignee["id"]
     assert doc["tenant_assignee"]["first_name"] == assignee["first_name"]
@@ -287,17 +287,17 @@ def test_partner_document_flow(tenant, partner_tenant):
     post(f"org/partners/{partnership_id}/documents/{doc_id}/assignments", {
         "user_id": None,
     }, *tenant.db_auths)
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["tenant_assignee"] is None
 
     # Assign the document to a partner tenant user.
     doc_id = doc["id"]
     assignee = get("partner/members", {}, *partner_tenant.ro_db_auths)["data"][0]
-    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/assignments", {
+    post(f"partner/partnerships/{partnership_id}/documents/{doc_id}/assignments", {
         "user_id": assignee["id"],
     }, *partner_tenant.db_auths)
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["partner_tenant_assignee"]["id"] == assignee["id"]
     assert doc["partner_tenant_assignee"]["first_name"] == assignee["first_name"]
@@ -309,15 +309,15 @@ def test_partner_document_flow(tenant, partner_tenant):
     }, *tenant.db_auths, status_code=404)
 
     # Remove the partner assignment.
-    post(f"compliance/partners/{partnership_id}/documents/{doc_id}/assignments", {
+    post(f"partner/partnerships/{partnership_id}/documents/{doc_id}/assignments", {
         "user_id": None,
     }, *partner_tenant.db_auths)
-    documents = get(f"compliance/partners/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
+    documents = get(f"partner/partnerships/{partnership_id}/documents", {}, *partner_tenant.ro_db_auths)
     doc = next((doc for doc in documents if doc["id"] == template_doc["id"]), None)
     assert doc["partner_tenant_assignee"] is None
 
     # Get timeline events for the document.
-    events = get(f"compliance/partners/{partnership_id}/documents/{doc_id}/events", {}, *partner_tenant.ro_db_auths)
+    events = get(f"partner/partnerships/{partnership_id}/documents/{doc_id}/events", {}, *partner_tenant.ro_db_auths)
     events = iter(events)
 
     assert next(events)["event"]["kind"] == "requested"

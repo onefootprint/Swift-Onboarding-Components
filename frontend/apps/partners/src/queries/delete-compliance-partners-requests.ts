@@ -19,7 +19,7 @@ const deleteCompliancePartnersRequests = async (
 ) =>
   authToken && partnershipId && requestId
     ? baseFetch<EmptyResponse>(
-        `/compliance/partners/${partnershipId}/requests/${requestId}`,
+        `/partner/partnerships/${partnershipId}/requests/${requestId}`,
         {
           headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
           method: 'DELETE',

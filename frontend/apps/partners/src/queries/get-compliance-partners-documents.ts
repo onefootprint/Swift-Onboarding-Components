@@ -36,7 +36,7 @@ const getCompliancePartnersDocuments = async (
 ) =>
   authToken && partnershipId
     ? baseFetch<PartnerDocument[]>(
-        `/compliance/partners/${partnershipId}/documents`,
+        `/partner/partnerships/${partnershipId}/documents`,
         {
           headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
           method: 'GET',

@@ -13,7 +13,7 @@ use newtypes::{ComplianceDocRequestId, TenantCompliancePartnershipId};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(description = "Retracts a document request.", tags(Compliance, Private))]
-#[actix::delete("/compliance/partners/{partnership_id}/requests/{request_id}")]
+#[actix::delete("/partner/partnerships/{partnership_id}/requests/{request_id}")]
 pub async fn delete(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,

@@ -22,7 +22,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Lists compliance document templates.",
     tags(Compliance, Private)
 )]
-#[actix::get("/compliance/doc_templates")]
+#[actix::get("/partner/doc_templates")]
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
@@ -73,7 +73,7 @@ pub async fn get(
     description = "Creates a new compliance document template.",
     tags(Compliance, Private)
 )]
-#[actix::post("/compliance/doc_templates")]
+#[actix::post("/partner/doc_templates")]
 pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateComplianceDocTemplateRequest>,
@@ -124,7 +124,7 @@ pub async fn post(
     description = "Updates a compliance document template by creating a new template version.",
     tags(Compliance, Private)
 )]
-#[actix::put("/compliance/doc_templates/{template_id}")]
+#[actix::put("/partner/doc_templates/{template_id}")]
 pub async fn put(
     state: web::Data<State>,
     template_id: web::Path<ComplianceDocTemplateId>,
@@ -174,7 +174,7 @@ pub async fn put(
     description = "Deactivates a compliance document template.",
     tags(Compliance, Private)
 )]
-#[actix::delete("/compliance/doc_templates/{template_id}")]
+#[actix::delete("/partner/doc_templates/{template_id}")]
 pub async fn delete(
     state: web::Data<State>,
     template_id: web::Path<ComplianceDocTemplateId>,

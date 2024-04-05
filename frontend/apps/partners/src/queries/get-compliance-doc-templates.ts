@@ -28,7 +28,7 @@ export type DocTemplate = ComplianceDocTemplate;
  */
 const getComplianceDocTemplates = async (authToken: string) =>
   authToken
-    ? baseFetch<DocTemplate[]>('/compliance/doc_templates', {
+    ? baseFetch<DocTemplate[]>('/partner/doc_templates', {
         headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
         method: 'GET',
       })

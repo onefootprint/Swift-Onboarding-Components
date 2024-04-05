@@ -21,7 +21,7 @@ export type PartnerCompany = ComplianceCompanySummary;
  */
 const getCompliancePartners = async (authToken: string) =>
   authToken
-    ? baseFetch<PartnerCompany[]>('/compliance/partners', {
+    ? baseFetch<PartnerCompany[]>('/partner/partnerships', {
         headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
         method: 'GET',
       })

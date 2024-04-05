@@ -37,14 +37,11 @@ const putComplianceDocTemplates = async (
   templateId: string,
 ) =>
   authToken && payload && templateId
-    ? baseFetch<ComplianceDocTemplate>(
-        `/compliance/doc_templates/${templateId}`,
-        {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
-          method: 'PUT',
-          body: JSON.stringify(payload),
-        },
-      )
+    ? baseFetch<ComplianceDocTemplate>(`/partner/doc_templates/${templateId}`, {
+        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      })
     : Promise.reject(new TypeError('Missing required parameters'));
 
 export default putComplianceDocTemplates;

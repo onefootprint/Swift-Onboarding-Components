@@ -17,7 +17,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Returns a list of timeline events for the given document",
     tags(Compliance, Private)
 )]
-#[actix::get("/compliance/partners/{partnership_id}/documents/{document_id}/events")]
+#[actix::get("/partner/partnerships/{partnership_id}/documents/{document_id}/events")]
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,

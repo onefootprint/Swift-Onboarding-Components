@@ -19,7 +19,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Submit a review for a compliance document submissions",
     tags(Compliance, Private)
 )]
-#[actix::post("/compliance/partners/{partnership_id}/documents/{document_id}/reviews")]
+#[actix::post("/partner/partnerships/{partnership_id}/documents/{document_id}/reviews")]
 pub async fn post(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,

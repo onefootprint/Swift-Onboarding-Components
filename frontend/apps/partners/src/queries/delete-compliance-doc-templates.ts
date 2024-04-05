@@ -16,7 +16,7 @@ const deleteComplianceDocTemplates = async (
   templateId: string,
 ) =>
   authToken && templateId
-    ? baseFetch<EmptyResponse>(`/compliance/doc_templates/${templateId}`, {
+    ? baseFetch<EmptyResponse>(`/partner/doc_templates/${templateId}`, {
         headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
         method: 'DELETE',
       })

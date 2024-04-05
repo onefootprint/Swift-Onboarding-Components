@@ -24,7 +24,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Returns a list of documents for a company partnered with the authorized compliance partner.",
     tags(Compliance, Private)
 )]
-#[actix::get("/compliance/partners/{partnership_id}/documents")]
+#[actix::get("/partner/partnerships/{partnership_id}/documents")]
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
@@ -52,7 +52,7 @@ pub async fn get(
 }
 
 #[api_v2_operation(description = "Creates a new document.", tags(Compliance, Private))]
-#[actix::post("/compliance/partners/{partnership_id}/documents")]
+#[actix::post("/partner/partnerships/{partnership_id}/documents")]
 pub async fn post(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,

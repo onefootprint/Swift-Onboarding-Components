@@ -13,7 +13,7 @@ use newtypes::{ComplianceDocId, TenantCompliancePartnershipId};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(description = "Request reupload of a document.", tags(Compliance, Private))]
-#[actix::post("/compliance/partners/{partnership_id}/documents/{document_id}/reupload")]
+#[actix::post("/partner/partnerships/{partnership_id}/documents/{document_id}/reupload")]
 pub async fn post(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
