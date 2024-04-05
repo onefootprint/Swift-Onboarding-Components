@@ -1,0 +1,1 @@
+ALTER TABLE incode_verification_session ALTER COLUMN purpose DROP DEFAULT;
