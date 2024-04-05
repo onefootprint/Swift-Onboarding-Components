@@ -28,20 +28,6 @@ export enum DirectionChange {
   next = 'next',
 }
 
-export type RangeInputsProps = {
-  startDate: Date | undefined;
-  endDate: Date | undefined;
-  onRangeChange: (
-    startDate: Date | undefined,
-    endDate: Date | undefined,
-  ) => void;
-};
-
-export enum DateType {
-  start = 'start',
-  end = 'end',
-}
-
 export type DayButtonProps = {
   day: Date;
   activeStartDate: Date | undefined;

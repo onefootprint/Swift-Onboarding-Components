@@ -42,10 +42,6 @@ const useOptions = (): DateRangeSelectOption[] => {
       label: t('onboarding-metrics.filters.all-time'),
       value: 'all-time',
     },
-    {
-      label: t('onboarding-metrics.filters.custom'),
-      value: 'custom',
-    },
   ];
 };
 
