@@ -11,7 +11,6 @@ export {
 } from './get-address-components';
 export { default as getBiometricChallengeResponse } from './get-biometric-challenge-response';
 export { default as getCanChallengeBiometrics } from './get-can-challenge-biometrics';
-export { default as getIdentifyBootstrapData } from './get-identify-bootstrap-data';
 export { default as getRandomID } from './get-random-id';
 export { getLogger, default as Logger } from './logger';
 export { default } from './media';

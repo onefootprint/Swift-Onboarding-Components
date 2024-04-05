@@ -20,7 +20,6 @@ export { BeneficialOwnerDataAttribute } from './beneficial-owner';
 export type { BiometricLoginChallengeJson } from './biometric-login-challenge-json';
 export type { BiometricRegisterChallengeJson } from './biometric-register-challenge-json';
 export type {
-  IdentifyBootstrapData,
   IdvBootstrapData,
   IdvOptions,
   KycBootstrapData,

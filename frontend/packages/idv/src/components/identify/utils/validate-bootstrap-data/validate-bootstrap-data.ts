@@ -1,7 +1,7 @@
-import type { IdentifyBootstrapData } from '@onefootprint/types';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import { validate as isEmail } from 'isemail';
 
+import type { IdentifyBootstrapData } from '../../../../utils/get-identify-bootstrap-data';
 import type { IdentifyVaultData } from '../../state/types';
 
 const SANDBOX_NUMBER = '+1 555-555-0100';

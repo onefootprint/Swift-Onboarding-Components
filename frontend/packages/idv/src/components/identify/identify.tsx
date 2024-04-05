@@ -9,7 +9,7 @@ import type {
 import React from 'react';
 
 import type { DeviceInfo } from '../../hooks';
-import { getIdentifyBootstrapData } from '../../utils';
+import { getIdentifyBootstrapData } from '../../utils/get-identify-bootstrap-data/get-identify-bootstrap-data';
 import Router from './components/router';
 import SandboxFooter from './components/sandbox-footer';
 import { IdentifyMachineProvider } from './state';

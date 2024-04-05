@@ -56,7 +56,6 @@ export {
   getAutoCompleteCity,
   getBiometricChallengeResponse,
   getCanChallengeBiometrics,
-  getIdentifyBootstrapData,
   getLogger,
   getRandomID,
   getSdkArgsToken,

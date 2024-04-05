@@ -278,7 +278,6 @@ export type {
   IdDocUploadedEvent,
   IdDocUploadedEventData,
   Identifier,
-  IdentifyBootstrapData,
   IdvBootstrapData,
   IdvOptions,
   InsightEvent,

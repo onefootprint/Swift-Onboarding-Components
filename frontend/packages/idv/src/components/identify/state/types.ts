@@ -2,7 +2,6 @@ import type {
   AuthMethodKind,
   ChallengeData,
   ChallengeKind,
-  IdentifyBootstrapData,
   ObConfigAuth,
   OverallOutcome,
   PublicOnboardingConfig,
@@ -11,6 +10,7 @@ import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 import type { EventObject, StateValue, TransitionConfigOrTarget } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
+import type { IdentifyBootstrapData } from '../../../utils/get-identify-bootstrap-data';
 
 export type IdentifyVaultData = {
   value: string;
