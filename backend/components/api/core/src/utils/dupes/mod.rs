@@ -105,7 +105,6 @@ mod tests {
     use super::*;
     use db::{
         models::{ob_configuration::ObConfiguration, scoped_vault::ScopedVault},
-        test_helpers::assert_have_same_elements,
         tests::fixtures,
     };
     use macros::test_state_case;
@@ -190,7 +189,7 @@ mod tests {
         (V::V2, T::T1, vec![(IDK::Ssn9, "123456789")]),
         (V::V3, T::T1, vec![(IDK::Ssn9, "123456789")]),
     ], ExpectedDupes {
-        same_tenant: vec![(V::V2, T::T1, vec![DK::Ssn9]), (V::V3, T::T1, vec![DK::Ssn9])],
+        same_tenant: vec![(V::V3, T::T1, vec![DK::Ssn9]), (V::V2, T::T1, vec![DK::Ssn9])],
         other_tenant: OtherTenantDupes {
             num_matches: 0,
             num_tenants: 0
@@ -235,7 +234,7 @@ mod tests {
         (V::V4, T::T2, vec![(IDK::Ssn9, "123456789"), (IDK::Email, "alice@boberto.com")]),
         (V::V5, T::T2, vec![(IDK::Ssn9, "123456789"), (IDK::Email, "bob@boberto.com")]),
         ], ExpectedDupes {
-            same_tenant: vec![(V::V2, T::T1, vec![DK::Ssn9, DK::Email]), (V::V3, T::T1, vec![DK::Email])],
+            same_tenant: vec![(V::V3, T::T1, vec![DK::Email]), (V::V2, T::T1, vec![DK::Ssn9, DK::Email])],
             other_tenant: OtherTenantDupes {
                 num_matches: 2,
                 num_tenants: 1
@@ -348,7 +347,7 @@ mod tests {
             .map(|d| d.scoped_vault.fp_id.clone())
             .collect_vec();
 
-        assert_have_same_elements(expected_same_tenant, actual_same_tenant); // have to do it this way for now because we aren't sorting the vec's
+        assert_eq!(expected_same_tenant, actual_same_tenant);
         assert_eq!(expected.other_tenant, dupes.other_tenant);
     }
 

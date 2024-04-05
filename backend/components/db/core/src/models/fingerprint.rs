@@ -176,6 +176,10 @@ impl Fingerprint {
                 sv2.fields(scoped_vault::all_columns),
                 v2.fields(vault::all_columns)
             ))
+            // For now, order by SV timestamp so we return consistent results and prioritize newer dupes vs older dupes which feels reasonable
+            // Note: other-tenant dupes here could "thrash" the same-tenant dupes (which are perhaps more important) so in addition to adding proper pagination or whatnot, it might be beneficial to separately query for same-tenant vs other-tenant dupes.
+            // Furthermore, now that we can downscoped the other-tenant dupes to just be a few stats, we could instead make this whole thing a boxed query and then for the other-tenant dupes, we could just `count`/`distinct` to produce our stats and not need to retrieve individual rows. (although maybe we will revisit that design soon enough anyway and then need other-tenant rows again)
+            .order_by(sv2.field(scoped_vault::start_timestamp).desc())
             .limit(30) // for safety
             .get_results::<(DataIdentifier, FingerprintScopeKind, ScopedVault, Vault)>(conn)?
             .into_iter()
