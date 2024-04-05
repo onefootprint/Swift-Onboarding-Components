@@ -270,7 +270,13 @@ where
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut query_builder = DB::QueryBuilder::default();
         let backend = DB::default();
-        QueryFragment::<DB>::to_sql(self.query, &mut query_builder, &backend).map_err(|_| std::fmt::Error)?;
-        write!(f, "{}", query_builder.finish())
+        match QueryFragment::<DB>::to_sql(self.query, &mut query_builder, &backend) {
+            Ok(_) => {
+                write!(f, "{}", query_builder.finish())
+            }
+            Err(e) => {
+                write!(f, "Error building query: {}", e)
+            }
+        }
     }
 }
