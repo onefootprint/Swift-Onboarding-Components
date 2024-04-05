@@ -1,4 +1,5 @@
 import type { NavigationHeaderLeftButtonProps } from '../layout';
+import type { IdentifyVaultData } from './state/types';
 
 export type HeaderProps = {
   title: string | JSX.Element;
@@ -8,12 +9,8 @@ export type HeaderProps = {
 export type ObKeyHeader = { 'X-Onboarding-Config-Key': string };
 export type DoneArgs = {
   authToken: string;
-  /// TODO deprecate this. We pass this in as bootstrap data to the collect KYC data machine, which
-  /// doesn't really make sense
-  phoneNumber?: string;
-  /// TODO deprecate this. We pass this in as bootstrap data to the collect KYC data machine, which
-  /// doesn't really make sense
-  email?: string;
+  phoneNumber?: IdentifyVaultData;
+  email?: IdentifyVaultData;
 };
 export type EmailAndOrPhone = { email?: string; phoneNumber?: string };
 

@@ -30,7 +30,7 @@ type IdentifyProps = {
   variant: IdentifyVariant;
 };
 
-// Should we move this to its own package?
+// TODO move this to its own package
 const Identify = ({
   config,
   device,

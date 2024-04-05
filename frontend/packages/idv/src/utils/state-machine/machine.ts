@@ -43,9 +43,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: {
-        ...args,
-      },
+      context: { ...args },
       on: {
         expireSession: {
           target: 'sessionExpired',
@@ -108,11 +106,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
             identifyCompleted: [
               {
                 target: 'onboarding',
-                actions: [
-                  'assignAuthToken',
-                  'assignEmail',
-                  'assignPhoneNumber',
-                ],
+                actions: ['assignAuthToken', 'assignIdentifyResult'],
               },
             ],
           },
@@ -166,17 +160,17 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           sandboxId: event.payload.sandboxId,
           overallOutcome: event.payload.overallOutcome,
         })),
-        assignEmail: assign((context, event) => {
+        assignIdentifyResult: assign((context, event) => {
           context.bootstrapData = context.bootstrapData || {};
+          // Pass the phone and email collected in the identify machine into the requirements
+          // machine. In very few cases, the phone and email are needed in the requirements machine
+          // TODO extract whether it's bootstrap or entered manually
           if (event.payload.email) {
-            context.bootstrapData[IdDI.email] = event.payload.email;
+            context.bootstrapData[IdDI.email] = event.payload.email?.value;
           }
-          return context;
-        }),
-        assignPhoneNumber: assign((context, event) => {
-          context.bootstrapData = context.bootstrapData || {};
           if (event.payload.phoneNumber) {
-            context.bootstrapData[IdDI.phoneNumber] = event.payload.phoneNumber;
+            context.bootstrapData[IdDI.phoneNumber] =
+              event.payload.phoneNumber?.value;
           }
           return context;
         }),

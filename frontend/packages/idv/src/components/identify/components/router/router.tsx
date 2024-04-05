@@ -52,9 +52,8 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
     if (isDone && challenge.authToken) {
       onDone({
         authToken: challenge.authToken,
-        // TODO also return context on whether these were bootstrapped
-        phoneNumber: phoneNumber?.value,
-        email: email?.value,
+        phoneNumber,
+        email,
       });
     }
   }, [isDone, onDone, challenge.authToken, email, phoneNumber]);

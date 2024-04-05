@@ -584,6 +584,7 @@ describe('<Identify />', () => {
 
           await bootstrapExistingUser();
           await waitFor(() => {
+            // TODO test this is called with the correct args
             expect(onDone).toHaveBeenCalled();
           });
         });

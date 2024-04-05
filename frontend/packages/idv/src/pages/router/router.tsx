@@ -1,6 +1,5 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import { SessionStatus } from '@onefootprint/types';
-import type { ComponentProps } from 'react';
 import React, { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -22,8 +21,10 @@ import Init from '../init';
 import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
 
-type IdentifyProps = ComponentProps<typeof Identify>;
-type RouterProps = { l10n?: L10n; onIdentifyDone?: IdentifyProps['onDone'] };
+type RouterProps = {
+  l10n?: L10n;
+  onIdentifyDone?: ({ authToken }: { authToken: string }) => void;
+};
 
 const { receivedDeviceResponseJson, stepUpCompleted } = FPCustomEvents;
 const { logWarn } = getLogger('idv-router');
