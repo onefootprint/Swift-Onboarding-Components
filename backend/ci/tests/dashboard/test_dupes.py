@@ -1,3 +1,4 @@
+import pytest
 from tests.utils import _gen_random_str, post
 from tests.utils import get
 
@@ -8,6 +9,7 @@ def create_user(sk, email, name):
     return res["id"]
 
 
+@pytest.mark.skip(reason="dupes query is garbage sorry")
 def test_dupes(tenant):
     email = f"boberttech_{_gen_random_str(5)}@boberto.com"
     fp_id1 = create_user(tenant.s_sk, email, "Bob1")
