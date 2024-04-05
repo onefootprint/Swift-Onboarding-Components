@@ -22,6 +22,9 @@ def test_dupes(tenant):
     assert len(dupes["same_tenant"]) == 1
     assert dupes["same_tenant"][0]["fp_id"] == fp_id2
     assert dupes["same_tenant"][0]["dupe_kinds"] == ["email"]
+    assert "status" in dupes["same_tenant"][0]
+    assert "start_timestamp" in dupes["same_tenant"][0]
+
     assert dupes["other_tenant"] == {"num_matches": 0, "num_tenants": 0}
 
     # the singular live vault is shown as having no dupes

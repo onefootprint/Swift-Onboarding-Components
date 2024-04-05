@@ -1,14 +1,21 @@
 use crate::utils::{db2api::DbToApi, dupes::Dupes};
 
+use super::entity;
+
 
 impl DbToApi<Dupes> for api_wire_types::Dupes {
     fn from_db(dupes: Dupes) -> Self {
         let same_tenant = dupes
             .same_tenant
             .into_iter()
-            .map(|d| api_wire_types::SameTenantDupe {
-                dupe_kinds: d.dupe_kinds,
-                fp_id: d.sv.fp_id,
+            .map(|d| {
+                let status = entity::status_from_sv(&d.sv);
+                api_wire_types::SameTenantDupe {
+                    dupe_kinds: d.dupe_kinds,
+                    fp_id: d.sv.fp_id,
+                    status,
+                    start_timestamp: d.sv.start_timestamp,
+                }
             })
             .collect();
 

@@ -1,6 +1,9 @@
+use chrono::{DateTime, Utc};
 use newtypes::{DupeKind, FpId};
 use paperclip::actix::Apiv2Schema;
 use serde::Serialize;
+
+use crate::EntityStatus;
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct Dupes {
@@ -12,6 +15,8 @@ pub struct Dupes {
 pub struct SameTenantDupe {
     pub dupe_kinds: Vec<DupeKind>,
     pub fp_id: FpId,
+    pub status: Option<EntityStatus>,
+    pub start_timestamp: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

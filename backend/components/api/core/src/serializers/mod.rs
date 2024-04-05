@@ -37,7 +37,6 @@ mod validate;
 mod watchlist_check;
 mod workflow_request;
 pub use business_owner::BusinessOwnerInfo;
-pub use entity::status_from_sv;
 pub use organization::*;
 #[allow(unused_imports)]
 pub use partner_organization::*;
