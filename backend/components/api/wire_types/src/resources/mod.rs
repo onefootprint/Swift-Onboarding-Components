@@ -141,3 +141,6 @@ pub use compliance::*;
 
 mod list_event;
 pub use list_event::*;
+
+mod dupes;
+pub use self::dupes::*;

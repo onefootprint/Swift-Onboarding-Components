@@ -6,11 +6,12 @@ use diesel::{prelude::*, Queryable};
 use itertools::Itertools;
 use newtypes::{
     DataIdentifier, DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId,
-    FingerprintScopeKind, FingerprintVersion, FpId, IdentityDataKind as IDK, ScopedVaultId, TenantId,
-    VaultId,
+    FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK, ScopedVaultId,
 };
 
 use crate::{DbResult, PgConn, TxnPgConn};
+
+use super::scoped_vault::ScopedVault;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = fingerprint)]
@@ -57,32 +58,16 @@ pub type DuplicateExistingFingerprintsByDLK = HashMap<DataIdentifier, i64>;
 const DUPLICATE_FINGERPRINT_KINDS: [DI; 3] =
     [DI::Id(IDK::PhoneNumber), DI::Id(IDK::Email), DI::Id(IDK::Ssn9)];
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct FingerprintDupe {
-    pub fp_id: FpId,
-    pub tenant_id: TenantId,
-    pub vault_id: VaultId,
     pub kind: DataIdentifier,
-    pub scope: FingerprintScopeKind,
+    pub scope: FingerprintScopeKind, // TODO: is this used?
+    pub sv: ScopedVault,
 }
 
-impl From<(FpId, TenantId, VaultId, DataIdentifier, FingerprintScopeKind)> for FingerprintDupe {
-    fn from(
-        (fp_id, tenant_id, vault_id, kind, scope): (
-            FpId,
-            TenantId,
-            VaultId,
-            DataIdentifier,
-            FingerprintScopeKind,
-        ),
-    ) -> Self {
-        Self {
-            fp_id,
-            tenant_id,
-            vault_id,
-            kind,
-            scope,
-        }
+impl From<(DataIdentifier, FingerprintScopeKind, ScopedVault)> for FingerprintDupe {
+    fn from((kind, scope, sv): (DataIdentifier, FingerprintScopeKind, ScopedVault)) -> Self {
+        Self { kind, scope, sv }
     }
 }
 
@@ -172,14 +157,12 @@ impl Fingerprint {
             .filter(sv1.field(scoped_vault::id).eq(sv_id))
             .filter(sv1.field(scoped_vault::is_live).eq(sv2.field(scoped_vault::is_live)))
             .select((
-                sv2.field(scoped_vault::fp_id),
-                sv2.field(scoped_vault::tenant_id),
-                sv2.field(scoped_vault::vault_id),
                 f1.field(fingerprint::kind),
                 f1.field(fingerprint::scope),
+                sv2.fields(scoped_vault::all_columns)
             ))
             .limit(200) // for safety
-            .get_results::<(FpId, TenantId, VaultId, DataIdentifier, FingerprintScopeKind)>(conn)?
+            .get_results::<(DataIdentifier, FingerprintScopeKind, ScopedVault)>(conn)?
             .into_iter()
             .map(FingerprintDupe::from)
             .collect();

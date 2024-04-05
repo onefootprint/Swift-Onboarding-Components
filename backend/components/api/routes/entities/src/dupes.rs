@@ -8,10 +8,9 @@ use crate::{
 };
 use api_core::{
     errors::ApiResult,
-    utils::{dupes, fp_id_path::FpIdPath},
+    utils::{db2api::DbToApi, dupes, fp_id_path::FpIdPath},
 };
 use db::models::scoped_vault::ScopedVault;
-use newtypes::Dupes;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
@@ -23,7 +22,7 @@ pub async fn get_dupes(
     state: web::Data<State>,
     request: FpIdPath,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<Dupes> {
+) -> JsonApiResponse<api_wire_types::Dupes> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -37,5 +36,5 @@ pub async fn get_dupes(
         })
         .await?;
 
-    ResponseData::ok(dupes).json()
+    ResponseData::ok(api_wire_types::Dupes::from_db(dupes)).json()
 }

@@ -160,7 +160,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
     }
 }
 
-fn status_from_sv(sv: &ScopedVault) -> Option<EntityStatus> {
+pub fn status_from_sv(sv: &ScopedVault) -> Option<EntityStatus> {
     match sv.status {
         None => None,
         Some(OnboardingStatus::Pass) => Some(EntityStatus::Pass),

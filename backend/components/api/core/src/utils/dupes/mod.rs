@@ -1,12 +1,34 @@
 use db::{
-    models::fingerprint::{Fingerprint, FingerprintDupe},
+    models::{
+        fingerprint::{Fingerprint, FingerprintDupe},
+        scoped_vault::ScopedVault,
+    },
     PgConn,
 };
 use either::Either;
 use itertools::Itertools;
-use newtypes::{DupeKind, Dupes, OtherTenantDupes, SameTenantDupe, ScopedVaultId, TenantId};
+use newtypes::{DupeKind, ScopedVaultId, TenantId};
 
 use crate::errors::ApiResult;
+
+
+#[derive(Debug, Clone)]
+pub struct Dupes {
+    pub same_tenant: Vec<SameTenantDupe>,
+    pub other_tenant: OtherTenantDupes,
+}
+
+#[derive(Debug, Clone)]
+pub struct SameTenantDupe {
+    pub sv: ScopedVault,
+    pub dupe_kinds: Vec<DupeKind>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OtherTenantDupes {
+    pub num_matches: usize, // number of distinct vaults that (1) have any sort of dupe match and (2) have not onboarded onto the same tenant as the the scoped_vault for which dupes are being queried for
+    pub num_tenants: usize, // number of distinct tenants from the vaults described above ^
+}
 
 
 fn get_dupe_kinds(dupes: &[FingerprintDupe]) -> Vec<DupeKind> {
@@ -33,11 +55,11 @@ fn fingerprint_dupes_to_dupe(dupes: Vec<FingerprintDupe>) -> Either<SameTenantDu
 
     if let Some(first) = same_tenant.first() {
         Either::Left(SameTenantDupe {
-            fp_id: first.fp_id.clone(),
+            sv: first.sv.clone(),
             dupe_kinds: get_dupe_kinds(&same_tenant),
         })
     } else {
-        let tenants = other_tenant.into_iter().map(|fd| fd.tenant_id).collect();
+        let tenants = other_tenant.into_iter().map(|fd| fd.sv.tenant_id).collect();
         Either::Right(tenants)
     }
 }
@@ -45,7 +67,9 @@ fn fingerprint_dupes_to_dupe(dupes: Vec<FingerprintDupe>) -> Either<SameTenantDu
 pub fn get_dupes(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<Dupes> {
     let fp_dupes = Fingerprint::get_dupes(conn, sv_id)?;
 
-    let fp_dupes = fp_dupes.into_iter().into_group_map_by(|fpd| fpd.vault_id.clone());
+    let fp_dupes = fp_dupes
+        .into_iter()
+        .into_group_map_by(|fpd| fpd.sv.vault_id.clone());
     let (same_tenant, other_tenant): (Vec<_>, Vec<_>) = fp_dupes
         .into_values()
         .map(fingerprint_dupes_to_dupe)
@@ -107,7 +131,7 @@ mod tests {
         V5,
     }
 
-    #[derive(Debug, Clone, Default)]
+    #[derive(Debug, Clone)]
     struct ExpectedDupes {
         same_tenant: Vec<(V, T, Vec<DupeKind>)>,
         other_tenant: OtherTenantDupes,
@@ -310,13 +334,15 @@ mod tests {
         let expected_same_tenant = expected
             .same_tenant
             .into_iter()
-            .map(|(v, t, dks)| SameTenantDupe {
-                fp_id: sv_map.get(&(v, t)).unwrap().fp_id.clone(),
-                dupe_kinds: dks,
-            })
-            .collect();
+            .map(|(v, t, _)| sv_map.get(&(v, t)).unwrap().fp_id.clone())
+            .collect_vec();
+        let actual_same_tenant = dupes
+            .same_tenant
+            .into_iter()
+            .map(|d| d.sv.fp_id.clone())
+            .collect_vec();
 
-        assert_have_same_elements(expected_same_tenant, dupes.same_tenant); // have to do it this way for now because we aren't sorting the vec's
+        assert_have_same_elements(expected_same_tenant, actual_same_tenant); // have to do it this way for now because we aren't sorting the vec's
         assert_eq!(expected.other_tenant, dupes.other_tenant);
     }
 
