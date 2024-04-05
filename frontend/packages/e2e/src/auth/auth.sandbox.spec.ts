@@ -30,5 +30,7 @@ test('Auth with sandbox #ci', async ({ browserName, page }) => {
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await expect(frame.getByLabel('Send code to +49 ••••• •••••')).toBeAttached();
+  await expect(
+    frame.locator('button').filter({ hasText: 'Send code to +49 ••••• •••••' }),
+  ).toBeAttached();
 });

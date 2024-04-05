@@ -33,7 +33,8 @@ test('Update auth methods #ci', async ({ browserName, page }) => {
   await expect(loginDescText.first()).toBeAttached();
 
   await frame
-    .getByLabel('Send code to s••••••@o•••••••••••.com')
+    .locator('button')
+    .filter({ hasText: 'Send code to s••••••@o' })
     .first()
     .click();
   await clickOnContinue({ frame });

@@ -1,7 +1,9 @@
+'use client';
+
 import { IS_DEV, IS_SERVER } from '@onefootprint/global-constants';
 import constate from 'constate';
 import debounce from 'lodash/debounce';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import UAParser from 'ua-parser-js';
 import { useEffectOnce } from 'usehooks-ts';
@@ -22,7 +24,7 @@ type ObserveCollectorProps = {
 };
 
 const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
-  const router = useRouter();
+  const pathname = usePathname();
   const queue: Record<string, unknown>[] = [];
   const userAgent = new UAParser().getResult();
   const clientContext: Record<string, unknown> = IS_LOGGING_DISABLED
@@ -90,7 +92,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
     queue.push({
       ...payload,
       sessionId: getSessionId(),
-      path: router.asPath,
+      path: pathname,
       timestamp: Date.now(),
       clientContext,
       environment,
@@ -156,7 +158,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
   useEffect(() => {
     log('page-change');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.asPath]);
+  }, [pathname]);
 
   useEventListener('beforeunload', () => {
     log('session-end');
