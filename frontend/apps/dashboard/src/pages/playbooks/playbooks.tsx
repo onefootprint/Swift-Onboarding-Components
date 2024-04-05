@@ -1,10 +1,10 @@
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Pagination, Stack, Text } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
-import WaveAnimation from 'src/components/wave-animation';
 import styled, { css } from 'styled-components';
 
 import CreateDialog from './components/create-dialog';
@@ -43,6 +43,16 @@ const Playbooks = () => {
     }
   }, [response]);
 
+  const highlighterAnimation = {
+    initial: { opacity: 0.2 },
+    animate: {
+      opacity: 0,
+      transform: 'scale(2.5)',
+      transition: { duration: 5, ease: 'easeInOut', repeat: Infinity },
+      borderRadius: '10px',
+    },
+  };
+
   return (
     <Container>
       <Head>
@@ -60,9 +70,17 @@ const Playbooks = () => {
             fallbackText={t('cta-not-allowed')}
             scopeKind={RoleScopeKind.onboardingConfiguration}
           >
-            <Button onClick={handleOpen}>{t('create-button')}</Button>
+            <Stack position="relative">
+              {!hasHadPlaybook && (
+                <Highlighter
+                  variants={highlighterAnimation}
+                  initial="initial"
+                  animate="animate"
+                />
+              )}
+              <Button onClick={handleOpen}>{t('create-button')}</Button>
+            </Stack>
           </PermissionGate>
-          {!hasHadPlaybook && <WaveAnimation width={140} />}
         </Wrapper>
       </HeaderContainer>
       <Stack direction="column">
@@ -91,6 +109,22 @@ const Playbooks = () => {
     </Container>
   );
 };
+
+const Highlighter = styled(motion.span)<{ shouldHighlight?: boolean }>`
+  ${({ theme }) => css`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: ${theme.backgroundColor.accent};
+    border-radius: ${theme.borderRadius.default};
+  `}
+`;
 
 const Title = styled.div`
   ${({ theme }) => css`
