@@ -69,12 +69,15 @@ export const withIdentifyError = () =>
     response: {},
   });
 
-export const withIdentify = (
-  userFound?: boolean,
-  challengeKinds?: string[],
-  isUnverified?: boolean,
-  tokenScopes?: string[],
-) => {
+export const withIdentify = (context?: {
+  challengeKinds?: string[];
+  isUnverified?: boolean;
+  tokenScopes?: string[];
+  matchingFps?: string[];
+}) => {
+  const userFound = !!context;
+  const { challengeKinds, isUnverified, tokenScopes, matchingFps } =
+    context ?? {};
   const availableChallengeKinds = challengeKinds ?? ['sms', 'biometric'];
   const authMethodKind: Record<string, string> = {
     [ChallengeKind.biometric]: AuthMethodKind.passkey,
@@ -95,9 +98,9 @@ export const withIdentify = (
         availableChallengeKinds,
         authMethods,
         hasSyncablePasskey: true,
-        scrubbedPhoneNumber: '+1 (•••) •••-••99',
+        scrubbedPhone: '+1 (***) ***-**99',
         tokenScopes: tokenScopes ?? [],
-        matchingFps: [IdDI.phoneNumber],
+        matchingFps: matchingFps ?? [IdDI.phoneNumber],
       },
     },
   });
@@ -110,7 +113,7 @@ export const withLoginChallenge = (challengeKind: string) =>
     response: {
       challengeData: {
         token: 'utok_xxx',
-        scrubbedPhoneNumber: '+1 (•••) •••-••99',
+        scrubbedPhoneNumber: '+1 (***) ***-**99',
         biometricChallengeJson: {},
         challengeToken: 'token',
         challengeKind,
@@ -125,7 +128,7 @@ export const withSignupChallenge = (challengeKind?: string) =>
     response: {
       challengeData: {
         token: 'utok_xxx',
-        scrubbedPhoneNumber: '+1 (•••) •••-••99',
+        scrubbedPhoneNumber: '+1 (***) ***-**99',
         challengeToken: 'token',
         challengeKind: challengeKind ?? 'sms',
       },
@@ -138,6 +141,15 @@ export const withIdentifyVerify = () =>
     path: '/hosted/identify/verify',
     response: {
       authToken: 'new-token',
+    },
+  });
+
+export const withKba = () =>
+  mockRequest({
+    method: 'post',
+    path: '/hosted/identify/kba',
+    response: {
+      token: 'new-token-2',
     },
   });
 
@@ -178,15 +190,13 @@ export const fillIdentifyEmail = async () => {
   await userEvent.click(screen.getByText('Continue'));
 };
 
-export const fillIdentifyPhone = async (
-  continueButtonText: string = 'Verify with SMS',
-) => {
+export const fillIdentifyPhone = async () => {
   await waitFor(() => {
     expect(screen.getByText('Phone number')).toBeInTheDocument();
   });
   const inputPhone = screen.getByText('Phone number');
   await userEvent.type(inputPhone, '6504600799');
-  await userEvent.click(screen.getByText(continueButtonText));
+  await userEvent.click(screen.getByText('Verify with SMS'));
 };
 
 export const fillChallengePin = async () => {

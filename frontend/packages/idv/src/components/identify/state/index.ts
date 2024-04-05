@@ -4,7 +4,7 @@ export {
   useIdentifyMachine,
 } from './machine-provider';
 export type {
+  IdentifyContext,
   IdentifyMachineContext,
   IdentifyMachineEvents,
-  IdentifyResult,
 } from './types';

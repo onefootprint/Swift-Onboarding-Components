@@ -25,9 +25,7 @@ const UpdateVerifyPhone = ({
   const { t } = useTranslation('identify');
   const subtitle = phoneNumber ? (
     <span data-private="true">
-      {t('sms-challenge.prompt-with-phone', {
-        scrubbedPhoneNumber: phoneNumber,
-      })}
+      {t('sms-challenge.prompt-with-phone', { phone: phoneNumber })}
     </span>
   ) : (
     t('sms-challenge.prompt-without-phone')

@@ -1,6 +1,7 @@
 import { ChallengeKind } from '@onefootprint/types';
 import React from 'react';
 
+import { SuccessfulIdentifier } from '../../state/types';
 import { getChallengeTitleByKind, getMethods } from './utils';
 
 describe('getChallengeTitleByKind', () => {
@@ -14,8 +15,10 @@ describe('getChallengeTitleByKind', () => {
     {
       identify: {
         user: {},
-        successfulIdentifier: { email: 'a@b.com' },
+        successfulIdentifiers: [SuccessfulIdentifier.email],
       },
+      email: 'a@b.com',
+      phoneNumber: undefined,
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
         email: (
@@ -30,8 +33,10 @@ describe('getChallengeTitleByKind', () => {
     {
       identify: {
         user: {},
-        successfulIdentifier: { phoneNumber: '+123' },
+        successfulIdentifiers: [SuccessfulIdentifier.phone],
       },
+      email: undefined,
+      phoneNumber: '+123',
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
         email: 'challenge-select-or-biometric.send-code-via-email',
@@ -46,27 +51,59 @@ describe('getChallengeTitleByKind', () => {
     {
       identify: {
         user: { scrubbedEmail: 'b***@g**.com' },
-        successfulIdentifier: undefined,
+        successfulIdentifiers: [SuccessfulIdentifier.phone],
       },
+      email: 'differentemail@gmail.com',
+      phoneNumber: '+123',
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
-        email: 'challenge-select-or-biometric.send-code-to b***@g**.com',
-        sms: 'challenge-select-or-biometric.send-code-via-sms',
+        email: (
+          <>
+            challenge-select-or-biometric.send-code-to{' '}
+            <span data-private="true">b•••@g••.com</span>
+          </>
+        ),
+        sms: (
+          <>
+            challenge-select-or-biometric.send-code-to{' '}
+            <span data-private="true">+123</span>
+          </>
+        ),
       },
     },
     {
       identify: {
         user: { scrubbedPhone: '+4***' },
-        successfulIdentifier: undefined,
+        successfulIdentifiers: [
+          SuccessfulIdentifier.email,
+          SuccessfulIdentifier.phone,
+        ],
       },
+      email: 'a@b.com',
+      phoneNumber: '+123',
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
-        email: 'challenge-select-or-biometric.send-code-via-email',
-        sms: 'challenge-select-or-biometric.send-code-to +4***',
+        email: (
+          <>
+            challenge-select-or-biometric.send-code-to{' '}
+            <span data-private="true">a@b.com</span>
+          </>
+        ),
+        sms: (
+          <>
+            challenge-select-or-biometric.send-code-to{' '}
+            <span data-private="true">+123</span>
+          </>
+        ),
       },
     },
-  ])('case %#', ({ identify, x }) => {
-    const result = getChallengeTitleByKind(t as T, identify as Identify);
+  ])('case %#', ({ identify, email, phoneNumber, x }) => {
+    const result = getChallengeTitleByKind(
+      t as T,
+      identify as Identify,
+      email,
+      phoneNumber,
+    );
     expect(result).toEqual(x);
   });
 });

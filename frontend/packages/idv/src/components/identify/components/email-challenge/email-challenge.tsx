@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 import useGetHeaderText from '../../hooks/use-get-header-text';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';
+import { getDisplayEmail } from '../../utils/get-display-contact-info/get-display-contact-info';
 import PinVerification from '../pin-verification';
 
 const IS_TEST = typeof jest !== 'undefined';
@@ -21,13 +22,12 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
   const { t } = useTranslation('identify');
   const [state, send] = useIdentifyMachine();
   const toast = useToast();
-  const {
-    identify: { email = '', successfulIdentifier },
-  } = state.context;
+  const { identify, email } = state.context;
   const headerTitle = useGetHeaderText();
-  const headerSubtitle = email ? ( // If we enter the email challenge via an auth token identifier, we won't have an email to display
+  const displayEmail = getDisplayEmail({ identify, email });
+  const headerSubtitle = displayEmail ? (
     <span data-private="true">
-      {t('email-challenge.prompt-with-email', { email })}
+      {t('email-challenge.prompt-with-email', { email: displayEmail })}
     </span>
   ) : (
     t('email-challenge.prompt-without-email')
@@ -53,7 +53,6 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
     <Container>
       <Header data-private title={headerTitle} subtitle={headerSubtitle} />
       <PinVerification
-        identifier={successfulIdentifier ?? { email }}
         onChallengeSucceed={handleChallengeSucceed}
         onNewChallengeRequested={handleNewChallengeRequested}
         preferredChallengeKind={ChallengeKind.email}

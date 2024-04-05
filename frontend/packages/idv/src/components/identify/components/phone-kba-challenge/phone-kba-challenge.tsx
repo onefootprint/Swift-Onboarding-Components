@@ -18,7 +18,8 @@ const { logError } = getLogger('phone-kba-challenge');
 const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { phoneNumber, user },
+    phoneNumber,
+    identify: { user },
     config,
   } = state.context;
   const { t } = useTranslation('identify');
@@ -63,7 +64,7 @@ const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
       texts={{
         headerTitle: t('confirm-phone-number'),
         headerSubtitle: t('before-email-code-confirmation', {
-          number: user?.scrubbedPhone!.slice(-4),
+          number: (user?.scrubbedPhone || '').slice(-4).replace(/\*/g, '•'),
         }),
         cta: t('continue'),
         emailChangeCta: t('change'),

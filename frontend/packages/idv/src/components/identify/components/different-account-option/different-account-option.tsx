@@ -18,7 +18,7 @@ const DifferentAccountOption = () => {
   });
   const handleLoginWithDifferent = () => {
     send({
-      type: 'identifyReset',
+      type: 'loginWithDifferentAccount',
     });
   };
 

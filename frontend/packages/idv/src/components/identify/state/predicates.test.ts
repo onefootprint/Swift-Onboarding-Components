@@ -4,7 +4,7 @@ import {
   requiresPhoneVerification,
   shouldShowChallengeSelector,
 } from './predicates';
-import type { IdentifyMachineContext, IdentifyResult } from './types';
+import type { IdentifyContext, IdentifyMachineContext } from './types';
 import { IdentifyVariant } from './types';
 
 describe('requiresPhoneVerification', () => {
@@ -46,7 +46,7 @@ describe('requiresPhoneVerification', () => {
 describe('shouldShowChallengeSelector', () => {
   const contexts: {
     context: Partial<IdentifyMachineContext>;
-    user: Partial<IdentifyResult['user']>;
+    user: Partial<IdentifyContext['user']>;
     x: boolean;
   }[] = [
     {
@@ -148,7 +148,7 @@ describe('shouldShowChallengeSelector', () => {
     expect(
       shouldShowChallengeSelector(
         context as IdentifyMachineContext,
-        user as unknown as IdentifyResult['user'],
+        user as unknown as IdentifyContext['user'],
       ),
     ).toEqual(x);
   });

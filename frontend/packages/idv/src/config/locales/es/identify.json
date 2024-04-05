@@ -102,7 +102,7 @@
   },
   "sms-challenge": {
     "label": "SMS",
-    "prompt-with-phone": "Introduce el código de 6 dígitos que enviamos a {{scrubbedPhoneNumber}}.",
+    "prompt-with-phone": "Introduce el código de 6 dígitos que enviamos a {{phone}}.",
     "prompt-without-phone": "Introduce el código de 6 dígitos que enviamos a tu teléfono.",
     "verify-title": "Verifica tu número de teléfono",
     "welcome-back-title": "¡Bienvenido nuevamente! 🎉"

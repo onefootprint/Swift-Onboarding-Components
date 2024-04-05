@@ -21,7 +21,7 @@ const ChallengeSelectOrPasskey = ({
   Header,
 }: ChallengeSelectOrPasskeyProps) => {
   const [state, send] = useIdentifyMachine();
-  const { device, identify, variant } = state.context;
+  const { device, identify, variant, phoneNumber, email } = state.context;
   const { t } = useTranslation('identify');
   const tryAnotherWay = useTryAnotherWay(t);
   const headerTitle = useGetHeaderText();
@@ -40,9 +40,9 @@ const ChallengeSelectOrPasskey = ({
   });
 
   const methodOptions = useMemo(() => {
-    const titleMap = getChallengeTitleByKind(t, identify);
+    const titleMap = getChallengeTitleByKind(t, identify, email, phoneNumber);
     return getMethods(identify, device, titleMap);
-  }, [t, identify, device]);
+  }, [t, identify, device, phoneNumber, email]);
 
   useEffect(() => {
     if (methodOptions.length && !selectedChallenge) {

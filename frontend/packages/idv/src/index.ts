@@ -59,7 +59,6 @@ export {
   getIdentifyBootstrapData,
   getLogger,
   getRandomID,
-  getScrubbedPhoneNumber,
   getSdkArgsToken,
   hasAuthMethodUnverifiedEmail,
   hasEmailAndPhoneNumber,

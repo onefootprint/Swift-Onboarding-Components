@@ -7,6 +7,7 @@ import { getLogger } from '../../../../utils';
 import LegalFooter from '../../../legal-footer';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
+import { SuccessfulIdentifier } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import getTokenScope from '../../utils/token-scope';
 import EmailPageStructure from '../email-page-structure';
@@ -20,10 +21,7 @@ const { logError } = getLogger('step-email');
 
 const StepEmail = ({ children, Header }: StepEmailProps) => {
   const [state, send] = useIdentifyMachine();
-  const {
-    identify: { email, sandboxId },
-    obConfigAuth,
-  } = state.context;
+  const { sandboxId, email, obConfigAuth } = state.context;
   const { t } = useTranslation('identify');
   const scope = getTokenScope(state.context.variant);
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
@@ -41,12 +39,16 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
           showRequestErrorToast(error);
         },
         onSuccess: res => {
+          const userFound = !!res.user;
+          const successfulIdentifiers = userFound
+            ? [SuccessfulIdentifier.email]
+            : undefined;
           send({
-            type: 'identified',
+            type: 'identifyResult',
             payload: {
               user: res.user,
               email: emailFromForm,
-              successfulIdentifier: { email: emailFromForm },
+              successfulIdentifiers,
             },
           });
         },

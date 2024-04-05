@@ -32,19 +32,6 @@ const requestFn = async ({
     headers,
   });
 
-  if (response.data.user?.scrubbedEmail) {
-    response.data.user.scrubbedEmail = response.data.user.scrubbedEmail.replace(
-      /\*/g,
-      '•',
-    );
-  }
-  if (response.data.user?.scrubbedPhone) {
-    response.data.user.scrubbedPhone = response.data.user.scrubbedPhone.replace(
-      /\*/g,
-      '•',
-    );
-  }
-
   return response.data;
 };
 

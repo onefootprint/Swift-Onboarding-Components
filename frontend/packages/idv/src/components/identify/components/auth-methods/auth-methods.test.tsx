@@ -166,7 +166,7 @@ describe('<AuthMethods />', () => {
 
       const emailField = screen.getByLabelText('Phone number');
       await userEvent.type(emailField, '5555550100');
-      await userEvent.click(screen.getByText('Continue'));
+      await userEvent.click(screen.getByText('Verify with SMS'));
 
       await waitFor(() => {
         const el = screen.getByText(/Verify your phone number/i);

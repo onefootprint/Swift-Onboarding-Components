@@ -15,7 +15,7 @@ const SandboxFooter = (): JSX.Element | null => {
   const [state, send] = useIdentifyMachine();
   const { overallOutcome } = state.context;
   const [sandboxId, setSandboxId] = useState<string>(
-    state.context.identify.sandboxId || '',
+    state.context.sandboxId || '',
   );
   const { isLive, bootstrapData, variant } = state.context;
 

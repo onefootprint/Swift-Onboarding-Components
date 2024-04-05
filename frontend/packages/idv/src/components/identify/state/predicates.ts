@@ -4,13 +4,13 @@ import { AuthMethodKind } from '@onefootprint/types/src/data';
 
 import type { DeviceInfo } from '../../../hooks/ui/use-device-info/use-device-info';
 import type {
+  IdentifyContext,
   IdentifyMachineContext,
-  IdentifyResult,
   NavigatedToPrevPage,
 } from './types';
 import { IdentifyVariant } from './types';
 
-type User = IdentifyResult['user'];
+type User = IdentifyContext['user'];
 
 const isUpdateLoginMethodsVariant = (
   v: unknown,
@@ -38,9 +38,6 @@ export const isUserFoundWithSingleChallenge = (
   const challengeKinds = availableChallengeKinds(device, user);
   return challengeKinds?.length === 1 && challengeKinds[0] === kind;
 };
-
-export const hasBootstrapTruthyValue = (c: IdentifyMachineContext): boolean =>
-  Object.values(c.bootstrapData).some(Boolean);
 
 export const isNoPhoneFlow = (c: IdentifyMachineContext): boolean =>
   Boolean(c.config?.isNoPhoneFlow);

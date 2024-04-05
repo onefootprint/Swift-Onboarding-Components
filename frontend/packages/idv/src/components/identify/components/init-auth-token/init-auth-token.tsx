@@ -5,7 +5,7 @@ import { getLogger } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
-import { IdentifyVariant } from '../../state/types';
+import { IdentifyVariant, SuccessfulIdentifier } from '../../state/types';
 import getTokenScope from '../../utils/token-scope';
 import Loading from '../loading';
 
@@ -24,11 +24,7 @@ const requiredScopes: Record<IdentifyVariant, UserTokenScope[]> = {
 
 const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
   const [state, send] = useIdentifyMachine();
-  const {
-    obConfigAuth,
-    identify: { sandboxId },
-    variant,
-  } = state.context;
+  const { obConfigAuth, sandboxId, variant } = state.context;
   const scope = getTokenScope(variant);
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
 
@@ -60,10 +56,10 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
               });
             } else {
               send({
-                type: 'identified',
+                type: 'identifyResult',
                 payload: {
                   user: res.user,
-                  successfulIdentifier: { authToken },
+                  successfulIdentifiers: [SuccessfulIdentifier.authToken],
                 },
               });
             }

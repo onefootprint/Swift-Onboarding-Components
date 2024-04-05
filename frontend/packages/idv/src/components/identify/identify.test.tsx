@@ -3,6 +3,7 @@ import '../../config/initializers/i18next-test';
 import {
   createUseRouterSpy,
   customRender,
+  mockRequest,
   screen,
   userEvent,
   waitFor,
@@ -33,6 +34,7 @@ import {
   withIdentify,
   withIdentifyError,
   withIdentifyVerify,
+  withKba,
   withLoginChallenge,
   withSignupChallenge,
   withUserChallenge,
@@ -102,7 +104,7 @@ describe('<Identify />', () => {
 
   describe('when running a sandbox onboarding config', () => {
     beforeEach(() => {
-      withIdentify(false);
+      withIdentify();
     });
 
     it('proceeds to email identification when sandbox outcome was successful', async () => {
@@ -123,7 +125,10 @@ describe('<Identify />', () => {
   describe('When there is an initial auth token', () => {
     describe('When sufficient scopes', () => {
       beforeEach(() => {
-        withIdentify(true, [ChallengeKind.sms], false, [UserTokenScope.signup]);
+        withIdentify({
+          challengeKinds: [ChallengeKind.sms],
+          tokenScopes: [UserTokenScope.signup],
+        });
       });
 
       it('identify machine finishes without challenge', async () => {
@@ -142,7 +147,7 @@ describe('<Identify />', () => {
 
     describe('When user not found', () => {
       beforeEach(() => {
-        withIdentify(false);
+        withIdentify();
       });
 
       it('takes user to invalid auth token page', async () => {
@@ -181,7 +186,7 @@ describe('<Identify />', () => {
     describe('When user found with insufficient scopes', () => {
       beforeEach(() => {
         mockGetBiometricChallengeResponse();
-        withIdentify(true);
+        withIdentify({});
         withIdentifyVerify();
         withLoginChallenge(ChallengeKind.biometric);
       });
@@ -207,7 +212,10 @@ describe('<Identify />', () => {
   describe('When running a live onboarding config', () => {
     describe('When onboarding for API-only user', () => {
       beforeEach(() => {
-        withIdentify(true, [ChallengeKind.sms], true);
+        withIdentify({
+          challengeKinds: [ChallengeKind.sms],
+          isUnverified: true,
+        });
         withIdentifyVerify();
         withLoginChallenge(ChallengeKind.sms);
       });
@@ -246,7 +254,7 @@ describe('<Identify />', () => {
     describe('When there is bootstrap email', () => {
       describe('When user found', () => {
         beforeEach(() => {
-          withIdentify(true, [ChallengeKind.sms]);
+          withIdentify({ challengeKinds: [ChallengeKind.sms] });
           withIdentifyVerify();
           withLoginChallenge(ChallengeKind.sms);
         });
@@ -271,7 +279,7 @@ describe('<Identify />', () => {
 
       describe('When user not found', () => {
         beforeEach(() => {
-          withIdentify(false, []);
+          withIdentify();
           withIdentifyVerify();
           withSignupChallenge();
           withUserVault();
@@ -312,7 +320,7 @@ describe('<Identify />', () => {
     describe('When there is bootstrap phone', () => {
       describe('When user found', () => {
         beforeEach(() => {
-          withIdentify(true, [ChallengeKind.sms]);
+          withIdentify({ challengeKinds: [ChallengeKind.sms] });
           withIdentifyVerify();
           withLoginChallenge(ChallengeKind.sms);
         });
@@ -337,7 +345,7 @@ describe('<Identify />', () => {
 
       describe('When user not found', () => {
         beforeEach(() => {
-          withIdentify(false, []);
+          withIdentify();
           withIdentifyVerify();
           withSignupChallenge();
           withUserVault();
@@ -382,7 +390,7 @@ describe('<Identify />', () => {
       describe('When user found', () => {
         beforeEach(() => {
           mockGetBiometricChallengeResponse();
-          withIdentify(true);
+          withIdentify({});
           withIdentifyVerify();
           withLoginChallenge(ChallengeKind.biometric);
         });
@@ -409,7 +417,7 @@ describe('<Identify />', () => {
 
       describe('When user not found', () => {
         beforeEach(() => {
-          withIdentify(false, []);
+          withIdentify();
           withIdentifyVerify();
           withSignupChallenge();
           withUserVault();
@@ -439,9 +447,11 @@ describe('<Identify />', () => {
 
     describe('when the user vault is new', () => {
       beforeEach(() => {
-        withIdentify(false, []);
+        withIdentify();
         withSignupChallenge(ChallengeKind.sms);
         withIdentifyVerify();
+        withUserChallenge();
+        withUserChallengeVerify();
       });
 
       it('shows sms challenge page', async () => {
@@ -499,7 +509,7 @@ describe('<Identify />', () => {
 
     describe('when the user is missing a phone auth method', () => {
       beforeEach(() => {
-        withIdentify(true, [ChallengeKind.email]);
+        withIdentify({ challengeKinds: [ChallengeKind.email] });
         withLoginChallenge(ChallengeKind.email);
         withIdentifyVerify();
         withUserChallenge();
@@ -526,7 +536,7 @@ describe('<Identify />', () => {
           screen.getByTestId('navigation-close-button'),
         ).toBeInTheDocument();
 
-        await fillIdentifyPhone('Continue');
+        await fillIdentifyPhone();
         await fillChallengePin();
 
         await waitFor(() => {
@@ -544,7 +554,7 @@ describe('<Identify />', () => {
 
       describe('when only email challenge is available', () => {
         beforeEach(() => {
-          withIdentify(true, [ChallengeKind.email]);
+          withIdentify({ challengeKinds: [ChallengeKind.email] });
           withLoginChallenge(ChallengeKind.email);
         });
 
@@ -605,7 +615,7 @@ describe('<Identify />', () => {
 
       describe('when other challenges are available', () => {
         beforeEach(() => {
-          withIdentify(true, [ChallengeKind.sms]);
+          withIdentify({ challengeKinds: [ChallengeKind.email] });
           withLoginChallenge(ChallengeKind.sms);
         });
 
@@ -666,7 +676,7 @@ describe('<Identify />', () => {
 
     describe('when the user vault is new', () => {
       beforeEach(() => {
-        withIdentify(false, []);
+        withIdentify();
         withSignupChallenge(ChallengeKind.email);
         withIdentifyVerify();
       });
@@ -736,11 +746,14 @@ describe('<Identify />', () => {
 
   describe('when has multiple challenge options', () => {
     beforeEach(() => {
-      withIdentify(true, [
-        ChallengeKind.email,
-        ChallengeKind.sms,
-        ChallengeKind.biometric,
-      ]);
+      withIdentify({
+        challengeKinds: [
+          ChallengeKind.email,
+          ChallengeKind.sms,
+          ChallengeKind.biometric,
+        ],
+        matchingFps: [IdDI.email],
+      });
       withIdentifyVerify();
     });
 
@@ -758,7 +771,7 @@ describe('<Identify />', () => {
           screen.getByText('Log in using one of the options below.'),
         ).toBeInTheDocument();
       });
-      await userEvent.click(screen.getByText('Send code via SMS'));
+      await userEvent.click(screen.getByText('••99', { exact: false }));
       await userEvent.click(screen.getByText('Continue'));
       await fillChallengePin();
 
@@ -838,7 +851,7 @@ describe('<Identify />', () => {
         expect(
           screen.queryByText('Log in with passkey'),
         ).not.toBeInTheDocument();
-        await userEvent.click(screen.getByText('Send code via SMS'));
+        await userEvent.click(screen.getByText('••99', { exact: false }));
         await userEvent.click(screen.getByText('Continue'));
         await fillChallengePin();
 
@@ -848,7 +861,9 @@ describe('<Identify />', () => {
       });
 
       it('skip straight to sms challenge when it is the only one available', async () => {
-        withIdentify(true, [ChallengeKind.sms, ChallengeKind.biometric]);
+        withIdentify({
+          challengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
+        });
         withLoginChallenge(ChallengeKind.sms);
         const onDone = jest.fn();
         renderIdentify({
@@ -878,7 +893,7 @@ describe('<Identify />', () => {
 
   describe('when bootstrap data is invalid', () => {
     beforeEach(() => {
-      withIdentify(false);
+      withIdentify();
       withSignupChallenge(ChallengeKind.sms);
       withIdentifyVerify();
     });
@@ -928,6 +943,77 @@ describe('<Identify />', () => {
 
       await fillIdentifyEmail();
       await fillIdentifyPhone();
+      await fillChallengePin();
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('when user has unverified email', () => {
+    beforeEach(() => {
+      mockRequest({
+        method: 'post',
+        path: '/hosted/identify',
+        response: {
+          user: {
+            token: 'utok_xxx',
+            isUnverified: false,
+            availableChallengeKinds: ['sms'],
+            authMethods: [
+              {
+                kind: 'phone',
+                isVerified: true,
+              },
+              {
+                kind: 'email',
+                isVerified: false,
+              },
+            ],
+            scrubbedPhone: '+1 (***) ***-**00',
+            tokenScopes: [],
+            matchingFps: [IdDI.email],
+          },
+        },
+      });
+
+      withLoginChallenge(ChallengeKind.sms);
+      withIdentifyVerify();
+      withKba();
+    });
+
+    it('can log in with unverified email after kba', async () => {
+      const onDone = jest.fn();
+      renderIdentify({
+        bootstrapEmail: 'sandbox@onefootprint.com',
+        config: liveOnboardingConfigFixture,
+        onDone,
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Send code to email instead'),
+        ).toBeInTheDocument();
+      });
+      await userEvent.click(screen.getByText('Send code to email instead'));
+      const inputPhone = screen.getByText('Phone number');
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Before we can send a code to your email, please confirm your full phone number ending in ••00',
+          ),
+        ).toBeInTheDocument();
+      });
+      await userEvent.type(inputPhone, '6504600799');
+      await userEvent.click(screen.getByText('Continue'));
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Enter the 6-digit code sent to sandbox@onefootprint.com.',
+          ),
+        ).toBeInTheDocument();
+      });
       await fillChallengePin();
 
       await waitFor(() => {

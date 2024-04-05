@@ -8,6 +8,7 @@ import { checkIsPhoneValid, getLogger } from '../../../../utils';
 import { useL10nContext } from '../../../l10n-provider';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
+import { SuccessfulIdentifier } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import getTokenScope from '../../utils/token-scope';
 import PhonePageStructure from '../phone-page-structure';
@@ -18,11 +19,7 @@ const { logError } = getLogger('step-phone');
 
 const StepPhone = ({ Header }: StepPhoneProps) => {
   const [state, send] = useIdentifyMachine();
-  const {
-    identify: { phoneNumber, email, sandboxId },
-    obConfigAuth,
-    config,
-  } = state.context;
+  const { sandboxId, phoneNumber, email, obConfigAuth, config } = state.context;
   const { t } = useTranslation('identify');
   const scope = getTokenScope(state.context.variant);
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
@@ -34,7 +31,7 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
   const handlePhoneValidation = (phone: string) =>
     checkIsPhoneValid(phone, config?.isLive === false);
 
-  const handleChangeEmail = () => send({ type: 'identifyReset' });
+  const handleChangeEmail = () => send({ type: 'navigatedToPrevPage' });
 
   const handleSubmit = (phoneFromForm: string) => {
     mutIdentify.mutate(
@@ -45,12 +42,16 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
           showRequestErrorToast(error);
         },
         onSuccess: res => {
+          const userFound = !!res.user;
+          const successfulIdentifiers = userFound
+            ? [SuccessfulIdentifier.phone]
+            : undefined;
           send({
-            type: 'identified',
+            type: 'identifyResult',
             payload: {
               user: res.user,
               phoneNumber: phoneFromForm,
-              successfulIdentifier: { phoneNumber: phoneFromForm },
+              successfulIdentifiers,
             },
           });
         },

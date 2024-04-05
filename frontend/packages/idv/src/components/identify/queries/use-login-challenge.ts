@@ -31,10 +31,6 @@ const requestFn = async ({ authToken, preferredChallengeKind }: Payload) => {
     headers,
   });
   const { challengeData, ...restOfResponse } = { ...response.data };
-  if (challengeData.scrubbedPhoneNumber) {
-    challengeData.scrubbedPhoneNumber =
-      challengeData.scrubbedPhoneNumber.replace(/\*/g, '•');
-  }
   challengeData.retryDisabledUntil = calculateRetryTime(
     challengeData.timeBeforeRetryS ?? 0,
   );

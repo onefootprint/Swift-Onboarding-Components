@@ -63,7 +63,7 @@ const UpdatePhone = ({
         texts={{
           headerTitle: getHeaderTitle(t, actionKind),
           headerSubtitle: t('phone-step.subtitle'),
-          cta: t('continue'),
+          cta: t('phone-step.verify-with-sms'),
           phoneInvalid: t('phone-step.form.input-invalid'),
           phoneLabel: t('phone-number'),
           phoneRequired: t('phone-step.form.input-required'),

@@ -5,13 +5,13 @@ import type { TFunction } from 'i18next';
 import React from 'react';
 
 import type { DeviceInfo } from '../../../../hooks';
-import {
-  isBiometric,
-  isEmailIdentifier,
-  isPhoneIdentifier,
-} from '../../../../utils';
-import type { IdentifyResult } from '../../state/types';
+import { isBiometric } from '../../../../utils';
+import type { IdentifyContext } from '../../state/types';
 import { IdentifyVariant } from '../../state/types';
+import {
+  getDisplayEmail,
+  getDisplayPhone,
+} from '../../utils/get-display-contact-info/get-display-contact-info';
 
 type T = TFunction<'identify'>;
 type TitleMap = Record<ChallengeKind, string | JSX.Element>;
@@ -36,7 +36,7 @@ export const getSubTitle = (t: T, variant: IdentifyVariant): string =>
     : t('challenge-select-or-biometric.log-in-to-modify-details');
 
 export const getMethods = (
-  identify: IdentifyResult,
+  identify: IdentifyContext,
   device: DeviceInfo,
   titleMap: TitleMap,
 ) => {
@@ -64,50 +64,43 @@ export const getMethods = (
 
 function getChallengeTitleEmail(
   t: T,
-  identify: IdentifyResult,
+  identify: IdentifyContext,
+  email?: string,
 ): string | JSX.Element {
-  const { user, successfulIdentifier } = identify;
+  const displayEmail = getDisplayEmail({ identify, email });
   const sendTo = t('challenge-select-or-biometric.send-code-to');
-
-  if (successfulIdentifier && isEmailIdentifier(successfulIdentifier)) {
-    return (
-      <>
-        {sendTo} <span data-private="true">{successfulIdentifier.email}</span>
-      </>
-    );
-  }
-  if (typeof user?.scrubbedEmail === 'string') {
-    return `${sendTo} ${user.scrubbedEmail}`;
-  }
-  return t('challenge-select-or-biometric.send-code-via-email');
+  return displayEmail ? (
+    <>
+      {sendTo} <span data-private="true">{displayEmail}</span>
+    </>
+  ) : (
+    t('challenge-select-or-biometric.send-code-via-email')
+  );
 }
 
 const getChallengeTitlePhone = (
   t: T,
-  identify: IdentifyResult,
+  identify: IdentifyContext,
+  phoneNumber?: string,
 ): string | JSX.Element => {
-  const { user, successfulIdentifier } = identify;
+  const displayPhone = getDisplayPhone({ identify, phoneNumber });
   const sendTo = t('challenge-select-or-biometric.send-code-to');
-
-  if (successfulIdentifier && isPhoneIdentifier(successfulIdentifier)) {
-    return (
-      <>
-        {sendTo}{' '}
-        <span data-private="true">{successfulIdentifier.phoneNumber}</span>
-      </>
-    );
-  }
-  if (typeof user?.scrubbedPhone === 'string') {
-    return `${sendTo} ${user.scrubbedPhone}`;
-  }
-  return t('challenge-select-or-biometric.send-code-via-sms');
+  return displayPhone ? (
+    <>
+      {sendTo} <span data-private="true">{displayPhone}</span>
+    </>
+  ) : (
+    t('challenge-select-or-biometric.send-code-via-sms')
+  );
 };
 
 export const getChallengeTitleByKind = (
   t: T,
-  identify: IdentifyResult,
+  identify: IdentifyContext,
+  email?: string,
+  phoneNumber?: string,
 ): TitleMap => ({
-  [ChallengeKind.sms]: getChallengeTitlePhone(t, identify),
-  [ChallengeKind.email]: getChallengeTitleEmail(t, identify),
+  [ChallengeKind.sms]: getChallengeTitlePhone(t, identify, phoneNumber),
+  [ChallengeKind.email]: getChallengeTitleEmail(t, identify, email),
   [ChallengeKind.biometric]: t('challenge-select-or-biometric.passkey'),
 });

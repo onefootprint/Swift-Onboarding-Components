@@ -43,7 +43,7 @@ const getHeader = (
 const Router = ({ onDone }: RouterProps): JSX.Element | null => {
   const [state, send] = useIdentifyMachine();
   const { context, matches } = state;
-  const { initialAuthToken, variant, challenge, identify } = context;
+  const { initialAuthToken, variant, challenge, email, phoneNumber } = context;
   const isDone = matches('success');
   const { t } = useTranslation('identify');
   const Header = getHeader(context, getLeftNavButton(state, send));
@@ -52,17 +52,11 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
     if (isDone && challenge.authToken) {
       onDone({
         authToken: challenge.authToken,
-        phoneNumber: identify.phoneNumber,
-        email: identify.email,
+        phoneNumber,
+        email,
       });
     }
-  }, [
-    isDone,
-    onDone,
-    challenge.authToken,
-    identify.email,
-    identify.phoneNumber,
-  ]);
+  }, [isDone, onDone, challenge.authToken, email, phoneNumber]);
 
   if (isDone) return null;
 
@@ -115,8 +109,11 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
         authToken={challenge.authToken}
         actionKind={UpdateAuthMethodActionKind.addPrimary}
         identifyVariant={variant}
-        onSuccess={phoneNumber => {
-          send({ type: 'phoneAdded', payload: { phoneNumber } });
+        onSuccess={newPhoneNumber => {
+          send({
+            type: 'phoneAdded',
+            payload: { phoneNumber: newPhoneNumber },
+          });
         }}
       />
     );

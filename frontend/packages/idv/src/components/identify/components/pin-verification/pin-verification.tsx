@@ -3,7 +3,6 @@ import { useRequestError } from '@onefootprint/request';
 import type {
   ChallengeData,
   ChallengeKind,
-  Identifier,
   LoginChallengeResponse,
   SignupChallengeResponse,
 } from '@onefootprint/types';
@@ -11,7 +10,7 @@ import type { ComponentProps } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getLogger, isPhoneIdentifier } from '../../../../utils';
+import { getLogger } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import {
   useIdentifyVerify,
@@ -25,7 +24,6 @@ import PinForm from '../pin-form';
 
 type PinFormProps = Pick<ComponentProps<typeof PinForm>, 'tryOtherAction'>;
 type PinVerificationProps = {
-  identifier: Identifier;
   onChallengeSucceed: (authToken: string) => void;
   onNewChallengeRequested: () => void;
   preferredChallengeKind: ChallengeKind;
@@ -35,7 +33,6 @@ type PinVerificationProps = {
 const { logError, logWarn } = getLogger('pin-verification');
 
 const PinVerification = ({
-  identifier,
   onChallengeSucceed,
   onNewChallengeRequested,
   preferredChallengeKind,
@@ -45,7 +42,10 @@ const PinVerification = ({
   const [state, send] = useIdentifyMachine();
   const {
     challenge: { challengeData: data },
-    identify: { email, identifyToken, phoneNumber, sandboxId },
+    sandboxId,
+    email,
+    phoneNumber,
+    identify: { identifyToken },
     variant,
     obConfigAuth,
   } = state.context;
@@ -128,10 +128,7 @@ const PinVerification = ({
     mutSignupChallenge.mutate(
       {
         email,
-        phoneNumber:
-          (isPhoneIdentifier(identifier)
-            ? identifier.phoneNumber
-            : undefined) || phoneNumber,
+        phoneNumber,
       },
       {
         onError: (error: unknown) => {
@@ -180,11 +177,6 @@ const PinVerification = ({
       preferredChallengeKind,
     );
     if (!canSendNewRequest) return;
-
-    if (!identifier) {
-      logError('No identifier found while initiating challenge');
-      return;
-    }
 
     if (identifyToken) {
       initiatePhoneOrEmailLoginChallenge(identifyToken);

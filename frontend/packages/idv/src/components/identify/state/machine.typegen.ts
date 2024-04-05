@@ -15,14 +15,13 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignAuthToken: 'identifiedWithSufficientScopes';
     assignChallengeData: 'challengeReceived';
-    assignEmail: 'identifyFailed';
-    assignIdentifySuccessResult: 'identified';
+    assignIdentifyResult: 'identifyResult';
     assignIdentifyToken: 'kbaSucceeded';
-    assignPhone: 'identifyFailed' | 'phoneAdded';
+    assignPhoneNumber: 'phoneAdded';
     assignSandboxId: 'sandboxIdChanged';
-    reset: 'bootstrapDataInvalid' | 'identifyReset';
     resetIdentifyState: 'navigatedToPrevPage';
     resetPhone: 'navigatedToPrevPage';
+    resetToLoginWithNewAccount: 'loginWithDifferentAccount';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
