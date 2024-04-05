@@ -3,10 +3,10 @@ import type {
   BusinessDIData,
   CollectKybDataRequirement,
   CollectKycDataRequirement,
-  KycBootstrapData,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
+import type { UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 
 export type BasicData = Required<
@@ -40,7 +40,7 @@ export type MachineContext = {
   // Plugin context
   kybRequirement: CollectKybDataRequirement;
   kycRequirement?: CollectKycDataRequirement;
-  kycBootstrapData?: KycBootstrapData;
+  kycUserData: UserData;
   idvContext: CommonIdvContext;
   config?: PublicOnboardingConfig;
   // Machine generated

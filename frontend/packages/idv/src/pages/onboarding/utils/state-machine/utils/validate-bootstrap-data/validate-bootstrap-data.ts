@@ -2,7 +2,6 @@ import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { STATES } from '@onefootprint/global-constants';
 import {
   IdDI,
-  type IdvBootstrapData,
   isCountryCode,
   UsLegalStatus,
   VisaKind,
@@ -11,6 +10,7 @@ import { isFuture } from 'date-fns';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import { validate as isEmail } from 'isemail';
 
+import type { UserData, UserDatum } from '../../../../../../types';
 import { isObject, isStringValid } from '../../../../../../utils';
 import Logger from '../../../../../../utils/logger';
 import {
@@ -31,10 +31,14 @@ const getIsoDateString = (dateStr: string, locale: SupportedLocale) => {
   return isoDate;
 };
 
+type UnvalidatedUserData = Partial<{
+  [K in IdDI]: UserDatum<unknown>;
+}>;
+
 const validateUserData = (
-  userData: unknown,
+  userData: UnvalidatedUserData,
   locale: SupportedLocale = 'en-US',
-): IdvBootstrapData => {
+): UserData => {
   if (!isObject(userData)) {
     return {};
   }
@@ -156,17 +160,20 @@ const validateUserData = (
 
   // Ignore null or undefined values or invalid keys
   const filledEntries = Object.entries(userData).filter(
-    ([key, value]) => key in ValidatorByField && !!value,
-  ) as [string, string][];
+    ([key, value]) => key in ValidatorByField && !!value?.value,
+  );
   const filledData = Object.fromEntries(filledEntries);
 
   // If the values are provided, they should pass the validators
   const validatedEntries = filledEntries.filter(([key, value]) => {
     if (key === IdDI.state) {
       const country = filledData[IdDI.country];
-      return !!ValidatorByField[IdDI.state](value, country);
+      return !!ValidatorByField[IdDI.state](
+        value.value as string,
+        country?.value as string,
+      );
     }
-    return !!ValidatorByField[key as IdDI](value);
+    return !!ValidatorByField[key as IdDI](value.value as string);
   });
 
   const validatedData = Object.fromEntries(validatedEntries);

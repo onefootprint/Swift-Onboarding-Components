@@ -35,7 +35,7 @@ const BeneficialOwners = ({
     idvContext: { authToken },
     data,
     kybRequirement: { missingAttributes },
-    kycBootstrapData,
+    kycUserData,
     config,
   } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -95,9 +95,9 @@ const BeneficialOwners = ({
       [BeneficialOwnerDataAttribute.middleName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
       [BeneficialOwnerDataAttribute.email]:
-        kycBootstrapData?.[IdDI.email] ?? '',
+        kycUserData?.[IdDI.email]?.value ?? '',
       [BeneficialOwnerDataAttribute.phoneNumber]:
-        kycBootstrapData?.[IdDI.phoneNumber] ?? '',
+        kycUserData?.[IdDI.phoneNumber]?.value ?? '',
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     },
   ];

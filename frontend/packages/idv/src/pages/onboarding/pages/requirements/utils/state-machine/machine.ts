@@ -1,11 +1,11 @@
 import type {
   IdDocOutcome,
-  IdvBootstrapData,
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import type { UserData } from '../../../../../../types';
 import Logger from '../../../../../../utils/logger';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 import isRepeatRequirement from '../is-repeat-requirement';
@@ -18,7 +18,7 @@ import type { MachineContext, MachineEvents } from './types';
 export type OnboardingRequirementsMachineArgs = {
   config: PublicOnboardingConfig;
   idvContext: CommonIdvContext;
-  bootstrapData?: IdvBootstrapData;
+  userData: UserData;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
   isTransferOnDesktopDisabled?: boolean;
@@ -26,7 +26,7 @@ export type OnboardingRequirementsMachineArgs = {
 
 const createOnboardingRequirementsMachine = ({
   config,
-  bootstrapData,
+  userData,
   idvContext,
   idDocOutcome,
   overallOutcome,
@@ -47,7 +47,7 @@ const createOnboardingRequirementsMachine = ({
         idvContext,
         onboardingContext: {
           config,
-          bootstrapData,
+          userData,
           idDocOutcome,
           overallOutcome,
         },

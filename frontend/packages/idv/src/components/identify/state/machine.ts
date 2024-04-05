@@ -31,7 +31,7 @@ import {
 
 export type IdentifyMachineArgs = {
   initialAuthToken?: string;
-  bootstrapData?: { email?: string; phoneNumber?: string };
+  bootstrapData?: IdentifyBootstrapData;
   config?: PublicOnboardingConfig;
   isLive: boolean;
   device: DeviceInfo;
@@ -42,6 +42,8 @@ export type IdentifyMachineArgs = {
   logoConfig?: LogoConfig;
   variant: IdentifyVariant;
 };
+
+export type IdentifyBootstrapData = { email?: string; phoneNumber?: string };
 
 const getKindPayload = (_: unknown, { payload }: { payload: Kind }) => payload;
 const isPayloadEmail = compose(isEmail, getKindPayload);

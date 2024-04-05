@@ -14,8 +14,8 @@ import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
-import type { IdentifyBootstrapData } from '../../../utils/get-identify-bootstrap-data';
 import createIdentifyMachine from './machine';
+import type { IdentifyBootstrapData } from './types';
 import { IdentifyVariant, SuccessfulIdentifier } from './types';
 
 const challengeKindToAuthMethod: Record<ChallengeKind, AuthMethodKind> = {

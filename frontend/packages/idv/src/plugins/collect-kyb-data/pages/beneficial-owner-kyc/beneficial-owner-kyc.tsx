@@ -1,4 +1,3 @@
-import type { IdDIData } from '@onefootprint/types';
 import {
   BeneficialOwnerDataAttribute,
   BusinessDI,
@@ -15,7 +14,7 @@ const BeneficialOwnerKyc = () => {
   const {
     kybRequirement: { missingAttributes },
     kycRequirement,
-    kycBootstrapData,
+    kycUserData,
     data,
     idvContext,
     config,
@@ -36,16 +35,24 @@ const BeneficialOwnerKyc = () => {
   const primaryBeneficialOwner = requireMultiKyc
     ? data?.[BusinessDI.kycedBeneficialOwners]?.[0]
     : data?.[BusinessDI.beneficialOwners]?.[0];
-  const bootstrapData: IdDIData = kycBootstrapData
-    ? { ...kycBootstrapData }
-    : {};
+  const userData = { ...kycUserData };
   if (primaryBeneficialOwner) {
-    bootstrapData[IdDI.firstName] =
-      primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName];
-    bootstrapData[IdDI.middleName] =
-      primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName];
-    bootstrapData[IdDI.lastName] =
-      primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName];
+    const userDatum = (value?: string) =>
+      value
+        ? {
+            value,
+            isBootstrap: false,
+          }
+        : undefined;
+    userData[IdDI.firstName] = userDatum(
+      primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName],
+    );
+    userData[IdDI.middleName] = userDatum(
+      primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName],
+    );
+    userData[IdDI.lastName] = userDatum(
+      primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName],
+    );
   }
 
   return (
@@ -53,7 +60,7 @@ const BeneficialOwnerKyc = () => {
       idvContext={idvContext}
       context={{
         disabledFields: [IdDI.firstName, IdDI.middleName, IdDI.lastName],
-        bootstrapData,
+        userData,
         requirement: kycRequirement,
         config,
       }}

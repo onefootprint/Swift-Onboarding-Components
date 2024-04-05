@@ -20,7 +20,7 @@ const Router = ({ onDone }: RouterProps) => {
   const {
     config,
     idvContext,
-    bootstrapData,
+    userData,
     overallOutcome,
     validationToken,
     idDocOutcome,
@@ -44,7 +44,7 @@ const Router = ({ onDone }: RouterProps) => {
         <Requirements
           config={config}
           idvContext={idvContext}
-          bootstrapData={bootstrapData}
+          userData={userData}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onDone={() => send({ type: 'requirementsCompleted' })}

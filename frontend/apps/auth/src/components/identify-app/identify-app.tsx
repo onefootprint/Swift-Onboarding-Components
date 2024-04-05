@@ -176,7 +176,10 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
         initialAuthToken={authToken}
         config={config}
         isLive={config.isLive}
-        userData={userData}
+        bootstrapData={{
+          email: userData?.['id.email'],
+          phoneNumber: userData?.['id.phone_number'],
+        }}
         logoConfig={
           options.showLogo
             ? {

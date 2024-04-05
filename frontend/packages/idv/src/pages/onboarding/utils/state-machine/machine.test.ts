@@ -26,7 +26,10 @@ describe('Onboarding Machine Tests', () => {
   };
 
   const defaultBootstrapData = {
-    [IdDI.email]: 'belce@onefootprint.com',
+    [IdDI.email]: {
+      value: 'belce@onefootprint.com',
+      isBootstrap: true,
+    },
   };
 
   const testDevice: DeviceInfo = {
@@ -37,11 +40,11 @@ describe('Onboarding Machine Tests', () => {
   };
 
   const createMachine = ({
-    bootstrapData = defaultBootstrapData,
+    userData = defaultBootstrapData,
   }: Partial<OnboardingMachineArgs> = {}) => {
     const machine = interpret(
       createOnboardingMachine({
-        bootstrapData,
+        userData,
         idvContext: {
           device: testDevice,
           authToken: 'token',
@@ -63,7 +66,7 @@ describe('Onboarding Machine Tests', () => {
         authToken: 'token',
       },
       config: testOnboardingConfig,
-      bootstrapData: defaultBootstrapData,
+      userData: defaultBootstrapData,
       validationToken: undefined,
     });
 
@@ -86,7 +89,7 @@ describe('Onboarding Machine Tests', () => {
         authToken: 'token',
       },
       config: testOnboardingConfig,
-      bootstrapData: defaultBootstrapData,
+      userData: defaultBootstrapData,
       validationToken: 'token',
     });
   });

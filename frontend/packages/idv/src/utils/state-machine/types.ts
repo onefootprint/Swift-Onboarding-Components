@@ -1,6 +1,5 @@
 import type {
   IdDocOutcome,
-  IdvBootstrapData,
   ObConfigAuth,
   OverallOutcome,
   PublicOnboardingConfig,
@@ -8,6 +7,7 @@ import type {
 
 import type { DoneArgs } from '../../components/identify';
 import type { DeviceInfo } from '../../hooks';
+import type { UserData } from '../../types';
 import type {
   AuthTokenPayload,
   DeviceResponseJsonPayload,
@@ -38,7 +38,7 @@ export type MachineContext = {
   config?: PublicOnboardingConfig;
   device?: DeviceInfo;
   authToken?: string;
-  bootstrapData?: IdvBootstrapData;
+  userData: UserData;
   isTransfer?: boolean;
   componentsSdkContext?: ComponentsSdkContext;
   isInIframe?: boolean;
