@@ -54,14 +54,9 @@ const StyledTrigger = styled(Select.Trigger)<{
       }
 
       &[data-state='open'] {
-        border-color: ${input.state.default.focus.border};
         ${IconContainer} {
           transform: rotate(180deg);
         }
-      }
-
-      &:focus {
-        border-color: ${input.state.default.focus.border};
       }
 
       &:hover {

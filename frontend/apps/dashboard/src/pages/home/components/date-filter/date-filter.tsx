@@ -112,12 +112,12 @@ const Range = styled.button`
 
       &[data-is-focus='true'],
       &:focus {
-        border-color: ${input.state.default.focus.border};
         background-color: ${input.state.default.focus.bg};
+<<<<<<< Updated upstream
 
-        &:hover {
-          border-color: ${input.state.default.focus.border};
-        }
+      
+=======
+>>>>>>> Stashed changes
       }
 
       &:hover {
