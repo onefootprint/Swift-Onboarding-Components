@@ -59,14 +59,21 @@ pub async fn evaluate_rule(
     let is_live = auth.is_live()?;
     let obc_id = ob_config_id.into_inner();
 
-    let EvaluateRuleRequest { add, edit, delete } = request.into_inner();
+    let EvaluateRuleRequest {
+        add,
+        edit,
+        delete,
+        start_timestamp,
+        end_timestamp,
+    } = request.into_inner();
     let (current_rules, historical_results) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
 
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc_id)?;
-            let rule_set_results = RuleSetResult::sample_for_eval(conn, &obc.id, 100)?;
+            let rule_set_results =
+                RuleSetResult::sample_for_eval(conn, &obc.id, start_timestamp, end_timestamp, 100)?;
 
             Ok((rules, rule_set_results))
         })

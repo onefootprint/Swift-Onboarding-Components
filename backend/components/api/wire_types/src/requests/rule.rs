@@ -42,4 +42,6 @@ pub struct EvaluateRuleRequest {
     pub add: Option<Vec<CreateRule>>,
     pub edit: Option<Vec<EditRule>>,
     pub delete: Option<Vec<RuleId>>,
+    pub start_timestamp: DateTime<Utc>,
+    pub end_timestamp: DateTime<Utc>,
 }

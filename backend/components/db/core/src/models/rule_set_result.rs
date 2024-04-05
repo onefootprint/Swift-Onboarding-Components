@@ -8,7 +8,7 @@ use super::{
     scoped_vault::ScopedVault,
 };
 use crate::{DbResult, OptionalNonNullVec, PgConn, TxnPgConn};
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Utc};
 use db_schema::schema::{
     risk_signal, rule_set_result, rule_set_result_risk_signal_junction, scoped_vault, workflow,
 };
@@ -171,6 +171,8 @@ impl RuleSetResult {
     pub fn sample_for_eval(
         conn: &mut PgConn,
         obc_id: &ObConfigurationId,
+        start: DateTime<Utc>,
+        end: DateTime<Utc>,
         limit: i64,
     ) -> DbResult<Vec<(ScopedVault, RuleSetResult, Vec<RiskSignal>)>> {
         let res: Vec<(ScopedVault, RuleSetResult)> = workflow::table
@@ -179,7 +181,8 @@ impl RuleSetResult {
             .filter(scoped_vault::deactivated_at.is_null())
             .filter(workflow::ob_configuration_id.eq(obc_id))
             .filter(not(workflow::completed_at.is_null()))
-            .filter(workflow::completed_at.gt(Utc::now() - Duration::weeks(8)))
+            .filter(workflow::completed_at.ge(start))
+            .filter(workflow::completed_at.le(end))
             .distinct_on(workflow::scoped_vault_id)
             .order((
                 workflow::scoped_vault_id,
@@ -235,6 +238,7 @@ mod tests {
         test_helpers::assert_have_same_elements,
         tests::prelude::*,
     };
+    use chrono::Duration;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
     use newtypes::{
@@ -485,7 +489,9 @@ mod tests {
         let wf5 = create_wf(conn, &sv5, &obc.id, None);
         let _rsr5 = create_rule_set_result(conn, &obc.id, &sv5.id, &wf5.id, &risk_signals5);
 
-        let results = RuleSetResult::sample_for_eval(conn, &obc.id, 10).unwrap();
+        let results =
+            RuleSetResult::sample_for_eval(conn, &obc.id, Utc::now() - Duration::hours(1), Utc::now(), 10)
+                .unwrap();
         assert_have_same_elements(
             vec![
                 (sv.id, rsr.id, rs_ids(risk_signals)),
