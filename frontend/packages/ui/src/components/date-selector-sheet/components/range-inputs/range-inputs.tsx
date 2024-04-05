@@ -1,109 +1,89 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { format } from 'date-fns';
-import type { ChangeEvent } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createFontStyles } from '../../../../utils';
-import InternalInput from '../../../internal/input';
 import Stack from '../../../stack';
-import type { RangeInputsProps } from '../../date-selector-sheet.types';
-import { DateType } from '../../date-selector-sheet.types';
+import DateInput from '../date-input';
+
+export type RangeInputsProps = {
+  startDate?: Date;
+  endDate?: Date;
+  onFocus?: (trigger: 'start' | 'end') => void;
+  onChange: ({
+    startDate,
+    endDate,
+    trigger,
+  }: {
+    startDate?: Date;
+    endDate?: Date;
+    trigger: 'start' | 'end';
+  }) => void;
+};
 
 const RangeInputs = ({
-  startDate,
-  endDate,
-  onRangeChange,
+  startDate = new Date(),
+  endDate = new Date(),
+  onChange,
+  onFocus,
 }: RangeInputsProps) => {
-  const [internalStartDate, setInternalStartDate] = useState(startDate);
-  const [internalEndDate, setInternalEndDate] = useState(endDate);
-  const [invalidDateRange, setInvalidDateRange] = useState(false);
+  const handleFocus = (trigger: 'start' | 'end') => () => {
+    onFocus?.(trigger);
+  };
 
-  const startDateRef = useRef(startDate);
-  const endDateRef = useRef(endDate);
-  useEffect(() => {
-    if (startDate !== startDateRef.current || endDate !== endDateRef.current) {
-      setInternalStartDate(startDate);
-      setInternalEndDate(endDate);
-      startDateRef.current = startDate;
-      endDateRef.current = endDate;
-      setInvalidDateRange(false);
+  const handleStartChanged = (newStartDate: Date) => {
+    if (newStartDate > endDate) {
+      onChange({
+        startDate: endDate,
+        endDate: newStartDate,
+        trigger: 'start',
+      });
+    } else {
+      onChange({
+        startDate: newStartDate,
+        endDate,
+        trigger: 'start',
+      });
     }
-  }, [startDate, endDate]);
+  };
 
-  const handleDateChange =
-    (dateType: DateType) => (e: ChangeEvent<HTMLInputElement>) => {
-      const dateValue = e.target.value;
-      const dateParts = dateValue.split('/');
-      if (
-        dateParts.length === 3 &&
-        dateParts[0].length === 2 &&
-        dateParts[1].length === 2 &&
-        dateParts[2].length === 4
-      ) {
-        const [month, day, year] = dateParts.map(Number);
-        const newDate = new Date(year, month - 1, day);
-
-        if (dateType === DateType.start) {
-          setInternalStartDate(newDate);
-          if (!invalidDateRange) {
-            onRangeChange(newDate, internalEndDate);
-          }
-          startDateRef.current = newDate;
-        } else {
-          setInternalEndDate(newDate);
-          if (!invalidDateRange) {
-            onRangeChange(internalStartDate, newDate);
-          }
-          endDateRef.current = newDate;
-        }
-      }
-    };
+  const handleEndChanged = (newEndDate: Date) => {
+    if (newEndDate < startDate) {
+      onChange({
+        startDate: newEndDate,
+        endDate: startDate,
+        trigger: 'end',
+      });
+    } else {
+      onChange({
+        startDate,
+        endDate: newEndDate,
+        trigger: 'end',
+      });
+    }
+  };
 
   return (
     <Container
       backgroundColor="secondary"
       direction="column"
-      padding={5}
-      marginBottom={4}
+      padding={4}
+      marginBottom={3}
       gap={3}
     >
-      <Stack gap={3} align="center" justify="center">
-        <DateInputContainer
-          inputMode="numeric"
-          placeholder="MM/DD/YYYY"
-          value={
-            internalStartDate ? format(internalStartDate, 'MM/dd/yyyy') : ''
-          }
-          onChange={handleDateChange(DateType.start)}
-          mask={{
-            date: true,
-            datePattern: ['m', 'd', 'Y'],
-            delimiter: '/',
-            blocks: [2, 2, 4],
-          }}
-          sx={{
-            letterSpacing: '0.02em',
-          }}
+      <Stack gap={3} center>
+        <DateInput
+          autoFocus
+          onChange={handleStartChanged}
+          onFocus={handleFocus('start')}
+          value={startDate}
         />
-        <Stack align="center" justify="center">
-          <IcoArrowRightSmall16 color="tertiary" />
+        <Stack center>
+          <IcoArrowRightSmall16 />
         </Stack>
-        <DateInputContainer
-          inputMode="numeric"
-          placeholder="MM/DD/YYYY"
-          value={internalEndDate ? format(internalEndDate, 'MM/dd/yyyy') : ''}
-          onChange={handleDateChange(DateType.end)}
-          hasError={invalidDateRange}
-          mask={{
-            date: true,
-            datePattern: ['m', 'd', 'Y'],
-            delimiter: '/',
-            blocks: [2, 2, 4],
-          }}
-          sx={{
-            letterSpacing: '0.02em',
-          }}
+        <DateInput
+          onChange={handleEndChanged}
+          onFocus={handleFocus('end')}
+          value={endDate}
         />
       </Stack>
     </Container>
@@ -111,25 +91,9 @@ const RangeInputs = ({
 };
 
 const Container = styled(Stack)`
-  ${({ theme }) => `
+  ${({ theme }) => css`
     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-
-    input {
-        width: 100%;
-    }
-  `}
-`;
-
-const DateInputContainer = styled(InternalInput)`
-  ${({ theme }) => css`
-    width: 100%;
-    padding: ${theme.spacing[3]};
-    ${createFontStyles('body-4')};
-    background-color: ${theme.backgroundColor.primary};
-    width: fit-content;
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
 `;
 

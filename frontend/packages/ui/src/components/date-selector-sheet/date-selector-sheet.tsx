@@ -17,6 +17,7 @@ import styled, { css } from 'styled-components';
 
 import DayButton from './components/day-button';
 import Header from './components/header';
+import RangeInputs from './components/range-inputs';
 import WeekHeader from './components/week-header';
 import type { DateSelectorSheetProps } from './date-selector-sheet.types';
 import { DirectionChange } from './date-selector-sheet.types';
@@ -61,6 +62,11 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
       [firstDayCurrentMonth],
     );
 
+    const goToDate = (targetDate?: Date) => {
+      if (!targetDate) return;
+      setVisibleMonth(format(targetDate, 'MMM-yyyy'));
+    };
+
     const handleMonthChange = (direction: DirectionChange) => {
       const monthAdjustment = direction === DirectionChange.next ? 1 : -1;
       const adjustedMonth = add(firstDayCurrentMonth, {
@@ -79,6 +85,33 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
         onChange({ startDate: day, endDate: startDate });
       } else {
         onChange({ startDate: day, endDate: day });
+      }
+    };
+
+    const handleRangeInputFocus = (trigger: 'start' | 'end') => {
+      if (trigger === 'start') {
+        goToDate(startDate || today);
+      }
+      if (trigger === 'end') {
+        goToDate(endDate || today);
+      }
+    };
+
+    const handleRangeChange = ({
+      startDate: newStartDate,
+      endDate: newEndDate,
+      trigger,
+    }: {
+      startDate?: Date;
+      endDate?: Date;
+      trigger: 'start' | 'end';
+    }) => {
+      onChange({ startDate: newStartDate, endDate: newEndDate });
+      if (trigger === 'start') {
+        goToDate(newStartDate);
+      }
+      if (trigger === 'end') {
+        goToDate(newEndDate);
       }
     };
 
@@ -102,6 +135,12 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
                   firstDayCurrentMonth={firstDayCurrentMonth}
                   movingDirection={movingDirection}
                   setMovingDirection={setMovingDirection}
+                />
+                <RangeInputs
+                  endDate={endDate}
+                  onChange={handleRangeChange}
+                  onFocus={handleRangeInputFocus}
+                  startDate={startDate}
                 />
                 <WeekHeader />
                 <Days

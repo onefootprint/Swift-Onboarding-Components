@@ -150,7 +150,7 @@ const Container = styled.button<{ $column: number; $row: number }>`
         }
       }
 
-      &[data-is-in-range='true'] {
+      &[data-is-in-range='true']&[data-is-selection-start='false']&[data-is-selection-end='false'] {
         &:hover {
           &::after {
             ${hoverInRageStyles}
