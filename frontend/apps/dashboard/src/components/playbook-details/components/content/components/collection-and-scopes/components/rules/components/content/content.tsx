@@ -68,7 +68,12 @@ const Content = ({
   };
 
   const handleAddRule = (newRules: AddedRuleWithId[]) => {
-    setAddedRules(newRules);
+    setAddedRules(currentRules => {
+      const unchangedAddedRules = currentRules.filter(currRule =>
+        newRules.every(newRule => newRule.tempId !== currRule.tempId),
+      );
+      return unchangedAddedRules.concat(newRules);
+    });
   };
 
   const handleDeleteAddedRule = (tempId: string) => {
