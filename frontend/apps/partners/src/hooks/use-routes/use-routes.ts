@@ -2,6 +2,8 @@ import type { Icon } from '@onefootprint/icons';
 import { IcoFileText16, IcoSettings16, IcoStore16 } from '@onefootprint/icons';
 import { useTranslation } from 'react-i18next';
 
+import { DEFAULT_PRIVATE_ROUTE } from '@/config/constants';
+
 type Route = {
   title?: string;
   employeesOnly: boolean;
@@ -16,7 +18,7 @@ const useRoutes = (): Route[] => {
       employeesOnly: false,
       items: [
         {
-          href: '/app/companies',
+          href: DEFAULT_PRIVATE_ROUTE,
           Icon: IcoStore16,
           text: t('companies.companies'),
         },
