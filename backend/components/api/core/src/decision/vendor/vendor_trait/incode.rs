@@ -17,6 +17,9 @@ use idv::{
             IncodeProcessIdRequest,
         },
         error::Error as IncodeError,
+        government_validation::{
+            request::IncodeGovernmentValidationRequest, response::GovernmentValidationResponse,
+        },
         response::OnboardingStartResponse,
         watchlist::{
             response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
@@ -563,5 +566,49 @@ impl VendorAPIResponse for IncodeResponse<CurpValidationResponse> {
     // we don't use incode in this way
     fn parsed_response(&self) -> ParsedResponse {
         ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a IncodeRawResponse again ?? idk i forget
+    }
+}
+
+
+#[async_trait]
+impl
+    VendorAPICall<
+        IncodeGovernmentValidationRequest,
+        IncodeResponse<GovernmentValidationResponse>,
+        IncodeError,
+    > for FootprintVendorHttpClient
+{
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeGovernmentValidationRequest"))]
+    async fn make_request(
+        &self,
+        request: IncodeGovernmentValidationRequest,
+    ) -> Result<IncodeResponse<GovernmentValidationResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client
+            .government_validation(self, request.config)
+            .await?;
+
+        let result = IncodeResponse::from_response(raw_response).await;
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<GovernmentValidationResponse> {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeIneData
+    }
+
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
+    }
+
+    // TODO: rm this and ParsedResponse
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }

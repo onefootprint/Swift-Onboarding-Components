@@ -19,6 +19,9 @@ use idv::{
             IncodeFetchScoresRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
             IncodeProcessIdRequest,
         },
+        government_validation::{
+            request::IncodeGovernmentValidationRequest, response::GovernmentValidationResponse,
+        },
         response::OnboardingStartResponse,
         watchlist::{
             response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
@@ -98,6 +101,11 @@ pub struct IncodeClients {
         IncodeResponse<CurpValidationResponse>,
         idv::incode::error::Error,
     >,
+    pub incode_government_validation: VendorClient<
+        IncodeGovernmentValidationRequest,
+        IncodeResponse<GovernmentValidationResponse>,
+        idv::incode::error::Error,
+    >,
 }
 
 impl IncodeClients {
@@ -175,6 +183,11 @@ impl IncodeClients {
                 IncodeResponse<CurpValidationResponse>,
                 idv::incode::error::Error,
             >::new()),
+            incode_government_validation: Arc::new(MockVendorAPICall::<
+                IncodeGovernmentValidationRequest,
+                IncodeResponse<GovernmentValidationResponse>,
+                idv::incode::error::Error,
+            >::new()),
         }
     }
 
@@ -194,6 +207,7 @@ impl IncodeClients {
             incode_updated_watchlist_result: footprint_client.clone(),
             incode_get_onboarding_status: footprint_client.clone(),
             incode_curp_validation: footprint_client.clone(),
+            incode_government_validation: footprint_client.clone(),
         }
     }
 }
