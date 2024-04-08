@@ -1,47 +1,76 @@
 CI:
-  - .github/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/**
 
 Backend:
-  - backend/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/**
 
 DB:
-  - backend/components/db/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/components/db/**
 
 Migrations:
-  - backend/components/db/migrations/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/components/db/migrations/**
 
 API:
-  - backend/components/api/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/components/api/**
 
 Enclave:
-  - backend/components/enclave/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - backend/components/enclave/**
 
 FastEphemeral:
-  - 'backend/infra/**/*'
-  - 'backend/infra/*'
-  - '.github/workflows/backend_deploy.yml'
-  - '.github/workflows/backend_release.yml'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'backend/infra/**'
+      - '.github/workflows/backend_deploy.yml'
+      - '.github/workflows/backend_release.yml'
 
 FullEphemeral:
-  - 'backend/infra/src/db.ts'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'backend/infra/src/db.ts'
 
 Mobile:
-  - mobile/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - mobile/**
 
 Frontend:
-  - frontend/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - frontend/**
 
 Dashboard:
-  - frontend/apps/dashboard/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - frontend/apps/dashboard/**
 
 Bifrost:
-  - frontend/apps/bifrost/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - frontend/apps/bifrost/**
 
 Developer Docs:
-  - frontend/apps/docs/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - frontend/apps/docs/**
 
 Frontpage:
-  - frontend/apps/frontpage/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - frontend/apps/frontpage/**
 
 DesignSystem:
-  - frontend/packages/ui/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - frontend/packages/ui/**
