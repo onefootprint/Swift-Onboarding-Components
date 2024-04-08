@@ -4,6 +4,7 @@ use super::{
         request::{AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, AddSelfieRequest, DocumentSide},
         response::GetOnboardingStatusResponse,
     },
+    government_validation::request::GovernmentValidationRequestQueryParams,
     request::{OnboardingStartCustomNameFields, OnboardingStartRequest},
     response::OnboardingStartResponse,
     watchlist::request::WatchlistResultRequest,
@@ -431,6 +432,31 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    pub async fn government_validation<T>(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        request: T,
+    ) -> Result<reqwest::Response, IncodeError>
+    where
+        T: Into<GovernmentValidationRequestQueryParams>,
+    {
+        let url = self
+            .client_adapter
+            .api_url("omni/process/government-validation")?;
+        let request = request.into();
+
+        let response = footprint_http_client
+            .client
+            .post(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .query(&request)
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
+
+        Ok(response)
+    }
+
     pub async fn updated_watchlist_result(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
@@ -501,8 +527,9 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 #[cfg(test)]
 mod tests {
     use newtypes::{
-        vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId,
-        IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiString,
+        incode::IncodeStatus, vendor_credentials::IncodeCredentials, DocVData, IdDocKind,
+        IncodeConfigurationId, IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
+        PiiString,
     };
 
     use crate::{
@@ -515,6 +542,10 @@ mod tests {
                     AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessFaceResponse,
                     ProcessIdResponse,
                 },
+            },
+            government_validation::{
+                request::{GovernmentValidationConfigByCountry, MXRequestConfig},
+                response::{GovernmentValidationResponse, MXStatusCode},
             },
             response::OnboardingStartResponse,
             watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
@@ -535,13 +566,21 @@ mod tests {
         IncodeClientAdapter::new(creds).expect("couldn't load incode client")
     }
 
-    async fn get_authed_client() -> (FootprintVendorHttpClient, AuthenticatedIncodeClientAdapter) {
+    async fn get_authed_client(
+        flow_id: &str,
+        incode_session_id: Option<String>,
+    ) -> (FootprintVendorHttpClient, AuthenticatedIncodeClientAdapter) {
         let client = load_client();
         let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
         // Start the session
-        let config = IncodeConfigurationId::from(INCODE_SANDBOX_SELFIE_FLOW_ID.to_string());
+        let config = IncodeConfigurationId::from(flow_id.to_string());
         let res = client
-            .onboarding_start(&fp_client, Some(config), None, None)
+            .onboarding_start(
+                &fp_client,
+                Some(config),
+                incode_session_id.map(IncodeSessionId::from),
+                None,
+            )
             .await
             .unwrap();
 
@@ -561,7 +600,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_document_upload_e2e() {
-        let (fp_client, authenticated_client) = get_authed_client().await;
+        let (fp_client, authenticated_client) = get_authed_client(INCODE_SANDBOX_SELFIE_FLOW_ID, None).await;
 
         let front_docv_data = DocVData {
             front_image: Some(PiiString::from(
@@ -714,7 +753,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_watchlist_result() {
-        let (fp_client, authenticated_client) = get_authed_client().await;
+        let (fp_client, authenticated_client) = get_authed_client(INCODE_SANDBOX_SELFIE_FLOW_ID, None).await;
 
         let raw_res = authenticated_client
             .watchlist_result(
@@ -779,7 +818,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_curp_validation_result() {
-        let (fp_client, authenticated_client) = get_authed_client().await;
+        let (fp_client, authenticated_client) = get_authed_client("65e241cbac19b78faa5d22e3", None).await;
 
         let raw_res = authenticated_client
             .curp_validation(&fp_client, PiiString::from(crate::test_fixtures::TEST_CURP))
@@ -795,5 +834,30 @@ mod tests {
         // we get a curp not found error with this one
         assert_eq!(resp.error.unwrap().codigo_error.unwrap(), String::from("06"));
         assert!(!resp.renapo_valid.unwrap());
+    }
+
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_government_validation_result() {
+        // this session is in demo and is a mx doc
+        let session_id = "65d8e7d249ef953b4bfbcf8e";
+        let (fp_client, authenticated_client) =
+            get_authed_client("660eb3bddaefaeac1c74a029", Some(session_id.to_string())).await;
+        let request_config = GovernmentValidationConfigByCountry::Mexico(MXRequestConfig::ScrapingOnly);
+
+        let raw_res = authenticated_client
+            .government_validation(&fp_client, request_config)
+            .await
+            .unwrap();
+
+        let resp = IncodeResponse::<GovernmentValidationResponse>::from_response(raw_res)
+            .await
+            .result
+            .into_success()
+            .unwrap();
+
+        assert_eq!(resp.overall_status().unwrap(), IncodeStatus::Fail);
+        assert_eq!(resp.status_code(), MXStatusCode::UserNotFoundInIneDb);
     }
 }
