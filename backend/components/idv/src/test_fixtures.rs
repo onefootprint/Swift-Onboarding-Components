@@ -6704,3 +6704,114 @@ pub fn neuro_id_success_response() -> serde_json::Value {
         "status": "SUCCESS"
     })
 }
+
+pub fn incode_ine_not_found_in_db() -> serde_json::Value {
+    serde_json::json!({
+        "valid": false,
+        "statusCode": 8,
+        "registralSituation": {
+            "tipoSituacionRegistral": "DATOS_NO_ENCONTRADOS"
+        },
+        "governmentValidation": {
+            "validationStatus": {
+                "value": "8",
+                "status": "FAIL",
+                "key": "userNotFoundInIneDb"
+            },
+            "overall": {
+                "status": "FAIL"
+            }
+        },
+        "customFields": {
+            "firstName": null,
+            "lastName": null
+        },
+        "ocrData": {
+            "name": {
+                "fullName": "BOBIERTA GOMEZ VELAZQUEZ",
+                "machineReadableFullName": "VELAZQUEZ BOBIERTA GOMEZ",
+                "firstName": "BOBIERTA",
+                "givenName": "BOBIERTA",
+                "givenNameMrz": "VELAZQUEZ BOBIERTA",
+                "paternalLastName": "GOMEZ",
+                "maternalLastName": "VELAZQUEZ",
+                "lastNameMrz": "GOMEZ"
+            },
+            "address": "PERCYPENGUIN 1253 INT. 4\nMAIN 04800\nCEMALPA DE MORELOS, D.F",
+            "addressFields": {
+                "street": "PENGI 1253 INT. 4",
+                "colony": "COMORELOS",
+                "postalCode": "04800",
+                "city": "PENGIN DE MORELOS",
+                "state": "D.F",
+                "stateCode": "09"
+            },
+            "fullAddress": true,
+            "invalidAddress": false,
+            "checkedAddressBean": {
+                "zipColonyOptions": []
+            },
+            "exteriorNumber": "1253",
+            "interiorNumber": "INT. 4",
+            "typeOfId": "VoterIdentification",
+            "documentFrontSubtype": "VOTER_IDENTIFICATION_CARD",
+            "documentBackSubtype": "VOTER_IDENTIFICATION_CARD",
+            "birthDate": 3316032,
+            "gender": "F",
+            "claveDeElector": "OINOIN",
+            "curp": "OINSOINOIN",
+            "numeroEmisionCredencial": "02",
+            "cic": "123123",
+            "ocr": "12312321",
+            "expireAt": "1546214400000",
+            "expirationDate": 2018,
+            "issueDate": 2008,
+            "registrationDate": 2008,
+            "issuingCountry": "MEX",
+            "birthPlace": "CL",
+            "nationality": "MEX",
+            "nationalityMrz": "MEX",
+            "notExtracted": 0,
+            "notExtractedDetails": [],
+            "mrz1": "IDMEX1836577170<<0747116375842",
+            "mrz2": "8007057M1812315MEX<02<<12345<7",
+            "mrz3": "GOMEZ<<VELAZQUEZ<BOBIERTA<<<<",
+            "fullNameMrz": "VELAZQUEZ BOBIERTA GOMEZ",
+            "documentNumberCheckDigit": "0",
+            "dateOfBirthCheckDigit": "7",
+            "expirationDateCheckDigit": "5",
+            "ocrDataConfidence": {
+                "birthDateConfidence": 0.9461168,
+                "nameConfidence": 0.96933496,
+                "givenNameConfidence": 0.96933496,
+                "firstNameConfidence": 0.96933496,
+                "mothersSurnameConfidence": 0.97957855,
+                "fathersSurnameConfidence": 0.97165126,
+                "addressConfidence": 0.5680398,
+                "streetConfidence": 0.8881735,
+                "colonyConfidence": 0.8590793,
+                "postalCodeConfidence": 0.96619743,
+                "cityConfidence": 0.7587342,
+                "stateConfidence": 0.5680398,
+                "stateCodeConfidence": 0.9881933,
+                "countryCodeConfidence": 0.9461168,
+                "genderConfidence": 0.9461168,
+                "expirationDateConfidence": 0.9461168,
+                "expireAtConfidence": 0.9461168,
+                "mrz1Confidence": 0.9756986,
+                "mrz2Confidence": 0.9600486,
+                "mrz3Confidence": 0.92436004,
+                "documentNumberConfidence": 0.9461168,
+                "backNumberConfidence": 0.9928337,
+                "claveDeElectorConfidence": 0.9491997,
+                "numeroEmisionCredencialConfidence": 0.9461168,
+                "curpConfidence": 0.8678653,
+                "birthPlaceConfidence": 0.8678653,
+                "nationalityConfidence": 0.9461168,
+                "nationalityMrzConfidence": 0.9461168
+            }
+        },
+        "deviceInfo": {},
+        "errorDescription": "userNotFoundInIneDb"
+    })
+}

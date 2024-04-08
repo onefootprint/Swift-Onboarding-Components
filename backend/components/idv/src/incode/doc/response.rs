@@ -140,15 +140,15 @@ pub struct FetchScoresResponse {
     pub liveness: Option<Liveness>,
     pub face_recognition: Option<FaceRecognition>,
     pub id_ocr_confidence: Option<IdOcrConfidence>,
-    pub overall: Option<IdTest>,
+    pub overall: Option<ValueStatusKey>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Liveness {
-    pub overall: Option<IdTest>,
-    pub photo_quality: Option<IdTest>,
-    pub liveness_score: Option<IdTest>,
+    pub overall: Option<ValueStatusKey>,
+    pub photo_quality: Option<ValueStatusKey>,
+    pub liveness_score: Option<ValueStatusKey>,
 }
 
 impl FetchScoresResponse {
@@ -253,7 +253,7 @@ impl FetchScoresResponse {
         Ok(resp)
     }
 
-    fn score_and_status(id_test: &Option<IdTest>) -> (Option<f64>, Option<IncodeStatus>) {
+    fn score_and_status(id_test: &Option<ValueStatusKey>) -> (Option<f64>, Option<IncodeStatus>) {
         let status = id_test
             .as_ref()
             .and_then(|o| o.status.as_ref())
@@ -271,17 +271,17 @@ impl FetchScoresResponse {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct IdValidation {
-    pub photo_security_and_quality: Option<Vec<IdTest>>,
-    pub id_specific: Option<Vec<IdTest>>,
-    pub custom_fields: Option<Vec<IdTest>>,
+    pub photo_security_and_quality: Option<Vec<ValueStatusKey>>,
+    pub id_specific: Option<Vec<ValueStatusKey>>,
+    pub custom_fields: Option<Vec<ValueStatusKey>>,
     pub applied_rule: Option<serde_json::Value>,
-    pub overall: Option<IdTest>,
+    pub overall: Option<ValueStatusKey>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct IdOcrConfidence {
-    pub overall_confidence: Option<IdTest>,
+    pub overall_confidence: Option<ValueStatusKey>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -293,20 +293,20 @@ pub struct FaceRecognition {
     // External ID, in case the user, is approved in another session.,
     pub existing_external_id: Option<String>,
     // Shows info if the user was wearing a mask during selfie capture,
-    pub mask_check: Option<IdTest>,
-    pub face_brightness: Option<IdTest>,
-    pub lenses_check: Option<IdTest>,
+    pub mask_check: Option<ValueStatusKey>,
+    pub face_brightness: Option<ValueStatusKey>,
+    pub lenses_check: Option<ValueStatusKey>,
     // Shows if the name matches the previously used (only in case the user is already approved in another session),
-    pub name_match: Option<IdTest>,
+    pub name_match: Option<ValueStatusKey>,
     // Specific rule from rule engine for faceValidation:,
     pub applied_rule: Option<serde_json::Value>,
     // Shows how much face from ID matches the selfie,
-    pub overall: Option<IdTest>,
+    pub overall: Option<ValueStatusKey>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct IdTest {
+pub struct ValueStatusKey {
     pub value: Option<String>,
     pub status: Option<String>,
     pub key: Option<String>,
@@ -456,7 +456,27 @@ pub struct FetchOCRResponse {
     pub cic: Option<ScrubbedPiiString>,
     pub mrz1: Option<ScrubbedPiiString>,
     pub mrz2: Option<ScrubbedPiiString>,
-    pub birth_place: Option<ScrubbedPiiString>,
+    pub mrz3: Option<ScrubbedPiiString>,
+    //
+    // Leaving a lot of these Values just in case they aren't consistent across diff countries...
+    //
+    pub full_name_mrz: Option<serde_json::Value>,
+    pub birth_place: Option<serde_json::Value>,
+    pub numero_emision_credencial: Option<serde_json::Value>,
+    pub full_address: Option<serde_json::Value>,
+    pub invalid_address: Option<serde_json::Value>,
+    pub exterior_number: Option<serde_json::Value>,
+    pub interior_number: Option<serde_json::Value>,
+    pub clave_de_elector: Option<serde_json::Value>,
+    // not sure - i think this is MX specific
+    pub ocr: Option<serde_json::Value>,
+    pub registration_date: Option<serde_json::Value>,
+    // unsure, i32 in response. number of not extracted fields?
+    pub not_extracted: Option<serde_json::Value>,
+    pub not_extracted_details: Option<serde_json::Value>,
+    pub document_number_check_digit: Option<serde_json::Value>,
+    pub date_of_birth_check_digit: Option<serde_json::Value>,
+    pub expiration_date_check_digit: Option<serde_json::Value>,
 }
 
 pub struct IncodeOcrFixtureResponseFields {

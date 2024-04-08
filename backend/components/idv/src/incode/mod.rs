@@ -11,6 +11,7 @@ pub mod client;
 pub mod curp_validation;
 pub mod doc;
 pub mod error;
+pub mod government_validation;
 pub mod request;
 pub mod response;
 pub mod watchlist;
