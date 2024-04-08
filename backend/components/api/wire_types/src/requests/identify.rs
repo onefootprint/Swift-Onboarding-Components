@@ -93,10 +93,34 @@ pub struct LoginChallengeResponse {
     pub error: Option<String>,
 }
 
+#[derive(Apiv2Schema, serde::Deserialize, Clone)]
+#[serde(untagged)]
+/// For backwards compatibility until the clients are updated   
+pub enum SignupChallengeData<T> {
+    Legacy(T),
+    New { value: T, is_bootstrap: bool },
+}
+
+impl<T> SignupChallengeData<T> {
+    pub fn value(self) -> T {
+        match self {
+            SignupChallengeData::Legacy(d) => d,
+            SignupChallengeData::New { value, .. } => value,
+        }
+    }
+
+    pub fn is_bootstrap(&self) -> bool {
+        match self {
+            SignupChallengeData::Legacy(..) => false,
+            SignupChallengeData::New { is_bootstrap, .. } => *is_bootstrap,
+        }
+    }
+}
+
 #[derive(Apiv2Schema, serde::Deserialize)]
 pub struct SignupChallengeRequest {
-    pub phone_number: Option<PhoneNumber>,
-    pub email: Option<Email>,
+    pub phone_number: Option<SignupChallengeData<PhoneNumber>>,
+    pub email: Option<SignupChallengeData<Email>>,
     pub scope: Option<IdentifyScope>,
 }
 

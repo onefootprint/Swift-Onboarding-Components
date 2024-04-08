@@ -343,6 +343,52 @@ def test_signup_flow(sandbox_tenant):
     bifrost.run()
 
 
+def test_modern_signup_flow(sandbox_tenant):
+    obc = sandbox_tenant.default_ob_config
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER, is_bootstrap=True),
+        email=dict(value=FIXTURE_EMAIL, is_bootstrap=False),
+        scope="onboarding",
+    )
+    body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
+    token = FpAuth(body["challenge_data"]["token"])
+
+    # Make sure the token issued has no scopes
+    token_body = get("/hosted/user/token", None, token)
+    assert not token_body["scopes"]
+
+    # Then finish sign up
+    data = {
+        "challenge_response": "000000",
+        "challenge_token": body["challenge_data"]["challenge_token"],
+        "scope": "onboarding",
+    }
+    body = post("hosted/identify/verify", data, token)
+    auth_token = FpAuth(body["auth_token"])
+
+    # Make sure the token has scopes
+    data = dict(scope="onboarding")
+    body = post("/hosted/identify", data, auth_token)
+    assert set(body["user"]["token_scopes"]) >= {"sign_up"}
+
+    # Finish onboarding onto this playbook using the auth token issued from the new flow
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    user = bifrost.run()
+
+    # And verify that the source of data is correct
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert (
+        next(i for i in body["data"] if i["identifier"] == "id.phone_number")["source"]
+        == "bootstrap"
+    )
+    assert (
+        next(i for i in body["data"] if i["identifier"] == "id.email")["source"]
+        == "hosted"
+    )
+
+
 @pytest.mark.parametrize(
     "kba_data,expected_error",
     [

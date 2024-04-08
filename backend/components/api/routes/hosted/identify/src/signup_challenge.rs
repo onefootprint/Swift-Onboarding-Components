@@ -19,11 +19,13 @@ use api_core::{
         vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper},
     },
 };
-use api_wire_types::{IdentifyId, SignupChallengeRequest, SignupChallengeResponse, UserChallengeData};
+use api_wire_types::{
+    IdentifyId, SignupChallengeData, SignupChallengeRequest, SignupChallengeResponse, UserChallengeData,
+};
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::GlobalFingerprintKind, ChallengeKind, DataIdentifier, Fingerprinter, IdentifyScope,
-    IdentityDataKind as IDK,
+    email::Email, fingerprinter::GlobalFingerprintKind, ChallengeKind, DataIdentifier, DataLifetimeSource,
+    Fingerprinter, IdentifyScope, IdentityDataKind as IDK, PhoneNumber,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -42,8 +44,8 @@ pub async fn post(
     root_span: RootSpan,
 ) -> JsonApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest {
-        phone_number,
-        email,
+        phone_number: phone_number_,
+        email: email_,
         scope,
     } = request.into_inner();
     let sandbox_id = sandbox_id.0;
@@ -55,6 +57,11 @@ pub async fn post(
         tracing::info!(tenant_id=%ob_context.ob_config().tenant_id, "Scope not provided");
         IdentifyScope::Onboarding
     };
+
+    // TODO remove this branch when all clients are updated
+    let phone_number = phone_number_.clone().map(|p| p.value());
+    let email = email_.clone().map(|e| e.value());
+
     let is_fixture = phone_number.as_ref().is_some_and(|p| p.is_fixture_phone_number())
         || email.as_ref().is_some_and(|e| e.is_fixture());
     if ob_context.ob_config().is_live && is_fixture {
@@ -97,7 +104,7 @@ pub async fn post(
     }
 
     // Create the new vault
-    let ctx = make_vault_context(&state, &ob_context, identifiers, sandbox_id.clone()).await?;
+    let ctx = make_vault_context(&state, &ob_context, email_, phone_number_, sandbox_id.clone()).await?;
     let (uv, sv, root_span) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -181,34 +188,41 @@ pub async fn post(
 async fn make_vault_context(
     state: &State,
     ob_pk_auth: &ObConfigAuth,
-    initial_data: Vec<IdentifyId>,
+    email: Option<SignupChallengeData<Email>>,
+    phone: Option<SignupChallengeData<PhoneNumber>>,
     sandbox_id: Option<newtypes::SandboxId>,
 ) -> ApiResult<VaultContext> {
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
-    let initial_data = initial_data
-        .into_iter()
-        .map(|id| match id {
-            IdentifyId::Email(e) => (IDK::Email.into(), e.email),
-            IdentifyId::PhoneNumber(e) => (IDK::PhoneNumber.into(), e.e164()),
-        })
-        .collect::<Vec<(DataIdentifier, _)>>();
+    let initial_data = vec![
+        email.map(|e| (IDK::Email.into(), e.is_bootstrap(), e.value().email)),
+        phone.map(|p| (IDK::PhoneNumber.into(), p.is_bootstrap(), p.value().e164())),
+    ]
+    .into_iter()
+    .flatten()
+    .collect::<Vec<(DataIdentifier, _, _)>>();
 
     let global_sh_data = initial_data
         .iter()
-        .map(|(di, v)| -> ApiResult<_> { Ok((di.clone(), GlobalFingerprintKind::try_from(di)?, v)) })
+        .map(|(di, _, v)| -> ApiResult<_> { Ok((di.clone(), GlobalFingerprintKind::try_from(di)?, v)) })
         .collect::<ApiResult<Vec<_>>>()?;
     let global_sh = state.enclave_client.compute_fingerprints(global_sh_data).await?;
 
     let tenant_sh_data = initial_data
         .iter()
-        .map(|(di, v)| (di.clone(), (di, &ob_pk_auth.tenant().id), v))
+        .map(|(di, _, v)| (di.clone(), (di, &ob_pk_auth.tenant().id), v))
         .collect_vec();
     // If we are in identify for a specific tenant, also compute tenant-scoped FP
     let tenant_sh = state.enclave_client.compute_fingerprints(tenant_sh_data).await?;
 
     let data = initial_data
         .into_iter()
-        .map(|(di, value)| -> ApiResult<_> {
+        .map(|(di, is_bootstrap, value)| -> ApiResult<_> {
+            let source = if is_bootstrap {
+                // TODO ComponentsSdk when we have a way to detect it
+                DataLifetimeSource::Bootstrap
+            } else {
+                DataLifetimeSource::Hosted
+            };
             Ok(InitialVaultData {
                 global_sh: global_sh
                     .iter()
@@ -221,6 +235,7 @@ async fn make_vault_context(
                     .next(),
                 di,
                 value,
+                source,
             })
         })
         .collect::<ApiResult<Vec<_>>>()?;

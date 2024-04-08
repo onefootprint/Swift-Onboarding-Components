@@ -12055,7 +12055,8 @@
                                         "tenant",
                                         "ocr",
                                         "prefill",
-                                        "components_sdk"
+                                        "components_sdk",
+                                        "bootstrap"
                                     ]
                                 },
                                 "transforms": {

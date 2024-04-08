@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 use super::{Any, DataRequestSources, PatchDataResult, Person, VaultWrapper, WriteableVw};
 use crate::{
@@ -33,6 +33,7 @@ pub struct InitialVaultData {
     pub value: PiiString,
     pub global_sh: Fingerprint,
     pub tenant_sh: Option<Fingerprint>,
+    pub source: DataLifetimeSource,
 }
 
 impl InitialVaultData {
@@ -135,6 +136,7 @@ impl VaultWrapper<Person> {
             .map(|d| (d.di.clone(), d.value.clone()))
             .collect();
         let request = DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(obc.is_live))?;
+        let sources = HashMap::from_iter(initial_data.iter().map(|d| (d.di.clone(), d.source)));
         let fingerprints = initial_data
             .into_iter()
             .map(|d| -> ApiResult<_> {
@@ -157,8 +159,7 @@ impl VaultWrapper<Person> {
             .flatten()
             .collect();
         let request = request.manual_fingerprints(fingerprints);
-        // TODO: Source per piece of data? each piece of data could have a different source here
-        let sources = DataRequestSources::single(DataLifetimeSource::Hosted);
+        let sources = DataRequestSources::overrides(DataLifetimeSource::Hosted, sources);
         let request = VaultWrapper::validate_request(&uvw, conn, request, sources, None, false)?;
         let result = WriteableVw::<Any>::internal_save_data(&uvw, conn, request, None)?;
 

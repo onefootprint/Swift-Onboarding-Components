@@ -30,7 +30,8 @@ use strum_macros::{Display, EnumIter, EnumString};
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DataLifetimeSource {
-    /// Vaulted via a hosted flow and entered by the user
+    /// Vaulted via a hosted flow and entered by the user.
+    /// NOTE: this could be spoofed by a malicious actor with a hosted auth token.
     Hosted,
     /// Vaulted via hosted flow with client-tenant auth
     ClientTenant,
@@ -42,6 +43,10 @@ pub enum DataLifetimeSource {
     Prefill,
     /// Vaulted via an auth token issued for the components SDK
     ComponentsSdk,
+    /// Passed into an SDK as bootstrap data.
+    /// NOTE: we only started tracking Bootstrap in prod on 2024-04-04. Previously bootstrapped
+    /// data will appear as Hosted.
+    Bootstrap,
 }
 
 crate::util::impl_enum_string_diesel!(DataLifetimeSource);
