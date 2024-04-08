@@ -31,6 +31,9 @@ pub use self::annotation::*;
 pub mod org;
 pub use self::org::*;
 
+pub mod partner;
+pub use self::partner::*;
+
 pub mod proxy_config;
 pub use self::proxy_config::*;
 

@@ -5902,6 +5902,41 @@
                         "Dashboard Token": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Organization",
+                    "OrgSettings",
+                    "Private"
+                ],
+                "description": "Updates the basic information for the tenant",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePartnerTenantRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PartnerOrganization"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
             }
         },
         "/partner/doc_templates": {
@@ -23933,6 +23968,20 @@
                             "disabled",
                             "enabled"
                         ]
+                    }
+                }
+            },
+            "UpdatePartnerTenantRequest": {
+                "type": "object",
+                "properties": {
+                    "allow_domain_access": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "website_url": {
+                        "type": "string"
                     }
                 }
             },

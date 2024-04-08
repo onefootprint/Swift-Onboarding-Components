@@ -45,7 +45,7 @@ pub struct NewPartnerTenant {
     pub website_url: Option<String>,
 }
 
-#[derive(Debug, Clone, AsChangeset, Default)]
+#[derive(Debug, Clone, AsChangeset, Default, PartialEq)]
 #[diesel(table_name = partner_tenant)]
 pub struct UpdatePartnerTenant {
     pub name: Option<String>,
@@ -105,16 +105,25 @@ impl PartnerTenant {
         let pt = partner_tenant::table
             .for_no_key_update()
             .filter(partner_tenant::id.eq(id))
+            .select(PartnerTenant::as_select())
             .first(conn.conn())?;
         Ok(pt)
     }
 
     #[tracing::instrument("PartnerTenant::update", skip_all)]
-    pub fn update(conn: &mut PgConn, id: &PartnerTenantId, update_pt: UpdatePartnerTenant) -> DbResult<Self> {
+    pub fn update(
+        conn: &mut TxnPgConn,
+        id: &PartnerTenantId,
+        update_pt: UpdatePartnerTenant,
+    ) -> DbResult<Self> {
+        if update_pt == UpdatePartnerTenant::default() {
+            return PartnerTenant::lock(conn, id);
+        }
+
         let result = diesel::update(partner_tenant::table)
             .filter(partner_tenant::id.eq(id))
             .set(update_pt)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
 
         Ok(result)
     }
