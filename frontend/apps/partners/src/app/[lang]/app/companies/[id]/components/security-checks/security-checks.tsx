@@ -6,7 +6,7 @@ import {
   IcoShield24,
   IcoUser16,
 } from '@onefootprint/icons';
-import { Button, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -43,9 +43,6 @@ const Checks = ({ securityChecks }: SecurityChecksProps) => {
           <IcoShield24 />
           <Text variant="label-2">{t('data-security-checks')}</Text>
         </Stack>
-        <Button variant="secondary" size="compact">
-          {t('download-report')}
-        </Button>
       </Stack>
       <Stack gap={3} direction="column">
         <CheckItem

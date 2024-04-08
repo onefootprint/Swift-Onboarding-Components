@@ -89,7 +89,7 @@ const renderTr = (t: T, handlers?: Handlers) =>
                 {t('see-document-timeline')}
               </Dropdown.Item>
               <Dropdown.Item onSelect={noop} onClick={stopPropagation}>
-                {t('edit-configuration')}
+                {t('modify-request')}
               </Dropdown.Item>
               <Dropdown.Item onSelect={noop} onClick={stopPropagation}>
                 {t('view')}

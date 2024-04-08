@@ -36,7 +36,7 @@ const DialogAdditionalDocument = ({
       primaryButton={{ label: t('invite'), type: 'submit' }}
       secondaryButton={{ label: t('cancel'), onClick: handleClose }}
       size="compact"
-      title={t('doc.request-additional-document')}
+      title={t('doc.request-document')}
     >
       <Text variant="label-2" marginBottom={4}>
         {t('doc.how-do-you-want-to-proceed')}

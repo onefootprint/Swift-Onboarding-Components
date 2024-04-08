@@ -76,7 +76,7 @@ const CompanyPageContent = ({
             size="compact"
             onClick={overlays.docAdditionalToggle}
           >
-            {t('companies.request-additional-document')}
+            {t('doc.request-document')}
           </Button>
         </Stack>
         <Box marginBlock={5}>
