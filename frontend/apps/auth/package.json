@@ -23,6 +23,7 @@
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },
   "dependencies": {
+    "@onefootprint/appearance": "*",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",

@@ -1,9 +1,9 @@
-import { type FootprintVariant } from '@onefootprint/footprint-js';
+import getCustomAppearance from '@onefootprint/appearance/src/utils/get-custom-appearance/get-custom-appearance'; /** Importing 'getCustomAppearance' from '@onefootprint/appearance' fails in server components */
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import React from 'react';
 
 import DrawerLoading from '@/src/components/client-loading/drawer-loading';
 import ModalLoading from '@/src/components/client-loading/modal-loading';
-import { getCustomAppearanceFork } from '@/src/package-appearance';
 
 import IdentifyApp from '../components/identify-app';
 import ClientProviders from './client-providers';
@@ -22,7 +22,7 @@ const getLoadingComponent = (variant?: FootprintVariant): Fallback => {
 const AppPage = async ({ searchParams }: AppPageProps) => {
   const variant = searchParams?.variant as FootprintVariant | undefined;
   const LoadingComponent = getLoadingComponent(variant);
-  const loadedStyle = await getCustomAppearanceFork({
+  const loadedStyle = await getCustomAppearance({
     strategy: ['queryParameters', 'obConfig'],
     obConfig: searchParams?.public_key,
     params: searchParams,

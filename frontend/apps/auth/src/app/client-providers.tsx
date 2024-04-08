@@ -1,19 +1,26 @@
 'use client';
 
+import { AppearanceProvider } from '@onefootprint/appearance';
 import { Logger } from '@onefootprint/idv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 import configureI18n from '@/src/config/initializers/18next';
 import { useEffectOnceStrict } from '@/src/hooks';
-import AppearanceProvider from '@/src/package-appearance/provider';
-import type { AppearanceResponse } from '@/src/package-appearance/types';
 import FootprintProvider from '@/src/provider-footprint';
 import configureFootprint from '@/src/provider-footprint/adapters';
 
+type AppearanceResponse = Parameters<typeof AppearanceProvider>[0];
+type Theme = AppearanceResponse['theme'];
+type Override = {
+  appearance: NonNullable<AppearanceResponse['appearance']> | null;
+  rules: string | null;
+};
+
 type ClientProvidersProps = {
   children: React.ReactNode;
-  loadedStyle: AppearanceResponse;
+  loadedStyle: Omit<AppearanceResponse, 'children' | 'rules' | 'appearance'> &
+    Override;
 };
 
 configureI18n();
@@ -22,7 +29,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
 
-const overrideThemeBackground = (theme: AppearanceResponse['theme']) => {
+const overrideThemeBackground = (theme: Theme) => {
   if (theme) {
     return {
       ...theme,
@@ -52,7 +59,7 @@ const ClientProviders = ({ loadedStyle, children }: ClientProvidersProps) => {
     <AppearanceProvider
       appearance={loadedStyle.appearance || {}}
       rules={loadedStyle.rules || ''}
-      theme={overrideThemeBackground(loadedStyle.theme)}
+      theme={overrideThemeBackground(loadedStyle.theme) as NonNullable<Theme>}
     >
       <QueryClientProvider client={queryClient}>
         <FootprintProvider client={fpClient}>{children}</FootprintProvider>

@@ -1,7 +1,6 @@
+import getCustomAppearance from '@onefootprint/appearance/src/utils/get-custom-appearance/get-custom-appearance'; /** Importing 'getCustomAppearance' from '@onefootprint/appearance' fails in server components */
 import dynamic from 'next/dynamic';
 import React from 'react';
-
-import { getCustomAppearanceFork } from '@/src/package-appearance';
 
 import ClientProviders from '../client-providers';
 import Loading from './loading';
@@ -19,7 +18,7 @@ type UserPageProps = {
 const variant = 'modal';
 const UserPage = async (props: UserPageProps) => {
   const { searchParams } = props;
-  const loadedStyle = await getCustomAppearanceFork({
+  const loadedStyle = await getCustomAppearance({
     strategy: ['queryParameters'],
     obConfig: searchParams?.public_key,
     params: searchParams,
