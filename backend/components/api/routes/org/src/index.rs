@@ -108,7 +108,11 @@ async fn patch(
                 .into());
             }
 
-            Ok(Tenant::update(conn, &tenant_id, update_tenant)?)
+            if update_tenant == UpdateTenant::default() {
+                Ok(tenant)
+            } else {
+                Ok(Tenant::update(conn, &tenant_id, update_tenant)?)
+            }
         })
         .await?;
 

@@ -334,7 +334,7 @@ impl From<&Tenant> for TenantKind {
     }
 }
 
-#[derive(Debug, Clone, AsChangeset, Default)]
+#[derive(Debug, Clone, AsChangeset, Default, PartialEq)]
 #[diesel(table_name = tenant)]
 pub struct UpdateTenant {
     pub name: Option<String>,
