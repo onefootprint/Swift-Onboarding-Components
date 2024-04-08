@@ -3,7 +3,10 @@ use crate::{
     State,
 };
 use api_core::{
-    auth::{session::tenant::TenantRbSession, tenant::AnyTenantSessionAuth},
+    auth::{
+        session::tenant::TenantRbSession,
+        tenant::{AnyOrgSessionAuth, AnyTenantSessionAuth},
+    },
     errors::AssertionError,
 };
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};

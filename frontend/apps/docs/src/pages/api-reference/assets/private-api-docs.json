@@ -5939,6 +5939,38 @@
                 ]
             }
         },
+        "/partner/auth/roles": {
+            "get": {
+                "tags": [
+                    "Auth",
+                    "Private"
+                ],
+                "description": "Return the list of partner tenants that can be inherited by the authed user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PartnerOrganization"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkOS Token": []
+                    },
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/partner/doc_templates": {
             "get": {
                 "tags": [
@@ -21025,6 +21057,9 @@
                             "id": {
                                 "type": "string"
                             },
+                            "is_auth_method_supported": {
+                                "type": "boolean"
+                            },
                             "is_domain_already_claimed": {
                                 "type": "boolean"
                             },
@@ -21569,6 +21604,9 @@
                     },
                     "id": {
                         "type": "string"
+                    },
+                    "is_auth_method_supported": {
+                        "type": "boolean"
                     },
                     "is_domain_already_claimed": {
                         "type": "boolean"

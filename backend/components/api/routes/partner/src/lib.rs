@@ -1,6 +1,7 @@
 use paperclip::actix::web;
 
 mod assignments;
+mod authn;
 mod doc_events;
 mod doc_templates;
 mod documents;
@@ -40,6 +41,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config.service(roles::post);
     config.service(roles::patch);
     config.service(roles::deactivate);
-
     config.service(submissions::get);
+
+    authn::routes(config);
 }

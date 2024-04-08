@@ -1,3 +1,5 @@
+mod any_org;
+pub use any_org::*;
 mod client;
 pub use client::*;
 mod firm_employee;
@@ -29,35 +31,9 @@ use newtypes::{DataLifetimeSource, DbActor, TenantApiKeyId, TenantScope, TenantU
 
 pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAssumeAuthContext>;
 
-pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, TenantSessionAuth>;
-
 pub type PartnerTenantSessionAuth = PartnerTenantRbAuthContext;
 
 pub type TenantOrPartnerTenantSessionAuth = Either<TenantSessionAuth, PartnerTenantSessionAuth>;
-
-impl AnyTenantSessionAuth {
-    /// The different types of session auths have very different purposes, so we have to do some
-    /// branching to extract the tenant_user_id
-    pub fn tenant_user_id(self) -> ApiResult<TenantUserId> {
-        let tu_id = match self {
-            // WorkOsSessions are only used for selecting an org, just pull out the tenant_user_id
-            Either::Left(l) => l.data.tenant_user_id,
-            // For any other session token, validate it has Any permission and then extract the user actor
-            Either::Right(r) => {
-                let r = r.check_guard(Any)?;
-                r.actor().tenant_user_id()?.clone()
-            }
-        };
-        Ok(tu_id)
-    }
-
-    pub fn auth_method(&self) -> WorkosAuthMethod {
-        match self {
-            Either::Left(l) => l.data.auth_method,
-            Either::Right(r) => r.auth_method(),
-        }
-    }
-}
 
 impl TenantSessionAuth {
     pub fn auth_method(&self) -> WorkosAuthMethod {
@@ -65,6 +41,12 @@ impl TenantSessionAuth {
             Either::Left(l) => l.data.0.auth_method,
             Either::Right(r) => r.data.0.auth_method,
         }
+    }
+}
+
+impl PartnerTenantSessionAuth {
+    pub fn auth_method(&self) -> WorkosAuthMethod {
+        self.data.0.auth_method
     }
 }
 
@@ -78,6 +60,13 @@ impl TenantOrPartnerTenantSessionAuth {
             Either::Left(t_auth) => Either::Left(t_auth.check_guard(t_guard)?),
             Either::Right(pt_auth) => Either::Right(pt_auth.check_guard(pt_guard)?),
         })
+    }
+
+    pub fn auth_method(&self) -> WorkosAuthMethod {
+        match self {
+            Either::Left(l) => l.auth_method(),
+            Either::Right(r) => r.auth_method(),
+        }
     }
 }
 

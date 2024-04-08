@@ -25,6 +25,11 @@ def test_partner_tenant_iam(tenant, partner_tenant):
     get("org/roles", {}, *partner_tenant.db_auths, status_code=401)
     get("org/roles", {}, *partner_tenant.ro_db_auths, status_code=401)
 
+    # Get the orgs this tenant can access.
+    roles = get("partner/auth/roles", {}, *partner_tenant.db_auths)
+    assert len(roles) == 1
+    assert roles[0]["id"] == partner_tenant.id
+
 
 def test_partner_tenant_iam_roles(partner_tenant):
     # Create a role.
