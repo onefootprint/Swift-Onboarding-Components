@@ -1,3 +1,4 @@
+import { getAuthCookie } from '@/app/actions';
 import { DASHBOARD_AUTHORIZATION_HEADER } from '@/config/constants';
 
 import baseFetch from './base-fetch';
@@ -30,25 +31,25 @@ type ComplianceDocSummary = {
 export type PartnerDocument = ComplianceDocSummary;
 
 /**
- * Posts a document to the compliance partners API.
+ * Posts compliance partner documents.
  *
- * @param {string} authToken - The authentication token for the API.
- * @param {CreateComplianceDocRequest} payload - The payload containing the document information.
- * @param {string} partnershipId - The ID of the partnership.
- * @return {Promise<PartnerDocument[]>} A promise that resolves to an array of partner documents.
+ * @param {string} partnershipId - ID of the partnership
+ * @param {CreateComplianceDocRequest} payload - request payload containing name, description, and template ID
+ * @return {Promise<PartnerDocument[]>} Promise that resolves with an array of PartnerDocument objects or rejects with a TypeError
  */
-const postCompliancePartnersDocuments = async (
-  authToken: string,
-  payload: CreateComplianceDocRequest,
+const postPartnerPartnershipsDocuments = async (
   partnershipId: string,
+  payload: CreateComplianceDocRequest,
 ) => {
-  const { name, description, templateId } = payload;
+  const token = await getAuthCookie();
+  if (!token) return Promise.reject(new TypeError('Missing auth token'));
 
-  return authToken && name && partnershipId
+  const { name, description, templateId } = payload;
+  return name && partnershipId
     ? baseFetch<PartnerDocument[]>(
         `/partner/partnerships/${partnershipId}/documents`,
         {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
+          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
           method: 'POST',
           body: JSON.stringify({
             name,
@@ -60,4 +61,4 @@ const postCompliancePartnersDocuments = async (
     : Promise.reject(new TypeError('Missing required parameters'));
 };
 
-export default postCompliancePartnersDocuments;
+export default postPartnerPartnershipsDocuments;

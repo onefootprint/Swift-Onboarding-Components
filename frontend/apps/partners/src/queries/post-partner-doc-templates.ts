@@ -1,3 +1,4 @@
+import { getAuthCookie } from '@/app/actions';
 import { DASHBOARD_AUTHORIZATION_HEADER } from '@/config/constants';
 
 import baseFetch from './base-fetch';
@@ -26,20 +27,22 @@ type ComplianceDocTemplate = {
 /**
  * Sends a POST request to create a new compliance document template.
  *
- * @param {string} authToken - The authentication token for the request.
  * @param {CreateComplianceDocTemplateRequest} payload - The payload containing the data for the new template.
  * @return {Promise<ComplianceDocTemplate>} A promise that resolves to the created template if successful, or rejects with an error if the required parameters are missing.
  */
-const postComplianceDocTemplates = async (
-  authToken: string,
+const postPartnerDocTemplates = async (
   payload: CreateComplianceDocTemplateRequest,
-) =>
-  authToken && payload
+) => {
+  const token = await getAuthCookie();
+  if (!token) return Promise.reject(new TypeError('Missing auth token'));
+
+  return payload
     ? baseFetch<ComplianceDocTemplate>('/partner/doc_templates', {
-        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
+        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
         method: 'POST',
         body: JSON.stringify(payload),
       })
     : Promise.reject(new TypeError('Missing required parameters'));
+};
 
-export default postComplianceDocTemplates;
+export default postPartnerDocTemplates;

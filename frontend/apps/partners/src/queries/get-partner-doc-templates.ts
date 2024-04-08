@@ -1,3 +1,4 @@
+import { getAuthCookie } from '@/app/actions';
 import { DASHBOARD_AUTHORIZATION_HEADER } from '@/config/constants';
 
 import baseFetch from './base-fetch';
@@ -23,15 +24,17 @@ export type DocTemplate = ComplianceDocTemplate;
 /**
  * Retrieves compliance document templates using the provided authentication token.
  *
- * @param {string} authToken - The authentication token for the request
  * @return {Promise<DocTemplate[]>} A promise that resolves with an array of compliance document templates, or rejects with a TypeError if the auth token is missing
  */
-const getComplianceDocTemplates = async (authToken: string) =>
-  authToken
-    ? baseFetch<DocTemplate[]>('/partner/doc_templates', {
-        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
-        method: 'GET',
-      })
-    : Promise.reject(new TypeError('Missing auth token parameter'));
+const getPartnerDocTemplates = async () => {
+  const token = await getAuthCookie();
+  if (!token) return Promise.reject(new TypeError('Missing auth token'));
 
-export default getComplianceDocTemplates;
+  return baseFetch<DocTemplate[]>('/partner/doc_templates', {
+    headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
+    method: 'GET',
+  });
+};
+
+export default getPartnerDocTemplates;
+// get-partner-doc-templates

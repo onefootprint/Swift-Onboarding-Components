@@ -1,3 +1,4 @@
+import { getAuthCookie } from '@/app/actions';
 import { DASHBOARD_AUTHORIZATION_HEADER } from '@/config/constants';
 
 import baseFetch from './base-fetch';
@@ -26,22 +27,22 @@ export type PartnerDocument = ComplianceDocSummary;
 /**
  * Fetches compliance documents for a specific partnership using the provided authentication token.
  *
- * @param {string} authToken - The authentication token for the request
  * @param {string} partnershipId - The ID of the partnership for which to fetch documents
  * @return {Promise<PartnerDocument[]>} A promise that resolves with an array of partner documents or rejects with a TypeError
  */
-const getCompliancePartnersDocuments = async (
-  authToken: string,
-  partnershipId: string,
-) =>
-  authToken && partnershipId
+const getPartnerPartnershipsDocuments = async (partnershipId: string) => {
+  const token = await getAuthCookie();
+  if (!token) return Promise.reject(new TypeError('Missing auth token'));
+
+  return partnershipId
     ? baseFetch<PartnerDocument[]>(
         `/partner/partnerships/${partnershipId}/documents`,
         {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
+          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
           method: 'GET',
         },
       )
     : Promise.reject(new TypeError('Missing required parameters'));
+};
 
-export default getCompliancePartnersDocuments;
+export default getPartnerPartnershipsDocuments;

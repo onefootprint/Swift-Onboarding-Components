@@ -1,8 +1,9 @@
+import { getAuthCookie } from '@/app/actions';
 import { DASHBOARD_AUTHORIZATION_HEADER } from '@/config/constants';
 
 import baseFetch from './base-fetch';
 
-type GetOrgMembersArgs = {
+type GetComplianceMembersArgs = {
   isInvitePending?: boolean;
   roleIds?: string;
   search?: string;
@@ -33,6 +34,7 @@ type OffsetPaginatedOrganizationMember = {
         | 'manage_webhooks'
         | 'manual_review'
         | 'onboarding_configuration'
+        | 'write_lists'
         | 'org_settings'
         | 'cip_integration'
         | 'trigger_kyb'
@@ -45,9 +47,11 @@ type OffsetPaginatedOrganizationMember = {
         | 'decrypt_all'
         | 'write_entities'
         | 'label_and_tag'
+        | 'manage_compliance_doc_submission'
         | 'compliance_partner_read'
         | 'compliance_partner_admin'
         | 'compliance_partner_manage_templates'
+        | 'compliance_partner_manage_reviews'
       >;
     };
     rolebinding?: { lastLoginAt?: string };
@@ -57,7 +61,7 @@ type OffsetPaginatedOrganizationMember = {
 
 export type OrganizationMember = OffsetPaginatedOrganizationMember['data'][0];
 
-const getQueryString = (x?: GetOrgMembersArgs): string => {
+const getQueryString = (x?: GetComplianceMembersArgs): string => {
   if (!x) return '';
   const output = new URLSearchParams();
 
@@ -81,27 +85,24 @@ const getQueryString = (x?: GetOrgMembersArgs): string => {
 };
 
 /**
- * Retrieves the organization members using the provided authentication token and optional arguments.
+ * Returns a list of dashboard members for the partner tenant.
  *
- * @param {string} authToken - The authentication token.
- * @param {GetOrgMembersArgs} [args] - Optional arguments for the function.
- * @return {Promise<OffsetPaginatedOrganizationMember>} A promise that resolves to the organization members.
+ * @param {GetComplianceMembersArgs} args - Optional arguments for retrieving compliance members.
+ * @return {Promise<OffsetPaginatedOrganizationMember>} A promise that resolves with the organization members.
  */
-const getPartnerOrgMembers = async (
-  authToken: string,
-  args?: GetOrgMembersArgs,
-) => {
+const getPartnerMembers = async (args?: GetComplianceMembersArgs) => {
+  const token = await getAuthCookie();
+  if (!token) return Promise.reject(new TypeError('Missing auth token'));
+
   const queryString = getQueryString(args);
   const path = queryString
     ? `/partner/members?${queryString}`
     : '/partner/members';
 
-  return authToken
-    ? baseFetch<OffsetPaginatedOrganizationMember>(path, {
-        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: authToken },
-        method: 'GET',
-      })
-    : Promise.reject(new TypeError('Missing auth token parameter'));
+  return baseFetch<OffsetPaginatedOrganizationMember>(path, {
+    headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
+    method: 'GET',
+  });
 };
 
-export default getPartnerOrgMembers;
+export default getPartnerMembers;
