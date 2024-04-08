@@ -1,6 +1,6 @@
+import type { CollectKycDataRequirement } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import allAttributes from '../all-attributes';
 import {
   isMissingBasicAttribute,
   isMissingEmailAttribute,
@@ -13,6 +13,11 @@ import type { MachineContext, MachineEvents } from './types';
 import isCountryUsOrTerritories from './utils/is-country-us-or-territories';
 import mergeUpdatedData from './utils/merge-data';
 import mergeInitialData from './utils/merge-initial-data';
+
+const missingAttributes = (req: CollectKycDataRequirement) => [
+  ...req.missingAttributes,
+  ...req.optionalAttributes,
+];
 
 const createCollectKycDataMachine = (
   initialContext: MachineContext,
@@ -49,7 +54,7 @@ const createCollectKycDataMachine = (
                   // use ob config things required to determine what's missing
                   // this will break if we start returning full ssn9 when only ssn4 is required
                   // should we serialize all attributes from the requirement?
-                  allAttributes(context.requirement),
+                  missingAttributes(context.requirement),
                   context.data,
                   true,
                 ),
@@ -58,7 +63,7 @@ const createCollectKycDataMachine = (
               target: 'basicInformation',
               cond: context =>
                 isMissingBasicAttribute(
-                  allAttributes(context.requirement),
+                  missingAttributes(context.requirement),
                   context.data,
                   true,
                 ),
@@ -67,7 +72,7 @@ const createCollectKycDataMachine = (
               target: 'residentialAddress',
               cond: context =>
                 isMissingResidentialAttribute(
-                  allAttributes(context.requirement),
+                  missingAttributes(context.requirement),
                   context.data,
                   true,
                 ),
@@ -77,7 +82,7 @@ const createCollectKycDataMachine = (
               cond: context =>
                 isCountryUsOrTerritories(context.data) &&
                 isMissingUsLegalStatusAttribute(
-                  allAttributes(context.requirement),
+                  missingAttributes(context.requirement),
                   context.data,
                   true,
                 ),
@@ -87,7 +92,7 @@ const createCollectKycDataMachine = (
               cond: context =>
                 isCountryUsOrTerritories(context.data) &&
                 isMissingSsnAttribute(
-                  allAttributes(context.requirement),
+                  missingAttributes(context.requirement),
                   context.data,
                   true,
                 ),
@@ -110,7 +115,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return isMissingBasicAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     allData,
                     true,
                   );
@@ -122,7 +127,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return isMissingResidentialAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     allData,
                     true,
                   );
@@ -136,7 +141,7 @@ const createCollectKycDataMachine = (
                   return (
                     isCountryUsOrTerritories(allData) &&
                     isMissingUsLegalStatusAttribute(
-                      allAttributes(context.requirement),
+                      missingAttributes(context.requirement),
                       allData,
                       true,
                     )
@@ -151,7 +156,7 @@ const createCollectKycDataMachine = (
                   return (
                     isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
-                      allAttributes(context.requirement),
+                      missingAttributes(context.requirement),
                       allData,
                       true,
                     )
@@ -174,7 +179,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return isMissingResidentialAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     allData,
                     true,
                   );
@@ -188,7 +193,7 @@ const createCollectKycDataMachine = (
                   return (
                     isCountryUsOrTerritories(allData) &&
                     isMissingUsLegalStatusAttribute(
-                      allAttributes(context.requirement),
+                      missingAttributes(context.requirement),
                       allData,
                       true,
                     )
@@ -203,7 +208,7 @@ const createCollectKycDataMachine = (
                   return (
                     isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
-                      allAttributes(context.requirement),
+                      missingAttributes(context.requirement),
                       allData,
                       true,
                     )
@@ -219,7 +224,7 @@ const createCollectKycDataMachine = (
               target: 'email',
               cond: context =>
                 isMissingEmailAttribute(
-                  allAttributes(context.requirement),
+                  missingAttributes(context.requirement),
                   context.initialData,
                   true,
                 ),
@@ -237,7 +242,7 @@ const createCollectKycDataMachine = (
                   return (
                     isCountryUsOrTerritories(allData) &&
                     isMissingUsLegalStatusAttribute(
-                      allAttributes(context.requirement),
+                      missingAttributes(context.requirement),
                       allData,
                       true,
                     )
@@ -252,7 +257,7 @@ const createCollectKycDataMachine = (
                   return (
                     isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
-                      allAttributes(context.requirement),
+                      missingAttributes(context.requirement),
                       allData,
                       true,
                     )
@@ -269,7 +274,7 @@ const createCollectKycDataMachine = (
                 target: 'basicInformation',
                 cond: context =>
                   isMissingBasicAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -278,7 +283,7 @@ const createCollectKycDataMachine = (
                 target: 'email',
                 cond: context =>
                   isMissingEmailAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -297,7 +302,7 @@ const createCollectKycDataMachine = (
                   return (
                     isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
-                      allAttributes(context.requirement),
+                      missingAttributes(context.requirement),
                       allData,
                       true,
                     )
@@ -314,7 +319,7 @@ const createCollectKycDataMachine = (
                 target: 'residentialAddress',
                 cond: context =>
                   isMissingResidentialAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -323,7 +328,7 @@ const createCollectKycDataMachine = (
                 target: 'basicInformation',
                 cond: context =>
                   isMissingBasicAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -332,7 +337,7 @@ const createCollectKycDataMachine = (
                 target: 'email',
                 cond: context =>
                   isMissingEmailAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -351,7 +356,7 @@ const createCollectKycDataMachine = (
                 target: 'usLegalStatus',
                 cond: context =>
                   isMissingUsLegalStatusAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -360,7 +365,7 @@ const createCollectKycDataMachine = (
                 target: 'residentialAddress',
                 cond: context =>
                   isMissingResidentialAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -369,7 +374,7 @@ const createCollectKycDataMachine = (
                 target: 'basicInformation',
                 cond: context =>
                   isMissingBasicAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -378,7 +383,7 @@ const createCollectKycDataMachine = (
                 target: 'email',
                 cond: context =>
                   isMissingEmailAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -401,7 +406,7 @@ const createCollectKycDataMachine = (
                 cond: context =>
                   isCountryUsOrTerritories(context.data) &&
                   isMissingSsnAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -411,7 +416,7 @@ const createCollectKycDataMachine = (
                 cond: context =>
                   isCountryUsOrTerritories(context.data) &&
                   isMissingUsLegalStatusAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -420,7 +425,7 @@ const createCollectKycDataMachine = (
                 target: 'residentialAddress',
                 cond: context =>
                   isMissingResidentialAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -429,7 +434,7 @@ const createCollectKycDataMachine = (
                 target: 'basicInformation',
                 cond: context =>
                   isMissingBasicAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
@@ -438,7 +443,7 @@ const createCollectKycDataMachine = (
                 target: 'email',
                 cond: context =>
                   isMissingEmailAttribute(
-                    allAttributes(context.requirement),
+                    missingAttributes(context.requirement),
                     context.initialData,
                     true,
                   ),
