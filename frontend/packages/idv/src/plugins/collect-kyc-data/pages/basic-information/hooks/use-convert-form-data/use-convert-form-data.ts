@@ -39,7 +39,7 @@ const useConvertFormData = () => {
       const isFirstNameChanged = firstName !== oldFirstName?.value;
       convertedData[IdDI.firstName] = {
         value: firstName,
-        dirty: isFirstNameChanged,
+        dirty: isFirstNameChanged || oldFirstName?.dirty,
         bootstrap: Boolean(
           isFirstNameChanged ? false : oldFirstName?.bootstrap,
         ),
@@ -55,7 +55,7 @@ const useConvertFormData = () => {
         !bothEmpty && middleName !== oldMiddleName?.value;
       convertedData[IdDI.middleName] = {
         value: middleName,
-        dirty: isMiddleNameChanged,
+        dirty: isMiddleNameChanged || oldMiddleName?.dirty,
         bootstrap: Boolean(
           isMiddleNameChanged ? false : oldMiddleName?.bootstrap,
         ),
@@ -69,7 +69,7 @@ const useConvertFormData = () => {
       const isLastNameChanged = lastName !== oldLastName?.value;
       convertedData[IdDI.lastName] = {
         value: lastName,
-        dirty: isLastNameChanged,
+        dirty: isLastNameChanged || oldLastName?.dirty,
         bootstrap: Boolean(isLastNameChanged ? false : oldLastName?.bootstrap),
         disabled: Boolean(oldLastName?.disabled),
         decrypted: Boolean(isLastNameChanged ? false : oldLastName?.decrypted),

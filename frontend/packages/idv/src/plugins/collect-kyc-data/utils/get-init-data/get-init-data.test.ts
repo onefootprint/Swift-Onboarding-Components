@@ -4,25 +4,31 @@ import getInitData from './get-init-data';
 
 describe('getInitData', () => {
   it('should return an empty object if no bootstrap data is provided', () => {
-    expect(getInitData([])).toEqual({});
+    expect(getInitData([], {})).toEqual({});
     expect(getInitData([], {}, [IdDI.email, IdDI.firstName])).toEqual({});
   });
 
-  const bootstrapData = {
-    [IdDI.email]: 'Email',
-    [IdDI.firstName]: 'Name',
+  const userData = {
+    [IdDI.email]: {
+      value: 'Email',
+      isBootstrap: false,
+    },
+    [IdDI.firstName]: {
+      value: 'Name',
+      isBootstrap: true,
+    },
   };
 
   it('should return populated data if bootstrap data is provided', () => {
     expect(
       getInitData(
         [CollectedKycDataOption.email, CollectedKycDataOption.name],
-        bootstrapData,
+        userData,
       ),
     ).toEqual({
       [IdDI.email]: {
         value: 'Email',
-        bootstrap: true,
+        bootstrap: false,
       },
       [IdDI.firstName]: {
         value: 'Name',
@@ -35,19 +41,21 @@ describe('getInitData', () => {
     expect(
       getInitData(
         [CollectedKycDataOption.email, CollectedKycDataOption.name],
-        bootstrapData,
+        userData,
         [IdDI.email, IdDI.firstName],
       ),
     ).toEqual({
       [IdDI.email]: {
         value: 'Email',
-        bootstrap: true,
+        bootstrap: false,
         disabled: true,
+        dirty: true,
       },
       [IdDI.firstName]: {
         value: 'Name',
         bootstrap: true,
         disabled: true,
+        dirty: true,
       },
     });
   });
@@ -56,14 +64,15 @@ describe('getInitData', () => {
     expect(
       getInitData(
         [CollectedKycDataOption.email, CollectedKycDataOption.name],
-        bootstrapData,
+        userData,
         [IdDI.email, IdDI.city],
       ),
     ).toEqual({
       [IdDI.email]: {
         value: 'Email',
-        bootstrap: true,
+        bootstrap: false,
         disabled: true,
+        dirty: true,
       },
       [IdDI.firstName]: {
         value: 'Name',
@@ -77,17 +86,24 @@ describe('getInitData', () => {
       getInitData(
         [CollectedKycDataOption.email, CollectedKycDataOption.name],
         {
-          ...bootstrapData,
-          [IdDI.city]: 'City',
-          [IdDI.state]: 'State',
+          ...userData,
+          [IdDI.city]: {
+            value: 'City',
+            isBootstrap: true,
+          },
+          [IdDI.state]: {
+            value: 'State',
+            isBootstrap: true,
+          },
         },
         [IdDI.email, IdDI.city],
       ),
     ).toEqual({
       [IdDI.email]: {
         value: 'Email',
-        bootstrap: true,
+        bootstrap: false,
         disabled: true,
+        dirty: true,
       },
       [IdDI.firstName]: {
         value: 'Name',

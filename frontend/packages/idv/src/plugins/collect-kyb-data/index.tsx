@@ -11,14 +11,14 @@ const App = ({ idvContext, context, onDone }: CollectKybDataProps) => {
     kybRequirement,
     // TODO: add support for kyb bootstrap data in the future
     kycRequirement,
-    kycBootstrapData,
+    kycUserData,
   } = context;
   const initContext: MachineContext = {
     idvContext,
     config,
     kybRequirement,
     kycRequirement,
-    kycBootstrapData,
+    kycUserData,
     data: {}, // TODO: add support for kyb bootstrap data in the future
   };
 

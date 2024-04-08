@@ -19,7 +19,7 @@ import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
 import Process from '../process';
 import StartOnboarding from '../start-onboarding';
-import getKycBootstrapData from './utils/get-kyc-bootstrap-data';
+import getKycBootstrapData from './utils/get-kyc-user-data';
 
 type RouterProps = {
   onDone: () => void;
@@ -29,7 +29,7 @@ const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     idvContext,
-    onboardingContext: { bootstrapData, config, idDocOutcome },
+    onboardingContext: { userData, config, idDocOutcome },
     collectedKycData,
     requirements,
   } = state.context;
@@ -52,7 +52,7 @@ const Router = ({ onDone }: RouterProps) => {
   );
   const isDone = state.matches('success');
   useLogStateMachine('onboarding-requirements', state);
-  const kycBootstrapData = getKycBootstrapData(bootstrapData);
+  const kycUserData = getKycBootstrapData(userData);
 
   useEffect(() => {
     if (isDone) {
@@ -83,7 +83,7 @@ const Router = ({ onDone }: RouterProps) => {
         context={{
           kybRequirement: kyb,
           kycRequirement: kyc,
-          kycBootstrapData,
+          kycUserData,
           config,
         }}
         onDone={handleRequirementCompleted}
@@ -96,7 +96,7 @@ const Router = ({ onDone }: RouterProps) => {
         idvContext={idvContext}
         context={{
           requirement: kyc,
-          bootstrapData: kycBootstrapData,
+          userData: kycUserData,
           config,
         }}
         onDone={handleRequirementCompleted}

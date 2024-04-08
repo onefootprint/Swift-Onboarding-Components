@@ -1,19 +1,19 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import type {
-  IdDIData,
   IdDocOutcome,
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import type { UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 import type { MachineContext, MachineEvents } from './types';
-import validateBootstrapData from './utils/validate-bootstrap-data';
+import validateUserData from './utils/validate-bootstrap-data';
 
 export type OnboardingMachineArgs = {
   config: PublicOnboardingConfig;
-  bootstrapData?: IdDIData; // TODO: generalize this more in the next iteration
+  userData: UserData;
   idvContext: CommonIdvContext;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
@@ -23,7 +23,7 @@ export type OnboardingMachineArgs = {
 const createOnboardingMachine = (
   {
     config,
-    bootstrapData = {},
+    userData,
     idvContext,
     idDocOutcome,
     overallOutcome,
@@ -44,7 +44,7 @@ const createOnboardingMachine = (
       initial: 'requirements',
       context: {
         config,
-        bootstrapData: validateBootstrapData(bootstrapData, l10n?.locale),
+        userData: validateUserData(userData, l10n?.locale),
         idvContext,
         idDocOutcome,
         overallOutcome,

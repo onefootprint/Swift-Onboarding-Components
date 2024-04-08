@@ -120,8 +120,11 @@ describe('<CollectKycData />', () => {
         populatedAttributes: [],
         optionalAttributes: [],
       },
-      bootstrapData: {
-        [IdDI.email]: 'piip@onefootprint.com',
+      userData: {
+        [IdDI.email]: {
+          value: 'piip@onefootprint.com',
+          isBootstrap: true,
+        },
       },
       config: onboardingConfig,
     },

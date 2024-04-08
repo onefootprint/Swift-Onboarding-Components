@@ -10,12 +10,7 @@ import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 import type { EventObject, StateValue, TransitionConfigOrTarget } from 'xstate';
 
 import type { DeviceInfo } from '../../../hooks';
-import type { IdentifyBootstrapData } from '../../../utils/get-identify-bootstrap-data';
-
-export type IdentifyVaultData = {
-  value: string;
-  isBootstrap: boolean;
-};
+import type { UserDatum } from '../../../types';
 
 export type IdentifyMachineContext = {
   bootstrapData: IdentifyBootstrapData;
@@ -29,10 +24,10 @@ export type IdentifyMachineContext = {
   sandboxId?: string;
   /** phoneNumber -
    * The phone number entered into the identify flow */
-  phoneNumber?: IdentifyVaultData;
+  phoneNumber?: UserDatum<string>;
   /** email -
    * The email entered into the identify flow */
-  email?: IdentifyVaultData;
+  email?: UserDatum<string>;
   identify: IdentifyContext;
   /** initialAuthToken -
    * Optionally, the identified token used to start the flow
@@ -45,6 +40,11 @@ export type IdentifyMachineContext = {
   obConfigAuth?: ObConfigAuth;
   overallOutcome?: OverallOutcome;
   variant: IdentifyVariant;
+};
+
+export type IdentifyBootstrapData = {
+  email?: string;
+  phoneNumber?: string;
 };
 
 export type IdentifyContext = {

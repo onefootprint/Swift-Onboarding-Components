@@ -1,16 +1,16 @@
 import type {
-  IdDIData,
   IdDocOutcome,
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
+import type { UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 
 export type MachineContext = {
   config: PublicOnboardingConfig;
   idvContext: CommonIdvContext;
-  bootstrapData: IdDIData; // TODO: generalize this more in the next iteration
+  userData: UserData;
   validationToken?: string;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
