@@ -71,3 +71,7 @@ class SandboxId(BaseAuth):
             value.replace("fail", "").replace("manualreview", "").replace("stepup", "")
         )
         super().__init__(value)
+
+
+class IsComponentsSdk(BaseAuth):
+    HEADER_NAME = "x-fp-is-components-sdk"

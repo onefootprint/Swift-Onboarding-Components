@@ -1,6 +1,8 @@
 use std::{collections::HashMap, str::FromStr};
 
-use super::{Any, DataRequestSources, PatchDataResult, Person, VaultWrapper, WriteableVw};
+use super::{
+    Any, DataLifetimeSources, DataRequestSource, PatchDataResult, Person, VaultWrapper, WriteableVw,
+};
 use crate::{
     enclave_client::VaultKeyPair,
     errors::{user::UserError, ApiResult, AssertionError},
@@ -159,8 +161,8 @@ impl VaultWrapper<Person> {
             .flatten()
             .collect();
         let request = request.manual_fingerprints(fingerprints);
-        let sources = DataRequestSources::overrides(DataLifetimeSource::Hosted, sources);
-        let request = VaultWrapper::validate_request(&uvw, conn, request, sources, None, false)?;
+        let sources = DataLifetimeSources::overrides(DataLifetimeSource::Hosted, sources);
+        let request = uvw.validate_request(conn, request, sources, None, DataRequestSource::CreateVault)?;
         let result = WriteableVw::<Any>::internal_save_data(&uvw, conn, request, None)?;
 
         Ok((uv, su, result))

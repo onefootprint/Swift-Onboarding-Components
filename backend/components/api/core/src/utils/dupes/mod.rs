@@ -98,7 +98,7 @@ mod tests {
     use std::collections::HashMap;
 
     use crate::{
-        utils::vault_wrapper::{Any, DataRequestSources, VaultWrapper},
+        utils::vault_wrapper::{Any, DataLifetimeSources, VaultWrapper},
         State,
     };
 
@@ -371,7 +371,7 @@ mod tests {
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id).unwrap();
-                let sources = DataRequestSources::single(DataLifetimeSource::Tenant);
+                let sources = DataLifetimeSources::single(DataLifetimeSource::Tenant);
                 uvw.patch_data(conn, data_req, sources, None).unwrap();
                 Ok(())
             })

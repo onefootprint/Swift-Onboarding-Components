@@ -1,4 +1,4 @@
-use super::{DataRequestSources, PrefillKind, WriteableVw};
+use super::{DataLifetimeSources, PrefillKind, WriteableVw};
 use crate::{
     errors::ApiResult,
     utils::vault_wrapper::{Person, TenantVw, VaultWrapper},
@@ -401,7 +401,7 @@ impl<Type> WriteableVw<Type> {
         } else {
             request.no_fingerprints_for_validation()
         };
-        let sources = DataRequestSources::single(DataLifetimeSource::Hosted);
+        let sources = DataLifetimeSources::single(DataLifetimeSource::Hosted);
         let new_ci = self.patch_data(conn, request, sources, None)?.new_ci;
         Ok(new_ci)
     }

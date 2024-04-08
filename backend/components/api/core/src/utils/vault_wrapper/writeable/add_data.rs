@@ -1,4 +1,4 @@
-use super::{DataRequestSources, SavedData, ValidatedDataRequest, WriteableVw};
+use super::{DataLifetimeSources, DataRequestSource, SavedData, ValidatedDataRequest, WriteableVw};
 use crate::{
     auth::tenant::AuthActor,
     errors::{ApiResult, AssertionError},
@@ -47,11 +47,12 @@ impl<Type> WriteableVw<Type> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DataRequest<Fingerprints>,
-        sources: DataRequestSources,
+        sources: DataLifetimeSources,
         actor: Option<AuthActor>,
     ) -> ApiResult<PatchDataResult> {
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
-        let request = self.validate_request(conn, request, sources, actor.clone(), false)?;
+        let r_source = DataRequestSource::PatchVault;
+        let request = self.validate_request(conn, request, sources, actor.clone(), r_source)?;
         let result = self.internal_save_data(conn, request, actor)?;
         self.create_bos_if_needed(conn, kyced_bos)?;
         Ok(result)

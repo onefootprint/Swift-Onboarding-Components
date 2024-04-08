@@ -12,7 +12,7 @@ use api_core::{
     },
     utils::{
         fp_id_path::FpIdPath,
-        vault_wrapper::{DataRequestSources, TenantVw},
+        vault_wrapper::{DataLifetimeSources, DataRequestSource, TenantVw},
     },
 };
 use db::models::scoped_vault::ScopedVault;
@@ -96,8 +96,9 @@ async fn post_inner(
         .db_query(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            let sources = DataRequestSources::single(source);
-            uvw.validate_request(conn, updates, sources, Some(actor), false)?;
+            let sources = DataLifetimeSources::single(source);
+
+            uvw.validate_request(conn, updates, sources, Some(actor), DataRequestSource::PatchVault)?;
             Ok(())
         })
         .await?;

@@ -5,7 +5,7 @@ use crate::{
     utils::{
         self,
         headers::InsightHeaders,
-        vault_wrapper::{Any, DataRequestSources, Person, VaultWrapper},
+        vault_wrapper::{Any, DataLifetimeSources, Person, VaultWrapper},
     },
     ApiError, State,
 };
@@ -176,7 +176,7 @@ pub async fn vault_pii(
                 // put our data
                 if !data.is_empty() {
                     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_vault.id)?;
-                    let sources = DataRequestSources::single(source);
+                    let sources = DataLifetimeSources::single(source);
                     uvw.patch_data(conn, data, sources, Some(actor.clone()))?;
                 }
 

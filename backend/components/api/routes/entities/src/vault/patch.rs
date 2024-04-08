@@ -14,7 +14,7 @@ use api_core::{
     utils::{
         fp_id_path::FpIdPath,
         headers::IgnoreLuhnValidation,
-        vault_wrapper::{Any, DataRequestSources},
+        vault_wrapper::{Any, DataLifetimeSources},
     },
 };
 use db::models::{
@@ -155,7 +155,7 @@ async fn patch_inner(
             // event with context on what was updated, deleted, and added
             let deleted_dis = uvw.soft_delete_vault_data(conn, deletions)?;
             let updated_dis = updates.keys().cloned().collect_vec();
-            let sources = DataRequestSources::single(source);
+            let sources = DataLifetimeSources::single(source);
             uvw.patch_data(conn, updates, sources, Some(actor.clone()))?;
 
             let insight_event_id = insight.insert_with_conn(conn)?.id;

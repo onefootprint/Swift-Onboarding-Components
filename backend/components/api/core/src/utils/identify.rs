@@ -71,10 +71,8 @@ pub async fn get_user_challenge_context(
     }
     let auth_methods = cis
         .iter()
-        // Do not allow logging in using any data that was vaulting via the components SDK token.
-        // We normally don't vault login methods using the components SDK, so if there is one, it
-        // could be nefarious.
-        .filter(|(_, _, dl)| dl.source != DataLifetimeSource::ComponentsSdk)
+        // Do not allow logging in using unverified data that was vaulting via the components SDK.
+        .filter(|(_, ci, dl)| dl.source != DataLifetimeSource::ComponentsSdk || ci.is_otp_verified)
         // TODO one day, don't allow logging in via data added via bootstrap?
         .map(|(cik, ci, _)| AuthMethod {
             kind: AuthMethodKind::from(*cik),

@@ -9,14 +9,18 @@ from tests.utils import (
     post,
     patch,
 )
-from tests.headers import FpAuth
+from tests.headers import FpAuth, IsComponentsSdk
 from tests.constants import ID_DATA, FIXTURE_EMAIL
 
 
 def create_user_with_components_token(tenant):
     sandbox_id = _gen_random_sandbox_id()
     obc = tenant.default_ob_config
-    token = IdentifyClient(obc.key, sandbox_id).create_user()
+    token = (
+        IdentifyClient(obc.key, sandbox_id)
+        .with_headers(IsComponentsSdk("true"))
+        .create_user()
+    )
 
     # Start the onboarding
     bifrost = BifrostClient.raw_auth(obc, token, sandbox_id)
@@ -83,13 +87,9 @@ def test_components_sdk(sandbox_tenant):
     # Should already have collect_data requirement met, from components_token
     assert [i["kind"] for i in bifrost.handled_requirements] == ["liveness", "process"]
 
-    # Ensure that the source of the saved data is components
+    # Ensure that the source of the saved data is components, including phone and email
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
-    assert all(
-        d["source"] == "components_sdk"
-        for d in body["data"]
-        if d["identifier"] in vault_data
-    )
+    assert all(d["source"] == "components_sdk" for d in body["data"])
 
     # Ensure that we can log into the user we just created
     IdentifyClient.from_user(user).inherit()
@@ -98,9 +98,11 @@ def test_components_sdk(sandbox_tenant):
 def test_components_sdk_cannot_add_auth_methods(sandbox_tenant):
     (components_token, token, _) = create_user_with_components_token(sandbox_tenant)
 
-    # We should be able to log in via unverified email
+    # Confirm that the email added via the components SDK can't be used to log into the vault
+    # when it is unverified
     body = post("hosted/identify", dict(scope="onboarding"), token)
-    assert any(i["kind"] == "email" for i in body["user"]["auth_methods"])
+    assert not any(i["kind"] == "email" for i in body["user"]["auth_methods"])
+    assert any(i["kind"] == "phone" for i in body["user"]["auth_methods"])
 
     # Add a new email using the components SDK and then verify we can't use it to log in
     data = {"id.email": FIXTURE_EMAIL}

@@ -7,7 +7,7 @@ use crate::{
         actix::OptionalJson,
         db2api::DbToApi,
         headers::{ExternalId, IdempotencyId, InsightHeaders},
-        vault_wrapper::{Any, DataRequestSources, VaultWrapper},
+        vault_wrapper::{Any, DataLifetimeSources, VaultWrapper},
     },
     State,
 };
@@ -108,7 +108,7 @@ pub async fn create_non_portable_vault(
             if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
-                let sources = DataRequestSources::single(source);
+                let sources = DataLifetimeSources::single(source);
                 uvw.patch_data(conn, request, sources, Some(actor))?;
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;

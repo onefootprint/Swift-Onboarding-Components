@@ -46,6 +46,11 @@ class IdentifyClient:
         self.phone_number = phone_number
         self.email = email
         self.auth_token = auth_token
+        self.headers = []
+
+    def with_headers(self, *args):
+        self.headers = args
+        return self
 
     def _signup_challenge(self, scope, kind="sms"):
         if kind == "sms":
@@ -55,7 +60,7 @@ class IdentifyClient:
         data = dict(**data, scope=scope)
 
         assert self.playbook_key, "Cannot issue signup challenge without playbook key"
-        headers = [self.playbook_key]
+        headers = [*self.headers, self.playbook_key]
         if self.sandbox_id:
             headers.append(SandboxId(self.sandbox_id))
         body = post("hosted/identify/signup_challenge", data, *headers)
@@ -71,7 +76,7 @@ class IdentifyClient:
                 data["phone_number"] = self.phone_number
 
         # Check that the user is found in identify
-        headers = []
+        headers = [*self.headers]
         if self.sandbox_id:
             headers.append(SandboxId(self.sandbox_id))
         if self.playbook_key:
@@ -80,6 +85,7 @@ class IdentifyClient:
             headers.append(self.auth_token)
         body = post("hosted/identify", data, *headers)
         assert body["user"]
+        print(body["user"])
         assert kind in body["user"]["available_challenge_kinds"]
         token = FpAuth(body["user"]["token"])
 

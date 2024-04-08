@@ -21,6 +21,9 @@ pub use ignore_luhn_validation::*;
 mod external_id;
 pub use external_id::*;
 
+mod is_components_sdk;
+pub use is_components_sdk::*;
+
 use crate::{
     errors::{ApiError, ApiResult},
     ApiErrorKind,

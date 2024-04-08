@@ -16,6 +16,12 @@ use newtypes::{
 };
 use std::collections::{HashMap, HashSet};
 
+pub enum DataRequestSource {
+    CreateVault,
+    PatchVault,
+    UpdateContactInfo,
+}
+
 impl<Type> VaultWrapper<Type> {
     /// Given a DataRequest, validate some invariants before allowing it to be written to the vault.
     /// These invariants are also a function of the data in the vault at the time
@@ -23,12 +29,16 @@ impl<Type> VaultWrapper<Type> {
         &self,
         conn: &mut PgConn,
         request: DataRequest<Fingerprints>,
-        sources: DataRequestSources,
+        sources: DataLifetimeSources,
         actor: Option<AuthActor>,
-        for_replacing_ci: bool,
+        request_source: DataRequestSource,
     ) -> ApiResult<ValidatedDataRequest> {
         assert_allowed_for_vault(&request, self.vault.kind)?;
-        assert_allowed_for_sources(&request, &sources)?;
+        if !matches!(request_source, DataRequestSource::CreateVault) {
+            // When a vault is being created, we support setting phone/email via the components SDK
+            // since this comes via the signup challenge API
+            assert_allowed_for_sources(&request, &sources)?;
+        }
         // Transform the request into a Vec<NewVaultData>
         let (data, json_fields, fingerprints) = request.decompose();
         let data = data
@@ -53,6 +63,7 @@ impl<Type> VaultWrapper<Type> {
             })
             .collect::<ApiResult<Vec<_>>>()?;
 
+        let for_replacing_ci = matches!(request_source, DataRequestSource::UpdateContactInfo);
         let new_cdos = self.validate_adding_dis(conn, &data, None, actor, for_replacing_ci)?;
 
         let req = ValidatedDataRequest {
@@ -233,7 +244,10 @@ pub fn assert_allowed_for_vault<T>(request: &DataRequest<T>, kind: VaultKind) ->
 }
 
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
-pub fn assert_allowed_for_sources<T>(request: &DataRequest<T>, sources: &DataRequestSources) -> NtResult<()> {
+pub fn assert_allowed_for_sources<T>(
+    request: &DataRequest<T>,
+    sources: &DataLifetimeSources,
+) -> NtResult<()> {
     let is_allowed = move |di: &DataIdentifier| -> bool {
         // Restrict the components SDK from adding phone or email
         let source = sources.get(di);
@@ -257,12 +271,12 @@ pub fn assert_allowed_for_sources<T>(request: &DataRequest<T>, sources: &DataReq
 }
 
 /// Helper struct to store which pieces of data have which DL sources.
-pub struct DataRequestSources {
+pub struct DataLifetimeSources {
     default: DataLifetimeSource,
     overrides: HashMap<DataIdentifier, DataLifetimeSource>,
 }
 
-impl DataRequestSources {
+impl DataLifetimeSources {
     pub fn single(source: DataLifetimeSource) -> Self {
         Self {
             default: source,

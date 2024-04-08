@@ -15,7 +15,7 @@ use crate::{
     errors::{ApiErrorKind, ApiResult, AssertionError},
     utils::{
         file_upload::mime_type_to_extension,
-        vault_wrapper::{DataRequestSources, NewDocument, Person, VaultWrapper, WriteableVw},
+        vault_wrapper::{DataLifetimeSources, NewDocument, Person, VaultWrapper, WriteableVw},
     },
     vendor_clients::IncodeClients,
 };
@@ -323,7 +323,7 @@ impl Complete {
         RiskSignal::bulk_create(conn, sv_id, rs, newtypes::RiskSignalGroupKind::Doc, false)?;
 
         // Then add some extracted OCR data to the vault.
-        let sources = DataRequestSources::single(DataLifetimeSource::Ocr);
+        let sources = DataLifetimeSources::single(DataLifetimeSource::Ocr);
         let seqno = uvw.patch_data(conn, ocr_data, sources, None)?.seqno;
 
         let (document_score, _) = score_response.document_score();

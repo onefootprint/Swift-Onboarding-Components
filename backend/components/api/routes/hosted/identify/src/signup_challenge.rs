@@ -13,7 +13,7 @@ use api_core::{
     utils::{
         challenge::Challenge,
         email::send_email_challenge_non_blocking,
-        headers::SandboxId,
+        headers::{IsComponentsSdk, SandboxId},
         identify::UserChallengeContext,
         sms::rx_background_error,
         vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper},
@@ -41,6 +41,7 @@ pub async fn post(
     ob_context: ObConfigAuth,
     // When provided, creates a sandbox user with the given suffix
     sandbox_id: SandboxId,
+    is_components_sdk: IsComponentsSdk,
     root_span: RootSpan,
 ) -> JsonApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest {
@@ -104,7 +105,15 @@ pub async fn post(
     }
 
     // Create the new vault
-    let ctx = make_vault_context(&state, &ob_context, email_, phone_number_, sandbox_id.clone()).await?;
+    let ctx = make_vault_context(
+        &state,
+        &ob_context,
+        email_,
+        phone_number_,
+        sandbox_id.clone(),
+        is_components_sdk.0,
+    )
+    .await?;
     let (uv, sv, root_span) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -191,6 +200,7 @@ async fn make_vault_context(
     email: Option<SignupChallengeData<Email>>,
     phone: Option<SignupChallengeData<PhoneNumber>>,
     sandbox_id: Option<newtypes::SandboxId>,
+    is_components_sdk: bool,
 ) -> ApiResult<VaultContext> {
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
     let initial_data = vec![
@@ -217,8 +227,9 @@ async fn make_vault_context(
     let data = initial_data
         .into_iter()
         .map(|(di, is_bootstrap, value)| -> ApiResult<_> {
-            let source = if is_bootstrap {
-                // TODO ComponentsSdk when we have a way to detect it
+            let source = if is_components_sdk {
+                DataLifetimeSource::ComponentsSdk
+            } else if is_bootstrap {
                 DataLifetimeSource::Bootstrap
             } else {
                 DataLifetimeSource::Hosted
