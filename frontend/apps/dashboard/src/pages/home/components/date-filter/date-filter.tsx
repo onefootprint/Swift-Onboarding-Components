@@ -74,6 +74,8 @@ const DateFilter = () => {
             lineHeight="22px"
             variant="body-4"
             whiteSpace="nowrap"
+            minWidth="190px"
+            textAlign="center"
           >
             {getFormattedRange(values.start, values.end)}
           </Text>
@@ -113,11 +115,6 @@ const Range = styled.button`
       &[data-is-focus='true'],
       &:focus {
         background-color: ${input.state.default.focus.bg};
-<<<<<<< Updated upstream
-
-      
-=======
->>>>>>> Stashed changes
       }
 
       &:hover {

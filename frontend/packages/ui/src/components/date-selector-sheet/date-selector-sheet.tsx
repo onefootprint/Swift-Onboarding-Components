@@ -3,13 +3,12 @@ import {
   add,
   eachDayOfInterval,
   endOfMonth,
-  endOfWeek,
   format,
   isAfter,
   isBefore,
+  isSameMonth,
   parse,
   startOfToday,
-  startOfWeek,
 } from 'date-fns';
 import { motion } from 'framer-motion';
 import React, { forwardRef, useMemo, useState } from 'react';
@@ -56,8 +55,8 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
     const days = useMemo(
       () =>
         eachDayOfInterval({
-          start: startOfWeek(firstDayCurrentMonth),
-          end: endOfWeek(endOfMonth(firstDayCurrentMonth)),
+          start: firstDayCurrentMonth,
+          end: endOfMonth(firstDayCurrentMonth),
         }),
       [firstDayCurrentMonth],
     );
@@ -78,6 +77,10 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
     const handleSelectDay = (day: Date, event: React.MouseEvent) => {
       event.stopPropagation();
       event.preventDefault();
+
+      if (!isSameMonth(day, firstDayCurrentMonth)) {
+        goToDate(day);
+      }
 
       if (isAfter(day, endDate || day)) {
         onChange({ startDate: endDate, endDate: day });

@@ -9,6 +9,7 @@ import {
   isToday,
   lastDayOfMonth,
   parse,
+  startOfMonth,
 } from 'date-fns';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -42,6 +43,8 @@ const DayButton = ({
     return getWeekOfMonth(day);
   };
   const getColumn = (targetDay: Date) => getDay(targetDay);
+  const isFirstDayOfMonth = isSameDay(day, startOfMonth(firstDayCurrentMonth));
+  const isLastDayOfMonth = isSameDay(day, lastDayOfMonth(firstDayCurrentMonth));
 
   return (
     <Container
@@ -50,6 +53,8 @@ const DayButton = ({
       data-is-in-range={isInRange}
       data-is-selection-start={isStart}
       data-is-selection-end={isEnd}
+      data-is-first-day-of-month={isFirstDayOfMonth}
+      data-is-last-day-of-month={isLastDayOfMonth}
       $column={getColumn(day)}
       $row={getRow(day) - 1}
       onClick={e => onClick(e, day)}
@@ -154,6 +159,40 @@ const Container = styled.button<{ $column: number; $row: number }>`
         &:hover {
           &::after {
             ${hoverInRageStyles}
+          }
+        }
+
+        &[data-is-first-day-of-month='true'] {
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+              to right,
+              ${theme.backgroundColor.transparent},
+              ${theme.backgroundColor.accent}
+            );
+            z-index: -1;
+          }
+        }
+
+        &[data-is-last-day-of-month='true'] {
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+              to left,
+              ${theme.backgroundColor.transparent},
+              ${theme.backgroundColor.accent}
+            );
+            z-index: -1;
           }
         }
 
