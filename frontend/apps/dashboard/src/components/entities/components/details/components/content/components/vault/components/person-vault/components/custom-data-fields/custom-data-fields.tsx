@@ -1,4 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
+import { DataKind, isVaultDataDecrypted } from '@onefootprint/types';
 import { Box, CodeInline, Grid, LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,7 @@ import useField from '../../../../hooks/use-field';
 import type { DiField } from '../../../../vault.types';
 import Field from '../../../field';
 import { useDecryptControls } from '../../../vault-actions';
+import CustomDocumentField from './custom-document-field';
 
 type CustomDataFieldsProps = WithEntityProps & {
   iconComponent: Icon;
@@ -34,7 +36,7 @@ const CustomDataFields = ({
     entity.id,
     entity,
   );
-  const vaultData = vaultWithTransforms?.vault;
+  const { vault: vaultData, dataKinds } = vaultWithTransforms || {};
   const customDIs = getCustomDIs(vaultData || {});
   const selectableFields = customDIs.filter(di => getFieldProps(di).canSelect);
   const allSelected = selectableFields.every(decryptForm.isChecked);
@@ -48,14 +50,22 @@ const CustomDataFields = ({
     decryptForm.set(selectableFields, false);
   };
 
-  const renderField = (field: DiField) => (
-    <Field
-      key={field.di}
-      renderLabel={() => <CodeInline disabled>{field.di}</CodeInline>}
-      di={field.di}
-      entity={entity}
-    />
-  );
+  const renderField = (field: DiField) => {
+    const isDecrypted = isVaultDataDecrypted(vaultData?.[field.di]);
+    const isDocument = dataKinds?.[field.di] === DataKind.documentData;
+    if (isDecrypted && isDocument) {
+      return <CustomDocumentField field={field} entity={entity} />;
+    }
+
+    return (
+      <Field
+        key={field.di}
+        renderLabel={() => <CodeInline disabled>{field.di}</CodeInline>}
+        di={field.di}
+        entity={entity}
+      />
+    );
+  };
 
   return vaultData ? (
     <Container>

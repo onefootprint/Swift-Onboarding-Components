@@ -1,6 +1,7 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { AmlDetail, Entity, RiskSignal } from '@onefootprint/types';
 import {
+  DataKind,
   EntityKind,
   EntityStatus,
   IdDI,
@@ -33,26 +34,29 @@ export const entityFixture: Entity = {
     if (di === IdDI.lastName) {
       return {
         identifier: IdDI.lastName,
-        is_decryptable: true,
+        isDecryptable: true,
         source: 'hosted',
         transforms: { prefix_1: 'S' },
+        dataKind: DataKind.vaultData,
         value: null,
       };
     }
     if (di === IdDI.firstName) {
       return {
         identifier: IdDI.firstName,
-        is_decryptable: true,
+        isDecryptable: true,
         source: 'hosted',
         transforms: {},
+        dataKind: DataKind.vaultData,
         value: 'John',
       };
     }
     return {
       identifier: di,
-      is_decryptable: true,
+      isDecryptable: true,
       source: 'hosted',
       transforms: {},
+      dataKind: DataKind.vaultData,
       value: null,
     };
   }),

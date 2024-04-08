@@ -250,6 +250,7 @@ export type {
   VaultTextData,
   VaultValue,
 } from './vault';
+export { DataKind } from './vault';
 export {
   isVaultDataDecrypted,
   isVaultDataDocument,

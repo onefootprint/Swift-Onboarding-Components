@@ -1,10 +1,11 @@
-import {
-  type DataIdentifier,
-  type Entity,
-  type EntityVault,
-  IdDI,
-  type VaultValue,
+import type {
+  DataIdentifier,
+  DataKind,
+  Entity,
+  EntityVault,
+  VaultValue,
 } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import type { QueryClient } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -12,6 +13,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 export type VaultType = {
   vault: EntityVault;
   transforms: Partial<Record<DataIdentifier, Transforms>>;
+  dataKinds: Partial<Record<DataIdentifier, DataKind>>;
 };
 
 // This is a custom hook that returns the vault for an entity.
@@ -23,11 +25,16 @@ const getVaultOrCreate = async (queryClient: QueryClient, entity: Entity) => {
     queryClient.getQueryData<VaultType>(['entity', entity.id, 'vault']);
 
   const createInitialData = (): VaultType => {
-    const vaultsAndTransforms: VaultType = { vault: {}, transforms: {} };
+    const vaultsAndTransforms: VaultType = {
+      vault: {},
+      transforms: {},
+      dataKinds: {},
+    };
     entity.data.forEach(attribute => {
       vaultsAndTransforms.vault[attribute.identifier] = attribute.value;
       vaultsAndTransforms.transforms[attribute.identifier] =
         attribute.transforms;
+      vaultsAndTransforms.dataKinds[attribute.identifier] = attribute.dataKind;
     });
     return vaultsAndTransforms;
   };
@@ -63,9 +70,11 @@ const useEntityVaultWithTransforms = (entityId: string, entity?: Entity) => {
 
     const newVault = { ...prevData?.vault, ...newDataConverted };
     const newTransforms = { ...prevData?.transforms, ...newData.transforms };
+    const newDataKinds = { ...prevData?.dataKinds, ...newData.dataKinds };
     queryClient.setQueryData(['entity', entityId, 'vault'], {
       vault: newVault,
       transforms: newTransforms,
+      dataKinds: newDataKinds,
     });
   };
 

@@ -43,7 +43,11 @@ const useEditControls = () => {
       {
         onSuccess: () => {
           send(Event.editSucceeded);
-          callbacks?.onSuccess?.({ vault: vaultData, transforms: {} });
+          callbacks?.onSuccess?.({
+            vault: vaultData,
+            transforms: {},
+            dataKinds: {},
+          });
           toast.show({
             description: t('success-toast.description'),
             title: t('success-toast.title'),

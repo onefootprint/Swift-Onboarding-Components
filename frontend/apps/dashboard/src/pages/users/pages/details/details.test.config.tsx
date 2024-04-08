@@ -15,6 +15,7 @@ import type {
 import {
   ActorKind,
   CollectedKycDataOption,
+  DataKind,
   DecisionStatus,
   DocumentDI,
   EntityKind,
@@ -69,15 +70,17 @@ const entityDataFixture = decryptableAttributesFixture
       ? {
           identifier: di,
           source: '',
-          is_decryptable: true,
+          isDecryptable: true,
           value: null,
+          dataKind: DataKind.vaultData,
           transforms: { prefix_1: 'D' },
         }
       : {
           identifier: di,
           source: '',
-          is_decryptable: true,
+          isDecryptable: true,
           value: null,
+          dataKind: DataKind.vaultData,
           transforms: {},
         },
   )

@@ -1,5 +1,10 @@
 import type { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
 
+export enum DataKind {
+  documentData = 'document_data',
+  vaultData = 'vault_data',
+}
+
 export type VaultEncryptedData = null;
 
 export type VaultEmptyData = undefined;

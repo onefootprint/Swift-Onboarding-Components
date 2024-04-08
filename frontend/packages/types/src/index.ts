@@ -384,6 +384,7 @@ export {
   D2PStatus,
   D2PStatusUpdate,
   DataIdentifierKeys,
+  DataKind,
   DateRange,
   dateRangeToDisplayText,
   DecisionStatus,

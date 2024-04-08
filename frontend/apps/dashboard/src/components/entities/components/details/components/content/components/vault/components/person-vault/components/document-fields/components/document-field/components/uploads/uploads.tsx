@@ -13,8 +13,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import getMimeType from '../../../../../../utils/get-mime-type';
 import HoverableImage from './components/hoverable-image';
-import getMimeType from './utils/get-mime-type';
 
 export type UploadsProps = {
   vault: EntityVault;

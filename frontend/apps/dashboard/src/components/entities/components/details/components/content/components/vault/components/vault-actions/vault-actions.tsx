@@ -38,7 +38,8 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
 
   const handleDecryptSubmit = () => {
     decryptControls.decrypt(entity.id, entityVault, {
-      onSuccess: newData => updateVault({ vault: newData, transforms: {} }),
+      onSuccess: newData =>
+        updateVault({ vault: newData, transforms: {}, dataKinds: {} }), // Update vault will take care of this using the already existing transforms and dataKinds
     });
   };
 

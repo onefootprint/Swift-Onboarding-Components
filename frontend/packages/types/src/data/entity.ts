@@ -5,7 +5,7 @@ import { DocumentDI, InvestorProfileDI } from './di';
 import type { EntityCard } from './entity-cards';
 import type { InsightEvent } from './insight-event';
 import type { WatchlistCheckEventData } from './timeline';
-import type { VaultValue } from './vault';
+import type { DataKind, VaultValue } from './vault';
 
 export type EntityVault = Partial<Record<DataIdentifier, VaultValue>> & {
   cards?: EntityCard[];
@@ -51,7 +51,8 @@ export type Transforms = {
 export type Attribute = {
   identifier: DataIdentifier;
   source: string;
-  is_decryptable: boolean;
+  isDecryptable: boolean;
+  dataKind: DataKind;
   value: VaultValue;
   transforms: Transforms;
 };
