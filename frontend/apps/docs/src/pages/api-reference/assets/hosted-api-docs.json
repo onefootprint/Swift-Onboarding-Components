@@ -4296,10 +4296,6 @@
                                 "description": "Encrypted, base64-encoded challenge information",
                                 "type": "string"
                             },
-                            "scrubbed_phone_number": {
-                                "description": "For login challenges, provide some context on where the challenge was sent",
-                                "type": "string"
-                            },
                             "time_before_retry_s": {
                                 "type": "integer",
                                 "format": "int64"
@@ -5844,10 +5840,6 @@
                             },
                             "challenge_token": {
                                 "description": "Encrypted, base64-encoded challenge information",
-                                "type": "string"
-                            },
-                            "scrubbed_phone_number": {
-                                "description": "For login challenges, provide some context on where the challenge was sent",
                                 "type": "string"
                             },
                             "time_before_retry_s": {

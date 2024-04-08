@@ -80,46 +80,33 @@ pub async fn post(
         return Err(ErrorWithCode::UnsupportedChallengeKind(challenge_kind.to_string()).into());
     }
 
-    let (rx, challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
-        match challenge_kind {
-            ChallengeKind::Passkey => {
-                let challenge = initiate_passkey_login_challenge(&state, &vw.vault.id, creds).await?;
-                let challenge_data = ChallengeData::Passkey(challenge.state);
-                (None, challenge_data, 0, None, Some(challenge.challenge_json))
-            }
-            ChallengeKind::Sms => {
-                let phone_number = vw.get_decrypted_phone(&state).await?;
-                let t = tenant.as_ref();
-                let (rx, challenge_state, time_before_retry_s) = state
-                    .sms_client
-                    .send_challenge_non_blocking(&state, t, phone_number.clone(), vault_id, sandbox_id)
-                    .await?;
-                let challenge_data = ChallengeData::Sms(challenge_state);
-                (
-                    Some(rx),
-                    challenge_data,
-                    time_before_retry_s.num_seconds(),
-                    Some(phone_number),
-                    None,
-                )
-            }
-            ChallengeKind::Email => {
-                let email = vw.get_decrypted_email(&state).await?;
-                let tenant = tenant.ok_or(OnboardingError::NoTenantForEmailChallenge)?;
+    let (rx, challenge_state_data, time_before_retry_s, biometric_challenge_json) = match challenge_kind {
+        ChallengeKind::Passkey => {
+            let challenge = initiate_passkey_login_challenge(&state, &vw.vault.id, creds).await?;
+            let challenge_data = ChallengeData::Passkey(challenge.state);
+            (None, challenge_data, 0, Some(challenge.challenge_json))
+        }
+        ChallengeKind::Sms => {
+            let phone_number = vw.get_decrypted_phone(&state).await?;
+            let t = tenant.as_ref();
+            let (rx, challenge_state, time_before_retry_s) = state
+                .sms_client
+                .send_challenge_non_blocking(&state, t, phone_number.clone(), vault_id, sandbox_id)
+                .await?;
+            let challenge_data = ChallengeData::Sms(challenge_state);
+            (Some(rx), challenge_data, time_before_retry_s.num_seconds(), None)
+        }
+        ChallengeKind::Email => {
+            let email = vw.get_decrypted_email(&state).await?;
+            let tenant = tenant.ok_or(OnboardingError::NoTenantForEmailChallenge)?;
 
-                let challenge_data =
-                    send_email_challenge_non_blocking(&state, &email, vault_id, &tenant, sandbox_id)?;
+            let challenge_data =
+                send_email_challenge_non_blocking(&state, &email, vault_id, &tenant, sandbox_id)?;
 
-                let challenge_data = ChallengeData::Email(challenge_data);
-                (
-                    None,
-                    challenge_data,
-                    state.config.time_s_between_challenges,
-                    None,
-                    None,
-                )
-            }
-        };
+            let challenge_data = ChallengeData::Email(challenge_data);
+            (None, challenge_data, state.config.time_s_between_challenges, None)
+        }
+    };
 
     let err = if let Some(rx) = rx {
         rx_background_error(rx, 3).await.err()
@@ -141,7 +128,6 @@ pub async fn post(
         token,
         challenge_kind,
         challenge_token,
-        scrubbed_phone_number: phone_number.map(|p| p.scrubbed()),
         biometric_challenge_json,
         time_before_retry_s,
     };

@@ -113,7 +113,6 @@ pub async fn post(
         let phone_number = phone_number.ok_or(ValidationError(
             "Phone number required to initiate sign up challenge",
         ))?;
-        let scrubbed_phone_number = phone_number.scrubbed();
         let tenant = ob_context.tenant();
         let (rx, challenge_state_data, time_before_retry_s) = state
             .sms_client
@@ -127,7 +126,6 @@ pub async fn post(
             token,
             challenge_kind: ChallengeKind::Sms,
             challenge_token,
-            scrubbed_phone_number: Some(scrubbed_phone_number),
             biometric_challenge_json: None,
             time_before_retry_s: time_before_retry_s.num_seconds(),
         };
@@ -156,7 +154,6 @@ pub async fn post(
             token,
             challenge_kind: ChallengeKind::Email,
             challenge_token,
-            scrubbed_phone_number: None,
             biometric_challenge_json: None,
             time_before_retry_s: state.config.time_s_between_challenges,
         };

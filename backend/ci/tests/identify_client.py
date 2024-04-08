@@ -89,12 +89,6 @@ class IdentifyClient:
             scope=scope,
         )
         body = post("hosted/identify/login_challenge", data, token)
-        if kind == "sms":
-            last_two = self.phone_number[-2:]
-            assert (
-                body["challenge_data"]["scrubbed_phone_number"]
-                == f"+1 (***) ***-**{last_two}"
-            )
         assert body["challenge_data"]["challenge_kind"] == kind
         self.challenge_kind = kind
         self.challenge_data = body["challenge_data"]

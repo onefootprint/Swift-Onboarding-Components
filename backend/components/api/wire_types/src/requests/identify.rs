@@ -77,8 +77,6 @@ pub struct UserChallengeData {
     pub token: SessionAuthToken,
     pub challenge_kind: ChallengeKind,
     pub challenge_token: ChallengeToken,
-    /// For login challenges, provide some context on where the challenge was sent
-    pub scrubbed_phone_number: Option<PiiString>,
     pub biometric_challenge_json: Option<String>,
     pub time_before_retry_s: i64,
 }
