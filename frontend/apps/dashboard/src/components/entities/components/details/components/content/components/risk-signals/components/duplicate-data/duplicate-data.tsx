@@ -1,5 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { Box, Table, Text } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useCurrentEntityDuplicateData from 'src/components/entities/components/details/hooks/use-current-entity-duplicate-data';
@@ -12,6 +13,7 @@ const DuplicateData = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.risk-signals.duplicate-data',
   });
+  const router = useRouter();
   const {
     data: duplicateData,
     isLoading,
@@ -25,6 +27,20 @@ const DuplicateData = () => {
     { text: t('table.header.status'), width: '17%' },
     { text: t('table.header.created-at'), width: '17%' },
   ];
+
+  const getFpId = (duplicateDataItem: DuplicateDataTableRowItem) => {
+    if ('sameTenant' in duplicateDataItem) {
+      return duplicateDataItem.sameTenant?.fpId;
+    }
+    return undefined;
+  };
+
+  const handleRowClick = (duplicateDataItem: DuplicateDataTableRowItem) => {
+    const fpId = getFpId(duplicateDataItem);
+    if (!fpId) return;
+    const basePath = router.asPath.split('/')[1];
+    window.open(`/${basePath}/${fpId}`, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <Container>
@@ -44,6 +60,7 @@ const DuplicateData = () => {
           }}
           isLoading={isLoading}
           items={duplicateData}
+          onRowClick={handleRowClick}
           renderTr={({ item }) => <Row duplicateDataTableRowItem={item} />}
         />
       </Box>
