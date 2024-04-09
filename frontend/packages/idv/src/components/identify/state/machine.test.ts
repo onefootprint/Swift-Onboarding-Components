@@ -413,13 +413,13 @@ describe('Identify Machine Tests', () => {
         },
       });
       const { state } = machine;
-      expect(state.context.email?.value).toEqual(undefined);
-      expect(state.context.phoneNumber?.value).toEqual(undefined);
+      expect(state.context.email).toEqual(undefined);
+      expect(state.context.phoneNumber).toEqual(undefined);
 
       expect(state.value).toEqual('emailIdentification');
     });
 
-    it('identify failed sends collects remaining phone number', () => {
+    it('identify failed collects remaining phone number', () => {
       const machine = createMachine({
         config: getOnboardingConfig(),
         bootstrapData: {
@@ -428,8 +428,11 @@ describe('Identify Machine Tests', () => {
       });
 
       let { state } = machine;
-      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber?.value).toEqual(undefined);
+      expect(state.context.email).toEqual({
+        value: 'sandbox@onefootprint.com',
+        isBootstrap: true,
+      });
+      expect(state.context.phoneNumber).toEqual(undefined);
       expect(state.value).toEqual('initBootstrap');
 
       state = machine.send({
@@ -442,9 +445,29 @@ describe('Identify Machine Tests', () => {
         successfulIdentifiers: undefined,
         user: undefined,
       });
-      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber?.value).toEqual(undefined);
+      expect(state.context.email).toEqual({
+        value: 'sandbox@onefootprint.com',
+        isBootstrap: true,
+      });
+      expect(state.context.phoneNumber).toEqual(undefined);
       expect(state.value).toEqual('phoneIdentification');
+
+      // Collect phone
+      state = machine.send({
+        type: 'identifyResult',
+        payload: {
+          user: undefined,
+          phoneNumber: '+15555550100',
+        },
+      });
+      expect(state.context.email).toEqual({
+        value: 'sandbox@onefootprint.com',
+        isBootstrap: true,
+      });
+      expect(state.context.phoneNumber).toEqual({
+        value: '+15555550100',
+        isBootstrap: false,
+      });
     });
 
     it('identify failed collects remaining email', () => {
@@ -457,7 +480,11 @@ describe('Identify Machine Tests', () => {
 
       let { state } = machine;
       expect(state.value).toEqual('initBootstrap');
-      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
+      expect(state.context.email).toEqual(undefined);
+      expect(state.context.phoneNumber).toEqual({
+        value: '+15555550100',
+        isBootstrap: true,
+      });
 
       state = machine.send({
         type: 'bootstrapReceived',
@@ -469,9 +496,29 @@ describe('Identify Machine Tests', () => {
         successfulIdentifiers: undefined,
         user: undefined,
       });
-      expect(state.context.email?.value).toEqual(undefined);
+      expect(state.context.phoneNumber).toEqual({
+        value: '+15555550100',
+        isBootstrap: true,
+      });
       expect(state.context.phoneNumber?.value).toEqual('+15555550100');
       expect(state.value).toEqual('emailIdentification');
+
+      // Collect email
+      state = machine.send({
+        type: 'identifyResult',
+        payload: {
+          user: undefined,
+          email: 'sandbox@onefootprint.com',
+        },
+      });
+      expect(state.context.email).toEqual({
+        value: 'sandbox@onefootprint.com',
+        isBootstrap: false,
+      });
+      expect(state.context.phoneNumber).toEqual({
+        value: '+15555550100',
+        isBootstrap: true,
+      });
     });
 
     it('identify failed with phone and email goes straight to sms signup challenge', () => {
@@ -498,8 +545,14 @@ describe('Identify Machine Tests', () => {
         successfulIdentifiers: undefined,
         user: undefined,
       });
-      expect(state.context.email?.value).toEqual('sandbox@onefootprint.com');
-      expect(state.context.phoneNumber?.value).toEqual('+15555550100');
+      expect(state.context.email).toEqual({
+        value: 'sandbox@onefootprint.com',
+        isBootstrap: true,
+      });
+      expect(state.context.phoneNumber).toEqual({
+        value: '+15555550100',
+        isBootstrap: true,
+      });
       expect(state.value).toEqual('smsChallenge');
 
       state = machine.send({

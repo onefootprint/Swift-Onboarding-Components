@@ -586,7 +586,6 @@ describe('<Identify />', () => {
 
           await bootstrapExistingUser();
           await waitFor(() => {
-            // TODO test this is called with the correct args
             expect(onDone).toHaveBeenCalled();
           });
         });
@@ -894,7 +893,7 @@ describe('<Identify />', () => {
     });
   });
 
-  describe('when bootstrap data is invalid', () => {
+  describe('when bootstrapping data', () => {
     beforeEach(() => {
       withIdentify();
       withSignupChallenge(ChallengeKind.sms);
@@ -914,7 +913,17 @@ describe('<Identify />', () => {
       await fillChallengePin();
 
       await waitFor(() => {
-        expect(onDone).toHaveBeenCalled();
+        expect(onDone).toHaveBeenCalledWith({
+          authToken: 'new-token',
+          email: {
+            value: 'piip@onefootprint.com',
+            isBootstrap: false,
+          },
+          phoneNumber: {
+            value: '+1 (650) 460-0799',
+            isBootstrap: false,
+          },
+        });
       });
     });
 
@@ -931,7 +940,17 @@ describe('<Identify />', () => {
       await fillChallengePin();
 
       await waitFor(() => {
-        expect(onDone).toHaveBeenCalled();
+        expect(onDone).toHaveBeenCalledWith({
+          authToken: 'new-token',
+          email: {
+            value: 'piip@onefootprint.com',
+            isBootstrap: true,
+          },
+          phoneNumber: {
+            value: '+1 (650) 460-0799',
+            isBootstrap: false,
+          },
+        });
       });
     });
 
@@ -949,7 +968,44 @@ describe('<Identify />', () => {
       await fillChallengePin();
 
       await waitFor(() => {
-        expect(onDone).toHaveBeenCalled();
+        expect(onDone).toHaveBeenCalledWith({
+          authToken: 'new-token',
+          email: {
+            value: 'piip@onefootprint.com',
+            isBootstrap: false,
+          },
+          phoneNumber: {
+            value: '+1 (650) 460-0799',
+            isBootstrap: false,
+          },
+        });
+      });
+    });
+
+    it('valid bootstrap phone and email, goes to SMS challenge', async () => {
+      const onDone = jest.fn();
+      renderIdentify({
+        bootstrapEmail: 'piip@onefootprint.com',
+        bootstrapPhone: '+16504600799',
+        config: liveOnboardingConfigFixture,
+        onDone,
+      });
+
+      await fillChallengePin();
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalledWith({
+          authToken: 'new-token',
+          email: {
+            value: 'piip@onefootprint.com',
+            isBootstrap: true,
+          },
+          phoneNumber: {
+            // TODO should we format the bootstrap phone passed in?
+            value: '+16504600799',
+            isBootstrap: true,
+          },
+        });
       });
     });
   });
