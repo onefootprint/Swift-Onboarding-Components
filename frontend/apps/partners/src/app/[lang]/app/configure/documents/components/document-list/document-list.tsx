@@ -1,60 +1,100 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { Box, IconButton, Table, type TableRow } from '@onefootprint/ui';
+import type { TableRow } from '@onefootprint/ui';
+import { Box, Dropdown, Table, useConfirmationDialog } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
-import React from 'react';
+import type { SyntheticEvent } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { PartnerDocumentTemplate } from '@/config/types';
+import type { Lang } from '@/app/types';
+import type { WithConfirm } from '@/helpers';
+import {
+  confirmDeletion,
+  dateFormatter,
+  getOr,
+  searchByPaths,
+} from '@/helpers';
+import type { DocTemplate } from '@/queries/get-partner-doc-templates';
 
 type T = TFunction<'common'>;
-type ListProps = { templates: PartnerDocumentTemplate[] };
+type Handle = (id?: string) => void;
+type Handlers = { onDeleteClick: Handle; onEditClick: Handle };
+type ListProps = { handlers: Handlers; lang: Lang; templates: DocTemplate[] };
 
-const getColumns = (t: T) => [
+const stopPropagation = (e: SyntheticEvent<unknown>) => e.stopPropagation();
+const getDataId = getOr<undefined | string>(undefined, 'target.dataset.id');
+const clientSearch = searchByPaths<DocTemplate>([
+  'latestVersion.name',
+  'latestVersion.description',
+]);
+
+const getTableColumns = (t: T) => [
   { text: t('document'), width: '35%' },
-  { text: t('file-format'), width: '20%' },
-  { text: t('frequency'), width: '15%' },
   { text: t('modified'), width: '15%' },
   { text: '', width: '15%' },
 ];
 
-const DocumentList = ({ templates }: ListProps) => {
+const DocumentList = ({ handlers, lang, templates }: ListProps) => {
   const { t } = useTranslation('common');
-
-  const handleSearchChange = (searchText: string) => {
-    // TODO: Implement search
-    // eslint-disable-next-line no-console
-    console.log(searchText);
-  };
+  const [search, setSearch] = useState<string>('');
+  const confirmationDialog = useConfirmationDialog();
+  const withConfirm = confirmDeletion(t, confirmationDialog.open);
 
   return (
-    <Table<PartnerDocumentTemplate>
+    <Table<DocTemplate>
       aria-label={t('doc.document-table-aria-label')}
-      columns={getColumns(t)}
+      columns={getTableColumns(t)}
       emptyStateText={t('doc.document-empty-state')}
-      getAriaLabelForRow={(item: PartnerDocumentTemplate) => item.name}
-      getKeyForRow={(item: PartnerDocumentTemplate) => item.id}
+      getAriaLabelForRow={(item: DocTemplate) => item.latestVersion.name}
+      getKeyForRow={(item: DocTemplate) => item.id}
       hasRowEmphasis={() => true}
       initialSearch=""
-      items={templates}
-      onChangeSearchText={handleSearchChange}
-      renderTr={renderTr(t)}
+      items={clientSearch(templates, search)}
+      onChangeSearchText={setSearch}
+      renderTr={renderTr(t, lang, handlers, withConfirm)}
       searchPlaceholder={t('search-placeholder')}
     />
   );
 };
 
-const renderTr = (t: T) =>
-  function Tr({ item }: TableRow<PartnerDocumentTemplate>) {
+const renderTr = (
+  t: T,
+  lang: Lang,
+  handlers: Handlers,
+  withConfirm: WithConfirm,
+) =>
+  function Tr({ item }: TableRow<DocTemplate>) {
     return (
       <>
-        <td>{item.name}</td>
-        <td>{item.format}</td>
-        <td>{item.frequency}</td>
-        <td>{item.lastUpdated}</td>
+        <td>{item.latestVersion.name}</td>
+        <td>{dateFormatter(lang, item.latestVersion.createdAt)}</td>
         <Box tag="td" display="grid" justifyContent="end" alignItems="center">
-          <IconButton aria-label={`${t('open-actions-for')} ${item.name}`}>
-            <IcoDotsHorizontal24 />
-          </IconButton>
+          <Dropdown.Root>
+            <Dropdown.Trigger
+              aria-label={`${t('open-actions-for')} ${item.latestVersion.name}`}
+            >
+              <IcoDotsHorizontal24 />
+            </Dropdown.Trigger>
+            <Dropdown.Content align="end">
+              <Dropdown.Item
+                data-id={item.id}
+                onSelect={e => handlers.onEditClick(getDataId(e))}
+                onClick={stopPropagation}
+              >
+                {t('edit')}
+              </Dropdown.Item>
+              <Dropdown.Item
+                data-id={item.id}
+                onSelect={withConfirm(e =>
+                  handlers.onDeleteClick(getDataId(e)),
+                )}
+                onClick={stopPropagation}
+                variant="destructive"
+              >
+                {t('delete')}
+              </Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown.Root>
         </Box>
       </>
     );

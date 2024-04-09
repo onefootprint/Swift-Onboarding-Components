@@ -1,3 +1,4 @@
+export { default as alertError } from './alert-error';
 export {
   default as confirmDeletion,
   confirmDocSubmission,
