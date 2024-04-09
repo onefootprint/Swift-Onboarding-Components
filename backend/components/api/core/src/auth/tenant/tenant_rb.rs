@@ -147,7 +147,7 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
 }
 
 // Allow calling SessionContext<T>::update for T=ParsedTenantRbAuth, only for mutating a token to be used
-// for impersonation
+// for impersonation or selecting a tenant at login.
 impl AllowSessionUpdate for ParsedTenantRbAuth {}
 
 impl GetFirmEmployee for TenantRbAuthContext {
