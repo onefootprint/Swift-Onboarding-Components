@@ -6,11 +6,11 @@ declare global {
     nid: {
       (command: 'identify', authToken: string): void;
       (command: 'applicationSubmit'): void;
-      (command: 'closeSession'): void;
     };
   }
 }
 
+// Identify the user with Neuro-ID
 const identify = async (authToken: string) => {
   if (window.nid) {
     try {
@@ -28,20 +28,14 @@ const identify = async (authToken: string) => {
   }
 };
 
+// Notify Neuro-ID that the application has been submitted
 const complete = () => {
   if (window.nid) {
     window.nid('applicationSubmit');
   }
 };
 
-const cancel = () => {
-  if (window.nid) {
-    window.nid('closeSession');
-  }
-};
-
 export default {
   identify,
   complete,
-  cancel,
 };

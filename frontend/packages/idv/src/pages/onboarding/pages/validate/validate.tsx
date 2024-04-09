@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useOnboardingValidate } from '../../../../hooks';
+import nid from '../../../../utils/neuro-id';
 import Error from '../../components/error';
 import { useOnboardingMachine } from '../../components/machine-provider';
 
@@ -21,6 +22,7 @@ const Validate = () => {
       return;
     }
 
+    nid.complete();
     onboardingValidateMutation.mutate(
       { authToken },
       {
