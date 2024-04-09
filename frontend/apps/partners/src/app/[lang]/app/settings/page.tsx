@@ -1,45 +1,30 @@
-import type { Member } from '@onefootprint/types';
 import React from 'react';
+
+import type { LangProp } from '@/app/types';
+import { LangFallback } from '@/i18n';
+import { getPartner, getPartnerMembers, getPartnerRoles } from '@/queries';
 
 import SettingsPageContent from './content';
 
-const members: Member[] = [
-  {
-    id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-    email: 'jane@onefootprint.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Admin',
-      numActiveUsers: 1,
-      numActiveApiKeys: 0,
-      scopes: [], // @ts-ignore
-      kind: 'dashboard_user',
-    },
-    rolebinding: { lastLoginAt: '2023-01-18T17:54:10.668420Z' },
-  },
-  {
-    id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
-    email: 'jane@onefootprint.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Admin',
-      numActiveUsers: 1,
-      numActiveApiKeys: 0,
-      scopes: [], // @ts-ignore
-      kind: 'dashboard_user',
-    },
-    rolebinding: { lastLoginAt: '2023-01-18T17:54:10.668420Z' },
-  },
-];
+type PartnerDocsPageProps = { params: LangProp };
 
-const SettingsPage = () => <SettingsPageContent members={members} />;
+const SettingsPage = async ({ params }: PartnerDocsPageProps) => {
+  const [partner, members, roles] = await Promise.all([
+    getPartner(),
+    getPartnerMembers().then(res => res.data),
+    getPartnerRoles({ kind: 'compliance_partner_dashboard_user' })
+      .then(res => res.data)
+      .then(list => list.map(x => ({ label: x.name, value: x.id }))),
+  ]);
+
+  return (
+    <SettingsPageContent
+      lang={params.lang || LangFallback}
+      members={members}
+      partner={partner}
+      roles={roles}
+    />
+  );
+};
 
 export default SettingsPage;

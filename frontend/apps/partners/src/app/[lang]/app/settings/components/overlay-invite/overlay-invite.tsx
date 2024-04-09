@@ -1,4 +1,3 @@
-// import { RoleKind } from '@onefootprint/types';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import type { SelectOption } from '@onefootprint/ui';
 import {
@@ -141,6 +140,7 @@ const OverlayInvite = ({
                         onChange={select.field.onChange}
                         options={roles}
                         placeholder={t('select-placeholder')}
+                        emptyStateText={t('no-results-found')}
                         value={select.field.value}
                       />
                     )}

@@ -1,6 +1,5 @@
-import { IcoPencil16 } from '@onefootprint/icons';
 import type { UpdateOrgRequest } from '@onefootprint/types';
-import { IconButton, LinkButton, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import React, { useId, useState } from 'react';
 
 import DialogWrapper from '../dialog-wrapper';
@@ -29,12 +28,8 @@ const OverlayFieldSet = ({
 }: OverlayFieldSetProps) => {
   const id = useId();
   const [isOpen, setIsOpen] = useState(false);
-  const openDialog = () => setIsOpen(true);
+  // const openDialog = () => setIsOpen(true);
   const closeDialog = () => setIsOpen(false);
-
-  const handleSubmit = (payload: UpdateOrgRequest) => {
-    console.log('# payload', payload); // eslint-disable-line no-console
-  };
 
   return (
     <Stack direction="column" justify="center">
@@ -42,15 +37,10 @@ const OverlayFieldSet = ({
         <Text variant="label-3" color="tertiary">
           {label}
         </Text>
-        <IconButton aria-label={dialogHeader} onClick={openDialog}>
-          <IcoPencil16 />
-        </IconButton>
+        {/* <IconButton aria-label={dialogHeader} onClick={openDialog}><IcoPencil16 /></IconButton> */}
       </Stack>
-      {value ? (
-        <Text variant="body-3">{value}</Text>
-      ) : (
-        <LinkButton onClick={openDialog}>{label}</LinkButton>
-      )}
+      {value ? <Text variant="body-3">{value}</Text> : '-'}
+      {/* <LinkButton onClick={openDialog}>{label}</LinkButton> */}
       <DialogWrapper
         id={id}
         labelLink={dialogDelete}
@@ -62,7 +52,7 @@ const OverlayFieldSet = ({
         open={isOpen}
         title={dialogHeader}
       >
-        {children({ id, handleSubmit })}
+        {children({ id, handleSubmit: () => undefined })}
       </DialogWrapper>
     </Stack>
   );

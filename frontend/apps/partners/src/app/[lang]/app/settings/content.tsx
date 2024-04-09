@@ -1,24 +1,56 @@
 'use client';
 
-import type { Member, Organization } from '@onefootprint/types';
+import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { TableRow } from '@onefootprint/ui';
-import { Badge, Button, Divider, Stack, Table, Text } from '@onefootprint/ui';
+import {
+  Badge,
+  Box,
+  Button,
+  Divider,
+  Dropdown,
+  Stack,
+  Table,
+  Text,
+  useConfirmationDialog,
+  useToast,
+} from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
-import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { SyntheticEvent } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+
+import type { Lang } from '@/app/types';
+import type { WithConfirm } from '@/helpers';
+import {
+  confirmDeletion,
+  dateFormatter,
+  getErrorMessage,
+  getOr,
+  searchByPaths,
+} from '@/helpers';
+import type { OrganizationMember, PartnerOrganization } from '@/queries';
+import { postPartnerMembers, postPartnerMembersDeactivate } from '@/queries';
 
 import { InputTextForm, LogoManager, OverlayFieldSet } from '../components';
 import OverlayInvite from './components/overlay-invite';
 
 type T = TFunction<'common'>;
-type SettingsPageContentProps = { members: Member[] };
+type SettingsPageContentProps = {
+  lang: Lang;
+  members: OrganizationMember[];
+  partner: PartnerOrganization;
+  roles: { label: string; value: string }[];
+};
 
 const organization = {
   name: 'Organization name',
   logoUrl: undefined,
-} as unknown as Organization;
+} as unknown as PartnerOrganization;
 
+const stopPropagation = (e: SyntheticEvent<unknown>) => e.stopPropagation();
+const getDataId = getOr<undefined | string>(undefined, 'target.dataset.id');
 const getColumns = (t: T) => [
   { id: 'email', text: t('email'), width: '25%' },
   { id: 'lastActive', text: t('last-active'), width: '20%' },
@@ -27,21 +59,44 @@ const getColumns = (t: T) => [
   { id: 'actions', text: '', width: '5%' },
 ];
 
-const SettingsPageContent = ({ members }: SettingsPageContentProps) => {
-  // const router = useRouter();
+const clientSearch = searchByPaths<OrganizationMember>([
+  'firstName',
+  'lastName',
+  'email',
+  'role.name',
+]);
+
+const SettingsPageContent = ({
+  lang,
+  members,
+  partner,
+  roles,
+}: SettingsPageContentProps) => {
   const { t } = useTranslation('common');
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [search, setSearch] = useState<string>('');
+  const toast = useToast();
+  const route = useRouter();
+  const confirmationDialog = useConfirmationDialog();
+  const withConfirm = confirmDeletion(t, confirmationDialog.open);
+  const companyName = partner.name;
+  const companyWebsiteUrl = partner.websiteUrl;
 
-  const handleSearchChange = (searchText: string) => {
-    // TODO: Implement search
-    // eslint-disable-next-line no-console
-    console.log(searchText);
-  };
-
-  const handleRowClick = (member: Member) => {
-    console.log('# member', member); // eslint-disable-line no-console
-    // router.push(`/app/companies/${member.id}`);
-  };
+  const onDeactivateClick = useCallback(
+    (id?: string) => {
+      if (!id) return;
+      postPartnerMembersDeactivate(id)
+        .then(route.refresh)
+        .catch(err => {
+          toast.show({
+            variant: 'error',
+            title: t('user-deactivation-error'),
+            description: getErrorMessage(err),
+          });
+        });
+    },
+    [route.refresh, t, toast],
+  );
 
   return (
     <>
@@ -64,7 +119,7 @@ const SettingsPageContent = ({ members }: SettingsPageContentProps) => {
         <Stack gap={11} flexWrap="wrap">
           <OverlayFieldSet
             dialogHeader={
-              'Evolve'
+              companyName
                 ? t('companies.edit-company-name')
                 : t('companies.add-company-name')
             }
@@ -72,21 +127,21 @@ const SettingsPageContent = ({ members }: SettingsPageContentProps) => {
             dialogDelete={t('delete')}
             dialogSave={t('save')}
             label={t('companies.company-name')}
-            value="Evolve"
+            value={companyName}
           >
             {({ id, handleSubmit }) => (
               <InputTextForm
                 formId={id}
                 label={t('companies.company-name')}
                 requiredMsg={t('required')}
-                value="Evolve"
+                value={companyName}
                 onSubmit={name => handleSubmit({ name })}
               />
             )}
           </OverlayFieldSet>
           <OverlayFieldSet
             dialogHeader={
-              'https://www.getevolved.com'
+              companyWebsiteUrl
                 ? t('companies.edit-company-website')
                 : t('companies.add-company-website')
             }
@@ -94,7 +149,7 @@ const SettingsPageContent = ({ members }: SettingsPageContentProps) => {
             dialogDelete={t('delete')}
             dialogSave={t('save')}
             label={t('companies.company-website')}
-            value="https://www.getevolved.com"
+            value={companyWebsiteUrl}
           >
             {({ id, handleSubmit }) => (
               <InputTextForm
@@ -102,7 +157,7 @@ const SettingsPageContent = ({ members }: SettingsPageContentProps) => {
                 label={t('companies.company-website')}
                 onSubmit={websiteUrl => handleSubmit({ websiteUrl })}
                 requiredMsg={t('required')}
-                value="https://www.getevolved.com"
+                value={companyWebsiteUrl}
               />
             )}
           </OverlayFieldSet>
@@ -124,7 +179,7 @@ const SettingsPageContent = ({ members }: SettingsPageContentProps) => {
       </Stack>
       <Divider marginBottom={7} />
 
-      <Table<Member>
+      <Table<OrganizationMember>
         aria-label={t('companies.company-table-aria-label')}
         columns={getColumns(t)}
         emptyStateText={t('companies.company-empty-state')}
@@ -132,29 +187,47 @@ const SettingsPageContent = ({ members }: SettingsPageContentProps) => {
         getKeyForRow={c => c.id}
         hasRowEmphasis={() => true}
         initialSearch=""
-        items={members}
-        onChangeSearchText={handleSearchChange}
-        onRowClick={handleRowClick}
-        renderTr={renderTr(t)}
+        items={clientSearch(members, search)}
+        onChangeSearchText={setSearch}
+        renderTr={renderTr(t, lang, withConfirm, onDeactivateClick)}
         searchPlaceholder={t('search-placeholder')}
       />
       <OverlayInvite
-        defaultRole={{ label: '', value: '', description: undefined }}
+        roles={roles}
+        defaultRole={
+          roles.find(x => x.label.includes('Member')) ||
+          roles[0] || { label: '', value: '' }
+        }
         isOpen={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
-        onSubmit={() => undefined}
-        roles={[]}
+        onSubmit={invitations => {
+          Promise.all(invitations.map(i => postPartnerMembers(i)))
+            .then(() => {
+              setIsInviteOpen(false);
+            })
+            .catch(err => {
+              toast.show({
+                variant: 'error',
+                description: getErrorMessage(err),
+                title: t('invitation-error', { count: invitations.length }),
+              });
+            });
+        }}
       />
     </>
   );
 };
 
-const renderTr = (t: T) =>
-  function Tr({ item: member }: TableRow<Member>) {
+const renderTr = (
+  t: T,
+  lang: Lang,
+  withConfirm: WithConfirm,
+  onDeactivateClick: (id?: string) => void,
+) =>
+  function Tr({ item: member }: TableRow<OrganizationMember>) {
     const { email, firstName, lastName } = member;
     const lastLoginAt = member.rolebinding?.lastLoginAt;
-    // const isMemberCurrentUser = session.data?.id === id;
-    // const shouldShowActions = !isMemberCurrentUser;
+
     return (
       <>
         <Td>
@@ -163,12 +236,37 @@ const renderTr = (t: T) =>
             {email}
           </Text>
         </Td>
-        <Td>{lastLoginAt || '-'}</Td>
+        <Td>{dateFormatter(lang, lastLoginAt) || '-'}</Td>
         <Td>{member.role.name}</Td>
         <Td>
           {!lastLoginAt && <Badge variant="warning">{t('pending')}</Badge>}
         </Td>
-        <Td>Action</Td>
+        <Td>
+          <Box
+            tag="div"
+            display="grid"
+            justifyContent="end"
+            alignItems="center"
+          >
+            <Dropdown.Root>
+              <Dropdown.Trigger
+                aria-label={`${t('open-actions-for')} ${member.email}`}
+              >
+                <IcoDotsHorizontal24 />
+              </Dropdown.Trigger>
+              <Dropdown.Content align="end">
+                <Dropdown.Item
+                  data-id={member.id}
+                  onSelect={withConfirm(e => onDeactivateClick(getDataId(e)))}
+                  onClick={stopPropagation}
+                  variant="destructive"
+                >
+                  {t('deactivate')}
+                </Dropdown.Item>
+              </Dropdown.Content>
+            </Dropdown.Root>
+          </Box>
+        </Td>
       </>
     );
   };

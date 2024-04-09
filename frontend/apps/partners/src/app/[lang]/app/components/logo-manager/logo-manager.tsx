@@ -1,33 +1,31 @@
-import type { Organization } from '@onefootprint/types';
-// import { RoleScopeKind } from '@onefootprint/types';
-import { Avatar, createFontStyles, Stack } from '@onefootprint/ui';
+import { Avatar, createFontStyles, Stack, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-// import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
-// import useUpdateOrgLogo from './hooks/use-update-org-logo';
+import { getErrorMessage } from '@/helpers';
+import type { PartnerOrganization } from '@/queries';
+import { putPartnerLogo } from '@/queries';
 
-type LogoManagerProps = {
-  organization: Organization;
-};
+type LogoManagerProps = { organization: PartnerOrganization };
 
 const LogoManager = ({ organization }: LogoManagerProps) => {
   const { t } = useTranslation('common');
-  // const updateOrgLogoMutation = useUpdateOrgLogo();
+  const toast = useToast();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
-    if (!files?.length) {
-      return;
-    }
-    const form = new FormData();
-    form.set('file', files[0]);
-    // updateOrgLogoMutation.mutate(form, {
-    //   onError: (error: unknown) => {
-    //     console.error('Updating business profile logo failed', error);
-    //   },
-    // });
+    if (!files?.length) return;
+    const formData = new FormData();
+    formData.set('file', files[0]);
+
+    putPartnerLogo(formData).catch(err => {
+      toast.show({
+        title: 'Upload failed',
+        variant: 'error',
+        description: getErrorMessage(err),
+      });
+    });
   };
 
   return (
