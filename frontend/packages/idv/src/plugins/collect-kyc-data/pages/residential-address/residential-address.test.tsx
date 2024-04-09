@@ -11,7 +11,7 @@ import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import type { KycData } from '../../utils/data-types';
-import type { MachineContext } from '../../utils/state-machine';
+import type { InitMachineArgs } from '../../utils/state-machine/machine';
 import TestWrapper from '../../utils/test-wrapper';
 import ResidentialAddress from './residential-address';
 import getInitialContext, {
@@ -19,7 +19,7 @@ import getInitialContext, {
 } from './residential-address.test.config';
 
 const renderResidentialAddress = (
-  initialContext: MachineContext,
+  initialContext: InitMachineArgs,
   onComplete?: (args: KycData) => void,
 ) =>
   customRender(

@@ -1,11 +1,11 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import type { MachineContext } from '../../utils/state-machine';
 import { createCollectKycDataMachine } from '../../utils/state-machine';
+import type { InitMachineArgs } from '../../utils/state-machine/machine';
 
 type CollectKycDataMachineArgs = {
-  initialContext: MachineContext;
+  initialContext: InitMachineArgs;
   initState?: string;
 };
 

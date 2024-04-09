@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import type { DeviceInfo } from 'src/hooks';
 import type { KycData } from 'src/plugins/collect-kyc-data/utils/data-types';
-import type { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
+import type { InitMachineArgs } from 'src/plugins/collect-kyc-data/utils/state-machine/machine';
 
 import getOnboardingConfig from './get-onboarding-config';
 
@@ -19,7 +19,7 @@ const getInitialContext = ({
   device,
   requirement,
   data,
-}: GetInitialContextArgs = {}): MachineContext => ({
+}: GetInitialContextArgs = {}): InitMachineArgs => ({
   authToken: 'token',
   device: device ?? {
     type: 'mobile',

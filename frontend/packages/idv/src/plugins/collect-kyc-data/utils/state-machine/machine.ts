@@ -1,26 +1,135 @@
 import type { CollectKycDataRequirement } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
+import type { StateValue } from 'xstate';
 import { assign, createMachine } from 'xstate';
 
-import {
-  isMissingBasicAttribute,
-  isMissingEmailAttribute,
-  isMissingResidentialAttribute,
-  isMissingSsnAttribute,
-  isMissingUsLegalStatusAttribute,
-  shouldConfirm,
-} from '../missing-attributes';
+import type { KycData } from '../data-types';
+import isMissing from '../missing-attributes';
 import type { MachineContext, MachineEvents } from './types';
 import isCountryUsOrTerritories from './utils/is-country-us-or-territories';
 import mergeUpdatedData from './utils/merge-data';
 import mergeInitialData from './utils/merge-initial-data';
 
-const missingAttributes = (req: CollectKycDataRequirement) => [
-  ...req.missingAttributes,
-  ...req.optionalAttributes,
+// TODO make sure we have coverage of optional SSN?
+type Screen = {
+  screen: StateValue;
+  /** The CDOs that this screen is responsible for collecting */
+  cdos: CollectedKycDataOption[];
+  addlCond?: (allData: KycData) => boolean;
+};
+
+const ORDERED_SCREENS: Screen[] = [
+  {
+    screen: 'email',
+    cdos: [CollectedKycDataOption.email],
+  },
+  {
+    screen: 'basicInformation',
+    cdos: [
+      CollectedKycDataOption.name,
+      CollectedKycDataOption.dob,
+      CollectedKycDataOption.nationality,
+    ],
+  },
+  {
+    screen: 'residentialAddress',
+    cdos: [CollectedKycDataOption.address],
+  },
+  {
+    screen: 'usLegalStatus',
+    cdos: [CollectedKycDataOption.usLegalStatus],
+    addlCond: (allData: KycData) => isCountryUsOrTerritories(allData),
+  },
+  {
+    screen: 'ssn',
+    cdos: [CollectedKycDataOption.ssn9, CollectedKycDataOption.ssn4],
+    addlCond: (allData: KycData) => isCountryUsOrTerritories(allData),
+  },
+  {
+    screen: 'confirm',
+    cdos: [],
+  },
 ];
 
+const getScreenOrder = (screen: StateValue) =>
+  ORDERED_SCREENS.findIndex(s => s.screen === screen) ?? -1;
+
+/**
+ * Given the CollectKycDataRequirement and initial data, computes the static set of screens we
+ * might show. The state machine transitions will only navigate forward and backward through this
+ * set of static pages of data that need to be collected.
+ */
+const getDataCollectionScreensToShow = (
+  req: CollectKycDataRequirement,
+  initialData: KycData,
+): StateValue[] => {
+  const missingAttributes = [
+    ...req.missingAttributes,
+    ...req.optionalAttributes,
+  ];
+  return ORDERED_SCREENS.filter(
+    s =>
+      isMissing(s.cdos, missingAttributes, initialData) ||
+      s.screen === 'confirm',
+  ).map(s => s.screen);
+};
+
+/**
+ * The forward transitions made for the specific `currentScreen`.
+ * They don't allow transitioning to a screen that is before the `currentScreen`.
+ */
+const nextScreenTransitions = (currentScreen: StateValue) => {
+  const currentScreenOrder = getScreenOrder(currentScreen);
+
+  return ORDERED_SCREENS.map(s => ({
+    target: s.screen as string,
+    actions: ['assignData'],
+    cond: (ctx: MachineContext, e: MachineEvents) => {
+      let allData;
+      if (e.type === 'dataSubmitted') {
+        allData = mergeUpdatedData(ctx.data, e.payload);
+      } else {
+        allData = ctx.data;
+      }
+      return (
+        // The requirement from the backend says there's info to collect on this screen
+        ctx.dataCollectionScreensToShow.includes(s.screen) &&
+        // The current screen came before this screen
+        getScreenOrder(s.screen) > currentScreenOrder &&
+        // Any additional condition for the screen
+        (s.addlCond?.(allData) ?? true)
+      );
+    },
+  }));
+};
+
+/**
+ * The backward transitions made for the specific `currentScreen` when the back button is hit.
+ * They don't allow transitioning to a screen that is after the `currentScreen`.
+ */
+const prevScreenTransitions = (currentScreen: StateValue) => {
+  const currentScreenOrder = getScreenOrder(currentScreen);
+
+  const reversedScreens = [...ORDERED_SCREENS].reverse();
+  return reversedScreens.map(s => ({
+    target: s.screen as string,
+    cond: (ctx: MachineContext) =>
+      // The requirement from the backend said there was info to collect on this screen
+      ctx.dataCollectionScreensToShow.includes(s.screen) &&
+      // The current screen came after this screen
+      getScreenOrder(s.screen) < currentScreenOrder &&
+      // Any additional condition for the screen
+      (s.addlCond?.(ctx.data) ?? true),
+  }));
+};
+
+export type InitMachineArgs = Omit<
+  MachineContext,
+  'dataCollectionScreensToShow'
+>;
+
 const createCollectKycDataMachine = (
-  initialContext: MachineContext,
+  initialContext: InitMachineArgs,
   initState?: string,
 ) =>
   createMachine(
@@ -34,7 +143,15 @@ const createCollectKycDataMachine = (
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: initState ?? 'init',
-      context: { ...initialContext },
+      context: {
+        ...initialContext,
+        // Snapshot the set of data we have before starting to collect from users. This helps us
+        // decide the pages to visit when navigated forward and backward
+        dataCollectionScreensToShow: getDataCollectionScreensToShow(
+          initialContext.requirement,
+          initialContext.data,
+        ),
+      },
       states: {
         init: {
           on: {
@@ -46,61 +163,7 @@ const createCollectKycDataMachine = (
         },
         router: {
           always: [
-            {
-              target: 'email',
-              cond: context =>
-                // If email was passed into initial context, no need to collect again
-                isMissingEmailAttribute(
-                  // use ob config things required to determine what's missing
-                  // this will break if we start returning full ssn9 when only ssn4 is required
-                  // should we serialize all attributes from the requirement?
-                  missingAttributes(context.requirement),
-                  context.data,
-                  true,
-                ),
-            },
-            {
-              target: 'basicInformation',
-              cond: context =>
-                isMissingBasicAttribute(
-                  missingAttributes(context.requirement),
-                  context.data,
-                  true,
-                ),
-            },
-            {
-              target: 'residentialAddress',
-              cond: context =>
-                isMissingResidentialAttribute(
-                  missingAttributes(context.requirement),
-                  context.data,
-                  true,
-                ),
-            },
-            {
-              target: 'usLegalStatus',
-              cond: context =>
-                isCountryUsOrTerritories(context.data) &&
-                isMissingUsLegalStatusAttribute(
-                  missingAttributes(context.requirement),
-                  context.data,
-                  true,
-                ),
-            },
-            {
-              target: 'ssn',
-              cond: context =>
-                isCountryUsOrTerritories(context.data) &&
-                isMissingSsnAttribute(
-                  missingAttributes(context.requirement),
-                  context.data,
-                  true,
-                ),
-            },
-            {
-              target: 'confirm',
-              cond: context => shouldConfirm(context.data, context.requirement),
-            },
+            ...nextScreenTransitions('router'),
             {
               target: 'completed',
             },
@@ -108,287 +171,31 @@ const createCollectKycDataMachine = (
         },
         email: {
           on: {
-            dataSubmitted: [
-              {
-                target: 'basicInformation',
-                actions: 'assignData',
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return isMissingBasicAttribute(
-                    missingAttributes(context.requirement),
-                    allData,
-                    true,
-                  );
-                },
-              },
-              {
-                target: 'residentialAddress',
-                actions: ['assignData'],
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return isMissingResidentialAttribute(
-                    missingAttributes(context.requirement),
-                    allData,
-                    true,
-                  );
-                },
-              },
-              {
-                target: 'usLegalStatus',
-                actions: 'assignData',
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return (
-                    isCountryUsOrTerritories(allData) &&
-                    isMissingUsLegalStatusAttribute(
-                      missingAttributes(context.requirement),
-                      allData,
-                      true,
-                    )
-                  );
-                },
-              },
-              {
-                target: 'ssn',
-                actions: ['assignData'],
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return (
-                    isCountryUsOrTerritories(allData) &&
-                    isMissingSsnAttribute(
-                      missingAttributes(context.requirement),
-                      allData,
-                      true,
-                    )
-                  );
-                },
-              },
-              {
-                target: 'confirm',
-                actions: ['assignData'],
-              },
-            ],
+            dataSubmitted: nextScreenTransitions('email'),
           },
         },
         basicInformation: {
           on: {
-            dataSubmitted: [
-              {
-                target: 'residentialAddress',
-                actions: ['assignData'],
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return isMissingResidentialAttribute(
-                    missingAttributes(context.requirement),
-                    allData,
-                    true,
-                  );
-                },
-              },
-              {
-                target: 'usLegalStatus',
-                actions: 'assignData',
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return (
-                    isCountryUsOrTerritories(allData) &&
-                    isMissingUsLegalStatusAttribute(
-                      missingAttributes(context.requirement),
-                      allData,
-                      true,
-                    )
-                  );
-                },
-              },
-              {
-                target: 'ssn',
-                actions: ['assignData'],
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return (
-                    isCountryUsOrTerritories(allData) &&
-                    isMissingSsnAttribute(
-                      missingAttributes(context.requirement),
-                      allData,
-                      true,
-                    )
-                  );
-                },
-              },
-              {
-                target: 'confirm',
-                actions: ['assignData'],
-              },
-            ],
-            navigatedToPrevPage: {
-              target: 'email',
-              cond: context =>
-                isMissingEmailAttribute(
-                  missingAttributes(context.requirement),
-                  context.initialData,
-                  true,
-                ),
-            },
+            dataSubmitted: nextScreenTransitions('basicInformation'),
+            navigatedToPrevPage: prevScreenTransitions('basicInformation'),
           },
         },
         residentialAddress: {
           on: {
-            dataSubmitted: [
-              {
-                target: 'usLegalStatus',
-                actions: 'assignData',
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return (
-                    isCountryUsOrTerritories(allData) &&
-                    isMissingUsLegalStatusAttribute(
-                      missingAttributes(context.requirement),
-                      allData,
-                      true,
-                    )
-                  );
-                },
-              },
-              {
-                target: 'ssn',
-                actions: ['assignData'],
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return (
-                    isCountryUsOrTerritories(allData) &&
-                    isMissingSsnAttribute(
-                      missingAttributes(context.requirement),
-                      allData,
-                      true,
-                    )
-                  );
-                },
-              },
-              {
-                target: 'confirm',
-                actions: ['assignData'],
-              },
-            ],
-            navigatedToPrevPage: [
-              {
-                target: 'basicInformation',
-                cond: context =>
-                  isMissingBasicAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'email',
-                cond: context =>
-                  isMissingEmailAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-            ],
+            dataSubmitted: nextScreenTransitions('residentialAddress'),
+            navigatedToPrevPage: prevScreenTransitions('residentialAddress'),
           },
         },
         usLegalStatus: {
           on: {
-            dataSubmitted: [
-              {
-                target: 'ssn',
-                actions: ['assignData'],
-                cond: (context, event) => {
-                  const allData = mergeUpdatedData(context.data, event.payload);
-                  return (
-                    isCountryUsOrTerritories(allData) &&
-                    isMissingSsnAttribute(
-                      missingAttributes(context.requirement),
-                      allData,
-                      true,
-                    )
-                  );
-                },
-              },
-              {
-                target: 'confirm',
-                actions: ['assignData'],
-              },
-            ],
-            navigatedToPrevPage: [
-              {
-                target: 'residentialAddress',
-                cond: context =>
-                  isMissingResidentialAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'basicInformation',
-                cond: context =>
-                  isMissingBasicAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'email',
-                cond: context =>
-                  isMissingEmailAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-            ],
+            dataSubmitted: nextScreenTransitions('usLegalStatus'),
+            navigatedToPrevPage: prevScreenTransitions('usLegalStatus'),
           },
         },
         ssn: {
           on: {
-            dataSubmitted: {
-              target: 'confirm',
-              actions: ['assignData'],
-            },
-            navigatedToPrevPage: [
-              {
-                target: 'usLegalStatus',
-                cond: context =>
-                  isMissingUsLegalStatusAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'residentialAddress',
-                cond: context =>
-                  isMissingResidentialAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'basicInformation',
-                cond: context =>
-                  isMissingBasicAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'email',
-                cond: context =>
-                  isMissingEmailAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-            ],
+            dataSubmitted: nextScreenTransitions('ssn'),
+            navigatedToPrevPage: prevScreenTransitions('ssn'),
           },
         },
         confirm: {
@@ -400,55 +207,7 @@ const createCollectKycDataMachine = (
               actions: ['assignData'],
             },
             confirmed: [{ target: 'completed' }],
-            navigatedToPrevPage: [
-              {
-                target: 'ssn',
-                cond: context =>
-                  isCountryUsOrTerritories(context.data) &&
-                  isMissingSsnAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'usLegalStatus',
-                cond: context =>
-                  isCountryUsOrTerritories(context.data) &&
-                  isMissingUsLegalStatusAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'residentialAddress',
-                cond: context =>
-                  isMissingResidentialAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'basicInformation',
-                cond: context =>
-                  isMissingBasicAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-              {
-                target: 'email',
-                cond: context =>
-                  isMissingEmailAttribute(
-                    missingAttributes(context.requirement),
-                    context.initialData,
-                    true,
-                  ),
-              },
-            ],
+            navigatedToPrevPage: prevScreenTransitions('confirm'),
             dataSubmitted: {
               actions: ['assignData'],
             },
@@ -486,12 +245,11 @@ const createCollectKycDataMachine = (
           authToken: event.payload.authToken,
         })),
         assignInitialData: assign((context, event) => {
-          context.data = mergeInitialData(context.data, event.payload);
-          // Snapshot the set of data we have before starting to collect from users. This helps
-          // us decide the page to visit when hitting the back button
+          const initialData = mergeInitialData(context.data, event.payload);
           return {
             ...context,
-            initialData: context.data,
+            data: initialData,
+            initialData,
           };
         }),
       },

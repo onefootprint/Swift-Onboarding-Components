@@ -7,7 +7,7 @@ import {
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
-import type { MachineContext } from '../../utils/state-machine';
+import type { InitMachineArgs } from '../../utils/state-machine/machine';
 import TestWrapper from '../../utils/test-wrapper';
 import BasicInformation from './basic-information';
 import {
@@ -17,7 +17,7 @@ import {
 } from './basic-information.test.config';
 
 const renderBasicInformation = (
-  initialContext: MachineContext,
+  initialContext: InitMachineArgs,
   onComplete?: () => void,
 ) => {
   customRender(

@@ -8,9 +8,9 @@ import {
 } from '@onefootprint/types';
 
 import type { KycData } from '../../utils/data-types';
-import type { MachineContext } from '../../utils/state-machine';
+import type { InitMachineArgs } from '../../utils/state-machine/machine';
 
-export const getInitialContext = (data: KycData): MachineContext => ({
+export const getInitialContext = (data: KycData): InitMachineArgs => ({
   authToken: 'token',
   device: {
     type: 'mobile',

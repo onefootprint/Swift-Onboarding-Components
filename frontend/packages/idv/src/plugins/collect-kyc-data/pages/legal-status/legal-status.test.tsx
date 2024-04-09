@@ -15,7 +15,7 @@ import {
 import React from 'react';
 
 import type { KycData } from '../../utils/data-types';
-import type { MachineContext } from '../../utils/state-machine';
+import type { InitMachineArgs } from '../../utils/state-machine/machine';
 import TestWrapper from '../../utils/test-wrapper';
 import {
   withIdentify,
@@ -28,7 +28,7 @@ import LegalStatus from './legal-status';
 import getInitialContext from './utils/test/get-initial-context';
 
 const renderLegalStatus = (
-  initialContext: MachineContext,
+  initialContext: InitMachineArgs,
   onComplete?: (args: KycData) => void,
 ) => {
   customRender(

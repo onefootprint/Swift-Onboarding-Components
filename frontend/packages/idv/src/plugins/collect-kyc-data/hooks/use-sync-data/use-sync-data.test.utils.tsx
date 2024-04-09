@@ -3,9 +3,9 @@ import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import { MachineProvider } from '../../components/machine-provider';
-import type { MachineContext } from '../../utils/state-machine';
+import type { InitMachineArgs } from '../../utils/state-machine/machine';
 
-export const getCustomWrapper = (initialContext: MachineContext) => {
+export const getCustomWrapper = (initialContext: InitMachineArgs) => {
   const initWrapper = ({ children }: { children: React.ReactNode }) => (
     <MachineProvider initialContext={initialContext}>
       <Wrapper>{children}</Wrapper>

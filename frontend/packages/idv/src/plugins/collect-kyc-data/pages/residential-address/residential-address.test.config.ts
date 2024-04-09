@@ -9,7 +9,8 @@ import {
   OnboardingRequirementKind,
 } from '@onefootprint/types';
 import type { KycData } from 'src/plugins/collect-kyc-data/utils/data-types';
-import type { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
+
+import type { InitMachineArgs } from '../../utils/state-machine/machine';
 
 type GetInitialContextArgs = {
   data?: KycData;
@@ -21,7 +22,7 @@ const getInitialContext = ({
   data,
   allowInternationalResidents = false,
   supportedCountries = ['US'],
-}: GetInitialContextArgs = {}): MachineContext => ({
+}: GetInitialContextArgs = {}): InitMachineArgs => ({
   authToken: 'token',
   device: {
     type: 'mobile',

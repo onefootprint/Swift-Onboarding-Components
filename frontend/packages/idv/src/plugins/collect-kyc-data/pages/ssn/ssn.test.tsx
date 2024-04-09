@@ -7,7 +7,7 @@ import {
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
-import type { MachineContext } from '../../utils/state-machine';
+import type { InitMachineArgs } from '../../utils/state-machine/machine';
 import TestWrapper from '../../utils/test-wrapper';
 import Ssn from './ssn';
 import {
@@ -16,7 +16,10 @@ import {
   withUserVaultError,
 } from './ssn.test.config';
 
-const renderSsn = (initialContext: MachineContext, onComplete?: () => void) => {
+const renderSsn = (
+  initialContext: InitMachineArgs,
+  onComplete?: () => void,
+) => {
   customRender(
     <TestWrapper initialContext={initialContext} initState="confirm">
       <Ssn onComplete={onComplete} />

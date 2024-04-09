@@ -4,12 +4,12 @@ import { ToastProvider } from '@onefootprint/ui';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { MachineProvider } from 'src/plugins/collect-kyc-data/components/machine-provider';
-import type { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
 
 import { Layout } from '../../../../components';
+import type { InitMachineArgs } from '../state-machine/machine';
 
 type TestWrapperProps = {
-  initialContext: MachineContext;
+  initialContext: InitMachineArgs;
   initState: string;
   children: ReactNode;
 };

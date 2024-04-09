@@ -3,6 +3,7 @@ import type {
   CollectKycDataRequirement,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
+import type { StateValue } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import type { KycData } from '../data-types';
@@ -13,6 +14,7 @@ export type MachineContext = {
   device: DeviceInfo;
   config: PublicOnboardingConfig;
   requirement: CollectKycDataRequirement;
+  dataCollectionScreensToShow: StateValue[];
   // Machine-generated
   data: KycData; // combines bootstrapData, disabledFields and fieldsToDecrypt after decrypting the values
   readonly initialData: KycData; // Snapshotted before we start collecting data to know what data we started with

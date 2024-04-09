@@ -12,7 +12,6 @@ import {
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import type { KycData } from '../../utils/data-types';
-import type { MachineContext } from '../../utils/state-machine';
 import useSyncData from './use-sync-data';
 import {
   getCustomWrapper,
@@ -164,7 +163,7 @@ describe('useSyncData', () => {
     });
 
     it('calls onError with field errors from api', async () => {
-      const initialContext: MachineContext = {
+      const initialContext = {
         authToken: 'tok_123',
         device: testDevice,
         config: testConfig,
@@ -199,7 +198,7 @@ describe('useSyncData', () => {
     });
 
     it('calls onError with string error from api', async () => {
-      const initialContext: MachineContext = {
+      const initialContext = {
         authToken: 'tok_123',
         device: testDevice,
         config: testConfig,
@@ -231,7 +230,7 @@ describe('useSyncData', () => {
     });
 
     it('calls onSuccess with cleaned data', async () => {
-      const initialContext: MachineContext = {
+      const initialContext = {
         authToken: 'tok_123',
         device: testDevice,
         config: testConfig,

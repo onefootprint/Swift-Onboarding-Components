@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
 import { useUserAuthMethods } from '../../../../components/identify';
-import getCurrentStepFromMissingAttributes from '../../components/navigation-header/utils/current-step-from-missing-attributes';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import useSyncData, {
@@ -24,18 +23,20 @@ const Confirm = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.confirm' });
 
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, requirement, initialData } = state.context;
+  const {
+    authToken,
+    data,
+    requirement,
+    initialData,
+    dataCollectionScreensToShow,
+  } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
 
   const toast = useToast();
   const qryUserAuthMethods = useUserAuthMethods(authToken);
 
-  const value = getCurrentStepFromMissingAttributes(
-    requirement,
-    initialData,
-    state.value,
-  );
-  const shouldShowBackButton = value > 0;
+  const currentPageIdx = dataCollectionScreensToShow.indexOf(state.value);
+  const shouldShowBackButton = currentPageIdx > 0;
   const headerVariant = shouldShowBackButton ? 'back' : 'close';
 
   const verifiedMethods = useMemo(() => {
