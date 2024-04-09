@@ -24,6 +24,14 @@ export type RequestParams = {
   statusCode?: number;
   response: any;
   once?: boolean;
+  /** Called with information from the mocked request. Can be used to check the HTTP body, headers, and query params in the request. */
+  onRequest?: (args: OnRequestCalledArgs) => void;
+};
+
+export type OnRequestCalledArgs = {
+  body: any;
+  headers: Record<string, string>;
+  queryParams: URLSearchParams;
 };
 
 const requestHelper = ({
@@ -34,11 +42,12 @@ const requestHelper = ({
   path,
   queryParams,
   response,
+  onRequest,
   once,
 }: RequestParams) => {
   const caller = rest[method];
   const URL = fullPath ? path : combineURL(API_BASE_URL ?? '', path);
-  return caller(URL, (req, res, ctx) => {
+  return caller(URL, async (req, res, ctx) => {
     if (queryParams) {
       let gotParams = new URLSearchParams(req.url.searchParams);
       let wantParams = new URLSearchParams(queryParams);
@@ -52,6 +61,17 @@ const requestHelper = ({
         });
         return req.passthrough();
       }
+    }
+
+    if (onRequest) {
+      const body = await req.json();
+      const headers = req.headers.all();
+      const queryParams = new URLSearchParams(req.url.searchParams);
+      onRequest({
+        body,
+        headers,
+        queryParams,
+      });
     }
 
     const args = [ctx.status(statusCode), ctx.delay(delay), ctx.json(response)];

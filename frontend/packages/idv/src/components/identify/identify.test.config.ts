@@ -121,10 +121,15 @@ export const withLoginChallenge = (challengeKind: string) =>
     },
   });
 
-export const withSignupChallenge = (challengeKind?: string) =>
+export const withSignupChallenge = (
+  challengeKind?: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRequest?: (args: any) => void,
+) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify/signup_challenge',
+    onRequest,
     response: {
       challengeData: {
         token: 'utok_xxx',

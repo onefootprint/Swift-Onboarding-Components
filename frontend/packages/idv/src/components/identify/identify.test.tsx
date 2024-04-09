@@ -62,6 +62,7 @@ describe('<Identify />', () => {
     bootstrapEmail,
     bootstrapPhone,
     initialAuthToken,
+    isComponentsSdk,
     config,
     device,
     onDone,
@@ -69,6 +70,7 @@ describe('<Identify />', () => {
     bootstrapEmail?: string;
     bootstrapPhone?: string;
     initialAuthToken?: string;
+    isComponentsSdk?: boolean;
     config: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     device?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     onDone?: () => void;
@@ -86,6 +88,7 @@ describe('<Identify />', () => {
           variant={IdentifyVariant.verify}
           config={config}
           isLive={config.isLive}
+          isComponentsSdk={isComponentsSdk}
           obConfigAuth={{ [CLIENT_PUBLIC_KEY_HEADER]: 'pk' }}
           bootstrapData={
             bootstrapEmail || bootstrapPhone ? userData : undefined
@@ -1074,6 +1077,45 @@ describe('<Identify />', () => {
         ).toBeInTheDocument();
       });
       await fillChallengePin();
+
+      await waitFor(() => {
+        expect(onDone).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('when using components SDK', () => {
+    it('sends x-fp-is-components-sdk header in signup challenge', async () => {
+      withIdentify();
+      const onSignupChallengeCalled = jest.fn();
+      withSignupChallenge(undefined, onSignupChallengeCalled);
+      withIdentifyVerify();
+
+      const onDone = jest.fn();
+      // Bootstrap email, enter phone explicitly
+      renderIdentify({
+        bootstrapEmail: 'sandbox@onefootprint.com',
+        config: liveOnboardingConfigFixture,
+        isComponentsSdk: true,
+        onDone,
+      });
+
+      await fillIdentifyPhone();
+      await fillChallengePin();
+
+      const { body, headers } = onSignupChallengeCalled.mock.calls[0][0];
+      expect(body).toEqual({
+        scope: 'onboarding',
+        email: {
+          value: 'sandbox@onefootprint.com',
+          is_bootstrap: true,
+        },
+        phone_number: {
+          value: '+1 (650) 460-0799',
+          is_bootstrap: false,
+        },
+      });
+      expect(headers['x-fp-is-components-sdk']).toEqual('true');
 
       await waitFor(() => {
         expect(onDone).toHaveBeenCalled();
