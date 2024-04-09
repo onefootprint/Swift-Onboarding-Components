@@ -5939,6 +5939,35 @@
                 ]
             }
         },
+        "/partner/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth",
+                    "Private"
+                ],
+                "description": "Logs out the authenticated principal and invalidates the session",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkOS Token": []
+                    },
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/partner/auth/roles": {
             "get": {
                 "tags": [

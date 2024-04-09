@@ -11,7 +11,7 @@ type EmptyResponse = Record<string, never>;
  * @return {Promise<EmptyResponse>} Promise that resolves to an empty response.
  */
 const authLogout = async (auth: string) =>
-  baseFetch<EmptyResponse>('/org/auth/logout', {
+  baseFetch<EmptyResponse>('/partner/auth/logout', {
     cache: 'no-cache',
     headers: { [DASHBOARD_AUTHORIZATION_HEADER]: auth },
     method: 'POST',
