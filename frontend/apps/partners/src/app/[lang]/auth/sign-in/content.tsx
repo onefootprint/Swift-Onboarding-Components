@@ -50,7 +50,7 @@ const SignInContent = () => {
     setIsLoginInProgress(true);
     try {
       const redirect = `${window.location.origin}/auth`;
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/org/auth/google_oauth?redirect_url=${redirect}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/partner/auth/google_oauth?redirect_url=${redirect}`;
       window.location.href = url;
     } catch (err) {
       toast.show(getFailedGoogleTexts(t));

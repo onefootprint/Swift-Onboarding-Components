@@ -5939,6 +5939,28 @@
                 ]
             }
         },
+        "/partner/auth/google_oauth": {
+            "get": {
+                "tags": [
+                    "Auth",
+                    "Private"
+                ],
+                "description": "Request to authenticate via Google OAuth.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "redirect_url",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {},
+                "security": []
+            }
+        },
         "/partner/auth/login": {
             "post": {
                 "tags": [

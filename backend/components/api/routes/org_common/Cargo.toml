@@ -20,6 +20,7 @@ actix-multipart = { workspace = true }
 mime = { workspace = true }
 paperclip = { workspace = true }
 chrono = { workspace = true }
+reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }

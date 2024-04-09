@@ -1232,6 +1232,7 @@ dependencies = [
  "mime",
  "newtypes",
  "paperclip",
+ "reqwest",
  "serde",
  "serde_json",
  "tracing",

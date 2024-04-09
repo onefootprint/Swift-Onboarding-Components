@@ -1,30 +1,16 @@
-use crate::{
+use actix_web::HttpResponseBuilder;
+use api_core::{
     errors::{workos::WorkOsError, ApiError},
     State,
 };
-use actix_web::HttpResponseBuilder;
-use paperclip::actix::{api_v2_operation, get, web, web::HttpResponse, Apiv2Schema};
+use api_wire_types::GoogleOauthRedirectUrl;
+use paperclip::actix::{web, web::HttpResponse};
 use reqwest::redirect;
 use workos::sso::{ClientId, ConnectionSelector, GetAuthorizationUrl, GetAuthorizationUrlParams, Provider};
 
-#[derive(serde::Serialize, Apiv2Schema)]
-struct GoogleOauthResponse {
-    redirect_url: String,
-}
-
-#[derive(serde::Deserialize, Apiv2Schema)]
-struct RedirectUrl {
-    redirect_url: String,
-}
-
-#[api_v2_operation(
-    description = "Request to authenticate via Google OAuth.",
-    tags(Auth, Private)
-)]
-#[get("/org/auth/google_oauth")]
-async fn handler(
+pub async fn handler(
     state: web::Data<State>,
-    redirect_url: web::Query<RedirectUrl>,
+    redirect_url: web::Query<GoogleOauthRedirectUrl>,
 ) -> actix_web::Result<HttpResponse, ApiError> {
     let redirect_url = &redirect_url.redirect_url;
 

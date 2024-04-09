@@ -147,3 +147,6 @@ pub use self::dupes::*;
 
 mod magic_link;
 pub use magic_link::*;
+
+mod google_oauth;
+pub use google_oauth::*;
