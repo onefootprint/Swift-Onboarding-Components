@@ -13,6 +13,7 @@ import {
   useValidateSession,
 } from '../../hooks';
 import { FPCustomEvents, getLogger } from '../../utils';
+import nid from '../../utils/neuro-id';
 import {
   createAuthTokenChangedPayload,
   createReceivedDeviceResponseJsonPayload,
@@ -144,6 +145,8 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
               }
               onDone={payload => {
                 send({ type: 'identifyCompleted', payload });
+                nid.identify(payload.authToken);
+
                 if (onIdentifyDone && payload) {
                   onIdentifyDone(payload);
                 }
