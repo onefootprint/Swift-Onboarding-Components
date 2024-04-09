@@ -87,7 +87,9 @@ declare -a all_commands # Array to store all commands
 for language in "${languages[@]}"; do
     local_sources=$(get_local_sources "$language")
     external_sources=$(get_external_package_sources "$language" deps[@])
-    all_commands+=("copy-and-watch ${watch_flag} ${local_sources} ${external_sources} public/locales/${language}/")
+    if [ -n "$local_sources" ] || [ -n "$external_sources" ]; then
+        all_commands+=("copy-and-watch ${watch_flag} ${local_sources} ${external_sources} public/locales/${language}/")
+    fi
 done
 
 # Execute copying tasks

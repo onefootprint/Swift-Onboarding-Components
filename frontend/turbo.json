@@ -78,10 +78,8 @@
       ]
     },
     "test:ci:bun": {
-      "dependsOn": [
-        "^build",
-        "i18n:copy-en"
-      ]
+      "cache": false,
+      "dependsOn": []
     },
     "test:e2e:ci": {
       "cache": false,

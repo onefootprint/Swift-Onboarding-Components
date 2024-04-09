@@ -26,6 +26,7 @@
   "frequency": "Frecuencia",
   "from": "de",
   "invitation-error_one": "La invitación no se ha enviado",
+  "invitation-error_many": "No se enviaron las invitaciones",
   "invitation-error_other": "No se enviaron las invitaciones",
   "invite-teammates": "Invitar compañeros",
   "invite": "Invitar",

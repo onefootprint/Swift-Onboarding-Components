@@ -20,6 +20,7 @@
   ],
   "scripts": {
     "test": "bun test --bail",
+    "pretest:ci:bun": "cd ../footprint-js && bun run tsup",
     "test:ci:bun": "bun test --bail",
     "test:watch": "bun test --watch",
     "dev": "tsup --watch",
