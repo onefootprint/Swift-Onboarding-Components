@@ -15,9 +15,8 @@ export type TabProps = {
   onClick?: React.MouseEventHandler<any>;
   selected?: boolean;
 };
-
 const Tab = forwardRef<HTMLAnchorElement, TabProps>(
-  ({ as, children, href, onClick, selected = false }: TabProps, ref) => (
+  ({ as, children, href, onClick, selected = false }, ref) => (
     <TabContainer
       aria-selected={selected}
       as={as}
@@ -38,6 +37,7 @@ const Tab = forwardRef<HTMLAnchorElement, TabProps>(
         variant="body-3"
         selected={selected}
         color={selected ? 'accent' : 'tertiary'}
+        tag="p"
       >
         {children}
       </Label>
@@ -52,32 +52,35 @@ const TabContainer = styled(Stack)<{ selected: boolean }>`
     gap: ${theme.spacing[2]};
     padding: ${theme.spacing[3]} 0;
     transition: background-color 0.5s ease;
+    height: ${theme.spacing[9]};
     cursor: pointer;
 
-    &:hover {
-      color: ${!selected && theme.color.secondary};
-
-      ${!selected &&
-      css`
-        &::after {
-          position: absolute;
-          content: '';
-          bottom: calc(${theme.spacing[4]} / 2);
-          left: calc(-1 * ${theme.spacing[3]} / 2);
-          width: calc(100% + ${theme.spacing[3]});
-          height: calc(100% - ${theme.spacing[2]});
-          background-color: ${theme.backgroundColor.secondary};
-          border-radius: ${theme.borderRadius.sm};
-          z-index: -1;
+    ${!selected &&
+    css`
+      &:hover {
+        p {
+          color: ${theme.color.secondary};
+          &::after {
+            content: '';
+            position: absolute;
+            background-color: ${theme.backgroundColor.secondary};
+            border-radius: ${theme.borderRadius.sm};
+            z-index: -1;
+            top: -${theme.spacing[2]};
+            bottom: -${theme.spacing[2]};
+            left: -${theme.spacing[3]};
+            right: -${theme.spacing[3]};
+          }
         }
-      `}
-    }
+      }
+    `}
   `}
 `;
 
 const Label = styled(Text)<{ selected: boolean }>`
   ${({ theme }) => css`
     position: relative;
+    display: inline-flex;
     z-index: 1;
     gap: ${theme.spacing[2]};
     transition: all 0.2s ease;
