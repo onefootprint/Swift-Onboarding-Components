@@ -7,18 +7,20 @@ import type {
 import { SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import type { EmailAndOrPhone } from '../types';
+import type { UserDatum } from '../../../types';
 import calculateRetryTime from './get-retry-time';
 
 type PayloadPartKey = 'obConfigAuth' | 'sandboxId' | 'scope';
-type Payload = EmailAndOrPhone & {
+type Payload = {
+  phoneNumber?: UserDatum<string>;
+  email?: UserDatum<string>;
   obConfigAuth?: ObConfigAuth;
   sandboxId?: string;
   scope: IdentifyTokenScope;
 };
 
 const requestFn = async (payload: Payload) => {
-  const { obConfigAuth, sandboxId, ...identifier } = payload;
+  const { obConfigAuth, sandboxId, ...restOfPayload } = payload;
   const headers: Record<string, string> = { ...obConfigAuth };
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
@@ -27,7 +29,7 @@ const requestFn = async (payload: Payload) => {
     method: 'POST',
     url: '/hosted/identify/signup_challenge',
     data: {
-      ...identifier,
+      ...restOfPayload,
     },
     headers,
   });

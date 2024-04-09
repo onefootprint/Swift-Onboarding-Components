@@ -12,7 +12,6 @@ export type DoneArgs = {
   phoneNumber?: UserDatum<string>;
   email?: UserDatum<string>;
 };
-export type EmailAndOrPhone = { email?: string; phoneNumber?: string };
 
 /**
  * Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.

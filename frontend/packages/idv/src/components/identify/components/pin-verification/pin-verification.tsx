@@ -127,8 +127,8 @@ const PinVerification = ({
 
     mutSignupChallenge.mutate(
       {
-        email: email?.value,
-        phoneNumber: phoneNumber?.value,
+        email,
+        phoneNumber,
       },
       {
         onError: (error: unknown) => {
