@@ -70,7 +70,7 @@ const NavDropdown = ({
         </StyledTrigger>
         {isOpen && (
           <Dropdown.Portal forceMount>
-            <NavDropdownContent forceMount>
+            <NavDropdownContent forceMount sideOffset={8}>
               <UserName
                 name={user.firstName}
                 lastName={user.lastName}

@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoUserCircle16 } from '@onefootprint/icons';
-import { createFontStyles, Divider, Stack } from '@onefootprint/ui';
+import { Box, createFontStyles, Divider, Stack, Text } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -26,7 +26,11 @@ const Nav = () => {
   const routes = useRoutes();
   const tenantsQuery = useAuthRoles(dangerouslyCastedData.auth);
   const currTenantId = dangerouslyCastedData.org.id;
-  const userName = `${dangerouslyCastedData.user.firstName} ${dangerouslyCastedData.user.lastName}`;
+  const { firstName, lastName, email } = dangerouslyCastedData.user;
+  const userName =
+    firstName || lastName
+      ? `${firstName || ''} ${lastName || ''}`.trim()
+      : undefined;
   const tenants = moveTenantToFront(tenantsQuery.data ?? [], currTenantId);
 
   const onAssumeTenant = (tenantId: string) => {
@@ -69,24 +73,37 @@ const Nav = () => {
       </Links>
       <Divider />
       <Stack
-        align="center"
         direction="row"
+        align="center"
         justify="space-between"
+        width="100%"
+        maxWidth="100%"
+        gap={3}
         paddingBottom={4}
         paddingLeft={5}
         paddingRight={5}
         paddingTop={4}
       >
-        <Stack direction="row" gap={3} align="center" justify="flex-start">
+        <Box>
           <IcoUserCircle16 color="tertiary" />
-          <User>{userName}</User>
-        </Stack>
-        <NavDropdown
-          currTenantId={currTenantId}
-          onAssumeTenant={onAssumeTenant}
-          tenants={tenants}
-          user={dangerouslyCastedData.user}
-        />
+        </Box>
+        <Text
+          variant="label-4"
+          color="tertiary"
+          truncate
+          width="100%"
+          marginBottom={1}
+        >
+          {userName || email}
+        </Text>
+        <Box>
+          <NavDropdown
+            currTenantId={currTenantId}
+            onAssumeTenant={onAssumeTenant}
+            tenants={tenants}
+            user={dangerouslyCastedData.user}
+          />
+        </Box>
       </Stack>
     </NavContainer>
   );
@@ -130,12 +147,5 @@ const Title = styled.div`
 `;
 
 const Element = styled(NavigationMenu.Link)``;
-
-const User = styled.div`
-  ${({ theme }) => css`
-    ${createFontStyles('label-4')}
-    color: ${theme.color.tertiary};
-  `}
-`;
 
 export default Nav;

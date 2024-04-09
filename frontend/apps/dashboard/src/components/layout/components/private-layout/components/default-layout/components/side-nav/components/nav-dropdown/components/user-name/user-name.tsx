@@ -8,18 +8,26 @@ type UserNameProps = {
   email?: string | null;
 };
 
-const UserName = ({ name, lastName, email }: UserNameProps) => (
-  <UserDropdownItem>
-    {(name || lastName) && (
-      <Text variant="label-3" truncate>
-        {name} {lastName}
+const UserName = ({ name, lastName, email }: UserNameProps) => {
+  const hasName = name || lastName;
+
+  return (
+    <UserDropdownItem>
+      {hasName && (
+        <Text variant="label-3" truncate>
+          {name} {lastName}
+        </Text>
+      )}
+      <Text
+        variant={!hasName ? 'label-3' : 'body-3'}
+        color={!hasName ? 'primary' : 'secondary'}
+        truncate
+      >
+        {email}
       </Text>
-    )}
-    <Text variant="body-3" color="secondary" truncate>
-      {email}
-    </Text>
-  </UserDropdownItem>
-);
+    </UserDropdownItem>
+  );
+};
 
 const UserDropdownItem = styled(Stack)`
   ${({ theme }) => css`
