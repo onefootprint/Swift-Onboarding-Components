@@ -12,6 +12,7 @@ import { getCountryCodeFromLocale } from '../../utils';
 import type { BaseSelectOption } from '../internal/base-select';
 import BaseSelect from '../internal/base-select';
 import Input from './components/input';
+import MobileOption from './components/mobile-option';
 import Option from './components/option';
 import type { PhoneInputProps, PhoneSelectOption } from './phone-input.types';
 import { getCountryFromPhoneNumber } from './phone-input.utils';
@@ -63,6 +64,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         onChange={handleCountryChange}
         OptionComponent={Option}
         options={localizedOptions}
+        MobileOptionComponent={MobileOption}
         renderTrigger={trigger => (
           <Input
             {...props}
