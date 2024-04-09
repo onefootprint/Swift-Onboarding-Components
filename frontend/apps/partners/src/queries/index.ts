@@ -15,7 +15,7 @@ export { default as getPartnerPartnershipsDocumentsEvents } from './get-partner-
 export { default as getPartnerPartnershipsSubmissions } from './get-partner-partnerships-submissions';
 export type { Role } from './get-partner-roles';
 export { default as getPartnerRoles } from './get-partner-roles';
-export { default as postOrgAuthLogin } from './post-org-auth-login';
+export { default as postPartnerAuthLogin } from './post-partner-auth-login';
 export { default as postPartnerDocTemplates } from './post-partner-doc-templates';
 export { default as postPartnerMembers } from './post-partner-members';
 export { default as postPartnerMembersDeactivate } from './post-partner-members-deactivate';

@@ -3756,7 +3756,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/OrgLoginRequest"
+                                "$ref": "#/components/schemas/OrgLoginRequest%3C%3E"
                             }
                         }
                     },
@@ -5937,6 +5937,38 @@
                         "Dashboard Token": []
                     }
                 ]
+            }
+        },
+        "/partner/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth",
+                    "Private"
+                ],
+                "description": "Called from the front-end with the WorkOS code. Returns the authorization token needed for future partner requests as well as user information",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrgLoginRequest%3C%3E"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrgLoginResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
             }
         },
         "/partner/auth/logout": {
@@ -21033,18 +21065,11 @@
                     "kind"
                 ]
             },
-            "OrgLoginRequest": {
+            "OrgLoginRequest<>": {
                 "type": "object",
                 "properties": {
                     "code": {
                         "type": "string"
-                    },
-                    "login_target": {
-                        "type": "string",
-                        "enum": [
-                            "tenant_dashboard",
-                            "partner_tenant_dashboard"
-                        ]
                     },
                     "request_org_id": {
                         "description": "Optionally request to log into the provided tenant, if the user has a rolebinding at this tenant.",
@@ -21052,8 +21077,7 @@
                     }
                 },
                 "required": [
-                    "code",
-                    "login_target"
+                    "code"
                 ]
             },
             "OrgLoginResponse": {

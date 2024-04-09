@@ -13,12 +13,12 @@ import {
 import { getErrorMessage } from '@/helpers';
 import type { Session } from '@/hooks';
 import { useClientStore, useEffectOnce } from '@/hooks';
-import postOrgAuthLogin from '@/queries/post-org-auth-login';
+import postPartnerAuthLogin from '@/queries/post-partner-auth-login';
 
 import Error from './error';
 
 type FromPromise<T> = T extends Promise<infer U> ? U : T;
-type ResLogin = FromPromise<ReturnType<typeof postOrgAuthLogin>>;
+type ResLogin = FromPromise<ReturnType<typeof postPartnerAuthLogin>>;
 type AuthPageProps = {
   params: LangProp; // eslint-disable-line react/no-unused-prop-types
   searchParams: { code?: string; error?: string; state?: string };
@@ -66,9 +66,8 @@ const AuthPage = ({ searchParams }: AuthPageProps) => {
   useEffectOnce(() => {
     if (!code) return;
 
-    postOrgAuthLogin({
+    postPartnerAuthLogin({
       code,
-      login_target: 'partner_tenant_dashboard',
     })
       .then(res => {
         setLoginSession(update, res);

@@ -2,7 +2,6 @@ import baseFetch from './base-fetch';
 
 type OrgLoginRequest = {
   code: string;
-  login_target: 'partner_tenant_dashboard' | 'tenant_dashboard';
   request_org_id?: string;
 };
 export type OrgLoginResponse = {
@@ -31,6 +30,16 @@ export type OrgLoginResponse = {
     supportEmail?: string;
     supportPhone?: string;
     supportWebsite?: string;
+    websiteUrl?: string;
+  };
+  partnerTenant?: {
+    id: string;
+    name: string;
+    domains: Array<string>;
+    allowDomainAccess: boolean;
+    isDomainAlreadyClaimed?: boolean;
+    isAuthMethodSupported?: boolean;
+    logoUrl?: string;
     websiteUrl?: string;
   };
   user?: {
@@ -78,16 +87,16 @@ export type OrgLoginResponse = {
 };
 
 /**
- * Sends a POST request to the '/org/auth/login' endpoint with the provided payload.
+ * Sends a POST request to the '/partner/auth/login' endpoint with the provided payload.
  *
  * @param {OrgLoginRequest} payload - The payload containing the login information.
  * @return {Promise<OrgLoginResponse>} - A promise that resolves to the response from the server.
  */
-const postOrgAuthLogin = async (payload: OrgLoginRequest) =>
-  baseFetch<OrgLoginResponse>('/org/auth/login', {
+const postPartnerAuthLogin = async (payload: OrgLoginRequest) =>
+  baseFetch<OrgLoginResponse>('/partner/auth/login', {
     method: 'POST',
     body: JSON.stringify(payload),
     next: { revalidate: 30 },
   });
 
-export default postOrgAuthLogin;
+export default postPartnerAuthLogin;

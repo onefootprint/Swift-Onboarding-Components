@@ -58,7 +58,7 @@ itertools = { workspace = true }
 lazy_static = { workspace = true }
 strum = { workspace = true }
 
-workos = "0.2"
+workos = { workspace = true }
 byteorder = { workspace = true }
 bytes = "1.3"
 
