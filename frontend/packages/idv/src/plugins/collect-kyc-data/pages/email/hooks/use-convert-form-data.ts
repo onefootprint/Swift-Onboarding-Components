@@ -18,13 +18,14 @@ const useConvertFormData = () => {
     if (!requiresEmail || !email) {
       return convertedData;
     }
-    const isChanged = email !== data[IdDI.email]?.value;
+    const oldEmail = data[IdDI.email];
+    const isChanged = email !== oldEmail?.value;
     convertedData[IdDI.email] = {
       value: email,
-      dirty: isChanged,
-      bootstrap: isChanged ? false : data[IdDI.email]?.bootstrap,
-      disabled: data[IdDI.email]?.disabled ?? false,
-      decrypted: isChanged ? false : data[IdDI.email]?.decrypted,
+      dirty: isChanged || oldEmail?.dirty,
+      bootstrap: isChanged ? false : oldEmail?.bootstrap,
+      disabled: oldEmail?.disabled ?? false,
+      decrypted: isChanged ? false : oldEmail?.decrypted,
     };
     return convertedData;
   };

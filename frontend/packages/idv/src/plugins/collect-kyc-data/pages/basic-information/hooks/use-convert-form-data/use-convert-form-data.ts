@@ -81,7 +81,7 @@ const useConvertFormData = () => {
       const isChanged = dob !== oldDob?.value;
       convertedData[IdDI.dob] = {
         value: dob,
-        dirty: isChanged,
+        dirty: isChanged || oldDob?.dirty,
         bootstrap: Boolean(isChanged ? false : oldDob?.bootstrap),
         disabled: Boolean(oldDob?.disabled),
         decrypted: Boolean(isChanged ? false : oldDob?.decrypted),
@@ -93,7 +93,7 @@ const useConvertFormData = () => {
       const isChanged = nationality.value !== oldNationality?.value;
       convertedData[IdDI.nationality] = {
         value: nationality.value,
-        dirty: isChanged,
+        dirty: isChanged || oldNationality?.dirty,
         bootstrap: Boolean(isChanged ? false : oldNationality?.bootstrap),
         disabled: Boolean(oldNationality?.disabled),
         decrypted: Boolean(isChanged ? false : oldNationality?.decrypted),
@@ -106,7 +106,7 @@ const useConvertFormData = () => {
       convertedData[IdDI.email] = {
         bootstrap: Boolean(isEmailChanged ? false : oldEmail?.bootstrap),
         decrypted: Boolean(isEmailChanged ? false : oldEmail?.decrypted),
-        dirty: isEmailChanged,
+        dirty: isEmailChanged || oldEmail?.dirty,
         disabled: Boolean(oldEmail?.disabled),
         value: email,
       };
@@ -118,7 +118,7 @@ const useConvertFormData = () => {
       convertedData[IdDI.phoneNumber] = {
         bootstrap: Boolean(isPhoneChanged ? false : oldPhone?.bootstrap),
         decrypted: Boolean(isPhoneChanged ? false : oldPhone?.decrypted),
-        dirty: isPhoneChanged,
+        dirty: isPhoneChanged || oldPhone?.dirty,
         disabled: Boolean(oldPhone?.disabled),
         value: phoneNumber,
       };

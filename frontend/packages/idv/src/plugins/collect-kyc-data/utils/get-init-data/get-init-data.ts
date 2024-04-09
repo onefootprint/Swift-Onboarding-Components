@@ -1,15 +1,17 @@
-import type { CollectedKycDataOption, IdDI } from '@onefootprint/types';
+import type { CollectKycDataRequirement, IdDI } from '@onefootprint/types';
 import { CdoToAllDisMap } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
 import type { UserData } from '../../../../types';
+import allAttributes from '../all-attributes';
 import type { KycData } from '../data-types';
 
 const getInitData = (
-  cdos: CollectedKycDataOption[],
+  requirement: CollectKycDataRequirement,
   userData: UserData,
   disabledFields?: IdDI[],
 ): KycData => {
+  const cdos = allAttributes(requirement);
   const data: KycData = {};
   Object.entries(userData).forEach(([key, value]) => {
     if (value) {
@@ -27,10 +29,20 @@ const getInitData = (
       const entry = data[field];
       if (entry) {
         entry.disabled = true;
-        entry.dirty = true;
       }
     });
   }
+
+  // If a piece of data is passed into the collect KYC machine but doesn't exist on the backend,
+  // we should immediately mark it as dirty
+  [...requirement.missingAttributes, ...requirement.optionalAttributes]
+    .flatMap(cdo => CdoToAllDisMap[cdo])
+    .forEach(field => {
+      const entry = data[field as IdDI];
+      if (entry) {
+        entry.dirty = true;
+      }
+    });
 
   // Filter out fields that are not in the ob config
   // For now we only support bootstrapping KYC fields
