@@ -32,6 +32,7 @@ jobs:
   e2e:
     # if: ${{ contains(github.event.pull_request.labels.*.name, 'e2e-on') }}
     strategy:
+      fail-fast: false
       matrix:
         node-version: [18.x]
         os: [ubuntu-latest]

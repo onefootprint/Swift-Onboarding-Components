@@ -32,6 +32,7 @@ jobs:
   e2e:
     # if: ${{ contains(github.event.pull_request.labels.*.name, 'e2e-on') }}
     strategy:
+      fail-fast: false
       matrix:
         shard: [1/4, 2/4, 3/4, 4/4]
         node-version: [18.x]
