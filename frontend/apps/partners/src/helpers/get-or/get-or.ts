@@ -1,16 +1,19 @@
-type Obj = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
+const isObject = (x: unknown): x is object => typeof x === 'object' && !!x;
 
 const getOr =
   <Override>(fallback: Override, strWithDots: string) =>
-  (obj: Obj): Override => {
+  (obj: object): Override => {
     if (!isObject(obj) || !strWithDots) return fallback;
 
-    return strWithDots.split('.').reduce((it, key) => {
-      if (it == null) return fallback;
-      return it[key];
-    }, obj) as Override;
+    const keys = strWithDots.split('.');
+    let acc: object = obj;
+
+    for (const key of keys) {
+      if (acc == null) return fallback;
+      acc = acc[key as keyof typeof acc];
+    }
+
+    return acc as Override;
   };
 
 export default getOr;

@@ -1,14 +1,14 @@
 'use client';
 
-import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { TableRow } from '@onefootprint/ui';
-import { Box, IconButton, Stack, Table, Text } from '@onefootprint/ui';
+import { Stack, Table, Text } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { PartnerCompany } from '@/config/types';
+import { searchByPaths } from '@/helpers';
+import type { PartnerCompany } from '@/queries/get-partner-partnerships';
 
 type T = TFunction<'common'>;
 type CompaniesContentProps = { companies: PartnerCompany[] };
@@ -17,18 +17,14 @@ const getColumns = (t: T) => [
   { text: t('company'), width: '40%' },
   { text: t('companies.completed-controls'), width: '25%' },
   { text: t('companies.active-playbooks'), width: '25%' },
-  { text: '', width: '10%' },
 ];
+
+const clientSearch = searchByPaths<PartnerCompany>(['companyName']);
 
 const CompaniesContent = ({ companies }: CompaniesContentProps) => {
   const router = useRouter();
   const { t } = useTranslation('common');
-
-  const handleSearchChange = (searchText: string) => {
-    // TODO: Implement search
-    // eslint-disable-next-line no-console
-    console.log(searchText);
-  };
+  const [search, setSearch] = useState<string>('');
 
   const handleRowClick = (company: PartnerCompany) => {
     router.push(`/app/companies/${company.id}`);
@@ -48,36 +44,28 @@ const CompaniesContent = ({ companies }: CompaniesContentProps) => {
         aria-label={t('companies.company-table-aria-label')}
         columns={getColumns(t)}
         emptyStateText={t('companies.company-empty-state')}
-        getAriaLabelForRow={(c: PartnerCompany) => c.name}
-        getKeyForRow={(c: PartnerCompany) => c.id}
+        getAriaLabelForRow={c => c.companyName}
+        getKeyForRow={c => c.id}
         hasRowEmphasis={() => true}
         initialSearch=""
-        items={companies}
-        onChangeSearchText={handleSearchChange}
-        renderTr={renderTr(t)}
-        searchPlaceholder={t('search-placeholder')}
+        items={clientSearch(companies, search)}
+        onChangeSearchText={setSearch}
         onRowClick={handleRowClick}
+        renderTr={renderTr}
+        searchPlaceholder={t('search-placeholder')}
       />
     </>
   );
 };
 
-const renderTr = (t: T) =>
-  function Tr({ item }: TableRow<PartnerCompany>) {
-    return (
-      <>
-        <td>{item.name}</td>
-        <td>
-          {item.controls.value} / {item.controls.total}
-        </td>
-        <td>{item.activePlaybooks}</td>
-        <Box tag="td" display="grid" justifyContent="end" alignItems="center">
-          <IconButton aria-label={`${t('open-actions-for')} ${item.name}`}>
-            <IcoDotsHorizontal24 />
-          </IconButton>
-        </Box>
-      </>
-    );
-  };
+const renderTr = ({ item }: TableRow<PartnerCompany>) => (
+  <>
+    <td>{item.companyName}</td>
+    <td>
+      {item.numControlsComplete} / {item.numControlsTotal}
+    </td>
+    <td>{item.numActivePlaybooks}</td>
+  </>
+);
 
 export default CompaniesContent;

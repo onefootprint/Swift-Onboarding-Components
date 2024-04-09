@@ -29,4 +29,23 @@ describe('getOr', () => {
     const result = getOr(fallback, 'a.b.c')({ a: { b: { c: 'value' } } });
     expect(result).toBe('value');
   });
+
+  it('should work with deeply nested objects', () => {
+    const fallback = 'fallback';
+    const obj = {
+      l1: { l2: { l3: { l4: { l5: { value: 'value' } } } } },
+    };
+
+    const result1 = getOr<string>(fallback, 'l1.l2.l3.l4.l5.value')(obj);
+    expect(result1).toEqual('value');
+
+    const result2 = getOr<object | string>(fallback, 'l1.l2.l3.l4.l5')(obj);
+    expect(result2).toEqual({ value: 'value' });
+
+    const result3 = getOr<object | string>(fallback, 'l1.l2.l3.l4')(obj);
+    expect(result3).toEqual({ l5: { value: 'value' } });
+
+    const result4 = getOr<object | string>(fallback, 'l1.l2.l3')(obj);
+    expect(result4).toEqual({ l4: { l5: { value: 'value' } } });
+  });
 });
