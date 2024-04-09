@@ -35,7 +35,7 @@ export type OnRequestCalledArgs = {
 };
 
 const requestHelper = ({
-  delay = 100,
+  delay = 5,
   statusCode = 200,
   fullPath = false,
   method = 'get',
