@@ -6,6 +6,7 @@ import { useEffectOnce } from 'usehooks-ts';
 import { AppErrorBoundary, SessionExpired } from '../../components';
 import { Identify, IdentifyVariant } from '../../components/identify';
 import { L10nContextProvider } from '../../components/l10n-provider';
+import LoadNeuroId from '../../components/load-neuro-id';
 import {
   useIdvMachine,
   useLogStateMachine,
@@ -117,56 +118,58 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
       {state.matches('init') ? <Init /> : null}
       {state.matches('sandboxOutcome') ? <SandboxOutcome /> : null}
-      {state.matches('identify') && config && device ? (
-        <L10nContextProvider l10n={l10n}>
-          <Identify
-            variant={IdentifyVariant.verify}
-            device={device}
-            config={config}
-            isLive={config.isLive}
-            overallOutcome={overallOutcome}
-            sandboxId={sandboxId}
-            initialAuthToken={authToken}
-            obConfigAuth={obConfigAuth}
-            bootstrapData={{
-              email: userData?.[IdDI.email]?.value,
-              phoneNumber: userData?.[IdDI.phoneNumber]?.value,
-            }}
-            logoConfig={
-              showLogo
-                ? {
-                    orgName: config.orgName,
-                    logoUrl: config.logoUrl || undefined,
-                  }
-                : undefined
-            }
-            onDone={payload => {
-              send({ type: 'identifyCompleted', payload });
-              if (onIdentifyDone && payload) {
-                onIdentifyDone(payload);
+      <LoadNeuroId disabled={!config?.nidEnabled}>
+        {state.matches('identify') && config && device ? (
+          <L10nContextProvider l10n={l10n}>
+            <Identify
+              variant={IdentifyVariant.verify}
+              device={device}
+              config={config}
+              isLive={config.isLive}
+              overallOutcome={overallOutcome}
+              sandboxId={sandboxId}
+              initialAuthToken={authToken}
+              obConfigAuth={obConfigAuth}
+              bootstrapData={{
+                email: userData?.[IdDI.email]?.value,
+                phoneNumber: userData?.[IdDI.phoneNumber]?.value,
+              }}
+              logoConfig={
+                showLogo
+                  ? {
+                      orgName: config.orgName,
+                      logoUrl: config.logoUrl || undefined,
+                    }
+                  : undefined
               }
+              onDone={payload => {
+                send({ type: 'identifyCompleted', payload });
+                if (onIdentifyDone && payload) {
+                  onIdentifyDone(payload);
+                }
+              }}
+            />
+          </L10nContextProvider>
+        ) : null}
+        {state.matches('onboarding') && authToken && config && device ? (
+          <Onboarding
+            config={config}
+            idvContext={{
+              device,
+              authToken,
+              isTransfer,
+              componentsSdkContext,
+              isInIframe,
             }}
+            userData={userData}
+            overallOutcome={overallOutcome}
+            idDocOutcome={idDocOutcome}
+            onClose={onClose}
+            onDone={payload => send({ type: 'onboardingCompleted', payload })}
+            l10n={l10n}
           />
-        </L10nContextProvider>
-      ) : null}
-      {state.matches('onboarding') && authToken && config && device ? (
-        <Onboarding
-          config={config}
-          idvContext={{
-            device,
-            authToken,
-            isTransfer,
-            componentsSdkContext,
-            isInIframe,
-          }}
-          userData={userData}
-          overallOutcome={overallOutcome}
-          idDocOutcome={idDocOutcome}
-          onClose={onClose}
-          onDone={payload => send({ type: 'onboardingCompleted', payload })}
-          l10n={l10n}
-        />
-      ) : null}
+        ) : null}
+      </LoadNeuroId>
       {state.matches('sessionExpired') ? (
         <SessionExpired onRestart={() => send({ type: 'reset' })} />
       ) : null}

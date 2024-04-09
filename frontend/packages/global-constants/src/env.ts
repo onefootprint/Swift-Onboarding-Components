@@ -1,7 +1,11 @@
 const getBranchSlug = (branchName: string) =>
   branchName.toLowerCase().split('/').join('-');
 
-const IS_VERCEL_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
+export const IS_VERCEL_PREVIEW =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
+export const IS_TEST = process.env.NODE_ENV === 'test';
+export const IS_E2E = process.env.IS_E2E === 'true';
+export const IS_CI = process.env.CI === 'true';
 
 export const IS_BROWSER = typeof window !== 'undefined';
 export const IS_SERVER = typeof window === 'undefined';
