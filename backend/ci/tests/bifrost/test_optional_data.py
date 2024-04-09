@@ -20,9 +20,11 @@ def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
         must_collect_data,
         can_access_data,
         optional_data=optional_data,
-        doc_scan_for_optional_ssn="document.passport,drivers_license,visa.none.none"
-        if step_up_to_doc
-        else None,
+        doc_scan_for_optional_ssn=(
+            "document.passport,drivers_license,visa.none.none"
+            if step_up_to_doc
+            else None
+        ),
     )
     bifrost = BifrostClient.new(obc, override_ob_config_auth=None)
 
@@ -72,18 +74,22 @@ def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
     met_requirement = get_requirement_from_requirements(
         "collect_data", status["all_requirements"], is_met=True
     )
-    expected_populated_attributes = ["full_address", "name", "email", "phone_number"]
     if submit_ssn:
-        expected_populated_attributes.append("ssn9")
-    assert set(met_requirement["populated_attributes"]) == set(
-        expected_populated_attributes
-    )
+        assert set(met_requirement["populated_attributes"]) == set(
+            ["full_address", "name", "email", "phone_number", "ssn9"]
+        )
+        assert met_requirement["optional_attributes"] == []
+    else:
+        assert set(met_requirement["populated_attributes"]) == set(
+            ["full_address", "name", "email", "phone_number"]
+        )
+        assert met_requirement["optional_attributes"] == ["ssn9"]
 
     authorize = get_requirement_from_requirements(
         "authorize", status["all_requirements"], is_met=True
     )
     assert set(authorize["fields_to_authorize"]["collected_data"]) == set(
-        expected_populated_attributes
+        met_requirement["populated_attributes"]
     )
 
     user = bifrost.run()

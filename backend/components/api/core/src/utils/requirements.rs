@@ -175,9 +175,10 @@ pub async fn get_requirements_for_person_and_maybe_business(
     Ok(requirements)
 }
 
-pub struct RequirementProgress {
-    pub populated_attributes: Vec<CollectedDataOption>,
-    pub missing_attributes: Vec<CollectedDataOption>,
+struct RequirementProgress {
+    populated_attributes: Vec<CollectedDataOption>,
+    missing_attributes: Vec<CollectedDataOption>,
+    optional_attributes: Vec<CollectedDataOption>,
 }
 
 /// Returns if the provided CDO is met by the data in the VW. Some CDOs have conditional
@@ -256,7 +257,7 @@ pub(crate) fn should_skip_us_only_cdos(
     }
 }
 
-pub fn get_data_collection_progress<Type>(
+fn get_data_collection_progress<Type>(
     vw: &VaultWrapper<Type>,
     ob_config: &ObConfiguration,
     di_kind: DID,
@@ -264,6 +265,7 @@ pub fn get_data_collection_progress<Type>(
 ) -> RequirementProgress {
     let mut populated_attributes = Vec::new();
     let mut missing_attributes = Vec::new();
+    let mut optional_attributes = Vec::new();
 
     ob_config
         .must_collect_data
@@ -277,12 +279,15 @@ pub fn get_data_collection_progress<Type>(
                 populated_attributes.push(cdo.clone());
             } else if must_collect {
                 missing_attributes.push(cdo.clone());
+            } else {
+                optional_attributes.push(cdo.clone());
             }
         });
 
     RequirementProgress {
         populated_attributes,
         missing_attributes,
+        optional_attributes,
     }
 }
 
@@ -362,11 +367,12 @@ fn get_requirement_inner(
                     let RequirementProgress {
                         populated_attributes,
                         missing_attributes,
+                        optional_attributes,
                     } = get_data_collection_progress(vw, obc, DID::Id, decrypted_values);
                     // if ob config needs to collect id data
                     OnboardingRequirement::CollectData {
                         missing_attributes,
-                        optional_attributes: obc.optional_data.clone(),
+                        optional_attributes,
                         populated_attributes,
                     }
                 })
@@ -378,6 +384,7 @@ fn get_requirement_inner(
                 .then(|| -> ApiResult<_> {
                     let RequirementProgress {
                         populated_attributes,
+                        optional_attributes: _,
                         missing_attributes,
                     } = get_data_collection_progress(vw, obc, DID::InvestorProfile, decrypted_values);
                     let declarations = decrypted_values.get_di(IPK::Declarations).ok();
@@ -405,6 +412,7 @@ fn get_requirement_inner(
             .then(|| -> ApiResult<_> {
                 let RequirementProgress {
                     populated_attributes,
+                    optional_attributes: _,
                     missing_attributes,
                 } = get_data_collection_progress(vw, obc, DID::Business, decrypted_values);
                 Ok(OnboardingRequirement::CollectBusinessData {
