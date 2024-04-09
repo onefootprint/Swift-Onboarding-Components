@@ -9,7 +9,7 @@ type EmptyResponse = Record<string, never>;
  * @return {Promise<EmptyResponse>} - A promise that resolves to an EmptyResponse object.
  */
 const authMagicLink = async (email: string) =>
-  baseFetch<EmptyResponse>('/org/auth/magic_link', {
+  baseFetch<EmptyResponse>('/partner/auth/magic_link', {
     cache: 'no-cache',
     method: 'POST',
     body: JSON.stringify({

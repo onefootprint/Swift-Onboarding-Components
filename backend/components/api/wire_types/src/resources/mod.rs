@@ -144,3 +144,6 @@ pub use list_event::*;
 
 mod dupes;
 pub use self::dupes::*;
+
+mod magic_link;
+pub use magic_link::*;

@@ -6000,6 +6000,38 @@
                 ]
             }
         },
+        "/partner/auth/magic_link": {
+            "post": {
+                "tags": [
+                    "Auth",
+                    "Private"
+                ],
+                "description": "Request to authenticate a user email. WorkOS will send the email a link to login. Once the user clicks the magic link, WorkOs will call the /workos/callback endpoint, at which point we authenticate the user",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkAuthRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
         "/partner/auth/roles": {
             "get": {
                 "tags": [

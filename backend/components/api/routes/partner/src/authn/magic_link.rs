@@ -11,7 +11,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
     at which point we authenticate the user",
     tags(Auth, Private)
 )]
-#[post("/org/auth/magic_link")]
-async fn handler(state: web::Data<State>, request: Json<LinkAuthRequest>) -> JsonApiResponse<EmptyResponse> {
+#[post("/partner/auth/magic_link")]
+fn handler(state: web::Data<State>, request: Json<LinkAuthRequest>) -> JsonApiResponse<EmptyResponse> {
     api_route_org_common::magic_link::handler(state, request).await
 }
