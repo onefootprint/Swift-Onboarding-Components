@@ -1,48 +1,19 @@
-import { type Entity, IdDI } from '@onefootprint/types';
+import { type Entity } from '@onefootprint/types';
 import { CodeInline, Text } from '@onefootprint/ui';
 import React from 'react';
 import { StatusBadge } from 'src/components';
 import Tags from 'src/components/entities/components/tags';
+import getTruncatedName from 'src/utils/get-truncated-name';
 
 type RowProps = {
   entity: Entity;
-};
-
-const getName = (entity: Entity) => {
-  const attributes = entity.data;
-
-  // find an attribute in attributes that has identifier with value IdDI.fistName
-  const firstNameAttribute = attributes.find(
-    attribute => attribute.identifier === IdDI.firstName,
-  );
-
-  // find an attribute in attributes that has identifier with value IdDI.lastName
-  const lastNameAttribute = attributes.find(
-    attribute => attribute.identifier === IdDI.lastName,
-  );
-
-  if (!firstNameAttribute) {
-    return '-';
-  }
-
-  const firstName = firstNameAttribute.value;
-  if (!firstName) {
-    return '-';
-  }
-
-  const lastNameInitial = lastNameAttribute?.transforms.prefix_1
-    ? `${lastNameAttribute.transforms.prefix_1}.`
-    : '';
-
-  const name = `${firstName} ${lastNameInitial}`;
-  return name;
 };
 
 const Row = ({ entity }: RowProps) => (
   <>
     <td>
       <Text variant="body-3" truncate>
-        {getName(entity)}
+        {getTruncatedName(entity.data)}
       </Text>
     </td>
     <td>

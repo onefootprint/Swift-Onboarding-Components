@@ -8,7 +8,7 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import RiskSignals from './risk-signals';
+import RiskSignalsList from '.';
 import {
   withRiskSignals,
   withRiskSignalsError,
@@ -28,7 +28,7 @@ describe('<RiskSignals />', () => {
   });
 
   const renderRiskSignals = () => {
-    customRender(<RiskSignals />);
+    customRender(<RiskSignalsList />);
   };
 
   const renderRiskSignalsAndWaitData = async () => {

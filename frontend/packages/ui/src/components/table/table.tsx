@@ -1,4 +1,3 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoInfo16 } from '@onefootprint/icons';
 import type { Property } from 'csstype';
 import times from 'lodash/times';
@@ -61,7 +60,6 @@ const Table = <T,>({
   const shouldShowEmptyState = !isLoading && !items?.length;
   const shouldShowData = !isLoading && !!items;
   const columnsCount = columns.length;
-  const [animate] = useAutoAnimate<HTMLDivElement>();
 
   return (
     <>
@@ -150,7 +148,6 @@ const Table = <T,>({
                   }
                   data-clickable={!!onRowClick}
                   key={getKeyForRow(item)}
-                  ref={animate}
                   onClick={() => {
                     onRowClick?.(item);
                   }}

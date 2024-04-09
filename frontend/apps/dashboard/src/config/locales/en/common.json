@@ -1681,6 +1681,31 @@
               "url": "Go to article"
             }
           }
+        },
+        "duplicate-data": {
+          "title": "Duplicate data",
+          "empty-state": "No duplicate data found",
+          "table": {
+            "aria-label": "Duplicate data",
+            "empty-state": "No duplicate data found",
+            "header": {
+              "fp-id": "Footprint ID",
+              "exact-match": "Exact match",
+              "status": "Onboarding status",
+              "created-at": "Created at",
+              "name": "Name"
+            }
+          },
+          "dupe-kinds": {
+            "ssn9": "SSN",
+            "email": "Email address",
+            "phone_number": "Phone number"
+          },
+          "empty-same-tenant": "No matches in {{orgName}}",
+          "other-tenants-summary": {
+            "description": "Plus <strong>{{numMatches}}</strong> more matches in <strong>{{numTenants}}</strong> other companies",
+            "description-empty-same-tenant": "<strong>{{numMatches}}</strong> matches in <strong>{{numTenants}}</strong> other companies"
+          }
         }
       },
       "device-insights": {

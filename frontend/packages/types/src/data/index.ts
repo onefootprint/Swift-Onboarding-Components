@@ -68,6 +68,12 @@ export {
 } from './di';
 export type { Document, DocumentUpload } from './document-type';
 export { UploadSource } from './document-type';
+export type {
+  DuplicateDataItem,
+  OtherTenantsDuplicateDataSummary,
+  SameTenantDuplicateData,
+} from './duplicate-data';
+export { DupeKind } from './duplicate-data';
 export type { Entity, EntityVault, EntityWorkflow } from './entity';
 export {
   ApiEntityStatus,

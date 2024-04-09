@@ -68,6 +68,10 @@ export type {
   GetClientSecurityResponse,
 } from './get-client-security-config';
 export type { GetD2PRequest, GetD2PResponse } from './get-d2p-status';
+export type {
+  GetDuplicateDataRequest,
+  GetDuplicateDataResponse,
+} from './get-duplicate-data';
 export type { GetEntitiesRequest, GetEntitiesResponse } from './get-entities';
 export type { GetEntityRequest, GetEntityResponse } from './get-entity';
 export type {
