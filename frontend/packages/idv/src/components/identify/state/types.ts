@@ -14,6 +14,7 @@ import type { UserDatum } from '../../../types';
 
 export type IdentifyMachineContext = {
   bootstrapData: IdentifyBootstrapData;
+  isComponentsSdk: boolean;
   challenge: MachineChallengeContext;
   /** config -
    * The identify flow may have no config if we're logging into a non-onboarding flow, like

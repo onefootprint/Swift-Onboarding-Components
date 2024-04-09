@@ -48,6 +48,7 @@ const PinVerification = ({
     identify: { identifyToken },
     variant,
     obConfigAuth,
+    isComponentsSdk,
   } = state.context;
   const requestError = useRequestError();
   const { t } = useTranslation('identify', { keyPrefix: 'pin-verification' });
@@ -59,6 +60,7 @@ const PinVerification = ({
     obConfigAuth,
     sandboxId,
     scope,
+    isComponentsSdk,
   });
   const mutIdentifyVerify = useIdentifyVerify({ scope });
 

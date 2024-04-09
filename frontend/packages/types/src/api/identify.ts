@@ -6,6 +6,7 @@ import type {
 } from '../data';
 import type { UserTokenScope } from './user-token';
 
+export const IS_COMPONENTS_SDK_HEADER = 'X-Fp-Is-Components-Sdk';
 export const SANDBOX_ID_HEADER = 'X-Sandbox-id';
 export const AUTH_HEADER = 'X-Fp-Authorization';
 

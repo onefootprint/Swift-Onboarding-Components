@@ -21,6 +21,7 @@ import {
   Stepper,
   Text,
 } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import Header from './components/header';
@@ -47,11 +48,18 @@ const steps = [
   },
 ];
 
-const publicKey =
+const publicKeyEnv =
   process.env.NEXT_PUBLIC_TENANT_KEY || 'pb_test_B1Q1ubKxYEpx3uKdGaXLQ2';
 
 const Demo = () => {
   const [option, setOption] = useState(steps[0]);
+  const router = useRouter();
+  if (!router.isReady) {
+    return null;
+  }
+  const { ob_key: obKey } = router.query;
+  const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
+
   const isIdentify = option.value === 'identify';
   const isBasicData = option.value === 'basic-data';
   const isCustomData = option.value === 'custom-data';

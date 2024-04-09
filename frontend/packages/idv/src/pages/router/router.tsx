@@ -131,6 +131,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
               sandboxId={sandboxId}
               initialAuthToken={authToken}
               obConfigAuth={obConfigAuth}
+              isComponentsSdk={!!componentsSdkContext}
               bootstrapData={{
                 email: userData?.[IdDI.email]?.value,
                 phoneNumber: userData?.[IdDI.phoneNumber]?.value,

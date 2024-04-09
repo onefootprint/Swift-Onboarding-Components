@@ -31,6 +31,7 @@ import {
 
 export type IdentifyMachineArgs = {
   initialAuthToken?: string;
+  isComponentsSdk?: boolean;
   bootstrapData?: IdentifyBootstrapData;
   config?: PublicOnboardingConfig;
   isLive: boolean;
@@ -114,6 +115,7 @@ const SUCCESS_TRANSITIONS: TransitionsFor<ChallengeSucceededEvent> = [
 
 export const getMachineArgs = ({
   initialAuthToken,
+  isComponentsSdk,
   bootstrapData,
   config,
   isLive,
@@ -127,6 +129,7 @@ export const getMachineArgs = ({
   const { email, phoneNumber } = validateBootstrapData(bootstrapData);
   return {
     initialAuthToken,
+    isComponentsSdk: !!isComponentsSdk,
     bootstrapData: bootstrapData ?? {},
     challenge: {},
     config,
