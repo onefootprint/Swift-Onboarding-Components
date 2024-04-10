@@ -1,0 +1,1 @@
+DROP INDEX tenant_role_unique_name_for_partner_tenant_id_kind;
