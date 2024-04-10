@@ -5,8 +5,8 @@ use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault};
 use diesel::{prelude::*, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId,
-    FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK, ScopedVaultId,
+    DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId,
+    FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK, ScopedVaultId, TenantId, VaultId,
 };
 
 use crate::{DbResult, PgConn, TxnPgConn};
@@ -21,7 +21,7 @@ pub struct Fingerprint {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
-    pub kind: DataIdentifier,
+    pub kind: DI,
     pub lifetime_id: DataLifetimeId,
     /// Version of the fingerprint schema
     pub version: FingerprintVersion,
@@ -30,46 +30,64 @@ pub struct Fingerprint {
     /// True if we want to hide this fingerprint from search results.
     /// This is only set manually through a dbshell
     pub is_hidden: bool,
+
+    /// Denormalized from scoped_vault
+    pub scoped_vault_id: Option<ScopedVaultId>,
+    /// Denormalized from scoped_vault
+    pub vault_id: Option<VaultId>,
+    /// Denormalized from scoped_vault
+    pub tenant_id: Option<TenantId>,
+    /// Denormalized from scoped_vault
+    pub is_live: Option<bool>,
+    /// ~Denormalized from data_lifetime. Won't be the exact timestamp from the data_lifetime, but
+    /// this is set at the same time the DataLifetimes are deactivated
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone)]
-pub struct NewFingerprintArgs {
+pub struct NewFingerprintArgs<'a> {
     pub sh_data: FingerprintData,
-    pub kind: DataIdentifier,
-    pub lifetime_id: DataLifetimeId,
+    pub kind: DI,
+    pub lifetime_id: &'a DataLifetimeId,
     pub version: FingerprintVersion,
     pub scope: FingerprintScopeKind,
+    pub scoped_vault_id: &'a ScopedVaultId,
+    pub vault_id: &'a VaultId,
+    pub tenant_id: &'a TenantId,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = fingerprint)]
-struct NewFingerprintRow {
+struct NewFingerprintRow<'a> {
     sh_data: FingerprintData,
-    kind: DataIdentifier,
-    lifetime_id: DataLifetimeId,
+    kind: DI,
+    lifetime_id: &'a DataLifetimeId,
     version: FingerprintVersion,
     scope: FingerprintScopeKind,
     is_hidden: bool,
+    scoped_vault_id: &'a ScopedVaultId,
+    vault_id: &'a VaultId,
+    tenant_id: &'a TenantId,
+    is_live: bool,
 }
 
 pub type IsUnique = bool;
-pub type DuplicateExistingFingerprintsByDLK = HashMap<DataIdentifier, i64>;
+pub type DuplicateExistingFingerprintsByDLK = HashMap<DI, i64>;
 
 const DUPLICATE_FINGERPRINT_KINDS: [DI; 3] =
     [DI::Id(IDK::PhoneNumber), DI::Id(IDK::Email), DI::Id(IDK::Ssn9)];
 
 #[derive(Debug, Clone)]
 pub struct FingerprintDupe {
-    pub kind: DataIdentifier,
+    pub kind: DI,
     pub scope: FingerprintScopeKind, // TODO: is this used?
     pub scoped_vault: ScopedVault,
     pub vault: Vault,
 }
 
-impl From<(DataIdentifier, FingerprintScopeKind, ScopedVault, Vault)> for FingerprintDupe {
-    fn from(
-        (kind, scope, scoped_vault, vault): (DataIdentifier, FingerprintScopeKind, ScopedVault, Vault),
-    ) -> Self {
+impl From<(DI, FingerprintScopeKind, ScopedVault, Vault)> for FingerprintDupe {
+    fn from((kind, scope, scoped_vault, vault): (DI, FingerprintScopeKind, ScopedVault, Vault)) -> Self {
         Self {
             kind,
             scope,
@@ -99,6 +117,10 @@ impl Fingerprint {
                      lifetime_id,
                      version,
                      scope,
+                     scoped_vault_id,
+                     vault_id,
+                     tenant_id,
+                     is_live,
                  }| NewFingerprintRow {
                     sh_data,
                     kind,
@@ -106,6 +128,10 @@ impl Fingerprint {
                     version,
                     scope,
                     is_hidden: false,
+                    scoped_vault_id,
+                    vault_id,
+                    tenant_id,
+                    is_live,
                 },
             )
             .collect_vec();
@@ -115,8 +141,22 @@ impl Fingerprint {
         Ok(())
     }
 
+    #[tracing::instrument("Fingerprint::bulk_deactivate", skip_all)]
+    pub fn bulk_deactivate(
+        conn: &mut TxnPgConn,
+        lifetime_ids: Vec<&DataLifetimeId>,
+        time: DateTime<Utc>,
+    ) -> DbResult<()> {
+        diesel::update(fingerprint::table)
+            .filter(fingerprint::lifetime_id.eq_any(lifetime_ids))
+            .set(fingerprint::deactivated_at.eq(time))
+            .execute(conn.conn())?;
+        Ok(())
+    }
+
     #[tracing::instrument("Fingerprint::get_dupes", skip_all)]
     pub fn get_dupes(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<FingerprintDupe>> {
+        // TODO for sandbox, only filter within the tenant
         let (f1, dl1, sv1, f2, dl2, sv2, v2) = diesel::alias!(
             fingerprint as f1,
             data_lifetime as dl1,
@@ -182,7 +222,7 @@ impl Fingerprint {
             // // Furthermore, now that we can downscoped the other-tenant dupes to just be a few stats, we could instead make this whole thing a boxed query and then for the other-tenant dupes, we could just `count`/`distinct` to produce our stats and not need to retrieve individual rows. (although maybe we will revisit that design soon enough anyway and then need other-tenant rows again)
             // .order_by(sv2.field(scoped_vault::start_timestamp).desc())
             .limit(30) // for safety
-            .get_results::<(DataIdentifier, FingerprintScopeKind, ScopedVault, Vault)>(conn)?
+            .get_results::<(DI, FingerprintScopeKind, ScopedVault, Vault)>(conn)?
             .into_iter()
             .map(FingerprintDupe::from)
             .collect();

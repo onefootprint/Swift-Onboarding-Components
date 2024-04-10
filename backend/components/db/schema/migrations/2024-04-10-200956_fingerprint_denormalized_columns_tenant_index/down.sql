@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY fingerprint_tenant_id;

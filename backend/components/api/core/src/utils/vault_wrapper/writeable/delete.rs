@@ -39,8 +39,8 @@ impl<Type> WriteableVw<Type> {
             .map(|(di, d)| (di, d.lifetime.id.clone()))
             .unzip();
 
-        let seqno = DataLifetime::get_next_seqno(conn.conn())?;
-        let _ = DataLifetime::bulk_deactivate(conn.conn(), dls, seqno)?;
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let _ = DataLifetime::bulk_deactivate(conn, dls, seqno)?;
 
         Ok(dis)
     }

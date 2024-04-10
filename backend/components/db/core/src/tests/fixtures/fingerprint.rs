@@ -1,5 +1,8 @@
 use crate::{
-    models::fingerprint::{Fingerprint, NewFingerprintArgs},
+    models::{
+        fingerprint::{Fingerprint, NewFingerprintArgs},
+        scoped_vault::ScopedVault,
+    },
     tests::prelude::TestPgConn,
 };
 use newtypes::{
@@ -8,10 +11,11 @@ use newtypes::{
 
 pub fn create(
     conn: &mut TestPgConn,
-    lifetime_id: DataLifetimeId,
+    lifetime_id: &DataLifetimeId,
     sh_data: FingerprintData,
     kind: DataIdentifier,
     scope: FingerprintScopeKind,
+    sv: &ScopedVault,
 ) {
     let fingerprint = NewFingerprintArgs {
         sh_data,
@@ -19,6 +23,10 @@ pub fn create(
         lifetime_id,
         scope,
         version: FingerprintVersion::current(),
+        scoped_vault_id: &sv.id,
+        vault_id: &sv.vault_id,
+        tenant_id: &sv.tenant_id,
+        is_live: sv.is_live,
     };
     Fingerprint::bulk_create(conn, vec![fingerprint]).unwrap();
 }

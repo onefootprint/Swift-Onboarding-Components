@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS fingerprint_tenant_id ON fingerprint(tenant_id);

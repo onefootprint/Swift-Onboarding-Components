@@ -1,11 +1,18 @@
 use chrono::{DateTime, Utc};
-use diesel::{prelude::*, sql_types::Int8};
+use diesel::{
+    pg::Pg,
+    prelude::*,
+    sql_types::{self, Int8},
+};
+use itertools::Itertools;
 use newtypes::{
     DataIdentifier, DataLifetimeId, DataLifetimeSeqno, DataLifetimeSource, DbActor, ScopedVaultId, VaultId,
 };
 
 use crate::{nextval, DbError, DbResult, PgConn, TxnPgConn};
-use db_schema::schema::data_lifetime;
+use db_schema::schema::data_lifetime::{self};
+
+use super::fingerprint::Fingerprint;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = data_lifetime)]
@@ -233,47 +240,52 @@ impl DataLifetime {
     }
 
     /// Given a list of DataLifetimeIds, marks the active DataLifetime rows as deactivated.
-    /// NOTE: this may deactivate portablized data. When deactivating portablized data, should
-    /// generally only do when replacing with other portablized data
     #[tracing::instrument("DataLifetime::bulk_deactivate", skip_all)]
     pub fn bulk_deactivate(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         ids: Vec<DataLifetimeId>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
-        let update = DataLifetimeUpdate {
-            deactivated_at: Some(Some(Utc::now())),
-            deactivated_seqno: Some(Some(seqno)),
-            ..DataLifetimeUpdate::default()
-        };
-        let results = diesel::update(data_lifetime::table)
-            .filter(data_lifetime::id.eq_any(ids))
-            .filter(data_lifetime::deactivated_seqno.is_null())
-            .set(update)
-            .get_results(conn)?;
-        Ok(results)
+        let filter = Box::new(data_lifetime::id.eq_any(ids));
+        Self::_bulk_deactivate(conn, filter, seqno)
     }
 
     /// Deactivates the old DataLifetimes with the provided kinds associated with this (user, tenant).
     /// This should only be used when replacing old data with new
     #[tracing::instrument("DataLifetime::bulk_deactivate_kinds", skip_all)]
     pub fn bulk_deactivate_kinds(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
         kinds: Vec<DataIdentifier>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
+        let filter = Box::new(
+            data_lifetime::kind
+                .eq_any(kinds)
+                .and(data_lifetime::scoped_vault_id.eq(scoped_vault_id.clone())),
+        );
+        Self::_bulk_deactivate(conn, filter, seqno)
+    }
+
+    /// Deactivates the DLs with the provided filter, and any fingerprints for these DLs
+    fn _bulk_deactivate(
+        conn: &mut TxnPgConn,
+        filter: Box<dyn BoxableExpression<data_lifetime::table, Pg, SqlType = sql_types::Bool>>,
+        seqno: DataLifetimeSeqno,
+    ) -> DbResult<Vec<Self>> {
+        let deactivated_at = Utc::now();
         let update = DataLifetimeUpdate {
-            deactivated_at: Some(Some(Utc::now())),
+            deactivated_at: Some(Some(deactivated_at)),
             deactivated_seqno: Some(Some(seqno)),
             ..DataLifetimeUpdate::default()
         };
         let results = diesel::update(data_lifetime::table)
-            .filter(data_lifetime::kind.eq_any(kinds))
-            .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
+            .filter(filter)
             .filter(data_lifetime::deactivated_seqno.is_null())
             .set(update)
-            .get_results(conn)?;
+            .get_results::<Self>(conn.conn())?;
+        let lifetime_ids = results.iter().map(|dl| &dl.id).collect_vec();
+        Fingerprint::bulk_deactivate(conn, lifetime_ids, deactivated_at)?;
         Ok(results)
     }
 

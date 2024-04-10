@@ -8,6 +8,7 @@ use db::{
         contact_info::{ContactInfo, NewContactInfoArgs},
         data_lifetime::DataLifetime,
         fingerprint::{Fingerprint, NewFingerprintArgs},
+        scoped_vault::ScopedVault,
         vault_data::{NewVaultData, VaultData},
     },
     TxnPgConn,
@@ -82,6 +83,7 @@ impl ValidatedDataRequest {
         let actor = actor.map(|a| a.into());
         let vd = VaultData::bulk_create(conn, v_id, sv_id, self.data, seqno, actor)?;
 
+        let sv = ScopedVault::get(conn, sv_id)?;
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let fingerprints: Vec<_> = self
             .fingerprints
@@ -100,9 +102,14 @@ impl ValidatedDataRequest {
                 Ok(NewFingerprintArgs {
                     kind: kind.clone(),
                     sh_data: fingerprint,
-                    lifetime_id: vd.lifetime_id.clone(),
+                    lifetime_id: &vd.lifetime_id,
                     scope,
                     version: newtypes::FingerprintVersion::current(),
+                    // Denormalized fields
+                    scoped_vault_id: &sv.id,
+                    vault_id: &sv.vault_id,
+                    tenant_id: &sv.tenant_id,
+                    is_live: sv.is_live,
                 })
             })
             .collect::<ApiResult<_>>()?;

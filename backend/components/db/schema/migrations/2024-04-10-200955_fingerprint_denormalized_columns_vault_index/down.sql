@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY fingerprint_vault_id;

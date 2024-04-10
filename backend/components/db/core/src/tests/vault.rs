@@ -37,10 +37,11 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     );
     fixtures::fingerprint::create(
         conn,
-        lifetime.id,
+        &lifetime.id,
         fingerprint.clone(),
         IDK::PhoneNumber.into(),
         FingerprintScopeKind::Global,
+        &su,
     );
 
     // Should never be able to find with wrong sandbox id

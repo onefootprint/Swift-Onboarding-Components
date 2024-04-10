@@ -403,6 +403,11 @@ diesel::table! {
         version -> Text,
         scope -> Text,
         is_hidden -> Bool,
+        scoped_vault_id -> Nullable<Text>,
+        vault_id -> Nullable<Text>,
+        tenant_id -> Nullable<Text>,
+        is_live -> Nullable<Bool>,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 
@@ -1576,6 +1581,9 @@ diesel::joinable!(document_request -> scoped_vault (scoped_vault_id));
 diesel::joinable!(document_request -> workflow (workflow_id));
 diesel::joinable!(document_upload -> identity_document (document_id));
 diesel::joinable!(fingerprint -> data_lifetime (lifetime_id));
+diesel::joinable!(fingerprint -> scoped_vault (scoped_vault_id));
+diesel::joinable!(fingerprint -> tenant (tenant_id));
+diesel::joinable!(fingerprint -> vault (vault_id));
 diesel::joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(fingerprint_visit_event -> vault (vault_id));
 diesel::joinable!(google_device_attestation -> vault (vault_id));

@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS fingerprint_scoped_vault_id ON fingerprint(scoped_vault_id);
