@@ -80,9 +80,9 @@ const SSN = ({
     });
   };
 
-  const onSubmitForm = (formData: FormData) => {
+  const sendData = (d: KycData) => {
     syncData({
-      data: omitPhoneAndEmail(convertFormData(formData)),
+      data: omitPhoneAndEmail(d),
       onSuccess: cleanData => {
         send({
           type: 'dataSubmitted',
@@ -94,13 +94,13 @@ const SSN = ({
     });
   };
 
+  const onSubmitForm = (formData: FormData) => {
+    sendData(convertFormData(formData));
+  };
+
   const onSubmitSkippedForm = () => {
     const convertedData = convertFormData(getValues(), true);
-    send({
-      type: 'dataSubmitted',
-      payload: convertedData,
-    });
-    onComplete?.(convertedData);
+    sendData(convertedData);
   };
 
   const handleSkip = () => {

@@ -3,6 +3,7 @@ import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import allAttributes from '../../../../utils/all-attributes/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
+import updateDataValue from '../../../../utils/update-data-value';
 import type { FormData } from '../../types';
 
 const isTest = process.env.NODE_ENV === 'test';
@@ -35,93 +36,44 @@ const useConvertFormData = () => {
     const hasName = firstName || middleName || lastName;
 
     if (requiresName && hasName) {
-      const oldFirstName = data[IdDI.firstName];
-      const isFirstNameChanged = firstName !== oldFirstName?.value;
-      convertedData[IdDI.firstName] = {
-        value: firstName,
-        dirty: isFirstNameChanged || oldFirstName?.dirty,
-        bootstrap: Boolean(
-          isFirstNameChanged ? false : oldFirstName?.bootstrap,
-        ),
-        disabled: Boolean(oldFirstName?.disabled),
-        decrypted: Boolean(
-          isFirstNameChanged ? false : oldFirstName?.decrypted,
-        ),
-      };
-
-      const oldMiddleName = data[IdDI.middleName];
-      const bothEmpty = !middleName === !oldMiddleName?.value;
-      const isMiddleNameChanged =
-        !bothEmpty && middleName !== oldMiddleName?.value;
-      convertedData[IdDI.middleName] = {
-        value: middleName,
-        dirty: isMiddleNameChanged || oldMiddleName?.dirty,
-        bootstrap: Boolean(
-          isMiddleNameChanged ? false : oldMiddleName?.bootstrap,
-        ),
-        disabled: Boolean(oldMiddleName?.disabled),
-        decrypted: Boolean(
-          isMiddleNameChanged ? false : oldMiddleName?.decrypted,
-        ),
-      };
-
-      const oldLastName = data[IdDI.lastName];
-      const isLastNameChanged = lastName !== oldLastName?.value;
-      convertedData[IdDI.lastName] = {
-        value: lastName,
-        dirty: isLastNameChanged || oldLastName?.dirty,
-        bootstrap: Boolean(isLastNameChanged ? false : oldLastName?.bootstrap),
-        disabled: Boolean(oldLastName?.disabled),
-        decrypted: Boolean(isLastNameChanged ? false : oldLastName?.decrypted),
-      };
+      convertedData[IdDI.firstName] = updateDataValue(
+        firstName,
+        data[IdDI.firstName],
+      );
+      convertedData[IdDI.middleName] = updateDataValue(
+        middleName,
+        data[IdDI.middleName],
+      );
+      convertedData[IdDI.lastName] = updateDataValue(
+        lastName,
+        data[IdDI.lastName],
+      );
+      convertedData[IdDI.firstName] = updateDataValue(
+        firstName,
+        data[IdDI.firstName],
+      );
     }
 
     if (requiresDob && dob) {
-      const oldDob = data[IdDI.dob];
-      const isChanged = dob !== oldDob?.value;
-      convertedData[IdDI.dob] = {
-        value: dob,
-        dirty: isChanged || oldDob?.dirty,
-        bootstrap: Boolean(isChanged ? false : oldDob?.bootstrap),
-        disabled: Boolean(oldDob?.disabled),
-        decrypted: Boolean(isChanged ? false : oldDob?.decrypted),
-      };
+      convertedData[IdDI.dob] = updateDataValue(dob, data[IdDI.dob]);
     }
 
     if (requiresNationality && nationality) {
-      const oldNationality = data[IdDI.nationality];
-      const isChanged = nationality.value !== oldNationality?.value;
-      convertedData[IdDI.nationality] = {
-        value: nationality.value,
-        dirty: isChanged || oldNationality?.dirty,
-        bootstrap: Boolean(isChanged ? false : oldNationality?.bootstrap),
-        disabled: Boolean(oldNationality?.disabled),
-        decrypted: Boolean(isChanged ? false : oldNationality?.decrypted),
-      };
+      convertedData[IdDI.nationality] = updateDataValue(
+        nationality.value,
+        data[IdDI.nationality],
+      );
     }
 
     if (requiresEmail && email) {
-      const oldEmail = data[IdDI.email];
-      const isEmailChanged = email !== oldEmail?.value;
-      convertedData[IdDI.email] = {
-        bootstrap: Boolean(isEmailChanged ? false : oldEmail?.bootstrap),
-        decrypted: Boolean(isEmailChanged ? false : oldEmail?.decrypted),
-        dirty: isEmailChanged || oldEmail?.dirty,
-        disabled: Boolean(oldEmail?.disabled),
-        value: email,
-      };
+      convertedData[IdDI.email] = updateDataValue(email, data[IdDI.email]);
     }
 
     if (requiresPhone && phoneNumber) {
-      const oldPhone = data[IdDI.phoneNumber];
-      const isPhoneChanged = phoneNumber !== oldPhone?.value;
-      convertedData[IdDI.phoneNumber] = {
-        bootstrap: Boolean(isPhoneChanged ? false : oldPhone?.bootstrap),
-        decrypted: Boolean(isPhoneChanged ? false : oldPhone?.decrypted),
-        dirty: isPhoneChanged || oldPhone?.dirty,
-        disabled: Boolean(oldPhone?.disabled),
-        value: phoneNumber,
-      };
+      convertedData[IdDI.phoneNumber] = updateDataValue(
+        phoneNumber,
+        data[IdDI.phoneNumber],
+      );
     }
 
     return convertedData;

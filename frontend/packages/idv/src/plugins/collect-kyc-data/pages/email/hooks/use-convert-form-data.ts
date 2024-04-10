@@ -3,6 +3,7 @@ import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import useCollectKycDataMachine from '../../../hooks/use-collect-kyc-data-machine';
 import allAttributes from '../../../utils/all-attributes';
 import type { KycData } from '../../../utils/data-types';
+import updateDataValue from '../../../utils/update-data-value';
 import type { FormData } from '../types';
 
 const useConvertFormData = () => {
@@ -18,15 +19,7 @@ const useConvertFormData = () => {
     if (!requiresEmail || !email) {
       return convertedData;
     }
-    const oldEmail = data[IdDI.email];
-    const isChanged = email !== oldEmail?.value;
-    convertedData[IdDI.email] = {
-      value: email,
-      dirty: isChanged || oldEmail?.dirty,
-      bootstrap: isChanged ? false : oldEmail?.bootstrap,
-      disabled: oldEmail?.disabled ?? false,
-      decrypted: isChanged ? false : oldEmail?.decrypted,
-    };
+    convertedData[IdDI.email] = updateDataValue(email, data[IdDI.email]);
     return convertedData;
   };
 };

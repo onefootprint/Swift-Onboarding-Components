@@ -4,6 +4,7 @@ import uniq from 'lodash/uniq';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import type { KycData } from '../../../../utils/data-types';
+import updateDataValue from '../../../../utils/update-data-value';
 import type { FormData } from '../../types';
 
 const eqSet = (set1: Set<string>, set2: Set<string>) =>
@@ -15,34 +16,16 @@ const useConvertFormData = () => {
 
   return (formData: FormData) => {
     const { usLegalStatus, nationality, citizenships, visa } = formData;
-    const isLegalStatusChanged =
-      usLegalStatus !== data[IdDI.usLegalStatus]?.value;
-    const isNationalityDirty =
-      nationality.value !== data[IdDI.nationality]?.value;
 
     const convertedData: KycData = {
-      [IdDI.usLegalStatus]: {
-        value: usLegalStatus,
-        dirty: isLegalStatusChanged,
-        bootstrap: isLegalStatusChanged
-          ? false
-          : data[IdDI.usLegalStatus]?.bootstrap,
-        disabled: data[IdDI.usLegalStatus]?.disabled ?? false,
-        decrypted: isLegalStatusChanged
-          ? false
-          : data[IdDI.usLegalStatus]?.decrypted,
-      },
-      [IdDI.nationality]: {
-        value: nationality.value,
-        dirty: isNationalityDirty,
-        bootstrap: isNationalityDirty
-          ? false
-          : data[IdDI.nationality]?.bootstrap,
-        disabled: data[IdDI.nationality]?.disabled ?? false,
-        decrypted: isNationalityDirty
-          ? false
-          : data[IdDI.nationality]?.decrypted,
-      },
+      [IdDI.usLegalStatus]: updateDataValue(
+        usLegalStatus,
+        data[IdDI.usLegalStatus],
+      ),
+      [IdDI.nationality]: updateDataValue(
+        nationality.value,
+        data[IdDI.nationality],
+      ),
       [IdDI.citizenships]: {
         value: undefined,
       },
@@ -64,43 +47,29 @@ const useConvertFormData = () => {
         .map(({ value }) => value as CountryCode),
     );
     if (citizenshipValues && citizenshipValues.length > 0) {
-      const existingSet = new Set(data[IdDI.citizenships]?.value ?? []);
-      const newSet = new Set(citizenshipValues);
-      const isChanged = !eqSet(existingSet, newSet);
-      convertedData[IdDI.citizenships] = {
-        value: citizenshipValues,
-        dirty: isChanged,
-        bootstrap: isChanged ? false : data[IdDI.citizenships]?.bootstrap,
-        disabled: data[IdDI.citizenships]?.disabled ?? false,
-        decrypted: isChanged ? false : data[IdDI.citizenships]?.decrypted,
-      };
+      convertedData[IdDI.citizenships] = updateDataValue(
+        citizenshipValues,
+        data[IdDI.citizenships],
+        (a?: CountryCode[], b?: CountryCode[]) => {
+          const existingSet = new Set(a ?? []);
+          const newSet = new Set(b ?? []);
+          return eqSet(existingSet, newSet);
+        },
+      );
     }
 
     if (usLegalStatus === UsLegalStatus.visa) {
       if (visa?.expirationDate) {
-        const isChanged =
-          visa.expirationDate !== data[IdDI.visaExpirationDate]?.value;
-        convertedData[IdDI.visaExpirationDate] = {
-          value: visa.expirationDate,
-          dirty: isChanged,
-          bootstrap: isChanged
-            ? false
-            : data[IdDI.visaExpirationDate]?.bootstrap,
-          disabled: data[IdDI.visaExpirationDate]?.disabled ?? false,
-          decrypted: isChanged
-            ? false
-            : data[IdDI.visaExpirationDate]?.decrypted,
-        };
+        convertedData[IdDI.visaExpirationDate] = updateDataValue(
+          visa.expirationDate,
+          data[IdDI.visaExpirationDate],
+        );
       }
       if (visa?.kind) {
-        const isChanged = visa.kind.value !== data[IdDI.visaKind]?.value;
-        convertedData[IdDI.visaKind] = {
-          value: visa.kind.value,
-          dirty: isChanged,
-          bootstrap: isChanged ? false : data[IdDI.visaKind]?.bootstrap,
-          disabled: data[IdDI.visaKind]?.disabled ?? false,
-          decrypted: isChanged ? false : data[IdDI.visaKind]?.decrypted,
-        };
+        convertedData[IdDI.visaKind] = updateDataValue(
+          visa.kind.value,
+          data[IdDI.visaKind],
+        );
       }
     }
 
