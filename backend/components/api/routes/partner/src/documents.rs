@@ -103,7 +103,7 @@ pub async fn post(
                 created_at: Utc::now(),
                 name: name.as_str(),
                 description: description.as_str(),
-                requested_by_partner_tenant_user_id: &requested_by_partner_tenant_user_id,
+                requested_by_partner_tenant_user_id: Some(&requested_by_partner_tenant_user_id),
                 compliance_doc_id: &doc.id,
             }
             .create(conn, &doc)?;

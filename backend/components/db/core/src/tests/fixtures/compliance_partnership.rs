@@ -155,7 +155,7 @@ pub fn create_resources<'a>(
                     created_at: Utc::now(),
                     name: &tv.name,
                     description: &tv.description,
-                    requested_by_partner_tenant_user_id: &pt_user.id,
+                    requested_by_partner_tenant_user_id: Some(&pt_user.id),
                     compliance_doc_id: &doc.id,
                 }
                 .create(conn, &doc)
@@ -183,7 +183,7 @@ pub fn create_resources<'a>(
                 created_at: Utc::now(),
                 name: "An ad-hoc request",
                 description: "This is an ad-hoc request",
-                requested_by_partner_tenant_user_id: &pt_user.id,
+                requested_by_partner_tenant_user_id: Some(&pt_user.id),
                 compliance_doc_id: &doc.id,
             }
             .create(conn, &doc)

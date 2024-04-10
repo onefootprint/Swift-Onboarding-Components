@@ -110,7 +110,7 @@ impl ComplianceDocSummary {
             let user_ids: HashSet<&TenantUserId> = chain!(
                 doc_requests
                     .values()
-                    .map(|r| &r.requested_by_partner_tenant_user_id,),
+                    .flat_map(|r| &r.requested_by_partner_tenant_user_id,),
                 doc_submissions.values().map(|s| &s.submitted_by_tenant_user_id,),
                 doc_reviews
                     .values()

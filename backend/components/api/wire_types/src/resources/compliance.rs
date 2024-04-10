@@ -70,7 +70,7 @@ pub struct ComplianceDocRequest {
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceDocEvent {
     pub timestamp: DateTime<Utc>,
-    pub actor: LiteUserAndOrg,
+    pub actor: Option<LiteUserAndOrg>,
     pub event: ComplianceDocEventType,
 }
 

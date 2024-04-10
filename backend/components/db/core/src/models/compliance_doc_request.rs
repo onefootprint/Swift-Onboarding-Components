@@ -23,7 +23,7 @@ pub struct ComplianceDocRequest {
     pub name: String,
     pub description: String,
 
-    pub requested_by_partner_tenant_user_id: TenantUserId,
+    pub requested_by_partner_tenant_user_id: Option<TenantUserId>,
 
     pub compliance_doc_id: ComplianceDocId,
 
@@ -38,7 +38,7 @@ pub struct NewComplianceDocRequest<'a> {
     pub name: &'a str,
     pub description: &'a str,
 
-    pub requested_by_partner_tenant_user_id: &'a TenantUserId,
+    pub requested_by_partner_tenant_user_id: Option<&'a TenantUserId>,
 
     pub compliance_doc_id: &'a ComplianceDocId,
 }

@@ -207,7 +207,7 @@ diesel::table! {
         deactivated_at -> Nullable<Timestamptz>,
         name -> Text,
         description -> Text,
-        requested_by_partner_tenant_user_id -> Text,
+        requested_by_partner_tenant_user_id -> Nullable<Text>,
         compliance_doc_id -> Text,
         deactivated_by_partner_tenant_user_id -> Nullable<Text>,
     }

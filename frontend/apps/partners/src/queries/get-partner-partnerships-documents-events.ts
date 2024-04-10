@@ -8,7 +8,7 @@ export type ComplianceDocEvent = {
   actor: {
     user: { id: string; firstName: string; lastName: string };
     org: string;
-  };
+  } | null;
   event: {
     kind: string;
     data: { templateId: null; name: string; description: string };

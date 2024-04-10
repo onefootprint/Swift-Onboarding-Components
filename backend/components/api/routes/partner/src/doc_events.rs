@@ -52,13 +52,13 @@ pub async fn get(
 
         events.push(ComplianceDocEvent {
             timestamp: assignment.created_at,
-            actor: api_wire_types::LiteUserAndOrg {
+            actor: Some(api_wire_types::LiteUserAndOrg {
                 user: api_wire_types::LiteOrgMember::try_from_db((
                     &summary,
                     &assignment.assigned_by_tenant_user_id,
                 ))?,
                 org: org.clone(),
-            },
+            }),
             event: ComplianceDocEventType::Assigned(api_wire_types::ComplianceDocEventAssigned {
                 kind: assignment.kind,
                 assigned_to: assignment
@@ -84,13 +84,16 @@ pub async fn get(
 
         events.push(ComplianceDocEvent {
             timestamp: req.created_at,
-            actor: api_wire_types::LiteUserAndOrg {
-                user: api_wire_types::LiteOrgMember::try_from_db((
-                    &summary,
-                    &req.requested_by_partner_tenant_user_id,
-                ))?,
-                org: summary.partner_tenant.name.clone(),
-            },
+            actor: req
+                .requested_by_partner_tenant_user_id
+                .as_ref()
+                .map(|user_id| -> ApiResult<_> {
+                    Ok(api_wire_types::LiteUserAndOrg {
+                        user: api_wire_types::LiteOrgMember::try_from_db((&summary, user_id))?,
+                        org: summary.partner_tenant.name.clone(),
+                    })
+                })
+                .transpose()?,
             event: ComplianceDocEventType::Requested(api_wire_types::ComplianceDocEventRequested {
                 template_id: doc.template_id.clone(),
                 name: req.name.clone(),
@@ -104,10 +107,10 @@ pub async fn get(
         {
             events.push(ComplianceDocEvent {
                 timestamp: deactivated_at,
-                actor: api_wire_types::LiteUserAndOrg {
+                actor: Some(api_wire_types::LiteUserAndOrg {
                     user: api_wire_types::LiteOrgMember::try_from_db((&summary, &user_id))?,
                     org: summary.partner_tenant.name.clone(),
-                },
+                }),
                 event: ComplianceDocEventType::RequestRetracted {},
             });
         }
@@ -117,13 +120,13 @@ pub async fn get(
     for sub in summary.doc_submissions.values() {
         events.push(ComplianceDocEvent {
             timestamp: sub.created_at,
-            actor: api_wire_types::LiteUserAndOrg {
+            actor: Some(api_wire_types::LiteUserAndOrg {
                 user: api_wire_types::LiteOrgMember::try_from_db((
                     &summary,
                     &sub.submitted_by_tenant_user_id,
                 ))?,
                 org: summary.tenant.name.clone(),
-            },
+            }),
             event: ComplianceDocEventType::Submitted(api_wire_types::ComplianceDocEventSubmitted {
                 submission_id: sub.id.clone(),
                 kind: (&sub.doc_data).into(),
@@ -135,13 +138,13 @@ pub async fn get(
     for rev in summary.doc_reviews.values() {
         events.push(ComplianceDocEvent {
             timestamp: rev.created_at,
-            actor: api_wire_types::LiteUserAndOrg {
+            actor: Some(api_wire_types::LiteUserAndOrg {
                 user: api_wire_types::LiteOrgMember::try_from_db((
                     &summary,
                     &rev.reviewed_by_partner_tenant_user_id,
                 ))?,
                 org: summary.partner_tenant.name.clone(),
-            },
+            }),
             event: ComplianceDocEventType::Reviewed(api_wire_types::ComplianceDocEventReviewed {
                 decision: rev.decision,
                 note: rev.note.clone(),
