@@ -320,6 +320,15 @@
                             "type": "string"
                         },
                         "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-is-components-sdk",
+                        "description": "When a non-empty value is provided, indicates that the request is originating from the components SDK",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "simple"
                     }
                 ],
                 "requestBody": {

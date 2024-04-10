@@ -3756,7 +3756,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/OrgLoginRequest%3C%3E"
+                                "$ref": "#/components/schemas/TenantLoginRequest"
                             }
                         }
                     },
@@ -6011,7 +6011,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/OrgLoginRequest%3C%3E"
+                                "$ref": "#/components/schemas/PartnerLoginRequest"
                             }
                         }
                     },
@@ -11763,7 +11763,8 @@
                                                     "tenant",
                                                     "ocr",
                                                     "prefill",
-                                                    "components_sdk"
+                                                    "components_sdk",
+                                                    "bootstrap"
                                                 ]
                                             },
                                             "transforms": {
@@ -21336,21 +21337,6 @@
                     "kind"
                 ]
             },
-            "OrgLoginRequest<>": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "string"
-                    },
-                    "request_org_id": {
-                        "description": "Optionally request to log into the provided tenant, if the user has a rolebinding at this tenant.",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "code"
-                ]
-            },
             "OrgLoginResponse": {
                 "type": "object",
                 "properties": {
@@ -21912,6 +21898,21 @@
                     "kind",
                     "name",
                     "scopes"
+                ]
+            },
+            "PartnerLoginRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "request_org_id": {
+                        "description": "Optionally request to log into the provided tenant, if the user has a rolebinding at this tenant.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code"
                 ]
             },
             "PartnerOrganization": {
@@ -24218,6 +24219,21 @@
                     "id",
                     "team_id",
                     "tenant_id"
+                ]
+            },
+            "TenantLoginRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "request_org_id": {
+                        "description": "Optionally request to log into the provided tenant, if the user has a rolebinding at this tenant.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code"
                 ]
             },
             "TriggerRequest": {

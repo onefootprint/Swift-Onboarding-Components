@@ -1,14 +1,19 @@
 use crate::*;
-use newtypes::{OrgIdentifier, SessionAuthToken};
+use newtypes::{PartnerTenantId, SessionAuthToken, TenantId};
 
 #[derive(serde::Deserialize, Apiv2Schema)]
-pub struct OrgLoginRequest<T>
-where
-    T: Into<OrgIdentifier>,
-{
+pub struct TenantLoginRequest {
     pub code: String,
     /// Optionally request to log into the provided tenant, if the user has a rolebinding at this tenant.
-    pub request_org_id: Option<T>,
+    pub request_org_id: Option<TenantId>,
+}
+
+
+#[derive(serde::Deserialize, Apiv2Schema)]
+pub struct PartnerLoginRequest {
+    pub code: String,
+    /// Optionally request to log into the provided tenant, if the user has a rolebinding at this tenant.
+    pub request_org_id: Option<PartnerTenantId>,
 }
 
 #[derive(serde::Serialize, Apiv2Schema)]

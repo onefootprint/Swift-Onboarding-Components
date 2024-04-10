@@ -8,9 +8,7 @@ use api_core::{
     utils::{db2api::DbToApi, email_domain, session::AuthSession},
     State,
 };
-use api_wire_types::{
-    OrgLoginRequest, OrgLoginResponse, Organization, OrganizationMember, PartnerOrganization,
-};
+use api_wire_types::{OrgLoginResponse, Organization, OrganizationMember, PartnerOrganization};
 use chrono::Duration;
 use db::{
     helpers::TenantOrPartnerTenant,
@@ -47,13 +45,13 @@ fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> 
 
 pub async fn handle_login<T>(
     state: web::Data<State>,
-    request: web::Json<OrgLoginRequest<T>>,
+    code: String,
+    request_org_id: Option<T>,
     tenant_kind: TenantKind,
 ) -> ApiResult<OrgLoginResponse>
 where
     T: Into<OrgIdentifier>,
 {
-    let OrgLoginRequest { code, request_org_id } = request.into_inner();
     let request_org_id: Option<OrgIdentifier> = request_org_id.map(|id| id.into());
 
     if let Some(request_org_id) = request_org_id.as_ref() {
