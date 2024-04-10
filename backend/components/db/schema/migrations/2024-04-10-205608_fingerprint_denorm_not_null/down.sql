@@ -1,0 +1,5 @@
+ALTER TABLE fingerprint
+    ALTER COLUMN scoped_vault_id DROP NOT NULL,
+    ALTER COLUMN vault_id DROP NOT NULL,
+    ALTER COLUMN tenant_id DROP NOT NULL,
+    ALTER COLUMN is_live DROP NOT NULL;

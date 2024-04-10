@@ -32,13 +32,13 @@ pub struct Fingerprint {
     pub is_hidden: bool,
 
     /// Denormalized from scoped_vault
-    pub scoped_vault_id: Option<ScopedVaultId>,
+    pub scoped_vault_id: ScopedVaultId,
     /// Denormalized from scoped_vault
-    pub vault_id: Option<VaultId>,
+    pub vault_id: VaultId,
     /// Denormalized from scoped_vault
-    pub tenant_id: Option<TenantId>,
+    pub tenant_id: TenantId,
     /// Denormalized from scoped_vault
-    pub is_live: Option<bool>,
+    pub is_live: bool,
     /// ~Denormalized from data_lifetime. Won't be the exact timestamp from the data_lifetime, but
     /// this is set at the same time the DataLifetimes are deactivated
     pub deactivated_at: Option<DateTime<Utc>>,

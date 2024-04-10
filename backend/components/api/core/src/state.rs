@@ -223,7 +223,11 @@ impl State {
             .expect("failed to build vendor client");
 
         // run migrations
-        db::run_migrations(&config.database_url).expect("failed to run migrations");
+        let result = db::run_migrations(&config.database_url);
+        if let Err(ref err) = result {
+            tracing::error!(err=%err, "Failed to run migrations");
+        }
+        result.expect("failed to run migrations");
 
         // then create the pool
         let db_pool = db::init(&config.database_url)

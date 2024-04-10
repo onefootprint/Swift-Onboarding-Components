@@ -403,10 +403,10 @@ diesel::table! {
         version -> Text,
         scope -> Text,
         is_hidden -> Bool,
-        scoped_vault_id -> Nullable<Text>,
-        vault_id -> Nullable<Text>,
-        tenant_id -> Nullable<Text>,
-        is_live -> Nullable<Bool>,
+        scoped_vault_id -> Text,
+        vault_id -> Text,
+        tenant_id -> Text,
+        is_live -> Bool,
         deactivated_at -> Nullable<Timestamptz>,
     }
 }
