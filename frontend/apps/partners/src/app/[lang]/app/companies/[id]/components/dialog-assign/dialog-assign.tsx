@@ -1,42 +1,60 @@
 import { Dialog } from '@onefootprint/ui';
-import { SelectNew } from '@onefootprint/ui/src/components';
-import React from 'react';
+import { Select } from '@onefootprint/ui/src/components';
+import type { FormEvent } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import hasOptionRole from '@/helpers/has-option-role';
+type Option = { label: string; value: string };
+type DialogAssignProps = {
+  docId?: string;
+  isOpen?: boolean;
+  onClose: () => void;
+  onSubmit: (fields: { docId: string; userId?: string }) => void;
+  options: Option[];
+};
 
-type DialogAssignProps = { isOpen?: boolean; onClose: () => void };
+const formId = 'form-assign-doc-dialog';
 
-const DialogAssign = ({ isOpen, onClose }: DialogAssignProps) => {
+const DialogAssign = ({
+  docId,
+  isOpen,
+  onClose,
+  onSubmit,
+  options,
+}: DialogAssignProps) => {
   const { t } = useTranslation('common');
+  const [member, setMember] = useState<Option>();
 
-  const handleClose = (ev?: unknown) => {
-    /** The options of <SelectNew /> are rendered outside of the dialog, causing CloseOnClickOutside */
-    if (ev instanceof Event && hasOptionRole(ev?.target)) return;
+  const handleClose = () => {
+    setMember(undefined);
     onClose();
+  };
+
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!docId) return;
+    onSubmit({ docId, userId: member?.value || undefined });
   };
 
   return isOpen ? (
     <Dialog
       onClose={handleClose}
       open
-      primaryButton={{ label: t('save'), type: 'submit' }}
+      primaryButton={{ label: t('save'), type: 'submit', form: formId }}
       secondaryButton={{ label: t('cancel'), onClick: handleClose }}
       size="compact"
       title={t('doc.assign-document')}
     >
-      <SelectNew
-        size="compact"
-        disabled={false}
-        options={[
-          { label: 'Boo Lee', value: '12873' },
-          { label: 'Rita Lee', value: '98731' },
-        ]}
-        contentWidth="auto"
-        label={t('assign-to')}
-        placeholder={t('select-placeholder')}
-        triggerWidth="full"
-      />
+      <form onSubmit={handleFormSubmit} id={formId}>
+        <Select
+          label={t('assign-to')}
+          onChange={setMember}
+          options={options}
+          placeholder={t('select-placeholder')}
+          size="compact"
+          value={member}
+        />
+      </form>
     </Dialog>
   ) : null;
 };

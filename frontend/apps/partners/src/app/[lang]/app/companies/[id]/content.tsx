@@ -1,44 +1,99 @@
 'use client';
 
 import { IcoFileText24 } from '@onefootprint/icons';
-import { Box, Breadcrumb, Button, Stack, Text } from '@onefootprint/ui';
+import {
+  Box,
+  Breadcrumb,
+  Button,
+  Stack,
+  Text,
+  useToast,
+} from '@onefootprint/ui';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import type { ComponentProps } from 'react';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { PartnerDocument, SecurityChecks } from '@/config/types';
+import type { Lang } from '@/app/types';
+import { alertError } from '@/helpers';
+import { useDialogManager } from '@/hooks';
+import type { PartnerDocument } from '@/queries';
+import {
+  deletePartnerPartnershipsRequests,
+  postPartnerPartnershipsDocuments,
+  postPartnerPartnershipsDocumentsAssignments,
+  postPartnerPartnershipsDocumentsReupload,
+} from '@/queries';
 
-import List from './components/company-doc-list';
-import DialogAdditionalDocument from './components/dialog-additional-document';
+import CompanyDocList from './components/company-doc-list';
 import DialogAssign from './components/dialog-assign';
+import DialogReSubmit from './components/dialog-re-submit';
+import DialogRequestDocument from './components/dialog-request-document';
 import DrawerTimeline from './components/drawer-timeline';
 import Progress from './components/progress';
 import Checks from './components/security-checks';
-import useOverlayState from './state/use-overlay-state';
+
+type Option = { label: string; value: string };
 
 type CompanyPageContentProps = {
   documents: PartnerDocument[];
   documentsStatus: { accepted: number; count: number; percentage: number };
-  securityChecks: SecurityChecks;
+  lang: Lang;
+  members: Option[];
+  partnerId: string;
+  partnerName: string;
+  securityChecks: ComponentProps<typeof Checks>['securityChecks'];
+  templates: Option[];
+  templatesUnused: Option[];
 };
 
 const resetBodyPointerEvents = () => {
   document.body.style.pointerEvents = '';
 };
 
-const initialOverlayState = {
-  docAdditional: false,
-  docAssign: false,
-  docTimeline: false,
-};
+const hasAssignee = (x?: PartnerDocument): boolean =>
+  Boolean(x?.partnerTenantAssignee?.id || x?.tenantAssignee?.id);
+
+const doWithId =
+  (noIdFn: () => unknown) =>
+  (withIdFn: (id: string) => unknown) =>
+  (id?: string) => (id ? withIdFn(id) : noIdFn());
 
 const CompanyPageContent = ({
   documents,
   documentsStatus,
+  lang,
+  members,
+  partnerId,
+  partnerName,
   securityChecks,
+  templates,
+  templatesUnused,
 }: CompanyPageContentProps) => {
   const { t } = useTranslation('common');
-  const overlays = useOverlayState(initialOverlayState);
+  const path = usePathname();
+  const router = useRouter();
+  const toast = useToast();
+  const dialog = useDialogManager();
+
+  const docDialog = documents.find(x => x.id === dialog.id());
+  const errorToast = alertError(t, toast.show);
+  const alertOr = doWithId(() => errorToast(t('doc.missing-doc-id')));
+
+  const onAssignClick = alertOr(id => dialog.add('assign', id));
+  const onEditClick = alertOr(id => dialog.add('edit', id));
+  const onReSubmitClick = alertOr(id => dialog.add('resubmit', id));
+  const onRowClick = (doc: PartnerDocument) => dialog.add('timeline', doc.id);
+
+  const onDeleteClick = alertOr((id: string) =>
+    deletePartnerPartnershipsRequests(partnerId, id)
+      .then(router.refresh)
+      .catch(errorToast),
+  );
+
+  const goToDocView = (docId?: string, subId?: string) =>
+    router.push(`/doc/${partnerId}/${docId}/${subId}?path=${path}`);
 
   /**
    * body pointer-events: none remains after closing
@@ -47,10 +102,10 @@ const CompanyPageContent = ({
    * */
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    if (!overlays.docTimeline) {
+    if (!dialog.has('timeline')) {
       window.setTimeout(resetBodyPointerEvents, 0);
     }
-  }, [overlays.docTimeline]);
+  }, [dialog]);
 
   return (
     <>
@@ -62,19 +117,19 @@ const CompanyPageContent = ({
           <Breadcrumb.Item href="/app/companies" as={Link}>
             {t('companies.companies')}
           </Breadcrumb.Item>
-          <Breadcrumb.Item>{t('company')}</Breadcrumb.Item>
+          <Breadcrumb.Item>{partnerName}</Breadcrumb.Item>
         </Breadcrumb.List>
         <Stack tag="header" justify="space-between" align="center">
           <Stack gap={2}>
             <IcoFileText24 />
-            <Text variant="label-2" tag="h2">
+            <Text variant="label-2" tag="h2" lineHeight={1.5}>
               {t('documents')}
             </Text>
           </Stack>
           <Button
             variant="secondary"
             size="compact"
-            onClick={overlays.docAdditionalToggle}
+            onClick={() => dialog.add('additional')}
           >
             {t('doc.request-document')}
           </Button>
@@ -88,27 +143,105 @@ const CompanyPageContent = ({
           />
         </Box>
         <Box marginBottom={8}>
-          <List
+          <CompanyDocList
             documents={documents}
             handlers={{
-              onAssignClick: overlays.docAssignToggle,
-              onReviewClick: overlays.docTimelineToggle,
+              onAssignClick,
+              onDeleteClick,
+              onEditClick,
+              onReSubmitClick,
+              onReviewClick: goToDocView,
+              onRowClick,
+              onViewClick: goToDocView,
             }}
+            lang={lang}
           />
         </Box>
         <Checks securityChecks={securityChecks} />
       </Box>
-      <DialogAdditionalDocument
-        isOpen={overlays.docAdditional}
-        onClose={overlays.docAdditionalToggle}
-      />
-      <DialogAssign
-        isOpen={overlays.docAssign}
-        onClose={overlays.docAssignToggle}
-      />
+      {dialog.has('additional') ? (
+        <DialogRequestDocument
+          isOpen
+          onClose={dialog.reset}
+          title={t('doc.request-document')}
+          onSubmit={payload => {
+            postPartnerPartnershipsDocuments(partnerId, payload)
+              .then(router.refresh)
+              .catch(errorToast);
+            dialog.reset();
+          }}
+          options={templatesUnused}
+        />
+      ) : null}
+      {dialog.has('edit') ? (
+        <DialogRequestDocument
+          isOpen
+          title={t('modify-request')}
+          docDialog={dialog.has('edit') ? docDialog : undefined}
+          onClose={dialog.reset}
+          onSubmit={({ id, name, description }) => {
+            if (!id) {
+              errorToast(t('doc.missing-doc-id'));
+              return;
+            }
+            postPartnerPartnershipsDocumentsReupload(partnerId, id, {
+              name,
+              description,
+            })
+              .then(router.refresh)
+              .catch(errorToast);
+            dialog.reset();
+          }}
+          options={templatesUnused}
+        />
+      ) : null}
+      {dialog.has('resubmit') ? (
+        <DialogReSubmit
+          docDialog={dialog.has('resubmit') ? docDialog : undefined}
+          isOpen
+          onClose={dialog.reset}
+          onSubmit={({ id, name, description }) => {
+            postPartnerPartnershipsDocumentsReupload(partnerId, id, {
+              name,
+              description,
+            })
+              .then(router.refresh)
+              .catch(errorToast);
+            dialog.reset();
+          }}
+          options={templates}
+        />
+      ) : null}
+      {dialog.has('assign') ? (
+        <DialogAssign
+          docId={dialog.id()}
+          isOpen
+          onClose={dialog.reset}
+          onSubmit={({ docId, userId }) => {
+            dialog.reset();
+            postPartnerPartnershipsDocumentsAssignments(
+              partnerId,
+              docId,
+              userId,
+            )
+              .then(router.refresh)
+              .catch(errorToast);
+          }}
+          options={
+            hasAssignee(docDialog)
+              ? [{ label: t('unassign'), value: '' }].concat(members)
+              : members
+          }
+        />
+      ) : null}
       <DrawerTimeline
-        isOpen={overlays.docTimeline}
-        onClose={overlays.docTimelineToggle}
+        docId={dialog.id()}
+        docStatus={docDialog?.status || ''}
+        isOpen={dialog.has('timeline')}
+        lang={lang}
+        onClose={dialog.reset}
+        onViewSubmissionClick={goToDocView}
+        partnerId={partnerId}
       />
     </>
   );

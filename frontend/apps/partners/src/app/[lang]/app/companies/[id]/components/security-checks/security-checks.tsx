@@ -10,7 +10,12 @@ import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { SecurityChecks } from '@/config/types';
+type SecurityChecks = {
+  accessControl: boolean;
+  dataAccess: boolean;
+  strongAuthentication: boolean;
+  dataEndToEndEncryption: boolean;
+};
 
 type SecurityChecksProps = { securityChecks: SecurityChecks };
 type CheckItemProps = {

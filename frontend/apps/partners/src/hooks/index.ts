@@ -1,3 +1,4 @@
+export { default as useDialogManager } from './use-dialog-manager';
 export { default as useEffectOnce } from './use-effect-once-strict';
 export { default as useRoutes } from './use-routes';
 export type { Session } from './use-store-client';

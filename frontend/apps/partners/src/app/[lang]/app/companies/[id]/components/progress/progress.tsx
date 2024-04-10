@@ -22,7 +22,7 @@ const Progress = ({ details, value }: ProgressProps) => {
     >
       <Stack gap={3} justify="space-between" width="100%">
         <Text variant="label-3" color="secondary">
-          {`${value}${t('percentage-completed')}`}
+          {`${value.toFixed(2)}${t('percentage-completed')}`}
         </Text>
         <Text variant="label-4" color="tertiary">
           {details}
@@ -30,7 +30,7 @@ const Progress = ({ details, value }: ProgressProps) => {
       </Stack>
       <Box position="relative" height="8px" width="100%">
         <Bar backgroundColor="tertiary" opacity="0.2" width="100%" />
-        <Bar backgroundColor="successInverted" width="200px" zIndex={1} />
+        <Bar backgroundColor="successInverted" width={`${value}%`} zIndex={1} />
       </Box>
     </Stack>
   );
