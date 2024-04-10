@@ -34,7 +34,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: IDK::LastName.into(),
@@ -42,7 +42,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: IDK::Ssn4.into(),
@@ -50,7 +50,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: IDK::Email.into(),
@@ -58,7 +58,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: IDK::PhoneNumber.into(),
@@ -66,11 +66,11 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let source = DataLifetimeSource::Hosted;
+    let source = DataLifetimeSource::LikelyHosted;
     let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, None).unwrap();
 
     // Portablize the phone as happens in prod
@@ -149,7 +149,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 p_data: None,
                 format: VaultDataFormat::String,
                 origin_id: None,
-                source: DataLifetimeSource::Hosted,
+                source: DataLifetimeSource::LikelyHosted,
             }],
         ),
         // Add speculative Dob and Email data at tenant 2
@@ -163,7 +163,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                     p_data: None,
                     format: VaultDataFormat::String,
                     origin_id: None,
-                    source: DataLifetimeSource::Hosted,
+                    source: DataLifetimeSource::LikelyHosted,
                 },
                 NewVaultData {
                     kind: IDK::Email.into(),
@@ -171,7 +171,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                     p_data: None,
                     format: VaultDataFormat::String,
                     origin_id: None,
-                    source: DataLifetimeSource::Hosted,
+                    source: DataLifetimeSource::LikelyHosted,
                 },
             ],
         ),
@@ -185,7 +185,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 p_data: None,
                 format: VaultDataFormat::String,
                 origin_id: None,
-                source: DataLifetimeSource::Hosted,
+                source: DataLifetimeSource::LikelyHosted,
             }],
         ),
         // Add portable Email at tenant 1
@@ -198,13 +198,13 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 p_data: None,
                 format: VaultDataFormat::String,
                 origin_id: None,
-                source: DataLifetimeSource::Hosted,
+                source: DataLifetimeSource::LikelyHosted,
             }],
         ),
     ];
     for (su_id, portablize, data) in data {
         let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-        let source = DataLifetimeSource::Hosted;
+        let source = DataLifetimeSource::LikelyHosted;
         let kinds = data.iter().map(|d| d.kind.clone()).collect_vec();
         DataLifetime::bulk_deactivate_kinds(conn, su_id, kinds, seqno).unwrap();
         let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, None).unwrap();
@@ -262,7 +262,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: Some(PiiString::from("Acme Inc")),
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: BDK::Website.into(),
@@ -270,7 +270,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: BDK::PhoneNumber.into(),
@@ -278,7 +278,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
@@ -911,7 +911,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
             "filename.png".into(),
             newtypes::SealedVaultDataKey(vec![0x01]),
             S3Url::from("test".to_string()),
-            DataLifetimeSource::Hosted,
+            DataLifetimeSource::LikelyHosted,
             None,
         )
         .unwrap();

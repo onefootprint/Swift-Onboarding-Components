@@ -75,7 +75,7 @@ mod tests {
                         p_data: None,
                         format: VaultDataFormat::String,
                         origin_id: None,
-                        source: DataLifetimeSource::Hosted,
+                        source: DataLifetimeSource::LikelyHosted,
                     },
                     NewVaultData {
                         kind: IDK::Ssn4.into(),
@@ -83,7 +83,7 @@ mod tests {
                         p_data: None,
                         format: VaultDataFormat::String,
                         origin_id: None,
-                        source: DataLifetimeSource::Hosted,
+                        source: DataLifetimeSource::LikelyHosted,
                     },
                 ];
                 let seqno = DataLifetime::get_next_seqno(conn).unwrap();

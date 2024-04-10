@@ -7,8 +7,7 @@ use crate::{
 use db::models::{contact_info::ContactInfo, webauthn_credential::WebauthnCredential};
 use itertools::Itertools;
 use newtypes::{
-    AuthMethodKind, ChallengeKind, ContactInfoKind, DataIdentifier as DI, DataLifetimeSource,
-    IdentityDataKind as IDK,
+    AuthMethodKind, ChallengeKind, ContactInfoKind, DataIdentifier as DI, IdentityDataKind as IDK,
 };
 
 use super::vault_wrapper::Person;
@@ -71,8 +70,6 @@ pub async fn get_user_challenge_context(
     }
     let auth_methods = cis
         .iter()
-        // Do not allow logging in using unverified data that was vaulting via the components SDK.
-        .filter(|(_, ci, dl)| dl.source != DataLifetimeSource::ComponentsSdk || ci.is_otp_verified)
         // TODO one day, don't allow logging in via data added via bootstrap?
         .map(|(cik, ci, _)| AuthMethod {
             kind: AuthMethodKind::from(*cik),

@@ -32,7 +32,21 @@ use strum_macros::{Display, EnumIter, EnumString};
 pub enum DataLifetimeSource {
     /// Vaulted via a hosted flow and entered by the user.
     /// NOTE: this could be spoofed by a malicious actor with a hosted auth token.
-    Hosted,
+    #[strum(serialize = "hosted")]
+    #[serde(rename = "hosted")]
+    LikelyHosted,
+    /// Vaulted via an auth token issued for the components SDK.
+    /// NOTE: this could be spoofed by a malicious actor with a hosted auth token.
+    #[strum(serialize = "components_sdk")]
+    #[serde(rename = "components_sdk")]
+    LikelyComponentsSdk,
+    /// Passed into an SDK as bootstrap data.
+    /// NOTE: this could be spoofed by a malicious actor with a hosted auth token.
+    /// NOTE: we only started tracking Bootstrap in prod on 2024-04-04. Previously bootstrapped
+    /// data will appear as Hosted.
+    #[strum(serialize = "bootstrap")]
+    #[serde(rename = "bootstrap")]
+    LikelyBootstrap,
     /// Vaulted via hosted flow with client-tenant auth
     ClientTenant,
     /// Vaulted via tenant-facing API
@@ -41,12 +55,6 @@ pub enum DataLifetimeSource {
     Ocr,
     /// Vaulted via portable data from another tenant
     Prefill,
-    /// Vaulted via an auth token issued for the components SDK
-    ComponentsSdk,
-    /// Passed into an SDK as bootstrap data.
-    /// NOTE: we only started tracking Bootstrap in prod on 2024-04-04. Previously bootstrapped
-    /// data will appear as Hosted.
-    Bootstrap,
 }
 
 crate::util::impl_enum_string_diesel!(DataLifetimeSource);

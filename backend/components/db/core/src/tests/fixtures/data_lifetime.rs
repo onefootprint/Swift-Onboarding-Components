@@ -17,7 +17,7 @@ pub fn build<T: Into<DataIdentifier>>(
     let args = NewDataLifetimeArgs {
         kind: kind.into(),
         origin_id: None,
-        source: DataLifetimeSource::Hosted,
+        source: DataLifetimeSource::LikelyHosted,
     };
     let mut lifetime = DataLifetime::bulk_create(conn, uv_id, su_id, vec![args], created_seqno, None)
         .unwrap()

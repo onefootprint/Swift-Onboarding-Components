@@ -269,7 +269,7 @@ pub fn vault_complete_images(
                 kind,
                 e_data_key: u.e_data_key,
                 s3_url: u.s3_url,
-                source: DataLifetimeSource::Hosted,
+                source: DataLifetimeSource::LikelyHosted,
             }
         })
         .collect_vec();

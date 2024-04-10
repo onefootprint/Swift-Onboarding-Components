@@ -424,7 +424,7 @@ fn create_latest_doc_upload(
 ) -> ApiResult<()> {
     let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
     // Vault the images under latest uploads
-    let source = DataLifetimeSource::Hosted;
+    let source = DataLifetimeSource::LikelyHosted;
     let (d, seqno) = uvw.put_document_unsafe(
         conn,
         di,

@@ -281,9 +281,9 @@ impl UserSession {
     pub fn dl_source(&self) -> DataLifetimeSource {
         if self.is_derived_from_components() {
             // Denote when data was added via components SDK, since it could be tampered with
-            DataLifetimeSource::ComponentsSdk
+            DataLifetimeSource::LikelyComponentsSdk
         } else {
-            DataLifetimeSource::Hosted
+            DataLifetimeSource::LikelyHosted
         }
     }
 

@@ -161,7 +161,7 @@ impl VaultWrapper<Person> {
             .flatten()
             .collect();
         let request = request.manual_fingerprints(fingerprints);
-        let sources = DataLifetimeSources::overrides(DataLifetimeSource::Hosted, sources);
+        let sources = DataLifetimeSources::overrides(DataLifetimeSource::LikelyHosted, sources);
         let request = uvw.validate_request(conn, request, sources, None, DataRequestSource::CreateVault)?;
         let result = WriteableVw::<Any>::internal_save_data(&uvw, conn, request, None)?;
 

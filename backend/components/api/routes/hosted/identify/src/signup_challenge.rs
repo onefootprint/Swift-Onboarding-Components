@@ -228,11 +228,11 @@ async fn make_vault_context(
         .into_iter()
         .map(|(di, is_bootstrap, value)| -> ApiResult<_> {
             let source = if is_components_sdk {
-                DataLifetimeSource::ComponentsSdk
+                DataLifetimeSource::LikelyComponentsSdk
             } else if is_bootstrap {
-                DataLifetimeSource::Bootstrap
+                DataLifetimeSource::LikelyBootstrap
             } else {
-                DataLifetimeSource::Hosted
+                DataLifetimeSource::LikelyHosted
             };
             Ok(InitialVaultData {
                 global_sh: global_sh

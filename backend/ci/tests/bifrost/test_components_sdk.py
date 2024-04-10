@@ -98,11 +98,9 @@ def test_components_sdk(sandbox_tenant):
 def test_components_sdk_cannot_add_auth_methods(sandbox_tenant):
     (components_token, token, _) = create_user_with_components_token(sandbox_tenant)
 
-    # Confirm that the email added via the components SDK can't be used to log into the vault
-    # when it is unverified
+    # We should be able to log in via unverified email
     body = post("hosted/identify", dict(scope="onboarding"), token)
-    assert not any(i["kind"] == "email" for i in body["user"]["auth_methods"])
-    assert any(i["kind"] == "phone" for i in body["user"]["auth_methods"])
+    assert any(i["kind"] == "email" for i in body["user"]["auth_methods"])
 
     # Add a new email using the components SDK and then verify we can't use it to log in
     data = {"id.email": FIXTURE_EMAIL}

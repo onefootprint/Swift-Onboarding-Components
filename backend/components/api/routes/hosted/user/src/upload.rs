@@ -56,7 +56,7 @@ pub async fn post(
                 file.filename,
                 e_data_key,
                 s3_url,
-                DataLifetimeSource::Hosted,
+                DataLifetimeSource::LikelyHosted,
                 None,
             )?;
             Ok(doc)

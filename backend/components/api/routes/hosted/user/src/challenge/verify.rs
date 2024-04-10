@@ -186,7 +186,7 @@ impl Action {
                         }
                     }
                 }
-                vw.replace_verified_ci(conn, data, DataLifetimeSource::Hosted)?;
+                vw.replace_verified_ci(conn, data, DataLifetimeSource::LikelyHosted)?;
                 (kind, None)
             }
             Self::RegisterWebauthnCred(res) => {

@@ -253,8 +253,8 @@ pub fn assert_allowed_for_sources<T>(
         let source = sources.get(di);
         #[allow(clippy::match_like_matches_macro)]
         match (source, di) {
-            (DataLifetimeSource::ComponentsSdk, DataIdentifier::Id(IDK::PhoneNumber)) => false,
-            (DataLifetimeSource::ComponentsSdk, DataIdentifier::Id(IDK::Email)) => false,
+            (DataLifetimeSource::LikelyComponentsSdk, DataIdentifier::Id(IDK::PhoneNumber)) => false,
+            (DataLifetimeSource::LikelyComponentsSdk, DataIdentifier::Id(IDK::Email)) => false,
             _ => true,
         }
     };

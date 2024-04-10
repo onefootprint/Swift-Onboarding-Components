@@ -38,7 +38,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: IdentityDataKind::LastName.into(),
@@ -46,7 +46,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: IdentityDataKind::Ssn4.into(),
@@ -54,7 +54,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: IdentityDataKind::Email.into(),
@@ -62,7 +62,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
         NewVaultData {
             kind: IdentityDataKind::PhoneNumber.into(),
@@ -70,7 +70,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             p_data: None,
             format: VaultDataFormat::String,
             origin_id: None,
-            source: DataLifetimeSource::Hosted,
+            source: DataLifetimeSource::LikelyHosted,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
