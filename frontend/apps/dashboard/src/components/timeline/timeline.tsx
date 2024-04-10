@@ -86,9 +86,11 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
               >
                 {iconComponent ?? <IcoDotSmall16 />}
               </Grid.Item>
-              <Grid.Item
-                gridArea="content"
-                direction="column"
+              <Grid.Container
+                style={{ gridArea: 'content' }}
+                templateAreas={['header', 'body']}
+                columns={['1fr']}
+                rows={['auto']}
                 marginLeft={2}
                 gap={5}
               >
@@ -103,7 +105,8 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
                   {headerComponent}
                 </Grid.Item>
                 {bodyComponent ? (
-                  <Stack
+                  <Grid.Item
+                    gridArea="body"
                     direction="column"
                     gap={2}
                     width="100%"
@@ -111,19 +114,19 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
                     paddingLeft={3}
                   >
                     {bodyComponent}
-                  </Stack>
+                  </Grid.Item>
                 ) : (
                   <Box height="4px" tag="span" />
                 )}
-              </Grid.Item>
+              </Grid.Container>
             </Grid.Container>
           );
         })}
       </Stack>
       {isLoading && (
-        <Box marginBottom={4}>
+        <Stack padding={7} width="100%" align="center" justify="center">
           <AnimatedLoadingSpinner animationStart />
-        </Box>
+        </Stack>
       )}
     </>
   );
