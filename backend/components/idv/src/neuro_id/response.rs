@@ -137,6 +137,8 @@ pub enum Status {
     SiteNotConfigured,
     // Api key not correct
     UnauthorizedAccess,
+    // No profiles found for the given ID and Site ID
+    ProfileNotFound,
     Unknown,
 }
 
@@ -156,8 +158,8 @@ pub enum Model {
 pub enum NeuroAPIResult {
     // We successfully can deserialize a 200 response
     Success(NeuroIdAnalyticsResponse),
-    // We got a 4xx, but we have informative error information we handle in code
-    ResponseErrorHandled(NeuroIdAnalyticsResponseError),
+    // We got a neuro error, but we have informative error information we handle in code
+    ResponseErrorWithResponse(NeuroIdAnalyticsResponseError),
     // We got a non-200 that didn't have handleable error information
     ResponseErrorUnhandled(error::Error),
 }
@@ -165,7 +167,7 @@ impl NeuroAPIResult {
     pub fn into_success(self) -> Result<NeuroIdAnalyticsResponse, error::Error> {
         match self {
             NeuroAPIResult::Success(s) => Ok(s),
-            NeuroAPIResult::ResponseErrorHandled(e) => Err(error::Error::APIResponseError(e)),
+            NeuroAPIResult::ResponseErrorWithResponse(e) => Err(error::Error::APIResponseError(e)),
             NeuroAPIResult::ResponseErrorUnhandled(e) => Err(e),
         }
     }
@@ -173,7 +175,7 @@ impl NeuroAPIResult {
     pub fn scrub(&self) -> Result<ScrubbedPiiJsonValue, error::Error> {
         let res = match self {
             NeuroAPIResult::Success(s) => ScrubbedPiiJsonValue::scrub(s),
-            NeuroAPIResult::ResponseErrorHandled(e) => ScrubbedPiiJsonValue::scrub(e),
+            NeuroAPIResult::ResponseErrorWithResponse(e) => ScrubbedPiiJsonValue::scrub(e),
             // If we have an unhandled error, there's no T to serialize
             NeuroAPIResult::ResponseErrorUnhandled(_) => ScrubbedPiiJsonValue::scrub(serde_json::json!({})),
         }?;
@@ -211,23 +213,12 @@ impl NeuroApiResponse {
                                 result: NeuroAPIResult::Success(d),
                                 raw_response: j.into(),
                             },
-                            Status::NotEnoughInteractionData
-                            | Status::SiteNotConfigured
-                            | Status::UnauthorizedAccess => Self {
-                                result: NeuroAPIResult::ResponseErrorHandled(
+                            _ => Self {
+                                result: NeuroAPIResult::ResponseErrorWithResponse(
                                     from_analytics_response_to_error(d),
                                 ),
                                 raw_response: j.into(),
                             },
-                            status @ Status::Unknown => {
-                                tracing::error!(?status, "unknown status received from NeuroID");
-                                Self {
-                                    result: NeuroAPIResult::ResponseErrorUnhandled(
-                                        error::Error::UnknownStatus,
-                                    ),
-                                    raw_response: j.into(),
-                                }
-                            }
                         },
                         Err(_e) => todo!(),
                     }
@@ -236,32 +227,16 @@ impl NeuroApiResponse {
                         serde_json::from_value(j.clone());
 
                     match deserialized_error {
-                        Ok(de) => match de.status() {
-                            Status::Success => {
-                                tracing::error!("unexpected success status for neuro non-200");
-                                Self {
-                                    result: NeuroAPIResult::ResponseErrorUnhandled(
-                                        error::Error::UnknownStatus,
-                                    ),
-                                    raw_response: j.into(),
-                                }
+                        Ok(de) => {
+                            if matches!(de.status(), Status::Success) {
+                                tracing::error!("unexpected success status for neuro error");
                             }
-                            Status::NotEnoughInteractionData
-                            | Status::SiteNotConfigured
-                            | Status::UnauthorizedAccess => Self {
-                                result: NeuroAPIResult::ResponseErrorHandled(de),
+
+                            Self {
+                                result: NeuroAPIResult::ResponseErrorWithResponse(de),
                                 raw_response: j.into(),
-                            },
-                            status @ Status::Unknown => {
-                                tracing::error!(?status, "unexpected success status for neuro non-200");
-                                Self {
-                                    result: NeuroAPIResult::ResponseErrorUnhandled(
-                                        error::Error::UnknownStatus,
-                                    ),
-                                    raw_response: j.into(),
-                                }
                             }
-                        },
+                        }
                         Err(_) => Self {
                             result: NeuroAPIResult::ResponseErrorUnhandled(error::Error::UnknownStatus),
                             raw_response: j.into(),
