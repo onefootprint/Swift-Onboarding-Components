@@ -247,7 +247,7 @@ impl Tenant {
 
         // Atomically create all of the immutable roles needed for the tenant
         for irk in [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly] {
-            let (name, scopes) = irk.props();
+            let (name, _, scopes) = irk.props();
             for kind in [
                 TenantRoleKind::ApiKey { is_live: true },
                 TenantRoleKind::ApiKey { is_live: false },
