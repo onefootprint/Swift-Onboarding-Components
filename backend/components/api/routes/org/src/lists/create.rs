@@ -20,7 +20,7 @@ pub async fn create_list(
     request: Json<CreateListRequest>,
     insights: InsightHeaders,
 ) -> ApiResult<Json<ResponseData<api_wire_types::List>>> {
-    let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?; // TODO: new guard for this + /rules probably
+    let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let actor = auth.actor();
