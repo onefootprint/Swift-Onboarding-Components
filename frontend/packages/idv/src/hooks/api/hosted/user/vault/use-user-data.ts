@@ -3,11 +3,23 @@ import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
 import { ALLOW_EXTRA_FIELDS_HEADER, AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
+import { getLogger } from '../../../../../utils/logger';
+
+const { logInfo } = getLogger('use-user-data');
+
 const userDataRequest = async (payload: UserDataRequest) => {
   const data = Object.fromEntries(
     Object.entries(payload.data).filter(
       // Don't send null or undefined or empty values
-      e => !!e[1],
+      e => {
+        const isEmpty = !e[1];
+        if (isEmpty) {
+          // TODO we want to remove this codepath and actually send null values to the backend if
+          // the ssn9 is cleared. But we need to first make sure we're not relying on this.
+          logInfo(`Skipping empty value for key: ${e[0]}`);
+        }
+        return !isEmpty;
+      },
     ),
   );
 
