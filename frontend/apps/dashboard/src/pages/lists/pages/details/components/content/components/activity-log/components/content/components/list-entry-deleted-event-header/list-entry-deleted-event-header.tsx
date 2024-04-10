@@ -2,12 +2,15 @@ import type { ListEntryDeletedEvent } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
+
+import Pill from '../components/pill';
 
 type ListEntryDeletedEventHeaderProps = {
   user: string;
   event: ListEntryDeletedEvent;
 };
+
+const HEADER_HEIGHT = '32px';
 
 const ListEntryDeletedEventHeader = ({
   user,
@@ -18,25 +21,20 @@ const ListEntryDeletedEventHeader = ({
   });
 
   return (
-    <Stack gap={3} flexWrap="wrap">
+    <Stack
+      rowGap={1}
+      columnGap={3}
+      flexWrap="wrap"
+      align="center"
+      minHeight={HEADER_HEIGHT}
+    >
       <Text variant="label-3">{user}</Text>
       <Text variant="body-3" color="tertiary">
         {t('verb')}
       </Text>
-      <Pill>{event.data.entry}</Pill>
+      <Pill height={HEADER_HEIGHT}>{event.data.entry}</Pill>
     </Stack>
   );
 };
-
-const Pill = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: ${theme.borderRadius.lg};
-    background-color: ${theme.backgroundColor.secondary};
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  `}
-`;
 
 export default ListEntryDeletedEventHeader;

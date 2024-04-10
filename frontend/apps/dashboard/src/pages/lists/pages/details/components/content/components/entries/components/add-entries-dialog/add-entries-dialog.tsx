@@ -95,7 +95,6 @@ const AddEntriesDialog = ({ open, onClose, onAdd }: AddEntriesDialogProps) => {
     >
       <form onSubmit={handleSubmit(handleBeforeSubmit)} id="add-entries-form">
         <TextArea
-          label={t('form.entries.label')}
           placeholder={t('form.entries.placeholder')}
           hasError={!!errors.entries}
           hint={getEntriesHint()}

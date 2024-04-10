@@ -1,4 +1,4 @@
-import { Box } from '@onefootprint/ui';
+import { Box, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import ActivityLog from './components/activity-log';
@@ -15,15 +15,11 @@ const Content = () => (
     <Box marginBottom={7}>
       <Header />
     </Box>
-    <Box marginBottom={7}>
+    <Stack direction="column" gap={9}>
       <Entries />
-    </Box>
-    <Box marginBottom={7}>
       <Playbooks />
-    </Box>
-    <Box marginBottom={7}>
       <ActivityLog />
-    </Box>
+    </Stack>
   </Box>
 );
 

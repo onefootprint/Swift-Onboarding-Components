@@ -1,12 +1,8 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoCloseSmall16 } from '@onefootprint/icons';
 import type { ListEntry } from '@onefootprint/types';
-import {
-  AnimatedLoadingSpinner,
-  createFontStyles,
-  Stack,
-  useToast,
-} from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Text, useToast } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,8 +44,18 @@ const EntryChip = ({ entry, disabled }: EntryChipProps) => {
   };
 
   return (
-    <Container>
-      <Label>{data}</Label>
+    <Container
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      key={id}
+    >
+      <Label>
+        <Text variant="body-3" truncate>
+          {data}
+        </Text>
+      </Label>
       {isDeleting ? (
         <Close aria-label={`Deleting ${data}`} data-disabled={disabled}>
           <AnimatedLoadingSpinner animationStart size={16} />
@@ -67,8 +73,11 @@ const EntryChip = ({ entry, disabled }: EntryChipProps) => {
   );
 };
 
-const Container = styled(Stack)`
+const Container = styled(motion.div)`
   ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: ${theme.borderRadius.full};
     overflow: hidden;
     width: fit-content;
@@ -77,11 +86,9 @@ const Container = styled(Stack)`
 
 const Label = styled.span`
   ${({ theme }) => css`
-    ${createFontStyles('body-3')}
-    padding: ${theme.spacing[1]} ${theme.spacing[3]} ${theme.spacing[1]} ${theme
-      .spacing[4]};
+    padding: ${theme.spacing[1]} ${theme.spacing[3]} ${theme.spacing[1]}
+      ${theme.spacing[4]};
     background-color: ${theme.backgroundColor.secondary};
-    color: ${theme.color.primary};
   `}
 `;
 
@@ -93,6 +100,7 @@ const Close = styled.button`
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    height: 100%;
     padding: 0 ${theme.spacing[3]} 0 ${theme.spacing[2]};
     background-color: ${theme.backgroundColor.secondary};
     transition: background-color 0.1s;

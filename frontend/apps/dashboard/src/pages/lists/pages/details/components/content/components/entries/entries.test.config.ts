@@ -24,6 +24,94 @@ export const entriesFixture = [
       },
     },
   },
+  {
+    id: 'entry_3',
+    data: 'test3@onefootprint.com',
+    created_at: '2024-03-27T04:11:01.168287Z',
+    actor: {
+      kind: 'tenant_user',
+      data: {
+        id: 'orguser_AwKqqIuRVeHeJqFIRQk5rw',
+      },
+    },
+  },
+  {
+    id: 'entry_4',
+    data: 'test4@onefootprint.com',
+    created_at: '2024-03-27T04:11:01.168287Z',
+    actor: {
+      kind: 'tenant_user',
+      data: {
+        id: 'orguser_AwKqqIuRVeHeJqFIRQk5rw',
+      },
+    },
+  },
+  {
+    id: 'entry_5',
+    data: 'test5@onefootprint.com',
+    created_at: '2024-03-27T04:11:01.168287Z',
+    actor: {
+      kind: 'tenant_user',
+      data: {
+        id: 'orguser_AwKqqIuRVeHeJqFIRQk5rw',
+      },
+    },
+  },
+  {
+    id: 'entry_6',
+    data: 'test6@onefootprint.com',
+    created_at: '2024-03-27T04:11:01.168287Z',
+    actor: {
+      kind: 'tenant_user',
+      data: {
+        id: 'orguser_AwKqqIuRVeHeJqFIRQk5rw',
+      },
+    },
+  },
+  {
+    id: 'entry_7',
+    data: 'test7@onefootprint.com',
+    created_at: '2024-03-27T04:11:01.168287Z',
+    actor: {
+      kind: 'tenant_user',
+      data: {
+        id: 'orguser_AwKqqIuRVeHeJqFIRQk5rw',
+      },
+    },
+  },
+  {
+    id: 'entry_8',
+    data: 'test8@onefootprint.com',
+    created_at: '2024-03-27T04:11:01.168287Z',
+    actor: {
+      kind: 'tenant_user',
+      data: {
+        id: 'orguser_AwKqqIuRVeHeJqFIRQk5rw',
+      },
+    },
+  },
+  {
+    id: 'entry_9',
+    data: 'test9@onefootprint.com',
+    created_at: '2024-03-27T04:11:01.168287Z',
+    actor: {
+      kind: 'tenant_user',
+      data: {
+        id: 'orguser_AwKqqIuRVeHeJqFIRQk5rw',
+      },
+    },
+  },
+  {
+    id: 'entry_10',
+    data: 'test10@onefootprint.com',
+    created_at: '2024-03-27T04:11:01.168287Z',
+    actor: {
+      kind: 'tenant_user',
+      data: {
+        id: 'orguser_AwKqqIuRVeHeJqFIRQk5rw',
+      },
+    },
+  },
 ];
 
 const listDetailsFixture = {

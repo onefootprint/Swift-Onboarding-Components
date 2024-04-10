@@ -20,7 +20,7 @@ const SectionTitle = ({ title, button }: SectionTitleProps) => {
   let buttonComponent;
   if (button) {
     buttonComponent = (
-      <Button variant="secondary" onClick={button.onClick}>
+      <Button variant="secondary" onClick={button.onClick} size="compact">
         {button.label}
       </Button>
     );
@@ -39,7 +39,7 @@ const SectionTitle = ({ title, button }: SectionTitleProps) => {
 
   return (
     <Container>
-      <Text variant="label-1">{title}</Text>
+      <Text variant="label-2">{title}</Text>
       {buttonComponent}
     </Container>
   );

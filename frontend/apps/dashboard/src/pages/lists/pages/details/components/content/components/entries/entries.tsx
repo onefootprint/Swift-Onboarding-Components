@@ -1,5 +1,6 @@
 import { type ListEntry, RoleScopeKind } from '@onefootprint/types';
 import { LinkButton, SearchInput, Stack, Text } from '@onefootprint/ui';
+import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,10 +39,13 @@ const Entries = () => {
   }, [data, filters.values]);
 
   const displayedEntries: ListEntry[] = useMemo(() => {
+    const sortedEntries = [...filteredEntries].sort((a, b) =>
+      a.data.localeCompare(b.data),
+    );
     if (showAllEntries) {
-      return filteredEntries;
+      return sortedEntries;
     }
-    return filteredEntries.slice(0, MAX_ENTRIES);
+    return sortedEntries.slice(0, MAX_ENTRIES);
   }, [filteredEntries, showAllEntries]);
 
   const shouldShowAllButton = filteredEntries.length > MAX_ENTRIES;
@@ -64,7 +68,7 @@ const Entries = () => {
   }
 
   return isLoading ? null : (
-    <Stack gap={4} direction="column">
+    <Stack gap={5} direction="column">
       <SectionTitle
         title={t('title')}
         button={{
@@ -78,23 +82,28 @@ const Entries = () => {
       />
       {data && data.length > 0 ? (
         <>
-          <SearchInput
-            placeholder={t('search-placeholder')}
-            width="300px"
-            onChangeText={value => filters.push({ search: value })}
-            value={filters.query.search || ''}
-            size="compact"
-          />
+          {data.length > 7 && (
+            <SearchInput
+              placeholder={t('search-placeholder')}
+              width="300px"
+              onChangeText={value => filters.push({ search: value })}
+              value={filters.query.search || ''}
+              size="compact"
+            />
+          )}
+
           <EntriesContainer>
-            {displayedEntries.map(entry => (
-              <PermissionGate
-                key={entry.id}
-                scopeKind={RoleScopeKind.writeLists}
-                fallbackText={t('delete-not-allowed')}
-              >
-                <EntryChip key={entry.id} entry={entry} />
-              </PermissionGate>
-            ))}
+            <AnimatePresence>
+              {displayedEntries.map(entry => (
+                <PermissionGate
+                  key={entry.id}
+                  scopeKind={RoleScopeKind.writeLists}
+                  fallbackText={t('delete-not-allowed')}
+                >
+                  <EntryChip key={entry.id} entry={entry} />
+                </PermissionGate>
+              ))}
+            </AnimatePresence>
           </EntriesContainer>
         </>
       ) : (
@@ -103,22 +112,22 @@ const Entries = () => {
         </Text>
       )}
       {shouldShowAllButton && (
-        <ButtonContainer>
+        <ButtonContainer align="flex-start">
           {showAllEntries ? (
-            <LinkButton variant="caption-1" onClick={toggleExpanded}>
+            <LinkButton variant="label-4" onClick={toggleExpanded}>
               {t('show-less')}
             </LinkButton>
           ) : (
             <>
-              <Text variant="caption-1" color="quaternary">
+              <Text variant="label-4" color="quaternary">
                 {t('entries-more', {
                   count: allCount,
                 })}
               </Text>
-              <Text tag="span" variant="caption-1" color="quaternary">
+              <Text tag="span" variant="label-4" color="quaternary">
                 •
               </Text>
-              <LinkButton variant="caption-1" onClick={toggleExpanded}>
+              <LinkButton variant="label-4" onClick={toggleExpanded}>
                 {t('show-all')}
               </LinkButton>
             </>
@@ -134,14 +143,9 @@ const Entries = () => {
   );
 };
 
-const ButtonContainer = styled.div`
+const ButtonContainer = styled(Stack)`
   ${({ theme }) => css`
-    border-top: ${theme.borderWidth[1]} dashed ${theme.borderColor.tertiary};
-    padding-bottom: ${theme.spacing[3]};
-    padding-top: ${theme.spacing[3]};
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: ${theme.spacing[3]};
     gap: ${theme.spacing[3]};
   `}
 `;

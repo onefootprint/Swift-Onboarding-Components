@@ -2,12 +2,15 @@ import type { ListEntryCreatedEvent } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
+
+import Pill from '../components/pill';
 
 type ListEntryCreatedEventHeaderProps = {
   user: string;
   event: ListEntryCreatedEvent;
 };
+
+const HEADER_HEIGHT = '32px';
 
 const ListEntryCreatedEventHeader = ({
   user,
@@ -18,27 +21,37 @@ const ListEntryCreatedEventHeader = ({
   });
 
   return (
-    <Stack gap={3} flexWrap="wrap">
-      <Text variant="label-3">{user}</Text>
-      <Text variant="body-3" color="tertiary">
+    <Stack
+      rowGap={2}
+      columnGap={3}
+      flexWrap="wrap"
+      align="center"
+      minHeight={HEADER_HEIGHT}
+    >
+      <Text
+        variant="label-3"
+        display="inline-flex"
+        alignItems="center"
+        height={HEADER_HEIGHT}
+      >
+        {user}
+      </Text>
+      <Text
+        variant="body-3"
+        color="tertiary"
+        display="inline-flex"
+        alignItems="center"
+        height={HEADER_HEIGHT}
+      >
         {t('verb')}
       </Text>
       {event.data.entries.map(e => (
-        <Pill key={e}>{e}</Pill>
+        <Pill height={HEADER_HEIGHT} key={e}>
+          {e}
+        </Pill>
       ))}
     </Stack>
   );
 };
-
-const Pill = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: ${theme.borderRadius.lg};
-    background-color: ${theme.backgroundColor.secondary};
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  `}
-`;
 
 export default ListEntryCreatedEventHeader;
