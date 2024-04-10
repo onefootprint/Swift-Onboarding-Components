@@ -82,7 +82,11 @@ def test_one_click_same_tenant_no_decryption_bleeding(sandbox_tenant, ob_config2
 
 
 @pytest.mark.parametrize(
-    "identifier", [dict(phone_number=FIXTURE_PHONE_NUMBER), dict(email=FIXTURE_EMAIL)]
+    "identifier",
+    [
+        dict(phone_number=dict(value=FIXTURE_PHONE_NUMBER)),
+        dict(email=dict(value=FIXTURE_EMAIL)),
+    ],
 )
 def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc):
     if "phone_number" in identifier:

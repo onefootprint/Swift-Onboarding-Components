@@ -9,7 +9,9 @@ from tests.headers import SandboxId, FpAuth, IsLive
 def test_entity_created_after_signup_challenge(sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     data = dict(
-        phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL, scope="onboarding"
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER),
+        email=dict(value=FIXTURE_EMAIL),
+        scope="onboarding",
     )
     post(
         "hosted/identify/signup_challenge",
@@ -40,7 +42,9 @@ def test_concurrent_signup_same_phone_number(sandbox_tenant):
 
     # Initiate two signup challenges for the same phone number, email, and sandbox ID.
     data = dict(
-        phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL, scope="onboarding"
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER),
+        email=dict(value=FIXTURE_EMAIL),
+        scope="onboarding",
     )
     body = post("hosted/identify/signup_challenge", data, obc.key, sandbox_id_h)
     challenge_data1 = body["challenge_data"]
@@ -77,7 +81,9 @@ def vault1(sandbox_id, sandbox_tenant):
     """
     sandbox_id_h = SandboxId(sandbox_id)
     data = dict(
-        phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL, scope="onboarding"
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER),
+        email=dict(value=FIXTURE_EMAIL),
+        scope="onboarding",
     )
     post(
         "hosted/identify/signup_challenge",
@@ -315,7 +321,9 @@ def test_signup_flow(sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
     data = dict(
-        phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL, scope="onboarding"
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER),
+        email=dict(value=FIXTURE_EMAIL),
+        scope="onboarding",
     )
     body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     token = FpAuth(body["challenge_data"]["token"])
@@ -485,7 +493,7 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
     assert not body["user"]["can_initiate_signup_challenge"]
 
     # We should block making the signup challenge for this tenant
-    data = dict(phone_number=phone_number, scope="onboarding")
+    data = dict(phone_number=dict(value=phone_number), scope="onboarding")
     body = post(
         "/hosted/identify/signup_challenge",
         data,
@@ -514,7 +522,11 @@ def test_create_duplicate_vault(sandbox_user, foo_sandbox_tenant):
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     assert body["user"]["can_initiate_signup_challenge"]
 
-    data = dict(phone_number=phone_number, email=FIXTURE_EMAIL, scope="onboarding")
+    data = dict(
+        phone_number=dict(value=phone_number),
+        email=dict(value=FIXTURE_EMAIL),
+        scope="onboarding",
+    )
     body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     data = {
         "challenge_response": "000000",
@@ -534,6 +546,6 @@ def test_double_signup_challenge(sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
     obc = sandbox_tenant.default_ob_config
-    data = dict(phone_number=FIXTURE_PHONE_NUMBER, scope="onboarding")
+    data = dict(phone_number=dict(value=FIXTURE_PHONE_NUMBER), scope="onboarding")
     post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)

@@ -15,7 +15,11 @@ def no_phone_user(skip_phone_obc):
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
     # Should ignore phone number and initiate an email challenge
-    data = dict(email=FIXTURE_EMAIL, phone_number="+15555555555", scope="onboarding")
+    data = dict(
+        email=dict(value=FIXTURE_EMAIL),
+        phone_number=dict(value="+15555555555"),
+        scope="onboarding",
+    )
     res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
     token = FpAuth(res["challenge_data"]["token"])
@@ -47,7 +51,7 @@ def test_new_user(skip_phone_obc):
     collect_data = ["full_address", "name", "email"]
     headers = [skip_phone_obc.key, SandboxId(_gen_random_sandbox_id())]
 
-    data = dict(email=FIXTURE_EMAIL, scope="onboarding")
+    data = dict(email=dict(value=FIXTURE_EMAIL), scope="onboarding")
     res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
     token = FpAuth(res["challenge_data"]["token"])

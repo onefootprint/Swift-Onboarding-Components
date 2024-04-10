@@ -98,11 +98,16 @@ pub struct LoginChallengeResponse {
 /// For backwards compatibility until the clients are updated   
 pub enum SignupChallengeData<T> {
     Legacy(T),
-    New { value: T, is_bootstrap: bool },
+    New {
+        value: T,
+        #[serde(default)]
+        is_bootstrap: bool,
+    },
 }
 
 impl<T> SignupChallengeData<T> {
     pub fn value(self) -> T {
+        tracing::info!(is_legacy=%matches!(self, Self::Legacy(_)), "Signup challenge data");
         match self {
             SignupChallengeData::Legacy(d) => d,
             SignupChallengeData::New { value, .. } => value,

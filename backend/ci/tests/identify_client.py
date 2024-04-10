@@ -54,9 +54,12 @@ class IdentifyClient:
 
     def _signup_challenge(self, scope, kind="sms"):
         if kind == "sms":
-            data = dict(phone_number=self.phone_number, email=self.email)
+            data = dict(
+                phone_number=dict(value=self.phone_number),
+                email=dict(value=self.email),
+            )
         elif kind == "email":
-            data = dict(email=self.email)
+            data = dict(email=dict(value=self.email))
         data = dict(**data, scope=scope)
 
         assert self.playbook_key, "Cannot issue signup challenge without playbook key"

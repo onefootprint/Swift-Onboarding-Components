@@ -133,7 +133,7 @@ def test_add_phone(skip_phone_obc):
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
     # Create a user on a skip_phone OBC so they don't have a phone
-    data = dict(email=FIXTURE_EMAIL, scope="onboarding")
+    data = dict(email=dict(value=FIXTURE_EMAIL), scope="onboarding")
     res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
     token = FpAuth(res["challenge_data"]["token"])
@@ -188,7 +188,7 @@ def test_add_phone_bifrost(skip_phone_obc):
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
     # Create a user on a skip_phone OBC so they don't have a phone
-    data = dict(email=FIXTURE_EMAIL, scope="onboarding")
+    data = dict(email=dict(value=FIXTURE_EMAIL), scope="onboarding")
     res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
     token = FpAuth(res["challenge_data"]["token"])
