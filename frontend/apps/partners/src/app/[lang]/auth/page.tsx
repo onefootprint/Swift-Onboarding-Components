@@ -57,7 +57,7 @@ const AuthPage = ({ searchParams }: AuthPageProps) => {
     })
       .then(res => {
         /** Requires organization selection */
-        if (!res.user || !res.tenant) {
+        if (!res.user || !res.partnerTenant) {
           router.push(`/auth/organizations?token=${res.authToken}`);
           return;
         }
