@@ -112,7 +112,7 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::AwsTextract => false,
         VendorAPI::LexisFlexId => lexis_flex_id_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::IncodeCurpValidation => false,
-        VendorAPI::IncodeIneData => false,
+        VendorAPI::IncodeGovernmentValidation => false,
         VendorAPI::NeuroIdAnalytics => false,
     }
 }
@@ -155,7 +155,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         | VendorAPI::AwsRekognition
         | VendorAPI::AwsTextract
         | VendorAPI::IncodeCurpValidation
-        | VendorAPI::IncodeIneData
+        | VendorAPI::IncodeGovernmentValidation
         | VendorAPI::NeuroIdAnalytics
         | VendorAPI::IdologyPa => false,
     }

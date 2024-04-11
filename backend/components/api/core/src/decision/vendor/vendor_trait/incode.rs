@@ -578,7 +578,11 @@ impl
         IncodeError,
     > for FootprintVendorHttpClient
 {
-    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeGovernmentValidationRequest"))]
+    #[tracing::instrument(
+        "make_request",
+        skip_all,
+        fields(request = "IncodeGovernmentValidationRequest")
+    )]
     async fn make_request(
         &self,
         request: IncodeGovernmentValidationRequest,
@@ -600,7 +604,7 @@ impl
 
 impl VendorAPIResponse for IncodeResponse<GovernmentValidationResponse> {
     fn vendor_api(&self) -> newtypes::VendorAPI {
-        VendorAPI::IncodeIneData
+        VendorAPI::IncodeGovernmentValidation
     }
 
     fn raw_response(&self) -> newtypes::PiiJsonValue {

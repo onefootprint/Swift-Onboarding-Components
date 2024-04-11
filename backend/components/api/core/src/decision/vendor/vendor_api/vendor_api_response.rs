@@ -124,7 +124,7 @@ pub fn scrub_raw_error_vendor_response(
         VendorAPI::AwsTextract => scrub_response::<AwsTextract>(raw_response),
         VendorAPI::LexisFlexId => scrub_response::<LexisFlexId>(raw_response),
         VendorAPI::IncodeCurpValidation => scrub_response::<IncodeCurpValidation>(raw_response),
-        VendorAPI::IncodeIneData => scrub_response::<IncodeIneData>(raw_response),
+        VendorAPI::IncodeGovernmentValidation => scrub_response::<IncodeIneData>(raw_response),
         VendorAPI::NeuroIdAnalytics => scrub_response::<NeuroIdAnalytics>(raw_response),
     }
 }
@@ -187,7 +187,7 @@ fn build_parsed_vendor_response_map_entry(
         VendorAPI::AwsTextract => insert_map_entry(map, AwsTextract, raw_response)?,
         VendorAPI::LexisFlexId => insert_map_entry(map, LexisFlexId, raw_response)?,
         VendorAPI::IncodeCurpValidation => insert_map_entry(map, IncodeCurpValidation, raw_response)?,
-        VendorAPI::IncodeIneData => insert_map_entry(map, IncodeIneData, raw_response)?,
+        VendorAPI::IncodeGovernmentValidation => insert_map_entry(map, IncodeIneData, raw_response)?,
         VendorAPI::NeuroIdAnalytics => insert_map_entry(map, NeuroIdAnalytics, raw_response)?,
     };
 
@@ -232,7 +232,7 @@ fn build_verification_identifier_map_entry(
         VendorAPI::AwsTextract => map.insert(AwsTextract, request_and_result),
         VendorAPI::LexisFlexId => map.insert(LexisFlexId, request_and_result),
         VendorAPI::IncodeCurpValidation => map.insert(IncodeCurpValidation, request_and_result),
-        VendorAPI::IncodeIneData => map.insert(IncodeIneData, request_and_result),
+        VendorAPI::IncodeGovernmentValidation => map.insert(IncodeIneData, request_and_result),
         VendorAPI::NeuroIdAnalytics => map.insert(NeuroIdAnalytics, request_and_result),
     };
 }

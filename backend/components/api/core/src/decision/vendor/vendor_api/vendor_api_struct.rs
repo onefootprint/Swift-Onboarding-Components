@@ -72,7 +72,7 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::AwsTextract => Self::AwsTextract,
             VendorAPI::LexisFlexId => Self::LexisFlexId,
             VendorAPI::IncodeCurpValidation => Self::IncodeCurpValidation,
-            VendorAPI::IncodeIneData => Self::IncodeIneData,
+            VendorAPI::IncodeGovernmentValidation => Self::IncodeIneData,
             VendorAPI::NeuroIdAnalytics => Self::NeuroIdAnalytics,
         }
     }
@@ -109,7 +109,7 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::AwsTextract => VendorAPI::AwsTextract,
             WrappedVendorAPI::LexisFlexId => VendorAPI::LexisFlexId,
             WrappedVendorAPI::IncodeCurpValidation => VendorAPI::IncodeCurpValidation,
-            WrappedVendorAPI::IncodeIneData => VendorAPI::IncodeIneData,
+            WrappedVendorAPI::IncodeIneData => VendorAPI::IncodeGovernmentValidation,
             WrappedVendorAPI::NeuroIdAnalytics => VendorAPI::NeuroIdAnalytics,
         }
     }

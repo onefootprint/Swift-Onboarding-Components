@@ -72,7 +72,7 @@ pub enum ParsedResponse {
     AwsRekognition(PiiJsonValue),
     LexisFlexId(FlexIdResponse),
     IncodeCurpValidation(CurpValidationResponse),
-    IncodeIneData(PiiJsonValue),
+    IncodeGovernmentValidation(PiiJsonValue),
     NeuroIdAnalytics(NeuroIdAnalyticsResponse),
 }
 
@@ -309,7 +309,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::AwsRekognition(_) => VendorAPI::AwsRekognition,
             ParsedResponse::LexisFlexId(_) => VendorAPI::LexisFlexId,
             ParsedResponse::IncodeCurpValidation(_) => VendorAPI::IncodeCurpValidation,
-            ParsedResponse::IncodeIneData(_) => VendorAPI::IncodeIneData,
+            ParsedResponse::IncodeGovernmentValidation(_) => VendorAPI::IncodeGovernmentValidation,
             ParsedResponse::NeuroIdAnalytics(_) => VendorAPI::NeuroIdAnalytics,
         }
     }
