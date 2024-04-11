@@ -167,7 +167,14 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         // Run Additional Checks
         //
         let curp_result = if obc.curp_validation_enabled {
-            common::run_curp_check(state, &self.wf_id).await?
+             // once this is stable, we should err.
+            match common::run_curp_check(state, &self.wf_id).await {
+                Ok(res) => res,
+                Err(err) => {
+                    tracing::error!(?err, wf_id=?self.wf_id, "error running curp validation");
+                    None
+                }
+            }
         } else {
             None
         };
