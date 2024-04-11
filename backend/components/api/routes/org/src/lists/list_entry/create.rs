@@ -10,7 +10,7 @@ use api_wire_types::CreateListEntryRequest;
 use crypto::aead::{AeadSealedBytes, SealingKey};
 use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::ListEntry, tenant::Tenant};
 use itertools::Itertools;
-use newtypes::{ListId, PiiBytes};
+use newtypes::{ListEntryValue, ListId, PiiBytes};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(description = "Creates a new list entry", tags(Lists, Organization, Private))]
@@ -52,11 +52,15 @@ pub async fn create_list_entry(
     let list_entries = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            // TODO: validate `entries` against `list.kind`
             // TODO: check if `entries` already exists in some other ListEntry? bit weirder to check since its bytea but should still work i guess
             let e_data = entries
                 .into_iter()
-                .map(|e| key.seal_bytes(e.leak().as_bytes()).map(|b| b.into()))
+                .map(|d| -> ApiResult<_> {
+                    let parsed = ListEntryValue::parse(list.kind, d)?;
+                    let canon = parsed.canonicalize();
+                    let enc = key.seal_bytes(canon.leak().as_bytes()).map(|b| b.into())?;
+                    Ok(enc)
+                })
                 .collect::<Result<Vec<_>, _>>()?;
             let ie = insight.insert_with_conn(conn)?;
             Ok(ListEntry::bulk_create(

@@ -9,7 +9,7 @@ use api_core::{errors::ValidationError, utils::headers::InsightHeaders};
 use api_wire_types::CreateListRequest;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::ListEntry, tenant::Tenant};
-use newtypes::{DbActor, SealedVaultDataKey};
+use newtypes::{DbActor, ListEntryValue, SealedVaultDataKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(description = "Creates a new List", tags(Lists, Organization, Private))]
@@ -54,7 +54,14 @@ pub async fn create_list(
                 Some(entries) => {
                     let e_data = entries
                         .into_iter()
-                        .map(|e| sealing_key.seal_bytes(e.leak().as_bytes()).map(|b| b.into()))
+                        .map(|d| -> ApiResult<_> {
+                            let parsed = ListEntryValue::parse(list.kind, d)?;
+                            let canon = parsed.canonicalize();
+                            let enc = sealing_key
+                                .seal_bytes(canon.leak().as_bytes())
+                                .map(|b| b.into())?;
+                            Ok(enc)
+                        })
                         .collect::<Result<Vec<_>, _>>()?;
 
                     let entries_created = ListEntry::bulk_create(

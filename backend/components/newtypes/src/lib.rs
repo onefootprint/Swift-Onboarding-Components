@@ -54,6 +54,9 @@ pub mod secret_api_key;
 pub mod reason_code;
 pub use reason_code::*;
 
+pub mod list;
+pub use list::*;
+
 pub mod locked;
 pub use locked::*;
 
@@ -89,8 +92,14 @@ pub use tenant_business_info::*;
 pub enum Error {
     #[error("Invalid email address: {0}")]
     InvalidEmail(email_address::Error),
+    #[error("Invalid email domain")]
+    InvalidEmailDomain,
+    #[error("Invalid SSN9: {0}")]
+    InvalidSsn9(String),
     #[error("{0}")]
     PhoneNumber(#[from] fields::phone_number::Error),
+    #[error("Invalid phone number country code: {0}")]
+    InvalidPhoneCountryCode(u16),
     #[error("Invalid sandbox suffix. Suffix must be non-empty, alphanumeric string")]
     InvalidSandboxSuffix,
     #[error("Serde error {0}")]
@@ -121,6 +130,8 @@ pub enum Error {
     FilterFunctionParsingError(#[from] crate::filter_function::FilterFunctionParsingError),
     #[error("{0}")]
     ParseIntError(#[from] std::num::ParseIntError),
+    #[error("{0}")]
+    ParseIpAddrError(#[from] std::net::AddrParseError),
 }
 
 use std::collections::HashMap;

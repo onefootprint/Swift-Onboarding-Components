@@ -76,7 +76,7 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
             name=f"My Super List 2 {nonce}",
             alias=f"my_super_list_2_{nonce}",
             kind="email_address",
-            entries=["bobertotech.com", "badppl.org", "somethingelseketchy.net"],
+            entries=["a@bobertotech.com", "b@badppl.org", "c@somethingelseketchy.net"],
         ),
         *sandbox_tenant.db_auths,
     )
@@ -350,7 +350,7 @@ def test_delete_no_permissions(sandbox_tenant):
 
 def test_create_list_entry(sandbox_tenant):
     nonce = _gen_random_str(5)
-    list = post(
+    resp = post(
         f"/org/lists",
         dict(
             name=f"My Super List {nonce}",
@@ -359,10 +359,11 @@ def test_create_list_entry(sandbox_tenant):
         ),
         *sandbox_tenant.db_auths,
     )
+    list_id = resp["id"]
 
     # add single
     entries = post(
-        f"/org/lists/{list['id']}/entries",
+        f"/org/lists/{list_id}/entries",
         dict(entries=["protonmail.com"]),
         *sandbox_tenant.db_auths,
     )
@@ -370,11 +371,12 @@ def test_create_list_entry(sandbox_tenant):
     assert entries[0]["data"] == "protonmail.com"
     assert entries[0]["actor"]["kind"] == "tenant_user"
 
-    list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
+    entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
+    assert len(entries) == 1
 
     # add multiple
     entries = post(
-        f"/org/lists/{list['id']}/entries",
+        f"/org/lists/{list_id}/entries",
         dict(entries=["bobertotech.com", "badppl.org", "somethingelseketchy.net"]),
         *sandbox_tenant.db_auths,
     )
@@ -383,7 +385,62 @@ def test_create_list_entry(sandbox_tenant):
     assert entries[1]["data"] == "badppl.org"
     assert entries[2]["data"] == "somethingelseketchy.net"
 
-    list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
+    entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
+    assert len(entries) == 4
+
+
+def test_create_list_entry_format_canonicalization(sandbox_tenant):
+    nonce = _gen_random_str(5)
+
+    # Invalid SSN yields HTTP 400
+    resp = post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List {nonce}",
+            alias=f"my_super_list_{nonce}",
+            kind="ssn9",
+            entries=[
+                "000-45-6789",
+            ]
+        ),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+    assert resp["error"]["message"] == "Invalid SSN9: Leading three digit number must not be 000, 666, or a value between 900 and 999 (inclusive)"
+
+    # Entries can be given in the list creation call.
+    resp = post(
+        f"/org/lists",
+        dict(
+            name=f"My Super List {nonce}",
+            alias=f"my_super_list_{nonce}",
+            kind="ssn9",
+            entries=[
+                "123-45-6789",
+            ]
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    list_id = resp["id"]
+
+    # Valid SSNs are canonicalized.
+    entries = post(
+        f"/org/lists/{list_id}/entries",
+        dict(entries=[
+            "234-56-2983",
+            "345671234",
+            "456-781234",
+        ]),
+        *sandbox_tenant.db_auths,
+    )
+    assert len(entries) == 3
+    assert entries[0]["data"] == "234562983"
+    assert entries[1]["data"] == "345671234"
+    assert entries[2]["data"] == "456781234"
+
+    # Listing all entries inclues entries given when list was created.
+    entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
+    assert set([e["data"] for e in entries]) == set(["123456789", "234562983", "345671234", "456781234"])
 
 
 def test_create_list_entry_no_permissions(sandbox_tenant):

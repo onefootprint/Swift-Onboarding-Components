@@ -5,6 +5,7 @@ pub mod output;
 pub mod phone_number;
 mod pii;
 pub mod sandbox;
+pub mod ssn;
 pub use data_request::*;
 pub use pii::*;
 pub mod put_data_request;
