@@ -267,9 +267,8 @@ impl IncodeVerificationSession {
 
 fn starting_state_for_purpose(purpose: &IncodeVerificationSessionPurpose) -> IncodeVerificationSessionState {
     match purpose {
-        IncodeVerificationSessionPurpose::Identity => IncodeVerificationSessionState::StartOnboarding, 
+        IncodeVerificationSessionPurpose::Identity => IncodeVerificationSessionState::StartOnboarding,
         // we don't have a full state machine for curp, IVS just used for record keeping
-        IncodeVerificationSessionPurpose::CurpValidation => IncodeVerificationSessionState::Complete, 
-
+        IncodeVerificationSessionPurpose::CurpValidation => IncodeVerificationSessionState::Complete,
     }
 }

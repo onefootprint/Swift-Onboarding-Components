@@ -15,7 +15,10 @@ use newtypes::{
     ScopedVaultId, TenantId, WorkflowId,
 };
 
-use super::{document_request::DocumentRequest, document_upload::DocumentUpload};
+use super::{
+    document_request::DocumentRequest, document_upload::DocumentUpload,
+    incode_verification_session::IncodeVerificationSession,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = identity_document)]
@@ -234,15 +237,14 @@ impl IdentityDocument {
     pub fn list_completed_sent_to_incode_by_wf_id(
         conn: &mut PgConn,
         wf_id: &WorkflowId,
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<Vec<(Self, DocumentRequest, Option<IncodeVerificationSession>)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::workflow_id.eq(wf_id))
             // only completed
             .filter(not(identity_document::completed_seqno.is_null()))
-            // only docs that went to incode
-            .inner_join(incode_verification_session::table)
-            .select(identity_document::all_columns)
+            // join in docs that went to incode
+            .left_join(incode_verification_session::table.on(incode_verification_session::identity_document_id.eq(identity_document::id)))
             // latest is first
             .order_by(identity_document::completed_seqno.desc())
             .get_results(conn)?;

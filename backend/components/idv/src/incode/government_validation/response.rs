@@ -45,6 +45,7 @@ impl IncodeClientErrorCustomFailureReasons for GovernmentValidationResponse {
 #[derive(Clone, Debug, Display, EnumString, Eq, PartialEq, Serialize)]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum MXStatusCode {
+    Success,
     ValidationError,
     IneConnectionError,
     IneInfrastructureError,
@@ -68,6 +69,7 @@ pub enum MXStatusCode {
 impl From<u8> for MXStatusCode {
     fn from(value: u8) -> MXStatusCode {
         match value {
+            0 => MXStatusCode::Success,
             1 => MXStatusCode::ValidationError,
             2 => MXStatusCode::IneConnectionError,
             3 => MXStatusCode::IneInfrastructureError,

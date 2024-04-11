@@ -71,6 +71,8 @@ pub enum OcrDataKind {
     Curp,
     /// Incode-determined document type
     ClassifiedDocumentType,
+    /// Temporary maybe: This is the full response from Curp validation
+    CurpValidationResponse,
 }
 
 impl From<DocumentKind> for DataIdentifier {
