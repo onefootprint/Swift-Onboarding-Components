@@ -43,11 +43,7 @@ pub async fn get_dupes(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             let dupes = Fingerprint::get_dupes(conn, &sv)?;
-            let sv_ids = dupes
-                .dupes_within_tenant
-                .iter()
-                .map(|fp| &fp.scoped_vault_id)
-                .collect_vec();
+            let sv_ids = dupes.internal.iter().map(|fp| &fp.scoped_vault_id).collect_vec();
             let vaults = ScopedVault::bulk_get(conn, sv_ids, &tenant_id, is_live)?;
             let vws: HashMap<ScopedVaultId, TenantVw> =
                 VaultWrapper::multi_get_for_tenant(conn, vaults, None)?;
@@ -59,7 +55,7 @@ pub async fn get_dupes(
     let mut decrypted_results =
         get::search::decrypt_visible_attrs(&state, &auth, vws.values().collect()).await?;
     let mut sv_id_to_dupe_fps = dupes
-        .dupes_within_tenant
+        .internal
         .into_iter()
         .map(|fp| (fp.scoped_vault_id, fp.kind))
         .into_group_map();
@@ -84,10 +80,10 @@ pub async fn get_dupes(
         .into_iter()
         .map(|(d, vw, data)| api_wire_types::SameTenantDupe::from_db((d, vw, &auth, data)))
         .collect();
-    let other_tenant = api_wire_types::OtherTenantDupes {
-        num_matches: dupes.num_dup_users_other_tenants,
-        num_tenants: dupes.num_other_tenants,
-    };
+    let other_tenant = dupes.external.map(|d| api_wire_types::OtherTenantDupes {
+        num_matches: d.num_users,
+        num_tenants: d.num_tenants,
+    });
     let response = api_wire_types::Dupes {
         same_tenant,
         other_tenant,

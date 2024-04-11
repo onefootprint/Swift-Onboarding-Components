@@ -7,7 +7,7 @@ use serde::Serialize;
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct Dupes {
     pub same_tenant: Vec<SameTenantDupe>,
-    pub other_tenant: OtherTenantDupes,
+    pub other_tenant: Option<OtherTenantDupes>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

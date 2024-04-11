@@ -136,11 +136,15 @@ impl Fingerprint {
 
 pub struct FingerprintDupesResult {
     /// The fingerprint rows belonging to other users in the same tenant that have matching duplicate data
-    pub dupes_within_tenant: Vec<Fingerprint>,
+    pub internal: Vec<Fingerprint>,
+    pub external: Option<ExternalDupes>,
+}
+
+pub struct ExternalDupes {
     /// The total number of vaults at other tenants that have matching duplicate data
-    pub num_dup_users_other_tenants: i64,
+    pub num_users: i64,
     /// The total number of other tenants that have
-    pub num_other_tenants: i64,
+    pub num_tenants: i64,
 }
 
 impl Fingerprint {
@@ -163,7 +167,7 @@ impl Fingerprint {
             .filter(fingerprint::vault_id.ne(&sv.vault_id));
 
         // TODO hide dupes at other tenants in sandbox in next PR
-        let dupes_within_tenant = q_dupes
+        let internal_matches = q_dupes
             .clone()
             .filter(fingerprint::tenant_id.eq(&sv.tenant_id))
             // TODO weird things will happen when there are more than 100 dupes
@@ -171,22 +175,31 @@ impl Fingerprint {
             .order_by(fingerprint::vault_id)
             .get_results::<Self>(conn)?;
 
-        let v_ids_with_dupes_at_tenant = dupes_within_tenant.iter().map(|f| &f.vault_id).collect_vec();
-        let (num_dup_users_other_tenants, num_other_tenants) = q_dupes
-            .filter(fingerprint::tenant_id.ne(&sv.tenant_id))
-            .filter(not(fingerprint::vault_id.eq_any(v_ids_with_dupes_at_tenant)))
-            .select((
-                count_distinct(fingerprint::vault_id),
-                count_distinct(fingerprint::tenant_id),
-            ))
-            .get_result(conn)?;
+        let external = if sv.is_live {
+            let v_ids_with_dupes_at_tenant = internal_matches.iter().map(|f| &f.vault_id).collect_vec();
+            let (num_users, num_tenants) = q_dupes
+                .filter(fingerprint::tenant_id.ne(&sv.tenant_id))
+                .filter(not(fingerprint::vault_id.eq_any(v_ids_with_dupes_at_tenant)))
+                .select((
+                    count_distinct(fingerprint::vault_id),
+                    count_distinct(fingerprint::tenant_id),
+                ))
+                .get_result(conn)?;
 
-        let res = FingerprintDupesResult {
-            dupes_within_tenant,
-            num_dup_users_other_tenants,
-            num_other_tenants,
+            Some(ExternalDupes {
+                num_users,
+                num_tenants,
+            })
+        } else {
+            // No need to look for external matches in sandbox - lots of false positives with
+            // sandbox phone number
+            None
         };
 
+        let res = FingerprintDupesResult {
+            internal: internal_matches,
+            external,
+        };
         Ok(res)
     }
 }

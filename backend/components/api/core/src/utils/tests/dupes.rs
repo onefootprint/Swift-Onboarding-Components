@@ -219,18 +219,16 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
         .map(|(v, t, _)| sv_map.get(&(v, t)).unwrap().id.clone())
         .collect_vec();
     let actual_same_tenant = dupes
-        .dupes_within_tenant
+        .internal
         .into_iter()
         .map(|d| d.scoped_vault_id.clone())
         .unique()
         .collect_vec();
 
     assert_have_same_elements(expected_same_tenant, actual_same_tenant); // have to do it this way for now because had to remove the order_by in the fingerprint query
-    assert_eq!(
-        expected.num_other_tenant_matches,
-        dupes.num_dup_users_other_tenants
-    );
-    assert_eq!(expected.num_other_tenants, dupes.num_other_tenants);
+    let external = dupes.external.unwrap();
+    assert_eq!(expected.num_other_tenant_matches, external.num_users);
+    assert_eq!(expected.num_other_tenants, external.num_tenants);
 }
 
 async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>) {

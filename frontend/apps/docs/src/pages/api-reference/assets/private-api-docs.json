@@ -11825,7 +11825,6 @@
                     }
                 },
                 "required": [
-                    "other_tenant",
                     "same_tenant"
                 ]
             },
