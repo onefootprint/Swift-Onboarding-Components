@@ -10,7 +10,7 @@ use db::models::list::List;
 use newtypes::ListId;
 use paperclip::actix::{api_v2_operation, patch, web};
 
-#[api_v2_operation(description = "Updates an existing list", tags(Organization, Private, Lists))]
+#[api_v2_operation(description = "Updates an existing list", tags(Lists, Organization, Private))]
 #[patch("/org/lists/{id}")]
 pub async fn patch(
     state: web::Data<State>,

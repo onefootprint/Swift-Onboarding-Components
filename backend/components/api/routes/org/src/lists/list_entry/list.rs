@@ -14,7 +14,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
     description = "Retrieves all entries of a list",
-    tags(Organization, Private, Lists)
+    tags(Lists, Organization, Private)
 )]
 #[actix::get("/org/lists/{list_id}/entries")]
 pub async fn entries_for_list(

@@ -13,7 +13,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
     description = "Retrieves all Lists for the Tenant",
-    tags(Organization, Private, Lists)
+    tags(Lists, Organization, Private)
 )]
 #[actix::get("/org/lists")]
 pub async fn list_for_tenant(

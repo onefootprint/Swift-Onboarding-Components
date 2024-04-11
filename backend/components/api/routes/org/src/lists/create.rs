@@ -12,7 +12,7 @@ use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::List
 use newtypes::{DbActor, SealedVaultDataKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-#[api_v2_operation(description = "Creates a new List", tags(Organization, Private, Lists))]
+#[api_v2_operation(description = "Creates a new List", tags(Lists, Organization, Private))]
 #[actix::post("/org/lists")]
 pub async fn create_list(
     state: web::Data<State>,

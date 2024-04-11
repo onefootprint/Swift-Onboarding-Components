@@ -30,7 +30,7 @@ pub const LIST_AUDIT_EVENT_NAMES: [AuditEventName; 2] =
     [AuditEventName::CreateListEntry, AuditEventName::DeleteListEntry];
 
 #[api_v2_operation(
-    tags(Playbooks, Organization, Private),
+    tags(Lists, Organization, Private),
     description = "Returns events for a List."
 )]
 #[get("/org/lists/{id}/timeline")]

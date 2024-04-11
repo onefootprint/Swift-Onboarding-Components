@@ -4054,9 +4054,9 @@
         "/org/lists": {
             "get": {
                 "tags": [
+                    "Lists",
                     "Organization",
-                    "Private",
-                    "Lists"
+                    "Private"
                 ],
                 "description": "Retrieves all Lists for the Tenant",
                 "parameters": [
@@ -4099,9 +4099,9 @@
             },
             "post": {
                 "tags": [
+                    "Lists",
                     "Organization",
-                    "Private",
-                    "Lists"
+                    "Private"
                 ],
                 "description": "Creates a new List",
                 "requestBody": {
@@ -4136,7 +4136,7 @@
         "/org/lists/{id}": {
             "get": {
                 "tags": [
-                    "Playbooks",
+                    "Lists",
                     "Organization",
                     "Private"
                 ],
@@ -4172,9 +4172,9 @@
             },
             "patch": {
                 "tags": [
+                    "Lists",
                     "Organization",
-                    "Private",
-                    "Lists"
+                    "Private"
                 ],
                 "description": "Updates an existing list",
                 "parameters": [
@@ -4220,7 +4220,7 @@
         "/org/lists/{id}/timeline": {
             "get": {
                 "tags": [
-                    "Playbooks",
+                    "Lists",
                     "Organization",
                     "Private"
                 ],
@@ -4305,9 +4305,9 @@
         "/org/lists/{list_id}": {
             "delete": {
                 "tags": [
+                    "Lists",
                     "Organization",
-                    "Private",
-                    "Lists"
+                    "Private"
                 ],
                 "description": "Delete the List",
                 "parameters": [
@@ -4343,9 +4343,9 @@
         "/org/lists/{list_id}/entries": {
             "get": {
                 "tags": [
+                    "Lists",
                     "Organization",
-                    "Private",
-                    "Lists"
+                    "Private"
                 ],
                 "description": "Retrieves all entries of a list",
                 "parameters": [
@@ -4382,9 +4382,9 @@
             },
             "post": {
                 "tags": [
+                    "Lists",
                     "Organization",
-                    "Private",
-                    "Lists"
+                    "Private"
                 ],
                 "description": "Creates a new list entry",
                 "parameters": [
@@ -4433,9 +4433,9 @@
         "/org/lists/{list_id}/entries/{list_entry_id}": {
             "delete": {
                 "tags": [
+                    "Lists",
                     "Organization",
-                    "Private",
-                    "Lists"
+                    "Private"
                 ],
                 "description": "Delete the List",
                 "parameters": [
@@ -8774,7 +8774,6 @@
                     }
                 },
                 "required": [
-                    "actor",
                     "event",
                     "timestamp"
                 ]

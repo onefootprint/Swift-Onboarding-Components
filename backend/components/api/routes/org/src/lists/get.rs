@@ -10,7 +10,7 @@ use db::models::{list::List, rule_instance::RuleInstance};
 use newtypes::ListId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-#[api_v2_operation(tags(Playbooks, Organization, Private), description = "Returns a blocklist.")]
+#[api_v2_operation(tags(Lists, Organization, Private), description = "Returns a blocklist.")]
 #[get("/org/lists/{id}")]
 async fn get_detail(
     state: web::Data<State>,

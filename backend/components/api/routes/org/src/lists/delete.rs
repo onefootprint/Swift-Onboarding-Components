@@ -9,7 +9,7 @@ use db::models::list::List;
 use newtypes::ListId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-#[api_v2_operation(description = "Delete the List", tags(Organization, Private, Lists))]
+#[api_v2_operation(description = "Delete the List", tags(Lists, Organization, Private))]
 #[actix::delete("/org/lists/{list_id}")]
 pub async fn deactivate_list(
     state: web::Data<State>,

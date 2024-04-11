@@ -13,7 +13,7 @@ use itertools::Itertools;
 use newtypes::{ListId, PiiBytes};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-#[api_v2_operation(description = "Creates a new list entry", tags(Organization, Private, Lists))]
+#[api_v2_operation(description = "Creates a new list entry", tags(Lists, Organization, Private))]
 #[actix::post("/org/lists/{list_id}/entries")]
 pub async fn create_list_entry(
     state: web::Data<State>,

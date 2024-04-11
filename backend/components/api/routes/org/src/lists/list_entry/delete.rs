@@ -9,7 +9,7 @@ use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::List
 use newtypes::{ListEntryId, ListId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-#[api_v2_operation(description = "Delete the List", tags(Organization, Private, Lists))]
+#[api_v2_operation(description = "Delete the List", tags(Lists, Organization, Private))]
 #[actix::delete("/org/lists/{list_id}/entries/{list_entry_id}")]
 pub async fn deactivate_list_entry(
     state: web::Data<State>,
