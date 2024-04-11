@@ -5,11 +5,19 @@ import { useMutation } from '@tanstack/react-query';
 
 import { getLogger } from '../../../../../utils/logger';
 
+const BOOTSTRAP_FIELDS_HEADER = 'X-Fp-Bootstrapped-Fields';
 const { logInfo } = getLogger('use-user-data');
 
 const userDataRequest = async (payload: UserDataRequest) => {
+  const {
+    data: rawData,
+    bootstrapDis,
+    authToken,
+    allowExtraFields,
+    speculative,
+  } = payload;
   const data = Object.fromEntries(
-    Object.entries(payload.data).filter(
+    Object.entries(rawData).filter(
       // Don't send null or undefined or empty values
       e => {
         const isEmpty = !e[1];
@@ -28,7 +36,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
     return {} as UserDataResponse;
   }
 
-  if (payload.speculative) {
+  if (speculative) {
     // used only in investor profile flows
     // we just send data to the backend to validate it
     const response = await requestWithoutCaseConverter<UserDataResponse>({
@@ -36,11 +44,16 @@ const userDataRequest = async (payload: UserDataRequest) => {
       url: '/hosted/user/vault/validate',
       data,
       headers: {
-        [AUTH_HEADER]: payload.authToken,
-        [ALLOW_EXTRA_FIELDS_HEADER]: !!payload.allowExtraFields,
+        [AUTH_HEADER]: authToken,
+        [ALLOW_EXTRA_FIELDS_HEADER]: !!allowExtraFields,
       },
     });
     return response.data;
+  }
+
+  const headers: Record<string, string> = { [AUTH_HEADER]: authToken };
+  if (bootstrapDis.length) {
+    headers[BOOTSTRAP_FIELDS_HEADER] = bootstrapDis.join(',');
   }
 
   // used for kyc flows
@@ -48,9 +61,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
     method: 'PATCH',
     url: '/hosted/user/vault',
     data,
-    headers: {
-      [AUTH_HEADER]: payload.authToken,
-    },
+    headers,
   });
   return response.data;
 };

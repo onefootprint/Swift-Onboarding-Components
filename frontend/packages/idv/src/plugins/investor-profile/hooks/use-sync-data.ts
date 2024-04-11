@@ -49,6 +49,8 @@ const useSyncData = () => {
     investorProfileDataMutation.mutate(
       {
         data,
+        // TODO we should populate this
+        bootstrapDis: [],
         authToken,
         speculative,
         allowExtraFields: true,

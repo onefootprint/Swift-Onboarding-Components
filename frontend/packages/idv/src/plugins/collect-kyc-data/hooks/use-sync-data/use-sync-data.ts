@@ -62,8 +62,9 @@ const useSyncData = () => {
     }
 
     let data: Partial<Record<IdDI | InvestorProfileDI, VaultValue>> | undefined;
+    let bootstrapDis: IdDI[] | undefined;
     try {
-      data = getRequestData(locale, rawData, requirement);
+      ({ data, bootstrapDis } = getRequestData(locale, rawData, requirement));
     } catch (e) {
       toast.show({
         title: t('request-data.title'),
@@ -121,7 +122,7 @@ const useSyncData = () => {
     };
 
     try {
-      await userDataMutation.mutateAsync({ data, authToken });
+      await userDataMutation.mutateAsync({ data, bootstrapDis, authToken });
       handleSuccess();
     } catch (e) {
       handleError(e);

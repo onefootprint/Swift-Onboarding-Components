@@ -10,73 +10,72 @@ import getRequestData from './get-request-data';
 
 describe('getRequestData', () => {
   it('removes entries with undefined values', () => {
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.firstName]: {
-            value: '',
-            dirty: true,
-          },
-          [IdDI.middleName]: {
-            value: undefined,
-          },
-          [IdDI.lastName]: {
-            value: 'Foot',
-            dirty: true,
-          },
+    const { data, bootstrapDis } = getRequestData(
+      'en-US',
+      {
+        [IdDI.firstName]: {
+          value: '',
+          dirty: true,
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [CollectedKycDataOption.name],
-          populatedAttributes: [],
-          optionalAttributes: [],
-          isMet: false,
+        [IdDI.middleName]: {
+          value: undefined,
         },
-      ),
-    ).toEqual({
+        [IdDI.lastName]: {
+          value: 'Foot',
+          dirty: true,
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [CollectedKycDataOption.name],
+        populatedAttributes: [],
+        optionalAttributes: [],
+        isMet: false,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.firstName]: '',
       [IdDI.lastName]: 'Foot',
     });
+    expect(bootstrapDis).toEqual([]);
   });
 
   it('keeps entries with empty strings', () => {
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.addressLine1]: {
-            value: '123 main st',
-          },
-          [IdDI.addressLine2]: {
-            value: '',
-            dirty: true,
-          },
-          [IdDI.city]: {
-            value: 'San francisco',
-          },
-          [IdDI.state]: {
-            value: 'CA',
-          },
-          [IdDI.zip]: {
-            value: '12345',
-          },
-          [IdDI.country]: {
-            value: 'US',
-          },
+    const { data } = getRequestData(
+      'en-US',
+      {
+        [IdDI.addressLine1]: {
+          value: '123 main st',
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.address,
-          ],
-          populatedAttributes: [],
-          optionalAttributes: [],
-          isMet: false,
+        [IdDI.addressLine2]: {
+          value: '',
+          dirty: true,
         },
-      ),
-    ).toEqual({
+        [IdDI.city]: {
+          value: 'San francisco',
+        },
+        [IdDI.state]: {
+          value: 'CA',
+        },
+        [IdDI.zip]: {
+          value: '12345',
+        },
+        [IdDI.country]: {
+          value: 'US',
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.address,
+        ],
+        populatedAttributes: [],
+        optionalAttributes: [],
+        isMet: false,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.addressLine1]: '123 main st',
       [IdDI.addressLine2]: '',
       [IdDI.city]: 'San francisco',
@@ -87,81 +86,79 @@ describe('getRequestData', () => {
   });
 
   it('removes non-dirty entries', () => {
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.dob]: {
-            value: '123',
-          },
-          [IdDI.firstName]: {
-            value: '123',
-            dirty: true,
-          },
-          [IdDI.lastName]: {
-            value: 'Foot',
-            dirty: true,
-          },
+    const { data } = getRequestData(
+      'en-US',
+      {
+        [IdDI.dob]: {
+          value: '123',
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [
-            CollectedKycDataOption.dob,
-            CollectedKycDataOption.name,
-          ],
-          populatedAttributes: [],
-          optionalAttributes: [],
-          isMet: false,
+        [IdDI.firstName]: {
+          value: '123',
+          dirty: true,
         },
-      ),
-    ).toEqual({
+        [IdDI.lastName]: {
+          value: 'Foot',
+          dirty: true,
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [
+          CollectedKycDataOption.dob,
+          CollectedKycDataOption.name,
+        ],
+        populatedAttributes: [],
+        optionalAttributes: [],
+        isMet: false,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.firstName]: '123',
       [IdDI.lastName]: 'Foot',
     });
   });
 
   it('formats dob and visa expiration data correctly', () => {
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.dob]: {
-            value: '01/02/2003',
-            dirty: true,
-          },
-          [IdDI.nationality]: {
-            value: 'US',
-            dirty: true,
-          },
-          [IdDI.usLegalStatus]: {
-            value: UsLegalStatus.citizen,
-            dirty: true,
-          },
-          [IdDI.citizenships]: {
-            value: ['US', 'MX'],
-            dirty: true,
-          },
-          [IdDI.visaKind]: {
-            value: VisaKind.f1,
-            dirty: true,
-          },
-          [IdDI.visaExpirationDate]: {
-            value: '01/02/2003',
-            dirty: true,
-          },
+    const { data } = getRequestData(
+      'en-US',
+      {
+        [IdDI.dob]: {
+          value: '01/02/2003',
+          dirty: true,
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [
-            CollectedKycDataOption.dob,
-            CollectedKycDataOption.usLegalStatus,
-          ],
-          populatedAttributes: [],
-          optionalAttributes: [],
-          isMet: false,
+        [IdDI.nationality]: {
+          value: 'US',
+          dirty: true,
         },
-      ),
-    ).toEqual({
+        [IdDI.usLegalStatus]: {
+          value: UsLegalStatus.citizen,
+          dirty: true,
+        },
+        [IdDI.citizenships]: {
+          value: ['US', 'MX'],
+          dirty: true,
+        },
+        [IdDI.visaKind]: {
+          value: VisaKind.f1,
+          dirty: true,
+        },
+        [IdDI.visaExpirationDate]: {
+          value: '01/02/2003',
+          dirty: true,
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [
+          CollectedKycDataOption.dob,
+          CollectedKycDataOption.usLegalStatus,
+        ],
+        populatedAttributes: [],
+        optionalAttributes: [],
+        isMet: false,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.dob]: '2003-01-02',
       [IdDI.nationality]: 'US',
       [IdDI.citizenships]: ['US', 'MX'],
@@ -171,58 +168,57 @@ describe('getRequestData', () => {
     });
   });
 
-  it('matches cdos if there are any dangling dis', () => {
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.firstName]: {
-            value: 'Piip',
-            decrypted: true,
-            dirty: true,
-          },
-          [IdDI.lastName]: {
-            value: 'Foot',
-            dirty: true,
-          },
-          [IdDI.ssn4]: {
-            value: '1234',
-            dirty: true,
-          },
-          [IdDI.addressLine1]: {
-            value: '123 Main St',
-            decrypted: true,
-            dirty: true,
-          },
-          [IdDI.city]: {
-            value: 'New York',
-            dirty: true,
-          },
-          [IdDI.state]: {
-            value: 'NY',
-            decrypted: true,
-          },
-          [IdDI.zip]: {
-            value: '10001',
-            decrypted: true,
-          },
-          [IdDI.country]: {
-            value: 'US',
-            bootstrap: true,
-          },
+  it('matches cdos if there are any dangling dis, address', () => {
+    const { data, bootstrapDis } = getRequestData(
+      'en-US',
+      {
+        [IdDI.firstName]: {
+          value: 'Piip',
+          decrypted: true,
+          dirty: true,
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [
-            CollectedKycDataOption.address,
-            CollectedKycDataOption.name,
-          ],
-          populatedAttributes: [],
-          optionalAttributes: [CollectedKycDataOption.ssn4],
-          isMet: false,
+        [IdDI.lastName]: {
+          value: 'Foot',
+          dirty: true,
         },
-      ),
-    ).toEqual({
+        [IdDI.ssn4]: {
+          value: '1234',
+          dirty: true,
+        },
+        [IdDI.addressLine1]: {
+          value: '123 Main St',
+          decrypted: true,
+          dirty: true,
+        },
+        [IdDI.city]: {
+          value: 'New York',
+          dirty: true,
+        },
+        [IdDI.state]: {
+          value: 'NY',
+          decrypted: true,
+        },
+        [IdDI.zip]: {
+          value: '10001',
+          decrypted: true,
+        },
+        [IdDI.country]: {
+          value: 'US',
+          bootstrap: true,
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [
+          CollectedKycDataOption.address,
+          CollectedKycDataOption.name,
+        ],
+        populatedAttributes: [],
+        optionalAttributes: [CollectedKycDataOption.ssn4],
+        isMet: false,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.firstName]: 'Piip',
       [IdDI.lastName]: 'Foot',
       [IdDI.ssn4]: '1234',
@@ -232,33 +228,35 @@ describe('getRequestData', () => {
       [IdDI.zip]: '10001',
       [IdDI.country]: 'US',
     });
+    expect(bootstrapDis).toEqual([IdDI.country]);
+  });
 
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.firstName]: {
-            value: 'Piip',
-            decrypted: true,
-          },
-          [IdDI.middleName]: {
-            value: 'Middle',
-            dirty: true,
-          },
-          [IdDI.lastName]: {
-            value: 'Foot',
-            decrypted: true,
-          },
+  it('matches cdos if there are any dangling dis, name', () => {
+    const { data } = getRequestData(
+      'en-US',
+      {
+        [IdDI.firstName]: {
+          value: 'Piip',
+          decrypted: true,
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [CollectedKycDataOption.name],
-          populatedAttributes: [],
-          optionalAttributes: [],
-          isMet: false,
+        [IdDI.middleName]: {
+          value: 'Middle',
+          dirty: true,
         },
-      ),
-    ).toEqual({
+        [IdDI.lastName]: {
+          value: 'Foot',
+          decrypted: true,
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [CollectedKycDataOption.name],
+        populatedAttributes: [],
+        optionalAttributes: [],
+        isMet: false,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.firstName]: 'Piip',
       [IdDI.middleName]: 'Middle',
       [IdDI.lastName]: 'Foot',
@@ -423,102 +421,99 @@ describe('getRequestData', () => {
   });
 
   it('removes decrypted values if they form full cdos', () => {
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.firstName]: {
-            value: 'Piip',
-            decrypted: true,
-          },
-          [IdDI.lastName]: {
-            value: 'Foot',
-            decrypted: true,
-          },
-          [IdDI.ssn4]: {
-            value: '1234',
-            dirty: true,
-          },
+    const { data } = getRequestData(
+      'en-US',
+      {
+        [IdDI.firstName]: {
+          value: 'Piip',
+          decrypted: true,
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [],
-          populatedAttributes: [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.ssn4,
-          ],
-          optionalAttributes: [],
-          isMet: true,
+        [IdDI.lastName]: {
+          value: 'Foot',
+          decrypted: true,
         },
-      ),
-    ).toEqual({
+        [IdDI.ssn4]: {
+          value: '1234',
+          dirty: true,
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [],
+        populatedAttributes: [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.ssn4,
+        ],
+        optionalAttributes: [],
+        isMet: true,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.ssn4]: '1234',
     });
   });
 
   it('removes scrubbed values', () => {
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.firstName]: {
-            value: 'Piip',
-          },
-          [IdDI.lastName]: {
-            value: 'Foot',
-            dirty: true,
-          },
-          [IdDI.ssn4]: {
-            value: undefined,
-            scrubbed: true,
-          },
+    const { data } = getRequestData(
+      'en-US',
+      {
+        [IdDI.firstName]: {
+          value: 'Piip',
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [],
-          populatedAttributes: [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.ssn4,
-          ],
-          optionalAttributes: [],
-          isMet: true,
+        [IdDI.lastName]: {
+          value: 'Foot',
+          dirty: true,
         },
-      ),
-    ).toEqual({
+        [IdDI.ssn4]: {
+          value: undefined,
+          scrubbed: true,
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [],
+        populatedAttributes: [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.ssn4,
+        ],
+        optionalAttributes: [],
+        isMet: true,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.firstName]: 'Piip',
       [IdDI.lastName]: 'Foot',
     });
   });
 
   it('omits populated but not decrypted requirements', () => {
-    expect(
-      getRequestData(
-        'en-US',
-        {
-          [IdDI.firstName]: {
-            value: 'Piip',
-          },
-          [IdDI.lastName]: {
-            value: 'Foot',
-            dirty: true,
-          },
-          [IdDI.ssn4]: {
-            value: undefined,
-            decrypted: true,
-          },
+    const { data } = getRequestData(
+      'en-US',
+      {
+        [IdDI.firstName]: {
+          value: 'Piip',
         },
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [],
-          populatedAttributes: [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.ssn4,
-          ],
-          optionalAttributes: [],
-          isMet: true,
+        [IdDI.lastName]: {
+          value: 'Foot',
+          dirty: true,
         },
-      ),
-    ).toEqual({
+        [IdDI.ssn4]: {
+          value: undefined,
+          decrypted: true,
+        },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [],
+        populatedAttributes: [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.ssn4,
+        ],
+        optionalAttributes: [],
+        isMet: true,
+      },
+    );
+    expect(data).toEqual({
       [IdDI.firstName]: 'Piip',
       [IdDI.lastName]: 'Foot',
     });

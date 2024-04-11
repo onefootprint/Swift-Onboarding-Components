@@ -9,6 +9,7 @@ import {
   IdDI,
 } from '@onefootprint/types';
 
+import { getLogger } from '../../../../../../utils/logger';
 import {
   fromUSDateToISO8601Format,
   strInputToUSDate,
@@ -17,41 +18,38 @@ import { isString } from '../../../../../../utils/type-guards';
 import allAttributes from '../../../../utils/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 
+const { logInfo } = getLogger('use-user-data');
+
 const isDate = (di: string) =>
   di === IdDI.dob || di === IdDI.visaExpirationDate;
+
+type RequestData = {
+  data: Partial<Record<IdDI, string | string[]>>;
+  bootstrapDis: IdDI[];
+};
 
 const getRequestData = (
   locale: SupportedLocale,
   data: KycData,
   requirement: CollectKycDataRequirement,
-) => {
-  // Filter out data that's already in the vault or has empty values or is not dirty
+): RequestData => {
   const filteredData = Object.fromEntries(
-    Object.entries(data).filter(
-      ([, value]) =>
-        !value.decrypted && !value.scrubbed && (value.dirty || value.bootstrap),
-    ),
+    Object.entries(data)
+      // If the data was decrypted from the backend or is still encrypted, don't send it (by default)
+      .filter(([, v]) => !v.decrypted && !v.scrubbed)
+      // Only send dirty data
+      .filter(([di, v]) => {
+        if (v.bootstrap && !v.dirty) {
+          logInfo(`${di} bootstrapped into flow and not marked as dirty`);
+        }
+        // TODO: i think we can change this to just `v.dirty` once we monitor logs
+        return v.dirty || v.bootstrap;
+      }),
   );
 
-  // Start constructing the request data, while making sure data formats are correct
-  const requestData: Partial<Record<IdDI, string | string[]>> = {};
-  Object.entries(filteredData).forEach(([key, value]) => {
-    const di = key as IdDI;
-    if (isDate(di)) {
-      const dateInputValue = isString(value.value)
-        ? strInputToUSDate(locale, value.value)
-        : undefined;
-
-      requestData[di] = fromUSDateToISO8601Format(dateInputValue);
-    } else {
-      requestData[di] = value.value;
-    }
-  });
-
-  // cdos includes the populated attributes too in case they got edited
   const cdos = allAttributes(requirement);
 
-  // Make sure there are no dangling DIs in the data. If there are,
+  // Make sure there are no dangling DIs in the filteredData. If there are,
   // add in the rest of the associated DIs (even though they may be
   // decrypted directly from backend), otherwise the backend will error
   Object.keys(CollectedKycDataOptionToRequiredAttributes).forEach(
@@ -62,26 +60,25 @@ const getRequestData = (
       // "" is a valid value to save to the backend, so only check for undefined
       if (
         cdos.indexOf(cdo) === -1 ||
-        !allDisForCdo.some(di => typeof requestData[di] !== 'undefined')
+        !allDisForCdo.some(di => typeof filteredData[di]?.value !== 'undefined')
       ) {
         return;
       }
 
-      // For each required DI, either try to add the decrypted value to the request data
-      // Or mark it as missing
+      // For each required DI, either try to add the value to the request data, or mark it as missing
       const requiredDisForCdo = CollectedKycDataOptionToRequiredAttributes[cdo];
       const missingDis = new Set<string>();
       requiredDisForCdo.forEach(di => {
-        const value = data[di]?.value;
-        if (typeof value === 'undefined') {
+        const value = data[di];
+        if (typeof value?.value === 'undefined') {
           missingDis.add(di);
-        } else if (!requestData[di]) {
-          requestData[di] = value;
+        } else if (!filteredData[di]?.value) {
+          filteredData[di] = value;
         }
       });
 
       // Ignore missing state & zip DIs if address is international
-      const isInternational = requestData[IdDI.country] !== 'US';
+      const isInternational = filteredData[IdDI.country]?.value !== 'US';
       if (isInternational) {
         missingDis.delete(IdDI.state);
         missingDis.delete(IdDI.zip);
@@ -104,7 +101,28 @@ const getRequestData = (
     },
   );
 
-  return requestData;
+  // Construct the request data and make sure data formats are correct
+  const bootstrapDis = Object.entries(filteredData)
+    .filter(e => e[1].bootstrap)
+    .map(e => e[0] as IdDI);
+  const requestData: Partial<Record<IdDI, string | string[]>> = {};
+  Object.entries(filteredData).forEach(([key, value]) => {
+    const di = key as IdDI;
+    if (isDate(di)) {
+      const dateInputValue = isString(value.value)
+        ? strInputToUSDate(locale, value.value)
+        : undefined;
+
+      requestData[di] = fromUSDateToISO8601Format(dateInputValue);
+    } else {
+      requestData[di] = value.value;
+    }
+  });
+
+  return {
+    data: requestData,
+    bootstrapDis,
+  };
 };
 
 export default getRequestData;

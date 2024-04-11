@@ -83,7 +83,7 @@ export const useFootprint = () => {
     }
     try {
       const data = getVaultFormData();
-      await saveReq({ data, authToken });
+      await saveReq({ data, bootstrapDis: [], authToken });
     } catch (error: unknown) {
       handleError(error);
       throw error;
