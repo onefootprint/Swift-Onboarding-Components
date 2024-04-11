@@ -36,7 +36,7 @@ const ExternalLink = ({ url }: ExternalLinkProps) => {
           {t('doc.hosted-on')}&nbsp;
         </Text>
         <Text tag="span" variant="label-3" color="primary">
-          {extractCleanDomain(url)}&nbsp;
+          {extractCleanDomain(url)}.&nbsp;
         </Text>
         <Text tag="span" variant="body-3">
           {t('doc.visit-and-review')}

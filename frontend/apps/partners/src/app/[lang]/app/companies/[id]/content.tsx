@@ -10,13 +10,14 @@ import {
   useToast,
 } from '@onefootprint/ui';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import type { ReadonlyURLSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ComponentProps } from 'react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Lang } from '@/app/types';
-import { alertError } from '@/helpers';
+import { alertDecision, alertError, omitSearchParams } from '@/helpers';
 import { useDialogManager } from '@/hooks';
 import type { PartnerDocument } from '@/queries';
 import {
@@ -60,6 +61,9 @@ const doWithId =
   (withIdFn: (id: string) => unknown) =>
   (id?: string) => (id ? withIdFn(id) : noIdFn());
 
+const omitDecisionParam = (params: ReadonlyURLSearchParams) =>
+  omitSearchParams(['rdecision'], params).toString();
+
 const CompanyPageContent = ({
   documents,
   documentsStatus,
@@ -72,13 +76,16 @@ const CompanyPageContent = ({
   templatesUnused,
 }: CompanyPageContentProps) => {
   const { t } = useTranslation('common');
+  const params = useSearchParams();
   const path = usePathname();
   const router = useRouter();
   const toast = useToast();
   const dialog = useDialogManager();
+  const refDecision = useRef(params.get('rdecision'));
 
   const docDialog = documents.find(x => x.id === dialog.id());
   const errorToast = alertError(t, toast.show);
+  const decisionToast = alertDecision(t, toast.show);
   const alertOr = doWithId(() => errorToast(t('doc.missing-doc-id')));
 
   const onAssignClick = alertOr(id => dialog.add('assign', id));
@@ -106,6 +113,14 @@ const CompanyPageContent = ({
       window.setTimeout(resetBodyPointerEvents, 0);
     }
   }, [dialog]);
+
+  useEffect(() => {
+    if (!refDecision.current) return;
+
+    decisionToast(refDecision.current);
+    refDecision.current = null;
+    router.replace(`${path}?${omitDecisionParam(params)}`);
+  }, [refDecision.current]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

@@ -1,11 +1,14 @@
 'use client';
 
 import { IcoClose24 } from '@onefootprint/icons';
-import { Button, IconButton, Stack, Text } from '@onefootprint/ui';
+import { Button, IconButton, Stack, Text, useToast } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
+import { revalidatePathAction } from '@/app/actions';
+import { alertError } from '@/helpers';
 import {
   type CreateReviewRequest,
   postPartnerPartnershipsDocumentsReviews,
@@ -50,17 +53,21 @@ const Header = ({
   const params = useSearchParams();
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const { t } = useTranslation('common');
+  const toast = useToast();
+  const errorToast = alertError(t, toast.show);
 
   const path = params.get('path');
   const onCloseClick = path ? () => router.push(path) : () => router.back();
 
   const docReview = useCallback(
     (payload: CreateReviewRequest) =>
-      postPartnerPartnershipsDocumentsReviews(
-        partnerId,
-        documentId,
-        payload,
-      ).then(onCloseClick),
+      postPartnerPartnershipsDocumentsReviews(partnerId, documentId, payload)
+        .then(() => {
+          revalidatePathAction(`/app/companies/${partnerId}/`);
+          const docsPath = `/app/companies/${partnerId}?rdecision=${payload.decision}`;
+          router.push(docsPath);
+        })
+        .catch(errorToast),
     [partnerId, documentId], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
@@ -78,18 +85,20 @@ const Header = ({
   }, [isReviewDialogOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <>
+    <Container>
       <Stack
         alignItems="center"
         justifyContent="space-between"
         paddingBlock={3}
         paddingInline={5}
       >
-        <IconButton aria-label="close" onClick={onCloseClick}>
-          <IcoClose24 />
-        </IconButton>
+        <Left>
+          <IconButton aria-label="close" onClick={onCloseClick}>
+            <IcoClose24 />
+          </IconButton>
+        </Left>
         <Text variant="label-3">{children}</Text>
-        <Stack alignItems="center" justifyContent="space-between" gap={3}>
+        <StackRight alignItems="center" justifyContent="space-between" gap={3}>
           {kind === 'file_upload' ? (
             <Button
               variant="secondary"
@@ -106,7 +115,7 @@ const Header = ({
               {t('review')}
             </Button>
           ) : null}
-        </Stack>
+        </StackRight>
       </Stack>
       <DialogReviewDocument
         isOpen={isReviewDialogOpen}
@@ -120,8 +129,25 @@ const Header = ({
           { label: t('rejected'), value: 'rejected' },
         ]}
       />
-    </>
+    </Container>
   );
 };
+
+const Left = styled.div`
+  flex-basis: 25%;
+  justify-content: left;
+`;
+
+const StackRight = styled(Stack)`
+  flex-basis: 25%;
+  justify-content: flex-end;
+`;
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    background: ${theme.backgroundColor.primary};
+    border-bottom: 1px solid ${theme.borderColor.tertiary};
+  `}
+`;
 
 export default Header;

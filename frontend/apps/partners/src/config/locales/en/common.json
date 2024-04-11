@@ -14,6 +14,7 @@
   "deactivate": "Deactivate",
   "decision": "Decision",
   "delete": "Delete",
+  "document-reviewed": "Document reviewed",
   "document": "Document",
   "documents": "Documents",
   "download": "Download",
@@ -107,7 +108,9 @@
     "submit-document-url": "Submit document URL",
     "uploaded-document": "uploaded the document",
     "view-submission": "View submission",
-    "visit-and-review": "Please open the link and come back here to review (approve/reject) it."
+    "visit-and-review": "Please open the link and come back here to review (approve/reject) it.",
+    "you-accepted": "You reviewed and accepted the document",
+    "you-rejected": "You reviewed and rejected the document"
   },
   "companies": {
     "access-control-roles-set-and-enforced": "Access control roles set and enforced",

@@ -14,6 +14,7 @@
   "deactivate": "Desactivar",
   "decision": "Decisión",
   "delete": "Eliminar",
+  "document-reviewed": "Documento revisado",
   "document": "Documento",
   "documents": "Documentos",
   "download": "Descargar",
@@ -108,7 +109,9 @@
     "submit-document-url": "Enviar URL del documento",
     "uploaded-document": "cargado el documento",
     "view-submission": "Ver documentos",
-    "visit-and-review": "Por favor, abra el enlace y vuelva aquí para revisarlo (aprobarlo/rechazarlo)."
+    "visit-and-review": "Por favor, abra el enlace y vuelva aquí para revisarlo (aprobarlo/rechazarlo).",
+    "you-accepted": "Has revisado y aceptado el documento",
+    "you-rejected": "Has revisado y rechazado el documento"
   },
   "companies": {
     "access-control-roles-set-and-enforced": "Roles de acceso establecidos y aplicados",

@@ -6,17 +6,11 @@ import {
 } from 'next/navigation';
 import { useMemo } from 'react';
 
+import omitSearchParams from '../../helpers/omit-search-params';
+
 type Router = ReturnType<typeof useRouter>;
 
-const omitDialog = (params: Params): URLSearchParams => {
-  const out = new URLSearchParams();
-  params.forEach((value, key) => {
-    if (key !== 'dialog' && key !== 'dialogId') {
-      out.append(key, String(value));
-    }
-  });
-  return out;
-};
+const omitDialog = omitSearchParams.bind(null, ['dialog', 'dialogId']);
 
 const reset = (params: Params, path: string, router: Router) => {
   router.replace(`${path}?${omitDialog(params).toString()}`);
