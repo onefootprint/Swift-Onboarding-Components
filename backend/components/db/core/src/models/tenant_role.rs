@@ -66,21 +66,12 @@ impl ImmutableRoleKind {
         }
     }
 
-    // TODO: remove second name
-    pub(super) fn props(&self) -> (&'static str, &'static str, Vec<TenantScope>) {
+    pub(super) fn props(&self) -> (&'static str, Vec<TenantScope>) {
         match self {
-            Self::Admin => ("Admin", "Admin", vec![TenantScope::Admin]),
-            Self::ReadOnly => ("Member", "Member", vec![TenantScope::Read]),
-            Self::CompliancePartnerAdmin => (
-                "Admin",
-                "CompliancePartnerAdmin",
-                vec![TenantScope::CompliancePartnerAdmin],
-            ),
-            Self::CompliancePartnerReadOnly => (
-                "Member",
-                "CompliancePartnerMember",
-                vec![TenantScope::CompliancePartnerRead],
-            ),
+            Self::Admin => ("Admin", vec![TenantScope::Admin]),
+            Self::ReadOnly => ("Member", vec![TenantScope::Read]),
+            Self::CompliancePartnerAdmin => ("Admin", vec![TenantScope::CompliancePartnerAdmin]),
+            Self::CompliancePartnerReadOnly => ("Member", vec![TenantScope::CompliancePartnerRead]),
         }
     }
 }
@@ -173,10 +164,10 @@ impl TenantRole {
             return Err(DbError::IncorrectTenantRoleKind);
         }
 
-        let (new_name, old_name, scopes) = kind.props();
+        let (name, scopes) = kind.props();
         let mut query = tenant_role::table
             .filter(TenantRole::tenant_or_partner_tenant_id_eq(org_id))
-            .filter(tenant_role::name.eq(new_name).or(tenant_role::name.eq(old_name)))
+            .filter(tenant_role::name.eq(name))
             .filter(tenant_role::scopes.eq(&scopes))
             .filter(tenant_role::is_immutable.eq(true))
             .into_boxed();

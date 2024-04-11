@@ -86,7 +86,7 @@ impl PartnerTenant {
             ImmutableRoleKind::CompliancePartnerAdmin,
             ImmutableRoleKind::CompliancePartnerReadOnly,
         ] {
-            let (name, _, scopes) = irk.props();
+            let (name, scopes) = irk.props();
             TenantRole::create(
                 conn,
                 &partner_tenant.id,
