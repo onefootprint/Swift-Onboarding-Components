@@ -54,6 +54,7 @@ pub struct Vault {
     pub duplicate_of_id: Option<VaultId>,
 }
 
+#[derive(derive_more::From)]
 pub enum VaultIdentifier<'a> {
     Id(&'a VaultId),
     ScopedVaultId(&'a ScopedVaultId),
@@ -62,28 +63,6 @@ pub enum VaultIdentifier<'a> {
         tenant_id: &'a TenantId,
         is_live: IsLive,
     },
-}
-
-impl<'a> From<&'a VaultId> for VaultIdentifier<'a> {
-    fn from(id: &'a VaultId) -> Self {
-        Self::Id(id)
-    }
-}
-
-impl<'a> From<&'a ScopedVaultId> for VaultIdentifier<'a> {
-    fn from(id: &'a ScopedVaultId) -> Self {
-        Self::ScopedVaultId(id)
-    }
-}
-
-impl<'a> From<(&'a FpId, &'a TenantId, IsLive)> for VaultIdentifier<'a> {
-    fn from((fp_id, tenant_id, is_live): (&'a FpId, &'a TenantId, IsLive)) -> Self {
-        Self::FpId {
-            fp_id,
-            tenant_id,
-            is_live,
-        }
-    }
 }
 
 impl Vault {

@@ -3,8 +3,8 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{tenant_api_key, tenant_api_key::BoxedQuery, tenant_role};
 use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use newtypes::{
-    ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, OrgIdentifierRef,
-    TenantRoleId, TenantRoleKindDiscriminant,
+    ApiKeyStatus, Fingerprint, OrgIdentifierRef, SealedVaultBytes, TenantApiKeyId, TenantId, TenantRoleId,
+    TenantRoleKindDiscriminant,
 };
 
 use super::{ob_configuration::IsLive, tenant::Tenant, tenant_role::TenantRole};
@@ -59,22 +59,11 @@ pub struct ApiKeyListFilters {
     pub search: Option<String>,
 }
 
+#[derive(derive_more::From)]
 pub enum TenantApiKeyIdentifier<'a> {
     Id(&'a TenantApiKeyId, &'a TenantId, IsLive),
     /// Only used when creating an integration testing tenant
     Name(&'a str, &'a TenantId, IsLive),
-}
-
-impl<'a> From<(&'a TenantApiKeyId, &'a TenantId, IsLive)> for TenantApiKeyIdentifier<'a> {
-    fn from((id, tenant_id, is_live): (&'a TenantApiKeyId, &'a TenantId, IsLive)) -> Self {
-        Self::Id(id, tenant_id, is_live)
-    }
-}
-
-impl<'a> From<(&'a str, &'a TenantId, IsLive)> for TenantApiKeyIdentifier<'a> {
-    fn from((name, tenant_id, is_live): (&'a str, &'a TenantId, IsLive)) -> Self {
-        Self::Name(name, tenant_id, is_live)
-    }
 }
 
 impl TenantApiKey {

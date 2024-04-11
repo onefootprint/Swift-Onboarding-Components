@@ -113,6 +113,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
                     WorkflowIdentifier::ScopedBusinessId {
                         sb_id: &sb_id,
                         vault_id: &person_vault_id,
+                        is_business: (),
                     },
                 )?;
                 Some((bvw, business_workflow))

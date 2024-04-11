@@ -94,6 +94,7 @@ pub struct ScopedVaultUpdate {
     pub last_activity_at: Option<DateTime<Utc>>,
 }
 
+#[derive(derive_more::From)]
 pub enum ScopedVaultIdentifier<'a> {
     Id {
         id: &'a ScopedVaultId,
@@ -124,36 +125,6 @@ pub enum ScopedVaultIdentifier<'a> {
         /// Either an fp id or a scoped vault id
         identifier: &'a str,
     },
-}
-
-impl<'a> From<&'a ScopedVaultId> for ScopedVaultIdentifier<'a> {
-    fn from(id: &'a ScopedVaultId) -> Self {
-        Self::Id { id }
-    }
-}
-
-impl<'a> From<&'a WorkflowId> for ScopedVaultIdentifier<'a> {
-    fn from(id: &'a WorkflowId) -> Self {
-        Self::WorkflowId { id }
-    }
-}
-
-impl<'a> From<(&'a ScopedVaultId, &'a VaultId)> for ScopedVaultIdentifier<'a> {
-    fn from((id, uv_id): (&'a ScopedVaultId, &'a VaultId)) -> Self {
-        Self::User { id, uv_id }
-    }
-}
-
-impl<'a> From<(&'a FpId, &'a TenantId, IsLive)> for ScopedVaultIdentifier<'a> {
-    fn from((fp_id, t_id, is_live): (&'a FpId, &'a TenantId, IsLive)) -> Self {
-        Self::FpId { fp_id, t_id, is_live }
-    }
-}
-
-impl<'a> From<(&'a VaultId, &'a TenantId)> for ScopedVaultIdentifier<'a> {
-    fn from((v_id, t_id): (&'a VaultId, &'a TenantId)) -> Self {
-        Self::Tenant { v_id, t_id }
-    }
 }
 
 pub type SerializableWorkflow = (Workflow, Option<InsightEvent>);

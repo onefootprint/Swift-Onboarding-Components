@@ -141,6 +141,7 @@ impl WorkflowUpdate {
     }
 }
 
+#[derive(derive_more::From)]
 pub enum WorkflowIdentifier<'a> {
     Id {
         id: &'a WorkflowId,
@@ -149,31 +150,20 @@ pub enum WorkflowIdentifier<'a> {
     BusinessOwner {
         owner_vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
+        /// To prevent the auto-derive from being misused to look up by su_id
+        is_business: (),
     },
     ScopedBusinessId {
         sb_id: &'a ScopedVaultId,
         /// Note: the ID of the user vault that owns this business
         vault_id: &'a VaultId,
+        /// To prevent the auto-derive from being misused to look up by su_id
+        is_business: (),
     },
     ConfigId {
         vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
     },
-}
-
-impl<'a> From<&'a WorkflowId> for WorkflowIdentifier<'a> {
-    fn from(id: &'a WorkflowId) -> Self {
-        Self::Id { id }
-    }
-}
-
-impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for WorkflowIdentifier<'a> {
-    fn from((vault_id, ob_config_id): (&'a VaultId, &'a ObConfigurationId)) -> Self {
-        Self::ConfigId {
-            vault_id,
-            ob_config_id,
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -431,6 +421,7 @@ impl Workflow {
             WorkflowIdentifier::BusinessOwner {
                 owner_vault_id,
                 ob_config_id,
+                ..
             } => {
                 let business_vault_ids = business_owner::table
                     .filter(business_owner::user_vault_id.eq(owner_vault_id))
@@ -439,7 +430,7 @@ impl Workflow {
                     .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
                     .filter(workflow::ob_configuration_id.eq(ob_config_id))
             }
-            WorkflowIdentifier::ScopedBusinessId { sb_id, vault_id } => {
+            WorkflowIdentifier::ScopedBusinessId { sb_id, vault_id, .. } => {
                 let business_vault_ids = business_owner::table
                     .filter(business_owner::user_vault_id.eq(vault_id))
                     .select(business_owner::business_vault_id);

@@ -139,6 +139,7 @@ impl CheckUserWfAuthContext {
         let identifier = WorkflowIdentifier::ScopedBusinessId {
             sb_id: &sb_id,
             vault_id: self.user_vault_id(),
+            is_business: (),
         };
         let (wf, _) = Workflow::get_all(conn, identifier)?;
         Ok(Some(wf))

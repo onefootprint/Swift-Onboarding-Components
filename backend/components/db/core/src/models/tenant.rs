@@ -84,21 +84,10 @@ pub struct PrivateTenantFilters {
     pub only_with_domains: Option<bool>,
 }
 
+#[derive(derive_more::From)]
 pub enum TenantIdentifier<'a> {
     Id(&'a TenantId),
     ScopedVaultId(&'a ScopedVaultId),
-}
-
-impl<'a> From<&'a TenantId> for TenantIdentifier<'a> {
-    fn from(id: &'a TenantId) -> Self {
-        Self::Id(id)
-    }
-}
-
-impl<'a> From<&'a ScopedVaultId> for TenantIdentifier<'a> {
-    fn from(id: &'a ScopedVaultId) -> Self {
-        Self::ScopedVaultId(id)
-    }
 }
 
 #[derive(Debug, Clone, Insertable)]

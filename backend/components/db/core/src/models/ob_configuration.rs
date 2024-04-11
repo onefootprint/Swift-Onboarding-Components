@@ -355,7 +355,7 @@ struct NewObConfiguration {
     curp_validation_enabled: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, derive_more::From)]
 pub enum ObConfigIdentifier<'a> {
     Id(&'a ObConfigurationId),
     Key(&'a ObConfigurationKey),
@@ -370,44 +370,6 @@ pub enum ObConfigIdentifier<'a> {
         is_live: bool,
     },
     Workflow(&'a WorkflowId),
-}
-
-impl<'a> From<&'a ObConfigurationId> for ObConfigIdentifier<'a> {
-    fn from(id: &'a ObConfigurationId) -> Self {
-        Self::Id(id)
-    }
-}
-
-impl<'a> From<&'a ObConfigurationKey> for ObConfigIdentifier<'a> {
-    fn from(key: &'a ObConfigurationKey) -> Self {
-        Self::Key(key)
-    }
-}
-
-impl<'a> From<(&'a ObConfigurationId, &'a TenantId, bool)> for ObConfigIdentifier<'a> {
-    fn from((id, tenant_id, is_live): (&'a ObConfigurationId, &'a TenantId, bool)) -> Self {
-        Self::Tenant {
-            id,
-            tenant_id,
-            is_live,
-        }
-    }
-}
-
-impl<'a> From<(&'a ObConfigurationKey, &'a TenantId, bool)> for ObConfigIdentifier<'a> {
-    fn from((key, tenant_id, is_live): (&'a ObConfigurationKey, &'a TenantId, bool)) -> Self {
-        Self::TenantKey {
-            key,
-            tenant_id,
-            is_live,
-        }
-    }
-}
-
-impl<'a> From<&'a WorkflowId> for ObConfigIdentifier<'a> {
-    fn from(id: &'a WorkflowId) -> Self {
-        Self::Workflow(id)
-    }
 }
 
 #[derive(AsChangeset)]

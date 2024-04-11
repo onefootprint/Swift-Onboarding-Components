@@ -236,21 +236,10 @@ impl IncodeVerificationSession {
     }
 }
 
+#[derive(derive_more::From)]
 pub enum IncodeSessionIdentifier<'a> {
     Id(&'a IncodeVerificationSessionId),
     IdDoc(&'a IdentityDocumentId),
-}
-
-impl<'a> From<&'a IncodeVerificationSessionId> for IncodeSessionIdentifier<'a> {
-    fn from(id: &'a IncodeVerificationSessionId) -> Self {
-        Self::Id(id)
-    }
-}
-
-impl<'a> From<&'a IdentityDocumentId> for IncodeSessionIdentifier<'a> {
-    fn from(id: &'a IdentityDocumentId) -> Self {
-        Self::IdDoc(id)
-    }
 }
 
 impl IncodeVerificationSession {

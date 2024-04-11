@@ -70,6 +70,7 @@ pub async fn post(
                     let id = WorkflowIdentifier::BusinessOwner {
                         owner_vault_id: &sv.vault_id,
                         ob_config_id: &ob_config.id,
+                        is_business: (),
                     };
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, id)?;
                     let biz_mr = ManualReview::get_active(conn, &biz_wf.id)?;
