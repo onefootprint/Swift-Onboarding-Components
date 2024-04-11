@@ -307,17 +307,21 @@ impl Vault {
         use crate::models::scoped_vault::ScopedVault;
         use db_schema::schema::{data_lifetime, fingerprint};
 
+        // Be careful changing these fingerprint queries - they're optimized to use a specific index
+
         // Look for verified vaults marked `is_portable` and `is_verified`
         // that also have portable, active data matching the fingerprint
         // and a matching sandbox_id, if provided
-        let mut query = vault::table
-            .inner_join(data_lifetime::table.inner_join(fingerprint::table))
+        let mut query = fingerprint::table
+            .inner_join(data_lifetime::table)
+            .inner_join(vault::table)
             .filter(fingerprint::sh_data.eq_any(sh_data))
             .filter(fingerprint::is_hidden.eq(false))
-            .filter(not(data_lifetime::portablized_seqno.is_null()))
+            .filter(fingerprint::is_live.eq(sandbox_id.is_none()))
             // When we allow replacing contact info, we might want to support finding the vault on
             // deactivated fingerprints in case the portable data is replaced by tenant-specific data
-            .filter(data_lifetime::deactivated_seqno.is_null())
+            .filter(fingerprint::deactivated_at.is_null())
+            .filter(not(data_lifetime::portablized_seqno.is_null()))
             // Don't identify users that haven't completed an OTP challenge
             .filter(vault::is_verified.eq(true))
             // Never allow identifying a user that is not marked as identifiable.
@@ -337,15 +341,17 @@ impl Vault {
         // And, add in all of the unverified vaults owned by this tenant. This allows portablizing
         // non-portable vaults
         if let Some(tenant_id) = tenant_id {
-            let mut query = scoped_vault::table
-                .inner_join(data_lifetime::table.inner_join(fingerprint::table))
+            let mut query = fingerprint::table
+                .inner_join(data_lifetime::table)
                 .inner_join(vault::table)
+                .inner_join(scoped_vault::table)
                 .filter(fingerprint::sh_data.eq_any(sh_data))
                 .filter(fingerprint::is_hidden.eq(false))
-                .filter(data_lifetime::portablized_seqno.is_null())
-                .filter(data_lifetime::deactivated_seqno.is_null())
+                .filter(fingerprint::deactivated_at.is_null())
+                .filter(fingerprint::is_live.eq(sandbox_id.is_none()))
                 // Un-verified vaults owned by this tenant
-                .filter(scoped_vault::tenant_id.eq(tenant_id))
+                .filter(fingerprint::tenant_id.eq(tenant_id))
+                .filter(data_lifetime::portablized_seqno.is_null())
                 .filter(scoped_vault::deactivated_at.is_null())
                 .filter(vault::is_verified.eq(false))
                 .filter(vault::is_identifiable.eq(false))

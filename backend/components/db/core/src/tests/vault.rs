@@ -4,6 +4,7 @@ use super::fixtures;
 use crate::{
     models::{
         data_lifetime::DataLifetime,
+        fingerprint::Fingerprint as DbFingerprint,
         vault::{Priority, Vault},
     },
     tests::prelude::*,
@@ -43,6 +44,9 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
         FingerprintScopeKind::Global,
         &su,
     );
+    if is_deactivated {
+        DbFingerprint::bulk_deactivate(conn, vec![&lifetime.id], Utc::now()).unwrap();
+    }
 
     // Should never be able to find with wrong sandbox id
     let inverse_sandbox_id = if uv.sandbox_id.is_some() {

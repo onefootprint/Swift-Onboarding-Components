@@ -70,7 +70,7 @@ impl ScopedVaultListQueryParams {
         } = self;
 
         let matching_vaults = if let Some(search) = search {
-            let vault_ids = vaults_matching_search(conn, search, &tenant_id)?;
+            let vault_ids = vaults_matching_search(conn, search, &tenant_id, is_live)?;
             Some(vault_ids)
         } else {
             None
@@ -258,6 +258,7 @@ fn vaults_matching_search(
     conn: &mut PgConn,
     search: SearchQuery,
     tenant_id: &TenantId,
+    is_live: bool,
 ) -> DbResult<Vec<ScopedVaultId>> {
     use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault_data};
     let SearchQuery {
@@ -281,6 +282,7 @@ fn vaults_matching_search(
             .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
             .filter(data_lifetime::deactivated_seqno.is_null())
             .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(is_live))
             .filter(scoped_vault::deactivated_at.is_null())
             // Matching filter
             .filter(vault_data::p_data.ilike(&plaintext_search))
@@ -296,15 +298,15 @@ fn vaults_matching_search(
             .collect_vec();
         tracing::info!(sh_datas=%Csv::from(all_fps.iter().cloned().collect_vec()), "Searching for fingerprints");
 
+        // Be careful changing this query - it's optimized to use a specific index
         let results: HashMap<_, _> = fingerprint::table
-            .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-            .filter(data_lifetime::deactivated_seqno.is_null())
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::deactivated_at.is_null())
+            .filter(fingerprint::deactivated_at.is_null())
+            .filter(fingerprint::tenant_id.eq(tenant_id))
+            .filter(fingerprint::is_live.eq(is_live))
             // Matching filter
             .filter(fingerprint::sh_data.eq_any(all_fps.clone()))
             .filter(fingerprint::is_hidden.eq(false))
-            .select((fingerprint::sh_data, data_lifetime::scoped_vault_id))
+            .select((fingerprint::sh_data, fingerprint::scoped_vault_id))
             .get_results::<(Fingerprint, ScopedVaultId)>(conn)?
             .into_iter()
             .into_group_map();
