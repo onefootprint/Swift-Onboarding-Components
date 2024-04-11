@@ -136,7 +136,7 @@ pub async fn run_curp_validation_check(
                 &state.enclave_client,
                 iddoc.vaulted_document_type.unwrap_or(iddoc.document_type),
                 // TODO: fix this in upstack PR
-                raw_response.clone().leak().to_string().into(),
+                raw_response.clone(),
                 is_live,
                 &tenant_id,
             )
@@ -355,8 +355,7 @@ async fn save_canned_response(
     let vault_data = pre_vault(
         &state.enclave_client,
         id_doc_kind,
-        // TODO: fix this in upstack PR
-        canned_res.clone().to_string().into(),
+        canned_res.clone().into(),
         false, // we're in sandbox
         tenant_id,
     )
@@ -398,7 +397,7 @@ async fn save_canned_response(
 pub async fn pre_vault(
     enclave_client: &EnclaveClient,
     id_doc_kind: IdDocKind,
-    response: PiiString,
+    response: PiiJsonValue,
     is_live: bool,
     tenant_id: &TenantId,
 ) -> ApiResult<DataRequest<Fingerprints>> {
@@ -410,7 +409,7 @@ pub async fn pre_vault(
     validate_args.allow_dangling_keys = true;
 
     let data = HashMap::from_iter(data.into_iter());
-    let data = DataRequest::clean_and_validate_str(data, validate_args)?;
+    let data = DataRequest::clean_and_validate(data, validate_args)?;
     data.build_fingerprints(enclave_client, tenant_id).await
 }
 

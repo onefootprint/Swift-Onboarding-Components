@@ -71,8 +71,15 @@ pub enum OcrDataKind {
     Curp,
     /// Incode-determined document type
     ClassifiedDocumentType,
-    /// Temporary maybe: This is the full response from Curp validation
+    /// This is the full response from Curp validation
     CurpValidationResponse,
+}
+
+impl OcrDataKind {
+    // some data is stored as json
+    pub fn is_json(&self) -> bool {
+        matches!(self, Self::CurpValidationResponse)
+    }
 }
 
 impl From<DocumentKind> for DataIdentifier {

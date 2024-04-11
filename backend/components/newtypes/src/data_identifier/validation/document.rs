@@ -14,6 +14,12 @@ impl Validate for DocumentKind {
         if matches!(self, DocumentKind::Barcodes(_, _)) {
             let result = validate_barcodes(self, value)?;
             Ok(result)
+        } else if let DocumentKind::OcrData(_, odk) = self {
+            if odk.is_json() {
+                Ok(vec![(self.into(), value.to_piistring()?)])
+            } else {
+                Ok(vec![(self.into(), value.as_string()?)])
+            }
         } else {
             Ok(vec![(self.into(), value.as_string()?)])
         }
