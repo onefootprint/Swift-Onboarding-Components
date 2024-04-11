@@ -75,3 +75,7 @@ class SandboxId(BaseAuth):
 
 class IsComponentsSdk(BaseAuth):
     HEADER_NAME = "x-fp-is-components-sdk"
+
+
+class BootstrappedFields(BaseAuth):
+    HEADER_NAME = "x-fp-bootstrapped-fields"

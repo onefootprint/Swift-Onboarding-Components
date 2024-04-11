@@ -6,7 +6,10 @@ use crate::{
 };
 use api_core::{
     auth::user::{UserAuthScope, UserWfAuthContext},
-    utils::vault_wrapper::{Any, DataLifetimeSources, DataRequestSource, Person, VwArgs},
+    utils::{
+        headers::BootstrapFieldsHeader,
+        vault_wrapper::{Any, DataLifetimeSources, DataRequestSource, Person, VwArgs},
+    },
 };
 use db::models::{
     document_request::{DocumentRequest, NewDocumentRequestArgs},
@@ -15,8 +18,8 @@ use db::models::{
 use newtypes::{
     email::Email,
     put_data_request::{PatchDataRequest, RawDataRequest},
-    DataIdentifier, DocumentRequestKind, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, ScopedVaultId,
-    ValidateArgs, WorkflowGuard, WorkflowId,
+    DataIdentifier, DataLifetimeSource, DocumentRequestKind, IdentityDataKind as IDK,
+    Iso3166TwoDigitCountryCode, ScopedVaultId, ValidateArgs, WorkflowGuard, WorkflowId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
@@ -64,6 +67,7 @@ pub async fn patch(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
     user_wf_auth: UserWfAuthContext,
+    bootstrap_fields: BootstrapFieldsHeader,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
@@ -85,16 +89,20 @@ pub async fn patch(
     let updates = updates.build_fingerprints(&state.enclave_client, t_id).await?;
 
     let su_id = user_auth.scoped_user.id.clone();
-    // TODO one day have a separate source for bootstrap too
     let source = user_auth.user_session.dl_source();
     let new_ci = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su_id)?;
 
+            let overrides = bootstrap_fields
+                .0
+                .into_iter()
+                .map(|di| (di, DataLifetimeSource::LikelyBootstrap))
+                .collect();
+            let sources = DataLifetimeSources::overrides(source, overrides);
             // Even though this accepts id.phone_number, it will always error at runtime if we
             // provide id.phone_number since we only allow a vault to have one phone number
-            let sources = DataLifetimeSources::single(source);
             let new_contact_info = uvw.patch_data(conn, updates, sources, None)?.new_ci;
             Ok(new_contact_info)
         })

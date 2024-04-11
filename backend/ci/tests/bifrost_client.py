@@ -1,6 +1,5 @@
 import json
 from typing import NamedTuple, Optional
-from tests.headers import SandboxId
 from tests.types import Tenant
 from tests.constants import (
     TEST_URL,

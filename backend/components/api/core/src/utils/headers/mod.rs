@@ -24,6 +24,9 @@ pub use external_id::*;
 mod is_components_sdk;
 pub use is_components_sdk::*;
 
+mod bootstrap_fields;
+pub use bootstrap_fields::*;
+
 use crate::{
     errors::{ApiError, ApiResult},
     ApiErrorKind,

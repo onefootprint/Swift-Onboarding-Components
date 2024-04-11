@@ -5,7 +5,7 @@ use crate::{
 use derive_more::Deref;
 
 use serde::{
-    de::{self, DeserializeOwned, IntoDeserializer},
+    de::{self, value::StrDeserializer, DeserializeOwned, IntoDeserializer},
     Deserialize,
 };
 
@@ -39,6 +39,20 @@ string_api_data_type_alias!(Csv<TenantScope>);
 string_api_data_type_alias!(Csv<AuditEventName>);
 string_api_data_type_alias!(Csv<ObConfigurationKind>);
 
+pub fn parse_csv<'de, I, E>(
+    s: &str,
+) -> Result<Vec<I>, <StrDeserializer<'de, E> as serde::Deserializer<'de>>::Error>
+where
+    I: de::DeserializeOwned,
+    E: de::Error,
+{
+    let ids = s
+        .split(',')
+        .map(|x| I::deserialize(x.trim().into_deserializer()))
+        .collect::<Result<Vec<I>, _>>()?;
+    Ok(ids)
+}
+
 /// serde_urlencoded, used by actix's web::Query, isn't very good at deserializing Vecs:
 /// https://github.com/nox/serde_urlencoded/issues/6
 pub fn deserialize_stringified_list<'de, D, I>(deserializer: D) -> Result<Vec<I>, D::Error>
@@ -47,16 +61,10 @@ where
     I: de::DeserializeOwned,
 {
     let s: Option<String> = serde::Deserialize::deserialize(deserializer)?;
-    let s = if let Some(s) = s {
-        s
-    } else {
+    let Some(s) = s else {
         return Ok(vec![]);
     };
-    let ids = s
-        .split(',')
-        .map(|x| I::deserialize(x.trim().into_deserializer()))
-        .collect::<Result<Vec<I>, _>>()?;
-    Ok(ids)
+    parse_csv(&s)
 }
 
 #[cfg(test)]
