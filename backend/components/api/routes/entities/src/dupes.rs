@@ -13,13 +13,13 @@ use api_core::{
     errors::{ApiResult, AssertionError},
     utils::{
         db2api::DbToApi,
-        dupes,
         fp_id_path::FpIdPath,
         vault_wrapper::{TenantVw, VaultWrapper},
     },
 };
-use db::models::scoped_vault::ScopedVault;
-use newtypes::ScopedVaultId;
+use db::models::{fingerprint::Fingerprint, scoped_vault::ScopedVault};
+use itertools::Itertools;
+use newtypes::{DupeKind, ScopedVaultId};
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
@@ -42,13 +42,13 @@ pub async fn get_dupes(
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
-            let dupes = dupes::get_dupes(conn, &sv.id)?;
-            let vaults = dupes
-                .same_tenant
+            let dupes = Fingerprint::get_dupes(conn, &sv)?;
+            let sv_ids = dupes
+                .dupes_within_tenant
                 .iter()
-                .map(|d| (d.scoped_vault.clone(), d.vault.clone()))
-                .collect();
-
+                .map(|fp| &fp.scoped_vault_id)
+                .collect_vec();
+            let vaults = ScopedVault::bulk_get(conn, sv_ids, &tenant_id, is_live)?;
             let vws: HashMap<ScopedVaultId, TenantVw> =
                 VaultWrapper::multi_get_for_tenant(conn, vaults, None)?;
 
@@ -58,26 +58,39 @@ pub async fn get_dupes(
 
     let mut decrypted_results =
         get::search::decrypt_visible_attrs(&state, &auth, vws.values().collect()).await?;
-
-    let other_tenant_dupes = api_wire_types::OtherTenantDupes::from_db(dupes.other_tenant.clone());
-    let same_tenant_dupes = dupes
-        .same_tenant
+    let mut sv_id_to_dupe_fps = dupes
+        .dupes_within_tenant
         .into_iter()
-        .map(|d| {
-            let decrypted_data = decrypted_results.remove(&d.scoped_vault.id).unwrap_or_default();
-            let vw = vws
-                .get(&d.scoped_vault.id)
+        .map(|fp| (fp.scoped_vault_id, fp.kind))
+        .into_group_map();
+
+    let same_tenant = vws
+        .into_iter()
+        .map(|(sv_id, vw)| {
+            let decrypted_data = decrypted_results.remove(&sv_id).unwrap_or_default();
+            let duplicate_dis = sv_id_to_dupe_fps
+                .remove(&sv_id)
                 .ok_or(AssertionError("VW not found"))?;
-            Ok((d, vw, decrypted_data))
+            let duplicate_kinds = duplicate_dis
+                .into_iter()
+                .map(DupeKind::try_from)
+                .collect::<newtypes::NtResult<Vec<_>>>()?
+                .into_iter()
+                .unique()
+                .collect_vec();
+            Ok((duplicate_kinds, vw, decrypted_data))
         })
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .map(|(d, vw, data)| api_wire_types::SameTenantDupe::from_db((d, vw, &auth, data)))
         .collect();
-
-    ResponseData::ok(api_wire_types::Dupes::from_db((
-        same_tenant_dupes,
-        other_tenant_dupes,
-    )))
-    .json()
+    let other_tenant = api_wire_types::OtherTenantDupes {
+        num_matches: dupes.num_dup_users_other_tenants,
+        num_tenants: dupes.num_other_tenants,
+    };
+    let response = api_wire_types::Dupes {
+        same_tenant,
+        other_tenant,
+    };
+    ResponseData::ok(response).json()
 }

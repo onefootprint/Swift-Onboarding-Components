@@ -11469,10 +11469,12 @@
                         "type": "object",
                         "properties": {
                             "num_matches": {
+                                "description": "Number of distinct vaults that (1) have any sort of dupe match and (2) have not onboarded onto the same tenant as the the scoped_vault for which dupes are being queried for",
                                 "type": "integer",
                                 "format": "int64"
                             },
                             "num_tenants": {
+                                "description": "Number of distinct tenants from the vaults described above ^",
                                 "type": "integer",
                                 "format": "int64"
                             }
@@ -11758,12 +11760,12 @@
                                                 "type": "string",
                                                 "enum": [
                                                     "hosted",
+                                                    "components_sdk",
+                                                    "bootstrap",
                                                     "client_tenant",
                                                     "tenant",
                                                     "ocr",
-                                                    "prefill",
-                                                    "components_sdk",
-                                                    "bootstrap"
+                                                    "prefill"
                                                 ]
                                             },
                                             "transforms": {
@@ -12383,12 +12385,12 @@
                                     "type": "string",
                                     "enum": [
                                         "hosted",
+                                        "components_sdk",
+                                        "bootstrap",
                                         "client_tenant",
                                         "tenant",
                                         "ocr",
-                                        "prefill",
-                                        "components_sdk",
-                                        "bootstrap"
+                                        "prefill"
                                     ]
                                 },
                                 "transforms": {

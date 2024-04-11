@@ -21,6 +21,8 @@ pub struct SameTenantDupe {
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct OtherTenantDupes {
-    pub num_matches: usize, // number of distinct vaults that (1) have any sort of dupe match and (2) have not onboarded onto the same tenant as the the scoped_vault for which dupes are being queried for
-    pub num_tenants: usize, // number of distinct tenants from the vaults described above ^
+    /// Number of distinct vaults that (1) have any sort of dupe match and (2) have not onboarded onto the same tenant as the the scoped_vault for which dupes are being queried for
+    pub num_matches: i64,
+    /// Number of distinct tenants from the vaults described above ^
+    pub num_tenants: i64,
 }

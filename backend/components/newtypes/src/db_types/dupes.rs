@@ -1,8 +1,7 @@
 use crate::DataIdentifier;
-use derive_more::Display;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, EnumString};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum_macros::{Display, EnumString};
 
 #[derive(
     Debug,
@@ -14,11 +13,11 @@ use strum_macros::{AsRefStr, EnumString};
     Hash,
     Clone,
     Copy,
-    AsRefStr,
-    Deserialize,
-    Serialize,
+    DeserializeFromStr,
+    SerializeDisplay,
     EnumString,
     Apiv2Schema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

@@ -127,6 +127,12 @@ pub enum ScopedVaultIdentifier<'a> {
     },
 }
 
+#[derive(derive_more::From)]
+pub enum BulkSvIdentifier<'a> {
+    FpIds(Vec<FpId>),
+    SvIds(Vec<&'a ScopedVaultId>),
+}
+
 pub type SerializableWorkflow = (Workflow, Option<InsightEvent>);
 pub type SerializableEntity = (
     ScopedVault,
@@ -320,20 +326,25 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::bulk_get", skip_all)]
-    pub fn bulk_get(
+    pub fn bulk_get<'a, T: Into<BulkSvIdentifier<'a>>>(
         conn: &mut PgConn,
-        fp_ids: Vec<FpId>,
+        ids: T,
         tenant_id: &TenantId,
         is_live: bool,
     ) -> DbResult<Vec<(Self, Vault)>> {
         use db_schema::schema::vault;
-        let results = scoped_vault::table
-            .filter(scoped_vault::fp_id.eq_any(fp_ids))
+        let mut query = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
             .filter(scoped_vault::deactivated_at.is_null())
             .inner_join(vault::table)
-            .get_results(conn)?;
+            .into_boxed();
+
+        match ids.into() {
+            BulkSvIdentifier::FpIds(fp_ids) => query = query.filter(scoped_vault::fp_id.eq_any(fp_ids)),
+            BulkSvIdentifier::SvIds(sv_ids) => query = query.filter(scoped_vault::id.eq_any(sv_ids)),
+        }
+        let results = query.get_results::<(Self, Vault)>(conn)?;
         Ok(results)
     }
 

@@ -3,7 +3,6 @@ pub mod body_bytes;
 pub mod challenge;
 pub mod challenge_rate_limit;
 pub mod db2api;
-pub mod dupes;
 pub mod email;
 pub mod email_domain;
 pub mod file_upload;
@@ -31,3 +30,6 @@ pub mod webhook_app;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 pub(crate) mod mock_enclave;
+
+#[cfg(test)]
+mod tests;

@@ -24,6 +24,7 @@ def test_dupes(tenant):
     assert dupes["same_tenant"][0]["dupe_kinds"] == ["email"]
     assert "status" in dupes["same_tenant"][0]
     assert "start_timestamp" in dupes["same_tenant"][0]
+    print(dupes)
     assert (
         next(
             d
@@ -32,11 +33,8 @@ def test_dupes(tenant):
         )["value"]
         == "Bob2"
     )
-    assert (
-        next(
-            d for d in dupes["same_tenant"][0]["data"] if d["identifier"] == "id.email"
-        )["value"]
-        is None
+    assert not any(
+        d["identifier"] == "id.email" for d in dupes["same_tenant"][0]["data"]
     )
 
     assert dupes["other_tenant"] == {"num_matches": 0, "num_tenants": 0}
