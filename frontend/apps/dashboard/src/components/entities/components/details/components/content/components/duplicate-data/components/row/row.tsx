@@ -45,7 +45,7 @@ const Row = ({ duplicateDataTableRowItem }: RowProps) => {
       data: { numMatches, numTenants },
     } = duplicateDataTableRowItem.otherTenant;
     return (
-      <td colSpan={4} aria-label="other tenants duplicate data">
+      <td colSpan={5} aria-label="other tenants duplicate data">
         <OtherTenantsSummaryContainer>
           <Box
             backgroundColor="secondary"
@@ -81,7 +81,7 @@ const Row = ({ duplicateDataTableRowItem }: RowProps) => {
     !duplicateDataTableRowItem.sameTenant
   ) {
     return (
-      <td colSpan={4} aria-label="no same tenant duplicate data">
+      <td colSpan={5} aria-label="no same tenant duplicate data">
         <Text variant="body-3" color="secondary">
           {t('empty-same-tenant', { orgName: org?.name ?? '' })}
         </Text>

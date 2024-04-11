@@ -1,11 +1,11 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { Box, Table, Text } from '@onefootprint/ui';
+import { Table } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useCurrentEntityDuplicateData from 'src/components/entities/components/details/hooks/use-current-entity-duplicate-data';
-import styled, { css } from 'styled-components';
 
+import Section from '../section';
 import type { DuplicateDataTableRowItem } from './components/row';
 import Row from './components/row';
 
@@ -43,37 +43,24 @@ const DuplicateData = () => {
   };
 
   return (
-    <Container>
-      <Text variant="label-3">{t('title')}</Text>
-      <Box>
-        <Table<DuplicateDataTableRowItem>
-          aria-label={t('table.aria-label')}
-          columns={columns}
-          emptyStateText={
-            error ? getErrorMessage(error) : t('table.empty-state')
+    <Section title={t('title')}>
+      <Table<DuplicateDataTableRowItem>
+        aria-label={t('table.aria-label')}
+        columns={columns}
+        emptyStateText={error ? getErrorMessage(error) : t('table.empty-state')}
+        getKeyForRow={(duplicateDataItem: DuplicateDataTableRowItem) => {
+          if ('sameTenant' in duplicateDataItem) {
+            return duplicateDataItem.sameTenant?.fpId ?? 'same-tenant';
           }
-          getKeyForRow={(duplicateDataItem: DuplicateDataTableRowItem) => {
-            if ('sameTenant' in duplicateDataItem) {
-              return duplicateDataItem.sameTenant?.fpId ?? 'same-tenant';
-            }
-            return 'other-tenants';
-          }}
-          isLoading={isLoading}
-          items={duplicateData}
-          onRowClick={handleRowClick}
-          renderTr={({ item }) => <Row duplicateDataTableRowItem={item} />}
-        />
-      </Box>
-    </Container>
+          return 'other-tenants';
+        }}
+        isLoading={isLoading}
+        items={duplicateData}
+        onRowClick={handleRowClick}
+        renderTr={({ item }) => <Row duplicateDataTableRowItem={item} />}
+      />
+    </Section>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-  `};
-`;
 
 export default DuplicateData;

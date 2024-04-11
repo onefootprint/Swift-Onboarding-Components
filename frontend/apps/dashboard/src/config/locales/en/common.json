@@ -1683,11 +1683,11 @@
           }
         },
         "duplicate-data": {
-          "title": "Duplicate data",
-          "empty-state": "No duplicate data found",
+          "title": "Duplicate accounts",
+          "empty-state": "No duplicate accounts found",
           "table": {
-            "aria-label": "Duplicate data",
-            "empty-state": "No duplicate data found",
+            "aria-label": "Duplicate accounts",
+            "empty-state": "No duplicate accounts found",
             "header": {
               "fp-id": "Footprint ID",
               "exact-match": "Exact match",

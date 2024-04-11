@@ -11,6 +11,7 @@ import {
   RiskSignals,
   Vault,
 } from './components';
+import DuplicateData from './components/duplicate-data';
 
 const Content = () => (
   <Box tag="section" testID="entity-content">
@@ -37,6 +38,9 @@ const Content = () => (
     </Box>
     <Box marginBottom={9}>
       <RiskSignals />
+    </Box>
+    <Box marginBottom={9}>
+      <DuplicateData />
     </Box>
     <DeviceInsights />
   </Box>

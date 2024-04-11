@@ -3,7 +3,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Section from '../section';
-import DuplicateData from './components/duplicate-data';
 import RiskSignalsList from './components/risk-signals-list';
 
 const RiskSignals = () => {
@@ -13,9 +12,8 @@ const RiskSignals = () => {
 
   return (
     <Section title={t('title')}>
-      <Box display="flex" flexDirection="column" gap={7}>
+      <Box display="flex" flexDirection="column">
         <RiskSignalsList />
-        <DuplicateData />
       </Box>
     </Section>
   );
