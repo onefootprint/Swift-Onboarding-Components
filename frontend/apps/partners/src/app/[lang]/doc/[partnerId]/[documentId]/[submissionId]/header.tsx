@@ -18,6 +18,7 @@ type HeaderProps = {
   documentId: string;
   documentStatus?: string;
   iframeId: string;
+  kind: 'external_url' | 'file_upload';
   partnerId: string;
   submissionId: string;
 };
@@ -41,6 +42,7 @@ const Header = ({
   documentId,
   documentStatus,
   iframeId,
+  kind,
   partnerId,
   submissionId,
 }: HeaderProps) => {
@@ -88,12 +90,14 @@ const Header = ({
         </IconButton>
         <Text variant="label-3">{children}</Text>
         <Stack alignItems="center" justifyContent="space-between" gap={3}>
-          <Button
-            variant="secondary"
-            onClick={() => downloadPdfFromIframe(iframeId)}
-          >
-            {t('download')}
-          </Button>
+          {kind === 'file_upload' ? (
+            <Button
+              variant="secondary"
+              onClick={() => downloadPdfFromIframe(iframeId)}
+            >
+              {t('download')}
+            </Button>
+          ) : null}
           {documentStatus === 'waiting_for_review' ? (
             <Button
               variant="primary"

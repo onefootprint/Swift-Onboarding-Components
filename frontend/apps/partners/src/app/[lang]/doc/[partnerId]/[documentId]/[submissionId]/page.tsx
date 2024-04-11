@@ -43,6 +43,7 @@ const PartnerSubmissionViewerPage = async ({ params }: Props) => {
         iframeId={iframeId}
         partnerId={partnerId}
         submissionId={submissionId}
+        kind={data.kind}
       >
         {document?.name || 'Document'}
       </Header>

@@ -47,7 +47,7 @@ const PartnerDocsPage = async ({ params }: PartnerDocsPageProps) => {
       .then(list => list.find(c => c.id === partnerId) || EmptyCompany)
       .catch(() => EmptyCompany),
     getPartnerMembers()
-      .then(res => res.data.map(getMemberLabelValue))
+      .then(res => res.data.map(getMemberLabelValue).filter(x => x.label))
       .catch(() => []),
   ]);
 

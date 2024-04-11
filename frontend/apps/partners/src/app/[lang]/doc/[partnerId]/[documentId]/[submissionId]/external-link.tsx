@@ -47,7 +47,7 @@ const ExternalLink = ({ url }: ExternalLinkProps) => {
           variant="secondary"
           onClick={() => (url ? window.open(url, '_blank') : undefined)}
         >
-          {t('download')}
+          {t('open-link')}
         </Button>
       </Stack>
     </Stack>

@@ -5,6 +5,7 @@ import {
   IcoUser16,
 } from '@onefootprint/icons';
 import { Drawer, LinkButton, Stack, Text } from '@onefootprint/ui';
+import type { TFunction } from 'i18next';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -32,8 +33,8 @@ const actFirstName = getOr<string>('', 'actor.user.firstName');
 const actLastName = getOr<string>('', 'actor.user.lastName');
 const endFirstName = getOr<string>('', 'event.data.assignedTo.user.firstName');
 const endLastName = getOr<string>('', 'event.data.assignedTo.user.lastName');
-const endOrg = getOr<string>('', 'event.data.assignedTo.org');
-const docName = getOr<string>('', 'event.data.name');
+const assignedToOrg = getOr<string>('', 'event.data.assignedTo.org');
+const dataName = getOr<string>('', 'event.data.name');
 const submissionId = getOr<string>('', 'event.data.submissionId');
 const decision = getOr<string>('', 'event.data.decision');
 const note = getOr<string>('', 'event.data.note');
@@ -47,6 +48,26 @@ const isSubmitted = (x: unknown) => x === 'submitted';
 
 const getActorName = (x: object) => join(actFirstName(x), actLastName(x));
 const getEndName = (x: object) => join(endFirstName(x), endLastName(x));
+
+const isOrgRequired = (kind: string): boolean =>
+  [isRequested, isRetracted, isSubmitted, isReviewed].some(fn => fn(kind));
+
+const getPersonalAction = (t: TFunction<'common'>, kind: string): string => {
+  if (isRequested(kind)) return `${t('doc.requested-the')} `;
+  if (isAssigned(kind)) return `${t('assigned-to')} `;
+  if (isRetracted(kind)) return `${t('doc.retracted-document')} `;
+  if (isSubmitted(kind)) return `${t('doc.uploaded-document')} · `;
+  if (isReviewed(kind)) return `${t('doc.reviewed-document')} `;
+  return '';
+};
+const getNonPersonal = (t: TFunction<'common'>, kind: string): string => {
+  if (isRequested(kind)) return ` ${t('doc.automatically-requested')}`;
+  if (isAssigned(kind)) return ` ${t('doc.automatically-assigned')}`;
+  if (isRetracted(kind)) return ` ${t('doc.automatically-retracted')}`;
+  if (isSubmitted(kind)) return ` ${t('doc.automatically-uploaded')}`;
+  if (isReviewed(kind)) return ` ${t('doc.automatically-reviewed')}`;
+  return '';
+};
 
 const DrawerTimeline = ({
   docId,
@@ -105,9 +126,13 @@ const DrawerTimeline = ({
               {status.text}
             </Text>
           </Stack>
-          <Stack flexDirection="column" gap={2}>
+          <Stack flexDirection="column">
             {events.map(i => {
               const { kind } = i.event;
+              const actorName = getActorName(i);
+              const actorOrg = i.actor?.org;
+              const docName = dataName(i);
+
               return (
                 <Stack flexDirection="row" gap={4} key={i.timestamp}>
                   <VerticalLine>
@@ -124,34 +149,27 @@ const DrawerTimeline = ({
                       justifyContent="space-between"
                       paddingBottom={isReviewed(kind) ? 2 : 6}
                     >
-                      <div>
-                        {!isAssigned(kind) ? (
-                          <Text tag="strong" variant="label-3" color="primary">
-                            {getActorName(i)}&nbsp;
-                          </Text>
+                      <DivWithRightPadding>
+                        {actorName ? (
+                          <>
+                            {!isAssigned(kind) ? (
+                              <Text
+                                tag="strong"
+                                variant="label-3"
+                                color="primary"
+                                display="inline-block"
+                              >
+                                {actorName}&nbsp;
+                              </Text>
+                            ) : null}
+                            {isOrgRequired(kind) ? (
+                              <From span={t('from')} strong={actorOrg} />
+                            ) : null}
+                            <Text tag="span" variant="body-3" color="tertiary">
+                              {getPersonalAction(t, kind)}
+                            </Text>
+                          </>
                         ) : null}
-                        {i.actor?.org &&
-                        (isRequested(kind) ||
-                          isRetracted(kind) ||
-                          isSubmitted(kind) ||
-                          isReviewed(kind)) ? (
-                          <From span={t('from')} strong={i.actor.org} />
-                        ) : null}
-                        <Text tag="span" variant="body-3" color="tertiary">
-                          {isRequested(kind)
-                            ? `${t('doc.requested-the')} `
-                            : ''}
-                          {isAssigned(kind) ? `${t('assigned-to')} ` : ''}
-                          {isRetracted(kind)
-                            ? `${t('doc.retracted-document')} `
-                            : ''}
-                          {isSubmitted(kind)
-                            ? `${t('doc.uploaded-document')} · `
-                            : ''}
-                          {isReviewed(kind)
-                            ? `${t('doc.reviewed-document')} `
-                            : ''}
-                        </Text>
                         {isSubmitted(kind) ? (
                           <LinkButton
                             onClick={() =>
@@ -163,17 +181,20 @@ const DrawerTimeline = ({
                           </LinkButton>
                         ) : null}
                         <Text tag="strong" variant="label-3" color="primary">
-                          {isRequested(kind) && docName(i)
-                            ? `${docName(i)} `
-                            : ''}
+                          {isRequested(kind) && docName ? `${docName} ` : ''}
                           {isAssigned(kind)
                             ? `${getEndName(i) || t('no-assignee')} `
                             : ''}
                         </Text>
-                        {isAssigned(kind) && endOrg(i) ? (
-                          <From span={t('from')} strong={endOrg(i)} />
+                        {isAssigned(kind) ? (
+                          <From span={t('from')} strong={assignedToOrg(i)} />
                         ) : null}
-                      </div>
+                        {!actorName ? (
+                          <Text tag="span" variant="body-3" color="tertiary">
+                            {getNonPersonal(t, kind)}
+                          </Text>
+                        ) : null}
+                      </DivWithRightPadding>
                       <Text
                         tag="span"
                         variant="body-4"
@@ -226,15 +247,20 @@ const DrawerTimeline = ({
   ) : null;
 };
 
+const DivWithRightPadding = styled.div`
+  padding-right: 20px;
+`;
+
 const VerticalLine = styled.div`
   ${({ theme }) => css`
+    padding-top: 3px;
     position: relative;
 
     &::before {
       content: '';
       position: absolute;
-      top: ${theme.spacing[7]};
-      bottom: 0;
+      top: 28px;
+      bottom: 4px;
       left: 50%;
       transform: translateX(-50%);
       border-left: 2px solid ${theme.color.senary};
@@ -246,18 +272,24 @@ const From = ({
   span,
   strong,
 }: {
-  span: string;
-  strong: string;
-}): JSX.Element => (
-  <>
-    <Text tag="span" variant="body-3" color="tertiary">
-      {span}&nbsp;
-    </Text>
-    <Text tag="strong" variant="label-3" color="primary">
-      {strong}&nbsp;
-    </Text>
-  </>
-);
+  span?: string;
+  strong?: string;
+}): JSX.Element | null =>
+  span && strong ? (
+    <>
+      <Text tag="span" variant="body-3" color="tertiary" display="inline-block">
+        {span}&nbsp;
+      </Text>
+      <Text
+        tag="strong"
+        variant="label-3"
+        color="primary"
+        display="inline-block"
+      >
+        {strong}&nbsp;
+      </Text>
+    </>
+  ) : null;
 
 const TextWithSideMargin = styled(Text)`
   margin: 0 10px;

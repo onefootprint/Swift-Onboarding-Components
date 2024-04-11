@@ -2,6 +2,8 @@
 
 import { redirect } from 'next/navigation';
 
+import { DEFAULT_PRIVATE_ROUTE } from '@/config/constants';
+
 export default async function AppPage() {
-  return redirect('/app/companies');
+  return redirect(DEFAULT_PRIVATE_ROUTE);
 }

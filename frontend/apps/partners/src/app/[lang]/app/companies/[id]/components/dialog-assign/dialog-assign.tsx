@@ -51,7 +51,6 @@ const DialogAssign = ({
           onChange={setMember}
           options={options}
           placeholder={t('select-placeholder')}
-          size="compact"
           value={member}
         />
       </form>

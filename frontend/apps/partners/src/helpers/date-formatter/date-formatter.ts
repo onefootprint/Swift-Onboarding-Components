@@ -8,6 +8,7 @@ const dateFormatter = (lang: Lang = 'en', strDate?: string) => {
   return new Intl.DateTimeFormat(locale, {
     dateStyle: 'medium',
     timeStyle: 'short',
+    hourCycle: 'h24',
   }).format(date);
 };
 

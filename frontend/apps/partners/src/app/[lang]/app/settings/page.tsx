@@ -11,10 +11,23 @@ type PartnerDocsPageProps = { params: LangProp };
 const SettingsPage = async ({ params }: PartnerDocsPageProps) => {
   const [partner, members, roles] = await Promise.all([
     getPartner(),
-    getPartnerMembers().then(res => res.data),
+    getPartnerMembers().then(res =>
+      res.data.map(x => ({
+        ...x,
+        role: {
+          ...x.role,
+          name: x.role.name.replace('CompliancePartner', ''),
+        },
+      })),
+    ),
     getPartnerRoles({ kind: 'compliance_partner_dashboard_user' })
       .then(res => res.data)
-      .then(list => list.map(x => ({ label: x.name, value: x.id }))),
+      .then(list =>
+        list.map(x => ({
+          label: x.name.replace('CompliancePartner', ''),
+          value: x.id,
+        })),
+      ),
   ]);
 
   return (

@@ -24,6 +24,7 @@ import styled from 'styled-components';
 import type { Lang } from '@/app/types';
 import type { WithConfirm } from '@/helpers';
 import {
+  alertError,
   confirmDeletion,
   dateFormatter,
   getErrorMessage,
@@ -31,7 +32,11 @@ import {
   searchByPaths,
 } from '@/helpers';
 import type { OrganizationMember, PartnerOrganization } from '@/queries';
-import { postPartnerMembers, postPartnerMembersDeactivate } from '@/queries';
+import {
+  patchPartner,
+  postPartnerMembers,
+  postPartnerMembersDeactivate,
+} from '@/queries';
 
 import { InputTextForm, LogoManager, OverlayFieldSet } from '../components';
 import OverlayInvite from './components/overlay-invite';
@@ -43,11 +48,6 @@ type SettingsPageContentProps = {
   partner: PartnerOrganization;
   roles: { label: string; value: string }[];
 };
-
-const organization = {
-  name: 'Organization name',
-  logoUrl: undefined,
-} as unknown as PartnerOrganization;
 
 const stopPropagation = (e: SyntheticEvent<unknown>) => e.stopPropagation();
 const getDataId = getOr<undefined | string>(undefined, 'target.dataset.id');
@@ -79,6 +79,7 @@ const SettingsPageContent = ({
   const route = useRouter();
   const confirmationDialog = useConfirmationDialog();
   const withConfirm = confirmDeletion(t, confirmationDialog.open);
+  const errorToast = alertError(t, toast.show);
   const companyName = partner.name;
   const companyWebsiteUrl = partner.websiteUrl;
 
@@ -115,7 +116,7 @@ const SettingsPageContent = ({
       </Stack>
 
       <Stack gap={7} direction="column" marginBottom={10}>
-        <LogoManager organization={organization} />
+        <LogoManager organization={partner} />
         <Stack gap={11} flexWrap="wrap">
           <OverlayFieldSet
             dialogHeader={
@@ -129,13 +130,18 @@ const SettingsPageContent = ({
             label={t('companies.company-name')}
             value={companyName}
           >
-            {({ id, handleSubmit }) => (
+            {({ id, closeDialog }) => (
               <InputTextForm
                 formId={id}
                 label={t('companies.company-name')}
                 requiredMsg={t('required')}
                 value={companyName}
-                onSubmit={name => handleSubmit({ name })}
+                onSubmit={name =>
+                  patchPartner({ name })
+                    .then(closeDialog)
+                    .then(route.refresh)
+                    .catch(errorToast)
+                }
               />
             )}
           </OverlayFieldSet>
@@ -151,11 +157,16 @@ const SettingsPageContent = ({
             label={t('companies.company-website')}
             value={companyWebsiteUrl}
           >
-            {({ id, handleSubmit }) => (
+            {({ id, closeDialog }) => (
               <InputTextForm
                 formId={id}
                 label={t('companies.company-website')}
-                onSubmit={websiteUrl => handleSubmit({ websiteUrl })}
+                onSubmit={websiteUrl =>
+                  patchPartner({ websiteUrl })
+                    .then(closeDialog)
+                    .then(route.refresh)
+                    .catch(errorToast)
+                }
                 requiredMsg={t('required')}
                 value={companyWebsiteUrl}
               />

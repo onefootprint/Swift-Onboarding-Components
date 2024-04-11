@@ -57,9 +57,9 @@ const isWaitingForReview = (x: string) =>
 const getTableColumns = (t: T) => [
   { text: t('document'), width: '35%' },
   { text: t('status'), width: '20%' },
-  { text: t('assigned-to'), width: '15%' },
-  { text: t('last-activity'), width: '15%' },
-  { text: '', width: '15%' },
+  { text: t('assigned-to'), width: '19%' },
+  { text: t('last-activity'), width: '19%' },
+  { text: '', width: '8%' },
 ];
 
 const clientSearch = searchByPaths<PartnerDocument>([

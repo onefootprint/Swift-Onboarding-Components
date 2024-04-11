@@ -7,8 +7,10 @@ export const metadata: Metadata = {
   title: 'Footprint - Magic link sent!',
 };
 
-const MagicLinkSent = () => (
-  <MagicLinkSentContent email="bruno@onefootprint.com" />
+type MagicLinkSentProps = { searchParams: { email?: string } };
+
+const MagicLinkSent = ({ searchParams: { email } }: MagicLinkSentProps) => (
+  <MagicLinkSentContent email={email || '-'} />
 );
 
 export default MagicLinkSent;

@@ -13,34 +13,20 @@ import {
 import { getErrorMessage } from '@/helpers';
 import type { Session } from '@/hooks';
 import { useClientStore, useEffectOnce } from '@/hooks';
+import type { OrgLoginResponse } from '@/queries';
 import postPartnerAuthLogin from '@/queries/post-partner-auth-login';
 
 import Error from './error';
+import getUserPayload from './get-user-payload';
 
-type FromPromise<T> = T extends Promise<infer U> ? U : T;
-type ResLogin = FromPromise<ReturnType<typeof postPartnerAuthLogin>>;
 type AuthPageProps = {
   params: LangProp; // eslint-disable-line react/no-unused-prop-types
   searchParams: { code?: string; error?: string; state?: string };
 };
 
-const getUserPayload = (
-  user: NonNullable<ResLogin['user']>,
-): Session['user'] => ({
-  id: String(user.id),
-  email: String(user.email),
-  firstName: user?.firstName || null,
-  lastName: user?.lastName || null,
-  isAssumedSession: false,
-  isAssumedSessionEditMode: false,
-  isFirmEmployee: user?.isFirmEmployee,
-  /** @ts-expect-error: scopes is string vs enum */
-  scopes: user?.role.scopes || [],
-});
-
 const setLoginSession = (
   update: (x: Partial<Session>) => void,
-  res: ResLogin,
+  res: OrgLoginResponse,
 ) => {
   const {
     authToken,
@@ -70,6 +56,13 @@ const AuthPage = ({ searchParams }: AuthPageProps) => {
       code,
     })
       .then(res => {
+        /** Requires organization selection */
+        if (!res.user || !res.tenant) {
+          router.push(`/auth/organizations?token=${res.authToken}`);
+          return;
+        }
+
+        /** Can proceed to dashboard */
         setLoginSession(update, res);
         createAuthCookie(res.authToken).then(() => {
           router.push(DEFAULT_PRIVATE_ROUTE);

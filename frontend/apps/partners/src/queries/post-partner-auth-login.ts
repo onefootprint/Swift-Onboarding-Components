@@ -80,6 +80,9 @@ export type OrgLoginResponse = {
         | 'compliance_partner_read'
         | 'compliance_partner_admin'
         | 'compliance_partner_manage_templates'
+        | 'compliance_partner_manage_reviews'
+        | 'manage_compliance_doc_submission'
+        | 'write_lists'
       >;
     };
     rolebinding?: { lastLoginAt?: string };

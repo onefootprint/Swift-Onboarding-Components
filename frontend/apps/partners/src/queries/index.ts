@@ -4,6 +4,7 @@ export { default as deletePartnerDocTemplates } from './delete-partner-doc-templ
 export { default as deletePartnerPartnershipsRequests } from './delete-partner-partnerships-requests';
 export type { PartnerOrganization } from './get-partner';
 export { default as getPartner } from './get-partner';
+export { default as getPartnerAuthRoles } from './get-partner-auth-roles';
 export { default as getPartnerDocTemplates } from './get-partner-doc-templates';
 export type { OrganizationMember } from './get-partner-members';
 export { default as getPartnerMembers } from './get-partner-members';
@@ -15,6 +16,10 @@ export { default as getPartnerPartnershipsDocumentsEvents } from './get-partner-
 export { default as getPartnerPartnershipsSubmissions } from './get-partner-partnerships-submissions';
 export type { Role } from './get-partner-roles';
 export { default as getPartnerRoles } from './get-partner-roles';
+export type { UpdatePartnerTenantRequest } from './patch-partner';
+export { default as patchPartner } from './patch-partner';
+export { default as postPartnerAuthAssumeRole } from './post-partner-auth-assume-role';
+export type { OrgLoginResponse } from './post-partner-auth-login';
 export { default as postPartnerAuthLogin } from './post-partner-auth-login';
 export { default as postPartnerDocTemplates } from './post-partner-doc-templates';
 export { default as postPartnerMembers } from './post-partner-members';

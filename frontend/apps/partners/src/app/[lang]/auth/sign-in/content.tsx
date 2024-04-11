@@ -68,7 +68,7 @@ const SignInContent = () => {
     try {
       if (email) {
         await authMagicLink(email);
-        router.push('/auth/link-sent');
+        router.push(`/auth/link-sent?email=${email}`);
       }
     } catch (err) {
       toast.show(getFailedEmailTexts(t));

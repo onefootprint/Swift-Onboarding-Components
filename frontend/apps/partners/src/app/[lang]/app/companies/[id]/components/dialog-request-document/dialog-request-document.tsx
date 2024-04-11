@@ -77,32 +77,36 @@ const DialogRequestDocument = ({
       size="compact"
       title={title}
     >
-      <Text variant="label-2" marginBottom={4}>
-        {t('doc.how-do-you-want-to-proceed')}
-      </Text>
+      {isRadioDisabled ? null : (
+        <Text variant="label-2" marginBottom={4}>
+          {t('doc.how-do-you-want-to-proceed')}
+        </Text>
+      )}
       <form onSubmit={handleFormSubmit} id={formId}>
-        <Stack gap={4} flexDirection="column" marginBottom={5}>
-          <Radio
-            checked={radio === 'template'}
-            id="radio-add-doc-1"
-            label={t('doc.select-from-template')}
-            name="radio-add-doc"
-            onChange={() => setRadio('template')}
-            required
-            disabled={isRadioDisabled}
-            value="template"
-          />
-          <Radio
-            checked={radio === 'new'}
-            id="radio-add-doc-2"
-            label={t('doc.configure-it-myself')}
-            name="radio-add-doc"
-            onChange={() => setRadio('new')}
-            required
-            disabled={isRadioDisabled}
-            value="new"
-          />
-        </Stack>
+        {isRadioDisabled ? null : (
+          <Stack gap={4} flexDirection="column" marginBottom={5}>
+            <Radio
+              checked={radio === 'template'}
+              id="radio-add-doc-1"
+              label={t('doc.select-from-template')}
+              name="radio-add-doc"
+              onChange={() => setRadio('template')}
+              required
+              disabled={isRadioDisabled}
+              value="template"
+            />
+            <Radio
+              checked={radio === 'new'}
+              id="radio-add-doc-2"
+              label={t('doc.configure-it-myself')}
+              name="radio-add-doc"
+              onChange={() => setRadio('new')}
+              required
+              disabled={isRadioDisabled}
+              value="new"
+            />
+          </Stack>
+        )}
         {radio === 'template' ? (
           <Select
             disabled={options.length === 0}

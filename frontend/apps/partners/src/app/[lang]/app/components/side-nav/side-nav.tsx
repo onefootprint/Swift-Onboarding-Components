@@ -1,18 +1,26 @@
-import { IcoUserCircle16 } from '@onefootprint/icons';
-import { createFontStyles, Divider, Stack } from '@onefootprint/ui';
+import {
+  IcoDotsHorizontal16,
+  IcoLogOut24,
+  IcoUserCircle16,
+} from '@onefootprint/icons';
+import { createFontStyles, Divider, Dropdown, Stack } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import useRoutes from '@/hooks/use-routes/use-routes';
+import { useClientStore, useRoutes } from '@/hooks';
 
-import NavLink from './components/nav-link';
+import NavLink from '../nav-link';
+
+const join = (...args: unknown[]): string => args.filter(Boolean).join(' ');
 
 const SideNav = () => {
-  const routes = useRoutes();
   const pathname = usePathname();
-  const userName = 'John Wick';
+  const router = useRouter();
+  const routes = useRoutes();
+  const { data } = useClientStore(x => x);
+  const userName = join(data.user?.firstName, data.user?.lastName);
 
   return (
     <NavContainer>
@@ -47,6 +55,21 @@ const SideNav = () => {
         <Stack direction="row" gap={3} align="center" justify="flex-start">
           <IcoUserCircle16 color="tertiary" />
           <User>{userName}</User>
+        </Stack>
+        <Stack alignItems="center">
+          <Dropdown.Root>
+            <Dropdown.Trigger aria-label="aria-label">
+              <IcoDotsHorizontal16 testID="nav-dropdown-button" />
+            </Dropdown.Trigger>
+            <Dropdown.Portal>
+              <Dropdown.Content align="start" sideOffset={8}>
+                <Dropdown.Item onSelect={() => router.push('/auth/logout')}>
+                  <IcoLogOut24 />
+                  Log out
+                </Dropdown.Item>
+              </Dropdown.Content>
+            </Dropdown.Portal>
+          </Dropdown.Root>
         </Stack>
       </Stack>
     </NavContainer>

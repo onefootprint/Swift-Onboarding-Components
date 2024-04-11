@@ -23,10 +23,7 @@ const putPartnerLogo = async (formData: FormData) => {
   if (!token) return Promise.reject(new TypeError('Missing auth token'));
 
   return baseFetch<PartnerOrganization>('/partner/logo', {
-    headers: {
-      [DASHBOARD_AUTHORIZATION_HEADER]: token,
-      'content-type': 'multipart/form-data',
-    },
+    headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
     method: 'PUT',
     body: formData,
   });

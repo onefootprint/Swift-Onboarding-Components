@@ -29,6 +29,9 @@ const DialogReSubmit = ({
   options,
 }: DialogReSubmitProps) => {
   const { t } = useTranslation('common');
+  const defaultName = docDialog?.templateId
+    ? options.find(o => o.value === docDialog?.templateId)?.label
+    : docDialog?.name || '';
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,12 +64,9 @@ const DialogReSubmit = ({
           label={t('document')}
           placeholder={t('doc.document-name')}
           required
-          size="compact"
-          defaultValue={
-            docDialog?.templateId
-              ? options.find(o => o.value === docDialog?.templateId)?.label
-              : docDialog?.name || ''
-          }
+          defaultValue={defaultName}
+          readOnly={Boolean(defaultName)}
+          disabled={Boolean(defaultName)}
         />
         <Stack gap={1} flexDirection="column" marginTop={7}>
           <TextArea

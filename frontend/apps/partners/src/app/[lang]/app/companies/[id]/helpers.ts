@@ -43,7 +43,7 @@ export const getMemberLabelValue = (x: {
   lastName?: string;
   id: string;
 }): Option => ({
-  label: join(x.firstName, x.lastName),
+  label: join(x.firstName, x.lastName) || '',
   value: x.id,
 });
 
