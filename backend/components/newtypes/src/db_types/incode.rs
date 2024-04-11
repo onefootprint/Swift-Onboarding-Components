@@ -159,6 +159,7 @@ pub enum IncodeVerificationSessionKind {
     IdDocument,
     Selfie,
     CurpValidation,
+    GovernmentValidation,
 }
 
 impl IncodeVerificationSessionKind {
@@ -167,6 +168,7 @@ impl IncodeVerificationSessionKind {
             IncodeVerificationSessionKind::IdDocument => false,
             IncodeVerificationSessionKind::Selfie => true,
             IncodeVerificationSessionKind::CurpValidation => false,
+            IncodeVerificationSessionKind::GovernmentValidation => false,
         }
     }
 }
@@ -221,6 +223,7 @@ crate::util::impl_enum_str_diesel!(IncodeEnvironment);
 pub enum IncodeVerificationSessionPurpose {
     Identity,
     CurpValidation,
+    GovernmentValidation,
 }
 
 crate::util::impl_enum_str_diesel!(IncodeVerificationSessionPurpose);
@@ -231,6 +234,9 @@ impl From<IncodeVerificationSessionKind> for IncodeVerificationSessionPurpose {
             IncodeVerificationSessionKind::IdDocument => IncodeVerificationSessionPurpose::Identity,
             IncodeVerificationSessionKind::Selfie => IncodeVerificationSessionPurpose::Identity,
             IncodeVerificationSessionKind::CurpValidation => IncodeVerificationSessionPurpose::CurpValidation,
+            IncodeVerificationSessionKind::GovernmentValidation => {
+                IncodeVerificationSessionPurpose::GovernmentValidation
+            }
         }
     }
 }

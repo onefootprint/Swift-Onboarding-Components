@@ -720,6 +720,7 @@ impl GetOnboardingStatusResponse {
                 }
             }
             IncodeVerificationSessionKind::CurpValidation => false,
+            IncodeVerificationSessionKind::GovernmentValidation => false,
         }
     }
 }
