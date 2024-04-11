@@ -94,32 +94,10 @@ pub struct LoginChallengeResponse {
 }
 
 #[derive(Apiv2Schema, serde::Deserialize, Clone)]
-#[serde(untagged)]
-/// For backwards compatibility until the clients are updated   
-pub enum SignupChallengeData<T> {
-    Legacy(T),
-    New {
-        value: T,
-        #[serde(default)]
-        is_bootstrap: bool,
-    },
-}
-
-impl<T> SignupChallengeData<T> {
-    pub fn value(self) -> T {
-        tracing::info!(is_legacy=%matches!(self, Self::Legacy(_)), "Signup challenge data");
-        match self {
-            SignupChallengeData::Legacy(d) => d,
-            SignupChallengeData::New { value, .. } => value,
-        }
-    }
-
-    pub fn is_bootstrap(&self) -> bool {
-        match self {
-            SignupChallengeData::Legacy(..) => false,
-            SignupChallengeData::New { is_bootstrap, .. } => *is_bootstrap,
-        }
-    }
+pub struct SignupChallengeData<T> {
+    pub value: T,
+    #[serde(default)]
+    pub is_bootstrap: bool,
 }
 
 #[derive(Apiv2Schema, serde::Deserialize)]

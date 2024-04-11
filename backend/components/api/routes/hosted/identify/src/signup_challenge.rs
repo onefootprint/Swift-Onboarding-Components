@@ -45,8 +45,8 @@ pub async fn post(
     root_span: RootSpan,
 ) -> JsonApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest {
-        phone_number: phone_number_,
-        email: email_,
+        phone_number: phone,
+        email,
         scope,
     } = request.into_inner();
     let sandbox_id = sandbox_id.0;
@@ -59,19 +59,15 @@ pub async fn post(
         IdentifyScope::Onboarding
     };
 
-    // TODO remove this branch when all clients are updated
-    let phone_number = phone_number_.clone().map(|p| p.value());
-    let email = email_.clone().map(|e| e.value());
-
-    let is_fixture = phone_number.as_ref().is_some_and(|p| p.is_fixture_phone_number())
-        || email.as_ref().is_some_and(|e| e.is_fixture());
+    let is_fixture = phone.as_ref().is_some_and(|p| p.value.is_fixture_phone_number())
+        || email.as_ref().is_some_and(|e| e.value.is_fixture());
     if ob_context.ob_config().is_live && is_fixture {
         return Err(UserError::FixtureCIInLive.into());
     }
 
     let identifiers = vec![
-        email.as_ref().map(|e| IdentifyId::Email(e.clone())),
-        phone_number.as_ref().map(|e| IdentifyId::PhoneNumber(e.clone())),
+        email.as_ref().map(|e| IdentifyId::Email(e.value.clone())),
+        phone.as_ref().map(|e| IdentifyId::PhoneNumber(e.value.clone())),
     ]
     .into_iter()
     .flatten()
@@ -108,8 +104,8 @@ pub async fn post(
     let ctx = make_vault_context(
         &state,
         &ob_context,
-        email_,
-        phone_number_,
+        email.clone(),
+        phone.clone(),
         sandbox_id.clone(),
         is_components_sdk.0,
     )
@@ -126,13 +122,15 @@ pub async fn post(
 
     let (rx, challenge_data) = if !ob_context.ob_config().is_no_phone_flow {
         // Expect a phone number and initiate an SMS challenge
-        let phone_number = phone_number.ok_or(ValidationError(
-            "Phone number required to initiate sign up challenge",
-        ))?;
+        let phone = phone
+            .ok_or(ValidationError(
+                "Phone number required to initiate sign up challenge",
+            ))?
+            .value;
         let tenant = ob_context.tenant();
         let (rx, challenge_state_data, time_before_retry_s) = state
             .sms_client
-            .send_challenge_non_blocking(&state, Some(tenant), phone_number, uv.id, sandbox_id)
+            .send_challenge_non_blocking(&state, Some(tenant), phone, uv.id, sandbox_id)
             .await?;
 
         let challenge_data = ChallengeData::Sms(challenge_state_data);
@@ -148,9 +146,11 @@ pub async fn post(
         (Some(rx), data)
     } else {
         // If obc is no-phone flow, only initiate email challenge
-        let email = email.ok_or(ValidationError(
-            "Email must be provided for no-phone signup challenges",
-        ))?;
+        let email = email
+            .ok_or(ValidationError(
+                "Email must be provided for no-phone signup challenges",
+            ))?
+            .value;
         let obc = ob_context.ob_config();
         let tenant = ob_context.tenant();
 
@@ -204,8 +204,8 @@ async fn make_vault_context(
 ) -> ApiResult<VaultContext> {
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
     let initial_data = vec![
-        email.map(|e| (IDK::Email.into(), e.is_bootstrap(), e.value().email)),
-        phone.map(|p| (IDK::PhoneNumber.into(), p.is_bootstrap(), p.value().e164())),
+        email.map(|e| (IDK::Email.into(), e.is_bootstrap, e.value.email)),
+        phone.map(|p| (IDK::PhoneNumber.into(), p.is_bootstrap, p.value.e164())),
     ]
     .into_iter()
     .flatten()

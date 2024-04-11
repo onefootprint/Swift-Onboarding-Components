@@ -18,8 +18,14 @@ const signupChallenge = async (payload: SignupChallengeRequest) => {
     method: 'POST',
     url: '/hosted/identify/signup_challenge',
     data: {
-      email,
-      phoneNumber,
+      email: {
+        value: email,
+        isBootstrap: false, // TODO
+      },
+      phoneNumber: {
+        value: phoneNumber,
+        isBootstrap: false, // TODO
+      },
     },
     headers,
   });
