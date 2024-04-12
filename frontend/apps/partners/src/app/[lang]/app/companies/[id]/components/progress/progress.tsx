@@ -22,7 +22,7 @@ const Progress = ({ details, value }: ProgressProps) => {
     >
       <Stack gap={3} justify="space-between" width="100%">
         <Text variant="label-3" color="secondary">
-          {`${value.toFixed(2)}${t('percentage-completed')}`}
+          {`${value.toFixed(0)}${t('percentage-completed')}`}
         </Text>
         <Text variant="label-4" color="tertiary">
           {details}

@@ -6,7 +6,7 @@ import {
 } from '@onefootprint/icons';
 import { Drawer, LinkButton, Stack, Text } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -53,7 +53,7 @@ const isOrgRequired = (kind: string): boolean =>
   [isRequested, isRetracted, isSubmitted, isReviewed].some(fn => fn(kind));
 
 const getPersonalAction = (t: TFunction<'common'>, kind: string): string => {
-  if (isRequested(kind)) return `${t('doc.requested-the')} `;
+  if (isRequested(kind)) return `${t('doc.requested')} `;
   if (isAssigned(kind)) return `${t('assigned-to')} `;
   if (isRetracted(kind)) return `${t('doc.retracted-document')} `;
   if (isSubmitted(kind)) return `${t('doc.uploaded-document')} · `;
@@ -80,21 +80,20 @@ const DrawerTimeline = ({
 }: DrawerTimelineProps) => {
   const { t } = useTranslation('common');
   const [events, setEvents] = useState<ComplianceDocEvent[]>([]);
-  const docRef = useRef('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const status = getDocStatus(t, docStatus);
 
   useEffect(() => {
     if (!partnerId || !docId) return;
-    if (docRef.current === docId) return;
-    docRef.current = docId;
+
+    setIsLoading(true);
     getPartnerPartnershipsDocumentsEvents(partnerId, docId)
       .then(list => list.sort(sortByTimestampDesc))
-      .then(setEvents);
+      .then(setEvents)
+      .finally(() => setIsLoading(false));
   }, [partnerId, docId]);
 
   const handleClose = () => {
-    setEvents([]);
-    docRef.current = '';
     onClose();
   };
 
@@ -105,7 +104,7 @@ const DrawerTimeline = ({
       open={isOpen}
       title={t('doc.document-history')}
     >
-      {!events.length ? (
+      {isLoading ? (
         <Loading />
       ) : (
         <>
@@ -230,6 +229,7 @@ const DrawerTimeline = ({
                             backgroundColor="secondary"
                             marginTop={5}
                             marginBottom={5}
+                            borderRadius="default"
                           >
                             ”{note(i)}”
                           </TextWithPadding>

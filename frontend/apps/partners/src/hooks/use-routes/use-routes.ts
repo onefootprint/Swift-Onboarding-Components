@@ -22,11 +22,6 @@ const useRoutes = (): Route[] => {
           Icon: IcoStore16,
           text: t('companies.companies'),
         },
-        {
-          href: '/app/settings',
-          Icon: IcoSettings16,
-          text: t('settings'),
-        },
       ],
     },
     {
@@ -37,6 +32,11 @@ const useRoutes = (): Route[] => {
           href: '/app/configure/documents',
           Icon: IcoFileText16,
           text: t('documents'),
+        },
+        {
+          href: '/app/configure/settings',
+          Icon: IcoSettings16,
+          text: t('settings'),
         },
       ],
     },

@@ -35,6 +35,7 @@ const getPartnerPartnershipsDocumentsEvents = async (
         {
           headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
           method: 'GET',
+          cache: 'no-store',
         },
       )
     : Promise.reject(new TypeError('Missing auth token parameter'));

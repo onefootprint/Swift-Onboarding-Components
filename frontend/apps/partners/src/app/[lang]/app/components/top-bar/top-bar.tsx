@@ -4,7 +4,7 @@ import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { DEFAULT_PUBLIC_ROUTE } from '@/config/constants';
+import { DEFAULT_PRIVATE_ROUTE } from '@/config/constants';
 
 const TopBar = () => (
   <Box
@@ -16,7 +16,7 @@ const TopBar = () => (
     borderColor="primary"
     borderStyle="solid"
   >
-    <Link href={DEFAULT_PUBLIC_ROUTE} aria-label="Home">
+    <Link href={DEFAULT_PRIVATE_ROUTE} aria-label="Home">
       <Box
         tag="span"
         position="relative"

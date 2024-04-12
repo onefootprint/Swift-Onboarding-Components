@@ -38,7 +38,7 @@ import {
   postPartnerMembersDeactivate,
 } from '@/queries';
 
-import { InputTextForm, LogoManager, OverlayFieldSet } from '../components';
+import { InputTextForm, LogoManager, OverlayFieldSet } from '../../components';
 import OverlayInvite from './components/overlay-invite';
 
 type T = TFunction<'common'>;
@@ -213,9 +213,8 @@ const SettingsPageContent = ({
         onClose={() => setIsInviteOpen(false)}
         onSubmit={invitations => {
           Promise.all(invitations.map(i => postPartnerMembers(i)))
-            .then(() => {
-              setIsInviteOpen(false);
-            })
+            .then(() => setIsInviteOpen(false))
+            .then(route.refresh)
             .catch(err => {
               toast.show({
                 variant: 'error',

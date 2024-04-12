@@ -54,6 +54,23 @@ const isRejected = (x: string) => normalizeStr(x) === 'rejected';
 const isWaitingForReview = (x: string) =>
   normalizeStr(x) === 'waitingforreview';
 
+const getAssignedTo = ({
+  partnerTenantAssignee,
+  tenantAssignee,
+}: PartnerDocument): string => {
+  if (partnerTenantAssignee)
+    return join(
+      partnerTenantAssignee.firstName,
+      partnerTenantAssignee.lastName,
+    ).trim();
+
+  if (tenantAssignee) {
+    return join(tenantAssignee.firstName, tenantAssignee.lastName).trim();
+  }
+
+  return '--';
+};
+
 const getTableColumns = (t: T) => [
   { text: t('document'), width: '35%' },
   { text: t('status'), width: '20%' },
@@ -116,14 +133,7 @@ const renderTr = (
             {status.text}
           </Text>
         </td>
-        <td>
-          {item.partnerTenantAssignee
-            ? join(
-                item.partnerTenantAssignee.firstName,
-                item.partnerTenantAssignee.lastName,
-              )
-            : '--'}
-        </td>
+        <td>{getAssignedTo(item)}</td>
         <td>{dateFormatter(lang, item.lastUpdated)}</td>
         {isNotRequested(item.status) ? (
           <td aria-label="no actions" />
@@ -178,7 +188,8 @@ const renderTr = (
                     {t('modify-request')}
                   </Dropdown.Item>
                 )}
-                {isAccepted(item.status) ? null : (
+                {isAccepted(item.status) ||
+                isWaitingForReview(item.status) ? null : (
                   <Dropdown.Item
                     data-id={item.activeRequestId}
                     onClick={stopPropagation}
