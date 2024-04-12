@@ -32,7 +32,8 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
 
     # Before the user finishes onboarding to foo_sandbox_tenant, the tenant shouldn't be able to
     # make a token that inherits auth
-    body = post("entities/search", None, *foo_sandbox_tenant.db_auths)
+    data = dict(pagination=dict(page_size=100))
+    body = post("entities/search", data, *foo_sandbox_tenant.db_auths)
     user = next(i for i in body["data"] if i["sandbox_id"] == sandbox_id)
     assert user["status"] == "in_progress"
     foo_fp_id = user["id"]

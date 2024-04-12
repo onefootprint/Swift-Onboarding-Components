@@ -18,7 +18,8 @@ def incomplete_user(sandbox_tenant):
 
     phone_number = bifrost.decrypted_data["id.phone_number"]
     # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
-    body = post("entities/search", dict(search=phone_number), *sandbox_tenant.db_auths)
+    data = dict(search=phone_number, pagination=dict(page_size=100))
+    body = post("entities/search", data, *sandbox_tenant.db_auths)
     user = next(i for i in body["data"] if i["sandbox_id"] == bifrost.sandbox_id)
     return user["id"]
 

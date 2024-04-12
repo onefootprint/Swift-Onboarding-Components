@@ -21,12 +21,14 @@ def test_entity_created_after_signup_challenge(sandbox_tenant):
     )
 
     # Make sure entity is created after initiating signup challenge. Should be hidden
-    data = dict(pagination=dict(page_size=100))
+    pagination = dict(pagination=dict(page_size=100))
     body = post("entities/search", data, *sandbox_tenant.db_auths)
     assert not any(e["sandbox_id"] == sandbox_id for e in body["data"])
 
     # But we can find it with show_all
-    body = post("entities/search", dict(show_all=True), *sandbox_tenant.db_auths)
+    body = post(
+        "entities/search", dict(show_all=True, **pagination), *sandbox_tenant.db_auths
+    )
     entity = next(e for e in body["data"] if e["sandbox_id"] == sandbox_id)
     assert set(entity["decryptable_attributes"]) == {"id.email", "id.phone_number"}
     assert entity["status"] == "in_progress"

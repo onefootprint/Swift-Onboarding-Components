@@ -264,7 +264,8 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
         (sandbox_tenant, user.fp_id),
         (foo_sandbox_tenant, foo_user.fp_id),
     ]:
-        body = post("entities/search", dict(search=FIXTURE_PHONE_NUMBER), *t.db_auths)
+        data = dict(search=FIXTURE_PHONE_NUMBER, pagination=dict(page_size=100))
+        body = post("entities/search", data, *t.db_auths)
         assert any(i["id"] == fp_id for i in body["data"])
 
 
@@ -285,6 +286,7 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
         timestamp_lte=arrow.now().shift(hours=-1, minutes=-5).isoformat(),
         is_created_via_api=False,
         kind="person",
+        pagination=dict(page_size=100),
     )
     body = post("entities/search", filters, *sandbox_tenant.db_auths)
     assert all([not i["is_created_via_api"] for i in body["data"]])
