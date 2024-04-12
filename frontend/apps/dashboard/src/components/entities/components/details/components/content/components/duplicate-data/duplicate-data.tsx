@@ -1,24 +1,30 @@
 import { getErrorMessage } from '@onefootprint/request';
+import type { DuplicateDataItem } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useCurrentEntityDuplicateData from 'src/components/entities/components/details/hooks/use-current-entity-duplicate-data';
+import useSession from 'src/hooks/use-session';
 
 import Section from '../section';
-import type { DuplicateDataTableRowItem } from './components/row';
+import OtherTenantSummary from './components/other-tenant-summary';
 import Row from './components/row';
 
 const DuplicateData = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals.duplicate-data',
+    keyPrefix: 'pages.entity.duplicate-data',
   });
   const router = useRouter();
+  const {
+    data: { org },
+  } = useSession();
   const {
     data: duplicateData,
     isLoading,
     error,
   } = useCurrentEntityDuplicateData();
+  const isSameTenantDataEmpty = !duplicateData?.sameTenant?.length;
 
   const columns = [
     { text: t('table.header.name'), width: '16%' },
@@ -28,15 +34,8 @@ const DuplicateData = () => {
     { text: t('table.header.created-at'), width: '17%' },
   ];
 
-  const getFpId = (duplicateDataItem: DuplicateDataTableRowItem) => {
-    if ('sameTenant' in duplicateDataItem) {
-      return duplicateDataItem.sameTenant?.fpId;
-    }
-    return undefined;
-  };
-
-  const handleRowClick = (duplicateDataItem: DuplicateDataTableRowItem) => {
-    const fpId = getFpId(duplicateDataItem);
+  const handleRowClick = (duplicateDataItem: DuplicateDataItem) => {
+    const fpId = duplicateDataItem?.fpId;
     if (!fpId) return;
     const basePath = router.asPath.split('/')[1];
     window.open(`/${basePath}/${fpId}`, '_blank', 'noopener,noreferrer');
@@ -44,21 +43,28 @@ const DuplicateData = () => {
 
   return (
     <Section title={t('title')}>
-      <Table<DuplicateDataTableRowItem>
+      <Table<DuplicateDataItem>
         aria-label={t('table.aria-label')}
         columns={columns}
-        emptyStateText={error ? getErrorMessage(error) : t('table.empty-state')}
-        getKeyForRow={(duplicateDataItem: DuplicateDataTableRowItem) => {
-          if ('sameTenant' in duplicateDataItem) {
-            return duplicateDataItem.sameTenant?.fpId ?? 'same-tenant';
-          }
-          return 'other-tenants';
-        }}
+        emptyStateText={
+          error
+            ? getErrorMessage(error)
+            : t('table.empty-state', { orgName: org?.name ?? '' })
+        }
+        getKeyForRow={(duplicateDataItem: DuplicateDataItem) =>
+          duplicateDataItem.fpId
+        }
         isLoading={isLoading}
-        items={duplicateData}
+        items={duplicateData?.sameTenant}
         onRowClick={handleRowClick}
-        renderTr={({ item }) => <Row duplicateDataTableRowItem={item} />}
+        renderTr={({ item }) => <Row duplicateDataItem={item} />}
       />
+      {duplicateData?.otherTenant && (
+        <OtherTenantSummary
+          summary={duplicateData.otherTenant}
+          isSameTenantDataEmpty={isSameTenantDataEmpty}
+        />
+      )}
     </Section>
   );
 };

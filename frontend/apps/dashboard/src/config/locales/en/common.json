@@ -1681,31 +1681,31 @@
               "url": "Go to article"
             }
           }
-        },
-        "duplicate-data": {
-          "title": "Duplicate accounts",
-          "empty-state": "No duplicate accounts found",
-          "table": {
-            "aria-label": "Duplicate accounts",
-            "empty-state": "No duplicate accounts found",
-            "header": {
-              "fp-id": "Footprint ID",
-              "exact-match": "Exact match",
-              "status": "Onboarding status",
-              "created-at": "Created at",
-              "name": "Name"
-            }
-          },
-          "dupe-kinds": {
-            "ssn9": "SSN",
-            "email": "Email address",
-            "phone_number": "Phone number"
-          },
-          "empty-same-tenant": "No matches in {{orgName}}",
-          "other-tenants-summary": {
-            "description": "Plus <strong>{{numMatches}}</strong> more matches in <strong>{{numTenants}}</strong> other companies",
-            "description-empty-same-tenant": "<strong>{{numMatches}}</strong> matches in <strong>{{numTenants}}</strong> other companies"
+        }
+      },
+      "duplicate-data": {
+        "title": "Duplicate accounts",
+        "empty-state": "No duplicate accounts found",
+        "table": {
+          "aria-label": "Duplicate accounts",
+          "empty-state": "No matches in {{orgName}}",
+          "header": {
+            "fp-id": "Footprint ID",
+            "exact-match": "Exact match",
+            "status": "Onboarding status",
+            "created-at": "Created at",
+            "name": "Name"
           }
+        },
+        "dupe-kinds": {
+          "ssn9": "SSN",
+          "email": "Email address",
+          "phone-number": "Phone number"
+        },
+        "other-tenants-summary": {
+          "description": "Plus <strong>{{numMatches}}</strong> more matches in <strong>{{numTenants}}</strong> other companies",
+          "description-empty-same-tenant": "<strong>{{numMatches}}</strong> matches in <strong>{{numTenants}}</strong> other companies",
+          "tooltip": "For security reasons, we can't show the details of these users"
         }
       },
       "device-insights": {

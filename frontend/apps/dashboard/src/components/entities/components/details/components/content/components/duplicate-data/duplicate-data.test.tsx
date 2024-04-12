@@ -47,7 +47,7 @@ describe('<DuplicateData/>', () => {
     expect(screen.getByText('Created at')).toBeInTheDocument();
 
     // Renders correct number of rows
-    expect(screen.getAllByRole('row')).toHaveLength(4);
+    expect(screen.getAllByRole('row')).toHaveLength(3);
   });
 
   it('should render the same tenant data correctly when populated', async () => {
@@ -88,7 +88,7 @@ describe('<DuplicateData/>', () => {
     ).toBeInTheDocument();
   });
 
-  it('Should render the other tenant data correctly when populated', async () => {
+  it('Should render the other tenant data correctly when same tenant data populated', async () => {
     withDuplicateDataPopulated();
     renderDuplicateData();
 
@@ -97,12 +97,9 @@ describe('<DuplicateData/>', () => {
       expect(table.getAttribute('aria-busy')).toEqual('false');
     });
 
-    // Get third row
-    const thirdRow = screen.getAllByRole('row')[3];
-    expect(thirdRow).toBeInTheDocument();
-    expect(
-      within(thirdRow).getByTestId('other-tenant-summary'),
-    ).toHaveTextContent('Plus 20 more matches in 10 other companies');
+    expect(screen.getByTestId('other-tenant-summary')).toHaveTextContent(
+      'Plus 20 more matches in 10 other companies',
+    );
   });
 
   it('Should render correctly when same tenant data is empty', async () => {
@@ -119,12 +116,9 @@ describe('<DuplicateData/>', () => {
     expect(firstRow).toBeInTheDocument();
     expect(within(firstRow).getByText('No matches in')).toBeInTheDocument();
 
-    // Get second row
-    const secondRow = screen.getAllByRole('row')[2];
-    expect(secondRow).toBeInTheDocument();
-    expect(
-      within(secondRow).getByTestId('other-tenant-summary'),
-    ).toHaveTextContent('20 matches in 10 other companies');
+    expect(screen.getByTestId('other-tenant-summary')).toHaveTextContent(
+      '20 matches in 10 other companies',
+    );
   });
 
   it('Should render correctly when there is an error', async () => {
