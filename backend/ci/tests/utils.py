@@ -353,7 +353,7 @@ def _gen_random_sandbox_id():
 
 
 def _gen_random_ssn():
-    return _gen_random_n_digit_number(9)
+    return "{:03d}{:02d}{:04}".format(random.randint(1,500), random.randint(1, 99), random.randint(1, 9999))
 
 
 def _gen_random_str(length):

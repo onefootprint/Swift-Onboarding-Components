@@ -14,21 +14,22 @@ pub struct Ssn9(PiiString);
 
 impl Ssn9 {
     pub fn parse(value: PiiString) -> Result<Self, Error> {
-        if !SSN9_FORMAT.is_match(value.leak()) {
+        let value = value.leak();
+        if !SSN9_FORMAT.is_match(value) {
             Err(Error::InvalidSsn9(
                 "Must have format ###-##-####, with optional dashes".into(),
             ))
-        } else if SSN9_BAD_GROUP_1.is_match(value.leak()) {
+        } else if SSN9_BAD_GROUP_1.is_match(value) {
             Err(Error::InvalidSsn9(
                 "Leading three digit number must not be 000, 666, or a value between 900 and 999 (inclusive)"
                     .into(),
             ))
-        } else if SSN9_BAD_GROUP_2.is_match(value.leak()) {
+        } else if SSN9_BAD_GROUP_2.is_match(value) {
             Err(Error::InvalidSsn9("Middle two digits must not be 00".into()))
-        } else if SSN9_BAD_GROUP_3.is_match(value.leak()) {
+        } else if SSN9_BAD_GROUP_3.is_match(value) {
             Err(Error::InvalidSsn9("Last four digits must not be 0000".into()))
         } else {
-            let digits: String = value.leak().chars().filter(|c| c.is_ascii_digit()).collect();
+            let digits: String = value.chars().filter(|c| c.is_ascii_digit()).collect();
             if digits.len() != 9 {
                 Err(Error::InvalidSsn9("Must contain exactly 9 digits".into()))
             } else {
@@ -38,6 +39,29 @@ impl Ssn9 {
     }
 
     pub fn format_no_dashes(&self) -> PiiString {
+        self.0.clone()
+    }
+}
+
+
+pub struct Ssn4(PiiString);
+
+impl Ssn4 {
+    pub fn parse(value: PiiString) -> Result<Self, Error> {
+        let value = value.leak();
+        if value.len() != 4 {
+            return Err(Error::InvalidSsn4("Must contain exactly 4 digits".into()));
+        }
+        if value.chars().any(|c| !c.is_ascii_digit()) {
+            return Err(Error::InvalidSsn4("Must contain only ASCII digits".into()));
+        }
+        if value == "0000" {
+            return Err(Error::InvalidSsn4("Last 4 digits of SSN can not be 0000".into()));
+        }
+        Ok(Ssn4(value.into()))
+    }
+
+    pub fn format(&self) -> PiiString {
         self.0.clone()
     }
 }
@@ -90,6 +114,8 @@ mod tests {
             ("95045-6789", None),
             ("950-456789", None),
             ("950456789", None),
+            // Spaces invalid.
+            ("  123-45-6789  ", None),
         ] {
             let ssn = Ssn9::parse(s.into());
             if let Some(expect) = expect {
@@ -106,5 +132,17 @@ mod tests {
                 assert!(ssn.is_err());
             }
         }
+    }
+
+    #[test]
+    fn test_ssn4_parsing() {
+        assert_eq!(Ssn4::parse("1234".into()).unwrap().format().leak(), "1234");
+        assert_eq!(Ssn4::parse("7436".into()).unwrap().format().leak(), "7436");
+        assert!(Ssn4::parse("-1234".into()).is_err());
+        assert!(Ssn4::parse("1-234".into()).is_err());
+        assert!(Ssn4::parse("12a34".into()).is_err());
+        assert!(Ssn4::parse("abc".into()).is_err());
+        assert!(Ssn4::parse("0000".into()).is_err());
+        assert!(Ssn4::parse(" 1234 ".into()).is_err());
     }
 }

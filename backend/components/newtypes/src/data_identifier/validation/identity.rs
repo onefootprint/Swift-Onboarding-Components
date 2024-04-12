@@ -3,8 +3,10 @@ use super::{
     Error, VResult,
 };
 use crate::{
-    email::Email, AllData, DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, NtResult,
-    PhoneNumber, PiiJsonValue, PiiString, Validate, ValidateArgs, DATE_FORMAT,
+    email::Email,
+    ssn::{Ssn4, Ssn9},
+    AllData, DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, NtResult, PhoneNumber,
+    PiiJsonValue, PiiString, Validate, ValidateArgs, DATE_FORMAT,
 };
 use chrono::{Datelike, NaiveDate, Utc};
 use serde_with::DeserializeFromStr;
@@ -149,7 +151,12 @@ fn validate_address_line2(input: PiiString, for_bifrost: bool) -> VResult<PiiStr
     Ok(input)
 }
 
-fn clean_and_validate_ssn4(input: PiiString) -> VResult<PiiString> {
+fn new_clean_and_validate_ssn4(input: PiiString) -> NtResult<PiiString> {
+    let ssn4 = Ssn4::parse(input)?;
+    Ok(ssn4.format())
+}
+
+fn old_clean_and_validate_ssn4(input: PiiString) -> VResult<PiiString> {
     if input.leak().len() != 4 {
         return Err(Error::InvalidLength);
     }
@@ -159,7 +166,27 @@ fn clean_and_validate_ssn4(input: PiiString) -> VResult<PiiString> {
     Ok(input)
 }
 
-fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
+fn clean_and_validate_ssn4(input: PiiString) -> VResult<PiiString> {
+    let new_result = new_clean_and_validate_ssn4(input.clone());
+    let old_result = old_clean_and_validate_ssn4(input);
+
+    if new_result.is_ok() != old_result.is_ok() {
+        tracing::error!(
+            ?new_result,
+            ?old_result,
+            "Mismatching results for new and old SSN4 validation",
+        );
+    }
+
+    old_result
+}
+
+fn new_clean_and_validate_ssn9(input: PiiString) -> NtResult<PiiString> {
+    let ssn9 = Ssn9::parse(input)?;
+    Ok(ssn9.format_no_dashes())
+}
+
+fn old_clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
     // Allow providing hyphens in input. This is permissive for now
     let input = PiiString::new(input.leak().chars().filter(|p| p != &'-').collect());
     if input.leak().len() != 9 {
@@ -170,6 +197,22 @@ fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
     }
     Ok(input)
 }
+
+fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
+    let new_result = new_clean_and_validate_ssn9(input.clone());
+    let old_result = old_clean_and_validate_ssn9(input);
+
+    if new_result.is_ok() != old_result.is_ok() {
+        tracing::error!(
+            ?new_result,
+            ?old_result,
+            "Mismatching results for new and old SSN9 validation",
+        );
+    }
+
+    old_result
+}
+
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq)]
 #[strum(serialize_all = "snake_case")]

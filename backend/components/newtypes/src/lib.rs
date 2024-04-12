@@ -96,6 +96,8 @@ pub enum Error {
     InvalidEmailDomain,
     #[error("Invalid SSN9: {0}")]
     InvalidSsn9(String),
+    #[error("Invalid SSN4: {0}")]
+    InvalidSsn4(String),
     #[error("{0}")]
     PhoneNumber(#[from] fields::phone_number::Error),
     #[error("Invalid phone number country code: {0}")]
