@@ -54,7 +54,18 @@ impl FromRequest for PublicOnboardingContext {
             let key2 = key.clone();
             let (ob_config, tenant) = state
                 .db_pool
-                .db_query(move |conn| -> DbResult<_> { ObConfiguration::get_enabled(conn, &key) })
+                .db_query(move |conn| -> DbResult<_> {
+                    let (obc, tenant) = ObConfiguration::get_enabled(conn, &key)?;
+                    // Temporary - see https://onefootprint.slack.com/archives/C05U1CAD6FQ/p1712959331008489
+                    let new_coba_key =
+                        newtypes::ObConfigurationKey::from("pb_live_u5tHhUCO1sqvEELugkpb2t".to_string());
+                    let old_coba_key =
+                        newtypes::ObConfigurationKey::from("ob_live_I5Au8tfp9Amzmuvr1lcNsq".to_string());
+                    if obc.key == new_coba_key {
+                        return ObConfiguration::get_enabled(conn, &old_coba_key);
+                    }
+                    Ok((obc, tenant))
+                })
                 .await
                 .map_err(|e| -> Self::Error {
                     if e.is_not_found() {
