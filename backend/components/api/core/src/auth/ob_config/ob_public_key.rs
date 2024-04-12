@@ -8,7 +8,7 @@ use db::{
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 
-use crate::{auth::AuthError, State};
+use crate::{auth::AuthError, errors::AssertionError, telemetry::RootSpan, State};
 
 /// Extracts a publishable key from the X-Onboarding-Config-Key header
 /// which indicates the tenant and onboarding configuration context
@@ -32,7 +32,7 @@ impl FromRequest for PublicOnboardingContext {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+    fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
         // get the tenant header
         let config_key = req
             .headers()
@@ -43,7 +43,13 @@ impl FromRequest for PublicOnboardingContext {
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
+        let root_span = RootSpan::from_request(req, payload);
+
         Box::pin(async move {
+            let root_span = root_span
+                .await
+                .map_err(|_| AssertionError("Cannot extract root span"))?;
+
             let key = newtypes::ObConfigurationKey::from(config_key?);
             let key2 = key.clone();
             let (ob_config, tenant) = state
@@ -64,6 +70,9 @@ impl FromRequest for PublicOnboardingContext {
                 })?;
 
             tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "pk_ob_session authenticated");
+            root_span.record("tenant_id", &tenant.id.to_string());
+            root_span.record("is_live", ob_config.is_live);
+            root_span.record("auth_method", "ob_pk");
 
             Ok(PublicOnboardingContext {
                 tenant,

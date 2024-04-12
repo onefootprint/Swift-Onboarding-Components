@@ -1,7 +1,7 @@
 use super::{AllowSessionUpdate, ExtractableAuthSession, GetSessionForUpdate};
 use crate::{
     auth::{tenant::InvalidateAuth, AuthError},
-    errors::{ApiError, ApiResult},
+    errors::{ApiError, ApiResult, AssertionError},
     utils::session::AuthSession,
     State,
 };
@@ -113,8 +113,9 @@ where
         req: RequestInfo,
     ) -> Pin<Box<dyn Future<Output = ApiResult<Self>>>> {
         Box::pin(async move {
-            #[allow(clippy::unwrap_used)]
-            let root_span = root_span.await.unwrap();
+            let root_span = root_span
+                .await
+                .map_err(|_| AssertionError("Cannot extract root span"))?;
 
             let allowed_headers = T::header_names().join(", "); // Temporary
             let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()))?;

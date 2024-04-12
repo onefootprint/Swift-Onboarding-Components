@@ -1,7 +1,7 @@
 use super::{AuthActor, CanCheckTenantGuard};
 use crate::{
     auth::{tenant::TenantAuth, AuthError},
-    errors::ApiError,
+    errors::{ApiError, AssertionError},
     State,
 };
 use actix_web::{http::header::Header, web, FromRequest};
@@ -48,8 +48,9 @@ impl FromRequest for SecretTenantAuthContext {
         let root_span = RootSpan::from_request(req, payload);
 
         Box::pin(async move {
-            #[allow(clippy::unwrap_used)]
-            let root_span = root_span.await.unwrap();
+            let root_span = root_span
+                .await
+                .map_err(|_| AssertionError("Cannot extract root span"))?;
 
             let sk = tenant_sk_input?;
             let sh_api_key = sk.fingerprint(state.as_ref()).await?;
