@@ -437,3 +437,22 @@ def test_user_having_trouble_with_their_mobile_camera(sandbox_tenant, doc_reques
     rsr = get(f"entities/{user.fp_id}/rule_set_result", None, *sandbox_tenant.db_auths)
     doc_capture_failed_rule_results = [r for r in rsr['rule_results'] if r['rule']['rule_expression'][0]['field'] == 'document_live_capture_failed']
     assert doc_capture_failed_rule_results[0]['result']
+
+
+def test_no_documents_set_on_obc(sandbox_tenant, must_collect_data, can_access_data): 
+    obc = create_ob_config(
+        sandbox_tenant,
+        "International config",
+        must_collect_data + ["document_and_selfie"],
+        can_access_data + ["document_and_selfie"],
+        # thing under test, empty
+        document_types_and_countries = {'global': [], 'country_specific': {}}
+    )
+    bifrost = BifrostClient.new(obc)
+    status = bifrost.get_status()
+    doc_requirement = get_requirement_from_requirements(
+        "collect_document", status["all_requirements"]
+    )
+    assert len(doc_requirement["supported_country_and_doc_types"].keys()) > 0
+    assert len(doc_requirement["supported_country_and_doc_types"]["US"]) > 0
+

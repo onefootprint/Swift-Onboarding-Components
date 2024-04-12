@@ -296,7 +296,7 @@ def create_ob_config(
     override_auths=None,
     skip_confirm=None,
     enhanced_aml=None,
-    document_types_and_countries=None,
+    document_types_and_countries=None, # TODO: argoff fix this, not what the FE uses as the default
 ):
     ob_conf_data = {
         "name": name,

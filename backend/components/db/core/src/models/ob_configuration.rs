@@ -94,7 +94,10 @@ impl ObConfiguration {
 
         // Now check if it's on the OBC itself
         if let Some(ref mapping) = self.document_types_and_countries {
-            return mapping.into_country_mapping_for_bifrost();
+            let out = mapping.into_country_mapping_for_bifrost();
+            if !out.is_empty() {
+                return out;
+            }
         }
 
         // Otherwise old logic
