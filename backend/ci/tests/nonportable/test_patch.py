@@ -5,12 +5,12 @@ from tests.utils import post, patch, get
 
 def test_ssn_vaulting(tenant):
     # We have some special logic that no-ops when updating ssn4
-    data = {"id.ssn9": "123-456789"}
+    data = {"id.ssn9": "12-345-6789"}
     body = post("users/", data, tenant.sk.key)
     fp_id = body["id"]
 
     # Shouldn't be able to add mismatching ssn4
-    data = {"id.ssn4": "0000"}
+    data = {"id.ssn4": "1233"}
     body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
     assert (
         body["error"]["message"]["id.ssn4"]

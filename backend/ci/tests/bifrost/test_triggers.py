@@ -113,7 +113,7 @@ def test_redo_kyc(sandbox_tenant, with_document, doc_first_obc):
             assert requirements[0]["is_met"]
 
         # Edit some data and finish the onboarding
-        data = {"id.ssn9": "999-99-9999"}
+        data = {"id.ssn9": "888-88-8888"}
         patch("/hosted/user/vault", data, bifrost.auth_token)
 
     bifrost = complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)
@@ -163,7 +163,7 @@ def test_redo_kyc_non_portable(sandbox_tenant, must_collect_data):
         assert requirements[0]["is_met"]
 
         # Edit some data and finish the onboarding
-        data = {"id.ssn9": "999-99-9999"}
+        data = {"id.ssn9": "888-88-8888"}
         patch("/hosted/user/vault", data, bifrost.auth_token)
 
     complete_redo_flow(initial_auth_token, fp_id, obc, sandbox_id, pre_run)
