@@ -5,37 +5,33 @@ const entityVaultWithJustIDCardDIs: EntityVault = {
   [`${DocumentDI.latestIdCardFront}:567`]: 'test ID URL',
   [`${DocumentDI.latestIdCardBack}:568`]: 'test ID URL',
   [`${DocumentDI.latestIdCardSelfie}:569`]: 'test ID URL',
-  [`${DocumentDI.idCardFullName}:1243`]: 'test ID full name',
-  [`${DocumentDI.idCardDOB}:1243`]: 'test ID DOB',
-  [`${DocumentDI.idCardGender}:1243`]: 'test id card gender',
-  [`${DocumentDI.idCardFullAddress}:1243`]: 'test id card full address',
-  [`${DocumentDI.idCardDocumentNumber}:1243`]: 'test id card document number',
-  [`${DocumentDI.idCardIssuedAt}:1243`]: 'test id card issued at',
-  [`${DocumentDI.idCardExpiresAt}:1243`]: 'test id card expires at',
-  [`${DocumentDI.idCardIssuingState}:1243`]: 'test id card issuing state',
-  [`${DocumentDI.idCardIssuingCountry}:1243`]: 'test id card issuing country',
-  [`${DocumentDI.idCardRefNumber}:1243`]: 'test id card ref number',
+  [`${DocumentDI.idCardFullName}`]: 'test ID full name',
+  [`${DocumentDI.idCardDOB}`]: 'test ID DOB',
+  [`${DocumentDI.idCardGender}`]: 'test id card gender',
+  [`${DocumentDI.idCardFullAddress}`]: 'test id card full address',
+  [`${DocumentDI.idCardDocumentNumber}`]: 'test id card document number',
+  [`${DocumentDI.idCardIssuedAt}`]: 'test id card issued at',
+  [`${DocumentDI.idCardExpiresAt}`]: 'test id card expires at',
+  [`${DocumentDI.idCardIssuingState}`]: 'test id card issuing state',
+  [`${DocumentDI.idCardIssuingCountry}`]: 'test id card issuing country',
+  [`${DocumentDI.idCardRefNumber}`]: 'test id card ref number',
 };
 
 export const driversLicenseExtractedDIs: EntityVault = {
-  [`${DocumentDI.driversLicenseFullName}:345`]:
-    'test drivers license full name',
-  [`${DocumentDI.driversLicenseDOB}:345`]: 'test drivers license DOB',
-  [`${DocumentDI.driversLicenseGender}:345`]: 'test drivers license gender',
-  [`${DocumentDI.driversLicenseFullAddress}:345`]:
+  [`${DocumentDI.driversLicenseFullName}`]: 'test drivers license full name',
+  [`${DocumentDI.driversLicenseDOB}`]: 'test drivers license DOB',
+  [`${DocumentDI.driversLicenseGender}`]: 'test drivers license gender',
+  [`${DocumentDI.driversLicenseFullAddress}`]:
     'test drivers license full address',
-  [`${DocumentDI.driversLicenseDocumentNumber}:345`]:
+  [`${DocumentDI.driversLicenseDocumentNumber}`]:
     'test drivers license document number',
-  [`${DocumentDI.driversLicenseIssuedAt}:345`]:
-    'test drivers license issued at',
-  [`${DocumentDI.driversLicenseExpiresAt}:345`]:
-    'test drivers license expires at',
-  [`${DocumentDI.driversLicenseIssuingState}:345`]:
+  [`${DocumentDI.driversLicenseIssuedAt}`]: 'test drivers license issued at',
+  [`${DocumentDI.driversLicenseExpiresAt}`]: 'test drivers license expires at',
+  [`${DocumentDI.driversLicenseIssuingState}`]:
     'test drivers license issuing state',
-  [`${DocumentDI.driversLicenseIssuingCountry}:345`]:
+  [`${DocumentDI.driversLicenseIssuingCountry}`]:
     'test drivers license issuing country',
-  [`${DocumentDI.driversLicenseRefNumber}:345`]:
-    'test drivers license ref number',
+  [`${DocumentDI.driversLicenseRefNumber}`]: 'test drivers license ref number',
 };
 
 export const entityVaultWithJustDriverseLicenseDIs: EntityVault = {
@@ -49,50 +45,16 @@ export const entityVaultWithJustDriverseLicenseDIs: EntityVault = {
 const entityVaultWithJustPassportDIs: EntityVault = {
   [`${DocumentDI.latestPassport}:787`]: 'test passport',
   [`${DocumentDI.latestPassportSelfie}:788`]: 'test passport selfie',
-  [`${DocumentDI.passportFullName}:1738`]: 'test passport full name',
-  [`${DocumentDI.passportDOB}:1738`]: 'test passport DOB',
-  [`${DocumentDI.passportGender}:1738`]: 'test passport gender',
-  [`${DocumentDI.passportFullAddress}:1738`]: 'test passport full address',
-  [`${DocumentDI.passportDocumentNumber}:1738`]:
-    'test passport document number',
-  [`${DocumentDI.passportIssuedAt}:1738`]: 'test passport issued at',
-  [`${DocumentDI.passportExpiresAt}:1738`]: 'test passport expires at',
-  [`${DocumentDI.passportIssuingState}:1738`]: 'test passport issuing state',
-  [`${DocumentDI.passportIssuingCountry}:1738`]:
-    'test passport issuing country',
-  [`${DocumentDI.passportRefNumber}:1738`]: 'test passport ref number',
-};
-
-export const entityVaultWithMultipleVersionsOfPassportDIs: EntityVault = {
-  [`${DocumentDI.latestPassport}:787`]: 'test passport',
-  [`${DocumentDI.latestPassportSelfie}:788`]: 'test passport selfie',
-  [`${DocumentDI.passportFullName}:1738`]: 'test passport full name',
-  [`${DocumentDI.passportDOB}:1738`]: 'test passport DOB',
-  [`${DocumentDI.passportGender}:1738`]: 'test passport gender',
-  [`${DocumentDI.passportFullAddress}:1738`]: 'test passport full address',
-  [`${DocumentDI.passportDocumentNumber}:1738`]:
-    'test passport document number',
-  [`${DocumentDI.passportIssuedAt}:1738`]: 'test passport issued at',
-  [`${DocumentDI.passportExpiresAt}:1738`]: 'test passport expires at',
-  [`${DocumentDI.passportIssuingState}:1738`]: 'test passport issuing state',
-  [`${DocumentDI.passportIssuingCountry}:1738`]:
-    'test passport issuing country',
-  [`${DocumentDI.passportRefNumber}:1738`]: 'test passport ref number',
-  [`${DocumentDI.latestPassport}:679`]: 'test passport',
-  [`${DocumentDI.latestPassportSelfie}:680`]: 'test passport selfie',
-  [`${DocumentDI.passportFullName}:681`]: 'test passport full name',
-  [`${DocumentDI.passportFullName}:2048`]: 'test passport DOB',
-  [`${DocumentDI.passportDOB}:2048`]: 'test passport DOB',
-  [`${DocumentDI.passportGender}:2048`]: 'test passport gender',
-  [`${DocumentDI.passportFullAddress}:2048`]: 'test passport full address',
-  [`${DocumentDI.passportDocumentNumber}:2048`]:
-    'test passport document number',
-  [`${DocumentDI.passportIssuedAt}:2048`]: 'test passport issued at',
-  [`${DocumentDI.passportExpiresAt}:2048`]: 'test passport expires at',
-  [`${DocumentDI.passportIssuingState}:2048`]: 'test passport issuing state',
-  [`${DocumentDI.passportIssuingCountry}:2048`]:
-    'test passport issuing country',
-  [`${DocumentDI.passportRefNumber}:2048`]: 'test passport ref number',
+  [`${DocumentDI.passportFullName}`]: 'test passport full name',
+  [`${DocumentDI.passportDOB}`]: 'test passport DOB',
+  [`${DocumentDI.passportGender}`]: 'test passport gender',
+  [`${DocumentDI.passportFullAddress}`]: 'test passport full address',
+  [`${DocumentDI.passportDocumentNumber}`]: 'test passport document number',
+  [`${DocumentDI.passportIssuedAt}`]: 'test passport issued at',
+  [`${DocumentDI.passportExpiresAt}`]: 'test passport expires at',
+  [`${DocumentDI.passportIssuingState}`]: 'test passport issuing state',
+  [`${DocumentDI.passportIssuingCountry}`]: 'test passport issuing country',
+  [`${DocumentDI.passportRefNumber}`]: 'test passport ref number',
 };
 
 export const entityVaultWithAllDocumentDIs: EntityVault = {

@@ -70,6 +70,7 @@ export enum DocumentDI {
   passportRefNumber = 'document.passport.ref_number',
   passportNationality = 'document.passport.nationality',
   passportClassifiedDocumentType = 'document.passport.classifed_document_type',
+  passportCurpValidationResponse = 'document.passport.curp_validation_response',
 
   latestDriversLicenseFront = 'document.drivers_license.front.latest_upload',
   latestDriversLicenseBack = 'document.drivers_license.back.latest_upload',
@@ -86,6 +87,7 @@ export enum DocumentDI {
   driversLicenseRefNumber = 'document.drivers_license.ref_number',
   driversLicenseNationality = 'document.drivers_license.nationality',
   driversLicenseClassifiedDocumentType = 'document.drivers_license.classifed_document_type',
+  driversLicenseCurpValidationResponse = 'document.drivers_license.curp_validation_response',
 
   latestIdCardFront = 'document.id_card.front.latest_upload',
   latestIdCardBack = 'document.id_card.back.latest_upload',
@@ -102,6 +104,7 @@ export enum DocumentDI {
   idCardRefNumber = 'document.id_card.ref_number',
   idCardNationality = 'document.id_card.nationality',
   idCardClassifiedDocumentType = 'document.id_card.classifed_document_type',
+  idCardCurpValidationResponse = 'document.id_card.curp_validation_response',
 
   latestVisa = 'document.visa.front.latest_upload',
   latestVisaSelfie = 'document.visa.selfie.latest_upload',
@@ -117,6 +120,7 @@ export enum DocumentDI {
   visaRefNumber = 'document.visa.ref_number',
   visaNationality = 'document.visa.nationality',
   visaClassifiedDocumentType = 'document.visa.classifed_document_type',
+  visaCurpValidationResponse = 'document.visa.curp_validation_response',
 
   latestResidenceDocumentFront = 'document.residence_document.front.latest_upload',
   latestResidenceDocumentBack = 'document.residence_document.back.latest_upload',
@@ -133,6 +137,7 @@ export enum DocumentDI {
   residenceDocumentRefNumber = 'document.residence_document.ref_number',
   residenceDocumentNationality = 'document.residence_document.nationality',
   residenceDocumentClassifiedDocumentType = 'document.residence_document.classifed_document_type',
+  residenceDocumentCurpValidationResponse = 'document.residence_document.curp_validation_response',
 
   latestWorkPermitFront = 'document.permit.front.latest_upload',
   latestWorkPermitBack = 'document.permit.back.latest_upload',
@@ -149,6 +154,7 @@ export enum DocumentDI {
   workPermitRefNumber = 'document.permit.ref_number',
   workPermitNationality = 'document.permit.nationality',
   workPermitClassifiedDocumentType = 'document.permit.classifed_document_type',
+  workPermitCurpValidationResponse = 'document.permit.curp_validation_response',
 
   latestVoterIdentificationFront = 'document.voter_identification.front.latest_upload',
   latestVoterIdentificationBack = 'document.voter_identification.back.latest_upload',
@@ -165,6 +171,7 @@ export enum DocumentDI {
   voterIdentificationRefNumber = 'document.voter_identification.ref_number',
   voterIdentificationNationality = 'document.voter_identification.nationality',
   voterIdentificationClassifiedDocumentType = 'document.voter_identification.classifed_document_type',
+  voterIdentificationCurpValidationResponse = 'document.voter_identification.curp_validation_response',
 
   latestPassportCardFront = 'document.passport_card.front.latest_upload',
   latestPassportCardBack = 'document.passport_card.back.latest_upload',
@@ -181,6 +188,7 @@ export enum DocumentDI {
   passportCardRefNumber = 'document.passport_card.ref_number',
   passportCardNationality = 'document.passport_card.nationality',
   passportCardClassifiedDocumentType = 'document.passport_card.classifed_document_type',
+  passportCardCurpValidationResponse = 'document.passport_card.curp_validation_response',
 
   latestSsnCardFront = 'document.ssn_card.front.image',
   latestLeaseFront = 'document.lease.front.image',

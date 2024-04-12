@@ -15,6 +15,7 @@ import { getDocumentStatus, getDocumentVersion } from '../../utils';
 import DocumentStatusBadge from '../document-status-badge';
 import ConfidenceScores from './components/confidence-scores';
 import ExtractedDocumentData from './components/extracted-document-data';
+import RawJsonData from './components/raw-json-data';
 import SessionSelect from './components/session-select';
 import Uploads from './components/uploads';
 
@@ -87,12 +88,9 @@ const DocumentField = ({
       >
         <DrawerItems>
           {currentDocument && <ConfidenceScores document={currentDocument} />}
-          <ExtractedDocumentData
-            vault={vault}
-            documentType={documentType}
-            activeDocumentVersion={activeDocumentVersion}
-          />
+          <ExtractedDocumentData vault={vault} documentType={documentType} />
           <Uploads currentDocument={currentDocument} vault={vault} />
+          <RawJsonData vault={vault} documentType={documentType} />
         </DrawerItems>
       </Drawer>
     </Container>

@@ -14,6 +14,7 @@ export type CodeBlockProps = {
   tooltipText?: string;
   tooltipTextConfirmation?: string;
   ariaLabel?: string;
+  disableCopy?: boolean;
 };
 
 const CodeBlock = ({
@@ -23,6 +24,7 @@ const CodeBlock = ({
   tooltipText,
   tooltipTextConfirmation,
   ariaLabel,
+  disableCopy,
 }: CodeBlockProps) => {
   const theme = useTheme();
   const { t } = useTranslation('ui');
@@ -30,17 +32,21 @@ const CodeBlock = ({
     <Container>
       <Header>
         <Text variant="label-3">{title || language}</Text>
-        <CopyButton
-          contentToCopy={children}
-          tooltipText={
-            tooltipText ?? t('components.code-block.tooltip-text-default')
-          }
-          tooltipTextConfirmation={
-            tooltipTextConfirmation ??
-            t('components.code-inline.tooltip-text-confirmation-default')
-          }
-          ariaLabel={ariaLabel ?? t('components.code-block.aria-label-default')}
-        />
+        {!disableCopy && (
+          <CopyButton
+            contentToCopy={children}
+            tooltipText={
+              tooltipText ?? t('components.code-block.tooltip-text-default')
+            }
+            tooltipTextConfirmation={
+              tooltipTextConfirmation ??
+              t('components.code-inline.tooltip-text-confirmation-default')
+            }
+            ariaLabel={
+              ariaLabel ?? t('components.code-block.aria-label-default')
+            }
+          />
+        )}
       </Header>
       <Content>
         <SyntaxHighlighter language={language} style={theme.codeHighlight}>

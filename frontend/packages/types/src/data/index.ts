@@ -67,7 +67,7 @@ export {
   InvestorProfileDI,
 } from './di';
 export type { Document, DocumentUpload } from './document-type';
-export { UploadSource } from './document-type';
+export { RawJsonKinds, UploadSource } from './document-type';
 export type {
   DuplicateDataItem,
   OtherTenantsDuplicateDataSummary,

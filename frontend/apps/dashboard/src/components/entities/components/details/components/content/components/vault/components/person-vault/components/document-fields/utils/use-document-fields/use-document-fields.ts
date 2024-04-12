@@ -24,6 +24,7 @@ const useDocumentFields = () => {
         DocumentDI.idCardRefNumber,
         DocumentDI.idCardNationality,
         DocumentDI.idCardClassifiedDocumentType,
+        DocumentDI.idCardCurpValidationResponse,
       ],
     },
     {
@@ -45,6 +46,7 @@ const useDocumentFields = () => {
         DocumentDI.driversLicenseRefNumber,
         DocumentDI.driversLicenseNationality,
         DocumentDI.driversLicenseClassifiedDocumentType,
+        DocumentDI.driversLicenseCurpValidationResponse,
       ],
     },
     {
@@ -65,6 +67,7 @@ const useDocumentFields = () => {
         DocumentDI.passportRefNumber,
         DocumentDI.passportNationality,
         DocumentDI.passportClassifiedDocumentType,
+        DocumentDI.passportCurpValidationResponse,
       ],
     },
     {
@@ -85,6 +88,7 @@ const useDocumentFields = () => {
         DocumentDI.visaRefNumber,
         DocumentDI.visaNationality,
         DocumentDI.visaClassifiedDocumentType,
+        DocumentDI.visaCurpValidationResponse,
       ],
     },
     {
@@ -106,6 +110,7 @@ const useDocumentFields = () => {
         DocumentDI.residenceDocumentRefNumber,
         DocumentDI.residenceDocumentNationality,
         DocumentDI.residenceDocumentClassifiedDocumentType,
+        DocumentDI.residenceDocumentCurpValidationResponse,
       ],
     },
     {
@@ -127,6 +132,7 @@ const useDocumentFields = () => {
         DocumentDI.workPermitRefNumber,
         DocumentDI.workPermitNationality,
         DocumentDI.workPermitClassifiedDocumentType,
+        DocumentDI.workPermitCurpValidationResponse,
       ],
     },
     {
@@ -148,6 +154,7 @@ const useDocumentFields = () => {
         DocumentDI.voterIdentificationRefNumber,
         DocumentDI.voterIdentificationNationality,
         DocumentDI.voterIdentificationClassifiedDocumentType,
+        DocumentDI.voterIdentificationCurpValidationResponse,
       ],
     },
     {
@@ -169,6 +176,7 @@ const useDocumentFields = () => {
         DocumentDI.passportCardRefNumber,
         DocumentDI.passportCardNationality,
         DocumentDI.passportCardClassifiedDocumentType,
+        DocumentDI.passportCardCurpValidationResponse,
       ],
     },
     {

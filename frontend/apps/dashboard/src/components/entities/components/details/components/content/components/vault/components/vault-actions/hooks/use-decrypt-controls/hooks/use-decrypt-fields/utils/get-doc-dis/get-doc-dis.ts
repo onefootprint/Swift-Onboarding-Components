@@ -39,6 +39,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.idCardRefNumber,
     DocumentDI.idCardNationality,
     DocumentDI.idCardClassifiedDocumentType,
+    DocumentDI.idCardCurpValidationResponse,
   ],
   [SupportedIdDocTypes.driversLicense]: [
     DocumentDI.driversLicenseFullName,
@@ -53,6 +54,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.driversLicenseRefNumber,
     DocumentDI.driversLicenseNationality,
     DocumentDI.driversLicenseClassifiedDocumentType,
+    DocumentDI.driversLicenseCurpValidationResponse,
   ],
   [SupportedIdDocTypes.passport]: [
     DocumentDI.passportFullName,
@@ -67,6 +69,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.passportRefNumber,
     DocumentDI.passportNationality,
     DocumentDI.passportClassifiedDocumentType,
+    DocumentDI.passportCurpValidationResponse,
   ],
   [SupportedIdDocTypes.visa]: [
     DocumentDI.visaFullName,
@@ -81,6 +84,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.visaRefNumber,
     DocumentDI.visaNationality,
     DocumentDI.visaClassifiedDocumentType,
+    DocumentDI.visaCurpValidationResponse,
   ],
   [SupportedIdDocTypes.workPermit]: [
     DocumentDI.workPermitFullName,
@@ -95,6 +99,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.workPermitRefNumber,
     DocumentDI.workPermitNationality,
     DocumentDI.workPermitClassifiedDocumentType,
+    DocumentDI.workPermitCurpValidationResponse,
   ],
   [SupportedIdDocTypes.residenceDocument]: [
     DocumentDI.residenceDocumentFullName,
@@ -109,6 +114,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.residenceDocumentRefNumber,
     DocumentDI.residenceDocumentNationality,
     DocumentDI.residenceDocumentClassifiedDocumentType,
+    DocumentDI.residenceDocumentCurpValidationResponse,
   ],
   [SupportedIdDocTypes.voterIdentification]: [
     DocumentDI.voterIdentificationFullName,
@@ -123,6 +129,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.voterIdentificationRefNumber,
     DocumentDI.voterIdentificationNationality,
     DocumentDI.voterIdentificationClassifiedDocumentType,
+    DocumentDI.voterIdentificationCurpValidationResponse,
   ],
   [SupportedIdDocTypes.passportCard]: [
     DocumentDI.passportCardFullName,
@@ -137,6 +144,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.passportCardRefNumber,
     DocumentDI.passportCardNationality,
     DocumentDI.passportCardClassifiedDocumentType,
+    DocumentDI.passportCardCurpValidationResponse,
   ],
 };
 
@@ -161,7 +169,7 @@ const getDocDis = ({ dis, documents, vaultData }: GetDocDIsProps) => {
             !isVaultDataEmpty(vaultData[di]) &&
             completedVersion
           ) {
-            dis.push(`${di}:${completedVersion}`);
+            dis.push(di);
           }
         });
         // get the specific upload images for each document

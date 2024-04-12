@@ -978,7 +978,8 @@
                 "issuing_country": "Issuing country",
                 "issuing_state": "Issuing state",
                 "ref_number": "Ref number",
-                "document_type": "Classified document type"
+                "document_type": "Classified document type",
+                "nationality": "Nationality"
               }
             },
             "confidence-scores": {
@@ -1051,6 +1052,11 @@
                 "unknown_error": "An error occurred.",
                 "face_not_found": "We could not detect a face in the document provided."
               }
+            },
+            "raw-json-data": {
+              "title": "Raw JSON data",
+              "curp-validation-response": "CURP validation response",
+              "json": "JSON"
             }
           }
         },

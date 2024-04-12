@@ -55,6 +55,7 @@ const Template: Story<CodeBlockProps> = ({
   title,
   tooltipText,
   tooltipTextConfirmation,
+  disableCopy,
 }: CodeBlockProps) => (
   <CodeBlock
     ariaLabel={ariaLabel}
@@ -62,6 +63,7 @@ const Template: Story<CodeBlockProps> = ({
     title={title}
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
+    disableCopy={disableCopy}
   >
     {children}
   </CodeBlock>
@@ -81,4 +83,21 @@ Base.args = {
   language: 'javascript',
   tooltipText: 'Copy to clipboard',
   tooltipTextConfirmation: 'Copied!',
+};
+
+export const WithoutCopy = Template.bind({});
+WithoutCopy.args = {
+  title: 'Example',
+  ariaLabel: 'Copy',
+  children: `
+  function doSomething(){
+    x = 33;
+    console.log(x);
+    var x;
+  } 
+  `,
+  language: 'javascript',
+  tooltipText: 'Copy to clipboard',
+  tooltipTextConfirmation: 'Copied!',
+  disableCopy: true,
 };

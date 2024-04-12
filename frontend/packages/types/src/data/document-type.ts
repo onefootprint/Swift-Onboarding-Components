@@ -29,3 +29,7 @@ export type Document = {
   ocrConfidenceScore: number | null;
   uploadSource: UploadSource;
 };
+
+export enum RawJsonKinds {
+  CurpValidationResponse = 'curp_validation_response',
+}
