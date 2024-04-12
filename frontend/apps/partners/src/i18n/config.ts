@@ -1,8 +1,8 @@
-export type Langs = 'en' | 'es';
+export type Langs = 'en';
 export type Namespaces = 'common';
 
 export const LangFallback = 'en';
-export const LangsSupported = [LangFallback, 'es'];
+export const LangsSupported = [LangFallback];
 
 export const i18nConfig = {
   locales: LangsSupported,

@@ -1,2 +1,2 @@
-export type Lang = 'en' | 'es';
-export type LangProp = { lang: 'en' | 'es' | undefined };
+export type Lang = 'en';
+export type LangProp = { lang: 'en' | undefined };
