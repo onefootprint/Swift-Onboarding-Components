@@ -41,9 +41,9 @@ const DataCollection = ({
       'business_kyced_beneficial_owners' ||
       'business_tin',
   );
-  const showIdDocScan =
-    mustCollectData.includes('document') ||
-    mustCollectData.includes('document_and_selfie');
+  const showIdDocScan = mustCollectData.some(
+    scope => scope.includes('document'), // to make it backwards compatible; new playbooks will have 'document' or "document_and_selfie"
+  );
   const idDocKind = documentTypesAndCountries?.global;
   const countrySpecificIdDocKind = documentTypesAndCountries?.countrySpecific;
 
