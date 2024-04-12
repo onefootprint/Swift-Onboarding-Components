@@ -25,7 +25,7 @@ def test_standalone_vaults(tenant):
         "id.first_name": "Jane",
         "id.last_name": "Joe",
         "id.dob": "1988-12-30",
-        "id.ssn9": "12-121-1212",
+        "id.ssn9": "121-21-1212",
         "custom.cc4": "4242",
     }
     body = post("/users", data, tenant.sk.key)
