@@ -1,6 +1,6 @@
 'use client';
 
-import { IcoDotsHorizontal24 } from '@onefootprint/icons';
+import { IcoChevronDown16, IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { TableRow } from '@onefootprint/ui';
 import {
   Badge,
@@ -28,12 +28,14 @@ import {
   confirmDeletion,
   dateFormatter,
   getErrorMessage,
-  getOr,
   searchByPaths,
 } from '@/helpers';
+import type { Session } from '@/hooks';
+import { useClientStore } from '@/hooks';
 import type { OrganizationMember, PartnerOrganization } from '@/queries';
 import {
   patchPartner,
+  patchPartnerMembers,
   postPartnerMembers,
   postPartnerMembersDeactivate,
 } from '@/queries';
@@ -42,15 +44,15 @@ import { InputTextForm, LogoManager, OverlayFieldSet } from '../../components';
 import OverlayInvite from './components/overlay-invite';
 
 type T = TFunction<'common'>;
+type Option = { label: string; value: string };
 type SettingsPageContentProps = {
   lang: Lang;
   members: OrganizationMember[];
   partner: PartnerOrganization;
-  roles: { label: string; value: string }[];
+  roles: Option[];
 };
 
 const stopPropagation = (e: SyntheticEvent<unknown>) => e.stopPropagation();
-const getDataId = getOr<undefined | string>(undefined, 'target.dataset.id');
 const getColumns = (t: T) => [
   { id: 'email', text: t('email'), width: '25%' },
   { id: 'lastActive', text: t('last-active'), width: '20%' },
@@ -66,6 +68,9 @@ const clientSearch = searchByPaths<OrganizationMember>([
   'role.name',
 ]);
 
+const amIAdmin = (data?: Session): boolean =>
+  data?.user?.scopes.some(x => x.kind === 'compliance_partner_admin') || false;
+
 const SettingsPageContent = ({
   lang,
   members,
@@ -80,13 +85,29 @@ const SettingsPageContent = ({
   const confirmationDialog = useConfirmationDialog();
   const withConfirm = confirmDeletion(t, confirmationDialog.open);
   const errorToast = alertError(t, toast.show);
+  const { data } = useClientStore(x => x);
+  const isAdmin = amIAdmin(data);
   const companyName = partner.name;
   const companyWebsiteUrl = partner.websiteUrl;
 
   const onDeactivateClick = useCallback(
-    (id?: string) => {
-      if (!id) return;
-      postPartnerMembersDeactivate(id)
+    (userId: string) => {
+      postPartnerMembersDeactivate(userId)
+        .then(route.refresh)
+        .catch(err => {
+          toast.show({
+            variant: 'error',
+            title: t('user-deactivation-error'),
+            description: getErrorMessage(err),
+          });
+        });
+    },
+    [route.refresh, t, toast],
+  );
+
+  const onRoleChange = useCallback(
+    (userId: string, roleId: string) => {
+      patchPartnerMembers(userId, roleId)
         .then(route.refresh)
         .catch(err => {
           toast.show({
@@ -184,9 +205,11 @@ const SettingsPageContent = ({
             {t('manage-team-roles')}
           </Text>
         </div>
-        <Button variant="secondary" onClick={() => setIsInviteOpen(true)}>
-          {t('invite-teammates')}
-        </Button>
+        {isAdmin ? (
+          <Button variant="secondary" onClick={() => setIsInviteOpen(true)}>
+            {t('invite-teammates')}
+          </Button>
+        ) : null}
       </Stack>
       <Divider marginBottom={7} />
 
@@ -200,8 +223,16 @@ const SettingsPageContent = ({
         initialSearch=""
         items={clientSearch(members, search)}
         onChangeSearchText={setSearch}
-        renderTr={renderTr(t, lang, withConfirm, onDeactivateClick)}
         searchPlaceholder={t('search-placeholder')}
+        renderTr={renderTr({
+          isAdmin,
+          lang,
+          onDeactivateClick,
+          onRoleChange,
+          roles,
+          t,
+          withConfirm,
+        })}
       />
       <OverlayInvite
         roles={roles}
@@ -228,12 +259,23 @@ const SettingsPageContent = ({
   );
 };
 
-const renderTr = (
-  t: T,
-  lang: Lang,
-  withConfirm: WithConfirm,
-  onDeactivateClick: (id?: string) => void,
-) =>
+const renderTr = ({
+  isAdmin,
+  lang,
+  onDeactivateClick,
+  onRoleChange,
+  roles,
+  t,
+  withConfirm,
+}: {
+  isAdmin: boolean;
+  lang: Lang;
+  onDeactivateClick: (userId: string) => void;
+  onRoleChange: (userId: string, roleId: string) => void;
+  roles: Option[];
+  t: T;
+  withConfirm: WithConfirm;
+}) =>
   function Tr({ item: member }: TableRow<OrganizationMember>) {
     const { email, firstName, lastName } = member;
     const lastLoginAt = member.rolebinding?.lastLoginAt;
@@ -247,36 +289,63 @@ const renderTr = (
           </Text>
         </Td>
         <Td>{dateFormatter(lang, lastLoginAt) || '-'}</Td>
-        <Td>{member.role.name}</Td>
+        {isAdmin ? (
+          <Td>
+            <Dropdown.Root>
+              <Trigger aria-label="new label">
+                {member.role.name} <IcoChevronDown16 />
+              </Trigger>
+              <Dropdown.Content align="end">
+                {roles
+                  .filter(r => r.label !== member.role.name)
+                  .map(r => (
+                    <Dropdown.Item
+                      data-id={r.value}
+                      key={r.value}
+                      onSelect={() => onRoleChange(member.id, r.value)}
+                      onClick={stopPropagation}
+                    >
+                      {r.label}
+                    </Dropdown.Item>
+                  ))}
+              </Dropdown.Content>
+            </Dropdown.Root>
+          </Td>
+        ) : (
+          <Td>{member.role.name}</Td>
+        )}
         <Td>
           {!lastLoginAt && <Badge variant="warning">{t('pending')}</Badge>}
         </Td>
-        <Td>
-          <Box
-            tag="div"
-            display="grid"
-            justifyContent="end"
-            alignItems="center"
-          >
-            <Dropdown.Root>
-              <Dropdown.Trigger
-                aria-label={`${t('open-actions-for')} ${member.email}`}
-              >
-                <IcoDotsHorizontal24 />
-              </Dropdown.Trigger>
-              <Dropdown.Content align="end">
-                <Dropdown.Item
-                  data-id={member.id}
-                  onSelect={withConfirm(e => onDeactivateClick(getDataId(e)))}
-                  onClick={stopPropagation}
-                  variant="destructive"
+        {isAdmin ? (
+          <Td>
+            <Box
+              tag="div"
+              display="grid"
+              justifyContent="end"
+              alignItems="center"
+            >
+              <Dropdown.Root>
+                <Dropdown.Trigger
+                  aria-label={`${t('open-actions-for')} ${member.email}`}
                 >
-                  {t('deactivate')}
-                </Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown.Root>
-          </Box>
-        </Td>
+                  <IcoDotsHorizontal24 />
+                </Dropdown.Trigger>
+                <Dropdown.Content align="end">
+                  <Dropdown.Item
+                    onSelect={withConfirm(() => onDeactivateClick(member.id))}
+                    onClick={stopPropagation}
+                    variant="destructive"
+                  >
+                    {t('deactivate')}
+                  </Dropdown.Item>
+                </Dropdown.Content>
+              </Dropdown.Root>
+            </Box>
+          </Td>
+        ) : (
+          <Td />
+        )}
       </>
     );
   };
@@ -284,6 +353,20 @@ const renderTr = (
 const Td = styled.td`
   && {
     height: 56px;
+  }
+`;
+
+const Trigger = styled(Dropdown.Trigger)`
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover,
+  &:enabled:hover,
+  &[data-state='open'] {
+    background: transparent;
   }
 `;
 

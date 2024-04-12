@@ -18,6 +18,7 @@ export type { Role } from './get-partner-roles';
 export { default as getPartnerRoles } from './get-partner-roles';
 export type { UpdatePartnerTenantRequest } from './patch-partner';
 export { default as patchPartner } from './patch-partner';
+export { default as patchPartnerMembers } from './patch-partner-members';
 export { default as postPartnerAuthAssumeRole } from './post-partner-auth-assume-role';
 export type { OrgLoginResponse } from './post-partner-auth-login';
 export { default as postPartnerAuthLogin } from './post-partner-auth-login';
