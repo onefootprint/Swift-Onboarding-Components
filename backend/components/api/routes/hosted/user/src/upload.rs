@@ -36,14 +36,10 @@ pub async fn post(
     )
     .await?;
 
-    let (e_data_key, s3_url) = utils::vault_wrapper::seal_file_and_upload_to_s3(
-        &state,
-        &file,
-        kind.into(),
-        user_auth.user(),
-        &user_auth.scoped_user.id,
-    )
-    .await?;
+    let di = kind.into();
+    let su_id = &user_auth.scoped_user.id;
+    let (e_data_key, s3_url) =
+        utils::vault_wrapper::seal_file_and_upload_to_s3(&state, &file, &di, user_auth.user(), su_id).await?;
 
     state
         .db_pool
@@ -51,7 +47,7 @@ pub async fn post(
             let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.scoped_user.id)?;
             let doc = uvw.put_document_unsafe(
                 conn,
-                kind.into(),
+                di,
                 file.mime_type,
                 file.filename,
                 e_data_key,

@@ -180,7 +180,7 @@ pub async fn handle_document_upload(
     let di = DataIdentifier::from(DocumentKind::LatestUpload(id_doc.document_type, side));
     let su_id = sv_id.clone();
     let (e_data_key, s3_url) =
-        seal_file_and_upload_to_s3(state, &file, di.clone(), &uvw.vault, &su_id).await?;
+        seal_file_and_upload_to_s3(state, &file, &di, &uvw.vault, &su_id).await?;
 
     // Create uploads for the document
     // Check if we should be initiating requests (e.g. check if we are testing)

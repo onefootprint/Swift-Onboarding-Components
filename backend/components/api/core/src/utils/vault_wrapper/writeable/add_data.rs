@@ -208,7 +208,7 @@ impl WriteableVw<Person> {
 pub async fn seal_file_and_upload_to_s3(
     state: &State,
     file: &FileUpload,
-    kind: DataIdentifier,
+    kind: &DataIdentifier,
     vault: &Vault,
     scoped_vault_id: &ScopedVaultId,
 ) -> ApiResult<(SealedVaultDataKey, S3Url)> {
@@ -239,7 +239,7 @@ fn hash_id<T: ToString>(id: &T) -> String {
     )
 }
 
-fn document_s3_key(vault_id: &VaultId, scoped_vault_id: &ScopedVaultId, kind: DataIdentifier) -> String {
+fn document_s3_key(vault_id: &VaultId, scoped_vault_id: &ScopedVaultId, kind: &DataIdentifier) -> String {
     format!(
         "docs/encrypted/{}/{}/{}/{}",
         hash_id(vault_id),

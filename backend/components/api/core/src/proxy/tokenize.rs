@@ -76,12 +76,12 @@ pub async fn vault_pii(
         let (data, documents): (Vec<_>, Vec<_>) = values
             .into_iter()
             .filter_map(|(di, filters, value)| match di {
-                DataIdentifier::Document(doc_kind) => match doc_kind.storage_type() {
+                DataIdentifier::Document(ref doc_kind) => match doc_kind.storage_type() {
                     StorageType::VaultData => Some(Either::Left((di, filters, value))),
-                    StorageType::DocumentData => Some(Either::Right((
-                        doc_kind,
-                        (mime_types.get(&doc_kind), filters, value),
-                    ))),
+                    StorageType::DocumentData => {
+                        let mime_type = mime_types.get(doc_kind);
+                        Some(Either::Right((doc_kind.clone(), (mime_type, filters, value))))
+                    }
                     StorageType::DocumentMetadata => None,
                 },
                 DataIdentifier::InvestorProfile(_)
@@ -142,7 +142,7 @@ pub async fn vault_pii(
                 let targets: Vec<DataIdentifier> = data
                     .keys()
                     .cloned()
-                    .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind)))
+                    .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind.clone())))
                     .collect();
 
                 let aeid = AuditEventId::generate();
@@ -265,14 +265,9 @@ async fn encrypt_document(
         mime_type.as_ref().map(|s| s.as_str()).unwrap_or("image/png"),
     );
 
-    let (e_data_key, s3_url) = utils::vault_wrapper::seal_file_and_upload_to_s3(
-        state,
-        &file,
-        doc_kind.into(),
-        &vault,
-        &scoped_vault.id,
-    )
-    .await?;
+    let di = doc_kind.clone().into();
+    let (e_data_key, s3_url) =
+        utils::vault_wrapper::seal_file_and_upload_to_s3(state, &file, &di, &vault, &scoped_vault.id).await?;
 
     Ok(EncryptedDocumentToStore {
         e_data_key,

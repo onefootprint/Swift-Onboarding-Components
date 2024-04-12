@@ -14,10 +14,11 @@ use idv::{
 };
 use itertools::Itertools;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DataLifetimeSource, DataRequest, DecisionIntentId,
-    DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind, IdentityDocumentFixtureResult,
-    IncodeConfigurationId, IncodeEnvironment, IncodeVerificationSessionKind, OcrDataKind as ODK,
-    PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
+    vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataLifetimeSource, DataRequest,
+    DecisionIntentId, DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind,
+    IdentityDocumentFixtureResult, IncodeConfigurationId, IncodeEnvironment, IncodeVerificationSessionKind,
+    OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey,
+    VendorAPI, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -307,16 +308,12 @@ async fn get_curp_for_check(
             return Ok((None, id_doc.clone()));
         }
 
-        let odk = DocumentKind::OcrData(vaulted_document_type, ODK::Curp);
+        let di = DataIdentifier::from(DocumentKind::OcrData(vaulted_document_type, ODK::Curp));
         // We should always get CURP on a voter ID
         // TODO: In the future we could have a risk signal or something for this i suppose. arguably this should go before the decryption, but just to observe incode
         // weirdness
-        let decrypted_curp = if vw.get(&odk.into()).is_some() {
-            vw.decrypt_unchecked(enclave_client, &[odk.into()])
-                .await?
-                .results
-                .get(&odk.into())
-                .cloned()
+        let decrypted_curp = if vw.get(&di).is_some() {
+            vw.decrypt_unchecked_single(enclave_client, di).await?
         } else {
             tracing::error!(id_doc=?id_doc.id, "missing curp for voter id");
 

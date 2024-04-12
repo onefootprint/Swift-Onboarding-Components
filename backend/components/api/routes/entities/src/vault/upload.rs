@@ -138,8 +138,7 @@ async fn post_upload_inner(
     let file = FileUpload::new_simple(image_bytes, format!("{}", di), &mime_type);
 
     let (e_data_key, s3_url) =
-        utils::vault_wrapper::seal_file_and_upload_to_s3(state, &file, di.clone(), &vault, &scoped_vault.id)
-            .await?;
+        utils::vault_wrapper::seal_file_and_upload_to_s3(state, &file, &di, &vault, &scoped_vault.id).await?;
 
     let actor = auth.actor();
     state

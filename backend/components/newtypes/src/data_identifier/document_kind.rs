@@ -11,7 +11,6 @@ use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumIter, EnumString};
 #[derive(
     Debug,
     Clone,
-    Copy,
     DeserializeFromStr,
     SerializeDisplay,
     PartialEq,
