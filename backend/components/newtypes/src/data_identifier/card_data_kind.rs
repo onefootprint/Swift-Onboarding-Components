@@ -1,6 +1,7 @@
 use crate::{AliasId, CollectedData, DataIdentifier, EnumDotNotationError, IsDataIdentifierDiscriminant};
+use itertools::Itertools;
 use std::str::FromStr;
-use strum::EnumIter;
+use strum::{EnumIter, IntoEnumIterator};
 use strum_macros::{Display, EnumString};
 
 #[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, EnumString, EnumIter)]
@@ -91,5 +92,16 @@ impl FromStr for CardInfo {
 impl std::fmt::Display for CardInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}.{}", self.alias, self.kind)
+    }
+}
+
+impl CardInfo {
+    pub fn api_examples() -> Vec<Self> {
+        CardDataKind::iter()
+            .map(|k| CardInfo {
+                alias: AliasId::fixture(),
+                kind: k,
+            })
+            .collect_vec()
     }
 }

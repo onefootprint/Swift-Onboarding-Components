@@ -136,6 +136,10 @@ impl AliasId {
     pub fn random() -> Self {
         Self(crypto::random::gen_random_alphanumeric_code(10))
     }
+
+    pub fn fixture() -> Self {
+        Self("*".to_string())
+    }
 }
 
 impl paperclip::v2::schema::TypedData for AliasId {

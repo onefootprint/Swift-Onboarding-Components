@@ -40,8 +40,8 @@ pub use self::{
     validation::{Error as ValidationError, *},
 };
 use crate::{
-    fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, AliasId, EnumDotNotationError,
-    KvDataKey, NtResult, PiiJsonValue, PiiString, ValidateArgs,
+    fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, EnumDotNotationError, KvDataKey,
+    NtResult, PiiJsonValue, PiiString, ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -193,13 +193,9 @@ impl DataIdentifier {
                     .into_iter()
                     .map(DataIdentifier::from)
                     .collect_vec(),
-                DataIdentifierDiscriminant::Card => CardDataKind::iter()
-                    .map(|k| {
-                        DataIdentifier::from(CardInfo {
-                            alias: AliasId::from("*".to_owned()),
-                            kind: k,
-                        })
-                    })
+                DataIdentifierDiscriminant::Card => CardInfo::api_examples()
+                    .into_iter()
+                    .map(DataIdentifier::from)
                     .collect_vec(),
             })
             .map(|id| serde_json::Value::String(id.to_string()))
@@ -347,7 +343,7 @@ impl_enum_string_diesel!(DataIdentifier);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{DocumentSide, IdDocKind};
+    use crate::{AliasId, DocumentSide, IdDocKind};
     use itertools::Itertools;
     use test_case::test_case;
 
@@ -397,16 +393,26 @@ mod tests {
                 .collect_vec(),
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
             BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
+            CardInfo::api_examples()
+                .into_iter()
+                .map(DataIdentifier::from)
+                .collect_vec(),
             DocumentKind::api_examples()
                 .into_iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),
-            vec![KvDataKey::from("hayes valley".to_owned()).into()],
+            vec![DataIdentifier::Custom(KvDataKey::from("hayesvalley".to_owned()))],
         ]
         .into_iter()
         .flatten()
         .collect_vec();
-        let plaintext_types = vec![DataIdentifier::Business(BusinessDataKind::Name)];
+        let plaintext_types = [
+            DataIdentifier::Business(BusinessDataKind::Name),
+            DataIdentifier::Card(CardInfo {
+                alias: AliasId::fixture(),
+                kind: CardDataKind::Issuer,
+            }),
+        ];
         assert!(dis
             .iter()
             .all(|di| di.store_plaintext() == plaintext_types.contains(di)));

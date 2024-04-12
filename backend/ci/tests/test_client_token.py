@@ -205,12 +205,12 @@ def test_vault_legacy(sandbox_user, sandbox_tenant):
     assert body["id.last_name"] == "Valley"
 
 
-def test_large_objects(sandbox_user):
+@pytest.mark.parametrize("di", ["document.custom.large_id", "custom.large_id"])
+def test_large_objects(sandbox_user, di):
     auth_token, _ = client_token_with_scope(
-        sandbox_user, fields=["custom.large_id"], scope="vault_and_decrypt"
+        sandbox_user, fields=[di], scope="vault_and_decrypt"
     )
 
-    di = "custom.large_id"
     obj = {"some_key": "hello world!" * 100_000}
 
     post(f"entities/vault/{di}/upload", obj, auth_token)
@@ -232,7 +232,7 @@ def test_large_objects(sandbox_user):
     # Test decrypt downloading
     token, _ = client_token_with_scope(
         sandbox_user,
-        fields=["custom.large_id"],
+        fields=[di],
         scope="decrypt_download",
         decrypt_reason="flerp",
     )

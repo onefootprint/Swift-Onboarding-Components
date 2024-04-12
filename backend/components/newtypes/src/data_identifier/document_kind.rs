@@ -1,5 +1,6 @@
 use crate::{
-    CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, StorageType,
+    AliasId, CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant,
+    StorageType,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -7,7 +8,6 @@ use mime::Mime;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumIter, EnumString};
-/// test2
 #[derive(
     Debug,
     Clone,
@@ -49,6 +49,10 @@ pub enum DocumentKind {
 
     /// Extracted OCR information from the image
     OcrData(IdDocKind, OcrDataKind),
+
+    /// Custom document
+    #[strum_discriminants(strum(to_string = "custom"))]
+    Custom(AliasId),
 }
 
 crate::util::impl_enum_string_diesel!(DocumentKind);
@@ -106,7 +110,8 @@ impl IsDataIdentifierDiscriminant for DocumentKind {
             DocumentKind::Barcodes(_, _)
             | DocumentKind::OcrData(_, _)
             | DocumentKind::MimeType(_, _)
-            | DocumentKind::LatestUpload(_, _) => None,
+            | DocumentKind::LatestUpload(_, _)
+            | DocumentKind::Custom(_) => None,
             DocumentKind::FinraComplianceLetter => Some(CollectedData::InvestorProfile),
         }
     }
@@ -125,7 +130,8 @@ impl DocumentKind {
             DocumentKind::Barcodes(_, _)
             | DocumentKind::OcrData(_, _)
             | DocumentKind::MimeType(_, _)
-            | DocumentKind::LatestUpload(_, _) => {
+            | DocumentKind::LatestUpload(_, _)
+            | DocumentKind::Custom(_) => {
                 vec![]
             }
         }
@@ -142,7 +148,8 @@ impl DocumentKind {
         match self {
             DocumentKind::Image(_, _)
             | DocumentKind::FinraComplianceLetter
-            | DocumentKind::LatestUpload(_, _) => StorageType::DocumentData,
+            | DocumentKind::LatestUpload(_, _)
+            | DocumentKind::Custom(_) => StorageType::DocumentData,
             DocumentKind::MimeType(_, _) => StorageType::DocumentMetadata,
             DocumentKind::OcrData(_, _) | DocumentKind::Barcodes(_, _) => StorageType::VaultData,
         }
@@ -154,22 +161,6 @@ impl DocumentKind {
         IdDocKind::iter()
             .map(|k| Self::OcrData(k, OcrDataKind::DocumentNumber))
             .collect()
-    }
-}
-
-impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
-    type Error = strum::ParseError;
-
-    fn try_from(value: DocumentKindDiscriminant) -> Result<Self, Self::Error> {
-        let v = match value {
-            DocumentKindDiscriminant::FinraComplianceLetter => DocumentKind::FinraComplianceLetter,
-            DocumentKindDiscriminant::Barcodes
-            | DocumentKindDiscriminant::OcrData
-            | DocumentKindDiscriminant::Image
-            | DocumentKindDiscriminant::MimeType
-            | DocumentKindDiscriminant::LatestUpload => return Err(strum::ParseError::VariantNotFound),
-        };
-        Ok(v)
     }
 }
 
@@ -192,49 +183,56 @@ impl std::str::FromStr for DocumentKind {
             Ok((prefix, suffix))
         };
 
-        let variant: DocumentKind = match variant {
-            // First try parsing based on the suffix, like mime_type or latest_upload
+        // First try parsing based on the suffix, like mime_type or latest_upload
+        let variant: Option<DocumentKind> = match variant {
             Ok(DocumentKindDiscriminant::LatestUpload) => {
                 let (prefix, suffix) = get_parts()?;
-                DocumentKind::LatestUpload(prefix, suffix)
+                Some(DocumentKind::LatestUpload(prefix, suffix))
             }
             Ok(DocumentKindDiscriminant::MimeType) => {
                 let (prefix, suffix) = get_parts()?;
-                DocumentKind::MimeType(prefix, suffix)
+                Some(DocumentKind::MimeType(prefix, suffix))
             }
             Ok(DocumentKindDiscriminant::Image) => {
                 let (prefix, suffix) = get_parts()?;
-                DocumentKind::Image(prefix, suffix)
+                Some(DocumentKind::Image(prefix, suffix))
             }
             Ok(DocumentKindDiscriminant::Barcodes) => {
                 let (prefix, suffix) = get_parts()?;
-                DocumentKind::Barcodes(prefix, suffix)
+                Some(DocumentKind::Barcodes(prefix, suffix))
             }
-            // Otherwise, try parsing as other variants
-            _ => {
-                if let Ok(variant) = DocumentKindDiscriminant::from_str(s)
-                    .map_err(|_| strum::ParseError::VariantNotFound)
-                    .and_then(Self::try_from)
-                {
-                    // TODO should we just remove discriminant code?
-                    variant
-                } else {
-                    let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
-                    let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
-                    let prefix = IdDocKind::from_str(prefix)?;
-                    let suffix = OcrDataKind::from_str(suffix)?;
-                    Self::OcrData(prefix, suffix)
-                }
-            }
+            _ => None,
         };
+        if let Some(variant) = variant {
+            return Ok(variant);
+        }
 
-        Ok(variant)
+        // Custom parsing for FinraComplianceLetter
+        if let Ok(DocumentKindDiscriminant::FinraComplianceLetter) = DocumentKindDiscriminant::from_str(s) {
+            return Ok(Self::FinraComplianceLetter);
+        }
+
+        // Ocr data
+        let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
+        let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
+        if let Ok(prefix) = IdDocKind::from_str(prefix) {
+            let suffix = OcrDataKind::from_str(suffix)?;
+            return Ok(Self::OcrData(prefix, suffix));
+        }
+
+        // Custom documents
+        if let Ok(DocumentKindDiscriminant::Custom) = DocumentKindDiscriminant::from_str(prefix) {
+            let alias = AliasId::from_str(suffix).map_err(|_| strum::ParseError::VariantNotFound)?;
+            return Ok(Self::Custom(alias));
+        }
+
+        Err(strum::ParseError::VariantNotFound)
     }
 }
 
 impl std::fmt::Display for DocumentKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        match *self {
+        match self {
             DocumentKind::LatestUpload(id_doc_kind, side)
             | DocumentKind::MimeType(id_doc_kind, side)
             | DocumentKind::Image(id_doc_kind, side)
@@ -250,6 +248,9 @@ impl std::fmt::Display for DocumentKind {
             DocumentKind::OcrData(doc_kind, data_kind) => {
                 write!(f, "{}.{}", doc_kind, data_kind)
             }
+            DocumentKind::Custom(alias) => {
+                write!(f, "custom.{}", alias)
+            }
             DocumentKind::FinraComplianceLetter => write!(f, "{}", DocumentKindDiscriminant::from(self)),
         }
     }
@@ -258,14 +259,14 @@ impl std::fmt::Display for DocumentKind {
 impl DocumentKind {
     /// Enumerate all possible DIs for DocumentKind that we'll display in API docs
     pub fn api_examples() -> Vec<Self> {
-        let complex_types = IdDocKind::iter().flat_map(|k| {
+        let id_doc_types = IdDocKind::iter().flat_map(|k| {
             // Purposefully omitting LatestUpload here
             let image_types =
                 DocumentSide::iter().flat_map(move |s| vec![Self::Image(k, s), Self::MimeType(k, s)]);
             let ocr_types = OcrDataKind::iter().map(move |dk| Self::OcrData(k, dk));
             image_types.chain(ocr_types)
         });
-        let simple_types = DocumentKindDiscriminant::iter().filter_map(|d| Self::try_from(d).ok());
-        complex_types.chain(simple_types).collect()
+        let simple_types = vec![Self::FinraComplianceLetter, Self::Custom(AliasId::fixture())];
+        id_doc_types.chain(simple_types).collect()
     }
 }
