@@ -269,7 +269,8 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
     phone_number = bifrost.data["id.phone_number"]
 
     # Don't finish onboarding. Grab fp_id from dashboard
-    body = post("entities/search", None, *sandbox_tenant.db_auths)
+    data = dict(pagination=dict(page_size=100))
+    body = post("entities/search", data, *sandbox_tenant.db_auths)
     user = next(u for u in body["data"] if u["sandbox_id"] == sandbox_id)
     fp_id = user["id"]
 
