@@ -6661,47 +6661,197 @@ pub fn incode_curp_validation_bad_curp() -> serde_json::Value {
 
 pub fn neuro_id_success_response() -> serde_json::Value {
     serde_json::json!({
+        "status": "SUCCESS",
         "message": "success",
         "moreInfo": null,
         "profile": {
-            "clientId": "example-response-2",
+            "siteId": "form_humor717",
             "funnel": "unknown",
-            "id": "example-response-2",
+            "clientId": "c00a322f-2179-4ef2-812b-e14b43945069",
+            "deviceId": "Of2yRcx14PRpavCp2DCS",
+            "interactionAttributes": {
+                "client_id_count": 1,
+                "session_id_count": 1,
+                "user_id_count": 1,
+                "ip_geolocation": {
+                    "accuracyRadius": 10,
+                    "latitude": 43.0592,
+                    "longitude": -73.7356,
+                    "postalCode": "12866",
+                    "timezone": "America/New_York",
+                    "city": {
+                        "name": "Saratoga Springs"
+                    },
+                    "country": {
+                        "code": "US",
+                        "name": "United States"
+                    },
+                    "continent": {
+                        "code": "NA",
+                        "name": "North America"
+                    },
+                    "subdivisions": [
+                        {
+                            "isoCode": "NY",
+                            "name": "New York"
+                        }
+                    ]
+                }
+            },
             "signals": [
                 {
-                    "label": "low",
+                    "version": "3.0.nm",
                     "model": "familiarity",
-                    "score": 97.68,
-                    "version": "2.5.0"
+                    "label": "medium",
+                    "reasonCodes": [
+                        "A2700",
+                        "A2900",
+                        "A2800"
+                    ],
+                    "score": 73.141122
                 },
                 {
-                    "label": "true",
+                    "version": "1.0",
                     "model": "fraud_ring_indicator",
-                    "score": 1.0,
-                    "version": "1.0"
-                },
-                {
-                    "label": "true",
-                    "model": "automated_activity",
-                    "score": 1.0,
-                    "version": "1.0"
-                },
-                {
-                    "label": "risky",
-                    "model": "combined_digital_intent",
-                    "score": 0.0,
-                    "version": "1.0"
-                },
-                {
                     "label": "false",
+                    "attributes": {},
+                    "score": 0.0
+                },
+                {
+                    "version": "1.0",
+                    "model": "automated_activity",
+                    "label": "false",
+                    "attributes": {},
+                    "score": 0.0
+                },
+                {
+                    "version": "1.0",
+                    "model": "combined_digital_intent",
+                    "label": "neutral",
+                    "attributes": {},
+                    "score": 0.5
+                },
+                {
+                    "version": "1.0",
                     "model": "risky_device",
-                    "score": 0.0,
-                    "version": "1.0"
+                    "label": "false",
+                    "attributes": {
+                        "risky_application_count": 0
+                    },
+                    "score": 0.0
+                },
+                {
+                    "version": "1.0",
+                    "model": "bot_framework",
+                    "label": "false",
+                    "attributes": {}
+                },
+                {
+                    "version": "1.0",
+                    "model": "factory_reset",
+                    "label": "false",
+                    "attributes": {}
+                },
+                {
+                    "version": "1.0",
+                    "model": "device_reputation",
+                    "label": "false",
+                    "attributes": {
+                        "customer_blocklist": false,
+                        "global_blocklist": false
+                    }
+                },
+                {
+                    "version": "1.0",
+                    "model": "device_velocity",
+                    "label": "false",
+                    "attributes": {
+                        "sessions_per_device_count_1_day": 1,
+                        "sessions_per_device_count_1_week": 1,
+                        "sessions_per_device_count_4_week": 1,
+                        "sessions_per_device_count_12_week": 1
+                    }
+                },
+                {
+                    "version": "1.0",
+                    "model": "incognito",
+                    "label": "false",
+                    "attributes": {}
+                },
+                {
+                    "version": "1.0",
+                    "model": "multiple_ids_per_device",
+                    "label": "false",
+                    "attributes": {
+                        "multiple_ids_per_device_count_1_day": 1,
+                        "multiple_ids_per_device_count_1_week": 1,
+                        "multiple_ids_per_device_count_4_week": 1,
+                        "multiple_ids_per_device_count_12_week": 1
+                    }
+                },
+                {
+                    "version": "1.0",
+                    "model": "public_proxy",
+                    "label": "false",
+                    "attributes": {}
+                },
+                {
+                    "version": "1.0",
+                    "model": "gps_spoofing",
+                    "label": "false",
+                    "attributes": {}
+                },
+                {
+                    "version": "1.0",
+                    "model": "suspicious_device",
+                    "label": "false",
+                    "attributes": {
+                        "emulator": false,
+                        "jailbroken": false,
+                        "missing_expected_properties": false,
+                        "frida": false
+                    }
+                },
+                {
+                    "version": "1.0",
+                    "model": "tor_exit_node",
+                    "label": "false",
+                    "attributes": {}
+                },
+                {
+                    "version": "1.0",
+                    "model": "vpn",
+                    "label": "false",
+                    "attributes": {}
+                },
+                {
+                    "version": "1.0",
+                    "model": "ip_address_association",
+                    "label": "false",
+                    "attributes": {
+                        "aws_ip_set": false,
+                        "azure_china_ip_set": false,
+                        "azure_germany_ip_set": false,
+                        "azure_government_ip_set": false,
+                        "azure_public_ip_set": false,
+                        "digital_ocean_ip_set": false,
+                        "google_ip_set": false,
+                        "oracle_ip_set": false,
+                        "vultr_ip_set": false
+                    }
+                },
+                {
+                    "version": "1.0",
+                    "model": "ip_blocklist",
+                    "label": "false",
+                    "attributes": {
+                        "customer_blocklist": false,
+                        "global_blocklist": false
+                    }
                 }
             ],
-            "siteId": "form_neuro300"
-        },
-        "status": "SUCCESS"
+            "id": "6hJkiD8VKFWT9yK1SdF201BcxxMC_Pg5l66rHplSDGg"
+        }
     })
 }
 
