@@ -1,6 +1,6 @@
 import { IcoWarning16 } from '@onefootprint/icons';
 import { Checkbox, Divider, Stack, Text, Toggle } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -15,8 +15,17 @@ const AML = ({ showError }: AMLProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.verification-checks.aml-monitoring',
   });
-  const { register, watch } = useFormContext<VerificationChecksFormData>();
+  const { register, watch, setValue } =
+    useFormContext<VerificationChecksFormData>();
   const isAmlChecked = watch('amlFormData.enhancedAml');
+
+  useEffect(() => {
+    if (!isAmlChecked) {
+      setValue('amlFormData.ofac', false);
+      setValue('amlFormData.pep', false);
+      setValue('amlFormData.adverseMedia', false);
+    }
+  }, [isAmlChecked, setValue]);
 
   return (
     <Container>
