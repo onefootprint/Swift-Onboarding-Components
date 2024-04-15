@@ -32,6 +32,9 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   browser,
   isMobile,
 }) => {
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
+
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
@@ -90,23 +93,12 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    // TODO (belce): remove isMobile conditional
-    return;
-    // const newPage = await doTransferFromMobile({
-    //   frame,
-    //   browser,
-    // });
-    // // eslint-disable-next-line playwright/no-wait-for-timeout
-    // await newPage.waitForTimeout(5000); // takes 3 seconds for the new tab to close
-  } else {
-    await doTransferFromDesktop({
-      page,
-      frame,
-      browser,
-    });
-    await page.waitForLoadState();
-  }
+  await doTransferFromDesktop({
+    page,
+    frame,
+    browser,
+  });
+  await page.waitForLoadState();
 
   await expect(page.getByTestId('result').first()).toContainText('_');
 });

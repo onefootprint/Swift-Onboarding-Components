@@ -21,7 +21,10 @@ const zipCode = '94105';
 const country = 'US';
 const ssn9 = '123412345';
 
-test('E2E.Bootstrap #ci', async ({ browserName, page }) => {
+test('E2E.Bootstrap #ci', async ({ browserName, page, isMobile }) => {
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
+
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 

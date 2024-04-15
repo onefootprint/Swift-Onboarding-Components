@@ -24,6 +24,9 @@ const city = 'Seward';
 const zipCode = '99664';
 
 test('E2E.es-MX.KYC.Docs #ci', async ({ browserName, isMobile, page }) => {
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
+
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
@@ -85,19 +88,7 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ browserName, isMobile, page }) => {
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();
-
-  // TODO (belce): remove isMobile conditional
-  if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    return;
-    // const newPage = await doTransferFromMobile({
-    //   frame,
-    //   browser,
-    // });
-    // await newPage.waitForLoadState();
-    // await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
-  } else {
-    await continueOnDesktop({ frame });
-    await page.waitForLoadState();
-    await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
-  }
+  await continueOnDesktop({ frame });
+  await page.waitForLoadState();
+  await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
 });

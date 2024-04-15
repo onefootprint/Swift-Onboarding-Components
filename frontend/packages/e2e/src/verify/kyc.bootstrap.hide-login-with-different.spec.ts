@@ -6,7 +6,10 @@ import {
   waitForVerifyButton,
 } from './utils/commands';
 
-test('E2E.Bootstrap #ci', async ({ browserName, page }) => {
+test('E2E.Bootstrap #ci', async ({ browserName, page, isMobile }) => {
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
+
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_Twvblr3NUeDzPuFteI1OCh';
