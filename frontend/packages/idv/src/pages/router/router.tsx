@@ -118,7 +118,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
       {state.matches('init') ? <Init /> : null}
       {state.matches('sandboxOutcome') ? <SandboxOutcome /> : null}
-      <LoadNeuroId disabled={!config?.nidEnabled}>
+      <LoadNeuroId config={config}>
         {state.matches('identify') && config && device ? (
           <L10nContextProvider l10n={l10n}>
             <Identify
