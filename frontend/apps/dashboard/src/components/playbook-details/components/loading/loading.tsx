@@ -1,34 +1,102 @@
-import { Shimmer, Stack } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Box, Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 const Loading = () => (
-  <Stack testID="onboarding-configs-details-loading" aria-busy>
-    <Container>
-      <Name />
-    </Container>
-    {/* more tk as more fields go in here */}
-  </Stack>
+  <Box testID="onboarding-configs-details-loading" aria-busy>
+    <Breadcrumb />
+    <Name />
+    <Stack justifyContent="space-between" marginBottom={9}>
+      <Stack alignItems="center" gap={4}>
+        <Kind />
+        <PublicKey />
+      </Stack>
+      <Box>
+        <EditButton />
+      </Box>
+    </Stack>
+    <Stack marginBottom={9} gap={5}>
+      <Tabs />
+    </Stack>
+    <Stack center marginTop={12}>
+      <AnimatedLoadingSpinner animationStart size={24} />
+    </Stack>
+  </Box>
 );
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    &:not(:last-child) {
-      border-bottom: 1px solid ${theme.borderColor.tertiary};
-      margin-bottom: ${theme.spacing[7]};
-      padding-bottom: ${theme.spacing[7]};
-    }
-  `}
-`;
+const Breadcrumb = () => (
+  <Shimmer
+    sx={{
+      width: '132px',
+      height: '20px',
+      marginBottom: 8,
+    }}
+  />
+);
 
 const Name = () => (
-  <Stack>
-    <Stack justify="space-between">
-      <Shimmer sx={{ width: '228px', height: '20px', marginBottom: 3 }} />
-      <Shimmer sx={{ width: '28px', height: '20px', marginBottom: 3 }} />
-    </Stack>
-    <Shimmer sx={{ width: '100px', height: '20px' }} />
-  </Stack>
+  <Shimmer
+    sx={{
+      width: '100px',
+      height: '20px',
+      marginBottom: 4,
+    }}
+  />
+);
+
+const Kind = () => (
+  <Shimmer
+    sx={{
+      width: '30px',
+      height: '20px',
+    }}
+  />
+);
+
+const PublicKey = () => (
+  <Shimmer
+    sx={{
+      width: '264px',
+      height: '20px',
+    }}
+  />
+);
+
+const EditButton = () => (
+  <Shimmer
+    sx={{
+      width: '157px',
+      height: '20px',
+    }}
+  />
+);
+
+const Tabs = () => (
+  <>
+    <Shimmer
+      sx={{
+        width: '105px',
+        height: '20px',
+      }}
+    />
+    <Shimmer
+      sx={{
+        width: '130px',
+        height: '20px',
+      }}
+    />
+    <Shimmer
+      sx={{
+        width: '110px',
+        height: '20px',
+      }}
+    />
+    <Shimmer
+      sx={{
+        width: '37px',
+        height: '20px',
+      }}
+    />
+  </>
 );
 
 export default Loading;

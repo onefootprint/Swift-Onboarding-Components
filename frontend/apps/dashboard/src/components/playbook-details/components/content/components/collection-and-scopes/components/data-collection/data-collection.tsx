@@ -83,7 +83,7 @@ const DataCollection = ({
       )}
       <Stack direction="column" gap={7}>
         {isKYB && (
-          <Text variant="label-3" color="secondary">
+          <Text variant="label-3" color="secondary" marginTop={9}>
             {t('kyb.business_beneficial_owners')}
           </Text>
         )}
