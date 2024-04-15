@@ -298,7 +298,7 @@ vendor_reason_code_enum! {
         HighRiskIpSpam,
 
         #[ser = "resultcode.high.risk.ip.tor", description = "Indicates that the IP address is associated with a TOR network."]
-        #[footprint_reason_code = Some(FootprintReasonCode::IpAlertHighRiskTor)]
+        #[footprint_reason_code = Some(FootprintReasonCode::IpTorExitNode)]
         HighRiskIpTor,
 
         #[ser = "resultcode.ip.location.not.available", description = "Indicates that the location of the IP address cannot be determined."]

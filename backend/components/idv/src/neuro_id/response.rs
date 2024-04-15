@@ -10,41 +10,39 @@ use super::error;
 pub struct NeuroIdAnalyticsResponse {
     pub message: Option<String>,
     pub more_info: Option<String>,
-    status: Option<String>,
-    pub profile: Option<NeuroProfile>,
+    status: String,
+    pub profile: NeuroProfile,
 }
 
 impl NeuroIdAnalyticsResponse {
-    pub fn get_signal_for_model(&self, model: Model) -> Option<NeuroSignal> {
-        self.profile
-            .as_ref()
-            .and_then(|p| p.signals.as_ref())
-            .and_then(|ss| ss.iter().find(|s| s.model() == model))
-            .cloned()
+    pub(crate) fn signals(&self) -> &Vec<NeuroSignal> {
+        &self.profile.signals
+    }
+
+    pub fn flagged_signals(&self) -> Vec<&NeuroSignal> {
+        self.signals().iter().filter(|s| s.is_flagged()).collect()
     }
 }
 
 impl NeuroIdAnalyticsResponse {
     pub fn status(&self) -> Status {
-        self.status
-            .as_ref()
-            .map(|s| match Status::try_from(s.as_str()) {
-                Ok(r) => r,
-                Err(err) => {
-                    tracing::error!(?err, status=%s, "Error parsing Neuro status");
-                    Status::Unknown
-                }
-            })
-            .unwrap_or(Status::Unknown)
+        let s = self.status.as_str();
+        match Status::try_from(s) {
+            Ok(r) => r,
+            Err(err) => {
+                tracing::error!(?err, status=%s, "Error parsing Neuro status");
+                Status::Unknown
+            }
+        }
     }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct NeuroProfile {
-    pub id: Option<String>,
+    pub id: String,
     pub funnel: Option<String>,
-    pub signals: Option<Vec<NeuroSignal>>,
+    pub signals: Vec<NeuroSignal>,
     // Cookie based identifier
     pub client_id: Option<String>,
     // Fingerprint JS derived ID
@@ -56,10 +54,10 @@ pub struct NeuroProfile {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct NeuroSignal {
-    /// The classification label for the signal. E.g., for the Intent signal, the possible labels are genuine, neutral, risky, and insufficient data
-    pub label: Option<String>,
+    /// The classification label for the signal. E.g., for the Intent signal, the possible labels are genuine, neutral, risky, and insufficient data. For others, it's "true"
+    pub label: String,
     /// The name of the signal.
-    model: Option<String>,
+    model: String,
     pub score: Option<f32>,
     pub version: Option<String>,
     // The lower-level data elements used to arrive at the classification for a signal.
@@ -71,17 +69,20 @@ pub struct NeuroSignal {
 }
 
 impl NeuroSignal {
-    fn model(&self) -> Model {
-        self.model
-            .as_ref()
-            .map(|s| match Model::try_from(s.as_str()) {
-                Ok(r) => r,
-                Err(err) => {
-                    tracing::error!(?err, status=%s, "Error parsing NeuroSignal model ");
-                    Model::Other("unknown".into())
-                }
-            })
-            .unwrap_or(Model::Other("missing".into()))
+    pub fn model(&self) -> Model {
+        let m = self.model.as_str();
+        match Model::try_from(m) {
+            Ok(r) => r,
+            Err(err) => {
+                // TODO: remove this after rollout!
+                tracing::error!(?err, model=%m, "Error parsing NeuroSignal model");
+                Model::Other
+            }
+        }
+    }
+
+    pub fn is_flagged(&self) -> bool {
+        self.label == *"true"
     }
 }
 
@@ -115,22 +116,20 @@ pub struct InteractionAttributes {
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct NeuroIdAnalyticsResponseError {
-    status: Option<String>,
+    status: String,
     pub message: Option<String>,
     pub more_info: Option<String>,
 }
 impl NeuroIdAnalyticsResponseError {
     pub fn status(&self) -> Status {
-        self.status
-            .as_ref()
-            .map(|s| match Status::try_from(s.as_str()) {
-                Ok(r) => r,
-                Err(err) => {
-                    tracing::error!(?err, status=%s, "Error parsing NeuroAnalyticsResponseError status ");
-                    Status::Unknown
-                }
-            })
-            .unwrap_or(Status::Unknown)
+        let s = self.status.as_str();
+        match Status::try_from(s) {
+            Ok(r) => r,
+            Err(err) => {
+                tracing::error!(?err, status=%s, "Error parsing NeuroAnalyticsResponseError status ");
+                Status::Unknown
+            }
+        }
     }
 }
 impl std::fmt::Display for NeuroIdAnalyticsResponseError {
@@ -175,7 +174,7 @@ pub enum Status {
     Unknown,
 }
 
-#[derive(Clone, Debug, Display, EnumString, DeserializeFromStr, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Display, EnumString, DeserializeFromStr, Eq, PartialEq, Serialize)]
 #[strum(serialize_all = "snake_case")]
 pub enum Model {
     //
@@ -221,7 +220,7 @@ pub enum Model {
     MultipleIdsPerDevice,
     // identifies if the device is associated with a blocklist you have provided or one of the available NeuroID blocklists
     DeviceReputation,
-    Other(String),
+    Other,
 }
 
 // T isn't needed here since it isn't an incode-style multi-endpoint request
@@ -291,7 +290,12 @@ impl NeuroApiResponse {
                                 raw_response: j.into(),
                             },
                         },
-                        Err(_e) => todo!(),
+                        Err(e) => Self {
+                            result: NeuroAPIResult::ResponseErrorUnhandled(
+                                error::Error::Http200WithDeserializationError(e),
+                            ),
+                            raw_response: j.into(),
+                        },
                     }
                 } else {
                     let deserialized_error: Result<NeuroIdAnalyticsResponseError, serde_json::Error> =
@@ -330,14 +334,18 @@ impl NeuroApiResponse {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_fixtures;
+    use crate::test_fixtures::{self, NeuroTestOpts};
 
     use super::*;
+
+    fn get_signal_for_model(res: &NeuroIdAnalyticsResponse, model: Model) -> Option<NeuroSignal> {
+        res.signals().iter().find(|s| s.model() == model).cloned()
+    }
 
     #[test]
     fn test_deserializes() {
         use Model::*;
-        let raw = test_fixtures::neuro_id_success_response();
+        let raw = test_fixtures::neuro_id_success_response(NeuroTestOpts::default());
         let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(raw).unwrap();
 
 
@@ -360,6 +368,6 @@ mod tests {
             DeviceVelocity,
         ]
         .into_iter()
-        .for_each(|m| assert!(parsed.get_signal_for_model(m).unwrap().label.is_some()));
+        .for_each(|m| assert!(get_signal_for_model(&parsed, m).is_some()));
     }
 }

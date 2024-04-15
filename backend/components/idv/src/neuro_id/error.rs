@@ -12,6 +12,8 @@ pub enum Error {
     SendError(String),
     #[error("No status found when calling neuro api")]
     UnknownStatus,
+    #[error("Could not deserialize Neuro response")]
+    Http200WithDeserializationError(serde_json::Error),
     #[error("Neuro API Error: {0}")]
     APIResponseError(super::response::NeuroIdAnalyticsResponseError),
 }

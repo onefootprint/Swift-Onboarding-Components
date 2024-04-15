@@ -50,7 +50,6 @@ impl NeuroIdClient {
 
 #[cfg(test)]
 mod tests {
-    use itertools::Itertools;
     use newtypes::vendor_credentials::{NeuroIdApiKey, NeuroIdSiteId};
 
     use crate::{
@@ -88,15 +87,6 @@ mod tests {
 
         assert_eq!(resp.status(), Status::Success);
 
-        assert_eq!(
-            resp.profile
-                .unwrap()
-                .signals
-                .into_iter()
-                .flatten()
-                .collect_vec()
-                .len(),
-            3
-        )
+        assert_eq!(resp.signals().len(), 3)
     }
 }

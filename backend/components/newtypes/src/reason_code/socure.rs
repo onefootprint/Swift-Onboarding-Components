@@ -1061,7 +1061,7 @@ vendor_reason_code_enum! {
         R644,
 
         #[ser = "R645", description = "IP proxy is TOR-based"]
-        #[footprint_reason_code = Some(FootprintReasonCode::IpAlertHighRiskTor)]
+        #[footprint_reason_code = Some(FootprintReasonCode::IpTorExitNode)]
         R645,
 
         #[ser = "R646", description = "IP proxy is VPN-based"]

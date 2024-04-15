@@ -6659,7 +6659,14 @@ pub fn incode_curp_validation_bad_curp() -> serde_json::Value {
 }
 
 
-pub fn neuro_id_success_response() -> serde_json::Value {
+#[derive(Default)]
+pub struct NeuroTestOpts {
+    pub automated_activity: bool,
+    pub bot_framework: bool,
+    pub factory_reset: bool,
+    pub fraud_ring_indicator: bool,
+}
+pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
     serde_json::json!({
         "status": "SUCCESS",
         "message": "success",
@@ -6713,14 +6720,14 @@ pub fn neuro_id_success_response() -> serde_json::Value {
                 {
                     "version": "1.0",
                     "model": "fraud_ring_indicator",
-                    "label": "false",
+                    "label": opts.fraud_ring_indicator.to_string(),
                     "attributes": {},
                     "score": 0.0
                 },
                 {
                     "version": "1.0",
                     "model": "automated_activity",
-                    "label": "false",
+                    "label": opts.automated_activity.to_string(),
                     "attributes": {},
                     "score": 0.0
                 },
@@ -6743,13 +6750,13 @@ pub fn neuro_id_success_response() -> serde_json::Value {
                 {
                     "version": "1.0",
                     "model": "bot_framework",
-                    "label": "false",
+                    "label": opts.bot_framework.to_string(),
                     "attributes": {}
                 },
                 {
                     "version": "1.0",
                     "model": "factory_reset",
-                    "label": "false",
+                    "label": opts.factory_reset.to_string(),
                     "attributes": {}
                 },
                 {

@@ -1438,6 +1438,14 @@ footprint_reason_code_enum! {
         BehaviorFraudRingRisk,
 
         #[scope = SignalScope::Behavior, additional_scopes = vec![], match_level = None]
+        #[note = "Behavior is high risk", severity = SignalSeverity::High,  description = "User's behavior is high risk"]
+        BehaviorHighRisk,
+
+        #[scope = SignalScope::Behavior, additional_scopes = vec![], match_level = None]
+        #[note = "Behavior is low risk", severity = SignalSeverity::Low,  description = "User's behavior is low risk"]
+        BehaviorLowRisk,
+
+        #[scope = SignalScope::Behavior, additional_scopes = vec![], match_level = None]
         #[note = "Behavior is associated with automated activities", severity = SignalSeverity::High,  description = "User's behavior is associated with automated activities"]
         BehaviorAutomaticActivity
     }

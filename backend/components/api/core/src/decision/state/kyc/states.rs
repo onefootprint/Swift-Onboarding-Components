@@ -167,7 +167,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         // Run Additional Checks
         //
         let curp_result = if obc.curp_validation_enabled {
-             // once this is stable, we should err.
+            // once this is stable, we should err.
             match common::run_curp_check(state, &self.wf_id).await {
                 Ok(res) => res,
                 Err(err) => {
@@ -264,7 +264,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .collect();
 
             let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Behavior)?;
-            RiskSignal::bulk_add(conn, neuro_frc, false, rsg.id)?;
+            RiskSignal::bulk_add(conn, neuro_frc, true, rsg.id)?;
         }
 
         let fixture_decision =
