@@ -99,9 +99,10 @@ const PinInput = ({
           const isIndexDisabled = pinIndex > enteredPin.length;
           return (
             <Pin
-              /** Do not change/remove these classes */
               autoComplete="one-time-code"
+              /** Do not change/remove these classes */
               className="fp-pin-input fp-custom-appearance"
+              data-nid-target={`otp${pinIndex + 1}`}
               hasError={hasError}
               inputMode="numeric"
               isDisabled={disabled || isIndexDisabled}
