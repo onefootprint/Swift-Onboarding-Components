@@ -51,7 +51,7 @@
     "lodash": "^4.17.21",
     "react-device-detect": "^2.2.3",
     "react-highlight-words": "^0.18.0",
-    "react-hook-form": "^7.51.3",
+    "react-hook-form": "^7.47.0",
     "react-merge-refs": "^1.1.0",
     "react-popper": "^2.3.0",
     "react-select": "^5.3.2",
