@@ -128,6 +128,8 @@ impl IncodeStateMachine {
         let session = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
+                // TODO: we need to handle auth tokens expiring on stale IVS sessions
+                // (e.g. someone starts and then comes back > 90d we will error here.)
                 let session = IncodeVerificationSession::get(conn, &id_doc_id)?;
                 let session = if let Some(existing) = session {
                     existing
@@ -147,6 +149,7 @@ impl IncodeStateMachine {
                         config_id,
                         session_kind,
                         Some(default_environment),
+                        None,
                     )?
                 };
                 Ok(session)

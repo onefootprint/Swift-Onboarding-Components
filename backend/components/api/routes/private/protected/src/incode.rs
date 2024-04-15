@@ -76,6 +76,7 @@ pub async fn rerun_machine(
                 config_id,
                 kind,
                 environment.or(old_session.incode_environment),
+                None,
             )?;
             Ok((id_doc, dr, su, di, uvw, obc))
         })

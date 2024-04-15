@@ -16,9 +16,9 @@ use itertools::Itertools;
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataLifetimeSource, DataRequest,
     DecisionIntentId, DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind,
-    IdentityDocumentFixtureResult, IncodeConfigurationId, IncodeEnvironment, IncodeVerificationSessionKind,
-    OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey,
-    VendorAPI, WorkflowId,
+    IdentityDocumentFixtureResult, IncodeConfigurationId, IncodeEnvironment, IncodeSessionId,
+    IncodeVerificationSessionKind, OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId, TenantId,
+    ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -105,6 +105,7 @@ pub async fn run_curp_validation_check(
                 environment,
             )
             .await?;
+            let incode_session_id = IncodeSessionId::from(res.interview_id);
 
             let credentials = IncodeCredentialsWithToken {
                 credentials: tvc.incode_credentials(environment),
@@ -157,6 +158,7 @@ pub async fn run_curp_validation_check(
                         config_id,
                         IncodeVerificationSessionKind::CurpValidation,
                         Some(environment),
+                        Some(incode_session_id),
                     )?;
 
                     Ok(session)

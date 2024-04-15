@@ -56,6 +56,7 @@ struct NewIncodeVerificationSession {
     ignored_failure_reasons: Vec<IncodeFailureReason>,
     incode_environment: Option<IncodeEnvironment>,
     purpose: IncodeVerificationSessionPurpose,
+    incode_session_id: Option<IncodeSessionId>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -122,6 +123,7 @@ impl IncodeVerificationSession {
         configuration_id: IncodeConfigurationId,
         kind: IncodeVerificationSessionKind,
         incode_environment: Option<IncodeEnvironment>,
+        incode_session_id: Option<IncodeSessionId>,
     ) -> DbResult<Self> {
         let purpose: IncodeVerificationSessionPurpose = kind.into();
         let new_req = NewIncodeVerificationSession {
@@ -134,6 +136,7 @@ impl IncodeVerificationSession {
             ignored_failure_reasons: vec![],
             incode_environment,
             purpose,
+            incode_session_id,
         };
 
         let res: IncodeVerificationSession = diesel::insert_into(incode_verification_session::table)
