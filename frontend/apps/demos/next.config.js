@@ -11,7 +11,7 @@ const ContentSecurityPolicy = `
   form-action 'self';
   frame-ancestors 'self';
   frame-src 'self' *.onefootprint.com http://localhost:3000 http://localhost:3010 http://localhost:3011 vercel.live;
-  img-src 'self' data: assets.vercel.com vercel.live footprint-blog.ghost.io vercel.com cdn.jsdelivr.net;
+  img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usefathom.com vercel.live vitals.vercel-insights.com https://cdn.jsdelivr.net;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
@@ -66,18 +66,6 @@ const nextConfig = {
         headers: securityHeaders,
       },
     ];
-  },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'static.ghost.org',
-      },
-      {
-        protocol: 'https',
-        hostname: 'footprint-blog.ghost.io',
-      },
-    ],
   },
   transpilePackages: [
     '@onefootprint/ui',

@@ -1,4 +1,4 @@
-import { media, Text } from '@onefootprint/ui';
+import { media } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -6,42 +6,25 @@ import styled, { css } from 'styled-components';
 import Form from './components/form';
 import Success from './components/success';
 
-export type DemoProps = {
-  page: {
-    id: string;
-    slug: string;
-    title: string;
-    html: string;
-    feature_image: string;
-    meta_title: string;
-  };
-};
-
-const Demo = ({ page }: DemoProps) => {
+const Demo = () => {
   const [showConfirmation, setConfirmation] = useState(false);
+
   const handleSuccess = () => {
     setConfirmation(true);
   };
 
-  return page ? (
+  return (
     <>
       <Head>
-        <title>{page.meta_title || 'Footprint Demo'}</title>
+        <title>Footprint Demo</title>
       </Head>
       <Container>
         <Inner>
-          {showConfirmation ? (
-            <Success />
-          ) : (
-            <Form html={page.html} onSuccess={handleSuccess} />
-          )}
+          {showConfirmation ? <Success /> : <Form onSuccess={handleSuccess} />}
         </Inner>
-        <Text color="tertiary" marginTop={7} variant="label-2">
-          Footprint ❤️ {page.title}
-        </Text>
       </Container>
     </>
-  ) : null;
+  );
 };
 
 const Container = styled.div`

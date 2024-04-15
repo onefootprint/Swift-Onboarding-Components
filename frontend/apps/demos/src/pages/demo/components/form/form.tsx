@@ -14,6 +14,7 @@ import {
   TextInput,
 } from '@onefootprint/ui';
 import debounce from 'lodash/debounce';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -30,11 +31,10 @@ type FormData = {
 const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY ?? '';
 
 type FormProps = {
-  html: string;
   onSuccess: () => void;
 };
 
-const Form = ({ html, onSuccess }: FormProps) => {
+const Form = ({ onSuccess }: FormProps) => {
   const router = useRouter();
   const { ob_key: obKey } = router.query;
   const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
@@ -114,7 +114,18 @@ const Form = ({ html, onSuccess }: FormProps) => {
 
   return (
     <Container>
-      <Content dangerouslySetInnerHTML={{ __html: html }} />
+      <Content>
+        <Image src="/logo-acme-bank.png" width={187} height={40} alt="Logo" />
+        <Text variant="display-3" tag="h3">
+          Help us verify your identity
+        </Text>
+        <Text variant="body-2">
+          We will need to collect some personal information to confirm and
+          protect your identity when you create your account at AcmeBank. To
+          learn more about how we process this data, please see our privacy
+          policy.
+        </Text>
+      </Content>
       <FormContainer>
         <InputsContainer>
           <TextInput
