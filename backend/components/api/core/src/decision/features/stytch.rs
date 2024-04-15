@@ -14,7 +14,7 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
     match value {
         Reason::AuthenticDevice => None,
         Reason::AuthorizedDevice => None,
-        Reason::KnownDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
+        Reason::KnownDatacenterIp => Some(FootprintReasonCode::IpDataCenter),
         Reason::JsPropertyDeception => Some(FootprintReasonCode::BrowserTampering),
         Reason::UnverifiedDevice => None,
         Reason::IpRateLimitExceeded => None,
@@ -24,17 +24,17 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::UnauthorizedPayloadOrigin => Some(FootprintReasonCode::BrowserTampering),
         Reason::BannedDevice => None,
         Reason::HeadlessBrowserAutomation => Some(FootprintReasonCode::BrowserAutomation),
-        Reason::KnownTorExitNode => Some(FootprintReasonCode::IpAlertHighRiskTor),
+        Reason::KnownTorExitNode => Some(FootprintReasonCode::IpTorExitNode),
         Reason::BannedIpAddress => None,
         Reason::UserAgentDeception => Some(FootprintReasonCode::BrowserTampering),
         Reason::IpRateLimitExceededCritical => None,
         Reason::TuningRuleMatch => None,
-        Reason::AwsDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
+        Reason::AwsDatacenterIp => Some(FootprintReasonCode::IpDataCenter),
         Reason::PossibleFakeAppleChromeOrMitm => None,
         Reason::PossibleTlsMitm => None,
-        Reason::AzureDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
+        Reason::AzureDatacenterIp => Some(FootprintReasonCode::IpDataCenter),
         Reason::PossibleTamperingDetected => Some(FootprintReasonCode::BrowserTampering),
-        Reason::GcpDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
+        Reason::GcpDatacenterIp => Some(FootprintReasonCode::IpDataCenter),
         Reason::Arm8_32BitAndroidOld => None,
         Reason::PossibleBrowserAutomation => Some(FootprintReasonCode::BrowserAutomation),
         Reason::Arm7_32BitAndroidOld => None,
@@ -72,7 +72,7 @@ mod test {
     #[test_case(Action::Challenge, vec![] => vec![FootprintReasonCode::DeviceMediumRisk])]
     #[test_case(Action::Allow, vec![] => vec![FootprintReasonCode::DeviceLowRisk])]
     #[test_case(Action::Challenge, vec![Reason::TuningRuleMatch] => vec![FootprintReasonCode::DeviceMediumRisk])]
-    #[test_case(Action::Challenge, vec![Reason::KnownDatacenterIp] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::IpAlertDataCenter])]
+    #[test_case(Action::Challenge, vec![Reason::KnownDatacenterIp] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::IpDataCenter])]
     #[test_case(Action::Challenge, vec![Reason::HeadlessBrowserAutomation] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::BrowserAutomation])]
     #[test_case(Action::Challenge, vec![Reason::UnauthorizedPayloadOrigin] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::BrowserTampering])]
     #[test_case(Action::Challenge, vec![Reason::UnauthorizedPayloadOrigin, Reason::JsPropertyDeception] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::BrowserTampering])]

@@ -40,6 +40,7 @@ pub enum SignalScope {
     NativeDevice,
     Document,
     Selfie,
+    Behavior,
 
     BusinessAddress,
     BusinessName,
@@ -77,6 +78,7 @@ impl SignalScope {
             SignalScope::BusinessTin => false,
             SignalScope::BeneficialOwners => false,
             SignalScope::BusinessDba => false,
+            SignalScope::Behavior => true,
         }
     }
 
@@ -105,6 +107,7 @@ impl SignalScope {
             | SignalScope::BusinessWebsite
             | SignalScope::BusinessTin
             | SignalScope::BeneficialOwners
+            | SignalScope::Behavior
             | SignalScope::BusinessDba => false,
         }
     }
@@ -127,6 +130,7 @@ impl SignalScope {
             | SignalScope::NativeDevice
             | SignalScope::Document
             | SignalScope::Selfie
+            | SignalScope::Behavior // TODO: cross this bridge when/if we use behavioral for kyb
             | SignalScope::PhoneNumber => false,
             SignalScope::BusinessAddress
             | SignalScope::BusinessName

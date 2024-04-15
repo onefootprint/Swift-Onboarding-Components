@@ -475,8 +475,16 @@ footprint_reason_code_enum! {
         IpAlertHighRiskProxy,
 
         #[scope = SignalScope::IpAddress, additional_scopes = vec![], match_level = None]
+        #[note = "IP proxy", severity = SignalSeverity::Medium,  description = "The IP address is associated with an anonymizing public proxy"]
+        IpProxy,
+
+        #[scope = SignalScope::IpAddress, additional_scopes = vec![], match_level = None]
         #[note = "IP from data center", severity = SignalSeverity::Medium,  description = "The IP address is from a known data center"]
-        IpAlertDataCenter,
+        IpDataCenter,
+
+        #[scope = SignalScope::IpAddress, additional_scopes = vec![], match_level = None]
+        #[note = "IP from data center", severity = SignalSeverity::Medium,  description = "The IP address is from a known data center"]
+        IpAlertDataCenter, // DEPRECATED USE IpIsDataCenter instead!!!
 
         // ~~~~~~~~~~~~ Email ~~~~~~~~~~~~
 
@@ -1329,6 +1337,45 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
         #[note = "High Risk Device", severity = SignalSeverity::Medium,  description = "Device exhibits properties typical of high risk populations"]
         DeviceHighRisk,
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Device factory reset", severity = SignalSeverity::Medium,  description = "Device is an iOS device that has been reset to the default factory settings"]
+        DeviceFactoryReset,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Device GPS location spoofing", severity = SignalSeverity::High,  description = "The location of a mobile device shows evidence of spoofing. Location spoofing is a common practice among fraudsters to fool fraud detection systems"]
+        DeviceGpsSpoofing,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "IP address is associated with a VPN", severity = SignalSeverity::Medium,  description = "The public IP address of the the device is associated with a VPN (Virtual Private Network)"]
+        IpVpn,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "IP address is a known TOR exit node", severity = SignalSeverity::High,  description = "The IP address of the the device is associated with a TOR exit node"]
+        IpTorExitNode,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Device bot automation risk", severity = SignalSeverity::High,  description = "The device has properties that are typically associated with automation tools."]
+        DeviceBotRisk,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Device bot activity risk", severity = SignalSeverity::High,  description = "The device has properties that suggest the device has been modified in a way that indicates the device is being used for fraudulent or bot activity, such as being jailbroken, using an emulator or Frida."]
+        DeviceSuspicious,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "High device velocity", severity = SignalSeverity::High,  description = "The device has a high number of recent sessions in the last day"]
+        DeviceVelocity,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "High users per device", severity = SignalSeverity::High,  description = "The device has a high number of distinct users associated with it in the last day"]
+        DeviceMultipleUsers,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Bad device reputation", severity = SignalSeverity::High,  description = "The device used was located on a list of known bad devices."]
+        DeviceReputation,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Browser is incognito", severity = SignalSeverity::Medium,  description = "Browser was identified as being in incognito or private browsing mode."]
+        BrowserIncognito,
 
         #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
         #[note = "Browser tampering", severity = SignalSeverity::Medium,  description = "Analysis indicates the user may have been tampering with aspects of their browser (user agent, javascript runtime, network calls) to circumvent or disrupt our collection of device insights. Often a sign of abuse."]
@@ -1380,7 +1427,19 @@ footprint_reason_code_enum! {
 
         #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Attested Device High Duplicate Risk", severity = SignalSeverity::High,  description = "User's attested device indicates high duplicate identity risk. Device may be associated with multiple identities."]
-        AttestedDeviceFraudDuplicateRiskHigh
+        AttestedDeviceFraudDuplicateRiskHigh,
+
+        //
+        // ~~~~~~~~~ Behavior ~~~~~~~~~~~
+        //
+
+        #[scope = SignalScope::Behavior, additional_scopes = vec![], match_level = None]
+        #[note = "Behavior is associated with fraud ring activities", severity = SignalSeverity::High,  description = "User's behavior is associated with fraud ring activities"]
+        BehaviorFraudRingRisk,
+
+        #[scope = SignalScope::Behavior, additional_scopes = vec![], match_level = None]
+        #[note = "Behavior is associated with automated activities", severity = SignalSeverity::High,  description = "User's behavior is associated with automated activities"]
+        BehaviorAutomaticActivity
     }
 }
 crate::util::impl_enum_str_diesel!(FootprintReasonCode);
@@ -1406,6 +1465,7 @@ impl FootprintReasonCode {
                 | Self::InputPhoneNumberDoesNotMatchIpState
                 | Self::DocumentRequiresReview
                 | Self::DocumentLowMatchScoreWithSelfie
+                | Self::IpTorExitNode // 2024-04-12 new naming for this one
         )
     }
 }
