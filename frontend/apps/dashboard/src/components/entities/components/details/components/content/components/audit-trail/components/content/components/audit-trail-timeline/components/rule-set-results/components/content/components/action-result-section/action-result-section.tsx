@@ -44,7 +44,7 @@ const ActionResultSection = ({
   };
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+    setIsDropdownOpen(isCurrentlyOpen => !isCurrentlyOpen);
   };
 
   const selectResultGroup = (group: RuleResultGroup) => {
@@ -74,30 +74,30 @@ const ActionResultSection = ({
               </Stack>
             </Stack>
           </CustomDropdownTrigger>
-          <Dropdown.Portal>
-            <Dropdown.Content align="end" sideOffset={4} asChild>
-              <DropdownInner>
-                {Object.values(RuleResultGroup).map(group => (
+          <Dropdown.Content align="end" sideOffset={4} asChild>
+            <DropdownInner>
+              {Object.values(RuleResultGroup).map(group => {
+                const label = t(kebabCase(group) as ParseKeys<'common'>);
+                return (
                   <DropdownOption
                     key={group}
                     role="option"
-                    aria-label={t(kebabCase(group) as ParseKeys<'common'>)}
+                    aria-label={label}
                     onClick={() => selectResultGroup(group)}
                   >
-                    <Text variant="body-3">
-                      {t(kebabCase(group) as ParseKeys<'common'>)}
-                    </Text>
+                    <Text variant="body-3">{label}</Text>
                     {group === selectedResultGroup && <IcoCheck16 />}
                   </DropdownOption>
-                ))}
-              </DropdownInner>
-            </Dropdown.Content>
-          </Dropdown.Portal>
+                );
+              })}
+            </DropdownInner>
+          </Dropdown.Content>
         </Dropdown.Root>
       </Stack>
       {actionSection === RuleActionSection.stepUp ? (
         stepUpActions.map(action => (
           <RuleList
+            key={action}
             rules={data[action][selectedResultGroup]}
             stepUpAction={action}
           />
@@ -114,9 +114,11 @@ const CustomDropdownTrigger = styled(Dropdown.Trigger)`
     display: flex;
     align-items: center;
     width: unset;
+
     &[data-state='open'] {
       background: unset;
     }
+
     &:hover {
       background-color: ${theme.backgroundColor.primary} !important;
     }

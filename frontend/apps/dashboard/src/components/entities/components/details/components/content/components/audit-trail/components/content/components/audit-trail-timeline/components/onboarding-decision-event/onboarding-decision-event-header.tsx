@@ -30,34 +30,26 @@ const OnboardingDecisionEventHeader = ({
     source.kind === ActorKind.firmEmployee ||
     source.kind === ActorKind.footprint;
   let text;
+  let link;
   if (isFootprintActor) {
-    text = (
-      <Stack align="center">
-        {isVerified ? t('verified-by') : t('not-verified-by')}
-        &nbsp;
-        <PlaybookLink playbook={playbook} />
-      </Stack>
-    );
+    text = isVerified ? t('verified-by') : t('not-verified-by');
+    link = <PlaybookLink playbook={playbook} />;
   } else {
-    const decision = t(`decision-status.${status}` as ParseKeys<'common'>);
-    text = (
-      <Stack align="center">
-        {t('org-overwrite.title', { decision })}
-        &nbsp;
-        <Actor actor={source} />
-      </Stack>
-    );
+    text = t('org-overwrite.title', {
+      decision: t(`decision-status.${status}` as ParseKeys<'common'>),
+    });
+    link = <Actor actor={source} />;
   }
 
   return (
     <Stack direction="row" align="center" gap={2}>
-      <Text
-        variant="label-3"
-        color={color}
-        testID="onboarding-decision-event-header"
-      >
-        {text}
-      </Text>
+      <Stack align="center" testID="onboarding-decision-event-header">
+        <Text variant="label-3" color={color}>
+          {text}
+        </Text>
+        &nbsp;
+        {link}
+      </Stack>
       {isFootprintActor && <Details ruleSetResultId={ruleSetResultId} />}
     </Stack>
   );

@@ -28,12 +28,12 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
             <>
               {t('attested-by')}
               {issuers?.map((issuer, i) => (
-                <>
+                <React.Fragment key={issuer}>
                   <Text variant="label-3" marginLeft={2} marginRight={2}>
                     {capitalize(issuer)}
                   </Text>
                   {i === issuers.length - 1 ? '' : ' and '}
-                </>
+                </React.Fragment>
               ))}
             </>
           }
