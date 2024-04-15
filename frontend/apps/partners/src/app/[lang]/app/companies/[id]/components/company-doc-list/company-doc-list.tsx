@@ -136,7 +136,24 @@ const renderTr = (
         <td>{getAssignedTo(item)}</td>
         <td>{dateFormatter(lang, item.lastUpdated)}</td>
         {isNotRequested(item.status) ? (
-          <td aria-label="no actions" />
+          <Box tag="td" display="grid" justifyContent="end" alignItems="center">
+            <Dropdown.Root>
+              <Dropdown.Trigger
+                aria-label={`${t('open-actions-for')} ${item.name}`}
+              >
+                <IcoDotsHorizontal24 />
+              </Dropdown.Trigger>
+              <Dropdown.Content align="end">
+                <Dropdown.Item
+                  data-id={item.id}
+                  onClick={stopPropagation}
+                  onSelect={e => handlers.onReSubmitClick(getDataId(e))}
+                >
+                  {t('doc.request-new-submission')}
+                </Dropdown.Item>
+              </Dropdown.Content>
+            </Dropdown.Root>
+          </Box>
         ) : (
           <Box tag="td" display="grid" justifyContent="end" alignItems="center">
             <Dropdown.Root>
@@ -179,7 +196,8 @@ const renderTr = (
                     {t('assign')}
                   </Dropdown.Item>
                 )}
-                {isAccepted(item.status) ? null : (
+                {isAccepted(item.status) ||
+                isWaitingForReview(item.status) ? null : (
                   <Dropdown.Item
                     data-id={item.id}
                     onClick={stopPropagation}
@@ -201,7 +219,9 @@ const renderTr = (
                     {t('doc.cancel-submission')}
                   </Dropdown.Item>
                 )}
-                {isAccepted(item.status) || isRejected(item.status) ? (
+                {isAccepted(item.status) ||
+                isRejected(item.status) ||
+                isWaitingForReview(item.status) ? (
                   <Dropdown.Item
                     data-id={item.id}
                     onClick={stopPropagation}
