@@ -2,6 +2,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import { useEffectOnce } from 'usehooks-ts';
 
 import Logger from '../../../../../../utils/logger';
+import nid from '../../../../../../utils/neuro-id';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import useOnboarding from './hooks/use-onboarding';
 
@@ -17,6 +18,7 @@ const StartOnboarding = () => {
       { authToken },
       {
         onSuccess: () => {
+          nid.identify(authToken);
           send('initialized');
         },
         onError: (err: unknown) => {
