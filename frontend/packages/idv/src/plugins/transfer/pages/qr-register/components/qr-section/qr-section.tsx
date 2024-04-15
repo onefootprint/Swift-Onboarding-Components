@@ -27,7 +27,7 @@ const QRSection = ({ text, qrValue, isLoading }: QRSectionProps) => (
         sx={{ height: `${QR_CODE_SIZE}px`, width: `${QR_CODE_SIZE}px` }}
       />
     ) : (
-      <QRContainer>
+      <QRContainer data-private="true">
         <QRCode size={QR_CODE_SIZE} value={qrValue} />
       </QRContainer>
     )}
