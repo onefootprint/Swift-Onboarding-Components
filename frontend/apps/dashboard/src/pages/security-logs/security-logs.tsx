@@ -64,6 +64,7 @@ const SecurityLogs = () => {
           onChangeText={value => filters.push({ search: value })}
           value={filters.query.search || ''}
           size="compact"
+          placeholder={t('filters.search')}
         />
         <SecurityLogsFilters />
       </FiltersContainer>

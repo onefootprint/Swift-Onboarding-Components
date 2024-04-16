@@ -270,20 +270,7 @@ impl AuditEvent {
         }
 
         if let Some(search) = params.search.as_ref() {
-            let exact_match_fp_id = scoped_vault::fp_id.eq(search);
-            let substr_match_tenant_name = tenant::name.ilike(format!("%{}%", search));
-            let substr_match_decrypt_reason = audit_event::name.eq(AuditEventName::DecryptUserData).and(
-                sql::<Bool>("metadata -> 'data' ->> 'reason' ILIKE ")
-                    .bind::<Text, _>(format!("%{}%", search)),
-            );
-            let exact_match_field = sql::<Bool>("metadata -> 'data' -> 'fields' ? ").bind::<Text, _>(search);
-
-            results = results.filter(
-                exact_match_fp_id
-                    .or(substr_match_tenant_name)
-                    .or(substr_match_decrypt_reason)
-                    .or(exact_match_field),
-            );
+            results = results.filter(scoped_vault::fp_id.eq(search));
         }
 
 
@@ -581,51 +568,6 @@ mod tests {
                     list_id: None,
                 },
                 vec![id1.clone()],
-            ),
-            (
-                "search by partial tenant name",
-                FilterQueryParams {
-                    cursor: None,
-                    tenant_id: tenant.id.clone(),
-                    search: Some(tenant.name[..tenant.name.len() - 3].to_owned()),
-                    timestamp_lte: None,
-                    timestamp_gte: None,
-                    names: vec![],
-                    targets: vec![],
-                    is_live: true,
-                    list_id: None,
-                },
-                vec![id1.clone(), id2.clone()],
-            ),
-            (
-                "search by decryption reason",
-                FilterQueryParams {
-                    cursor: None,
-                    tenant_id: tenant.id.clone(),
-                    search: Some("investigating".to_owned()),
-                    timestamp_lte: None,
-                    timestamp_gte: None,
-                    names: vec![],
-                    targets: vec![],
-                    is_live: true,
-                    list_id: None,
-                },
-                vec![id2.clone()],
-            ),
-            (
-                "search by fields",
-                FilterQueryParams {
-                    cursor: None,
-                    tenant_id: tenant.id.clone(),
-                    search: Some("id.zip".to_owned()),
-                    timestamp_lte: None,
-                    timestamp_gte: None,
-                    names: vec![],
-                    targets: vec![],
-                    is_live: true,
-                    list_id: None,
-                },
-                vec![id2.clone()],
             ),
             (
                 "timestamp <= 0",

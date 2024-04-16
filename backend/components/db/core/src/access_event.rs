@@ -53,13 +53,7 @@ impl AccessEventListItemForTenant {
                     .into_boxed();
 
                 if let Some(search) = params.search {
-                    results = results.filter(
-                        schema::access_event::reason
-                            .ilike(format!("%{}%", search))
-                            .or(schema::tenant::name.ilike(format!("%{}%", search))) // TODO also search on tenant name
-                            .or(schema::scoped_vault::fp_id.eq(search.clone()))
-                            .or(schema::access_event::targets.overlaps_with(vec![search])),
-                    )
+                    results = results.filter(schema::scoped_vault::fp_id.eq(search.clone()))
                 }
 
                 if let Some(timestamp_lte) = params.timestamp_lte {
