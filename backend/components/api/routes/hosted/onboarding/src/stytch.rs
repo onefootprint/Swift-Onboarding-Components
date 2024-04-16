@@ -25,6 +25,7 @@ use db::{
     TxnPgConn,
 };
 use either::Either;
+use feature_flag::BoolFlag;
 use idv::{
     stytch::{StytchLookupRequest, StytchLookupResponse},
     ParsedResponse, VendorResponse,
@@ -64,6 +65,18 @@ pub async fn post(
         .scoped_user_id()
         .ok_or(AssertionError("auth missing scoped_user_id"))?;
     let wf_id = user_auth.workflow_id();
+
+    // We want to only show a signal set of device signals from Stytch OR Neuro or else it's confusing
+    let obc_key_for_flag = user_auth.ob_config().map(|o| o.key.clone());
+    let should_hide_risk_signals = obc_key_for_flag
+        .as_ref()
+        .map(|obc_key| {
+            state
+                .feature_flag_client
+                .flag(BoolFlag::IsNeuroEnabledForObc(obc_key))
+        })
+        .unwrap_or(false);
+
     state
         .db_pool
         .db_transaction(move |conn: &mut db::TxnPgConn<'_>| -> ApiResult<_> {
@@ -87,6 +100,7 @@ pub async fn post(
                         &uv_id,
                         &sv_id,
                         telemetry_headers,
+                        should_hide_risk_signals,
                     )?;
                 }
                 // error response
@@ -106,6 +120,7 @@ pub async fn post(
     EmptyResponse::ok().json()
 }
 
+#[allow(clippy::too_many_arguments)]
 fn save_successful_response(
     conn: &mut TxnPgConn,
     vreq: VerificationRequest,
@@ -114,6 +129,7 @@ fn save_successful_response(
     uv_id: &VaultId,
     sv_id: &ScopedVaultId,
     telemetry_headers: TelemetryHeaders,
+    hide_risk_signals: bool,
 ) -> ApiResult<()> {
     let vendor_response = VendorResponse {
         response: ParsedResponse::StytchLookup(res.parsed_response.clone()),
@@ -133,8 +149,9 @@ fn save_successful_response(
             .map(|rc| (rc, VendorAPI::StytchLookup, vres.id.clone()))
             .collect::<Vec<_>>(),
         RiskSignalGroupKind::WebDevice,
-        false,
+        hide_risk_signals,
     )?;
+
 
     let _e = StytchFingerprintEvent::create(
         conn,

@@ -166,7 +166,8 @@ pub fn fetch_latest_risk_signals_map(
     scoped_vault_id: &ScopedVaultId,
 ) -> Result<RiskSignalsForDecision, ApiError> {
     let mut db_risk_signals_map: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
-        RiskSignal::latest_by_risk_signal_group_kinds(conn, scoped_vault_id, IncludeHidden(true))?
+        // We don't make decisions on hidden risk signals
+        RiskSignal::latest_by_risk_signal_group_kinds(conn, scoped_vault_id, IncludeHidden(false))?
             .into_iter()
             .fold(HashMap::new(), |mut acc, (kind, rs)| {
                 acc.entry(kind).or_default().push(rs);
