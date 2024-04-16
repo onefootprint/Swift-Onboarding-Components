@@ -191,10 +191,12 @@ const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
     </ConfirmationDialogProvider>
     <div id="footprint-portal" />
     <div id="footprint-toast-portal" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/rafaelmotta/footprint-flags/sprite.css"
-    />
+    {process.env.NODE_ENV === 'test' ? null : (
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/rafaelmotta/footprint-flags/sprite.css"
+      />
+    )}
   </ThemeProvider>
 );
 
