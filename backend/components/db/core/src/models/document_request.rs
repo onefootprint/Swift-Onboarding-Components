@@ -28,7 +28,7 @@ pub struct DocumentRequest {
     // If docreq was created as a result of a stepup rule, then this would be the id of that rule_result
     // Note: Not currently backfilled for all historical docreqs!
     pub rule_set_result_id: Option<RuleSetResultId>,
-    pub config: Option<DocumentRequestConfig>,
+    pub config: DocumentRequestConfig,
 }
 
 impl DocumentRequest {
