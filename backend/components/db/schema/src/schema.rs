@@ -363,6 +363,7 @@ diesel::table! {
         workflow_id -> Text,
         kind -> Text,
         rule_set_result_id -> Nullable<Text>,
+        config -> Nullable<Jsonb>,
     }
 }
 

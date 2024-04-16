@@ -1,37 +1,51 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::EnumIter;
+use strum::{EnumDiscriminants, EnumIter};
 use strum_macros::Display;
 
 use strum_macros::EnumString;
 
 #[derive(
     Debug,
-    Display,
     Clone,
-    Copy,
     Eq,
     PartialEq,
-    Ord,
-    PartialOrd,
-    AsExpression,
-    FromSqlRow,
-    EnumString,
-    SerializeDisplay,
-    DeserializeFromStr,
+    serde::Serialize,
+    serde::Deserialize,
+    AsJsonb,
     macros::SerdeAttr,
-    Apiv2Schema,
-    EnumIter,
+    EnumDiscriminants,
 )]
-#[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
-#[diesel(sql_type = Text)]
-pub enum DocumentRequestKind {
-    Identity,
-    ProofOfSsn,
-    ProofOfAddress,
+#[serde(tag = "kind", content = "data")]
+#[strum_discriminants(
+    name(DocumentRequestKind),
+    derive(
+        Display,
+        Ord,
+        PartialOrd,
+        AsExpression,
+        FromSqlRow,
+        EnumString,
+        SerializeDisplay,
+        DeserializeFromStr,
+        macros::SerdeAttr,
+        Apiv2Schema,
+        EnumIter,
+    ),
+    vis(pub),
+    strum(serialize_all = "snake_case"),
+    diesel(sql_type = Text)
+)]
+pub enum DocumentRequestConfig {
+    Identity {},
+    ProofOfSsn {},
+    ProofOfAddress {},
 }
+
+
 impl DocumentRequestKind {
     pub fn is_identity(&self) -> bool {
         matches!(self, DocumentRequestKind::Identity)
