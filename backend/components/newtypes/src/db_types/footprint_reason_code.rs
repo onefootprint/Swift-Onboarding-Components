@@ -800,6 +800,14 @@ footprint_reason_code_enum! {
         DocumentNotFakeImage,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document PDF417 data validation passed", severity = SignalSeverity::Info,  description = "Information decoded from the barcode was valid and matched information from OCR."]
+        DocumentPdf417DataIsValid,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document PDF417 data validation failed", severity = SignalSeverity::High,  description = "Information decoded from the barcode was not valid, did not match information from OCR, or was incorrect for the version or state"]
+        DocumentPdf417DataIsNotValid,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document image possibly an image of a screen", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being a picture of a document on a screen"]
         DocumentPhotoIsScreenCapture,
 
@@ -822,6 +830,14 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document visible photo features are not verified", severity = SignalSeverity::Medium,  description = "The visible photo features of the document were not verified"]
         DocumentVisiblePhotoFeaturesNotVerified,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document MRZ line formatting check fail", severity = SignalSeverity::Medium,  description = "The MRZ of the document was not in the correct format"]
+        DocumentMrzLineFormatCheck,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document QR validation failed", severity = SignalSeverity::Medium,  description = "The check digit extracted from the QR code does not match the OCR value from the MRZ or the URL of the QR code is incorrect."]
+        DocumentQrCodeCheck,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document visible photo features are verified", severity = SignalSeverity::Info,  description = "The visible photo features of the document were verified"]

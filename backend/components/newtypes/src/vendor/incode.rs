@@ -101,8 +101,10 @@ incode_reason_code_enum! {
         Alignment,
         // Technology to identify and reject fake IDs (Credentials not issued by government authority).
         // ML model that can detect patterns that differs from the original ones. For example: slight difference in layout of the ID, different font or font size.
+        //
+        // 2024-04-15: this appears as fakeCheck in the API response, but the display has been changed on Incode's side to be more specifically about pdf417 data
         #[ser = "fakeCheck"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNotFakeImage, FRC::DocumentPossibleFakeImage))]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentPdf417DataIsValid, FRC::DocumentPdf417DataIsNotValid))]
         FakeCheck,
         #[ser = "ocrIdentityCheck"]
         #[footprint_reason_code = None]
@@ -165,8 +167,11 @@ incode_reason_code_enum! {
         #[footprint_reason_code = None]
         IssuingStateValidity,
         #[ser = "qrScan"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new_with_optional(None, Some(FRC::DocumentQrCodeCheck)))]
         QrScan,
+        #[ser = "mrzLineFormatCheck"]
+        #[footprint_reason_code = Some(IncodeRCH::new_with_optional(None, Some(FRC::DocumentMrzLineFormatCheck)))]
+        MrzLineFormatCheck,
         // TODO: Not sure what check digits are
         #[ser = "documentNumberCheckDigit"]
         #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNumberCheckDigitMatches, FRC::DocumentNumberCheckDigitDoesNotMatch))]
@@ -286,6 +291,7 @@ impl IncodeTest {
             | IncodeTest::CompositeCheckDigit
             | IncodeTest::TwoDBarcodeContent
             | IncodeTest::Barcode2DDetected
+            | IncodeTest::MrzLineFormatCheck
             | IncodeTest::LastNameMatch => false,
 
             // Tests relating to checking MRZ/Barcode against OCR
@@ -350,10 +356,14 @@ pub enum IncodeDocumentType {
 impl<'a> TryFrom<(&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>)> for IdDocKind {
     type Error = crate::Error;
 
-    fn try_from((doc_type, doc_sub_type): (&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>)) -> Result<Self, Self::Error> {
+    fn try_from(
+        (doc_type, doc_sub_type): (&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>),
+    ) -> Result<Self, Self::Error> {
         match (doc_type, doc_sub_type) {
             (IncodeDocumentType::Passport, _) => Ok(Self::Passport),
-            (IncodeDocumentType::TravelDocument, Some(IncodeDocumentSubType::PassportCardAllages)) => Ok(Self::PassportCard),
+            (IncodeDocumentType::TravelDocument, Some(IncodeDocumentSubType::PassportCardAllages)) => {
+                Ok(Self::PassportCard)
+            }
             (IncodeDocumentType::DriversLicense, _) => Ok(Self::DriversLicense),
             (IncodeDocumentType::IdentificationCard, _) => Ok(Self::IdCard),
             (IncodeDocumentType::Permit, _) => Ok(Self::Permit),
@@ -425,7 +435,7 @@ pub enum IncodeDocumentSubType {
     VeteranIdentificationCard,
     VisaAllages,
     VisaB1B2,
-    VoterIdentificationCard,    
+    VoterIdentificationCard,
 }
 
 
@@ -444,7 +454,13 @@ mod tests {
         let mut incode_doc_types_mapped_to_our_doc_types: Vec<IdDocKind> = IncodeDocumentType::iter()
             .filter_map(|dt| IdDocKind::try_from((&dt, None)).ok())
             .collect();
-        incode_doc_types_mapped_to_our_doc_types.push(IdDocKind::try_from((&IncodeDocumentType::TravelDocument, Some(&IncodeDocumentSubType::PassportCardAllages))).unwrap());
+        incode_doc_types_mapped_to_our_doc_types.push(
+            IdDocKind::try_from((
+                &IncodeDocumentType::TravelDocument,
+                Some(&IncodeDocumentSubType::PassportCardAllages),
+            ))
+            .unwrap(),
+        );
         IdDocKind::identity_docs().iter().for_each(|doc_kind| {
             assert!(
                 incode_doc_types_mapped_to_our_doc_types.contains(doc_kind),
@@ -459,6 +475,9 @@ mod tests {
 
     #[test]
     fn scream_like_a_snake() {
-        assert_eq!(IncodeDocumentSubType::EnhancedDriversLicenseUnder21 , IncodeDocumentSubType::from_str("ENHANCED_DRIVERS_LICENSE_UNDER21").unwrap());
+        assert_eq!(
+            IncodeDocumentSubType::EnhancedDriversLicenseUnder21,
+            IncodeDocumentSubType::from_str("ENHANCED_DRIVERS_LICENSE_UNDER21").unwrap()
+        );
     }
 }
