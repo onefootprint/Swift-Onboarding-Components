@@ -65,8 +65,6 @@ pub enum Error {
     BusinessOwnerStakeBelow25,
     #[error("Contact info for beneficial owners must be unique")]
     NonUniqueBusinessOwners,
-    #[error("Invalid phone or email")]
-    SandboxNotAllowed,
     #[error("Couldn't parse as host. Should not include URL scheme or path")]
     UrlParseError(#[from] url::ParseError),
     #[error("Invalid host. Should be a domain")]
@@ -99,6 +97,10 @@ pub enum Error {
     ExpectedStringFormat,
     #[error("Expected {0} value, received {1} value.")]
     IncorrectDataType(PiiValueKind, PiiValueKind),
+    #[error("Business owner is missing email.")]
+    BoMissingEmail,
+    #[error("Business owner is missing phone number.")]
+    BoMissingPhoneNumber,
 }
 
 pub type VResult<T> = Result<T, Error>;

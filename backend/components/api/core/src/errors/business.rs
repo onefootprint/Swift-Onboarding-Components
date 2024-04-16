@@ -24,6 +24,4 @@ pub enum BusinessError {
     BoVaultMissingFirstName,
     #[error("BO vault does not have LastName")]
     BoVaultMissingLastName,
-    #[error("Primary BO has no email")]
-    PrimaryBoHasNoEmail,
 }

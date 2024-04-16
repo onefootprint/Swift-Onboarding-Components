@@ -14,15 +14,18 @@ use crate::{
 };
 use db::models::{business_owner::BusinessOwner, tenant::Tenant, workflow::Workflow};
 use futures::FutureExt;
+use itertools::Itertools;
 use newtypes::{
-    sms_message::SmsMessage, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, KybState,
-    KycedBusinessOwnerData, OnboardingStatus, PiiString, WorkflowState,
+    email::Email, sms_message::SmsMessage, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, KybState,
+    KycedBusinessOwnerData, NtResult, OnboardingStatus, PhoneNumber, PiiString, WorkflowState,
 };
 
 pub struct BasicBusinessInfo {
     pub business_name: PiiString,
+    /// Primary BO, missing phone and email
     pub primary_bo: KycedBusinessOwnerData,
-    pub secondary_bos: HashMap<BoLinkId, KycedBusinessOwnerData>,
+    /// Secondary BOs, with phone and email required
+    pub secondary_bos: HashMap<BoLinkId, KycedBusinessOwnerData<BoLinkId, Email, PhoneNumber>>,
 }
 
 pub async fn decrypt_basic_business_info(
@@ -45,8 +48,9 @@ pub async fn decrypt_basic_business_info(
     let secondary_bos = bos
         .into_iter()
         .skip(1)
-        .map(|bo| (bo.link_id.clone(), bo))
-        .collect();
+        .map(|bo| bo.validate_has_email_and_phone())
+        .map_ok(|bo| (bo.link_id.clone(), bo))
+        .collect::<NtResult<HashMap<_, _>>>()?;
     let info = BasicBusinessInfo {
         business_name,
         primary_bo,
@@ -98,7 +102,7 @@ pub async fn send_secondary_bo_links(
     // TODO batch this
     let tokens = futures::future::try_join_all(auth_token_futs).await?;
 
-    // Generate a link for each business
+    // Generate a link for each business owner
     let inviter = PiiString::new(format!(
         "{} {}",
         primary_bo.first_name.leak(),

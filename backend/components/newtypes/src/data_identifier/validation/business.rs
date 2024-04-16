@@ -82,7 +82,7 @@ fn clean_and_validate_beneficial_owners(input: PiiJsonValue) -> VResult<PiiStrin
 // Or should we branch validation logic based on a ParseArg
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
-pub struct KycedBusinessOwnerData<IdT = BoLinkId, EmailT = Email, PhoneT = PhoneNumber>
+pub struct KycedBusinessOwnerData<IdT = BoLinkId, EmailT = Option<Email>, PhoneT = Option<PhoneNumber>>
 where
     IdT: Serialize,
 {
@@ -93,6 +93,31 @@ where
     pub email: EmailT,
     pub phone_number: PhoneT,
     pub ownership_stake: u32,
+}
+
+impl<IdT: Serialize> KycedBusinessOwnerData<IdT> {
+    pub fn validate_has_email_and_phone(self) -> NtResult<KycedBusinessOwnerData<IdT, Email, PhoneNumber>> {
+        let Self {
+            link_id,
+            first_name,
+            last_name,
+            email,
+            phone_number,
+            ownership_stake,
+        } = self;
+
+        let email = email.ok_or(Error::BoMissingEmail)?;
+        let phone_number = phone_number.ok_or(Error::BoMissingPhoneNumber)?;
+        let res = KycedBusinessOwnerData {
+            link_id,
+            first_name,
+            last_name,
+            email,
+            phone_number,
+            ownership_stake,
+        };
+        Ok(res)
+    }
 }
 
 type KycedBusinessOwnerDataDe = KycedBusinessOwnerData<Option<()>>;
@@ -253,8 +278,8 @@ mod test {
         assert!(owner.link_id.to_string().starts_with("bo_link_"));
         assert_eq!(owner.first_name.leak(), "Piip");
         assert_eq!(owner.last_name.leak(), "Penguin");
-        assert_eq!(owner.email.leak(), "piip@onefootprint.com");
-        assert_eq!(owner.phone_number.e164().leak(), "+14155555555",);
+        assert_eq!(owner.email.unwrap().leak(), "piip@onefootprint.com");
+        assert_eq!(owner.phone_number.unwrap().e164().leak(), "+14155555555",);
         assert_eq!(owner.ownership_stake, 90);
 
         // Test bad email
