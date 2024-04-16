@@ -38,6 +38,7 @@ pub struct NewOnboardingArgs<'a> {
     pub source: WorkflowSource,
     pub actor: Option<AuthActor>,
     pub maybe_prefill_data: Option<PrefillData>,
+    pub is_neuro_enabled: bool,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -56,6 +57,7 @@ pub fn get_or_start_onboarding(
         source,
         actor,
         maybe_prefill_data,
+        is_neuro_enabled,
     } = args;
     let user_vault = Vault::lock(conn, &sv.vault_id)?;
     if !obc.kind.can_onboard() {
@@ -90,6 +92,7 @@ pub fn get_or_start_onboarding(
             fixture_result: None,
             is_one_click: is_first_wf && has_prefill_data,
             wfr: wfr.clone(),
+            is_neuro_enabled,
         };
         let (wf, is_new_ob) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
 
@@ -147,6 +150,7 @@ pub fn get_or_start_onboarding(
                 fixture_result: None,
                 is_one_click: false,
                 wfr: None,
+                is_neuro_enabled: false, // not now
             };
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, false)?;
             biz_wf

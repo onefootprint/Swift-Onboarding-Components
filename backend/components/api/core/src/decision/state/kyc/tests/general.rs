@@ -66,6 +66,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     authorized_at: None,
                     source: WorkflowSource::Hosted,
                     is_one_click: false,
+                    is_neuro_enabled: false,
                 },
             )
         })
@@ -614,6 +615,7 @@ async fn redo_and_pass(
                 authorized: false,
                 source: WorkflowSource::Hosted,
                 is_one_click: false,
+                is_neuro_enabled: false,
             };
             Workflow::create(conn, args)
         })

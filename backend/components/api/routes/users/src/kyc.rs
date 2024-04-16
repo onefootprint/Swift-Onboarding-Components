@@ -123,6 +123,8 @@ pub async fn post(
                 source: WorkflowSource::Tenant,
                 actor: Some(actor),
                 maybe_prefill_data: None,
+                // can't run neuro if using this path
+                is_neuro_enabled: false,
             };
             let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
             if let Some(fixture_result) = fixture_result {

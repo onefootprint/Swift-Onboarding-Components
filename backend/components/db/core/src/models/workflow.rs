@@ -63,6 +63,8 @@ pub struct Workflow {
     /// Note, note all workflows are expected to be validated.
     /// And not all historical workflows will have this backfilled
     pub session_validated_at: Option<DateTime<Utc>>,
+    /// When we create an onboarding, we will determine if NeuroID data should be collected and run for the workflow
+    pub is_neuro_enabled: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -80,6 +82,7 @@ pub struct NewWorkflow {
     pub authorized_at: Option<DateTime<Utc>>,
     pub source: WorkflowSource,
     pub is_one_click: bool,
+    pub is_neuro_enabled: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -92,6 +95,7 @@ pub struct NewWorkflowArgs {
     pub authorized: bool,
     pub source: WorkflowSource,
     pub is_one_click: bool,
+    pub is_neuro_enabled: bool,
 }
 
 #[derive(Debug, Default, AsChangeset)]
@@ -179,6 +183,7 @@ pub struct OnboardingWorkflowArgs {
     pub is_one_click: bool,
     /// If starting from a WorkflowRequest, the config
     pub wfr: Option<WorkflowRequest>,
+    pub is_neuro_enabled: bool,
 }
 
 pub type IsNew = bool;
@@ -217,6 +222,7 @@ impl Workflow {
             fixture_result,
             is_one_click,
             wfr,
+            is_neuro_enabled,
         } = args;
 
         let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
@@ -287,6 +293,7 @@ impl Workflow {
             insight_event_id,
             source,
             is_one_click,
+            is_neuro_enabled,
         };
         let wf = Self::create(conn, args)?;
 
@@ -321,6 +328,7 @@ impl Workflow {
             authorized,
             source,
             is_one_click,
+            is_neuro_enabled,
         } = args;
         let kind = config.kind();
         let initial_state = match kind {
@@ -342,6 +350,7 @@ impl Workflow {
             authorized_at: authorized.then_some(Utc::now()),
             source,
             is_one_click,
+            is_neuro_enabled,
         };
 
         Self::insert(conn, new_workflow)
@@ -791,6 +800,7 @@ mod tests {
                 authorized_at: None,
                 source: WorkflowSource::Unknown,
                 is_one_click: false,
+                is_neuro_enabled: false,
             },
         )
         .unwrap();
@@ -818,6 +828,7 @@ mod tests {
                 authorized_at: None,
                 source: WorkflowSource::Unknown,
                 is_one_click: false,
+                is_neuro_enabled: false,
             },
         )
         .unwrap();

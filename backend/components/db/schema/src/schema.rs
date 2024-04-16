@@ -1485,6 +1485,7 @@ diesel::table! {
         source -> Text,
         is_one_click -> Bool,
         session_validated_at -> Nullable<Timestamptz>,
+        is_neuro_enabled -> Bool,
     }
 }
 

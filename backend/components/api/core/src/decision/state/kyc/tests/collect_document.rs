@@ -289,6 +289,7 @@ async fn redo_document_and_pass(
                 authorized: false,
                 source: WorkflowSource::Hosted,
                 is_one_click: false,
+                is_neuro_enabled: false,
             };
             Workflow::create(conn, args)
         })

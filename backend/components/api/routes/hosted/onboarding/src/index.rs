@@ -25,6 +25,7 @@ use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::{
     insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, scoped_vault::ScopedVault,
 };
+use feature_flag::BoolFlag;
 use newtypes::{ObConfigurationKind, WorkflowSource};
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -82,6 +83,9 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
+    let is_neuro_enabled = state
+        .feature_flag_client
+        .flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
@@ -99,6 +103,7 @@ pub async fn post(
                 source: WorkflowSource::Hosted,
                 actor: None,
                 maybe_prefill_data: Some(prefill_data),
+                is_neuro_enabled,
             };
             let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
 

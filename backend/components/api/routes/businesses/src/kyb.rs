@@ -120,6 +120,7 @@ pub async fn post(
                 fixture_result,
                 is_one_click: false,
                 wfr: None,
+                is_neuro_enabled: false,
             };
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, false)?;
 

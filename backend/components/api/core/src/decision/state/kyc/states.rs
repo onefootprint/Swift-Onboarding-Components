@@ -142,9 +142,14 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     ) -> ApiResult<Self::AsyncRes> {
         let wfid = self.wf_id.clone();
         let svid = self.sv_id.clone();
-        let (vw, obc) = state
+        let (vw, obc, wf) = state
             .db_pool
-            .db_transaction(move |conn| common::get_vw_and_obc(conn, &svid, &wfid))
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let (vw, obc) = common::get_vw_and_obc(conn, &svid, &wfid)?;
+                let wf = DbWorkflow::get(conn, &wfid)?;
+
+                Ok((vw, obc, wf))
+            })
             .await?;
 
         // TODO: we should also skip if the UVW is non-US, but then we probably need to assert that doc was collected. Also need to clairfy tenant's understanding of this
@@ -179,10 +184,11 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
-        let is_neuro_enabled = state
+        let is_neuro_enabled_ff = state
             .feature_flag_client
             .flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
-        let neuro_result = if is_neuro_enabled {
+        let is_neuro_enabled_for_workflow = wf.is_neuro_enabled;
+        let neuro_result = if is_neuro_enabled_ff && is_neuro_enabled_for_workflow {
             match common::run_neuro_check(state, &self.wf_id, &self.t_id).await {
                 Ok(res) => res,
                 Err(err) => {
@@ -191,6 +197,14 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 }
             }
         } else {
+            // if FF and workflow get out of sync, make some noise
+            if is_neuro_enabled_ff != is_neuro_enabled_for_workflow {
+                tracing::error!(
+                    ?is_neuro_enabled_ff,
+                    ?is_neuro_enabled_for_workflow,
+                    "Neuro wf and ff disagree, not running neuro API call"
+                )
+            }
             None
         };
 

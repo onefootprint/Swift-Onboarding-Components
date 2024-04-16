@@ -23,6 +23,7 @@ pub fn create(
         fixture_result,
         is_one_click: false,
         wfr: None,
+        is_neuro_enabled: false,
     };
     let (wf, _) = Workflow::get_or_create_onboarding(conn, args, true).unwrap();
     wf
