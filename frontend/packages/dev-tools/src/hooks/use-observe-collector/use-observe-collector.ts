@@ -1,6 +1,5 @@
 'use client';
 
-import { IS_DEV, IS_SERVER } from '@onefootprint/global-constants';
 import constate from 'constate';
 import debounce from 'lodash/debounce';
 import { usePathname } from 'next/navigation';
@@ -16,7 +15,9 @@ import sendObservePayload from './utils/send-observe-payload';
 
 const DEBOUNCE_INTERVAL = 10000; // 10 seconds
 const MAX_DEBOUNCE = 30000; // 30 seconds
-const IS_TEST = typeof jest !== 'undefined';
+const IS_DEV = process.env.NODE_ENV === 'development';
+const IS_SERVER = typeof window === 'undefined';
+const IS_TEST = typeof jest !== 'undefined' || process.env.NODE_ENV === 'test';
 const IS_LOGGING_DISABLED = IS_SERVER || IS_DEV || IS_TEST;
 
 type ObserveCollectorProps = {
