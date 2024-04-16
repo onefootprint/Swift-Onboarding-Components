@@ -48,8 +48,9 @@ use idv::{
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
 use newtypes::{
-    DbUserTimelineEventKind, DecisionIntentKind, DocumentRequestKind, FootprintReasonCode, OnboardingStatus,
-    PiiJsonValue, RiskSignalGroupKind, ScopedVaultId, VendorAPI, WorkflowFixtureResult, WorkflowId,
+    DbUserTimelineEventKind, DecisionIntentKind, DocumentRequestConfig, DocumentRequestKind,
+    FootprintReasonCode, OnboardingStatus, PiiJsonValue, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
+    WorkflowFixtureResult, WorkflowId,
 };
 use strum_macros::EnumIter;
 use webhooks::{events::WebhookEvent, MockWebhookClient};
@@ -534,13 +535,15 @@ pub async fn mock_incode_doc_collection(
                     .is_none()
             {
                 // we need a doc request in order to indicate to the decision engine that we should include document rules in decisioning
+                let config = DocumentRequestConfig::Identity {
+                    collect_selfie: false,
+                };
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: scoped_vault_id.clone(),
                     ref_id: None,
                     workflow_id: wf_id.clone(),
-                    should_collect_selfie: false,
-                    kind: DocumentRequestKind::Identity,
                     rule_set_result_id: None,
+                    config,
                 };
                 DocumentRequest::create(conn, args).unwrap();
             }

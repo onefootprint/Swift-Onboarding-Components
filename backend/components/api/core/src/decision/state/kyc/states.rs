@@ -17,8 +17,9 @@ use db::models::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, ListId, Locked, OnboardingStatus,
-    RiskSignalGroupKind, RuleAction, RuleSetResultKind, StepUpInfo, VendorAPI, VerificationResultId,
+    DecisionStatus, DocumentRequestConfig, DocumentRequestKind, EnhancedAmlOption, KycConfig, ListId, Locked,
+    OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleSetResultKind, StepUpInfo, VendorAPI,
+    VerificationResultId,
 };
 
 use super::{
@@ -494,22 +495,26 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 Ok(KycState::from(KycComplete))
             }
             DecisionStatus::StepUp => {
-                let mut doc_reqs: Vec<NewDocumentRequestArgs> = vec![];
-                if let Some(RuleAction::StepUp(kind)) = decision.action {
-                    let sv_id = self.sv_id.clone();
-                    let wf_id: newtypes::WorkflowId = self.wf_id.clone();
-
-                    kind.to_doc_kinds().into_iter().for_each(|kind| {
-                        let should_collect_selfie = kind.is_identity(); // TODO: should come from config
-                        doc_reqs.push(NewDocumentRequestArgs {
-                            scoped_vault_id: sv_id.clone(),
-                            ref_id: None,
-                            workflow_id: wf_id.clone(),
-                            should_collect_selfie,
-                            kind,
-                            rule_set_result_id: Some(rule_set_result.id.clone()),
+                let doc_reqs = if let Some(RuleAction::StepUp(kind)) = decision.action {
+                    kind.to_doc_kinds()
+                        .into_iter()
+                        .map(|kind| match kind {
+                            DocumentRequestKind::Identity => DocumentRequestConfig::Identity {
+                                collect_selfie: true, // TODO: should come from config
+                            },
+                            DocumentRequestKind::ProofOfAddress => DocumentRequestConfig::ProofOfAddress {},
+                            DocumentRequestKind::ProofOfSsn => DocumentRequestConfig::ProofOfSsn {},
                         })
-                    })
+                        .map(|config| NewDocumentRequestArgs {
+                            scoped_vault_id: self.sv_id.clone(),
+                            ref_id: None,
+                            workflow_id: self.wf_id.clone(),
+                            rule_set_result_id: Some(rule_set_result.id.clone()),
+                            config,
+                        })
+                        .collect()
+                } else {
+                    vec![]
                 };
                 let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
                 let stepup_info = StepUpInfo {

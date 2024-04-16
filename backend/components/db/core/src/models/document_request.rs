@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::document_request;
+use db_schema::schema::document_request::{self};
 use diesel::{prelude::*, Insertable, Queryable};
 use newtypes::{
     DocumentRequestConfig, DocumentRequestId, DocumentRequestKind, RuleSetResultId, ScopedVaultId, WorkflowId,
@@ -16,10 +16,12 @@ pub struct DocumentRequest {
     pub id: DocumentRequestId,
     // Not really needed anymore since we can go through Workflow
     pub scoped_vault_id: ScopedVaultId,
+    // TODO can probably rm? old from idology
     pub ref_id: Option<DocRefId>,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    // TODO can rm
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
     pub kind: DocumentRequestKind,
@@ -36,10 +38,15 @@ impl DocumentRequest {
             scoped_vault_id,
             ref_id,
             workflow_id,
-            should_collect_selfie,
-            kind,
             rule_set_result_id,
+            config,
         } = args;
+        let kind = (&config).into();
+        let should_collect_selfie = if let DocumentRequestConfig::Identity { collect_selfie } = &config {
+            *collect_selfie
+        } else {
+            false
+        };
         let new = NewDocumentRequestRow {
             scoped_vault_id,
             ref_id,
@@ -48,6 +55,7 @@ impl DocumentRequest {
             workflow_id,
             kind,
             rule_set_result_id,
+            config,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -64,10 +72,16 @@ impl DocumentRequest {
                     scoped_vault_id,
                     ref_id,
                     workflow_id,
-                    should_collect_selfie,
-                    kind,
+                    config,
                     rule_set_result_id,
                 } = a;
+                let kind = (&config).into();
+                let should_collect_selfie =
+                    if let DocumentRequestConfig::Identity { collect_selfie } = &config {
+                        *collect_selfie
+                    } else {
+                        false
+                    };
                 NewDocumentRequestRow {
                     scoped_vault_id,
                     ref_id,
@@ -76,6 +90,7 @@ impl DocumentRequest {
                     workflow_id,
                     kind,
                     rule_set_result_id,
+                    config,
                 }
             })
             .collect();
@@ -105,7 +120,7 @@ impl DocumentRequest {
 
     #[tracing::instrument("DocumentRequest::get_or_create", skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
-        if let Some(existing) = Self::get(conn, &args.workflow_id, args.kind)? {
+        if let Some(existing) = Self::get(conn, &args.workflow_id, (&args.config).into())? {
             // TODO FP-5894: this is a bit lacking in specificity could be a doc req that is _not_ a selfie, but should be a selfie based on app logic
             Ok(existing)
         } else {
@@ -133,10 +148,9 @@ impl DocumentRequest {
 pub struct NewDocumentRequestArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub ref_id: Option<String>,
-    pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
-    pub kind: DocumentRequestKind,
     pub rule_set_result_id: Option<RuleSetResultId>,
+    pub config: DocumentRequestConfig,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -149,4 +163,5 @@ struct NewDocumentRequestRow {
     workflow_id: WorkflowId,
     kind: DocumentRequestKind,
     rule_set_result_id: Option<RuleSetResultId>,
+    config: DocumentRequestConfig,
 }

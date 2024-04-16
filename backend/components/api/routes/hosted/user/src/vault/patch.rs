@@ -18,7 +18,7 @@ use db::models::{
 use newtypes::{
     email::Email,
     put_data_request::{PatchDataRequest, RawDataRequest},
-    DataIdentifier, DataLifetimeSource, DocumentRequestKind, IdentityDataKind as IDK,
+    DataIdentifier, DataLifetimeSource, DocumentRequestConfig, IdentityDataKind as IDK,
     Iso3166TwoDigitCountryCode, ScopedVaultId, ValidateArgs, WorkflowGuard, WorkflowId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -123,6 +123,7 @@ pub async fn patch(
         }
     }
 
+    // TODO these need to be atomic with the patch
     if let Some(address) = residential_address {
         // if we allow international and haven't requested a doc, we need to create a doc req
         let obc = user_auth.ob_config()?;
@@ -189,8 +190,9 @@ fn default_identity_doc_args(
         scoped_vault_id: sv_id.clone(),
         ref_id: None,
         workflow_id: workflow_id.clone(),
-        should_collect_selfie,
-        kind: DocumentRequestKind::Identity,
         rule_set_result_id: None,
+        config: DocumentRequestConfig::Identity {
+            collect_selfie: should_collect_selfie,
+        },
     }
 }

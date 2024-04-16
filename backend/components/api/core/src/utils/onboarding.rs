@@ -17,7 +17,7 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey, Selfie, VaultKind,
+    DocumentConfig, DocumentRequestConfig, DocumentRequestKind, EncryptedVaultPrivateKey, Selfie, VaultKind,
     VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
 };
 
@@ -165,66 +165,43 @@ pub fn get_or_start_onboarding(
 
 /// Create a DocumentRequest associated with the provided wf if the obc requires document collection
 fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObConfiguration) -> ApiResult<()> {
-    let (kind, should_collect_selfie) = match wf.config {
-        WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => {
-            let Some(doc_info) = obc
-                .must_collect_data
-                .iter()
-                .filter_map(|cdo| match cdo {
-                    CollectedDataOption::Document(doc_info) => Some(doc_info),
-                    _ => None,
-                })
-                .next()
-            else {
-                // No doc request needed
-                return Ok(());
-            };
-            let should_collect_selfie = doc_info.selfie() == Selfie::RequireSelfie;
-            (DocumentRequestKind::Identity, should_collect_selfie)
+    let doc_requests_to_create = match wf.config {
+        WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => obc
+            .document_cdo()
+            .map(|cdo| DocumentRequestConfig::Identity {
+                collect_selfie: cdo.selfie() == Selfie::RequireSelfie,
+            })
+            .into_iter()
+            .collect(),
+        WorkflowConfig::Document(DocumentConfig { kind, collect_selfie }) => {
+            match kind {
+                DocumentRequestKind::Identity => vec![DocumentRequestConfig::Identity { collect_selfie }],
+                DocumentRequestKind::ProofOfAddress => vec![DocumentRequestConfig::ProofOfAddress {}],
+                // Proof of SSN always collects ID doc
+                DocumentRequestKind::ProofOfSsn => vec![
+                    DocumentRequestConfig::ProofOfSsn {},
+                    DocumentRequestConfig::Identity { collect_selfie: true },
+                ],
+            }
         }
-        WorkflowConfig::Document(DocumentConfig { kind, collect_selfie }) => (kind, collect_selfie),
         WorkflowConfig::Kyb(_) => {
-            // No doc request needed
-            return Ok(());
+            vec![]
         }
     };
+    if doc_requests_to_create.is_empty() {
+        return Ok(());
+    }
 
-    let doc_requests_to_create = match kind {
-        DocumentRequestKind::Identity => vec![NewDocumentRequestArgs {
+    let doc_requests_to_create = doc_requests_to_create
+        .into_iter()
+        .map(|config| NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
             ref_id: None,
             workflow_id: wf.id.clone(),
-            should_collect_selfie,
-            kind: DocumentRequestKind::Identity,
             rule_set_result_id: None,
-        }],
-        DocumentRequestKind::ProofOfSsn => vec![
-            NewDocumentRequestArgs {
-                scoped_vault_id: wf.scoped_vault_id.clone(),
-                ref_id: None,
-                workflow_id: wf.id.clone(),
-                should_collect_selfie: false,
-                kind: DocumentRequestKind::ProofOfSsn,
-                rule_set_result_id: None,
-            },
-            NewDocumentRequestArgs {
-                scoped_vault_id: wf.scoped_vault_id.clone(),
-                ref_id: None,
-                workflow_id: wf.id.clone(),
-                should_collect_selfie: true,
-                kind: DocumentRequestKind::Identity,
-                rule_set_result_id: None,
-            },
-        ],
-        DocumentRequestKind::ProofOfAddress => vec![NewDocumentRequestArgs {
-            scoped_vault_id: wf.scoped_vault_id.clone(),
-            ref_id: None,
-            workflow_id: wf.id.clone(),
-            should_collect_selfie: false,
-            kind: DocumentRequestKind::ProofOfAddress,
-            rule_set_result_id: None,
-        }],
-    };
+            config,
+        })
+        .collect();
 
     DocumentRequest::bulk_create(conn, doc_requests_to_create)?;
 

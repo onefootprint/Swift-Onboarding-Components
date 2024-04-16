@@ -7,9 +7,14 @@ use api_wire_types::{CreateIdentityDocumentRequest, DocumentResponse};
 use chrono::Utc;
 use db::{
     models::{
-        identity_document::IdentityDocument, incode_verification_session::IncodeVerificationSession,
-        incode_verification_session_event::IncodeVerificationSessionEvent, insight_event::InsightEvent,
-        user_consent::UserConsent, vault::Vault, workflow::Workflow,
+        document_request::{DocumentRequest, NewDocumentRequestArgs},
+        identity_document::IdentityDocument,
+        incode_verification_session::IncodeVerificationSession,
+        incode_verification_session_event::IncodeVerificationSessionEvent,
+        insight_event::InsightEvent,
+        user_consent::UserConsent,
+        vault::Vault,
+        workflow::Workflow,
     },
     test_helpers::assert_have_same_elements,
     tests::fixtures::ob_configuration::ObConfigurationOpts,
@@ -18,15 +23,15 @@ use db::{
 
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentRequestKind,
-    DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind, ScopedVaultId,
-    Selfie, TenantId, WorkflowFixtureResult,
+    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentRequestConfig,
+    DocumentRequestKind, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId,
+    IdentityDocumentStatus, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes,
+    RiskSignalGroupKind, ScopedVaultId, Selfie, TenantId, WorkflowFixtureResult,
 };
 
 use super::document_test_utils::{
-    mock_enclave_s3_client, mock_ff_client, mock_incode_request, mock_s3_put_object, save_document_request,
-    DocumentUploadTestCase, UserKind,
+    mock_enclave_s3_client, mock_ff_client, mock_incode_request, mock_s3_put_object, DocumentUploadTestCase,
+    UserKind,
 };
 
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]
@@ -106,7 +111,26 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
     // Save proof of SSN doc req
     let doc_kind: DocumentRequestKind = test_case.document_type.into();
     if !doc_kind.is_identity() {
-        save_document_request(state, doc_kind, wf.id.clone(), sv.id.clone(), false).await;
+        let config = match doc_kind {
+            DocumentRequestKind::Identity => DocumentRequestConfig::Identity {
+                collect_selfie: false,
+            },
+            DocumentRequestKind::ProofOfAddress => DocumentRequestConfig::ProofOfAddress {},
+            DocumentRequestKind::ProofOfSsn => DocumentRequestConfig::ProofOfSsn {},
+        };
+        let args = NewDocumentRequestArgs {
+            scoped_vault_id: sv.id.clone(),
+            ref_id: None,
+            workflow_id: wf.id.clone(),
+            rule_set_result_id: None,
+            config,
+        };
+
+        state
+            .db_pool
+            .db_query(move |conn| DocumentRequest::create(conn, args))
+            .await
+            .unwrap();
     }
 
     let wf_id = wf.id.clone();

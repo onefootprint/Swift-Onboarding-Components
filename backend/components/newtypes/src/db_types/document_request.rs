@@ -40,7 +40,7 @@ use strum_macros::EnumString;
     diesel(sql_type = Text)
 )]
 pub enum DocumentRequestConfig {
-    Identity {},
+    Identity { collect_selfie: bool },
     ProofOfSsn {},
     ProofOfAddress {},
 }

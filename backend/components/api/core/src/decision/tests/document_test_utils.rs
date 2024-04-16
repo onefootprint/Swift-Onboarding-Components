@@ -2,14 +2,7 @@ use std::sync::Arc;
 
 use crate::{decision::vendor::vendor_trait::MockVendorAPICall, State};
 use crypto::aead::SealingKey;
-use db::{
-    models::{
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        identity_document::IdentityDocument,
-    },
-    tests::MockFFClient,
-    DbResult,
-};
+use db::{models::identity_document::IdentityDocument, tests::MockFFClient, DbResult};
 use feature_flag::BoolFlag;
 use idv::incode::{
     doc::{
@@ -23,7 +16,7 @@ use idv::incode::{
 };
 use newtypes::{
     DocumentRequestKind, DocumentSide, EncryptedVaultPrivateKey, IdDocKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, S3Url, ScopedVaultId, SealedVaultBytes, Selfie, TenantId, WorkflowId,
+    IdentityDocumentId, S3Url, SealedVaultBytes, Selfie, TenantId,
 };
 
 #[derive(Clone, Copy)]
@@ -49,6 +42,7 @@ pub struct DocumentUploadTestCase {
     pub document_type: IdDocKind,
     pub require_selfie: Selfie,
 }
+
 impl DocumentUploadTestCase {
     pub fn new(user_kind: UserKind, document_type: IdDocKind, include_selfie: Selfie) -> Self {
         DocumentUploadTestCase {
@@ -305,27 +299,4 @@ pub fn mock_ff_client(
         });
         state.set_ff_client(mock_ff_client.into_mock());
     }
-}
-
-pub async fn save_document_request(
-    state: &State,
-    kind: DocumentRequestKind,
-    wf_id: WorkflowId,
-    sv_id: ScopedVaultId,
-    should_collect_selfie: bool,
-) {
-    let args = NewDocumentRequestArgs {
-        scoped_vault_id: sv_id,
-        ref_id: None,
-        workflow_id: wf_id,
-        should_collect_selfie,
-        kind,
-        rule_set_result_id: None,
-    };
-
-    state
-        .db_pool
-        .db_query(move |conn| DocumentRequest::create(conn, args))
-        .await
-        .unwrap();
 }
