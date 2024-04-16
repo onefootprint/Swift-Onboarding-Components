@@ -91,7 +91,7 @@ pub async fn rerun_machine(
         &uvw,
         dr.clone(),
         !su.is_live,
-        dr.should_collect_selfie,
+        dr.should_collect_selfie(),
         &dr.workflow_id,
         state.feature_flag_client.clone(),
         Some(0),

@@ -136,7 +136,8 @@ impl IncodeStateMachine {
                 } else {
                     // Create a brand new session
                     let (id_doc, doc_request) = IdentityDocument::get(conn, &id_doc_id)?;
-                    let session_kind = if doc_request.should_collect_selfie && !id_doc.should_skip_selfie() {
+                    let session_kind = if doc_request.should_collect_selfie() && !id_doc.should_skip_selfie()
+                    {
                         IncodeVerificationSessionKind::Selfie
                     } else {
                         IncodeVerificationSessionKind::IdDocument
@@ -268,11 +269,12 @@ impl IncodeStateMachine {
             .feature_flag_client
             .flag(feature_flag::BoolFlag::DisableSelfieChecking(&obc.tenant_id));
 
+        let should_collect_selfie = doc_req.should_collect_selfie() && !id_doc.should_skip_selfie();
         let ctx = IncodeContext {
-            di_id: di.id.clone(),
-            sv_id: doc_req.scoped_vault_id.clone(),
-            id_doc_id: id_doc.id.clone(),
-            wf_id: doc_req.workflow_id.clone(),
+            di_id: di.id,
+            sv_id: doc_req.scoped_vault_id,
+            id_doc_id: id_doc.id,
+            wf_id: doc_req.workflow_id,
             obc: obc.clone(),
             vault: uvw.vault,
             docv_data,
@@ -287,7 +289,6 @@ impl IncodeStateMachine {
             aws_selfie_client: state.aws_selfie_doc_client.clone(),
         };
         let is_sandbox = id_doc.fixture_result.is_some();
-        let should_collect_selfie = doc_req.should_collect_selfie && !id_doc.should_skip_selfie();
         Self::init(
             state,
             obc.tenant_id.clone(),

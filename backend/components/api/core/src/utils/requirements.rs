@@ -562,7 +562,7 @@ fn identity_doc_requirement(
 
     Ok(OnboardingRequirement::CollectDocument {
         document_request_id: dr.id.clone(),
-        should_collect_selfie: dr.should_collect_selfie,
+        should_collect_selfie: dr.should_collect_selfie(),
         should_collect_consent: user_consent.is_none(),
         supported_country_and_doc_types: supported_country_and_doc_types.0,
         upload_mode,

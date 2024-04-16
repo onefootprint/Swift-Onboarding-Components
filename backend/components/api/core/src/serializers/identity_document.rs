@@ -13,7 +13,7 @@ impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDo
             ..
         } = identity_doc;
 
-        let selfie_collected = document_request.should_collect_selfie && !skip_selfie;
+        let selfie_collected = document_request.should_collect_selfie() && !skip_selfie;
 
         Self {
             status,

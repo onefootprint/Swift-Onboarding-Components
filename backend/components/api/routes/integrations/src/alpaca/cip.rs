@@ -293,7 +293,7 @@ pub(crate) async fn create_cip_request(
         ?annotation,
         ?risk_signals,
         ?vres,
-        collect_document = ?latest_identity_document_and_request.as_ref().map(|(_, dr)| dr.should_collect_selfie),
+        collect_document = ?latest_identity_document_and_request.as_ref().map(|(_, dr)| dr.should_collect_selfie()),
         "create_cip_request data"
     );
 
@@ -644,7 +644,7 @@ fn document_and_photo(
     identity_document: IdentityDocument,
     document_request: DocumentRequest,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
-    let expect_selfie = document_request.should_collect_selfie;
+    let expect_selfie = document_request.should_collect_selfie();
     let (vendor_map, _) = build_vendor_response_map_from_vendor_results(vendor_results)?;
     let ocr_api = IncodeFetchOCR;
     let scores_api = IncodeFetchScores;

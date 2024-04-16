@@ -108,9 +108,9 @@ pub async fn handle_document_create(
                 .flag(BoolFlag::CanSkipSelfie(&tenant_id));
 
             
-            let should_skip_selfie = if skip_selfie == Some(true) && doc_request.should_collect_selfie {
+            let should_skip_selfie = if skip_selfie == Some(true) && doc_request.should_collect_selfie() {
                 if can_tenant_skip_selfie {
-                    tracing::info!(sv_id=%su_id, tenant=%tenant_id, wf_id=%wf_id, device_type=?device_type, requires_selfie=%doc_request.should_collect_selfie, "User skipping selfie");
+                    tracing::info!(sv_id=%su_id, tenant=%tenant_id, wf_id=%wf_id, device_type=?device_type, requires_selfie=%doc_request.should_collect_selfie(), "User skipping selfie");
                     true
                 } else {
                     tracing::warn!(sv_id=%su_id, tenant=%tenant_id, wf_id=%wf_id, device_type=?device_type, "User tried skipping selfie, but tenant is not allowed");
@@ -168,7 +168,7 @@ pub async fn handle_document_upload(
         return Err(ErrorWithCode::IdentityDocumentNotPending.into());
     }
     // We support the flow
-    let should_collect_selfie = doc_request.should_collect_selfie && !id_doc.should_skip_selfie();
+    let should_collect_selfie = doc_request.should_collect_selfie() && !id_doc.should_skip_selfie();
 
     if side == DocumentSide::Selfie && !should_collect_selfie {
         return Err(OnboardingError::NotExpectingSelfie.into());
@@ -268,7 +268,7 @@ pub async fn handle_document_process(
                 .and_then(|session| session.side_from_session());
 
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
-            let should_collect_selfie = dr.should_collect_selfie && !id_doc.should_skip_selfie();
+            let should_collect_selfie = dr.should_collect_selfie() && !id_doc.should_skip_selfie();
             let (missing_sides, attempts_for_side) =
                 super::utils::get_side_info(conn, &id_doc, should_collect_selfie, side_from_session)?;
 
