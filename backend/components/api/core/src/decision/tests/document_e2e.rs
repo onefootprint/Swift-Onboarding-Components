@@ -120,7 +120,6 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         };
         let args = NewDocumentRequestArgs {
             scoped_vault_id: sv.id.clone(),
-            ref_id: None,
             workflow_id: wf.id.clone(),
             rule_set_result_id: None,
             config,

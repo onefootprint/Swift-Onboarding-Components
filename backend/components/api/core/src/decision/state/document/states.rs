@@ -241,7 +241,6 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                             })
                             .map(|config| NewDocumentRequestArgs {
                                 scoped_vault_id: self.sv_id.clone(),
-                                ref_id: None,
                                 workflow_id: self.wf_id.clone(),
                                 rule_set_result_id: Some(rule_set_result.id.clone()),
                                 config,

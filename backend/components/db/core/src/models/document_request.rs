@@ -8,21 +8,15 @@ use newtypes::{
     DocumentRequestConfig, DocumentRequestId, DocumentRequestKind, RuleSetResultId, ScopedVaultId, WorkflowId,
 };
 
-pub type DocRefId = String;
-
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
     // Not really needed anymore since we can go through Workflow
     pub scoped_vault_id: ScopedVaultId,
-    // TODO can probably rm? old from idology
-    pub ref_id: Option<DocRefId>,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    // TODO can rm
-    pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
     pub kind: DocumentRequestKind,
     // If docreq was created as a result of a stepup rule, then this would be the id of that rule_result
@@ -36,22 +30,14 @@ impl DocumentRequest {
     pub fn create(conn: &mut PgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
         let NewDocumentRequestArgs {
             scoped_vault_id,
-            ref_id,
             workflow_id,
             rule_set_result_id,
             config,
         } = args;
         let kind = (&config).into();
-        let should_collect_selfie = if let DocumentRequestConfig::Identity { collect_selfie } = &config {
-            *collect_selfie
-        } else {
-            false
-        };
         let new = NewDocumentRequestRow {
             scoped_vault_id,
-            ref_id,
             created_at: Utc::now(),
-            should_collect_selfie,
             workflow_id,
             kind,
             rule_set_result_id,
@@ -70,23 +56,14 @@ impl DocumentRequest {
             .map(|a| {
                 let NewDocumentRequestArgs {
                     scoped_vault_id,
-                    ref_id,
                     workflow_id,
                     config,
                     rule_set_result_id,
                 } = a;
                 let kind = (&config).into();
-                let should_collect_selfie =
-                    if let DocumentRequestConfig::Identity { collect_selfie } = &config {
-                        *collect_selfie
-                    } else {
-                        false
-                    };
                 NewDocumentRequestRow {
                     scoped_vault_id,
-                    ref_id,
                     created_at: Utc::now(),
-                    should_collect_selfie,
                     workflow_id,
                     kind,
                     rule_set_result_id,
@@ -156,7 +133,6 @@ impl DocumentRequest {
 #[derive(Debug, Clone)]
 pub struct NewDocumentRequestArgs {
     pub scoped_vault_id: ScopedVaultId,
-    pub ref_id: Option<String>,
     pub workflow_id: WorkflowId,
     pub rule_set_result_id: Option<RuleSetResultId>,
     pub config: DocumentRequestConfig,
@@ -166,9 +142,7 @@ pub struct NewDocumentRequestArgs {
 #[diesel(table_name = document_request)]
 struct NewDocumentRequestRow {
     scoped_vault_id: ScopedVaultId,
-    ref_id: Option<String>,
     created_at: DateTime<Utc>,
-    should_collect_selfie: bool,
     workflow_id: WorkflowId,
     kind: DocumentRequestKind,
     rule_set_result_id: Option<RuleSetResultId>,

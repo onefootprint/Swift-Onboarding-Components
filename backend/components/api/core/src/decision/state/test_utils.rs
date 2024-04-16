@@ -540,7 +540,6 @@ pub async fn mock_incode_doc_collection(
                 };
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: scoped_vault_id.clone(),
-                    ref_id: None,
                     workflow_id: wf_id.clone(),
                     rule_set_result_id: None,
                     config,

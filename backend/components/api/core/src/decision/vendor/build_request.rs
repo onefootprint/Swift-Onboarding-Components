@@ -1,14 +1,14 @@
 use crate::{
     enclave_client::EnclaveClient,
-    errors::{business::BusinessError, ApiError, ApiErrorKind, ApiResult, AssertionError},
+    errors::{business::BusinessError, ApiError, ApiResult},
     utils::vault_wrapper::{Business, DecryptedBusinessOwners, Person, TenantVw, VaultWrapper, VwArgs},
     State,
 };
 
 use db::{
     models::{
-        document_request::DocRefId, document_upload::DocumentUpload, identity_document::IdentityDocument,
-        scoped_vault::ScopedVault, verification_request::VerificationRequest,
+        document_upload::DocumentUpload, identity_document::IdentityDocument, scoped_vault::ScopedVault,
+        verification_request::VerificationRequest,
     },
     DbPool,
 };
@@ -144,42 +144,6 @@ pub async fn build_docv_data_from_identity_doc(
         first_name: decrypted_name_idks.remove(&IDK::FirstName.into()),
         last_name: decrypted_name_idks.remove(&IDK::LastName.into()),
     })
-}
-
-/// 2023-01-05
-/// We are deprioritizing scan verify step ups for now since it requires a bit more product thought, but leaving this around for the future
-#[allow(dead_code)]
-async fn build_docv_for_scan_verify_results(
-    state: &State,
-    request: VerificationRequest,
-) -> Result<DocVData, ApiError> {
-    let Some(identity_doc_id) = request.identity_document_id.clone() else {
-        return Err(ApiErrorKind::AssertionError(format!(
-            "{} is not a document verification vendor",
-            request.vendor_api
-        )))?;
-    };
-
-    let ref_id = state
-        .db_pool
-        .db_query(move |conn| -> Result<Option<DocRefId>, ApiError> {
-            let (_, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
-            Ok(ref_id.ref_id)
-        })
-        .await?;
-    let parsed_reference_id = parse_reference_id_for_scan_verify(ref_id)?;
-
-    Ok(DocVData {
-        reference_id: parsed_reference_id,
-        ..Default::default()
-    })
-}
-
-fn parse_reference_id_for_scan_verify(reference_id: Option<String>) -> Result<Option<u64>, ApiError> {
-    reference_id
-        .map(|r| r.parse::<u64>())
-        .transpose()
-        .map_err(|_| AssertionError("could not parse ref_id for idology").into())
 }
 
 pub async fn build_business_data_from_verification_request(

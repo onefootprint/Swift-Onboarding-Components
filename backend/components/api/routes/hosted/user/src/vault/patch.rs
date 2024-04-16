@@ -188,7 +188,6 @@ fn default_identity_doc_args(
 ) -> NewDocumentRequestArgs {
     NewDocumentRequestArgs {
         scoped_vault_id: sv_id.clone(),
-        ref_id: None,
         workflow_id: workflow_id.clone(),
         rule_set_result_id: None,
         config: DocumentRequestConfig::Identity {

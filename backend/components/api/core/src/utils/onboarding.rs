@@ -196,7 +196,6 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
         .into_iter()
         .map(|config| NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
-            ref_id: None,
             workflow_id: wf.id.clone(),
             rule_set_result_id: None,
             config,

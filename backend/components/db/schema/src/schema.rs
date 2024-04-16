@@ -355,11 +355,9 @@ diesel::table! {
     document_request (id) {
         id -> Text,
         scoped_vault_id -> Text,
-        ref_id -> Nullable<Text>,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        should_collect_selfie -> Bool,
         workflow_id -> Text,
         kind -> Text,
         rule_set_result_id -> Nullable<Text>,

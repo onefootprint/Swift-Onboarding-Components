@@ -1,0 +1,1 @@
+ALTER TABLE document_request ALTER COLUMN should_collect_selfie SET DEFAULT 'f';
