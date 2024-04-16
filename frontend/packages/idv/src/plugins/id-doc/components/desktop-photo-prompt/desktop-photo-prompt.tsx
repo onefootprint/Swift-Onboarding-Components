@@ -103,6 +103,7 @@ const DesktopPhotoPrompt = ({
       files,
       onSuccess: handleImage,
       onError: handleUploadError,
+      allowPdf,
     });
   };
 
