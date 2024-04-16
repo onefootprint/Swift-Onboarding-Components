@@ -16,11 +16,11 @@ use paperclip::actix::{self, api_v2_operation, web};
 pub async fn get(user_auth: UserAuthContext) -> JsonApiResponse<NeuroIdentityIdResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
-    let sv_id = user_auth
-        .scoped_user_id()
-        .ok_or(AssertionError("auth missing sv_id"))?;
+    let wf_id = user_auth
+        .workflow_id()
+        .ok_or(AssertionError("auth missing wf_id"))?;
 
-    let id = NeuroIdentityId::from(sv_id);
+    let id = NeuroIdentityId::from(wf_id);
 
     Ok(web::Json(ResponseData::ok(NeuroIdentityIdResponse { id })))
 }

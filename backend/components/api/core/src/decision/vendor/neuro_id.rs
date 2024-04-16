@@ -102,8 +102,9 @@ pub async fn run_neuro_call(
     let tvc =
         TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.config, &state.enclave_client).await?;
     // TODO: get this site_id from a playbook config somewhere
+    // TODO: change this to sandbox form
     let credentials = NeuroIdCredentials::new(tvc.neuro_api_key(), NeuroIdSiteId("form_humor717".into()));
-    let id = NeuroIdentityId::from(di.scoped_vault_id.clone());
+    let id = NeuroIdentityId::from(wf_id.clone());
 
     let res = state
         .vendor_clients
