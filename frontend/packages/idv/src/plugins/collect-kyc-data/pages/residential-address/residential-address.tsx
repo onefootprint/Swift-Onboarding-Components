@@ -46,14 +46,20 @@ const ResidentialAddress = ({
   const convertFormData = useConvertFormData();
 
   let defaultCountry: CountryCode | undefined;
-  if (countryFromContext && isCountryCode(countryFromContext)) {
+  const { supportedCountries } = config;
+  const hasSupportedCountries =
+    supportedCountries && supportedCountries.length > 0;
+  const isValidCountryInContext =
+    countryFromContext && isCountryCode(countryFromContext);
+  const isSupportedCountryInContext =
+    isValidCountryInContext && supportedCountries?.includes(countryFromContext);
+
+  if (isSupportedCountryInContext) {
     defaultCountry = countryFromContext;
-  } else if (
-    config.allowInternationalResidents &&
-    config.supportedCountries &&
-    config.supportedCountries.length > 0
-  ) {
-    [defaultCountry] = config.supportedCountries;
+  } else if (!hasSupportedCountries && isValidCountryInContext) {
+    defaultCountry = countryFromContext;
+  } else if (hasSupportedCountries) {
+    [defaultCountry] = supportedCountries;
   }
 
   const defaultValues = {

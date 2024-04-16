@@ -44,7 +44,7 @@ const createOnboardingMachine = (
       initial: 'requirements',
       context: {
         config,
-        userData: validateUserData(userData, l10n?.locale),
+        userData: validateUserData(userData, config, l10n?.locale),
         idvContext,
         idDocOutcome,
         overallOutcome,

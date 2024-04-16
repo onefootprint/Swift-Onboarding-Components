@@ -1,5 +1,6 @@
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { STATES } from '@onefootprint/global-constants';
+import type { CountryCode, PublicOnboardingConfig } from '@onefootprint/types';
 import {
   IdDI,
   isCountryCode,
@@ -37,6 +38,7 @@ type UnvalidatedUserData = Partial<{
 
 const validateUserData = (
   userData: UnvalidatedUserData,
+  config: PublicOnboardingConfig,
   locale: SupportedLocale = 'en-US',
 ): UserData => {
   if (!isObject(userData)) {
@@ -135,6 +137,14 @@ const validateUserData = (
     return date.getFullYear() > 1900 && date.getFullYear() < 3000;
   };
 
+  const isCountryValid = (country: string) => {
+    if (!isCountryCode(country)) return false;
+    if (config.supportedCountries?.length) {
+      return config.supportedCountries.includes(country as CountryCode);
+    }
+    return true;
+  };
+
   const ValidatorByField: Record<IdDI, (...args: string[]) => boolean> = {
     [IdDI.email]: isEmailValid,
     [IdDI.phoneNumber]: isPhoneValid,
@@ -149,7 +159,7 @@ const validateUserData = (
     [IdDI.city]: isStringValid,
     [IdDI.state]: (state: string, country?: string) =>
       isStateValid(state, country),
-    [IdDI.country]: isCountryCode,
+    [IdDI.country]: isCountryValid,
     [IdDI.zip]: isStringValid,
     [IdDI.usLegalStatus]: isUsLegalStatusValid,
     [IdDI.citizenships]: isCitizenshipsValid,

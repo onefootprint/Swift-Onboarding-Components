@@ -1,11 +1,31 @@
-import { IdDI } from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { IdDI, OnboardingConfigStatus } from '@onefootprint/types';
 
 import type { UserDatum } from '../../../../../../types';
 import validateBootstrapData from './validate-bootstrap-data';
 
+const config: PublicOnboardingConfig = {
+  isLive: true,
+  logoUrl: 'url',
+  privacyPolicyUrl: 'url',
+  name: 'tenant',
+  orgName: 'tenantOrg',
+  orgId: 'orgId',
+  status: OnboardingConfigStatus.enabled,
+  isAppClipEnabled: false,
+  isInstantAppEnabled: false,
+  appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
+  isNoPhoneFlow: false,
+  requiresIdDoc: false,
+  key: 'key',
+  isKyb: false,
+  allowInternationalResidents: true,
+  supportedCountries: ['US', 'CA'],
+};
+
 describe('validateBootstrapData', () => {
   it('should filter out invalid entries', () => {
-    expect(validateBootstrapData({}, 'es-MX')).toEqual({});
+    expect(validateBootstrapData({}, config, 'es-MX')).toEqual({});
 
     const d = <T>(value: T): UserDatum<T> => ({
       value,
@@ -40,6 +60,7 @@ describe('validateBootstrapData', () => {
           undefined,
           123: 123,
         },
+        config,
         'en-US',
       ),
     ).toEqual({
@@ -72,6 +93,7 @@ describe('validateBootstrapData', () => {
           [IdDI.visaKind]: d('f1'),
           [IdDI.visaExpirationDate]: d('01/01/2030'),
         },
+        config,
         'en-US',
       ),
     ).toEqual({
@@ -103,6 +125,7 @@ describe('validateBootstrapData', () => {
           [IdDI.dob]: d('25/12/1997'),
           [IdDI.visaExpirationDate]: d('2020-01-01'),
         },
+        config,
         'es-MX',
       ),
     ).toEqual({
@@ -118,6 +141,7 @@ describe('validateBootstrapData', () => {
           [IdDI.dob]: d('99/99/1232'),
           [IdDI.visaExpirationDate]: d('25/12/2030'),
         },
+        config,
         'en-US',
       ),
     ).toEqual({
@@ -133,10 +157,28 @@ describe('validateBootstrapData', () => {
           [IdDI.visaExpirationDate]: d('25-12-2030'),
           [IdDI.ssn9]: d('123-45-1234'),
         },
+        config,
         'en-US',
       ),
     ).toEqual({
       [IdDI.country]: d('US'),
+      [IdDI.state]: d('MA'),
+      [IdDI.ssn9]: d('123-45-1234'),
+    });
+
+    expect(
+      validateBootstrapData(
+        {
+          [IdDI.country]: d('MX'),
+          [IdDI.state]: d('MA'),
+          [IdDI.dob]: d('05-12-1996'),
+          [IdDI.visaExpirationDate]: d('25-12-2030'),
+          [IdDI.ssn9]: d('123-45-1234'),
+        },
+        config,
+        'en-US',
+      ),
+    ).toEqual({
       [IdDI.state]: d('MA'),
       [IdDI.ssn9]: d('123-45-1234'),
     });
