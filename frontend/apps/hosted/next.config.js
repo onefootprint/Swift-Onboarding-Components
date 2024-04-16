@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+const IS_DEV = process.env.NODE_ENV === 'development';
+
 const SENTRY_CONNECT_SRC = ['*.sentry.io', '*.ingest.sentry.io'].join(' ');
 const SENTRY_SCRIPT_SRC = [
   'https://browser.sentry-cdn.com',
@@ -31,9 +33,14 @@ const LOG_ROCKET_CONNECT_SRC = [
   'https://*.intake-lr.com',
 ].join(' ');
 
+const DEV_CONNECT_SRC = (IS_DEV ? [
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+] : []).join(' ');
+
 const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
-  connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com *.launchdarkly.com ${OBSERVE_CONNECT_SRC} ${LOG_ROCKET_CONNECT_SRC} ${SENTRY_CONNECT_SRC};
+  connect-src 'self' ${DEV_CONNECT_SRC} vitals.vercel-insights.com vercel.live *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com *.launchdarkly.com ${OBSERVE_CONNECT_SRC} ${LOG_ROCKET_CONNECT_SRC} ${SENTRY_CONNECT_SRC};
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';

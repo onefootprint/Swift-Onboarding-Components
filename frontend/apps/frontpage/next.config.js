@@ -12,14 +12,20 @@ const withMDX = require('@next/mdx')({
   },
 });
 
+const IS_DEV = process.env.NODE_ENV === 'development';
+
+const DEV_FRAME_SRC = (IS_DEV ? [
+  'http://localhost:3000',
+] : []).join(' ');
+
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live usefathom.com *.usefathom.com *.ingest.sentry.io www.youtube.com api.onefootprint.com getform.io unifyintent.com *.unifyintent.com; 
-  default-src 'self' vitals.vercel-insights.com;  
+  connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live usefathom.com *.usefathom.com *.ingest.sentry.io www.youtube.com api.onefootprint.com getform.io unifyintent.com *.unifyintent.com;
+  default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
-  frame-src 'self' localhost:3000 *.onefootprint.com vercel.live www.youtube.com form.typeform.com; 
+  frame-src 'self' ${DEV_FRAME_SRC} *.onefootprint.com vercel.live www.youtube.com form.typeform.com;
   img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com usefathom.com *.usefathom.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net unifyintent.com *.unifyintent.com cdn.jsdelivr.net;
   media-src 'self' https footprint-blog.ghost.io;
   object-src 'self' data:;

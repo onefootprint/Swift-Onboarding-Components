@@ -17,24 +17,14 @@ const getNextConfig = () => {
   ].join(' ');
   const OBSERVE_CONNECT_SRC = ['189225732777.collect.observeinc.com'].join(' ');
 
-  const DevContentSecurityPolicy = `
-    child-src onefootprint.com;
-    connect-src 'self' http://localhost:8000 *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live ${SENTRY_CONNECT_SRC} getform.io ${OBSERVE_CONNECT_SRC}; 
-    default-src 'self' vitals.vercel-insights.com data:;
-    font-src 'self' fonts.googleapis.com fonts.gstatic.com;
-    form-action 'self';
-    frame-ancestors 'self';
-    frame-src 'self' vercel.live https://app.svix.com calendly.com cdn.jsdelivr.net data:;
-    img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com cdn.jsdelivr.net;
-    media-src 'self' https data:;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com ${SENTRY_SCRIPT_SRC};
-    style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
-    worker-src 'self' blob:;
-  `;
+  const DEV_CONNECT_SRC = (IS_DEV ? [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+  ] : []).join(' ');
 
-  const ProdContentSecurityPolicy = `
+  const ContentSecurityPolicy = `
     child-src onefootprint.com;
-    connect-src 'self' *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live ${SENTRY_CONNECT_SRC} ${OBSERVE_CONNECT_SRC}; 
+    connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live ${SENTRY_CONNECT_SRC} ${OBSERVE_CONNECT_SRC};
     default-src 'self' vitals.vercel-insights.com data:;
     font-src 'self' fonts.googleapis.com fonts.gstatic.com;
     form-action 'self';
@@ -46,10 +36,6 @@ const getNextConfig = () => {
     style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
     worker-src 'self' blob:;
   `;
-
-  const ContentSecurityPolicy = IS_DEV
-    ? DevContentSecurityPolicy
-    : ProdContentSecurityPolicy;
 
   const securityHeaders = [
     {

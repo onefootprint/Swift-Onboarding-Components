@@ -1,16 +1,28 @@
 /** @type {import('next').NextConfig} */
 
+const IS_DEV = process.env.NODE_ENV === 'development';
 const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
 
+const DEV_CONNECT_SRC = (IS_DEV ? [
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+] : []).join(' ');
+
+const DEV_FRAME_SRC = (IS_DEV ? [
+  'http://localhost:3000',
+  'http://localhost:3010',
+  'http://localhost:3011',
+] : []).join(' ');
+
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' *.onefootprint.com http://localhost:8000 vitals.vercel-insights.com *.usefathom.com *.ingest.sentry.io *.pusher.com wss://*.pusher.com vercel.live unpkg.com; 
+  connect-src 'self' *.onefootprint.com ${DEV_CONNECT_SRC} vitals.vercel-insights.com *.usefathom.com *.ingest.sentry.io *.pusher.com wss://*.pusher.com vercel.live unpkg.com;
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
-  frame-src 'self' *.onefootprint.com http://localhost:3000 http://localhost:3010 http://localhost:3011 vercel.live;
+  frame-src 'self' *.onefootprint.com ${DEV_FRAME_SRC} vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usefathom.com vercel.live vitals.vercel-insights.com https://cdn.jsdelivr.net;

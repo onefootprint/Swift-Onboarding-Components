@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 
+const IS_DEV = process.env.NODE_ENV === 'development';
 const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 
 const SENTRY_CONNECT_SRC = ['*.sentry.io', '*.ingest.sentry.io'].join(' ');
@@ -33,9 +34,14 @@ const LOG_ROCKET_CONNECT_SRC = [
   'https://*.intake-lr.com',
 ].join(' ');
 
+const DEV_CONNECT_SRC = (IS_DEV ? [
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+] : []).join(' ');
+
 const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
-  connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.onefootprint.com maps.googleapis.com *.pusher.com wss://*.pusher.com ${OBSERVE_CONNECT_SRC} ${LOG_ROCKET_CONNECT_SRC} ${SENTRY_CONNECT_SRC}; 
+  connect-src 'self' ${DEV_CONNECT_SRC} vitals.vercel-insights.com vercel.live *.onefootprint.com maps.googleapis.com *.pusher.com wss://*.pusher.com ${OBSERVE_CONNECT_SRC} ${LOG_ROCKET_CONNECT_SRC} ${SENTRY_CONNECT_SRC};
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
