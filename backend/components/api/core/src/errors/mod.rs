@@ -434,8 +434,17 @@ impl actix_web::ResponseError for ApiError {
         // Failing to close the TCP connection after sending a timeout response allows clients to
         // continue sending request data even server has sent an error response. This would create
         // unneccesary work for both the server and the client.
+        //
+        // Closing the connection on FileTooLarge errors works around a long-standing actix-web
+        // bug:
+        // https://github.com/actix/actix-web/issues/2357
+        // https://github.com/actix/actix-web/issues/3152
+        // May not be necessary in all environments (e.g. load balancers mask the issue), but it's
+        // necessary in local dev to prevent the client from hanging.
         match self.kind() {
-            ApiErrorKind::ResponseTimeout | ApiErrorKind::ErrorWithCode(ErrorWithCode::FileUploadTimeout) => {
+            ApiErrorKind::ResponseTimeout
+            | ApiErrorKind::ErrorWithCode(ErrorWithCode::FileUploadTimeout)
+            | ApiErrorKind::ErrorWithCode(ErrorWithCode::FileTooLarge(_)) => {
                 resp.force_close();
             }
             _ => {}

@@ -83,7 +83,7 @@ impl ErrorWithCode {
             Self::MissingMimeType => StatusCode::BAD_REQUEST,
             Self::InvalidMimeType(_) => StatusCode::BAD_REQUEST,
             Self::MultipartError => StatusCode::BAD_REQUEST,
-            Self::FileTooLarge(_) => StatusCode::BAD_REQUEST,
+            Self::FileTooLarge(_) => StatusCode::PAYLOAD_TOO_LARGE,
             Self::FileTooSmall(_) => StatusCode::BAD_REQUEST,
             Self::InvalidContentLength => StatusCode::BAD_REQUEST,
             Self::MissingFilename => StatusCode::BAD_REQUEST,
