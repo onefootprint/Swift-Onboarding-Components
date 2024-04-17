@@ -264,6 +264,7 @@ export { default as IcoRefresh24 } from './ico-refresh-24';
 export { default as IcoRepeat40 } from './ico-repeat-40';
 export { default as IcoReturn16 } from './ico-return-16';
 export { default as IcoReturn24 } from './ico-return-24';
+export { default as IcoScan16 } from './ico-scan-16';
 export { default as IcoScroll16 } from './ico-scroll-16';
 export { default as IcoScroll24 } from './ico-scroll-24';
 export { default as IcoSearch16 } from './ico-search-16';
