@@ -78,6 +78,8 @@ pub(crate) fn test_tenant_api_key(
 #[allow(clippy::module_inception)]
 #[cfg(test)]
 mod test {
+    use std::time::Duration;
+
     use crate::{
         models::{tenant::Tenant, vault::Vault},
         test_helpers, DbResult,
@@ -94,7 +96,7 @@ mod test {
         // Run migrations on this DB if they haven't been run yet
         test_helpers::run_migrations_once(db_url.clone());
 
-        let pool = crate::init(&db_url).expect("couldn't initiate DB pool");
+        let pool = crate::init(&db_url, Duration::from_secs(30)).expect("couldn't initiate DB pool");
         let tenant = crate::models::tenant::NewTenant {
             name: "test_tenant".to_owned(),
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
@@ -143,9 +145,9 @@ mod test {
         let mut conn = test_helpers::test_db_conn();
         let res = sql_query("
             select table_name
-            from information_schema.columns 
-            where 
-                column_name = '_updated_at' 
+            from information_schema.columns
+            where
+                column_name = '_updated_at'
                 and table_name not in (select event_object_table from information_schema.triggers where action_statement = 'EXECUTE FUNCTION diesel_set_updated_at()');")
             .get_results::<Res>(&mut conn)
             .unwrap();

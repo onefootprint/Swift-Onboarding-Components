@@ -36,6 +36,10 @@ export async function CreateWorkerTasks(
         ]),
         worker.name,
         worker.args,
+        {
+          // 10 minute DB statement timeout for worker.
+          dbStatementTimeoutSec: 10 * 60,
+        },
       );
 
       const taskSlug = `${stackMetadata.shortStackName}-worker-${worker.name}`;

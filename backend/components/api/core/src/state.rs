@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use crate::{
     config::Config,
@@ -230,9 +230,12 @@ impl State {
         result.expect("failed to run migrations");
 
         // then create the pool
-        let db_pool = db::init(&config.database_url)
-            .map_err(ApiError::from)
-            .expect("failed to init db pool");
+        let db_pool = db::init(
+            &config.database_url,
+            Duration::from_secs(config.database_statement_timeout_sec),
+        )
+        .map_err(ApiError::from)
+        .expect("failed to init db pool");
 
         // our session key
         let (challenge_sealing_key, session_sealing_key) = {

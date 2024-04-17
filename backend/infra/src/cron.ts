@@ -38,6 +38,10 @@ export async function CreateScheduledTasks(
         ]),
         cronTask.name,
         cronTask.args,
+        {
+          // 10 minute DB statement timeout for cron tasks.
+          dbStatementTimeoutSec: 10 * 60,
+        },
       );
 
       const taskSlug = `cron-${cronTask.name}-${stackMetadata.shortStackName}`;

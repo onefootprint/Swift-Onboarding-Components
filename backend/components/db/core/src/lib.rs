@@ -114,7 +114,7 @@ impl DbPool {
 const CONNECTION_RECYCLE_MAX_AGE_SECS: u64 = 600;
 
 /// Initialize our DB
-pub fn init(url: &str) -> Result<DbPool, DbError> {
+pub fn init(url: &str, statement_timeout: Duration) -> Result<DbPool, DbError> {
     let manager = Manager::new(url, Runtime::Tokio1);
     let pool = Pool::builder(manager)
         .runtime(Runtime::Tokio1)
@@ -148,11 +148,23 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
             );
             Ok(())
         }))
-        .post_create(Hook::sync_fn(move |_, metrics| {
-            let now = std::time::Instant::now();
-            let created = now.duration_since(metrics.created).as_secs();
-            tracing::debug!(db.pool.created_secs_ago = created, "db_pool.post_create");
-            Ok(())
+        .post_create(Hook::<Manager>::async_fn(move |conn, metrics| {
+            Box::pin(async move {
+                conn.interact(move |conn| -> QueryResult<_> {
+                    let statement_timeout = statement_timeout.as_millis();
+                    // bind() doesn't seem to work on SET queries.
+                    diesel::sql_query(format!("SET statement_timeout = {}", statement_timeout)).execute(conn)?;
+                    Ok(())
+                }).await
+                    .map_err(|err| HookError::message(err.to_string()))?
+                    .map_err(|err| HookError::message(err.to_string()))?;
+
+                let now = std::time::Instant::now();
+                let created = now.duration_since(metrics.created).as_secs();
+                tracing::debug!(db.pool.created_secs_ago = created, "db_pool.post_create");
+
+                Ok(())
+            })
         }))
         .post_recycle(Hook::sync_fn(move |_, metrics| {
             let now = std::time::Instant::now();

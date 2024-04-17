@@ -69,6 +69,11 @@ export async function CreateApiService(
     new Map([['component', 'api']]),
     '',
     ['api-server'],
+    {
+      // With a 60s API server & LB timeout, DB queries should
+      // certainly never take more than 60s.
+      dbStatementTimeoutSec: 60,
+    },
   );
 
   // Setup our load balancer and CloudFront

@@ -26,6 +26,10 @@ export type ContainersOutput = {
   metricsEndpointPath: string;
 };
 
+export type Knobs = {
+  dbStatementTimeoutSec: number;
+};
+
 export abstract class ServiceContainers {
   static async monolithMain(
     constants: Config,
@@ -40,6 +44,7 @@ export abstract class ServiceContainers {
     otelExtraAttributes: Map<string, string>,
     logGroupComponent: string,
     containerArgs: string[],
+    knobs: Knobs,
   ): Promise<ContainersOutput> {
     const otelCollectorContainerName = 'otelcollector';
     const serverContainerName = 'fpc';
@@ -73,6 +78,7 @@ export abstract class ServiceContainers {
       otelExtraAttributes,
       logGroupComponent,
       containerArgs,
+      knobs,
     );
 
     const definitions = pulumi
@@ -107,6 +113,7 @@ export abstract class ServiceContainers {
     otelExtraAttributes: Map<string, string>,
     logGroupComponent: string,
     containerArgs: string[],
+    knobs: Knobs,
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
     let serviceEnvironment: string;
 
@@ -569,6 +576,10 @@ export abstract class ServiceContainers {
               {
                 name: 'GOOGLE_PLAY_INTEGRITY_VERIFICATION_KEY',
                 value: constants.google.playIntegrityVerificationKey,
+              },
+              {
+                name: 'DATABASE_STATEMENT_TIMEOUT_SEC',
+                value: `${knobs.dbStatementTimeoutSec}`,
               },
             ],
             // TODO: I've suggested some more tolerant values

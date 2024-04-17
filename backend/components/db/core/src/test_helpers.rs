@@ -1,6 +1,6 @@
 use crate::{run_migrations, DbPool, PgConn, TxnPgConn};
 use diesel::Connection;
-use std::sync::Once;
+use std::{sync::Once, time::Duration};
 
 /// Common DB test helpers for this crate and others
 static INIT: Once = Once::new();
@@ -26,7 +26,7 @@ pub fn test_db_conn() -> PgConn {
 pub fn test_db_pool() -> DbPool {
     let db_url = db_url();
 
-    crate::init(&db_url).unwrap()
+    crate::init(&db_url, Duration::from_secs(30)).unwrap()
 }
 
 pub fn have_same_elements<T>(l: Vec<T>, r: Vec<T>) -> bool
