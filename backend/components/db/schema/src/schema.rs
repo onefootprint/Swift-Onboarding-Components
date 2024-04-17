@@ -679,6 +679,42 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    neuro_id_analytics_event (id) {
+        id -> Text,
+        verification_result_id -> Text,
+        workflow_id -> Text,
+        scoped_vault_id -> Text,
+        tenant_id -> Text,
+        neuro_identifier -> Text,
+        cookie_id -> Nullable<Text>,
+        device_id -> Nullable<Text>,
+        model_fraud_ring_indicator_result -> Nullable<Bool>,
+        model_automated_activity_result -> Nullable<Bool>,
+        model_risky_device_result -> Nullable<Bool>,
+        model_factory_reset_result -> Nullable<Bool>,
+        model_gps_spoofing_result -> Nullable<Bool>,
+        model_tor_exit_node_result -> Nullable<Bool>,
+        model_public_proxy_result -> Nullable<Bool>,
+        model_vpn_result -> Nullable<Bool>,
+        model_ip_blocklist_result -> Nullable<Bool>,
+        model_ip_address_association_result -> Nullable<Bool>,
+        model_incognito_result -> Nullable<Bool>,
+        model_bot_framework_result -> Nullable<Bool>,
+        model_suspicious_device_result -> Nullable<Bool>,
+        model_multiple_ids_per_device_result -> Nullable<Bool>,
+        model_device_reputation_result -> Nullable<Bool>,
+        suspicious_device_emulator -> Nullable<Bool>,
+        suspicious_device_jailbroken -> Nullable<Bool>,
+        suspicious_device_missing_expected_properties -> Nullable<Bool>,
+        suspicious_device_frida -> Nullable<Bool>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     ob_configuration (id) {
         id -> Text,
         key -> Text,
@@ -1603,6 +1639,10 @@ diesel::joinable!(manual_review -> scoped_vault (scoped_vault_id));
 diesel::joinable!(manual_review -> workflow (workflow_id));
 diesel::joinable!(middesk_request -> decision_intent (decision_intent_id));
 diesel::joinable!(middesk_request -> workflow (workflow_id));
+diesel::joinable!(neuro_id_analytics_event -> scoped_vault (scoped_vault_id));
+diesel::joinable!(neuro_id_analytics_event -> tenant (tenant_id));
+diesel::joinable!(neuro_id_analytics_event -> verification_result (verification_result_id));
+diesel::joinable!(neuro_id_analytics_event -> workflow (workflow_id));
 diesel::joinable!(ob_configuration -> appearance (appearance_id));
 diesel::joinable!(ob_configuration -> tenant (tenant_id));
 diesel::joinable!(onboarding_decision -> rule_set_result (rule_set_result_id));
@@ -1714,6 +1754,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     liveness_event,
     manual_review,
     middesk_request,
+    neuro_id_analytics_event,
     ob_configuration,
     onboarding_decision,
     onboarding_decision_verification_result_junction,

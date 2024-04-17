@@ -314,6 +314,11 @@ define_newtype_id!(
 define_newtype_id!(ListEntryId, String, "Identifier for a ListEntry");
 define_newtype_id!(RuleSetVersionId, String, "Identifier for a RuleSetVersion");
 define_newtype_id!(NeuroIdentityId, String, "Identifier for a NeuroID User");
+define_newtype_id!(
+    NeuroIdAnalyticsEventId,
+    String,
+    "Identifier for a NeuroID analytics event"
+);
 define_newtype_id!(ListEntryCreationId, String, "Identifier for a ListEntryCreation");
 
 impl From<WorkflowId> for NeuroIdentityId {

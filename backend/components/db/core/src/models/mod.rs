@@ -34,6 +34,7 @@ pub mod list_entry_creation;
 pub mod liveness_event;
 pub mod manual_review;
 pub mod middesk_request;
+pub mod neuro_id_analytics_event;
 pub mod ob_configuration;
 pub mod onboarding_decision;
 pub mod partner_tenant;

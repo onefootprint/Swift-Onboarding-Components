@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS neuro_id_analytics_event;
