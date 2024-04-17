@@ -14,7 +14,7 @@ type ContentProps = {
 
 const Content = ({ doc }: ContentProps) => {
   const { t } = useTranslation('user-details');
-  // eslint-ignore-next-line
+  // eslint-disable-next-line no-console
   console.log(doc);
 
   return (

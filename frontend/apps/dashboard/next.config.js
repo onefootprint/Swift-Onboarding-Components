@@ -110,6 +110,14 @@ const getNextConfig = () => {
         },
       ];
     },
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'i.imgur.com',
+        },
+      ],
+    },
     webpack: config => {
       config.resolve.alias.canvas = false;
       return config;
