@@ -31,7 +31,7 @@ pub enum DbError {
     #[error("Pool error: {0}")]
     PoolGet(#[from] deadpool_diesel::PoolError),
     #[error("Pool init error: {0}")]
-    PoolInit(#[from] deadpool::managed::BuildError<deadpool_diesel::Error>),
+    PoolInit(#[from] deadpool::managed::BuildError),
     #[error("Connection error: {0}")]
     ConnectionError(#[from] diesel::ConnectionError),
     #[error("Migration error: {0}")]

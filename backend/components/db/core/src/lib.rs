@@ -111,7 +111,7 @@ impl DbPool {
 }
 
 /// max age of a recycled connection in seconds (10min)
-const CONNECTION_RECYCLE_MAX_AGES_SECS: u64 = 600;
+const CONNECTION_RECYCLE_MAX_AGE_SECS: u64 = 600;
 
 /// Initialize our DB
 pub fn init(url: &str) -> Result<DbPool, DbError> {
@@ -129,14 +129,14 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
 
             // if the connection has been running for a while (10min) we can drop it
             // and force the pool to build a new one
-            if created > CONNECTION_RECYCLE_MAX_AGES_SECS {
+            if created > CONNECTION_RECYCLE_MAX_AGE_SECS {
                 tracing::debug!(
                     db.pool.recycled_secs_ago = recycled,
                     "db_pool.pre_recycle.drop_stale"
                 );
                 // this tells deadpool to continue the operation, but drop the connection
                 // and build a new one
-                return Err(HookError::Continue(None));
+                return Err(HookError::message("connection older than max age"));
             }
 
             // log the pre recycle event
