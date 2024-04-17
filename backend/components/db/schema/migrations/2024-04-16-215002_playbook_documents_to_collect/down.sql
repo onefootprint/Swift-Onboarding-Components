@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration DROP COLUMN documents_to_collect;

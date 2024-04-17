@@ -1,14 +1,15 @@
-use crate::CustomDocumentConfig;
+use crate::DataIdentifier;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
+use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{EnumDiscriminants, EnumIter};
 use strum_macros::Display;
 
 use strum_macros::EnumString;
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Serialize, serde::Deserialize, AsJsonb, EnumDiscriminants)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, AsJsonb, EnumDiscriminants, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 #[strum_discriminants(
@@ -35,6 +36,18 @@ pub enum DocumentRequestConfig {
     ProofOfSsn {},
     ProofOfAddress {},
     Custom(CustomDocumentConfig),
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema, macros::SerdeAttr)]
+#[serde(rename_all = "snake_case")]
+pub struct CustomDocumentConfig {
+    /// Custom document identifier under which the document will be vaulted
+    pub identifier: DataIdentifier,
+    /// The human-readable name of the document to display to the user
+    pub name: String,
+    /// Optional human-readable description of the document that will be displayed to the user
+    pub description: Option<String>,
+    // pub accepted_types: Vec<DocumentType>, // image? pdf?
 }
 
 

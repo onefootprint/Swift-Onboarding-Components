@@ -745,6 +745,7 @@ diesel::table! {
         skip_confirm -> Bool,
         document_types_and_countries -> Nullable<Jsonb>,
         curp_validation_enabled -> Bool,
+        documents_to_collect -> Nullable<Array<Nullable<Jsonb>>>,
     }
 }
 

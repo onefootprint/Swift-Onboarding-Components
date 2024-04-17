@@ -167,11 +167,14 @@ pub fn get_or_start_onboarding(
 fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObConfiguration) -> ApiResult<()> {
     let doc_requests_to_create = match wf.config {
         WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => obc
+            // Identity documents are generally still represented in CDOs. We could migrate them
+            // to `obc.documents_to_collect` one day
             .document_cdo()
             .map(|cdo| DocumentRequestConfig::Identity {
                 collect_selfie: cdo.selfie() == Selfie::RequireSelfie,
             })
             .into_iter()
+            .chain(obc.documents_to_collect.clone().unwrap_or_default())
             .collect(),
         WorkflowConfig::Document(DocumentConfig { kind, collect_selfie }) => {
             match kind {

@@ -9,9 +9,10 @@ use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     ApiKeyStatus, AppearanceId, AuthMethodKind, CipKind, CollectedDataOption as CDO,
-    DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo, EnhancedAmlOption,
-    IdDocKind, Iso3166TwoDigitCountryCode, Locked, ObConfigurationId, ObConfigurationKey,
-    ObConfigurationKind, ScopedVaultId, SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
+    DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo,
+    DocumentRequestConfig, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, Locked,
+    ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
+    SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -58,6 +59,11 @@ pub struct ObConfiguration {
     pub skip_confirm: bool,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     pub curp_validation_enabled: bool,
+    /// The list of additional non-identity documents to be collected by this playbook.
+    /// Identity documents are still unfortunately specified in CDOs. We could migrate them
+    /// to this field in the future.
+    #[diesel(deserialize_as = OptionalNonNullVec<DocumentRequestConfig>)]
+    pub documents_to_collect: Option<Vec<DocumentRequestConfig>>,
 }
 
 
@@ -356,6 +362,7 @@ struct NewObConfiguration {
     skip_confirm: bool,
     document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     curp_validation_enabled: bool,
+    documents_to_collect: Vec<DocumentRequestConfig>,
 }
 
 #[derive(Debug, derive_more::From)]
@@ -569,6 +576,7 @@ impl ObConfiguration {
         skip_kyb: bool,
         skip_confirm: bool,
         document_types_and_countries: Option<DocumentAndCountryConfiguration>,
+        documents_to_collect: Vec<DocumentRequestConfig>,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -596,6 +604,7 @@ impl ObConfiguration {
             skip_confirm,
             document_types_and_countries,
             curp_validation_enabled: false,
+            documents_to_collect,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -763,6 +772,7 @@ mod tests {
             skip_confirm: false,
             document_types_and_countries: None,
             curp_validation_enabled: false,
+            documents_to_collect: None,
         };
 
         assert_have_same_elements(
@@ -809,6 +819,7 @@ mod tests {
             skip_confirm: false,
             document_types_and_countries: None,
             curp_validation_enabled: false,
+            documents_to_collect: None,
         }
     }
 
@@ -1059,6 +1070,7 @@ mod tests {
             skip_confirm: false,
             document_types_and_countries: None,
             curp_validation_enabled: false,
+            documents_to_collect: None,
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
@@ -1105,6 +1117,7 @@ mod tests {
             skip_confirm: false,
             document_types_and_countries: None,
             curp_validation_enabled: false,
+            documents_to_collect: None,
         };
 
         let mapping = obc.supported_country_mapping_for_document(residential_country).0;
@@ -1185,6 +1198,7 @@ mod tests {
             // TESTING THIS
             document_types_and_countries: Some(doc_config),
             curp_validation_enabled: false,
+            documents_to_collect: None,
         };
 
         let mapping = obc_with_supported_countries_set
@@ -1239,6 +1253,7 @@ mod tests {
             // TESTING THIS
             document_types_and_countries: Some(doc_config),
             curp_validation_enabled: false,
+            documents_to_collect: None,
         };
 
         // Despite configuring document_types_and_countries on the OBC, we respect the alpaca overrides

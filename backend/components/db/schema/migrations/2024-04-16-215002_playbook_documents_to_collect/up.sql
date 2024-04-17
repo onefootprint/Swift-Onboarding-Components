@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN documents_to_collect JSONB[];

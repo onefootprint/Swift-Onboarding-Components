@@ -336,9 +336,16 @@ def test_config_create(sandbox_tenant):
             "Playbook of kind document must skip KYC",
         ),
         # happy path alpaca
-          (
+        (
             dict(
-                must_collect_data=["name", "dob", "ssn9", "full_address", "email", "phone_number"],
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "ssn9",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
                 optional_data=[],
                 can_access_data=[],
                 kind="kyc",
@@ -356,7 +363,7 @@ def test_config_create(sandbox_tenant):
             ),
             None,
         ),
-         (
+        (
             dict(
                 must_collect_data=["dob", "full_address", "email", "phone_number"],
                 optional_data=[],
@@ -378,7 +385,15 @@ def test_config_create(sandbox_tenant):
         ),
         (
             dict(
-                must_collect_data=["name", "dob", "ssn9", "full_address", "email", "phone_number", "document"],
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "ssn9",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "document",
+                ],
                 optional_data=[],
                 can_access_data=[],
                 kind="kyc",
@@ -396,9 +411,16 @@ def test_config_create(sandbox_tenant):
             ),
             "Validation error: Cannot specify documents in Playbook and be using an Alpaca CIP",
         ),
-         (
+        (
             dict(
-                must_collect_data=["name", "dob", "ssn9", "full_address", "email", "phone_number"],
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "ssn9",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
                 optional_data=[],
                 can_access_data=[],
                 kind="kyc",
@@ -416,9 +438,16 @@ def test_config_create(sandbox_tenant):
             ),
             "Validation error: Cannot create Alpaca playbook without allow_us_residents=true && allow_us_territories=true",
         ),
-         (
+        (
             dict(
-                must_collect_data=["name", "dob", "ssn9", "full_address", "email", "phone_number"],
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "ssn9",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
                 optional_data=[],
                 can_access_data=[],
                 kind="kyc",
@@ -436,9 +465,16 @@ def test_config_create(sandbox_tenant):
             ),
             "Validation error: Must run OFAC/PEP/AdverseMedia for Alpaca playbook",
         ),
-            (
+        (
             dict(
-                must_collect_data=["name", "dob", "ssn9", "full_address", "email", "phone_number"],
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "ssn9",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
                 optional_data=[],
                 can_access_data=[],
                 kind="kyc",
@@ -455,6 +491,35 @@ def test_config_create(sandbox_tenant):
                 allow_us_territories=True,
             ),
             "Validation error: Must choose EnhancedAmlOption Alpaca playbook",
+        ),
+        (
+            dict(
+                must_collect_data=["name", "full_address", "email", "phone_number"],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                cip_kind=None,
+                skip_kyc=False,
+                skip_confirm=False,
+                enhanced_aml=dict(
+                    enhanced_aml=False,
+                    ofac=False,
+                    pep=False,
+                    adverse_media=False,
+                ),
+                allow_us_residents=False,
+                allow_us_territories=False,
+                documents_to_collect=[
+                    dict(
+                        kind="custom",
+                        data=dict(
+                            identifier="id.first_name",
+                            name="Custom document",
+                        ),
+                    )
+                ],
+            ),
+            "Must use identifier starting with document.custom. for custom documents",
         ),
     ],
 )
@@ -507,14 +572,20 @@ def test_doc_only(sandbox_tenant):
         kind="document",
         skip_kyc=True,
         skip_confirm=True,
-        document_types_and_countries= {'global': ['passport'], 'country_specific': {'US': ['drivers_license']}}
+        document_types_and_countries={
+            "global": ["passport"],
+            "country_specific": {"US": ["drivers_license"]},
+        },
     )
     res = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
 
     assert res["kind"] == "document"
     assert res["must_collect_data"] == collect_data
     assert res["can_access_data"] == collect_data
-    assert res["document_types_and_countries"] == {'global': ['passport'], 'country_specific': {'US': ['drivers_license']}}
+    assert res["document_types_and_countries"] == {
+        "global": ["passport"],
+        "country_specific": {"US": ["drivers_license"]},
+    }
 
 
 @pytest.mark.parametrize(

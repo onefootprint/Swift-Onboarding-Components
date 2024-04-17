@@ -30,6 +30,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         false,
         false,
         None,
+        vec![],
     )
     .expect("Could not create ob config")
 }
@@ -104,6 +105,7 @@ pub fn create_with_opts(
         false,
         false,
         opts.document_types_and_countries,
+        vec![],
     )
     .expect("Could not create ob config")
 }

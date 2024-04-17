@@ -15,8 +15,9 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     output::Csv, AdverseMediaListKind, CipKind, CollectedData as CD, CollectedDataOption as CDO,
-    CollectedDataOptionKind as CDOK, DataIdentifierDiscriminant, DocumentAndCountryConfiguration,
-    EnhancedAml, EnhancedAmlOption, Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
+    CollectedDataOptionKind as CDOK, DataIdentifier, DataIdentifierDiscriminant,
+    DocumentAndCountryConfiguration, DocumentKind, DocumentRequestConfig, EnhancedAml, EnhancedAmlOption,
+    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
@@ -49,6 +50,8 @@ pub struct CreateOnboardingConfigurationRequest {
     kind: Option<ObConfigurationKind>,
     skip_confirm: Option<bool>,
     document_types_and_countries: Option<DocumentAndCountryConfiguration>,
+    #[serde(default)]
+    documents_to_collect: Vec<DocumentRequestConfig>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -134,6 +137,8 @@ impl CreateOnboardingConfigurationRequest {
             )
             .into());
         }
+
+        self.validate_documents()?;
 
         self.validate_countries()?;
 
@@ -227,6 +232,67 @@ impl CreateOnboardingConfigurationRequest {
                 }
             })
             .collect::<ApiResult<Vec<_>>>()?;
+        Ok(())
+    }
+
+    fn validate_documents(&self) -> ApiResult<()> {
+        let docs = &self.documents_to_collect;
+        if docs
+            .iter()
+            .any(|d| matches!(d, DocumentRequestConfig::Identity { .. }))
+        {
+            return ValidationError(
+                "Cannot yet provide ID document configs here. Please use must_collect_data instead.",
+            )
+            .into();
+        }
+
+        if docs
+            .iter()
+            .filter(|d| matches!(d, DocumentRequestConfig::ProofOfAddress { .. }))
+            .count()
+            > 1
+        {
+            return ValidationError("Can only collect one proof of address doc").into();
+        }
+
+        if docs
+            .iter()
+            .filter(|d| matches!(d, DocumentRequestConfig::ProofOfSsn { .. }))
+            .count()
+            > 1
+        {
+            return ValidationError("Can only collect one proof of SSN doc").into();
+        }
+
+        // Custom doc validation
+
+        let custom_docs = docs
+            .iter()
+            .filter_map(|d| match d {
+                DocumentRequestConfig::Custom(i) => Some(i),
+                _ => None,
+            })
+            .collect_vec();
+
+        let num_identifiers = custom_docs.iter().map(|d| &d.identifier).unique().count();
+        if num_identifiers != custom_docs.len() {
+            return ValidationError("Cannot specify the same identifier for multiple custom documents")
+                .into();
+        }
+        if custom_docs
+            .iter()
+            .any(|d| !matches!(d.identifier, DataIdentifier::Document(DocumentKind::Custom(_))))
+        {
+            return ValidationError(
+                "Must use identifier starting with document.custom. for custom documents",
+            )
+            .into();
+        }
+        if custom_docs.iter().any(|d| d.name.is_empty()) {
+            return ValidationError("Custom document name cannot be empty").into();
+        }
+
         Ok(())
     }
 
@@ -513,6 +579,7 @@ pub async fn post(
         kind,
         skip_confirm,
         document_types_and_countries,
+        documents_to_collect,
     } = request.clone();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -581,6 +648,7 @@ pub async fn post(
                 skip_kyb,
                 skip_confirm.unwrap_or(false),
                 document_types_and_countries,
+                documents_to_collect,
             )?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))?;
@@ -643,9 +711,12 @@ fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<Enhanced
 
 #[cfg(test)]
 mod test {
+    use std::str::FromStr;
+
     use super::*;
     use newtypes::{
-        CollectedDataOption as CDO, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, Selfie,
+        CollectedDataOption as CDO, CountryRestriction, CustomDocumentConfig, DocTypeRestriction,
+        DocumentCdoInfo, Selfie,
     };
     use test_case::test_case;
 
@@ -687,6 +758,7 @@ mod test {
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
             document_types_and_countries: None,
+            documents_to_collect: vec![],
         };
         req.validate_inner().is_ok()
     }
@@ -718,6 +790,7 @@ mod test {
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
             document_types_and_countries: None,
+            documents_to_collect: vec![],
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }
@@ -748,6 +821,7 @@ mod test {
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
             document_types_and_countries: None,
+            documents_to_collect: vec![],
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }
@@ -774,6 +848,39 @@ mod test {
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
             document_types_and_countries: None,
+            documents_to_collect: vec![],
+        };
+        req.validate(ObConfigurationKind::Kyc).is_ok()
+    }
+
+    #[test_case(vec![] => true)]
+    #[test_case(vec![DocumentRequestConfig::Identity{ collect_selfie: true }] => false)]
+    #[test_case(vec![DocumentRequestConfig::ProofOfAddress {}, DocumentRequestConfig::ProofOfSsn {}, DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None}), DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.bye").unwrap(), name: "Bye".to_owned(), description: None})] => true; "proofofssn-proofofaddress-multiple-custom")]
+    #[test_case(vec![DocumentRequestConfig::ProofOfAddress {}, DocumentRequestConfig::ProofOfAddress {}] => false)]
+    #[test_case(vec![DocumentRequestConfig::ProofOfSsn {}, DocumentRequestConfig::ProofOfSsn {}] => false)]
+    #[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None}), DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None})] => false; "two-custom-with-same-di")]
+    #[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "".to_owned(), description: None})] => false; "custom-with-empty-name")]
+    #[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("custom.hi").unwrap(), name: "Hi".to_owned(), description: None})] => false; "custom-with-non-doc-DI")]
+    fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
+        let req = CreateOnboardingConfigurationRequest {
+            name: "Flerp".to_owned(),
+            must_collect_data: vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber],
+            optional_data: None,
+            can_access_data: vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber],
+            cip_kind: None,
+            is_no_phone_flow: Some(false),
+            is_doc_first_flow: false,
+            allow_international_residents: false,
+            international_country_restrictions: None,
+            skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
+            enhanced_aml: Some(EnhancedAml::default()),
+            allow_us_residents: Some(true),
+            allow_us_territories: Some(false),
+            kind: Some(ObConfigurationKind::Kyc),
+            skip_confirm: None,
+            document_types_and_countries: None,
+            documents_to_collect,
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }
