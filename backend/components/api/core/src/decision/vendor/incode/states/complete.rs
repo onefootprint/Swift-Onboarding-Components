@@ -61,6 +61,7 @@ pub(super) struct PreCompleteArgs<'a> {
     pub doc_uploads: &'a [DocumentUpload],
 }
 
+#[tracing::instrument(skip_all)]
 pub(super) async fn compute_ocr_data<'a>(
     enclave_client: &EnclaveClient,
     args: PreCompleteArgs<'a>,
@@ -246,6 +247,7 @@ pub(super) fn compute_risk_signals<'a>(
 }
 
 /// Now that we have the correct type of the document, add the images to the vault under the correct type
+#[tracing::instrument(skip_all)]
 pub fn vault_complete_images(
     conn: &mut TxnPgConn,
     vw: &WriteableVw<Person>,
@@ -288,6 +290,7 @@ pub struct CompleteArgs<'a> {
 
 impl Complete {
     /// Must call this before instantiating Complete
+    #[tracing::instrument("Complete::enter", skip_all)]
     pub fn enter(conn: &mut TxnPgConn, args: CompleteArgs) -> ApiResult<()> {
         let CompleteArgs {
             vault,

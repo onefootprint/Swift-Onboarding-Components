@@ -56,6 +56,7 @@ pub struct FetchScores {
 
 #[async_trait]
 impl IncodeStateTransition for FetchScores {
+    #[tracing::instrument("FetchScores::run", skip_all)]
     async fn run(
         db_pool: &DbPool,
         clients: &IncodeClients,
@@ -202,6 +203,7 @@ impl IncodeStateTransition for FetchScores {
         }))
     }
 
+    #[tracing::instrument("FetchScores::transition", skip_all)]
     fn transition(
         self,
         conn: &mut TxnPgConn,

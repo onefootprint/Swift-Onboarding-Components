@@ -29,6 +29,7 @@ use newtypes::{
 pub struct Fail {}
 
 impl Fail {
+    #[tracing::instrument("Fail::enter", skip_all)]
     pub fn enter(
         conn: &mut TxnPgConn,
         di_id: &DecisionIntentId,
