@@ -3,17 +3,22 @@ use crate::{
     utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
     ApiError, State,
 };
-use db::models::{decision_intent::DecisionIntent, verification_request::VerificationRequest};
+use db::models::{
+    decision_intent::DecisionIntent,
+    neuro_id_analytics_event::{NeuroIdAnalyticsEvent, NewNeuroIdAnalyticsEvent},
+    verification_request::VerificationRequest,
+};
 use idv::{
     neuro_id::{
-        response::{NeuroApiResponse, NeuroIdAnalyticsResponse},
+        response::{NeuroApiResponse, NeuroIdAnalyticsResponse, NeuroIdAttributes},
         NeuroIdAnalyticsRequest,
     },
     ParsedResponse, VendorResponse,
 };
 use newtypes::{
     vendor_credentials::{NeuroIdCredentials, NeuroIdSiteId},
-    DecisionIntentId, NeuroIdentityId, ScopedVaultId, TenantId, VaultPublicKey, VendorAPI, WorkflowId,
+    DecisionIntentId, NeuroIdentityId, ScopedVaultId, TenantId, VaultPublicKey, VendorAPI,
+    VerificationResultId, WorkflowId,
 };
 
 use super::{
@@ -109,7 +114,10 @@ pub async fn run_neuro_call(
     let res = state
         .vendor_clients
         .neuro_id
-        .make_request(NeuroIdAnalyticsRequest { credentials, id })
+        .make_request(NeuroIdAnalyticsRequest {
+            credentials,
+            id: id.clone(),
+        })
         .await;
 
     let args = SaveVerificationResultArgs::new_for_neuro(
@@ -123,6 +131,10 @@ pub async fn run_neuro_call(
     let raw_response = neuro_response.raw_response.clone();
     let parsed: NeuroIdAnalyticsResponse = neuro_response.result.into_success().map_err(map_to_api_error)?;
 
+    // save event for metrics/dupes/user insights
+    save_neuro_event(state, &parsed, t_id, id, &di.scoped_vault_id, wf_id, &vres_id).await?;
+
+
     let vendor_result = VendorResult {
         response: VendorResponse {
             response: ParsedResponse::NeuroIdAnalytics(parsed),
@@ -133,4 +145,53 @@ pub async fn run_neuro_call(
     };
 
     Ok(Some(vendor_result))
+}
+
+
+async fn save_neuro_event(
+    state: &State,
+    response: &NeuroIdAnalyticsResponse,
+    tenant_id: &TenantId,
+    neuro_identifier: NeuroIdentityId,
+    scoped_vault_id: &ScopedVaultId,
+    workflow_id: &WorkflowId,
+    vres_id: &VerificationResultId,
+) -> ApiResult<()> {
+    let attributes = NeuroIdAttributes::new(response);
+
+    let event = NewNeuroIdAnalyticsEvent {
+        verification_result_id: vres_id.clone(),
+        workflow_id: workflow_id.clone(),
+        scoped_vault_id: scoped_vault_id.clone(),
+        tenant_id: tenant_id.clone(),
+        neuro_identifier: neuro_identifier.clone(),
+        cookie_id: response.profile.client_id.clone(),
+        device_id: response.profile.device_id.clone(),
+        model_fraud_ring_indicator_result: attributes.model_fraud_ring_indicator_result,
+        model_automated_activity_result: attributes.model_automated_activity_result,
+        model_risky_device_result: attributes.model_risky_device_result,
+        model_factory_reset_result: attributes.model_factory_reset_result,
+        model_gps_spoofing_result: attributes.model_gps_spoofing_result,
+        model_tor_exit_node_result: attributes.model_tor_exit_node_result,
+        model_public_proxy_result: attributes.model_public_proxy_result,
+        model_vpn_result: attributes.model_vpn_result,
+        model_ip_blocklist_result: attributes.model_ip_blocklist_result,
+        model_ip_address_association_result: attributes.model_ip_address_association_result,
+        model_incognito_result: attributes.model_incognito_result,
+        model_bot_framework_result: attributes.model_bot_framework_result,
+        model_suspicious_device_result: attributes.model_suspicious_device_result,
+        model_multiple_ids_per_device_result: attributes.model_multiple_ids_per_device_result,
+        model_device_reputation_result: attributes.model_device_reputation_result,
+        suspicious_device_emulator: attributes.emulator,
+        suspicious_device_jailbroken: attributes.jailbroken,
+        suspicious_device_missing_expected_properties: attributes.missing_expected_properties,
+        suspicious_device_frida: attributes.frida,
+    };
+
+    state
+        .db_pool
+        .db_query(move |conn| NeuroIdAnalyticsEvent::create(conn, event))
+        .await?;
+
+    Ok(())
 }
