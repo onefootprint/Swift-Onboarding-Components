@@ -8,7 +8,7 @@ use crate::{
 use api_core::{
     auth::tenant::{TenantGuard, TenantSessionAuth},
     config::LinkKind,
-    errors::{user::UserError, ApiResult},
+    errors::{user::UserError, ApiResult, AssertionError},
     utils::{
         email::SendgridClient,
         fp_id_path::FpIdPath,
@@ -104,6 +104,7 @@ async fn send_communication(
                 DocumentRequestKind::Identity => TriggerMessageKind::IdentityDocument,
                 DocumentRequestKind::ProofOfAddress => TriggerMessageKind::ProofOfAddress,
                 DocumentRequestKind::ProofOfSsn => TriggerMessageKind::ProofOfSsn,
+                DocumentRequestKind::Custom => return AssertionError("Not implemented").into(),
             },
         };
         (kind, note)

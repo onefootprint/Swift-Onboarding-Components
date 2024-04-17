@@ -1,3 +1,4 @@
+use crate::CustomDocumentConfig;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -7,17 +8,7 @@ use strum_macros::Display;
 
 use strum_macros::EnumString;
 
-#[derive(
-    Debug,
-    Clone,
-    Eq,
-    PartialEq,
-    serde::Serialize,
-    serde::Deserialize,
-    AsJsonb,
-    macros::SerdeAttr,
-    EnumDiscriminants,
-)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Serialize, serde::Deserialize, AsJsonb, EnumDiscriminants)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 #[strum_discriminants(
@@ -43,6 +34,7 @@ pub enum DocumentRequestConfig {
     Identity { collect_selfie: bool },
     ProofOfSsn {},
     ProofOfAddress {},
+    Custom(CustomDocumentConfig),
 }
 
 

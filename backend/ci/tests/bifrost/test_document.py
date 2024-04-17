@@ -1,6 +1,12 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config, open_multipart_file, post, get, get_requirement_from_requirements
+from tests.utils import (
+    create_ob_config,
+    open_multipart_file,
+    post,
+    get,
+    get_requirement_from_requirements,
+)
 
 
 @pytest.fixture(scope="session")
@@ -39,7 +45,8 @@ def test_upload_documents(doc_request_sandbox_ob_config):
     id = post("hosted/user/documents", data, bifrost.auth_token)["id"]
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
-    import copy 
+    import copy
+
     post(
         f"hosted/user/documents/{id}/upload/front",
         None,
@@ -174,7 +181,10 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
         must_collect_data + ["document.voter_identification.none.require_selfie"],
         can_access_data + ["document.voter_identification.none.require_selfie"],
         # restrict to only DL in US
-        document_types_and_countries = {'global': ['passport'], 'country_specific': {'US': ['drivers_license']}}
+        document_types_and_countries={
+            "global": ["passport"],
+            "country_specific": {"US": ["drivers_license"]},
+        },
     )
     bifrost = BifrostClient.new(obc)
     bifrost.handle_requirements(kind="collect_data")
@@ -250,7 +260,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config):
         "collect_document", status["all_requirements"]
     )
 
-    assert doc_requirement["should_collect_selfie"]
+    assert doc_requirement["config"]["should_collect_selfie"]
     # consent
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
@@ -370,30 +380,24 @@ def test_user_uploading_small_image(doc_request_sandbox_ob_config):
     body = post("hosted/user/documents", data, bifrost.auth_token)
     doc_id = body["id"]
 
-    
     body = post(
         f"hosted/user/documents/{doc_id}/upload/front",
         None,
         bifrost.auth_token,
-        files=open_multipart_file(
-                "small_image.png", "image/png"
-            )(),
-        status_code=400
+        files=open_multipart_file("small_image.png", "image/png")(),
+        status_code=400,
     )
-    assert body["error"]["message"].startswith(
-        "Image too small"
-    )
+    assert body["error"]["message"].startswith("Image too small")
+
 
 # When a user has issues with their mobile device's camera initializing, we force the user to upload images
 # and we produce a risk signal so that tenants are aware
-def test_user_having_trouble_with_their_mobile_camera(sandbox_tenant, doc_request_sandbox_ob_config):
+def test_user_having_trouble_with_their_mobile_camera(
+    sandbox_tenant, doc_request_sandbox_ob_config
+):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
-    status = bifrost.get_status()
-    doc_requirement = get_requirement_from_requirements(
-        "collect_document", status["all_requirements"]
-    )
     # consent
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
@@ -425,34 +429,36 @@ def test_user_having_trouble_with_their_mobile_camera(sandbox_tenant, doc_reques
     # Finish bifrost
     user = bifrost.run()
 
-
     # we have correct risk signal for forcing upload
     risk_signals = get(
         f"entities/{user.fp_id}/risk_signals", None, sandbox_tenant.sk.key
     )
     reason_codes = set(r["reason_code"] for r in risk_signals)
     assert "document_live_capture_failed" in reason_codes
-    
+
     # this is added as a default rule, so we test user triggers the rule
     rsr = get(f"entities/{user.fp_id}/rule_set_result", None, *sandbox_tenant.db_auths)
-    doc_capture_failed_rule_results = [r for r in rsr['rule_results'] if r['rule']['rule_expression'][0]['field'] == 'document_live_capture_failed']
-    assert doc_capture_failed_rule_results[0]['result']
+    doc_capture_failed_rule_results = [
+        r
+        for r in rsr["rule_results"]
+        if r["rule"]["rule_expression"][0]["field"] == "document_live_capture_failed"
+    ]
+    assert doc_capture_failed_rule_results[0]["result"]
 
 
-def test_no_documents_set_on_obc(sandbox_tenant, must_collect_data, can_access_data): 
+def test_no_documents_set_on_obc(sandbox_tenant, must_collect_data, can_access_data):
     obc = create_ob_config(
         sandbox_tenant,
         "International config",
         must_collect_data + ["document_and_selfie"],
         can_access_data + ["document_and_selfie"],
         # thing under test, empty
-        document_types_and_countries = {'global': [], 'country_specific': {}}
+        document_types_and_countries={"global": [], "country_specific": {}},
     )
     bifrost = BifrostClient.new(obc)
     status = bifrost.get_status()
     doc_requirement = get_requirement_from_requirements(
         "collect_document", status["all_requirements"]
     )
-    assert len(doc_requirement["supported_country_and_doc_types"].keys()) > 0
-    assert len(doc_requirement["supported_country_and_doc_types"]["US"]) > 0
-
+    assert len(doc_requirement["config"]["supported_country_and_doc_types"].keys()) > 0
+    assert len(doc_requirement["config"]["supported_country_and_doc_types"]["US"]) > 0

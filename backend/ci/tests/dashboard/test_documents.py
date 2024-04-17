@@ -21,7 +21,7 @@ def user_with_documents(doc_request_sandbox_ob_config):
     doc_requirement = next(
         r for r in bifrost.handled_requirements if r["kind"] == "collect_document"
     )
-    assert doc_requirement["should_collect_selfie"]
+    assert doc_requirement["config"]["should_collect_selfie"]
 
     return user
 

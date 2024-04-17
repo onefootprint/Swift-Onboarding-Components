@@ -182,6 +182,9 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
                     DocumentRequestConfig::ProofOfSsn {},
                     DocumentRequestConfig::Identity { collect_selfie: true },
                 ],
+                // This should never happen.
+                // TODO: We should migrate WorkflowConfig::Document to use DocumentRequestConfig
+                DocumentRequestKind::Custom => vec![],
             }
         }
         WorkflowConfig::Kyb(_) => {

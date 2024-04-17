@@ -498,12 +498,16 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 let doc_reqs = if let Some(RuleAction::StepUp(kind)) = decision.action {
                     kind.to_doc_kinds()
                         .into_iter()
-                        .map(|kind| match kind {
-                            DocumentRequestKind::Identity => DocumentRequestConfig::Identity {
+                        .filter_map(|kind| match kind {
+                            DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
                                 collect_selfie: true, // TODO: should come from config
-                            },
-                            DocumentRequestKind::ProofOfAddress => DocumentRequestConfig::ProofOfAddress {},
-                            DocumentRequestKind::ProofOfSsn => DocumentRequestConfig::ProofOfSsn {},
+                            }),
+                            DocumentRequestKind::ProofOfAddress => {
+                                Some(DocumentRequestConfig::ProofOfAddress {})
+                            }
+                            DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
+                            // TODO handle custom doc step-ups
+                            DocumentRequestKind::Custom => None,
                         })
                         .map(|config| NewDocumentRequestArgs {
                             scoped_vault_id: self.sv_id.clone(),

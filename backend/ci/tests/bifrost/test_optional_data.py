@@ -63,9 +63,9 @@ def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
     assert collect_data_req is None
 
     if step_up_to_doc and not submit_ssn:
-        assert set(collect_doc_req["supported_country_and_doc_types"]["US"]) == set(
-            ["passport", "drivers_license", "visa"]
-        )
+        assert set(
+            collect_doc_req["config"]["supported_country_and_doc_types"]["US"]
+        ) == set(["passport", "drivers_license", "visa"])
     else:
         assert collect_doc_req is None
 

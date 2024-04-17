@@ -94,6 +94,8 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                             DocumentRequestKind::ProofOfSsn => TriggerKind::ProofOfSsn,
                             DocumentRequestKind::Identity => TriggerKind::IdDocument,
                             DocumentRequestKind::ProofOfAddress => TriggerKind::ProofOfAddress,
+                            // TODO add more context here - much bigger PR
+                            DocumentRequestKind::Custom => TriggerKind::RedoKyc,
                         },
                     };
                     let request = api_wire_types::WorkflowRequest::from_db(wfr);

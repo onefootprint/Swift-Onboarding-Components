@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    CollectedDataOption, DocumentRequestId, DocumentRequestKind, DocumentUploadMode, IdDocKind,
-    Iso3166TwoDigitCountryCode,
+    CollectedDataOption, CustomDocumentConfig, DocumentRequestId, DocumentRequestKind, DocumentUploadMode,
+    IdDocKind, Iso3166TwoDigitCountryCode,
 };
 use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
@@ -40,11 +40,16 @@ pub enum OnboardingRequirement {
     /// A document needs to be collected
     CollectDocument {
         document_request_id: DocumentRequestId,
+        /// TODO rm
         should_collect_selfie: bool,
+        /// TODO rm
         should_collect_consent: bool,
+        /// TODO rm
         supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
         upload_mode: DocumentUploadMode,
+        /// TODO rm
         document_request_kind: DocumentRequestKind,
+        config: CollectDocumentConfig,
     },
     /// The client needs to display the authorization consent page and confirm the user authorizes access
     Authorize {
@@ -55,46 +60,88 @@ pub enum OnboardingRequirement {
     Process,
 }
 
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "kind")]
+pub enum CollectDocumentConfig {
+    Identity {
+        should_collect_selfie: bool,
+        should_collect_consent: bool,
+        supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
+    },
+    ProofOfSsn {},
+    ProofOfAddress {},
+    Custom(CustomDocumentConfig),
+}
+
+impl From<&CollectDocumentConfig> for DocumentRequestKind {
+    fn from(value: &CollectDocumentConfig) -> Self {
+        match value {
+            CollectDocumentConfig::Identity { .. } => Self::Identity,
+            CollectDocumentConfig::ProofOfSsn {} => Self::ProofOfSsn,
+            CollectDocumentConfig::ProofOfAddress {} => Self::ProofOfAddress,
+            CollectDocumentConfig::Custom(_) => Self::Custom,
+        }
+    }
+}
+
+#[derive(Ord, PartialOrd, Eq, PartialEq, Clone, Hash)]
+pub struct OnboardingRequirementPriority {
+    pub priority: usize,
+    /// Tie breaker for custom document requirements
+    pub tie_breaker: Option<String>,
+}
+
 
 impl OnboardingRequirement {
-    pub fn priority(&self, is_doc_first: bool) -> usize {
-        if !is_doc_first {
+    /// Returns an order-able struct that allows sorting requirements by a priority
+    pub fn priority(&self, is_doc_first: bool) -> OnboardingRequirementPriority {
+        let priority = if !is_doc_first {
             match self {
                 OnboardingRequirement::CollectBusinessData { .. } => 0,
                 OnboardingRequirement::CollectData { .. } => 1,
                 OnboardingRequirement::CollectInvestorProfile { .. } => 2,
 
                 OnboardingRequirement::RegisterPasskey => 3,
-                OnboardingRequirement::CollectDocument {
-                    document_request_kind,
-                    ..
-                } => match document_request_kind {
-                    DocumentRequestKind::Identity => 4,
-                    DocumentRequestKind::ProofOfSsn => 5,
-                    DocumentRequestKind::ProofOfAddress => 6,
+                OnboardingRequirement::CollectDocument { config, .. } => match config {
+                    CollectDocumentConfig::Identity { .. } => 4,
+                    CollectDocumentConfig::ProofOfSsn { .. } => 5,
+                    CollectDocumentConfig::ProofOfAddress { .. } => 6,
+                    CollectDocumentConfig::Custom(..) => 7,
                 },
-                OnboardingRequirement::Authorize { .. } => 7,
-                OnboardingRequirement::Process => 8,
+                OnboardingRequirement::Authorize { .. } => 8,
+                OnboardingRequirement::Process => 9,
             }
         } else {
             // For a doc-first config, we show passkey and doc collection first
             match self {
                 OnboardingRequirement::RegisterPasskey => 0,
-                OnboardingRequirement::CollectDocument {
-                    document_request_kind,
-                    ..
-                } => match document_request_kind {
-                    DocumentRequestKind::Identity => 1,
-                    DocumentRequestKind::ProofOfSsn => 2,
-                    DocumentRequestKind::ProofOfAddress => 3,
+                OnboardingRequirement::CollectDocument { config, .. } => match config {
+                    CollectDocumentConfig::Identity { .. } => 1,
+                    CollectDocumentConfig::ProofOfSsn { .. } => 2,
+                    CollectDocumentConfig::ProofOfAddress { .. } => 3,
+                    CollectDocumentConfig::Custom(..) => 4,
                 },
-                OnboardingRequirement::CollectBusinessData { .. } => 4,
-                OnboardingRequirement::CollectData { .. } => 5,
-                OnboardingRequirement::CollectInvestorProfile { .. } => 6,
+                OnboardingRequirement::CollectBusinessData { .. } => 5,
+                OnboardingRequirement::CollectData { .. } => 6,
+                OnboardingRequirement::CollectInvestorProfile { .. } => 7,
 
-                OnboardingRequirement::Authorize { .. } => 7,
-                OnboardingRequirement::Process => 8,
+                OnboardingRequirement::Authorize { .. } => 8,
+                OnboardingRequirement::Process => 9,
             }
+        };
+        let tie_breaker = if let OnboardingRequirement::CollectDocument {
+            config: CollectDocumentConfig::Custom(CustomDocumentConfig { identifier, .. }),
+            ..
+        } = self
+        {
+            Some(identifier.to_string())
+        } else {
+            None
+        };
+        OnboardingRequirementPriority {
+            priority,
+            tie_breaker,
         }
     }
 }
@@ -129,6 +176,7 @@ impl OnboardingRequirement {
                 supported_country_and_doc_types: _,
                 upload_mode: _,
                 document_request_kind: _,
+                config: _,
             } => false,
             Self::Process => false,
         }
@@ -146,8 +194,8 @@ mod test {
     use std::{collections::HashMap, str::FromStr};
 
     use crate::{
-        AuthorizeFields, DocumentRequestId, DocumentRequestKind, DocumentUploadMode, OnboardingRequirement,
-        OnboardingRequirementKind,
+        AuthorizeFields, CollectDocumentConfig, CustomDocumentConfig, DataIdentifier, DocumentRequestId,
+        DocumentRequestKind, DocumentUploadMode, OnboardingRequirement, OnboardingRequirementKind,
     };
     use itertools::Itertools;
     use strum::IntoEnumIterator;
@@ -189,6 +237,20 @@ mod test {
                 supported_country_and_doc_types: HashMap::new(),
                 upload_mode: DocumentUploadMode::AllowUpload,
                 document_request_kind: dr_kind,
+                config: match dr_kind {
+                    DocumentRequestKind::Identity => CollectDocumentConfig::Identity {
+                        should_collect_selfie: false,
+                        should_collect_consent: false,
+                        supported_country_and_doc_types: HashMap::new(),
+                    },
+                    DocumentRequestKind::ProofOfSsn => CollectDocumentConfig::ProofOfSsn {},
+                    DocumentRequestKind::ProofOfAddress => CollectDocumentConfig::ProofOfAddress {},
+                    DocumentRequestKind::Custom => CollectDocumentConfig::Custom(CustomDocumentConfig {
+                        identifier: DataIdentifier::from_str("document.custom.flerp").unwrap(),
+                        name: "Flerp".to_string(),
+                        description: None,
+                    }),
+                },
             });
         }
 

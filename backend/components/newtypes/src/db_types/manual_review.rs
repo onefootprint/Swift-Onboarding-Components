@@ -31,6 +31,7 @@ pub enum ReviewReason {
     WatchlistHit,
     ProofOfSsnDocument,
     ProofOfAddressDocument,
+    CustomDocument,
 }
 
 impl ReviewReason {
@@ -42,6 +43,7 @@ impl ReviewReason {
             ReviewReason::WatchlistHit => "Watchlist hit deemed low risk or false-positive",
             ReviewReason::ProofOfSsnDocument => "Proof of SSN was submitted and verified",
             ReviewReason::ProofOfAddressDocument => "Proof of Address was submitted and verified",
+            ReviewReason::CustomDocument => "Custom document was submitted and verified",
         }
     }
 }

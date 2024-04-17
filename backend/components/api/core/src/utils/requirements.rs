@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 use crate::{
     auth::user::CheckUserWfAuthContext,
@@ -21,11 +21,11 @@ use db::{
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, AuthorizeFields, CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration,
-    DocumentCdoInfo, DocumentKind, DocumentRequestKind, DocumentUploadMode, IdentityDataKind as IDK,
-    IdentityDocumentStatus, InvestorProfileKind as IPK, Iso3166TwoDigitCountryCode, KycState, LivenessSource,
-    OnboardingRequirement, OnboardingRequirementKind, ScopedVaultId, Selfie, UsLegalStatus, VaultId,
-    WorkflowId, WorkflowState,
+    AlpacaKycState, AuthorizeFields, CollectDocumentConfig, CollectedDataOption,
+    DataIdentifierDiscriminant as DID, Declaration, DocumentCdoInfo, DocumentKind, DocumentRequestConfig,
+    DocumentRequestKind, DocumentUploadMode, IdentityDataKind as IDK, IdentityDocumentStatus,
+    InvestorProfileKind as IPK, Iso3166TwoDigitCountryCode, KycState, LivenessSource, OnboardingRequirement,
+    OnboardingRequirementKind, ScopedVaultId, Selfie, UsLegalStatus, VaultId, WorkflowState,
 };
 
 use super::vault_wrapper::Any;
@@ -456,22 +456,84 @@ fn get_requirement_inner(
                         || id_doc
                             .into_iter()
                             .any(|d| d.status == IdentityDocumentStatus::Pending);
-
-                    if should_render {
-                        let req = match dr.kind {
-                            DocumentRequestKind::Identity => {
-                                identity_doc_requirement(conn, &wf.id, &dr, obc, decrypted_values, opts)?
-                            }
-                            DocumentRequestKind::ProofOfSsn => proof_of_ssn_requirement(&dr, obc),
-                            DocumentRequestKind::ProofOfAddress => {
-                                proof_of_address_requirement(&dr, obc, decrypted_values)
-                            }
-                        };
-
-                        Ok(Some(req))
-                    } else {
-                        Ok(None)
+                    if !should_render {
+                        return Ok(None);
                     }
+
+                    let country = decrypted_values
+                        .get(&IDK::Country.into())
+                        .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
+                    let config = match dr.config {
+                        DocumentRequestConfig::Identity { collect_selfie } => {
+                            let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
+                            let supported_country_and_doc_types =
+                                obc.supported_country_mapping_for_document(country).0;
+                            CollectDocumentConfig::Identity {
+                                should_collect_selfie: collect_selfie,
+                                should_collect_consent: user_consent.is_none(),
+                                supported_country_and_doc_types,
+                            }
+                        }
+                        DocumentRequestConfig::ProofOfAddress {} => CollectDocumentConfig::ProofOfAddress {},
+                        DocumentRequestConfig::ProofOfSsn {} => CollectDocumentConfig::ProofOfSsn {},
+                        DocumentRequestConfig::Custom(info) => CollectDocumentConfig::Custom(info),
+                    };
+                    // if FF'd into require capture only
+                    // TODO: this will come from rule configuration table at some point in future
+                    let upload_mode = match dr.kind {
+                        DocumentRequestKind::Identity => {
+                            if opts.require_capture_on_stepup.unwrap_or(false) {
+                                DocumentUploadMode::CaptureOnly
+                            } else {
+                                DocumentUploadMode::Default
+                            }
+                        }
+                        // TODO also AllowUpload
+                        DocumentRequestKind::ProofOfSsn => DocumentUploadMode::Default,
+                        DocumentRequestKind::ProofOfAddress => DocumentUploadMode::AllowUpload,
+                        // TODO this might be a new mode - select between capture or upload, no preference
+                        DocumentRequestKind::Custom => DocumentUploadMode::AllowUpload,
+                    };
+
+                    // TODO remove both of these when we deprecate old fields, these are only to
+                    // compute the old versions of the fields for backcompat
+                    let (should_collect_selfie, should_collect_consent) =
+                        if let CollectDocumentConfig::Identity {
+                            should_collect_selfie,
+                            should_collect_consent,
+                            ..
+                        } = &config
+                        {
+                            (*should_collect_selfie, *should_collect_consent)
+                        } else {
+                            (false, false)
+                        };
+                    let supported_country_and_doc_types = match config {
+                        CollectDocumentConfig::Identity {
+                            ref supported_country_and_doc_types,
+                            ..
+                        } => supported_country_and_doc_types.clone(),
+                        CollectDocumentConfig::ProofOfSsn {} => {
+                            obc.supported_countries_and_doc_types_for_proof_of_ssn().0
+                        }
+                        CollectDocumentConfig::ProofOfAddress {} => {
+                            obc.supported_countries_and_doc_types_for_proof_of_address(country)
+                                .0
+                        }
+                        CollectDocumentConfig::Custom(_) => HashMap::new(),
+                    };
+
+                    let req = OnboardingRequirement::CollectDocument {
+                        document_request_id: dr.id.clone(),
+                        should_collect_selfie,
+                        should_collect_consent,
+                        supported_country_and_doc_types,
+                        upload_mode,
+                        document_request_kind: (&config).into(),
+                        config,
+                    };
+
+                    Ok(Some(req))
                 })
                 .collect::<ApiResult<Vec<Option<_>>>>()?
                 .into_iter()
@@ -536,69 +598,4 @@ fn get_requirement_inner(
         }
     };
     Ok(req)
-}
-
-
-fn identity_doc_requirement(
-    conn: &mut PgConn,
-    wf_id: &WorkflowId,
-    dr: &DocumentRequest,
-    obc: &ObConfiguration,
-    decrypted_values: &DecryptUncheckedResult,
-    opts: &RequirementOpts,
-) -> ApiResult<OnboardingRequirement> {
-    let user_consent = UserConsent::get_for_workflow(conn, wf_id)?;
-    let country = decrypted_values
-        .get(&IDK::Country.into())
-        .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
-    let supported_country_and_doc_types = obc.supported_country_mapping_for_document(country);
-    // if FF'd into require capture only
-    // TODO: this will come from rule configuration table at some point in future
-    let upload_mode = if opts.require_capture_on_stepup.unwrap_or(false) {
-        DocumentUploadMode::CaptureOnly
-    } else {
-        DocumentUploadMode::Default
-    };
-
-    Ok(OnboardingRequirement::CollectDocument {
-        document_request_id: dr.id.clone(),
-        should_collect_selfie: dr.should_collect_selfie(),
-        should_collect_consent: user_consent.is_none(),
-        supported_country_and_doc_types: supported_country_and_doc_types.0,
-        upload_mode,
-        document_request_kind: dr.kind,
-    })
-}
-
-
-fn proof_of_ssn_requirement(dr: &DocumentRequest, obc: &ObConfiguration) -> OnboardingRequirement {
-    OnboardingRequirement::CollectDocument {
-        document_request_id: dr.id.clone(),
-        should_collect_selfie: false,
-        should_collect_consent: false,
-        supported_country_and_doc_types: obc.supported_countries_and_doc_types_for_proof_of_ssn().0,
-        upload_mode: DocumentUploadMode::Default,
-        document_request_kind: dr.kind,
-    }
-}
-
-fn proof_of_address_requirement(
-    dr: &DocumentRequest,
-    obc: &ObConfiguration,
-    decrypted_values: &DecryptUncheckedResult,
-) -> OnboardingRequirement {
-    let country = decrypted_values
-        .get(&IDK::Country.into())
-        .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
-
-    OnboardingRequirement::CollectDocument {
-        document_request_id: dr.id.clone(),
-        should_collect_selfie: false,
-        should_collect_consent: false,
-        supported_country_and_doc_types: obc
-            .supported_countries_and_doc_types_for_proof_of_address(country)
-            .0,
-        upload_mode: DocumentUploadMode::AllowUpload,
-        document_request_kind: dr.kind,
-    }
 }

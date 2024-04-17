@@ -275,6 +275,9 @@ class BifrostClient:
 
     def handle_collect_document(self, requirement):
         """Add identity documents to vault"""
+        assert (
+            requirement["config"]["kind"] != "custom"
+        ), "BifrostClient cannot handle custom docs"
         if requirement["should_collect_consent"]:
             consent_data = {"consent_language_text": "I consent"}
             post("hosted/user/consent", consent_data, self.auth_token)

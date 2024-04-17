@@ -117,6 +117,8 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
             },
             DocumentRequestKind::ProofOfAddress => DocumentRequestConfig::ProofOfAddress {},
             DocumentRequestKind::ProofOfSsn => DocumentRequestConfig::ProofOfSsn {},
+            // Don't support custom doc requests in these tests yet
+            DocumentRequestKind::Custom => todo!(),
         };
         let args = NewDocumentRequestArgs {
             scoped_vault_id: sv.id.clone(),

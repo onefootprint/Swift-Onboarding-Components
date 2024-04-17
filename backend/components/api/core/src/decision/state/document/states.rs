@@ -230,14 +230,15 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                     let doc_reqs = if let Some(RuleAction::StepUp(kind)) = decision.action {
                         kind.to_doc_kinds()
                             .into_iter()
-                            .map(|kind| match kind {
-                                DocumentRequestKind::Identity => DocumentRequestConfig::Identity {
+                            .filter_map(|kind| match kind {
+                                DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
                                     collect_selfie: true, // TODO: should come from config
-                                },
+                                }),
                                 DocumentRequestKind::ProofOfAddress => {
-                                    DocumentRequestConfig::ProofOfAddress {}
+                                    Some(DocumentRequestConfig::ProofOfAddress {})
                                 }
-                                DocumentRequestKind::ProofOfSsn => DocumentRequestConfig::ProofOfSsn {},
+                                DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
+                                DocumentRequestKind::Custom => None,
                             })
                             .map(|config| NewDocumentRequestArgs {
                                 scoped_vault_id: self.sv_id.clone(),
@@ -311,6 +312,7 @@ fn handle_non_identity_document(
         DocumentRequestKind::Identity => None,
         DocumentRequestKind::ProofOfSsn => Some(vec![ReviewReason::ProofOfSsnDocument]),
         DocumentRequestKind::ProofOfAddress => Some(vec![ReviewReason::ProofOfAddressDocument]),
+        DocumentRequestKind::Custom => Some(vec![ReviewReason::CustomDocument]),
     };
     let decision = NewDecisionArgs {
         vault_id: sv.vault_id.clone(),

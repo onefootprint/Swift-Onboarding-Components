@@ -6,9 +6,9 @@ use serde::Serialize;
 #[derive(Serialize, Debug, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentUploadMode {
-    // Capture is encouraged, but uploads are allowed
+    /// We try to capture first, but uploads are allowed as a fallback if the camera isn't available
     Default,
-    // For document types that are likely to be uploaded (proof of address, leases, bank statements)
+    /// Give the user the option to either upload or capture the document.
     AllowUpload,
     CaptureOnly,
 }
