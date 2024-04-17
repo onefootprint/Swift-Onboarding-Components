@@ -6764,8 +6764,8 @@ pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
                     "model": "device_reputation",
                     "label": "false",
                     "attributes": {
-                        "customer_blocklist": false,
-                        "global_blocklist": false
+                        "customer_blocklist": true,
+                        "global_blocklist": true
                     }
                 },
                 {
@@ -6776,7 +6776,7 @@ pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
                         "sessions_per_device_count_1_day": 1,
                         "sessions_per_device_count_1_week": 1,
                         "sessions_per_device_count_4_week": 1,
-                        "sessions_per_device_count_12_week": 1
+                        "sessions_per_device_count_12_week": 3
                     }
                 },
                 {
@@ -6793,7 +6793,7 @@ pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
                         "multiple_ids_per_device_count_1_day": 1,
                         "multiple_ids_per_device_count_1_week": 1,
                         "multiple_ids_per_device_count_4_week": 1,
-                        "multiple_ids_per_device_count_12_week": 1
+                        "multiple_ids_per_device_count_12_week": 5
                     }
                 },
                 {
@@ -6814,7 +6814,7 @@ pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
                     "label": "false",
                     "attributes": {
                         "emulator": false,
-                        "jailbroken": false,
+                        "jailbroken": true,
                         "missing_expected_properties": false,
                         "frida": false
                     }
@@ -6839,7 +6839,7 @@ pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
                         "aws_ip_set": false,
                         "azure_china_ip_set": false,
                         "azure_germany_ip_set": false,
-                        "azure_government_ip_set": false,
+                        "azure_government_ip_set": true,
                         "azure_public_ip_set": false,
                         "digital_ocean_ip_set": false,
                         "google_ip_set": false,

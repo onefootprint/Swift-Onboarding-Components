@@ -4,6 +4,7 @@ pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
     let mut frcs = vec![];
 
     // Overall behavior decision
+    // TODO: include familiarity and combined digital intent in here
     let behavior_decision = res
         .flagged_signals()
         .iter()

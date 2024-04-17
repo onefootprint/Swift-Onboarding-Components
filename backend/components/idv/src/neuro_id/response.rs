@@ -1,7 +1,7 @@
 use newtypes::{PiiJsonValue, ScrubbedPiiJsonValue};
 use serde::{Deserialize, Serialize};
 use serde_with::DeserializeFromStr;
-use strum::{Display, EnumString};
+use strum::{Display, EnumIter, EnumString, IntoEnumIterator};
 
 use super::error;
 
@@ -21,6 +21,17 @@ impl NeuroIdAnalyticsResponse {
 
     pub fn flagged_signals(&self) -> Vec<&NeuroSignal> {
         self.signals().iter().filter(|s| s.is_flagged()).collect()
+    }
+
+    pub fn all_attributes(&self) -> Vec<(Model, Attribute)> {
+        self.signals()
+            .iter()
+            .filter_map(|s| s.attributes().map(|a| (s.model(), a)))
+            .collect()
+    }
+
+    pub fn get_signal_for_model(&self, model: Model) -> Option<NeuroSignal> {
+        self.signals().iter().find(|s| s.model() == model).cloned()
     }
 }
 
@@ -81,8 +92,29 @@ impl NeuroSignal {
         }
     }
 
+    // TODO: familiary and combined digital intent have labels that are non-boolean
+    // but we can handle these after we move to using those models
     pub fn is_flagged(&self) -> bool {
         self.label == *"true"
+    }
+
+    pub fn attributes(&self) -> Option<Attribute> {
+        // This doesn't ahve attributes
+        if matches!(self.model(), Model::Familiarity) {
+            None
+        } else {
+            self.attributes.clone().and_then(|a| {
+                match serde_json::from_value(a) {
+                    Ok(a) => Some(a),
+                    Err(e) => {
+                        // TODO: remove this after rollout!
+                        tracing::error!(?e, model=?self.model, "error deserializing model attributes");
+
+                        None
+                    }
+                }
+            })
+        }
     }
 }
 
@@ -174,7 +206,7 @@ pub enum Status {
     Unknown,
 }
 
-#[derive(Clone, Copy, Debug, Display, EnumString, DeserializeFromStr, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Display, EnumString, DeserializeFromStr, Eq, PartialEq, Serialize, EnumIter)]
 #[strum(serialize_all = "snake_case")]
 pub enum Model {
     //
@@ -331,6 +363,349 @@ impl NeuroApiResponse {
     }
 }
 
+// Define attribute serializations
+
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(untagged)]
+pub enum Attribute {
+    RiskyDevice {
+        risky_application_count: i32,
+    },
+    DeviceVelocity {
+        sessions_per_device_count_1_day: i32,
+        sessions_per_device_count_1_week: i32,
+        sessions_per_device_count_4_week: i32,
+        sessions_per_device_count_12_week: i32,
+    },
+    SuspiciousDevice {
+        emulator: bool,
+        jailbroken: bool,
+        missing_expected_properties: bool,
+        frida: bool,
+    },
+    IpAddressAssociation {
+        aws_ip_set: bool,
+        azure_china_ip_set: bool,
+        azure_germany_ip_set: bool,
+        azure_government_ip_set: bool,
+        azure_public_ip_set: bool,
+        digital_ocean_ip_set: bool,
+        google_ip_set: bool,
+        oracle_ip_set: bool,
+        vultr_ip_set: bool,
+    },
+
+    MultipleIdsPerDevice {
+        multiple_ids_per_device_count_1_day: i32,
+        multiple_ids_per_device_count_1_week: i32,
+        multiple_ids_per_device_count_4_week: i32,
+        multiple_ids_per_device_count_12_week: i32,
+    },
+    // for device and IP
+    Blocklist {
+        customer_blocklist: bool,
+        global_blocklist: bool,
+    },
+    Empty {},
+}
+
+#[derive(Default)]
+pub struct NeuroAttributesBuilder {
+    risky_application_count: i32,
+    sessions_per_device_count_1_day: i32,
+    sessions_per_device_count_1_week: i32,
+    sessions_per_device_count_4_week: i32,
+    sessions_per_device_count_12_week: i32,
+    emulator: Option<bool>,
+    jailbroken: Option<bool>,
+    missing_expected_properties: Option<bool>,
+    frida: Option<bool>,
+    aws_ip_set: Option<bool>,
+    azure_china_ip_set: Option<bool>,
+    azure_germany_ip_set: Option<bool>,
+    azure_government_ip_set: Option<bool>,
+    azure_public_ip_set: Option<bool>,
+    digital_ocean_ip_set: Option<bool>,
+    google_ip_set: Option<bool>,
+    oracle_ip_set: Option<bool>,
+    vultr_ip_set: Option<bool>,
+    multiple_ids_per_device_count_1_day: i32,
+    multiple_ids_per_device_count_1_week: i32,
+    multiple_ids_per_device_count_4_week: i32,
+    multiple_ids_per_device_count_12_week: i32,
+    ip_customer_blocklist: Option<bool>,
+    ip_global_blocklist: Option<bool>,
+    device_customer_blocklist: Option<bool>,
+    device_global_blocklist: Option<bool>,
+    model_fraud_ring_indicator_result: Option<bool>,
+    model_automated_activity_result: Option<bool>,
+    model_risky_device_result: Option<bool>,
+    model_factory_reset_result: Option<bool>,
+    model_gps_spoofing_result: Option<bool>,
+    model_tor_exit_node_result: Option<bool>,
+    model_public_proxy_result: Option<bool>,
+    model_vpn_result: Option<bool>,
+    model_ip_blocklist_result: Option<bool>,
+    model_ip_address_association_result: Option<bool>,
+    model_incognito_result: Option<bool>,
+    model_bot_framework_result: Option<bool>,
+    model_suspicious_device_result: Option<bool>,
+    model_multiple_ids_per_device_result: Option<bool>,
+    model_device_reputation_result: Option<bool>,
+}
+impl NeuroAttributesBuilder {
+    pub fn build_from_response(response: &NeuroIdAnalyticsResponse) -> NeuroIdAttributes {
+        let mut builder = NeuroAttributesBuilder::default();
+        builder.set_attributes(response);
+        builder.set_model_results(response);
+
+
+        let NeuroAttributesBuilder {
+            risky_application_count,
+            sessions_per_device_count_1_day,
+            sessions_per_device_count_1_week,
+            sessions_per_device_count_4_week,
+            sessions_per_device_count_12_week,
+            emulator,
+            jailbroken,
+            missing_expected_properties,
+            frida,
+            aws_ip_set,
+            azure_china_ip_set,
+            azure_germany_ip_set,
+            azure_government_ip_set,
+            azure_public_ip_set,
+            digital_ocean_ip_set,
+            google_ip_set,
+            oracle_ip_set,
+            vultr_ip_set,
+            multiple_ids_per_device_count_1_day,
+            multiple_ids_per_device_count_1_week,
+            multiple_ids_per_device_count_4_week,
+            multiple_ids_per_device_count_12_week,
+            ip_customer_blocklist,
+            ip_global_blocklist,
+            device_customer_blocklist,
+            device_global_blocklist,
+            model_fraud_ring_indicator_result,
+            model_automated_activity_result,
+            model_risky_device_result,
+            model_factory_reset_result,
+            model_gps_spoofing_result,
+            model_tor_exit_node_result,
+            model_public_proxy_result,
+            model_vpn_result,
+            model_ip_blocklist_result,
+            model_ip_address_association_result,
+            model_incognito_result,
+            model_bot_framework_result,
+            model_suspicious_device_result,
+            model_multiple_ids_per_device_result,
+            model_device_reputation_result,
+        } = builder;
+
+        NeuroIdAttributes {
+            risky_application_count,
+            sessions_per_device_count_1_day,
+            sessions_per_device_count_1_week,
+            sessions_per_device_count_4_week,
+            sessions_per_device_count_12_week,
+            emulator,
+            jailbroken,
+            missing_expected_properties,
+            frida,
+            aws_ip_set,
+            azure_china_ip_set,
+            azure_germany_ip_set,
+            azure_government_ip_set,
+            azure_public_ip_set,
+            digital_ocean_ip_set,
+            google_ip_set,
+            oracle_ip_set,
+            vultr_ip_set,
+            multiple_ids_per_device_count_1_day,
+            multiple_ids_per_device_count_1_week,
+            multiple_ids_per_device_count_4_week,
+            multiple_ids_per_device_count_12_week,
+            ip_customer_blocklist,
+            ip_global_blocklist,
+            device_customer_blocklist,
+            device_global_blocklist,
+            model_fraud_ring_indicator_result,
+            model_automated_activity_result,
+            model_risky_device_result,
+            model_factory_reset_result,
+            model_gps_spoofing_result,
+            model_tor_exit_node_result,
+            model_public_proxy_result,
+            model_vpn_result,
+            model_ip_blocklist_result,
+            model_ip_address_association_result,
+            model_incognito_result,
+            model_bot_framework_result,
+            model_suspicious_device_result,
+            model_multiple_ids_per_device_result,
+            model_device_reputation_result,
+        }
+    }
+
+    fn set_attributes(&mut self, response: &NeuroIdAnalyticsResponse) {
+        response.all_attributes().into_iter().for_each(|(m, a)| match a {
+            Attribute::RiskyDevice {
+                risky_application_count,
+            } => self.risky_application_count = risky_application_count,
+            Attribute::DeviceVelocity {
+                sessions_per_device_count_1_day,
+                sessions_per_device_count_1_week,
+                sessions_per_device_count_4_week,
+                sessions_per_device_count_12_week,
+            } => {
+                self.sessions_per_device_count_1_day = sessions_per_device_count_1_day;
+                self.sessions_per_device_count_1_week = sessions_per_device_count_1_week;
+                self.sessions_per_device_count_4_week = sessions_per_device_count_4_week;
+                self.sessions_per_device_count_12_week = sessions_per_device_count_12_week;
+            }
+            Attribute::SuspiciousDevice {
+                emulator,
+                jailbroken,
+                missing_expected_properties,
+                frida,
+            } => {
+                self.emulator = Some(emulator);
+                self.jailbroken = Some(jailbroken);
+                self.missing_expected_properties = Some(missing_expected_properties);
+                self.frida = Some(frida);
+            }
+            Attribute::IpAddressAssociation {
+                aws_ip_set,
+                azure_china_ip_set,
+                azure_germany_ip_set,
+                azure_government_ip_set,
+                azure_public_ip_set,
+                digital_ocean_ip_set,
+                google_ip_set,
+                oracle_ip_set,
+                vultr_ip_set,
+            } => {
+                self.aws_ip_set = Some(aws_ip_set);
+                self.azure_china_ip_set = Some(azure_china_ip_set);
+                self.azure_germany_ip_set = Some(azure_germany_ip_set);
+                self.azure_government_ip_set = Some(azure_government_ip_set);
+                self.azure_public_ip_set = Some(azure_public_ip_set);
+                self.digital_ocean_ip_set = Some(digital_ocean_ip_set);
+                self.google_ip_set = Some(google_ip_set);
+                self.oracle_ip_set = Some(oracle_ip_set);
+                self.vultr_ip_set = Some(vultr_ip_set);
+            }
+            Attribute::MultipleIdsPerDevice {
+                multiple_ids_per_device_count_1_day,
+                multiple_ids_per_device_count_1_week,
+                multiple_ids_per_device_count_4_week,
+                multiple_ids_per_device_count_12_week,
+            } => {
+                self.multiple_ids_per_device_count_1_day = multiple_ids_per_device_count_1_day;
+                self.multiple_ids_per_device_count_1_week = multiple_ids_per_device_count_1_week;
+                self.multiple_ids_per_device_count_4_week = multiple_ids_per_device_count_4_week;
+                self.multiple_ids_per_device_count_12_week = multiple_ids_per_device_count_12_week;
+            }
+            Attribute::Blocklist {
+                customer_blocklist,
+                global_blocklist,
+            } => {
+                if m == Model::DeviceReputation {
+                    self.device_customer_blocklist = Some(customer_blocklist);
+                    self.device_global_blocklist = Some(global_blocklist);
+                } else if m == Model::IpBlocklist {
+                    self.ip_customer_blocklist = Some(customer_blocklist);
+                    self.ip_global_blocklist = Some(global_blocklist);
+                }
+            }
+            Attribute::Empty {} => (),
+        });
+    }
+
+    fn set_model_results(&mut self, response: &NeuroIdAnalyticsResponse) {
+        Model::iter().for_each(|m| {
+            let result = response.get_signal_for_model(m).map(|s| s.is_flagged());
+            match m {
+                Model::FraudRingIndicator => self.model_fraud_ring_indicator_result = result,
+                Model::AutomatedActivity => self.model_automated_activity_result = result,
+
+                Model::RiskyDevice => self.model_risky_device_result = result,
+                Model::FactoryReset => self.model_factory_reset_result = result,
+                Model::GpsSpoofing => self.model_gps_spoofing_result = result,
+                Model::TorExitNode => self.model_tor_exit_node_result = result,
+                Model::PublicProxy => self.model_public_proxy_result = result,
+                Model::Vpn => self.model_vpn_result = result,
+                Model::IpBlocklist => self.model_ip_blocklist_result = result,
+                Model::IpAddressAssociation => self.model_ip_address_association_result = result,
+                Model::Incognito => self.model_incognito_result = result,
+                Model::BotFramework => self.model_bot_framework_result = result,
+                Model::SuspiciousDevice => self.model_suspicious_device_result = result,
+                // we'll compute this ourselves maybe
+                Model::DeviceVelocity => (),
+                Model::MultipleIdsPerDevice => self.model_multiple_ids_per_device_result = result,
+                Model::DeviceReputation => self.model_device_reputation_result = result,
+                Model::Other => (),
+                // TODO: these models use non-boolean fields to indicate flags, so we need to handle those when we go to use them
+                Model::CombinedDigitalIntent => (),
+                Model::Familiarity => (),
+            }
+        })
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NeuroIdAttributes {
+    pub risky_application_count: i32,
+    pub sessions_per_device_count_1_day: i32,
+    pub sessions_per_device_count_1_week: i32,
+    pub sessions_per_device_count_4_week: i32,
+    pub sessions_per_device_count_12_week: i32,
+    pub emulator: Option<bool>,
+    pub jailbroken: Option<bool>,
+    pub missing_expected_properties: Option<bool>,
+    pub frida: Option<bool>,
+    pub aws_ip_set: Option<bool>,
+    pub azure_china_ip_set: Option<bool>,
+    pub azure_germany_ip_set: Option<bool>,
+    pub azure_government_ip_set: Option<bool>,
+    pub azure_public_ip_set: Option<bool>,
+    pub digital_ocean_ip_set: Option<bool>,
+    pub google_ip_set: Option<bool>,
+    pub oracle_ip_set: Option<bool>,
+    pub vultr_ip_set: Option<bool>,
+    pub multiple_ids_per_device_count_1_day: i32,
+    pub multiple_ids_per_device_count_1_week: i32,
+    pub multiple_ids_per_device_count_4_week: i32,
+    pub multiple_ids_per_device_count_12_week: i32,
+    pub ip_customer_blocklist: Option<bool>,
+    pub ip_global_blocklist: Option<bool>,
+    pub device_customer_blocklist: Option<bool>,
+    pub device_global_blocklist: Option<bool>,
+    pub model_fraud_ring_indicator_result: Option<bool>,
+    pub model_automated_activity_result: Option<bool>,
+    pub model_risky_device_result: Option<bool>,
+    pub model_factory_reset_result: Option<bool>,
+    pub model_gps_spoofing_result: Option<bool>,
+    pub model_tor_exit_node_result: Option<bool>,
+    pub model_public_proxy_result: Option<bool>,
+    pub model_vpn_result: Option<bool>,
+    pub model_ip_blocklist_result: Option<bool>,
+    pub model_ip_address_association_result: Option<bool>,
+    pub model_incognito_result: Option<bool>,
+    pub model_bot_framework_result: Option<bool>,
+    pub model_suspicious_device_result: Option<bool>,
+    pub model_multiple_ids_per_device_result: Option<bool>,
+    pub model_device_reputation_result: Option<bool>,
+}
+
+impl NeuroIdAttributes {
+    pub fn new(response: &NeuroIdAnalyticsResponse) -> Self {
+        NeuroAttributesBuilder::build_from_response(response)
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -347,7 +722,6 @@ mod tests {
         use Model::*;
         let raw = test_fixtures::neuro_id_success_response(NeuroTestOpts::default());
         let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(raw).unwrap();
-
 
         // these are the signals neuro recommends using for their decision logic, so just checking we can deser
         vec![
@@ -369,5 +743,132 @@ mod tests {
         ]
         .into_iter()
         .for_each(|m| assert!(get_signal_for_model(&parsed, m).is_some()));
+
+        // Attribute matching
+        assert!(matches!(
+            get_signal_for_model(&parsed, RiskyDevice)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::RiskyDevice { .. }
+        ));
+        assert!(matches!(
+            get_signal_for_model(&parsed, DeviceVelocity)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::DeviceVelocity { .. }
+        ));
+        assert!(matches!(
+            get_signal_for_model(&parsed, SuspiciousDevice)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::SuspiciousDevice { .. }
+        ));
+        assert!(matches!(
+            get_signal_for_model(&parsed, IpAddressAssociation)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::IpAddressAssociation { .. }
+        ));
+        assert!(matches!(
+            get_signal_for_model(&parsed, MultipleIdsPerDevice)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::MultipleIdsPerDevice { .. }
+        ));
+        assert!(matches!(
+            get_signal_for_model(&parsed, IpBlocklist)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::Blocklist { .. }
+        ));
+        assert!(matches!(
+            get_signal_for_model(&parsed, DeviceReputation)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::Blocklist { .. }
+        ));
+        // no attributes here
+        assert!(get_signal_for_model(&parsed, Familiarity)
+            .unwrap()
+            .attributes()
+            .is_none(),);
+        assert!(matches!(
+            get_signal_for_model(&parsed, FraudRingIndicator)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::Empty {}
+        ));
+        assert!(matches!(
+            get_signal_for_model(&parsed, AutomatedActivity)
+                .unwrap()
+                .attributes()
+                .unwrap(),
+            Attribute::Empty {}
+        ));
+    }
+
+    #[test]
+    fn test_neuro_id_attributes() {
+        let opts = NeuroTestOpts {
+            automated_activity: true,
+            bot_framework: true,
+            factory_reset: true,
+            fraud_ring_indicator: true,
+        };
+        let raw = test_fixtures::neuro_id_success_response(opts);
+        let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(raw).unwrap();
+
+        let expected = NeuroIdAttributes {
+            risky_application_count: 0,
+            sessions_per_device_count_1_day: 1,
+            sessions_per_device_count_1_week: 1,
+            sessions_per_device_count_4_week: 1,
+            sessions_per_device_count_12_week: 3,
+            emulator: Some(false),
+            jailbroken: Some(true),
+            missing_expected_properties: Some(false),
+            frida: Some(false),
+            aws_ip_set: Some(false),
+            azure_china_ip_set: Some(false),
+            azure_germany_ip_set: Some(false),
+            azure_government_ip_set: Some(true),
+            azure_public_ip_set: Some(false),
+            digital_ocean_ip_set: Some(false),
+            google_ip_set: Some(false),
+            oracle_ip_set: Some(false),
+            vultr_ip_set: Some(false),
+            multiple_ids_per_device_count_1_day: 1,
+            multiple_ids_per_device_count_1_week: 1,
+            multiple_ids_per_device_count_4_week: 1,
+            multiple_ids_per_device_count_12_week: 5,
+            ip_customer_blocklist: Some(false),
+            ip_global_blocklist: Some(false),
+            device_customer_blocklist: Some(true),
+            device_global_blocklist: Some(true),
+            model_fraud_ring_indicator_result: Some(true),
+            model_automated_activity_result: Some(true),
+            model_risky_device_result: Some(false),
+            model_factory_reset_result: Some(true),
+            model_gps_spoofing_result: Some(false),
+            model_tor_exit_node_result: Some(false),
+            model_public_proxy_result: Some(false),
+            model_vpn_result: Some(false),
+            model_ip_blocklist_result: Some(false),
+            model_ip_address_association_result: Some(false),
+            model_incognito_result: Some(false),
+            model_bot_framework_result: Some(true),
+            model_suspicious_device_result: Some(false),
+            model_multiple_ids_per_device_result: Some(false),
+            model_device_reputation_result: Some(false),
+        };
+        assert_eq!(NeuroIdAttributes::new(&parsed), expected);
     }
 }
