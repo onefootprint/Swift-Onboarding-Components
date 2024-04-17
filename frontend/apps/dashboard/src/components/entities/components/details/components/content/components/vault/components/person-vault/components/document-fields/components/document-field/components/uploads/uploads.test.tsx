@@ -16,6 +16,11 @@ const renderUploads = ({ vault, currentDocument }: UploadsProps) =>
   customRender(<Uploads vault={vault} currentDocument={currentDocument} />);
 
 describe('<Uploads />', () => {
+  window.URL.createObjectURL = jest.fn(
+    () => 'http://127.0.0.1:0000/a-blob-url',
+  );
+  window.URL.revokeObjectURL = jest.fn(() => {});
+
   it('should show correct labels for each upload if successful', () => {
     renderUploads({
       vault: entityVaultWithIdCard,
@@ -65,13 +70,9 @@ describe('<Uploads />', () => {
       .filter(el => el.tagName === 'IMG') as HTMLImageElement[];
 
     expect(images).toHaveLength(3);
-    expect(images[0]?.src).toContain(
-      'data:image/jpeg;base64,test ID selfie URL',
-    );
-    expect(images[1]?.src).toContain('data:image/jpeg;base64,test ID back URL');
-    expect(images[2]?.src).toContain(
-      'data:image/jpeg;base64,test ID front URL',
-    );
+    expect(images[0]?.src).toContain('a-blob-url');
+    expect(images[1]?.src).toContain('a-blob-url');
+    expect(images[2]?.src).toContain('a-blob-url');
   });
 
   it('should show proper upload source for mobile uploads', () => {

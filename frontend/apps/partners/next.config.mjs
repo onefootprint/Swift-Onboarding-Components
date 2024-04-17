@@ -43,8 +43,8 @@ const ContentSecurityPolicy = `
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
-  frame-src 'self' vercel.live data:;
-  img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net maps.googleapis.com i-dev.onefp.net *.i-dev.onefp.net;
+  frame-src 'self' vercel.live data: blob:;
+  img-src 'self' data: blob: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net maps.googleapis.com i-dev.onefp.net *.i-dev.onefp.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: vercel.live vitals.vercel-insights.com maps.googleapis.com ${LOG_ROCKET_SCRIPT_SRC} ${SENTRY_SCRIPT_SRC};
   style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;

@@ -4,7 +4,7 @@ import {
   IcoMaximize24,
   IcoMinimize24,
 } from '@onefootprint/icons';
-import { Stack } from '@onefootprint/ui';
+import { Stack, useObjectUrl } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -14,13 +14,13 @@ import styled, { css } from 'styled-components';
 import PdfViewer from './components/pdf-viewer';
 
 type HoverableImageProps = {
-  src: string;
+  base64Data: string;
   isSuccess: boolean;
   documentName: string;
 };
 
 const HoverableImage = ({
-  src,
+  base64Data,
   isSuccess,
   documentName,
 }: HoverableImageProps) => {
@@ -33,11 +33,15 @@ const HoverableImage = ({
     setExpanded(!isExpanded);
   };
 
-  const isPDF = src.startsWith('data:application/pdf;base64');
+  const { objectUrl, mimeType } = useObjectUrl(base64Data);
 
-  return isPDF ? (
+  if (!objectUrl) {
+    return <div />;
+  }
+
+  return mimeType === 'application/pdf' ? (
     <Stack direction="column" gap={5}>
-      <PdfViewer base64Src={src} documentName={documentName} />
+      <PdfViewer src={objectUrl} documentName={documentName} />
     </Stack>
   ) : (
     <ImageContainer
@@ -45,7 +49,7 @@ const HoverableImage = ({
       transition={{ duration: 0.2, ease: 'easeInOut' }}
       initial={{ width: '50%' }}
     >
-      <StyledImage src={src} width={0} height={0} alt={t('image-alt')} />
+      <StyledImage src={objectUrl} width={0} height={0} alt={t('image-alt')} />
       <>
         <ToggleContainer onClick={handleToggleExpanded} className="toggle">
           {isExpanded ? (

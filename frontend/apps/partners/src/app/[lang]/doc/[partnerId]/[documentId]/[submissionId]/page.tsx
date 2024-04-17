@@ -6,6 +6,7 @@ import {
   getPartnerPartnershipsSubmissions,
 } from '@/queries';
 
+import DocIFrame from './doc-iframe';
 import ExternalLink from './external-link';
 import Header from './header';
 
@@ -31,7 +32,8 @@ const PartnerSubmissionViewerPage = async ({ params }: Props) => {
 
   const { data } = submission;
   const url = data.kind === 'external_url' ? data.data.url : undefined;
-  const src = data.kind === 'file_upload' ? data.data.data : undefined;
+
+  const base64Data = data.kind === 'file_upload' ? data.data.data : undefined;
   const fileName =
     data.kind === 'file_upload' ? data?.data.filename : undefined;
 
@@ -48,15 +50,11 @@ const PartnerSubmissionViewerPage = async ({ params }: Props) => {
         {document?.name || 'Document'}
       </Header>
       {url ? <ExternalLink url={url || ''} /> : null}
-      {src ? (
-        <iframe
-          id={iframeId}
-          title={`${fileName} || PDF container`}
-          width="100%"
-          height="100%"
-          src={`data:application/pdf;base64,${src}`}
-        />
-      ) : null}
+      <DocIFrame
+        id={iframeId}
+        fileName={fileName || 'Document Submission'}
+        base64Data={base64Data}
+      />
     </>
   );
 };

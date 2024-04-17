@@ -160,6 +160,7 @@ export type {
 export {
   useEventListener,
   useMediaQuery,
+  useObjectUrl,
   useOnClickOutside,
   useSX,
 } from './hooks';
@@ -169,6 +170,7 @@ export {
   createOverlayBackground,
   createText,
   DesignSystemProvider,
+  detectMimeType,
   getCountryCodeFromLocale,
   LoadFonts,
   media,

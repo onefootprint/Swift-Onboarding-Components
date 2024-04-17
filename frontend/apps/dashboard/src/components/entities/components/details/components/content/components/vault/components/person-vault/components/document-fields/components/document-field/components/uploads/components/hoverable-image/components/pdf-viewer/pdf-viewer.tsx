@@ -15,11 +15,11 @@ import styled, { css } from 'styled-components';
 import PdfThumbnail from './components/pdf-thumbnail';
 
 type PdfViewerProps = {
-  base64Src: string;
+  src: string;
   documentName: string;
 };
 
-const PdfViewer = ({ base64Src, documentName }: PdfViewerProps) => {
+const PdfViewer = ({ src, documentName }: PdfViewerProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document.drawer.uploads.pdf-viewer',
   });
@@ -29,7 +29,7 @@ const PdfViewer = ({ base64Src, documentName }: PdfViewerProps) => {
       <Stack>
         <Dialog.Trigger asChild>
           <Stack direction="column" gap={5}>
-            <PdfThumbnail src={base64Src} />
+            <PdfThumbnail src={src} />
             <LinkButton>{t('expand')}</LinkButton>
           </Stack>
         </Dialog.Trigger>
@@ -48,7 +48,7 @@ const PdfViewer = ({ base64Src, documentName }: PdfViewerProps) => {
             </Dialog.Title>
             <Box width="24px" height="24px" />
           </Header>
-          <iframe title="pdf" src={base64Src} width="100%" height="100%" />
+          <iframe title="pdf" src={src} width="100%" height="100%" />
         </Container>
       </Dialog.Portal>
     </Dialog.Root>

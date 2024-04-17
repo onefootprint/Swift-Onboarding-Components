@@ -13,7 +13,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import getMimeType from '../../../../../../utils/get-mime-type';
 import HoverableImage from './components/hoverable-image';
 
 export type UploadsProps = {
@@ -27,15 +26,14 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
   });
   const { formatTime } = useIntl();
 
-  const getSrc = (side: IdDocImageTypes, version: string) => {
+  const getImgBase64Data = (side: IdDocImageTypes, version: string) => {
     const vaultIndex =
       `document.${currentDocument?.kind}.${side}.latest_upload:${version}` as DataIdentifier;
     const hasVaultValue = vaultIndex in vault;
     if (hasVaultValue) {
       const vaultValue = vault[vaultIndex];
       if (typeof vaultValue === 'string') {
-        const mime = getMimeType(vaultValue);
-        return `data:${mime};base64,${vaultValue}`;
+        return vaultValue;
       }
     }
     return '';
@@ -131,7 +129,10 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
             </Title>
             <HoverableImage
               isSuccess={upload.failureReasons.length === 0}
-              src={getSrc(upload.side, upload.version.toString())}
+              base64Data={getImgBase64Data(
+                upload.side,
+                upload.version.toString(),
+              )}
               documentName={t(
                 `document-types.${currentDocument.kind}` as ParseKeys<'common'>,
               )}

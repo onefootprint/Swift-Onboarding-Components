@@ -1,5 +1,5 @@
 import type { Entity } from '@onefootprint/types';
-import { CodeInline, Dialog, LinkButton } from '@onefootprint/ui';
+import { CodeInline, Dialog, LinkButton, useObjectUrl } from '@onefootprint/ui';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +7,6 @@ import styled, { css } from 'styled-components';
 
 import useField from '../../../../../hooks/use-field';
 import type { DiField } from '../../../../../vault.types';
-import getMimeType from '../../../utils/get-mime-type';
 
 type CustomDocumentFieldProps = {
   field: DiField;
@@ -20,12 +19,13 @@ const CustomDocumentField = ({ field, entity }: CustomDocumentFieldProps) => {
   });
   const [isDocOpen, setIsDocOpen] = useState(false);
   const { value } = useField(entity)(field.di);
-  const srcString = typeof value === 'string' ? value : '';
-  const mimeType = getMimeType(srcString);
-  const isPDF = mimeType === 'application/pdf';
-  const base64Src = mimeType ? `data:${mimeType};base64,${srcString}` : '';
 
-  return (
+  const base64Data = typeof value === 'string' ? value : '';
+  const { objectUrl, mimeType } = useObjectUrl(base64Data || null);
+
+  const isPDF = mimeType === 'application/pdf';
+
+  return objectUrl ? (
     <Container>
       <CodeInline disabled>{field.di}</CodeInline>
       <LinkButton onClick={() => setIsDocOpen(true)}>
@@ -39,11 +39,11 @@ const CustomDocumentField = ({ field, entity }: CustomDocumentFieldProps) => {
       >
         {isPDF ? (
           <PdfContainer>
-            <iframe title="pdf" src={base64Src} width="100%" height="100%" />
+            <iframe title="pdf" src={objectUrl} width="100%" height="100%" />
           </PdfContainer>
         ) : (
           <StyledImage
-            src={base64Src}
+            src={objectUrl}
             width={0}
             height={0}
             alt="custom document image"
@@ -51,7 +51,7 @@ const CustomDocumentField = ({ field, entity }: CustomDocumentFieldProps) => {
         )}
       </Dialog>
     </Container>
-  );
+  ) : null;
 };
 
 const Container = styled.div`
