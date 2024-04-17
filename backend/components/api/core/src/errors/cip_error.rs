@@ -1,3 +1,4 @@
+use alpaca::Error;
 use newtypes::{ReviewReason, VendorAPI};
 use reqwest::StatusCode;
 
@@ -29,7 +30,8 @@ impl CipError {
         match self {
             CipError::EntityDecisionManualReviewStatusNotPass
             | CipError::EntityDecisionDoesNotExist
-            | CipError::EntityDecisionStatusNotPass => StatusCode::BAD_REQUEST,
+            | CipError::EntityDecisionStatusNotPass
+            | CipError::AlpacaError(Error::ConnectionError(_)) => StatusCode::BAD_REQUEST,
             CipError::AlpacaError(_)
             | CipError::WatchlistResultsNotFoundError
             | CipError::ExpectedReviewReasonNotFound(_)

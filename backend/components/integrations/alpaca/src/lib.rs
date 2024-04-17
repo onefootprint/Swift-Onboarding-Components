@@ -51,10 +51,24 @@ impl AlpacaCipClient {
         .map(jitter) // add jitter
         .take(3); // limit to 3 retries
 
+
+        let path2 = path.clone();
         let result = Retry::spawn(retry_strategy, move || {
             self.make_request(method.clone(), path.clone(), json_body)
         })
-        .await?;
+        .await
+        .map_err(|err| {
+            if let Error::Reqwest(e) = err {
+                // tenant provides hostname in the alpaca request, so connection/dns errors are probably from their side
+                if e.is_connect() {
+                    Error::ConnectionError(path2.to_string())
+                } else {
+                    Error::Reqwest(e)
+                }
+            } else {
+                err
+            }
+        })?;
 
         Ok(result)
     }

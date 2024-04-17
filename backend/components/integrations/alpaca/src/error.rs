@@ -6,4 +6,6 @@ pub enum Error {
     InvalidEndpointUrl(#[from] url::ParseError),
     #[error("Reqwest error")]
     Reqwest(#[from] reqwest::Error),
+    #[error("Error trying to connect to {0}")]
+    ConnectionError(String),
 }
