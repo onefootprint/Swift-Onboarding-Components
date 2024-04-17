@@ -25,6 +25,10 @@ impl TenantId {
     pub fn is_coast(&self) -> bool {
         self.0 == *"org_vZfj1sekMjwGdURGCWisF"
     }
+
+    pub fn is_flexcar(&self) -> bool {
+        self.0 == *"org_pl9GdKAiT9Yo0107B6ZOGp"
+    }
 }
 
 #[derive(Debug, Clone, Copy, From, PartialEq, Eq)]

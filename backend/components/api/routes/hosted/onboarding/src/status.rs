@@ -1,9 +1,18 @@
 use crate::{
     auth::user::UserAuthScope, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi, State,
 };
-use api_core::{auth::user::UserWfAuthContext, utils::requirements::GetRequirementsArgs};
+use api_core::{
+    auth::user::UserWfAuthContext,
+    utils::{headers::InsightHeaders, requirements::GetRequirementsArgs},
+};
 use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse};
+use db::models::{
+    insight_event::CreateInsightEvent,
+    liveness_event::{LivenessEvent, NewLivenessEvent},
+    webauthn_credential::WebauthnCredential,
+};
 use itertools::Itertools;
+use newtypes::{LivenessSource, SkipLivenessClientType, SkipLivenessContext};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -14,8 +23,50 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
+    insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+
+    if user_auth.tenant().id.is_flexcar() {
+        let vault_id = user_auth.user().id.clone();
+        let sv_id = user_auth.scoped_user.id.clone();
+        state
+            .db_pool
+            .db_transaction(move |conn| -> Result<_, ApiError> {
+                let credentials = WebauthnCredential::list(conn, &vault_id)?;
+
+                let liveness_skip_events = LivenessEvent::get_by_scoped_vault_id(conn, &sv_id)?
+                    .into_iter()
+                    .filter(|evt| matches!(evt.liveness_source, LivenessSource::Skipped))
+                    .collect_vec();
+
+                let has_registered_passkey = !liveness_skip_events.is_empty() || !credentials.is_empty();
+                let is_desktop = insights.is_desktop_viewer.as_ref().is_some_and(|d| !d.is_empty());
+                if has_registered_passkey || is_desktop {
+                    return Ok(());
+                }
+
+                let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
+                let skip_context = SkipLivenessContext {
+                    reason: "skip_for_flexcar".to_string(),
+                    client_type: SkipLivenessClientType::Mobile,
+                    num_attempts: 0,
+                    attempts: vec![],
+                };
+
+                let _ = NewLivenessEvent {
+                    scoped_vault_id: sv_id,
+                    attributes: None,
+                    liveness_source: newtypes::LivenessSource::Skipped,
+                    insight_event_id: Some(insight_event.id),
+                    skip_context: Some(skip_context),
+                }
+                .insert(conn)?;
+
+                Ok(())
+            })
+            .await?;
+    }
 
     let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
         &state,
