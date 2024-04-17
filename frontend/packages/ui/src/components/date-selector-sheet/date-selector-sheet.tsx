@@ -14,6 +14,7 @@ import { motion } from 'framer-motion';
 import React, { forwardRef, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import Stack from '../stack';
 import DayButton from './components/day-button';
 import Header from './components/header';
 import RangeInputs from './components/range-inputs';
@@ -141,12 +142,17 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
                   movingDirection={movingDirection}
                   setMovingDirection={setMovingDirection}
                 />
-                <RangeInputs
-                  endDate={endDate}
-                  onChange={handleRangeChange}
-                  onFocus={handleRangeInputFocus}
-                  startDate={startDate}
-                />
+                <Stack direction="column" marginBottom={3}>
+                  <RangeInputs
+                    onChange={handleRangeChange}
+                    onFocus={handleRangeInputFocus}
+                    startDate={startDate}
+                    endDate={endDate}
+                    disableFutureDates={disableFutureDates}
+                    disablePastDates={disablePastDates}
+                  />
+                  <div id="error-message" />
+                </Stack>
                 <WeekHeader />
                 <Days
                   key={format(firstDayCurrentMonth, 'MMMM yyyy')}

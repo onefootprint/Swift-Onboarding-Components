@@ -9,11 +9,18 @@ import Text from '../../../text';
 type DateInputProps = {
   autoFocus?: boolean;
   value: Date;
+  hasError?: boolean;
   onChange: (date: Date) => void;
   onFocus: () => void;
 };
 
-const DateInput = ({ autoFocus, value, onChange, onFocus }: DateInputProps) => {
+const DateInput = ({
+  autoFocus,
+  value,
+  hasError,
+  onChange,
+  onFocus,
+}: DateInputProps) => {
   const [focused, setFocused] = useState(false);
   const [month, setMonth] = useState(() =>
     (value.getMonth() + 1).toString().padStart(2, '0'),
@@ -59,15 +66,22 @@ const DateInput = ({ autoFocus, value, onChange, onFocus }: DateInputProps) => {
   };
 
   const handleMonthChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMonth(event.target.value);
+    let monthValue = parseInt(event.target.value, 10);
+    monthValue = Math.max(1, Math.min(12, monthValue));
+    setMonth(monthValue.toString().padStart(2, '0'));
   };
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDay(event.target.value);
+    let dateValue = parseInt(event.target.value, 10);
+    dateValue = Math.max(1, Math.min(31, dateValue));
+    setDay(dateValue.toString().padStart(2, '0'));
   };
 
   const handleYearChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setYear(event.target.value);
+    const yearValue = parseInt(event.target.value, 10);
+    if (yearValue > 0) {
+      setYear(yearValue.toString());
+    }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -77,7 +91,7 @@ const DateInput = ({ autoFocus, value, onChange, onFocus }: DateInputProps) => {
   };
 
   return (
-    <Container data-focused={focused}>
+    <Container data-focused={focused} data-error={hasError}>
       <Month
         autoFocus={autoFocus}
         maxLength={2}
@@ -85,6 +99,7 @@ const DateInput = ({ autoFocus, value, onChange, onFocus }: DateInputProps) => {
         onChange={handleMonthChange}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
+        type="number"
         value={month}
       />
       <Text color="tertiary" variant="body-4">
@@ -96,18 +111,19 @@ const DateInput = ({ autoFocus, value, onChange, onFocus }: DateInputProps) => {
         onChange={handleDateChange}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
+        type="number"
         value={day}
       />
       <Text color="tertiary" variant="body-4">
         /
       </Text>
-
       <Year
         maxLength={4}
         onBlur={handleBlur}
         onChange={handleYearChange}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
+        type="number"
         value={year}
       />
     </Container>
@@ -132,6 +148,12 @@ const Container = styled(Stack)`
         border-color: ${input.state.default.focus.border};
         box-shadow: ${input.state.default.focus.elevation};
       }
+
+      &[data-error='true'] {
+        border-color: ${theme.borderColor.error};
+        box-shadow: ${input.state.error.focus.elevation};
+        background: ${input.state.error.focus.bg};
+      }
     `;
   }}
 `;
@@ -139,6 +161,12 @@ const Container = styled(Stack)`
 const Input = styled.input`
   ${({ theme }) => css`
     ${createFontStyles('body-4')};
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
     border: none;
     color: ${theme.color.primary};
     height: $ ${theme.spacing[6]};
