@@ -10,7 +10,7 @@ const Documents = () => {
 
   return (
     <>
-      {data && <Content document={data} />}
+      {data && <Content doc={data} />}
       {isLoading && <Loading />}
       {error && <Error message="Lorem" />}
     </>

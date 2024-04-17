@@ -9,11 +9,13 @@ import Scores from './components/scores';
 import Uploads from './components/uploads';
 
 type ContentProps = {
-  document: Record<string, string>;
+  doc: Record<string, string>;
 };
 
-const Content = ({ document }: ContentProps) => {
+const Content = ({ doc }: ContentProps) => {
   const { t } = useTranslation('user-details');
+  // eslint-ignore-next-line
+  console.log(doc);
 
   return (
     <>
