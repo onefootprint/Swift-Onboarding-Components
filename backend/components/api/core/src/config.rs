@@ -463,4 +463,6 @@ pub struct LexisConfig {
 pub struct NeuroIdConfig {
     #[envconfig(from = "NEUROID_API_KEY")]
     pub api_key: PiiString,
+    #[envconfig(from = "NEUROID_API_KEY_TEST")]
+    pub api_key_test: PiiString,
 }

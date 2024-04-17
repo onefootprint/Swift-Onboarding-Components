@@ -13,7 +13,7 @@ use idv::{
 use newtypes::{
     vendor_credentials::{
         ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials, IncodeCredentials,
-        LexisCredentials, MiddeskCredentials, NeuroIdApiKey,
+        LexisCredentials, MiddeskCredentials, NeuroIdApiKeys,
     },
     IdvData, IncodeEnvironment, PiiString, TenantId, Vendor, VendorAPI,
 };
@@ -31,7 +31,7 @@ pub struct TenantVendorControl {
     tenant_id: TenantId,
     tenant_name: String,
     tbi: Option<newtypes::TenantBusinessInfo>,
-    neuro_id_api_key: NeuroIdApiKey,
+    neuro_id_api_key: NeuroIdApiKeys,
 }
 
 impl TenantVendorControl {
@@ -90,7 +90,7 @@ impl TenantVendorControl {
         self.tbi.clone()
     }
 
-    pub fn neuro_api_key(&self) -> NeuroIdApiKey {
+    pub fn neuro_api_key(&self) -> NeuroIdApiKeys {
         self.neuro_id_api_key.clone()
     }
 
@@ -130,7 +130,7 @@ impl TenantVendorControl {
         // As of 2023-06-28 we just use our default idology credentials for all tenants
         let idology_credentials = IdologyCredentials::from(config);
         // TODO: we'll likely need to have diff site_ids in the future that we store on playbooks so we will refactor then
-        let neuro_id_api_key = NeuroIdApiKey::from(config);
+        let neuro_id_api_key = NeuroIdApiKeys::from(config);
 
         // For experian, we use the bulk of the same credentials, just need to update subscriber code
         let experian_credential_builder = ExperianCredentialBuilder::from(config);
@@ -308,9 +308,12 @@ impl From<&Config> for MiddeskCredentials {
     }
 }
 
-impl From<&Config> for NeuroIdApiKey {
+impl From<&Config> for NeuroIdApiKeys {
     fn from(config: &Config) -> Self {
-        NeuroIdApiKey(config.neuro_id_config.api_key.clone())
+        NeuroIdApiKeys {
+            key: config.neuro_id_config.api_key.clone(),
+            test_key: config.neuro_id_config.api_key_test.clone(),
+        }
     }
 }
 

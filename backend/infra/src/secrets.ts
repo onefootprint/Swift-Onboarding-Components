@@ -68,6 +68,7 @@ export interface StaticSecrets {
   lexisUserId: aws.ssm.Parameter;
   lexisPassword: aws.ssm.Parameter;
   neuroIdApiKey: aws.ssm.Parameter;
+  neuroIdApiKeyTest: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -194,6 +195,7 @@ interface Lexis {
 
 interface Neuro {
   apiKey: string;
+  apiKeyTest: string;
 }
 
 export async function LoadSecrets(
@@ -481,6 +483,10 @@ export async function LoadSecrets(
     neuroIdApiKey: createSecretParameter(
       `neuroApiKey-${stack}`,
       secretConstants.neuro.apiKey,
+    ),
+    neuroIdApiKeyTest: createSecretParameter(
+      `neuroApiKeyTest-${stack}`,
+      secretConstants.neuro.apiKeyTest,
     ),
   };
 }

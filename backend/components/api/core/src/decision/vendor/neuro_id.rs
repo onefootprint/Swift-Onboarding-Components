@@ -6,6 +6,7 @@ use crate::{
 use db::models::{
     decision_intent::DecisionIntent,
     neuro_id_analytics_event::{NeuroIdAnalyticsEvent, NewNeuroIdAnalyticsEvent},
+    scoped_vault::ScopedVault,
     verification_request::VerificationRequest,
 };
 use idv::{
@@ -84,14 +85,15 @@ pub async fn run_neuro_call(
 ) -> ApiResult<Option<VendorResult>> {
     let di_id = di.id.clone();
     let svid = di.scoped_vault_id.clone();
-    let (vw, latest_results) = state
+    let (vw, latest_results, scoped_vault) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&svid))?;
             let latest_results =
                 VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &di_id)?;
+            let scoped_vault = ScopedVault::get(conn, &svid)?;
 
-            Ok((vw, latest_results))
+            Ok((vw, latest_results, scoped_vault))
         })
         .await?;
 
@@ -107,8 +109,12 @@ pub async fn run_neuro_call(
     let tvc =
         TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.config, &state.enclave_client).await?;
     // TODO: get this site_id from a playbook config somewhere
-    // TODO: change this to sandbox form
-    let credentials = NeuroIdCredentials::new(tvc.neuro_api_key(), NeuroIdSiteId("form_humor717".into()));
+    let use_test_key = !(state.config.service_config.is_production() && scoped_vault.is_live);
+    let credentials = NeuroIdCredentials::new(
+        tvc.neuro_api_key(),
+        NeuroIdSiteId("form_humor717".into()),
+        use_test_key,
+    );
     let id = NeuroIdentityId::from(wf_id.clone());
 
     let res = state

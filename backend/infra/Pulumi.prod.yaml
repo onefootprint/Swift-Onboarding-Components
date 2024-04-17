@@ -124,6 +124,8 @@ config:
     neuro:
       apiKey:
         secure: v1:iKIx28wCAXMwkjAB:LsdkiIu8bqhWS4zX9TEGr/935oL8qaFinKeT5Tdi5eY5TFfXPtmG1nsDZufxHhkA+g==
+      apiKeyTest:
+        secure: v1:El9JuX14SRD+34/B:Y4vGbXddnQ3zl+vHcc8jKihlmF9l0OqxOj1hUCJv7YZSPYVgqbeMDQh3v7hicnyM1Q==
     resources:
       cpuUnits: 4096
       maxInstances: 50

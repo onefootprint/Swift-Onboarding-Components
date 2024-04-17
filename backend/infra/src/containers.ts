@@ -194,6 +194,7 @@ export abstract class ServiceContainers {
         secretsStore.lexisUserId.arn,
         secretsStore.lexisPassword.arn,
         secretsStore.neuroIdApiKey.arn,
+        secretsStore.neuroIdApiKeyTest.arn,
       ])
       .apply(
         ([
@@ -248,6 +249,7 @@ export abstract class ServiceContainers {
           lexisUserId,
           lexisPassword,
           neuroIdApiKey,
+          neuroIdApiKeyTest,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -445,6 +447,10 @@ export abstract class ServiceContainers {
               {
                 name: 'NEUROID_API_KEY',
                 valueFrom: neuroIdApiKey,
+              },
+              {
+                name: 'NEUROID_API_KEY_TEST',
+                valueFrom: neuroIdApiKeyTest,
               },
             ],
             environment: [

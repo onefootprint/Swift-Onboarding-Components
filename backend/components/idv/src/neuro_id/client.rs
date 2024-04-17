@@ -50,7 +50,7 @@ impl NeuroIdClient {
 
 #[cfg(test)]
 mod tests {
-    use newtypes::vendor_credentials::{NeuroIdApiKey, NeuroIdSiteId};
+    use newtypes::vendor_credentials::{NeuroIdApiKeys, NeuroIdSiteId};
 
     use crate::{
         footprint_http_client::FpVendorClientArgs,
@@ -63,8 +63,12 @@ mod tests {
         // https://neuro-id.readme.io/reference/api-test-cases
         (
             NeuroIdCredentials::new(
-                NeuroIdApiKey(PiiString::from(dotenv::var("NEUROID_API_KEY").unwrap())),
+                NeuroIdApiKeys {
+                    key: PiiString::from(dotenv::var("NEUROID_API_KEY").unwrap()),
+                    test_key: PiiString::from(dotenv::var("NEUROID_API_KEY_TEST").unwrap()),
+                },
                 NeuroIdSiteId("form_neuro300".into()),
+                true,
             ),
             NeuroIdentityId::from("example-response-2".to_string()),
         )

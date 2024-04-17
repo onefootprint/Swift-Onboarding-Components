@@ -40,8 +40,12 @@ pub struct LexisCredentials {
     pub password: PiiString,
 }
 
+// in prod sandbox, we need to use a different API key
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
-pub struct NeuroIdApiKey(pub PiiString);
+pub struct NeuroIdApiKeys {
+    pub key: PiiString,
+    pub test_key: PiiString,
+}
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct NeuroIdSiteId(pub PiiString);
@@ -49,18 +53,23 @@ pub struct NeuroIdSiteId(pub PiiString);
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct NeuroIdCredentials {
     // we get this from api Config
-    api_key: NeuroIdApiKey,
+    api_key: PiiString,
     // we might get this from playbook or per-tenant configurations
     site_id: NeuroIdSiteId,
 }
 
 impl NeuroIdCredentials {
-    pub fn new(api_key: NeuroIdApiKey, site_id: NeuroIdSiteId) -> Self {
+    pub fn new(api_keys: NeuroIdApiKeys, site_id: NeuroIdSiteId, use_test_key: bool) -> Self {
+        let api_key = if use_test_key {
+            api_keys.test_key
+        } else {
+            api_keys.key
+        };
         Self { api_key, site_id }
     }
 
     pub fn api_key(&self) -> PiiString {
-        self.api_key.0.clone()
+        self.api_key.clone()
     }
 
     pub fn site_id(&self) -> PiiString {
