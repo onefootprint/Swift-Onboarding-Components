@@ -36,6 +36,8 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
       open,
       asChild,
       children,
+      disableFutureDates,
+      disablePastDates,
       onOpenChange,
       onClickOutside,
       onChange,
@@ -164,6 +166,10 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
                       visibleMonth={visibleMonth}
                       activeStartDate={startDate}
                       activeEndDate={endDate}
+                      disabled={
+                        (disableFutureDates && isAfter(day, today)) ||
+                        (disablePastDates && isBefore(day, today))
+                      }
                     />
                   ))}
                 </Days>

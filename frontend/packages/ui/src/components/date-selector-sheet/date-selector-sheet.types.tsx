@@ -12,6 +12,8 @@ export type DateSelectorSheetProps = {
   ariaLabel?: string;
   asChild?: boolean;
   children: React.ReactNode;
+  disableFutureDates?: boolean;
+  disablePastDates?: boolean;
   onChange: ({
     startDate,
     endDate,
@@ -34,4 +36,5 @@ export type DayButtonProps = {
   activeEndDate: Date | undefined;
   visibleMonth: string;
   onClick: (e: React.MouseEvent, day: Date) => void;
+  disabled?: boolean;
 };

@@ -23,6 +23,7 @@ const DayButton = ({
   activeEndDate,
   visibleMonth,
   onClick,
+  disabled,
 }: DayButtonProps) => {
   const firstDayCurrentMonth = parse(visibleMonth, 'MMM-yyyy', new Date());
   const isInRange =
@@ -59,14 +60,19 @@ const DayButton = ({
       $row={getRow(day) - 1}
       onClick={e => onClick(e, day)}
       aria-label={`Select ${format(day, 'MMMM d, yyyy')}`}
+      disabled={disabled}
     >
       <time dateTime={format(day, 'yyyy-MM-dd')}>{format(day, 'd')}</time>
     </Container>
   );
 };
 
-const Container = styled.button<{ $column: number; $row: number }>`
-  ${({ theme, $column, $row }) => {
+const Container = styled.button<{
+  $column: number;
+  $row: number;
+  disabled?: boolean;
+}>`
+  ${({ theme, $column, $row, disabled }) => {
     const shadeStyles = css`
       content: '';
       position: absolute;
@@ -118,6 +124,13 @@ const Container = styled.button<{ $column: number; $row: number }>`
       color: ${theme.color.quaternary};
       grid-column: ${$column + 1};
       grid-row: ${$row + 1};
+
+      ${disabled &&
+      css`
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.25;
+      `}
 
       &[data-is-in-range='false'] {
         &:hover {

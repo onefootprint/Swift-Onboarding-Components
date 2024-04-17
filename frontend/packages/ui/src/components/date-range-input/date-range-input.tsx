@@ -11,6 +11,8 @@ export type DateRangeInputProps = {
   onChange?: (startDate: Date | undefined, endDate: Date | undefined) => void;
   initialStartDate?: Date;
   initialEndDate?: Date;
+  disableFutureDates?: boolean;
+  disablePastDates?: boolean;
   placeholder?: string;
   size?: 'default' | 'compact';
   onOpenChange?: (open: boolean) => void;
@@ -21,6 +23,8 @@ export type DateRangeInputProps = {
 const DateRangeInput = ({
   initialStartDate,
   initialEndDate,
+  disableFutureDates,
+  disablePastDates,
   startDate,
   endDate,
   placeholder = 'Select a date range',
@@ -76,6 +80,8 @@ const DateRangeInput = ({
     <DateSelectorSheet
       startDate={selectedStartDate}
       endDate={selectedEndDate}
+      disableFutureDates={disableFutureDates}
+      disablePastDates={disablePastDates}
       onOpenChange={onOpenChange}
       onChange={handleRangeChange}
       onClickOutside={handleToggleDateSheet}

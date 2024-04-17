@@ -65,6 +65,7 @@ const DateFilter = () => {
         onOpenChange={handleToggleDataSheet}
         onClickOutside={handleToggleDataSheet}
         open={isDateSheetOpen}
+        disableFutureDates
         asChild
       >
         <Range onClick={handleToggleDataSheet} data-is-focus={isDateSheetOpen}>
