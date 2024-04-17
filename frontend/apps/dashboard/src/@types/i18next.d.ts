@@ -7,6 +7,7 @@ import type commonResource from '../config/locales/en/common.json';
 import type domainRestrictionsResource from '../config/locales/en/domain-restrictions.json';
 import type internalResource from '../config/locales/en/internal.json';
 import type listsResource from '../config/locales/en/lists.json';
+import type userDetails from '../config/locales/en/user-details-documents.json';
 import type usersResource from '../config/locales/en/users.json';
 
 declare module 'i18next' {
@@ -23,6 +24,7 @@ declare module 'i18next' {
       users: typeof usersResource;
       lists: typeof listsResource;
       request: typeof requestResource;
+      'user-details': typeof userDetails;
     };
   }
 }

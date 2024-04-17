@@ -1,0 +1,20 @@
+{
+  "page-title": "Footprint | User details | Documents",
+  "navigation": {
+    "title": "User documents breadcrumb",
+    "users": "Users",
+    "details": "User details",
+    "documents": "Documents"
+  },
+  "scores": {
+    "document": "Document",
+    "extracted": "Extracted data",
+    "face": "Face match"
+  },
+  "uploads": {
+    "title": "Uploaded"
+  },
+  "ocr": {
+    "title": "Extracted document data (OCR)"
+  }
+}
