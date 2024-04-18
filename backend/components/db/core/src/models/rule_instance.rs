@@ -98,19 +98,6 @@ impl RuleInstanceUpdate {
     }
 }
 
-
-#[derive(Debug, Clone)]
-pub struct CreateRule {
-    pub rule_expression: RuleExpression,
-    pub rule_action: RuleAction,
-}
-
-#[derive(Debug, Clone)]
-pub struct EditRule {
-    pub rule_id: RuleId,
-    pub rule_expression: RuleExpression,
-}
-
 #[derive(Debug, Clone)]
 pub struct MultiRuleUpdate {
     pub expected_rule_set_version: Option<i32>, // can drop Option later once all clients start passing this
@@ -145,8 +132,7 @@ impl RuleInstance {
         let lists = List::bulk_get(conn, &obc.tenant_id, obc.is_live, &list_ids)?;
         let deactivated_lists = lists
             .iter()
-            .filter(|l| l.deactivated_seqno.is_some())
-            .map(|l| l.id.clone())
+            .filter_map(|(id, list)| list.deactivated_seqno.map(|_| id.clone()))
             .collect_vec();
         if !deactivated_lists.is_empty() {
             return Err(DbError::ValidationError(format!(
@@ -155,10 +141,9 @@ impl RuleInstance {
             )));
         }
 
-        let found_list_ids = lists.into_iter().map(|l| l.id).collect_vec();
         let unknown_list_ids = list_ids
             .into_iter()
-            .filter(|l| !found_list_ids.contains(l))
+            .filter(|l| !lists.contains_key(l))
             .collect_vec();
         if !unknown_list_ids.is_empty() {
             return Err(DbError::ValidationError(format!(

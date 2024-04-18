@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{data_lifetime::DataLifetime, ob_configuration::IsLive};
 use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -98,13 +100,16 @@ impl List {
         tenant_id: &TenantId,
         is_live: bool,
         list_ids: &[ListId],
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<HashMap<ListId, Self>> {
         let res = list::table
             .filter(list::tenant_id.eq(tenant_id))
             .filter(list::is_live.eq(is_live))
             .filter(list::id.eq_any(list_ids))
             .get_results(conn)?;
-        Ok(res)
+        Ok(res
+            .into_iter()
+            .map(|list: Self| (list.id.clone(), list))
+            .collect())
     }
 
     /// Find for tenant by case insensitively querying on name or alias

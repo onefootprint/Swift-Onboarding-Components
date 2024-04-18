@@ -198,6 +198,234 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     assert len(list["playbooks"]) == 0
 
 
+def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
+    # We should only be able to use lists in a rule expression with a field
+    # that matches the list type.
+
+    # Create some lists.
+    nonce = _gen_random_str(5)
+    ssn9_list = post(
+        f"/org/lists",
+        dict(
+            name=f"SSN0 {nonce}",
+            alias=f"ssn9_{nonce}",
+            kind="ssn9",
+            entries=["123121234", "234232345", "345343456"],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    email_addr_list = post(
+        f"/org/lists",
+        dict(
+            name=f"Email address {nonce}",
+            alias=f"email_addr_{nonce}",
+            kind="email_address",
+            entries=["a@bobertotech.com", "b@badppl.org", "c@somethingelseketchy.net"],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    email_domain_list = post(
+        f"/org/lists",
+        dict(
+            name=f"Email domain {nonce}",
+            alias=f"email_domain_{nonce}",
+            kind="email_domain",
+            entries=["bobertotech.com", "badppl.org", "verybad.com"],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
+    )
+
+    # [POST] Try to create a rule with a mismatching field and list type.
+    resp = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            action="manual_review",
+            rule_expression=[
+                {
+                    "field": "id.email",
+                    "op": "is_in",
+                    "value": ssn9_list["id"],
+                }
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+    assert resp["error"]["message"] == "Vaulted field id.email can not be matched against list with kind ssn9"
+
+    # [POST] Create a rule with a list that accepts exact matches on a field.
+    post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            action="manual_review",
+            rule_expression=[
+                {
+                    "field": "id.email",
+                    "op": "is_in",
+                    "value": email_addr_list["id"],
+                }
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # [POST] Create a rule with a list that accepts transformed matches on a field.
+    post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            action="manual_review",
+            rule_expression=[
+                {
+                    "field": "id.email",
+                    "op": "is_in",
+                    "value": email_domain_list["id"],
+                }
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # [POST] Create a rule matching against a custom list.
+    post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            action="manual_review",
+            rule_expression=[
+                {
+                    "field": "custom.other_email",
+                    "op": "is_in",
+                    "value": email_addr_list["id"],
+                }
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # [PATCH] Try to augment a playbook with a rule with a mismatching field and list type.
+    resp = patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=4,
+            add=[
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "id.email",
+                            "op": "is_in",
+                            "value": ssn9_list["id"],
+                        }
+                    ],
+                ),
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+    assert resp["error"]["message"] == "Vaulted field id.email can not be matched against list with kind ssn9"
+
+    # [PATCH] Augment a playbook with a rule with a list that accepts exact matches on a field.
+    patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=4,
+            add=[
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "id.email",
+                            "op": "is_in",
+                            "value": email_domain_list["id"],
+                        }
+                    ],
+                ),
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # [PATCH] Augment a playbook with a rule with a list that accepts transformed matches on a field.
+    patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=5,
+            add=[
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "id.email",
+                            "op": "is_in",
+                            "value": email_addr_list["id"],
+                        }
+                    ],
+                ),
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # [PATCH] Augment a playbook with a rule matching against a custom DI.
+    patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=6,
+            add=[
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "custom.other_email",
+                            "op": "is_in",
+                            "value": email_addr_list["id"],
+                        }
+                    ],
+                ),
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    resp = get(f"/org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths)
+    assert len([
+            rule for rule in resp
+            if rule["rule_expression"] == [{
+                "field": "id.email",
+                "op": "is_in",
+                "value": ssn9_list["id"],
+            }]
+        ]) == 0
+    assert len([
+            rule for rule in resp
+            if rule["rule_expression"] == [{
+                "field": "id.email",
+                "op": "is_in",
+                "value": email_addr_list["id"],
+            }]
+        ]) == 2
+    assert len([
+            rule for rule in resp
+            if rule["rule_expression"] == [{
+                "field": "id.email",
+                "op": "is_in",
+                "value": email_domain_list["id"],
+            }]
+        ]) == 2
+    assert len([
+            rule for rule in resp
+            if rule["rule_expression"] == [{
+                "field": "custom.other_email",
+                "op": "is_in",
+                "value": email_addr_list["id"],
+            }]
+        ]) == 2
+
+
 def test_update(sandbox_tenant):
     nonce = _gen_random_str(5)
     list = post(

@@ -12,19 +12,18 @@ use api_core::{
         rule_engine::{
             engine::VaultDataForRules,
             eval::{Rule, RuleEvalConfig},
+            validation::validate_rule_expression,
         },
     },
     errors::AssertionError,
 };
 use api_wire_types::{EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
-use db::{
-    models::{
-        ob_configuration::ObConfiguration, rule_instance::RuleInstance, rule_set_result::RuleSetResult,
-    },
-    DbError,
+use db::models::{
+    list::List, ob_configuration::ObConfiguration, rule_instance::RuleInstance,
+    rule_set_result::RuleSetResult,
 };
-use itertools::Itertools;
-use newtypes::{ObConfigurationId, RuleId};
+use itertools::{chain, Itertools};
+use newtypes::{ListId, ObConfigurationId, RuleAction, RuleExpression, RuleId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 /*
@@ -66,16 +65,49 @@ pub async fn evaluate_rule(
         start_timestamp,
         end_timestamp,
     } = request.into_inner();
-    let (current_rules, historical_results) = state
+    let (current_rules, historical_results, adds, edits) = state
         .db_pool
-        .db_query(move |conn| -> Result<_, DbError> {
+        .db_query(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
 
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc_id)?;
             let rule_set_results =
                 RuleSetResult::sample_for_eval(conn, &obc.id, start_timestamp, end_timestamp, 100)?;
 
-            Ok((rules, rule_set_results))
+            let list_ids: Vec<ListId> = chain(
+                add.iter()
+                    .flatten()
+                    .flat_map(|rule| rule.rule_expression.list_ids()),
+                edit.iter()
+                    .flatten()
+                    .flat_map(|rule| rule.rule_expression.list_ids()),
+            )
+            .collect();
+            let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
+
+            let adds: Vec<(RuleExpression, RuleAction)> = add
+                .into_iter()
+                .flatten()
+                .map(|rule| -> ApiResult<_> {
+                    Ok((
+                        validate_rule_expression(rule.rule_expression, &lists, is_live)?,
+                        rule.rule_action,
+                    ))
+                })
+                .collect::<ApiResult<_>>()?;
+
+            let edits: Vec<(RuleId, RuleExpression)> = edit
+                .into_iter()
+                .flatten()
+                .map(|rule| -> ApiResult<_> {
+                    Ok((
+                        rule.rule_id,
+                        validate_rule_expression(rule.rule_expression, &lists, is_live)?,
+                    ))
+                })
+                .collect::<ApiResult<_>>()?;
+
+            Ok((rules, rule_set_results, adds, edits))
         })
         .await?;
 
@@ -91,6 +123,7 @@ pub async fn evaluate_rule(
             )
         })
         .collect();
+
     // For every delete, remove that rule from our current_rules set
     if let Some(delete) = delete {
         for rule_id in delete {
@@ -99,24 +132,24 @@ pub async fn evaluate_rule(
                 .ok_or(AssertionError(&format!("Rule not found: {}", rule_id)))?;
         }
     }
+
     // For every edit, remove that rule from our current_rules set and add a new version with the edit
     let mut edit_rules = vec![];
-    if let Some(edit) = edit {
-        for edit_rule in edit {
-            let curr_rule = current_rules
-                .remove(&edit_rule.rule_id)
-                .ok_or(AssertionError(&format!("Rule not found: {}", edit_rule.rule_id)))?;
+    for (edit_rule_id, edit_rule_expression) in edits {
+        let curr_rule = current_rules
+            .remove(&edit_rule_id)
+            .ok_or(AssertionError(&format!("Rule not found: {}", edit_rule_id)))?;
 
-            edit_rules.push(Rule {
-                expression: edit_rule.rule_expression,
-                action: curr_rule.action,
-            });
-        }
+        edit_rules.push(Rule {
+            expression: edit_rule_expression,
+            action: curr_rule.action,
+        });
     }
+
     // For every add, add that rule to the rules
-    let add_rules = add.unwrap_or_default().into_iter().map(|cr| Rule {
-        expression: cr.rule_expression,
-        action: cr.rule_action,
+    let add_rules = adds.into_iter().map(|(rule_expression, rule_action)| Rule {
+        expression: rule_expression,
+        action: rule_action,
     });
 
     let all_rules = current_rules

@@ -1,9 +1,21 @@
-use newtypes::{FpId, ObConfigurationId, OnboardingStatus, RuleAction, RuleExpression, RuleId};
+use newtypes::{
+    FpId, ListId, ObConfigurationId, OnboardingStatus, RuleAction, RuleExpression, RuleExpressionCondition,
+    RuleId,
+};
 use std::collections::HashMap;
 
 use serde_with::SerializeDisplay;
 
 use crate::*;
+
+#[derive(Debug, Clone, Deserialize, Eq, PartialEq, Apiv2Schema)]
+pub struct UnvalidatedRuleExpression(pub Vec<RuleExpressionCondition>);
+
+impl UnvalidatedRuleExpression {
+    pub fn list_ids(&self) -> Vec<ListId> {
+        self.0.iter().filter_map(|c| c.list_id().cloned()).collect()
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct Rule {

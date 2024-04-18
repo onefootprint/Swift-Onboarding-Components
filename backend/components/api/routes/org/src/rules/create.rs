@@ -5,11 +5,9 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
+use api_core::{decision::rule_engine::validation::validate_rule_expression, ApiError};
 use api_wire_types::CreateRuleRequest;
-use db::{
-    models::{ob_configuration::ObConfiguration, rule_instance::RuleInstance},
-    DbError,
-};
+use db::models::{list::List, ob_configuration::ObConfiguration, rule_instance::RuleInstance};
 use newtypes::ObConfigurationId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -38,10 +36,21 @@ pub async fn create_rule(
 
     let rule = state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, DbError> {
+        .db_transaction(move |conn| -> Result<_, ApiError> {
+            let list_ids = rule_expression.list_ids();
+            let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
+            let rule_expression = validate_rule_expression(rule_expression, &lists, is_live)?;
+
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id.into_inner(), &tenant_id, is_live))?;
             let obc = ObConfiguration::lock(conn, &obc.id)?; //TODO: maybe just change lock to take in (obc, tenant_id, is_live)?
-            RuleInstance::create(conn, &obc, &actor.into(), name, rule_expression, action)
+            Ok(RuleInstance::create(
+                conn,
+                &obc,
+                &actor.into(),
+                name,
+                rule_expression,
+                action,
+            )?)
         })
         .await?;
 
