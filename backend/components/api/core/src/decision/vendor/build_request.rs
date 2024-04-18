@@ -139,7 +139,7 @@ pub async fn build_docv_data_from_identity_doc(
         selfie_image: decrypted
             .remove(&DocumentSide::Selfie)
             .map(PiiBytes::into_base64_pii),
-        country_code: Some(doc.country_code.into()),
+        country_code: doc.country_code.map(PiiString::from),
         document_type: Some(doc.document_type),
         first_name: decrypted_name_idks.remove(&IDK::FirstName.into()),
         last_name: decrypted_name_idks.remove(&IDK::LastName.into()),

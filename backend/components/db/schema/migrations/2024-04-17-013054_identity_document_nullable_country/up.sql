@@ -1,0 +1,1 @@
+ALTER TABLE identity_document ALTER COLUMN country_code DROP NOT NULL;

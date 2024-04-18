@@ -461,7 +461,7 @@ diesel::table! {
         id -> Text,
         request_id -> Text,
         document_type -> Text,
-        country_code -> Text,
+        country_code -> Nullable<Text>,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,

@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{errors::ValidationError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{document_request, document_upload, identity_document, incode_verification_session};
 
@@ -27,7 +27,7 @@ pub struct IdentityDocument {
     pub request_id: DocumentRequestId,
     /// This is the stated document type, selected by the user, not necessarily the true document type
     pub document_type: IdDocKind,
-    pub country_code: String,
+    pub country_code: Option<String>,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -66,7 +66,7 @@ impl IdentityDocument {
 pub struct NewIdentityDocumentArgs {
     pub request_id: DocumentRequestId,
     pub document_type: IdDocKind,
-    pub country_code: Iso3166TwoDigitCountryCode,
+    pub country_code: Option<Iso3166TwoDigitCountryCode>,
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
     pub device_type: Option<DocumentScanDeviceType>,
@@ -77,7 +77,7 @@ pub struct NewIdentityDocumentArgs {
 struct NewIdentityDocumentRow {
     request_id: DocumentRequestId,
     document_type: IdDocKind,
-    country_code: Iso3166TwoDigitCountryCode,
+    country_code: Option<Iso3166TwoDigitCountryCode>,
     created_at: DateTime<Utc>,
     status: IdentityDocumentStatus,
     fixture_result: Option<IdentityDocumentFixtureResult>,
@@ -101,7 +101,7 @@ impl IdentityDocument {
     /// Returns the existing IdentityDocument with this args if uploads haven't began. Otherwise
     /// creates a new IdentityDocument and deactivates the old ones
     pub fn get_or_create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
-        document_request::table
+        let dr = document_request::table
             .filter(document_request::id.eq(&args.request_id))
             .for_no_key_update()
             .get_result::<DocumentRequest>(conn.conn())?;
@@ -114,6 +114,10 @@ impl IdentityDocument {
             device_type,
         } = args;
 
+        if country_code.is_none() && dr.kind.is_identity() {
+            return ValidationError("Country code must be provided for ID doc").into();
+        }
+
         // See if we can use an existing Pending IdDoc instead of making a new on
         let existing: Option<Self> = identity_document::table
             .filter(identity_document::request_id.eq(&request_id))
@@ -123,7 +127,7 @@ impl IdentityDocument {
         if let Some(existing) = existing {
             let has_no_uploads = existing.images(conn, false)?.is_empty();
             if existing.document_type == document_type
-                && existing.country_code == country_code.to_string()
+                && existing.country_code == country_code.map(|c| c.to_string())
                 && existing.fixture_result == fixture_result
                 && existing.skip_selfie == skip_selfie
                 && existing.device_type == device_type

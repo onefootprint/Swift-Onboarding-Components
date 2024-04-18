@@ -14,7 +14,7 @@ pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Id
     let args = NewIdentityDocumentArgs {
         request_id: request_id.unwrap_or_else(|| DocumentRequestId::from_str("test_derp").unwrap()),
         document_type: IdDocKind::DriversLicense,
-        country_code: newtypes::Iso3166TwoDigitCountryCode::US,
+        country_code: Some(newtypes::Iso3166TwoDigitCountryCode::US),
         fixture_result: None,
         skip_selfie: None,
         device_type: None,

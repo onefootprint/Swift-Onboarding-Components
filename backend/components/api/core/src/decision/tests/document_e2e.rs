@@ -137,7 +137,7 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
     let wf_id = wf.id.clone();
     let id_doc_req = CreateIdentityDocumentRequest {
         document_type: test_case.document_type,
-        country_code: Iso3166TwoDigitCountryCode::US,
+        country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: test_case.identity_doc_fixture(),
         skip_selfie: None,
         device_type: None,

@@ -46,7 +46,7 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
 
     let id_doc_req = CreateIdentityDocumentRequest {
         document_type: IdDocKind::DriversLicense,
-        country_code: Iso3166TwoDigitCountryCode::US,
+        country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,
         device_type: None,
@@ -137,7 +137,7 @@ async fn test_require_doc_request(state: &mut State, user_kind: UserKind) {
 
     let id_doc_req = CreateIdentityDocumentRequest {
         document_type: IdDocKind::DriversLicense,
-        country_code: Iso3166TwoDigitCountryCode::US,
+        country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,
         device_type: None,
@@ -189,7 +189,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     //
     let id_doc_req = CreateIdentityDocumentRequest {
         document_type: IdDocKind::Passport,
-        country_code: Iso3166TwoDigitCountryCode::US,
+        country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,
         device_type: None,
@@ -215,7 +215,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     //
     let id_doc_req = CreateIdentityDocumentRequest {
         document_type: IdDocKind::DriversLicense,
-        country_code: Iso3166TwoDigitCountryCode::ZA,
+        country_code: Some(Iso3166TwoDigitCountryCode::ZA),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,
         device_type: None,

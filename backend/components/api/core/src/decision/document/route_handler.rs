@@ -7,7 +7,7 @@ use newtypes::{
 
 use crate::{
     decision,
-    errors::{onboarding::OnboardingError, ApiResult, error_with_code::ErrorWithCode},
+    errors::{error_with_code::ErrorWithCode, onboarding::OnboardingError, ApiResult, ValidationError},
     utils::file_upload::FileUpload,
     State,
 };
@@ -79,6 +79,7 @@ pub async fn handle_document_create(
             // If there's no doc requests, nothing to do here
             let doc_request =
                 DbDocumentRequest::get(conn, &wf_id, DocumentRequestKind::Identity)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
+            let country_code = country_code.ok_or(ValidationError("Identity document requires country code"))?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;         
             crate::decision::vendor::incode::validate_doc_type_is_allowed(
@@ -124,7 +125,7 @@ pub async fn handle_document_create(
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request.id,
                 document_type,
-                country_code,
+                country_code: Some(country_code),
                 fixture_result,
                 skip_selfie: Some(should_skip_selfie),
                 device_type
@@ -383,7 +384,7 @@ async fn handle_non_identity_document(
     state: &State,
     workflow_id: WorkflowId,
     document_type: IdDocKind,
-    country_code: Iso3166TwoDigitCountryCode,
+    country_code: Option<Iso3166TwoDigitCountryCode>,
     device_type: Option<DocumentScanDeviceType>,
     doc_kind: DocumentRequestKind,
 ) -> ApiResult<IdentityDocumentId> {

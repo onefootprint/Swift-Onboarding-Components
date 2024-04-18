@@ -182,6 +182,12 @@ impl<'a> From<ValidationError<'a>> for DbError {
     }
 }
 
+impl<'a, T> From<ValidationError<'a>> for Result<T, DbError> {
+    fn from(value: ValidationError<'a>) -> Self {
+        Err(value.into())
+    }
+}
+
 #[derive(Debug)]
 /// Shorthand to make it convenient to make an HTTP 500 server error.
 pub(crate) struct AssertionError<'a>(pub &'a str);

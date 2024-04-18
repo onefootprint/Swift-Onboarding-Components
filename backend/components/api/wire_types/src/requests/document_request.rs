@@ -7,8 +7,7 @@ use paperclip::actix::Apiv2Schema;
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct CreateIdentityDocumentRequest {
     pub document_type: IdDocKind,
-    // TODO make this optional, doesn't need to be provided for PoA or PoSSN
-    pub country_code: Iso3166TwoDigitCountryCode,
+    pub country_code: Option<Iso3166TwoDigitCountryCode>,
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
     pub device_type: Option<DocumentScanDeviceType>,
