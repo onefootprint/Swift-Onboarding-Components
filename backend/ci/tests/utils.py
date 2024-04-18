@@ -243,6 +243,7 @@ def create_tenant(org_data, ob_conf_data):
     # get-or-create operation w/ a unique constraint on the org ID.
     return try_until_success(inner, 10)
 
+
 def create_partner_tenant(org_data, tenant):
     def inner():
         body = post("private/test_partner_tenant", org_data, CUSTODIAN_AUTH)
@@ -279,7 +280,6 @@ def create_partner_tenant(org_data, tenant):
     return try_until_success(inner, 10)
 
 
-
 def create_ob_config(
     tenant,
     name,
@@ -296,7 +296,8 @@ def create_ob_config(
     override_auths=None,
     skip_confirm=None,
     enhanced_aml=None,
-    document_types_and_countries=None, # TODO: argoff fix this, not what the FE uses as the default
+    document_types_and_countries=None,  # TODO: argoff fix this, not what the FE uses as the default
+    documents_to_collect=None,
 ):
     ob_conf_data = {
         "name": name,
@@ -313,8 +314,8 @@ def create_ob_config(
         "skip_confirm": skip_confirm,
         "enhanced_aml": enhanced_aml,
         "document_types_and_countries": document_types_and_countries,
+        "documents_to_collect": documents_to_collect or [],
     }
-    # TODO also make this get or create?
     auths = override_auths if override_auths else tenant.db_auths
     body = post("org/onboarding_configs", ob_conf_data, *auths)
     ob_config = ObConfiguration.from_response(body, tenant)
@@ -353,7 +354,9 @@ def _gen_random_sandbox_id():
 
 
 def _gen_random_ssn():
-    return "{:03d}{:02d}{:04}".format(random.randint(1,500), random.randint(1, 99), random.randint(1, 9999))
+    return "{:03d}{:02d}{:04}".format(
+        random.randint(1, 500), random.randint(1, 99), random.randint(1, 9999)
+    )
 
 
 def _gen_random_str(length):

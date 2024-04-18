@@ -82,6 +82,39 @@ def test_upload_documents(doc_request_sandbox_ob_config):
     assert users_docs[0]["document_type"] == "drivers_license"
 
 
+def test_upload_custom_document(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Custom doc",
+        must_collect_data,
+        must_collect_data,
+        documents_to_collect=[
+            dict(
+                kind="custom",
+                data=dict(
+                    name="Utility bill",
+                    identifier="document.custom.utility_bill",
+                    description="Please upload a utility bill that shows your full name and address.",
+                ),
+            )
+        ],
+    )
+
+    bifrost = BifrostClient.new(obc)
+    user = bifrost.run()
+    fp_id = user.fp_id
+
+    # TODO check timeline event
+
+    assert any(
+        r["kind"] == "collect_document" and r["config"]["kind"] == "custom"
+        for r in bifrost.handled_requirements
+    )
+
+    body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
+    assert any(i["identifier"] == "document.custom.utility_bill" for i in body["data"])
+
+
 def test_upload_documents_with_ob_config_restriction_legacy_version(
     restricted_doc_ob_config,
 ):

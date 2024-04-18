@@ -1,7 +1,5 @@
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestKind, DocumentSide,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, S3Url, ScopedVaultId,
-    SealedVaultDataKey, TenantId, WorkflowId,
+    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentSide, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId, WorkflowId
 };
 
 use crate::{
@@ -16,20 +14,17 @@ use api_wire_types::{CreateIdentityDocumentRequest, DocumentResponse};
 use feature_flag::BoolFlag;
 
 use crate::decision::vendor::incode::states::vault_complete_images;
-use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier},
-        document_upload::{DocumentUpload, NewDocumentUploadArgs},
-        identity_document::{IdentityDocument, IdentityDocumentUpdate, NewIdentityDocumentArgs},
-        incode_verification_session::IncodeVerificationSession,
-        ob_configuration::ObConfiguration,
-        user_consent::UserConsent,
-        user_timeline::UserTimeline,
-        vault::Vault,
-        workflow::Workflow,
-    },
-    TxnPgConn,
+use db::models::{
+    decision_intent::DecisionIntent,
+    document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier},
+    document_upload::{DocumentUpload, NewDocumentUploadArgs},
+    identity_document::{IdentityDocument, IdentityDocumentUpdate, NewIdentityDocumentArgs},
+    incode_verification_session::IncodeVerificationSession,
+    ob_configuration::ObConfiguration,
+    user_consent::UserConsent,
+    user_timeline::UserTimeline,
+    vault::Vault,
+    workflow::Workflow,
 };
 
 use super::meta_headers::MetaHeaders;
@@ -188,23 +183,23 @@ pub async fn handle_document_upload(
             Ok((id_doc, doc_request, uvw, user_consent))
         })
         .await?;
-    let meta2 = meta.clone();
-    let doc_kind: DocumentRequestKind = id_doc.document_type.into();
 
     if id_doc.status != IdentityDocumentStatus::Pending {
         return Err(ErrorWithCode::IdentityDocumentNotPending.into());
     }
-    // We support the flow
     let should_collect_selfie = doc_request.should_collect_selfie() && !id_doc.should_skip_selfie();
-
     if side == DocumentSide::Selfie && !should_collect_selfie {
         return Err(OnboardingError::NotExpectingSelfie.into());
     }
-
-    check_consent(user_consent, doc_kind)?;
+    if user_consent.is_none() && doc_request.kind.is_identity() {
+        return Err(OnboardingError::UserConsentNotFound.into());
+    }
 
     // Upload the image to s3
-    let di = DataIdentifier::from(DocumentKind::LatestUpload(id_doc.document_type, side));
+    let di = match &doc_request.config {
+        DocumentRequestConfig::Custom(CustomDocumentConfig{identifier, ..}) => identifier.clone(),
+        _ => DataIdentifier::from(DocumentKind::LatestUpload(id_doc.document_type, side)),
+    };
     let su_id = sv_id.clone();
     let (e_data_key, s3_url) = seal_file_and_upload_to_s3(state, &file, &di, &uvw.vault, &su_id).await?;
 
@@ -213,22 +208,38 @@ pub async fn handle_document_upload(
     let should_initiate_reqs =
         crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result)
             .await?
-            && doc_kind.should_initiate_incode_requests();
+            && doc_request.kind.should_initiate_incode_requests();
 
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            create_latest_doc_upload(
+            let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
+            // Vault the images under latest uploads
+            let source = DataLifetimeSource::LikelyHosted;
+            let (d, seqno) = uvw.put_document_unsafe(
                 conn,
-                &su_id,
                 di,
-                s3_url,
-                side,
-                id_doc.id.clone(),
-                file,
+                file.mime_type,
+                file.filename,
                 e_data_key,
-                meta2,
+                s3_url,
+                source,
+                None,
             )?;
+            let args = NewDocumentUploadArgs {
+                document_id: id_doc.id,
+                side,
+                s3_url: d.s3_url,
+                e_data_key: d.e_data_key,
+                created_seqno: seqno,
+                is_instant_app: meta.is_instant_app,
+                is_app_clip: meta.is_app_clip,
+                is_manual: meta.is_manual,
+                is_extra_compressed: meta.is_extra_compressed,
+                is_upload: meta.is_upload,
+                is_forced_upload: meta.is_forced_upload,
+            };
+            DocumentUpload::create(conn, args)?;
 
             // Now that the document is created, either initiate IDV reqs or create fixture data
             if should_initiate_reqs {
@@ -293,12 +304,11 @@ pub async fn handle_document_process(
         .await?;
 
     let is_sandbox = id_doc.fixture_result.is_some();
-    let doc_kind: DocumentRequestKind = id_doc.document_type.into();
-    let is_non_identity_document = !doc_kind.is_identity();
+    let is_non_identity_document = !dr.kind.is_identity();
     let should_initiate_reqs =
         crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result)
             .await?
-            && doc_kind.should_initiate_incode_requests();
+            && dr.kind.should_initiate_incode_requests();
 
     let response = if should_initiate_reqs {
         // Not sandbox - make our request to vendors!
@@ -384,54 +394,4 @@ pub async fn complete_non_identity_document(
         .await?;
 
     Ok(())
-}
-
-#[allow(clippy::too_many_arguments)]
-fn create_latest_doc_upload(
-    conn: &mut TxnPgConn,
-    sv_id: &ScopedVaultId,
-    di: DataIdentifier,
-    s3_url: S3Url,
-    side: DocumentSide,
-    identity_document_id: IdentityDocumentId,
-    file: FileUpload,
-    e_data_key: SealedVaultDataKey,
-    meta: MetaHeaders,
-) -> ApiResult<()> {
-    let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
-    // Vault the images under latest uploads
-    let source = DataLifetimeSource::LikelyHosted;
-    let (d, seqno) = uvw.put_document_unsafe(
-        conn,
-        di,
-        file.mime_type,
-        file.filename,
-        e_data_key,
-        s3_url,
-        source,
-        None,
-    )?;
-    let args = NewDocumentUploadArgs {
-        document_id: identity_document_id,
-        side,
-        s3_url: d.s3_url,
-        e_data_key: d.e_data_key,
-        created_seqno: seqno,
-        is_instant_app: meta.is_instant_app,
-        is_app_clip: meta.is_app_clip,
-        is_manual: meta.is_manual,
-        is_extra_compressed: meta.is_extra_compressed,
-        is_upload: meta.is_upload,
-        is_forced_upload: meta.is_forced_upload,
-    };
-    DocumentUpload::create(conn, args)?;
-    Ok(())
-}
-
-fn check_consent(user_consent: Option<UserConsent>, doc_kind: DocumentRequestKind) -> ApiResult<()> {
-    if user_consent.is_none() && doc_kind.is_identity() {
-        Err(OnboardingError::UserConsentNotFound.into())
-    } else {
-        Ok(())
-    }
 }
