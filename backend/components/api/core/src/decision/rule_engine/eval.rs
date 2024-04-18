@@ -3,16 +3,15 @@ use std::{collections::HashMap, str::FromStr};
 use db::models::{list_entry::ListWithDecryptedEntries, rule_instance::RuleInstance};
 use itertools::Itertools;
 use newtypes::{
-    email::Email, BooleanOperator, DocumentRequestKind, Equals, FootprintReasonCode, IsIn, ListId, ListKind,
-    PhoneNumber, PiiString, RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, VaultOperation,
+    email::Email, BooleanOperator, BusinessDataKind, DataIdentifier, DocumentRequestKind, Equals,
+    FootprintReasonCode, IdentityDataKind, IsIn, ListEntryValue, ListId, ListKind, PhoneNumber, PiiString,
+    RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, VaultOperation,
 };
 use strum::IntoEnumIterator;
 
 use crate::errors::{ApiResult, AssertionError};
 
 use super::engine::VaultDataForRules;
-
-// pub struct Rule(pub RuleExpression, pub RuleAction);
 
 pub trait HasRule {
     fn expression(&self) -> RuleExpression;
@@ -166,11 +165,11 @@ fn evaluate_condition(
                         Equals::Equals => field_value.leak_to_string() == *value.leak_to_string(),
                         Equals::DoesNotEqual => field_value.leak_to_string() != *value.leak_to_string(),
                     },
-                    VaultOperation::IsIn { field: _, op, value } => {
+                    VaultOperation::IsIn { field, op, value } => {
                         if let Some(list) = lists.get(value) {
                             match op {
-                                IsIn::IsIn => is_in_list(field_value, list)?,
-                                IsIn::IsNotIn => !is_in_list(field_value, list)?,
+                                IsIn::IsIn => is_in_list(field, field_value, list)?,
+                                IsIn::IsNotIn => !is_in_list(field, field_value, list)?,
                             }
                         } else {
                             return Err(AssertionError(&format!(
@@ -195,8 +194,28 @@ fn evaluate_condition(
     Ok(res)
 }
 
-fn is_in_list(value: PiiString, list: &ListWithDecryptedEntries) -> ApiResult<bool> {
+fn is_in_list(field: &DataIdentifier, value: PiiString, list: &ListWithDecryptedEntries) -> ApiResult<bool> {
     let (list, entries) = list;
+
+    match (field, list.kind) {
+        (DataIdentifier::Id(IdentityDataKind::Email), ListKind::EmailAddress)
+        | (DataIdentifier::Id(IdentityDataKind::Email), ListKind::EmailDomain)
+        | (DataIdentifier::Id(IdentityDataKind::Ssn9), ListKind::Ssn9)
+        | (DataIdentifier::Id(IdentityDataKind::PhoneNumber), ListKind::PhoneNumber)
+        | (DataIdentifier::Id(IdentityDataKind::PhoneNumber), ListKind::PhoneCountryCode)
+        | (DataIdentifier::Business(BusinessDataKind::PhoneNumber), ListKind::PhoneNumber)
+        | (DataIdentifier::Business(BusinessDataKind::PhoneNumber), ListKind::PhoneCountryCode)
+        | (DataIdentifier::Custom(_), _) => {}
+        (field, _) => {
+            // This should have been validated when the rule was written.
+            return AssertionError(&format!(
+                "Cannot check membership of DI {} in list with kind {}",
+                field, list.kind
+            ))
+            .into();
+        }
+    };
+
     let derived_value = match list.kind {
         ListKind::EmailAddress => value,
         ListKind::EmailDomain => Email::from_str(value.leak())?.domain().into(),
@@ -204,11 +223,20 @@ fn is_in_list(value: PiiString, list: &ListWithDecryptedEntries) -> ApiResult<bo
         ListKind::PhoneNumber => value,
         ListKind::PhoneCountryCode => PhoneNumber::from_str(value.leak())?.country_code(),
         ListKind::IpAddress => {
-            return Err(AssertionError("IpAddress list not implemented in rules eval").into())
+            // This should have been validated when the rule was written.
+            return Err(AssertionError("IpAddress list not acceptable in VaultData rule").into());
         }
     };
 
-    Ok(entries.iter().any(|(_, e)| derived_value == *e))
+    let parsed = ListEntryValue::parse(list.kind, derived_value)?;
+    let canon = parsed.canonicalize();
+    let canon_bytes = canon.leak().as_bytes();
+
+    let exact_match = entries
+        .iter()
+        .any(|(_, e)| crypto::safe_compare(canon_bytes, e.leak().as_bytes()));
+
+    Ok(exact_match)
 }
 
 #[cfg(test)]
