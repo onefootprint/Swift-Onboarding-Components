@@ -1316,7 +1316,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/DocumentResponse"
+                                    "$ref": "#/components/schemas/EmptyResponse"
                                 }
                             }
                         }
@@ -2707,7 +2707,8 @@
                             "residence_document",
                             "voter_identification",
                             "ssn_card",
-                            "proof_of_address"
+                            "proof_of_address",
+                            "custom"
                         ]
                     },
                     "fixture_result": {
@@ -2718,12 +2719,14 @@
                             "Real"
                         ]
                     },
+                    "request_id": {
+                        "type": "string"
+                    },
                     "skip_selfie": {
                         "type": "boolean"
                     }
                 },
                 "required": [
-                    "country_code",
                     "document_type"
                 ]
             },

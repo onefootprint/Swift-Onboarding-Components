@@ -20,7 +20,6 @@ const submitDoc = async (payload: SubmitDocRequest) => {
       'x-fp-is-app-clip': false, // This is used to check if it's an app clip
       'x-fp-is-instant-app': false, // This is used to check if it's instant app
       'Content-Type': 'multipart/form-data',
-      'x-fp-process-separately': true, // This is used to process the image separately in a different POST request
       'x-fp-is-upload': meta.isUpload, // This is used to differentiate between upload and capture
       'x-fp-force-upload': forceUpload, // This is used when the user had to upload instead of capturing because the camera is stuck
     },

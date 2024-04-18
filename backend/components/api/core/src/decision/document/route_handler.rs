@@ -173,7 +173,7 @@ pub async fn handle_document_upload(
     file: FileUpload,
     document_id: IdentityDocumentId,
     side: DocumentSide,
-) -> ApiResult<DocumentResponse> {
+) -> ApiResult<()> {
     let wf_id = workflow.id.clone();
     let wf_id2 = wf_id.clone();
     let su_id = sv_id.clone();
@@ -213,7 +213,7 @@ pub async fn handle_document_upload(
             .await?
             && doc_kind.should_initiate_incode_requests();
 
-    let missing_sides = state
+    state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             create_latest_doc_upload(
@@ -227,8 +227,6 @@ pub async fn handle_document_upload(
                 e_data_key,
                 meta2,
             )?;
-            let (missing_sides, _) =
-                super::utils::get_side_info(conn, &id_doc, should_collect_selfie, Some(side))?;
 
             // Now that the document is created, either initiate IDV reqs or create fixture data
             if should_initiate_reqs {
@@ -240,21 +238,11 @@ pub async fn handle_document_upload(
                     DecisionIntentKind::DocScan,
                 )?;
             };
-
-            Ok(missing_sides)
+            Ok(())
         })
         .await?;
 
-    // Compose the API response
-    let next_side_to_collect = missing_sides.next_side_to_collect();
-    // Bogus response - the client isn't reading it anymore
-    let response = DocumentResponse {
-        next_side_to_collect,
-        errors: vec![],
-        is_retry_limit_exceeded: false,
-    };
-
-    Ok(response)
+    Ok(())
 }
 
 /// Route handler for /hosted/user/documents/{id}/process

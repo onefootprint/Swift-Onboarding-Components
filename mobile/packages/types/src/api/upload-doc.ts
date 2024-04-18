@@ -1,5 +1,3 @@
-import type { IdDocImageProcessingError } from '../data/id-doc-image-error';
-
 export enum UploadDocumentSide {
   Front = 'front',
   Back = 'back',
@@ -14,8 +12,4 @@ export type UploadDocRequest = {
   side?: UploadDocumentSide;
 };
 
-export type UploadDocResponse = {
-  errors: IdDocImageProcessingError[];
-  nextSideToCollect: UploadDocumentSide | null;
-  isRetryLimitExceeded: boolean;
-};
+export type UploadDocResponse = {};

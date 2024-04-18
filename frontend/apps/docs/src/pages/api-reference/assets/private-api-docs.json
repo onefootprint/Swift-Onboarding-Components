@@ -9260,7 +9260,8 @@
                                         "residence_document",
                                         "voter_identification",
                                         "ssn_card",
-                                        "proof_of_address"
+                                        "proof_of_address",
+                                        "custom"
                                     ]
                                 }
                             }
@@ -11472,7 +11473,8 @@
                             "residence_document",
                             "voter_identification",
                             "ssn_card",
-                            "proof_of_address"
+                            "proof_of_address",
+                            "custom"
                         ]
                     },
                     "ocr_confidence_score": {
@@ -20404,7 +20406,8 @@
                                                     "residence_document",
                                                     "voter_identification",
                                                     "ssn_card",
-                                                    "proof_of_address"
+                                                    "proof_of_address",
+                                                    "custom"
                                                 ]
                                             }
                                         }
@@ -21369,7 +21372,8 @@
                                         "residence_document",
                                         "voter_identification",
                                         "ssn_card",
-                                        "proof_of_address"
+                                        "proof_of_address",
+                                        "custom"
                                     ]
                                 }
                             }

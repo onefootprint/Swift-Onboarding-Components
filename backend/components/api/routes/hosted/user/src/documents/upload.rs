@@ -2,10 +2,11 @@ use crate::{auth::user::UserAuthScope, decision, types::response::ResponseData, 
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::{
-    auth::user::UserWfAuthContext, decision::document::meta_headers::MetaHeaders, types::JsonApiResponse,
+    auth::user::UserWfAuthContext,
+    decision::document::meta_headers::MetaHeaders,
+    types::{EmptyResponse, JsonApiResponse},
     utils::file_upload::handle_file_upload,
 };
-use api_wire_types::DocumentResponse;
 
 use newtypes::{DocumentSide, IdentityDocumentId, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -25,7 +26,7 @@ pub async fn post(
     mut payload: Multipart,
     request: HttpRequest,
     meta: MetaHeaders,
-) -> JsonApiResponse<DocumentResponse> {
+) -> JsonApiResponse<EmptyResponse> {
     let file = handle_file_upload(
         &mut payload,
         &request,
@@ -41,7 +42,7 @@ pub async fn post(
     let wf = user_auth.workflow().clone();
     let su_id = user_auth.scoped_user.id.clone();
 
-    let result = decision::document::route_handler::handle_document_upload(
+    decision::document::route_handler::handle_document_upload(
         &state,
         wf,
         su_id.clone(),
@@ -52,5 +53,5 @@ pub async fn post(
     )
     .await?;
 
-    ResponseData::ok(result).json()
+    ResponseData::ok(EmptyResponse {}).json()
 }
