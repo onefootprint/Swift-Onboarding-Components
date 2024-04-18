@@ -193,14 +193,14 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             match common::run_neuro_check(state, &self.wf_id, &self.t_id).await {
                 Ok(res) => res,
                 Err(err) => {
-                    tracing::error!(?err, wf_id=?self.wf_id, "error running NeuroID");
+                    tracing::warn!(?err, wf_id=?self.wf_id, "error running NeuroID");
                     None
                 }
             }
         } else {
             // if FF and workflow get out of sync, make some noise
             if is_neuro_enabled_ff != is_neuro_enabled_for_workflow {
-                tracing::error!(
+                tracing::warn!(
                     ?is_neuro_enabled_ff,
                     ?is_neuro_enabled_for_workflow,
                     "Neuro wf and ff disagree, not running neuro API call"
