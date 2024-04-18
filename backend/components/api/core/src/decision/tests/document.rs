@@ -106,7 +106,7 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
         .unwrap();
 
     // try uploading again, and we're successful
-    let upload_res_with_consent = decision::document::route_handler::handle_document_upload(
+    decision::document::route_handler::handle_document_upload(
         state,
         wf.clone(),
         sv.id.clone(),
@@ -115,9 +115,8 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
         identity_doc_id.clone(),
         DocumentSide::Front,
     )
-    .await;
-
-    assert!(upload_res_with_consent.unwrap().is_none())
+    .await
+    .unwrap();
 }
 
 /// Test that we only allow going through doc flow if there's a pending document request

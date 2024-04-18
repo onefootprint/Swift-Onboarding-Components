@@ -53,6 +53,7 @@ def test_upload_documents(doc_request_sandbox_ob_config):
         bifrost.auth_token,
         files=bifrost.data["document.drivers_license.front.image"](),
     )
+    post(f"hosted/user/documents/{id}/process", None, bifrost.auth_token)
 
     data = {
         "document_type": "drivers_license",

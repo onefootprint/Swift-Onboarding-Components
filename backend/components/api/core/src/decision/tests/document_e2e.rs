@@ -251,7 +251,7 @@ async fn upload_and_process_inner(
     mock_s3_put_object(state);
 
     // Upload the document
-    let upload_res = decision::document::route_handler::handle_document_upload(
+    decision::document::route_handler::handle_document_upload(
         state,
         workflow.clone(),
         sv_id.clone(),
@@ -262,7 +262,6 @@ async fn upload_and_process_inner(
     )
     .await
     .unwrap();
-    assert!(upload_res.is_none());
 
     //
     // PROCESS (incode)
