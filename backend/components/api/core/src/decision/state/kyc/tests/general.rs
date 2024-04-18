@@ -10,7 +10,7 @@ use crate::{
             },
             MakeDecision, WorkflowActions, WorkflowKind, WorkflowWrapper,
         },
-        tests::test_helpers,
+        tests::test_helpers::{self, FixtureData},
     },
     State,
 };
@@ -38,7 +38,7 @@ use newtypes::{
 };
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
-    let (_, _, _, sv, obc) = test_helpers::create_kyc_user_and_wf(
+    let FixtureData { sv, obc, .. } = test_helpers::create_kyc_user_and_wf(
         state,
         ObConfigurationOpts {
             is_live: true,

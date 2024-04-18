@@ -36,6 +36,8 @@ pub enum IdDocKind {
     Visa,
     ResidenceDocument,
     VoterIdentification,
+    // These shouldn't have anything except from front images.
+    // custom will also be in this boat
     // Proof of ssn
     SsnCard,
     // Proof of address

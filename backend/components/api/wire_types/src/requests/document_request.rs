@@ -1,6 +1,6 @@
 use newtypes::{
-    DocumentScanDeviceType, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId,
-    IdentityDocumentStatus, IncodeFailureReason, Iso3166TwoDigitCountryCode,
+    DocumentRequestId, DocumentScanDeviceType, DocumentSide, IdDocKind, IdentityDocumentFixtureResult,
+    IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason, Iso3166TwoDigitCountryCode,
 };
 use paperclip::actix::Apiv2Schema;
 
@@ -11,6 +11,8 @@ pub struct CreateIdentityDocumentRequest {
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
     pub device_type: Option<DocumentScanDeviceType>,
+    // TODO make required
+    pub request_id: Option<DocumentRequestId>,
 }
 
 #[derive(Debug, Apiv2Schema, serde::Serialize)]

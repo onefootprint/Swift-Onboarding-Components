@@ -3,9 +3,8 @@ use std::sync::Arc;
 use crate::{
     decision::{
         features::risk_signals::{risk_signal_group_struct::Doc, save_risk_signals, RiskSignalGroupStruct},
-        tests::test_helpers,
-        vendor,
-        vendor::vendor_trait::MockVendorAPICall,
+        tests::test_helpers::{self, FixtureData},
+        vendor::{self, vendor_trait::MockVendorAPICall},
     },
     errors::ApiResult,
     ApiError, State,
@@ -151,7 +150,9 @@ pub async fn setup_data(
     obc_opts: ObConfigurationOpts,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
-    let (tenant, wf, _, _, obc) = test_helpers::create_kyc_user_and_wf(state, obc_opts, fixture_result).await;
+    let FixtureData {
+        t: tenant, wf, obc, ..
+    } = test_helpers::create_kyc_user_and_wf(state, obc_opts, fixture_result).await;
 
     let tid = tenant.id.clone();
     let tu = state

@@ -246,7 +246,7 @@ mod test {
     use super::*;
     use crate::{
         decision::{
-            tests::test_helpers::create_kyc_user_and_wf,
+            tests::test_helpers::{create_kyc_user_and_wf, FixtureData},
             vendor::vendor_trait::{MockVendorAPICall, VendorAPICall, VendorAPIResponse},
         },
         State,
@@ -287,7 +287,9 @@ mod test {
             error: e.into(),
         });
 
-        let (_, wf, uv, su, _) = create_kyc_user_and_wf(
+        let FixtureData {
+            wf, v: uv, sv: su, ..
+        } = create_kyc_user_and_wf(
             state,
             ObConfigurationOpts {
                 is_live: true,

@@ -33,7 +33,7 @@ use newtypes::{
 use super::IncodeContext;
 use crate::{
     decision::{
-        tests::test_helpers::create_kyc_user_and_wf,
+        tests::test_helpers::{create_kyc_user_and_wf, FixtureData},
         vendor::incode::{get_config_id, images::*, IncodeStateMachine},
     },
     State,
@@ -68,7 +68,14 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             ..Default::default()
         }
     };
-    let (tenant, wf, uv, su, obc) = create_kyc_user_and_wf(state, obc_opts, None).await;
+    let FixtureData {
+        t: tenant,
+        wf,
+        v: uv,
+        sv: su,
+        obc,
+        ..
+    } = create_kyc_user_and_wf(state, obc_opts, None).await;
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
 
@@ -313,7 +320,14 @@ async fn test_fail(state: &State, is_selfie: bool) {
             ..Default::default()
         }
     };
-    let (tenant, wf, uv, su, obc) = create_kyc_user_and_wf(state, obc_opts, None).await;
+    let FixtureData {
+        t: tenant,
+        wf,
+        v: uv,
+        sv: su,
+        obc,
+        ..
+    } = create_kyc_user_and_wf(state, obc_opts, None).await;
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
 

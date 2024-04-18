@@ -25,6 +25,12 @@ pub struct DocumentRequest {
     pub config: DocumentRequestConfig,
 }
 
+#[derive(derive_more::From)]
+pub enum DocumentRequestIdentifier<'a> {
+    Id(&'a DocumentRequestId),
+    Kind(DocumentRequestKind),
+}
+
 impl DocumentRequest {
     #[tracing::instrument("DocumentRequest::create", skip_all)]
     pub fn create(conn: &mut PgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
@@ -78,12 +84,23 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument("DocumentRequest::get", skip_all)]
-    pub fn get(conn: &mut PgConn, wf_id: &WorkflowId, kind: DocumentRequestKind) -> DbResult<Option<Self>> {
-        let result = document_request::table
+    pub fn get<'a, T: Into<DocumentRequestIdentifier<'a>>>(
+        conn: &mut PgConn,
+        wf_id: &WorkflowId,
+        id: T,
+    ) -> DbResult<Option<Self>> {
+        let mut query = document_request::table
             .filter(document_request::workflow_id.eq(wf_id))
-            .filter(document_request::kind.eq(kind))
-            .first(conn)
-            .optional()?;
+            .into_boxed();
+        match id.into() {
+            DocumentRequestIdentifier::Id(id) => {
+                query = query.filter(document_request::id.eq(id));
+            }
+            DocumentRequestIdentifier::Kind(kind) => {
+                query = query.filter(document_request::kind.eq(kind));
+            }
+        }
+        let result = query.first(conn).optional()?;
         Ok(result)
     }
 
@@ -97,7 +114,8 @@ impl DocumentRequest {
 
     #[tracing::instrument("DocumentRequest::get_or_create", skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
-        if let Some(existing) = Self::get(conn, &args.workflow_id, (&args.config).into())? {
+        let kind = DocumentRequestKind::from(&args.config);
+        if let Some(existing) = Self::get(conn, &args.workflow_id, kind)? {
             // TODO FP-5894: this is a bit lacking in specificity could be a doc req that is _not_ a selfie, but should be a selfie based on app logic
             Ok(existing)
         } else {

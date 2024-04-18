@@ -29,9 +29,12 @@ use newtypes::{
     RiskSignalGroupKind, ScopedVaultId, Selfie, TenantId, WorkflowFixtureResult,
 };
 
-use super::document_test_utils::{
-    mock_enclave_s3_client, mock_ff_client, mock_incode_request, mock_s3_put_object, DocumentUploadTestCase,
-    UserKind,
+use super::{
+    document_test_utils::{
+        mock_enclave_s3_client, mock_ff_client, mock_incode_request, mock_s3_put_object,
+        DocumentUploadTestCase, UserKind,
+    },
+    test_helpers::FixtureData,
 };
 
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]
@@ -105,12 +108,12 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         UserKind::Sandbox(_) => Some(WorkflowFixtureResult::Pass), // not important here
         UserKind::Demo => todo!(),
     };
-    let (t, wf, v, sv, _obc) =
+    let FixtureData { t, wf, v, sv, dr, .. } =
         super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
 
     // Save proof of SSN doc req
     let doc_kind: DocumentRequestKind = test_case.document_type.into();
-    if !doc_kind.is_identity() {
+    let dr = if !doc_kind.is_identity() {
         let config = match doc_kind {
             DocumentRequestKind::Identity => DocumentRequestConfig::Identity {
                 collect_selfie: false,
@@ -131,11 +134,14 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
             .db_pool
             .db_query(move |conn| DocumentRequest::create(conn, args))
             .await
-            .unwrap();
-    }
+            .unwrap()
+    } else {
+        dr.unwrap()
+    };
 
     let wf_id = wf.id.clone();
     let id_doc_req = CreateIdentityDocumentRequest {
+        request_id: Some(dr.id),
         document_type: test_case.document_type,
         country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: test_case.identity_doc_fixture(),

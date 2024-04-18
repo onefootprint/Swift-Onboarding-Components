@@ -1,4 +1,7 @@
-use super::document_test_utils::{mock_ff_client, mock_s3_put_object, UserKind};
+use super::{
+    document_test_utils::{mock_ff_client, mock_s3_put_object, UserKind},
+    test_helpers::FixtureData,
+};
 use crate::{
     decision::{self, document::meta_headers::MetaHeaders},
     errors::onboarding::OnboardingError,
@@ -41,10 +44,12 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
         UserKind::Sandbox(_) => Some(WorkflowFixtureResult::Pass), // not important here
         UserKind::Demo => todo!(),
     };
-    let (t, wf, _v, sv, _obc) =
+    let FixtureData { t, wf, sv, dr, .. } =
         super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
+    let dr = dr.unwrap();
 
     let id_doc_req = CreateIdentityDocumentRequest {
+        request_id: Some(dr.id),
         document_type: IdDocKind::DriversLicense,
         country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
@@ -120,52 +125,6 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
 #[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass))]
 #[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Real))]
 #[tokio::test]
-async fn test_require_doc_request(state: &mut State, user_kind: UserKind) {
-    let obc_opts = ObConfigurationOpts {
-        // no doc req created
-        must_collect_data: vec![],
-        is_live: matches!(user_kind, UserKind::Live),
-        ..Default::default()
-    };
-    let user_fixture_result = match user_kind {
-        UserKind::Live => None,
-        UserKind::Sandbox(_) => Some(WorkflowFixtureResult::Pass), // not important here
-        UserKind::Demo => todo!(),
-    };
-    let (t, wf, _v, sv, _obc) =
-        super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
-
-    let id_doc_req = CreateIdentityDocumentRequest {
-        document_type: IdDocKind::DriversLicense,
-        country_code: Some(Iso3166TwoDigitCountryCode::US),
-        fixture_result: user_kind.identity_doc_fixture(),
-        skip_selfie: None,
-        device_type: None,
-    };
-
-    mock_ff_client(state, user_kind.identity_doc_fixture(), t.id.clone());
-    let identity_doc_res = decision::document::route_handler::handle_document_create(
-        state,
-        id_doc_req,
-        t.id.clone(),
-        sv.id.clone(),
-        wf.id.clone(),
-    )
-    .await;
-
-    // we are expecting a no doc request error
-    let err = identity_doc_res.err().unwrap().into_kind();
-    match err {
-        ApiErrorKind::OnboardingError(OnboardingError::NoDocumentRequestFound) => {}
-        _ => panic!("wrong error found when trying to uploading a doc with no doc req"),
-    }
-}
-
-/// Test that we only allow going through doc flow if there's a pending document request
-#[test_state_case(UserKind::Live)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass))]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Real))]
-#[tokio::test]
 async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     let obc_opts = ObConfigurationOpts {
         // restrict to DL
@@ -182,12 +141,15 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
         UserKind::Sandbox(_) => Some(WorkflowFixtureResult::Pass), // not important here
         UserKind::Demo => todo!(),
     };
-    let (t, wf, _v, sv, _obc) =
+    let FixtureData { t, wf, sv, dr, .. } =
         super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
+    let dr = dr.unwrap();
+
     //
     // Add Passport, but we only accept DL
     //
     let id_doc_req = CreateIdentityDocumentRequest {
+        request_id: Some(dr.id.clone()),
         document_type: IdDocKind::Passport,
         country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
@@ -214,6 +176,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     // Add DL, but wrong country
     //
     let id_doc_req = CreateIdentityDocumentRequest {
+        request_id: Some(dr.id.clone()),
         document_type: IdDocKind::DriversLicense,
         country_code: Some(Iso3166TwoDigitCountryCode::ZA),
         fixture_result: user_kind.identity_doc_fixture(),

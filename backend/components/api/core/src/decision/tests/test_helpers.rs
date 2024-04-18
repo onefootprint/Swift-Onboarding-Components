@@ -1,6 +1,7 @@
 use db::{
     models::{
         contact_info::{ContactInfo, VerificationLevel},
+        document_request::DocumentRequest,
         insight_event::CreateInsightEvent,
         ob_configuration::ObConfiguration,
         scoped_vault::ScopedVault,
@@ -12,8 +13,8 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    BusinessDataKind, DataIdentifier, IdentityDataKind, PiiString, ScopedVaultId, VaultKind,
-    WorkflowFixtureResult, WorkflowSource,
+    BusinessDataKind, DataIdentifier, DocumentRequestKind, IdentityDataKind, PiiString, ScopedVaultId,
+    VaultKind, WorkflowFixtureResult, WorkflowSource,
 };
 
 use crate::{
@@ -108,13 +109,35 @@ pub async fn create_user_and_onboarding(
         .unwrap()
 }
 
+pub struct FixtureData {
+    pub t: Tenant,
+    pub wf: Workflow,
+    pub v: Vault,
+    pub sv: ScopedVault,
+    pub obc: ObConfiguration,
+    pub dr: Option<DocumentRequest>,
+}
+
 pub async fn create_kyc_user_and_wf(
     state: &State,
     obc_opts: ObConfigurationOpts,
     fixture_result: Option<WorkflowFixtureResult>,
-) -> (Tenant, Workflow, Vault, ScopedVault, ObConfiguration) {
+) -> FixtureData {
     let (t, wf, v, sv, obc, _) = create_user_and_onboarding(state, obc_opts, fixture_result, false).await;
-    (t, wf, v, sv, obc)
+    let wf_id = wf.id.clone();
+    let dr = state
+        .db_pool
+        .db_query(move |conn| DocumentRequest::get(conn, &wf_id, DocumentRequestKind::Identity))
+        .await
+        .unwrap();
+    FixtureData {
+        t,
+        wf,
+        v,
+        sv,
+        obc,
+        dr,
+    }
 }
 
 pub async fn create_kyb_user_and_onboarding(
