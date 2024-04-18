@@ -54,7 +54,11 @@ impl TaskExecutionUpdate {
 
 impl TaskExecution {
     #[tracing::instrument("TaskExecution::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut PgConn, args: Vec<TaskExecutionCreateArgs>, now: DateTime<Utc>) -> DbResult<Vec<Self>> {
+    pub fn bulk_create(
+        conn: &mut PgConn,
+        args: Vec<TaskExecutionCreateArgs>,
+        now: DateTime<Utc>,
+    ) -> DbResult<Vec<Self>> {
         let new_rows: Vec<NewTaskExecution> = args
             .into_iter()
             .map(|a| NewTaskExecution {

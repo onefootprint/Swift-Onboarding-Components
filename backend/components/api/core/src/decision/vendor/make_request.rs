@@ -7,8 +7,7 @@ use super::{vendor_trait::VendorAPIResponse, *};
 use crate::{errors::ApiError, vendor_clients::VendorClient, State};
 use db::{
     models::{
-        ob_configuration::ObConfiguration,
-        vault::Vault, verification_request::VerificationRequest,
+        ob_configuration::ObConfiguration, vault::Vault, verification_request::VerificationRequest,
         verification_result::VerificationResult,
     },
     DbError,
@@ -23,7 +22,6 @@ use idv::{
     ParsedResponse, VendorResponse,
 };
 use newtypes::{IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
-
 
 // For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call, and returns the success or error response
 #[tracing::instrument(skip(state, tvc))]
@@ -86,14 +84,7 @@ pub async fn make_idv_vendor_call_save_vreq(
 
     Ok((
         vreq,
-        send_idv_request(
-            state,
-            tvc,
-            vendor_api,
-            idv_data,
-            ob_configuration_key,
-        )
-        .await,
+        send_idv_request(state, tvc, vendor_api, idv_data, ob_configuration_key).await,
     ))
 }
 
@@ -180,7 +171,6 @@ pub async fn send_idv_request(
     }
     .map_err(|e| VendorAPIError { vendor_api, error: e })
 }
-
 
 #[tracing::instrument(skip_all)]
 pub async fn send_twilio_lookupv2_request(
@@ -372,14 +362,7 @@ pub async fn make_idv_request(
         "Sending verification request"
     );
 
-    let vendor_response = send_idv_request(
-        state,
-        tvc,
-        vendor_api,
-        idv_data,
-        ob_configuration_key,
-    )
-    .await?;
+    let vendor_response = send_idv_request(state, tvc, vendor_api, idv_data, ob_configuration_key).await?;
 
     Ok(vendor_response)
 }
@@ -405,26 +388,17 @@ pub async fn make_vendor_requests(
 
     let obc_key = state
         .db_pool
-        .db_query(
-            move |conn| -> Result<ObConfigurationKey, DbError> {
-                let obc_key = ObConfiguration::get(conn, &wfid)?.0.key;
+        .db_query(move |conn| -> Result<ObConfigurationKey, DbError> {
+            let obc_key = ObConfiguration::get(conn, &wfid)?.0.key;
 
-                Ok(obc_key)
-            },
-        )
+            Ok(obc_key)
+        })
         .await?;
 
     let raw_futures_with_vendors = requests_with_data.into_iter().map(|(r, data)| {
         (
             r.clone(),
-            make_idv_request(
-                state,
-                &tvc,
-                r.vendor_api,
-                data,
-                obc_key.clone(),
-                wf_id,
-            ),
+            make_idv_request(state, &tvc, r.vendor_api, data, obc_key.clone(), wf_id),
         )
     });
 

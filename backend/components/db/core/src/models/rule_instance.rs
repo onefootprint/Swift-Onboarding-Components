@@ -105,7 +105,6 @@ pub struct MultiRuleUpdate {
     pub updates: Vec<RuleInstanceUpdate>,
 }
 
-
 impl RuleInstance {
     #[tracing::instrument("RuleInstance::bulk_edit", skip_all)]
     pub fn bulk_edit(
@@ -517,7 +516,6 @@ mod tests {
                 .version
         );
     }
-
 
     #[db_test]
     fn test_rule_instance_references_list(conn: &mut TestPgConn) {

@@ -58,7 +58,6 @@ impl ListEntryCreation {
             .values(new)
             .get_result::<Self>(conn.conn())?;
 
-
         NewAuditEvent {
             id: AuditEventId::generate(),
             tenant_id: tenant_id.clone(),

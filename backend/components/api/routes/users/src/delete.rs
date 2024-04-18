@@ -18,7 +18,6 @@ use macros::route_alias;
 use newtypes::{AuditEventDetail, AuditEventId, DbActor};
 use paperclip::actix::{self, api_v2_operation, web};
 
-
 #[route_alias(actix::delete(
     "/businesses/{fp_bid}",
     tags(Businesses, Deprecated),

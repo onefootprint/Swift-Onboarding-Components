@@ -39,7 +39,8 @@ pub async fn create_list(
         .db_transaction(move |conn| -> ApiResult<_> {
             let tenant = Tenant::get(conn, &tenant_id)?;
             if List::find(conn, &tenant_id, is_live, &name, &alias)?.is_some() {
-                return Err(ValidationError("List with that name already exists").into()); // AssertionError? something else?
+                return Err(ValidationError("List with that name already exists").into());
+                // AssertionError? something else?
             }
 
             let (e_data_key, sealing_key) =
@@ -81,7 +82,6 @@ pub async fn create_list(
             Ok((list, entries_count))
         })
         .await?;
-
 
     ResponseData::ok(api_wire_types::List::from_db((list, entries_count, false))).json()
 }

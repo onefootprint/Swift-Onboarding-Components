@@ -531,7 +531,6 @@ impl VendorAPIResponse for IncodeResponse<UpdatedWatchlistResultResponse> {
     }
 }
 
-
 #[async_trait]
 impl VendorAPICall<IncodeCurpValidationRequest, IncodeResponse<CurpValidationResponse>, IncodeError>
     for FootprintVendorHttpClient
@@ -568,7 +567,6 @@ impl VendorAPIResponse for IncodeResponse<CurpValidationResponse> {
         ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a IncodeRawResponse again ?? idk i forget
     }
 }
-
 
 #[async_trait]
 impl

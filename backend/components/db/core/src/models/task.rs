@@ -4,7 +4,9 @@ use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::task;
 use diesel::{
-    prelude::*, sql_query, sql_types::{BigInt, Text, Timestamptz}
+    prelude::*,
+    sql_query,
+    sql_types::{BigInt, Text, Timestamptz},
 };
 use newtypes::{Locked, TaskData, TaskExecutionId, TaskId, TaskKind, TaskStatus};
 
@@ -22,7 +24,7 @@ pub struct Task {
     pub status: TaskStatus,
     pub num_attempts: i32,
     pub max_lease_duration_s: Option<i32>,
-    pub last_leased_at: Option<DateTime<Utc>>
+    pub last_leased_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -34,7 +36,7 @@ pub struct NewTask {
     pub status: TaskStatus,
     pub num_attempts: i32,
     pub max_lease_duration_s: Option<i32>,
-    pub last_leased_at: Option<DateTime<Utc>>
+    pub last_leased_at: Option<DateTime<Utc>>,
 }
 
 pub struct TaskCreateArgs {
@@ -62,7 +64,7 @@ impl Task {
             status: TaskStatus::Pending,
             num_attempts: 0,
             max_lease_duration_s: Some(TaskKind::from(task_data).max_lease_duration().num_seconds() as i32),
-            last_leased_at: None
+            last_leased_at: None,
         };
         let result = diesel::insert_into(task::table)
             .values(new_task)
@@ -80,8 +82,10 @@ impl Task {
                 task_data: a.task_data.clone(),
                 status: TaskStatus::Pending,
                 num_attempts: 0,
-                max_lease_duration_s: Some(TaskKind::from(a.task_data).max_lease_duration().num_seconds() as i32),
-                last_leased_at: None
+                max_lease_duration_s: Some(
+                    TaskKind::from(a.task_data).max_lease_duration().num_seconds() as i32
+                ),
+                last_leased_at: None,
             })
             .collect();
         let res = diesel::insert_into(task::table)
@@ -307,7 +311,7 @@ mod tests {
             })
             .await
             .unwrap();
-    }    
+    }
 
     #[test_db_pool]
     async fn poll_over_leased(db_pool: TestDbPool) {
@@ -334,9 +338,9 @@ mod tests {
             .await
             .unwrap();
 
-            std::thread::sleep(std::time::Duration::from_secs(3));
-            db_pool
-                .db_transaction(move |conn| -> DbResult<()> {
+        std::thread::sleep(std::time::Duration::from_secs(3));
+        db_pool
+            .db_transaction(move |conn| -> DbResult<()> {
                 // tasks now past their max lease duration and should be polled again, num_attempts incremented, and new task_execution's written
                 let repolled_tasks = Task::poll(conn, 2, None)?;
                 assert!(have_same_elements(
@@ -358,7 +362,4 @@ mod tests {
             .await
             .unwrap();
     }
-
-
 }
-

@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-
 use idv::idology::{
     common::response::{IDologyQualifiers, WarmAddressType},
     expectid::response::{ExpectIDResponse, PaWatchlistHit},

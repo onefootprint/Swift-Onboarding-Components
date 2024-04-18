@@ -240,7 +240,6 @@ pub struct VendorResponse {
     pub raw_response: PiiJsonValue,
 }
 
-
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("IDology error: {0}")]

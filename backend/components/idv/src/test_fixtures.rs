@@ -6586,7 +6586,6 @@ pub fn incode_watchlist_result_response_yes_hits() -> serde_json::Value {
     })
 }
 
-
 pub fn incode_curp_validation_good_curp() -> serde_json::Value {
     serde_json::json!({
         "success": true,
@@ -6657,7 +6656,6 @@ pub fn incode_curp_validation_bad_curp() -> serde_json::Value {
         "renapo_valid": false
     })
 }
-
 
 #[derive(Default)]
 pub struct NeuroTestOpts {

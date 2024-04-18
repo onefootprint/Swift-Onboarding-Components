@@ -27,7 +27,6 @@ pub fn get(
     })))
 }
 
-
 #[api_v2_operation(
     tags(User, Hosted),
     description = "Create a new token with the requested scopes using the permissions granted by the existing token. Used to create a secondary token with more limited scope. The new token's expiry time is the same as the old token's"

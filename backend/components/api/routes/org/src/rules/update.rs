@@ -72,7 +72,6 @@ pub async fn update_rule(
     ResponseData::ok(api_wire_types::Rule::from_db(rule)).json()
 }
 
-
 #[api_v2_operation(
     description = "Performs 1 or more edits (additions, deletions, edits) to rules for the playbooks",
     tags(Playbooks, Organization, Private, Rules)
@@ -108,7 +107,6 @@ pub async fn multi_update_rules(
 
     ResponseData::ok(rules.into_iter().map(api_wire_types::Rule::from_db).collect_vec()).json()
 }
-
 
 fn validate_request(
     conn: &mut PgConn,

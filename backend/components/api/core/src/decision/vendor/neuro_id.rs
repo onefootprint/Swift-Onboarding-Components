@@ -29,7 +29,6 @@ use super::{
     verification_result::{SaveVerificationResultArgs, ShouldSaveVerificationRequest},
 };
 
-
 impl SaveVerificationResultArgs {
     pub fn new_for_neuro(
         request_result: &Result<NeuroApiResponse, idv::neuro_id::error::Error>,
@@ -74,7 +73,6 @@ impl SaveVerificationResultArgs {
         }
     }
 }
-
 
 #[tracing::instrument(skip(state, di))]
 pub async fn run_neuro_call(
@@ -140,7 +138,6 @@ pub async fn run_neuro_call(
     // save event for metrics/dupes/user insights
     save_neuro_event(state, &parsed, t_id, id, &di.scoped_vault_id, wf_id, &vres_id).await?;
 
-
     let vendor_result = VendorResult {
         response: VendorResponse {
             response: ParsedResponse::NeuroIdAnalytics(parsed),
@@ -152,7 +149,6 @@ pub async fn run_neuro_call(
 
     Ok(Some(vendor_result))
 }
-
 
 async fn save_neuro_event(
     state: &State,

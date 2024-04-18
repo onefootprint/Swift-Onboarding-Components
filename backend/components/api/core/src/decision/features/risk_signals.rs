@@ -256,7 +256,6 @@ impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
     }
 }
 
-
 #[derive(Clone, Default)]
 pub struct RiskSignalsForDecision {
     pub kyc: Option<RiskSignalGroupStruct<Kyc>>,

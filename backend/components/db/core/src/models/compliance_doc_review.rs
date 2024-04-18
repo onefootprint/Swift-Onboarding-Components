@@ -9,7 +9,6 @@ use newtypes::{
 
 use super::compliance_doc::ComplianceDoc;
 
-
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = compliance_doc_review)]
 pub struct ComplianceDocReview {
@@ -61,7 +60,6 @@ impl<'a> NewComplianceDocReview<'a> {
             .get_result(conn.conn())?)
     }
 }
-
 
 impl ComplianceDocReview {
     #[tracing::instrument("ComplianceDocReview::get_active", skip_all)]

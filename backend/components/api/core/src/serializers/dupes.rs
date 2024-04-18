@@ -8,7 +8,6 @@ use crate::{
 };
 use newtypes::DupeKind;
 
-
 pub type SameTenantDupeDetail<'a> = (
     Vec<DupeKind>,
     TenantVw<Any>,

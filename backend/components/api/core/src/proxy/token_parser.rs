@@ -39,7 +39,11 @@ impl<'a> ProxyTokenParser<'a> {
         Ok((parser, tokens))
     }
 
-    pub fn parse_and_log_fp_id(body: &'a str, global_fp_id: Option<FpId>, root_span: RootSpan) -> ApiResult<(ProxyTokenParser, Vec<ProxyToken>)> {
+    pub fn parse_and_log_fp_id(
+        body: &'a str,
+        global_fp_id: Option<FpId>,
+        root_span: RootSpan,
+    ) -> ApiResult<(ProxyTokenParser, Vec<ProxyToken>)> {
         let (parser, tokens) = Self::parse(body, global_fp_id)?;
         let fp_ids = tokens.iter().map(|pt| &pt.fp_id).unique().collect_vec();
         if fp_ids.len() == 1 {
@@ -47,7 +51,7 @@ impl<'a> ProxyTokenParser<'a> {
                 root_span.record("fp_id", fp_id.to_string());
             }
         }
-        Ok((parser ,tokens))
+        Ok((parser, tokens))
     }
 
     #[tracing::instrument("ProxyTokenParser::detokenize_body", skip_all)]

@@ -3,7 +3,6 @@ use diesel::{
     Queryable,
 };
 
-
 /// In postgres, all Array fields can have null values.
 /// In practice, most things in our application don't want arrays with null values. For fields
 /// where we use Vec<T> instead of Vec<Option<T>>, we'll never write null values and want to only
@@ -83,7 +82,6 @@ impl<T> From<OptionalNonNullVec<T>> for Option<Vec<T>> {
         value.0.map(|x| x.into())
     }
 }
-
 
 /// Expected more fields then present in the current row while deserializing results
 #[derive(Debug, Clone, Copy)]

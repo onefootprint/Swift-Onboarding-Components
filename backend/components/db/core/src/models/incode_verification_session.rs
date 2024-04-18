@@ -256,7 +256,6 @@ impl IncodeVerificationSession {
     }
 }
 
-
 fn starting_state_for_purpose(purpose: &IncodeVerificationSessionPurpose) -> IncodeVerificationSessionState {
     match purpose {
         IncodeVerificationSessionPurpose::Identity => IncodeVerificationSessionState::StartOnboarding,

@@ -128,7 +128,6 @@ impl std::fmt::Display for ErrorWithCode {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::ErrorWithCode;

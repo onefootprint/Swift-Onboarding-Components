@@ -62,7 +62,6 @@ pub struct UpdateTenantAndroidAppMetaRequest {
     pub integrity_decryption_key: Option<String>,
 }
 
-
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct CreateTenantIosAppMetaRequest {
     pub team_id: String,

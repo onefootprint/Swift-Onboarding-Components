@@ -45,7 +45,6 @@ use crate::{
     State,
 };
 
-
 // Watchlist check saves Vreq first, so we wrap existing incode utils to just save vreq
 // For future us: This is just because we need IdvData, and we create that from `build_idv_data_from_verification_request` which requires a Vreq
 // We could just refactor so that the fn just takes a seqno, rather than a vreq
@@ -73,7 +72,6 @@ async fn save_verification_result_for_watchlist_check<
 
     Ok(vres_id)
 }
-
 
 #[tracing::instrument(skip(state, user_vault_public_key, credentials))]
 async fn call_watchlist_result(

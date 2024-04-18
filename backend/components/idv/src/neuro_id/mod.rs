@@ -6,7 +6,6 @@ pub mod response;
 
 pub type NeuroApiResult<T> = Result<T, error::Error>;
 
-
 pub struct NeuroIdAnalyticsRequest {
     pub credentials: NeuroIdCredentials,
     pub id: NeuroIdentityId,

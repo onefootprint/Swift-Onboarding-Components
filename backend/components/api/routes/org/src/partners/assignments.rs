@@ -53,7 +53,6 @@ pub async fn post(
             }
             .create(conn, &doc)?;
 
-
             Ok(())
         })
         .await?;

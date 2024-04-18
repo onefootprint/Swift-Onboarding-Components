@@ -31,6 +31,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(neuro_id::get)
         .service(config::get);
 
-
     config::configure_get_aliases(config);
 }

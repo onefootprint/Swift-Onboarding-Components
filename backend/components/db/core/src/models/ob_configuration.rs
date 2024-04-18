@@ -66,7 +66,6 @@ pub struct ObConfiguration {
     pub documents_to_collect: Option<Vec<DocumentRequestConfig>>,
 }
 
-
 impl ObConfiguration {
     // returns a map of country -> supported document types
     pub fn supported_country_mapping_for_document(
@@ -1336,7 +1335,6 @@ mod tests {
             obc.enhanced_aml
         );
     }
-
 
     #[db_test]
     pub fn test_document_and_countries_roundtrip(conn: &mut TestPgConn) {

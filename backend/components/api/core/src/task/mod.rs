@@ -151,7 +151,8 @@ async fn update_task(
     let te_id = task_execution_id.clone();
     db_pool
         .db_transaction(move |conn| -> DbResult<Task> {
-            let updated_task = Task::update_running_task(conn, &task_id, task_status, &te_id, task_execution_update)?;
+            let updated_task =
+                Task::update_running_task(conn, &task_id, task_status, &te_id, task_execution_update)?;
             Ok(updated_task)
         })
         .await

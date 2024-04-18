@@ -69,7 +69,6 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Document);
 
-
         Self {
             name,
             key,

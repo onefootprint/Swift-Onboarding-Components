@@ -9,7 +9,6 @@ use db::{models::tenant_android_app_meta::TenantAndroidAppMeta, DbResult};
 use newtypes::TenantAndroidAppMetaId;
 use paperclip::actix::{self, api_v2_operation, web};
 
-
 #[api_v2_operation(
     description = "Delete a tenant android app metadata for the organization.",
     tags(OrgSettings, Organization, Private)

@@ -50,7 +50,6 @@ pub struct CustomDocumentConfig {
     // pub accepted_types: Vec<DocumentType>, // image? pdf?
 }
 
-
 impl DocumentRequestKind {
     pub fn is_identity(&self) -> bool {
         matches!(self, DocumentRequestKind::Identity)

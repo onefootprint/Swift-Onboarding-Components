@@ -147,7 +147,6 @@ impl DocumentRequest {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct NewDocumentRequestArgs {
     pub scoped_vault_id: ScopedVaultId,

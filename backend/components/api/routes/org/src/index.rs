@@ -78,7 +78,6 @@ async fn patch(
     let support_phone = clear_or_set(clear_support_phone, support_phone);
     let support_website = clear_or_set(clear_support_website, support_website);
 
-
     let update_tenant = UpdateTenant {
         name,
         logo_url: None,

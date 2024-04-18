@@ -8,7 +8,6 @@ pub struct TenantLoginRequest {
     pub request_org_id: Option<TenantId>,
 }
 
-
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct PartnerLoginRequest {
     pub code: String,

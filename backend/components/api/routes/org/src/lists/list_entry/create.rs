@@ -87,7 +87,6 @@ pub async fn create_list_entry(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-
     ResponseData::ok(
         decrypted_list_entries
             .into_iter()

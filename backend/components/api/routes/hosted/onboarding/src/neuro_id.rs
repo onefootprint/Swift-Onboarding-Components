@@ -7,7 +7,6 @@ use api_wire_types::hosted::neuro_id::NeuroIdentityIdResponse;
 use newtypes::{NeuroIdentityId, UserAuthScope};
 use paperclip::actix::{self, api_v2_operation, web};
 
-
 #[api_v2_operation(
     tags(Onboarding, Hosted),
     description = "Retrieve identifier used for NeuroId"

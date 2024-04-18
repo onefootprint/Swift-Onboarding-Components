@@ -43,7 +43,6 @@ impl Ssn9 {
     }
 }
 
-
 pub struct Ssn4(PiiString);
 
 impl Ssn4 {

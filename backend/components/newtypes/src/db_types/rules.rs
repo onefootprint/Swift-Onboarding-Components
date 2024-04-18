@@ -275,7 +275,6 @@ mod tests {
         let all_action_len = RuleAction::all_rule_actions().len();
         let expected = ra_iter_len + suk_iter_len;
 
-
         assert_eq!(all_action_len, 7);
         assert_eq!(all_action_len, expected);
     }

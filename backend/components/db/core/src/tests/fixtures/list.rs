@@ -17,7 +17,6 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> List {
     .unwrap()
 }
 
-
 pub fn create_in_memory(kind: ListKind) -> List {
     List {
         id: Default::default(),

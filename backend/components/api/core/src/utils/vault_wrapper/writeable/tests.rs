@@ -362,7 +362,6 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
     }
 }
 
-
 impl<Type> WriteableVw<Type> {
     /// Shorthand to add data to a vault in tests
     pub fn patch_data_test(

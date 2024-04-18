@@ -488,7 +488,6 @@ impl MiddeskState<Complete> {
             })
             .await?;
 
-
         // TODO: make a version of this method for a single vreq/vres
         let vendor_result = vendor_result::VendorResult::from_verification_results_for_onboarding(
             vec![(

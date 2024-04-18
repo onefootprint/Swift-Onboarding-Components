@@ -9,7 +9,6 @@ mod guard;
 mod user_wf;
 pub use user_wf::*;
 
-
 /// A helper trait to extract a user vault id on combined types
 pub trait UserAuth {
     fn user_vault_id(&self) -> &VaultId;

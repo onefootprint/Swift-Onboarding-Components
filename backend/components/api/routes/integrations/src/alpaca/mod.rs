@@ -1,7 +1,6 @@
 mod account;
 pub(crate) mod cip;
 
-
 use paperclip::actix::web::{self};
 
 pub fn routes(config: &mut web::ServiceConfig) {

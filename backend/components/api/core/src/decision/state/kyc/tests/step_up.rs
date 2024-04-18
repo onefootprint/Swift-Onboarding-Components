@@ -205,7 +205,6 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     assert_eq!(obd.unwrap().status, DecisionStatus::Pass)
 }
 
-
 // Simulate collecting ID Doc
 // Having a rule to runs on the ID Doc
 // Then stepping up again
@@ -386,7 +385,6 @@ async fn test_multi_stage_step_up(state: &mut State) {
         .await
         .unwrap();
 
-
     let (wf, mut wfe, _, _obd, _) = query_data(state, &svid, &wfid).await;
     let latest_wfe = wfe.pop().unwrap();
     assert_eq!(
@@ -448,7 +446,6 @@ async fn test_multi_stage_step_up(state: &mut State) {
         )
         .await
         .unwrap();
-
 
     let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);

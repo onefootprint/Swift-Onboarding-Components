@@ -22,7 +22,6 @@ pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
         .max()
         .unwrap_or(NeuroDecisionRiskLevel::Low);
 
-
     // For logging, this is Neuro's suggested decision for now (2024-04-12)
     // https://www.notion.so/onefootprint/2024-04-12-Neuro-Decision-Matrix-a374616605994b55aca0b804b3ed3bc6?pvs=4
     let overall_neuro_decision = match (behavior_decision, device_decision) {
@@ -52,13 +51,11 @@ pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
         _ => (),
     }
 
-
     // Add individual model FRCS
     res.flagged_signals()
         .iter()
         .flat_map(|signal| model_to_frc(&signal.model()))
         .for_each(|frc| frcs.push(frc));
-
 
     frcs.into_iter().collect()
 }
@@ -102,7 +99,6 @@ impl From<Model> for NeuroModelGroup {
         }
     }
 }
-
 
 impl From<Model> for NeuroDecisionRiskLevel {
     fn from(value: Model) -> Self {
@@ -159,13 +155,14 @@ fn model_to_frc(model: &Model) -> Vec<FRC> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use idv::{test_fixtures::{self, NeuroTestOpts}, tests::assert_have_same_elements};
+    use idv::{
+        test_fixtures::{self, NeuroTestOpts},
+        tests::assert_have_same_elements,
+    };
     use test_case::test_case;
-
 
     #[test_case(true, true, true, true, vec![FRC::BehaviorHighRisk,
         FRC::DeviceHighRisk,
@@ -194,7 +191,7 @@ mod tests {
         let raw = test_fixtures::neuro_id_success_response(opts);
         let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(raw).unwrap();
         let frcs = footprint_reason_codes(&parsed);
-        
+
         assert_have_same_elements(frcs, expected);
     }
 }

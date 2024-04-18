@@ -31,7 +31,6 @@ pub async fn generate_user_input_risk_signals(
 
     let mut reason_codes = user_input_based_risk_signals(vw, obc, &decrypted);
 
-
     if let Ok(declarations) = decrypted.get_di(InvestorProfileKind::Declarations) {
         let declarations: Vec<Declaration> = declarations.deserialize()?;
         if declarations.contains(&Declaration::AffiliatedWithUsBroker) {

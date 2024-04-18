@@ -32,7 +32,6 @@ pub async fn get(
         })
         .await?;
 
-
     let companies = summaries
         .values()
         .map(|summary| api_wire_types::ComplianceCompanySummary::try_from_db((summary, &counts)))

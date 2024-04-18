@@ -77,7 +77,6 @@ impl<Type> VaultWrapper<Type> {
     }
 }
 
-
 impl<Type> WriteableVw<Type> {
     /// Given the source user-scoped vault and destination tenant-scoped vault, assembles the
     /// ValidatedDataRequest that will prefill portable data into the destination vault
@@ -206,7 +205,6 @@ impl<Type> VaultWrapper<Type> {
         Ok(new_cdos)
     }
 }
-
 
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
 pub fn assert_allowed_for_vault<T>(request: &DataRequest<T>, kind: VaultKind) -> NtResult<()> {

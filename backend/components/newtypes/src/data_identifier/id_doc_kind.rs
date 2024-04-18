@@ -68,7 +68,6 @@ impl From<IdDocKind> for DocumentRequestKind {
     }
 }
 
-
 crate::util::impl_enum_string_diesel!(IdDocKind);
 
 impl IdDocKind {

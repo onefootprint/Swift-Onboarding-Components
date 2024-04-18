@@ -25,7 +25,6 @@ pub struct ComplianceDocAssignment {
     pub assigned_by_tenant_user_id: TenantUserId,
 }
 
-
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = compliance_doc_assignment)]
 pub struct NewComplianceDocAssignment<'a> {

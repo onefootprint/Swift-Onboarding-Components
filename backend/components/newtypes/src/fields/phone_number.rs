@@ -146,7 +146,6 @@ mod tests {
         phone_number.scrubbed().leak_to_string()
     }
 
-
     #[test_case("+1-415-123-1234" => "4151231234".to_owned(); "US")]
     #[test_case("+55 (12) 12345-1234" => "12123451234".to_owned(); "brazil")]
     #[test_case("+47 913 12 123" => "91312123".to_owned(); "norway")]

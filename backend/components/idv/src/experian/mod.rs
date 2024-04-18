@@ -44,7 +44,6 @@ pub fn normalize_name(s: &str) -> String {
     normalize_with_regex(s, &NAME_VALIDATION)
 }
 
-
 #[cfg(test)]
 mod tests {
     use test_case::test_case;

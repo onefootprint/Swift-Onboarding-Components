@@ -1,5 +1,7 @@
 use crate::*;
-use newtypes::{CollectedDataOption, DecisionStatus, ObConfigurationId, OnboardingDecisionId, RuleSetResultId};
+use newtypes::{
+    CollectedDataOption, DecisionStatus, ObConfigurationId, OnboardingDecisionId, RuleSetResultId,
+};
 
 /// Describes the outcome of an onboarding decision that took place on the user
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

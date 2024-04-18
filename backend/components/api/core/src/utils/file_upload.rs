@@ -87,7 +87,6 @@ pub async fn handle_file_upload(
     }
 }
 
-
 #[tracing::instrument(skip_all)]
 async fn handle_file_upload_inner(
     payload: &mut Multipart,

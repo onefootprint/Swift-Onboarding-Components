@@ -8,8 +8,7 @@ use chrono::{NaiveDateTime, Utc};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    DataIdentifier, FootprintReasonCode, IdDocKind, IdentityDataKind, PiiString, 
-    VerificationResultId,
+    DataIdentifier, FootprintReasonCode, IdDocKind, IdentityDataKind, PiiString, VerificationResultId,
 };
 
 #[derive(Default, Clone, PartialEq, Eq)]
@@ -85,7 +84,6 @@ pub struct IncodeDocumentFeatures {
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
     pub verification_result_id: VerificationResultId,
 }
-
 
 // Once we move RiskSignals to being computed at the time are handling the VRes, we can use this method.
 pub fn footprint_reason_codes(
@@ -220,7 +218,6 @@ pub fn reason_codes_from_score_response(
         .collect()
 }
 
-
 pub fn pii_matching_reason_codes_from_ocr_response(
     res: &FetchOCRResponse,
     vault_data: IncodeOcrComparisonDataFields,
@@ -316,7 +313,6 @@ fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintRe
         }
     })
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -655,7 +651,6 @@ mod tests {
             })
             .collect()
     }
-
 
     #[test_case(FetchOCRResponse { ..Default::default()} => None)]
     #[test_case(FetchOCRResponse { expire_at: Some(ScrubbedPiiString::from("1663459200000")), ..Default::default()} => Some(FootprintReasonCode::DocumentExpired))]

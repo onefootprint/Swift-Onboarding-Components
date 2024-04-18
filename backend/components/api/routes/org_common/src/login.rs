@@ -29,7 +29,6 @@ use workos::{
     KnownOrUnknown,
 };
 
-
 fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> ApiResult<WorkosAuthMethod> {
     // To protect against MagcicLink becoming a known type, check based on the string representation
     // of the connection type. Sadly, Display isn't implemented so have to check the serialization
@@ -41,7 +40,6 @@ fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> 
     };
     Ok(result)
 }
-
 
 pub async fn handle_login<T>(
     state: web::Data<State>,

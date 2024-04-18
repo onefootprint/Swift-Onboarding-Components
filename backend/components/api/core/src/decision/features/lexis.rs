@@ -133,7 +133,6 @@ fn name_match_codes(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) 
     vec![first_name_frc, last_name_frc, overall_name_frc]
 }
 
-
 fn address_match_code(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
     let address_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R30);
     match (nas.address_match, address_was_partial_match) {
@@ -173,7 +172,6 @@ fn phone_match_code(nap: &LexisNAP, risk_indicator_codes: &[RiskIndicatorCode]) 
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -206,7 +204,6 @@ mod tests {
         )
     }
 
-
     #[test_case(true, vec![] => FRC::AddressMatches)]
     #[test_case(true, vec![RIC::R73] => FRC::AddressMatches)]
     #[test_case(true, vec![RIC::R30] => FRC::AddressPartiallyMatches)]
@@ -223,7 +220,6 @@ mod tests {
             &ric,
         )
     }
-
 
     #[test_case(true, vec![] => FRC::SsnMatches)]
     #[test_case(true, vec![RIC::R39] => FRC::SsnMatches)]
@@ -258,7 +254,6 @@ mod tests {
             &ric,
         )
     }
-
 
     #[test_case(
         idv::test_fixtures::passing_lexis_flex_id_response(),

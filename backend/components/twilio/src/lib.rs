@@ -8,7 +8,6 @@ use reqwest_tracing::TracingMiddleware;
 use response::{decode_response, lookup::LookupResponse, message::Message};
 use std::time::Duration;
 
-
 pub mod error;
 pub mod request;
 pub mod response;
@@ -57,7 +56,6 @@ impl TwilioConfig {
         }
     }
 }
-
 
 #[derive(Clone)]
 pub struct Client {
@@ -248,7 +246,6 @@ impl Client {
         Ok(message)
     }
 }
-
 
 /// Add jitter of +- 10%
 pub fn jitter_10p(duration: Duration) -> Duration {

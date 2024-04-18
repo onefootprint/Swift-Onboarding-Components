@@ -9,7 +9,6 @@ use db::{models::tenant_ios_app_meta::TenantIosAppMeta, DbResult};
 use newtypes::TenantIosAppMetaId;
 use paperclip::actix::{self, api_v2_operation, web};
 
-
 #[api_v2_operation(
     description = "Delete a tenant iOS app metadata for the organization.",
     tags(OrgSettings, Organization, Private)

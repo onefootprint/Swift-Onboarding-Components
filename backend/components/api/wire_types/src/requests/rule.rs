@@ -1,7 +1,6 @@
 use crate::*;
 use newtypes::{RuleAction, RuleId};
 
-
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateRuleRequest {
     pub name: Option<String>,
@@ -35,7 +34,6 @@ pub struct EditRule {
     pub rule_id: RuleId,
     pub rule_expression: UnvalidatedRuleExpression,
 }
-
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct EvaluateRuleRequest {

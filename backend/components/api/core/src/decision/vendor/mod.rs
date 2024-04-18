@@ -21,7 +21,6 @@ pub mod vendor_result;
 pub mod vendor_trait;
 pub mod verification_result;
 
-
 pub fn get_vendor_apis_for_verification_requests(
     present_data_lifetime_kinds: &[IdentityDataKind],
     tenant_vendor_control: &TenantVendorControl,

@@ -218,7 +218,6 @@ fn get_stats(results: &[RuleEvalResult]) -> RuleEvalStats {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use newtypes::{FpId, OnboardingStatus, RuleAction};

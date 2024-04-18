@@ -15,7 +15,6 @@ pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, list_id: &ListId) -> L
     .unwrap()
 }
 
-
 pub fn create_in_memory() -> ListEntry {
     ListEntry {
         id: Default::default(),

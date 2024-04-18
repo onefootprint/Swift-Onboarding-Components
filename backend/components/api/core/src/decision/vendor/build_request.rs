@@ -254,7 +254,6 @@ pub async fn build_business_data_from_verification_request(
     Ok(bd)
 }
 
-
 #[cfg(test)]
 #[allow(unused)]
 mod tests {

@@ -5,7 +5,6 @@ pub struct IncodeGovernmentValidationRequest {
     pub credentials: IncodeCredentialsWithToken,
 }
 
-
 pub enum GovernmentValidationConfigByCountry {
     Mexico(MXRequestConfig),
 }

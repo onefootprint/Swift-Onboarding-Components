@@ -1,7 +1,6 @@
 use crate::incode::IncodeClientErrorCustomFailureReasons;
 use newtypes::{IncodeFailureReason, PiiString, ScrubbedPiiJsonValue, ScrubbedPiiString};
 
-
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct CurpValidationResponse {
@@ -31,7 +30,6 @@ pub struct CurpValidationResponse {
     pub error: Option<CurpError>,
 }
 
-
 // Not documented what any of these mean.
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -53,7 +51,6 @@ pub struct ProbationDocumentData {
     pub folio_carta: Option<ScrubbedPiiString>,
 }
 
-
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CurpError {
@@ -73,14 +70,12 @@ impl CurpError {
     }
 }
 
-
 impl IncodeClientErrorCustomFailureReasons for CurpValidationResponse {
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         // TODO: invalid curp is here
         None
     }
 }
-
 
 mod tests {
 

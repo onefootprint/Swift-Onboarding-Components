@@ -46,7 +46,6 @@ impl ExecuteTasks {
             }
         });
 
-
         let mut interval = time::interval(poll_period);
         // If there's a batch that takes longer than the poll_period, the max task throughput will
         // not burst following that slow batch.

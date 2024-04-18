@@ -3,7 +3,6 @@ use std::{fmt::Display, str::Utf8Error};
 use crate::{api_schema_helper::string_api_data_type_alias, PiiString};
 use serde::{ser::Error, Deserialize, Serialize, Serializer};
 
-
 #[derive(Clone, Default, PartialEq, Eq, Hash, Deserialize)]
 pub struct AlpacaPiiString(PiiString);
 impl AlpacaPiiString {
@@ -32,7 +31,6 @@ impl AlpacaPiiString {
 
 string_api_data_type_alias!(AlpacaPiiString);
 
-
 // Custom implementation for alpaca so we can standardize with the validations
 impl Serialize for AlpacaPiiString {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -53,7 +51,6 @@ impl std::fmt::Debug for AlpacaPiiString {
     }
 }
 
-
 impl From<PiiString> for AlpacaPiiString {
     fn from(value: PiiString) -> Self {
         Self(value)
@@ -69,13 +66,11 @@ where
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use serde_json::Value;
     use test_case::test_case;
-
 
     #[test_case(" hi there ", "hi there")] // trailing and leading spaces removed
     #[test_case(" é\t à", "e  a")] // non ascii with tabs

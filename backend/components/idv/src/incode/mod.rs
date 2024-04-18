@@ -63,7 +63,6 @@ impl<T: IncodeClientErrorCustomFailureReasons + serde::Serialize> IncodeResponse
     }
 }
 
-
 pub enum IncodeAPIResult<T: IncodeClientErrorCustomFailureReasons> {
     // We successfully can deserialize a 200 response
     Success(T),

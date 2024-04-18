@@ -118,7 +118,6 @@ impl NeuroSignal {
     }
 }
 
-
 // Reference: https://neuro-id.readme.io/reference/interaction-attributes-1
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")] // argh neuro
@@ -290,14 +289,12 @@ impl NeuroAPIResult {
     }
 }
 
-
 #[derive(derive_more::Deref)]
 pub struct NeuroApiResponse {
     #[deref]
     pub result: NeuroAPIResult,
     pub raw_response: PiiJsonValue,
 }
-
 
 impl NeuroApiResponse {
     pub async fn from_response(response: reqwest::Response) -> Self {
@@ -458,7 +455,6 @@ impl NeuroAttributesBuilder {
         let mut builder = NeuroAttributesBuilder::default();
         builder.set_attributes(response);
         builder.set_model_results(response);
-
 
         let NeuroAttributesBuilder {
             risky_application_count,
@@ -705,7 +701,6 @@ impl NeuroIdAttributes {
         NeuroAttributesBuilder::build_from_response(response)
     }
 }
-
 
 #[cfg(test)]
 mod tests {

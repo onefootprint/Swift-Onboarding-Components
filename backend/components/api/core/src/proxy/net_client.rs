@@ -139,7 +139,6 @@ async fn record_reqwest_error(log: ProxyRequestLog, state: &State, error: &reqwe
     Ok(())
 }
 
-
 // As long as we're serving proxy responses on api.onefootprint.com, we should be careful about
 // what response headers we allow. In theory, it should be hard to get a web browser to render a
 // web page with the response, since it's a POST request that requires an API key header. However,

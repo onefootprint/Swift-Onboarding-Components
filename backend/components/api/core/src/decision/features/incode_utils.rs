@@ -42,7 +42,6 @@ impl ParsedIncodeFields {
             )
         };
 
-
         ParsedIncodeFields(
             vec![
                 pif(
@@ -115,7 +114,6 @@ impl ParsedIncodeFields {
         )
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParsedIncodeNames {
@@ -199,12 +197,19 @@ impl ParsedIncodeNames {
                 .collect_vec();
 
             let incode_parsed_name_components: Vec<PiiString> = [
-                first_name_from_first_name_field.as_ref().map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
-                middle_name_from_middle_name_field.as_ref().map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
-                last_name.as_ref().map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
+                first_name_from_first_name_field
+                    .as_ref()
+                    .map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
+                middle_name_from_middle_name_field
+                    .as_ref()
+                    .map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
+                last_name
+                    .as_ref()
+                    .map(|s| s.leak_to_string().split(' ').map(|s| s.to_owned()).collect_vec()),
             ]
             .into_iter()
-            .flatten().flatten()
+            .flatten()
+            .flatten()
             .map(|s| {
                 Self::remove_hyphens_and_apostrophes(&s.to_owned().into())
                     .leak_to_string()
@@ -327,7 +332,6 @@ impl ParsedIncodeNames {
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParsedIncodeAddress {
     pub city: Option<PiiString>,
@@ -386,7 +390,6 @@ impl ParsedIncodeAddress {
                 }
                 None => (None, None, None, None),
             };
-
 
         ParsedIncodeAddress::new(city, state, zip, street, scrubbed_to_pii(ocr.address.as_ref()))
     }
@@ -556,7 +559,6 @@ fn scrubbed_to_pii(s: Option<&ScrubbedPiiString>) -> Option<PiiString> {
     s.map(|p| p.leak_to_string().trim().into())
 }
 
-
 fn convert_unicode_and_remove_chars(s: &PiiString, regex: Regex) -> PiiString {
     regex
         .replace_all(s.leak(), "")
@@ -646,7 +648,6 @@ pub fn reason_codes_from_match_field(
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {

@@ -8,7 +8,6 @@ use crate::{
     PiiJsonValue, PiiValueKind, ValidateArgs, ValidationError,
 };
 
-
 flat_api_object_map_type!(
     RawDataRequest<DataIdentifier, PiiJsonValue>,
     description="Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/apis#vault-fields).",

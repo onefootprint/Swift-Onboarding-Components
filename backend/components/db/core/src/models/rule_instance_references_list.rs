@@ -23,7 +23,6 @@ pub struct NewRuleInstanceReferencesList {
     pub list_id: ListId,
 }
 
-
 impl RuleInstanceReferencesList {
     #[tracing::instrument("RuleInstanceReferencesList::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewRuleInstanceReferencesList>) -> DbResult<Vec<Self>> {

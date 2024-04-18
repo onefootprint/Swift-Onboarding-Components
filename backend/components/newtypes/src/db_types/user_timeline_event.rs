@@ -1,5 +1,8 @@
 use crate::{
-    util::impl_enum_string_diesel, ActionKind, AnnotationId, AuthEventId, AuthMethodKind, CollectedDataOption, DataIdentifier, DbActor, DocumentRequestId, IdentityDocumentId, LabelId, LivenessEventId, ObConfigurationId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId, WorkflowId, WorkflowRequestId
+    util::impl_enum_string_diesel, ActionKind, AnnotationId, AuthEventId, AuthMethodKind,
+    CollectedDataOption, DataIdentifier, DbActor, DocumentRequestId, IdentityDocumentId, LabelId,
+    LivenessEventId, ObConfigurationId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
+    WorkflowId, WorkflowRequestId,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -213,5 +216,5 @@ pub struct ExternalIntegrationInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StepUpInfo {
-    pub document_request_ids: Vec<DocumentRequestId>
+    pub document_request_ids: Vec<DocumentRequestId>,
 }

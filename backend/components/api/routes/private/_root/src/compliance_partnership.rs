@@ -14,7 +14,6 @@ use db::models::{
     tenant_compliance_partnership::{NewTenantCompliancePartnership, TenantCompliancePartnership},
 };
 
-
 #[post("/private/compliance/partnership")]
 pub async fn post(
     state: web::Data<State>,

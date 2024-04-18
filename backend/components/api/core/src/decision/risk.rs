@@ -61,7 +61,7 @@ pub fn save_final_decision(
         actor: DbActor::Footprint,
         seqno,
         create_manual_review_reasons: decision.create_manual_review.then_some(review_reasons),
-        rule_set_result_id: rule_set_result_id.cloned()
+        rule_set_result_id: rule_set_result_id.cloned(),
     };
 
     // TODO: Make a billable event here

@@ -836,7 +836,6 @@ mod tests {
         assert!(!resp.renapo_valid.unwrap());
     }
 
-
     #[ignore]
     #[tokio::test]
     async fn test_government_validation_result() {

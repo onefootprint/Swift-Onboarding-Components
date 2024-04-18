@@ -240,7 +240,6 @@ impl SaveVerificationResultArgs {
     }
 }
 
-
 #[cfg(test)]
 mod test {
     use super::*;

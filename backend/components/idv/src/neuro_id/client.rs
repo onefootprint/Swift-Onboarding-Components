@@ -4,7 +4,6 @@ use super::{error::Error as NeuroError, NeuroApiResult};
 use newtypes::{vendor_credentials::NeuroIdCredentials, NeuroIdentityId, PiiString};
 use reqwest::header;
 
-
 pub struct NeuroIdClient {
     site_id: PiiString,
     default_headers: header::HeaderMap,
@@ -46,7 +45,6 @@ impl NeuroIdClient {
             .map_err(|err| NeuroError::SendError(err.to_string()))
     }
 }
-
 
 #[cfg(test)]
 mod tests {

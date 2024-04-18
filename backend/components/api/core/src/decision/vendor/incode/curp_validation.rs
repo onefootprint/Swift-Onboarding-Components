@@ -39,7 +39,6 @@ use crate::{
 };
 use feature_flag::BoolFlag;
 
-
 #[tracing::instrument(skip(state, di))]
 pub async fn run_curp_validation_check(
     state: &State,
@@ -165,7 +164,6 @@ pub async fn run_curp_validation_check(
                 })
                 .await?;
 
-
             let vendor_result = VendorResult {
                 response: VendorResponse {
                     response: ParsedResponse::IncodeCurpValidation(parsed),
@@ -205,7 +203,6 @@ pub async fn run_curp_validation_check(
         }
     }
 }
-
 
 type ShouldSendCurpRequest = Option<IncodeEnvironment>;
 /// We want to be able to handle the case where documents are provided in sandbox
@@ -271,7 +268,6 @@ impl IdentityDocumentForCurpHelper {
     }
 }
 
-
 // TODO: upstream this?
 // These are configurations that _only_ have the CURP validation module enabled, so we don't change, for example, our selfie flowID and forget to
 // add CURP
@@ -321,7 +317,6 @@ async fn get_curp_for_check(
 
             None
         };
-
 
         Ok((decrypted_curp, id_doc.clone()))
     } else {
@@ -391,7 +386,6 @@ async fn save_canned_response(
         })
         .await
 }
-
 
 pub async fn pre_vault(
     enclave_client: &EnclaveClient,

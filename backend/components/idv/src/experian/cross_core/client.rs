@@ -169,7 +169,6 @@ impl ExperianClientAdapter {
             .await
             .map_err(|err| Error::SendError(err.to_string()))?;
 
-
         let (cl, http_status) = (response.content_length(), response.status());
         if !http_status.is_success() {
             tracing::info!(http_status=%http_status, content_length=?cl, service=?"precise_id", "experian error response");

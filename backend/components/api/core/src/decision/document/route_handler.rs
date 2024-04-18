@@ -1,5 +1,7 @@
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentSide, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId, WorkflowId
+    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind,
+    DocumentRequestConfig, DocumentRequestKind, DocumentSide, IdentityDocumentFixtureResult,
+    IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId, WorkflowId,
 };
 
 use crate::{
@@ -197,7 +199,7 @@ pub async fn handle_document_upload(
 
     // Upload the image to s3
     let di = match &doc_request.config {
-        DocumentRequestConfig::Custom(CustomDocumentConfig{identifier, ..}) => identifier.clone(),
+        DocumentRequestConfig::Custom(CustomDocumentConfig { identifier, .. }) => identifier.clone(),
         _ => DataIdentifier::from(DocumentKind::LatestUpload(id_doc.document_type, side)),
     };
     let su_id = sv_id.clone();

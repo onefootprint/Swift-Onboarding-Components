@@ -34,7 +34,6 @@ pub enum UserAuthScope {
     ExplicitAuth,
 }
 
-
 #[cfg(test)]
 mod test {
     use crate::UserAuthScope;

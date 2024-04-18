@@ -1,13 +1,13 @@
 use chrono::Duration;
 use db_schema::schema;
 
-use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn, errors::ValidationError};
-use newtypes::ActionKind;
-use newtypes::AuthMethodKind;
-use newtypes::AuthMethodUpdatedInfo;
+use crate::{errors::ValidationError, DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::auth_event;
 use diesel::{prelude::*, Insertable, Queryable};
+use newtypes::ActionKind;
+use newtypes::AuthMethodKind;
+use newtypes::AuthMethodUpdatedInfo;
 use newtypes::{AuthEventId, AuthEventKind, IdentifyScope, WebauthnCredentialId};
 
 use newtypes::{InsightEventId, ScopedVaultId};
@@ -82,7 +82,10 @@ impl AuthEvent {
             IdentifyScope::Onboarding | IdentifyScope::Auth => {
                 // We depend upon this in the validate API
                 if scoped_vault_id.is_none() {
-                    return Err(DbError::ValidationError(format!("Auth event of type {} must have a scoped_vault_id", scope)));
+                    return Err(DbError::ValidationError(format!(
+                        "Auth event of type {} must have a scoped_vault_id",
+                        scope
+                    )));
                 }
             }
         }
@@ -102,7 +105,9 @@ impl AuthEvent {
         // For auth events when a new auth method is registered, create a timeline event
         if let Some(new_auth_method_action) = new_auth_method_action {
             if let Some(sv_id) = ev.scoped_vault_id.clone() {
-                let kind = AuthMethodKind::try_from(ev.kind).map_err(|_| ValidationError("Can't create a timeline event for third-party auth event"))?;
+                let kind = AuthMethodKind::try_from(ev.kind).map_err(|_| {
+                    ValidationError("Can't create a timeline event for third-party auth event")
+                })?;
                 // Create a timeline event that shows the passkey was added
                 let info = AuthMethodUpdatedInfo {
                     kind,

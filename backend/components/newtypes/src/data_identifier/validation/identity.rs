@@ -147,7 +147,6 @@ fn validate_address_line2(input: PiiString, for_bifrost: bool) -> VResult<PiiStr
         validate_po_box(&input)?;
     }
 
-
     Ok(input)
 }
 
@@ -212,7 +211,6 @@ fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
 
     old_result
 }
-
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq)]
 #[strum(serialize_all = "snake_case")]

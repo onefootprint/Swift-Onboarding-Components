@@ -3,7 +3,6 @@ use std::cmp::Ordering;
 use newtypes::{DecisionStatus, RuleAction};
 use serde::Serialize;
 
-
 #[derive(PartialEq, Eq, Debug, Clone, Serialize)]
 pub struct Decision {
     pub decision_status: DecisionStatus,
@@ -11,7 +10,6 @@ pub struct Decision {
     pub create_manual_review: bool,
     pub action: Option<RuleAction>,
 }
-
 
 // Note: follows the same convention as DecisionStatus, which has more egregious things as Ordering::Less
 // This is tested

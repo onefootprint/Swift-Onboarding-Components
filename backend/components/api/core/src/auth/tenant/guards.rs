@@ -173,7 +173,6 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
     }
 }
 
-
 impl<A, B, T> CanCheckTenantGuard for Either<A, B>
 where
     A: CanCheckTenantGuard<Auth = T>,

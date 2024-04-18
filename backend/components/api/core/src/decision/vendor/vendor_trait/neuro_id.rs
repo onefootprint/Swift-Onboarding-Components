@@ -20,11 +20,9 @@ impl VendorAPICall<NeuroIdAnalyticsRequest, NeuroApiResponse, idv::neuro_id::err
         let neuro_client = NeuroIdClient::new(credentials)?;
         let response = neuro_client.get_profile(self, &id).await?;
 
-
         Ok(NeuroApiResponse::from_response(response).await)
     }
 }
-
 
 impl VendorAPIResponse for NeuroApiResponse {
     fn vendor_api(&self) -> newtypes::VendorAPI {

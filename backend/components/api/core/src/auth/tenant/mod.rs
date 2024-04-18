@@ -96,7 +96,6 @@ pub trait PartnerTenantAuth {
     fn scopes(&self) -> Vec<TenantScope>;
 }
 
-
 pub trait GetFirmEmployee {
     /// Escape hatch to get the `TenantUser` for an auth session, if and only if the authed user
     /// is a firm employee.

@@ -77,7 +77,6 @@ impl NeuroIdCredentials {
     }
 }
 
-
 /// The bulk of experian credentials are shared across requests for different tenants
 /// All that is different is the subscriber code
 impl ExperianCredentialBuilder {

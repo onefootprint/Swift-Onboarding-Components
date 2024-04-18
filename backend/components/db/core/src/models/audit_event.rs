@@ -273,7 +273,6 @@ impl AuditEvent {
             results = results.filter(scoped_vault::fp_id.eq(search));
         }
 
-
         let results: Vec<DieselJoinedAuditEvent> = results
             .select((
                 AuditEvent::as_select(),
@@ -748,7 +747,6 @@ mod tests {
                 test_case,
             );
         }
-
 
         let events = AuditEvent::filter(
             conn,

@@ -226,7 +226,6 @@ impl ListEntry {
             ))
             .get_result(conn.conn())?;
 
-
         NewAuditEvent {
             id: AuditEventId::generate(),
             tenant_id: tenant_id.clone(),

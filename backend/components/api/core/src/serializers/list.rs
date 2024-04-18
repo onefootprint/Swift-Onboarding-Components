@@ -5,7 +5,6 @@ use db::models::{
 };
 use newtypes::PiiString;
 
-
 impl DbToApi<(List, usize, bool)> for api_wire_types::List {
     fn from_db((list, entries_count, used_in_playbook): (List, usize, bool)) -> Self {
         let List {

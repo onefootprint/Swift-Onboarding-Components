@@ -8,7 +8,6 @@ use crate::incode::{
 
 use strum::{Display, EnumString};
 
-
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GovernmentValidationResponse {
@@ -40,7 +39,6 @@ impl IncodeClientErrorCustomFailureReasons for GovernmentValidationResponse {
         None
     }
 }
-
 
 #[derive(Clone, Debug, Display, EnumString, Eq, PartialEq, Serialize)]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
@@ -92,7 +90,6 @@ impl From<u8> for MXStatusCode {
     }
 }
 
-
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RegistralSituation {
@@ -121,12 +118,10 @@ impl GovernmentValidation {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::test_fixtures;
-
 
     #[test]
     fn test_response_deserializes() {

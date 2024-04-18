@@ -247,7 +247,6 @@ impl TenantRole {
                 .for_no_key_update() // Make sure someone doesn't deactivate the role while we are using it
                 .first(conn.conn())?;
 
-
         if role.deactivated_at.is_some() {
             return Err(DbError::TargetTenantRoleDeactivated);
         }
@@ -366,7 +365,6 @@ impl TenantRole {
                 query.filter(tenant_role::partner_tenant_id.eq(pt_id))
             }
         };
-
 
         if let Some(ref scopes) = filters.scopes {
             query = query.filter(tenant_role::scopes.overlaps_with(scopes))

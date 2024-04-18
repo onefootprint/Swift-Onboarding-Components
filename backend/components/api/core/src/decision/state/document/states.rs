@@ -212,7 +212,6 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 .map(|vr| vr.verification_result_id)
                 .collect();
 
-
             match decision.decision_status {
                 DecisionStatus::Fail | DecisionStatus::Pass => {
                     common::save_kyc_decision(

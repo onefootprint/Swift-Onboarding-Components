@@ -152,7 +152,6 @@ fn save_successful_response(
         hide_risk_signals,
     )?;
 
-
     let _e = StytchFingerprintEvent::create(
         conn,
         NewStytchFingerprintEvent {

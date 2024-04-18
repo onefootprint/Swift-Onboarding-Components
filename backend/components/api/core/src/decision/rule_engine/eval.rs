@@ -490,9 +490,9 @@ pub mod tests {
         value: false,
     }, vec![]  => false)]
     pub fn test_evaluate_condition(cond: REC, input: Vec<FRC>) -> bool {
-        evaluate_condition(&cond, &input, &VaultDataForRules::empty(), &HashMap::new()).unwrap() // TODO: vault data condition
+        evaluate_condition(&cond, &input, &VaultDataForRules::empty(), &HashMap::new()).unwrap()
+        // TODO: vault data condition
     }
-
 
     #[test_case(
         vec![DocumentRequestKind::Identity],
@@ -579,7 +579,6 @@ pub mod tests {
         )
         .unwrap());
     }
-
 
     #[test_case(
         (ListKind::EmailAddress, vec![]),

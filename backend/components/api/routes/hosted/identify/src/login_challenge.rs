@@ -186,9 +186,7 @@ async fn initiate_passkey_login_challenge(
 
     // generate the challenge and return it
     let webauthn = WebauthnConfig::new(&state.config);
-    let (challenge, auth_state) = webauthn
-        .webauthn()
-        .generate_challenge_authenticate(creds, None)?;
+    let (challenge, auth_state) = webauthn.webauthn().generate_challenge_authenticate(creds, None)?;
 
     Ok(BiometricChallenge {
         state: BiometricChallengeState {

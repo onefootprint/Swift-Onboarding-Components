@@ -124,7 +124,6 @@ impl From<Option<RuleAction>> for RuleResultRuleAction {
     }
 }
 
-
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct RuleSet {
     pub version: i32,

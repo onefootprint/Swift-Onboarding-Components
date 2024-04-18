@@ -110,7 +110,6 @@ impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::C
     }
 }
 
-
 impl
     DbToApi<(
         ComplianceDocTemplate,

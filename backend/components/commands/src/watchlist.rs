@@ -60,7 +60,11 @@ impl CreateOverdueWatchlistCheckTasks {
     }
 }
 
-fn distribute_timestamps(length: usize, start: DateTime<Utc>, duration: Duration) -> impl Iterator<Item = DateTime<Utc>> {
+fn distribute_timestamps(
+    length: usize,
+    start: DateTime<Utc>,
+    duration: Duration,
+) -> impl Iterator<Item = DateTime<Utc>> {
     let interval = if length > 1 {
         duration / (length as i32 - 1)
     } else {
@@ -77,8 +81,8 @@ fn distribute_timestamps(length: usize, start: DateTime<Utc>, duration: Duration
 
 #[cfg(test)]
 mod tests {
-    use chrono::{DateTime, Duration, Utc};
     use super::distribute_timestamps;
+    use chrono::{DateTime, Duration, Utc};
     use test_case::test_case;
 
     fn dt(s: &str) -> DateTime<Utc> {
@@ -89,9 +93,11 @@ mod tests {
     #[test_case(1, dt("2020-04-04T17:00:00+00:00"), Duration::hours(1) => vec![dt("2020-04-04T17:00:00Z")])]
     #[test_case(2, dt("2020-04-04T17:00:00+00:00"), Duration::hours(1) => vec![dt("2020-04-04T17:00:00Z"), dt("2020-04-04T18:00:00Z")])]
     #[test_case(4, dt("2020-04-04T17:00:00+00:00"), Duration::hours(1) => vec![dt("2020-04-04T17:00:00Z"), dt("2020-04-04T17:20:00Z"), dt("2020-04-04T17:40:00Z"), dt("2020-04-04T18:00:00Z")])]
-    fn test_distribute_timestamps(len: usize, start: DateTime<Utc>, duration: Duration) -> Vec<DateTime<Utc>>{
+    fn test_distribute_timestamps(
+        len: usize,
+        start: DateTime<Utc>,
+        duration: Duration,
+    ) -> Vec<DateTime<Utc>> {
         distribute_timestamps(len, start, duration).collect::<Vec<_>>()
     }
 }
-
-

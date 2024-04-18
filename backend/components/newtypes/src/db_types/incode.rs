@@ -202,7 +202,6 @@ pub enum IncodeEnvironment {
 
 crate::util::impl_enum_str_diesel!(IncodeEnvironment);
 
-
 #[derive(
     Debug,
     Display,

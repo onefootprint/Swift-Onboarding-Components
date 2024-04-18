@@ -137,7 +137,6 @@ async fn saturate_events(
         .map(|(le_id, le)| decrypt_list_entry(&decrypted_list_key, &le).map(|p| (le_id, p)))
         .collect::<Result<HashMap<ListEntryId, PiiString>, _>>()?;
 
-
     events
         .into_iter()
         .map(|le| {

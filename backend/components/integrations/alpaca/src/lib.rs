@@ -51,7 +51,6 @@ impl AlpacaCipClient {
         .map(jitter) // add jitter
         .take(3); // limit to 3 retries
 
-
         let path2 = path.clone();
         let result = Retry::spawn(retry_strategy, move || {
             self.make_request(method.clone(), path.clone(), json_body)

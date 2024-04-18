@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use crate::PiiString;
 
-
 #[derive(Clone, strum::EnumDiscriminants)]
 #[strum_discriminants(vis(pub), name(SmsMessageKind))]
 pub enum SmsMessage {
@@ -23,7 +22,6 @@ pub enum SmsMessage {
         content: PiiString,
     },
 }
-
 
 impl SmsMessage {
     pub fn body(&self) -> PiiString {

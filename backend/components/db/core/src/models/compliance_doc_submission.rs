@@ -8,7 +8,6 @@ use newtypes::{
     TenantUserId,
 };
 
-
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = compliance_doc_submission)]
 pub struct ComplianceDocSubmission {

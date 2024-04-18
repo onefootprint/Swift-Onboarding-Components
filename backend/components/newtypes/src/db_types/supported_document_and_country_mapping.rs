@@ -7,7 +7,6 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
-
 // We currently use a similar looking map to drive bifrost requirements, so introduce a newtype here
 // This will be deprecated
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, derive_more::Deref)]
@@ -28,7 +27,6 @@ impl SupportedDocumentAndCountryMappingForBifrost {
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq)]
 pub struct CountrySpecificDocumentMapping(pub HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>);
 
-
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq)]
 pub struct DocumentAndCountryConfiguration {
     // Documents available in all countries
@@ -48,7 +46,6 @@ impl DocumentAndCountryConfiguration {
         };
 
         mapping.extend(self.country_specific.0.clone());
-
 
         SupportedDocumentAndCountryMappingForBifrost(mapping)
     }

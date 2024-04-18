@@ -813,7 +813,6 @@ mod tests {
         .unwrap_err();
         assert!(matches!(err, DbError::ValidationError(_)));
 
-
         let (sv1, _) = ScopedVault::get_or_create_non_portable(
             conn,
             nva.clone(),

@@ -9,7 +9,6 @@ use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
 use newtypes::TenantAndroidAppMetaId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 struct TenantAndroidAppMetaRevealRequest {
     id: TenantAndroidAppMetaId,

@@ -29,7 +29,6 @@ impl GenerateInvoices {
             .await
             .map_err(|e| anyhow!("{}", e))?;
 
-
         let mut tasks = futures::stream::FuturesUnordered::<
             std::pin::Pin<Box<dyn std::future::Future<Output = BResult<()>>>>,
         >::new();

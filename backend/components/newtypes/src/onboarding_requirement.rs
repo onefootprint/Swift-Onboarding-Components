@@ -92,7 +92,6 @@ pub struct OnboardingRequirementPriority {
     pub tie_breaker: Option<String>,
 }
 
-
 impl OnboardingRequirement {
     /// Returns an order-able struct that allows sorting requirements by a priority
     pub fn priority(&self, is_doc_first: bool) -> OnboardingRequirementPriority {

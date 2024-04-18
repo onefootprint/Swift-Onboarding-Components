@@ -9,7 +9,6 @@ use super::{
     compliance_doc_submission::ComplianceDocSubmission,
 };
 
-
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = compliance_doc_request)]
 pub struct ComplianceDocRequest {

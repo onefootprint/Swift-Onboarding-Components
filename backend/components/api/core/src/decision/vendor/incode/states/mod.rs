@@ -201,7 +201,6 @@ pub async fn save_incode_fixtures(
     Ok(())
 }
 
-
 // Struct that represents a document kind that has been validated as the type indicated by a vendor, in this case incode
 // For example, we don't want to be vaulting something as a Passport that is in fact, a driver's license
 #[derive(Clone, Copy)]

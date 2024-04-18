@@ -1,7 +1,6 @@
 use idv::incode::curp_validation::response::CurpValidationResponse;
 use newtypes::FootprintReasonCode as FRC;
 
-
 pub fn footprint_reason_codes(res: &CurpValidationResponse) -> Vec<FRC> {
     match (res.renapo_valid, res.error.as_ref()) {
         (Some(true), _) => vec![FRC::CurpValid],

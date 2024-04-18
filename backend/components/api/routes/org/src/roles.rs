@@ -50,7 +50,6 @@ pub async fn patch(
     roles_common::patch(state, request, role_id, auth.into()).await
 }
 
-
 #[api_v2_operation(
     tags(Roles, OrgSettings, Private),
     description = "Deactivates the provided IAM role."

@@ -4,7 +4,6 @@ use crate::{
 };
 use rand::distributions::{Alphanumeric, DistString};
 
-
 fn generate_random_id(prefix: &str, length: usize) -> String {
     format!(
         "{}_{}",

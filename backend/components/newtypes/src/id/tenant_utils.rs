@@ -37,7 +37,6 @@ pub enum OrgIdentifierRef<'a> {
     PartnerTenantId(&'a PartnerTenantId),
 }
 
-
 #[derive(Debug, Clone, From)]
 pub enum OrgIdentifier {
     TenantId(TenantId),

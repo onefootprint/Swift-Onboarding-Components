@@ -6,7 +6,6 @@ use newtypes::{
     NeuroIdAnalyticsEventId, NeuroIdentityId, ScopedVaultId, TenantId, VerificationResultId, WorkflowId,
 };
 
-
 /// An append-only, immutable event that denormalizes a lot of data we get back from NeuroID
 /// in order to render and/or compute signals for the dashboard, analysis, or model training pipelines
 #[derive(Debug, Clone, Insertable, Queryable)]

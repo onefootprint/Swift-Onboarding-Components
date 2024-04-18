@@ -25,7 +25,6 @@ pub enum RuleExpressionCondition {
     },
 }
 
-
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 #[serde(untagged)]
@@ -68,14 +67,12 @@ pub enum Equals {
     DoesNotEqual,
 }
 
-
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum IsIn {
     IsIn,
     IsNotIn,
 }
-
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -101,7 +98,6 @@ pub enum RiskScore {
     ExperianScore,
     IncodeSelfieMatchScore,
 }
-
 
 impl RuleExpressionCondition {
     pub fn list_id(&self) -> Option<&ListId> {

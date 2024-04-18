@@ -37,7 +37,7 @@ impl DbToApi<OnboardingDecisionInfo> for api_wire_types::OnboardingDecision {
             source: Actor::from_db(saturated_db_actor),
             ob_configuration: ob_configuration.map(api_wire_types::TimelinePlaybook::from_db),
             manual_review: mr.map(api_wire_types::ManualReview::from_db),
-            rule_set_result_id: decision.rule_set_result_id
+            rule_set_result_id: decision.rule_set_result_id,
         }
     }
 }

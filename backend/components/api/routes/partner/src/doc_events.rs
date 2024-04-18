@@ -12,7 +12,6 @@ use itertools::Itertools;
 use newtypes::{ComplianceDocId, TenantCompliancePartnershipId, TenantKind};
 use paperclip::actix::{self, api_v2_operation, web};
 
-
 #[api_v2_operation(
     description = "Returns a list of timeline events for the given document",
     tags(Compliance, Private)

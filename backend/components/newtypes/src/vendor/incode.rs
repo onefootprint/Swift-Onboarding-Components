@@ -385,7 +385,6 @@ pub enum IncodeDocumentRestriction {
     ConservativeSharpness,
 }
 
-
 #[derive(
     Display, Debug, Clone, EnumString, Eq, PartialEq, Hash, DeserializeFromStr, SerializeDisplay, EnumIter,
 )]
@@ -437,7 +436,6 @@ pub enum IncodeDocumentSubType {
     VisaB1B2,
     VoterIdentificationCard,
 }
-
 
 #[cfg(test)]
 mod tests {
