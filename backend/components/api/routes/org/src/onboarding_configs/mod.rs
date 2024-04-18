@@ -4,6 +4,9 @@ mod get;
 mod patch;
 mod post;
 
+#[cfg(test)]
+mod tests;
+
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(get::get_list)
