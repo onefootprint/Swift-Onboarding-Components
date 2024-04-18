@@ -3,7 +3,8 @@ use std::{collections::HashMap, str::FromStr};
 use db::models::{list_entry::ListWithDecryptedEntries, rule_instance::RuleInstance};
 use itertools::Itertools;
 use newtypes::{
-    email::Email, BooleanOperator, DocumentRequestKind, Equals, FootprintReasonCode, IsIn, ListId, ListKind, PhoneNumber, PiiString, RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, VaultOperation
+    email::Email, BooleanOperator, DocumentRequestKind, Equals, FootprintReasonCode, IsIn, ListId, ListKind,
+    PhoneNumber, PiiString, RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, VaultOperation,
 };
 use strum::IntoEnumIterator;
 
@@ -107,7 +108,7 @@ pub fn evaluate_rule_set<T: HasRule>(
                     // when the new blocklist stuff seems more stable, we should maybe change this to a regular hard error
                     tracing::error!(?err, "Error evaluating rule expression, defaulting to `false`");
                     false
-                },
+                }
             };
             (r, eval)
         })
@@ -127,15 +128,29 @@ pub fn evaluate_rule_set<T: HasRule>(
     (rule_results, action_triggered)
 }
 
-pub fn evaluate_rule_expression(rule_expression: &RuleExpression, input: &[FootprintReasonCode], vault_data: &VaultDataForRules, lists: &HashMap<ListId, ListWithDecryptedEntries>) -> ApiResult<bool> {
+pub fn evaluate_rule_expression(
+    rule_expression: &RuleExpression,
+    input: &[FootprintReasonCode],
+    vault_data: &VaultDataForRules,
+    lists: &HashMap<ListId, ListWithDecryptedEntries>,
+) -> ApiResult<bool> {
     // Conditions in a Rule are all AND'd together
     // Empty rule_expression's with no conditions shouldn't be possible (should fail validation), but should one of these sneak into existence (ie a bad manual PG fiddle) then we'd want to default to evaluate to false there, not true
-    let results = rule_expression.0.iter().map(|c| evaluate_condition(c, input, vault_data, lists)).collect::<Result<Vec<_>,_>>()?;
+    let results = rule_expression
+        .0
+        .iter()
+        .map(|c| evaluate_condition(c, input, vault_data, lists))
+        .collect::<Result<Vec<_>, _>>()?;
     Ok(!rule_expression.0.is_empty() && results.into_iter().all(|r| r))
 }
 
 // TODO: maybe use a Set here later but honestly at small N its probably moot
-fn evaluate_condition(cond: &RuleExpressionCondition, input: &[FootprintReasonCode], vault_data: &VaultDataForRules, lists: &HashMap<ListId, ListWithDecryptedEntries>,) -> ApiResult<bool> {
+fn evaluate_condition(
+    cond: &RuleExpressionCondition,
+    input: &[FootprintReasonCode],
+    vault_data: &VaultDataForRules,
+    lists: &HashMap<ListId, ListWithDecryptedEntries>,
+) -> ApiResult<bool> {
     let res = match cond {
         RuleExpressionCondition::RiskSignal { field, op, value } => {
             let field_value = input.contains(field);
@@ -147,27 +162,35 @@ fn evaluate_condition(cond: &RuleExpressionCondition, input: &[FootprintReasonCo
         RuleExpressionCondition::VaultData(vo) => {
             if let Ok(field_value) = vault_data.get_di(vo.field().clone()) {
                 match vo {
-                    VaultOperation::Equals { field:_, op, value } => match op {
+                    VaultOperation::Equals { field: _, op, value } => match op {
                         Equals::Equals => field_value.leak_to_string() == *value.leak_to_string(),
                         Equals::DoesNotEqual => field_value.leak_to_string() != *value.leak_to_string(),
                     },
-                    VaultOperation::IsIn { field: _, op, value} => {
+                    VaultOperation::IsIn { field: _, op, value } => {
                         if let Some(list) = lists.get(value) {
                             match op {
                                 IsIn::IsIn => is_in_list(field_value, list)?,
                                 IsIn::IsNotIn => !is_in_list(field_value, list)?,
                             }
                         } else {
-                            return Err(AssertionError(&format!("Missing List needed for rule evaluation: {}", value)).into())
+                            return Err(AssertionError(&format!(
+                                "Missing List needed for rule evaluation: {}",
+                                value
+                            ))
+                            .into());
                         }
-                    },
+                    }
                 }
             } else {
                 // if vault data is missing, never evaluate to true
                 false
             }
-        },
-        RuleExpressionCondition::RiskScore { field:_, op:_, value:_ } => return Err(AssertionError("RiskScore rules not supported").into()),
+        }
+        RuleExpressionCondition::RiskScore {
+            field: _,
+            op: _,
+            value: _,
+        } => return Err(AssertionError("RiskScore rules not supported").into()),
     };
     Ok(res)
 }
@@ -180,7 +203,9 @@ fn is_in_list(value: PiiString, list: &ListWithDecryptedEntries) -> ApiResult<bo
         ListKind::Ssn9 => value,
         ListKind::PhoneNumber => value,
         ListKind::PhoneCountryCode => PhoneNumber::from_str(value.leak())?.country_code(),
-        ListKind::IpAddress => return Err(AssertionError("IpAddress list not implemented in rules eval").into()),
+        ListKind::IpAddress => {
+            return Err(AssertionError("IpAddress list not implemented in rules eval").into())
+        }
     };
 
     Ok(entries.iter().any(|(_, e)| derived_value == *e))
@@ -190,11 +215,16 @@ fn is_in_list(value: PiiString, list: &ListWithDecryptedEntries) -> ApiResult<bo
 pub mod tests {
     use std::collections::HashMap;
 
-    use crate::{decision::rule_engine::engine::VaultDataForRules, utils::vault_wrapper::{DecryptUncheckedResult, EnclaveDecryptOperation}};
+    use crate::{
+        decision::rule_engine::engine::VaultDataForRules,
+        utils::vault_wrapper::{DecryptUncheckedResult, EnclaveDecryptOperation},
+    };
 
     use super::*;
     use newtypes::{
-        BooleanOperator as BO, DataIdentifier, DataIdentifier as DI, FootprintReasonCode as FRC, IdentityDataKind, InvestorProfileKind, PiiString, RuleAction as RA, RuleExpression as RE, RuleExpressionCondition as REC
+        BooleanOperator as BO, DataIdentifier, DataIdentifier as DI, FootprintReasonCode as FRC,
+        IdentityDataKind, InvestorProfileKind, PiiString, RuleAction as RA, RuleExpression as RE,
+        RuleExpressionCondition as REC,
     };
     use test_case::test_case;
 
@@ -334,7 +364,13 @@ pub mod tests {
         docs_collected: Vec<DocumentRequestKind>,
     ) -> (Vec<bool>, Option<RuleAction>) {
         let config = RuleEvalConfig::new(docs_collected);
-        let (rule_results, action) = evaluate_rule_set(rules, &input, &VaultDataForRules::empty(), &HashMap::new(), &config); // TODO: tests with vault data
+        let (rule_results, action) = evaluate_rule_set(
+            rules,
+            &input,
+            &VaultDataForRules::empty(),
+            &HashMap::new(),
+            &config,
+        ); // TODO: tests with vault data
         (rule_results.into_iter().map(|(_, e)| e).collect_vec(), action)
     }
 
@@ -381,7 +417,8 @@ pub mod tests {
         value: true,
     }]), vec![FRC::IdNotLocated, FRC::NameDoesNotMatch, FRC::SsnNotProvided]  => true)]
     pub fn test_evaluate_rule_expression(re: RE, input: Vec<FRC>) -> bool {
-        evaluate_rule_expression(&re, &input, &VaultDataForRules::empty(), &HashMap::new()).unwrap() // TODO: vault data rules
+        evaluate_rule_expression(&re, &input, &VaultDataForRules::empty(), &HashMap::new()).unwrap()
+        // TODO: vault data rules
     }
 
     #[test_case(REC::RiskSignal {
@@ -430,44 +467,58 @@ pub mod tests {
 
 
     #[test_case(
-        vec![DocumentRequestKind::Identity], 
+        vec![DocumentRequestKind::Identity],
         vec![
-            RA::StepUp(StepUpKind::Identity), 
-            RA::StepUp(StepUpKind::IdentityProofOfSsn), 
+            RA::StepUp(StepUpKind::Identity),
+            RA::StepUp(StepUpKind::IdentityProofOfSsn),
             RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress)
         ])]
     #[test_case(
-        vec![DocumentRequestKind::Identity, DocumentRequestKind::ProofOfAddress], 
+        vec![DocumentRequestKind::Identity, DocumentRequestKind::ProofOfAddress],
         vec![
-            RA::StepUp(StepUpKind::Identity), 
-            RA::StepUp(StepUpKind::IdentityProofOfSsn), 
+            RA::StepUp(StepUpKind::Identity),
+            RA::StepUp(StepUpKind::IdentityProofOfSsn),
             RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
             RA::StepUp(StepUpKind::ProofOfAddress),
         ])]
     #[test_case(vec![], vec![])]
     #[test_case(
-        vec![DocumentRequestKind::ProofOfSsn], 
+        vec![DocumentRequestKind::ProofOfSsn],
         vec![
-            RA::StepUp(StepUpKind::IdentityProofOfSsn), 
+            RA::StepUp(StepUpKind::IdentityProofOfSsn),
             RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
         ])]
-    fn test_rule_eval_config(doc_kinds: Vec<DocumentRequestKind>, expected_disallowed_rule_actions: Vec<RuleAction>) {
+    fn test_rule_eval_config(
+        doc_kinds: Vec<DocumentRequestKind>,
+        expected_disallowed_rule_actions: Vec<RuleAction>,
+    ) {
         let rc = RuleEvalConfig::new(doc_kinds);
         expected_disallowed_rule_actions
             .iter()
             .for_each(|a| assert!(!rc.action_is_allowed(a)));
 
         // check all others are allowed
-        RuleAction::all_rule_actions().iter().filter(|ra| !expected_disallowed_rule_actions.contains(ra))
-            .for_each(|a| assert!(rc.action_is_allowed(a)));  
+        RuleAction::all_rule_actions()
+            .iter()
+            .filter(|ra| !expected_disallowed_rule_actions.contains(ra))
+            .for_each(|a| assert!(rc.action_is_allowed(a)));
     }
 
     #[test]
     pub fn test_basic_vault_data_setup() {
         let results: HashMap<EnclaveDecryptOperation, PiiString> = HashMap::from_iter([
-            (DataIdentifier::Id(IdentityDataKind::FirstName).into(), "Bob".into()),
-            (DataIdentifier::InvestorProfile(InvestorProfileKind::Declarations).into(), "[\"affiliated_with_us_broker\"]".into()),
-            (DataIdentifier::InvestorProfile(InvestorProfileKind::InvestmentGoals).into(), "[\"buy_a_home\", \"speculation\"]".into()),
+            (
+                DataIdentifier::Id(IdentityDataKind::FirstName).into(),
+                "Bob".into(),
+            ),
+            (
+                DataIdentifier::InvestorProfile(InvestorProfileKind::Declarations).into(),
+                "[\"affiliated_with_us_broker\"]".into(),
+            ),
+            (
+                DataIdentifier::InvestorProfile(InvestorProfileKind::InvestmentGoals).into(),
+                "[\"buy_a_home\", \"speculation\"]".into(),
+            ),
         ]);
         let decrypted_dis = results.keys().cloned().collect();
         let vault_data = DecryptUncheckedResult {
@@ -476,105 +527,126 @@ pub mod tests {
         };
         let vd = VaultDataForRules::new(vault_data);
 
-        assert!(evaluate_condition(&REC::VaultData(VaultOperation::Equals {
-            field: DataIdentifier::Id(IdentityDataKind::FirstName),
-            op: Equals::Equals,
-            value: "Bob".into(),
-        }), &Vec::<FRC>::new(),  &vd, &HashMap::new()).unwrap());
-        
-        assert!(!evaluate_condition(&REC::VaultData(VaultOperation::Equals {
-            field: DataIdentifier::Id(IdentityDataKind::FirstName),
-            op: Equals::Equals,
-            value: "Alice".into(),
-        }), &Vec::<FRC>::new(),  &vd, &HashMap::new()).unwrap());
+        assert!(evaluate_condition(
+            &REC::VaultData(VaultOperation::Equals {
+                field: DataIdentifier::Id(IdentityDataKind::FirstName),
+                op: Equals::Equals,
+                value: "Bob".into(),
+            }),
+            &Vec::<FRC>::new(),
+            &vd,
+            &HashMap::new()
+        )
+        .unwrap());
+
+        assert!(!evaluate_condition(
+            &REC::VaultData(VaultOperation::Equals {
+                field: DataIdentifier::Id(IdentityDataKind::FirstName),
+                op: Equals::Equals,
+                value: "Alice".into(),
+            }),
+            &Vec::<FRC>::new(),
+            &vd,
+            &HashMap::new()
+        )
+        .unwrap());
     }
 
 
     #[test_case(
-        (ListKind::EmailAddress, vec![]), 
+        (ListKind::EmailAddress, vec![]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::Email), "bob@bobertotech.org"),]
     => false; "no entries")]
     #[test_case(
-        (ListKind::EmailAddress, vec![]), 
+        (ListKind::EmailAddress, vec![]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsIn),
         vec![]
     => false; "no entries, no vd")]
     #[test_case(
-        (ListKind::EmailAddress, vec![]), 
+        (ListKind::EmailAddress, vec![]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsNotIn),
         vec![(DI::Id(IdentityDataKind::Email), "bob@bobertotech.org"),]
     => true; "no entries, IsNotIn")]
     #[test_case(
-        (ListKind::EmailAddress, vec![]), 
+        (ListKind::EmailAddress, vec![]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsNotIn),
         vec![]
     => false; "no entries, no vd, IsNotIn (vd not present always evals to false)")]
     #[test_case(
-        (ListKind::EmailAddress, vec!["bob@bobertotech.org"]), 
+        (ListKind::EmailAddress, vec!["bob@bobertotech.org"]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::AddressLine1), "bob@bobertotech.org"),]
     => false; "single entry, different vd kind")]
     #[test_case(
-        (ListKind::EmailAddress, vec!["bob@bobertotech.org"]), 
+        (ListKind::EmailAddress, vec!["bob@bobertotech.org"]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::Email), "bob@bobertotech.org"),]
     => true; "single entry, matching vd")]
     #[test_case(
-        (ListKind::EmailAddress, vec!["baddies@wenotgood.com", "bob@bobertotech.org", "aksdfj@fasdjk.net"]), 
+        (ListKind::EmailAddress, vec!["baddies@wenotgood.com", "bob@bobertotech.org", "aksdfj@fasdjk.net"]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::Email), "bob@bobertotech.org"),]
     => true; "multiple entries, matching vd")]
     #[test_case(
-        (ListKind::EmailAddress, vec!["baddies@wenotgood.com", "bob@bobertotech.org", "aksdfj@fasdjk.net"]), 
+        (ListKind::EmailAddress, vec!["baddies@wenotgood.com", "bob@bobertotech.org", "aksdfj@fasdjk.net"]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::Email), "bob3421@bobertotech.org"),]
     => false; "multiple entries, no matching vd")]
     #[test_case(
-        (ListKind::EmailDomain, vec!["bobertotech.org"]), 
+        (ListKind::EmailDomain, vec!["bobertotech.org"]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::Email), "alice@bobertotech.org"),]
     => true; "EmailDomain, matches")]
     #[test_case(
-        (ListKind::EmailDomain, vec!["bobertotech.org"]), 
+        (ListKind::EmailDomain, vec!["bobertotech.org"]),
         (DI::Id(IdentityDataKind::Email), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::Email), "alice@bobertotech.net"),]
     => false; "EmailDomain, no match")]
     #[test_case(
-        (ListKind::Ssn9, vec!["222222222"]), 
+        (ListKind::Ssn9, vec!["222222222"]),
         (DI::Id(IdentityDataKind::Ssn9), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::Ssn9), "222222222"),]
     => true; "ssn9, matches")]
     #[test_case(
-        (ListKind::Ssn9, vec!["111111111", "222222222"]), 
+        (ListKind::Ssn9, vec!["111111111", "222222222"]),
         (DI::Id(IdentityDataKind::Ssn9), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::Ssn9), "333333333"),]
     => false; "ssn9, no match")]
     #[test_case(
-        (ListKind::PhoneNumber, vec!["+15555555555"]), 
+        (ListKind::PhoneNumber, vec!["+15555555555"]),
         (DI::Id(IdentityDataKind::PhoneNumber), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::PhoneNumber), "+15555555555"),]
     => true; "PhoneNumber, matches")]
     #[test_case(
-        (ListKind::PhoneNumber, vec!["+15555555555"]), 
+        (ListKind::PhoneNumber, vec!["+15555555555"]),
         (DI::Id(IdentityDataKind::PhoneNumber), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::PhoneNumber), "+14444444444"),]
     => false; "PhoneNumber, no match")]
     #[test_case(
-        (ListKind::PhoneCountryCode, vec!["1"]), 
+        (ListKind::PhoneCountryCode, vec!["1"]),
         (DI::Id(IdentityDataKind::PhoneNumber), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::PhoneNumber), "+15555555555"),]
     => true; "PhoneCountryCode, matches")]
     #[test_case(
-        (ListKind::PhoneCountryCode, vec!["1", "2"]), 
+        (ListKind::PhoneCountryCode, vec!["1", "2"]),
         (DI::Id(IdentityDataKind::PhoneNumber), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::PhoneNumber), "+35555555555"),]
     => false; "PhoneCountryCode, no match")]
-    pub fn test_evaluate_condition_lists(list: (ListKind, Vec<&str>), rule: (DI, IsIn), vault_data: Vec<(DI, &str)>) -> bool {
+    pub fn test_evaluate_condition_lists(
+        list: (ListKind, Vec<&str>),
+        rule: (DI, IsIn),
+        vault_data: Vec<(DI, &str)>,
+    ) -> bool {
         let (list_kind, list_entries) = list;
         let (rule_field, rule_op) = rule;
 
-        let results: HashMap<EnclaveDecryptOperation, PiiString> = HashMap::from_iter(vault_data.into_iter().map(|(di, s)| (di.into(), s.into())).collect_vec());
+        let results: HashMap<EnclaveDecryptOperation, PiiString> = HashMap::from_iter(
+            vault_data
+                .into_iter()
+                .map(|(di, s)| (di.into(), s.into()))
+                .collect_vec(),
+        );
         let decrypted_dis = results.keys().cloned().collect();
         let vault_data = DecryptUncheckedResult {
             results,
@@ -584,7 +656,10 @@ pub mod tests {
 
         let list = db::tests::fixtures::list::create_in_memory(list_kind);
         let list_id = list.id.clone();
-        let list_entries = list_entries.into_iter().map(|s| (db::tests::fixtures::list_entry::create_in_memory(), s.into())).collect();
+        let list_entries = list_entries
+            .into_iter()
+            .map(|s| (db::tests::fixtures::list_entry::create_in_memory(), s.into()))
+            .collect();
         let lists = HashMap::from_iter([(list_id.clone(), (list, list_entries))]);
 
         let cond = REC::VaultData(VaultOperation::IsIn {
@@ -595,6 +670,4 @@ pub mod tests {
 
         evaluate_condition(&cond, &[], &vd, &lists).unwrap()
     }
-    
-
 }
