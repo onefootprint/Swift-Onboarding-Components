@@ -36,13 +36,18 @@ pub enum IdDocKind {
     Visa,
     ResidenceDocument,
     VoterIdentification,
-    // These shouldn't have anything except from front images.
-    // custom will also be in this boat
+
+    //
+    // All of these options are slightly different from the above... they only have a front,
+    // cannot have selfie or back. They are not yet verified. And they are stored in sometimes
+    // different DIs
+    //
+
     // Proof of ssn
     SsnCard,
     // Proof of address
-    // For now, we'll only have a single PoA document per vault to make the FE UI more flexible to build
     ProofOfAddress,
+    Custom,
 }
 
 impl From<IdDocKind> for DocumentRequestKind {
@@ -58,6 +63,7 @@ impl From<IdDocKind> for DocumentRequestKind {
             IdDocKind::VoterIdentification => Self::Identity,
             IdDocKind::SsnCard => Self::ProofOfSsn,
             IdDocKind::ProofOfAddress => Self::ProofOfAddress,
+            IdDocKind::Custom => Self::Custom,
         }
     }
 }
@@ -80,6 +86,7 @@ impl IdDocKind {
             Self::VoterIdentification => vec![DocumentSide::Front, DocumentSide::Back],
             Self::SsnCard => vec![DocumentSide::Front],
             Self::ProofOfAddress => vec![DocumentSide::Front],
+            Self::Custom => vec![DocumentSide::Front],
         }
     }
 
@@ -126,6 +133,7 @@ impl IdDocKind {
             // In actuality, We don't parse anything from these.
             IdDocKind::SsnCard => vec![],
             IdDocKind::ProofOfAddress => vec![],
+            IdDocKind::Custom => vec![],
         }
     }
 }
@@ -156,6 +164,7 @@ impl TryFrom<IdDocKind> for AlpacaDocumentType {
             IdDocKind::VoterIdentification => Err(crate::Error::Custom(msg.into())),
             IdDocKind::SsnCard => Err(crate::Error::Custom(msg.into())),
             IdDocKind::ProofOfAddress => Ok(AlpacaDocumentType::ProofOfAddress),
+            IdDocKind::Custom => Err(crate::Error::Custom(msg.into())),
         }
     }
 }

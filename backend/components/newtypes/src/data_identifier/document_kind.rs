@@ -24,6 +24,7 @@ use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumIter, EnumString};
 #[strum_discriminants(derive(EnumString, AsRefStr, Display, EnumIter))]
 #[diesel(sql_type = Text)]
 pub enum DocumentKind {
+    // TODO We have IdDocKind::Custom but shouldn't be able to use it for any DIs
     /// represents the verified image for a document
     /// document.[doc_kind].[side].image
     #[strum_discriminants(strum(to_string = "image"))]
@@ -183,7 +184,7 @@ impl std::str::FromStr for DocumentKind {
             Ok((prefix, suffix))
         };
 
-        // First try parsing based on the suffix, like mime_type or latest_upload
+        // First try parsing govt-isued ID types based on the suffix, like mime_type or latest_upload
         let variant: Option<DocumentKind> = match variant {
             Ok(DocumentKindDiscriminant::LatestUpload) => {
                 let (prefix, suffix) = get_parts()?;
@@ -216,8 +217,9 @@ impl std::str::FromStr for DocumentKind {
         let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
         let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
         if let Ok(prefix) = IdDocKind::from_str(prefix) {
-            let suffix = OcrDataKind::from_str(suffix)?;
-            return Ok(Self::OcrData(prefix, suffix));
+            if let Ok(suffix) = OcrDataKind::from_str(suffix) {
+                return Ok(Self::OcrData(prefix, suffix));
+            }
         }
 
         // Custom documents
@@ -259,13 +261,15 @@ impl std::fmt::Display for DocumentKind {
 impl DocumentKind {
     /// Enumerate all possible DIs for DocumentKind that we'll display in API docs
     pub fn api_examples() -> Vec<Self> {
-        let id_doc_types = IdDocKind::iter().flat_map(|k| {
-            // Purposefully omitting LatestUpload here
-            let image_types =
-                DocumentSide::iter().flat_map(move |s| vec![Self::Image(k, s), Self::MimeType(k, s)]);
-            let ocr_types = OcrDataKind::iter().map(move |dk| Self::OcrData(k, dk));
-            image_types.chain(ocr_types)
-        });
+        let id_doc_types = IdDocKind::iter()
+            .filter(|d| d != &IdDocKind::Custom)
+            .flat_map(|k| {
+                // Purposefully omitting LatestUpload here
+                let image_types =
+                    DocumentSide::iter().flat_map(move |s| vec![Self::Image(k, s), Self::MimeType(k, s)]);
+                let ocr_types = OcrDataKind::iter().map(move |dk| Self::OcrData(k, dk));
+                image_types.chain(ocr_types)
+            });
         let simple_types = vec![Self::FinraComplianceLetter, Self::Custom(AliasId::fixture())];
         id_doc_types.chain(simple_types).collect()
     }

@@ -282,6 +282,7 @@ impl SupportedCountriesForDocType for Findigs {
             IdDocKind::VoterIdentification => vec![],
             IdDocKind::SsnCard => vec![],
             IdDocKind::ProofOfAddress => vec![],
+            IdDocKind::Custom => vec![],
         }
     }
 
@@ -303,6 +304,7 @@ impl SupportedCountriesForDocType for Coba {
             IdDocKind::VoterIdentification => vec![Iso3166TwoDigitCountryCode::MX],
             IdDocKind::SsnCard => vec![],
             IdDocKind::ProofOfAddress => vec![],
+            IdDocKind::Custom => vec![],
         }
     }
 
@@ -325,6 +327,7 @@ impl SupportedCountriesForDocType for Default {
             IdDocKind::VoterIdentification => all_us_and_territories,
             IdDocKind::SsnCard => vec![],
             IdDocKind::ProofOfAddress => vec![],
+            IdDocKind::Custom => vec![],
         }
     }
 
