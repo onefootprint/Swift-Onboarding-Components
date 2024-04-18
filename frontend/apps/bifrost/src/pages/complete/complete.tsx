@@ -47,9 +47,12 @@ const Complete = () => {
       <IcoCheckCircle40 color="success" />
       <Box marginBottom={4} />
       <HeaderTitle
-        sx={{ display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3 }}
-        title={t('title')}
+        display="flex"
+        flexDirection="column"
+        gap={4}
         subtitle={t('subtitle')}
+        title={t('title')}
+        zIndex={3}
       />
       <Box />
       <Box marginTop={7}>

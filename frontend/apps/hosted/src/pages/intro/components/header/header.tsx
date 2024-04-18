@@ -26,7 +26,7 @@ const Header = () => {
             otherBoName,
             businessName,
           })}
-          sx={{ marginTop: 4 }}
+          marginTop={4}
         />
       ) : (
         <HeaderTitle
@@ -40,7 +40,7 @@ const Header = () => {
               ? t('kyb.subtitle', { tenantName })
               : t('kyc.subtitle', { tenantName })
           }
-          sx={{ marginTop: 4 }}
+          marginTop={4}
         />
       )}
     </HeaderContainer>

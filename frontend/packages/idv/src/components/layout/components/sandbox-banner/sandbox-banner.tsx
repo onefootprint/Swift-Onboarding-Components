@@ -30,7 +30,7 @@ const SandboxBanner = forwardRef<SandboxBannerHandler, SandboxBannerProps>(
     return (
       <SandboxBannerContainer
         ref={containerRef}
-        hideOnDesktop={!!hideOnDesktop}
+        $hideOnDesktop={!!hideOnDesktop}
         data-testid="sandbox-banner"
       >
         <Banner variant="warning">{t('sandbox-banner')}</Banner>
@@ -40,7 +40,7 @@ const SandboxBanner = forwardRef<SandboxBannerHandler, SandboxBannerProps>(
 );
 
 const SandboxBannerContainer = styled.div<{
-  hideOnDesktop: boolean;
+  $hideOnDesktop: boolean;
 }>`
   ${({ theme }) => css`
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
@@ -49,8 +49,8 @@ const SandboxBannerContainer = styled.div<{
     z-index: ${theme.zIndex.sticky};
   `};
 
-  ${({ hideOnDesktop }) =>
-    !!hideOnDesktop &&
+  ${({ $hideOnDesktop }) =>
+    !!$hideOnDesktop &&
     css`
       ${media.greaterThan('md')`
         display: none;

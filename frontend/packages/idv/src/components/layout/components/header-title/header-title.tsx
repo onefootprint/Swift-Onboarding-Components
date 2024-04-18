@@ -1,32 +1,47 @@
 import type { Icon } from '@onefootprint/icons';
-import type { SXStyleProps } from '@onefootprint/ui';
 import { Stack, Text } from '@onefootprint/ui';
+import type { ComponentProps } from 'react';
 import React from 'react';
+
+type StackProps = ComponentProps<typeof Stack>;
 
 export const HEADER_TITLE_DEFAULT_ID = 'header-title';
 
 export type HeaderTitleProps = {
+  display?: StackProps['display'];
+  flexDirection?: StackProps['flexDirection'];
+  gap?: StackProps['gap'];
+  icon?: Icon;
+  marginBottom?: StackProps['marginBottom'];
+  marginTop?: StackProps['marginTop'];
+  subtitle?: string | JSX.Element;
   title: string | JSX.Element;
   titleElementId?: string;
-  subtitle?: string | JSX.Element;
-  sx?: SXStyleProps;
-  icon?: Icon;
+  zIndex?: StackProps['zIndex'];
 };
 
 const HeaderTitle = ({
-  title,
-  subtitle,
-  sx,
-  titleElementId = HEADER_TITLE_DEFAULT_ID,
+  display,
+  flexDirection,
+  gap = 3,
   icon: Icon,
+  marginTop,
+  marginBottom,
+  subtitle,
+  title,
+  titleElementId = HEADER_TITLE_DEFAULT_ID,
+  zIndex,
 }: HeaderTitleProps) => (
   <Stack
-    textAlign="center"
-    direction="column"
     align="center"
-    gap={3}
-    // @ts-ignore fix this later
-    sx={{ ...sx }}
+    direction="column"
+    display={display}
+    flexDirection={flexDirection}
+    gap={gap}
+    marginBottom={marginBottom}
+    marginTop={marginTop}
+    textAlign="center"
+    zIndex={zIndex}
   >
     {Icon && <Icon />}
     <Stack direction="column" align="center" gap={3}>

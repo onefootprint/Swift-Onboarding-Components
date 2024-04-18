@@ -55,7 +55,7 @@ const PhoneForm = ({
   return (
     <Grid.Container
       as="form"
-      gap={7}
+      gap={7} // "gap" is being sent through to the DOM
       onSubmit={handleSubmit(handleBeforeSubmit)}
     >
       <Controller

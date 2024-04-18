@@ -1,20 +1,23 @@
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import type { BannerVariant } from './banner.types';
 import { createVariantStyles } from './banner.utils';
 
-export type BannerProps = {
-  children: React.ReactNode;
-  variant: BannerVariant;
-};
+export type BannerProps = { children: React.ReactNode; variant: BannerVariant };
+type StyledProps = { children: React.ReactNode; $variant: BannerVariant };
 
-const Banner = styled.div.attrs<BannerProps>({
+const Banner = ({ children, variant }: BannerProps) => (
+  <StyledDiv $variant={variant}>{children}</StyledDiv>
+);
+
+const StyledDiv = styled.div.attrs<StyledProps>({
   role: 'alert',
-})<BannerProps>`
-  ${({ theme, variant }) => css`
+})<StyledProps>`
+  ${({ theme, $variant }) => css`
     ${createFontStyles('label-3')};
-    ${createVariantStyles(variant)};
+    ${createVariantStyles($variant)};
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
     text-align: center;
     width: 100%;

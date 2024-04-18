@@ -21,6 +21,7 @@ import { filterProps } from './box.utils';
 const Box = forwardRef<HTMLDivElement, BoxProps>(
   ({ center, typography, tag, testID, isPrivate, ...props }, ref) => {
     const { styleProps, ...allProps } = filterProps(props);
+
     return (
       <SB
         $center={center}
@@ -49,7 +50,9 @@ const SB = styled.div<
     ${$center && 'display: flex; justify-content: center; align-items: center;'}
     ${Object.keys($styleProps)
       .map(prop => {
+        const key = toKebabCase(prop);
         const value = $styleProps[prop as keyof BoxStyleProps];
+
         if (
           prop.startsWith('margin') ||
           prop.startsWith('padding') ||
@@ -57,17 +60,13 @@ const SB = styled.div<
           prop === 'rowGap' ||
           prop === 'columnGap'
         ) {
-          return `${toKebabCase(prop)}: ${theme.spacing[value as Spacing]};`;
+          return `${key}: ${theme.spacing[value as Spacing]};`;
         }
         if (prop.startsWith('border') && prop.endsWith('Color')) {
-          return `${toKebabCase(prop)}: ${
-            theme.borderColor[value as BorderColor]
-          };`;
+          return `${key}: ${theme.borderColor[value as BorderColor]};`;
         }
         if (prop.includes('Radius')) {
-          return `${toKebabCase(prop)}: ${
-            theme.borderRadius[value as BorderRadius]
-          };`;
+          return `${key}: ${theme.borderRadius[value as BorderRadius]};`;
         }
         if (
           prop.includes('borderWidth') ||
@@ -76,9 +75,7 @@ const SB = styled.div<
           prop.includes('borderLeftWidth') ||
           prop.includes('borderRightWidth')
         ) {
-          return `${toKebabCase(prop)}: ${
-            theme.borderWidth[value as BorderWidth]
-          };`;
+          return `${key}: ${theme.borderWidth[value as BorderWidth]};`;
         }
 
         if (prop === 'backgroundColor') {
@@ -93,7 +90,7 @@ const SB = styled.div<
           return `box-shadow: ${theme.elevation[value as Elevation]};`;
         }
         if (value != null) {
-          return `${toKebabCase(prop)}: ${value};`;
+          return `${key}: ${value};`;
         }
         return '';
       })

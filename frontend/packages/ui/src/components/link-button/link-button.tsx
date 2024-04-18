@@ -45,6 +45,10 @@ export type LinkButtonProps = {
   $paddingBlock?: keyof Theme['spacing'];
 };
 
+type StyledProps = Omit<LinkButtonProps, 'variant'> & {
+  $variant?: LinkButtonVariant;
+};
+
 const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
   (
     {
@@ -100,7 +104,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         rel={target === '_blank' ? 'noopener noreferrer' : undefined}
         target={target}
         type={href ? undefined : type}
-        variant={variant}
+        $variant={variant}
         form={href ? undefined : form}
         destructive={destructive}
         $margin={$margin}
@@ -126,11 +130,11 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
   },
 );
 
-export const LinkButtonStyled = styled.button<LinkButtonProps>`
+export const LinkButtonStyled = styled.button<StyledProps>`
   ${({
     theme,
     destructive,
-    variant = 'label-3',
+    $variant = 'label-3',
     disabled,
     $margin,
     $marginInline,
@@ -155,7 +159,7 @@ export const LinkButtonStyled = styled.button<LinkButtonProps>`
     const smallSizes = ['snippet-2', 'snippet-3'];
 
     return css`
-      ${createFontStyles(variant)}
+      ${createFontStyles($variant)}
       margin: ${$margin ? theme.spacing[$margin] : '0'};
       margin-inline: ${$marginInline
         ? theme.spacing[$marginInline]
@@ -190,7 +194,7 @@ export const LinkButtonStyled = styled.button<LinkButtonProps>`
       display: inline-flex;
       text-decoration: none;
       width: fit-content;
-      gap: ${smallSizes.includes(variant)
+      gap: ${smallSizes.includes($variant)
         ? theme.spacing[1]
         : theme.spacing[2]};
 

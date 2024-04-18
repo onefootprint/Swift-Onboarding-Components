@@ -64,30 +64,30 @@ const NavigationHeaderContainer = ({
 
   return (
     <Header
-      style={isSticky ? { top: `${headerTop}px` } : {}}
-      hasScroll={hasScroll}
+      $background={headerBackground}
+      $buttonOnly={headerPosition === 'button-only'}
+      $hasScroll={hasScroll}
+      $isSticky={isSticky}
+      $position={position}
       id={NAVIGATION_HEADER_PORTAL_ID}
-      isSticky={isSticky}
-      background={headerBackground}
-      position={position}
+      style={isSticky ? { top: `${headerTop}px` } : {}}
       width={layoutContainerWidth}
-      buttonOnly={headerPosition === 'button-only'}
     />
   );
 };
 
 const Header = styled.header<{
-  hasScroll: boolean;
-  isSticky: boolean;
-  background: NavigationHeaderBGVariant;
-  position: string;
+  $background: NavigationHeaderBGVariant;
+  $buttonOnly: boolean;
+  $hasScroll: boolean;
+  $isSticky: boolean;
+  $position: string;
   width: number;
-  buttonOnly: boolean;
 }>`
-  ${({ theme, isSticky, background, position, buttonOnly }) => css`
+  ${({ theme, $isSticky, $background, $position, $buttonOnly }) => css`
     padding: 0 ${theme.spacing[5]};
-    position: ${position};
-    z-index: ${isSticky ? theme.zIndex.sticky : 0};
+    position: ${$position};
+    z-index: ${$isSticky ? theme.zIndex.sticky : 0};
 
     ${media.greaterThan('md')`
       padding: 0 ${theme.spacing[4]};
@@ -102,17 +102,17 @@ const Header = styled.header<{
       height: 100%;
       z-index: 0;
 
-      ${background === 'primary' &&
+      ${$background === 'primary' &&
       css`
         background: ${theme.backgroundColor.primary};
       `}
 
-      ${background === 'transparent' &&
+      ${$background === 'transparent' &&
       css`
         background: ${theme.backgroundColor.transparent};
       `}
 
-      ${background === 'dark-glass' &&
+      ${$background === 'dark-glass' &&
       css`
         background-color: black;
         backdrop-filter: blur(12px);
@@ -120,7 +120,7 @@ const Header = styled.header<{
         opacity: 0.2;
       `}
       
-      ${background === 'light-glass' &&
+      ${$background === 'light-glass' &&
       css`
         background: ${theme.backgroundColor.primary};
         backdrop-filter: blur(10px);
@@ -128,7 +128,7 @@ const Header = styled.header<{
         opacity: 0.2;
       `}
 
-      ${buttonOnly &&
+      ${$buttonOnly &&
       css`
         background: ${theme.backgroundColor.transparent};
       `}
@@ -140,16 +140,16 @@ const Header = styled.header<{
     }
   `}
 
-  ${({ position, width, buttonOnly }) =>
-    position === 'fixed' &&
+  ${({ $position, width, $buttonOnly }) =>
+    $position === 'fixed' &&
     css`
-      width: ${buttonOnly ? 0 : `${width}px`};
+      width: ${$buttonOnly ? 0 : `${width}px`};
     `}
 
-  ${({ theme, hasScroll, buttonOnly, position }) =>
-    hasScroll &&
-    !buttonOnly &&
-    position !== 'relative' &&
+  ${({ theme, $hasScroll, $buttonOnly, $position }) =>
+    $hasScroll &&
+    !$buttonOnly &&
+    $position !== 'relative' &&
     css`
       border-bottom: 1px solid ${theme.borderColor.tertiary};
 

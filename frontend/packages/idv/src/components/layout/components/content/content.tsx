@@ -89,9 +89,9 @@ const Content = ({ children, isSandbox, config }: ContentProps) => {
         <BodyContent>{children}</BodyContent>
       </Stack>
       <BottomActionContainer
-        bottom={footerHeight}
+        $bottom={footerHeight}
+        $showBorderTop={bodyContentOverflowing}
         id={BOTTOM_ACTION_BOX_PORTAL_ID}
-        showBorderTop={bodyContentOverflowing}
       />
       <WhatsThisBottomSheet
         open={isSheetOpen}
@@ -125,19 +125,19 @@ const BodyContent = styled.div`
 `;
 
 const BottomActionContainer = styled.div<{
-  bottom: number;
-  showBorderTop: boolean;
+  $bottom: number;
+  $showBorderTop: boolean;
 }>`
-  ${({ theme, bottom }) => css`
+  ${({ theme, $bottom }) => css`
     display: flex;
     flex-direction: column;
     position: sticky;
-    bottom: ${bottom}px;
+    bottom: ${$bottom}px;
     z-index: ${theme.zIndex.sticky};
   `}
 
-  ${({ theme, showBorderTop }) =>
-    showBorderTop &&
+  ${({ theme, $showBorderTop }) =>
+    $showBorderTop &&
     css`
       border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
 

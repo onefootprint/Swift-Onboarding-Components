@@ -171,10 +171,10 @@ const DrawerTimeline = ({
                         ) : null}
                         {isSubmitted(kind) ? (
                           <LinkButton
+                            variant="label-3"
                             onClick={() =>
                               onViewSubmissionClick(docId, submissionId(i))
                             }
-                            variant="label-3"
                           >
                             {t('doc.view-submission')}
                           </LinkButton>

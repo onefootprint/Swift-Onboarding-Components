@@ -43,11 +43,11 @@ const FootprintFooter = ({
 
   return (
     <FootprintFooterContainer
-      hideOnDesktop={hideOnDesktop}
-      isSticky={footerPosition === 'sticky'}
-      isVisible={footerVisible}
-      ref={ref}
+      $hideOnDesktop={hideOnDesktop}
+      $isSticky={footerPosition === 'sticky'}
+      $isVisible={footerVisible}
       id={FOOTPRINT_FOOTER_ID}
+      ref={ref}
     >
       <SecuredByFootprint />
       <LinksContainer align="center" justify="center" gap={3}>
@@ -84,30 +84,30 @@ const WhatsThisButton = styled.button`
 `;
 
 const FootprintFooterContainer = styled.footer<{
-  hideOnDesktop?: boolean;
-  isSticky: boolean;
-  isVisible: boolean;
+  $hideOnDesktop?: boolean;
+  $isSticky: boolean;
+  $isVisible: boolean;
 }>`
-  ${({ theme, isSticky }) => css`
+  ${({ theme, $isSticky }) => css`
     display: flex;
     justify-content: space-between;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
     flex: 0;
-    position: ${isSticky ? 'sticky' : 'relative'};
-    bottom: ${isSticky ? 0 : undefined};
-    z-index: ${isSticky ? theme.zIndex.sticky : 1};
+    position: ${$isSticky ? 'sticky' : 'relative'};
+    bottom: ${$isSticky ? 0 : undefined};
+    z-index: ${$isSticky ? theme.zIndex.sticky : 1};
     background-color: ${theme.backgroundColor.secondary};
     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
 
-  ${({ isVisible }) =>
-    !isVisible &&
+  ${({ $isVisible }) =>
+    !$isVisible &&
     css`
       display: none;
     `}
 
-  ${({ hideOnDesktop }) =>
-    !!hideOnDesktop &&
+  ${({ $hideOnDesktop }) =>
+    !!$hideOnDesktop &&
     css`
       ${media.greaterThan('md')`
         display: none;

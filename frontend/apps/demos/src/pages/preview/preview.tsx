@@ -36,7 +36,7 @@ const Preview = ({ obConfig }: PreviewProps) => {
   return (
     <>
       <Head>
-        <title>Footprint Preview - {obConfig.org_name}</title>
+        <title>{`Footprint Preview - ${obConfig.org_name}`}</title>
       </Head>
       <Container>
         <Inner>

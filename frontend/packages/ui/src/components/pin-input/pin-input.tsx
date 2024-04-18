@@ -105,7 +105,7 @@ const PinInput = ({
               data-nid-target={`otp${pinIndex + 1}`}
               hasError={hasError}
               inputMode="numeric"
-              isDisabled={disabled || isIndexDisabled}
+              $isDisabled={disabled || isIndexDisabled}
               key={key}
               onChange={handleChange(pinIndex)}
               onKeyDown={handleKeyDown(pinIndex)}
@@ -131,11 +131,11 @@ const PinContainer = styled.div`
   gap: ${({ theme }) => theme.spacing[3]};
 `;
 
-const Pin = styled(Input)<{ isDisabled: boolean }>`
-  ${({ isDisabled }) => css`
+const Pin = styled(Input)<{ $isDisabled: boolean }>`
+  ${({ $isDisabled }) => css`
     height: 44px;
     padding: 0;
-    pointer-events: ${isDisabled ? 'none' : undefined};
+    pointer-events: ${$isDisabled ? 'none' : undefined};
     text-align: center;
   `}
 `;

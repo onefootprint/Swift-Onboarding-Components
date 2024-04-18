@@ -105,7 +105,7 @@ const BasicData = ({
           <HeaderTitle
             title={t('kyb.pages.basic-data.title')}
             subtitle={t('kyb.pages.basic-data.subtitle')}
-            sx={{ marginBottom: 7 }}
+            marginBottom={7}
           />
         </>
       )}

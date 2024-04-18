@@ -29,6 +29,7 @@ const createRows = (rows?: string | string[]) => {
   return undefined;
 };
 
+// TODO: Add "$" in front of props to prevent them from being passed to the DOM.
 const Container = styled('div').attrs<{ as: GridTag }>(({ as }) => ({
   as,
 }))<GridContainerProps>`

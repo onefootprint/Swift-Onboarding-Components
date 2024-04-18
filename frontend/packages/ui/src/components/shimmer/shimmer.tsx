@@ -32,7 +32,7 @@ const Shimmer = ({
       }
       data-testid={testID}
       role="progressbar"
-      sx={sxStyles}
+      $sx={sxStyles}
       tabIndex={0}
     />
   );
@@ -44,7 +44,7 @@ const blink = keyframes`
   }
 `;
 
-const ShimmerContainer = styled.div<{ sx: SXStyles }>`
+const ShimmerContainer = styled.div<{ $sx: SXStyles }>`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.sm};
@@ -70,8 +70,8 @@ const ShimmerContainer = styled.div<{ sx: SXStyles }>`
       animation: ${blink} 2s infinite;
     }
   `}
-  ${({ sx }) => css`
-    ${sx};
+  ${({ $sx }) => css`
+    ${$sx};
   `}
 `;
 

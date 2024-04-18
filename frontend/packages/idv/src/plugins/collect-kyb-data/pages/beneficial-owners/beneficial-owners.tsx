@@ -110,7 +110,7 @@ const BeneficialOwners = ({
           <HeaderTitle
             title={t('title')}
             subtitle={t('subtitle')}
-            sx={{ marginBottom: 7 }}
+            marginBottom={7}
           />
         </>
       )}

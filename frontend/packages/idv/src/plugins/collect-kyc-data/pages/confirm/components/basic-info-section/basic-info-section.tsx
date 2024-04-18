@@ -89,7 +89,7 @@ const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
             <ResponsiveGridContainer>
               {basicList.map(({ text, subtext, textColor }) => (
                 <SectionItem
-                  key={text}
+                  key={text + subtext}
                   text={text}
                   subtext={subtext}
                   textColor={textColor}
@@ -104,6 +104,7 @@ const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
             ? verifiableList.map(
                 ({ isVerified, onClick, subtext, text, textColor }) => (
                   <Grid.Container
+                    key={text + subtext}
                     paddingTop={7}
                     width="100%"
                     columns={['1fr auto']}

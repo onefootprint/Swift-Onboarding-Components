@@ -28,7 +28,7 @@ const FullHeightContainer = forwardRef<
     <Container
       id={id}
       ref={ref}
-      hasBorderRadius={!!hasBorderRadius}
+      $hasBorderRadius={!!hasBorderRadius}
       height={height}
       data-variant={variant}
     >
@@ -37,7 +37,7 @@ const FullHeightContainer = forwardRef<
   );
 });
 
-const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
+const Container = styled.div<{ $hasBorderRadius: boolean; height: string }>`
   ${({ theme, height }) => css`
     background: ${theme.components.bifrost.container.bg};
     border: ${theme.components.bifrost.container.border};
@@ -76,8 +76,8 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
     }
   `}
 
-  ${({ hasBorderRadius, theme }) =>
-    hasBorderRadius &&
+  ${({ $hasBorderRadius, theme }) =>
+    $hasBorderRadius &&
     css`
       ${media.greaterThan('md')`
         border-radius: ${theme.components.bifrost.container.borderRadius};

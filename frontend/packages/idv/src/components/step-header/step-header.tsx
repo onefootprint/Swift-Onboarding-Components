@@ -29,7 +29,7 @@ const StepHeader = ({
       {showLogo && orgName ? (
         <Logo orgName={orgName} logoUrl={logoUrl} />
       ) : null}
-      <HeaderTitle title={title} subtitle={subtitle} sx={{ marginBottom: 8 }} />
+      <HeaderTitle title={title} subtitle={subtitle} />
     </ContentHeader>
   </>
 );

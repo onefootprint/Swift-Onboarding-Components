@@ -128,7 +128,7 @@ const NavigationHeader = ({
     <Portal selector={NAVIGATION_HEADER_PORTAL_SELECTOR}>
       <HeaderContent ref={isStatic ? null : measuredRef}>
         <ButtonContainer
-          headerPosition={position}
+          $headerPosition={position}
           data-scrolling={hasScroll}
           data-button-position="left"
         >
@@ -148,7 +148,7 @@ const NavigationHeader = ({
         </ButtonContainer>
         {rightButton && (
           <ButtonContainer
-            headerPosition={position}
+            $headerPosition={position}
             data-scrolling={hasScroll}
             data-button-position="right"
           >
@@ -171,7 +171,7 @@ const NavigationHeader = ({
 };
 
 const ButtonContainer = styled.div<{
-  headerPosition?: NavigationHeaderPositionTypes;
+  $headerPosition?: NavigationHeaderPositionTypes;
 }>`
   position: absolute;
   isolation: isolate;
@@ -185,8 +185,8 @@ const ButtonContainer = styled.div<{
     right: 0;
   }
 
-  ${({ headerPosition, theme }) =>
-    headerPosition === 'button-only' &&
+  ${({ $headerPosition, theme }) =>
+    $headerPosition === 'button-only' &&
     css`
       background-color: ${theme.backgroundColor.primary};
       border-radius: ${theme.borderRadius.full};
