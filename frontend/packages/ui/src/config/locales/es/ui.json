@@ -310,6 +310,10 @@
     "tabs": {},
     "toast": {
       "close-aria-label-default": "Cerrar"
+    },
+    "date-range": {
+      "error-future": "The date must be today or in the past.",
+      "error-past": "The date must be today or in the past."
     }
   }
 }

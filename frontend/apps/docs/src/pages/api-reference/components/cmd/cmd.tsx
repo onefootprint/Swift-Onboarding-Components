@@ -1,5 +1,12 @@
 import { IcoClose16, IcoSearch24 } from '@onefootprint/icons';
-import { createFontStyles, Grid, IconButton, Overlay } from '@onefootprint/ui';
+import {
+  createFontStyles,
+  Grid,
+  IconButton,
+  Overlay,
+  Stack,
+  Text,
+} from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,6 +78,22 @@ const Cmd = ({ sections }: PageNavProps) => {
                 ))}
               </Group>
             ))}
+          <Group>
+            {sections.flatMap(({ articles }) =>
+              articles.flatMap(({ parameters = [], id }) =>
+                parameters.map(parameter => (
+                  <Option onSelect={() => handleScroll(id)} key={id}>
+                    <Stack direction="row" gap={3}>
+                      <Text variant="label-2">{parameter.name}</Text>
+                      <Text variant="body-2" color="tertiary">
+                        {id}
+                      </Text>
+                    </Stack>
+                  </Option>
+                )),
+              ),
+            )}
+          </Group>
         </List>
         <Footer />
       </DialogContainer>
@@ -168,4 +191,5 @@ const EmptyState = styled(Command.Empty)`
     text-align: center;
   `}
 `;
+
 export default Cmd;
