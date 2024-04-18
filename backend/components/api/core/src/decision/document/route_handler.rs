@@ -55,6 +55,8 @@ pub async fn handle_document_create(
     let su_id2 = su_id.clone();
     let ff_client = state.feature_flag_client.clone();
 
+    tracing::info!(has_request_id=%request_id.is_some(), "Creating document with request_id");
+
     let workflow_id = wf_id.clone();
     let dr = state
         .db_pool

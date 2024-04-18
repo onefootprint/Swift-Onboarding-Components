@@ -36,16 +36,17 @@ def restricted_doc_ob_config_only_international(
 
 def test_upload_documents(doc_request_sandbox_ob_config):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    doc_requirement = bifrost.get_requirement("collect_document")
 
     # First, make a few upload sessions that are aborted
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "id_card",
         "country_code": "US",
     }
     id = post("hosted/user/documents", data, bifrost.auth_token)["id"]
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
-    import copy
 
     post(
         f"hosted/user/documents/{id}/upload/front",
@@ -56,6 +57,7 @@ def test_upload_documents(doc_request_sandbox_ob_config):
     post(f"hosted/user/documents/{id}/process", None, bifrost.auth_token)
 
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "US",
     }
@@ -84,6 +86,7 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
     restricted_doc_ob_config,
 ):
     bifrost = BifrostClient.new(restricted_doc_ob_config)
+    doc_requirement = bifrost.get_requirement("collect_document")
 
     # Manually handle the document requirement with some invalid data
     consent_data = {"consent_language_text": "I consent"}
@@ -91,6 +94,7 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
 
     # Shouldn't be allowed to upload non-US document
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "NO",
     }
@@ -104,6 +108,7 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
 
     # Shouldn't be allowed to upload non-drivers-license
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "id_card",
         "country_code": "US",
     }
@@ -127,6 +132,8 @@ def test_upload_documents_with_ob_config_restriction(
     bifrost = BifrostClient.new(restricted_doc_ob_config_only_international)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
+    doc_requirement = bifrost.get_requirement("collect_document")
+
     # make sure we've collected country
     met_requirement = get_requirement_from_requirements(
         "collect_data", bifrost.get_status()["all_requirements"], is_met=True
@@ -139,6 +146,7 @@ def test_upload_documents_with_ob_config_restriction(
 
     # Shouldn't be allowed to upload DL
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "MX",
     }
@@ -150,6 +158,7 @@ def test_upload_documents_with_ob_config_restriction(
 
     # Can upload a non-US passport
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "passport",
         "country_code": "NO",
     }
@@ -157,6 +166,7 @@ def test_upload_documents_with_ob_config_restriction(
 
     # Can upload a US DL
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "US",
     }
@@ -190,6 +200,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
     bifrost = BifrostClient.new(obc)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
+    doc_requirement = bifrost.get_requirement("collect_document")
 
     # Manually handle the document requirement with some invalid data
     consent_data = {"consent_language_text": "I consent"}
@@ -197,6 +208,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
 
     # Shouldn't be allowed to upload DL in MX
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "MX",
     }
@@ -208,6 +220,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
 
     # Shouldn't be allowed to passport in US
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "passport",
         "country_code": "US",
     }
@@ -219,6 +232,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
 
     # Shouldn't be allowed to voter id in US
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "voter_identification",
         "country_code": "US",
     }
@@ -230,6 +244,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
 
     # Can upload a non-US passport
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "passport",
         "country_code": "NO",
     }
@@ -237,6 +252,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
 
     # Can upload a US DL
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "US",
     }
@@ -267,6 +283,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config):
     post("hosted/user/consent", consent_data, bifrost.auth_token)
 
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "US",
         "skip_selfie": True,
@@ -305,12 +322,15 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config):
 
 def test_upload_apis(doc_request_sandbox_ob_config):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    doc_requirement = bifrost.get_requirement("collect_document")
+
     # consent
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
 
     # Make sure re-posting yields same doc ID
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "id_card",
         "country_code": "US",
         "device_type": "desktop",
@@ -322,6 +342,7 @@ def test_upload_apis(doc_request_sandbox_ob_config):
 
     # Now, make a drivers_license session. Should have a different ID
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "US",
         "device_type": "desktop",
@@ -367,12 +388,14 @@ def test_user_uploading_small_image(doc_request_sandbox_ob_config):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
-    status = bifrost.get_status()
+    doc_requirement = bifrost.get_requirement("collect_document")
+
     # consent
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
 
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "US",
         "skip_selfie": True,
@@ -399,11 +422,14 @@ def test_user_having_trouble_with_their_mobile_camera(
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
+    doc_requirement = bifrost.get_requirement("collect_document")
+
     # consent
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
 
     data = {
+        "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "US",
         "device_type": "desktop",

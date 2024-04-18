@@ -21,6 +21,7 @@ from tests.utils import (
     patch,
     override_webauthn_challenge,
     override_webauthn_attestation,
+    get_requirement_from_requirements,
 )
 
 
@@ -181,6 +182,10 @@ class BifrostClient:
     def get_status(self):
         return get("hosted/onboarding/status", None, self.auth_token)
 
+    def get_requirement(self, kind):
+        status = self.get_status()
+        return get_requirement_from_requirements(kind, status["all_requirements"])
+
     def handle_requirements(self, kind=None):
         """
         Handle all onboarding requirements.
@@ -275,36 +280,38 @@ class BifrostClient:
 
     def handle_collect_document(self, requirement):
         """Add identity documents to vault"""
-        assert (
-            requirement["config"]["kind"] != "custom"
-        ), "BifrostClient cannot handle custom docs"
-        if requirement["should_collect_consent"]:
+        if requirement["config"].get("should_collect_consent", None):
             consent_data = {"consent_language_text": "I consent"}
             post("hosted/user/consent", consent_data, self.auth_token)
 
         doc_kind = None
+        country_code = None
         sides = ["front"]
-        supported_doc_types = requirement["supported_country_and_doc_types"]["US"]
-        if "drivers_license" in supported_doc_types:
-            doc_kind = "drivers_license"
-            sides.append("back")
-        elif "ssn_card" in supported_doc_types:
-            # Kind of a hack - we won't actually upload an ssn card image
+        if requirement["config"]["kind"] == "identity":
+            supported_doc_types = requirement["config"][
+                "supported_country_and_doc_types"
+            ]["US"]
+            country_code = "US"
+            if "drivers_license" in supported_doc_types:
+                doc_kind = "drivers_license"
+                sides.append("back")
+        elif requirement["config"]["kind"] == "proof_of_ssn":
             doc_kind = "ssn_card"
-        elif set(["proof_of_address"]).intersection(set(supported_doc_types)) != set():
-            # Kind of a hack - we won't actually upload an PoA image
+        elif requirement["config"]["kind"] == "proof_of_address":
+            # Kind of a hack - we won't actually upload a PoA image
             doc_kind = "proof_of_address"
+        elif requirement["config"]["kind"] == "custom":
+            doc_kind = "custom"
         else:
-            assert (
-                False
-            ), f"""BifrostClient can't upload a supported document type: {",".join(supported_doc_types)}"""
+            assert False, "BifrostClient can't handle this document requirement"
 
         if requirement["should_collect_selfie"]:
             sides.append("selfie")
 
         data = {
+            "request_id": requirement["document_request_id"],
             "document_type": doc_kind,
-            "country_code": "US",
+            "country_code": country_code,
         }
         body = post("hosted/user/documents", data, self.auth_token)
         doc_id = body["id"]
@@ -316,7 +323,6 @@ class BifrostClient:
                 "x-fp-is-app-clip": "true",
                 "x-fp-is-instant-app": "false",
                 "x-fp-is-mobile": "true",
-                "x-fp-process-separately": "true",
             }
             post(
                 f"hosted/user/documents/{doc_id}/upload/{side}",
