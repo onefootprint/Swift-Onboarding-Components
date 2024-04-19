@@ -22,6 +22,7 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             ocr_confidence_score,
             status,
             device_type,
+            curp_completed_seqno,
             ..
         } = identity_doc;
 
@@ -35,6 +36,7 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             started_at: Some(created_at),
             status: Some(status),
             completed_version: completed_seqno,
+            curp_completed_version: curp_completed_seqno,
             uploads,
             document_score,
             selfie_score,
@@ -81,6 +83,7 @@ impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
             started_at: None,
             status: None,
             completed_version: None,
+            curp_completed_version: None,
             uploads,
             document_score: None,
             selfie_score: None,

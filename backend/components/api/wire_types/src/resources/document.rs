@@ -29,6 +29,7 @@ pub struct Document {
     /// Non-null for images uploaded via the UI
     pub status: Option<IdentityDocumentStatus>,
     pub completed_version: Option<DataLifetimeSeqno>,
+    pub curp_completed_version: Option<DataLifetimeSeqno>,
     pub uploads: Vec<DocumentUpload>,
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
