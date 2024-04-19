@@ -84,7 +84,11 @@ pub(super) async fn compute_ocr_data<'a>(
     let data = ParsedIncodeFields::from_fetch_ocr_res(r)
         .0
         .into_iter()
-        .map(|pif| (DocumentKind::OcrData(dk.0, pif.odk).into(), pif.value))
+        .map(|pif| {
+            let di = DocumentKind::OcrData(dk.0, pif.odk).into();
+            let v = PiiJsonValue::from_piistring(pif.value);
+            (di, v)
+        })
         .collect_vec();
     // For doc-first onboardings, populate identity data
     let id_data = if obc.is_doc_first {
@@ -102,16 +106,19 @@ pub(super) async fn compute_ocr_data<'a>(
         vec![]
     };
     let data = HashMap::from_iter(data.into_iter().chain(id_data));
-    let data = DataRequest::clean_and_validate_str(data, validate_args)?;
+    let data = DataRequest::clean_and_validate(data, validate_args)?;
     let data = data.build_fingerprints(enclave_client, &obc.tenant_id).await?;
     Ok(data)
 }
 
-fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(DataIdentifier, PiiString)> {
+fn doc_first_id_data(
+    r: &FetchOCRResponse,
+    validate_args: ValidateArgs,
+) -> Vec<(DataIdentifier, PiiJsonValue)> {
     let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(r);
 
     let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
-    vec![
+    let all_data = vec![
         (
             IDK::FirstName,
             parsed_names.first_name.map(ScrubbedPiiString::from).as_ref(),
@@ -133,9 +140,16 @@ fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(
     ]
     .into_iter()
     .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
+    .map(|(k, v)| (k, PiiJsonValue::from_piistring(v)))
+    .collect::<HashMap<_, _>>();
+
+    let raw_data = all_data.clone();
+
     // Don't add OCR data that fails validation - don't want it to block sign up
-    .filter(|(k, v)| k.clone().validate(PiiJsonValue::from_piistring(v.clone()), validate_args, &HashMap::new()).is_ok())
-    .collect()
+    all_data
+        .into_iter()
+        .filter(|(k, v)| k.clone().validate(v.clone(), validate_args, &raw_data).is_ok())
+        .collect()
 }
 
 pub(super) type NewRiskSignal = (FootprintReasonCode, VendorAPI, VerificationResultId);
