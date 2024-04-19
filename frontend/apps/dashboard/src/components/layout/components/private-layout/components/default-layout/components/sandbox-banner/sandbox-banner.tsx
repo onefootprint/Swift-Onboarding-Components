@@ -1,4 +1,4 @@
-import { Banner, Text } from '@onefootprint/ui';
+import { Banner, Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,29 +15,31 @@ const SandboxBanner = () => {
   return sandbox.isSandbox ? (
     <SandboxBannerContainer>
       <StyledBanner variant="warning">
-        {t('title')}
-        {sandbox.canToggle ? (
-          <button
-            type="button"
-            onClick={sandbox.toggle}
-            disabled={!sandbox.canToggle}
-          >
-            {t('toggle')}
-          </button>
-        ) : (
-          <>
-            <Link href="mailto:eli@onefootprint.com">
-              <button type="button">{t('contact-us')}</button>
-            </Link>
-            <Text variant="body-2" color="warning" marginLeft={2}>
-              {t('or')}
-            </Text>
-            <ContactForm>{t('form')}</ContactForm>
-            <Text variant="body-2" color="warning">
-              .
-            </Text>
-          </>
-        )}
+        <Stack direction="row" align="center" justify="center">
+          {t('title')}
+          {sandbox.canToggle ? (
+            <button
+              type="button"
+              onClick={sandbox.toggle}
+              disabled={!sandbox.canToggle}
+            >
+              {t('toggle')}
+            </button>
+          ) : (
+            <Stack direction="row" gap={2}>
+              <Link href="mailto:eli@onefootprint.com">
+                <button type="button">{t('contact-us')}</button>
+              </Link>
+              <Text variant="body-2" color="warning" marginLeft={2}>
+                {t('or')}
+              </Text>
+              <ContactForm>{t('form')}</ContactForm>
+              <Text variant="body-2" color="warning">
+                .
+              </Text>
+            </Stack>
+          )}
+        </Stack>
       </StyledBanner>
     </SandboxBannerContainer>
   ) : null;

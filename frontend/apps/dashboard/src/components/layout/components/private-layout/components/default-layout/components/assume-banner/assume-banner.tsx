@@ -28,7 +28,7 @@ const AssumeBanner = () => {
   return data.user?.isAssumedSession ? (
     <AssumeBannerContainer>
       <StyledBanner variant={isAssumedSessionEditMode ? 'error' : 'info'}>
-        <Stack direction="row" gap={2}>
+        <Stack direction="row" align="center" justify="center" gap={2}>
           <span>
             {t(isAssumedSessionEditMode ? 'edit-mode-title' : 'title', {
               orgName: data.org?.name,
