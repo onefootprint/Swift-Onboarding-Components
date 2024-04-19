@@ -37,10 +37,12 @@ impl From<IncodeOcrComparisonDataFields> for IncodeOcrFixtureResponseFields {
             dob,
             address: _,
         } = value;
+        
         Self {
             first_name,
             last_name,
             dob,
+            ..Default::default()
         }
     }
 }

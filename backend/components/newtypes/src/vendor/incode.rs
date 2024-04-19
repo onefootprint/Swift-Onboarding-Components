@@ -378,6 +378,33 @@ impl<'a> TryFrom<(&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>)> fo
     }
 }
 
+impl From<IdDocKind> for (Option<IncodeDocumentType>, Option<IncodeDocumentSubType>) {
+    fn from(value: IdDocKind) -> Self {
+        match value {
+            IdDocKind::IdCard => (
+                Some(IncodeDocumentType::IdentificationCard),
+                Some(IncodeDocumentSubType::IdentificationCard),
+            ),
+            IdDocKind::DriversLicense => (
+                Some(IncodeDocumentType::DriversLicense),
+                Some(IncodeDocumentSubType::DriversLicense),
+            ),
+            IdDocKind::Passport => (Some(IncodeDocumentType::Passport), None),
+            IdDocKind::PassportCard => (
+                Some(IncodeDocumentType::TravelDocument),
+                Some(IncodeDocumentSubType::PassportCardAllages),
+            ),
+            IdDocKind::Permit => (Some(IncodeDocumentType::Permit), None),
+            IdDocKind::Visa => (Some(IncodeDocumentType::Visa), None),
+            IdDocKind::ResidenceDocument => (Some(IncodeDocumentType::ResidenceDocument), None),
+            IdDocKind::VoterIdentification => (Some(IncodeDocumentType::VoterIdentification), None),
+            IdDocKind::SsnCard => (None, None),
+            IdDocKind::ProofOfAddress => (None, None),
+            IdDocKind::Custom => (None, None),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IncodeDocumentRestriction {
     NoDriverLicensePermit,

@@ -51,17 +51,17 @@ pub async fn run_curp_validation_check(
     let svid = di.scoped_vault_id.clone();
     let wf_id2 = wf_id.clone();
     let di_id = di.id.clone();
-    let (vw, tenant_id, id_documents, latest_results) = state
+    let (vw, tenant_id, id_documents, latest_results, sv) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
-            let tenant_id = sv.tenant_id;
+            let tenant_id = sv.tenant_id.clone();
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             let id_documents = IdentityDocument::list_completed_sent_to_incode_by_wf_id(conn, &wf_id2)?;
             let latest_results =
                 VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &di_id)?;
 
-            Ok((vw, tenant_id, id_documents, latest_results))
+            Ok((vw, tenant_id, id_documents, latest_results, sv))
         })
         .await?;
 
@@ -76,7 +76,7 @@ pub async fn run_curp_validation_check(
     // Handle both sandbox and prod
     let id_doc_helper = IdentityDocumentForCurpHelper::new(id_documents);
     let id_doc_fixture = id_doc_helper.fixture();
-    let should_sent_curp_request = id_doc_helper.get_incode_environment(state, &tenant_id);
+    let should_sent_curp_request = id_doc_helper.get_incode_environment(state, &tenant_id, sv.is_live);
 
     match should_sent_curp_request {
         Some(environment) => {
@@ -253,12 +253,18 @@ impl IdentityDocumentForCurpHelper {
     // TODO: we need to incorporate UseIncodeDemoCredentialsInLivemode
     //    -- if we flip the flag to use Incode demo creds in prod? I'm not sure validations will work there...? Does this actually do anything w/ Renapo in demo?
     #[tracing::instrument(skip_all)]
-    pub fn get_incode_environment(&self, state: &State, tenant_id: &TenantId) -> ShouldSendCurpRequest {
-        let fixture = self.fixture();
-        let is_sandbox = fixture.is_some();
-        let can_make_incode_request_in_sandbox = state
-            .feature_flag_client
-            .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(tenant_id))
+    pub fn get_incode_environment(
+        &self,
+        state: &State,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> ShouldSendCurpRequest {
+        let fixture: Option<IdentityDocumentFixtureResult> = self.fixture();
+        let is_sandbox = !is_live;
+        let can_make_incode_request_in_sandbox = !is_live
+            && state
+                .feature_flag_client
+                .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(tenant_id))
             && matches!(fixture, Some(IdentityDocumentFixtureResult::Real),);
 
         if is_sandbox {

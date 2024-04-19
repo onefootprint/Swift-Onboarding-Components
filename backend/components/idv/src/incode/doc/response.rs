@@ -479,11 +479,34 @@ pub struct FetchOCRResponse {
     pub expiration_date_check_digit: Option<serde_json::Value>,
 }
 
+/// A struct that produces a fixture OCR response from incode
+#[derive(Default, Clone)]
 pub struct IncodeOcrFixtureResponseFields {
     pub first_name: Option<PiiString>,
     pub last_name: Option<PiiString>,
     pub dob: Option<PiiString>,
+    // just used for MX now, but in future will extend and de-private
+    pub curp: Option<PiiString>,
+    pub type_of_id: Option<IncodeDocumentType>,
 }
+
+impl IncodeOcrFixtureResponseFields {
+    pub fn set_doc_kind_fields(mut self, doc_kind: IdDocKind) -> Self {
+        let (curp, type_of_id) = {
+            let (type_of_id, _) = doc_kind.into();
+            let curp = match doc_kind {
+                IdDocKind::VoterIdentification | IdDocKind::Passport => Some(test_fixtures::TEST_CURP.into()),
+                _ => None,
+            };
+
+            (curp, type_of_id)
+        };
+        self.curp = curp;
+        self.type_of_id = type_of_id;
+        self
+    }
+}
+
 
 impl FetchOCRResponse {
     fn format_date(date: Option<&ScrubbedPiiString>) -> Result<ScrubbedPiiString, IncodeError> {
@@ -613,8 +636,7 @@ impl FetchOCRResponse {
         Ok((today - dob).num_days() / 365)
     }
 
-    pub fn fixture_response<T: Into<IncodeOcrFixtureResponseFields>>(data: Option<T>) -> serde_json::Value {
-        let data: Option<IncodeOcrFixtureResponseFields> = data.map(|d| d.into());
+    pub fn fixture_response(data: Option<IncodeOcrFixtureResponseFields>) -> serde_json::Value {
         let first_name = data
             .as_ref()
             .and_then(|d| d.first_name.clone())
@@ -631,6 +653,12 @@ impl FetchOCRResponse {
             .and_then(|d| d.and_hms_milli_opt(0, 0, 0, 0))
             .map(|d| d.timestamp_millis())
             .unwrap_or(529873860000);
+        let curp = data.as_ref().and_then(|d| d.curp.clone());
+        let type_of_id = data
+            .as_ref()
+            .and_then(|d| d.type_of_id.clone())
+            .unwrap_or(IncodeDocumentType::DriversLicense)
+            .to_string();
 
         serde_json::json!(
             {"additionalTimestamps":null,
@@ -685,7 +713,8 @@ impl FetchOCRResponse {
             "refNumber": "03/05/2020503OD/BBFD/24",
             "restrictions":null,
             "taxIdNumber":null,
-            "typeOfId":"DriversLicense"
+            "typeOfId":type_of_id,
+            "curp": curp
         })
     }
 }
@@ -842,8 +871,8 @@ pub struct OcrDataConfidence {
 #[cfg(test)]
 mod tests {
     use newtypes::{
-        incode::{IncodeDocumentRestriction, IncodeStatus, IncodeTest},
-        IncodeFailureReason, PiiLong, ScrubbedPiiLong,
+        incode::{IncodeDocumentRestriction, IncodeDocumentType, IncodeStatus, IncodeTest},
+        IdDocKind, IncodeFailureReason, PiiLong, ScrubbedPiiLong,
     };
 
     use crate::{
@@ -854,7 +883,7 @@ mod tests {
         test_fixtures::{self, DocTestOpts},
     };
 
-    use super::{AddSideResponse, FetchOCRResponse, FetchScoresResponse};
+    use super::{AddSideResponse, FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
 
     #[test]
     pub fn test_parse_fetch_scores() {
@@ -1040,6 +1069,49 @@ mod tests {
         // check negatives
         parsed.birth_date = Some(ScrubbedPiiLong::new(PiiLong::new(-631152000000)));
         assert_eq!(parsed.dob().unwrap().leak(), "1950-01-01");
+    }
+
+    #[test]
+    fn test_ocr_fixture() {
+        let (type_of_id, _) = IdDocKind::DriversLicense.into();
+        let opts = IncodeOcrFixtureResponseFields {
+            first_name: Some("Bobby".to_string().into()),
+            last_name: Some("Bobierto".to_string().into()),
+            dob: None,
+            curp: None,
+            type_of_id,
+        };
+        let raw_response = FetchOCRResponse::fixture_response(Some(opts.clone()));
+        let parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();
+
+        assert!(parsed.curp.is_none());
+        assert_eq!(parsed.type_of_id.unwrap(), IncodeDocumentType::DriversLicense);
+        assert_eq!(
+            parsed.name.clone().unwrap().first_name.unwrap(),
+            "Bobby".to_string().into()
+        );
+        assert_eq!(
+            parsed.name.unwrap().paternal_last_name.unwrap(),
+            "Bobierto".to_string().into()
+        );
+
+        // now set diff fields
+        let mx_opts = opts.set_doc_kind_fields(IdDocKind::VoterIdentification);
+        let raw_response = FetchOCRResponse::fixture_response(Some(mx_opts));
+        let parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();
+        assert!(parsed.curp.is_some());
+        assert_eq!(
+            parsed.type_of_id.unwrap(),
+            IncodeDocumentType::VoterIdentification
+        );
+        assert_eq!(
+            parsed.name.clone().unwrap().first_name.unwrap(),
+            "Bobby".to_string().into()
+        );
+        assert_eq!(
+            parsed.name.unwrap().paternal_last_name.unwrap(),
+            "Bobierto".to_string().into()
+        );
     }
 
     use test_case::test_case;

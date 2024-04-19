@@ -10,7 +10,7 @@ use db::models::{
 mod start_onboarding;
 
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
+use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
 use newtypes::incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType};
 pub use start_onboarding::*;
 
@@ -103,9 +103,11 @@ pub async fn save_incode_fixtures(
         None
     };
     let uv_public_key = vw.vault.public_key.clone();
-
-    // Save OCR
-    let raw_ocr_response = FetchOCRResponse::fixture_response(ocr_comparison_fields.clone());
+    let fixture_opts: Option<IncodeOcrFixtureResponseFields> =
+        ocr_comparison_fields.clone().map(|o| o.into());
+    let fixture_opts = fixture_opts.map(|f| f.set_doc_kind_fields(id_doc.document_type)); // meh, will clean up when writing more rust tests simulating incode responses
+                                                                                          // Save OCR
+    let raw_ocr_response = FetchOCRResponse::fixture_response(fixture_opts);
     let ocr_response: FetchOCRResponse = serde_json::from_value(raw_ocr_response.clone())?;
     let e_ocr_response = vendor::verification_result::encrypt_verification_result_response(
         &raw_ocr_response.clone().into(),

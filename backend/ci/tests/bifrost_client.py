@@ -288,12 +288,19 @@ class BifrostClient:
         country_code = None
         sides = ["front"]
         if requirement["config"]["kind"] == "identity":
-            supported_doc_types = requirement["config"][
-                "supported_country_and_doc_types"
-            ]["US"]
-            country_code = "US"
+            us_docs = requirement["supported_country_and_doc_types"].get("US")
+            mx_docs = requirement["supported_country_and_doc_types"].get("MX")
+            supported_doc_types =  us_docs if us_docs is not None else []
+            supported_doc_types_mx =  mx_docs if mx_docs is not None else []
+            
             if "drivers_license" in supported_doc_types:
                 doc_kind = "drivers_license"
+                country_code = "US"
+                sides.append("back")
+            elif "voter_identification" in supported_doc_types_mx:
+                # Kind of a hack 
+                doc_kind = "voter_identification"
+                country_code = "MX"
                 sides.append("back")
         elif requirement["config"]["kind"] == "proof_of_ssn":
             doc_kind = "ssn_card"

@@ -25,6 +25,22 @@ def user_with_documents(doc_request_sandbox_ob_config):
 
     return user
 
+@pytest.fixture(scope="session")
+def user_with_documents_and_curp(doc_request_sandbox_ob_config_with_curp):
+    """
+    Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
+    with document info as well
+    """
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config_with_curp)
+    
+    user = bifrost.run()
+    doc_requirement = next(
+        r for r in bifrost.handled_requirements if r["kind"] == "collect_document"
+    )
+    assert doc_requirement["should_collect_selfie"]
+
+    return user
+
 
 # Check which things are available in the vault
 def test_tenant_document_get_decrypt(user_with_documents):
@@ -105,7 +121,6 @@ def test_tenant_document_decrypt_download(user_with_documents):
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant)
     assert set(access_event["targets"]) == set(fields)
 
-
 def test_get_entity_documents(user_with_documents):
     tenant = user_with_documents.tenant
     fp_id = user_with_documents.fp_id
@@ -120,6 +135,23 @@ def test_get_entity_documents(user_with_documents):
     assert front["version"] < back["version"]
     assert back["version"] < selfie["version"]
     assert selfie["version"] < doc["completed_version"]
+    
+def test_get_entity_documents_with_curp(user_with_documents_and_curp):
+    tenant = user_with_documents_and_curp.tenant
+    fp_id = user_with_documents_and_curp.fp_id
+    body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
+    
+    doc = body[0]
+    assert doc["kind"] == "voter_identification"
+    assert doc["status"] == "complete"
+    assert all(u["failure_reasons"] == [] for u in doc["uploads"])
+    front = next(u for u in doc["uploads"] if u["side"] == "front")
+    back = next(u for u in doc["uploads"] if u["side"] == "back")
+    curp_version = doc['curp_completed_version']
+    assert curp_version
+    assert front["version"] < back["version"]
+    assert back["version"] < curp_version
+    assert doc["completed_version"] < curp_version
 
 
 def test_get_entity_documents_uploaded_via_api(sandbox_tenant):
