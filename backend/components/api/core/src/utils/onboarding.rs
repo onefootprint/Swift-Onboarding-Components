@@ -18,8 +18,8 @@ use db::{
 };
 use itertools::chain;
 use newtypes::{
-    DocumentConfig, DocumentRequestConfig, DocumentRequestKind, EncryptedVaultPrivateKey, Selfie, VaultKind,
-    VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
+    DocumentConfig, DocumentRequestConfig, EncryptedVaultPrivateKey, Selfie, VaultKind, VaultPublicKey,
+    WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
 };
 
 pub struct NewBusinessVaultArgs {
@@ -176,26 +176,20 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
             obc.documents_to_collect.clone().unwrap_or_default(),
         )
         .collect(),
-        WorkflowConfig::Document(DocumentConfig {
-            kind,
-            collect_selfie,
-            // TODO start reading configs once it's backfilled, make a doc request for each config
-            // BUT when we do this, be careful - we used to request an Identity document alongside
-            // the ProofOfSsn...
-            configs: _,
-        }) => {
-            match kind {
-                DocumentRequestKind::Identity => vec![DocumentRequestConfig::Identity { collect_selfie }],
-                DocumentRequestKind::ProofOfAddress => vec![DocumentRequestConfig::ProofOfAddress {}],
-                // Proof of SSN always collects ID doc
-                DocumentRequestKind::ProofOfSsn => vec![
-                    DocumentRequestConfig::ProofOfSsn {},
-                    DocumentRequestConfig::Identity { collect_selfie: true },
-                ],
-                // This should never happen.
-                // TODO: We should migrate WorkflowConfig::Document to use DocumentRequestConfig
-                DocumentRequestKind::Custom => vec![],
-            }
+        WorkflowConfig::Document(DocumentConfig { ref configs }) => {
+            // We used to always request an ID doc alongside PoSsn for coba. We'll soon just migrate
+            // the client to send this instead of doing this implicitly
+            let should_include_addl_id = configs
+                .iter()
+                .any(|c| matches!(c, DocumentRequestConfig::ProofOfSsn {}))
+                && !configs
+                    .iter()
+                    .any(|c| matches!(c, DocumentRequestConfig::Identity { .. }));
+            chain(
+                configs.clone(),
+                should_include_addl_id.then_some(DocumentRequestConfig::Identity { collect_selfie: true }),
+            )
+            .collect()
         }
         WorkflowConfig::Kyb(_) => {
             vec![]

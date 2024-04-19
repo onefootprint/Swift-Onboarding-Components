@@ -1,4 +1,4 @@
-use crate::{DocumentRequestConfig, DocumentRequestKind};
+use crate::DocumentRequestConfig;
 
 pub use super::*;
 use diesel::{AsExpression, FromSqlRow};
@@ -53,44 +53,14 @@ impl From<AlpacaKycConfig> for WorkflowConfig {
     }
 }
 
-fn default_doc_req_kind() -> DocumentRequestKind {
-    DocumentRequestKind::Identity
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct DocumentConfig {
-    // Legacy rows don't have this, so need serde default
-    // TODO rm
-    #[serde(default)]
-    pub collect_selfie: bool,
-    // Legacy rows don't have this, so need serde default
-    // TODO rm
-    #[serde(default = "default_doc_req_kind")]
-    pub kind: DocumentRequestKind,
-
-    #[serde(default)]
     pub configs: Vec<DocumentRequestConfig>,
 }
 
 impl From<DocumentConfig> for WorkflowConfig {
     fn from(value: DocumentConfig) -> Self {
         Self::Document(value)
-    }
-}
-
-impl From<DocumentRequestConfig> for WorkflowConfig {
-    fn from(value: DocumentRequestConfig) -> Self {
-        let kind = DocumentRequestKind::from(&value);
-        let collect_selfie = match value {
-            DocumentRequestConfig::Identity { collect_selfie, .. } => collect_selfie,
-            _ => false,
-        };
-        DocumentConfig {
-            kind,
-            collect_selfie,
-            configs: vec![value],
-        }
-        .into()
     }
 }
 

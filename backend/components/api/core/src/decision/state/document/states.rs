@@ -1,25 +1,23 @@
 use std::{collections::HashMap, sync::Arc};
 
 use async_trait::async_trait;
-use db::{
-    models::{
-        data_lifetime::DataLifetime,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        ob_configuration::ObConfiguration,
-        onboarding_decision::NewDecisionArgs,
-        scoped_vault::ScopedVault,
-        user_timeline::UserTimeline,
-        vault::Vault,
-        workflow::{Workflow as DbWorkflow, WorkflowUpdate as DbWorkflowUpdate},
-    },
-    TxnPgConn,
+use db::models::{
+    data_lifetime::DataLifetime,
+    document_request::{DocumentRequest, NewDocumentRequestArgs},
+    ob_configuration::ObConfiguration,
+    onboarding_decision::NewDecisionArgs,
+    scoped_vault::ScopedVault,
+    user_timeline::UserTimeline,
+    vault::Vault,
+    workflow::{Workflow as DbWorkflow, WorkflowUpdate as DbWorkflowUpdate},
 };
 
 use feature_flag::FeatureFlagClient;
+use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, DbActor, DecisionStatus, DocumentConfig, DocumentRequestConfig, DocumentRequestKind,
-    Locked, OnboardingStatus, ReviewReason, RuleAction, RuleSetResultKind, ScopedVaultId, StepUpInfo,
-    TenantId, WorkflowConfig, WorkflowId,
+    DbActor, DecisionStatus, DocumentConfig, DocumentRequestConfig, DocumentRequestKind, Locked,
+    OnboardingStatus, ReviewReason, RuleAction, RuleSetResultKind, ScopedVaultId, StepUpInfo, TenantId,
+    WorkflowConfig, WorkflowId,
 };
 
 use super::{DocumentState, MakeDecision};
@@ -164,20 +162,40 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     ) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results) = async_res;
 
-        let non_identity_document_request = match &wf.config {
-            WorkflowConfig::Document(c) => {
-                if !c.kind.is_identity() {
-                    Some(c.kind)
-                } else {
-                    None
-                }
-            }
-            _ => None,
+        let review_reasons = match &wf.config {
+            WorkflowConfig::Document(c) => c
+                .configs
+                .iter()
+                .filter_map(|c| match c {
+                    DocumentRequestConfig::Identity { .. } => None,
+                    DocumentRequestConfig::ProofOfSsn {} => Some(ReviewReason::ProofOfSsnDocument),
+                    DocumentRequestConfig::ProofOfAddress {} => Some(ReviewReason::ProofOfAddressDocument),
+                    DocumentRequestConfig::Custom { .. } => Some(ReviewReason::CustomDocument),
+                })
+                .collect_vec(),
+            _ => vec![],
         };
         let current_seqno = DataLifetime::get_current_seqno(conn)?;
 
-        if let Some(doc_req) = non_identity_document_request {
-            handle_non_identity_document(conn, wf, Some(current_seqno), doc_req)?;
+        if !review_reasons.is_empty() {
+            // We short circuit for document workflows that have non-identity documents. Since we
+            // don't verify them, we need a human to manually review them.
+            // We'll create a manual review without evaluating rules
+            let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
+            let decision = NewDecisionArgs {
+                vault_id: sv.vault_id.clone(),
+                logic_git_hash: crate::GIT_HASH.to_string(),
+                status: from_scoped_vault_status_for_non_identity_document_decision(&sv)?,
+                result_ids: vec![],
+                annotation_id: None,
+                actor: DbActor::Footprint,
+                seqno: Some(current_seqno),
+                create_manual_review_reasons: Some(review_reasons),
+                rule_set_result_id: None,
+            };
+            let update = DbWorkflowUpdate::set_decision(&wf, decision);
+            // TODO: figure out a strategy for users already in MR to push the fact that there's a MR for SSN Upload now
+            DbWorkflow::update(wf, conn, update)?;
             Ok(DocumentState::from(DocumentComplete))
         } else {
             let v = Vault::get(conn, &wf.scoped_vault_id)?;
@@ -297,38 +315,6 @@ impl WorkflowState for DocumentComplete {
     fn default_action(&self) -> Option<WorkflowActions> {
         None
     }
-}
-
-#[tracing::instrument(skip_all)]
-fn handle_non_identity_document(
-    conn: &mut TxnPgConn,
-    wf: Locked<DbWorkflow>,
-    seqno: Option<DataLifetimeSeqno>,
-    doc_request_kind: DocumentRequestKind,
-) -> ApiResult<()> {
-    let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
-    let review_reasons = match doc_request_kind {
-        DocumentRequestKind::Identity => None,
-        DocumentRequestKind::ProofOfSsn => Some(vec![ReviewReason::ProofOfSsnDocument]),
-        DocumentRequestKind::ProofOfAddress => Some(vec![ReviewReason::ProofOfAddressDocument]),
-        DocumentRequestKind::Custom => Some(vec![ReviewReason::CustomDocument]),
-    };
-    let decision = NewDecisionArgs {
-        vault_id: sv.vault_id.clone(),
-        logic_git_hash: crate::GIT_HASH.to_string(),
-        status: from_scoped_vault_status_for_non_identity_document_decision(&sv)?,
-        result_ids: vec![],
-        annotation_id: None,
-        actor: DbActor::Footprint,
-        seqno,
-        create_manual_review_reasons: review_reasons,
-        rule_set_result_id: None,
-    };
-    let update = DbWorkflowUpdate::set_decision(&wf, decision);
-    // TODO: figure out a strategy for users already in MR to push the fact that there's a MR for SSN Upload now
-    DbWorkflow::update(wf, conn, update)?;
-
-    Ok(())
 }
 
 // in order to avoid updating sv status or triggering a status changed updated webhook,

@@ -4,6 +4,7 @@ use newtypes::{TriggerKind, WorkflowKind};
 use crate::utils::db2api::DbToApi;
 
 // Used to serialize a workflow as used in the user timeline events
+// TODO rm
 impl DbToApi<Workflow> for api_wire_types::TriggeredWorkflow {
     fn from_db(wc: Workflow) -> Self {
         let Workflow { kind: wf_kind, .. } = wc;
@@ -26,6 +27,7 @@ impl DbToApi<WorkflowRequest> for api_wire_types::WorkflowRequest {
             id,
             deactivated_at,
             ob_configuration_id,
+            config,
             ..
         } = wfr;
 
@@ -33,6 +35,7 @@ impl DbToApi<WorkflowRequest> for api_wire_types::WorkflowRequest {
             id,
             is_deactivated: deactivated_at.is_some(),
             playbook_id: ob_configuration_id,
+            config,
         }
     }
 }

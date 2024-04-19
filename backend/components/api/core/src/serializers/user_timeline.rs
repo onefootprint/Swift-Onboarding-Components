@@ -88,13 +88,6 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     let kind = match wfr.config {
                         WorkflowRequestConfig::RedoKyc => TriggerKind::RedoKyc,
                         WorkflowRequestConfig::Onboard { .. } => TriggerKind::Onboard,
-                        WorkflowRequestConfig::IdDocument { kind, .. } => match kind {
-                            DocumentRequestKind::ProofOfSsn => TriggerKind::ProofOfSsn,
-                            DocumentRequestKind::Identity => TriggerKind::IdDocument,
-                            DocumentRequestKind::ProofOfAddress => TriggerKind::ProofOfAddress,
-                            // TODO add more context here - much bigger PR
-                            DocumentRequestKind::Custom => TriggerKind::RedoKyc,
-                        },
                         WorkflowRequestConfig::Document { ref configs } => {
                             let kind = configs.first().map(DocumentRequestKind::from);
                             match kind {

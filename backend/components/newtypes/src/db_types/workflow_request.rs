@@ -1,6 +1,6 @@
 use paperclip::actix::Apiv2Schema;
 
-use crate::{DocumentRequestConfig, DocumentRequestKind, ObConfigurationId, TriggerInfo};
+use crate::{DocumentRequestConfig, ObConfigurationId, TriggerInfo};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use serde::{Deserialize, Serialize};
@@ -14,18 +14,9 @@ pub enum WorkflowRequestConfig {
     RedoKyc,
     /// Allow onboarding onto the specific playbook.
     /// This allows editing data, re-verifies data, and then re-triggers decision engine
-    Onboard {
-        playbook_id: ObConfigurationId,
-    },
+    Onboard { playbook_id: ObConfigurationId },
     /// Upload a new document and re-run the decision engine
-    /// DEPRECATED.
-    IdDocument {
-        kind: DocumentRequestKind,
-        collect_selfie: bool,
-    },
-    Document {
-        configs: Vec<DocumentRequestConfig>,
-    },
+    Document { configs: Vec<DocumentRequestConfig> },
 }
 
 impl From<TriggerInfo> for WorkflowRequestConfig {

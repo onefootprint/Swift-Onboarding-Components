@@ -97,15 +97,6 @@ async fn send_communication(
         let kind = match config {
             WorkflowRequestConfig::RedoKyc => TriggerMessageKind::RedoKyc,
             WorkflowRequestConfig::Onboard { .. } => TriggerMessageKind::Onboard,
-            WorkflowRequestConfig::IdDocument {
-                kind,
-                collect_selfie: _,
-            } => match kind {
-                DocumentRequestKind::Identity => TriggerMessageKind::IdentityDocument,
-                DocumentRequestKind::ProofOfAddress => TriggerMessageKind::ProofOfAddress,
-                DocumentRequestKind::ProofOfSsn => TriggerMessageKind::ProofOfSsn,
-                DocumentRequestKind::Custom => return AssertionError("Not implemented").into(),
-            },
             WorkflowRequestConfig::Document { ref configs } => {
                 let config = configs
                     .first()
@@ -114,6 +105,7 @@ async fn send_communication(
                     DocumentRequestKind::Identity => TriggerMessageKind::IdentityDocument,
                     DocumentRequestKind::ProofOfAddress => TriggerMessageKind::ProofOfAddress,
                     DocumentRequestKind::ProofOfSsn => TriggerMessageKind::ProofOfSsn,
+                    // TODO
                     DocumentRequestKind::Custom => return AssertionError("Not implemented").into(),
                 }
             }
