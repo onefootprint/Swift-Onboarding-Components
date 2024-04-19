@@ -18,7 +18,7 @@ pub enum WorkflowRequestConfig {
         playbook_id: ObConfigurationId,
     },
     /// Upload a new document and re-run the decision engine
-    /// DEPRECATED. TODO backfill IdDocument -> Document
+    /// DEPRECATED.
     IdDocument {
         kind: DocumentRequestKind,
         collect_selfie: bool,

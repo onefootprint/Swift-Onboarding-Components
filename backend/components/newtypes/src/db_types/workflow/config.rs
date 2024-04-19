@@ -60,13 +60,14 @@ fn default_doc_req_kind() -> DocumentRequestKind {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct DocumentConfig {
     // Legacy rows don't have this, so need serde default
+    // TODO rm
     #[serde(default)]
     pub collect_selfie: bool,
     // Legacy rows don't have this, so need serde default
+    // TODO rm
     #[serde(default = "default_doc_req_kind")]
     pub kind: DocumentRequestKind,
 
-    // TODO backfill this....
     #[serde(default)]
     pub configs: Vec<DocumentRequestConfig>,
 }
