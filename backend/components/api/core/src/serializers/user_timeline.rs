@@ -95,6 +95,18 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                             // TODO add more context here - much bigger PR
                             DocumentRequestKind::Custom => TriggerKind::RedoKyc,
                         },
+                        WorkflowRequestConfig::Document { ref configs } => {
+                            let kind = configs.first().map(DocumentRequestKind::from);
+                            match kind {
+                                Some(DocumentRequestKind::ProofOfSsn) => TriggerKind::ProofOfSsn,
+                                Some(DocumentRequestKind::Identity) => TriggerKind::IdDocument,
+                                Some(DocumentRequestKind::ProofOfAddress) => TriggerKind::ProofOfAddress,
+                                // TODO add more context here - much bigger PR.
+                                // We should serialize the whole document request config
+                                Some(DocumentRequestKind::Custom) => TriggerKind::RedoKyc,
+                                None => TriggerKind::RedoKyc,
+                            }
+                        }
                     };
                     let request = api_wire_types::WorkflowRequest::from_db(wfr);
                     let wf = api_wire_types::TriggeredWorkflow { kind };

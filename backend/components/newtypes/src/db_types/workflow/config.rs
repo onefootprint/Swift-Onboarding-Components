@@ -1,4 +1,4 @@
-use crate::DocumentRequestKind;
+use crate::{DocumentRequestConfig, DocumentRequestKind};
 
 pub use super::*;
 use diesel::{AsExpression, FromSqlRow};
@@ -65,11 +65,31 @@ pub struct DocumentConfig {
     // Legacy rows don't have this, so need serde default
     #[serde(default = "default_doc_req_kind")]
     pub kind: DocumentRequestKind,
+
+    // TODO backfill this....
+    #[serde(default)]
+    pub configs: Vec<DocumentRequestConfig>,
 }
 
 impl From<DocumentConfig> for WorkflowConfig {
     fn from(value: DocumentConfig) -> Self {
         Self::Document(value)
+    }
+}
+
+impl From<DocumentRequestConfig> for WorkflowConfig {
+    fn from(value: DocumentRequestConfig) -> Self {
+        let kind = DocumentRequestKind::from(&value);
+        let collect_selfie = match value {
+            DocumentRequestConfig::Identity { collect_selfie, .. } => collect_selfie,
+            _ => false,
+        };
+        DocumentConfig {
+            kind,
+            collect_selfie,
+            configs: vec![value],
+        }
+        .into()
     }
 }
 

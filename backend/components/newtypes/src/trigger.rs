@@ -4,7 +4,7 @@ use serde::Deserialize;
 use serde_with::SerializeDisplay;
 use strum_macros::{Display, EnumDiscriminants};
 
-use crate::ObConfigurationId;
+use crate::{DocumentRequestConfig, ObConfigurationId};
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, EnumDiscriminants)]
 #[strum_discriminants(
@@ -24,10 +24,16 @@ pub enum TriggerInfo {
     Onboard {
         playbook_id: ObConfigurationId,
     },
+    Document {
+        configs: Vec<DocumentRequestConfig>,
+    },
     /// Upload a new document and re-run the decision engine
+    /// DEPRECATED
     IdDocument {
         collect_selfie: bool,
     },
+    /// DEPRECATED
     ProofOfSsn,
+    /// DEPRECATED
     ProofOfAddress,
 }

@@ -106,6 +106,17 @@ async fn send_communication(
                 DocumentRequestKind::ProofOfSsn => TriggerMessageKind::ProofOfSsn,
                 DocumentRequestKind::Custom => return AssertionError("Not implemented").into(),
             },
+            WorkflowRequestConfig::Document { ref configs } => {
+                let config = configs
+                    .first()
+                    .ok_or(AssertionError("Document request config list is empty"))?;
+                match DocumentRequestKind::from(config) {
+                    DocumentRequestKind::Identity => TriggerMessageKind::IdentityDocument,
+                    DocumentRequestKind::ProofOfAddress => TriggerMessageKind::ProofOfAddress,
+                    DocumentRequestKind::ProofOfSsn => TriggerMessageKind::ProofOfSsn,
+                    DocumentRequestKind::Custom => return AssertionError("Not implemented").into(),
+                }
+            }
         };
         (kind, note)
     } else {

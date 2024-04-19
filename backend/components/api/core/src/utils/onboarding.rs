@@ -16,6 +16,7 @@ use db::{
     },
     TxnPgConn,
 };
+use itertools::chain;
 use newtypes::{
     DocumentConfig, DocumentRequestConfig, DocumentRequestKind, EncryptedVaultPrivateKey, Selfie, VaultKind,
     VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
@@ -166,17 +167,23 @@ pub fn get_or_start_onboarding(
 /// Create a DocumentRequest associated with the provided wf if the obc requires document collection
 fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObConfiguration) -> ApiResult<()> {
     let doc_requests_to_create = match wf.config {
-        WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => obc
+        WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => chain(
             // Identity documents are generally still represented in CDOs. We could migrate them
             // to `obc.documents_to_collect` one day
-            .document_cdo()
-            .map(|cdo| DocumentRequestConfig::Identity {
+            obc.document_cdo().map(|cdo| DocumentRequestConfig::Identity {
                 collect_selfie: cdo.selfie() == Selfie::RequireSelfie,
-            })
-            .into_iter()
-            .chain(obc.documents_to_collect.clone().unwrap_or_default())
-            .collect(),
-        WorkflowConfig::Document(DocumentConfig { kind, collect_selfie }) => {
+            }),
+            obc.documents_to_collect.clone().unwrap_or_default(),
+        )
+        .collect(),
+        WorkflowConfig::Document(DocumentConfig {
+            kind,
+            collect_selfie,
+            // TODO start reading configs once it's backfilled, make a doc request for each config
+            // BUT when we do this, be careful - we used to request an Identity document alongside
+            // the ProofOfSsn...
+            configs: _,
+        }) => {
             match kind {
                 DocumentRequestKind::Identity => vec![DocumentRequestConfig::Identity { collect_selfie }],
                 DocumentRequestKind::ProofOfAddress => vec![DocumentRequestConfig::ProofOfAddress {}],

@@ -124,7 +124,10 @@ pub async fn post(
 fn validate(trigger_info: TriggerKind, scoped_vault: &ScopedVault) -> ApiResult<()> {
     match trigger_info {
         TriggerKind::RedoKyc | TriggerKind::Onboard { .. } => Ok(()),
-        TriggerKind::IdDocument | TriggerKind::ProofOfSsn | TriggerKind::ProofOfAddress => {
+        TriggerKind::IdDocument
+        | TriggerKind::ProofOfSsn
+        | TriggerKind::ProofOfAddress
+        | TriggerKind::Document => {
             // Since the proceeding workflow would overwrite the scoped vault's status, we don't
             // to allow running a document workflow unless the user has already onboarded onto
             // another playbook and hopefully has a KYC status/risk signals.

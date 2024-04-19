@@ -11,7 +11,7 @@ use super::{
     workflow_request::WorkflowRequest,
 };
 use crate::{
-    errors::ValidationError,
+    errors::{AssertionError, ValidationError},
     models::{billing_event::BillingEvent, vault::Vault},
     DbResult, PgConn, TxnPgConn,
 };
@@ -23,11 +23,12 @@ use diesel::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, DbActor, DocumentConfig, DocumentState, FireWebhookArgs, InsightEventId, KybConfig,
-    KybState, KycConfig, KycState, Locked, ObConfigurationId, ObConfigurationKind,
-    OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload, ScopedVaultId, TaskData,
-    TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowConfig, WorkflowFixtureResult,
-    WorkflowId, WorkflowKind, WorkflowRequestConfig, WorkflowSource, WorkflowStartedInfo, WorkflowState,
+    AlpacaKycState, DbActor, DocumentConfig, DocumentRequestConfig, DocumentRequestKind, DocumentState,
+    FireWebhookArgs, InsightEventId, KybConfig, KybState, KycConfig, KycState, Locked, ObConfigurationId,
+    ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload,
+    ScopedVaultId, TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowConfig,
+    WorkflowFixtureResult, WorkflowId, WorkflowKind, WorkflowRequestConfig, WorkflowSource,
+    WorkflowStartedInfo, WorkflowState,
 };
 use std::collections::HashMap;
 
@@ -265,11 +266,43 @@ impl Workflow {
                     // This is_redo flag can be deprecated - redo flows are treated no differently
                     KycConfig { is_redo: false }.into()
                 }
-                WorkflowRequestConfig::IdDocument { kind, collect_selfie } => DocumentConfig {
-                    kind: *kind,
-                    collect_selfie: *collect_selfie,
+                // TODO will rm this branch
+                WorkflowRequestConfig::IdDocument { kind, collect_selfie } => {
+                    let config = match kind {
+                        DocumentRequestKind::Identity => DocumentRequestConfig::Identity {
+                            collect_selfie: *collect_selfie,
+                        },
+                        DocumentRequestKind::ProofOfAddress => DocumentRequestConfig::ProofOfAddress {},
+                        DocumentRequestKind::ProofOfSsn => DocumentRequestConfig::ProofOfSsn {},
+                        DocumentRequestKind::Custom => {
+                            return AssertionError("Custom DRK not supported here yet").into()
+                        }
+                    };
+                    DocumentConfig {
+                        kind: *kind,
+                        collect_selfie: *collect_selfie,
+                        configs: vec![config],
+                    }
+                    .into()
                 }
-                .into(),
+                WorkflowRequestConfig::Document { configs } => {
+                    // We'll remove this logic once we've backfilled the WRCs. For now, just select
+                    // the first config from the list since it's all we'll support for now.
+                    let config = configs
+                        .first()
+                        .ok_or(AssertionError("Document request config list is empty"))?;
+                    let kind = DocumentRequestKind::from(config);
+                    let collect_selfie = match config {
+                        DocumentRequestConfig::Identity { collect_selfie, .. } => *collect_selfie,
+                        _ => false,
+                    };
+                    DocumentConfig {
+                        kind,
+                        collect_selfie,
+                        configs: configs.clone(),
+                    }
+                    .into()
+                }
             }
         } else {
             match v.kind {

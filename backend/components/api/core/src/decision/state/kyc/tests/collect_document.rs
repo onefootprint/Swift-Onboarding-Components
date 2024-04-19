@@ -28,9 +28,10 @@ use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
     BooleanOperator, CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus,
-    DocTypeRestriction, DocumentCdoInfo, DocumentConfig, DocumentRequestKind, FootprintReasonCode, KycState,
-    OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleExpression, RuleExpressionCondition, Selfie,
-    TenantId, VendorAPI, WorkflowFixtureResult, WorkflowSource, WorkflowState,
+    DocTypeRestriction, DocumentCdoInfo, DocumentConfig, DocumentRequestConfig, DocumentRequestKind,
+    FootprintReasonCode, KycState, OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleExpression,
+    RuleExpressionCondition, Selfie, TenantId, VendorAPI, WorkflowFixtureResult, WorkflowSource,
+    WorkflowState,
 };
 
 #[test_state_case(UserKind::Live, Failure)]
@@ -281,6 +282,9 @@ async fn redo_document_and_pass(
                 config: DocumentConfig {
                     kind: DocumentRequestKind::Identity,
                     collect_selfie: false,
+                    configs: vec![DocumentRequestConfig::Identity {
+                        collect_selfie: false,
+                    }],
                 }
                 .into(),
                 fixture_result,

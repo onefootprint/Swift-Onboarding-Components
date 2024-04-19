@@ -197,3 +197,9 @@ impl<'a> From<AssertionError<'a>> for DbError {
         Self::AssertionError(value.0.to_string())
     }
 }
+
+impl<'a, T> From<AssertionError<'a>> for Result<T, DbError> {
+    fn from(value: AssertionError<'a>) -> Self {
+        Err(value.into())
+    }
+}
