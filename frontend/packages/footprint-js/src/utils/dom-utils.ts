@@ -19,6 +19,7 @@ export const removeDOMElements = async (uniqueId: string) => {
   await removeOverlayContainer(uniqueId);
 };
 
+/** @deprecated: import { appendOverlayContainer } from `@onefootprint/core` */
 export const createOverlayContainer = (uniqueId: string): HTMLElement => {
   const id = getOverlayContainerId(uniqueId);
   const possibleContainer = document.getElementById(id);
@@ -89,6 +90,7 @@ const removeInlineContainer = (uniqueId: string) => {
   }
 };
 
+/** @deprecated: import { removeLoadingIndicator } from `@onefootprint/core` */
 export const removeLoader = (uniqueId: string) => {
   const id = getDomElementId(LOADING_INDICATOR_ID_PREFIX, uniqueId);
   const loader = document.getElementById(id);
@@ -97,12 +99,14 @@ export const removeLoader = (uniqueId: string) => {
   }
 };
 
+/** @deprecated: import { appendLoadingIndicator } from `@onefootprint/core` */
 export const createLoader = (container: HTMLElement, uniqueId: string) => {
   const id = getDomElementId(LOADING_INDICATOR_ID_PREFIX, uniqueId);
   const loadingIndicator = createLoadingIndicator(id);
   container.appendChild(loadingIndicator);
 };
 
+/** @deprecated: import { appendOverlay } from `@onefootprint/core` */
 export const createOverlay = (container: HTMLElement, uniqueId: string) => {
   document.body.classList.add(BODY_LOCKED_CLASS);
   const overlay = document.createElement('div');
@@ -113,6 +117,7 @@ export const createOverlay = (container: HTMLElement, uniqueId: string) => {
   return overlay;
 };
 
+/** @deprecated: import { createLoadingIndicator } from `@onefootprint/core` */
 const createLoadingIndicator = (id: string) => {
   const container = document.createElement('div');
   container.setAttribute('id', id);

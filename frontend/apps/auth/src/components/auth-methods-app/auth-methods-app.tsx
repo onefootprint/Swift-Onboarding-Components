@@ -1,5 +1,6 @@
 'use client';
 
+import { getWindowUrl } from '@onefootprint/core';
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import type { CustomChildAPI } from '@onefootprint/idv';
 import { AuthMethods, getLogger, getSdkArgsToken } from '@onefootprint/idv';
@@ -13,7 +14,7 @@ import { useEffectOnceStrict } from '@/src/hooks';
 import { useFootprintProvider } from '@/src/provider-footprint';
 import useProps from '@/src/provider-footprint/hooks/use-props';
 import type { Variant } from '@/src/types';
-import { getWindowUrl, isEmbeddedInIframe } from '@/src/utils';
+import { isEmbeddedInIframe } from '@/src/utils';
 
 import Layout from '../client-layout';
 import type { NotificationProps } from '../notification';

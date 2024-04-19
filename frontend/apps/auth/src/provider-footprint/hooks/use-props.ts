@@ -1,9 +1,9 @@
+import { getWindowUrl } from '@onefootprint/core';
 import { getSdkArgsToken, hasInvalidHashFragment } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useEffect, useState } from 'react';
 
 import { useGetSdkArgs } from '@/src/queries';
-import { getWindowUrl } from '@/src/utils';
 
 import { useFootprintProvider } from '../provider';
 

@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@onefootprint/appearance": "*",
+    "@onefootprint/core": "*",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/idv": "*",
@@ -32,7 +33,6 @@
     "@onefootprint/ui": "*",
     "@tanstack/react-query": "^4.35.7",
     "@xstate/react": "^3.2.1",
-    "constate": "^3.3.2",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-locales-sync": "^2.0.1",

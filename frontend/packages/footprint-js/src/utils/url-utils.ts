@@ -8,6 +8,7 @@ import {
   isValidString,
 } from './type-guards';
 
+/** @deprecated: import from `@onefootprint/core` */
 export const getWindowUrl = (): string =>
   typeof window !== 'undefined'
     ? window.location?.href || window.location.toString()
