@@ -9,12 +9,12 @@ import styled, { css } from 'styled-components';
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
 import AddToListDialog from '../add-to-list-dialog';
-import RetriggerKYCDialog from '../retrigger-kyc-dialog';
+import RequestMoreInfoDialog from '../request-more-info-dialog';
 import UpdateAuthDialog from '../update-auth-dialog';
 
 enum ActionDialog {
   auth,
-  retrigger,
+  requestMoreInfo,
   addToList,
 }
 
@@ -29,8 +29,8 @@ const Actions = ({ entity }: WithEntityProps) => {
     setOpenDialog(null);
   };
 
-  const handleOpenRetriggerKycDialog = () => {
-    setOpenDialog(ActionDialog.retrigger);
+  const handleOpenRequestMoreInfoDialog = () => {
+    setOpenDialog(ActionDialog.requestMoreInfo);
   };
 
   const handleOpenAuthMethodsDialog = () => {
@@ -58,10 +58,10 @@ const Actions = ({ entity }: WithEntityProps) => {
           </PermissionGate>
           <PermissionGate
             scopeKind={RoleScopeKind.manualReview}
-            fallbackText={t('retrigger-kyc.not-allowed')}
+            fallbackText={t('request-more-info.not-allowed')}
           >
-            <Dropdown.Item onSelect={handleOpenRetriggerKycDialog}>
-              {t('retrigger-kyc.label')}
+            <Dropdown.Item onSelect={handleOpenRequestMoreInfoDialog}>
+              {t('request-more-info.label')}
             </Dropdown.Item>
           </PermissionGate>
           <PermissionGate
@@ -83,8 +83,8 @@ const Actions = ({ entity }: WithEntityProps) => {
           </PermissionGate> */}
         </Dropdown.Content>
       </Dropdown.Root>
-      <RetriggerKYCDialog
-        open={openDialog === ActionDialog.retrigger}
+      <RequestMoreInfoDialog
+        open={openDialog === ActionDialog.requestMoreInfo}
         onClose={handleCloseDialog}
       />
       <UpdateAuthDialog

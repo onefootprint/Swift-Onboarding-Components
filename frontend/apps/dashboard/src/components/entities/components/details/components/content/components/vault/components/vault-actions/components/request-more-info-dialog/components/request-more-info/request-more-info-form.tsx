@@ -33,14 +33,17 @@ export type TriggerFormData = {
   note?: string;
 };
 
-type RetriggerKYCFormProps = {
+type RequestMoreInfoFormProps = {
   onSubmit: (data: TriggerFormData) => void;
   formId: string;
 };
 
-const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
+const RequestMoreInfoForm = ({
+  onSubmit,
+  formId,
+}: RequestMoreInfoFormProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.retrigger-kyc',
+    keyPrefix: 'pages.entity.actions.request-more-info',
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
@@ -194,7 +197,7 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   );
 };
 
-export default RetriggerKYCForm;
+export default RequestMoreInfoForm;
 
 const StyledForm = styled.form`
   ${({ theme }) => css`

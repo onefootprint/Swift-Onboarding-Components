@@ -14,9 +14,9 @@ import {
   withPlaybooks,
 } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
-import type { RetriggerKYCDialogProps } from './retrigger-kyc-dialog';
-import RetriggerKYCDialog from './retrigger-kyc-dialog';
-import { entityFixture, withEntity } from './retrigger-kyc-dialog.test.config';
+import { entityFixture, withEntity } from './request-more-info.test.config';
+import type { RequestMoreInfoDialogProps } from './request-more-info-dialog';
+import RequestMoreInfoDialog from './request-more-info-dialog';
 
 const defaultOptions = {
   open: true,
@@ -28,10 +28,10 @@ const useRouterSpy = createUseRouterSpy();
 const renderDialog = ({
   open = defaultOptions.open,
   onClose = defaultOptions.onClose,
-}: Partial<RetriggerKYCDialogProps>) =>
-  customRender(<RetriggerKYCDialog open={open} onClose={onClose} />);
+}: Partial<RequestMoreInfoDialogProps>) =>
+  customRender(<RequestMoreInfoDialog open={open} onClose={onClose} />);
 
-describe('<RetriggerKYCDialog />', () => {
+describe('<RequestMoreInfoDialog />', () => {
   beforeEach(() => {
     withEntity(entityFixture.id);
     withPlaybooks();

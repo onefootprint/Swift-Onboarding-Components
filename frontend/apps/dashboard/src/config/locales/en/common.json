@@ -1265,7 +1265,7 @@
           "label": "Edit user information",
           "not-allowed": "You're not allowed to edit user information"
         },
-        "retrigger-kyc": {
+        "request-more-info": {
           "label": "Request more information",
           "title": "Request more information",
           "not-allowed": "You're not allowed to request additional information",

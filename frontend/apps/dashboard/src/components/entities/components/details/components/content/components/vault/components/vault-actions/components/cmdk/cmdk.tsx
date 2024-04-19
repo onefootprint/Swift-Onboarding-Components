@@ -12,7 +12,7 @@ import { useEntityContext } from '@/entity/hooks/use-entity-context';
 import useDecryptControls from '../../hooks/use-decrypt-controls';
 import useEditControls from '../../hooks/use-edit-controls';
 import type { VaultActionsControlsProps } from '../../vault-actions';
-import RetriggerKYCDialog from '../retrigger-kyc-dialog';
+import RequestMoreInfoDialog from '../request-more-info-dialog';
 import { ActionType } from './cmdk.types';
 import ActionList from './components/main-dialog/action-list/action-list';
 import Footer from './components/main-dialog/footer/footer';
@@ -175,7 +175,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         />
         <Footer />
       </DialogContainer>
-      <RetriggerKYCDialog
+      <RequestMoreInfoDialog
         open={retrigerDialogOpen}
         onClose={handleRetrigerDialogClose}
       />

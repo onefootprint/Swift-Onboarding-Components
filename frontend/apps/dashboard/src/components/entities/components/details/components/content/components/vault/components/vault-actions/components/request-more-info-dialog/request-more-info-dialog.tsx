@@ -7,12 +7,12 @@ import { useTranslation } from 'react-i18next';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import useRetriggerKYC from '../actions/components/hooks/use-retrigger-kyc';
-import RetriggerKYCForm from './components/retrigger-kyc-form';
-import type { TriggerFormData } from './components/retrigger-kyc-form/retrigger-kyc-form';
+import useCreateTrigger from '../actions/components/hooks/use-create-trigger';
+import RequestMoreInfoForm from './components/request-more-info';
+import type { TriggerFormData } from './components/request-more-info/request-more-info-form';
 import useDisplayLinkDialog from './hooks/use-display-link-dialog';
 
-export type RetriggerKYCDialogProps = {
+export type RequestMoreInfoDialogProps = {
   open: boolean;
   onClose: () => void;
 };
@@ -22,11 +22,14 @@ enum DialogState {
   link = 'link',
 }
 
-const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
+const RequestMoreInfoDialog = ({
+  open,
+  onClose,
+}: RequestMoreInfoDialogProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.retrigger-kyc',
+    keyPrefix: 'pages.entity.actions.request-more-info',
   });
-  const submitRetriggerKYCMutation = useRetriggerKYC();
+  const submitTriggerMutation = useCreateTrigger();
   const showRequestErrorToast = useRequestErrorToast();
   const entityId = useEntityId();
   // This dialog has two states: one that collects info on what kind of link to generate,
@@ -38,7 +41,7 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
     onClose();
   };
   const displayLinkDialogProps = useDisplayLinkDialog({
-    linkData: submitRetriggerKYCMutation.data,
+    linkData: submitTriggerMutation.data,
     onClose: handleClose,
   });
 
@@ -56,7 +59,7 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
     } else {
       return;
     }
-    submitRetriggerKYCMutation.mutate(
+    submitTriggerMutation.mutate(
       {
         entityId,
         trigger,
@@ -80,20 +83,20 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
 
   if (dialogState === DialogState.form) {
     primaryButton = {
-      form: 'retrigger-kyc-form',
+      form: 'request-more-info-form',
       label: t('next'),
-      loading: submitRetriggerKYCMutation.isLoading,
-      disabled: submitRetriggerKYCMutation.isLoading,
+      loading: submitTriggerMutation.isLoading,
+      disabled: submitTriggerMutation.isLoading,
       type: 'submit',
     };
     secondaryButton = {
       label: t('cancel'),
       onClick: handleClose,
-      disabled: submitRetriggerKYCMutation.isLoading,
+      disabled: submitTriggerMutation.isLoading,
     };
     component = (
-      <RetriggerKYCForm
-        formId="retrigger-kyc-form"
+      <RequestMoreInfoForm
+        formId="request-more-info-form"
         onSubmit={handleGenerateLink}
       />
     );
@@ -115,4 +118,4 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
   );
 };
 
-export default RetriggerKYCDialog;
+export default RequestMoreInfoDialog;

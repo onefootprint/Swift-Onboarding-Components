@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const submitRetriggerKYC = async (
+const submitTrigger = async (
   authHeaders: AuthHeaders,
   { entityId, ...data }: TriggerRequest,
 ) => {
@@ -17,16 +17,16 @@ const submitRetriggerKYC = async (
   return response.data;
 };
 
-const useRetriggerKYC = () => {
+const useCreateTrigger = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: TriggerRequest) => submitRetriggerKYC(authHeaders, data),
+    mutationFn: (data: TriggerRequest) => submitTrigger(authHeaders, data),
     onSuccess: () => {
       queryClient.refetchQueries();
     },
   });
 };
 
-export default useRetriggerKYC;
+export default useCreateTrigger;

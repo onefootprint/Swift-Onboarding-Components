@@ -10,7 +10,7 @@ export type LinkDisplayProps = {
 
 const LinkDisplay = ({ linkData }: LinkDisplayProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.retrigger-kyc',
+    keyPrefix: 'pages.entity.actions.request-more-info',
   });
 
   const expiresAt = linkData?.expiresAt

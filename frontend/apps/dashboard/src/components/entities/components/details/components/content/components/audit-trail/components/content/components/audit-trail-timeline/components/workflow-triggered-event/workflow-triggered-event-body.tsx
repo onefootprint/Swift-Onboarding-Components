@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
-import useDisplayLinkDialog from '../../../../../../../vault/components/vault-actions/components/retrigger-kyc-dialog/hooks/use-display-link-dialog';
+import useDisplayLinkDialog from '../../../../../../../vault/components/vault-actions/components/request-more-info-dialog/hooks/use-display-link-dialog';
 import useGenerateTokenRequest from '../../../../../../../vault/components/vault-actions/hooks/use-generate-token';
 import AnnotationNote from '../annotation-note';
 import EventBodyEntry from '../event-body-entry';
