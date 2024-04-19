@@ -474,6 +474,7 @@ diesel::table! {
         skip_selfie -> Nullable<Bool>,
         device_type -> Nullable<Text>,
         vaulted_document_type -> Nullable<Text>,
+        curp_completed_seqno -> Nullable<Int8>,
     }
 }
 

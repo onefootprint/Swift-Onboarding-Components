@@ -45,6 +45,7 @@ pub struct IdentityDocument {
     pub device_type: Option<DocumentScanDeviceType>,
     // the document_type we stored this in the vault as
     pub vaulted_document_type: Option<IdDocKind>,
+    pub curp_completed_seqno: Option<DataLifetimeSeqno>,
 }
 
 impl IdentityDocument {
@@ -94,6 +95,16 @@ pub struct IdentityDocumentUpdate {
     pub ocr_confidence_score: Option<f64>,
     pub status: Option<IdentityDocumentStatus>,
     pub vaulted_document_type: Option<IdDocKind>,
+    pub curp_completed_seqno: Option<DataLifetimeSeqno>,
+}
+
+impl IdentityDocumentUpdate {
+    pub fn set_curp_completed_seqno(seqno: DataLifetimeSeqno) -> Self {
+        Self {
+            curp_completed_seqno: Some(seqno),
+            ..Default::default()
+        }
+    }
 }
 
 impl IdentityDocument {

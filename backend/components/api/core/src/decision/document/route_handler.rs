@@ -388,6 +388,7 @@ pub async fn complete_non_identity_document(
                 ocr_confidence_score: None,
                 status: Some(IdentityDocumentStatus::Complete),
                 vaulted_document_type: Some(dk),
+                curp_completed_seqno: None
             };
             IdentityDocument::update(conn, &id_doc_id, update)?;
 

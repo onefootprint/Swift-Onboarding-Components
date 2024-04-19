@@ -354,6 +354,7 @@ impl Complete {
             ocr_confidence_score,
             status: Some(IdentityDocumentStatus::Complete),
             vaulted_document_type: Some(validated_doc_kind),
+            curp_completed_seqno: None,
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
 

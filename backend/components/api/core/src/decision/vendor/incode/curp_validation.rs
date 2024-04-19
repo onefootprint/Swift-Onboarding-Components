@@ -2,9 +2,12 @@ use std::collections::HashMap;
 
 use db::{
     models::{
-        decision_intent::DecisionIntent, document_request::DocumentRequest,
-        identity_document::IdentityDocument, incode_verification_session::IncodeVerificationSession,
-        scoped_vault::ScopedVault, verification_request::VerificationRequest,
+        decision_intent::DecisionIntent,
+        document_request::DocumentRequest,
+        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        incode_verification_session::IncodeVerificationSession,
+        scoped_vault::ScopedVault,
+        verification_request::VerificationRequest,
     },
     TxnPgConn,
 };
@@ -14,11 +17,11 @@ use idv::{
 };
 use itertools::Itertools;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataLifetimeSource, DataRequest,
-    DecisionIntentId, DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind,
-    IdentityDocumentFixtureResult, IncodeConfigurationId, IncodeEnvironment, IncodeSessionId,
-    IncodeVerificationSessionKind, OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId, TenantId,
-    ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
+    vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource,
+    DataRequest, DecisionIntentId, DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment,
+    IncodeSessionId, IncodeVerificationSessionKind, OcrDataKind as ODK, PiiJsonValue, PiiString,
+    ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -132,6 +135,7 @@ pub async fn run_curp_validation_check(
                 curp_response.result.into_success().map_err(map_to_api_error)?;
 
             // Vaulting
+            let iddoc_id = iddoc.id.clone();
             let is_live = matches!(environment, IncodeEnvironment::Production);
             let vault_data = pre_vault(
                 &state.enclave_client,
@@ -144,14 +148,14 @@ pub async fn run_curp_validation_check(
             .await?;
 
             let sv_id = di.scoped_vault_id.clone();
-            let _ = state
+            state
                 .db_pool
                 .db_transaction(move |conn| -> ApiResult<_> {
                     // Vault the curp response
-                    vault_curp_response(conn, &sv_id, vault_data)?;
+                    let seqno = vault_curp_response(conn, &sv_id, vault_data)?;
 
                     // create an IVS record for billing/tracking
-                    let session = IncodeVerificationSession::create(
+                    let _ = IncodeVerificationSession::create(
                         conn,
                         iddoc.id,
                         config_id,
@@ -160,7 +164,12 @@ pub async fn run_curp_validation_check(
                         Some(incode_session_id),
                     )?;
 
-                    Ok(session)
+                    // set curp completed seqno so we can render historical responses in the dashboard
+                    let update = IdentityDocumentUpdate::set_curp_completed_seqno(seqno);
+                    let _ = IdentityDocument::update(conn, &iddoc_id, update)?;
+
+
+                    Ok(())
                 })
                 .await?;
 
@@ -189,6 +198,7 @@ pub async fn run_curp_validation_check(
                             id_doc_fixture,
                             &tenant_id,
                             id_doc_kind,
+                            doc.id,
                         )
                         .await?,
                     )
@@ -327,6 +337,7 @@ async fn get_curp_for_check(
 }
 
 #[tracing::instrument(skip_all)]
+#[allow(clippy::too_many_arguments)]
 async fn save_canned_response(
     state: &State,
     sv_id: ScopedVaultId,
@@ -335,6 +346,7 @@ async fn save_canned_response(
     identity_document_fixture: Option<IdentityDocumentFixtureResult>,
     tenant_id: &TenantId,
     id_doc_kind: IdDocKind,
+    id_doc_id: IdentityDocumentId,
 ) -> ApiResult<VendorResult> {
     let canned_res = match identity_document_fixture {
         Some(decision) => match decision {
@@ -372,7 +384,12 @@ async fn save_canned_response(
                 }),
             )?;
 
-            vault_curp_response(conn, &sv_id, vault_data)?;
+            let seqno = vault_curp_response(conn, &sv_id, vault_data)?;
+
+            // set curp completed seqno so we can render historical responses in the dashboard
+            let update = IdentityDocumentUpdate::set_curp_completed_seqno(seqno);
+            let _ = IdentityDocument::update(conn, &id_doc_id, update)?;
+
 
             let vendor_result = VendorResult {
                 response: VendorResponse {
@@ -410,12 +427,12 @@ pub fn vault_curp_response(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
     data: DataRequest<Fingerprints>,
-) -> ApiResult<()> {
+) -> ApiResult<DataLifetimeSeqno> {
     let vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
     let sources = DataLifetimeSources::single(DataLifetimeSource::Ocr);
-    vw.patch_data(conn, data, sources, None)?;
+    let result = vw.patch_data(conn, data, sources, None)?;
 
-    Ok(())
+    Ok(result.seqno)
 }
 
 fn id_doc_kind_expects_curp(id_doc_kind: IdDocKind) -> bool {
