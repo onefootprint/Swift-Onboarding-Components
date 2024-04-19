@@ -1430,7 +1430,7 @@
             "device-os": "Device & OS: ",
             "ip-address": "IP address: "
           },
-          "id-doc-uploaded-event": {
+          "document-uploaded-event": {
             "title": {
               "complete": "Collected ",
               "success": "Collected ",

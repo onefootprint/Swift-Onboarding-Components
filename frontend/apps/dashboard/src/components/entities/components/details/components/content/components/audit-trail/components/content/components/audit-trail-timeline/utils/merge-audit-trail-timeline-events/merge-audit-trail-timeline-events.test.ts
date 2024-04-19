@@ -96,7 +96,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
       const events: TimelineEvent[] = [
         {
           event: {
-            kind: TimelineEventKind.idDocUploaded,
+            kind: TimelineEventKind.documentUploaded,
             data: {
               status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.driversLicense,
@@ -107,7 +107,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
         },
         {
           event: {
-            kind: TimelineEventKind.idDocUploaded,
+            kind: TimelineEventKind.documentUploaded,
             data: {
               status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.passport,
@@ -121,7 +121,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
       expect(result).toEqual([
         {
           event: {
-            kind: TimelineEventKind.idDocUploaded,
+            kind: TimelineEventKind.documentUploaded,
             data: {
               status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.driversLicense,
@@ -132,7 +132,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
         },
         {
           event: {
-            kind: TimelineEventKind.idDocUploaded,
+            kind: TimelineEventKind.documentUploaded,
             data: {
               status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.passport,

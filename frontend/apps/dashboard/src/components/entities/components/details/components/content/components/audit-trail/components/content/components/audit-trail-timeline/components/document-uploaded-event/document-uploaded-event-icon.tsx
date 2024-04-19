@@ -9,7 +9,7 @@ import {
   IcoVoter16,
   IcoWriting16,
 } from '@onefootprint/icons';
-import type { IdDocUploadedEventData } from '@onefootprint/types';
+import type { DocumentUploadedEventData } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
@@ -30,11 +30,11 @@ const IconByIdDocType: Record<SupportedIdDocTypes, JSX.Element> = {
   [SupportedIdDocTypes.passportCard]: <IcoPassportCard16 />,
 };
 
-type IdDocUploadedEventIconProps = {
-  data: IdDocUploadedEventData;
+type DocumentUploadedEventIconProps = {
+  data: DocumentUploadedEventData;
 };
 
-const IdDocUploadedEventIcon = ({ data }: IdDocUploadedEventIconProps) =>
+const DocumentUploadedEventIcon = ({ data }: DocumentUploadedEventIconProps) =>
   IconByIdDocType[data.documentType] ?? <IcoIdCard16 />;
 
-export default IdDocUploadedEventIcon;
+export default DocumentUploadedEventIcon;

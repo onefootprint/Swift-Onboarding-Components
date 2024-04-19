@@ -21,6 +21,8 @@ export enum TimelineEventKind {
   dataCollected = 'data_collected',
   onboardingDecision = 'onboarding_decision',
   liveness = 'liveness',
+  documentUploaded = 'document_uploaded',
+  // TODO rm
   idDocUploaded = 'identity_document_uploaded',
   watchlistCheck = 'watchlist_check',
   freeFormNote = 'annotation',
@@ -73,12 +75,12 @@ export type LivenessEventData = {
   attributes?: LivenessAttribute;
 };
 
-export type IdDocUploadedEvent = {
-  kind: TimelineEventKind.idDocUploaded;
-  data: IdDocUploadedEventData;
+export type DocumentUploadedEvent = {
+  kind: TimelineEventKind.documentUploaded | TimelineEventKind.idDocUploaded;
+  data: DocumentUploadedEventData;
 };
 
-export type IdDocUploadedEventData = {
+export type DocumentUploadedEventData = {
   selfieCollected: boolean;
   status: IdDocStatus;
   documentType: SupportedIdDocTypes;
@@ -223,7 +225,7 @@ export type TimelineEvent = {
     | LabelAddedEvent
     | CollectedDataEvent
     | LivenessEvent
-    | IdDocUploadedEvent
+    | DocumentUploadedEvent
     | OnboardingDecisionEvent
     | WatchlistCheckEvent
     | FreeFormNoteEvent

@@ -3,9 +3,9 @@ import type {
   Annotation,
   CollectedDataEventData,
   CombinedWatchlistChecksEvent,
+  DocumentUploadedEventData,
   Entity,
   ExternalIntegrationCalledData,
-  IdDocUploadedEventData,
   LivenessEventData,
   OnboardingDecisionEventData,
   PreviousWatchlistChecksEventData,
@@ -36,11 +36,11 @@ import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
 import AuthMethodUpdatedEventHeader from './components/auth-method-updated-event';
 import DataCollectedEventHeader from './components/data-collected-event';
+import DocumentUploadedEventHeader from './components/document-uploaded-event';
 import {
   ExternalIntegrationCalledEventBody,
   ExternalIntegrationCalledEventHeader,
 } from './components/external-integration-called-event';
-import IdDocUploadedEventHeader from './components/id-doc-uploaded-event';
 import LabelAddedEventHeader from './components/label-added-event';
 import {
   LivenessEventBody,
@@ -117,11 +117,14 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
           headerComponent: <DataCollectedEventHeader data={eventData} />,
         });
       }
-    } else if (kind === TimelineEventKind.idDocUploaded) {
-      const eventData = data as IdDocUploadedEventData;
+    } else if (
+      kind === TimelineEventKind.documentUploaded ||
+      kind === TimelineEventKind.idDocUploaded
+    ) {
+      const eventData = data as DocumentUploadedEventData;
       items.push({
         time,
-        headerComponent: <IdDocUploadedEventHeader data={eventData} />,
+        headerComponent: <DocumentUploadedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.onboardingDecision) {
       const eventData = data as OnboardingDecisionEventData;
