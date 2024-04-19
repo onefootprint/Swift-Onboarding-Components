@@ -579,6 +579,7 @@ impl ObConfiguration {
         skip_confirm: bool,
         document_types_and_countries: Option<DocumentAndCountryConfiguration>,
         documents_to_collect: Vec<DocumentRequestConfig>,
+        curp_validation_enabled: bool,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -605,7 +606,7 @@ impl ObConfiguration {
             skip_kyb,
             skip_confirm,
             document_types_and_countries,
-            curp_validation_enabled: false,
+            curp_validation_enabled,
             documents_to_collect,
         };
         let obc = diesel::insert_into(ob_configuration::table)

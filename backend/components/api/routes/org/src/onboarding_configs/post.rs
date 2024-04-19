@@ -52,6 +52,8 @@ pub struct CreateOnboardingConfigurationRequest {
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     #[serde(default)]
     pub documents_to_collect: Vec<DocumentRequestConfig>,
+    #[serde(default)]
+    pub curp_validation_enabled: Option<bool>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -128,6 +130,13 @@ impl CreateOnboardingConfigurationRequest {
                 )
                 .into());
             }
+        }
+
+        if self.curp_validation_enabled.unwrap_or(false) && doc_cdo.is_none() {
+            return Err(TenantError::ValidationError(
+                "Must collect document if `curp_validation_enabled=true".to_owned(),
+            )
+            .into());
         }
 
         if self.skip_kyc && !self.allow_international_residents && doc_cdo.is_none() {
@@ -580,6 +589,7 @@ pub async fn post(
         skip_confirm,
         document_types_and_countries,
         documents_to_collect,
+        curp_validation_enabled,
     } = request.clone();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -649,6 +659,7 @@ pub async fn post(
                 skip_confirm.unwrap_or(false),
                 document_types_and_countries,
                 documents_to_collect,
+                curp_validation_enabled.unwrap_or(false),
             )?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))?;
