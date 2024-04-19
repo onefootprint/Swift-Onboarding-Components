@@ -312,8 +312,8 @@
       "close-aria-label-default": "Cerrar"
     },
     "date-range": {
-      "error-future": "The date must be today or in the past.",
-      "error-past": "The date must be today or in the past."
+      "error-future": "La fecha debe ser hoy o previa a hoy.",
+      "error-past": "La fecha debe ser hoy o posterior a hoy."
     }
   }
 }
