@@ -102,17 +102,22 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
 
     bifrost = BifrostClient.new(obc)
     user = bifrost.run()
-    fp_id = user.fp_id
-
-    # TODO check timeline event
-
     assert any(
         r["kind"] == "collect_document" and r["config"]["kind"] == "custom"
         for r in bifrost.handled_requirements
     )
 
-    body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     assert any(i["identifier"] == "document.custom.utility_bill" for i in body["data"])
+
+    body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    event = next(
+        i["event"]["data"]
+        for i in body
+        if i["event"]["kind"] == "identity_document_uploaded"
+    )
+    assert event["config"]["data"]["identifier"] == "document.custom.utility_bill"
+    assert event["config"]["data"]["name"] == "Utility bill"
 
 
 def test_upload_documents_with_ob_config_restriction_legacy_version(

@@ -20,6 +20,7 @@ impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDo
             document_type,
             selfie_collected,
             device_type: device_type.unwrap_or(DocumentScanDeviceType::Mobile),
+            config: document_request.config,
         }
     }
 }
