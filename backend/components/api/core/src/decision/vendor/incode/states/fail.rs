@@ -69,7 +69,7 @@ impl Fail {
 
         IdentityDocument::update(conn, id_doc_id, update)?;
         // Create a timeline event
-        let info = newtypes::IdentityDocumentUploadedInfo {
+        let info = newtypes::DocumentUploadedInfo {
             id: id_doc_id.clone(),
         };
         UserTimeline::create(conn, info, vault_id.clone(), sv_id.clone())?;

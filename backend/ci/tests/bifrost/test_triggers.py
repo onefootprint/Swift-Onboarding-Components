@@ -120,7 +120,7 @@ def test_redo_kyc(sandbox_tenant, with_document, doc_first_obc):
 
     if with_document:
         body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
-        docs = [i for i in body if i["event"]["kind"] == "identity_document_uploaded"]
+        docs = [i for i in body if i["event"]["kind"] == "document_uploaded"]
         assert len(docs) == 2
 
         users_docs = get(f"users/{fp_id}/documents", None, sandbox_tenant.sk.key)

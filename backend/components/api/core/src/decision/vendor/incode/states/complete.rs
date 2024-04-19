@@ -320,7 +320,7 @@ impl Complete {
         let validated_doc_kind = dk.into_inner();
 
         // Create a timeline event
-        let info = newtypes::IdentityDocumentUploadedInfo {
+        let info = newtypes::DocumentUploadedInfo {
             id: id_doc_id.clone(),
         };
         UserTimeline::create(conn, info, vault.id.clone(), sv_id.clone())?;

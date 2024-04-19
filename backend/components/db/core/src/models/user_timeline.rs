@@ -66,7 +66,7 @@ pub struct SaturatedDataCollectedEvent {
 pub enum SaturatedTimelineEvent {
     DataCollected(SaturatedDataCollectedEvent),
     OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
-    IdentityDocumentUploaded((IdentityDocument, DocumentRequest)),
+    DocumentUploaded((IdentityDocument, DocumentRequest)),
     Liveness(LivenessEvent, InsightEvent),
     Annotation(AnnotationInfo),
     WatchlistCheck(WatchlistCheck),
@@ -147,7 +147,7 @@ impl UserTimeline {
             _ => None,
         });
         let identity_document_ids = results.iter().flat_map(|ut| match ut.event {
-            DbUserTimelineEvent::IdentityDocumentUploaded(ref e) => Some(&e.id),
+            DbUserTimelineEvent::DocumentUploaded(ref e) => Some(&e.id),
             _ => None,
         });
         let watchlist_check_ids = results.iter().flat_map(|ut| match ut.event {
@@ -239,14 +239,12 @@ impl UserTimeline {
                                 .cloned(),
                         )
                     }
-                    DbUserTimelineEvent::IdentityDocumentUploaded(ref e) => {
-                        SaturatedTimelineEvent::IdentityDocumentUploaded(
-                            identity_documents_and_requests
-                                .get(&e.id)
-                                .ok_or(DbError::RelatedObjectNotFound)?
-                                .clone(),
-                        )
-                    }
+                    DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
+                        identity_documents_and_requests
+                            .get(&e.id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone(),
+                    ),
                     DbUserTimelineEvent::Liveness(ref e) => {
                         let (liveness, insight) = liveness_events
                             .get(&e.id)

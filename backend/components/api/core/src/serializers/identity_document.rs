@@ -3,7 +3,7 @@ use newtypes::DocumentScanDeviceType;
 
 use crate::utils::db2api::DbToApi;
 
-impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDocumentTimelineEvent {
+impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::DocumentUploadedTimelineEvent {
     fn from_db((identity_doc, document_request): (IdentityDocument, DocumentRequest)) -> Self {
         let skip_selfie = identity_doc.should_skip_selfie();
         let IdentityDocument {

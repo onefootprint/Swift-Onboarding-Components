@@ -1,7 +1,7 @@
 use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, ExternalIntegrationKind, LabelKind};
 
 use crate::{
-    Actor, Annotation, Apiv2Schema, DateTime, DocumentRequest, IdentityDocumentTimelineEvent, InsightEvent,
+    Actor, Annotation, Apiv2Schema, DateTime, DocumentRequest, DocumentUploadedTimelineEvent, InsightEvent,
     LivenessEvent, OnboardingDecision, Serialize, TimelinePlaybook, TriggeredWorkflow, Utc, VaultCreated,
     WatchlistCheck, WorkflowRequest,
 };
@@ -22,7 +22,7 @@ pub struct UserTimeline {
 pub enum UserTimelineEvent {
     DataCollected(DataCollectedInfo),
     Liveness(LivenessEvent),
-    IdentityDocumentUploaded(IdentityDocumentTimelineEvent),
+    DocumentUploaded(DocumentUploadedTimelineEvent),
     OnboardingDecision {
         decision: OnboardingDecision,
         annotation: Option<Annotation>,

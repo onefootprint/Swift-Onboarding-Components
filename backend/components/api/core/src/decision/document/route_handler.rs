@@ -375,7 +375,7 @@ pub async fn complete_non_identity_document(
             // TODO: doc_type might need to come from incode once we get to that point
             let (_, seqno) = vault_complete_images(conn, &uvw, dk, &id_doc)?;
             // Create a timeline event
-            let info = newtypes::IdentityDocumentUploadedInfo {
+            let info = newtypes::DocumentUploadedInfo {
                 id: id_doc_id.clone(),
             };
             UserTimeline::create(conn, info, uvw.vault.id.clone(), sv_id.clone())?;
