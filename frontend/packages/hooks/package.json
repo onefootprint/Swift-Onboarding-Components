@@ -12,16 +12,15 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@onefootprint/global-constants": "*",
     "@onefootprint/jest-presets": "*",
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@types/react-dom": "^18",
     "eslint-config-footprint": "*",
+    "react": "^18",
     "react-dom": "^18",
     "react-i18next": "^14.0.0",
-    "react": "^18",
     "tsconfig": "*",
     "typescript": "^5"
   },
