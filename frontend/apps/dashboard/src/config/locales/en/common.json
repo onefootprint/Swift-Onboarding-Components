@@ -1559,6 +1559,7 @@
           "workflow-triggered-event": {
             "requested-user-to": "requested user to {{action}}",
             "actions": {
+              "document": "upload document",
               "id_document": "upload ID photo",
               "onboard": "onboard onto",
               "redo_kyc": "reonboard onto",

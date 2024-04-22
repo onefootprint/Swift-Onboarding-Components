@@ -1,5 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { TriggerKind } from '@onefootprint/types';
+import type { DocumentRequestConfig, Trigger } from '@onefootprint/types';
+import { DocumentRequestKind, TriggerKind } from '@onefootprint/types';
 import type { DialogButton } from '@onefootprint/ui';
 import { Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -9,7 +10,10 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useCreateTrigger from '../actions/components/hooks/use-create-trigger';
 import RequestMoreInfoForm from './components/request-more-info';
-import type { TriggerFormData } from './components/request-more-info/request-more-info-form';
+import {
+  RequestMoreInfoKind,
+  type TriggerFormData,
+} from './components/request-more-info/request-more-info-form';
 import useDisplayLinkDialog from './hooks/use-display-link-dialog';
 
 export type RequestMoreInfoDialogProps = {
@@ -47,17 +51,48 @@ const RequestMoreInfoDialog = ({
 
   const handleGenerateLink = (data: TriggerFormData) => {
     const { kind, collectSelfie, note, playbook } = data;
-    let trigger;
-    if (kind === TriggerKind.IdDocument) {
-      trigger = { kind, data: { collectSelfie } };
-    } else if (kind === TriggerKind.Onboard && playbook) {
-      trigger = { kind, data: { playbookId: playbook.value } };
-    } else if (kind === TriggerKind.ProofOfSsn) {
-      trigger = { kind };
-    } else if (kind === TriggerKind.ProofOfAddress) {
-      trigger = { kind };
+    let trigger: Trigger;
+    if (kind === RequestMoreInfoKind.Onboard && playbook) {
+      trigger = {
+        kind: TriggerKind.Onboard,
+        data: { playbookId: playbook.value },
+      };
     } else {
-      return;
+      let configs: DocumentRequestConfig[];
+      if (kind === RequestMoreInfoKind.IdDocument) {
+        configs = [
+          {
+            kind: DocumentRequestKind.Identity,
+            data: {
+              collectSelfie,
+            },
+          },
+        ];
+      } else if (kind === RequestMoreInfoKind.ProofOfSsn) {
+        configs = [
+          // For now, we are implicitly requesting an ID doc alongside PoSsn
+          {
+            kind: DocumentRequestKind.Identity,
+            data: {
+              collectSelfie: true,
+            },
+          },
+          {
+            kind: DocumentRequestKind.ProofOfSsn,
+            data: {},
+          },
+        ];
+      } else if (kind === RequestMoreInfoKind.ProofOfAddress) {
+        configs = [
+          {
+            kind: DocumentRequestKind.ProofOfAddress,
+            data: {},
+          },
+        ];
+      } else {
+        return;
+      }
+      trigger = { kind: TriggerKind.Document, data: { configs } };
     }
     submitTriggerMutation.mutate(
       {

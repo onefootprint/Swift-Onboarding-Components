@@ -1,7 +1,6 @@
 import {
   OnboardingConfigKind,
   OrgFrequentNoteKind,
-  TriggerKind,
   WorkflowStatus,
 } from '@onefootprint/types';
 import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
@@ -26,8 +25,15 @@ import styled, { css } from 'styled-components';
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
+export enum RequestMoreInfoKind {
+  Onboard = 'onboard',
+  ProofOfAddress = 'proof_of_address',
+  ProofOfSsn = 'proof_of_ssn',
+  IdDocument = 'id_document',
+}
+
 export type TriggerFormData = {
-  kind: TriggerKind;
+  kind: RequestMoreInfoKind;
   collectSelfie: boolean;
   playbook?: SelectOption;
   note?: string;
@@ -102,14 +108,14 @@ const RequestMoreInfoForm = ({
               text={t('form.cannot-request-info')}
             >
               <Radio
-                value={TriggerKind.IdDocument}
+                value={RequestMoreInfoKind.IdDocument}
                 label={t('form.id-photo.title')}
                 disabled={!hasPriorOnboarding}
                 {...register('kind', { required: true })}
               />
             </Tooltip>
             <AnimatedContainer
-              isExpanded={triggerKind === TriggerKind.IdDocument}
+              isExpanded={triggerKind === RequestMoreInfoKind.IdDocument}
               marginLeft={8}
               marginTop={4}
             >
@@ -125,7 +131,7 @@ const RequestMoreInfoForm = ({
             text={t('form.cannot-request-info')}
           >
             <Radio
-              value={TriggerKind.ProofOfSsn}
+              value={RequestMoreInfoKind.ProofOfSsn}
               label={t('form.proof-of-ssn.title')}
               disabled={!hasPriorOnboarding}
               {...register('kind', { required: true })}
@@ -137,7 +143,7 @@ const RequestMoreInfoForm = ({
             text={t('form.cannot-request-info')}
           >
             <Radio
-              value={TriggerKind.ProofOfAddress}
+              value={RequestMoreInfoKind.ProofOfAddress}
               label={t('form.proof-of-address.title')}
               disabled={!hasPriorOnboarding}
               {...register('kind', { required: true })}
@@ -145,12 +151,12 @@ const RequestMoreInfoForm = ({
           </Tooltip>
           <div>
             <Radio
-              value={TriggerKind.Onboard}
+              value={RequestMoreInfoKind.Onboard}
               label={t('form.onboard.title')}
               {...register('kind', { required: true })}
             />
             <AnimatedContainer
-              isExpanded={triggerKind === TriggerKind.Onboard}
+              isExpanded={triggerKind === RequestMoreInfoKind.Onboard}
               marginLeft={8}
               marginTop={2}
             >
@@ -158,7 +164,9 @@ const RequestMoreInfoForm = ({
                 <Controller
                   control={control}
                   name="playbook"
-                  rules={{ required: triggerKind === TriggerKind.Onboard }}
+                  rules={{
+                    required: triggerKind === RequestMoreInfoKind.Onboard,
+                  }}
                   render={select => (
                     <Select
                       hasError={!!select.fieldState.error}

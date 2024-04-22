@@ -1,3 +1,5 @@
+import type { DocumentRequestConfig } from '../data';
+
 export type TriggerRequest = {
   entityId: string;
   trigger: Trigger;
@@ -13,24 +15,17 @@ export type Trigger =
       };
     }
   | {
-      kind: TriggerKind.IdDocument;
+      kind: TriggerKind.Document;
       data: {
-        collectSelfie: boolean;
+        configs: DocumentRequestConfig[];
       };
-    }
-  | {
-      kind: TriggerKind.ProofOfSsn;
-    }
-  | {
-      kind: TriggerKind.ProofOfAddress;
     };
 
 export enum TriggerKind {
   RedoKyc = 'redo_kyc',
   Onboard = 'onboard',
+  Document = 'document',
   IdDocument = 'id_document',
-  ProofOfSsn = 'proof_of_ssn',
-  ProofOfAddress = 'proof_of_address',
 }
 
 export type TriggerResponse = {
