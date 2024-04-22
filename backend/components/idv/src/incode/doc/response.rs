@@ -827,6 +827,20 @@ impl OCRAddress {
             }
         })
     }
+
+    // Note: this field is used for multiple country's postal codes, not just the US
+    pub fn normalized_zip5(&self) -> Option<ScrubbedPiiString> {
+        self.postal_code.as_ref().and_then(|p| {
+            let z = p.leak();
+
+            match z.len().cmp(&5) {
+                // don't want to return a zip that isn't at least 5
+                std::cmp::Ordering::Less => None,
+                std::cmp::Ordering::Equal => Some(z.into()),
+                std::cmp::Ordering::Greater => Some(z[..5].into()),
+            }
+        })
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]

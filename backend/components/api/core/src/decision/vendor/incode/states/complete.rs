@@ -130,6 +130,7 @@ fn doc_first_id_data(
     };
 
     let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
+    let zip5 = address.and_then(|a| a.normalized_zip5());
 
     let all_data = vec![
         (
@@ -147,7 +148,7 @@ fn doc_first_id_data(
         (IDK::AddressLine1, address.and_then(|n| n.street.as_ref())),
         (IDK::City, address.and_then(|n| n.city.as_ref())),
         (IDK::State, state.as_ref()),
-        (IDK::Zip, address.and_then(|n| n.postal_code.as_ref())),
+        (IDK::Zip, zip5.as_ref()),
         (IDK::Country, r.issuing_country_two_digit().as_ref()),
         (IDK::Dob, r.dob().ok().as_ref()),
     ]
