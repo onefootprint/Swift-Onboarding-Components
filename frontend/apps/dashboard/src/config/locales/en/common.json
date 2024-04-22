@@ -1434,6 +1434,7 @@
             "title": {
               "complete": "Collected ",
               "success": "Collected ",
+              "pending": "Started collecting ",
               "failed": "Unable to collect "
             }
           },

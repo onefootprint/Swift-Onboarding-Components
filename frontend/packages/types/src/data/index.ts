@@ -66,6 +66,8 @@ export {
   IdDI,
   InvestorProfileDI,
 } from './di';
+export type { DocumentRequestConfig } from './document-request-config';
+export { DocumentRequestKind } from './document-request-config';
 export type { Document, DocumentUpload } from './document-type';
 export { RawJsonKinds, UploadSource } from './document-type';
 export type {

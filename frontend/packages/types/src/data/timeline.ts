@@ -7,6 +7,7 @@ import type {
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from './collected-data-option';
+import type { DocumentRequestConfig } from './document-request-config';
 import type { EntityLabel } from './entity';
 import type { IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
 import type { InsightEvent } from './insight-event';
@@ -22,8 +23,6 @@ export enum TimelineEventKind {
   onboardingDecision = 'onboarding_decision',
   liveness = 'liveness',
   documentUploaded = 'document_uploaded',
-  // TODO rm
-  idDocUploaded = 'identity_document_uploaded',
   watchlistCheck = 'watchlist_check',
   freeFormNote = 'annotation',
   combinedWatchlistChecks = 'combined_watchlist_checks',
@@ -76,14 +75,14 @@ export type LivenessEventData = {
 };
 
 export type DocumentUploadedEvent = {
-  kind: TimelineEventKind.documentUploaded | TimelineEventKind.idDocUploaded;
+  kind: TimelineEventKind.documentUploaded;
   data: DocumentUploadedEventData;
 };
 
 export type DocumentUploadedEventData = {
-  selfieCollected: boolean;
   status: IdDocStatus;
   documentType: SupportedIdDocTypes;
+  config: DocumentRequestConfig;
 };
 
 export type OnboardingDecisionEvent = {

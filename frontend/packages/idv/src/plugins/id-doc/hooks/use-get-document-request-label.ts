@@ -10,6 +10,7 @@ const useGetDocumentRequestLabel = () => {
       [DocumentRequestKind.Identity]: t('identity'),
       [DocumentRequestKind.ProofOfAddress]: t('proof_of_address'),
       [DocumentRequestKind.ProofOfSsn]: t('proof_of_ssn'),
+      [DocumentRequestKind.Custom]: t('unknown'),
     };
     if (kind in translations) {
       return translations[kind];

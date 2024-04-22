@@ -1,3 +1,4 @@
+import type { DocumentRequestKind } from '..';
 import type {
   CollectedDataOption,
   CollectedInvestorProfileDataOption,
@@ -46,12 +47,6 @@ export type IdDocRequirement = {
   uploadMode: 'default' | 'allow_upload' | 'capture_only';
   documentRequestKind: DocumentRequestKind;
 };
-
-export enum DocumentRequestKind {
-  Identity = 'identity',
-  ProofOfSsn = 'proof_of_ssn',
-  ProofOfAddress = 'proof_of_address',
-}
 
 export type RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey;

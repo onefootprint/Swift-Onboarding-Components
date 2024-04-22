@@ -14,7 +14,7 @@ export enum TimelineEventKind {
   dataCollected = 'data_collected',
   onboardingDecision = 'onboarding_decision',
   liveness = 'liveness',
-  documentUploaded = 'identity_document_uploaded',
+  documentUploaded = 'document_uploaded',
   watchlistCheck = 'watchlist_check',
   freeFormNote = 'annotation',
   combinedWatchlistChecks = 'combined_watchlist_checks',

@@ -117,10 +117,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
           headerComponent: <DataCollectedEventHeader data={eventData} />,
         });
       }
-    } else if (
-      kind === TimelineEventKind.documentUploaded ||
-      kind === TimelineEventKind.idDocUploaded
-    ) {
+    } else if (kind === TimelineEventKind.documentUploaded) {
       const eventData = data as DocumentUploadedEventData;
       items.push({
         time,

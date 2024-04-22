@@ -1,6 +1,7 @@
 import type { TimelineEvent, WatchlistCheckEvent } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
+  DocumentRequestKind,
   IdDocStatus,
   SupportedIdDocTypes,
   TimelineEventKind,
@@ -100,7 +101,12 @@ describe('mergeAuditTrailTimelineEvents', () => {
             data: {
               status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.driversLicense,
-              selfieCollected: true,
+              config: {
+                kind: DocumentRequestKind.Identity,
+                data: {
+                  collectSelfie: true,
+                },
+              },
             },
           },
           timestamp: '2021-01-02T00:00:00.000Z',
@@ -111,7 +117,12 @@ describe('mergeAuditTrailTimelineEvents', () => {
             data: {
               status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.passport,
-              selfieCollected: true,
+              config: {
+                kind: DocumentRequestKind.Identity,
+                data: {
+                  collectSelfie: true,
+                },
+              },
             },
           },
           timestamp: '2021-02-01T00:00:00.000Z',
@@ -125,7 +136,12 @@ describe('mergeAuditTrailTimelineEvents', () => {
             data: {
               status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.driversLicense,
-              selfieCollected: true,
+              config: {
+                kind: DocumentRequestKind.Identity,
+                data: {
+                  collectSelfie: true,
+                },
+              },
             },
           },
           time: { timestamp: '2021-01-02T00:00:00.000Z' },
@@ -136,7 +152,12 @@ describe('mergeAuditTrailTimelineEvents', () => {
             data: {
               status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.passport,
-              selfieCollected: true,
+              config: {
+                kind: DocumentRequestKind.Identity,
+                data: {
+                  collectSelfie: true,
+                },
+              },
             },
           },
           time: { timestamp: '2021-02-01T00:00:00.000Z' },

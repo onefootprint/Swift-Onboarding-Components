@@ -165,11 +165,7 @@ export type {
   RegisterPasskeyRequirement,
   RequirementForKind,
 } from './onboarding-status';
-export {
-  DocumentRequestKind,
-  getRequirement,
-  OnboardingRequirementKind,
-} from './onboarding-status';
+export { getRequirement, OnboardingRequirementKind } from './onboarding-status';
 export type {
   OnboardingSubmitRequest,
   OnboardingSubmitResponse,
