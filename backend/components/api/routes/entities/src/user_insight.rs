@@ -6,7 +6,9 @@ use api_core::{
     State,
 };
 use db::{
-    models::{neuro_id_analytics_event::NeuroIdAnalyticsEvent, scoped_vault::ScopedVault},
+    models::{
+        neuro_id_analytics_event::NeuroIdAnalyticsEvent, scoped_vault::ScopedVault, workflow::Workflow,
+    },
     DbResult,
 };
 use paperclip::actix::{api_v2_operation, get, web};
@@ -29,22 +31,22 @@ pub async fn get(
     let fp_id = request.into_inner();
 
 
-    let behavior_events = state
+    let (behavior_events, latest_completed_wf) = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            NeuroIdAnalyticsEvent::list(conn, &sv.id)
+            let behavior = NeuroIdAnalyticsEvent::list(conn, &sv.id)?;
+            let latest_completed_wf = Workflow::latest(conn, &sv.id, true)?.map(|(wf, _)| wf);
+
+            Ok((behavior, latest_completed_wf))
         })
         .await?;
     // TODO: add unique key on wf_id
     // TODO: add aggregations
 
-    let behavior_insights = if let Some(behavior) = behavior_events.first() {
-        user_insights::from_db(behavior.clone())
-    } else {
-        vec![]
-    };
-
-
-    ResponseData::ok(behavior_insights).json()
+    ResponseData::ok(user_insights::from_db(
+        behavior_events.first().cloned(),
+        latest_completed_wf,
+    ))
+    .json()
 }

@@ -5,4 +5,5 @@ use serde::Serialize;
 pub enum UserInsightScope {
     Behavior,
     Device,
+    Workflow,
 }
