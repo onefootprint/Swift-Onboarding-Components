@@ -46,6 +46,7 @@ impl Fail {
             vaulted_document_type: None,
             status: Some(IdentityDocumentStatus::Failed),
             curp_completed_seqno: None,
+            validated_country_code: None,
         };
 
         let (vres_id, vendor_api): (VerificationResultId, VendorAPI) = VerificationRequest::list(conn, di_id)?

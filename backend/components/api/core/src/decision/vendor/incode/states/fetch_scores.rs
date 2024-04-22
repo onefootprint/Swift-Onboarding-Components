@@ -42,7 +42,7 @@ use idv::{
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataRequest, DecisionIntentKind,
     DocumentKind, DocumentSide, Fingerprints, IdentityDocumentId, PiiJsonValue, ScopedVaultId, VendorAPI,
-    WorkflowId,
+    VendorValidatedCountryCode, WorkflowId,
 };
 use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
 use tracing::Instrument;
@@ -52,6 +52,7 @@ pub struct FetchScores {
     ocr_data: DataRequest<Fingerprints>,
     document_kind: ValidatedIdDocKind,
     rs: Vec<NewRiskSignal>,
+    country_code: Option<VendorValidatedCountryCode>,
 }
 
 #[async_trait]
@@ -200,6 +201,9 @@ impl IncodeStateTransition for FetchScores {
             ocr_data,
             document_kind: dk,
             rs,
+            country_code: ocr_response
+                .issuing_country_two_digit_code()
+                .map(VendorValidatedCountryCode),
         }))
     }
 
@@ -219,6 +223,7 @@ impl IncodeStateTransition for FetchScores {
             ocr_data: self.ocr_data,
             score_response: self.score_response,
             rs: self.rs,
+            country_code: self.country_code,
         };
         Complete::enter(conn, args)?;
         Ok(Complete::new().into())

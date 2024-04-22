@@ -606,11 +606,14 @@ impl FetchOCRResponse {
     }
 
     pub fn issuing_country_two_digit(&self) -> Option<ScrubbedPiiString> {
+        self.issuing_country_two_digit_code().map(ScrubbedPiiString::from)
+    }
+
+    pub fn issuing_country_two_digit_code(&self) -> Option<Iso3166TwoDigitCountryCode> {
         self.issuing_country
             .as_ref()
             .and_then(|i| Iso3166ThreeDigitCountryCode::from_str(i.leak()).ok())
             .map(Iso3166TwoDigitCountryCode::from)
-            .map(ScrubbedPiiString::from)
     }
 
     pub fn dob(&self) -> Result<ScrubbedPiiString, IncodeError> {

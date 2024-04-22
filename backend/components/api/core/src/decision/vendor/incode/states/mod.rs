@@ -193,6 +193,7 @@ pub async fn save_incode_fixtures(
                 ocr_data,
                 score_response,
                 rs,
+                country_code: None,
             };
             Complete::enter(conn, args)?;
 

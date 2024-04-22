@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use newtypes::{
     DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType, IdDocKind, IdentityDocumentFixtureResult,
     IdentityDocumentId, IdentityDocumentStatus, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode,
-    ScopedVaultId, TenantId, WorkflowId,
+    ScopedVaultId, TenantId, VendorValidatedCountryCode, WorkflowId,
 };
 
 use super::{
@@ -46,6 +46,8 @@ pub struct IdentityDocument {
     // the document_type we stored this in the vault as
     pub vaulted_document_type: Option<IdDocKind>,
     pub curp_completed_seqno: Option<DataLifetimeSeqno>,
+    /// The confirmed document country (usually confirmed by a vendor)
+    validated_country_code: Option<Iso3166TwoDigitCountryCode>,
 }
 
 impl IdentityDocument {
@@ -59,6 +61,10 @@ impl IdentityDocument {
 
     pub fn is_complete(&self) -> bool {
         matches!(self.status, IdentityDocumentStatus::Complete)
+    }
+
+    pub fn vendor_validated_country_code(&self) -> Option<VendorValidatedCountryCode> {
+        self.validated_country_code.map(VendorValidatedCountryCode)
     }
 }
 
@@ -96,6 +102,7 @@ pub struct IdentityDocumentUpdate {
     pub status: Option<IdentityDocumentStatus>,
     pub vaulted_document_type: Option<IdDocKind>,
     pub curp_completed_seqno: Option<DataLifetimeSeqno>,
+    pub validated_country_code: Option<Iso3166TwoDigitCountryCode>,
 }
 
 impl IdentityDocumentUpdate {

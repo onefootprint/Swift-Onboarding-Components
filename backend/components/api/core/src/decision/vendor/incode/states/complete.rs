@@ -39,7 +39,7 @@ use newtypes::{
     DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentKind, Fingerprints,
     FootprintReasonCode, IdDocKind, IdentityDataKind as IDK, IdentityDocumentId, IdentityDocumentStatus,
     IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId,
-    ScrubbedPiiString, Validate, ValidateArgs, VendorAPI, VerificationResultId,
+    ScrubbedPiiString, Validate, ValidateArgs, VendorAPI, VendorValidatedCountryCode, VerificationResultId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -310,6 +310,7 @@ pub struct CompleteArgs<'a> {
     pub sv_id: &'a ScopedVaultId,
     pub id_doc_id: &'a IdentityDocumentId,
     pub dk: ValidatedIdDocKind,
+    pub country_code: Option<VendorValidatedCountryCode>,
     pub ocr_data: DataRequest<Fingerprints>,
     pub score_response: FetchScoresResponse,
     pub rs: Vec<NewRiskSignal>,
@@ -324,6 +325,7 @@ impl Complete {
             sv_id,
             id_doc_id,
             dk,
+            country_code,
             ocr_data,
             score_response,
             rs,
@@ -368,6 +370,7 @@ impl Complete {
             status: Some(IdentityDocumentStatus::Complete),
             vaulted_document_type: Some(validated_doc_kind),
             curp_completed_seqno: None,
+            validated_country_code: country_code.map(|c| c.0),
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
 

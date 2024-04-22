@@ -1,0 +1,1 @@
+ALTER TABLE identity_document ADD COLUMN validated_country_code TEXT;

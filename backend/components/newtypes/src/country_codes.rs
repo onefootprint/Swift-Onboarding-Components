@@ -851,6 +851,11 @@ impl From<Iso3166ThreeDigitCountryCode> for Iso3166TwoDigitCountryCode {
     }
 }
 
+
+/// Newtype for country codes that have been validated by a vendor (in some manner)
+#[derive(derive_more::Deref, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct VendorValidatedCountryCode(pub Iso3166TwoDigitCountryCode);
+
 #[cfg(test)]
 mod tests {
     use strum::IntoEnumIterator;
