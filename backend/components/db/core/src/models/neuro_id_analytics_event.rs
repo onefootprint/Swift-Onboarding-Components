@@ -45,6 +45,7 @@ pub struct NeuroIdAnalyticsEvent {
     // pub model_combined_digital_intent_result: Option<String>,
 }
 
+
 #[derive(Debug, Clone)]
 pub struct NewNeuroIdAnalyticsEvent {
     pub verification_result_id: VerificationResultId,
@@ -169,5 +170,14 @@ impl NeuroIdAnalyticsEvent {
             .values(new)
             .get_result::<NeuroIdAnalyticsEvent>(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument("NeuroIdAnalyticsEvent::list", skip_all)]
+    pub fn list(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+        let res = neuro_id_analytics_event::table
+            .filter(neuro_id_analytics_event::scoped_vault_id.eq(scoped_vault_id))
+            .get_results(conn)?;
+
+        Ok(res)
     }
 }

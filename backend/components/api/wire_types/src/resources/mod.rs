@@ -150,3 +150,6 @@ pub use magic_link::*;
 
 mod google_oauth;
 pub use google_oauth::*;
+
+mod user_insight;
+pub use user_insight::*;

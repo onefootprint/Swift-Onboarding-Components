@@ -88,6 +88,9 @@ pub use trigger::*;
 pub mod tenant_business_info;
 pub use tenant_business_info::*;
 
+pub mod user_insight;
+pub use user_insight::*;
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Invalid email address: {0}")]

@@ -31,6 +31,7 @@ mod secret_api_key;
 mod tenant_android_app_meta;
 mod tenant_ios_app_meta;
 mod user;
+pub mod user_insights;
 mod user_tag;
 mod user_timeline;
 mod validate;
