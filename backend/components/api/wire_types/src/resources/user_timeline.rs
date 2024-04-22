@@ -1,4 +1,7 @@
-use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, ExternalIntegrationKind, LabelKind};
+use newtypes::{
+    ActionKind, AuthMethodKind, CollectedDataOption, ExternalIntegrationKind, LabelKind,
+    WorkflowRequestConfig,
+};
 
 use crate::{
     Actor, Annotation, Apiv2Schema, DateTime, DocumentRequest, DocumentUploadedTimelineEvent, InsightEvent,
@@ -49,8 +52,13 @@ pub struct DataCollectedInfo {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct WorkflowTriggered {
+    // TODO deprecate
     pub workflow: TriggeredWorkflow,
+    // TODO deprecate
     pub request: Option<WorkflowRequest>,
+    pub request_is_active: bool,
+
+    pub config: WorkflowRequestConfig,
     pub actor: Actor,
     pub note: Option<String>,
 }

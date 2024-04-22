@@ -82,8 +82,33 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 actor: api_wire_types::Actor::from_db(actor),
             }),
             SaturatedTimelineEvent::WorkflowTriggered((workflow, actor, wfr)) => {
-                // Some weird logic for backcompat to determine the trigger type
                 let note = wfr.as_ref().and_then(|wfr| wfr.note.clone());
+                // Some weird logic for backcompat to determine the trigger type
+                let config = if let Some(wfr) = wfr.as_ref() {
+                    // This is the most modern format - WFR is created when the trigger is made
+                    wfr.config.clone()
+                } else if let Some(wf) = workflow.as_ref() {
+                    // Some legacy triggers created a Workflow inline
+                    match wf.config {
+                        WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) | WorkflowConfig::Kyb(_) => {
+                            if let Some(playbook_id) = wf.ob_configuration_id.clone() {
+                                WorkflowRequestConfig::Onboard { playbook_id }
+                            } else {
+                                // This probably never happens, but need the type anyways
+                                WorkflowRequestConfig::RedoKyc
+                            }
+                        }
+                        WorkflowConfig::Document(ref c) => WorkflowRequestConfig::Document {
+                            configs: c.configs.clone(),
+                        },
+                    }
+                } else {
+                    // And even more legacy triggers didn't have a workflow associated with them
+                    WorkflowRequestConfig::RedoKyc
+                };
+                let request_is_active = wfr.as_ref().is_some_and(|wfr| wfr.deactivated_at.is_none());
+
+                // TODO deprecate this
                 let (workflow, request) = if let Some(wfr) = wfr {
                     let kind = match wfr.config {
                         WorkflowRequestConfig::RedoKyc => TriggerKind::RedoKyc,
@@ -113,6 +138,8 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 Self::WorkflowTriggered(api_wire_types::WorkflowTriggered {
                     workflow,
                     request,
+                    request_is_active,
+                    config,
                     actor: api_wire_types::Actor::from_db(actor),
                     note,
                 })
