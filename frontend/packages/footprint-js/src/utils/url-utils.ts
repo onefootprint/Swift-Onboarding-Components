@@ -14,7 +14,7 @@ export const getWindowUrl = (): string =>
     ? window.location?.href || window.location.toString()
     : '';
 
-const getSearchParams = (props: Props, token: string): string => {
+export const getSearchParams = (props: Props, token: string): string => {
   const { appearance, kind, l10n, variant } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const searchParams = new URLSearchParams();

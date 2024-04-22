@@ -1,9 +1,11 @@
-import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
+import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
+
+import fakeSdk from './fake-sdk';
 
 type RouterReturn = ReturnType<typeof useRouter>;
 
@@ -18,9 +20,10 @@ const getSdkArgsToken = (str: string): string =>
 
 const getQueryArgs = (router: RouterReturn) => {
   const { query, asPath } = router;
-  const { ob_key: obKey, user_data: rawUserData } = query;
+  const { ob_key: obKey, user_data: rawUserData, app_url: appUrl } = query;
   const authToken = getSdkArgsToken(asPath.split('#')[1]) ?? '';
   const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
+  const appUrlStr = String(appUrl);
   let userData = {};
 
   try {
@@ -31,15 +34,24 @@ const getQueryArgs = (router: RouterReturn) => {
   } catch (_) {
     // do nothing
   }
-  return { authToken, publicKey, userData };
+  return {
+    authToken,
+    appUrl:
+      appUrlStr.startsWith('https://auth-') ||
+      appUrlStr.startsWith('http://localhost')
+        ? appUrlStr
+        : 'http://localhost:3011',
+    publicKey,
+    userData,
+  };
 };
 
 const AuthDemo = () => {
   const router = useRouter();
-  const { authToken, publicKey, userData } = getQueryArgs(router);
+  const { appUrl, authToken, publicKey, userData } = getQueryArgs(router);
 
   const handleAuthenticateClick = () => {
-    const component = footprint.init({
+    const component = fakeSdk.init({
       kind: FootprintComponentKind.Auth,
       onCancel: () => console.log('demo onCancel'),
       onClose: () => console.log('demo onClose'),
@@ -49,7 +61,7 @@ const AuthDemo = () => {
       userData,
       variant: 'modal',
     });
-    component.render();
+    component.render(appUrl);
 
     return () => {
       component.destroy();
@@ -57,7 +69,7 @@ const AuthDemo = () => {
   };
 
   const handleUpdateFlowClick = () => {
-    const component = footprint.init({
+    const component = fakeSdk.init({
       kind: FootprintComponentKind.Auth,
       variant: 'modal',
       authToken,
@@ -68,7 +80,7 @@ const AuthDemo = () => {
       onClose: () => console.log('demo onClose'),
       onComplete: (s: string) => console.log('demo onComplete', s),
     });
-    component.render();
+    component.render(appUrl);
 
     return () => {
       component.destroy();

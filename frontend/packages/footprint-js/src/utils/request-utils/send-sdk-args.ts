@@ -38,12 +38,12 @@ type ArgsDataPayload =
   | VerifyDataProps
   | undefined;
 
-const getSdkKind = (props: Props): SdkKind =>
+export const getSdkKind = (props: Props): SdkKind =>
   isUpdateLoginMethods(props)
     ? SdkKind.UpdateAuthMethodsV1
     : SdkKindByComponentKind[props.kind];
 
-const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
+export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
   const { kind } = props;
 
   if (kind === ComponentKind.Verify || kind === ComponentKind.Components) {

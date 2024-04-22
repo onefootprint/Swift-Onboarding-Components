@@ -9,14 +9,20 @@ import {
 } from '../verify/utils/commands';
 
 const email = 'sandbox@onefootprint.com';
-const uToken = process.env.E2E_UPDATE_UTOKEN || false;
+const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
+const uToken = process.env.E2E_UPDATE_UTOKEN || '';
 
-test('Update auth methods #ci', async ({ browserName, page }) => {
+test('Update auth methods by providing email #ci', async ({
+  browserName,
+  page,
+}) => {
   expect(uToken, 'Missing E2E_UPDATE_UTOKEN').toBeTruthy();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/components/auth?ob_key=1&flow=${flowId}#${uToken}`);
+  await page.goto(
+    `/components/auth?ob_key=1&app_url=${authAppUrl}&flow=${flowId}#${uToken}`,
+  );
   await page.waitForLoadState();
 
   await clickOnUpdateAuthentication({ frame: page });
