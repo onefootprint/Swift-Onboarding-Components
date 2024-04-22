@@ -117,7 +117,20 @@ fn doc_first_id_data(
 ) -> Vec<(DataIdentifier, PiiJsonValue)> {
     let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(r);
 
+    // Incode sends full state in one field, and 2 character code in another, so we handle here. we prefer the checked address, since it
+    // uses an external service to validate
+    let address_checked_bean_state = r.checked_address_bean.as_ref().and_then(|a| a.normalized_state());
+    let address_fields_state = r.address_fields.as_ref().and_then(|a| a.normalized_state());
+    let state = match address_checked_bean_state.or(address_fields_state) {
+        Some(Ok(s)) => Some(s),
+        _ => {
+            tracing::warn!("incode changed address formats");
+            None
+        }
+    };
+
     let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
+
     let all_data = vec![
         (
             IDK::FirstName,
@@ -133,7 +146,7 @@ fn doc_first_id_data(
         ),
         (IDK::AddressLine1, address.and_then(|n| n.street.as_ref())),
         (IDK::City, address.and_then(|n| n.city.as_ref())),
-        (IDK::State, address.and_then(|n| n.state.as_ref())),
+        (IDK::State, state.as_ref()),
         (IDK::Zip, address.and_then(|n| n.postal_code.as_ref())),
         (IDK::Country, r.issuing_country_two_digit().as_ref()),
         (IDK::Dob, r.dob().ok().as_ref()),

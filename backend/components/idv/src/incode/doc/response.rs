@@ -12,7 +12,7 @@ use newtypes::{
     },
     IdDocKind, IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
     Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiInt, ScrubbedPiiLong,
-    ScrubbedPiiString, DATE_FORMAT,
+    ScrubbedPiiString, UsState, UsStateFull, DATE_FORMAT,
 };
 
 /// Response we get back from adding a document image
@@ -809,6 +809,23 @@ pub struct OCRAddress {
     pub state: Option<ScrubbedPiiString>,
 }
 
+impl OCRAddress {
+    // returns None if no state, returns Result if there's a state inside that we tried to parse
+    pub fn normalized_state(&self) -> Option<Result<ScrubbedPiiString, strum::ParseError>> {
+        self.state.as_ref().map(|s| {
+            let from_2_char = UsState::from_raw_string(s.leak()).ok();
+            let from_full: Option<UsState> = UsStateFull::from_raw_string(s.leak()).ok().map(|s| s.into());
+            // try to parse our state, otherwise error
+            let parsed: Option<ScrubbedPiiString> = from_2_char.or(from_full).map(|s| s.to_string().into());
+            if let Some(p) = parsed {
+                Ok(p)
+            } else {
+                Err(strum::ParseError::VariantNotFound)
+            }
+        })
+    }
+}
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct OcrDataConfidence {
@@ -883,7 +900,7 @@ mod tests {
         test_fixtures::{self, DocTestOpts},
     };
 
-    use super::{AddSideResponse, FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
+    use super::*;
 
     #[test]
     pub fn test_parse_fetch_scores() {
@@ -1053,6 +1070,24 @@ mod tests {
         let res = IncodeAPIResult::<ProcessFaceResponse>::try_from(raw_response).unwrap();
         let e = res.into_success().unwrap_err();
         assert!(matches!(e, crate::incode::error::Error::APIResponseError(_)));
+    }
+
+    #[test_case(Some("New York") => Some(Some("NY".into())))]
+    #[test_case(Some(" ny") => Some(Some("NY".into())))]
+    #[test_case(Some("GA") => Some(Some("GA".into())))]
+    #[test_case(Some("Georgia    ") => Some(Some("GA".into())))]
+    #[test_case(Some("BobbyZone") => Some(None))]
+    #[test_case(None => None)]
+    fn test_ocr_address(raw: Option<&str>) -> Option<Option<String>> {
+        let state = raw.map(|r| r.into());
+        let address1 = OCRAddress {
+            state,
+            ..Default::default()
+        };
+
+        address1
+            .normalized_state()
+            .map(|r| r.ok().map(|s| s.leak_to_string()))
     }
 
     #[test]
