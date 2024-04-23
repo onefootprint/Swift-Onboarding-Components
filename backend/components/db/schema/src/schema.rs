@@ -476,6 +476,7 @@ diesel::table! {
         vaulted_document_type -> Nullable<Text>,
         curp_completed_seqno -> Nullable<Int8>,
         validated_country_code -> Nullable<Text>,
+        review_status -> Nullable<Text>,
     }
 }
 

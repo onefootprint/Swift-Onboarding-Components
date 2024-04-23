@@ -10,9 +10,10 @@ use diesel::{
 use std::collections::HashMap;
 
 use newtypes::{
-    DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType, IdDocKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, IdentityDocumentStatus, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode,
-    ScopedVaultId, TenantId, VendorValidatedCountryCode, WorkflowId,
+    DataLifetimeSeqno, DocumentRequestId, DocumentReviewStatus, DocumentScanDeviceType, IdDocKind,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
+    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId,
+    VendorValidatedCountryCode, WorkflowId,
 };
 
 use super::{
@@ -37,6 +38,7 @@ pub struct IdentityDocument {
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
+    /// Represents progress collecting the user's document
     pub status: IdentityDocumentStatus,
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
     // Indicating that the client cannot collect selfie for some reason
@@ -48,6 +50,8 @@ pub struct IdentityDocument {
     pub curp_completed_seqno: Option<DataLifetimeSeqno>,
     /// The confirmed document country (usually confirmed by a vendor)
     validated_country_code: Option<Iso3166TwoDigitCountryCode>,
+    /// Represents whether the document has been reviewed by a human or machine
+    pub review_status: Option<DocumentReviewStatus>,
 }
 
 impl IdentityDocument {
@@ -59,7 +63,7 @@ impl IdentityDocument {
         matches!(self.device_type, Some(DocumentScanDeviceType::Desktop))
     }
 
-    pub fn is_complete(&self) -> bool {
+    pub fn is_upload_complete(&self) -> bool {
         matches!(self.status, IdentityDocumentStatus::Complete)
     }
 
@@ -90,6 +94,7 @@ struct NewIdentityDocumentRow {
     fixture_result: Option<IdentityDocumentFixtureResult>,
     skip_selfie: bool,
     device_type: Option<DocumentScanDeviceType>,
+    review_status: DocumentReviewStatus,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -103,6 +108,7 @@ pub struct IdentityDocumentUpdate {
     pub vaulted_document_type: Option<IdDocKind>,
     pub curp_completed_seqno: Option<DataLifetimeSeqno>,
     pub validated_country_code: Option<Iso3166TwoDigitCountryCode>,
+    pub review_status: Option<DocumentReviewStatus>,
 }
 
 impl IdentityDocumentUpdate {
@@ -171,6 +177,7 @@ impl IdentityDocument {
             fixture_result,
             skip_selfie: skip_selfie.unwrap_or(false),
             device_type,
+            review_status: DocumentReviewStatus::Unreviewed,
         };
         // Create a new doc
         let result = diesel::insert_into(identity_document::table)

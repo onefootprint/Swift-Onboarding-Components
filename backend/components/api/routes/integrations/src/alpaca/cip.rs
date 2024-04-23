@@ -245,7 +245,7 @@ pub(crate) async fn create_cip_request(
             let latest_identity_document_and_request: Option<(IdentityDocument, DocumentRequest)> =
                 IdentityDocument::list_by_wf_id(conn, &wf.id)?
                 .into_iter()
-                .filter(|(i, dr)| i.is_complete() && dr.kind.is_identity())
+                .filter(|(i, dr)| i.is_upload_complete() && dr.kind.is_identity())
                 // sort just for safety, we shouldn't have more than 1 completed doc per wf
                 .sorted_by(|(i1, _), (i2, _)| i1.completed_seqno.cmp(&i2.completed_seqno))
                 .collect_vec()

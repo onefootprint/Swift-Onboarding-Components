@@ -68,9 +68,9 @@ struct NewDocumentUploadRow {
 
 #[derive(Debug, AsChangeset)]
 #[diesel(table_name = document_upload)]
-pub struct IdentityDocumentUpdate {
-    pub deactivated_at: Option<DateTime<Utc>>,
-    pub failure_reasons: Option<Vec<IncodeFailureReason>>,
+struct DocumentUploadUpdate {
+    deactivated_at: Option<DateTime<Utc>>,
+    failure_reasons: Option<Vec<IncodeFailureReason>>,
 }
 
 #[derive(Debug)]
@@ -143,7 +143,7 @@ impl DocumentUpload {
         failure_reasons: Vec<IncodeFailureReason>,
         deactivate: bool,
     ) -> DbResult<()> {
-        let update = IdentityDocumentUpdate {
+        let update = DocumentUploadUpdate {
             deactivated_at: deactivate.then_some(Utc::now()),
             failure_reasons: Some(failure_reasons),
         };

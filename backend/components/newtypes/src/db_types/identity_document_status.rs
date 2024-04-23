@@ -1,4 +1,3 @@
-use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 
@@ -7,7 +6,8 @@ use strum_macros::{AsRefStr, EnumString};
 
 #[derive(
     Debug,
-    Display,
+    // be careful, this is the evil derive_more::Display
+    derive_more::Display,
     Clone,
     Copy,
     Deserialize,
@@ -42,3 +42,14 @@ impl IdentityDocumentStatus {
         }
     }
 }
+
+#[derive(Debug, strum_macros::Display, Clone, Copy, AsExpression, FromSqlRow, EnumString)]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum DocumentReviewStatus {
+    Unreviewed,
+    ReviewedByMachine,
+    ReviewedByHuman,
+}
+
+crate::util::impl_enum_string_diesel!(DocumentReviewStatus);

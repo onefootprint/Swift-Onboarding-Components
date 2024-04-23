@@ -1,0 +1,1 @@
+ALTER TABLE identity_document ADD COLUMN review_status TEXT;

@@ -36,10 +36,11 @@ use db::{
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentKind, Fingerprints,
-    FootprintReasonCode, IdDocKind, IdentityDataKind as IDK, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId,
-    ScrubbedPiiString, Validate, ValidateArgs, VendorAPI, VendorValidatedCountryCode, VerificationResultId,
+    DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentKind, DocumentReviewStatus,
+    Fingerprints, FootprintReasonCode, IdDocKind, IdentityDataKind as IDK, IdentityDocumentId,
+    IdentityDocumentStatus, IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue,
+    PiiString, ScopedVaultId, ScrubbedPiiString, Validate, ValidateArgs, VendorAPI,
+    VendorValidatedCountryCode, VerificationResultId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -372,6 +373,7 @@ impl Complete {
             vaulted_document_type: Some(validated_doc_kind),
             curp_completed_seqno: None,
             validated_country_code: country_code.map(|c| c.0),
+            review_status: Some(DocumentReviewStatus::ReviewedByMachine),
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
 
