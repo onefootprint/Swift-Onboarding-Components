@@ -84,7 +84,7 @@ const CountDownProps = {
   intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
 };
 const PLAY_CHECK_INTERVAL = 1500;
-const FORCED_UPLOAD_DELAY = 10000;
+const FORCED_UPLOAD_DELAY = 5000;
 const CAMERA_LOADING_FEEDBACK_DELAY = 4000;
 
 const logError = (e: string) => Logger.error(e, 'camera');
