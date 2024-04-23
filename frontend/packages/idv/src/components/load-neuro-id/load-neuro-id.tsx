@@ -9,6 +9,8 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import Script from 'next/script';
 import React from 'react';
 
+import nid from '../../utils/neuro-id';
+
 const NID_LIVE_SITE_NAME = 'humor717';
 const NID_DEV_SITE_NAME = 'humor717-test';
 
@@ -32,6 +34,11 @@ const LoadNeuroId = ({ children, config }: LoadNeuroIdProps) => {
           onError={e => console.error('Failed to load the Neuro-ID script', e)}
           src={`//scripts.neuro-id.com/c/nid-${siteName}.js`}
           strategy="afterInteractive"
+          onLoad={() => {
+            if (config.orgId) {
+              nid.start(config.orgId);
+            }
+          }}
         />
       )}
       {children}

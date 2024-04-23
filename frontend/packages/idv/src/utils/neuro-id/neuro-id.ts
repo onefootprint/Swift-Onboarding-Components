@@ -6,9 +6,16 @@ declare global {
     nid: {
       (command: 'identify', authToken: string): void;
       (command: 'applicationSubmit'): void;
+      (command: 'start', options: { funnel: string }): void;
     };
   }
 }
+
+const start = (funnel: string) => {
+  if (window.nid) {
+    window.nid('start', { funnel });
+  }
+};
 
 // Identify the user with Neuro-ID
 const identify = async (authToken: string) => {
@@ -36,6 +43,7 @@ const complete = () => {
 };
 
 export default {
+  start,
   identify,
   complete,
 };
