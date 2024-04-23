@@ -110,7 +110,7 @@ impl
     )> for api_wire_types::OnboardingConfiguration
 {
     fn from_db(
-        (ob_config, author, rule_set, ff_client): (
+        (ob_config, author, rule_set, _ff_client): (
             ObConfiguration,
             Option<SaturatedActor>,
             Option<RuleSetVersion>,
@@ -137,13 +137,11 @@ impl
             allow_us_territory_residents,
             doc_scan_for_optional_ssn,
             kind,
-            tenant_id,
             document_types_and_countries,
             cip_kind,
             ..
         } = ob_config;
 
-        let is_rules_enabled = ff_client.flag(BoolFlag::IsRulesProductEnabled(&tenant_id));
 
         Self {
             id,
@@ -166,7 +164,7 @@ impl
             allow_us_territory_residents,
             doc_scan_for_optional_ssn,
             kind,
-            is_rules_enabled,
+            is_rules_enabled: true,
             document_types_and_countries,
             rule_set: rule_set.map(|rs| api_wire_types::RuleSet { version: rs.version }),
             cip_kind,
