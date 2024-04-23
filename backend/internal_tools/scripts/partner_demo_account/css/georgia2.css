@@ -1,0 +1,12 @@
+body {
+  font-family: 'Georgia' !important;
+  margin: 1em;
+  font-size: 16px;
+}
+
+table,
+th,
+td {
+  border: 1px solid;
+  border-collapse: collapse;
+}

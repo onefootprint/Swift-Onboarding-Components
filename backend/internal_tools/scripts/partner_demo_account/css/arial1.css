@@ -1,0 +1,12 @@
+body {
+  font-family: 'Arial' !important;
+  margin: -1em;
+  font-size: 14px;
+}
+
+table,
+th,
+td {
+  border: 1px solid;
+  border-collapse: collapse;
+}
