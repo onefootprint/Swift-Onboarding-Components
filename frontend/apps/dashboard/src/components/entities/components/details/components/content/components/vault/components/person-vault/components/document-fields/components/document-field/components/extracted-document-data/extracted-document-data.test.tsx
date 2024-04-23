@@ -12,9 +12,14 @@ import {
 const renderExtractedDocumentData = ({
   vault,
   documentType,
+  activeDocumentVersion,
 }: ExtractedDocumentDataProps) =>
   customRender(
-    <ExtractedDocumentData vault={vault} documentType={documentType} />,
+    <ExtractedDocumentData
+      vault={vault}
+      documentType={documentType}
+      activeDocumentVersion={activeDocumentVersion}
+    />,
   );
 
 describe('<ExtractedDocumentData />', () => {
@@ -22,6 +27,7 @@ describe('<ExtractedDocumentData />', () => {
     renderExtractedDocumentData({
       vault: entityVaultWithAllDocumentDIs,
       documentType: SupportedIdDocTypes.driversLicense,
+      activeDocumentVersion: '456',
     });
     expect(screen.getByText('Full name')).toBeInTheDocument();
     expect(
@@ -87,6 +93,7 @@ describe('<ExtractedDocumentData />', () => {
     renderExtractedDocumentData({
       vault: entityVaultWithAllDocumentDIs,
       documentType: SupportedIdDocTypes.idCard,
+      activeDocumentVersion: '123',
     });
     expect(screen.getByText('Full name')).toBeInTheDocument();
     expect(screen.getByText('test ID full name')).toBeInTheDocument();
@@ -131,6 +138,7 @@ describe('<ExtractedDocumentData />', () => {
     renderExtractedDocumentData({
       vault: entityVaultWithAllDocumentDIs,
       documentType: SupportedIdDocTypes.passport,
+      activeDocumentVersion: '679',
     });
     expect(screen.getByText('Full name')).toBeInTheDocument();
     expect(screen.getByText('test passport full name')).toBeInTheDocument();
@@ -175,6 +183,7 @@ describe('<ExtractedDocumentData />', () => {
     renderExtractedDocumentData({
       vault: driversLicensePartialDIs,
       documentType: SupportedIdDocTypes.driversLicense,
+      activeDocumentVersion: '456',
     });
     expect(screen.getByText('Full name')).toBeInTheDocument();
     expect(

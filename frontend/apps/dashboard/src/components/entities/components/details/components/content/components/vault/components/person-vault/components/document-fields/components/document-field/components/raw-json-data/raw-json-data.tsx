@@ -15,16 +15,25 @@ import CollapsibleSection from './components/collapsible-section';
 type RawJsonDataProps = {
   vault: EntityVault;
   documentType: SupportedIdDocTypes;
+  curpCompletedVersion?: string;
 };
 
-const getRawJsonData = ({ vault, documentType }: RawJsonDataProps) => {
+const getRawJsonData = ({
+  vault,
+  documentType,
+  curpCompletedVersion,
+}: RawJsonDataProps) => {
   const rawJsonKinds: RawJsonKinds[] = Object.values(RawJsonKinds);
   const rawJsonData: {
     rawJsonKind: RawJsonKinds;
     rawJsonData: string;
   }[] = [];
   rawJsonKinds.forEach(kind => {
-    const di = `document.${documentType}.${kind}` as DocumentDI;
+    let di = `document.${documentType}.${kind}` as DocumentDI;
+    if (curpCompletedVersion) {
+      di =
+        `document.${documentType}.${kind}:${curpCompletedVersion}` as DocumentDI;
+    }
     if (typeof vault[di] === 'string') {
       rawJsonData.push({
         rawJsonKind: kind,
@@ -35,11 +44,19 @@ const getRawJsonData = ({ vault, documentType }: RawJsonDataProps) => {
   return rawJsonData;
 };
 
-const RawJsonData = ({ vault, documentType }: RawJsonDataProps) => {
+const RawJsonData = ({
+  vault,
+  documentType,
+  curpCompletedVersion,
+}: RawJsonDataProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document.drawer.raw-json-data',
   });
-  const rawJsonData = getRawJsonData({ vault, documentType });
+  const rawJsonData = getRawJsonData({
+    vault,
+    documentType,
+    curpCompletedVersion,
+  });
   if (!rawJsonData.length) {
     return null;
   }

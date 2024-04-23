@@ -2,6 +2,7 @@ import type { DataIdentifier, Document, VaultValue } from '@onefootprint/types';
 import {
   DocumentDI,
   isVaultDataEmpty,
+  RawJsonKinds,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 
@@ -177,7 +178,12 @@ const getDocDis = ({ dis, documents, vaultData }: GetDocDIsProps) => {
             !isVaultDataEmpty(vaultData[di]) &&
             completedVersion
           ) {
-            dis.push(di);
+            if (di.includes(RawJsonKinds.CurpValidationResponse)) {
+              const curpVersion = document.curpCompletedVersion ?? '';
+              const versionedCurpDI = curpVersion ? `${di}:${curpVersion}` : di;
+              dis.push(versionedCurpDI);
+            }
+            dis.push(`${di}:${completedVersion}`);
           }
         });
         // get the specific upload images for each document

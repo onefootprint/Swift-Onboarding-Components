@@ -46,13 +46,13 @@ const DocumentField = ({
     document =>
       document?.completedVersion?.toString() === activeDocumentVersion,
   );
-
   if (!currentDocument) {
     const docIndex = +activeDocumentVersion.replace('incomplete_', ''); // If the status/version of the document is "null", we use the format "incomplete_<array index>" as active version
     if (!Number.isNaN(docIndex) && documents.length > docIndex) {
       currentDocument = documents[docIndex];
     }
   }
+  const curpCompletedVersion = currentDocument?.curpCompletedVersion;
 
   return documentType ? (
     <Container>
@@ -88,9 +88,17 @@ const DocumentField = ({
       >
         <DrawerItems>
           {currentDocument && <ConfidenceScores document={currentDocument} />}
-          <ExtractedDocumentData vault={vault} documentType={documentType} />
+          <ExtractedDocumentData
+            vault={vault}
+            documentType={documentType}
+            activeDocumentVersion={activeDocumentVersion}
+          />
           <Uploads currentDocument={currentDocument} vault={vault} />
-          <RawJsonData vault={vault} documentType={documentType} />
+          <RawJsonData
+            vault={vault}
+            documentType={documentType}
+            curpCompletedVersion={curpCompletedVersion}
+          />
         </DrawerItems>
       </Drawer>
     </Container>

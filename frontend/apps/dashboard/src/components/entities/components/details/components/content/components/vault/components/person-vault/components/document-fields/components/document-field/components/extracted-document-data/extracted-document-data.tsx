@@ -16,11 +16,13 @@ import { getDataLabel, getRelevantKeys } from '../../../../utils';
 export type ExtractedDocumentDataProps = {
   vault: EntityVault;
   documentType: SupportedIdDocTypes;
+  activeDocumentVersion: string;
 };
 
 const ExtractedDocumentData = ({
   vault,
   documentType,
+  activeDocumentVersion,
 }: ExtractedDocumentDataProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document',
@@ -28,6 +30,7 @@ const ExtractedDocumentData = ({
   const relevantKeys = getRelevantKeys({
     vault,
     documentType,
+    currentDocumentNumber: activeDocumentVersion,
   });
 
   const getVaultValueString = (key: DocumentDI) => {
@@ -53,6 +56,7 @@ const ExtractedDocumentData = ({
               {t(
                 `drawer.document-data.labels.${getDataLabel(
                   key,
+                  activeDocumentVersion,
                 )}` as ParseKeys<'common'>,
               )}
             </Text>
