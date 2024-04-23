@@ -37,6 +37,7 @@ impl<Type> TenantVw<Type> {
     /// fields are being one-clicked
     /// NOTE: be careful making changes to this. It affects implicit auth and wf authorization.
     pub fn can_auto_authorize(&self, has_prefill_data: bool) -> bool {
+        // TODO I think we can only check the fields in must_collect on the new playbook here
         let can_decrypt_all_dis = self
             .populated_dis()
             .into_iter()

@@ -104,7 +104,7 @@ impl<Type> VaultWrapper<Type> {
             .filter(|d| pb.must_collect_data.iter().any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(&d.lifetime.kind)))
             .filter(|d| kind.allow_prefilling(&d.lifetime.kind))
             // Note: this won't support portable documents
-            .filter_map(|d| if let PieceOfData::Vd(d) = &d.data {Some(d)} else { None})
+            .filter_map(|d| if let PieceOfData::Vd(d) = &d.data { Some(d) } else { None })
             .collect_vec();
 
         //

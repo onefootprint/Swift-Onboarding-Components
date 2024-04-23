@@ -110,7 +110,7 @@ run-local:
 watch-local:
 	(trap 'kill 0' SIGINT EXIT; \
 		make run-enclave-local & \
-		echo "starting api server and watching for changes..." && cargo watch -x 'run -p api_server' -i ci -i vscode-target \
+		echo "starting api server and watching for changes..." && cargo watch --why -x 'run -p api_server' -i ci -i vscode-target  -i target \
 	)
 
 watch: watch-local
