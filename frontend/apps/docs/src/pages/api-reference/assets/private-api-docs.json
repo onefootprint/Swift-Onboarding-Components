@@ -1707,7 +1707,7 @@
                                 "type": "string",
                                 "enum": [
                                     "DataCollected",
-                                    "IdentityDocumentUploaded",
+                                    "DocumentUploaded",
                                     "OnboardingDecision",
                                     "Liveness",
                                     "Annotation",
@@ -9216,6 +9216,9 @@
                             "apex"
                         ]
                     },
+                    "curp_validation_enabled": {
+                        "type": "boolean"
+                    },
                     "doc_scan_for_optional_ssn": {
                         "type": "string",
                         "enum": [
@@ -11453,6 +11456,11 @@
                 "type": "object",
                 "properties": {
                     "completed_version": {
+                        "description": "Sequence number used to order DataLifetimes",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "curp_completed_version": {
                         "description": "Sequence number used to order DataLifetimes",
                         "type": "integer",
                         "format": "int64"
@@ -24822,9 +24830,7 @@
                     "trigger": {
                         "type": "string",
                         "enum": [
-                            "redo_kyc",
-                            "proof_of_ssn",
-                            "proof_of_address"
+                            "redo_kyc"
                         ]
                     }
                 },

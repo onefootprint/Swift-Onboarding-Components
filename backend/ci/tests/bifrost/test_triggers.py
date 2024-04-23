@@ -220,6 +220,7 @@ def test_retrigger_onboard(sandbox_tenant, must_collect_data):
         dict(kind="identity", data=dict(collect_selfie=False)),
         dict(kind="proof_of_ssn", data=dict()),
         dict(kind="proof_of_address", data=dict()),
+        dict(kind="custom", data=dict(name="My special doc", identifier="document.custom.my_special_doc")),
     ],
 )
 def test_collect_document(document_config, sandbox_tenant):

@@ -8,7 +8,7 @@ use crate::{
 use api_core::{
     auth::tenant::{TenantGuard, TenantSessionAuth},
     config::LinkKind,
-    errors::{user::UserError, ApiResult, AssertionError},
+    errors::{user::UserError, ApiResult},
     utils::{
         email::SendgridClient,
         fp_id_path::FpIdPath,
@@ -21,7 +21,7 @@ use chrono::Duration;
 use db::models::{scoped_vault::ScopedVault, workflow_request::WorkflowRequest};
 use itertools::Itertools;
 use newtypes::{
-    sms_message::SmsMessage, ContactInfoKind, DocumentRequestKind, PhoneNumber, PiiString,
+    sms_message::SmsMessage, ContactInfoKind, DocumentRequestConfig, PhoneNumber, PiiString,
     WorkflowRequestConfig,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
@@ -97,18 +97,7 @@ async fn send_communication(
         let kind = match config {
             WorkflowRequestConfig::RedoKyc => TriggerMessageKind::RedoKyc,
             WorkflowRequestConfig::Onboard { .. } => TriggerMessageKind::Onboard,
-            WorkflowRequestConfig::Document { ref configs } => {
-                let config = configs
-                    .first()
-                    .ok_or(AssertionError("Document request config list is empty"))?;
-                match DocumentRequestKind::from(config) {
-                    DocumentRequestKind::Identity => TriggerMessageKind::IdentityDocument,
-                    DocumentRequestKind::ProofOfAddress => TriggerMessageKind::ProofOfAddress,
-                    DocumentRequestKind::ProofOfSsn => TriggerMessageKind::ProofOfSsn,
-                    // TODO
-                    DocumentRequestKind::Custom => return AssertionError("Not implemented").into(),
-                }
-            }
+            WorkflowRequestConfig::Document { configs } => TriggerMessageKind::Document { configs },
         };
         (kind, note)
     } else {
@@ -153,9 +142,30 @@ enum TriggerMessageKind {
     Auth,
     RedoKyc,
     Onboard,
-    IdentityDocument,
-    ProofOfAddress,
-    ProofOfSsn,
+    Document { configs: Vec<DocumentRequestConfig> },
+}
+
+fn message_for_documents(configs: &[DocumentRequestConfig], org_name: &str) -> String {
+    match configs.first() {
+        Some(config) if configs.len() == 1 => {
+            let doc_type = match config {
+                DocumentRequestConfig::Identity { .. } => "provide a photo of your ID.",
+                DocumentRequestConfig::ProofOfAddress { .. } => "provide proof of your address.",
+                DocumentRequestConfig::ProofOfSsn { .. } => "provide proof of your SSN.",
+                DocumentRequestConfig::Custom { .. } => "upload a document.",
+            };
+            format!(
+                "In order to verify your identity, {} has requested you {}",
+                org_name, doc_type,
+            )
+        }
+        _ => {
+            format!(
+                "In order to verify your identity, {} has requested you upload additional documentation.",
+                org_name,
+            )
+        }
+    }
 }
 
 impl TriggerMessageKind {
@@ -173,24 +183,7 @@ impl TriggerMessageKind {
             Self::Onboard => {
                 format!("{} has requested you to verify your identity.", org_name)
             }
-            Self::IdentityDocument => {
-                format!(
-                    "In order to verify your identity, {} has requested you provide a photo of your ID.",
-                    org_name
-                )
-            }
-            Self::ProofOfAddress => {
-                format!(
-                    "In order to verify your address, {} has requested you provide proof of your address.",
-                    org_name
-                )
-            }
-            Self::ProofOfSsn => {
-                format!(
-                    "In order to verify your identity, {} has requested you provide proof of your SSN.",
-                    org_name
-                )
-            }
+            Self::Document { configs } => message_for_documents(configs, org_name),
         }
     }
 
@@ -211,27 +204,10 @@ impl TriggerMessageKind {
                 format!("{} has requested you to verify your identity", org_name),
                 "Some of the information you have provided may be missing or incorrect. Please take a moment to re-verify your identity.".into()
             ),
-            Self::IdentityDocument => (
-                "Verify your identity".into(),
-                format!(
-                    "In order to verify your identity, {} has requested you provide a photo of your ID.",
-                    org_name
-                )
-            ),
-            Self::ProofOfAddress => (
-                "Verify your identity".into(),
-                format!(
-                    "In order to verify your address, {} has requested you provide proof of your address.",
-                    org_name
-                )
-            ),
-            Self::ProofOfSsn => (
-                "Verify your identity".into(),
-                format!(
-                    "In order to verify your identity, {} has requested you provide proof of your SSN.",
-                    org_name
-                )
-            )
+            Self::Document { configs } => {
+                let body = message_for_documents(configs, org_name);
+                ("Verify your identity".into(), body)
+            }
         }
     }
 }
