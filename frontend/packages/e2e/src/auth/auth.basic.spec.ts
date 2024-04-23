@@ -1,47 +1,64 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  clickOnContinue,
-  fillEmail,
-  fillPhoneNumber,
-  verifyPhoneNumber,
-  clickOnVerifyWithSms,
-  clickOnAuthenticateWithFootprint,
-  waitForEmailField,
-} from '../verify/utils/commands';
+import { verifyPhoneNumber } from '../verify/utils/commands';
+
+const iframeSelector = 'iframe[name^="footprint-iframe-"]';
+const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
+const key = process.env.E2E_AUTH_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
 
 const email = 'sandbox@onefootprint.com';
 const phoneNumber = '5555550100';
-const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
 
 test('Auth with email, fill phone number, verify phone #ci', async ({
   browserName,
+  isMobile,
   page,
 }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  const key = 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
+  const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
+  if (isMobile) test.setTimeout(90000); // eslint-disable-line playwright/no-conditional-in-test
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
   await page.goto(
     `/components/auth?ob_key=${key}&app_url=${authAppUrl}&flow=${flowId}`,
   );
   await page.waitForLoadState();
+  await expect(page).toHaveURL(/.*auth/);
 
-  await clickOnAuthenticateWithFootprint({ frame: page });
+  await page
+    .getByRole('button')
+    .filter({ hasText: /Authenticate with Footprint/i })
+    .first()
+    .click();
 
-  const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  const $email = page.frameLocator(iframeSelector).getByLabel(/email/i);
+  await $email.waitFor({ state: 'attached', timeout });
+  await $email.first().fill(email);
 
-  await waitForEmailField({ frame });
+  await page
+    .frameLocator(iframeSelector)
+    .getByRole('button')
+    .filter({ hasText: /continue/i })
+    .first()
+    .click();
 
-  await fillEmail({ frame }, { email });
-  await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnVerifyWithSms({ frame });
+  const $phone = page
+    .frameLocator(iframeSelector)
+    .locator('input[name="phoneNumber"]');
+  await $phone.waitFor({ state: 'attached', timeout });
+  await $phone.fill(phoneNumber);
+
+  await page
+    .frameLocator(iframeSelector)
+    .getByRole('button')
+    .filter({ hasText: /verify with sms/i })
+    .first()
+    .click();
   await page.waitForLoadState();
 
-  await verifyPhoneNumber({ frame, page });
+  await verifyPhoneNumber({ frame: page.frameLocator(iframeSelector), page });
   await page.waitForLoadState();
 
   expect(1).toBe(1);
