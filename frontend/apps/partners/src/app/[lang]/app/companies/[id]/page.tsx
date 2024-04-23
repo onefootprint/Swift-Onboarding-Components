@@ -64,7 +64,6 @@ const PartnerDocsPage = async ({ params }: PartnerDocsPageProps) => {
       partnerId={partnerId}
       partnerName={company?.companyName || t('company')}
       securityChecks={SecurityChecks}
-      templates={templates}
       templatesUnused={getUnusedTemplates(documents, templates.slice(0))}
     />
   );

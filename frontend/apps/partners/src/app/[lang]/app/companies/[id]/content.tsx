@@ -45,7 +45,6 @@ type CompanyPageContentProps = {
   partnerId: string;
   partnerName: string;
   securityChecks: ComponentProps<typeof Checks>['securityChecks'];
-  templates: Option[];
   templatesUnused: Option[];
 };
 
@@ -72,7 +71,6 @@ const CompanyPageContent = ({
   partnerId,
   partnerName,
   securityChecks,
-  templates,
   templatesUnused,
 }: CompanyPageContentProps) => {
   const { t } = useTranslation('common');
@@ -224,7 +222,6 @@ const CompanyPageContent = ({
               .catch(errorToast);
             dialog.reset();
           }}
-          options={templates}
         />
       ) : null}
       {dialog.has('assign') ? (

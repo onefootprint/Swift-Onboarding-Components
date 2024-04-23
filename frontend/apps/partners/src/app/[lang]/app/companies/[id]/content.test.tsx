@@ -10,7 +10,6 @@ import {
   documents,
   members,
   securityChecks,
-  templates,
   unusedTemplates,
 } from '@/test/responses';
 
@@ -30,7 +29,6 @@ const customRender = async () =>
       partnerId="tcp_TWgsHzTVhlyhB9vcOuioFW"
       partnerName="Acme Inc."
       securityChecks={securityChecks}
-      templates={templates}
       templatesUnused={unusedTemplates}
     />,
   );

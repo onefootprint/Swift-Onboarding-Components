@@ -26,6 +26,10 @@ const CompaniesContent = ({ companies }: CompaniesContentProps) => {
   const { t } = useTranslation('common');
   const [search, setSearch] = useState<string>('');
 
+  const sortedCompanies = companies.toSorted((a, b) =>
+    a.companyName.localeCompare(b.companyName),
+  );
+
   const handleRowClick = (company: PartnerCompany) => {
     router.push(`/app/companies/${company.id}`);
   };
@@ -48,7 +52,7 @@ const CompaniesContent = ({ companies }: CompaniesContentProps) => {
         getKeyForRow={c => c.id}
         hasRowEmphasis={() => true}
         initialSearch=""
-        items={clientSearch(companies, search)}
+        items={clientSearch(sortedCompanies, search)}
         onChangeSearchText={setSearch}
         onRowClick={handleRowClick}
         renderTr={renderTr}

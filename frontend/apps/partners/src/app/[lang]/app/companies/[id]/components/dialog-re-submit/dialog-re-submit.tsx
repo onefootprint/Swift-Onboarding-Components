@@ -8,13 +8,11 @@ import { getFormElementValue } from '@/helpers';
 import type { PartnerDocument } from '@/queries';
 
 type Fields = { description: string; id: string; name: string };
-type Option = { label: string; value: string };
 type DialogReSubmitProps = {
   docDialog?: PartnerDocument;
   isOpen?: boolean;
   onClose: () => void;
   onSubmit: (fields: Fields) => void;
-  options: Option[];
 };
 
 const formId = 'form-add-additional-doc-dialog';
@@ -26,12 +24,8 @@ const DialogReSubmit = ({
   isOpen,
   onClose,
   onSubmit,
-  options,
 }: DialogReSubmitProps) => {
   const { t } = useTranslation('common');
-  const defaultName = docDialog?.templateId
-    ? options.find(o => o.value === docDialog?.templateId)?.label
-    : docDialog?.name || '';
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -64,9 +58,7 @@ const DialogReSubmit = ({
           label={t('document')}
           placeholder={t('doc.document-name')}
           required
-          defaultValue={defaultName}
-          readOnly={Boolean(defaultName)}
-          disabled={Boolean(defaultName)}
+          defaultValue={docDialog?.name || ''}
         />
         <Stack gap={1} flexDirection="column" marginTop={7}>
           <TextArea
