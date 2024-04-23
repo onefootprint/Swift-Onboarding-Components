@@ -1,4 +1,4 @@
-use crate::data_identifier::ValidationError;
+use crate::data_identifier::DiValidationError;
 use diesel::{
     backend::Backend,
     deserialize::{FromSql, FromSqlRow},
@@ -39,14 +39,14 @@ lazy_static! {
 pub struct KvDataKey(pub(in crate::id) String);
 
 impl FromStr for KvDataKey {
-    type Err = ValidationError;
+    type Err = DiValidationError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.is_empty() {
-            return Err(ValidationError::InvalidLength);
+            return Err(DiValidationError::InvalidLength);
         }
         if !ALIAS_CHARS_W_DOT.is_match(s) {
-            return Err(ValidationError::InvalidCharacter);
+            return Err(DiValidationError::InvalidCharacter);
         }
         Ok(Self(s.to_string()))
     }
@@ -119,14 +119,14 @@ where
 pub struct AliasId(pub(in crate::id) String);
 
 impl FromStr for AliasId {
-    type Err = ValidationError;
+    type Err = DiValidationError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.is_empty() {
-            return Err(ValidationError::InvalidLength);
+            return Err(DiValidationError::InvalidLength);
         }
         if !ALIAS_CHARS.is_match(s) {
-            return Err(ValidationError::InvalidCharacter);
+            return Err(DiValidationError::InvalidCharacter);
         }
         Ok(Self(s.to_string()))
     }

@@ -1,5 +1,5 @@
 use crate::{
-    data_identifier::ValidationError,
+    data_identifier::DiValidationError,
     fingerprinter::{FingerprintScope, Fingerprinter, GlobalFingerprintKind},
     CollectedDataOption, DataIdentifier, DataValidationError, Error, Fingerprint, FingerprintScopeKind,
     IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType, TenantId, Validate,
@@ -108,7 +108,7 @@ impl DataRequest<()> {
             .keys()
             .filter_map(|di| {
                 let err = if di.storage_type() != StorageType::VaultData {
-                    Some(ValidationError::CannotVault.into())
+                    Some(DiValidationError::CannotVault.into())
                 } else {
                     None
                 };

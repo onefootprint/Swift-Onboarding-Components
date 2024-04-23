@@ -11,7 +11,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataLifetimeSource, DataRequest,
-    Error as NtError, Fingerprints, IdentityDataKind as IDK, NtResult, ScopedVaultId, ValidationError,
+    DiValidationError, Error as NtError, Fingerprints, IdentityDataKind as IDK, NtResult, ScopedVaultId,
     VaultDataFormat, VaultKind,
 };
 use std::collections::{HashMap, HashSet};
@@ -136,7 +136,7 @@ impl<Type> VaultWrapper<Type> {
                     // be able to replace CI
                     tracing::error!("Firm employee is updating verified ContactInfo! Note that this won't entirely work properly - the new ContactInfo is marked as unverified, which causes weird bugs. Please repair the vault manually");
                 } else if prefill_sv_id.is_none() {
-                    validation_errors.insert(di, ValidationError::CannotReplaceVerifiedContactInfo.into());
+                    validation_errors.insert(di, DiValidationError::CannotReplaceVerifiedContactInfo.into());
                 } else if prefill_sv_id.is_some_and(|sv_id| sv_id == &d.lifetime.scoped_vault_id) {
                     // With our current prefill logic that only prefills for the first WF for a SV,
                     // we shouldn't ever get in a position where we're replacing CI.
@@ -151,7 +151,7 @@ impl<Type> VaultWrapper<Type> {
             let update_has_di = dis.iter().any(|x| *x == &di);
             let vault_already_has_di = self.data(&di).is_some();
             if update_has_di && vault_already_has_di {
-                validation_errors.insert(di, ValidationError::CannotReplaceData.into());
+                validation_errors.insert(di, DiValidationError::CannotReplaceData.into());
             }
         }
 
@@ -192,7 +192,7 @@ impl<Type> VaultWrapper<Type> {
                     .flatten()
                     .filter(|di| dis.contains(&di))
                 {
-                    let err = ValidationError::PartialUpdateNotAllowed(speculative_cdo.clone()).into();
+                    let err = DiValidationError::PartialUpdateNotAllowed(speculative_cdo.clone()).into();
                     validation_errors.insert(di, err);
                 }
             }

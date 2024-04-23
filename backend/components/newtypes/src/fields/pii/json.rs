@@ -38,7 +38,7 @@ impl PiiJsonValue {
     pub fn as_string(self) -> VResult<PiiString> {
         match self.0 {
             serde_json::Value::String(s) => Ok(PiiString::new(s)),
-            _ => Err(crate::data_identifier::ValidationError::ExpectedStringFormat),
+            _ => Err(crate::data_identifier::DiValidationError::ExpectedStringFormat),
         }
     }
 

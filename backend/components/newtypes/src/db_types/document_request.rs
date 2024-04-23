@@ -1,6 +1,7 @@
-use crate::DataIdentifier;
+use crate::{DataIdentifier, DocumentKind, NtResult, ValidationError};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
+use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -57,6 +58,58 @@ impl DocumentRequestKind {
 
     pub fn should_initiate_incode_requests(&self) -> bool {
         self.is_identity()
+    }
+}
+
+impl DocumentRequestConfig {
+    pub fn validate(configs: &[Self]) -> NtResult<()> {
+        if configs
+            .iter()
+            .filter(|d| matches!(d, DocumentRequestConfig::ProofOfAddress { .. }))
+            .count()
+            > 1
+        {
+            return ValidationError("Can only collect one proof of address doc").into();
+        }
+
+        if configs
+            .iter()
+            .filter(|d| matches!(d, DocumentRequestConfig::ProofOfSsn { .. }))
+            .count()
+            > 1
+        {
+            return ValidationError("Can only collect one proof of SSN doc").into();
+        }
+
+        // Custom doc validation
+
+        let custom_docs = configs
+            .iter()
+            .filter_map(|d| match d {
+                DocumentRequestConfig::Custom(i) => Some(i),
+                _ => None,
+            })
+            .collect_vec();
+
+        let num_identifiers = custom_docs.iter().map(|d| &d.identifier).unique().count();
+        if num_identifiers != custom_docs.len() {
+            return ValidationError("Cannot specify the same identifier for multiple custom documents")
+                .into();
+        }
+        if custom_docs
+            .iter()
+            .any(|d| !matches!(d.identifier, DataIdentifier::Document(DocumentKind::Custom(_))))
+        {
+            return ValidationError(
+                "Must use identifier starting with document.custom. for custom documents",
+            )
+            .into();
+        }
+        if custom_docs.iter().any(|d| d.name.is_empty()) {
+            return ValidationError("Custom document name cannot be empty").into();
+        }
+
+        Ok(())
     }
 }
 

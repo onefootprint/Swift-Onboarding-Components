@@ -295,7 +295,7 @@ impl ApiError {
         use ApiErrorKind::*;
         match self.0.as_ref() {
             NewtypeError(e) => {
-                if let newtypes::Error::ValidationError(err) = e.as_ref() {
+                if let newtypes::Error::DataValidationError(err) = e.as_ref() {
                     return err.json_message();
                 }
             }

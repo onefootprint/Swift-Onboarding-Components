@@ -115,9 +115,9 @@ pub enum Error {
     #[error("Invalid FpId prefix")]
     InvalidFpIdPrefix,
     #[error("{0}")]
-    ParsingError(#[from] data_identifier::ValidationError),
+    ParsingError(#[from] data_identifier::DiValidationError),
     #[error("{0}")]
-    ValidationError(#[from] DataValidationError),
+    DataValidationError(#[from] DataValidationError),
     #[error("{0}")]
     Custom(String),
     #[error("Cannot add to this type of vault")]
@@ -134,6 +134,8 @@ pub enum Error {
     ParseIntError(#[from] std::num::ParseIntError),
     #[error("{0}")]
     ParseIpAddrError(#[from] std::net::AddrParseError),
+    #[error("{0}")]
+    ValidationError(String),
 }
 
 use std::collections::HashMap;
@@ -203,6 +205,22 @@ pub enum EnumDotNotationError {
     CannotParsePrefix(String),
     #[error("Cannot parse suffix: {0}")]
     CannotParseSuffix(String),
+}
+
+#[derive(Debug)]
+/// Shorthand to make it convenient to make an HTTP 400 validation error.
+pub(crate) struct ValidationError<'a>(pub &'a str);
+
+impl<'a> From<ValidationError<'a>> for Error {
+    fn from(value: ValidationError<'a>) -> Self {
+        Self::ValidationError(value.0.to_string())
+    }
+}
+
+impl<'a, T> From<ValidationError<'a>> for Result<T, Error> {
+    fn from(value: ValidationError<'a>) -> Self {
+        Err(value.into())
+    }
 }
 
 #[macro_use]

@@ -19,7 +19,10 @@ use db::models::{
     workflow::Workflow,
     workflow_request::{NewWorkflowRequestArgs, WorkflowRequest},
 };
-use newtypes::{DbActor, ObConfigurationKind, VaultKind, WorkflowRequestConfig, WorkflowTriggeredInfo};
+use newtypes::{
+    DbActor, DocumentRequestConfig, ObConfigurationKind, VaultKind, WorkflowRequestConfig,
+    WorkflowTriggeredInfo,
+};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -122,7 +125,7 @@ pub async fn post(
 fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> ApiResult<()> {
     match trigger {
         WorkflowRequestConfig::RedoKyc { .. } | WorkflowRequestConfig::Onboard { .. } => Ok(()),
-        WorkflowRequestConfig::Document { .. } => {
+        WorkflowRequestConfig::Document { configs } => {
             // Since the proceeding workflow would overwrite the scoped vault's status, we don't
             // to allow running a document workflow unless the user has already onboarded onto
             // another playbook and hopefully has a KYC status/risk signals.
@@ -130,11 +133,11 @@ fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> ApiR
             // KYC is run.
             // The frontend also disables these options.
             // TODO: theoretically we should be checking risk signals here too or that there's an FP decision, but maybe not
-            if scoped_vault.status.map(|d| d.has_decision()).unwrap_or(false) {
-                Ok(())
-            } else {
-                Err(UserError::NoCompleteOnboardings.into())
+            if !scoped_vault.status.map(|d| d.has_decision()).unwrap_or(false) {
+                return Err(UserError::NoCompleteOnboardings.into());
             }
+            DocumentRequestConfig::validate(configs)?;
+            Ok(())
         }
     }
 }

@@ -37,7 +37,7 @@ pub use self::{
     id_doc_kind::*,
     identity_data_kind::*,
     investor_profile_kind::*,
-    validation::{Error as ValidationError, *},
+    validation::{Error as DiValidationError, *},
 };
 use crate::{
     fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, EnumDotNotationError, KvDataKey,

@@ -4,8 +4,8 @@ use either::Either;
 use itertools::Itertools;
 
 use crate::{
-    flat_api_object_map_type, DataIdentifier, DataRequest, DataValidationError, DocumentKind, NtResult,
-    PiiJsonValue, PiiValueKind, ValidateArgs, ValidationError,
+    flat_api_object_map_type, DataIdentifier, DataRequest, DataValidationError, DiValidationError,
+    DocumentKind, NtResult, PiiJsonValue, PiiValueKind, ValidateArgs,
 };
 
 flat_api_object_map_type!(
@@ -32,7 +32,7 @@ impl RawDataRequest {
                     DataIdentifier::Document(k) => match k {
                         DocumentKind::OcrData(_, _) => None,  // allow vaulting OCR data
                         DocumentKind::Barcodes(_, _) => None, // allow vaulting barcodes
-                        _ => Some(ValidationError::CannotVaultDocument.into()),
+                        _ => Some(DiValidationError::CannotVaultDocument.into()),
                     },
                     _ => None,
                 };

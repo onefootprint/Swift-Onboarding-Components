@@ -15,9 +15,9 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     output::Csv, AdverseMediaListKind, CipKind, CollectedData as CD, CollectedDataOption as CDO,
-    CollectedDataOptionKind as CDOK, DataIdentifier, DataIdentifierDiscriminant,
-    DocumentAndCountryConfiguration, DocumentKind, DocumentRequestConfig, EnhancedAml, EnhancedAmlOption,
-    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
+    CollectedDataOptionKind as CDOK, DataIdentifierDiscriminant, DocumentAndCountryConfiguration,
+    DocumentRequestConfig, EnhancedAml, EnhancedAmlOption, Iso3166TwoDigitCountryCode, ObConfigurationKind,
+    TenantId,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
@@ -245,8 +245,8 @@ impl CreateOnboardingConfigurationRequest {
     }
 
     fn validate_documents(&self) -> ApiResult<()> {
-        let docs = &self.documents_to_collect;
-        if docs
+        if self
+            .documents_to_collect
             .iter()
             .any(|d| matches!(d, DocumentRequestConfig::Identity { .. }))
         {
@@ -256,51 +256,7 @@ impl CreateOnboardingConfigurationRequest {
             .into();
         }
 
-        if docs
-            .iter()
-            .filter(|d| matches!(d, DocumentRequestConfig::ProofOfAddress { .. }))
-            .count()
-            > 1
-        {
-            return ValidationError("Can only collect one proof of address doc").into();
-        }
-
-        if docs
-            .iter()
-            .filter(|d| matches!(d, DocumentRequestConfig::ProofOfSsn { .. }))
-            .count()
-            > 1
-        {
-            return ValidationError("Can only collect one proof of SSN doc").into();
-        }
-
-        // Custom doc validation
-
-        let custom_docs = docs
-            .iter()
-            .filter_map(|d| match d {
-                DocumentRequestConfig::Custom(i) => Some(i),
-                _ => None,
-            })
-            .collect_vec();
-
-        let num_identifiers = custom_docs.iter().map(|d| &d.identifier).unique().count();
-        if num_identifiers != custom_docs.len() {
-            return ValidationError("Cannot specify the same identifier for multiple custom documents")
-                .into();
-        }
-        if custom_docs
-            .iter()
-            .any(|d| !matches!(d.identifier, DataIdentifier::Document(DocumentKind::Custom(_))))
-        {
-            return ValidationError(
-                "Must use identifier starting with document.custom. for custom documents",
-            )
-            .into();
-        }
-        if custom_docs.iter().any(|d| d.name.is_empty()) {
-            return ValidationError("Custom document name cannot be empty").into();
-        }
+        DocumentRequestConfig::validate(&self.documents_to_collect)?;
 
         Ok(())
     }
