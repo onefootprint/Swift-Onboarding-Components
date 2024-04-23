@@ -5,6 +5,7 @@ mod entities;
 mod invoice;
 mod long;
 mod panic;
+mod partner_demo;
 mod tenants;
 mod test_partner_tenant;
 mod test_tenant;
@@ -23,5 +24,6 @@ pub fn configure(config: &mut actix_web::web::ServiceConfig) {
         .service(long::get)
         .service(invoice::post)
         .service(invoice::post_all)
-        .service(compliance_partnership::post);
+        .service(compliance_partnership::post)
+        .service(partner_demo::post);
 }

@@ -1296,6 +1296,7 @@ dependencies = [
  "aws-sdk-s3",
  "billing",
  "chrono",
+ "crypto",
  "db",
  "feature_flag",
  "futures",
