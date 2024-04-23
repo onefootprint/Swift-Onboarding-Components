@@ -26,8 +26,7 @@ def send_trigger(fp_id, sandbox_tenant, trigger, expected_error=None):
     trigger_event = next(
         i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
     )
-    t_id = trigger_event["data"]["request"]["id"]
-    assert not trigger_event["data"]["request"]["is_deactivated"]
+    assert trigger_event["data"]["request_is_active"]
     assert trigger_event["data"]["actor"]["kind"] == "organization"
 
     # Enforce the user is marked as "info requested"
@@ -76,7 +75,7 @@ def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     trigger_event = next(
         i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
     )
-    assert trigger_event["data"]["request"]["is_deactivated"]
+    assert not trigger_event["data"]["request_is_active"]
     obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2
 
@@ -207,8 +206,8 @@ def test_retrigger_onboard(sandbox_tenant, must_collect_data):
     trigger_event = next(
         i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
     )
-    assert trigger_event["data"]["request"]["is_deactivated"]
-    assert trigger_event["data"]["request"]["playbook_id"] == obc.id
+    assert not trigger_event["data"]["request_is_active"]
+    assert trigger_event["data"]["config"]["data"]["playbook_id"] == obc.id
     obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
     obd = obds[0]
@@ -216,31 +215,32 @@ def test_retrigger_onboard(sandbox_tenant, must_collect_data):
 
 
 @pytest.mark.parametrize(
-    "trigger",
+    "document_config",
     [
-        dict(kind="id_document", data=dict(collect_selfie=False)),
-        dict(kind="proof_of_ssn"),
-        dict(kind="proof_of_address"),
+        dict(kind="identity", data=dict(collect_selfie=False)),
+        dict(kind="proof_of_ssn", data=dict()),
+        dict(kind="proof_of_address", data=dict()),
     ],
 )
-def test_recollect_document(trigger, sandbox_tenant):
+def test_collect_document(document_config, sandbox_tenant):
     bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
 
     fp_id = sandbox_user.fp_id
 
     # Trigger recollect document
+    trigger = dict(
+        kind="document",
+        data=dict(configs=[document_config]),
+    )
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
 
     # re-run Bifrost with the token from the link we sent to user
     def pre_run(bifrost):
-        upload_mode = (
-            "allow_upload" if trigger["kind"] == "proof_of_address" else "default"
-        )
         # Check that requirements are what we expect
         requirements = bifrost.get_status()["all_requirements"]
         assert requirements[0]["kind"] == "collect_document"
-        assert requirements[0]["upload_mode"] == upload_mode
+        assert requirements[0]["config"]["kind"] == document_config["kind"]
         assert not requirements[0]["is_met"]
 
     complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)
@@ -254,9 +254,18 @@ def test_recollect_document(trigger, sandbox_tenant):
 @pytest.mark.parametrize(
     "trigger",
     [
-        dict(kind="id_document", data=dict(collect_selfie=False)),
-        dict(kind="proof_of_ssn"),
-        dict(kind="proof_of_address"),
+        dict(
+            kind="document",
+            data=dict(configs=[dict(kind="identity", data=dict(collect_selfie=False))]),
+        ),
+        dict(
+            kind="document",
+            data=dict(configs=[dict(kind="proof_of_ssn", data=dict())]),
+        ),
+        dict(
+            kind="document",
+            data=dict(configs=[dict(kind="proof_of_address", data=dict())]),
+        ),
         dict(kind="redo_kyc"),
     ],
 )
@@ -277,7 +286,7 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
     # Trigger
     expected_error = (
         "Cannot reonboard user - user has no complete onboardings."
-        if trigger["kind"] in ["proof_of_ssn", "id_document", "proof_of_address"]
+        if trigger["kind"] == "document"
         else None
     )
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, expected_error)

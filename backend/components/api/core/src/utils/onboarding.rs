@@ -176,21 +176,7 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
             obc.documents_to_collect.clone().unwrap_or_default(),
         )
         .collect(),
-        WorkflowConfig::Document(DocumentConfig { ref configs }) => {
-            // We used to always request an ID doc alongside PoSsn for coba. We'll soon just migrate
-            // the client to send this instead of doing this implicitly
-            let should_include_addl_id = configs
-                .iter()
-                .any(|c| matches!(c, DocumentRequestConfig::ProofOfSsn {}))
-                && !configs
-                    .iter()
-                    .any(|c| matches!(c, DocumentRequestConfig::Identity { .. }));
-            chain(
-                configs.clone(),
-                should_include_addl_id.then_some(DocumentRequestConfig::Identity { collect_selfie: true }),
-            )
-            .collect()
-        }
+        WorkflowConfig::Document(DocumentConfig { ref configs }) => configs.clone(),
         WorkflowConfig::Kyb(_) => {
             vec![]
         }

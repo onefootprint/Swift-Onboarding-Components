@@ -5,8 +5,7 @@ use newtypes::{
 
 use crate::{
     Actor, Annotation, Apiv2Schema, DateTime, DocumentRequest, DocumentUploadedTimelineEvent, InsightEvent,
-    LivenessEvent, OnboardingDecision, Serialize, TimelinePlaybook, TriggeredWorkflow, Utc, VaultCreated,
-    WatchlistCheck, WorkflowRequest,
+    LivenessEvent, OnboardingDecision, Serialize, TimelinePlaybook, Utc, VaultCreated, WatchlistCheck,
 };
 
 /// Describes a liveness event that took place
@@ -52,12 +51,7 @@ pub struct DataCollectedInfo {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct WorkflowTriggered {
-    // TODO deprecate
-    pub workflow: TriggeredWorkflow,
-    // TODO deprecate
-    pub request: Option<WorkflowRequest>,
     pub request_is_active: bool,
-
     pub config: WorkflowRequestConfig,
     pub actor: Actor,
     pub note: Option<String>,

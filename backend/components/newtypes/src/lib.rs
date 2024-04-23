@@ -82,9 +82,6 @@ pub use document_upload_mode::*;
 pub mod fingerprinter;
 pub use self::fingerprinter::Fingerprinter;
 
-mod trigger;
-pub use trigger::*;
-
 pub mod tenant_business_info;
 pub use tenant_business_info::*;
 

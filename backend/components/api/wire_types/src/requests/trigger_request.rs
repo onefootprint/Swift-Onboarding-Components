@@ -1,10 +1,10 @@
 use crate::*;
-use newtypes::{ObConfigurationKey, PiiString, TriggerInfo, WorkflowFixtureResult};
+use newtypes::{ObConfigurationKey, PiiString, WorkflowFixtureResult, WorkflowRequestConfig};
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerRequest {
-    pub trigger: TriggerInfo,
+    pub trigger: WorkflowRequestConfig,
     /// Optional note with more context on what we're asking the user to do
     pub note: Option<String>,
 }

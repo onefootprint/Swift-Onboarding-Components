@@ -19,7 +19,7 @@ use db::models::{
     workflow::Workflow,
     workflow_request::{NewWorkflowRequestArgs, WorkflowRequest},
 };
-use newtypes::{DbActor, ObConfigurationKind, TriggerInfo, TriggerKind, VaultKind, WorkflowTriggeredInfo};
+use newtypes::{DbActor, ObConfigurationKind, VaultKind, WorkflowRequestConfig, WorkflowTriggeredInfo};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -42,19 +42,18 @@ pub async fn post(
     let actor = DbActor::from(auth.actor());
 
     // Generate an auth token for the user and send to their phone number on file
-    let trigger_kind = (&trigger).into();
     let (token, session) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vault = Vault::get(conn, &sv.id)?;
-            validate(trigger_kind, &sv)?;
+            validate(&trigger, &sv)?;
 
             if vault.kind != VaultKind::Person {
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
 
-            let obc = if let TriggerInfo::Onboard { playbook_id } = &trigger {
+            let obc = if let WorkflowRequestConfig::Onboard { playbook_id } = &trigger {
                 // Trigger specifically requested the playbook onto which the user should onboard
                 let (obc, _) = ObConfiguration::get(conn, (playbook_id, &tenant_id, is_live))?;
                 obc
@@ -68,12 +67,11 @@ pub async fn post(
                 return ValidationError("Cannot triggering onboarding onto an auth playbook").into();
             }
 
-            let config = trigger.into();
             let wfr_args = NewWorkflowRequestArgs {
                 scoped_vault_id: sv.id.clone(),
                 ob_configuration_id: obc.id.clone(),
                 created_by: actor.clone(),
-                config,
+                config: trigger,
                 note,
             };
             let wfr = WorkflowRequest::create(conn, wfr_args)?;
@@ -121,13 +119,10 @@ pub async fn post(
     ResponseData::ok(response).json()
 }
 
-fn validate(trigger_info: TriggerKind, scoped_vault: &ScopedVault) -> ApiResult<()> {
-    match trigger_info {
-        TriggerKind::RedoKyc | TriggerKind::Onboard { .. } => Ok(()),
-        TriggerKind::IdDocument
-        | TriggerKind::ProofOfSsn
-        | TriggerKind::ProofOfAddress
-        | TriggerKind::Document => {
+fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> ApiResult<()> {
+    match trigger {
+        WorkflowRequestConfig::RedoKyc { .. } | WorkflowRequestConfig::Onboard { .. } => Ok(()),
+        WorkflowRequestConfig::Document { .. } => {
             // Since the proceeding workflow would overwrite the scoped vault's status, we don't
             // to allow running a document workflow unless the user has already onboarded onto
             // another playbook and hopefully has a KYC status/risk signals.

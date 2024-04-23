@@ -94,9 +94,6 @@ pub use self::manual_review::*;
 mod vault_created;
 pub use self::vault_created::*;
 
-mod workflow_request;
-pub use self::workflow_request::*;
-
 mod document;
 pub use document::*;
 

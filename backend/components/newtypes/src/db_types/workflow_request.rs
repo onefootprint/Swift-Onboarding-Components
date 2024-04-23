@@ -1,8 +1,7 @@
-use paperclip::actix::Apiv2Schema;
-
-use crate::{DocumentRequestConfig, ObConfigurationId, TriggerInfo};
+use crate::{DocumentRequestConfig, ObConfigurationId};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
+use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
@@ -17,23 +16,4 @@ pub enum WorkflowRequestConfig {
     Onboard { playbook_id: ObConfigurationId },
     /// Upload a new document and re-run the decision engine
     Document { configs: Vec<DocumentRequestConfig> },
-}
-
-impl From<TriggerInfo> for WorkflowRequestConfig {
-    fn from(value: TriggerInfo) -> Self {
-        match value {
-            TriggerInfo::RedoKyc => Self::RedoKyc,
-            TriggerInfo::Onboard { playbook_id } => Self::Onboard { playbook_id },
-            TriggerInfo::IdDocument { collect_selfie } => Self::Document {
-                configs: vec![DocumentRequestConfig::Identity { collect_selfie }],
-            },
-            TriggerInfo::ProofOfSsn => Self::Document {
-                configs: vec![DocumentRequestConfig::ProofOfSsn {}],
-            },
-            TriggerInfo::ProofOfAddress => Self::Document {
-                configs: vec![DocumentRequestConfig::ProofOfAddress {}],
-            },
-            TriggerInfo::Document { configs } => Self::Document { configs },
-        }
-    }
 }

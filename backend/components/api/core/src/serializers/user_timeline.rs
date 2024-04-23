@@ -4,10 +4,7 @@ use db::models::{
     user_timeline::{SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo},
 };
 use itertools::Itertools;
-use newtypes::{
-    AuthMethodUpdatedInfo, DocumentRequestKind, ExternalIntegrationInfo, TriggerKind, WorkflowConfig,
-    WorkflowRequestConfig,
-};
+use newtypes::{AuthMethodUpdatedInfo, ExternalIntegrationInfo, WorkflowConfig, WorkflowRequestConfig};
 
 use crate::utils::db2api::DbToApi;
 
@@ -108,36 +105,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 };
                 let request_is_active = wfr.as_ref().is_some_and(|wfr| wfr.deactivated_at.is_none());
 
-                // TODO deprecate this
-                let (workflow, request) = if let Some(wfr) = wfr {
-                    let kind = match wfr.config {
-                        WorkflowRequestConfig::RedoKyc => TriggerKind::RedoKyc,
-                        WorkflowRequestConfig::Onboard { .. } => TriggerKind::Onboard,
-                        WorkflowRequestConfig::Document { ref configs } => {
-                            let kind = configs.first().map(DocumentRequestKind::from);
-                            match kind {
-                                Some(DocumentRequestKind::ProofOfSsn) => TriggerKind::ProofOfSsn,
-                                Some(DocumentRequestKind::Identity) => TriggerKind::IdDocument,
-                                Some(DocumentRequestKind::ProofOfAddress) => TriggerKind::ProofOfAddress,
-                                // TODO add more context here - much bigger PR.
-                                // We should serialize the whole document request config
-                                Some(DocumentRequestKind::Custom) => TriggerKind::RedoKyc,
-                                None => TriggerKind::RedoKyc,
-                            }
-                        }
-                    };
-                    let request = api_wire_types::WorkflowRequest::from_db(wfr);
-                    let wf = api_wire_types::TriggeredWorkflow { kind };
-                    (wf, Some(request))
-                } else if let Some(wf) = workflow {
-                    (api_wire_types::TriggeredWorkflow::from_db(wf), None)
-                } else {
-                    let kind = TriggerKind::RedoKyc;
-                    (api_wire_types::TriggeredWorkflow { kind }, None)
-                };
                 Self::WorkflowTriggered(api_wire_types::WorkflowTriggered {
-                    workflow,
-                    request,
                     request_is_active,
                     config,
                     actor: api_wire_types::Actor::from_db(actor),
