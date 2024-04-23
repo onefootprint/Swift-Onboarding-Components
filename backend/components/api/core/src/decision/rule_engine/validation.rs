@@ -1,4 +1,4 @@
-use crate::errors::{ApiResult, AssertionError, ValidationError};
+use crate::errors::{ApiResult, ValidationError};
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
 use newtypes::{
@@ -31,7 +31,7 @@ pub fn validate_rule_expression(
                 }
                 VaultOperation::IsIn { field, op: _, value } => {
                     let Some(list) = lists.get(value) else {
-                        return AssertionError("List ID not present in prefetched lists").into();
+                        return ValidationError(&format!("List with ID {} not found", value)).into();
                     };
 
                     if list.is_live != is_live {

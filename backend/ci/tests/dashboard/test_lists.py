@@ -884,3 +884,78 @@ def test_delete_list_entries_no_permissions(sandbox_tenant):
     entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)
     assert len(entries) == 1
     assert entries[0]["data"] == entry1[0]["data"]
+
+
+def test_rule_list_id_validation(sandbox_tenant, must_collect_data, can_access_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
+    )
+
+    nonce = _gen_random_str(5)
+    ssn9_list = post(
+        f"/org/lists",
+        dict(
+            name=f"SSN9 {nonce}",
+            alias=f"ssn9_{nonce}",
+            kind="ssn9",
+            entries=["123121234", "234232345", "345343456"],
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    rule = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            name="Test Rule",
+            rule_expression=[
+                {
+                    "field": "id.ssn9",
+                    "op": "is_in",
+                    "value": ssn9_list["id"],
+                }
+            ],
+            action="manual_review",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    rule_id = rule["rule_id"]
+
+    # Try patching the rule with a non-existent list ID
+    resp = patch(
+        f"/org/onboarding_configs/{obc.id}/rules/{rule_id}",
+        dict(
+            rule_expression=[
+                {
+                    "field": "id.email",
+                    "op": "is_in",
+                    "value": "not_a_real_list_id",
+                }
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+    assert resp["error"]["message"] == "List with ID not_a_real_list_id not found"
+
+    # Try creating a new rule with a non-exising list ID
+    resp = patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=1,
+            add=[
+                dict(
+                    rule_action="manual_review",
+                    rule_expression=[
+                        {
+                            "field": "id.email",
+                            "op": "is_in",
+                            "value": "not_a_real_list_id",
+                        }
+                    ],
+                ),
+            ],
+        ),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+    assert resp["error"]["message"] == "List with ID not_a_real_list_id not found"
