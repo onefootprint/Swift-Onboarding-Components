@@ -21,11 +21,19 @@ env:
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
+  # debug:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: debug github.event.deployment
+  #       run: echo "${{ toJson(github.event.deployment) }}"
+  #     - name: debug github.event.deployment_status
+  #       run: echo "${{ toJson(github.event.deployment_status) }}"
   e2e-auth:
-    name: 'On auth deployment success'
+    name: 'On auth success'
     if: >
       github.event.deployment_status.state == 'success' &&
-      startsWith(github.event.deployment_status.target_url, 'https://auth-')
+      startsWith(github.event.deployment_status.target_url, 'https://auth-') &&
+      startsWith(github.event.deployment_status.environment, 'Preview')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
