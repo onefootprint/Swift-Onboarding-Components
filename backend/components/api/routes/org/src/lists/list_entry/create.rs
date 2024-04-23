@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::{
     auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
     errors::ApiResult,
@@ -10,7 +12,7 @@ use api_wire_types::CreateListEntryRequest;
 use crypto::aead::{AeadSealedBytes, SealingKey};
 use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::ListEntry, tenant::Tenant};
 use itertools::Itertools;
-use newtypes::{ListEntryValue, ListId, PiiBytes};
+use newtypes::{ListEntryValue, ListId, PiiBytes, PiiString};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(description = "Creates a new list entry", tags(Lists, Organization, Private))]
@@ -29,12 +31,13 @@ pub async fn create_list_entry(
     let CreateListEntryRequest { entries } = request.into_inner();
 
     let tid = tenant_id.clone();
-    let (tenant, list) = state
+    let (tenant, list, existing_entries) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let t = Tenant::get(conn, &tid)?;
             let list = List::get(conn, &tid, is_live, &list_id)?;
-            Ok((t, list))
+            let entries = ListEntry::list(conn, &list_id)?;
+            Ok((t, list, entries))
         })
         .await?;
 
@@ -45,6 +48,16 @@ pub async fn create_list_entry(
             .await?
             .into_leak(),
     )?;
+    let decrypted_existing_entries = existing_entries
+        .iter()
+        .map(|e| {
+            decrypted_list_key
+                .unseal_bytes(AeadSealedBytes(e.e_data.clone().0))
+                .map_err(ApiError::from)
+                .map(PiiBytes::new)
+                .and_then(|b| PiiString::try_from(b).map_err(ApiError::from))
+        })
+        .collect::<Result<HashSet<_>, _>>()?;
 
     let list_id = list.id.clone();
     let key = decrypted_list_key.clone();
@@ -52,16 +65,23 @@ pub async fn create_list_entry(
     let list_entries = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            // TODO: check if `entries` already exists in some other ListEntry? bit weirder to check since its bytea but should still work i guess
-            let e_data = entries
+            let canonicalized = entries
                 .into_iter()
                 .map(|d| -> ApiResult<_> {
                     let parsed = ListEntryValue::parse(list.kind, d)?;
-                    let canon = parsed.canonicalize();
+                    Ok(parsed.canonicalize())
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+
+            let e_data = canonicalized
+                .into_iter()
+                .filter(|canon| !decrypted_existing_entries.contains(canon))
+                .map(|canon| -> ApiResult<_> {
                     let enc = key.seal_bytes(canon.leak().as_bytes()).map(|b| b.into())?;
                     Ok(enc)
                 })
                 .collect::<Result<Vec<_>, _>>()?;
+
             let ie = insight.insert_with_conn(conn)?;
             Ok(ListEntry::bulk_create(
                 conn,

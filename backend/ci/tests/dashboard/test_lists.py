@@ -616,6 +616,25 @@ def test_create_list_entry(sandbox_tenant):
     entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
     assert len(entries) == 4
 
+    # Adding duplicates should be a no-op
+    entries = post(
+        f"/org/lists/{list_id}/entries",
+        dict(entries=["protonmail.com"]),
+        *sandbox_tenant.db_auths,
+    )
+    assert len(entries) == 0
+
+    entries = post(
+        f"/org/lists/{list_id}/entries",
+        dict(entries=["protonmail.com", "newdomain.com"]),
+        *sandbox_tenant.db_auths,
+    )
+    assert len(entries) == 1
+    assert entries[0]["data"] == "newdomain.com"
+
+    entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
+    assert len(entries) == 5
+
 
 def test_create_list_entry_format_canonicalization(sandbox_tenant):
     nonce = _gen_random_str(5)

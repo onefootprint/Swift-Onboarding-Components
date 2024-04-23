@@ -94,7 +94,7 @@ pub enum DbError {
     InvalidProxyConfigId,
     #[error("List already deactivated")]
     ListAlreadyDeactivated,
-    #[error("ListEntry already deactivated")]
+    #[error("List entry already deactivated")]
     ListEntryAlreadyDeactivated,
     #[error("Expected version {0} but latest version is {1}")]
     UnexpectedRuleSetVersion(i32, i32),

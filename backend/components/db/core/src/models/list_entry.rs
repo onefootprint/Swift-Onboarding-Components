@@ -82,6 +82,10 @@ impl ListEntry {
         is_live: bool,
         insight_event_id: &InsightEventId,
     ) -> DbResult<Vec<Self>> {
+        if e_data.is_empty() {
+            return Ok(vec![]);
+        }
+
         let created_at = Utc::now();
         let created_seqno = DataLifetime::get_current_seqno(conn)?;
 
@@ -142,7 +146,7 @@ impl ListEntry {
         let res = list_entry::table
             .filter(list_entry::list_id.eq(list_id))
             .filter(list_entry::deactivated_seqno.is_null())
-            // TODO: limit/paginate here 
+            // TODO: limit/paginate here
             .order_by(list_entry::created_at.desc())
             .get_results(conn)?;
         Ok(res)
