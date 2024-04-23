@@ -133,8 +133,10 @@ pub async fn post(
                 .into_iter()
                 .map(|(first, last)| -> ApiResult<_> {
                     let email = format!(
-                        "demo.partner.user.{0}@demo-email.onefootprint.com",
-                        gen_random_alphanumeric_code(16)
+                        "{}.{}@compliance-automation-demo-email-{}.onefootprint.com",
+                        &first,
+                        &last,
+                        gen_random_alphanumeric_code(16),
                     );
                     let user =
                         TenantUser::get_and_update_or_create(conn, email.parse()?, Some(first), Some(last))?;

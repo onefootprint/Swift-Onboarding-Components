@@ -85,6 +85,9 @@ PDF_DIR = os.path.join(os.path.dirname(__file__), "pdf")
 def str_hash(s):
     return int(hashlib.md5(s.encode()).hexdigest(), 16)
 
+def random_choice(s, options):
+    return options[str_hash(s) % len(options)]
+
 def get_doc(doc_id):
     docs = requests.get(
         url=f"{API_BASE}/partner/partnerships/{partnership_id}/documents",
@@ -227,11 +230,11 @@ for (doc_name, doc_description) in TEMPLATES:
         if not should_review:
             continue
 
-        decision = random.choice(["accepted"] * 7 + ["rejected"])
+        decision = random_choice("decision" + doc_name + tenant["name"], ["accepted"] * 7 + ["rejected"])
         if decision == "accepted":
-            note = random.choice(["Looks good", "Thanks for submitting. Looks good to me.", "Approved for 2024."])
+            note = random_choice("accepted" + doc_name + tenant["name"], ["Looks good", "Thanks for submitting. Looks good to me.", "Approved for 2024."])
         else:
-            note = random.choice(["We are passing on this partnership", "This is not the proper format", "Please resubmit with up-to-date information"])
+            note = random_choice("rejected" + doc_name + tenant["name"], ["We are passing on this partnership", "This is not the proper format", "Please resubmit with up-to-date information"])
 
         requests.post(
             f"{API_BASE}/partner/partnerships/{partnership_id}/documents/{doc_id}/reviews",
