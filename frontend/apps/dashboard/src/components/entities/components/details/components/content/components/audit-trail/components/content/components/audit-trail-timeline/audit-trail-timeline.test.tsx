@@ -33,13 +33,7 @@ describe('<AuditTrailTimeline />', () => {
       pathname: `/entities/${entityIdFixure}`,
       query: {
         id: entityIdFixure,
-        playbook_id: obcIdFixture,
       },
-    });
-    mockRequest({
-      method: 'get',
-      path: `/org/onboarding_configs/${obcIdFixture}`,
-      response: { name: 'My playbook' },
     });
     withRuleSetResult();
     asAdminUser();
@@ -131,6 +125,11 @@ describe('<AuditTrailTimeline />', () => {
     describe('when rendering workflow trigger event with link', () => {
       it('should be able to generate a new link', async () => {
         const { writeTestMockFn } = createClipboardSpy();
+        mockRequest({
+          method: 'get',
+          path: `/org/onboarding_configs/${obcIdFixture}`,
+          response: { name: 'My playbook' },
+        });
         mockRequest({
           method: 'post',
           path: `/entities/${entityIdFixure}/token`,

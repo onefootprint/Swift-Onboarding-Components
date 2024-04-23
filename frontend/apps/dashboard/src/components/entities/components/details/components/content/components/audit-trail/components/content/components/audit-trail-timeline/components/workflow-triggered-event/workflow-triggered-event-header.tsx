@@ -9,6 +9,7 @@ import usePlaybook from 'src/components/playbook-details/hooks/use-playbook';
 
 import Actor from '../actor/actor';
 import PlaybookLink from '../playbook-link';
+import useGetActionName from './hooks/use-get-action-name';
 
 type WorkflowTriggeredEventHeaderProps = {
   data: WorkflowTriggeredEventData;
@@ -20,7 +21,9 @@ const WorkflowTriggeredEventHeader = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
   });
-  const action = t(`actions.${data.workflow.kind}`);
+
+  const getActionName = useGetActionName();
+  const action = getActionName(data.config);
 
   return (
     <>
@@ -39,12 +42,11 @@ const PlaybookContext = ({ data }: WorkflowTriggeredEventHeaderProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
   });
-  const workflowKind = data.workflow.kind;
-  const actionHasPlaybook =
-    workflowKind === TriggerKind.Onboard ||
-    workflowKind === TriggerKind.RedoKyc;
-  const { data: playbook, isError } = usePlaybook();
-  if (!actionHasPlaybook) {
+
+  const playbookId =
+    data.config.kind === TriggerKind.Onboard ? data.config.data.playbookId : '';
+  const { data: playbook, isError } = usePlaybook(playbookId);
+  if (!playbookId) {
     return null;
   }
   if (isError) {

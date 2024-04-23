@@ -2,12 +2,12 @@ import type { DocumentRequestConfig } from '../data';
 
 export type TriggerRequest = {
   entityId: string;
-  trigger: Trigger;
+  trigger: WorkflowRequestConfig;
   note?: string;
   sendLink: boolean;
 };
 
-export type Trigger =
+export type WorkflowRequestConfig =
   | {
       kind: TriggerKind.Onboard;
       data: {
@@ -19,13 +19,15 @@ export type Trigger =
       data: {
         configs: DocumentRequestConfig[];
       };
+    }
+  | {
+      kind: TriggerKind.RedoKyc;
     };
 
 export enum TriggerKind {
   RedoKyc = 'redo_kyc',
   Onboard = 'onboard',
   Document = 'document',
-  IdDocument = 'id_document',
 }
 
 export type TriggerResponse = {

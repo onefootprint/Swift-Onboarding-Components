@@ -1,5 +1,8 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import type { DocumentRequestConfig, Trigger } from '@onefootprint/types';
+import type {
+  DocumentRequestConfig,
+  WorkflowRequestConfig,
+} from '@onefootprint/types';
 import { DocumentRequestKind, TriggerKind } from '@onefootprint/types';
 import type { DialogButton } from '@onefootprint/ui';
 import { Dialog } from '@onefootprint/ui';
@@ -51,7 +54,7 @@ const RequestMoreInfoDialog = ({
 
   const handleGenerateLink = (data: TriggerFormData) => {
     const { kind, collectSelfie, note, playbook } = data;
-    let trigger: Trigger;
+    let trigger: WorkflowRequestConfig;
     if (kind === RequestMoreInfoKind.Onboard && playbook) {
       trigger = {
         kind: TriggerKind.Onboard,

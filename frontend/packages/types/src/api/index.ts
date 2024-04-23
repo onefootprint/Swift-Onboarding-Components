@@ -243,7 +243,11 @@ export type {
   SubmitReviewRequest,
   SubmitReviewResponse,
 } from './submit-review';
-export type { Trigger, TriggerRequest, TriggerResponse } from './trigger';
+export type {
+  TriggerRequest,
+  TriggerResponse,
+  WorkflowRequestConfig,
+} from './trigger';
 export { TriggerKind } from './trigger';
 export type { TriggerLinkRequest } from './trigger-link';
 export type {

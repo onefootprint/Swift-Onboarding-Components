@@ -168,7 +168,6 @@ export type {
   SubmitFreeFormNoteResponse,
   SubmitReviewRequest,
   SubmitReviewResponse,
-  Trigger,
   TriggerRequest,
   TriggerResponse,
   UpdateAnnotationRequest,
@@ -207,6 +206,7 @@ export type {
   UserUpdateRequest,
   UserUpdateResponse,
   ValidateSessionRequest,
+  WorkflowRequestConfig,
 } from './api';
 export {
   ALLOW_EXTRA_FIELDS_HEADER,

@@ -16,8 +16,9 @@ const getPlaybook = async (authHeaders: AuthHeaders, id: string) => {
   return response.data;
 };
 
-const usePlaybook = () => {
-  const id = usePlaybookId();
+const usePlaybook = (overrideId?: string) => {
+  const selectedId = usePlaybookId();
+  const id = overrideId ?? selectedId;
   const { authHeaders } = useSession();
 
   const onboardingConfigQuery = useQuery(

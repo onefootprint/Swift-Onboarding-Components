@@ -39,13 +39,9 @@ const WorkflowTriggeredEventBody = ({
       onClose: handleClose,
     });
 
-  const shouldShowCopyButton = data.request?.isDeactivated === false;
+  const shouldShowGenerateLinkButton = data.requestIsActive;
 
   const openLinkDialog = () => {
-    const triggerId = data.request?.id;
-    if (!triggerId) {
-      return;
-    }
     setIsDialogOpen(true);
     generateTokenMutation.mutate(
       {
@@ -87,7 +83,7 @@ const WorkflowTriggeredEventBody = ({
               <Text variant="body-3" tag="span">
                 {t('link-generated')}
               </Text>
-              {shouldShowCopyButton && (
+              {shouldShowGenerateLinkButton && (
                 <>
                   <Stack
                     align="center"

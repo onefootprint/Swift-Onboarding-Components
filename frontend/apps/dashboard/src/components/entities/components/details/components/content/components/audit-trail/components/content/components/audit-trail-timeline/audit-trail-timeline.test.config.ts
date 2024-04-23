@@ -10,6 +10,7 @@ import {
   ActorKind,
   CollectedKycDataOption,
   DecisionStatus,
+  DocumentRequestKind,
   EntityKind,
   EntityLabel,
   EntityStatus,
@@ -185,8 +186,19 @@ export const TimelineFixture: Timeline = [
     event: {
       kind: TimelineEventKind.workflowTriggered,
       data: {
-        workflow: {
-          kind: TriggerKind.IdDocument,
+        requestIsActive: false,
+        config: {
+          kind: TriggerKind.Document,
+          data: {
+            configs: [
+              {
+                kind: DocumentRequestKind.Identity,
+                data: {
+                  collectSelfie: true,
+                },
+              },
+            ],
+          },
         },
         actor: {
           kind: ActorKind.organization,
@@ -217,13 +229,12 @@ export const WorkflowTriggeredWithLinkEvent: TimelineEvent = {
   event: {
     kind: TimelineEventKind.workflowTriggered,
     data: {
-      workflow: {
+      requestIsActive: true,
+      config: {
         kind: TriggerKind.Onboard,
-      },
-      request: {
-        id: 'wfr_id',
-        isDeactivated: false,
-        playbookId: obcIdFixture,
+        data: {
+          playbookId: obcIdFixture,
+        },
       },
       actor: {
         kind: ActorKind.organization,

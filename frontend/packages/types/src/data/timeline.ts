@@ -1,4 +1,4 @@
-import type { TriggerKind } from '../api/trigger';
+import type { WorkflowRequestConfig } from '../api/trigger';
 import type { Actor } from './actor';
 import type { Annotation } from './annotation';
 import type AuthMethodKind from './auth-method';
@@ -110,14 +110,8 @@ export type VaultCreatedEvent = {
 };
 
 export type WorkflowTriggeredEventData = {
-  workflow: {
-    kind: TriggerKind;
-  };
-  request?: {
-    id: string;
-    isDeactivated: boolean;
-    playbookId: string;
-  };
+  requestIsActive: boolean;
+  config: WorkflowRequestConfig;
   actor: Actor;
   note?: string;
 };
