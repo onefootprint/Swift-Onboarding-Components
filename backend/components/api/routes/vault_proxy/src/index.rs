@@ -24,6 +24,7 @@ use paperclip::actix::{
     api_v2_operation, post, web,
     web::{HttpRequest, HttpResponse},
 };
+use reqwest::StatusCode;
 
 /// Limit the body payload to 5MB
 const FIVE_MB: usize = 5 * 1024 * 1024;
@@ -164,22 +165,39 @@ async fn invoke_vault_proxy(
     tracing::info!(status=%response.status_code, "proxy destination response");
 
     // 4. build the ingress response
-    let mut builder = HttpResponse::build(response.status_code);
+    let original_status_code = response.status_code;
+    let mapped_status_code = if original_status_code.is_server_error() {
+        StatusCode::BAD_GATEWAY
+    } else {
+        original_status_code
+    };
+
+    let mut builder = HttpResponse::build(mapped_status_code);
 
     // 4a. forward ingress headers
     response.headers.iter().for_each(|(name, value)| {
         builder.insert_header((name, value));
     });
 
-    // 4b. tokenize the ingress if needed
-    let TokenizedIngress {
-        tokenized_body,
-        values_to_vault,
-    } = pii_parser::process_ingress(response.body, config.ingress).await?;
+    builder.insert_header((
+        "x-footprint-proxy-upstream-status-code",
+        original_status_code.as_str(),
+    ));
 
-    // 4c. vault pii
-    tokenize::vault_pii(&state, auth.as_ref(), values_to_vault, insight).await?;
+    if original_status_code.is_success() {
+        // 4b. tokenize the ingress if needed
+        let TokenizedIngress {
+            tokenized_body,
+            values_to_vault,
+        } = pii_parser::process_ingress(response.body, config.ingress).await?;
 
-    let response = builder.body(tokenized_body);
-    Ok(response)
+        // 4c. vault pii
+        tokenize::vault_pii(&state, auth.as_ref(), values_to_vault, insight).await?;
+
+        let response = builder.body(tokenized_body);
+        Ok(response)
+    } else {
+        let response = builder.body(response.body);
+        Ok(response)
+    }
 }

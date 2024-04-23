@@ -56,6 +56,11 @@ const staticAlerts: Alert[] = [
           op: '>=',
           value: 500,
         },
+        {
+          column: 'http.status_code',
+          op: '!=',
+          value: 502,
+        },
       ],
       filter_combination: 'AND',
     },

@@ -339,6 +339,8 @@ class TestVaultProxy:
         assert response.headers["x-footprint-proxy-fwd-my-secret-header"] == "footprintrocks"
         assert response.headers["x-footprint-proxy-fwd-my-test-header"] == "my-test-value"
 
+        assert response.headers["x-footprint-proxy-upstream-status-code"] == "200"
+
         # test the body came in
         result = response.json()
         # print(result)
@@ -473,6 +475,8 @@ class TestVaultProxy:
         assert result["data"]["card_number"] == f"{fp_id}.card.primary.number"
         assert result["data"]["card_cvc"] == f"{fp_id}.card.primary.cvc"
         assert result["data"]["date_of_birth"] == f"{fp_id}.id.dob"
+
+        assert response.headers["x-footprint-proxy-upstream-status-code"] == "200"
 
         data = dict(
             reason="test",
