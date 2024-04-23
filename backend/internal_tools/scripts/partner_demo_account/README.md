@@ -46,7 +46,7 @@ Remove your access to all tenants with a certain name by running a command like:
 UPDATE tenant_rolebinding
 SET deactivated_at = NOW()
 WHERE
-	deactivated_at = NULL
+	deactivated_at IS NULL
 	AND
 	id IN (
 		SELECT tenant_rolebinding.id FROM tenant_rolebinding
