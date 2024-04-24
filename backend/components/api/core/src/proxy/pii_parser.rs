@@ -4,22 +4,67 @@ use std::collections::HashMap;
 
 use crate::proxy::IngressRule;
 use actix_web::web::Bytes;
+use mime::Mime;
 use newtypes::PiiString;
 
-use crate::errors::{proxy::VaultProxyError, ApiResult};
+use crate::errors::proxy::VaultProxyError;
 
-use super::config::{IngressConfig, IngressContentType};
+use super::{
+    config::{IngressConfig, IngressContentType},
+    net_client::ProxyResponse,
+};
 
 pub struct TokenizedIngress {
     pub tokenized_body: Bytes,
     pub values_to_vault: HashMap<IngressRule, PiiString>,
 }
 
+fn check_mime(response: &ProxyResponse, config: &IngressConfig) -> Result<(), VaultProxyError> {
+    let expected_content_type: Option<Mime> = config.content_type.into();
+    let Some(expected_mime) = expected_content_type else {
+        return Ok(());
+    };
+
+    let Some(got_content_type) = response.headers.get("content-type") else {
+        return Err(VaultProxyError::InvalidUpstreamContentType(
+            "missing content-type header".to_owned(),
+        ));
+    };
+
+    let got_content_type = got_content_type
+        .to_str()
+        .map_err(|e| VaultProxyError::InvalidUpstreamContentType(e.to_string()))?;
+
+    let got_mime: Mime = got_content_type.parse().map_err(|e| {
+        VaultProxyError::InvalidUpstreamContentType(format!("failed to parse content-type: {}", e))
+    })?;
+
+    if got_mime.type_() != expected_mime.type_() {
+        return Err(VaultProxyError::InvalidUpstreamContentType(format!(
+            "expected content type: {}, got: {}",
+            expected_mime, got_mime
+        )));
+    }
+
+    Ok(())
+}
+
 /// Tranforms the ingress response into a tokenized response by the
 /// configuration rules
 ///
 /// Also: returns values to send to the vault
-pub async fn process_ingress(response: bytes::Bytes, config: IngressConfig) -> ApiResult<TokenizedIngress> {
+pub async fn process_ingress(
+    response: ProxyResponse,
+    config: IngressConfig,
+) -> Result<TokenizedIngress, VaultProxyError> {
+    // TODO: make this a hard error (502)
+    if let Err(e) = check_mime(&response, &config) {
+        tracing::warn!(
+            %e,
+            "Soft error validating ingress response content type",
+        );
+    }
+
     let extractor = match config.content_type {
         IngressContentType::Unspecified => {
             // we need a content-type if rules are provided
@@ -29,16 +74,16 @@ pub async fn process_ingress(response: bytes::Bytes, config: IngressConfig) -> A
 
             // nothing to do!
             return Ok(TokenizedIngress {
-                tokenized_body: response,
+                tokenized_body: response.body,
                 values_to_vault: HashMap::new(),
             });
         }
         IngressContentType::Json => JsonPath {
-            value: serde_json::from_slice(response.as_ref())?,
+            value: serde_json::from_slice(response.body.as_ref())?,
         },
     };
 
-    Ok(extractor.process_rules(config.rules)?)
+    extractor.process_rules(config.rules)
 }
 
 trait IngressTokenizer {

@@ -383,7 +383,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::ValidationError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::InvalidProxyBody => StatusCode::BAD_REQUEST,
-            ApiErrorKind::VaultProxyError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::VaultProxyError(e) => e.status_code(),
             ApiErrorKind::InvalidBody(_) | ApiErrorKind::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,

@@ -121,6 +121,15 @@ pub enum IngressContentType {
     Json,
 }
 
+impl From<IngressContentType> for Option<mime::Mime> {
+    fn from(value: IngressContentType) -> Self {
+        match value {
+            IngressContentType::Unspecified => None,
+            IngressContentType::Json => Some(mime::APPLICATION_JSON),
+        }
+    }
+}
+
 impl From<ProxyIngressContentType> for IngressContentType {
     fn from(t: ProxyIngressContentType) -> Self {
         match t {

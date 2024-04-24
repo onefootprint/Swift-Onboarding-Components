@@ -1,3 +1,4 @@
+use http::StatusCode;
 use newtypes::{ProxyConfigIngressRuleId, ProxyTokenError};
 use thiserror::Error;
 
@@ -47,12 +48,12 @@ pub enum VaultProxyError {
     InvalidClientCertificateKey,
     #[error("Forward reqwest error")]
     RequestError(#[from] reqwest::Error),
-    #[error("Target json path not found: {0}")]
+    #[error("Target JSON path not found: {0}")]
     TargetJsonPathNotFound(#[from] jsonpath_lib::JsonPathError),
-    #[error("Target json path value not a string or number")]
+    #[error("Target JSON path value not a string or number")]
     TargetJsonPathValueNotAStringOrNumber,
-    #[error("Failed to convert to json: {0}")]
-    FailedToParseIngressBodyJson(#[from] serde_json::Error),
+    #[error("Failed to parse upstream body as JSON: {0}")]
+    FailedToParseUpstreamBodyJson(#[from] serde_json::Error),
     #[error("Cannot vault restricted identity data")]
     CannotVaultIdentityDataForPortableVaultViaProxy,
     #[error("Cannot proxy vault documents")]
@@ -65,4 +66,46 @@ pub enum VaultProxyError {
     MissingFootprintUserTokenParameter,
     #[error("Proxy configuration is disabled. Please enable it to use it.")]
     ProxyConfigDisabled,
+    #[error("Upstream content type error: {0}")]
+    InvalidUpstreamContentType(String),
+}
+
+impl VaultProxyError {
+    pub fn status_code(&self) -> StatusCode {
+        match self {
+            VaultProxyError::InvalidTokenStart
+            | VaultProxyError::InvalidTokenComponents
+            | VaultProxyError::InvalidDataIdentifier(_)
+            | VaultProxyError::DataIdentifiersNotFound(_)
+            | VaultProxyError::InvalidDestinationUrl
+            | VaultProxyError::InvalidFootprintDestinationUrl
+            | VaultProxyError::InvalidDestinationMethod
+            | VaultProxyError::DestinationMustBeHttps
+            | VaultProxyError::InvalidProxyForwardHeader(_)
+            | VaultProxyError::InvalidIngressRuleHeader
+            | VaultProxyError::BadIngressRule(_)
+            | VaultProxyError::IngressRuleTokenMissing(_)
+            | VaultProxyError::MissingIngressRuleContentType
+            | VaultProxyError::InvalidPinCertHeader
+            | VaultProxyError::InvalidPemUrlEncoding
+            | VaultProxyError::InvalidBase64(_)
+            | VaultProxyError::InvalidClientCertHeader
+            | VaultProxyError::ClientIdentityCertificate(_)
+            | VaultProxyError::ServerPinCertificate(_)
+            | VaultProxyError::InvalidClientCertificate
+            | VaultProxyError::InvalidClientCertificateKey
+            | VaultProxyError::RequestError(_)
+            | VaultProxyError::TargetJsonPathNotFound(_)
+            | VaultProxyError::TargetJsonPathValueNotAStringOrNumber
+            | VaultProxyError::CannotVaultIdentityDataForPortableVaultViaProxy
+            | VaultProxyError::IngressDocumentVaultProxyingNotSupported
+            | VaultProxyError::PemError(_)
+            | VaultProxyError::ProxyTokenError(_)
+            | VaultProxyError::MissingFootprintUserTokenParameter
+            | VaultProxyError::ProxyConfigDisabled => StatusCode::BAD_REQUEST,
+            VaultProxyError::FailedToParseUpstreamBodyJson(_) | Self::InvalidUpstreamContentType(_) => {
+                StatusCode::BAD_GATEWAY
+            }
+        }
+    }
 }

@@ -189,7 +189,7 @@ async fn invoke_vault_proxy(
         let TokenizedIngress {
             tokenized_body,
             values_to_vault,
-        } = pii_parser::process_ingress(response.body, config.ingress).await?;
+        } = pii_parser::process_ingress(response, config.ingress).await?;
 
         // 4c. vault pii
         tokenize::vault_pii(&state, auth.as_ref(), values_to_vault, insight).await?;
