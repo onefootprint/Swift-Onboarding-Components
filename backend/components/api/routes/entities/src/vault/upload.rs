@@ -1,5 +1,5 @@
 use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    auth::tenant::{SecretTenantAuthContext, TenantGuard},
     errors::ApiResult,
     types::{EmptyResponse, JsonApiResponse},
     utils::{headers::InsightHeaders, vault_wrapper::VaultWrapper},
@@ -8,15 +8,10 @@ use crate::{
 use api_core::{
     api_headers_schema,
     auth::{
-        tenant::{ClientTenantAuthContext, TenantAuth},
-        CanVault,
+        tenant::{CheckTenantGuard, ClientTenantAuthContext, TenantAuth, TenantSessionAuth},
+        CanVault, Either,
     },
-    utils::{
-        body_bytes::BodyBytes,
-        file_upload::FileUpload,
-        vault_wrapper::NewDocument,
-        {self},
-    },
+    utils::{self, body_bytes::BodyBytes, file_upload::FileUpload, vault_wrapper::NewDocument},
 };
 use db::models::{
     access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
@@ -64,7 +59,7 @@ const TEN_MB: usize = 10 * 1024 * 1024;
 pub async fn post(
     state: web::Data<State>,
     path: Path<(FpId, DataIdentifier)>,
-    auth: SecretTenantAuthContext,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insight: InsightHeaders,
     headers: UploadHeaderParams,
     body: BodyBytes<TEN_MB>,
