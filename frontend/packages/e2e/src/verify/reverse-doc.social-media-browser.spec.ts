@@ -7,6 +7,16 @@ import {
   waitForVerifyButton,
 } from './utils/commands';
 
+const key =
+  process.env.E2E_OB_KYC_DOC_FIRST || 'pb_test_ZeSUWIlEteLWZByDjLITUL';
+
+const userData = encodeURIComponent(
+  JSON.stringify({
+    'id.email': 'piip@onefootprint.com',
+    'id.phoneNumber': '+15555550100',
+  }),
+);
+
 const SOCIAL_MEDIA_BROWSER_USER_AGENTS = [
   {
     label: 'Tiktok.iOS',
@@ -22,6 +32,7 @@ const SOCIAL_MEDIA_BROWSER_USER_AGENTS = [
 
 for (const { label, userAgent } of SOCIAL_MEDIA_BROWSER_USER_AGENTS) {
   test.use({ userAgent, isMobile: true });
+
   test.skip(`reverse-doc.social-media-browser.${label} #ci`, async ({
     browserName,
     browser,
@@ -36,29 +47,21 @@ for (const { label, userAgent } of SOCIAL_MEDIA_BROWSER_USER_AGENTS) {
       permissions: ['camera'],
     });
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-    const key = 'pb_test_ZeSUWIlEteLWZByDjLITUL';
 
     await context.grantPermissions(['camera']);
     await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-    await page.goto(
-      `/e2e?ob_key=${key}&flow=${flowId}&user_data=${encodeURIComponent(
-        JSON.stringify({
-          'id.email': 'piip@onefootprint.com',
-          'id.phoneNumber': '+15555550100',
-        }),
-      )}`,
-    );
+    await page.goto(`/e2e?ob_key=${key}&flow=${flowId}&user_data=${userData}`);
     await page.waitForLoadState();
 
-    await waitForVerifyButton({ page });
+    await waitForVerifyButton(page);
 
     await page.getByRole('button', { name: 'Verify with Footprint' }).click();
     await page.waitForLoadState();
 
     const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-    await selectOutcomeOptional({ frame }, 'Success');
-    await clickOnContinue({ frame });
+    await selectOutcomeOptional(frame, 'Success');
+    await clickOnContinue(frame);
     await page.waitForLoadState();
 
     await verifyPhoneNumber({ frame, page });

@@ -2,14 +2,18 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
-  selectOutcomeOptional,
-  verifyPhoneNumber,
   confirmData,
-  waitForVerifyButton,
+  selectOutcomeOptional,
+  verifyAppIframeClick,
+  verifyPhoneNumber,
 } from './utils/commands';
 
-const email = 'piip@onefootprint.com';
-const phoneNumber = '+15555550100';
+const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
+const key =
+  process.env.E2E_OB_KYC ||
+  process.env.NEXT_PUBLIC_E2E_TENANT_PK ||
+  'ob_test_Gw8TsnS2xWOYazI0pugdxu';
+
 const firstName = 'John';
 const lastName = 'Doe';
 const dob = '01/01/1990';
@@ -21,17 +25,10 @@ const zipCode = '94105';
 const country = 'US';
 const ssn9 = '123412345';
 
-test('E2E.Bootstrap #ci', async ({ browserName, page, isMobile }) => {
-  // eslint-disable-next-line playwright/no-conditional-in-test
-  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
-
-  test.setTimeout(120000);
-  const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-
-  await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  const bootstrapData = {
-    'id.email': email,
-    'id.phone_number': phoneNumber,
+const userData = encodeURIComponent(
+  JSON.stringify({
+    'id.email': 'piip@onefootprint.com',
+    'id.phone_number': '+15555550100',
     'id.first_name': firstName,
     'id.last_name': lastName,
     'id.dob': dob,
@@ -42,24 +39,35 @@ test('E2E.Bootstrap #ci', async ({ browserName, page, isMobile }) => {
     'id.zip': zipCode,
     'id.country': country,
     'id.ssn9': ssn9,
-  };
+  }),
+);
 
+test.beforeEach(async ({ browserName, isMobile, page }) => {
+  const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
+
+  await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
   await page.goto(
-    `/e2e?flow=${flowId}&user_data=${encodeURIComponent(
-      JSON.stringify(bootstrapData),
-    )}`,
+    `/components/verify?ob_key=${key}&app_url=${appUrl}&user_data=${userData}&f=${flowId}`,
   );
   await page.waitForLoadState();
 
-  await waitForVerifyButton({ page });
-
-  await page.getByRole('button', { name: 'Verify with Footprint' }).click();
+  await verifyAppIframeClick(page, isMobile);
   await page.waitForLoadState();
+});
 
+test('KYC with bootstrap #ci', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
+  const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
+
+  await expect(
+    page
+      .frameLocator('iframe[name^="footprint-iframe-"]')
+      .getByText(/Sandbox Mode/i),
+  ).toBeVisible({ timeout });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-  await selectOutcomeOptional({ frame }, 'Success');
-  await clickOnContinue({ frame });
+  await selectOutcomeOptional(frame, 'Success');
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   // Check that "Log in with a different account" is visible
@@ -70,23 +78,20 @@ test('E2E.Bootstrap #ci', async ({ browserName, page, isMobile }) => {
 
   await page.waitForLoadState();
 
-  await confirmData(
-    { frame },
-    {
-      firstName,
-      lastName,
-      dob,
-      addressLine1,
-      addressLine2,
-      city,
-      state: 'AL',
-      country,
-      zipCode,
-      ssn: ssn9,
-    },
-  );
+  await confirmData(frame, {
+    firstName,
+    lastName,
+    dob,
+    addressLine1,
+    addressLine2,
+    city,
+    state: 'AL',
+    country,
+    zipCode,
+    ssn: ssn9,
+  });
 
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   return expect(1).toBe(1);

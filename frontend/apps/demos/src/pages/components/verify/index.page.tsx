@@ -1,3 +1,4 @@
+import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -20,7 +21,12 @@ const getSdkArgsToken = (str: string): string =>
 
 const getQueryArgs = (router: RouterReturn) => {
   const { query, asPath } = router;
-  const { ob_key: obKey, user_data: rawUserData, app_url: appUrl } = query;
+  const {
+    app_url: appUrl,
+    ob_key: obKey,
+    user_data: rawUserData,
+    locale = 'en-US',
+  } = query;
   const authToken = getSdkArgsToken(asPath.split('#')[1]) ?? '';
   const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
   const appUrlStr = String(appUrl);
@@ -37,50 +43,47 @@ const getQueryArgs = (router: RouterReturn) => {
   return {
     authToken,
     appUrl:
-      appUrlStr.startsWith('https://auth-') ||
+      appUrlStr.startsWith('https://bifrost-') ||
       appUrlStr.startsWith('http://localhost')
         ? appUrlStr
-        : 'http://localhost:3011',
+        : 'http://localhost:3000',
     publicKey,
     userData,
+    locale,
   };
 };
 
-const AuthDemo = () => {
-  const router = useRouter();
-  const { appUrl, authToken, publicKey, userData } = getQueryArgs(router);
+const onComplete = (token: string) => {
+  console.log('# token', token); // eslint-disable-line no-console
+  const el = document.querySelector('[data-testid="result"]');
+  if (el && token) {
+    el.innerHTML = token;
+  }
+};
 
-  const handleAuthenticateClick = () => {
+const VerifyDemo = () => {
+  const router = useRouter();
+  const {
+    appUrl: bifrostUrl,
+    locale,
+    publicKey,
+    userData,
+  } = getQueryArgs(router);
+
+  const handleVerifyClick = () => {
     const component = fakeSdk.init({
-      kind: FootprintComponentKind.Auth,
+      kind: FootprintComponentKind.Verify,
+      variant: 'modal',
+      onAuth: (s: string) => console.log('demo onAuth', s),
       onCancel: () => console.log('demo onCancel'),
       onClose: () => console.log('demo onClose'),
-      onComplete: (s: string) => console.log('demo onComplete', s),
+      onComplete,
+      l10n: { locale: locale as SupportedLocale },
       options: { showLogo: false },
       publicKey,
       userData,
-      variant: 'modal',
     });
-    component.render(appUrl);
-
-    return () => {
-      component.destroy();
-    };
-  };
-
-  const handleUpdateFlowClick = () => {
-    const component = fakeSdk.init({
-      kind: FootprintComponentKind.Auth,
-      variant: 'modal',
-      authToken,
-      updateLoginMethods: true,
-      options: { showLogo: false },
-      userData,
-      onCancel: () => console.log('demo onCancel'),
-      onClose: () => console.log('demo onClose'),
-      onComplete: (s: string) => console.log('demo onComplete', s),
-    });
-    component.render(appUrl);
+    component.render(bifrostUrl);
 
     return () => {
       component.destroy();
@@ -90,16 +93,13 @@ const AuthDemo = () => {
   return (
     <>
       <Head>
-        <title>Footprint Auth Demo</title>
+        <title>Footprint Verify Demo</title>
       </Head>
       <Container>
-        <Button onClick={handleAuthenticateClick} variant="secondary">
-          Authenticate with Footprint
+        <Button onClick={handleVerifyClick} variant="secondary">
+          Verify with Footprint
         </Button>
-        <br />
-        <Button onClick={handleUpdateFlowClick} variant="secondary">
-          Update Authentication Methods with Footprint
-        </Button>
+        <div data-testid="result" />
       </Container>
     </>
   );
@@ -118,4 +118,4 @@ const Container = styled.div`
   `}
 `;
 
-export default AuthDemo;
+export default VerifyDemo;

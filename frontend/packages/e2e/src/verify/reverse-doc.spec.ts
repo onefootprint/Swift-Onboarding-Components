@@ -7,39 +7,49 @@ import {
   continueOnDesktop,
   uploadImage,
   verifyPhoneNumber,
-  waitForVerifyButton,
+  verifyAppIframeClick,
 } from './utils/commands';
 
-test('reverse-doc #ci', async ({ browserName, browser, page, isMobile }) => {
-  // eslint-disable-next-line playwright/no-conditional-in-test
-  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
+const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
+const key =
+  process.env.E2E_OB_KYC_DOC_FIRST || 'pb_test_ZeSUWIlEteLWZByDjLITUL';
 
-  test.setTimeout(120000);
-  const context = await browser.newContext({ permissions: ['camera'] });
+const userData = encodeURIComponent(
+  JSON.stringify({
+    'id.email': 'piip@onefootprint.com',
+    'id.phoneNumber': '+15555550100',
+  }),
+);
+
+test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  const key = 'pb_test_ZeSUWIlEteLWZByDjLITUL';
-
-  await context.grantPermissions(['camera']);
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
   await page.goto(
-    `/e2e?ob_key=${key}&flow=${flowId}&user_data=${encodeURIComponent(
-      JSON.stringify({
-        'id.email': 'piip@onefootprint.com',
-        'id.phoneNumber': '+15555550100',
-      }),
-    )}`,
+    `/components/verify?ob_key=${key}&app_url=${appUrl}&user_data=${userData}&f=${flowId}`,
   );
   await page.waitForLoadState();
 
-  await waitForVerifyButton({ page });
-
-  await page.getByRole('button', { name: 'Verify with Footprint' }).click();
+  await verifyAppIframeClick(page, isMobile);
   await page.waitForLoadState();
+});
 
+test('reverse-doc #ci', async ({ browser, isMobile, page }) => {
+  test.slow(); // ~16.0s
+  test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
+  const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
+  const context = await browser.newContext({ permissions: ['camera'] });
+
+  await context.grantPermissions(['camera']);
+
+  await expect(
+    page
+      .frameLocator('iframe[name^="footprint-iframe-"]')
+      .getByText(/Sandbox Mode/i),
+  ).toBeVisible({ timeout });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-  await selectOutcomeOptional({ frame }, 'Success');
-  await clickOnContinue({ frame });
+  await selectOutcomeOptional(frame, 'Success');
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });
@@ -57,13 +67,16 @@ test('reverse-doc #ci', async ({ browserName, browser, page, isMobile }) => {
   }
 
   await page.waitForLoadState();
-  await continueOnDesktop({ frame });
+  await expect(frame.getByText(/Continue on your mobile phone/i)).toBeVisible({
+    timeout,
+  });
+  await continueOnDesktop(frame);
   await page.waitForLoadState();
 
   const scanText = frame.getByText(/scan or upload/i).first();
   await scanText.waitFor({ state: 'attached', timeout: 3000 });
 
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await frame
@@ -71,7 +84,7 @@ test('reverse-doc #ci', async ({ browserName, browser, page, isMobile }) => {
     .first()
     .scrollIntoViewIfNeeded();
 
-  await clickOnAgree({ frame });
+  await clickOnAgree(frame);
   await page.waitForLoadState();
 
   await uploadImage(
@@ -79,7 +92,7 @@ test('reverse-doc #ci', async ({ browserName, browser, page, isMobile }) => {
     /Choose file to upload/i,
     'driver-front.png',
   );
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await uploadImage(
@@ -87,39 +100,6 @@ test('reverse-doc #ci', async ({ browserName, browser, page, isMobile }) => {
     /Choose file to upload/i,
     'driver-back.png',
   );
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   expect(1).toBe(1);
-
-  // TODO: add back in when we figure out the playwright camera error
-  // await clickOnTakePhoto({ frame });
-  // await page.waitForLoadState();
-  // await clickOnConfirm({ frame });
-  // await page.waitForLoadState();
-  // await clickOnContinue({ frame });
-  // await page.waitForLoadState();
-
-  // await fillSSN({ frame }, { ssn: '418437970' });
-  // await clickOnContinue({ frame });
-  // await page.waitForLoadState();
-
-  // await confirmData(
-  //   { frame },
-  //   {
-  //     firstName: 'Piip',
-  //     lastName: 'Penguin',
-  //     dob: '10/16/1986',
-  //     addressLine1: '567 Hayes St',
-  //     city: 'San Francisco',
-  //     state: 'CA',
-  //     zipCode: '94102',
-  //     country: 'US',
-  //     ssn: '418437970',
-  //   },
-  // );
-
-  // await clickOnContinue({ frame });
-  // await page.waitForLoadState();
-
-  // await expect(page.getByTestId('result').first()).toContainText('_');
-  // await context.close();
 });

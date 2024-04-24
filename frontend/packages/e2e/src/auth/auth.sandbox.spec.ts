@@ -24,9 +24,9 @@ test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
     .first()
     .click();
 
-  const $sandBoxEdit = page.frameLocator(iframeSelector).getByLabel('Edit');
-  await expect($sandBoxEdit).toBeAttached();
-  await $sandBoxEdit.first().click();
+  const sandBoxEdit = page.frameLocator(iframeSelector).getByLabel('Edit');
+  await expect(sandBoxEdit).toBeAttached();
+  await sandBoxEdit.first().click();
 
   await page
     .frameLocator(iframeSelector)
@@ -34,10 +34,10 @@ test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
     .fill('aoy4lrqr9oqKb');
   await page.frameLocator(iframeSelector).getByLabel('Save').first().click();
 
-  const $email = page.frameLocator(iframeSelector).getByLabel(/email/i);
-  await $email.waitFor({ state: 'attached', timeout });
-  await expect($email).toBeAttached();
-  await $email.first().fill(email);
+  const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
+  await emailEl.waitFor({ state: 'attached', timeout });
+  await expect(emailEl).toBeAttached();
+  await emailEl.first().fill(email);
 
   await page
     .frameLocator(iframeSelector)

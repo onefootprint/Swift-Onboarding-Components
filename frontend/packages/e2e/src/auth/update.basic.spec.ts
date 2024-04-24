@@ -4,8 +4,7 @@ import { verifyEmail } from '../verify/utils/commands';
 
 const iframeSelector = 'iframe[name^="footprint-iframe-"]';
 const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
-const uToken =
-  process.env.E2E_UPDATE_UTOKEN || 'utok_utPB4ICs55aCJyviDRBpS6FZcAFjxtnisp';
+const uToken = process.env.E2E_UPDATE_UTOKEN || '';
 
 const email = 'sandbox@onefootprint.com';
 
@@ -36,11 +35,11 @@ test('Update auth methods by providing email #ci #debug', async ({
     .first()
     .click();
 
-  const $loginDesc = page
+  const loginDesc = page
     .frameLocator(iframeSelector)
     .getByText('Log in to modify your account details.');
-  await $loginDesc.waitFor(attached);
-  await expect($loginDesc.first()).toBeAttached();
+  await loginDesc.waitFor(attached);
+  await expect(loginDesc.first()).toBeAttached();
 
   await page
     .frameLocator(iframeSelector)
@@ -48,7 +47,6 @@ test('Update auth methods by providing email #ci #debug', async ({
     .filter({ hasText: 'Send code to s••••••@o' })
     .first()
     .click();
-
   await page
     .frameLocator(iframeSelector)
     .getByRole('button')
@@ -60,9 +58,9 @@ test('Update auth methods by providing email #ci #debug', async ({
   await verifyEmail({ frame: page.frameLocator(iframeSelector), page });
   await page.waitForLoadState();
 
-  const $emailEntryText = page.frameLocator(iframeSelector).getByText(email);
-  await $emailEntryText.waitFor(attached);
-  await expect($emailEntryText.first()).toBeAttached();
+  const emailEntryText = page.frameLocator(iframeSelector).getByText(email);
+  await emailEntryText.waitFor(attached);
+  await expect(emailEntryText.first()).toBeAttached();
 
   await page
     .frameLocator(iframeSelector)
@@ -71,9 +69,9 @@ test('Update auth methods by providing email #ci #debug', async ({
     .click();
   await page.waitForLoadState();
 
-  const $email = page.frameLocator(iframeSelector).getByLabel(/email/i);
-  await $email.waitFor(attached);
-  await $email.first().fill(email);
+  const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
+  await emailEl.waitFor(attached);
+  await emailEl.first().fill(email);
 
   await page
     .frameLocator(iframeSelector)
@@ -86,9 +84,9 @@ test('Update auth methods by providing email #ci #debug', async ({
   await verifyEmail({ frame: page.frameLocator(iframeSelector), page });
   await page.waitForLoadState();
 
-  const $finish = page
+  const finish = page
     .frameLocator(iframeSelector)
     .getByRole('button', { name: 'Finish' });
-  await $finish.waitFor(attached);
-  await expect($finish.first()).toBeAttached();
+  await finish.waitFor(attached);
+  await expect(finish.first()).toBeAttached();
 });

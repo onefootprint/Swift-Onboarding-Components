@@ -11,8 +11,12 @@ import {
   selectOutcomeOptional,
   continueOnDesktop,
   verifyPhoneNumber,
-  waitForVerifyButton,
+  verifyAppIframeClick,
 } from './utils/commands';
+
+const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
+const key = process.env.E2E_OB_KYC_ES || 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
+const locale = 'es-MX';
 
 const firstName = 'Jorge';
 const lastName = 'Mejia';
@@ -23,32 +27,37 @@ const addressLine1 = '432 3rd Ave';
 const city = 'Seward';
 const zipCode = '99664';
 
-test('E2E.es-MX.KYC.Docs #ci', async ({ browserName, isMobile, page }) => {
-  // eslint-disable-next-line playwright/no-conditional-in-test
-  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
-
-  test.setTimeout(120000);
+test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  const key = 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
-  const locale = 'es-MX';
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/e2e?ob_key=${key}&locale=${locale}&flow=${flowId}`);
+  await page.goto(
+    `/components/verify?ob_key=${key}&locale=${locale}&app_url=${appUrl}&f=${flowId}`,
+  );
   await page.waitForLoadState();
 
-  await waitForVerifyButton({ page });
-
-  await page.getByRole('button', { name: 'Verify with Footprint' }).click();
+  await verifyAppIframeClick(page, isMobile);
   await page.waitForLoadState();
+});
 
+test('E2E.es-MX.KYC.Docs #ci', async ({ isMobile, page }) => {
+  test.slow();
+  test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
+  const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
+
+  await expect(
+    page
+      .frameLocator('iframe[name^="footprint-iframe-"]')
+      .getByText(/Sandbox Mode/i),
+  ).toBeVisible({ timeout });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-  await selectOutcomeOptional({ frame }, 'Success');
-  await clickOnContinue({ frame });
+  await selectOutcomeOptional(frame, 'Success');
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillEmail({ frame }, { email });
-  await clickOnContinue({ frame });
+  await fillEmail(frame, email);
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await frame.getByRole('button').filter({ hasText: '+52' }).first().click();
@@ -58,37 +67,34 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ browserName, isMobile, page }) => {
   await page.keyboard.press('t');
   await page.keyboard.press('Enter');
 
-  await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnVerifyWithSms({ frame });
+  await fillPhoneNumber(frame, phoneNumber);
+  await clickOnVerifyWithSms(frame);
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
-  await fillNameAndDoB({ frame }, { firstName, lastName, dob });
-  await clickOnContinue({ frame });
+  await fillNameAndDoB(frame, { firstName, lastName, dob });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await fillAddress({ frame, page }, { addressLine1, city, zipCode });
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await confirmData(
-    { frame },
-    {
-      firstName,
-      lastName,
-      dob,
-      addressLine1,
-      city,
-      state: 'AL',
-      zipCode,
-      country: 'US',
-    },
-  );
-  await clickOnContinue({ frame });
+  await confirmData(frame, {
+    firstName,
+    lastName,
+    dob,
+    addressLine1,
+    city,
+    state: 'AL',
+    zipCode,
+    country: 'US',
+  });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
-  await continueOnDesktop({ frame });
+  await continueOnDesktop(frame);
   await page.waitForLoadState();
   await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
 });

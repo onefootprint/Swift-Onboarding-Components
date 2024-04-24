@@ -87,18 +87,18 @@ for (const { format, urlFragment, hasUserData } of SdkUrls) {
 
     await page.waitForLoadState();
 
-    await selectOutcomeOptional({ frame: page }, 'Success');
-    await clickOnContinue({ frame: page });
+    await selectOutcomeOptional(page, 'Success');
+    await clickOnContinue(page);
     await page.waitForLoadState();
 
     /* eslint-disable-next-line playwright/no-conditional-in-test*/
     if (!hasUserData) {
-      await fillEmail({ frame: page }, { email: testUserData['id.email'] });
-      await clickOnContinue({ frame: page });
+      await fillEmail(page, testUserData['id.email']);
+      await clickOnContinue(page);
       await page.waitForLoadState();
 
-      await fillPhoneNumber({ frame: page }, { phoneNumber: '5555550100' });
-      await clickOnVerifyWithSms({ frame: page });
+      await fillPhoneNumber(page, '5555550100');
+      await clickOnVerifyWithSms(page);
       await page.waitForLoadState();
     }
 
@@ -107,21 +107,18 @@ for (const { format, urlFragment, hasUserData } of SdkUrls) {
 
     /* eslint-disable-next-line playwright/no-conditional-in-test*/
     if (hasUserData) {
-      await confirmData(
-        { frame: page },
-        {
-          firstName: testUserData['id.first_name'],
-          lastName: testUserData['id.last_name'],
-          dob: testUserData['id.dob'],
-          addressLine1: testUserData['id.address_line1'],
-          addressLine2: testUserData['id.address_line2'],
-          city: testUserData['id.city'],
-          state: 'AL',
-          country: testUserData['id.country'],
-          zipCode: testUserData['id.zip'],
-          ssn: testUserData['id.ssn9'],
-        },
-      );
+      await confirmData(page, {
+        firstName: testUserData['id.first_name'],
+        lastName: testUserData['id.last_name'],
+        dob: testUserData['id.dob'],
+        addressLine1: testUserData['id.address_line1'],
+        addressLine2: testUserData['id.address_line2'],
+        city: testUserData['id.city'],
+        state: 'AL',
+        country: testUserData['id.country'],
+        zipCode: testUserData['id.zip'],
+        ssn: testUserData['id.ssn9'],
+      });
     }
 
     expect(1).toBe(1);

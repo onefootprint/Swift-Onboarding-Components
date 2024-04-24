@@ -134,7 +134,7 @@ export const decryptData = async ({
 
 export const saveFormViaRef = async ({ page }: { page: Page }) => {
   const requestPromise = page.waitForRequest('**/users/vault');
-  await clickOn(/custom save via ref/i, { frame: page });
+  await clickOn(/custom save via ref/i, page);
 
   const req = await requestPromise;
   const res = await req.response();
@@ -149,7 +149,7 @@ export const saveForm = async ({
   page: Page;
 }) => {
   const requestPromise = page.waitForRequest('**/users/vault');
-  await clickOnSave({ frame });
+  await clickOnSave(frame);
   const req = await requestPromise;
   const res = await req.response();
   expect(res?.status()).toBe(200);
@@ -180,5 +180,5 @@ export const initializeForm = async ({
   await page.getByLabel('Name').first().click();
   await page.getByLabel('Partial address').first().click();
 
-  await clickOnContinue({ frame: page });
+  await clickOnContinue(page);
 };

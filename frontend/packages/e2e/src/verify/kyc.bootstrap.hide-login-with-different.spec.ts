@@ -3,44 +3,52 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   selectOutcomeOptional,
-  waitForVerifyButton,
+  verifyAppIframeClick,
 } from './utils/commands';
 
-test('E2E.Bootstrap #ci', async ({ browserName, page, isMobile }) => {
-  // eslint-disable-next-line playwright/no-conditional-in-test
-  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
+const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
+const key =
+  process.env.E2E_OB_KYC ||
+  process.env.NEXT_PUBLIC_E2E_TENANT_PK ||
+  'ob_test_Gw8TsnS2xWOYazI0pugdxu';
 
-  test.setTimeout(120000);
-  const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  const key = 'ob_test_Twvblr3NUeDzPuFteI1OCh';
-
-  await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  const bootstrapData = {
+const userData = encodeURIComponent(
+  JSON.stringify({
     'id.email': 'piip@onefootprint.com',
     'id.phone_number': '+15555550100',
-  };
+  }),
+);
+
+test.beforeEach(async ({ browserName, isMobile, page }) => {
+  const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
+
+  await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
   await page.goto(
-    `/e2e?ob_key=${key}&flow=${flowId}&user_data=${encodeURIComponent(
-      JSON.stringify(bootstrapData),
-    )}`,
+    `/components/verify?ob_key=${key}&app_url=${appUrl}&user_data=${userData}&f=${flowId}`,
   );
   await page.waitForLoadState();
 
-  await waitForVerifyButton({ page });
-
-  await page.getByRole('button', { name: 'Verify with Footprint' }).click();
+  await verifyAppIframeClick(page, isMobile);
   await page.waitForLoadState();
+});
 
+test('Bootstrap hide login with different #ci', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
+  const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
+
+  await expect(
+    page
+      .frameLocator('iframe[name^="footprint-iframe-"]')
+      .getByText(/Sandbox Mode/i),
+  ).toBeVisible({ timeout });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-  await selectOutcomeOptional({ frame }, 'Success');
-  await clickOnContinue({ frame });
+  await selectOutcomeOptional(frame, 'Success');
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   // Check that "Log in with a different account" is not visible
   await expect(
     frame.getByText('Log in with a different account'),
   ).not.toBeAttached();
-
-  return expect(1).toBe(1);
 });

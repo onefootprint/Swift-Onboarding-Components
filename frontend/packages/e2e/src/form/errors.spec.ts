@@ -32,7 +32,7 @@ test.describe('/components/form', () => {
     const frame = await waitForFormLoad({ page });
 
     // If the form is not filled, user shouldn't be able to save it
-    await clickOn(/custom save via ref/i, { frame: page });
+    await clickOn(/custom save via ref/i, page);
     const errorToastTitle = page.getByText('Error').first();
     await errorToastTitle.waitFor({ state: 'attached', timeout: 1000 });
     const errorToastDescription = page
@@ -65,7 +65,7 @@ test.describe('/components/form', () => {
         country: 'US',
       },
     });
-    await clickOn(/custom save via ref/i, { frame: page });
+    await clickOn(/custom save via ref/i, page);
 
     // Filling the name should remove the previous error
     const isNameEmptyVisible = await nameEmpty.isVisible();

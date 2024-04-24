@@ -54,8 +54,8 @@ test.describe('/components/form', () => {
     });
 
     // Cancel the form if not already cancelled
-    await clickOnCancel({ frame });
-    await clickOnYes({ frame });
+    await clickOnCancel(frame);
+    await clickOnYes(frame);
     const cancelToast = page.getByText('User canceled form').first();
     await cancelToast.waitFor({ state: 'attached', timeout: 3000 });
 

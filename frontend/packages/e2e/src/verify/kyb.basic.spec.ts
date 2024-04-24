@@ -12,10 +12,13 @@ import {
   fillPhoneNumber,
   selectOutcomeOptional,
   verifyPhoneNumber,
-  waitForVerifyButton,
   clickOnVerifyWithSms,
   doTransferFromDesktop,
+  verifyAppIframeClick,
 } from './utils/commands';
+
+const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
+const key = process.env.E2E_OB_KYB || 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg';
 
 const firstName = 'Jane';
 const lastName = 'Doe';
@@ -35,35 +38,41 @@ const beneficialOwner1Phone = '6178408644';
 const businessName = 'Business name';
 const businessNameOptional = 'Optional name';
 
-test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
-  // eslint-disable-next-line playwright/no-conditional-in-test
-  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
-
-  test.setTimeout(120000);
+test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  const key = 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg';
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/e2e?ob_key=${key}&flow=${flowId}`);
+  await page.goto(
+    `/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`,
+  );
   await page.waitForLoadState();
 
-  await waitForVerifyButton({ page });
-
-  await page.getByRole('button', { name: 'Verify with Footprint' }).click();
+  await verifyAppIframeClick(page, isMobile);
   await page.waitForLoadState();
+});
 
+test('KYB verification #ci', async ({ browser, page, isMobile }) => {
+  test.slow(); // ~48.9s
+  test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
+  const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
+
+  await expect(
+    page
+      .frameLocator('iframe[name^="footprint-iframe-"]')
+      .getByText(/Sandbox Mode/i),
+  ).toBeVisible({ timeout });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-  await selectOutcomeOptional({ frame }, 'Success');
-  await clickOnContinue({ frame });
+  await selectOutcomeOptional(frame, 'Success');
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillEmail({ frame }, { email });
-  await clickOnContinue({ frame });
+  await fillEmail(frame, email);
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnVerifyWithSms({ frame });
+  await fillPhoneNumber(frame, phoneNumber);
+  await clickOnVerifyWithSms(frame);
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });
@@ -71,48 +80,40 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
 
   const letsKYB = frame.getByText("Let's get to know your business!").first();
   await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillBasicDataKYB(
-    { frame },
-    {
-      businessName,
-      businessNameOptional,
-      userTIN,
-    },
-  );
-  await clickOnContinue({ frame });
+  await fillBasicDataKYB(frame, {
+    businessName,
+    businessNameOptional,
+    userTIN,
+  });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await fillAddressKYB({ frame, page }, { addressLine1, city, zipCode });
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillBeneficialOwners(
-    { frame },
-    {
-      beneficialOwner1Email,
-      beneficialOwner1LastName,
-      beneficialOwner1Name,
-      beneficialOwner1Phone,
-      userFirstName: firstName,
-      userLastName: lastName,
-    },
-  );
-  await clickOnContinue({ frame });
+  await fillBeneficialOwners(frame, {
+    beneficialOwner1Email,
+    beneficialOwner1LastName,
+    beneficialOwner1Name,
+    beneficialOwner1Phone,
+    userFirstName: firstName,
+    userLastName: lastName,
+  });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  // #region Confirm your business data
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2
     .waitFor({ state: 'attached', timeout: 3000 })
     .catch(() => false);
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
   // #endregion
 
-  // #region Basic data
   const basicH2 = frame.getByText('Basic data').first();
   await basicH2
     .waitFor({ state: 'attached', timeout: 3000 })
@@ -122,33 +123,30 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
   await dobField.waitFor({ state: 'attached', timeout: 3000 });
   await dobField.fill(dob, { timeout: 200 });
 
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
   // #endregion
 
   await fillAddress({ frame, page }, { addressLine1, city, zipCode });
-  await clickOnContinue({ frame });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillSSN({ frame }, { ssn });
-  await clickOnContinue({ frame });
+  await fillSSN(frame, { ssn });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await confirmData(
-    { frame },
-    {
-      firstName,
-      lastName,
-      dob,
-      addressLine1,
-      city,
-      state: 'AL',
-      zipCode,
-      country: 'US',
-      ssn,
-    },
-  );
-  await clickOnContinue({ frame });
+  await confirmData(frame, {
+    firstName,
+    lastName,
+    dob,
+    addressLine1,
+    city,
+    state: 'AL',
+    zipCode,
+    country: 'US',
+    ssn,
+  });
+  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await doTransferFromDesktop({

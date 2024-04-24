@@ -22,6 +22,23 @@ const zipCode = '94105';
 const country = 'US';
 const ssn9 = '123412345';
 
+const bootstrapData = {
+  'id.email': email,
+  'id.phone_number': phoneNumber,
+  'id.first_name': firstName,
+  'id.last_name': lastName,
+  'id.dob': dob,
+  'id.address_line1': addressLine1,
+  'id.address_line2': addressLine2,
+  'id.city': city,
+  'id.state': state,
+  'id.zip': zipCode,
+  'id.country': country,
+  'id.ssn9': ssn9,
+};
+
+const userData = encodeURIComponent(JSON.stringify(bootstrapData));
+
 const Sdks = [
   {
     version: '3.2.0',
@@ -53,25 +70,9 @@ for (const { version, baseUrl } of Sdks) {
 
     await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
     const publicKey = 'pb_test_kZerd69hBocbsmHqAuYBE1';
-    const bootstrapData = {
-      'id.email': email,
-      'id.phone_number': phoneNumber,
-      'id.first_name': firstName,
-      'id.last_name': lastName,
-      'id.dob': dob,
-      'id.address_line1': addressLine1,
-      'id.address_line2': addressLine2,
-      'id.city': city,
-      'id.state': state,
-      'id.zip': zipCode,
-      'id.country': country,
-      'id.ssn9': ssn9,
-    };
 
     await page.goto(
-      `${baseUrl}/?ob_key=${publicKey}&user_data=${encodeURIComponent(
-        JSON.stringify(bootstrapData),
-      )}&flow=${flowId}`,
+      `${baseUrl}/?ob_key=${publicKey}&user_data=${userData}&flow=${flowId}`,
     );
 
     await page.waitForLoadState();
@@ -82,33 +83,35 @@ for (const { version, baseUrl } of Sdks) {
 
     await page.waitForLoadState();
 
+    await expect(
+      page
+        .frameLocator('iframe[name^="footprint-iframe-"]')
+        .getByText(/Sandbox Mode/i),
+    ).toBeVisible({ timeout: 40000 });
     const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-    await selectOutcomeOptional({ frame }, 'Success');
-    await clickOnContinue({ frame });
+    await selectOutcomeOptional(frame, 'Success');
+    await clickOnContinue(frame);
     await page.waitForLoadState();
 
     await verifyPhoneNumber({ frame, page });
 
     await page.waitForLoadState();
 
-    await confirmData(
-      { frame },
-      {
-        firstName,
-        lastName,
-        dob,
-        addressLine1,
-        addressLine2,
-        city,
-        state: 'AL',
-        country,
-        zipCode,
-        ssn: ssn9,
-      },
-    );
+    await confirmData(frame, {
+      firstName,
+      lastName,
+      dob,
+      addressLine1,
+      addressLine2,
+      city,
+      state: 'AL',
+      country,
+      zipCode,
+      ssn: ssn9,
+    });
 
-    await clickOnContinue({ frame });
+    await clickOnContinue(frame);
     await page.waitForLoadState();
 
     if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {

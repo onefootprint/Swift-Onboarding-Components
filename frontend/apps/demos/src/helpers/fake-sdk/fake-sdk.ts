@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   appendLoadingElements,
   appendOverlayContainer,
@@ -70,7 +71,7 @@ const fakeSdk = (() => ({
     const uId = getUniqueId();
     let parentApi: ParentApi | null = null;
 
-    const destroy = () => {
+    const destroy = (x?: unknown) => {
       removeOverlayAndLoading(uId);
       if (parentApi) {
         parentApi.destroy();
@@ -104,18 +105,21 @@ const fakeSdk = (() => ({
           url,
           props.authToken,
         ).then(api => {
-          api.on('canceled', () /** @ts-ignore */ => {
-            props?.onCancel();
-            destroy();
-          });
-          api.on('closed', () /** @ts-ignore */ => {
-            props?.onClose();
-            destroy();
-          });
-          api.on('completed', (x) /** @ts-ignore */ => {
-            props?.onComplete(x);
-            destroy();
-          });
+          const on = (event: string, callback?: (x?: unknown) => void) =>
+            api.on(event, x => destroy(callback?.(x)));
+
+          /** @ts-ignore */
+          api.on(`${uId}:auth`, props?.onAuth); /** @ts-ignore */
+
+          on(`${uId}:canceled`, props?.onCancel); /** @ts-ignore */
+          on('canceled', props?.onCancel); /** @ts-ignore */
+
+          on(`${uId}:closed`, props?.onClose); /** @ts-ignore */
+          on('closed', props?.onClose); /** @ts-ignore */
+
+          on(`${uId}:completed`, props?.onComplete); /** @ts-ignore */
+          on('completed', props?.onComplete);
+
           return api;
         });
 
