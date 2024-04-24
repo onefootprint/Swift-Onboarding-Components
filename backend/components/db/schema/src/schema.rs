@@ -660,6 +660,7 @@ diesel::table! {
         review_reasons -> Array<Nullable<Text>>,
         workflow_id -> Text,
         scoped_vault_id -> Text,
+        kind -> Nullable<Text>,
     }
 }
 

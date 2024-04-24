@@ -234,6 +234,7 @@ pub async fn make_vendor_requests(
     Ok(partition_vendor_errors(results))
 }
 
+// TODO can we remove this proxy method?
 /// Create and save an onboarding decision
 #[allow(clippy::too_many_arguments)]
 pub fn save_onboarding_decision(

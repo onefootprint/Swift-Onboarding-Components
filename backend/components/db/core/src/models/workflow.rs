@@ -603,7 +603,7 @@ impl Workflow {
         // Make the new OnboardingDecision if any
         if let Some(decision) = update.decision {
             let actor = decision.actor.clone();
-            let create_manual_review_reasons = decision.create_manual_review_reasons.clone();
+            let create_manual_review_reasons = decision.create_manual_review.clone();
             let decision = OnboardingDecision::create(conn, &result, decision)?;
             //
             // NOTE

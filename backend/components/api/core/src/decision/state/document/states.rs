@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use db::models::{
     data_lifetime::DataLifetime,
     document_request::{DocumentRequest, NewDocumentRequestArgs},
+    manual_review::NewManualReviewArgs,
     ob_configuration::ObConfiguration,
     onboarding_decision::NewDecisionArgs,
     scoped_vault::ScopedVault,
@@ -16,8 +17,8 @@ use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
     DbActor, DecisionStatus, DocumentConfig, DocumentRequestConfig, DocumentRequestKind, Locked,
-    OnboardingStatus, ReviewReason, RuleAction, RuleSetResultKind, ScopedVaultId, StepUpInfo, TenantId,
-    WorkflowConfig, WorkflowId,
+    ManualReviewKind, OnboardingStatus, ReviewReason, RuleAction, RuleSetResultKind, ScopedVaultId,
+    StepUpInfo, TenantId, WorkflowConfig, WorkflowId,
 };
 
 use super::{DocumentState, MakeDecision};
@@ -182,6 +183,10 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             // don't verify them, we need a human to manually review them.
             // We'll create a manual review without evaluating rules
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
+            let manual_review = NewManualReviewArgs {
+                kind: ManualReviewKind::DocumentNeedsReview,
+                review_reasons,
+            };
             let decision = NewDecisionArgs {
                 vault_id: sv.vault_id.clone(),
                 logic_git_hash: crate::GIT_HASH.to_string(),
@@ -190,7 +195,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 annotation_id: None,
                 actor: DbActor::Footprint,
                 seqno: Some(current_seqno),
-                create_manual_review_reasons: Some(review_reasons),
+                create_manual_review: Some(manual_review),
                 rule_set_result_id: None,
             };
             let update = DbWorkflowUpdate::set_decision(&wf, decision);

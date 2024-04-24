@@ -1,7 +1,11 @@
-use newtypes::{DbActor, ReviewReason, RuleSetResultId, VerificationResultId, WorkflowId, WorkflowSource};
+use newtypes::{
+    DbActor, ManualReviewKind, ReviewReason, RuleSetResultId, VerificationResultId, WorkflowId,
+    WorkflowSource,
+};
 
 use db::{
     models::{
+        manual_review::NewManualReviewArgs,
         ob_configuration::ObConfiguration,
         onboarding_decision::NewDecisionArgs,
         scoped_vault::ScopedVault,
@@ -52,6 +56,10 @@ pub fn save_final_decision(
         None
     };
 
+    let manual_review = decision.create_manual_review.then_some(NewManualReviewArgs {
+        kind: ManualReviewKind::RuleTriggered,
+        review_reasons,
+    });
     let decision = NewDecisionArgs {
         vault_id: scoped_user.vault_id,
         logic_git_hash: crate::GIT_HASH.to_string(),
@@ -60,7 +68,7 @@ pub fn save_final_decision(
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno,
-        create_manual_review_reasons: decision.create_manual_review.then_some(review_reasons),
+        create_manual_review: manual_review,
         rule_set_result_id: rule_set_result_id.cloned(),
     };
 

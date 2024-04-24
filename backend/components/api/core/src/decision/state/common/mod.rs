@@ -250,6 +250,7 @@ pub fn evaluate_rules(
     )
 }
 
+// TODO can we remove this proxy method?
 #[tracing::instrument(skip(conn))]
 #[allow(clippy::too_many_arguments)]
 pub fn save_kyc_decision(

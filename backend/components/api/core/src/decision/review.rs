@@ -42,7 +42,8 @@ pub fn save_review_decision(
         annotation_id: Some(annotation.0.id),
         actor: DbActor::from(actor),
         seqno: None,
-        create_manual_review_reasons: None,
+        // TODO when saving new decision, should we clear all ManualReviewKinds?
+        create_manual_review: None,
         rule_set_result_id: None,
     };
 

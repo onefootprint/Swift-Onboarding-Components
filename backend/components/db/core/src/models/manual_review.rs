@@ -2,12 +2,13 @@ use crate::{DbError, DbResult, NonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{manual_review, onboarding_decision};
 use diesel::{dsl::not, prelude::*};
-use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, ReviewReason, ScopedVaultId, WorkflowId};
-use serde::{Deserialize, Serialize};
+use newtypes::{
+    DbActor, ManualReviewId, ManualReviewKind, OnboardingDecisionId, ReviewReason, ScopedVaultId, WorkflowId,
+};
 
 use super::onboarding_decision::OnboardingDecision;
 
-#[derive(Debug, Clone, Queryable, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Queryable, Default)]
 #[diesel(table_name = manual_review)]
 pub struct ManualReview {
     pub id: ManualReviewId,
@@ -25,18 +26,26 @@ pub struct ManualReview {
     pub review_reasons: Vec<ReviewReason>,
     pub workflow_id: WorkflowId,
     pub scoped_vault_id: ScopedVaultId,
+    pub kind: Option<ManualReviewKind>,
 }
 
-#[derive(Debug, Clone, Insertable, Default)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = manual_review)]
 struct NewManualReview {
     timestamp: DateTime<Utc>,
     review_reasons: Vec<ReviewReason>,
     workflow_id: WorkflowId,
     scoped_vault_id: ScopedVaultId,
+    kind: ManualReviewKind,
 }
 
-#[derive(Debug, AsChangeset, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+pub struct NewManualReviewArgs {
+    pub kind: ManualReviewKind,
+    pub review_reasons: Vec<ReviewReason>,
+}
+
+#[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = manual_review)]
 struct ManualReviewUpdate {
     completed_at: Option<Option<DateTime<Utc>>>,
@@ -48,10 +57,11 @@ impl ManualReview {
     #[tracing::instrument("ManualReview::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
-        review_reasons: Vec<ReviewReason>,
+        args: NewManualReviewArgs,
         workflow_id: WorkflowId,
         scoped_vault_id: ScopedVaultId,
     ) -> DbResult<Self> {
+        let NewManualReviewArgs { kind, review_reasons } = args;
         // NOTE: We have a uniqueness constraint that won't allow us to create multiple active
         // ManualReview rows for one onboarding.
         let new = NewManualReview {
@@ -59,6 +69,7 @@ impl ManualReview {
             review_reasons,
             workflow_id,
             scoped_vault_id,
+            kind,
         };
         let result = diesel::insert_into(manual_review::table)
             .values(new)

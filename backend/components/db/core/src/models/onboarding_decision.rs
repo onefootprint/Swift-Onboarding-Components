@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use super::{manual_review::ManualReview, ob_configuration::ObConfiguration, user_timeline::UserTimeline};
+use super::{
+    manual_review::{ManualReview, NewManualReviewArgs},
+    ob_configuration::ObConfiguration,
+    user_timeline::UserTimeline,
+};
 use crate::{actor, actor::SaturatedActor, models::workflow::Workflow, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
@@ -10,8 +14,8 @@ use db_schema::schema::{
 use diesel::{dsl::not, prelude::*, Insertable, Queryable};
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, FpId, OnboardingDecisionId,
-    OnboardingDecisionInfo, ReviewReason, RuleSetResultId, ScopedVaultId, TenantId, VaultId,
-    VerificationResultId, WorkflowId,
+    OnboardingDecisionInfo, RuleSetResultId, ScopedVaultId, TenantId, VaultId, VerificationResultId,
+    WorkflowId,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -61,8 +65,8 @@ pub struct NewDecisionArgs {
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
     pub seqno: Option<DataLifetimeSeqno>,
-    /// When non-null, create a manual review with the provided reasons
-    pub create_manual_review_reasons: Option<Vec<ReviewReason>>,
+    /// When non-null, create a manual review with the provided kind
+    pub create_manual_review: Option<NewManualReviewArgs>,
     pub rule_set_result_id: Option<RuleSetResultId>,
 }
 

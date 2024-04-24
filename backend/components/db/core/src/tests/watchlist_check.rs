@@ -247,7 +247,7 @@ fn make_vault(
                 annotation_id: None,
                 actor: DbActor::Footprint,
                 seqno: None,
-                create_manual_review_reasons: None,
+                create_manual_review: None,
                 rule_set_result_id: None,
             };
             let wf = Workflow::lock(conn, &wf.id).unwrap();
