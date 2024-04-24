@@ -1,5 +1,5 @@
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentSide, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId, WorkflowId
+    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentReviewStatus, DocumentSide, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId, WorkflowId
 };
 
 use crate::{
@@ -388,8 +388,8 @@ pub async fn complete_non_identity_document(
                 vaulted_document_type: Some(dk),
                 curp_completed_seqno: None,
                 validated_country_code: None,
-                // These non-ID docs weren't reviewed at all
-                review_status: None,
+                // Non-ID docs need to be reviewed by a human - put them into a review required state
+                review_status: Some(DocumentReviewStatus::PendingHumanReview),
             };
             IdentityDocument::update(conn, &id_doc_id, update)?;
 

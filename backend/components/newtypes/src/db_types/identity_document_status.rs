@@ -47,8 +47,15 @@ impl IdentityDocumentStatus {
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DocumentReviewStatus {
+    /// The document has been created and a human or machine review has not occured.
     Unreviewed,
+    /// The document is uploaded and we've started the process of verifying the document via a machine
+    PendingMachineReview,
+    /// The document has been automatically processed with a vendor
     ReviewedByMachine,
+    /// The document is uploaded and ready to be reviewed by a human
+    PendingHumanReview,
+    /// The document has been manually reviewed by a human
     ReviewedByHuman,
 }
 

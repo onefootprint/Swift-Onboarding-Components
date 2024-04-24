@@ -20,7 +20,7 @@ use db::{
     DbPool, TxnPgConn,
 };
 use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
-use newtypes::{IdentityDocumentId, IdentityDocumentStatus, VendorAPI};
+use newtypes::{DocumentReviewStatus, IdentityDocumentId, IdentityDocumentStatus, VendorAPI};
 
 /// Add Consent
 pub struct AddConsent {}
@@ -32,6 +32,7 @@ impl AddConsent {
         // It would actually be nice to write the timeline event, vault the docs, etc here but it sounds like the problem is our DI data model requires us to know the doc type and we can't confirm that until the processing part of the flow is complete
         let update = IdentityDocumentUpdate {
             status: Some(IdentityDocumentStatus::Complete),
+            review_status: Some(DocumentReviewStatus::PendingMachineReview),
             ..Default::default()
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
