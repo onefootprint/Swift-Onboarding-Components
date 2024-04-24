@@ -36,7 +36,7 @@ const LoadNeuroId = ({ children, config }: LoadNeuroIdProps) => {
           strategy="afterInteractive"
           onLoad={() => {
             if (config.orgId) {
-              nid.start(config.orgId);
+              nid.setVariable('funnel', config.orgId);
             }
           }}
         />

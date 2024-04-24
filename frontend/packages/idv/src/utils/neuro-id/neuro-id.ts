@@ -6,14 +6,18 @@ declare global {
     nid: {
       (command: 'identify', authToken: string): void;
       (command: 'applicationSubmit'): void;
-      (command: 'start', options: { funnel: string }): void;
+      (
+        command: 'setVariable',
+        variableName: string,
+        variableValue: string,
+      ): void;
     };
   }
 }
 
-const start = (funnel: string) => {
+const setVariable = (variableName: string, variableValue: string) => {
   if (window.nid) {
-    window.nid('start', { funnel });
+    window.nid('setVariable', variableName, variableValue);
   }
 };
 
@@ -43,7 +47,7 @@ const complete = () => {
 };
 
 export default {
-  start,
+  setVariable,
   identify,
   complete,
 };
