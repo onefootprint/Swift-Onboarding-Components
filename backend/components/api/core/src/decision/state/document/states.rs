@@ -3,12 +3,10 @@ use std::{collections::HashMap, sync::Arc};
 use async_trait::async_trait;
 use db::models::{
     data_lifetime::DataLifetime,
-    document_request::{DocumentRequest, NewDocumentRequestArgs},
     manual_review::{ManualReviewAction, ManualReviewArgs},
     ob_configuration::ObConfiguration,
     onboarding_decision::NewDecisionArgs,
     scoped_vault::ScopedVault,
-    user_timeline::UserTimeline,
     vault::Vault,
     workflow::{Workflow as DbWorkflow, WorkflowUpdate as DbWorkflowUpdate},
 };
@@ -16,9 +14,8 @@ use db::models::{
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
-    DbActor, DecisionStatus, DocumentConfig, DocumentRequestConfig, DocumentRequestKind, Locked,
-    ManualReviewKind, OnboardingStatus, ReviewReason, RuleAction, RuleSetResultKind, ScopedVaultId,
-    StepUpInfo, TenantId, WorkflowConfig, WorkflowId,
+    DbActor, DecisionStatus, DocumentConfig, DocumentRequestConfig, Locked, ManualReviewKind,
+    OnboardingStatus, ReviewReason, RuleSetResultKind, ScopedVaultId, TenantId, WorkflowConfig, WorkflowId,
 };
 
 use super::{DocumentState, MakeDecision};
@@ -163,6 +160,8 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     ) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results) = async_res;
 
+        // TODO move this logic to make a DocumentNeedsReview manual review into common::save_decision
+        // so the KYC (and probably KYB) workflow can also use it
         let review_reasons = match &wf.config {
             WorkflowConfig::Document(c) => c
                 .configs
@@ -235,58 +234,17 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 .map(|vr| vr.verification_result_id)
                 .collect();
 
-            match decision.decision_status {
-                DecisionStatus::Fail | DecisionStatus::Pass => {
-                    common::save_kyc_decision(
-                        conn,
-                        &self.sv_id,
-                        &wf,
-                        vres_ids,
-                        decision,
-                        Some(&rule_set_result.id),
-                        vec![],
-                    )?;
-                    Ok(DocumentState::from(DocumentComplete))
-                }
-                DecisionStatus::StepUp => {
-                    let doc_reqs = if let Some(RuleAction::StepUp(kind)) = decision.action {
-                        kind.to_doc_kinds()
-                            .into_iter()
-                            .filter_map(|kind| match kind {
-                                DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
-                                    collect_selfie: true, // TODO: should come from config
-                                }),
-                                DocumentRequestKind::ProofOfAddress => {
-                                    Some(DocumentRequestConfig::ProofOfAddress {})
-                                }
-                                DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
-                                DocumentRequestKind::Custom => None,
-                            })
-                            .map(|config| NewDocumentRequestArgs {
-                                scoped_vault_id: self.sv_id.clone(),
-                                workflow_id: self.wf_id.clone(),
-                                rule_set_result_id: Some(rule_set_result.id.clone()),
-                                config,
-                            })
-                            .collect()
-                    } else {
-                        vec![]
-                    };
-                    let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
-                    let stepup_info = StepUpInfo {
-                        document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
-                    };
-                    UserTimeline::create(conn, stepup_info, v.id.clone(), self.sv_id.clone())?;
+            let decision_status = decision.decision_status;
+            let rsr_id = Some(rule_set_result.id);
+            common::save_decision(conn, wf, v.id, vres_ids, decision, rsr_id, vec![])?;
 
-                    let update = DbWorkflowUpdate::set_status(OnboardingStatus::Incomplete);
-                    DbWorkflow::update(wf, conn, update)?;
-
-                    Ok(DocumentState::from(DocumentDataCollection {
-                        wf_id: self.wf_id,
-                        sv_id: self.sv_id,
-                        t_id: self.t_id,
-                    }))
-                }
+            match decision_status {
+                DecisionStatus::Fail | DecisionStatus::Pass => Ok(DocumentState::from(DocumentComplete)),
+                DecisionStatus::StepUp => Ok(DocumentState::from(DocumentDataCollection {
+                    wf_id: self.wf_id,
+                    sv_id: self.sv_id,
+                    t_id: self.t_id,
+                })),
             }
         }
     }

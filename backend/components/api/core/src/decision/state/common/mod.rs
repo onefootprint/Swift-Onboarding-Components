@@ -4,6 +4,7 @@ use crypto::aead::{AeadSealedBytes, SealingKey};
 use db::{
     models::{
         decision_intent::DecisionIntent,
+        document_request::{DocumentRequest, NewDocumentRequestArgs},
         list_entry::{ListEntry, ListWithDecryptedEntries, ListWithEntries},
         ob_configuration::ObConfiguration,
         risk_signal::NewRiskSignalInfo,
@@ -11,16 +12,18 @@ use db::{
         rule_set_result::RuleSetResult,
         scoped_vault::ScopedVault,
         tenant::Tenant,
-        workflow::Workflow,
+        user_timeline::UserTimeline,
+        workflow::{Workflow, WorkflowUpdate},
     },
     DbPool, DbResult, TxnPgConn,
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::{
-    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ListId, PiiBytes, PiiString,
-    ReviewReason, RuleExpressionCondition, RuleSetResultId, RuleSetResultKind, ScopedVaultId,
-    SealedVaultBytes, TenantId, VaultOperation, VendorAPI, VerificationResultId, WorkflowId,
+    CipKind, DecisionIntentKind, DecisionStatus, DocumentRequestConfig, DocumentRequestKind,
+    FootprintReasonCode, ListId, Locked, OnboardingStatus, PiiBytes, PiiString, ReviewReason, RuleAction,
+    RuleExpressionCondition, RuleSetResultId, RuleSetResultKind, ScopedVaultId, SealedVaultBytes, StepUpInfo,
+    TenantId, VaultId, VaultOperation, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -250,16 +253,75 @@ pub fn evaluate_rules(
     )
 }
 
+#[tracing::instrument(skip(conn))]
+#[allow(clippy::too_many_arguments)]
+pub fn save_decision(
+    conn: &mut TxnPgConn,
+    wf: Locked<Workflow>,
+    v_id: VaultId,
+    vres_ids: Vec<VerificationResultId>,
+    rules_output: Decision,
+    rule_set_result_id: Option<RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
+    review_reasons: Vec<ReviewReason>,
+) -> ApiResult<()> {
+    let sv_id = &wf.scoped_vault_id;
+    match rules_output.decision_status {
+        DecisionStatus::Fail | DecisionStatus::Pass => {
+            save_decision_inner(
+                conn,
+                sv_id,
+                &wf,
+                vres_ids,
+                rules_output,
+                rule_set_result_id,
+                vec![],
+            )?;
+        }
+        DecisionStatus::StepUp => {
+            let doc_reqs = if let Some(RuleAction::StepUp(kind)) = rules_output.action {
+                kind.to_doc_kinds()
+                    .into_iter()
+                    .filter_map(|kind| match kind {
+                        DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
+                            collect_selfie: true, // TODO: should come from config
+                        }),
+                        DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {}),
+                        DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
+                        DocumentRequestKind::Custom => None,
+                    })
+                    .map(|config| NewDocumentRequestArgs {
+                        scoped_vault_id: sv_id.clone(),
+                        workflow_id: wf.id.clone(),
+                        rule_set_result_id: rule_set_result_id.clone(),
+                        config,
+                    })
+                    .collect()
+            } else {
+                vec![]
+            };
+            let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
+            let stepup_info = StepUpInfo {
+                document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
+            };
+            UserTimeline::create(conn, stepup_info, v_id, sv_id.clone())?;
+
+            let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
+            Workflow::update(wf, conn, update)?;
+        }
+    }
+    Ok(())
+}
+
 // TODO can we remove this proxy method?
 #[tracing::instrument(skip(conn))]
 #[allow(clippy::too_many_arguments)]
-pub fn save_kyc_decision(
+pub fn save_decision_inner(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
     workflow: &Workflow,
     verification_result_ids: Vec<VerificationResultId>,
     rules_output: Decision,
-    rule_set_result_id: Option<&RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
+    rule_set_result_id: Option<RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     engine::save_onboarding_decision(

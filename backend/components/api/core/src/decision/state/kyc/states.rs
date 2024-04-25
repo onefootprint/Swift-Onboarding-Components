@@ -3,13 +3,12 @@ use std::{collections::HashMap, sync::Arc};
 use async_trait::async_trait;
 use db::models::{
     data_lifetime::DataLifetime,
-    document_request::{DocumentRequest, NewDocumentRequestArgs},
+    document_request::DocumentRequest,
     list_entry::{ListEntry, ListWithDecryptedEntries},
     ob_configuration::ObConfiguration,
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
     rule_instance::RuleInstance,
-    user_timeline::UserTimeline,
     vault::Vault,
     workflow::{Workflow as DbWorkflow, WorkflowUpdate},
 };
@@ -17,9 +16,8 @@ use db::models::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    DecisionStatus, DocumentRequestConfig, DocumentRequestKind, EnhancedAmlOption, KycConfig, ListId, Locked,
-    OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleSetResultKind, StepUpInfo, VendorAPI,
-    VerificationResultId,
+    DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, ListId, Locked, OnboardingStatus,
+    RiskSignalGroupKind, RuleSetResultKind, VendorAPI, VerificationResultId,
 };
 
 use super::{
@@ -481,59 +479,17 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             decision
         };
 
-        match decision.decision_status {
-            DecisionStatus::Fail | DecisionStatus::Pass => {
-                common::save_kyc_decision(
-                    conn,
-                    &self.sv_id,
-                    &wf,
-                    vres_ids,
-                    decision,
-                    Some(&rule_set_result.id),
-                    review_reasons,
-                )?;
-                Ok(KycState::from(KycComplete))
-            }
-            DecisionStatus::StepUp => {
-                let doc_reqs = if let Some(RuleAction::StepUp(kind)) = decision.action {
-                    kind.to_doc_kinds()
-                        .into_iter()
-                        .filter_map(|kind| match kind {
-                            DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
-                                collect_selfie: true, // TODO: should come from config
-                            }),
-                            DocumentRequestKind::ProofOfAddress => {
-                                Some(DocumentRequestConfig::ProofOfAddress {})
-                            }
-                            DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
-                            // TODO handle custom doc step-ups
-                            DocumentRequestKind::Custom => None,
-                        })
-                        .map(|config| NewDocumentRequestArgs {
-                            scoped_vault_id: self.sv_id.clone(),
-                            workflow_id: self.wf_id.clone(),
-                            rule_set_result_id: Some(rule_set_result.id.clone()),
-                            config,
-                        })
-                        .collect()
-                } else {
-                    vec![]
-                };
-                let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
-                let stepup_info = StepUpInfo {
-                    document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
-                };
-                UserTimeline::create(conn, stepup_info, v.id.clone(), self.sv_id.clone())?;
+        let decision_status = decision.decision_status;
+        let rsr_id = Some(rule_set_result.id);
+        common::save_decision(conn, wf, v.id, vres_ids, decision, rsr_id, review_reasons)?;
 
-                let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
-                DbWorkflow::update(wf, conn, update)?;
-
-                Ok(KycState::from(KycDocCollection {
-                    wf_id: self.wf_id,
-                    sv_id: self.sv_id,
-                    t_id: self.t_id,
-                }))
-            }
+        match decision_status {
+            DecisionStatus::Fail | DecisionStatus::Pass => Ok(KycState::from(KycComplete)),
+            DecisionStatus::StepUp => Ok(KycState::from(KycDocCollection {
+                wf_id: self.wf_id,
+                sv_id: self.sv_id,
+                t_id: self.t_id,
+            })),
         }
     }
 }

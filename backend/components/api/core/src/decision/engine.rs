@@ -241,7 +241,7 @@ pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     workflow: &Workflow,
     final_decision: Decision,
-    rule_set_result_id: Option<&RuleSetResultId>,
+    rule_set_result_id: Option<RuleSetResultId>,
     verification_result_ids: Vec<VerificationResultId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {

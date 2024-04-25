@@ -28,7 +28,7 @@ pub fn save_final_decision(
     wf_id: WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &Decision,
-    rule_set_result_id: Option<&RuleSetResultId>, // TODO: mb just pass in RuleSetResult at this point and then get Decision from that? just need to pull should_commit out of Decision
+    rule_set_result_id: Option<RuleSetResultId>, // TODO: mb just pass in RuleSetResult at this point and then get Decision from that? just need to pull should_commit out of Decision
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     let wf = Workflow::lock(conn, &wf_id)?;
@@ -67,7 +67,7 @@ pub fn save_final_decision(
         actor: DbActor::Footprint,
         seqno,
         manual_reviews,
-        rule_set_result_id: rule_set_result_id.cloned(),
+        rule_set_result_id,
     };
 
     let update = WorkflowUpdate::set_decision(&wf, decision);

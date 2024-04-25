@@ -72,7 +72,7 @@ async fn kyc_bo(state: &mut State, person_wf: &DbWorkflow) {
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            common::save_kyc_decision(
+            common::save_decision_inner(
                 conn,
                 &svid,
                 &wf,

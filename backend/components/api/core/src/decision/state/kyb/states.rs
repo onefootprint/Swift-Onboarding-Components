@@ -468,7 +468,11 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             )
         };
 
-        common::save_kyc_decision(conn, &sv.id, &wf, vres_ids, decision, rsr_id.as_ref(), vec![])?;
+        // TODO should we use common::save_decision as well in order to handle step-ups in KYB?
+        // or no, because this only applies to business entities? then where are we saving the
+        // decision / applying step up for the user entity?
+        // or yes, but it just no-ops?
+        common::save_decision_inner(conn, &sv.id, &wf, vres_ids, decision, rsr_id, vec![])?;
 
         Ok(KybState::from(KybComplete {}))
     }

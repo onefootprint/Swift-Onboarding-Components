@@ -175,14 +175,8 @@ async fn make_decision(
             ) {
                 return Err(AssertionError("decision was StepUp, erroring").into());
             }
-            engine::save_onboarding_decision(
-                conn,
-                &wf,
-                decision.clone(),
-                Some(&rule_set_result.id),
-                vres_ids,
-                vec![],
-            )?;
+            let rsr_id = Some(rule_set_result.id);
+            engine::save_onboarding_decision(conn, &wf, decision.clone(), rsr_id, vres_ids, vec![])?;
             Ok(decision)
         })
         .await?;
