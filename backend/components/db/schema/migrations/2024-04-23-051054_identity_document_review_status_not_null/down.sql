@@ -1,0 +1,1 @@
+ALTER TABLE identity_document ALTER COLUMN review_status DROP NOT NULL;

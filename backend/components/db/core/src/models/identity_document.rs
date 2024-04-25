@@ -51,7 +51,7 @@ pub struct IdentityDocument {
     /// The confirmed document country (usually confirmed by a vendor)
     validated_country_code: Option<Iso3166TwoDigitCountryCode>,
     /// Represents whether the document has been reviewed by a human or machine
-    pub review_status: Option<DocumentReviewStatus>,
+    pub review_status: DocumentReviewStatus,
 }
 
 impl IdentityDocument {
