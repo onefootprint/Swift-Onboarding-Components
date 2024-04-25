@@ -76,7 +76,7 @@ const QRRegister = () => {
   return (
     <>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <Grid.Container textAlign="center">
+      <Grid.Container sx={{ textAlign: 'center' }}>
         <Grid.Item paddingBottom={7} direction="column" gap={5}>
           <HeaderTitle
             title={title}

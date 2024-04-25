@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import type { OnboardingStatusResponse } from '@onefootprint/types';
+import { type OnboardingStatusResponse } from '@onefootprint/types';
 
 import { useGetOnboardingStatus } from '../../../../../../hooks/api';
 import Logger from '../../../../../../utils/logger';
@@ -14,11 +14,23 @@ const CheckRequirements = () => {
     collectedKycData,
   } = state.context;
 
+  const logOnboardingStatusResponse = (response: OnboardingStatusResponse) => {
+    // Just log requirements and whether they are met or not for now
+    const requirements: { kind: string; isMet: boolean }[] = [];
+    response.allRequirements.forEach(req => {
+      requirements.push({
+        kind: req.kind,
+        isMet: req.isMet,
+      });
+    });
+    Logger.info(`Onboarding requirements: ${JSON.stringify(requirements)}`);
+  };
+
   useGetOnboardingStatus({
     authToken,
     options: {
       onSuccess: (response: OnboardingStatusResponse) => {
-        Logger.info(`Onboarding requirements: ${JSON.stringify(response)}`);
+        logOnboardingStatusResponse(response);
 
         const context = {
           isTransfer: !!isTransfer,

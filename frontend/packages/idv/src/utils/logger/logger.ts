@@ -104,8 +104,29 @@ const configureLogRocket = (appName: string) => {
     dom: {
       inputSanitizer: true,
     },
+    shouldDetectExceptions: true,
     network: {
       requestSanitizer: rawRequest => {
+        try {
+          const { entryType, initiatorType, url } = rawRequest as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+          if (
+            initiatorType === 'xmlhttprequest' ||
+            initiatorType === 'script' ||
+            url.startsWith('data:')
+          ) {
+            return null;
+          }
+
+          const isEmptyObject =
+            typeof entryType === 'object' &&
+            Object.keys(entryType).length === 0;
+          if (entryType === 'resource' || isEmptyObject) {
+            return null;
+          }
+        } catch {
+          return null;
+        }
+
         const request = { ...rawRequest };
         request.body = '<REDACTED>'; // Never log request bodies
         Object.keys(request.headers).forEach(headerName => {
