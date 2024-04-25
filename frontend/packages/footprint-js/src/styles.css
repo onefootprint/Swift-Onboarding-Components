@@ -23,7 +23,7 @@
   overflow: hidden;
 }
 
-.footprint-modal, .footprint-overlay {
+.footprint-overlay {
   height: 100%;
   left: 0;
   position: fixed;
@@ -83,6 +83,7 @@
   top: 0;
   right: 0;
   z-index: 50001;
+  border: none;
 }
 
 .footprint-drawer {
