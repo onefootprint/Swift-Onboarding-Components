@@ -29,11 +29,8 @@ pub fn save_final_decision(
     verification_result_ids: Vec<VerificationResultId>,
     decision: &Decision,
     rule_set_result_id: Option<&RuleSetResultId>, // TODO: mb just pass in RuleSetResult at this point and then get Decision from that? just need to pull should_commit out of Decision
-    // TODO make this non-null soon
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
-    // TODO: Create our risk signals!
-    // Save status
     let wf = Workflow::lock(conn, &wf_id)?;
     let scoped_user = ScopedVault::get(conn, &wf.scoped_vault_id)?;
 
@@ -73,8 +70,6 @@ pub fn save_final_decision(
         rule_set_result_id: rule_set_result_id.cloned(),
     };
 
-    // TODO: Make a billable event here
-    // NOTE: must do this after completing the manual review
     let update = WorkflowUpdate::set_decision(&wf, decision);
     Workflow::update(wf, conn, update)?;
 

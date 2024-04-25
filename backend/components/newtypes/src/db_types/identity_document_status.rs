@@ -43,7 +43,7 @@ impl IdentityDocumentStatus {
     }
 }
 
-#[derive(Debug, strum_macros::Display, Clone, Copy, AsExpression, FromSqlRow, EnumString)]
+#[derive(Debug, strum_macros::Display, Clone, Copy, AsExpression, FromSqlRow, EnumString, Eq, PartialEq)]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DocumentReviewStatus {

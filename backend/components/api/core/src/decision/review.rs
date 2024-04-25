@@ -3,6 +3,7 @@ use api_wire_types::{CreateAnnotationRequest, DecisionRequest};
 use db::{
     models::{
         annotation::Annotation,
+        identity_document::{IdentityDocument, IdentityDocumentUpdate},
         manual_review::{ManualReviewAction, ManualReviewArgs},
         onboarding_decision::NewDecisionArgs,
         scoped_vault::ScopedVault,
@@ -10,7 +11,8 @@ use db::{
     },
     TxnPgConn,
 };
-use newtypes::{DbActor, Locked, ManualReviewKind};
+use itertools::Itertools;
+use newtypes::{DbActor, DocumentReviewStatus, Locked, ManualReviewKind};
 use strum::IntoEnumIterator;
 
 pub fn save_review_decision(
@@ -37,7 +39,26 @@ pub fn save_review_decision(
             kind,
             action: ManualReviewAction::Complete,
         })
-        .collect();
+        .collect_vec();
+
+    if manual_reviews
+        .iter()
+        .any(|r| r.kind == ManualReviewKind::DocumentNeedsReview)
+    {
+        // If we're clearing a ManualReview for DocumentNeedsReview, we should also implicitly
+        // update the ID docs to be reviewed
+        let id_docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
+        let reviewed_docs = id_docs
+            .into_iter()
+            .filter(|(doc, _)| doc.review_status == DocumentReviewStatus::PendingHumanReview);
+        for (doc, _) in reviewed_docs {
+            let update = IdentityDocumentUpdate {
+                review_status: Some(DocumentReviewStatus::ReviewedByHuman),
+                ..Default::default()
+            };
+            IdentityDocument::update(conn, &doc.id, update)?;
+        }
+    }
 
     // Make the decision regardless of whether the status changed - the actor of the decision
     // may be different
@@ -53,7 +74,6 @@ pub fn save_review_decision(
         rule_set_result_id: None,
     };
 
-    // NOTE: must do this after completing the manual review
     let update = WorkflowUpdate::set_decision(&wf, new_decision);
     Workflow::update(wf, conn, update)?;
 

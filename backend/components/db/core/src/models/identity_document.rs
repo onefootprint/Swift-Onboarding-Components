@@ -142,7 +142,7 @@ impl IdentityDocument {
             return ValidationError("Country code must be provided for ID doc").into();
         }
 
-        // See if we can use an existing Pending IdDoc instead of making a new on
+        // See if we can use an existing Pending IdDoc instead of making a new one
         let existing: Option<Self> = identity_document::table
             .filter(identity_document::request_id.eq(&request_id))
             .filter(identity_document::status.eq(IdentityDocumentStatus::Pending))
@@ -165,6 +165,7 @@ impl IdentityDocument {
         // Mark all existing IdentityDocuments for this DocumentRequest as failed
         diesel::update(identity_document::table)
             .filter(identity_document::request_id.eq(&request_id))
+            // TODO it might be nice to use the deactivated_at model here too
             .filter(identity_document::status.eq(IdentityDocumentStatus::Pending))
             .set(identity_document::status.eq(IdentityDocumentStatus::Failed))
             .execute(conn.conn())?;
@@ -187,7 +188,7 @@ impl IdentityDocument {
     }
 
     /// Get the identity document, and the associated document request
-    #[tracing::instrument("IdentityDocument::update", skip_all)]
+    #[tracing::instrument("IdentityDocument::update", skip(conn, update))]
     pub fn update(
         conn: &mut PgConn,
         id: &IdentityDocumentId,
