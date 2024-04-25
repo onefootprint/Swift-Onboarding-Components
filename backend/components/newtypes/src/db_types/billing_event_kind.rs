@@ -10,6 +10,7 @@ pub enum BillingEventKind {
     /// TODO: charge again for events 1y after
     ContinuousMonitoringPerYear,
     AdverseMediaPerUser,
+    CurpValidation,
 }
 
 impl BillingEventKind {
@@ -20,6 +21,7 @@ impl BillingEventKind {
         match self {
             Self::ContinuousMonitoringPerYear => Some(Duration::days(365)),
             Self::AdverseMediaPerUser => None,
+            Self::CurpValidation => None,
         }
     }
 }

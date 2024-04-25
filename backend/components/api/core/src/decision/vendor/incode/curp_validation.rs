@@ -2,10 +2,12 @@ use std::collections::HashMap;
 
 use db::{
     models::{
+        billing_event::BillingEvent,
         decision_intent::DecisionIntent,
         document_request::DocumentRequest,
         identity_document::{IdentityDocument, IdentityDocumentUpdate},
         incode_verification_session::IncodeVerificationSession,
+        ob_configuration::ObConfiguration,
         scoped_vault::ScopedVault,
         verification_request::VerificationRequest,
     },
@@ -17,9 +19,9 @@ use idv::{
 };
 use itertools::Itertools;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource,
-    DataRequest, DecisionIntentId, DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment,
+    vendor_credentials::IncodeCredentialsWithToken, BillingEventKind, DataIdentifier, DataLifetimeSeqno,
+    DataLifetimeSource, DataRequest, DecisionIntentId, DocumentKind, DocumentRequestKind, Fingerprints,
+    IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment,
     IncodeSessionId, IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode, OcrDataKind as ODK,
     PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
 };
@@ -50,6 +52,7 @@ pub async fn run_curp_validation_check(
 ) -> ApiResult<Option<VendorResult>> {
     let svid = di.scoped_vault_id.clone();
     let wf_id2 = wf_id.clone();
+    let wf_id3 = wf_id.clone();
     let di_id = di.id.clone();
     let (vw, tenant_id, id_documents, latest_results, sv) = state
         .db_pool
@@ -154,7 +157,7 @@ pub async fn run_curp_validation_check(
                     // Vault the curp response
                     let seqno = vault_curp_response(conn, &sv_id, vault_data)?;
 
-                    // create an IVS record for billing/tracking
+                    // create an IVS record for tracking
                     let _ = IncodeVerificationSession::create(
                         conn,
                         iddoc.id,
@@ -167,6 +170,10 @@ pub async fn run_curp_validation_check(
                     // set curp completed seqno so we can render historical responses in the dashboard
                     let update = IdentityDocumentUpdate::set_curp_completed_seqno(seqno);
                     let _ = IdentityDocument::update(conn, &iddoc_id, update)?;
+
+                    let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
+                    // create billing event
+                    BillingEvent::create(conn, sv_id.clone(), obc.id, BillingEventKind::CurpValidation)?;
 
 
                     Ok(())
