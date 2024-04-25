@@ -6,7 +6,6 @@ def test_get_org(sandbox_user):
     tenant = body
     assert tenant["name"] == sandbox_user.tenant.name
     assert not tenant["is_sandbox_restricted"]
-    assert tenant["logo_url"]
 
 
 def test_patch_org(sandbox_user):

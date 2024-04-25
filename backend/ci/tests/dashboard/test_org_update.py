@@ -10,13 +10,10 @@ def _logo_path():
 def test_org_update_logo(sandbox_tenant):
     files = {"upload_file": ("logo.png", open(_logo_path(), "rb"), "image/png")}
 
-    body = put(
-        "org/logo",
-        None,
-        *sandbox_tenant.db_auths,
-        files=files,
-    )
+    body = put("org/logo", None, *sandbox_tenant.db_auths, files=files)
+    assert body["logo_url"]
 
+    body = get("org", None, *sandbox_tenant.db_auths)
     assert body["logo_url"]
 
 
