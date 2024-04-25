@@ -76,7 +76,7 @@ impl ManualReview {
         decision: OnboardingDecision,
         mrs: Vec<ManualReviewArgs>,
     ) -> DbResult<()> {
-        let existing_mrs = Self::get_active(conn, &workflow.id)?;
+        let existing_mrs = Self::get_active(conn, &workflow.scoped_vault_id)?;
         for ManualReviewArgs { kind, action } in mrs {
             let existing = existing_mrs.iter().find(|mr| mr.kind == kind);
             match (existing, action) {
