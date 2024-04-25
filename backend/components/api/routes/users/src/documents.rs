@@ -33,6 +33,7 @@ pub async fn get(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let id_docs: Vec<IdentityDocument> = IdentityDocument::list(conn, &sv.id)?
                 .into_iter()
+                .map(|(i, _)| i)
                 .filter(|i| i.completed_seqno.is_some())
                 .sorted_by(|x, y| Ord::cmp(&x.created_at, &y.created_at))
                 .collect();

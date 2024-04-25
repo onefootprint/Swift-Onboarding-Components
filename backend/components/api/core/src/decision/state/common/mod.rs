@@ -14,7 +14,7 @@ use db::{
         user_timeline::UserTimeline,
         workflow::{Workflow, WorkflowUpdate},
     },
-    DbPool, DbResult, TxnPgConn,
+    DbPool, DbResult, PgConn, TxnPgConn,
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
@@ -59,7 +59,7 @@ pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbRes
 
 #[tracing::instrument(skip(conn))]
 pub fn get_vw_and_obc(
-    conn: &mut TxnPgConn,
+    conn: &mut PgConn,
     sv_id: &ScopedVaultId,
     wf_id: &WorkflowId,
 ) -> ApiResult<(VaultWrapper, ObConfiguration)> {

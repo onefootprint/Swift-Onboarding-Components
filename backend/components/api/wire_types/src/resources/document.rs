@@ -1,5 +1,8 @@
 use crate::*;
-use newtypes::{DataLifetimeSeqno, DocumentScanDeviceType, DocumentSide, IdDocKind, IdentityDocumentStatus};
+use newtypes::{
+    DataIdentifier, DataLifetimeSeqno, DocumentScanDeviceType, DocumentSide, IdDocKind,
+    IdentityDocumentStatus,
+};
 
 use serde_with::SerializeDisplay;
 pub use strum_macros::Display;
@@ -45,6 +48,7 @@ pub struct DocumentUpload {
     pub version: DataLifetimeSeqno,
     /// When true, we detected that the user had a slow internet connection and the client compressed the image more than normal to allow for a faster upload.
     pub is_extra_compressed: bool,
+    pub identifier: DataIdentifier,
 }
 
 #[derive(Debug, Serialize, Apiv2Schema)]

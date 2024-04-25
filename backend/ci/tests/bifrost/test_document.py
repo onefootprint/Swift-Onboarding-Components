@@ -117,6 +117,10 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
     assert event["config"]["data"]["identifier"] == "document.custom.utility_bill"
     assert event["config"]["data"]["name"] == "Utility bill"
 
+    body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
+    assert body[0]["kind"] == "custom"
+    assert body[0]["uploads"][0]["identifier"] == "document.custom.utility_bill"
+
 
 def test_upload_documents_with_ob_config_restriction_legacy_version(
     restricted_doc_ob_config,

@@ -242,11 +242,13 @@ impl IdentityDocument {
 
     /// Get all the documents collected for a given scoped vault over all workflows
     #[tracing::instrument("IdentityDocument::list", skip_all)]
-    pub fn list(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+    pub fn list(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> DbResult<Vec<(Self, DocumentRequest)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
-            .select(identity_document::all_columns)
             .get_results(conn)?;
 
         Ok(results)
@@ -257,7 +259,6 @@ impl IdentityDocument {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::workflow_id.eq(wf_id))
-            .select((identity_document::all_columns, document_request::all_columns))
             .get_results(conn)?;
 
         Ok(results)

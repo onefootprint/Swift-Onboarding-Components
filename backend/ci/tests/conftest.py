@@ -168,7 +168,6 @@ def partner_tenant(tenant):
     return create_partner_tenant(org_data, tenant)
 
 
-
 @pytest.fixture(scope="session")
 def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
     return create_ob_config(
@@ -177,18 +176,6 @@ def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_
         must_collect_data + ["document_and_selfie"],
         can_access_data + ["document_and_selfie"],
     )
-
-@pytest.fixture(scope="session")
-def doc_request_sandbox_ob_config_with_curp(sandbox_tenant, must_collect_data, can_access_data):
-    return create_ob_config(
-        sandbox_tenant,
-        "Doc request config",
-        must_collect_data + ["document_and_selfie"],
-        can_access_data + ["document_and_selfie"],
-        curp_validation_enabled=True,
-        document_types_and_countries = {'global': [], 'country_specific': {'MX': ['voter_identification']}}
-    )
-
 
 
 @pytest.fixture(scope="session")

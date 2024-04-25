@@ -13,8 +13,10 @@ use api_core::{
     },
 };
 use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
-use itertools::Itertools;
-use newtypes::{DataIdentifier, DocumentKind};
+use itertools::{chain, Itertools};
+use newtypes::{
+    CustomDocumentConfig, DataIdentifier, DocumentKind, DocumentRequestConfig, DocumentSide, IdDocKind,
+};
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
@@ -32,8 +34,6 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
 
-    // Some things might break if we start deactivating doc request
-    // look at all uses of DocumentREquest::get - they should be filtering on active
     let (id_docs, api_docs) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -42,42 +42,57 @@ pub async fn get(
             let documents = IdentityDocument::list(conn, &sv.id)?;
             let id_docs = documents
                 .into_iter()
-                .map(|d| -> ApiResult<_> {
-                    let images = d.images(conn, false)?;
-                    Ok((d, images))
+                .map(|(doc, dr)| -> ApiResult<_> {
+                    let images = doc.images(conn, false)?;
+                    Ok((doc, dr, images))
                 })
-                .collect::<ApiResult<Vec<_>>>()?
-                .into_iter()
-                .filter(|(_, images)| !images.is_empty())
+                .filter_ok(|(_, _, images)| !images.is_empty())
+                .collect::<ApiResult<Vec<_>>>()?;
+
+            let custom_dis = id_docs
+                .iter()
+                .filter_map(|(_, dr, _)| match dr.config {
+                    DocumentRequestConfig::Custom(CustomDocumentConfig { ref identifier, .. }) => {
+                        Some(identifier)
+                    }
+                    _ => None,
+                })
                 .collect_vec();
 
-            // Since some of our tenants are backfilling the ID doc images they already have,
-            // we also have to support rendering documents that only exist in the vault
-            // (and not in ID docs)
+            // Documents can also be uploaded via tenant-facing API or via the dashboard.
+            // So we have to add these in here...
+            // TODO we won't show historical versions of documents uploaded here, even though we
+            // show multiple ID document sessions
             let api_docs = vw
                 .populated_dis()
                 .into_iter()
                 .filter_map(|di| {
-                    let DataIdentifier::Document(DocumentKind::LatestUpload(kind, side)) = di else {
-                        return None;
-                    };
                     let dl = vw.get_lifetime(&di)?.clone();
-                    Some((kind, (side, dl)))
+                    // Only take document DIs that don't have a corresponding IdDoc in the DB.
+                    // This will be a little derpy if an API-uploaded document is replaced by a
+                    // bifrost-uploaded document...
+                    match di {
+                        DataIdentifier::Document(DocumentKind::LatestUpload(kind, side)) => {
+                            let already_contains = id_docs.iter().any(|d| d.0.document_type == kind);
+                            (!already_contains).then_some((kind, (side, dl)))
+                        }
+                        DataIdentifier::Document(DocumentKind::Custom(_)) => {
+                            let already_contains = custom_dis.iter().any(|i| **i == di);
+                            (!already_contains).then_some((IdDocKind::Custom, (DocumentSide::Front, dl)))
+                        }
+                        _ => None,
+                    }
                 })
-                // Only take document DIs that don't have a corresponding IdDocument.
-                // This will be a little derpy if an API-uploaded document is replaced by a
-                // bifrost-uploaded document
-                .filter(|(kind, _)| !id_docs.iter().any(|d| &d.0.document_type == kind))
                 .into_group_map();
 
             Ok((id_docs, api_docs))
         })
         .await?;
 
-    let response = id_docs
-        .into_iter()
-        .map(api_wire_types::Document::from_db)
-        .chain(api_docs.into_iter().map(api_wire_types::Document::from_db))
-        .collect::<Vec<_>>();
+    let response = chain(
+        id_docs.into_iter().map(api_wire_types::Document::from_db),
+        api_docs.into_iter().map(api_wire_types::Document::from_db),
+    )
+    .collect::<Vec<_>>();
     ResponseData::ok(response).json()
 }

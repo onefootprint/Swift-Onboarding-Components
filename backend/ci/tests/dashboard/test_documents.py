@@ -1,6 +1,7 @@
 import pytest
 from tests.dashboard.utils import latest_access_event_for
 from tests.utils import (
+    create_ob_config,
     get,
     post,
     get_raw,
@@ -22,22 +23,6 @@ def user_with_documents(doc_request_sandbox_ob_config):
         r for r in bifrost.handled_requirements if r["kind"] == "collect_document"
     )
     assert doc_requirement["config"]["should_collect_selfie"]
-
-    return user
-
-@pytest.fixture(scope="session")
-def user_with_documents_and_curp(doc_request_sandbox_ob_config_with_curp):
-    """
-    Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
-    with document info as well
-    """
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config_with_curp)
-    
-    user = bifrost.run()
-    doc_requirement = next(
-        r for r in bifrost.handled_requirements if r["kind"] == "collect_document"
-    )
-    assert doc_requirement["should_collect_selfie"]
 
     return user
 
@@ -121,6 +106,7 @@ def test_tenant_document_decrypt_download(user_with_documents):
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant)
     assert set(access_event["targets"]) == set(fields)
 
+
 def test_get_entity_documents(user_with_documents):
     tenant = user_with_documents.tenant
     fp_id = user_with_documents.fp_id
@@ -135,44 +121,89 @@ def test_get_entity_documents(user_with_documents):
     assert front["version"] < back["version"]
     assert back["version"] < selfie["version"]
     assert selfie["version"] < doc["completed_version"]
-    
-def test_get_entity_documents_with_curp(user_with_documents_and_curp):
-    tenant = user_with_documents_and_curp.tenant
-    fp_id = user_with_documents_and_curp.fp_id
-    body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
-    
-    doc = body[0]
-    assert doc["kind"] == "voter_identification"
-    assert doc["status"] == "complete"
-    assert all(u["failure_reasons"] == [] for u in doc["uploads"])
-    front = next(u for u in doc["uploads"] if u["side"] == "front")
-    back = next(u for u in doc["uploads"] if u["side"] == "back")
-    curp_version = doc['curp_completed_version']
-    assert curp_version
-    assert front["version"] < back["version"]
-    assert back["version"] < curp_version
-    assert doc["completed_version"] < curp_version
 
 
-def test_get_entity_documents_uploaded_via_api(sandbox_tenant):
-    body = post("users", None, sandbox_tenant.sk.key)
-    fp_id = body["id"]
+def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_data):
+    """
+    Test GET /entities/<>/documents API for a user with identity docs from bifrost (with a CURP),
+    custom docs from bifrost, custom docs uploaded via the dashboard, and id doc uploded via api.
+    """
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Doc request config",
+        must_collect_data + ["document_and_selfie"],
+        must_collect_data + ["document_and_selfie"],
+        curp_validation_enabled=True,
+        document_types_and_countries={
+            "global": [],
+            "country_specific": {"MX": ["voter_identification"]},
+        },
+        documents_to_collect=[
+            dict(
+                kind="custom",
+                data=dict(
+                    name="Utility bill",
+                    identifier="document.custom.utility_bill",
+                    description="Please upload a utility bill that shows your full name and address.",
+                ),
+            )
+        ],
+    )
+    bifrost = BifrostClient.new(obc)
+    user = bifrost.run()
 
+    # Then, also upload some docs via API
     post(
-        f"users/{fp_id}/vault/document.drivers_license.front.image/upload",
+        f"users/{user.fp_id}/vault/document.id_card.front.image/upload",
         None,
         sandbox_tenant.sk.key,
         files=open_multipart_file("drivers_license.front.png", "image/png")(),
     )
+    post(
+        f"users/{user.fp_id}/vault/document.custom.my_special_doc/upload",
+        None,
+        *sandbox_tenant.db_auths,
+        files=open_multipart_file("example_pdf.pdf", "application/pdf")(),
+    )
 
-    body = get(f"entities/{fp_id}/documents", None, *sandbox_tenant.db_auths)
-    doc = body[0]
-    assert doc["kind"] == "drivers_license"
-    assert not doc["status"]
-    assert not doc["started_at"]
-    assert doc["upload_source"] == "api"
-    assert all(u["failure_reasons"] == [] for u in doc["uploads"])
-    assert any(u["side"] == "front" for u in doc["uploads"])
+    body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
+
+    # Test voter ID with curp
+    voter_id = next(i for i in body if i["kind"] == "voter_identification")
+    assert voter_id["status"] == "complete"
+    assert all(u["failure_reasons"] == [] for u in voter_id["uploads"])
+    front = next(u for u in voter_id["uploads"] if u["side"] == "front")
+    back = next(u for u in voter_id["uploads"] if u["side"] == "back")
+    curp_version = voter_id["curp_completed_version"]
+    assert curp_version
+    assert front["version"] < back["version"]
+    assert back["version"] < curp_version
+    assert voter_id["completed_version"] < curp_version
+
+    # Test custom doc uploaded via bifrost
+    utility_bill = next(
+        i
+        for i in body
+        if i["uploads"][0]["identifier"] == "document.custom.utility_bill"
+    )
+    assert utility_bill["kind"] == "custom"
+    # TODO eventually test review status and whatnot
+
+    # Test custom doc uploaded via API
+    utility_bill = next(
+        i
+        for i in body
+        if i["uploads"][0]["identifier"] == "document.custom.my_special_doc"
+    )
+    assert utility_bill["kind"] == "custom"
+
+    # Test identity doc uploaded via API
+    id_card = next(i for i in body if i["kind"] == "id_card")
+    assert not id_card["status"]
+    assert not id_card["started_at"]
+    assert id_card["upload_source"] == "api"
+    assert all(u["failure_reasons"] == [] for u in id_card["uploads"])
+    assert any(u["side"] == "front" for u in id_card["uploads"])
 
 
 def test_decrypt_historical(user_with_documents):
