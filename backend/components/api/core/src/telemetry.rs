@@ -104,7 +104,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             country,
             user_agent,
             ..
-        } = InsightHeaders::parse_from_request(request.headers());
+        } = InsightHeaders::parse_from_request(request.request());
 
         let TelemetryHeaders {
             session_id,

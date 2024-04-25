@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, pin::Pin};
 
-use actix_web::{http::header::HeaderMap, FromRequest};
+use actix_web::FromRequest;
 use chrono::{DateTime, Utc};
 use db::models::insight_event::CreateInsightEvent;
 use futures_util::Future;
@@ -43,16 +43,24 @@ impl FromRequest for InsightHeaders {
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
-        let cloudfront = InsightHeaders::parse_from_request(req.headers());
+        let cloudfront = InsightHeaders::parse_from_request(req);
         Box::pin(async move { Ok(cloudfront) })
     }
 }
 
 impl InsightHeaders {
     /// parse cloudfront headers
-    pub fn parse_from_request(headers: &HeaderMap) -> Self {
-        let ip_address = get_header("cloudfront-viewer-address", headers)
-            .and_then(|s| s.parse::<SocketAddr>().map(|s| s.ip().to_string()).ok());
+    pub fn parse_from_request(req: &actix_web::HttpRequest) -> Self {
+        let headers = req.headers();
+
+        let ip_address = if let Some(h) = get_header("cloudfront-viewer-address", headers) {
+            h.parse::<SocketAddr>().map(|s| s.ip().to_string()).ok()
+        } else {
+            // Fall back on peer address if we're not behind the CloudFront proxy.
+            // Useful for local testing.
+            req.peer_addr().map(|s| s.ip().to_string())
+        };
+
         let session_id = get_header(TelemetryHeaders::SESSION_HEADER_NAME, headers);
 
         let headers = InsightHeaders {
