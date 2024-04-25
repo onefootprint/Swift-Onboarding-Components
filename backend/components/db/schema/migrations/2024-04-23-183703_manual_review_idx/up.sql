@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS manual_review_unique_workflow_id;

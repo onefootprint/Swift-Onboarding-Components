@@ -8,7 +8,8 @@ use newtypes::{
 
 use super::onboarding_decision::OnboardingDecision;
 
-#[derive(Debug, Clone, Queryable, Default)]
+
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = manual_review)]
 pub struct ManualReview {
     pub id: ManualReviewId,
@@ -26,7 +27,7 @@ pub struct ManualReview {
     pub review_reasons: Vec<ReviewReason>,
     pub workflow_id: WorkflowId,
     pub scoped_vault_id: ScopedVaultId,
-    pub kind: Option<ManualReviewKind>,
+    pub kind: ManualReviewKind,
 }
 
 #[derive(Debug, Clone, Insertable)]

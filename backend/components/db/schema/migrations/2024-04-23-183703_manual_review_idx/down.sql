@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX CONCURRENTLY manual_review_unique_workflow_id ON manual_review(workflow_id) WHERE completed_at IS NULL;

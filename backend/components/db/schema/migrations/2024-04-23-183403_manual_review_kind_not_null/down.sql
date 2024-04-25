@@ -1,0 +1,1 @@
+ALTER TABLE manual_review ALTER COLUMN kind DROP NOT NULL;
