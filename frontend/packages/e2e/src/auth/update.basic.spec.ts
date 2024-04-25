@@ -71,7 +71,7 @@ test('Update auth methods by providing email #ci #debug', async ({
 
   const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
   await emailEl.waitFor(attached);
-  await emailEl.first().fill(email);
+  await emailEl.first().fill(email, { timeout: 200 });
 
   await page
     .frameLocator(iframeSelector)

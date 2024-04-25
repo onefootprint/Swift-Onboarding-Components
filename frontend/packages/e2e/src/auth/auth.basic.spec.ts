@@ -33,7 +33,7 @@ test('Auth with email, fill phone number, verify phone #ci', async ({
 
   const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
   await emailEl.waitFor({ state: 'attached', timeout });
-  await emailEl.first().fill(email);
+  await emailEl.first().fill(email, { timeout: 200 });
 
   await page
     .frameLocator(iframeSelector)
@@ -48,7 +48,7 @@ test('Auth with email, fill phone number, verify phone #ci', async ({
     .frameLocator(iframeSelector)
     .locator('input[name="phoneNumber"]');
   await phoneEl.waitFor({ state: 'attached', timeout });
-  await phoneEl.fill(phoneNumber);
+  await phoneEl.fill(phoneNumber, { timeout: 200 });
 
   await page
     .frameLocator(iframeSelector)
