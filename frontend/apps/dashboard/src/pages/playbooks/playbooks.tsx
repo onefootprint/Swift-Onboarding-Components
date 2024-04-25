@@ -66,21 +66,21 @@ const Playbooks = () => {
           </Text>
         </Title>
         <Wrapper>
-          <PermissionGate
-            fallbackText={t('cta-not-allowed')}
-            scopeKind={RoleScopeKind.onboardingConfiguration}
-          >
-            <Stack position="relative">
-              {!hasHadPlaybook && (
-                <Highlighter
-                  variants={highlighterAnimation}
-                  initial="initial"
-                  animate="animate"
-                />
-              )}
+          <Stack position="relative">
+            {!hasHadPlaybook && (
+              <Highlighter
+                variants={highlighterAnimation}
+                initial="initial"
+                animate="animate"
+              />
+            )}
+            <PermissionGate
+              fallbackText={t('cta-not-allowed')}
+              scopeKind={RoleScopeKind.onboardingConfiguration}
+            >
               <Button onClick={handleOpen}>{t('create-button')}</Button>
-            </Stack>
-          </PermissionGate>
+            </PermissionGate>
+          </Stack>
         </Wrapper>
       </HeaderContainer>
       <Stack direction="column">
