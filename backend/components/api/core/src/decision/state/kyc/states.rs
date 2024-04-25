@@ -35,7 +35,10 @@ use crate::{
                 save_risk_signals, RiskSignalGroupStruct,
             },
         },
-        rule_engine::engine::VaultDataForRules,
+        rule_engine::{
+            self,
+            engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
+        },
         state::{
             actions::{Authorize, WorkflowActions},
             common, DocCollected, OnAction, WorkflowState,
@@ -450,15 +453,17 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let vres_ids = risk_signals.verification_result_ids();
 
         // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision instead of the decision from these real Rules
-        let (rule_set_result, decision) = common::evaluate_rules(
-            conn,
-            risk_signals,
-            &vault_data_for_rules,
-            &lists_for_rules,
-            &wf,
-            fixture_decision.is_some(),
-            RuleSetResultKind::WorkflowDecision,
-        )?;
+        let args = EvaluateWorkflowDecisionArgs {
+            sv_id: &wf.scoped_vault_id,
+            obc_id: &obc.id,
+            wf_id: &wf.id,
+            kind: RuleSetResultKind::WorkflowDecision,
+            risk_signals: risk_signals.risk_signals,
+            vault_data: &vault_data_for_rules,
+            lists: &lists_for_rules,
+            is_fixture: fixture_decision.is_some(),
+        };
+        let (rule_set_result, decision) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
         // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture decision
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {

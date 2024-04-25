@@ -23,7 +23,10 @@ use crate::{
     decision::{
         self,
         features::risk_signals::fetch_latest_risk_signals_map,
-        rule_engine::engine::VaultDataForRules,
+        rule_engine::{
+            self,
+            engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
+        },
         state::{
             actions::{DocCollected, WorkflowActions},
             common, OnAction, WorkflowState,
@@ -211,15 +214,18 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 should_execute_rules_for_document_only(&v, &wf)?;
             let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
             // TODO: what's the review strategy for this case?
-            let (rule_set_result, decision) = common::evaluate_rules(
-                conn,
-                risk_signals,
-                &VaultDataForRules::empty(), // TODO
-                &HashMap::new(),             // TODO mb
-                &wf,
-                fixture_decision.is_some(),
-                RuleSetResultKind::WorkflowDecision,
-            )?;
+            let args = EvaluateWorkflowDecisionArgs {
+                sv_id: &wf.scoped_vault_id,
+                obc_id: &obc.id,
+                wf_id: &wf.id,
+                kind: RuleSetResultKind::WorkflowDecision,
+                risk_signals: risk_signals.risk_signals,
+                vault_data: &VaultDataForRules::empty(), // TODO
+                lists: &HashMap::new(),                  // TODO mb
+                is_fixture: fixture_decision.is_some(),
+            };
+            let (rule_set_result, decision) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
+
             let decision = if let Some(fixture_decision) = fixture_decision {
                 if execute_rules_for_real_document_decision_only || obc.skip_kyc {
                     decision

@@ -8,6 +8,7 @@ use crate::{
     decision::{
         self,
         onboarding::Decision,
+        risk,
         rule_engine::{engine::VaultDataForRules, eval::RuleEvalConfig},
         state::{
             actions::{Authorize, WorkflowActions},
@@ -472,7 +473,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         // or no, because this only applies to business entities? then where are we saving the
         // decision / applying step up for the user entity?
         // or yes, but it just no-ops?
-        common::save_decision_inner(conn, &sv.id, &wf, vres_ids, decision, rsr_id, vec![])?;
+        risk::save_final_decision(conn, &wf.id, vres_ids, &decision, rsr_id, vec![])?;
 
         Ok(KybState::from(KybComplete {}))
     }

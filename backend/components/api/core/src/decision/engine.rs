@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use super::{
-    onboarding::Decision,
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
         tenant_vendor_control::TenantVendorControl,
@@ -22,15 +21,12 @@ use db::{
         verification_result::VerificationResult,
         workflow::Workflow,
     },
-    DbError, DbPool, TxnPgConn,
+    DbError, DbPool,
 };
 use either::Either;
 
 use itertools::Itertools;
-use newtypes::{
-    PiiJsonValue, ReviewReason, RuleSetResultId, ScopedVaultId, VerificationRequestId, VerificationResultId,
-    WorkflowId,
-};
+use newtypes::{PiiJsonValue, ScopedVaultId, VerificationRequestId, WorkflowId};
 
 pub async fn save_vendor_responses(
     db_pool: &DbPool,
@@ -232,28 +228,4 @@ pub async fn make_vendor_requests(
     let results = vendor::make_request::make_vendor_requests(state, tvc, requests, wf_id).await?;
 
     Ok(partition_vendor_errors(results))
-}
-
-// TODO can we remove this proxy method?
-/// Create and save an onboarding decision
-#[allow(clippy::too_many_arguments)]
-pub fn save_onboarding_decision(
-    conn: &mut TxnPgConn,
-    workflow: &Workflow,
-    final_decision: Decision,
-    rule_set_result_id: Option<RuleSetResultId>,
-    verification_result_ids: Vec<VerificationResultId>,
-    review_reasons: Vec<ReviewReason>,
-) -> ApiResult<()> {
-    // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    risk::save_final_decision(
-        conn,
-        workflow.id.clone(),
-        verification_result_ids,
-        &final_decision,
-        rule_set_result_id,
-        review_reasons,
-    )?;
-
-    Ok(())
 }

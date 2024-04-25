@@ -9,7 +9,6 @@ use db::{
         ob_configuration::ObConfiguration,
         risk_signal::NewRiskSignalInfo,
         rule_instance::RuleInstance,
-        rule_set_result::RuleSetResult,
         scoped_vault::ScopedVault,
         tenant::Tenant,
         user_timeline::UserTimeline,
@@ -22,19 +21,19 @@ use itertools::Itertools;
 use newtypes::{
     CipKind, DecisionIntentKind, DecisionStatus, DocumentRequestConfig, DocumentRequestKind,
     FootprintReasonCode, ListId, Locked, OnboardingStatus, PiiBytes, PiiString, ReviewReason, RuleAction,
-    RuleExpressionCondition, RuleSetResultId, RuleSetResultKind, ScopedVaultId, SealedVaultBytes, StepUpInfo,
-    TenantId, VaultId, VaultOperation, VendorAPI, VerificationResultId, WorkflowId,
+    RuleExpressionCondition, RuleSetResultId, ScopedVaultId, SealedVaultBytes, StepUpInfo, TenantId, VaultId,
+    VaultOperation, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
     decision::{
-        self, engine,
+        self,
         features::{
             incode_docv::{self, IncodeOcrComparisonDataFields},
             risk_signals::{risk_signal_group_struct::Aml, RiskSignalGroupStruct, RiskSignalsForDecision},
         },
         onboarding::Decision,
-        rule_engine::{self, engine::VaultDataForRules},
+        risk,
         utils::FixtureDecision,
         vendor::{
             self,
@@ -228,31 +227,6 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ap
     Ok(decision)
 }
 
-#[tracing::instrument(skip_all)]
-pub fn evaluate_rules(
-    conn: &mut TxnPgConn,
-    risk_signals: RiskSignalsForDecision,
-    vault_data: &VaultDataForRules,
-    lists: &HashMap<ListId, ListWithDecryptedEntries>,
-    wf: &Workflow,
-    is_fixture: bool,
-    rule_result_kind: RuleSetResultKind,
-) -> ApiResult<(RuleSetResult, Decision)> {
-    let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-
-    rule_engine::engine::evaluate_workflow_decision(
-        conn,
-        &wf.scoped_vault_id,
-        &obc.id,
-        &wf.id,
-        rule_result_kind,
-        risk_signals.risk_signals,
-        vault_data,
-        lists,
-        is_fixture,
-    )
-}
-
 #[tracing::instrument(skip(conn))]
 #[allow(clippy::too_many_arguments)]
 pub fn save_decision(
@@ -261,21 +235,13 @@ pub fn save_decision(
     v_id: VaultId,
     vres_ids: Vec<VerificationResultId>,
     rules_output: Decision,
-    rule_set_result_id: Option<RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
+    rsr_id: Option<RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     let sv_id = &wf.scoped_vault_id;
     match rules_output.decision_status {
         DecisionStatus::Fail | DecisionStatus::Pass => {
-            save_decision_inner(
-                conn,
-                sv_id,
-                &wf,
-                vres_ids,
-                rules_output,
-                rule_set_result_id,
-                vec![],
-            )?;
+            risk::save_final_decision(conn, &wf.id, vres_ids, &rules_output, rsr_id, vec![])?;
         }
         DecisionStatus::StepUp => {
             let doc_reqs = if let Some(RuleAction::StepUp(kind)) = rules_output.action {
@@ -292,7 +258,7 @@ pub fn save_decision(
                     .map(|config| NewDocumentRequestArgs {
                         scoped_vault_id: sv_id.clone(),
                         workflow_id: wf.id.clone(),
-                        rule_set_result_id: rule_set_result_id.clone(),
+                        rule_set_result_id: rsr_id.clone(),
                         config,
                     })
                     .collect()
@@ -309,29 +275,6 @@ pub fn save_decision(
             Workflow::update(wf, conn, update)?;
         }
     }
-    Ok(())
-}
-
-// TODO can we remove this proxy method?
-#[tracing::instrument(skip(conn))]
-#[allow(clippy::too_many_arguments)]
-pub fn save_decision_inner(
-    conn: &mut TxnPgConn,
-    sv_id: &ScopedVaultId,
-    workflow: &Workflow,
-    verification_result_ids: Vec<VerificationResultId>,
-    rules_output: Decision,
-    rule_set_result_id: Option<RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
-    review_reasons: Vec<ReviewReason>,
-) -> ApiResult<()> {
-    engine::save_onboarding_decision(
-        conn,
-        workflow,
-        rules_output,
-        rule_set_result_id,
-        verification_result_ids,
-        review_reasons,
-    )?;
     Ok(())
 }
 

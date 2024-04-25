@@ -28,19 +28,32 @@ use newtypes::{
     RuleSetResultKind, ScopedVaultId, WorkflowId,
 };
 
-#[allow(clippy::too_many_arguments)]
+pub struct EvaluateWorkflowDecisionArgs<'a> {
+    pub sv_id: &'a ScopedVaultId,
+    pub obc_id: &'a ObConfigurationId,
+    pub wf_id: &'a WorkflowId,
+    pub kind: RuleSetResultKind,
+    pub risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
+    pub vault_data: &'a VaultDataForRules,
+    pub lists: &'a HashMap<ListId, ListWithDecryptedEntries>,
+    pub is_fixture: bool,
+}
+
 #[tracing::instrument(skip_all)]
-pub fn evaluate_workflow_decision(
+pub fn evaluate_workflow_decision<'a>(
     conn: &mut TxnPgConn,
-    sv_id: &ScopedVaultId,
-    obc_id: &ObConfigurationId,
-    wf_id: &WorkflowId,
-    kind: RuleSetResultKind,
-    risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
-    vault_data: &VaultDataForRules,
-    lists: &HashMap<ListId, ListWithDecryptedEntries>,
-    is_fixture: bool,
+    args: EvaluateWorkflowDecisionArgs<'a>,
 ) -> ApiResult<(RuleSetResult, Decision)> {
+    let EvaluateWorkflowDecisionArgs {
+        sv_id,
+        obc_id,
+        wf_id,
+        kind,
+        risk_signals,
+        vault_data,
+        lists,
+        is_fixture,
+    } = args;
     let doc_reqs = DocumentRequest::get_all(conn, wf_id)?;
     let doc_collected = doc_reqs
         .iter()

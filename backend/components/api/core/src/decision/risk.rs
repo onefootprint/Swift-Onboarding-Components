@@ -25,19 +25,19 @@ use crate::{errors::ApiResult, utils::vault_wrapper::VaultWrapper};
 #[tracing::instrument(skip(conn))]
 pub fn save_final_decision(
     conn: &mut TxnPgConn,
-    wf_id: WorkflowId,
+    wf_id: &WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &Decision,
     rule_set_result_id: Option<RuleSetResultId>, // TODO: mb just pass in RuleSetResult at this point and then get Decision from that? just need to pull should_commit out of Decision
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
-    let wf = Workflow::lock(conn, &wf_id)?;
+    let wf = Workflow::lock(conn, wf_id)?;
     let scoped_user = ScopedVault::get(conn, &wf.scoped_vault_id)?;
 
     // If we should commit, portablize all data for the onboarding
     let seqno = if decision.should_commit {
         let vw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
-        let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
+        let (obc, _) = ObConfiguration::get(conn, wf_id)?;
         // don't portabalize vaults from no-phone onboardings
         // and don't portablize vaults from tenant-initiated flows via POST /kyc
         if !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {

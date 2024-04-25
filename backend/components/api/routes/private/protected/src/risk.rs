@@ -5,10 +5,15 @@ use actix_web::{
 };
 use api_core::{
     decision::{
-        self, engine,
+        self,
         features::risk_signals::{fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result},
         onboarding::Decision,
-        rule_engine::{engine::VaultDataForRules, eval::RuleEvalConfig},
+        risk,
+        rule_engine::{
+            self,
+            engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
+            eval::RuleEvalConfig,
+        },
         vendor::{
             get_vendor_apis_for_verification_requests, tenant_vendor_control::TenantVendorControl,
             vendor_result::VendorResult,
@@ -157,18 +162,22 @@ async fn make_decision(
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
+            let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
             let risk_signals = fetch_latest_risk_signals_map(conn, &sv.id)?;
             let vres_ids = risk_signals.verification_result_ids();
-            let (rule_set_result, decision) = decision::state::common::evaluate_rules(
-                conn,
-                risk_signals,
-                &VaultDataForRules::empty(), // TODO
-                &HashMap::new(),             // TODO
-                &wf,
-                false,
-                RuleSetResultKind::Adhoc,
-            )?;
+
+            let args = EvaluateWorkflowDecisionArgs {
+                sv_id: &wf.scoped_vault_id,
+                obc_id: &obc.id,
+                wf_id: &wf.id,
+                kind: RuleSetResultKind::Adhoc,
+                risk_signals: risk_signals.risk_signals,
+                vault_data: &VaultDataForRules::empty(), // TODO
+                lists: &HashMap::new(),                  // TODO mb
+                is_fixture: false,
+            };
+            let (rule_set_result, decision) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
             if !matches!(
                 decision.decision_status,
                 DecisionStatus::Pass | DecisionStatus::Fail
@@ -176,7 +185,7 @@ async fn make_decision(
                 return Err(AssertionError("decision was StepUp, erroring").into());
             }
             let rsr_id = Some(rule_set_result.id);
-            engine::save_onboarding_decision(conn, &wf, decision.clone(), rsr_id, vres_ids, vec![])?;
+            risk::save_final_decision(conn, &wf.id, vres_ids, &decision, rsr_id, vec![])?;
             Ok(decision)
         })
         .await?;
