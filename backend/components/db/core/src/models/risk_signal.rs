@@ -445,7 +445,7 @@ mod tests {
                     annotation_id: None,
                     actor: DbActor::Footprint,
                     seqno: None,
-                    create_manual_review: None,
+                    manual_reviews: vec![],
                     rule_set_result_id: None,
                 };
 

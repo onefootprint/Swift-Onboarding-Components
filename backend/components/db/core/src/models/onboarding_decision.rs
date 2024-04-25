@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::{
-    manual_review::{ManualReview, NewManualReviewArgs},
+    manual_review::{ManualReview, ManualReviewArgs},
     ob_configuration::ObConfiguration,
     user_timeline::UserTimeline,
 };
@@ -65,8 +65,9 @@ pub struct NewDecisionArgs {
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
     pub seqno: Option<DataLifetimeSeqno>,
-    /// When non-null, create a manual review with the provided kind
-    pub create_manual_review: Option<NewManualReviewArgs>,
+    /// List of actions to perform for each ManualReviewKind. If no action is provided for a
+    /// ManualReviewKind, we'll leave any existing ManualReview for that kind untouched.
+    pub manual_reviews: Vec<ManualReviewArgs>,
     pub rule_set_result_id: Option<RuleSetResultId>,
 }
 

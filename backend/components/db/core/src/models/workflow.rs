@@ -602,30 +602,13 @@ impl Workflow {
 
         // Make the new OnboardingDecision if any
         if let Some(decision) = update.decision {
-            let actor = decision.actor.clone();
-            let create_manual_review_reasons = decision.create_manual_review.clone();
+            let manual_reviews = decision.manual_reviews.clone();
             let decision = OnboardingDecision::create(conn, &result, decision)?;
-            //
-            // NOTE
-            //
-            // Create or clear the manual review if needed
-            // MUST do all manual review bookkeeping before sending the webhooks below
+            // NOTE: MUST do all manual review bookkeeping before sending the webhooks below
+            ManualReview::apply_actions(conn, &wf, decision, manual_reviews)?;
             // TODO we really need to better think through how we deal with ManualReviews and
-            // multiple Workflows
-            // For now, just going to mark all ManualReviews for a workflow as complete
-            let existing_reviews = ManualReview::get_active(conn, &result.scoped_vault_id)?;
-            if let Some(review_reasons) = create_manual_review_reasons {
-                // If the decision requested to create a manual review, this creates one
-                if existing_reviews.is_empty() {
-                    let sv_id = wf.scoped_vault_id.clone();
-                    ManualReview::create(conn, review_reasons, result.id.clone(), sv_id)?;
-                }
-            } else {
-                // If there is an outstanding review, creating this override decision clears it.
-                for mr in existing_reviews {
-                    mr.complete(conn, actor.clone(), decision.id.clone())?;
-                }
-            }
+            // multiple Workflows.
+            // Should MRs be per-SV rather than per-WF?
         }
 
         // Fire webhook

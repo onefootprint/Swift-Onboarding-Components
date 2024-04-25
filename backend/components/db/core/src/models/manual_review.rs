@@ -3,9 +3,11 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::manual_review;
 use diesel::prelude::*;
 use newtypes::{
-    DbActor, ManualReviewId, ManualReviewKind, OnboardingDecisionId, ReviewReason, ScopedVaultId, WorkflowId,
+    output::Csv, DbActor, ManualReviewId, ManualReviewKind, OnboardingDecisionId, ReviewReason,
+    ScopedVaultId, WorkflowId,
 };
 
+use super::{onboarding_decision::OnboardingDecision, workflow::Workflow};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = manual_review)]
@@ -39,9 +41,17 @@ struct NewManualReview {
 }
 
 #[derive(Debug, Clone)]
-pub struct NewManualReviewArgs {
+pub struct ManualReviewArgs {
     pub kind: ManualReviewKind,
-    pub review_reasons: Vec<ReviewReason>,
+    pub action: ManualReviewAction,
+}
+
+#[derive(Debug, Clone)]
+pub enum ManualReviewAction {
+    /// Create a new ManualReview with the specified reasons, unless one already exist
+    GetOrCreate { review_reasons: Vec<ReviewReason> },
+    /// Clear the existing ManualReview of this kind, if exists
+    Complete,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -59,52 +69,53 @@ pub enum ManualReviewIdentifier<'a> {
 }
 
 impl ManualReview {
-    #[tracing::instrument("ManualReview::create", skip_all)]
-    pub fn create(
-        conn: &mut PgConn,
-        args: NewManualReviewArgs,
-        workflow_id: WorkflowId,
-        scoped_vault_id: ScopedVaultId,
-    ) -> DbResult<Self> {
-        let NewManualReviewArgs { kind, review_reasons } = args;
-        // NOTE: We have a uniqueness constraint that won't allow us to create multiple active
-        // ManualReview rows for one onboarding.
-        let new = NewManualReview {
-            timestamp: Utc::now(),
-            review_reasons,
-            workflow_id,
-            scoped_vault_id,
-            kind,
-        };
-        let result = diesel::insert_into(manual_review::table)
-            .values(new)
-            .get_result(conn)?;
-        Ok(result)
-    }
-
-    /// Used to mark the manual review as complete
-    #[tracing::instrument("ManualReview::complete", skip_all)]
-    pub(super) fn complete<T>(
-        self,
+    #[tracing::instrument("ManualReview::apply_actions", skip_all)]
+    pub fn apply_actions(
         conn: &mut TxnPgConn,
-        actor: T,
-        decision_id: OnboardingDecisionId,
-    ) -> DbResult<()>
-    where
-        T: Into<DbActor>,
-    {
-        let update = ManualReviewUpdate {
-            completed_at: Some(Some(Utc::now())),
-            completed_by_decision_id: Some(Some(decision_id)),
-            completed_by_actor: Some(Some(actor.into())),
-        };
-        let results = diesel::update(manual_review::table)
-            .filter(manual_review::id.eq(self.id))
-            .filter(manual_review::completed_at.is_null())
-            .set(update)
-            .get_results::<Self>(conn.conn())?;
-        if results.len() != 1 {
-            return Err(DbError::IncorrectNumberOfRowsUpdated);
+        workflow: &Workflow,
+        decision: OnboardingDecision,
+        mrs: Vec<ManualReviewArgs>,
+    ) -> DbResult<()> {
+        let existing_mrs = Self::get_active(conn, &workflow.id)?;
+        for ManualReviewArgs { kind, action } in mrs {
+            let existing = existing_mrs.iter().find(|mr| mr.kind == kind);
+            match (existing, action) {
+                (None, ManualReviewAction::GetOrCreate { review_reasons }) => {
+                    // NOTE: We have a uniqueness constraint that won't allow us to create multiple
+                    // active ManualReview rows of the same kind for one onboarding.
+                    // Maybe we should merge the `review_reasons` when there's an existing one?
+                    let new = NewManualReview {
+                        timestamp: Utc::now(),
+                        review_reasons,
+                        workflow_id: workflow.id.clone(),
+                        scoped_vault_id: workflow.scoped_vault_id.clone(),
+                        kind,
+                    };
+                    diesel::insert_into(manual_review::table)
+                        .values(new)
+                        .execute(conn.conn())?;
+                }
+                (Some(mr), ManualReviewAction::Complete) => {
+                    let update = ManualReviewUpdate {
+                        completed_at: Some(Some(Utc::now())),
+                        completed_by_decision_id: Some(Some(decision.id.clone())),
+                        completed_by_actor: Some(Some(decision.actor.clone())),
+                    };
+                    let results = diesel::update(manual_review::table)
+                        .filter(manual_review::id.eq(&mr.id))
+                        .filter(manual_review::completed_at.is_null())
+                        .set(update)
+                        .get_results::<Self>(conn.conn())?;
+                    if results.len() != 1 {
+                        return Err(DbError::IncorrectNumberOfRowsUpdated);
+                    }
+                }
+                // No-op
+                (None, ManualReviewAction::Complete { .. }) => {}
+                (Some(existing), ManualReviewAction::GetOrCreate { review_reasons }) => {
+                    tracing::info!(%kind, existing_review_reasons=%Csv(existing.review_reasons.clone()), new_review_reasons=%Csv(review_reasons), "Manual review already exists, not creating");
+                }
+            }
         }
         Ok(())
     }

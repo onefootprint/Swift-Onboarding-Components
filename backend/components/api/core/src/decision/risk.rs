@@ -5,7 +5,7 @@ use newtypes::{
 
 use db::{
     models::{
-        manual_review::NewManualReviewArgs,
+        manual_review::{ManualReviewAction, ManualReviewArgs},
         ob_configuration::ObConfiguration,
         onboarding_decision::NewDecisionArgs,
         scoped_vault::ScopedVault,
@@ -56,10 +56,11 @@ pub fn save_final_decision(
         None
     };
 
-    let manual_review = decision.create_manual_review.then_some(NewManualReviewArgs {
+    let manual_review = decision.create_manual_review.then_some(ManualReviewArgs {
         kind: ManualReviewKind::RuleTriggered,
-        review_reasons,
+        action: ManualReviewAction::GetOrCreate { review_reasons },
     });
+    let manual_reviews = manual_review.into_iter().collect();
     let decision = NewDecisionArgs {
         vault_id: scoped_user.vault_id,
         logic_git_hash: crate::GIT_HASH.to_string(),
@@ -68,7 +69,7 @@ pub fn save_final_decision(
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno,
-        create_manual_review: manual_review,
+        manual_reviews,
         rule_set_result_id: rule_set_result_id.cloned(),
     };
 

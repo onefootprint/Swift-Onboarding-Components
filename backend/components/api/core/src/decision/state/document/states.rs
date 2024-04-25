@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use db::models::{
     data_lifetime::DataLifetime,
     document_request::{DocumentRequest, NewDocumentRequestArgs},
-    manual_review::NewManualReviewArgs,
+    manual_review::{ManualReviewAction, ManualReviewArgs},
     ob_configuration::ObConfiguration,
     onboarding_decision::NewDecisionArgs,
     scoped_vault::ScopedVault,
@@ -183,9 +183,9 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             // don't verify them, we need a human to manually review them.
             // We'll create a manual review without evaluating rules
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
-            let manual_review = NewManualReviewArgs {
+            let manual_review = ManualReviewArgs {
                 kind: ManualReviewKind::DocumentNeedsReview,
-                review_reasons,
+                action: ManualReviewAction::GetOrCreate { review_reasons },
             };
             let decision = NewDecisionArgs {
                 vault_id: sv.vault_id.clone(),
@@ -195,7 +195,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 annotation_id: None,
                 actor: DbActor::Footprint,
                 seqno: Some(current_seqno),
-                create_manual_review: Some(manual_review),
+                manual_reviews: vec![manual_review],
                 rule_set_result_id: None,
             };
             let update = DbWorkflowUpdate::set_decision(&wf, decision);
