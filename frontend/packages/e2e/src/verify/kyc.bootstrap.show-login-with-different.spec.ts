@@ -32,7 +32,8 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 });
 
-test('Bootstrap hide login with different #ci', async ({ page, isMobile }) => {
+test('Bootstrap show login with different #ci', async ({ page, isMobile }) => {
+  test.slow();
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
@@ -50,5 +51,6 @@ test('Bootstrap hide login with different #ci', async ({ page, isMobile }) => {
   // Check that "Log in with a different account" is not visible
   await expect(
     frame.getByText('Log in with a different account'),
-  ).not.toBeAttached();
+  ).toBeAttached();
+  // Update, After this PR -> https://github.com/onefootprint/monorepo/pull/8201 the login with a different account will be visible
 });

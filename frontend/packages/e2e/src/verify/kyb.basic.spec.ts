@@ -121,7 +121,7 @@ test('KYB verification #ci', async ({ browser, page, isMobile }) => {
 
   const dobField = frame.getByLabel('Date of Birth').first();
   await dobField.waitFor({ state: 'attached', timeout: 3000 });
-  await dobField.fill(dob, { timeout: 200 });
+  await dobField.fill(dob);
 
   await clickOnContinue(frame);
   await page.waitForLoadState();

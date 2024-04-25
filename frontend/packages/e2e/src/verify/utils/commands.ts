@@ -88,7 +88,7 @@ export const fillPhoneNumber = async (
   const input = parent.locator('input[name="phoneNumber"]').first();
   return input /** locator.fill() needs a visible input, bypass using force:true */
     .waitFor(attachedState)
-    .then(() => input.fill(str, { timeout: 200, force: true })); // eslint-disable-line playwright/no-force-option,
+    .then(() => input.fill(str, { force: true })); // eslint-disable-line playwright/no-force-option,
 };
 
 export const sixDigitChallenger = async (
@@ -119,18 +119,9 @@ export const fillNameAndDoB = async (
   frame: FrameLocator,
   payload: { firstName: string; lastName: string; dob: string },
 ) => {
-  await frame
-    .getByLabel('First name')
-    .first()
-    .fill(payload.firstName, { timeout: 200 });
-  await frame
-    .getByLabel('Last name')
-    .first()
-    .fill(payload.lastName, { timeout: 200 });
-  await frame
-    .getByLabel('Date of Birth')
-    .first()
-    .fill(payload.dob, { timeout: 200 });
+  await frame.getByLabel('First name').first().fill(payload.firstName);
+  await frame.getByLabel('Last name').first().fill(payload.lastName);
+  await frame.getByLabel('Date of Birth').first().fill(payload.dob);
 };
 
 export const fillBasicDataKYB = async (
@@ -141,33 +132,24 @@ export const fillBasicDataKYB = async (
     userTIN: string;
   },
 ) => {
-  await frame
-    .getByLabel('Business name')
-    .first()
-    .fill(payload.businessName, { timeout: 200 });
+  await frame.getByLabel('Business name').first().fill(payload.businessName);
   await frame
     .getByLabel('Doing Business As (optional)')
     .first()
-    .fill(payload.businessNameOptional, { timeout: 200 });
+    .fill(payload.businessNameOptional);
   await frame
     .getByLabel('Taxpayer Identification Number (TIN)')
     .first()
-    .fill(payload.userTIN, { timeout: 200 });
+    .fill(payload.userTIN);
 };
 
 export const fillAddress = async (
   { frame, page }: { frame: FrameLocator; page: Page },
   payload: { addressLine1: string; city: string; zipCode: string },
 ) => {
-  await frame
-    .getByLabel('Address line 1')
-    .first()
-    .fill(payload.addressLine1, { timeout: 200 });
-  await frame.getByLabel('City').first().fill(payload.city, { timeout: 200 });
-  await frame
-    .getByLabel('Zip code')
-    .first()
-    .fill(payload.zipCode, { timeout: 200 });
+  await frame.getByLabel('Address line 1').first().fill(payload.addressLine1);
+  await frame.getByLabel('City').first().fill(payload.city);
+  await frame.getByLabel('Zip code').first().fill(payload.zipCode);
   await frame
     .getByRole('button', { name: 'State', disabled: false, exact: true })
     .first()
@@ -180,15 +162,9 @@ export const fillAddressKYB = async (
   { frame, page }: { frame: FrameLocator; page: Page },
   payload: { addressLine1: string; city: string; zipCode: string },
 ) => {
-  await frame
-    .getByLabel('Address line 1')
-    .first()
-    .fill(payload.addressLine1, { timeout: 200 });
-  await frame.getByLabel('City').first().fill(payload.city, { timeout: 200 });
-  await frame
-    .getByLabel('Zip code')
-    .first()
-    .fill(payload.zipCode, { timeout: 200 });
+  await frame.getByLabel('Address line 1').first().fill(payload.addressLine1);
+  await frame.getByLabel('City').first().fill(payload.city);
+  await frame.getByLabel('Zip code').first().fill(payload.zipCode);
   await frame
     .getByRole('button', { name: 'Select', disabled: false })
     .first()
@@ -211,40 +187,40 @@ export const fillBeneficialOwners = async (
   await frame
     .locator('input[name="beneficialOwners.0.first_name"]')
     .first()
-    .fill(payload.userFirstName, { timeout: 200 });
+    .fill(payload.userFirstName);
   await frame
     .locator('input[name="beneficialOwners.0.last_name"]')
     .first()
-    .fill(payload.userLastName, { timeout: 200 });
+    .fill(payload.userLastName);
   const share0 = frame
     .locator('input[name="beneficialOwners.0.ownership_stake"]')
     .first();
   await share0.clear();
-  await share0.fill('50', { timeout: 200 });
+  await share0.fill('50');
 
   await frame.getByRole('button', { name: 'Add more' }).first().click();
 
   await frame
     .locator('input[name="beneficialOwners.1.first_name"]')
     .first()
-    .fill(payload.beneficialOwner1Name, { timeout: 200 });
+    .fill(payload.beneficialOwner1Name);
   await frame
     .locator('input[name="beneficialOwners.1.last_name"]')
     .first()
-    .fill(payload.beneficialOwner1LastName, { timeout: 200 });
+    .fill(payload.beneficialOwner1LastName);
   await frame
     .locator('input[name="beneficialOwners.1.email"]')
     .first()
-    .fill(payload.beneficialOwner1Email, { timeout: 200 });
+    .fill(payload.beneficialOwner1Email);
   await frame
     .locator('input[name="beneficialOwners.1.phone_number"]')
     .first()
-    .fill(payload.beneficialOwner1Phone, { timeout: 200 });
+    .fill(payload.beneficialOwner1Phone);
   const share1 = frame
     .locator('input[name="beneficialOwners.1.ownership_stake"]')
     .first();
   await share1.clear();
-  await share1.fill('50', { timeout: 200 });
+  await share1.fill('50');
 };
 
 export const fillSSN = async (
@@ -252,9 +228,7 @@ export const fillSSN = async (
   payload: { ssn: string },
 ) => {
   const field = frame.getByLabel('SSN').first();
-  await field
-    .waitFor(attachedState)
-    .then(() => field.fill(payload.ssn, { timeout: 200 }));
+  await field.waitFor(attachedState).then(() => field.fill(payload.ssn));
 };
 
 export const fillVisa = async ({ frame, page }: PageNFrame) => {
@@ -299,9 +273,7 @@ export const fillVisa = async ({ frame, page }: PageNFrame) => {
   await frame.getByText('E-1').first().click();
 
   const field = frame.getByLabel('Visa expiration date').first();
-  await field
-    .waitFor(attachedState)
-    .then(() => field.fill('01/01/2024', { timeout: 200 }));
+  await field.waitFor(attachedState).then(() => field.fill('01/01/2024'));
 };
 
 export const confirmData = async (

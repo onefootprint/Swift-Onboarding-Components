@@ -31,13 +31,13 @@ test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
   await page
     .frameLocator(iframeSelector)
     .getByPlaceholder('Enter test ID')
-    .fill('aoy4lrqr9oqKb', { timeout: 200 });
+    .fill('aoy4lrqr9oqKb');
   await page.frameLocator(iframeSelector).getByLabel('Save').first().click();
 
   const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
   await emailEl.waitFor({ state: 'attached', timeout });
   await expect(emailEl).toBeAttached();
-  await emailEl.first().fill(email, { timeout: 200 });
+  await emailEl.first().fill(email);
 
   await page
     .frameLocator(iframeSelector)

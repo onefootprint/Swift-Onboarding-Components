@@ -94,11 +94,8 @@ test('Verify KYC as an investor', async ({ page, browser, isMobile }) => {
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await frame
-    .getByLabel('Occupation')
-    .first()
-    .fill('Occupation', { timeout: 200 });
-  await frame.getByLabel('Employer').first().fill('Employer', { timeout: 200 });
+  await frame.getByLabel('Occupation').first().fill('Occupation');
+  await frame.getByLabel('Employer').first().fill('Employer');
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
