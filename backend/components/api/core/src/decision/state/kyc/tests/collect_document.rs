@@ -199,7 +199,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         .await
         .unwrap();
 
-    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mrs, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == expected_status);
@@ -212,11 +212,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
 
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(doc_outcome.expected_onboarding_decision(), wf.status.unwrap());
-    if doc_outcome.expect_manual_review() {
-        assert!(mr.is_some());
-    } else {
-        assert!(mr.is_none());
-    }
+    assert_eq!(doc_outcome.expect_manual_review(), !mrs.is_empty());
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {

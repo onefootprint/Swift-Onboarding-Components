@@ -177,7 +177,7 @@ pub async fn query_data(
     // TODO: probably make a struct for this output
     Workflow,
     Vec<WorkflowEvent>,
-    Option<ManualReview>,
+    Vec<ManualReview>,
     Option<OnboardingDecision>,
     Vec<RiskSignal>,
 ) {
@@ -194,10 +194,10 @@ pub async fn query_data(
 
             let wf = Workflow::get(conn, &wfid)?;
             let obd = OnboardingDecision::get_active(conn, &wfid)?;
-            let mr = ManualReview::get_active(conn, &wfid)?;
+            let mrs = ManualReview::get_active(conn, &wfid)?;
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid)?;
 
-            Ok((wf, wfe, mr, obd, rs))
+            Ok((wf, wfe, mrs, obd, rs))
         })
         .await
         .unwrap()

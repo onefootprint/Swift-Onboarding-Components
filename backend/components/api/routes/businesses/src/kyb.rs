@@ -151,15 +151,15 @@ pub async fn post(
     api_core::utils::kyb_utils::run_kyb(&state, auth.tenant(), biz_wf.clone()).await?;
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    let (wf, sv, mr) = state
+    let (wf, sv, mrs) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (wf, sv) = Workflow::get_all(conn, &biz_wf.id)?;
-            let mr = ManualReview::get_active(conn, &biz_wf.id)?;
-            Ok((wf, sv, mr))
+            let mrs = ManualReview::get_active(conn, &biz_wf.id)?;
+            Ok((wf, sv, mrs))
         })
         .await?;
 
     let status = wf.status.ok_or(OnboardingError::NoStatusForWorkflow)?;
-    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((status, sv, mr))).json()
+    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((status, sv, mrs))).json()
 }

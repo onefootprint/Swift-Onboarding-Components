@@ -202,10 +202,10 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         .await
         .unwrap();
 
-    let (wf, _, mr, _, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mrs, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
 
-    assert!(mr.is_none());
+    assert!(mrs.is_empty());
     assert_eq!(expected_status, wf.status.unwrap());
 }
 
@@ -312,7 +312,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     .await
     .unwrap();
 
-    let (wf, _, mr, _, rs) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mrs, _, rs) = query_data(state, &svid, &wfid).await;
     let (rule_set_result, _) = query_rule_set_result(state, &wf.scoped_vault_id).await.unwrap();
     assert_eq!(rule_set_result.action_triggered, expected_rule_action);
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
@@ -333,11 +333,11 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     ];
     match terminal_status {
         TerminalDecisionStatus::Pass => {
-            assert!(mr.is_none());
+            assert!(mrs.is_empty());
             assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
         }
         TerminalDecisionStatus::Fail => {
-            assert!(mr.is_some());
+            assert!(!mrs.is_empty());
             assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
             expected_rs.push((
                 VendorAPI::MiddeskBusinessUpdateWebhook,

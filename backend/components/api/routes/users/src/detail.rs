@@ -33,7 +33,7 @@ pub async fn detail(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let mrs = ManualReview::get_active_for_sv(conn, &sv.id)?;
+            let mrs = ManualReview::get_active(conn, &sv.id)?;
             let wfr = if show_requires_additional_info {
                 WorkflowRequest::get_active(conn, &sv.id)?
             } else {

@@ -60,7 +60,7 @@ pub async fn post(
             let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
             let (wf, biz_wf) = if let Some(wf_id) = wf_id {
                 let (wf, _) = Workflow::get_all(conn, &wf_id)?;
-                let user_mr = ManualReview::get_active(conn, &wf_id)?;
+                let user_mrs = ManualReview::get_active(conn, &wf_id)?;
                 let obc_id = wf
                     .ob_configuration_id
                     .as_ref()
@@ -73,12 +73,12 @@ pub async fn post(
                         is_business: (),
                     };
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, id)?;
-                    let biz_mr = ManualReview::get_active(conn, &biz_wf.id)?;
-                    Some((biz_sv, biz_wf, biz_mr))
+                    let biz_mrs = ManualReview::get_active(conn, &biz_wf.id)?;
+                    Some((biz_sv, biz_wf, biz_mrs))
                 } else {
                     None
                 };
-                (Some((wf, user_mr)), biz_wf)
+                (Some((wf, user_mrs)), biz_wf)
             } else {
                 (None, None)
             };
@@ -100,7 +100,7 @@ pub async fn post(
             (
                 Some(sv.fp_id.clone()),
                 Some(wf.as_ref().and_then(|(wf, _)| wf.status).ok_or(OnboardingError::NoStatusForWorkflow)?),
-                Some(wf.as_ref().and_then(|(_, mr)| mr.as_ref()).is_some()),
+                Some(wf.as_ref().is_some_and(|(_, mrs)| !mrs.is_empty())),
                 wf.as_ref().and_then(|(wf, _)| wf.ob_configuration_id.clone()),
                 wf.as_ref().map(|(wf, _)| wf.created_at),
             )
@@ -110,7 +110,7 @@ pub async fn post(
 
     // Validate and serialize the user and optionally the business onboardings
     let validate_and_serialize = |sv: ScopedVault,
-                                  mr: Option<ManualReview>,
+                                  mrs: Vec<ManualReview>,
                                   wf: Workflow,
                                   kind: VaultKind|
      -> ApiResult<EntityValidateResponse> {
@@ -131,7 +131,7 @@ pub async fn post(
         }
 
         let status = wf.status.ok_or(OnboardingError::NoStatusForWorkflow)?;
-        let response = api_wire_types::EntityValidateResponse::from_db((status, sv, mr));
+        let response = api_wire_types::EntityValidateResponse::from_db((status, sv, mrs));
         Ok(response)
     };
     let user_auth = UserAuthResponse {
@@ -146,10 +146,10 @@ pub async fn post(
     };
     let wf_id = wf.as_ref().map(|(wf, _)| wf.id.clone());
     let user = wf
-        .map(|(wf, mr)| validate_and_serialize(sv, mr, wf, VaultKind::Person))
+        .map(|(wf, mrs)| validate_and_serialize(sv, mrs, wf, VaultKind::Person))
         .transpose()?;
     let business = biz_wf
-        .map(|(sv, wf, mr)| validate_and_serialize(sv, mr, wf, VaultKind::Business))
+        .map(|(sv, wf, mrs)| validate_and_serialize(sv, mrs, wf, VaultKind::Business))
         .transpose()?;
 
     if let Some(wf_id) = wf_id {

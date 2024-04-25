@@ -447,11 +447,11 @@ async fn test_multi_stage_step_up(state: &mut State) {
         .await
         .unwrap();
 
-    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mrs, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert_eq!(obd.status, DecisionStatus::Fail);
-    assert!(mr.is_some());
+    assert!(!mrs.is_empty());
     assert_have_same_elements(
         rs.into_iter().map(|r| r.reason_code).collect(),
         vec![

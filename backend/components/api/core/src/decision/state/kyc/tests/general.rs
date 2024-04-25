@@ -281,12 +281,12 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         .await
         .unwrap();
 
-    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mrs, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
     assert!(obd.as_ref().unwrap().seqno.is_some());
     assert!(obd.unwrap().rule_set_result_id.is_some());
-    assert!(mr.is_none());
+    assert!(mrs.is_empty());
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
@@ -502,7 +502,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         .await
         .unwrap();
 
-    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mrs, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
@@ -510,11 +510,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     assert!(obd.seqno.is_none());
     assert!(obd.rule_set_result_id.is_some());
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
-    if expect_review {
-        assert!(mr.is_some());
-    } else {
-        assert!(mr.is_none());
-    }
+    assert_eq!(expect_review, !mrs.is_empty());
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
