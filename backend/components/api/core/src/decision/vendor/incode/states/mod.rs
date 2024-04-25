@@ -11,7 +11,10 @@ mod start_onboarding;
 
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
-use newtypes::incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType};
+use newtypes::{
+    incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType},
+    VendorValidatedCountryCode,
+};
 pub use start_onboarding::*;
 
 mod add_front;
@@ -193,7 +196,10 @@ pub async fn save_incode_fixtures(
                 ocr_data,
                 score_response,
                 rs,
-                country_code: None,
+                country_code: id_doc
+                    .country_code
+                    .and_then(|c| Iso3166TwoDigitCountryCode::from_str(c.as_str()).ok())
+                    .map(VendorValidatedCountryCode),
             };
             Complete::enter(conn, args)?;
 

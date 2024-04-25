@@ -20,8 +20,8 @@ use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource,
     DataRequest, DecisionIntentId, DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind,
     IdentityDocumentFixtureResult, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment,
-    IncodeSessionId, IncodeVerificationSessionKind, OcrDataKind as ODK, PiiJsonValue, PiiString,
-    ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
+    IncodeSessionId, IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode, OcrDataKind as ODK,
+    PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -188,7 +188,7 @@ pub async fn run_curp_validation_check(
             let id_doc = id_doc_helper.identity_document_for_sandbox();
             if let Some(doc) = id_doc {
                 let id_doc_kind = doc.vaulted_document_type.unwrap_or(doc.document_type);
-                let vendor_result = if id_doc_kind_expects_curp(id_doc_kind) {
+                let vendor_result = if id_doc_expects_curp(&doc) {
                     Some(
                         save_canned_response(
                             state,
@@ -318,7 +318,7 @@ async fn get_curp_for_check(
         };
 
         // We only expect a CURP for voter ID now
-        if !id_doc_kind_expects_curp(vaulted_document_type) {
+        if !id_doc_expects_curp(id_doc) {
             return Ok((None, id_doc.clone()));
         }
 
@@ -329,7 +329,7 @@ async fn get_curp_for_check(
         let decrypted_curp = if vw.get(&di).is_some() {
             vw.decrypt_unchecked_single(enclave_client, di).await?
         } else {
-            tracing::error!(id_doc=?id_doc.id, "missing curp for voter id");
+            tracing::error!(id_doc=?id_doc.id, "{}", format!("missing curp for {:?}", id_doc.vaulted_document_type));
 
             None
         };
@@ -441,6 +441,12 @@ pub fn vault_curp_response(
     Ok(result.seqno)
 }
 
-fn id_doc_kind_expects_curp(id_doc_kind: IdDocKind) -> bool {
-    matches!(id_doc_kind, IdDocKind::VoterIdentification)
+fn id_doc_expects_curp(id_doc: &IdentityDocument) -> bool {
+    matches!(
+        id_doc.vaulted_document_type.unwrap_or(id_doc.document_type),
+        IdDocKind::VoterIdentification | IdDocKind::Passport
+    ) && matches!(
+        id_doc.vendor_validated_country_code().map(|v| v.0),
+        Some(Iso3166TwoDigitCountryCode::MX)
+    )
 }
