@@ -364,9 +364,13 @@ async fn save_canned_response(
     let canned_res = match identity_document_fixture {
         Some(decision) => match decision {
             IdentityDocumentFixtureResult::Pass => idv::test_fixtures::incode_curp_validation_good_curp(),
-            IdentityDocumentFixtureResult::Fail => idv::test_fixtures::incode_curp_validation_bad_curp(),
+            IdentityDocumentFixtureResult::Fail => {
+                idv::test_fixtures::incode_curp_validation_bad_curp("01", "06")
+            }
             // shouldn't happen
-            IdentityDocumentFixtureResult::Real => idv::test_fixtures::incode_curp_validation_bad_curp(),
+            IdentityDocumentFixtureResult::Real => {
+                idv::test_fixtures::incode_curp_validation_bad_curp("01", "06")
+            }
         },
         None => idv::test_fixtures::incode_curp_validation_good_curp(),
     };

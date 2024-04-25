@@ -1025,6 +1025,18 @@ footprint_reason_code_enum! {
         #[note = "CURP could not be validate", severity = SignalSeverity::Medium,  description = "CURP could not be validated"]
         CurpCouldNotValidate,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "More than one individual associated with CURP", severity = SignalSeverity::Medium,  description = "More than 1 CURP in RENAPO is associated with this data"]
+        CurpMultipleResultsForData,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Renapo service unavailable", severity = SignalSeverity::Info,  description = "RENAPO service unavailable."]
+        CurpServiceNotAvailable,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "The CURP was incorrectly formatted", severity = SignalSeverity::Low,  description = "Incorrect format for a CURP, possibly due to OCR issues."]
+        CurpMalformed,
+
         // ~~~~~ Info ~~~~~~~~
         // These are present if:
         //   !IdNotLocated && specific other reason codes are not present

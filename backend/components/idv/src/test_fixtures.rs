@@ -6618,11 +6618,11 @@ pub fn incode_curp_validation_good_curp() -> serde_json::Value {
     })
 }
 
-pub fn incode_curp_validation_bad_curp() -> serde_json::Value {
+pub fn incode_curp_validation_bad_curp(tipo_error: &str, codigo_error: &str) -> serde_json::Value {
     serde_json::json!({
         "success": false,
         "error": {
-            "codigoError": "06",
+            "codigoError": codigo_error,
             "resultCURPS": {
                 "numEntidadReg": "",
                 "apellidoPaterno": "",
@@ -6648,7 +6648,7 @@ pub fn incode_curp_validation_bad_curp() -> serde_json::Value {
                 "docProbatorio": ""
             },
             "statusOper": "NO EXITOSO",
-            "tipoError": "01",
+            "tipoError": tipo_error,
             "sessionID": "LNvRMK1zysdZDYLo7hQt8IeVu1hFnZIgGRTjhIa4dNUhlsfb5hik!-1293949714!1708611644787",
             "message": "La CURP no se encuentra en la base de datos"
         },
