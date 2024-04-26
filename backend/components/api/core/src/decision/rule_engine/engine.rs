@@ -13,6 +13,7 @@ use crate::{
 use db::{
     models::{
         document_request::DocumentRequest,
+        insight_event::InsightEvent,
         list_entry::ListWithDecryptedEntries,
         ob_configuration::ObConfiguration,
         risk_signal::RiskSignal,
@@ -75,6 +76,10 @@ pub fn evaluate_workflow_decision<'a>(
         // TODO: maybe we should just generally only evaluate rules on risk signals generated during the current workflow? 🤔 lots of inter-workflow/inter-playbooks/inter-play thingies to figure out
         .filter(|(k, _)| doc_collected || !matches!(k, RiskSignalGroupKind::Doc)).flat_map(|(_, v)| v.clone()).collect();
 
+    // TODO: Consider pulling in additional insight events?
+    let insight_events: Vec<InsightEvent> =
+        InsightEvent::get_for_workflow(conn, wf_id)?.into_iter().collect();
+
     let (rule_set_result, _rule_results) = evaluate_rules(
         conn,
         sv_id,
@@ -83,6 +88,7 @@ pub fn evaluate_workflow_decision<'a>(
         kind,
         &risk_signals,
         vault_data,
+        &insight_events,
         lists,
         &rule_eval_config,
     )?;
@@ -99,6 +105,7 @@ pub fn evaluate_workflow_decision<'a>(
         should_commit_rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
         vault_data,
+        &insight_events,
         lists,
         &rule_eval_config,
     );
@@ -161,6 +168,7 @@ pub fn evaluate_rules(
     kind: RuleSetResultKind,
     risk_signals: &[RiskSignal],
     vault_data: &VaultDataForRules,
+    insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
     rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
 ) -> ApiResult<(RuleSetResult, Vec<RuleResult>)> {
@@ -174,6 +182,7 @@ pub fn evaluate_rules(
         rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
         vault_data,
+        insight_events,
         lists,
         rule_eval_config,
     );
@@ -302,6 +311,7 @@ mod tests {
             RuleSetResultKind::Adhoc,
             &risk_signals,
             &VaultDataForRules::empty(), // TODO add tests for vd rules
+            &[],
             &HashMap::new(),
             &config,
         )

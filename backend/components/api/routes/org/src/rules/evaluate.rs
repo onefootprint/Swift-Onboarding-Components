@@ -163,11 +163,13 @@ pub async fn evaluate_rule(
         .map(|(sv, rsr, rs)| {
             let frcs = &rs.into_iter().map(|r| r.reason_code).collect_vec();
             let vault_data = VaultDataForRules::empty(); // TODO: add support for this, need to bulk query VW's for every onboarding
+            let insight_events = []; // TODO: implement
 
             let (_, action_triggered) = decision::rule_engine::eval::evaluate_rule_set(
                 all_rules.clone(),
                 frcs,
                 &vault_data,
+                &insight_events,
                 &HashMap::new(),
                 &RuleEvalConfig::default(),
             );

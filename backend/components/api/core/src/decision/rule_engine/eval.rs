@@ -1,11 +1,14 @@
 use std::{collections::HashMap, str::FromStr};
 
-use db::models::{list_entry::ListWithDecryptedEntries, rule_instance::RuleInstance};
+use db::models::{
+    insight_event::InsightEvent, list_entry::ListWithDecryptedEntries, rule_instance::RuleInstance,
+};
 use itertools::Itertools;
 use newtypes::{
-    email::Email, BooleanOperator, BusinessDataKind, DataIdentifier, DocumentRequestKind, Equals,
-    FootprintReasonCode, IdentityDataKind, IsIn, ListEntryValue, ListId, ListKind, PhoneNumber, PiiString,
-    RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, VaultOperation,
+    email::Email, BooleanOperator, BusinessDataKind, DataIdentifier, DeviceInsightField,
+    DeviceInsightOperation, DocumentRequestKind, Equals, FootprintReasonCode, IdentityDataKind, IsIn,
+    ListEntryValue, ListId, ListKind, PhoneNumber, PiiString, RuleAction, RuleExpression,
+    RuleExpressionCondition, StepUpKind, VaultOperation,
 };
 use strum::IntoEnumIterator;
 
@@ -94,17 +97,24 @@ impl Default for RuleEvalConfig {
 
 pub fn evaluate_rule_set<T: HasRule>(
     rules: Vec<T>,
-    input: &[FootprintReasonCode],
+    reason_codes: &[FootprintReasonCode],
     vault_data: &VaultDataForRules, // TODO: for waterfall, we won't execute on vault data based rules so should probs more explicitly handle that vs having it pass in an empty DUR here
     // a bit annoying to have to put this here, but this is our one case currently where a ruleset is evaluated but a particular action is not allowed. If we have already collected a document or already step'd up, we want to ensure that we don't chose that action again
     // maybe soon we'll put StepUp rules in a separate group and evaluate those separately and then can remove this from here
+    insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
     rule_config: &RuleEvalConfig,
 ) -> (Vec<(T, bool)>, Option<RuleAction>) {
     let rule_results = rules
         .into_iter()
         .map(|r| {
-            let eval = match evaluate_rule_expression(&r.expression(), input, vault_data, lists) {
+            let eval = match evaluate_rule_expression(
+                &r.expression(),
+                reason_codes,
+                vault_data,
+                insight_events,
+                lists,
+            ) {
                 Ok(r) => r,
                 Err(err) => {
                     // !!!! For now, the only possible source of errors is from blocklist rules. If there is an error, we log and fail open by just treating the eval as false (ie instead of erroring the entire eval of the ruleset)
@@ -133,8 +143,9 @@ pub fn evaluate_rule_set<T: HasRule>(
 
 pub fn evaluate_rule_expression(
     rule_expression: &RuleExpression,
-    input: &[FootprintReasonCode],
+    reason_codes: &[FootprintReasonCode],
     vault_data: &VaultDataForRules,
+    insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
 ) -> ApiResult<bool> {
     // Conditions in a Rule are all AND'd together
@@ -142,7 +153,7 @@ pub fn evaluate_rule_expression(
     let results = rule_expression
         .0
         .iter()
-        .map(|c| evaluate_condition(c, input, vault_data, lists))
+        .map(|c| evaluate_condition(c, reason_codes, vault_data, insight_events, lists))
         .collect::<Result<Vec<_>, _>>()?;
     Ok(!rule_expression.0.is_empty() && results.into_iter().all(|r| r))
 }
@@ -150,13 +161,14 @@ pub fn evaluate_rule_expression(
 // TODO: maybe use a Set here later but honestly at small N its probably moot
 fn evaluate_condition(
     cond: &RuleExpressionCondition,
-    input: &[FootprintReasonCode],
+    reason_codes: &[FootprintReasonCode],
     vault_data: &VaultDataForRules,
+    insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
 ) -> ApiResult<bool> {
     let res = match cond {
         RuleExpressionCondition::RiskSignal { field, op, value } => {
-            let field_value = input.contains(field);
+            let field_value = reason_codes.contains(field);
             match op {
                 BooleanOperator::Equals => field_value == *value,
                 BooleanOperator::DoesNotEqual => field_value != *value,
@@ -170,17 +182,13 @@ fn evaluate_condition(
                         Equals::DoesNotEqual => field_value.leak_to_string() != *value.leak_to_string(),
                     },
                     VaultOperation::IsIn { field, op, value } => {
-                        if let Some(list) = lists.get(value) {
-                            match op {
-                                IsIn::IsIn => is_in_list(field, field_value, list)?,
-                                IsIn::IsNotIn => !is_in_list(field, field_value, list)?,
-                            }
-                        } else {
-                            return Err(AssertionError(&format!(
-                                "Missing List needed for rule evaluation: {}",
-                                value
-                            ))
-                            .into());
+                        let list = lists.get(value).ok_or(AssertionError(&format!(
+                            "Missing List needed for rule evaluation: {}",
+                            value
+                        )))?;
+                        match op {
+                            IsIn::IsIn => vault_data_is_in_list(field, field_value, list)?,
+                            IsIn::IsNotIn => !vault_data_is_in_list(field, field_value, list)?,
                         }
                     }
                 }
@@ -189,6 +197,18 @@ fn evaluate_condition(
                 false
             }
         }
+        RuleExpressionCondition::DeviceInsight(dio) => match dio {
+            DeviceInsightOperation::IsIn { field, op, value } => {
+                let list = lists.get(value).ok_or(AssertionError(&format!(
+                    "Missing List needed for rule evaluation: {}",
+                    value
+                )))?;
+                match op {
+                    IsIn::IsIn => insight_field_value_is_in_list(field, insight_events, list)?,
+                    IsIn::IsNotIn => !insight_field_value_is_in_list(field, insight_events, list)?,
+                }
+            }
+        },
         RuleExpressionCondition::RiskScore {
             field: _,
             op: _,
@@ -198,7 +218,11 @@ fn evaluate_condition(
     Ok(res)
 }
 
-fn is_in_list(field: &DataIdentifier, value: PiiString, list: &ListWithDecryptedEntries) -> ApiResult<bool> {
+fn vault_data_is_in_list(
+    field: &DataIdentifier,
+    value: PiiString,
+    list: &ListWithDecryptedEntries,
+) -> ApiResult<bool> {
     let (list, entries) = list;
 
     match (field, list.kind) {
@@ -241,6 +265,42 @@ fn is_in_list(field: &DataIdentifier, value: PiiString, list: &ListWithDecrypted
         .any(|(_, e)| crypto::safe_compare(canon_bytes, e.leak().as_bytes()));
 
     Ok(exact_match)
+}
+
+fn insight_field_value_is_in_list(
+    field: &DeviceInsightField,
+    insight_events: &[InsightEvent],
+    list: &ListWithDecryptedEntries,
+) -> ApiResult<bool> {
+    let (list, entries) = list;
+
+    if list.kind != ListKind::IpAddress {
+        return AssertionError(&format!(
+            "Cannot check membership of Device Insight field {} in list with kind {}",
+            field, list.kind
+        ))
+        .into();
+    }
+
+    for event in insight_events {
+        let value = match field {
+            DeviceInsightField::IpAddress => event.ip_address.clone(),
+        };
+        let Some(value) = value else { continue };
+
+        let parsed = ListEntryValue::parse(list.kind, value.into())?;
+        let canon = parsed.canonicalize();
+        let canon_bytes = canon.leak().as_bytes();
+
+        let exact_match = entries
+            .iter()
+            .any(|(_, e)| crypto::safe_compare(canon_bytes, e.leak().as_bytes()));
+        if exact_match {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
 }
 
 #[cfg(test)]
@@ -400,6 +460,7 @@ pub mod tests {
             rules,
             &input,
             &VaultDataForRules::empty(),
+            &[],
             &HashMap::new(),
             &config,
         ); // TODO: tests with vault data
@@ -449,7 +510,7 @@ pub mod tests {
         value: true,
     }]), vec![FRC::IdNotLocated, FRC::NameDoesNotMatch, FRC::SsnNotProvided]  => true)]
     pub fn test_evaluate_rule_expression(re: RE, input: Vec<FRC>) -> bool {
-        evaluate_rule_expression(&re, &input, &VaultDataForRules::empty(), &HashMap::new()).unwrap()
+        evaluate_rule_expression(&re, &input, &VaultDataForRules::empty(), &[], &HashMap::new()).unwrap()
         // TODO: vault data rules
     }
 
@@ -494,7 +555,7 @@ pub mod tests {
         value: false,
     }, vec![]  => false)]
     pub fn test_evaluate_condition(cond: REC, input: Vec<FRC>) -> bool {
-        evaluate_condition(&cond, &input, &VaultDataForRules::empty(), &HashMap::new()).unwrap()
+        evaluate_condition(&cond, &input, &VaultDataForRules::empty(), &[], &HashMap::new()).unwrap()
         // TODO: vault data condition
     }
 
@@ -567,6 +628,7 @@ pub mod tests {
             }),
             &Vec::<FRC>::new(),
             &vd,
+            &[],
             &HashMap::new()
         )
         .unwrap());
@@ -579,6 +641,7 @@ pub mod tests {
             }),
             &Vec::<FRC>::new(),
             &vd,
+            &[],
             &HashMap::new()
         )
         .unwrap());
@@ -664,7 +727,7 @@ pub mod tests {
         (DI::Id(IdentityDataKind::PhoneNumber), IsIn::IsIn),
         vec![(DI::Id(IdentityDataKind::PhoneNumber), "+35555555555"),]
     => false; "PhoneCountryCode, no match")]
-    pub fn test_evaluate_condition_lists(
+    pub fn test_evaluate_vault_condition_lists(
         list: (ListKind, Vec<&str>),
         rule: (DI, IsIn),
         vault_data: Vec<(DI, &str)>,
@@ -699,6 +762,71 @@ pub mod tests {
             value: list_id,
         });
 
-        evaluate_condition(&cond, &[], &vd, &lists).unwrap()
+        evaluate_condition(&cond, &[], &vd, &[], &lists).unwrap()
+    }
+
+    #[test_case(
+        (ListKind::IpAddress, vec!["1.2.3.4", "5.6.7.8"]),
+        (DeviceInsightField::IpAddress, IsIn::IsIn),
+        vec![
+            InsightEvent{
+                ip_address: Some("2.4.6.8".to_owned()),
+                ..InsightEvent::default()
+            },
+        ]
+    => false; "IP address, no match")]
+    #[test_case(
+        (ListKind::IpAddress, vec!["1.2.3.4", "5.6.7.8"]),
+        (DeviceInsightField::IpAddress, IsIn::IsIn),
+        vec![
+            InsightEvent{
+                ip_address: Some("1.2.3.4".to_owned()),
+                ..InsightEvent::default()
+            },
+        ]
+    => true; "IP address, match IPv4")]
+    #[test_case(
+        (ListKind::IpAddress, vec!["1.2.3.4", "3f02:cad:1ce7:8b65:fa3d:9c4b:17ef:ac12"]),
+        (DeviceInsightField::IpAddress, IsIn::IsIn),
+        vec![
+            InsightEvent{
+                ip_address: Some("3f02:cad:1ce7:8b65:fa3d:9c4b:17ef:ac12".to_owned()),
+                ..InsightEvent::default()
+            },
+        ]
+    => true; "IP address, match IPv6")]
+    #[test_case(
+        (ListKind::IpAddress, vec!["1.2.3.4", "5.6.7.8"]),
+        (DeviceInsightField::IpAddress, IsIn::IsIn),
+        vec![
+            InsightEvent{
+                ip_address: Some("::ffff:1.2.3.4".to_owned()),
+                ..InsightEvent::default()
+            },
+        ]
+    => true; "IP address, match canonicalized")]
+    pub fn test_evaluate_insight_condition_lists(
+        list: (ListKind, Vec<&str>),
+        rule: (DeviceInsightField, IsIn),
+        insight_events: Vec<InsightEvent>,
+    ) -> bool {
+        let (list_kind, list_entries) = list;
+        let (rule_field, rule_op) = rule;
+
+        let list = db::tests::fixtures::list::create_in_memory(list_kind);
+        let list_id = list.id.clone();
+        let list_entries = list_entries
+            .into_iter()
+            .map(|s| (db::tests::fixtures::list_entry::create_in_memory(), s.into()))
+            .collect();
+        let lists = HashMap::from_iter([(list_id.clone(), (list, list_entries))]);
+
+        let cond = REC::DeviceInsight(DeviceInsightOperation::IsIn {
+            field: rule_field,
+            op: rule_op,
+            value: list_id,
+        });
+
+        evaluate_condition(&cond, &[], &VaultDataForRules::empty(), &insight_events, &lists).unwrap()
     }
 }

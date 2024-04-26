@@ -1,4 +1,4 @@
-use crate::{DataIdentifier, FootprintReasonCode, ListId, PiiString};
+use crate::{DataIdentifier, DeviceInsightField, FootprintReasonCode, ListId, PiiString};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -17,6 +17,7 @@ pub enum RuleExpressionCondition {
         value: bool,
     },
     VaultData(VaultOperation),
+    DeviceInsight(DeviceInsightOperation),
     // just a proof of concept, not used. would have #[cfg(test)] but vscode is annoying with that
     RiskScore {
         field: RiskScore,
@@ -56,6 +57,17 @@ impl VaultOperation {
             } => field,
         }
     }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+#[serde(untagged)]
+pub enum DeviceInsightOperation {
+    IsIn {
+        field: DeviceInsightField,
+        op: IsIn,
+        value: ListId,
+    },
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
@@ -103,6 +115,11 @@ impl RuleExpressionCondition {
     pub fn list_id(&self) -> Option<&ListId> {
         match self {
             RuleExpressionCondition::VaultData(VaultOperation::IsIn {
+                field: _,
+                op: _,
+                value,
+            }) => Some(value),
+            RuleExpressionCondition::DeviceInsight(DeviceInsightOperation::IsIn {
                 field: _,
                 op: _,
                 value,
@@ -193,6 +210,29 @@ mod test {
             json!(
                 [
                     {"field":"id.ssn9","op":"is_in","value":"lst_123"},
+                ]
+            ),
+            json
+        );
+        assert_eq!(re, serde_json::from_value(json).unwrap());
+    }
+
+    #[test]
+    fn test_deser_device_insight_isin() {
+        let re = RuleExpression(vec![RuleExpressionCondition::DeviceInsight(
+            DeviceInsightOperation::IsIn {
+                field: DeviceInsightField::IpAddress,
+                op: IsIn::IsIn,
+                value: ListId::from("lst_123".to_string()),
+            },
+        )]);
+
+        let json = serde_json::to_value(re.clone()).unwrap();
+
+        assert_eq!(
+            json!(
+                [
+                    {"field":"ip_address","op":"is_in","value":"lst_123"},
                 ]
             ),
             json

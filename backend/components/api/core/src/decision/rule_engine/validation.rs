@@ -2,8 +2,9 @@ use crate::errors::{ApiResult, ValidationError};
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
 use newtypes::{
-    AllData, BusinessDataKind, DataIdentifier, IdentityDataKind, ListId, ListKind, PiiJsonValue,
-    RuleExpression, RuleExpressionCondition, Validate, ValidateArgs, VaultOperation,
+    AllData, BusinessDataKind, DataIdentifier, DeviceInsightField, DeviceInsightOperation, IdentityDataKind,
+    ListId, ListKind, PiiJsonValue, RuleExpression, RuleExpressionCondition, Validate, ValidateArgs,
+    VaultOperation,
 };
 use std::collections::HashMap;
 
@@ -15,7 +16,7 @@ pub fn validate_rule_expression(
     for condition in rule_expression.0.iter() {
         match condition {
             RuleExpressionCondition::RiskSignal { .. } => {}
-            RuleExpressionCondition::VaultData(vault_data) => match vault_data {
+            RuleExpressionCondition::VaultData(vault_op) => match vault_op {
                 VaultOperation::Equals { field, op: _, value } => {
                     let all_data = AllData::new();
                     field.clone().validate(
@@ -66,6 +67,37 @@ pub fn validate_rule_expression(
                         return ValidationError(
                             format!(
                                 "Vaulted field {} can not be matched against list with kind {}",
+                                field, list.kind
+                            )
+                            .as_str(),
+                        )
+                        .into();
+                    }
+                }
+            },
+            RuleExpressionCondition::DeviceInsight(insight_op) => match insight_op {
+                DeviceInsightOperation::IsIn { field, op: _, value } => {
+                    let Some(list) = lists.get(value) else {
+                        return ValidationError(&format!("List with ID {} not found", value)).into();
+                    };
+
+                    if list.is_live != is_live {
+                        return ValidationError("List is_live does not match is_live context").into();
+                    }
+
+                    let di_matches_list_kind = match list.kind {
+                        ListKind::IpAddress => *field == DeviceInsightField::IpAddress,
+                        ListKind::EmailAddress
+                        | ListKind::EmailDomain
+                        | ListKind::Ssn9
+                        | ListKind::PhoneNumber
+                        | ListKind::PhoneCountryCode => false,
+                    };
+
+                    if !di_matches_list_kind {
+                        return ValidationError(
+                            format!(
+                                "Device Insight field {} can not be matched against list with kind {}",
                                 field, list.kind
                             )
                             .as_str(),

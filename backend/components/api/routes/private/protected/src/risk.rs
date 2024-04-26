@@ -121,6 +121,7 @@ async fn make_vendor_calls(
         rules,
         &reason_codes,
         &VaultDataForRules::empty(), // TODO
+        &[],                         // TODO
         &HashMap::new(),             // TODO
         &RuleEvalConfig::default(),
     );
@@ -288,6 +289,7 @@ async fn shadow_run(
         rules,
         &reason_codes,
         &VaultDataForRules::empty(), // TODO
+        &[],                         // TODO
         &HashMap::new(),             // TODO
         &RuleEvalConfig::default(),
     );

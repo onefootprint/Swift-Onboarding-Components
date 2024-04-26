@@ -1,6 +1,6 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.utils import _gen_random_str, create_ob_config, get, post, patch, delete
+from tests.utils import _gen_random_str, _gen_random_sandbox_id, create_ob_config, get, post, patch, delete
 
 
 @pytest.fixture(scope="function")
@@ -216,6 +216,119 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
         assert rsr["rule_results"][-2]["result"] == False
         assert rsr["rule_results"][-1]["rule"] == rule2
         assert rsr["rule_results"][-1]["result"] == True
+
+
+def new_list(kind, entries, sandbox_tenant):
+    nonce = _gen_random_str(5)
+    return post(
+        f"/org/lists",
+        dict(
+            name=f"Integration Test List {nonce}",
+            alias=f"integration-test-list-{nonce}",
+            kind=kind,
+            entries=entries,
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+
+def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
+    # Flake note: requires a consistent client IP for the duration of the test.
+
+    sandbox_id = _gen_random_sandbox_id()
+    obc = create_ob_config(
+        sandbox_tenant, "Baseline", must_collect_data, can_access_data,
+        # These are the necessary arguments to skip KYC so the status is only
+        # dependent on rules evaluation.
+        skip_kyc=True,
+        allow_international_residents=True,
+    )
+    bifrost = BifrostClient.create(
+        obc,
+        override_sandbox_id=sandbox_id,
+    )
+    user = bifrost.run()
+    fp_id = user.fp_id
+
+    # Get the client IP address for the integration tests.
+    user = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
+    assert len(user["workflows"]) == 1
+    ip_address = user["workflows"][0]["insight_event"]["ip_address"]
+
+    # The user should pass the default rules.
+    assert user["status"] == "pass"
+
+    ip_list_with_match = new_list("ip_address", [ip_address], sandbox_tenant)
+    other_ip_address = "1.2.3.4"
+    assert ip_address != other_ip_address
+    ip_list_without_match = new_list("ip_address", [other_ip_address], sandbox_tenant)
+
+    matching_rule = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            name="Should match",
+            rule_expression=[
+                {
+                    "field": "ip_address",
+                    "op": "is_in",
+                    "value": ip_list_with_match["id"],
+                },
+            ],
+            action="fail",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    non_matching_rule = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            name="Should not match",
+            rule_expression=[
+                {
+                    "field": "ip_address",
+                    "op": "is_in",
+                    "value": ip_list_without_match["id"],
+                },
+            ],
+            action="fail",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    # Rerun Bifrost in a new sandbox.
+    sandbox_id = _gen_random_sandbox_id()
+    bifrost = BifrostClient.create(
+        obc,
+        override_sandbox_id=sandbox_id,
+    )
+    user = bifrost.run()
+    fp_id = user.fp_id
+
+    timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    stepup_event = [
+        i for i in timeline if i["event"]["kind"] == "onboarding_decision"
+    ].pop()
+    rule_set_result_id = stepup_event['event']['data']['decision']['rule_set_result_id']
+
+    # Get the client IP address for the integration tests.
+    user = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
+    assert len(user["workflows"]) == 1
+    ip_address = user["workflows"][0]["insight_event"]["ip_address"]
+
+    # The user should fail now with the custom rules.
+    assert user["status"] == "fail"
+
+    # Check the result of the rule evaluation.
+    rsr = get(
+        f"entities/{fp_id}/rule_set_result/{rule_set_result_id}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
+    assert rsr["rule_results"][-2]["rule"]["rule_id"] == matching_rule["rule_id"]
+    assert rsr["rule_results"][-2]["result"] == True
+
+    assert rsr["rule_results"][-1]["rule"]["rule_id"] == non_matching_rule["rule_id"]
+    assert rsr["rule_results"][-1]["result"] == False
 
 
 def test_delete(sandbox_tenant, obc):

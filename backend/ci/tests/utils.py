@@ -298,7 +298,8 @@ def create_ob_config(
     enhanced_aml=None,
     document_types_and_countries=None,  # TODO: argoff fix this, not what the FE uses as the default
     documents_to_collect=None,
-    curp_validation_enabled=False
+    curp_validation_enabled=False,
+    skip_kyc=False,
 ):
     ob_conf_data = {
         "name": name,
@@ -316,7 +317,8 @@ def create_ob_config(
         "enhanced_aml": enhanced_aml,
         "document_types_and_countries": document_types_and_countries,
         "documents_to_collect": documents_to_collect or [],
-        "curp_validation_enabled": curp_validation_enabled
+        "curp_validation_enabled": curp_validation_enabled,
+        "skip_kyc": skip_kyc
     }
     auths = override_auths if override_auths else tenant.db_auths
     body = post("org/onboarding_configs", ob_conf_data, *auths)

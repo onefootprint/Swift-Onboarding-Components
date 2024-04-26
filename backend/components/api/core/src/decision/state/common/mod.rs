@@ -19,9 +19,10 @@ use db::{
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::{
-    CipKind, DecisionIntentKind, FootprintReasonCode, ListId, Locked, OnboardingStatus, PiiBytes, PiiString,
-    ReviewReason, RuleAction, RuleExpressionCondition, RuleSetResultId, ScopedVaultId, SealedVaultBytes,
-    StepUpInfo, TenantId, VaultId, VaultOperation, VendorAPI, VerificationResultId, WorkflowId,
+    CipKind, DecisionIntentKind, DeviceInsightOperation, FootprintReasonCode, ListId, Locked,
+    OnboardingStatus, PiiBytes, PiiString, ReviewReason, RuleAction, RuleExpressionCondition,
+    RuleSetResultId, ScopedVaultId, SealedVaultBytes, StepUpInfo, TenantId, VaultId, VaultOperation,
+    VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -368,12 +369,22 @@ pub fn list_ids_from_rules(rules: &[RuleInstance]) -> Vec<ListId> {
         .iter()
         .flat_map(|ri| &ri.rule_expression.0)
         .filter_map(|re| match re {
-            RuleExpressionCondition::VaultData(VaultOperation::IsIn {
-                field: _,
-                op: _,
-                value,
-            }) => Some(value.clone()),
-            _ => None,
+            RuleExpressionCondition::VaultData(op) => match op {
+                VaultOperation::Equals { .. } => None,
+                VaultOperation::IsIn {
+                    field: _,
+                    op: _,
+                    value,
+                } => Some(value.clone()),
+            },
+            RuleExpressionCondition::DeviceInsight(op) => match op {
+                DeviceInsightOperation::IsIn {
+                    field: _,
+                    op: _,
+                    value,
+                } => Some(value.clone()),
+            },
+            RuleExpressionCondition::RiskSignal { .. } | RuleExpressionCondition::RiskScore { .. } => None,
         })
         .collect_vec()
 }

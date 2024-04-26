@@ -252,7 +252,7 @@ pub(crate) async fn create_cip_request(
                 .pop();
 
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let insight = InsightEvent::get(conn, &wf.id)?;
+            let insight = InsightEvent::get_for_workflow(conn, &wf.id)?;
 
             let decision = manual_obd.unwrap_or(fp_obd);
 

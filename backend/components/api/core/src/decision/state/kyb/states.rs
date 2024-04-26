@@ -25,6 +25,7 @@ use crate::{
 use async_trait::async_trait;
 use db::models::{
     data_lifetime::DataLifetime,
+    insight_event::InsightEvent,
     list_entry::{ListEntry, ListWithDecryptedEntries},
     ob_configuration::ObConfiguration,
     onboarding_decision::OnboardingDecision,
@@ -444,6 +445,11 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         } else {
             let kyb_rs: Vec<RiskSignal> = rsfd.risk_signals.into_iter().flat_map(|(_, v)| v).collect();
 
+            // TODO: Consider pulling in additional insight events?
+            let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?
+                .into_iter()
+                .collect();
+
             let (rsr, _) = decision::rule_engine::engine::evaluate_rules(
                 conn,
                 &sv.id,
@@ -452,6 +458,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 RuleSetResultKind::WorkflowDecision,
                 &kyb_rs,
                 &vault_data_for_rules,
+                &insight_events,
                 &lists_for_rules,
                 &RuleEvalConfig::default(),
             )?;

@@ -336,6 +336,7 @@ pub(super) fn eval_rules(res: VendorResult, vw: &VaultWrapper, obc: &ObConfigura
         rules,
         &reason_codes,
         &VaultDataForRules::empty(),
+        &[],
         &HashMap::new(),
         &RuleEvalConfig::default(),
     );

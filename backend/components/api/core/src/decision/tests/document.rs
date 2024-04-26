@@ -96,7 +96,7 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
     state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
+            let ie = InsightEvent::get_for_workflow(conn, &wf_id)?.unwrap();
 
             let note = "I, Bob Boberto, consent to NOTHING".into();
             UserConsent::create(conn, Utc::now(), ie.id, note, false, wf_id)?;

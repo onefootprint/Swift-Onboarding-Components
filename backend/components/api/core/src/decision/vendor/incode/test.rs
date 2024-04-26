@@ -88,7 +88,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 DecisionIntent::get_or_create_for_workflow(conn, &su_id, &wf.id, DecisionIntentKind::DocScan)
                     .unwrap();
 
-            let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
+            let ie = InsightEvent::get_for_workflow(conn, &wf_id)?.unwrap();
             let doc_request =
                 DocumentRequest::get(conn.conn(), &wf.id, DocumentRequestKind::Identity)?.unwrap();
 
@@ -339,7 +339,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             let di =
                 DecisionIntent::get_or_create_for_workflow(conn, &suid, &wf.id, DecisionIntentKind::DocScan)
                     .unwrap();
-            let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
+            let ie = InsightEvent::get_for_workflow(conn, &wf_id)?.unwrap();
 
             let doc_request = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.unwrap();
 

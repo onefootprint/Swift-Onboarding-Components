@@ -4,7 +4,7 @@ use db_schema::schema::{insight_event, workflow};
 use diesel::{prelude::*, Insertable, Queryable, RunQueryDsl};
 use newtypes::{InsightEventId, WorkflowId};
 
-#[derive(Debug, Clone, Queryable, Insertable, Selectable)]
+#[derive(Debug, Clone, Default, Queryable, Insertable, Selectable)]
 #[diesel(table_name = insight_event)]
 pub struct InsightEvent {
     pub id: InsightEventId,
@@ -78,8 +78,8 @@ impl CreateInsightEvent {
 }
 
 impl InsightEvent {
-    #[tracing::instrument("InsightEvent::get", skip_all)]
-    pub fn get(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<InsightEvent>> {
+    #[tracing::instrument("InsightEvent::get_for_workflow", skip_all)]
+    pub fn get_for_workflow(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<InsightEvent>> {
         let insight_event: Option<InsightEvent> = workflow::table
             .inner_join(insight_event::table)
             .filter(workflow::id.eq(wf_id))
