@@ -69,7 +69,11 @@ impl RuleEvalConfig {
     fn excluded_rule_actions(doc_kinds_collected: Vec<DocumentRequestKind>) -> Vec<RuleAction> {
         StepUpKind::iter()
             .filter(|suk| {
-                let doc_kinds_from_suk = suk.to_doc_kinds();
+                let doc_kinds_from_suk = suk
+                    .to_doc_configs()
+                    .into_iter()
+                    .map(DocumentRequestKind::from)
+                    .collect_vec();
                 // only allow stepups to doc kinds we haven't collected yet
                 doc_kinds_collected
                     .iter()

@@ -19,10 +19,9 @@ use db::{
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::{
-    CipKind, DecisionIntentKind, DocumentRequestConfig, DocumentRequestKind, FootprintReasonCode, ListId,
-    Locked, OnboardingStatus, PiiBytes, PiiString, ReviewReason, RuleAction, RuleExpressionCondition,
-    RuleSetResultId, ScopedVaultId, SealedVaultBytes, StepUpInfo, TenantId, VaultId, VaultOperation,
-    VendorAPI, VerificationResultId, WorkflowId,
+    CipKind, DecisionIntentKind, FootprintReasonCode, ListId, Locked, OnboardingStatus, PiiBytes, PiiString,
+    ReviewReason, RuleAction, RuleExpressionCondition, RuleSetResultId, ScopedVaultId, SealedVaultBytes,
+    StepUpInfo, TenantId, VaultId, VaultOperation, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -215,34 +214,25 @@ pub fn handle_rules_output(
     rsr_id: Option<RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<DecisionOutput> {
-    if matches!(rules_output.action, Some(RuleAction::StepUp(_))) {
-        let doc_reqs = if let Some(RuleAction::StepUp(kind)) = rules_output.action {
-            kind.to_doc_kinds()
-                .into_iter()
-                .filter_map(|kind| match kind {
-                    DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
-                        collect_selfie: true, // TODO: should come from config
-                    }),
-                    DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {}),
-                    DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
-                    DocumentRequestKind::Custom => None,
-                })
-                .map(|config| NewDocumentRequestArgs {
-                    scoped_vault_id: wf.scoped_vault_id.clone(),
-                    workflow_id: wf.id.clone(),
-                    rule_set_result_id: rsr_id.clone(),
-                    config,
-                })
-                .collect()
-        } else {
-            vec![]
-        };
+    if let Some(RuleAction::StepUp(suk)) = rules_output.action {
+        let doc_reqs = suk
+            .to_doc_configs()
+            .into_iter()
+            .map(|config| NewDocumentRequestArgs {
+                scoped_vault_id: wf.scoped_vault_id.clone(),
+                workflow_id: wf.id.clone(),
+                rule_set_result_id: rsr_id.clone(),
+                config,
+            })
+            .collect();
         let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
         let stepup_info = StepUpInfo {
             document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
         };
+        // Leave a timeline event showing step up was requested
         UserTimeline::create(conn, stepup_info, v_id, wf.scoped_vault_id.clone())?;
 
+        // Move the workflow back into an Incomplete state to show we are waiting for data from user
         let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
         Workflow::update(wf, conn, update)?;
         Ok(DecisionOutput::NonTerminal)

@@ -1,6 +1,6 @@
 use crate::{
     util::{impl_enum_str_diesel, impl_enum_string_diesel},
-    DecisionStatus, DocumentRequestKind,
+    DecisionStatus, DocumentRequestConfig, DocumentRequestKind,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::v2::models::DataType;
@@ -79,9 +79,8 @@ pub enum StepUpKind {
 }
 
 impl StepUpKind {
-    // TODO to configs
-    pub fn to_doc_kinds(&self) -> Vec<DocumentRequestKind> {
-        match self {
+    pub fn to_doc_configs(&self) -> Vec<DocumentRequestConfig> {
+        let doc_kinds = match self {
             StepUpKind::Identity => vec![DocumentRequestKind::Identity],
             StepUpKind::ProofOfAddress => vec![DocumentRequestKind::ProofOfAddress],
             StepUpKind::IdentityProofOfSsn => {
@@ -94,7 +93,19 @@ impl StepUpKind {
                     DocumentRequestKind::ProofOfAddress,
                 ]
             }
-        }
+        };
+
+        doc_kinds
+            .into_iter()
+            .filter_map(|kind| match kind {
+                DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
+                    collect_selfie: true, // TODO: should come from config
+                }),
+                DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {}),
+                DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
+                DocumentRequestKind::Custom => None,
+            })
+            .collect()
     }
 }
 
