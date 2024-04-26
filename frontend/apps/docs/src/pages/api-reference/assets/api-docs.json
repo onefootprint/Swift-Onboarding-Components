@@ -1559,6 +1559,9 @@
                 },
                 "security": [
                     {
+                        "Dashboard Token": []
+                    },
+                    {
                         "Secret API Key": []
                     }
                 ]

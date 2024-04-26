@@ -3,7 +3,7 @@ use crate::{
     DecisionStatus, DocumentRequestKind,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::actix::Apiv2Schema;
+use paperclip::v2::models::DataType;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{AsRefStr, IntoEnumIterator, ParseError};
 use strum_macros::{Display, EnumIter, EnumString};
@@ -21,7 +21,6 @@ use strum_macros::{Display, EnumIter, EnumString};
     Hash,
     Ord,
     PartialOrd,
-    Apiv2Schema,
     // TODO(argoff): come back and fix this somehow. not good to have around
     EnumIter,
     macros::SerdeAttr,
@@ -131,6 +130,32 @@ impl std::str::FromStr for RuleAction {
 }
 
 impl_enum_string_diesel!(RuleAction);
+
+
+// Custom impl since paperclip won't display the nested enums properly
+impl paperclip::v2::schema::Apiv2Schema for RuleAction {
+    fn name() -> Option<String> {
+        Some("RuleAction".to_string())
+    }
+
+    fn description() -> &'static str {
+        "Represents an action that a Rule can take"
+    }
+
+    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+        use paperclip::v2::models::DefaultSchemaRaw;
+        DefaultSchemaRaw {
+            name: Some("RuleAction".into()),
+            data_type: Some(DataType::String),
+            enum_: Self::all_rule_actions()
+                .into_iter()
+                .map(|ra| serde_json::Value::String(ra.to_string()))
+                .collect(),
+            ..Default::default()
+        }
+    }
+}
+impl paperclip::actix::OperationModifier for RuleAction {}
 
 impl From<&RuleAction> for DecisionStatus {
     fn from(value: &RuleAction) -> Self {
