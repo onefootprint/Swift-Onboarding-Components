@@ -85,6 +85,8 @@ pub enum BoolFlag<'a> {
     IsNeuroEnabledForObc(&'a ObConfigurationKey),
     #[strum(to_string = "RequireCaptureOnStepUp")]
     RequireCaptureOnStepUp(&'a ObConfigurationKey),
+    #[strum(to_string = "TenantCanViewNeuro")]
+    TenantCanViewNeuro(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -135,6 +137,7 @@ impl<'a> BoolFlag<'a> {
             Self::IsVaultProxyJitEndpointEnabled(k) => Some(k.to_string()),
             Self::IsNeuroEnabledForObc(k) => Some(k.to_string()),
             Self::RequireCaptureOnStepUp(k) => Some(k.to_string()),
+            Self::TenantCanViewNeuro(k) => Some(k.to_string()),
         }
     }
 
@@ -181,6 +184,7 @@ impl<'a> BoolFlag<'a> {
             Self::IsVaultProxyJitEndpointEnabled(_) => false,
             Self::IsNeuroEnabledForObc(_) => false,
             Self::RequireCaptureOnStepUp(_) => false,
+            Self::TenantCanViewNeuro(_) => false,
         }
     }
 }

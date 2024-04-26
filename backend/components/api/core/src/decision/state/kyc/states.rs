@@ -280,7 +280,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .collect();
 
             let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Behavior)?;
-            RiskSignal::bulk_add(conn, neuro_frc, true, rsg.id)?;
+            RiskSignal::bulk_add(conn, neuro_frc, false, rsg.id)?;
         }
 
         let fixture_decision =

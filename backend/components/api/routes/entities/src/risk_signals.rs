@@ -7,13 +7,15 @@ use crate::{
     },
     types::{response::ResponseData, JsonApiResponse},
 };
-use api_core::{auth::CanDecrypt, utils::headers::InsightHeaders};
+use api_core::{
+    auth::CanDecrypt, decision::vendor::neuro_id::tenant_can_view_neuro, utils::headers::InsightHeaders,
+};
 use db::models::{
     access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
 };
 use newtypes::{
     AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DbActor,
-    IdentityDataKind as IDK,
+    IdentityDataKind as IDK, VendorAPI,
 };
 
 use crate::{utils::db2api::DbToApi, State};
@@ -73,6 +75,7 @@ pub async fn get(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
+    let can_view_neuro = tenant_can_view_neuro(&state, &tenant_id);
 
     let signals = state
         .db_pool
@@ -83,6 +86,13 @@ pub async fn get(
         .await?
         .into_iter()
         .filter(|(_, rs)| !rs.reason_code.to_be_deprecated())
+        .filter(|(_, rs)| {
+            if matches!(rs.vendor_api, VendorAPI::NeuroIdAnalytics) {
+               can_view_neuro
+            } else {
+                true
+            }
+        })
         .filter_map(|(_, rs)| {
             // FP-5097
             if !matches!(rs.reason_code, FootprintReasonCode::Other(_)) {

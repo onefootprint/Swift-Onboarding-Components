@@ -9,6 +9,7 @@ use db::models::{
     scoped_vault::ScopedVault,
     verification_request::VerificationRequest,
 };
+use feature_flag::BoolFlag;
 use idv::{
     neuro_id::{
         response::{NeuroApiResponse, NeuroIdAnalyticsResponse, NeuroIdAttributes},
@@ -196,4 +197,11 @@ async fn save_neuro_event(
         .await?;
 
     Ok(())
+}
+
+
+pub fn tenant_can_view_neuro(state: &State, tenant_id: &TenantId) -> bool {
+    state
+        .feature_flag_client
+        .flag(BoolFlag::TenantCanViewNeuro(tenant_id))
 }

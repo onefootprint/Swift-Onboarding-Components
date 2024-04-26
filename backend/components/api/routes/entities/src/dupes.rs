@@ -71,6 +71,7 @@ pub async fn get_dupes(
                 .into_iter()
                 .map(DupeKind::try_from)
                 .collect::<newtypes::NtResult<Vec<_>>>()?
+                // TODO: filter out neuro here based on flag
                 .into_iter()
                 .unique()
                 .collect_vec();
