@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::{InsightEvent, WatchlistCheck};
 use chrono::{DateTime, Utc};
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, ExternalId, FilterFunction, FpId, LabelKind, ObConfigurationId,
-    OnboardingStatus, PiiString, SandboxId, TenantId, VaultKind,
+    DataIdentifier, DataLifetimeSource, ExternalId, FilterFunction, FpId, LabelKind, ManualReviewKind,
+    ObConfigurationId, OnboardingStatus, PiiString, SandboxId, TenantId, VaultKind,
 };
 use paperclip::actix::Apiv2Schema;
 
@@ -30,6 +30,7 @@ pub struct Entity {
     // These are a representation of the associated workflows
     pub status: Option<EntityStatus>,
     pub requires_manual_review: bool,
+    pub manual_review_kinds: Vec<ManualReviewKind>,
     pub is_created_via_api: bool,
     /// These are not sorted
     pub workflows: Vec<EntityWorkflow>,

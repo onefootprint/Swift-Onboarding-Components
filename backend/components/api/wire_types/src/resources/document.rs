@@ -1,6 +1,6 @@
 use crate::*;
 use newtypes::{
-    DataIdentifier, DataLifetimeSeqno, DocumentScanDeviceType, DocumentSide, IdDocKind,
+    DataIdentifier, DataLifetimeSeqno, DocumentReviewStatus, DocumentScanDeviceType, DocumentSide, IdDocKind,
     IdentityDocumentStatus,
 };
 
@@ -29,8 +29,10 @@ pub struct Document {
     pub kind: IdDocKind,
     /// Non-null for images uploaded via the UI
     pub started_at: Option<DateTime<Utc>>,
-    /// Non-null for images uploaded via the UI
+    /// Non-null for images uploaded via bifrost
     pub status: Option<IdentityDocumentStatus>,
+    /// Non-null for images uploaded via bifrost
+    pub review_status: Option<DocumentReviewStatus>,
     pub completed_version: Option<DataLifetimeSeqno>,
     pub curp_completed_version: Option<DataLifetimeSeqno>,
     pub uploads: Vec<DocumentUpload>,

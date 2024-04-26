@@ -73,8 +73,8 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             ..
         } = sv;
 
-        // If the latest Workflow has an uncompleted review
         let requires_manual_review = !mrs.is_empty();
+        let manual_review_kinds = mrs.iter().map(|mr| mr.kind).collect();
 
         let has_outstanding_doc_wf = wfs.iter().any(|(wf, _)| {
             wf.kind == WorkflowKind::Document && wf.completed_at.is_none() && wf.deactivated_at.is_none()
@@ -97,6 +97,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             ordering_id,
             status,
             requires_manual_review,
+            manual_review_kinds,
             is_created_via_api,
             data,
             workflows,

@@ -138,10 +138,10 @@ impl
             doc_scan_for_optional_ssn,
             kind,
             document_types_and_countries,
+            documents_to_collect,
             cip_kind,
             ..
         } = ob_config;
-
 
         Self {
             id,
@@ -168,6 +168,7 @@ impl
             document_types_and_countries,
             rule_set: rule_set.map(|rs| api_wire_types::RuleSet { version: rs.version }),
             cip_kind,
+            documents_to_collect: documents_to_collect.unwrap_or_default(),
         }
     }
 }

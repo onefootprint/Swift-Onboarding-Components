@@ -2,6 +2,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 
 use serde::{Deserialize, Serialize};
+use serde_with::SerializeDisplay;
 use strum::EnumIter;
 use strum_macros::{AsRefStr, EnumString};
 
@@ -52,9 +53,22 @@ impl ReviewReason {
 crate::util::impl_enum_str_diesel!(ReviewReason);
 
 #[derive(
-    Debug, strum_macros::Display, Clone, Copy, AsExpression, FromSqlRow, EnumString, Eq, PartialEq, EnumIter,
+    Debug,
+    strum_macros::Display,
+    Clone,
+    Copy,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    Eq,
+    PartialEq,
+    EnumIter,
+    SerializeDisplay,
+    Apiv2Schema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum ManualReviewKind {
     RuleTriggered,

@@ -171,6 +171,7 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
     # Test voter ID with curp
     voter_id = next(i for i in body if i["kind"] == "voter_identification")
     assert voter_id["status"] == "complete"
+    assert voter_id["review_status"] == "reviewed_by_machine"
     assert all(u["failure_reasons"] == [] for u in voter_id["uploads"])
     front = next(u for u in voter_id["uploads"] if u["side"] == "front")
     back = next(u for u in voter_id["uploads"] if u["side"] == "back")
@@ -187,15 +188,18 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
         if i["uploads"][0]["identifier"] == "document.custom.utility_bill"
     )
     assert utility_bill["kind"] == "custom"
-    # TODO eventually test review status and whatnot
+    assert utility_bill["status"] == "complete"
+    assert utility_bill["review_status"] == "pending_human_review"
 
     # Test custom doc uploaded via API
-    utility_bill = next(
+    special_doc = next(
         i
         for i in body
         if i["uploads"][0]["identifier"] == "document.custom.my_special_doc"
     )
-    assert utility_bill["kind"] == "custom"
+    assert special_doc["kind"] == "custom"
+    assert special_doc["status"] is None
+    assert special_doc["review_status"] is None
 
     # Test identity doc uploaded via API
     id_card = next(i for i in body if i["kind"] == "id_card")
@@ -204,6 +208,8 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
     assert id_card["upload_source"] == "api"
     assert all(u["failure_reasons"] == [] for u in id_card["uploads"])
     assert any(u["side"] == "front" for u in id_card["uploads"])
+    assert id_card["status"] is None
+    assert id_card["review_status"] is None
 
 
 def test_decrypt_historical(user_with_documents):

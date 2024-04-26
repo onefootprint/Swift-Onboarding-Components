@@ -31,6 +31,7 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             selfie_score,
             ocr_confidence_score,
             status,
+            review_status,
             device_type,
             curp_completed_seqno,
             ..
@@ -40,6 +41,7 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             kind: document_type,
             started_at: Some(created_at),
             status: Some(status),
+            review_status: Some(review_status),
             completed_version: completed_seqno,
             curp_completed_version: curp_completed_seqno,
             uploads,
@@ -94,6 +96,7 @@ impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
             kind,
             started_at: None,
             status: None,
+            review_status: None,
             completed_version: None,
             curp_completed_version: None,
             uploads,

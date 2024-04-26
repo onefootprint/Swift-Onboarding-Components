@@ -2,6 +2,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 
 use serde::{Deserialize, Serialize};
+use serde_with::SerializeDisplay;
 use strum_macros::{AsRefStr, EnumString};
 
 #[derive(
@@ -43,8 +44,22 @@ impl IdentityDocumentStatus {
     }
 }
 
-#[derive(Debug, strum_macros::Display, Clone, Copy, AsExpression, FromSqlRow, EnumString, Eq, PartialEq)]
+#[derive(
+    Debug,
+    strum_macros::Display,
+    Clone,
+    Copy,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    Eq,
+    PartialEq,
+    SerializeDisplay,
+    Apiv2Schema,
+    macros::SerdeAttr,
+)]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DocumentReviewStatus {
     /// The document has been created and a human or machine review has not occured.
