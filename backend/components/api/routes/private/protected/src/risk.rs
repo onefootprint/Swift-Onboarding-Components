@@ -8,12 +8,12 @@ use api_core::{
         self,
         features::risk_signals::{fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result},
         onboarding::Decision,
-        risk,
         rule_engine::{
             self,
             engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
             eval::RuleEvalConfig,
         },
+        state::common::{self, DecisionOutput},
         vendor::{
             get_vendor_apis_for_verification_requests, tenant_vendor_control::TenantVendorControl,
             vendor_result::VendorResult,
@@ -36,8 +36,8 @@ use db::models::{
 };
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DecisionStatus, FpId, RiskSignalGroupKind, RiskSignalId, RuleAction, RuleSetResultKind,
-    TenantId, Vendor, VendorAPI, VerificationRequestId, VerificationResultId, WorkflowId,
+    DecisionIntentId, FpId, RiskSignalGroupKind, RiskSignalId, RuleAction, RuleSetResultKind, TenantId,
+    Vendor, VendorAPI, VerificationRequestId, VerificationResultId, WorkflowId,
 };
 use std::{collections::HashMap, str::FromStr};
 
@@ -162,6 +162,7 @@ async fn make_decision(
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
+            let wf = Workflow::lock(conn, &wf.id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
             let risk_signals = fetch_latest_risk_signals_map(conn, &sv.id)?;
@@ -178,15 +179,14 @@ async fn make_decision(
                 is_fixture: false,
             };
             let (rule_set_result, decision) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
-            if !matches!(
-                decision.decision_status,
-                DecisionStatus::Pass | DecisionStatus::Fail
-            ) {
-                return Err(AssertionError("decision was StepUp, erroring").into());
-            }
+            let d = decision.clone();
             let rsr_id = Some(rule_set_result.id);
-            risk::save_final_decision(conn, &wf.id, vres_ids, &decision, rsr_id, vec![])?;
-            Ok(decision)
+            let output =
+                common::handle_rules_output(conn, wf, sv.vault_id, vres_ids, decision, rsr_id, vec![])?;
+            if matches!(output, DecisionOutput::NonTerminal) {
+                return Err(AssertionError("Non-terminal rule action").into());
+            }
+            Ok(d)
         })
         .await?;
 
@@ -203,7 +203,7 @@ pub struct ShadowRunRequest {
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ShadowRunResult {
-    decision_status: DecisionStatus,
+    action_triggered: Option<RuleAction>,
 }
 
 #[post("/private/protected/risk/shadow_run_vendor_calls_and_decisioning")]
@@ -292,9 +292,7 @@ async fn shadow_run(
         &RuleEvalConfig::default(),
     );
 
-    Ok(Json(ResponseData::ok(ShadowRunResult {
-        decision_status: action_triggered.into(),
-    })))
+    Ok(Json(ResponseData::ok(ShadowRunResult { action_triggered })))
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]

@@ -457,7 +457,6 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             )?;
             (
                 Decision {
-                    decision_status: rsr.action_triggered.into(),
                     should_commit: false, // never commit business data for now
                     create_manual_review: rsr
                         .action_triggered

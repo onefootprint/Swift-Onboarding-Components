@@ -79,6 +79,7 @@ pub enum StepUpKind {
 }
 
 impl StepUpKind {
+    // TODO to configs
     pub fn to_doc_kinds(&self) -> Vec<DocumentRequestKind> {
         match self {
             StepUpKind::Identity => vec![DocumentRequestKind::Identity],
@@ -131,7 +132,6 @@ impl std::str::FromStr for RuleAction {
 
 impl_enum_string_diesel!(RuleAction);
 
-
 // Custom impl since paperclip won't display the nested enums properly
 impl paperclip::v2::schema::Apiv2Schema for RuleAction {
     fn name() -> Option<String> {
@@ -157,22 +157,13 @@ impl paperclip::v2::schema::Apiv2Schema for RuleAction {
 }
 impl paperclip::actix::OperationModifier for RuleAction {}
 
-impl From<&RuleAction> for DecisionStatus {
-    fn from(value: &RuleAction) -> Self {
+impl From<RuleAction> for DecisionStatus {
+    fn from(value: RuleAction) -> Self {
         match value {
             RuleAction::PassWithManualReview => DecisionStatus::Pass,
             RuleAction::StepUp(_) => DecisionStatus::StepUp,
             RuleAction::ManualReview => DecisionStatus::Fail,
             RuleAction::Fail => DecisionStatus::Fail,
-        }
-    }
-}
-
-impl From<Option<RuleAction>> for DecisionStatus {
-    fn from(value: Option<RuleAction>) -> Self {
-        match value {
-            Some(ra) => (&ra).into(),
-            None => DecisionStatus::Pass,
         }
     }
 }

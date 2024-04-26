@@ -89,8 +89,8 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            // If this auth token was created via API, the tenant is specifically requesting that
-            // a new Workflow is created, even if one already exists
+            // If this auth token was created via API or via the dashboard, the tenant is
+            // specifically requesting that a new Workflow is created, even if one already exists
             let force_create = user_auth.data.is_from_api();
             let args = NewOnboardingArgs {
                 existing_wf_id: user_auth.workflow_id(),

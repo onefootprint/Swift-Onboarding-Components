@@ -6,7 +6,7 @@ use crate::{
 use card_validate::Validate as CardValidate;
 use itertools::Itertools;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::{Display, EnumString};
+use strum::{Display, EnumIter, EnumString};
 
 impl Validate for CI {
     fn validate(
@@ -34,7 +34,7 @@ impl Validate for CI {
     }
 }
 
-#[derive(Debug, Clone, Copy, DeserializeFromStr, SerializeDisplay, EnumString, Display)]
+#[derive(Debug, Clone, Copy, DeserializeFromStr, SerializeDisplay, EnumString, Display, EnumIter)]
 #[strum(serialize_all = "snake_case")]
 pub enum CardIssuer {
     // Debit

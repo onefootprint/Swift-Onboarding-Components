@@ -61,7 +61,8 @@ pub async fn post(
                 let (obc, _) = ObConfiguration::get(conn, (playbook_id, &tenant_id, is_live))?;
                 obc
             } else {
-                // For all other trigger kinds, just associate the last playbook with the WFR
+                // For all other trigger kinds, just associate the last playbook with the WFR.
+                // This applies the same rules to from the last playbook to the WF that this creates.
                 let (_, obc) =
                     Workflow::latest(conn, &sv.id, false)?.ok_or(UserError::NoCompleteOnboardings)?;
                 obc

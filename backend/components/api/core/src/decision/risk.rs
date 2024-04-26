@@ -1,6 +1,6 @@
 use newtypes::{
-    DbActor, ManualReviewKind, ReviewReason, RuleSetResultId, VerificationResultId, WorkflowId,
-    WorkflowSource,
+    DbActor, DecisionStatus, ManualReviewKind, ReviewReason, RuleSetResultId, VerificationResultId,
+    WorkflowId, WorkflowSource,
 };
 
 use db::{
@@ -58,10 +58,21 @@ pub fn save_final_decision(
         action: ManualReviewAction::GetOrCreate { review_reasons },
     });
     let manual_reviews = manual_review.into_iter().collect();
+
+    // Fall back to pass for now
+    // TODO in future, fail if we're raising manual review for docs, or fall back to existing status
+    let status = decision
+        .action
+        .map(DecisionStatus::from)
+        .unwrap_or(DecisionStatus::Pass);
+
+    if status == DecisionStatus::StepUp {
+        tracing::error!(%wf_id, "Saving final decision with non-terminal status");
+    }
     let decision = NewDecisionArgs {
         vault_id: scoped_user.vault_id,
         logic_git_hash: crate::GIT_HASH.to_string(),
-        status: decision.decision_status,
+        status,
         result_ids: verification_result_ids,
         annotation_id: None,
         actor: DbActor::Footprint,

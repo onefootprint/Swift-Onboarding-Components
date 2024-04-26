@@ -1,5 +1,24 @@
-use std::{collections::HashMap, sync::Arc};
-
+use super::{DocumentState, MakeDecision};
+use crate::{
+    decision::{
+        self,
+        features::risk_signals::fetch_latest_risk_signals_map,
+        onboarding::Decision,
+        rule_engine::{
+            self,
+            engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
+        },
+        state::{
+            actions::{DocCollected, WorkflowActions},
+            common::{self, DecisionOutput},
+            OnAction, WorkflowState,
+        },
+        utils::should_execute_rules_for_document_only,
+        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
+    },
+    errors::{ApiResult, AssertionError},
+    State,
+};
 use async_trait::async_trait;
 use db::models::{
     data_lifetime::DataLifetime,
@@ -10,33 +29,13 @@ use db::models::{
     vault::Vault,
     workflow::{Workflow as DbWorkflow, WorkflowUpdate as DbWorkflowUpdate},
 };
-
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
     DbActor, DecisionStatus, DocumentConfig, DocumentRequestConfig, Locked, ManualReviewKind,
     OnboardingStatus, ReviewReason, RuleSetResultKind, ScopedVaultId, TenantId, WorkflowConfig, WorkflowId,
 };
-
-use super::{DocumentState, MakeDecision};
-use crate::{
-    decision::{
-        self,
-        features::risk_signals::fetch_latest_risk_signals_map,
-        rule_engine::{
-            self,
-            engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
-        },
-        state::{
-            actions::{DocCollected, WorkflowActions},
-            common, OnAction, WorkflowState,
-        },
-        utils::should_execute_rules_for_document_only,
-        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
-    },
-    errors::{ApiResult, AssertionError},
-    State,
-};
+use std::{collections::HashMap, sync::Arc};
 
 ///
 /// States
@@ -184,6 +183,8 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             // We short circuit for document workflows that have non-identity documents. Since we
             // don't verify them, we need a human to manually review them.
             // We'll create a manual review without evaluating rules
+
+            // TODO don't need to lock
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
             let manual_review = ManualReviewArgs {
                 kind: ManualReviewKind::DocumentNeedsReview,
@@ -230,7 +231,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 if execute_rules_for_real_document_decision_only || obc.skip_kyc {
                     decision
                 } else {
-                    common::kyc_decision_from_fixture(fixture_decision)?
+                    Decision::from(fixture_decision)
                 }
             } else {
                 decision
@@ -240,13 +241,11 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 .map(|vr| vr.verification_result_id)
                 .collect();
 
-            let decision_status = decision.decision_status;
             let rsr_id = Some(rule_set_result.id);
-            common::save_decision(conn, wf, v.id, vres_ids, decision, rsr_id, vec![])?;
-
-            match decision_status {
-                DecisionStatus::Fail | DecisionStatus::Pass => Ok(DocumentState::from(DocumentComplete)),
-                DecisionStatus::StepUp => Ok(DocumentState::from(DocumentDataCollection {
+            let output = common::handle_rules_output(conn, wf, v.id, vres_ids, decision, rsr_id, vec![])?;
+            match output {
+                DecisionOutput::Terminal => Ok(DocumentState::from(DocumentComplete)),
+                DecisionOutput::NonTerminal => Ok(DocumentState::from(DocumentDataCollection {
                     wf_id: self.wf_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,

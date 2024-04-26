@@ -25,8 +25,8 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::{test_state, test_state_case};
 use newtypes::{
-    CollectedDataOption as CDO, DecisionStatus, FootprintReasonCode, KybState, OnboardingStatus, RuleAction,
-    SignalSeverity, VendorAPI, WorkflowFixtureResult, WorkflowState,
+    CollectedDataOption as CDO, FootprintReasonCode, KybState, OnboardingStatus, RuleAction, SignalSeverity,
+    VendorAPI, WorkflowFixtureResult, WorkflowState,
 };
 
 async fn setup(
@@ -73,7 +73,6 @@ async fn kyc_bo(state: &mut State, person_wf: &DbWorkflow) {
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let decision = Decision {
-                decision_status: DecisionStatus::Pass,
                 should_commit: false,
                 create_manual_review: false,
                 action: None,

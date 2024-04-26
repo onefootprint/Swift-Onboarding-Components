@@ -19,10 +19,10 @@ use db::{
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::{
-    CipKind, DecisionIntentKind, DecisionStatus, DocumentRequestConfig, DocumentRequestKind,
-    FootprintReasonCode, ListId, Locked, OnboardingStatus, PiiBytes, PiiString, ReviewReason, RuleAction,
-    RuleExpressionCondition, RuleSetResultId, ScopedVaultId, SealedVaultBytes, StepUpInfo, TenantId, VaultId,
-    VaultOperation, VendorAPI, VerificationResultId, WorkflowId,
+    CipKind, DecisionIntentKind, DocumentRequestConfig, DocumentRequestKind, FootprintReasonCode, ListId,
+    Locked, OnboardingStatus, PiiBytes, PiiString, ReviewReason, RuleAction, RuleExpressionCondition,
+    RuleSetResultId, ScopedVaultId, SealedVaultBytes, StepUpInfo, TenantId, VaultId, VaultOperation,
+    VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -34,7 +34,6 @@ use crate::{
         },
         onboarding::Decision,
         risk,
-        utils::FixtureDecision,
         vendor::{
             self,
             incode::{curp_validation::run_curp_validation_check, incode_watchlist::WatchlistCheckKind},
@@ -200,36 +199,14 @@ pub async fn get_latest_vendor_results(state: &State, sv_id: &ScopedVaultId) -> 
     .map(|r| r.completed_requests)
 }
 
-pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> ApiResult<Decision> {
-    let decision = Decision::from(fixture_decision);
-    Ok(decision)
-}
-
-#[tracing::instrument(skip_all)]
-pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> ApiResult<Decision> {
-    let decision_status = match fixture_decision {
-        // #manualreview -> we want KYC to pass here and then we have a watchlist hit which actually triggers the workflow to go to PendingReview
-        (newtypes::DecisionStatus::Fail, true) => DecisionStatus::Pass,
-        // #fail
-        (newtypes::DecisionStatus::Fail, false) => DecisionStatus::Fail,
-        // #pass
-        (newtypes::DecisionStatus::Pass, _) => DecisionStatus::Pass,
-        // #stepup
-        (newtypes::DecisionStatus::StepUp, _) => DecisionStatus::StepUp,
-    };
-
-    let decision = Decision {
-        decision_status,
-        should_commit: false,
-        create_manual_review: false,
-        action: None,
-    };
-    Ok(decision)
+pub enum DecisionOutput {
+    Terminal,
+    NonTerminal,
 }
 
 #[tracing::instrument(skip(conn))]
 #[allow(clippy::too_many_arguments)]
-pub fn save_decision(
+pub fn handle_rules_output(
     conn: &mut TxnPgConn,
     wf: Locked<Workflow>,
     v_id: VaultId,
@@ -237,45 +214,42 @@ pub fn save_decision(
     rules_output: Decision,
     rsr_id: Option<RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
     review_reasons: Vec<ReviewReason>,
-) -> ApiResult<()> {
-    let sv_id = &wf.scoped_vault_id;
-    match rules_output.decision_status {
-        DecisionStatus::Fail | DecisionStatus::Pass => {
-            risk::save_final_decision(conn, &wf.id, vres_ids, &rules_output, rsr_id, vec![])?;
-        }
-        DecisionStatus::StepUp => {
-            let doc_reqs = if let Some(RuleAction::StepUp(kind)) = rules_output.action {
-                kind.to_doc_kinds()
-                    .into_iter()
-                    .filter_map(|kind| match kind {
-                        DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
-                            collect_selfie: true, // TODO: should come from config
-                        }),
-                        DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {}),
-                        DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
-                        DocumentRequestKind::Custom => None,
-                    })
-                    .map(|config| NewDocumentRequestArgs {
-                        scoped_vault_id: sv_id.clone(),
-                        workflow_id: wf.id.clone(),
-                        rule_set_result_id: rsr_id.clone(),
-                        config,
-                    })
-                    .collect()
-            } else {
-                vec![]
-            };
-            let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
-            let stepup_info = StepUpInfo {
-                document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
-            };
-            UserTimeline::create(conn, stepup_info, v_id, sv_id.clone())?;
+) -> ApiResult<DecisionOutput> {
+    if matches!(rules_output.action, Some(RuleAction::StepUp(_))) {
+        let doc_reqs = if let Some(RuleAction::StepUp(kind)) = rules_output.action {
+            kind.to_doc_kinds()
+                .into_iter()
+                .filter_map(|kind| match kind {
+                    DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
+                        collect_selfie: true, // TODO: should come from config
+                    }),
+                    DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {}),
+                    DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
+                    DocumentRequestKind::Custom => None,
+                })
+                .map(|config| NewDocumentRequestArgs {
+                    scoped_vault_id: wf.scoped_vault_id.clone(),
+                    workflow_id: wf.id.clone(),
+                    rule_set_result_id: rsr_id.clone(),
+                    config,
+                })
+                .collect()
+        } else {
+            vec![]
+        };
+        let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
+        let stepup_info = StepUpInfo {
+            document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
+        };
+        UserTimeline::create(conn, stepup_info, v_id, wf.scoped_vault_id.clone())?;
 
-            let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
-            Workflow::update(wf, conn, update)?;
-        }
+        let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
+        Workflow::update(wf, conn, update)?;
+        Ok(DecisionOutput::NonTerminal)
+    } else {
+        risk::save_final_decision(conn, &wf.id, vres_ids, &rules_output, rsr_id, vec![])?;
+        Ok(DecisionOutput::Terminal)
     }
-    Ok(())
 }
 
 pub async fn maybe_generate_ocr_reason_codes(

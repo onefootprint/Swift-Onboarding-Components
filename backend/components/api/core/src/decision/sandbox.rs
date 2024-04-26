@@ -260,7 +260,6 @@ impl From<FixtureDecision> for Decision {
         };
 
         Decision {
-            decision_status,
             should_commit: decision_status == DecisionStatus::Pass,
             create_manual_review,
             action,

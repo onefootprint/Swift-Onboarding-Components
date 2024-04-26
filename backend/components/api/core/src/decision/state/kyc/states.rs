@@ -35,13 +35,15 @@ use crate::{
                 save_risk_signals, RiskSignalGroupStruct,
             },
         },
+        onboarding::Decision,
         rule_engine::{
             self,
             engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
         },
         state::{
             actions::{Authorize, WorkflowActions},
-            common, DocCollected, OnAction, WorkflowState,
+            common::{self, DecisionOutput},
+            DocCollected, OnAction, WorkflowState,
         },
         utils::should_execute_rules_for_document_only,
         vendor::vendor_result::VendorResult,
@@ -478,19 +480,17 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                     } else {
                         fixture_decision
                     };
-                common::kyc_decision_from_fixture(fixture_decision)?
+                Decision::from(fixture_decision)
             }
         } else {
             decision
         };
 
-        let decision_status = decision.decision_status;
         let rsr_id = Some(rule_set_result.id);
-        common::save_decision(conn, wf, v.id, vres_ids, decision, rsr_id, review_reasons)?;
-
-        match decision_status {
-            DecisionStatus::Fail | DecisionStatus::Pass => Ok(KycState::from(KycComplete)),
-            DecisionStatus::StepUp => Ok(KycState::from(KycDocCollection {
+        let output = common::handle_rules_output(conn, wf, v.id, vres_ids, decision, rsr_id, review_reasons)?;
+        match output {
+            DecisionOutput::Terminal => Ok(KycState::from(KycComplete)),
+            DecisionOutput::NonTerminal => Ok(KycState::from(KycDocCollection {
                 wf_id: self.wf_id,
                 sv_id: self.sv_id,
                 t_id: self.t_id,

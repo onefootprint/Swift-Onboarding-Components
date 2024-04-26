@@ -103,7 +103,6 @@ pub fn evaluate_workflow_decision<'a>(
         &rule_eval_config,
     );
     let decision = Decision {
-        decision_status: rule_set_result.action_triggered.into(),
         should_commit: !is_fixture && should_commit_action.is_none(),
         create_manual_review: rule_set_result
             .action_triggered
