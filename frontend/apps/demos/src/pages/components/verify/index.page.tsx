@@ -7,54 +7,22 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import fakeSdk from '../../../helpers/fake-sdk';
+import getQueryArgs, { isString } from '../../../helpers/get-query-args';
 
-type RouterReturn = ReturnType<typeof useRouter>;
+const fallbackPKey =
+  process.env.NEXT_PUBLIC_TENANT_KEY || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
 
-const AcmeDevAuthKey = 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
-const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY || AcmeDevAuthKey;
-
-const isValidTokenFormat = (str: string): boolean =>
-  Boolean(str) && /tok_/.test(str);
-
-const getSdkArgsToken = (str: string): string =>
-  isValidTokenFormat(str) ? str : '';
-
-const getQueryArgs = (router: RouterReturn) => {
-  const { query, asPath } = router;
-  const {
-    app_url: appUrl,
-    ob_key: obKey,
-    user_data: rawUserData,
-    locale = 'en-US',
-  } = query;
-  const authToken = getSdkArgsToken(asPath.split('#')[1]) ?? '';
-  const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
-  const appUrlStr = String(appUrl);
-  let userData = {};
-
-  try {
-    userData =
-      typeof rawUserData === 'string'
-        ? JSON.parse(decodeURIComponent(rawUserData))
-        : {};
-  } catch (_) {
-    // do nothing
-  }
-  return {
-    authToken,
-    appUrl:
-      appUrlStr.startsWith('https://bifrost-') ||
-      appUrlStr.startsWith('http://localhost')
-        ? appUrlStr
-        : 'http://localhost:3000',
-    publicKey,
-    userData,
-    locale,
-  };
-};
+const getVerifyArgs = (o: ReturnType<typeof getQueryArgs>) => ({
+  ...o,
+  publicKey: isString(o.publicKey) ? o.publicKey : fallbackPKey,
+  appUrl:
+    o.appUrl.startsWith('https://bifrost-') ||
+    o.appUrl.startsWith('http://localhost')
+      ? o.appUrl
+      : 'http://localhost:3000',
+});
 
 const onComplete = (token: string) => {
-  console.log('# token', token); // eslint-disable-line no-console
   const el = document.querySelector('[data-testid="result"]');
   if (el && token) {
     el.innerHTML = token;
@@ -63,12 +31,9 @@ const onComplete = (token: string) => {
 
 const VerifyDemo = () => {
   const router = useRouter();
-  const {
-    appUrl: bifrostUrl,
-    locale,
-    publicKey,
-    userData,
-  } = getQueryArgs(router);
+  const { appUrl, locale, publicKey, userData } = getVerifyArgs(
+    getQueryArgs(router),
+  );
 
   const handleVerifyClick = () => {
     const component = fakeSdk.init({
@@ -83,7 +48,7 @@ const VerifyDemo = () => {
       publicKey,
       userData,
     });
-    component.render(bifrostUrl);
+    component.render(appUrl);
 
     return () => {
       component.destroy();

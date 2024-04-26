@@ -100,6 +100,20 @@ const removeOverlayContainer = (uId: string): void => {
 };
 
 /**
+ * Removes the inline container element with the specified unique identifier.
+ *
+ * @param {string} uId - The unique identifier for the inline container element.
+ * @return {void} This function does not return a value.
+ */
+const removeInlineContainer = (uId: string) => {
+  const id = `footprint-inline-container-${uId}`;
+  const inlineContainer = document.getElementById(id);
+  if (inlineContainer) {
+    inlineContainer.remove();
+  }
+};
+
+/**
  * Appends loading elements to the specified container element.
  *
  * @param {string} uId - The unique identifier for the loading elements.
@@ -119,6 +133,7 @@ export const appendLoadingElements = (uId: string, container: HTMLElement) => {
 export const removeOverlayAndLoading = (uId: string) => {
   removeLoadingIndicator(uId);
   removeOverlayContainer(uId);
+  removeInlineContainer(uId);
 };
 
 /**
@@ -140,4 +155,41 @@ export const appendOverlayContainer = (uId: string): HTMLElement => {
   }
 
   return overlayContainer;
+};
+
+/**
+ * Creates and appends an inline container element to a specified parent element.
+ *
+ * @param {string} uId - The unique identifier for the inline container.
+ * @param {string} [containerId] - The ID of the parent element where the inline container will be appended.
+ * @return {HTMLElement} The created inline container element.
+ */
+export const appendInlineContainer = (uId: string, containerId?: string) => {
+  if (!containerId) throw new Error('No element id provided');
+
+  const clientParent = document.getElementById(containerId);
+  if (!clientParent)
+    throw new Error(`Could not find element with id ${containerId}`);
+
+  const id = `footprint-inline-container-${uId}`;
+  const inlineContainer = document.createElement('div');
+
+  inlineContainer.classList.add('footprint-inline-container');
+  inlineContainer.setAttribute('id', id);
+  inlineContainer.innerHTML = '';
+  clientParent.appendChild(inlineContainer);
+
+  return inlineContainer;
+};
+
+/**
+ * Appends an inline loader element to the specified container element.
+ *
+ * @param {string} uId - The unique identifier for the inline loader element.
+ * @param {HTMLElement} container - The container element to which the loader will be appended.
+ */
+export const appendInlineLoader = (uId: string, container: HTMLElement) => {
+  const id = `footprint-loading-indicator-${uId}`;
+  const loadingIndicator = createLoadingIndicator(id);
+  container.appendChild(loadingIndicator);
 };

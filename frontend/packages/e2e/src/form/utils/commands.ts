@@ -10,7 +10,7 @@ import {
   API_BASE_URL_PROD,
   API_SECRET_KEY_DEV,
   API_SECRET_KEY_PROD,
-} from '../constants';
+} from './constants';
 
 type CardData = {
   name: string;
@@ -35,19 +35,16 @@ export const findMissingConfig = (): Error | undefined => {
   return undefined;
 };
 
-export const waitForFormLoad = async ({
-  page,
-}: {
-  page: Page;
-}): Promise<FrameLocator> => {
-  await page.waitForLoadState();
-  const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
-  await page.waitForLoadState();
+export const waitForFormLoad = async (page: Page): Promise<FrameLocator> => {
+  await expect(
+    page
+      .frameLocator('iframe[name^="footprint-iframe-"]')
+      .getByText(/Card information/i),
+  ).toBeVisible({ timeout: 60000 });
 
-  const header = frame.getByText('Card information').first();
-  await header
-    .waitFor({ state: 'attached', timeout: 15000 })
-    .catch(() => false);
+  const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  const header = frame.getByText(/Card information/i).first();
+  await header.waitFor({ state: 'attached', timeout: 15000 });
 
   return frame;
 };

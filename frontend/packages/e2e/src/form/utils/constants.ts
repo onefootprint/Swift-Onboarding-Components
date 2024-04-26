@@ -1,4 +1,5 @@
 export const API_SECRET_KEY_DEV = process.env.E2E_ACME_SECRET_API_KEY_DEV || '';
+
 export const API_SECRET_KEY_PROD =
   process.env.E2E_ACME_SECRET_API_KEY_PROD || '';
 

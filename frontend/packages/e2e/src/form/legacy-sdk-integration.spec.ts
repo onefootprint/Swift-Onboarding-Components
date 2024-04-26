@@ -8,7 +8,7 @@ import {
   saveFormViaRef,
   waitForFormLoad,
 } from './utils/commands';
-import { API_SECRET_KEY_PROD } from './constants';
+import { API_SECRET_KEY_PROD } from './utils/constants';
 
 const name = 'Piip Penguin';
 const number = '378282246310005';
@@ -21,20 +21,24 @@ test.describe('/components/form', () => {
 
   test('form.legacy-sdk-integration', async ({
     browserName,
+    isMobile,
     page,
     request,
   }) => {
     expect(missingConfig, missingConfig?.message).toBe(undefined);
+
     test.setTimeout(120000);
+    test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
+
     const fpUserId = await createUser({ api: 'prod', request }); // From prod acme inc.
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
     await page.goto(
-      `https://footprint-js-3-7-1.preview.onefootprint.com/form?flow=${flowId}&userId=${fpUserId}&cardAlias=${flowId}#${API_SECRET_KEY_PROD}`,
+      `https://footprint-js-3-7-1.preview.onefootprint.com/form?f=${flowId}&userId=${fpUserId}&cardAlias=${flowId}#${API_SECRET_KEY_PROD}`,
     );
     await page.waitForLoadState();
 
-    const frame = await waitForFormLoad({ page });
+    const frame = await waitForFormLoad(page);
 
     // Fill the form and save it
     await fillCardData({

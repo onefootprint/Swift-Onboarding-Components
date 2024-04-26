@@ -1,4 +1,6 @@
 export {
+  appendInlineContainer,
+  appendInlineLoader,
   appendLoadingElements,
   appendOverlayContainer,
   removeOverlayAndLoading,

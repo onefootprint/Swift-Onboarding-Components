@@ -6,49 +6,25 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import fakeSdk from '../../../helpers/fake-sdk';
+import getQueryArgs, { isString } from '../../../helpers/get-query-args';
 
-type RouterReturn = ReturnType<typeof useRouter>;
-
-const AcmeDevAuthKey = 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
-const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY || AcmeDevAuthKey;
-
-const isValidTokenFormat = (str: string): boolean =>
-  Boolean(str) && /tok_/.test(str);
-
-const getSdkArgsToken = (str: string): string =>
-  isValidTokenFormat(str) ? str : '';
-
-const getQueryArgs = (router: RouterReturn) => {
-  const { query, asPath } = router;
-  const { ob_key: obKey, user_data: rawUserData, app_url: appUrl } = query;
-  const authToken = getSdkArgsToken(asPath.split('#')[1]) ?? '';
-  const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
-  const appUrlStr = String(appUrl);
-  let userData = {};
-
-  try {
-    userData =
-      typeof rawUserData === 'string'
-        ? JSON.parse(decodeURIComponent(rawUserData))
-        : {};
-  } catch (_) {
-    // do nothing
-  }
-  return {
-    authToken,
-    appUrl:
-      appUrlStr.startsWith('https://auth-') ||
-      appUrlStr.startsWith('http://localhost')
-        ? appUrlStr
-        : 'http://localhost:3011',
-    publicKey,
-    userData,
-  };
-};
+const fallbackPKey =
+  process.env.NEXT_PUBLIC_TENANT_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
+const getAuthArgs = (o: ReturnType<typeof getQueryArgs>) => ({
+  ...o,
+  publicKey: isString(o.publicKey) ? o.publicKey : fallbackPKey,
+  appUrl:
+    o.appUrl.startsWith('https://auth-') ||
+    o.appUrl.startsWith('http://localhost')
+      ? o.appUrl
+      : 'http://localhost:3011',
+});
 
 const AuthDemo = () => {
   const router = useRouter();
-  const { appUrl, authToken, publicKey, userData } = getQueryArgs(router);
+  const { appUrl, authToken, publicKey, userData } = getAuthArgs(
+    getQueryArgs(router),
+  );
 
   const handleAuthenticateClick = () => {
     const component = fakeSdk.init({

@@ -1,5 +1,7 @@
 export { default as getWindowUrl } from './dom-window/get-window-url';
 export {
+  appendInlineContainer,
+  appendInlineLoader,
   appendLoadingElements,
   appendOverlayContainer,
   removeOverlayAndLoading,

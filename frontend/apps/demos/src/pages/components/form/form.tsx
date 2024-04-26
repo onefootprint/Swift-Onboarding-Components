@@ -9,10 +9,6 @@ import DemoForm from './components/demo-form';
 const SecureFormDemo = () => {
   const [authToken, setAuthToken] = useState<string>();
 
-  const handleSubmit = (token: string) => {
-    setAuthToken(token);
-  };
-
   return (
     <Container>
       <Inner>
@@ -25,7 +21,7 @@ const SecureFormDemo = () => {
         {authToken ? (
           <DemoForm authToken={authToken} />
         ) : (
-          <CredsForm onSubmit={handleSubmit} />
+          <CredsForm onSubmit={setAuthToken} />
         )}
       </Inner>
     </Container>

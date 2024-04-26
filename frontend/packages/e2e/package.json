@@ -10,7 +10,7 @@
     "postinstall": "npx playwright install",
     "test:e2e:auth-ci": "npx playwright test src/auth/ -g \"#ci\" --workers=10",
     "test:e2e:verify-ci": "npx playwright test src/verify/ -g \"#ci\" --workers=10",
-    "test:e2e:form-ci": "npx playwright test src/form/ -g \"#ci\"",
+    "test:e2e:form-ci": "npx playwright test src/form/ -g \"#ci\" --workers=10",
     "test:e2e:debug": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#debug\"",
     "test:e2e:generate": "npx playwright codegen http://localhost:3002/e2e?ob_key=ob_test_yHlPBcaJ6lnxwkkD1YLStx&locale=es-MX",
     "test:e2e:real": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#real\"",

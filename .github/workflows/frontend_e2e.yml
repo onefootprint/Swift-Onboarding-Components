@@ -13,11 +13,14 @@ permissions:
 env:
   CI_SKIP: false
   CI: true
+  E2E_ACME_SECRET_API_KEY_DEV: ${{ secrets.E2E_ACME_SECRET_API_KEY_DEV }}
+  E2E_ACME_SECRET_API_KEY_PROD: ${{ secrets.E2E_ACME_SECRET_API_KEY_PROD }}
   E2E_AUTH_BASE_URL: ''
   E2E_AUTH_KEY: 'ob_test_2TwubGlrWdKaJnWsQQKQYl'
-  E2E_BIFROST_BASE_URL: http://localhost:3000
+  E2E_BIFROST_BASE_URL: 'http://localhost:3000'
+  E2E_COMPONENTS_BASE_URL: 'http://localhost:3010'
   E2E_DEMOS_BASE_URL: 'https://demo.preview.onefootprint.com'
-  E2E_HANDOFF_BASE_URL: http://localhost:3005
+  E2E_HANDOFF_BASE_URL: 'http://localhost:3005'
   E2E_OB_INVESTOR: 'ob_test_3xYoHcfrkxuOGNy8vILxh4'
   E2E_OB_KYB: 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg'
   E2E_OB_KYC_DOC_FIRST: 'pb_test_ZeSUWIlEteLWZByDjLITUL'
@@ -29,11 +32,6 @@ env:
   E2E_UPDATE_UTOKEN: ''
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  VERCEL_AWAIT_POLL_INTERVAL_SEC: 7
-  VERCEL_AWAIT_TIMEOUT_SEC: 360
-  VERCEL_PROJECT_ID_HANDOFF: 'prj_UWCk5C2ed14AnfXDfkF9H5YQHRic'
-  VERCEL_TEAM_ID: 'footprint'
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
 jobs:
   # debug:
@@ -170,26 +168,6 @@ jobs:
         if: ${{ failure() }}
         run: exit 1
 
-      - name: Get Vercel handoff preview_url
-        uses: zentered/vercel-preview-url@v1.1.9
-        id: vercel_handoff
-        continue-on-error: true
-        with:
-          vercel_team_id: ${{ env.VERCEL_TEAM_ID }}
-          vercel_project_id: ${{ env.VERCEL_PROJECT_ID_HANDOFF }}
-
-      - name: Wait for handoff preview_url to be ready
-        uses: UnlyEd/github-action-await-vercel@v1
-        id: await-vercel-handoff
-        if: >
-          steps.vercel_handoff.outputs.deployment_state != 'CANCELED' &&
-          steps.vercel_handoff.outputs.deployment_state != 'ERROR'
-        continue-on-error: true
-        with:
-          deployment-url: ${{ steps.vercel_handoff.outputs.preview_url }}
-          poll-interval: ${{ env.VERCEL_AWAIT_POLL_INTERVAL_SEC }}
-          timeout: ${{ env.VERCEL_AWAIT_TIMEOUT_SEC }}
-
       - name: Run Playwright tests
         working-directory: ./frontend
         env:
@@ -240,5 +218,89 @@ jobs:
                 repo: context.repo.repo,
                 issue_number: prNumber,
                 body: "E2E verify run failed for ${{ github.sha }}:\n\n- Report URL: [report](https://pwe2e.z13.web.core.windows.net/${{ steps.upload-report.outputs.report-dir }}/index.html)"
+              })
+            }
+
+  e2e-form:
+    name: 'On components success'
+    if: >
+      github.event.deployment_status.state == 'success' &&
+      startsWith(github.event.deployment_status.target_url, 'https://components--') &&
+      startsWith(github.event.deployment_status.environment, 'Preview')
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup bun latest
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      # Cache error: The event type deployment_status is not supported because it's not tied to a branch or tag ref.
+      - name: Bun install node_modules
+        working-directory: ./frontend
+        run: bun install --frozen-lockfile
+
+      - name: Install playwright dependencies
+        working-directory: ./frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Exit on failure
+        if: ${{ failure() }}
+        run: exit 1
+
+      - name: Run Playwright tests
+        working-directory: ./frontend
+        env:
+          E2E_DEMOS_BASE_URL: ${{ env.E2E_DEMOS_BASE_URL }}
+          E2E_COMPONENTS_BASE_URL: ${{ github.event.deployment_status.target_url }}
+        run: yarn workspace @onefootprint/e2e test:e2e:form-ci --reporter=html --project=chromium
+
+      - name: Upload test results (for 3 days)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: ./frontend/packages/e2e/test-results/
+          retention-days: 3
+
+      - name: Upload HTML report to azure (for 7 days)
+        if: ${{ failure() }}
+        id: upload-report
+        shell: bash
+        run: |
+          REPORT_DIR='run-${{ github.run_id }}-${{ github.run_attempt }}'
+          azcopy cp --recursive "./frontend/packages/e2e/playwright-report/*" "https://pwe2e.blob.core.windows.net/\$web/$REPORT_DIR"
+          echo "::set-output name=report-dir::$REPORT_DIR"
+          echo "::notice title=HTML report url::https://pwe2e.z13.web.core.windows.net/$REPORT_DIR/index.html"
+        env:
+          AZCOPY_AUTO_LOGIN_TYPE: SPN
+          AZCOPY_SPA_APPLICATION_ID: '${{ secrets.AZCOPY_SPA_APPLICATION_ID }}'
+          AZCOPY_SPA_CLIENT_SECRET: '${{ secrets.AZCOPY_SPA_CLIENT_SECRET }}'
+          AZCOPY_TENANT_ID: '${{ secrets.AZCOPY_TENANT_ID }}'
+
+      - name: Add failure comment to PR
+        if: ${{ failure() }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issues = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            })
+
+            const prNumber = context.issue.number || issues.data.find(i => i.head.sha === context.sha)?.number || null
+            if (prNumber) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: "E2E form run failed for ${{ github.sha }}:\n\n- Report URL: [report](https://pwe2e.z13.web.core.windows.net/${{ steps.upload-report.outputs.report-dir }}/index.html)"
               })
             }

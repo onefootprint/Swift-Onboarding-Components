@@ -82,6 +82,7 @@ export const createInlineContainer = (
   return inlineContainer;
 };
 
+/** @deprecated: import { removeInlineContainer } from `@onefootprint/core` */
 const removeInlineContainer = (uniqueId: string) => {
   const id = getDomElementId(INLINE_CONTAINER_ID_PREFIX, uniqueId);
   const inlineContainer = document.getElementById(id);

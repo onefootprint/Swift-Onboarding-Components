@@ -1,56 +1,71 @@
 import type { FootprintFormRef } from '@onefootprint/footprint-js';
-import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
+import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { Button, Divider, media, useToast } from '@onefootprint/ui';
+import debounce from 'lodash/debounce';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-type DemoFormProps = {
-  authToken: string;
+import fakeSdk from '../../../../../helpers/fake-sdk';
+import getQueryArgs from '../../../../../helpers/get-query-args';
+
+type DemoFormProps = { authToken: string };
+
+const getFormArgs = (o: ReturnType<typeof getQueryArgs>) => ({
+  ...o,
+  appUrl:
+    o.appUrl.startsWith('https://components-') ||
+    o.appUrl.startsWith('http://localhost')
+      ? o.appUrl
+      : 'http://localhost:3010/form',
+});
+
+const formSetup = (
+  authToken: string,
+  setRef: React.Dispatch<React.SetStateAction<FootprintFormRef | undefined>>,
+  toast: ReturnType<typeof useToast>,
+) => {
+  const component = fakeSdk.init({
+    kind: FootprintComponentKind.Form,
+    authToken,
+    title: 'Add a New Card',
+    variant: 'inline',
+    containerId: 'footprint-secure-form',
+    getRef: setRef,
+    onComplete: () => {
+      toast.show({
+        title: 'Success',
+        description: 'Successfully completed form',
+      });
+    },
+    onCancel: () => {
+      toast.show({ title: 'Canceled', description: 'User canceled form' });
+    },
+    onClose: () => {
+      toast.show({ title: 'Closed', description: 'User closed form' });
+    },
+  });
+
+  return {
+    render: debounce(component.render, 1000),
+    destroy: component.destroy,
+  };
 };
 
 const DemoForm = ({ authToken }: DemoFormProps) => {
+  const router = useRouter();
+  const { appUrl } = getFormArgs(getQueryArgs(router));
   const [ref, setRef] = React.useState<FootprintFormRef | undefined>();
   const [isCustomSaveLoading, setIsCustomSaveLoading] = useState(false);
   const toast = useToast();
+  const form = formSetup(authToken, setRef, toast);
 
   useEffect(() => {
-    if (!authToken) return () => {};
-
-    const component = footprint.init({
-      kind: FootprintComponentKind.Form,
-      authToken,
-      title: 'Add a New Card',
-      variant: 'inline',
-      containerId: 'footprint-secure-form',
-      getRef: (formRef: FootprintFormRef) => {
-        setRef(formRef);
-      },
-      onComplete: () => {
-        toast.show({
-          title: 'Success',
-          description: 'Successfully completed form',
-        });
-      },
-      onCancel: () => {
-        toast.show({
-          title: 'Canceled',
-          description: 'User canceled form',
-        });
-      },
-      onClose: () => {
-        toast.show({
-          title: 'Closed',
-          description: 'User closed form',
-        });
-      },
-    });
-    component.render();
-
+    form.render(appUrl);
     return () => {
-      component.destroy();
+      form.destroy();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClick = () => {
     setIsCustomSaveLoading(true);
