@@ -1507,7 +1507,6 @@
             "bank-credit-card-statement": "Extractos bancarios o de tarjetas de crédito",
             "vehicle-voter-registration": "Tarjetas de registro de vehículo o de votante",
             "rental-agreement": "Contrato de arrendamiento",
-            "insurance": "Tarjeta de seguro médico",
             "phone-internet-bill": "Facturas recientes de teléfono o internet"
           },
           "alert-messages": "El documento debe mostrar su nombre y dirección"

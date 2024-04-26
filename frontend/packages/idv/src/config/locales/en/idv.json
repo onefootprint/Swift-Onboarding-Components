@@ -1506,7 +1506,6 @@
             "bank-credit-card-statement": "Recent bank or credit card statements",
             "vehicle-voter-registration": "Vehicle or voter registration cards",
             "rental-agreement": "Rental lease agreement",
-            "insurance": "Health or card insurance",
             "phone-internet-bill": "Recent phone number or internet bills"
           },
           "alert-messages": "Document should show your name and address"

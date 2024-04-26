@@ -30,7 +30,6 @@ const guidelineKeys: Partial<{
     'bank-credit-card-statement',
     'vehicle-voter-registration',
     'rental-agreement',
-    'insurance',
     'phone-internet-bill',
   ],
 };
