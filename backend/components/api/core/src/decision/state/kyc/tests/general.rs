@@ -45,6 +45,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
             ..Default::default()
         },
         None,
+        None,
     )
     .await;
 

@@ -75,7 +75,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         sv: su,
         obc,
         ..
-    } = create_kyc_user_and_wf(state, obc_opts, None).await;
+    } = create_kyc_user_and_wf(state, obc_opts, None, None).await;
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
 
@@ -327,7 +327,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         sv: su,
         obc,
         ..
-    } = create_kyc_user_and_wf(state, obc_opts, None).await;
+    } = create_kyc_user_and_wf(state, obc_opts, None, None).await;
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
 

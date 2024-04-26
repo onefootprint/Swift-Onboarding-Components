@@ -109,7 +109,7 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         UserKind::Demo => todo!(),
     };
     let FixtureData { t, wf, v, sv, dr, .. } =
-        super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
+        super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result, None).await;
 
     // Save proof of SSN doc req
     let doc_kind: DocumentRequestKind = test_case.document_type.into();

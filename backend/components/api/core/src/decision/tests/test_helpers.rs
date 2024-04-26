@@ -34,6 +34,7 @@ pub async fn create_user_and_onboarding(
     obc_opts: ObConfigurationOpts,
     kyc_fixture_result: Option<WorkflowFixtureResult>,
     create_business: bool,
+    reuse_tenant: Option<Tenant>,
 ) -> (
     Tenant,
     Workflow,
@@ -56,7 +57,11 @@ pub async fn create_user_and_onboarding(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
+            let tenant = if let Some(t) = reuse_tenant {
+                t
+            } else {
+                fixtures::tenant::create_with_keys(conn, pk, tenant_e_key)
+            };
             let obc = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
             let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
             // TODO: need to rework our test utils so they use the same codepaths as our application logic to create things like OBC's and such
@@ -122,8 +127,10 @@ pub async fn create_kyc_user_and_wf(
     state: &State,
     obc_opts: ObConfigurationOpts,
     fixture_result: Option<WorkflowFixtureResult>,
+    reuse_tenant: Option<Tenant>,
 ) -> FixtureData {
-    let (t, wf, v, sv, obc, _) = create_user_and_onboarding(state, obc_opts, fixture_result, false).await;
+    let (t, wf, v, sv, obc, _) =
+        create_user_and_onboarding(state, obc_opts, fixture_result, false, reuse_tenant).await;
     let wf_id = wf.id.clone();
     let dr = state
         .db_pool
@@ -152,7 +159,8 @@ pub async fn create_kyb_user_and_onboarding(
     ObConfiguration,
     Workflow, // Business workflow
 ) {
-    let (t, wf, v, sv, obc, biz_wf) = create_user_and_onboarding(state, obc_opts, fixture_result, true).await;
+    let (t, wf, v, sv, obc, biz_wf) =
+        create_user_and_onboarding(state, obc_opts, fixture_result, true, None).await;
 
     (t, wf, v, sv, obc, biz_wf.unwrap())
 }

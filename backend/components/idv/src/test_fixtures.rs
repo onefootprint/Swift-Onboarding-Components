@@ -6663,6 +6663,8 @@ pub struct NeuroTestOpts {
     pub bot_framework: bool,
     pub factory_reset: bool,
     pub fraud_ring_indicator: bool,
+    pub device_id: Option<String>,
+    pub cookie_id: Option<String>,
 }
 pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
     serde_json::json!({
@@ -6672,8 +6674,8 @@ pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
         "profile": {
             "siteId": "form_humor717",
             "funnel": "unknown",
-            "clientId": "c00a322f-2179-4ef2-812b-e14b43945069",
-            "deviceId": "Of2yRcx14PRpavCp2DCS",
+            "clientId": opts.cookie_id.unwrap_or("c00a322f-2179-4ef2-812b-e14b43945069".into()),
+            "deviceId": opts.device_id.unwrap_or("c00a322f-2179-4ef2-812b-e14b43945069".into()),
             "interactionAttributes": {
                 "client_id_count": 1,
                 "session_id_count": 1,

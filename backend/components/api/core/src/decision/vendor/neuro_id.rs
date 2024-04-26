@@ -151,7 +151,7 @@ pub async fn run_neuro_call(
     Ok(Some(vendor_result))
 }
 
-async fn save_neuro_event(
+pub async fn save_neuro_event(
     state: &State,
     response: &NeuroIdAnalyticsResponse,
     tenant_id: &TenantId,
@@ -199,9 +199,177 @@ async fn save_neuro_event(
     Ok(())
 }
 
-
 pub fn tenant_can_view_neuro(state: &State, tenant_id: &TenantId) -> bool {
     state
         .feature_flag_client
         .flag(BoolFlag::TenantCanViewNeuro(tenant_id))
+}
+
+
+#[cfg(test)]
+
+mod tests {
+    use db::{
+        models::{
+            decision_intent::DecisionIntent, neuro_id_analytics_event::NeuroIdAnalyticsEvent,
+            scoped_vault::ScopedVault, tenant::Tenant,
+        },
+        test_helpers::assert_have_same_elements,
+        tests::{
+            fixtures::{self, ob_configuration::ObConfigurationOpts},
+            test_db_pool::TestDbPool,
+        },
+    };
+    use idv::{
+        neuro_id::response::NeuroIdAnalyticsResponse,
+        test_fixtures::{self, NeuroTestOpts},
+        ParsedResponse, VendorResponse,
+    };
+    use macros::test_state;
+    use newtypes::{DecisionIntentKind, DupeKind, NeuroIdentityId};
+
+    use crate::{
+        decision::{
+            tests::test_helpers::{create_kyc_user_and_wf, FixtureData},
+            vendor::verification_result::save_vreq_and_vres,
+        },
+        errors::ApiResult,
+        State,
+    };
+
+    use super::save_neuro_event;
+
+    async fn create_neuro_event(
+        state: &mut State,
+        response: serde_json::Value,
+        use_tenant: Option<Tenant>,
+    ) -> ScopedVault {
+        let FixtureData {
+            wf, v: uv, sv: su, ..
+        } = create_kyc_user_and_wf(
+            state,
+            ObConfigurationOpts {
+                is_live: true,
+                ..Default::default()
+            },
+            None,
+            use_tenant,
+        )
+        .await;
+
+        let sv_id = su.id.clone();
+        let wf_id = wf.id.clone();
+        let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(response.clone()).unwrap();
+        let vendor_resp = VendorResponse {
+            response: ParsedResponse::NeuroIdAnalytics(parsed.clone()),
+            raw_response: response.into(),
+        };
+
+        // save vreq/vres and do DI setup
+        let (_, vres) = state
+            .db_pool
+            .db_transaction(move |conn| {
+                let di = DecisionIntent::get_or_create_for_workflow(
+                    conn,
+                    &sv_id,
+                    &wf_id,
+                    DecisionIntentKind::OnboardingKyc,
+                )
+                .unwrap();
+                save_vreq_and_vres(conn, &uv.public_key, &sv_id, &di.id, Ok(vendor_resp))
+            })
+            .await
+            .unwrap();
+
+        // save our event
+        save_neuro_event(
+            state,
+            &parsed,
+            &su.tenant_id,
+            NeuroIdentityId::from(wf.id.clone()),
+            &su.id,
+            &wf.id,
+            &vres.id,
+        )
+        .await
+        .unwrap();
+
+        su
+    }
+
+    #[test_state]
+    async fn test_neuro_dupes(state: &mut State) {
+        let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
+        let tenant = state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                Ok(fixtures::tenant::create_with_keys(conn, pk, tenant_e_key))
+            })
+            .await
+            .unwrap();
+
+        // save a few identifiers
+        // dupes with sv3 on device
+        let opts1 = NeuroTestOpts {
+            device_id: Some("di_1".into()),
+            cookie_id: Some("ci_1".into()),
+            ..Default::default()
+        };
+        let resp1 = test_fixtures::neuro_id_success_response(opts1);
+        let sv1 = create_neuro_event(state, resp1, Some(tenant.clone())).await;
+        let sv_id1 = sv1.id.clone();
+
+        // dupes with sv1 on device, sv3 on cookie
+        let opts2 = NeuroTestOpts {
+            device_id: Some("di_2".into()),
+            cookie_id: Some("ci_2".into()),
+            ..Default::default()
+        };
+        let resp2 = test_fixtures::neuro_id_success_response(opts2);
+        let sv2 = create_neuro_event(state, resp2, Some(tenant.clone())).await;
+        let sv_id2 = sv2.id.clone();
+
+        // dupes with sv1 on device, sv2 on cookie
+        let opts3 = NeuroTestOpts {
+            device_id: Some("di_1".into()),
+            cookie_id: Some("ci_2".into()),
+            ..Default::default()
+        };
+        let resp3 = test_fixtures::neuro_id_success_response(opts3);
+        let sv3 = create_neuro_event(state, resp3, Some(tenant.clone())).await;
+        let sv_id3 = sv3.id.clone();
+
+        // dupes on device and cookie with sv1, but diff tenant
+        let opts4 = NeuroTestOpts {
+            device_id: Some("di_1".into()),
+            cookie_id: Some("ci_1".into()),
+            ..Default::default()
+        };
+        let resp4 = test_fixtures::neuro_id_success_response(opts4);
+        let sv4 = create_neuro_event(state, resp4, None).await;
+
+
+        //
+        // Tests
+        //
+        let (dupes1, dupes2, dupes3, dupes4) = state
+            .db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let d1 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv1)?;
+                let d2 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv2)?;
+                let d3 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv3)?;
+                let d4 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv4)?;
+                Ok((d1, d2, d3, d4))
+            })
+            .await
+            .unwrap();
+
+        assert_have_same_elements(dupes1.internal, vec![(DupeKind::DeviceId, sv_id3.clone())]);
+        assert_have_same_elements(dupes2.internal, vec![(DupeKind::CookieId, sv_id3.clone())]);
+        assert_have_same_elements(
+            dupes3.internal,
+            vec![(DupeKind::CookieId, sv_id2.clone()), (DupeKind::DeviceId, sv_id1)],
+        );
+        assert!(dupes4.internal.is_empty());
+    }
 }

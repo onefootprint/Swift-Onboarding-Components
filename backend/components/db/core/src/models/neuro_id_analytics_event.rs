@@ -2,9 +2,13 @@ use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::neuro_id_analytics_event;
 use diesel::{prelude::*, Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::{
-    NeuroIdAnalyticsEventId, NeuroIdentityId, ScopedVaultId, TenantId, VerificationResultId, WorkflowId,
+    DupeKind, NeuroIdAnalyticsEventId, NeuroIdentityId, ScopedVaultId, TenantId, VerificationResultId,
+    WorkflowId,
 };
+
+use super::scoped_vault::ScopedVault;
 
 /// An append-only, immutable event that denormalizes a lot of data we get back from NeuroID
 /// in order to render and/or compute signals for the dashboard, analysis, or model training pipelines
@@ -179,5 +183,56 @@ impl NeuroIdAnalyticsEvent {
             .get_results(conn)?;
 
         Ok(res)
+    }
+}
+
+pub struct NeuroDeviceDupesResult {
+    pub internal: Vec<(DupeKind, ScopedVaultId)>,
+    // TODO, when rolling out to more tenants: punting on external for now
+}
+
+impl NeuroIdAnalyticsEvent {
+    pub fn get_dupes_for_tenant(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<NeuroDeviceDupesResult> {
+        let (device_ids, cookie_ids): (Vec<Option<String>>, Vec<Option<String>>) =
+            neuro_id_analytics_event::table
+                .filter(neuro_id_analytics_event::scoped_vault_id.eq(&sv.id))
+                .select((
+                    neuro_id_analytics_event::device_id,
+                    neuro_id_analytics_event::cookie_id,
+                ))
+                .get_results(conn)?
+                .into_iter()
+                .unzip();
+
+        let device_id_matches = neuro_id_analytics_event::table
+            .filter(neuro_id_analytics_event::tenant_id.eq(&sv.tenant_id))
+            .filter(
+                neuro_id_analytics_event::device_id
+                    .eq_any(device_ids.into_iter().flatten().collect::<Vec<String>>())
+                    .nullable(),
+            )
+            .filter(neuro_id_analytics_event::scoped_vault_id.ne(&sv.id))
+            .select(neuro_id_analytics_event::scoped_vault_id)
+            .get_results(conn)?
+            .into_iter()
+            .unique() // need this because other sv could go through multiple wfs with same device ID
+            .map(|sv| (DupeKind::DeviceId, sv));
+
+        let cookie_id_matches = neuro_id_analytics_event::table
+            .filter(neuro_id_analytics_event::tenant_id.eq(&sv.tenant_id))
+            .filter(
+                neuro_id_analytics_event::cookie_id
+                    .eq_any(cookie_ids.into_iter().flatten().collect::<Vec<String>>())
+                    .nullable(),
+            )
+            .filter(neuro_id_analytics_event::scoped_vault_id.ne(&sv.id))
+            .select(neuro_id_analytics_event::scoped_vault_id)
+            .get_results(conn)?
+            .into_iter()
+            .unique() // need this because other sv could go through multiple wfs with same device ID
+            .map(|sv| (DupeKind::CookieId, sv));
+        let matches = device_id_matches.chain(cookie_id_matches).collect();
+
+        Ok(NeuroDeviceDupesResult { internal: matches })
     }
 }

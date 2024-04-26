@@ -817,6 +817,7 @@ mod tests {
             bot_framework: true,
             factory_reset: true,
             fraud_ring_indicator: true,
+            ..Default::default()
         };
         let raw = test_fixtures::neuro_id_success_response(opts);
         let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(raw).unwrap();

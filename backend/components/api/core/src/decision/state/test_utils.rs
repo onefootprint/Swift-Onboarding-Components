@@ -152,7 +152,7 @@ pub async fn setup_data(
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
     let FixtureData {
         t: tenant, wf, obc, ..
-    } = test_helpers::create_kyc_user_and_wf(state, obc_opts, fixture_result).await;
+    } = test_helpers::create_kyc_user_and_wf(state, obc_opts, fixture_result, None).await;
 
     let tid = tenant.id.clone();
     let tu = state

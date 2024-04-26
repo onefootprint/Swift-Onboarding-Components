@@ -186,6 +186,7 @@ mod tests {
             bot_framework,
             factory_reset,
             fraud_ring_indicator,
+            ..Default::default()
         };
 
         let raw = test_fixtures::neuro_id_success_response(opts);

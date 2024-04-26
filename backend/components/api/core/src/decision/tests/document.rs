@@ -45,7 +45,7 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
         UserKind::Demo => todo!(),
     };
     let FixtureData { t, wf, sv, dr, .. } =
-        super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
+        super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result, None).await;
     let dr = dr.unwrap();
 
     let id_doc_req = CreateIdentityDocumentRequest {
@@ -141,7 +141,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
         UserKind::Demo => todo!(),
     };
     let FixtureData { t, wf, sv, dr, .. } =
-        super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
+        super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result, None).await;
     let dr = dr.unwrap();
 
     //
