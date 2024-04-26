@@ -1,6 +1,6 @@
 use api_wire_types::UserInsight;
 use db::models::{neuro_id_analytics_event::NeuroIdAnalyticsEvent, workflow::Workflow};
-use newtypes::UserInsightScope;
+use newtypes::{UserInsightScope, UserInsightUnit};
 use strum_macros::{Display, EnumString};
 macro_rules! user_insight {
     (
@@ -51,78 +51,109 @@ pub fn from_db(event: Option<NeuroIdAnalyticsEvent>, workflow: Option<Workflow>)
                 Insight::FraudRingIndicator,
                 model_fraud_ring_indicator_result,
                 UserInsightScope::Behavior,
+                UserInsightUnit::Boolean,
             ),
             (
                 Insight::AutomatedActivity,
                 model_automated_activity_result,
                 UserInsightScope::Behavior,
+                UserInsightUnit::Boolean,
             ),
         ]
         .into_iter()
-        .filter_map(|(n, value, scope)| {
+        .filter_map(|(n, value, scope, unit)| {
             value.map(|v| UserInsight {
                 name: n.to_string(),
                 value: v.to_string(),
                 scope,
                 description: n.description(),
+                unit,
             })
         });
 
         let device = vec![
-            (Insight::Vpn, model_vpn_result, UserInsightScope::Device),
+            (
+                Insight::Vpn,
+                model_vpn_result,
+                UserInsightScope::Device,
+                UserInsightUnit::Boolean,
+            ),
             (
                 Insight::MultipleSessionsPerDevice,
                 model_multiple_ids_per_device_result,
                 UserInsightScope::Device,
+                UserInsightUnit::Boolean,
             ),
             (
                 Insight::Incognito,
                 model_incognito_result,
                 UserInsightScope::Device,
+                UserInsightUnit::Boolean,
             ),
-            (Insight::Tor, model_tor_exit_node_result, UserInsightScope::Device),
+            (
+                Insight::Tor,
+                model_tor_exit_node_result,
+                UserInsightScope::Device,
+                UserInsightUnit::Boolean,
+            ),
             (
                 Insight::Proxy,
                 model_public_proxy_result,
                 UserInsightScope::Device,
+                UserInsightUnit::Boolean,
             ),
             (
                 Insight::SuspiciousDeviceEmulator,
                 suspicious_device_emulator,
                 UserInsightScope::Device,
+                UserInsightUnit::Boolean,
             ),
             (
                 Insight::SuspiciousDeviceMissingExpectedProperties,
                 suspicious_device_missing_expected_properties,
                 UserInsightScope::Device,
+                UserInsightUnit::Boolean,
             ),
             (
                 Insight::SuspiciousDeviceMissingExpectedFrida,
                 suspicious_device_frida,
                 UserInsightScope::Device,
+                UserInsightUnit::Boolean,
             ),
         ]
         .into_iter()
-        .filter_map(|(n, value, scope)| {
+        .filter_map(|(n, value, scope, unit)| {
             value.map(|v| UserInsight {
                 name: n.to_string(),
                 value: v.to_string(),
                 scope,
                 description: n.description(),
+                unit,
             })
         });
 
         let device_ids = vec![
-            (Insight::CookieId, cookie_id, UserInsightScope::Device),
-            (Insight::DeviceId, device_id, UserInsightScope::Device),
+            (
+                Insight::CookieId,
+                cookie_id,
+                UserInsightScope::Device,
+                UserInsightUnit::String,
+            ),
+            (
+                Insight::DeviceId,
+                device_id,
+                UserInsightScope::Device,
+                UserInsightUnit::String,
+            ),
         ]
         .into_iter()
-        .filter_map(|(n, value, scope)| {
+        .filter_map(|(n, value, scope, unit)| {
             value.map(|value| UserInsight {
                 name: n.to_string(),
                 value,
                 scope,
                 description: n.description(),
+                unit,
             })
         });
 
@@ -145,14 +176,16 @@ pub fn from_db(event: Option<NeuroIdAnalyticsEvent>, workflow: Option<Workflow>)
             Insight::WorkflowCompletionTime,
             wf_time,
             UserInsightScope::Workflow,
+            UserInsightUnit::DurationMs,
         )]
         .into_iter()
-        .filter_map(|(n, value, scope)| {
+        .filter_map(|(n, value, scope, unit)| {
             value.map(|v| UserInsight {
                 name: n.to_string(),
                 value: v.to_string(),
                 scope,
                 description: n.description(),
+                unit,
             })
         })
         .collect()
@@ -173,17 +206,17 @@ user_insight! {
         AutomatedActivity,
         #[ser = "Suspicious Device", description = "Identifies if a device has properties that suggest the device has been modified in a way that indicates the device is being used for fraudulent or bot activity"]
         SuspiciousDevice,
-        #[ser = "Suspicious Device - Emulator", description = ""]
+        #[ser = "Emulator Usage", description = "Device exhibits properties of using an emulator"]
         SuspiciousDeviceEmulator,
-        #[ser = "Suspicious Device - Missing Expected Properties", description = ""]
+        #[ser = "Missing Expected Properties", description = "Device is missing expected properties, and appears to be modified"]
         SuspiciousDeviceMissingExpectedProperties,
-        #[ser = "Suspicious Device - Frida", description = ""]
+        #[ser = "Frida Usage", description = "Device exhibits properties of using Frida"]
         SuspiciousDeviceMissingExpectedFrida,
         #[ser = "VPN", description = "The public IP of the user is associated with a VPN"]
         Vpn,
         #[ser = "Incognito Mode", description = "Browser in incognito mode"]
         Incognito,
-        #[ser = "Multiple Sessions per Device", description = "Browser in incognito mode"]
+        #[ser = "Multiple Sessions per Device", description = "Multiple workflows are associated with this device, potentially on different users. Check the duplicates table for more information"]
         MultipleSessionsPerDevice,
         #[ser = "Tor Exit Node", description = "Public IP associated with TOR exit node"]
         Tor,
@@ -193,7 +226,7 @@ user_insight! {
         CookieId,
         #[ser = "Device ID", description = "Persistent identifier based on fingerprinting"]
         DeviceId,
-        #[ser = "Workflow time in ms", description = "The amount of time in ms it took this user to onboard"]
+        #[ser = "Latest onboarding completion time", description = "The amount of time in milliseconds it took this user to onboard"]
         WorkflowCompletionTime
     }
 }

@@ -20,4 +20,5 @@ def test_get_users_list(sandbox_user_with_insights):
         assert insight['value']
         assert insight['scope']
         assert len(insight['description']) > 0
+        assert insight['unit'] == 'duration_ms'
     

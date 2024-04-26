@@ -11,3 +11,12 @@ pub enum UserInsightScope {
     Device,
     Workflow,
 }
+
+
+#[derive(Clone, SerializeDisplay, EnumString, Display, Debug, Apiv2Schema)]
+#[strum(serialize_all = "snake_case")]
+pub enum UserInsightUnit {
+    DurationMs,
+    Boolean,
+    String,
+}

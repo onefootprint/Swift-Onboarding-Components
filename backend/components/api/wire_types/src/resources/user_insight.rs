@@ -1,4 +1,4 @@
-use newtypes::UserInsightScope;
+use newtypes::{UserInsightScope, UserInsightUnit};
 use paperclip::actix::Apiv2Schema;
 use serde::Serialize;
 
@@ -13,4 +13,5 @@ pub struct UserInsight {
     // enum: Behavior, Onboarding, Device, etc so we can render into specific section
     pub scope: UserInsightScope,
     pub description: String,
+    pub unit: UserInsightUnit,
 }
