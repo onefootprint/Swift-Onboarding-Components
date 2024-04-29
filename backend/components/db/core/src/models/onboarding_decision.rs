@@ -44,7 +44,7 @@ struct NewOnboardingDecisionRow {
     created_at: DateTime<Utc>,
     status: DecisionStatus,
     actor: DbActor,
-    seqno: Option<DataLifetimeSeqno>,
+    seqno: DataLifetimeSeqno,
     workflow_id: WorkflowId,
     rule_set_result_id: Option<RuleSetResultId>,
 }
@@ -64,7 +64,7 @@ pub struct NewDecisionArgs {
     pub result_ids: Vec<VerificationResultId>,
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
-    pub seqno: Option<DataLifetimeSeqno>,
+    pub seqno: DataLifetimeSeqno,
     /// List of actions to perform for each ManualReviewKind. If no action is provided for a
     /// ManualReviewKind, we'll leave any existing ManualReview for that kind untouched.
     pub manual_reviews: Vec<ManualReviewArgs>,

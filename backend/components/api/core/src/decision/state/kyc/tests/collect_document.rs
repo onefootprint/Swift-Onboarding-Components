@@ -1,7 +1,8 @@
 use crate::decision::state::{
     actions::{Authorize, MakeVendorCalls},
     test_utils::{
-        mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals, setup_data,
+        mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_portablized_seqno,
+        query_risk_signals, setup_data,
         DocumentOutcome::{self, *},
         ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind,
         WithQualifier,
@@ -204,12 +205,6 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     let obd = obd.unwrap();
     assert!(obd.status == expected_status);
 
-    if matches!(user_kind, UserKind::Live) {
-        assert!(obd.seqno.is_some());
-    } else {
-        assert!(obd.seqno.is_none());
-    }
-
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(doc_outcome.expected_onboarding_decision(), wf.status.unwrap());
     let expect_mr = doc_outcome.expect_manual_review();
@@ -352,6 +347,7 @@ async fn redo_document_and_pass(
         .unwrap();
 
     let (wf, _, _, obd, rs) = query_data(state, &svid2, &wfid).await;
+    let portablized_seqno = query_portablized_seqno(state, &wf.scoped_vault_id).await;
     assert_eq!(
         WorkflowState::Document(newtypes::DocumentState::Complete),
         wf.state
@@ -360,11 +356,7 @@ async fn redo_document_and_pass(
     let obd = obd.unwrap();
     assert!(obd.id != prior_obd.id);
     assert!(obd.status == DecisionStatus::Pass);
-    if expect_committed {
-        assert!(obd.seqno.is_some())
-    } else {
-        assert!(obd.seqno.is_none())
-    };
+    assert_eq!(expect_committed, portablized_seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
 

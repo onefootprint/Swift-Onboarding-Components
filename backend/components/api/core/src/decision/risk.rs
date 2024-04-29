@@ -5,6 +5,7 @@ use newtypes::{
 
 use db::{
     models::{
+        data_lifetime::DataLifetime,
         manual_review::{ManualReviewAction, ManualReviewArgs},
         ob_configuration::ObConfiguration,
         onboarding_decision::NewDecisionArgs,
@@ -33,24 +34,20 @@ pub fn save_final_decision(
 ) -> ApiResult<()> {
     let wf = Workflow::lock(conn, wf_id)?;
     let scoped_user = ScopedVault::get(conn, &wf.scoped_vault_id)?;
+    let (obc, _) = ObConfiguration::get(conn, wf_id)?;
 
     // If we should commit, portablize all data for the onboarding
-    let seqno = if decision.should_commit {
+    // But, don't portabalize vaults from no-phone onboardings,
+    // and don't portablize vaults from tenant-initiated flows via POST /kyc
+    let seqno = if decision.should_commit && !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
+        // We may decide to start portablizing data from tenant-initiated workflows, but leave
+        // the vaults un-identifiable.
+        // Make sure our product stats reflect this if we do so
         let vw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
-        let (obc, _) = ObConfiguration::get(conn, wf_id)?;
-        // don't portabalize vaults from no-phone onboardings
-        // and don't portablize vaults from tenant-initiated flows via POST /kyc
-        if !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
-            // We may decide to start portablizing data from tenant-initiated workflows, but leave
-            // the vaults un-identifiable.
-            // Make sure our product stats reflect this if we do so
-            let seqno = vw.portablize_identity_data(conn)?;
-            Some(seqno)
-        } else {
-            None
-        }
+        // Explicitly use the seqno from portablizing data on the decision
+        vw.portablize_identity_data(conn)?
     } else {
-        None
+        DataLifetime::get_current_seqno(conn)?
     };
 
     let manual_review = decision.create_manual_review.then_some(ManualReviewArgs {

@@ -3,6 +3,7 @@ use api_wire_types::{CreateAnnotationRequest, DecisionRequest};
 use db::{
     models::{
         annotation::Annotation,
+        data_lifetime::DataLifetime,
         identity_document::{IdentityDocument, IdentityDocumentUpdate},
         manual_review::{ManualReviewAction, ManualReviewArgs},
         onboarding_decision::NewDecisionArgs,
@@ -62,6 +63,7 @@ pub fn save_review_decision(
 
     // Make the decision regardless of whether the status changed - the actor of the decision
     // may be different
+    let seqno = DataLifetime::get_current_seqno(conn)?;
     let new_decision = NewDecisionArgs {
         vault_id: sv.vault_id,
         logic_git_hash: crate::GIT_HASH.to_string(),
@@ -69,7 +71,7 @@ pub fn save_review_decision(
         status: status.into(),
         annotation_id: Some(annotation.0.id),
         actor: DbActor::from(actor),
-        seqno: None,
+        seqno,
         manual_reviews,
         rule_set_result_id: None,
     };

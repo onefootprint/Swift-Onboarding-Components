@@ -402,7 +402,7 @@ mod tests {
                 result_ids: vec![],
                 annotation_id: None,
                 actor: DbActor::Footprint,
-                seqno: None,
+                seqno: DataLifetimeSeqno::from(0),
                 manual_reviews: vec![],
                 rule_set_result_id: None,
             };

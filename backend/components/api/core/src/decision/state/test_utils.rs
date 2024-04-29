@@ -11,6 +11,7 @@ use crate::{
 };
 use db::{
     models::{
+        data_lifetime::DataLifetime,
         decision_intent::DecisionIntent,
         document_request::{DocumentRequest, NewDocumentRequestArgs},
         manual_review::ManualReview,
@@ -46,10 +47,11 @@ use idv::{
     middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
+use itertools::Itertools;
 use newtypes::{
-    DbUserTimelineEventKind, DecisionIntentKind, DocumentRequestConfig, DocumentRequestKind,
-    FootprintReasonCode, OnboardingStatus, PiiJsonValue, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
-    WorkflowFixtureResult, WorkflowId,
+    DataLifetimeSeqno, DbUserTimelineEventKind, DecisionIntentKind, DocumentRequestConfig,
+    DocumentRequestKind, FootprintReasonCode, OnboardingStatus, PiiJsonValue, RiskSignalGroupKind,
+    ScopedVaultId, VendorAPI, WorkflowFixtureResult, WorkflowId,
 };
 use strum_macros::EnumIter;
 use webhooks::{events::WebhookEvent, MockWebhookClient};
@@ -201,6 +203,24 @@ pub async fn query_data(
         })
         .await
         .unwrap()
+}
+
+pub async fn query_portablized_seqno(state: &State, sv_id: &ScopedVaultId) -> Option<DataLifetimeSeqno> {
+    let sv_id = sv_id.clone();
+    let dls = state
+        .db_pool
+        .db_query(move |conn| {
+            let seqno = DataLifetime::get_current_seqno(conn).unwrap();
+            DataLifetime::bulk_get_active_at(conn, vec![&sv_id], seqno)
+        })
+        .await
+        .unwrap();
+    let portablized_seqnos = dls.iter().filter_map(|dl| dl.portablized_seqno).collect_vec();
+    if !portablized_seqnos.is_empty() {
+        // Make sure data is portablized together
+        assert_eq!(portablized_seqnos.iter().unique().count(), 1);
+    }
+    portablized_seqnos.into_iter().next()
 }
 
 pub async fn query_risk_signals(

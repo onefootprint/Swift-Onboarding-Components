@@ -197,7 +197,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 result_ids: vec![],
                 annotation_id: None,
                 actor: DbActor::Footprint,
-                seqno: Some(current_seqno),
+                seqno: current_seqno,
                 manual_reviews: vec![manual_review],
                 rule_set_result_id: None,
             };

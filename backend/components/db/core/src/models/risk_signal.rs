@@ -328,7 +328,9 @@ mod tests {
     };
     use itertools::Itertools;
     use macros::db_test_case;
-    use newtypes::{DbActor, DecisionIntentId, DecisionIntentKind, DecisionStatus, ScopedVaultId};
+    use newtypes::{
+        DataLifetimeSeqno, DbActor, DecisionIntentId, DecisionIntentKind, DecisionStatus, ScopedVaultId,
+    };
     use serde_json::json;
 
     fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Workflow) {
@@ -444,7 +446,7 @@ mod tests {
                         .collect(),
                     annotation_id: None,
                     actor: DbActor::Footprint,
-                    seqno: None,
+                    seqno: DataLifetimeSeqno::from(0),
                     manual_reviews: vec![],
                     rule_set_result_id: None,
                 };

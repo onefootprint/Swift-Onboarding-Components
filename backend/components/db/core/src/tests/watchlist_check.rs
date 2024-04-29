@@ -11,8 +11,8 @@ use crate::{
 use chrono::{DateTime, Duration, Utc};
 use macros::db_test;
 use newtypes::{
-    DbActor, DecisionStatus, EnhancedAmlOption, ScopedVaultId, TaskData, TaskStatus, TenantId, VaultKind,
-    WatchlistCheckArgs, WatchlistCheckStatus, WatchlistCheckStatusKind,
+    DataLifetimeSeqno, DbActor, DecisionStatus, EnhancedAmlOption, ScopedVaultId, TaskData, TaskStatus,
+    TenantId, VaultKind, WatchlistCheckArgs, WatchlistCheckStatus, WatchlistCheckStatusKind,
 };
 
 use super::fixtures::ob_configuration::ObConfigurationOpts;
@@ -246,7 +246,7 @@ fn make_vault(
                 result_ids: vec![],
                 annotation_id: None,
                 actor: DbActor::Footprint,
-                seqno: None,
+                seqno: DataLifetimeSeqno::from(0),
                 manual_reviews: vec![],
                 rule_set_result_id: None,
             };

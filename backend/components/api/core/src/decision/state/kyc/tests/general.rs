@@ -4,9 +4,10 @@ use crate::{
             actions::{Authorize, MakeVendorCalls},
             kyc,
             test_utils::{
-                mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals,
-                setup_data, DocumentCollectionKind, DocumentOutcome::*, ExpectedRequiresManualReview,
-                ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
+                mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_portablized_seqno,
+                query_risk_signals, setup_data, DocumentCollectionKind, DocumentOutcome::*,
+                ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
+                UserKind, WithQualifier,
             },
             MakeDecision, WorkflowActions, WorkflowKind, WorkflowWrapper,
         },
@@ -283,9 +284,11 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         .unwrap();
 
     let (wf, _, mrs, obd, rs) = query_data(state, &svid, &wfid).await;
+    let portablized_seqno = query_portablized_seqno(state, &svid).await.unwrap();
+
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
-    assert!(obd.as_ref().unwrap().seqno.is_some());
+    assert_eq!(obd.as_ref().unwrap().seqno.unwrap(), portablized_seqno);
     assert!(obd.unwrap().rule_set_result_id.is_some());
     assert!(mrs.is_empty());
 
@@ -508,7 +511,6 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert!(obd.seqno.is_none());
     assert!(obd.rule_set_result_id.is_some());
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
     assert_eq!(expect_review, !mrs.is_empty());
