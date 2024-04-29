@@ -1,10 +1,16 @@
-import type { CountryCode, IdDocOutcome, SupportedIdDocTypes } from '../data';
+import type {
+  CountryCode,
+  DocumentRequestKind,
+  IdDocOutcome,
+  SupportedIdDocTypes,
+} from '../data';
 
 export type SubmitDocTypeRequest = {
   authToken: string;
-  documentType: SupportedIdDocTypes;
-  countryCode: CountryCode;
+  documentType: SupportedIdDocTypes | DocumentRequestKind;
+  documentRequestId: string;
   fixtureResult?: IdDocOutcome;
+  countryCode?: CountryCode;
   skipSelfie?: boolean;
   deviceType?: 'mobile' | 'desktop';
 };

@@ -22,7 +22,14 @@ const idDocReq: IdDocRequirement = {
   shouldCollectConsent: true,
   uploadMode: 'default',
   supportedCountryAndDocTypes: {},
+  documentRequestId: 'id',
   documentRequestKind: DocumentRequestKind.Identity,
+  config: {
+    kind: DocumentRequestKind.Identity,
+    shouldCollectConsent: true,
+    shouldCollectSelfie: true,
+    supportedCountryAndDocTypes: {},
+  },
 };
 
 const getMobileArgs = () => ({

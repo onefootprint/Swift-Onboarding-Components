@@ -18,6 +18,7 @@ export enum SupportedIdDocTypes {
   utilityBill = 'utility_bill',
   proofOfAddress = 'proof_of_address',
   passportCard = 'passport_card',
+  custom = 'custom',
 }
 
 export enum IdDocRegionality {

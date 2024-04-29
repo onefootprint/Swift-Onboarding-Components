@@ -29,6 +29,7 @@ const idDocRequirement: IdDocRequirement = {
   shouldCollectSelfie: true,
   shouldCollectConsent: true,
   uploadMode: 'default',
+  documentRequestId: 'id',
   supportedCountryAndDocTypes: {
     us: [
       SupportedIdDocTypes.driversLicense,
@@ -42,6 +43,23 @@ const idDocRequirement: IdDocRequirement = {
     ],
   },
   documentRequestKind: DocumentRequestKind.Identity,
+  config: {
+    kind: DocumentRequestKind.Identity,
+    shouldCollectConsent: false,
+    shouldCollectSelfie: false,
+    supportedCountryAndDocTypes: {
+      us: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+      ca: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+    },
+  },
 };
 
 const kycRequirement: CollectKycDataRequirement = {

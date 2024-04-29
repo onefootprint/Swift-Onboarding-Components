@@ -41,12 +41,43 @@ export type CollectInvestorProfileRequirement = {
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
   isMet: boolean;
+  documentRequestId: string;
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
   supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
-  uploadMode: 'default' | 'allow_upload' | 'capture_only';
+  uploadMode: DocumentUploadMode;
   documentRequestKind: DocumentRequestKind;
+  config: DocumentRequirementConfig;
 };
+
+export type DocumentUploadMode = 'default' | 'allow_upload' | 'capture_only';
+
+export type IdDocRequirementConfig = {
+  kind: DocumentRequestKind.Identity;
+  shouldCollectSelfie: boolean;
+  shouldCollectConsent: boolean;
+  supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
+};
+
+export type ProofOfAddressRequirementConfig = {
+  kind: DocumentRequestKind.ProofOfAddress;
+};
+
+export type ProofOfSsnRequirementConfig = {
+  kind: DocumentRequestKind.ProofOfSsn;
+};
+
+export type CustomDocumentRequirementConfig = {
+  kind: DocumentRequestKind.Custom;
+  name: string;
+  description?: string;
+};
+
+export type DocumentRequirementConfig =
+  | IdDocRequirementConfig
+  | ProofOfAddressRequirementConfig
+  | ProofOfSsnRequirementConfig
+  | CustomDocumentRequirementConfig;
 
 export type RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey;

@@ -4,9 +4,9 @@ import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../../../hooks/ui/use-log-state-machine';
 import {
+  CollectDocument,
   CollectKybData,
   CollectKycData,
-  IdDoc,
   InvestorProfile,
   Liveness,
   Transfer,
@@ -137,11 +137,12 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches('idDoc') && idDocReqs.length) {
     return (
-      <IdDoc
+      <CollectDocument
         idvContext={idvContext}
         context={{
           requirement: idDocReqs[0],
           sandboxOutcome: idDocOutcome,
+          obConfigSupportedCountries: config.supportedCountries,
           orgId,
         }}
         onDone={handleRequirementCompleted}

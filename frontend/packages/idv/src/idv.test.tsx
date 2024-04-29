@@ -84,6 +84,7 @@ const collectKycDataRequirement: OnboardingRequirement = {
 const idDocRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.idDoc,
   isMet: false,
+  documentRequestId: 'id',
   shouldCollectConsent: false,
   shouldCollectSelfie: false,
   uploadMode: 'allow_upload',
@@ -103,6 +104,26 @@ const idDocRequirement: OnboardingRequirement = {
     ],
   },
   documentRequestKind: DocumentRequestKind.Identity,
+  config: {
+    kind: DocumentRequestKind.Identity,
+    shouldCollectConsent: false,
+    shouldCollectSelfie: false,
+    supportedCountryAndDocTypes: {
+      us: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+        SupportedIdDocTypes.residenceDocument,
+        SupportedIdDocTypes.visa,
+        SupportedIdDocTypes.workPermit,
+      ],
+      ca: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+    },
+  },
 };
 
 describe('<Idv />', () => {

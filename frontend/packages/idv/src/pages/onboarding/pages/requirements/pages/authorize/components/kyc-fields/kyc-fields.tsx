@@ -60,6 +60,7 @@ const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
   [SupportedIdDocTypes.bankStatement]: IcoWriting24,
   [SupportedIdDocTypes.utilityBill]: IcoWriting24,
   [SupportedIdDocTypes.proofOfAddress]: IcoWriting24,
+  [SupportedIdDocTypes.custom]: IcoWriting24,
   [SupportedIdDocTypes.passportCard]: IcoPassportCard24,
 };
 
@@ -107,6 +108,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [SupportedIdDocTypes.utilityBill]: t('data-labels.utilityBill'),
     [SupportedIdDocTypes.proofOfAddress]: t('data-labels.proofOfAddress'),
     [SupportedIdDocTypes.passportCard]: t('data-labels.passportCard'),
+    [SupportedIdDocTypes.custom]: t('data-labels.custom'),
   };
 
   const fields: FieldProps[] = [];

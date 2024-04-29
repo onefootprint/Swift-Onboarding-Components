@@ -215,6 +215,7 @@
           "visa": "Visa",
           "voterIdentification": "Voter identification",
           "ssnCard": "SSN card",
+          "custom": "Custom",
           "lease": "Lease",
           "utilityBill": "Utility bill",
           "bankStatement": "Bank statement",
@@ -909,6 +910,12 @@
     }
   },
   "transfer": {
+    "document-request-kind": {
+      "identity": "ID document",
+      "proof_of_address": "proof of address",
+      "proof_of_ssn": "proof of SSN",
+      "unknown": "document"
+    },
     "components": {
       "sms-button-with-countdown": {
         "cta": "Resend link",
@@ -1009,155 +1016,9 @@
       }
     }
   },
-  "id-doc": {
-    "document-request-kind": {
-      "identity": "ID document",
-      "proof_of_address": "proof of address",
-      "proof_of_ssn": "proof of SSN",
-      "unknown": "document"
-    },
+  "document-flow": {
     "components": {
-      "media-errors": {
-        "not-found": "We couldn't find a camera on your device. Please use another device.",
-        "already-in-use": "Another application is using your camera, please close the other application and try again.",
-        "constraint": "We couldn't find a camera that could be used to take photos. Please use another device.",
-        "undefined-navigator": "Looks like your browser can't open the camera. Please try using a different browser or device.",
-        "other-error": "There was an error accessing your camera. Please try again."
-      },
-      "retry-limit-exceeded": {
-        "title": "Too many attempts",
-        "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
-      },
-      "missing-permissions": {
-        "title": "Allow access to your camera",
-        "subtitle": "We will need you to take photos of your document to properly verify your identity.",
-        "cta": "Open Settings to give camera permissions",
-        "cta-safari": "Open Safari settings to grant camera permissions and refresh the page.",
-        "cta-ios": "Open Settings to grant camera permissions to your mobile browser.",
-        "cta-android": "Grant camera permissions via your browser and/or device settings.",
-        "cta-mobile": "Adjust your device and/or browser settings to grant camera permissions.",
-        "cta-desktop": "Open your browser settings to grant camera permissions."
-      },
-      "id-doc-photo-prompt": {
-        "title": "Scan or upload the {{side}} of your {{type}} ({{country}})",
-        "camera-permission-name": "camera",
-        "photo-lib-permission-name": "photo library",
-        "guidelines": {
-          "device-steady": {
-            "title": "Hold your device steady"
-          },
-          "position-document": {
-            "title": "Align your {{document}} with the frame outline",
-            "description": "Make sure it's the {{side}}."
-          },
-          "background": {
-            "title": "Find a background with good contrast",
-            "description": "The most different from the id card color as possible."
-          },
-          "autocapture": {
-            "title": "Image will be captured automatically"
-          }
-        },
-        "consent-mobile": {
-          "consent-bottomsheet": {
-            "submit-button": {
-              "disabled-title": "Scroll to agree",
-              "enabled-title": "Agree and continue"
-            }
-          }
-        },
-        "continue": "Continue"
-      },
-      "desktop-header": {
-        "title": {
-          "doc-name": {
-            "id-doc": "{{type, capitalize}}"
-          },
-          "side-name": {
-            "id-doc": "{{side, capitalize}}"
-          },
-          "selfie": "Selfie"
-        },
-        "subtitle": "Issued in {{country}}"
-      },
-      "desktop-photo-prompt": {
-        "upload-link-button": {
-          "title": "Choose file to upload"
-        },
-        "drag-drop-text": {
-          "line-1": "or drag and drop",
-          "line-2": "Only images allowed (JPG, PNG, etc)"
-        },
-        "continue": "Continue",
-        "choose-different-file": "Choose a different file",
-        "camera-fallback-text": {
-          "title": "Time exceeded",
-          "subtitle": "We're unable to access your camera at this time."
-        }
-      },
-      "image-consent": {
-        "title": "Consent to use your images",
-        "subtitle": "Consent and Written Release for Collection, Use, Disclosure and Storage of Personal Data (including Biometric Information and Identifiers)",
-        "description": "By clicking Agree and continuing and providing One Footprint, Inc. (hereinafter referred to as \"Company\") with your Personal Data, including your Biometric Information and government identification information, you consent to Company's and Incode Technologies, Inc. (hereinafter \"Incode\")’s collection, storage, retention, use and disclosure of such information to provide the identity verification services, consistent with Company's <privacy>Privacy Notice</privacy> and <toc>Terms of Use</toc>. Even if you consent, you can subsequently withdraw consent at any time.<br/><br/>In order to verify that you are the person depicted in your government-issued identification (\"Services\"), Company uses third-party technology from Incode to collect personal data from or about you, including biometric information and biometric identifiers such as your faceprint (\"Biometric Information\"), a selfie, and government-issued identification, including information obtained, for example and where applicable, by scanning the barcode (collectively with Biometric Information, \"Personal Data\"). Specifically, you will be asked to take a selfie through the Incode platform. Incode will then scan and map your facial features in comparison with the picture on your government-issued identification to allow you to create and/or access your account with Company. Please note the processing of your Personal Data, namely of your Biometric Information by Incode, shall include a comparison of the picture in your ID document with your selfie (1:1) which shall then be compared against the Company database for fraud prevention purposes (1:N). For the Services, Incode will also collect other information that is on the front and back of your identification documentation, including where it exists and permitted by law, by scanning the barcode and collecting information derived from it (e.g., name, date of birth, height). Incode uses this information to verify your identity and to prevent fraud. Incode may also, with your consent, use this information to improve its products and services. Company or Incode on behalf of Company, may also share your Personal Data with third-party service providers or governmental entities that enable us to provide our Services (e.g. cloud hosting providers, fraudsters data base or the Department of Motor Vehicles if you provide a US identification card) and other third parties where required by law. Use of your Personal Data: Your Personal Data, including Biometric Information, may be used for the following purposes (as applicable depending on your consent), in each case as further described in Company's <privacy>Privacy Policy</privacy> and/or <incode_privacy>Incode's Privacy Policy</incode_privacy>:<br/> • To provide the services for which the Personal Data was requested;<br/> • To improve or modify Incode's products and services; and<br/> • To comply with Company's or Incode's obligations under applicable law.<br/>You can request the deletion of your Personal Data, and exercise any other rights under applicable data protection laws, at any time by emailing Company at support@onefootprint.com or Incode at dataprotection@incode.com. If you request deletion of your Personal Data, we will not be able to recover it at a later point. Company or Incode, as applicable, will permanently delete Biometric Information processed (if any) for its own purposes by the earlier of: (i) the time at which the purpose for which it was collected has been satisfied; or (ii) three years from the moment you provide consent. Incode will do likewise with the Biometric Information that it processes on behalf of, and as instructed by, Company.",
-        "cta": "Agree",
-        "continue": "Continue",
-        "third-party-consent": "Optional:  By ticking this box and providing Incode with your Personal Data, including your Biometric Information and government identification information, you consent to and provide a written release to Incode for the collection, storage, retention, use and disclosure of such information to improve, modify or update Incode’s products or services (including its algorithm), in accordance with its Privacy Notice. You can exercise your rights under applicable privacy laws, including withdrawal of consent, by contacting dataprotection@incode.com. IMPORTANT: Your consent is voluntary, even if you do not consent you will still be able to access Company's services."
-      },
-      "loading": {
-        "title": {
-          "process-front": "Processing...",
-          "process-back": "Processing...",
-          "process-selfie": "Processing selfie...",
-          "upload-front": "Uploading...",
-          "upload-back": "Uploading...",
-          "upload-selfie": "Uploading selfie...",
-          "analyze-front": "Analyzing...",
-          "analyze-back": "Analyzing...",
-          "analyze-selfie": "Analyzing selfie..."
-        },
-        "subtitle": "Hang tight! It'll be done soon.",
-        "slow-connection": "Your internet connection seems unstable. This might take longer than usual."
-      },
-      "error": {
-        "title-front": "We couldn't process your image",
-        "title-back": "We couldn't process your image",
-        "title-selfie": "We couldn't process your selfie",
-        "description": {
-          "doc_type_mismatch": "Document type didn't match. Please upload your {{documentType}} from {{countryName}}.",
-          "unknown_document_type": "We couldn't classify this document. Please upload your {{documentType}} from {{countryName}}.",
-          "unsupported_document_type": "Unfortunately the uploaded document type is not supported. Please upload your {{documentType}} from {{countryName}}.",
-          "wrong_document_side": "It looks like you uploaded the wrong side of your document. Please flip your ID and upload the {{side}} of your {{documentType}} from {{countryName}}.",
-          "wrong_one_sided_document": "Incorrect document type detected. Please upload your {{documentType}} from {{countryName}}.",
-          "document_not_readable": "Your document could not be read. Please try again.",
-          "document_glare": "Your document's picture had too much glare. Please adjust the lighting and try again.",
-          "document_sharpness": "The document image was blurry. Please upload or capture a sharper image.",
-          "id_type_not_acceptable": "Invalid document type detected. Please upload your {{documentType}} from {{countryName}}.",
-          "unable_to_align_document": "One or more corners of the document is not within the borders of the image. Please center the document in the frame and try again.",
-          "unknown_country_code": "We couldn't detect the issuer country from your document. Please upload your {{documentType}} from {{countryName}}.",
-          "country_code_mismatch": "The {{documentType}} issuer country didn't match. Please upload your {{documentType}} from {{countryName}}.",
-          "selfie_face_not_found": "We could not detect a face in the selfie. Please try again and make sure that your face is in the frame.",
-          "selfie_low_confidence": "We could not verify your selfie. Please try again.",
-          "selfie_too_dark": "Your image was too dark. Please adjust the lighting and try again.",
-          "selfie_glare": "Your selfie had too much glare. Please adjust the lighting and try again.",
-          "selfie_has_lenses": "We detected glasses in your selfie. Please remove your glasses and try again.",
-          "selfie_has_face_mask": "We detected a face mask in your selfie. Please remove all face coverings and try again.",
-          "unknown_upload_error": "The file upload failed. Please try again.",
-          "multiple_files_error": "We detected more than one files. Please upload a single image file.",
-          "file_type_not_allowed": "The uploaded file type is not supported. Please upload image files only.",
-          "selfie_blurry": "Your selfie was too blurry. Please try again.",
-          "selfie_image_size_unsupported": "Your selfie image was too small. Please try again with a higher resolution picture.",
-          "selfie_image_orientation_incorrect": "Your selfie image has the wrong orientation. Please ensure the picture submitted is in portrait format and try again.",
-          "selfie_bad_image_compression": "Your selfie image has the incorrect image compression. Please try again.",
-          "drivers_license_permit_not_allowed": "Driver's license permits are not allowed, please retry with a full driver's license or reach out to the business for support.",
-          "unknown_error": "An error occurred. Please try again.",
-          "network_error": "{{errorInfo}}. Please try again.",
-          "face_not_found": "We could not detect a face in the document provided. Please try again and make sure that you a capturing a clear image."
-        }
-      },
-      "success": {
-        "title": "Success!"
-      },
-      "id-doc-photo-upload-buttons": {
+      "photo-upload-buttons": {
         "take-photo": {
           "title": "Take photo",
           "take": "Take photo"
@@ -1169,39 +1030,21 @@
           "title": "Upload file"
         }
       },
-      "next-side": {
-        "front": "Now the front side",
-        "back": "Now the back side",
-        "selfie": "Now we need a selfie"
+      "retry-limit-exceeded": {
+        "title": "Too many attempts",
+        "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
       },
-      "photo-capture": {
-        "instructions": {
-          "title": "Instructions",
-          "background": {
-            "title": "Find a background with good contrast",
-            "description": "High contrast helps with document detection, avoiding errors."
-          },
-          "position-document": {
-            "title": "Position the document in the frame",
-            "description": "Make sure that the whole document is positioned, as indicated, in the frame."
-          },
-          "position-face": {
-            "title": "Position your face in the frame",
-            "description": "Make sure that the whole face is positioned, as indicated, in the frame."
-          },
-          "steady": {
-            "title": "Hold steady",
-            "description": "Hold your camera steady to avoid any blur or glare."
-          },
-          "autocapture-document": {
-            "title": "Image will be captured automatically",
-            "description": "We'll show a 3-second countdown before it's captured."
-          },
-          "autocapture-face": {
-            "title": "Selfie will be captured automatically",
-            "description": "We'll show a 3-second countdown before it's captured."
-          }
-        }
+      "success": {
+        "title": "Success!"
+      },
+      "loading": {
+        "title": {
+          "process": "Processing...",
+          "upload": "Uploading...",
+          "analyze": "Analyzing..."
+        },
+        "subtitle": "Hang tight! It'll be done soon.",
+        "slow-connection": "Your internet connection seems unstable. This might take longer than usual."
       },
       "camera": {
         "take": "Take photo",
@@ -1219,9 +1062,14 @@
               "head-not-straight": "Face is tilted or looking other way",
               "blurry": "Image is blurry, find better lighting or move your camera"
             },
-            "document": {
+            "idDoc": {
               "ok": "Hold still...",
-              "detecting": " Scan the {{side, allCaps}} of your {{documentType}}",
+              "detecting": "Scan the {{side, allCaps}} of your {{documentType}}",
+              "blurry": "Image is blurry, find better lighting or move your camera"
+            },
+            "nonIdDoc": {
+              "ok": "Hold still...",
+              "detecting": "Scan your {{documentType}}",
               "blurry": "Image is blurry, find better lighting or move your camera"
             }
           }
@@ -1256,251 +1104,124 @@
           "cta": "Allow"
         }
       },
-      "preview": {
-        "retake": "Retake",
-        "confirm": "Confirm"
+      "photo-capture": {
+        "instructions": {
+          "title": "Instructions",
+          "background": {
+            "title": "Find a background with good contrast",
+            "description": "High contrast helps with document detection, avoiding errors."
+          },
+          "position-document": {
+            "title": "Position the document in the frame",
+            "description": "Make sure that the whole document is positioned, as indicated, in the frame."
+          },
+          "position-face": {
+            "title": "Position your face in the frame",
+            "description": "Make sure that the whole face is positioned, as indicated, in the frame."
+          },
+          "steady": {
+            "title": "Hold steady",
+            "description": "Hold your camera steady to avoid any blur or glare."
+          },
+          "autocapture-document": {
+            "title": "Image will be captured automatically",
+            "description": "We'll show a 3-second countdown before it's captured."
+          },
+          "autocapture-face": {
+            "title": "Selfie will be captured automatically",
+            "description": "We'll show a 3-second countdown before it's captured."
+          }
+        },
+        "preview": {
+          "retake": "Retake",
+          "confirm": "Confirm"
+        }
+      },
+      "error": {
+        "title": "We couldn't process your image",
+        "description": {
+          "doc_type_mismatch": "Document type didn't match. Please upload your {{documentType}} from {{countryName}}.",
+          "unknown_document_type": "We couldn't classify this document. Please upload your {{documentType}} from {{countryName}}.",
+          "unsupported_document_type": "Unfortunately the uploaded document type is not supported. Please upload your {{documentType}} from {{countryName}}.",
+          "wrong_document_side": "It looks like you uploaded the wrong side of your document. Please flip your ID and upload the {{side}} of your {{documentType}} from {{countryName}}.",
+          "wrong_one_sided_document": "Incorrect document type detected. Please upload your {{documentType}} from {{countryName}}.",
+          "document_not_readable": "Your document could not be read. Please try again.",
+          "document_glare": "Your document's picture had too much glare. Please adjust the lighting and try again.",
+          "document_sharpness": "The document image was blurry. Please upload or capture a sharper image.",
+          "id_type_not_acceptable": "Invalid document type detected. Please upload your {{documentType}} from {{countryName}}.",
+          "unable_to_align_document": "One or more corners of the document is not within the borders of the image. Please center the document in the frame and try again.",
+          "unknown_country_code": "We couldn't detect the issuer country from your document. Please upload your {{documentType}} from {{countryName}}.",
+          "country_code_mismatch": "The {{documentType}} issuer country didn't match. Please upload your {{documentType}} from {{countryName}}.",
+          "selfie_face_not_found": "We could not detect a face in the selfie. Please try again and make sure that your face is in the frame.",
+          "selfie_low_confidence": "We could not verify your selfie. Please try again.",
+          "selfie_too_dark": "Your image was too dark. Please adjust the lighting and try again.",
+          "selfie_glare": "Your selfie had too much glare. Please adjust the lighting and try again.",
+          "selfie_has_lenses": "We detected glasses in your selfie. Please remove your glasses and try again.",
+          "selfie_has_face_mask": "We detected a face mask in your selfie. Please remove all face coverings and try again.",
+          "unknown_upload_error": "The file upload failed. Please try again.",
+          "multiple_files_error": "We detected more than one files. Please upload a single image file.",
+          "file_type_not_allowed": "The uploaded file type is not supported. Please upload image files only.",
+          "selfie_blurry": "Your selfie was too blurry. Please try again.",
+          "selfie_image_size_unsupported": "Your selfie image was too small. Please try again with a higher resolution picture.",
+          "selfie_image_orientation_incorrect": "Your selfie image has the wrong orientation. Please ensure the picture submitted is in portrait format and try again.",
+          "selfie_bad_image_compression": "Your selfie image has the incorrect image compression. Please try again.",
+          "drivers_license_permit_not_allowed": "Driver's license permits are not allowed, please retry with a full driver's license or reach out to the business for support.",
+          "unknown_error": "An error occurred. Please try again.",
+          "network_error": "{{errorInfo}}. Please try again.",
+          "face_not_found": "We could not detect a face in the document provided. Please try again and make sure that you a capturing a clear image."
+        }
+      },
+      "desktop-photo-prompt": {
+        "upload-link-button": {
+          "title": "Choose file to upload"
+        },
+        "drag-drop-text": {
+          "line-1": "or drag and drop",
+          "line-2": "Only images allowed (JPG, PNG, etc)"
+        },
+        "continue": "Continue",
+        "choose-different-file": "Choose a different file",
+        "camera-fallback-text": {
+          "title": "Time exceeded",
+          "subtitle": "We're unable to access your camera at this time."
+        }
+      },
+      "desktop-header": {
+        "subtitle": "Issued in {{country}}"
+      },
+      "missing-permissions": {
+        "title": "Allow access to your camera",
+        "subtitle": "We will need you to take photos of your document to properly verify your identity.",
+        "cta": "Open Settings to give camera permissions",
+        "cta-safari": "Open Safari settings to grant camera permissions and refresh the page.",
+        "cta-ios": "Open Settings to grant camera permissions to your mobile browser.",
+        "cta-android": "Grant camera permissions via your browser and/or device settings.",
+        "cta-mobile": "Adjust your device and/or browser settings to grant camera permissions.",
+        "cta-desktop": "Open your browser settings to grant camera permissions."
+      },
+      "media-errors": {
+        "not-found": "We couldn't find a camera on your device. Please use another device.",
+        "already-in-use": "Another application is using your camera, please close the other application and try again.",
+        "constraint": "We couldn't find a camera that could be used to take photos. Please use another device.",
+        "undefined-navigator": "Looks like your browser can't open the camera. Please try using a different browser or device.",
+        "other-error": "There was an error accessing your camera. Please try again."
       }
     },
-    "pages": {
-      "desktop-consent": {
-        "submit-button": {
-          "disabled-title": "Scroll to agree",
-          "enabled-title": "Agree and continue"
+    "non-id-doc": {
+      "global": {
+        "doc-name": {
+          "proof-of-address": "proof of address",
+          "proof-of-ssn": "proof of SSN",
+          "custom": "{{documentName}}"
         }
       },
-      "country-and-type-selection": {
-        "title": "Scan or upload your {{documentKind}}",
-        "subtitle": "We need some more information from you.",
-        "form": {
-          "country": "Country",
-          "hint": {
-            "label": "Only documents issued by {{country}} are accepted"
-          },
-          "type": {
-            "passport": {
-              "title": "Passport"
-            },
-            "idCard": {
-              "title": "Identity card"
-            },
-            "driversLicense": {
-              "title": "Driver's license"
-            },
-            "visa": {
-              "title": "Government-issued visa"
-            },
-            "workPermit": {
-              "title": "Work permit / EAD card"
-            },
-            "residenceDocument": {
-              "title": "Residence card / Green card"
-            },
-            "voterIdentification": {
-              "title": "Voter identification"
-            },
-            "ssnCard": {
-              "title": "SSN Card"
-            },
-            "lease": {
-              "title": "Lease (Current)"
-            },
-            "bankStatement": {
-              "title": "Bank Statement (from last 30d)"
-            },
-            "utilityBill": {
-              "title": "Utility Bill (from last 30d)"
-            },
-            "proofOfAddress": {
-              "title": "Proof of address"
-            },
-            "passportCard": {
-              "title": "Passport card"
-            }
-          },
-          "not-supported": "Sorry, we don't support IDs for your country yet.",
-          "cta": "Continue"
-        }
-      },
-      "front-photo-capture": {
-        "title": {
-          "camera": {
-            "driversLicense": "Driver's license · FRONT",
-            "idCard": "ID card · FRONT",
-            "passport": "Passport · PHOTO PAGE",
-            "visa": "Visa · PHOTO PAGE",
-            "workPermit": "EAD card · FRONT",
-            "residenceDocument": "Green card · FRONT",
-            "voterIdentification": "Voter identification · FRONT",
-            "ssnCard": "SSN Card · FRONT",
-            "proofOfAddress": "Proof of address",
-            "passportCard": "Passport card · FRONT"
-          },
-          "preview": {
-            "driversLicense": "Driver's license",
-            "idCard": "ID card",
-            "passport": "Passport",
-            "visa": "Visa",
-            "workPermit": "EAD card",
-            "residenceDocument": "Green card",
-            "voterIdentification": "Voter identification",
-            "ssnCard": "SSN Card",
-            "proofOfAddress": "Proof of address",
-            "passportCard": "Passport card"
-          }
+      "pages": {
+        "init": {
+          "error": "Something went wrong. Please try again.",
+          "try-again": "Try again",
+          "retry-limit-exceeded": "Unfortunately we can't complete your request at this time. Please try again later."
         },
-        "subtitle": {
-          "preview": "Front side"
-        }
-      },
-      "mobile-front-photo-fallback-upload": {
-        "title": "Time exceeded",
-        "subtitle": {
-          "driversLicense": "We're unable to access your camera at this time. Please manually upload the front side of your driver's license",
-          "idCard": "We're unable to access your camera at this time. Please manually upload the front side of your ID card",
-          "passport": "We're unable to access your camera at this time. Please manually upload the front side of your passport",
-          "visa": "We're unable to access your camera at this time. Please manually upload the front side of your visa",
-          "workPermit": "We're unable to access your camera at this time. Please manually upload the front side of your EAD card",
-          "residenceDocument": "We're unable to access your camera at this time. Please manually upload the front side of your green card",
-          "voterIdentification": "We're unable to access your camera at this time. Please manually upload the front side of your voter identification",
-          "ssnCard": "We're unable to access your camera at this time. Please manually upload the front side of your SSN Card",
-          "proofOfAddress": "We're unable to access your camera at this time. Please manually upload the front side of your proof of address",
-          "passportCard": "We're unable to access your camera at this time. Please manually upload the front side of your passport card"
-        }
-      },
-      "back-photo-capture": {
-        "title": {
-          "camera": {
-            "driversLicense": "Driver's license · BACK",
-            "idCard": "ID card · BACK",
-            "passport": "Passport · PHOTO PAGE",
-            "visa": "Visa · PHOTO PAGE",
-            "workPermit": "EAD card · BACK",
-            "residenceDocument": "Green card · BACK",
-            "voterIdentification": "Voter identification · BACK",
-            "ssnCard": "SSN Card · BACK",
-            "proofOfAddress": "Proof of address",
-            "passportCard": "Passport card · BACK"
-          },
-          "preview": {
-            "driversLicense": "Driver's license",
-            "idCard": "ID card",
-            "passport": "Passport",
-            "visa": "Visa",
-            "workPermit": "EAD card",
-            "residenceDocument": "Green card",
-            "voterIdentification": "Voter identification",
-            "ssnCard": "SSN Card",
-            "proofOfAddress": "Proof of address",
-            "passportCard": "Passport card"
-          }
-        },
-        "subtitle": {
-          "preview": "Back side"
-        }
-      },
-      "mobile-back-photo-fallback-upload": {
-        "title": "Time exceeded",
-        "subtitle": {
-          "driversLicense": "We're unable to access your camera at this time. Please manually upload the back side of your driver's license",
-          "idCard": "We're unable to access your camera at this time. Please manually upload the back side of your ID card",
-          "passport": "We're unable to access your camera at this time. Please manually upload the back side of your passport",
-          "visa": "We're unable to access your camera at this time. Please manually upload the back side of your visa",
-          "workPermit": "We're unable to access your camera at this time. Please manually upload the back side of your EAD card",
-          "residenceDocument": "We're unable to access your camera at this time. Please manually upload the back side of your green card",
-          "voterIdentification": "We're unable to access your camera at this time. Please manually upload the back side of your voter identification",
-          "ssnCard": "We're unable to access your camera at this time. Please manually upload the back side of your SSN Card",
-          "proofOfAddress": "We're unable to access your camera at this time. Please manually upload the back side of your proof of address",
-          "passportCard": "We're unable to access your camera at this time. Please manually upload the back side of your passport card"
-        }
-      },
-      "selfie-photo-prompt": {
-        "title": "Take a selfie",
-        "subtitle": "This will allow us to validate the ID document you uploaded in the previous step.",
-        "camera-permission-name": "camera",
-        "photo-lib-permission-name": "photo library",
-        "cta": "Take photo",
-        "animation-selfie": {
-          "first-text": "Back image captured",
-          "second-text": "Now we need a selfie"
-        },
-        "animation-selfie-from-passport": {
-          "first-text": "Document image captured",
-          "second-text": "Now we need a selfie"
-        },
-        "guidelines": {
-          "whole-face": {
-            "title": "Position your face within the frame",
-            "description": "Keep your head straight pointing at the camera"
-          },
-          "check-lighting": {
-            "title": "Check your lighting",
-            "description": "It can't be too bright or too dark."
-          },
-          "device-steady": {
-            "title": "Hold your device steady"
-          },
-          "autocapture": {
-            "title": "Image will be captured automatically"
-          }
-        }
-      },
-      "mobile-selfie-fallback-upload": {
-        "title": "Time exceeded",
-        "subtitle": "We're unable to access your camera at this time. Please manually upload your selfie photo."
-      },
-      "selfie-retry-prompt": {
-        "cta": "Take photo"
-      },
-      "selfie-photo": {
-        "title": "Selfie photo"
-      },
-      "desktop-selfie": {
-        "desktop-camera-permission": {
-          "title": {
-            "not-allowed": "Allow access to your camera",
-            "undefined-navigator": "Can't open camera",
-            "device-not-found": "Camera not found",
-            "device-busy": "Camera is busy",
-            "no-video-option": "Camera can't take photos",
-            "other-error": "Something went wrong"
-          },
-          "subtitle": {
-            "not-allowed": "Please give permission to this website so we can use your camera to take your selfie.",
-            "device-not-found": "We couldn't find a camera on your device. Please make sure that the camera is working properly and not being used by another application.",
-            "device-busy": "The camera seems to be in use by another application. Please make sure that the camera is not being used by another application.",
-            "no-video-option": "We couldn't find a camera that could be used to take photos. Please use another device.",
-            "undefined-navigator": "Looks like your browser can't open the camera. Please try using a different browser or device.",
-            "other-error": "There was an error accessing your camera. Please try again."
-          },
-          "take-selfie": "Take a selfie"
-        },
-        "header": {
-          "title": {
-            "camera": "Take a selfie",
-            "preview": "Confirm selfie"
-          },
-          "subtitle": {
-            "camera": "Place your face within the frame"
-          }
-        }
-      },
-      "desktop-selfie-retry": {
-        "take-selfie-again": "Take selfie again"
-      },
-      "processing": {
-        "missing-requirement-error": "Sorry, something went wrong! Please restart the onboarding."
-      },
-      "desktop-processing": {
-        "continue": "Continue",
-        "missing-requirement-error": "Sorry, something went wrong! Please restart the onboarding."
-      },
-      "device-warning": {
-        "warning": "This action can only be performed on a mobile phone. Please go back to the previous screen/tab and click the \"Cancel\" button to generate a new QR code with a new URL link. Open the new link on your phone."
-      },
-      "id-doc-upload-first-prompt": {
-        "proof_of_address": {
-          "title": "We need to verify your address",
-          "description": "Please upload one of the following documents.",
+        "document-prompt": {
           "guidelines": {
             "gas-water-electricity-bill": "Recent gas, water or electricity bills",
             "bank-credit-card-statement": "Recent bank or credit card statements",
@@ -1508,9 +1229,301 @@
             "rental-agreement": "Rental lease agreement",
             "phone-internet-bill": "Recent phone number or internet bills"
           },
-          "alert-messages": "Document should show your name and address"
+          "proof-of-address": {
+            "title": "We need to verify your address",
+            "description": "Please upload an official document that shows both your name and address."
+          },
+          "proof-of-ssn": {
+            "title": "We need to verify your SSN",
+            "description": "Please upload a government-issued document that shows both your name and your Social Security Number."
+          },
+          "custom": {
+            "title": "Upload {{documentName}}",
+            "description": "{{documentDescription}}"
+          },
+          "single-country-alert": "Document must be issued in {{country}}"
         },
-        "issued-in": "Must be issued in"
+        "mobile-image-capture": {
+          "camera-stuck": {
+            "title": "Camera is stuck",
+            "description": "We're having trouble accessing your camera. Please try again or use upload option."
+          }
+        },
+        "desktop-processing": {
+          "continue": "Continue",
+          "missing-requirement-error": "Sorry, something went wrong! Please restart the onboarding.",
+          "title": {
+            "proof-of-address": "Proof of address",
+            "proof-of-ssn": "Proof of SSN",
+            "custom": "{{documentName}}"
+          }
+        }
+      }
+    },
+    "id-doc": {
+      "global": {
+        "doc-name": {
+          "driversLicense": "driver's license",
+          "idCard": "ID card",
+          "passport": "passport",
+          "visa": "visa",
+          "workPermit": "EAD card",
+          "residenceDocument": "green card",
+          "voterIdentification": "voter identification",
+          "passportCard": "passport card"
+        },
+        "side": {
+          "front": "front",
+          "back": "back",
+          "photo": "photo page",
+          "selfie": "selfie"
+        }
+      },
+      "components": {
+        "id-doc-photo-prompt": {
+          "title": "Scan or upload the {{side}} of your {{type}} ({{country}})",
+          "camera-permission-name": "camera",
+          "photo-lib-permission-name": "photo library",
+          "guidelines": {
+            "device-steady": {
+              "title": "Hold your device steady"
+            },
+            "position-document": {
+              "title": "Align your {{document}} with the frame outline",
+              "description": "Make sure it's the {{side}}."
+            },
+            "background": {
+              "title": "Find a background with good contrast",
+              "description": "The most different from the id card color as possible."
+            },
+            "autocapture": {
+              "title": "Image will be captured automatically"
+            }
+          },
+          "consent-mobile": {
+            "consent-bottomsheet": {
+              "submit-button": {
+                "disabled-title": "Scroll to agree",
+                "enabled-title": "Agree and continue"
+              }
+            }
+          },
+          "continue": "Continue"
+        },
+        "image-consent": {
+          "title": "Consent to use your images",
+          "subtitle": "Consent and Written Release for Collection, Use, Disclosure and Storage of Personal Data (including Biometric Information and Identifiers)",
+          "description": "By clicking Agree and continuing and providing One Footprint, Inc. (hereinafter referred to as \"Company\") with your Personal Data, including your Biometric Information and government identification information, you consent to Company's and Incode Technologies, Inc. (hereinafter \"Incode\")’s collection, storage, retention, use and disclosure of such information to provide the identity verification services, consistent with Company's <privacy>Privacy Notice</privacy> and <toc>Terms of Use</toc>. Even if you consent, you can subsequently withdraw consent at any time.<br/><br/>In order to verify that you are the person depicted in your government-issued identification (\"Services\"), Company uses third-party technology from Incode to collect personal data from or about you, including biometric information and biometric identifiers such as your faceprint (\"Biometric Information\"), a selfie, and government-issued identification, including information obtained, for example and where applicable, by scanning the barcode (collectively with Biometric Information, \"Personal Data\"). Specifically, you will be asked to take a selfie through the Incode platform. Incode will then scan and map your facial features in comparison with the picture on your government-issued identification to allow you to create and/or access your account with Company. Please note the processing of your Personal Data, namely of your Biometric Information by Incode, shall include a comparison of the picture in your ID document with your selfie (1:1) which shall then be compared against the Company database for fraud prevention purposes (1:N). For the Services, Incode will also collect other information that is on the front and back of your identification documentation, including where it exists and permitted by law, by scanning the barcode and collecting information derived from it (e.g., name, date of birth, height). Incode uses this information to verify your identity and to prevent fraud. Incode may also, with your consent, use this information to improve its products and services. Company or Incode on behalf of Company, may also share your Personal Data with third-party service providers or governmental entities that enable us to provide our Services (e.g. cloud hosting providers, fraudsters data base or the Department of Motor Vehicles if you provide a US identification card) and other third parties where required by law. Use of your Personal Data: Your Personal Data, including Biometric Information, may be used for the following purposes (as applicable depending on your consent), in each case as further described in Company's <privacy>Privacy Policy</privacy> and/or <incode_privacy>Incode's Privacy Policy</incode_privacy>:<br/> • To provide the services for which the Personal Data was requested;<br/> • To improve or modify Incode's products and services; and<br/> • To comply with Company's or Incode's obligations under applicable law.<br/>You can request the deletion of your Personal Data, and exercise any other rights under applicable data protection laws, at any time by emailing Company at support@onefootprint.com or Incode at dataprotection@incode.com. If you request deletion of your Personal Data, we will not be able to recover it at a later point. Company or Incode, as applicable, will permanently delete Biometric Information processed (if any) for its own purposes by the earlier of: (i) the time at which the purpose for which it was collected has been satisfied; or (ii) three years from the moment you provide consent. Incode will do likewise with the Biometric Information that it processes on behalf of, and as instructed by, Company.",
+          "cta": "Agree",
+          "continue": "Continue",
+          "third-party-consent": "Optional:  By ticking this box and providing Incode with your Personal Data, including your Biometric Information and government identification information, you consent to and provide a written release to Incode for the collection, storage, retention, use and disclosure of such information to improve, modify or update Incode’s products or services (including its algorithm), in accordance with its Privacy Notice. You can exercise your rights under applicable privacy laws, including withdrawal of consent, by contacting dataprotection@incode.com. IMPORTANT: Your consent is voluntary, even if you do not consent you will still be able to access Company's services."
+        },
+        "next-side": {
+          "front": "Now the front side",
+          "back": "Now the back side",
+          "selfie": "Now we need a selfie"
+        }
+      },
+      "pages": {
+        "desktop-consent": {
+          "submit-button": {
+            "disabled-title": "Scroll to agree",
+            "enabled-title": "Agree and continue"
+          }
+        },
+        "country-and-type-selection": {
+          "title": "Scan or upload your ID document",
+          "subtitle": "We need some more information from you.",
+          "form": {
+            "country": "Country",
+            "hint": {
+              "label": "Only documents issued by {{country}} are accepted"
+            },
+            "type": {
+              "passport": {
+                "title": "Passport"
+              },
+              "idCard": {
+                "title": "Identity card"
+              },
+              "driversLicense": {
+                "title": "Driver's license"
+              },
+              "visa": {
+                "title": "Government-issued visa"
+              },
+              "workPermit": {
+                "title": "Work permit / EAD card"
+              },
+              "residenceDocument": {
+                "title": "Residence card / Green card"
+              },
+              "voterIdentification": {
+                "title": "Voter identification"
+              },
+              "ssnCard": {
+                "title": "SSN Card"
+              },
+              "lease": {
+                "title": "Lease (Current)"
+              },
+              "bankStatement": {
+                "title": "Bank Statement (from last 30d)"
+              },
+              "utilityBill": {
+                "title": "Utility Bill (from last 30d)"
+              },
+              "proofOfAddress": {
+                "title": "Proof of address"
+              },
+              "passportCard": {
+                "title": "Passport card"
+              }
+            },
+            "not-supported": "Sorry, we don't support IDs for your country yet.",
+            "cta": "Continue"
+          }
+        },
+        "front-photo-capture": {
+          "subtitle": {
+            "preview": "Front side"
+          }
+        },
+        "mobile-front-photo-fallback-upload": {
+          "title": "Time exceeded",
+          "subtitle": {
+            "driversLicense": "We're unable to access your camera at this time. Please manually upload the front side of your driver's license",
+            "idCard": "We're unable to access your camera at this time. Please manually upload the front side of your ID card",
+            "passport": "We're unable to access your camera at this time. Please manually upload the front side of your passport",
+            "visa": "We're unable to access your camera at this time. Please manually upload the front side of your visa",
+            "workPermit": "We're unable to access your camera at this time. Please manually upload the front side of your EAD card",
+            "residenceDocument": "We're unable to access your camera at this time. Please manually upload the front side of your green card",
+            "voterIdentification": "We're unable to access your camera at this time. Please manually upload the front side of your voter identification",
+            "ssnCard": "We're unable to access your camera at this time. Please manually upload the front side of your SSN Card",
+            "proofOfAddress": "We're unable to access your camera at this time. Please manually upload the front side of your proof of address",
+            "passportCard": "We're unable to access your camera at this time. Please manually upload the front side of your passport card"
+          }
+        },
+        "back-photo-capture": {
+          "subtitle": {
+            "preview": "Back side"
+          }
+        },
+        "mobile-back-photo-fallback-upload": {
+          "title": "Time exceeded",
+          "subtitle": {
+            "driversLicense": "We're unable to access your camera at this time. Please manually upload the back side of your driver's license",
+            "idCard": "We're unable to access your camera at this time. Please manually upload the back side of your ID card",
+            "passport": "We're unable to access your camera at this time. Please manually upload the back side of your passport",
+            "visa": "We're unable to access your camera at this time. Please manually upload the back side of your visa",
+            "workPermit": "We're unable to access your camera at this time. Please manually upload the back side of your EAD card",
+            "residenceDocument": "We're unable to access your camera at this time. Please manually upload the back side of your green card",
+            "voterIdentification": "We're unable to access your camera at this time. Please manually upload the back side of your voter identification",
+            "ssnCard": "We're unable to access your camera at this time. Please manually upload the back side of your SSN Card",
+            "proofOfAddress": "We're unable to access your camera at this time. Please manually upload the back side of your proof of address",
+            "passportCard": "We're unable to access your camera at this time. Please manually upload the back side of your passport card"
+          }
+        },
+        "selfie-photo-prompt": {
+          "title": "Take a selfie",
+          "subtitle": "This will allow us to validate the ID document you uploaded in the previous step.",
+          "camera-permission-name": "camera",
+          "photo-lib-permission-name": "photo library",
+          "cta": "Take photo",
+          "animation-selfie": {
+            "first-text": "Back image captured",
+            "second-text": "Now we need a selfie"
+          },
+          "animation-selfie-from-passport": {
+            "first-text": "Document image captured",
+            "second-text": "Now we need a selfie"
+          },
+          "guidelines": {
+            "whole-face": {
+              "title": "Position your face within the frame",
+              "description": "Keep your head straight pointing at the camera"
+            },
+            "check-lighting": {
+              "title": "Check your lighting",
+              "description": "It can't be too bright or too dark."
+            },
+            "device-steady": {
+              "title": "Hold your device steady"
+            },
+            "autocapture": {
+              "title": "Image will be captured automatically"
+            }
+          }
+        },
+        "mobile-selfie-fallback-upload": {
+          "title": "Time exceeded",
+          "subtitle": "We're unable to access your camera at this time. Please manually upload your selfie photo."
+        },
+        "selfie-retry-prompt": {
+          "cta": "Take photo"
+        },
+        "selfie-photo": {
+          "title": "Selfie photo"
+        },
+        "desktop-selfie": {
+          "desktop-camera-permission": {
+            "title": {
+              "not-allowed": "Allow access to your camera",
+              "undefined-navigator": "Can't open camera",
+              "device-not-found": "Camera not found",
+              "device-busy": "Camera is busy",
+              "no-video-option": "Camera can't take photos",
+              "other-error": "Something went wrong"
+            },
+            "subtitle": {
+              "not-allowed": "Please give permission to this website so we can use your camera to take your selfie.",
+              "device-not-found": "We couldn't find a camera on your device. Please make sure that the camera is working properly and not being used by another application.",
+              "device-busy": "The camera seems to be in use by another application. Please make sure that the camera is not being used by another application.",
+              "no-video-option": "We couldn't find a camera that could be used to take photos. Please use another device.",
+              "undefined-navigator": "Looks like your browser can't open the camera. Please try using a different browser or device.",
+              "other-error": "There was an error accessing your camera. Please try again."
+            },
+            "take-selfie": "Take a selfie"
+          },
+          "header": {
+            "title": {
+              "camera": "Take a selfie",
+              "preview": "Confirm selfie"
+            },
+            "subtitle": {
+              "camera": "Place your face within the frame"
+            }
+          }
+        },
+        "desktop-selfie-retry": {
+          "take-selfie-again": "Take selfie again"
+        },
+        "processing": {
+          "missing-requirement-error": "Sorry, something went wrong! Please restart the onboarding."
+        },
+        "desktop-processing": {
+          "continue": "Continue",
+          "missing-requirement-error": "Sorry, something went wrong! Please restart the onboarding."
+        },
+        "device-warning": {
+          "warning": "This action can only be performed on a mobile phone. Please go back to the previous screen/tab and click the \"Cancel\" button to generate a new QR code with a new URL link. Open the new link on your phone."
+        },
+        "id-doc-upload-first-prompt": {
+          "proof_of_address": {
+            "title": "We need to verify your address",
+            "description": "Please upload one of the following documents.",
+            "guidelines": {
+              "gas-water-electricity-bill": "Recent gas, water or electricity bills",
+              "bank-credit-card-statement": "Recent bank or credit card statements",
+              "vehicle-voter-registration": "Vehicle or voter registration cards",
+              "rental-agreement": "Rental lease agreement",
+              "insurance": "Health or card insurance",
+              "phone-internet-bill": "Recent phone number or internet bills"
+            },
+            "alert-messages": "Document should show your name and address"
+          },
+          "issued-in": "Must be issued in"
+        }
       }
     }
   }

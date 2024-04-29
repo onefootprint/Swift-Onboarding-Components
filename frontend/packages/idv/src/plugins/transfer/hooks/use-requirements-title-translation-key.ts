@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import useGetDocumentRequestLabel from '../../id-doc/hooks/use-get-document-request-label';
 import type { TransferRequirements } from '../types';
+import useGetDocumentRequestLabel from './use-get-document-request-label';
 
 const useRequirementsTitle = (
   missingRequirements: TransferRequirements,
