@@ -73,8 +73,10 @@ pub async fn create_list_entry(
                 })
                 .collect::<Result<Vec<_>, _>>()?;
 
+            // Remove duplicates and encrypt.
             let e_data = canonicalized
                 .into_iter()
+                .unique()
                 .filter(|canon| !decrypted_existing_entries.contains(canon))
                 .map(|canon| -> ApiResult<_> {
                     let enc = key.seal_bytes(canon.leak().as_bytes()).map(|b| b.into())?;

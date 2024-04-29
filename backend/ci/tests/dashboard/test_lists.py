@@ -584,9 +584,12 @@ def test_create_list_entry(sandbox_tenant):
             name=f"My Super List {nonce}",
             alias=f"my_super_list_{nonce}",
             kind="email_domain",
+            entries=["a.com", "b.com", "b.com"],
         ),
         *sandbox_tenant.db_auths,
     )
+    # Duplicates are removed.
+    assert resp["entries_count"] == 2
     list_id = resp["id"]
 
     # add single
@@ -600,12 +603,14 @@ def test_create_list_entry(sandbox_tenant):
     assert entries[0]["actor"]["kind"] == "tenant_user"
 
     entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
-    assert len(entries) == 1
+    assert len(entries) == 3
 
     # add multiple
     entries = post(
         f"/org/lists/{list_id}/entries",
-        dict(entries=["bobertotech.com", "badppl.org", "somethingelseketchy.net"]),
+        dict(entries=["bobertotech.com", "badppl.org", "somethingelseketchy.net",
+                      # Duplicate is ignored
+                      "badppl.org"]),
         *sandbox_tenant.db_auths,
     )
     assert len(entries) == 3
@@ -614,7 +619,7 @@ def test_create_list_entry(sandbox_tenant):
     assert entries[2]["data"] == "somethingelseketchy.net"
 
     entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
-    assert len(entries) == 4
+    assert len(entries) == 6
 
     # Adding duplicates should be a no-op
     entries = post(
@@ -633,7 +638,7 @@ def test_create_list_entry(sandbox_tenant):
     assert entries[0]["data"] == "newdomain.com"
 
     entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
-    assert len(entries) == 5
+    assert len(entries) == 7
 
 
 def test_create_list_entry_format_canonicalization(sandbox_tenant):

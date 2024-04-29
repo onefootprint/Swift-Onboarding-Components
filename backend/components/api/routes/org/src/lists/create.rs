@@ -9,6 +9,7 @@ use api_core::{errors::ValidationError, utils::headers::InsightHeaders};
 use api_wire_types::CreateListRequest;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::ListEntry, tenant::Tenant};
+use itertools::Itertools;
 use newtypes::{DbActor, ListEntryValue, SealedVaultDataKey};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -53,11 +54,19 @@ pub async fn create_list(
             let ie = insight.insert_with_conn(conn)?;
             let entries_count = match entries {
                 Some(entries) => {
-                    let e_data = entries
+                    let canonicalized = entries
                         .into_iter()
                         .map(|d| -> ApiResult<_> {
                             let parsed = ListEntryValue::parse(list.kind, d)?;
-                            let canon = parsed.canonicalize();
+                            Ok(parsed.canonicalize())
+                        })
+                        .collect::<Result<Vec<_>, _>>()?;
+
+                    // Remove duplicates and encrypt.
+                    let e_data = canonicalized
+                        .into_iter()
+                        .unique()
+                        .map(|canon| -> ApiResult<_> {
                             let enc = sealing_key
                                 .seal_bytes(canon.leak().as_bytes())
                                 .map(|b| b.into())?;
