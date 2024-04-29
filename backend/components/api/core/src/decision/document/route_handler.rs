@@ -15,16 +15,7 @@ use feature_flag::BoolFlag;
 
 use crate::decision::vendor::incode::states::vault_complete_images;
 use db::models::{
-    decision_intent::DecisionIntent,
-    document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier},
-    document_upload::{DocumentUpload, NewDocumentUploadArgs},
-    identity_document::{IdentityDocument, IdentityDocumentUpdate, NewIdentityDocumentArgs},
-    incode_verification_session::IncodeVerificationSession,
-    ob_configuration::ObConfiguration,
-    user_consent::UserConsent,
-    user_timeline::UserTimeline,
-    vault::Vault,
-    workflow::Workflow,
+    decision_intent::DecisionIntent, document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier}, document_upload::{DocumentUpload, NewDocumentUploadArgs}, identity_document::{IdentityDocument, IdentityDocumentUpdate, NewIdentityDocumentArgs}, incode_verification_session::IncodeVerificationSession, insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, user_consent::UserConsent, user_timeline::UserTimeline, vault::Vault, workflow::Workflow
 };
 
 use super::meta_headers::MetaHeaders;
@@ -36,6 +27,7 @@ pub async fn handle_document_create(
     tenant_id: TenantId,
     sv_id: ScopedVaultId,
     wf_id: WorkflowId,
+    insight: CreateInsightEvent
 ) -> ApiResult<IdentityDocumentId> {
     let CreateIdentityDocumentRequest {
         document_type,
@@ -83,6 +75,7 @@ pub async fn handle_document_create(
                     fixture_result: None,
                     skip_selfie: None,
                     device_type,
+                    insight
                 };
                 let id_doc = IdentityDocument::get_or_create(conn, args)?;
                 Ok(id_doc.id)
@@ -149,7 +142,8 @@ pub async fn handle_document_create(
                 country_code: Some(country_code),
                 fixture_result,
                 skip_selfie: Some(should_skip_selfie),
-                device_type
+                device_type,
+                insight
             };
 
             let id_doc = IdentityDocument::get_or_create(conn, args)?;

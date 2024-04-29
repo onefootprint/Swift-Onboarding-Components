@@ -5,6 +5,7 @@ use crate::{
         data_lifetime::DataLifetime,
         document_upload::{DocumentUpload, NewDocumentUploadArgs},
         identity_document::{IdentityDocument, NewIdentityDocumentArgs},
+        insight_event::CreateInsightEvent,
     },
     TxnPgConn,
 };
@@ -18,6 +19,7 @@ pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Id
         fixture_result: None,
         skip_selfie: None,
         device_type: None,
+        insight: CreateInsightEvent { ..Default::default() },
     };
     let doc = IdentityDocument::get_or_create(conn, args).unwrap();
     let key = SealedVaultDataKey(vec![]);

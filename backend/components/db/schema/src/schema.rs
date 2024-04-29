@@ -477,6 +477,7 @@ diesel::table! {
         curp_completed_seqno -> Nullable<Int8>,
         validated_country_code -> Nullable<Text>,
         review_status -> Text,
+        insight_event_id -> Nullable<Text>,
     }
 }
 
@@ -1630,6 +1631,7 @@ diesel::joinable!(fingerprint_visit_event -> vault (vault_id));
 diesel::joinable!(google_device_attestation -> vault (vault_id));
 diesel::joinable!(google_device_attestation -> webauthn_credential (webauthn_credential_id));
 diesel::joinable!(identity_document -> document_request (request_id));
+diesel::joinable!(identity_document -> insight_event (insight_event_id));
 diesel::joinable!(incode_verification_session -> identity_document (identity_document_id));
 diesel::joinable!(incode_verification_session_event -> identity_document (identity_document_id));
 diesel::joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));

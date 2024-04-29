@@ -1,6 +1,9 @@
 use crate::{auth::user::UserAuthScope, types::response::ResponseData, State};
-use api_core::{auth::user::UserWfAuthContext, decision, types::JsonApiResponse};
+use api_core::{
+    auth::user::UserWfAuthContext, decision, types::JsonApiResponse, utils::headers::InsightHeaders,
+};
 use api_wire_types::{CreateIdentityDocumentRequest, CreateIdentityDocumentResponse};
+use db::models::insight_event::CreateInsightEvent;
 use newtypes::WorkflowGuard;
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -13,9 +16,11 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     request: web::Json<CreateIdentityDocumentRequest>,
+    insight: InsightHeaders,
 ) -> JsonApiResponse<CreateIdentityDocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
+    let insight = CreateInsightEvent::from(insight);
 
     let su_id = user_auth.scoped_user.id.clone();
     let tenant_id = user_auth.tenant().id.clone();
@@ -26,6 +31,7 @@ pub async fn post(
         tenant_id,
         su_id,
         wf_id,
+        insight,
     )
     .await?;
     ResponseData::ok(CreateIdentityDocumentResponse { id: response }).json()

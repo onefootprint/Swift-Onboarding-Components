@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS identity_document_insight_event_id ON identity_document(insight_event_id);

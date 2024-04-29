@@ -11,7 +11,7 @@ use db::{
         identity_document::IdentityDocument,
         incode_verification_session::IncodeVerificationSession,
         incode_verification_session_event::IncodeVerificationSessionEvent,
-        insight_event::InsightEvent,
+        insight_event::{CreateInsightEvent, InsightEvent},
         user_consent::UserConsent,
         vault::Vault,
         workflow::Workflow,
@@ -170,6 +170,7 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
         t.id.clone(),
         sv.id.clone(),
         wf.id.clone(),
+        CreateInsightEvent { ..Default::default() },
     )
     .await
     .unwrap();

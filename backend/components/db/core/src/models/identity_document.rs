@@ -12,13 +12,13 @@ use std::collections::HashMap;
 use newtypes::{
     DataLifetimeSeqno, DocumentRequestId, DocumentReviewStatus, DocumentScanDeviceType, IdDocKind,
     IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId,
+    IncodeVerificationSessionState, InsightEventId, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId,
     VendorValidatedCountryCode, WorkflowId,
 };
 
 use super::{
     document_request::DocumentRequest, document_upload::DocumentUpload,
-    incode_verification_session::IncodeVerificationSession,
+    incode_verification_session::IncodeVerificationSession, insight_event::CreateInsightEvent,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -52,6 +52,7 @@ pub struct IdentityDocument {
     validated_country_code: Option<Iso3166TwoDigitCountryCode>,
     /// Represents whether the document has been reviewed by a human or machine
     pub review_status: DocumentReviewStatus,
+    pub insight_event_id: Option<InsightEventId>,
 }
 
 impl IdentityDocument {
@@ -72,8 +73,7 @@ impl IdentityDocument {
     }
 }
 
-#[derive(Debug, Clone, Insertable)]
-#[diesel(table_name = identity_document)]
+#[derive(Debug, Clone)]
 pub struct NewIdentityDocumentArgs {
     pub request_id: DocumentRequestId,
     pub document_type: IdDocKind,
@@ -81,6 +81,7 @@ pub struct NewIdentityDocumentArgs {
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
     pub device_type: Option<DocumentScanDeviceType>,
+    pub insight: CreateInsightEvent,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -95,6 +96,7 @@ struct NewIdentityDocumentRow {
     skip_selfie: bool,
     device_type: Option<DocumentScanDeviceType>,
     review_status: DocumentReviewStatus,
+    insight_event_id: Option<InsightEventId>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -136,6 +138,7 @@ impl IdentityDocument {
             fixture_result,
             skip_selfie,
             device_type,
+            insight,
         } = args;
 
         if country_code.is_none() && dr.kind.is_identity() {
@@ -161,6 +164,8 @@ impl IdentityDocument {
             }
         }
 
+        let insight_event_id = Some(insight.insert_with_conn(conn)?.id);
+
         // Otherwise, make a new IdDoc
         // Mark all existing IdentityDocuments for this DocumentRequest as failed
         diesel::update(identity_document::table)
@@ -179,11 +184,14 @@ impl IdentityDocument {
             skip_selfie: skip_selfie.unwrap_or(false),
             device_type,
             review_status: DocumentReviewStatus::Unreviewed,
+            insight_event_id,
         };
         // Create a new doc
         let result = diesel::insert_into(identity_document::table)
             .values(new)
             .get_result(conn.conn())?;
+
+
         Ok(result)
     }
 

@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS identity_document_insight_event_id;

@@ -11,7 +11,10 @@ use crate::{
 use api_wire_types::CreateIdentityDocumentRequest;
 use chrono::Utc;
 use db::{
-    models::{insight_event::InsightEvent, user_consent::UserConsent},
+    models::{
+        insight_event::{CreateInsightEvent, InsightEvent},
+        user_consent::UserConsent,
+    },
     tests::fixtures::ob_configuration::ObConfigurationOpts,
     DbResult,
 };
@@ -64,6 +67,7 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
         t.id.clone(),
         sv.id.clone(),
         wf.id.clone(),
+        CreateInsightEvent { ..Default::default() },
     )
     .await
     .unwrap();
@@ -163,6 +167,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
         t.id.clone(),
         sv.id.clone(),
         wf.id.clone(),
+        CreateInsightEvent { ..Default::default() },
     )
     .await;
 
@@ -190,6 +195,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
         t.id.clone(),
         sv.id.clone(),
         wf.id.clone(),
+        CreateInsightEvent { ..Default::default() },
     )
     .await;
 
