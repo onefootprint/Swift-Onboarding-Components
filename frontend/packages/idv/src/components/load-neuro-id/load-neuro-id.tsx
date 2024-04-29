@@ -18,32 +18,26 @@ const IS_DISABLED_BY_ENV = IS_SERVER || IS_TEST || IS_E2E || IS_CI;
 
 type LoadNeuroIdProps = {
   config?: PublicOnboardingConfig;
-  children: React.ReactNode;
 };
 
-const LoadNeuroId = ({ children, config }: LoadNeuroIdProps) => {
+const LoadNeuroId = ({ config }: LoadNeuroIdProps) => {
   const isEnabled = !IS_DISABLED_BY_ENV && config?.nidEnabled;
   const siteName =
     IS_PROD && config?.isLive ? NID_LIVE_SITE_NAME : NID_DEV_SITE_NAME;
 
-  return (
-    <>
-      {isEnabled && (
-        <Script
-          id="neuro-id-script"
-          onError={e => console.error('Failed to load the Neuro-ID script', e)}
-          src={`//scripts.neuro-id.com/c/nid-${siteName}.js`}
-          strategy="afterInteractive"
-          onLoad={() => {
-            if (config.orgId) {
-              nid.setVariable('funnel', config.orgId);
-            }
-          }}
-        />
-      )}
-      {children}
-    </>
-  );
+  return isEnabled ? (
+    <Script
+      id="neuro-id-script"
+      onError={e => console.error('Failed to load the Neuro-ID script', e)}
+      src={`//scripts.neuro-id.com/c/nid-${siteName}.js`}
+      strategy="afterInteractive"
+      onLoad={() => {
+        if (config.orgId) {
+          nid.setVariable('funnel', config.orgId);
+        }
+      }}
+    />
+  ) : null;
 };
 
 export default LoadNeuroId;
