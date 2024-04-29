@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Navigation = () => {
-  const { t } = useTranslation('user-details', { keyPrefix: 'navigation' });
+  const { t } = useTranslation('entity-documents', { keyPrefix: 'navigation' });
 
   return (
     <Breadcrumb.List aria-label={t('title')}>
@@ -12,7 +12,7 @@ const Navigation = () => {
         {t('users')}
       </Breadcrumb.Item>
       <Breadcrumb.Item href="/users" as={Link}>
-        {t('user-details')}
+        {t('details')}
       </Breadcrumb.Item>
       <Breadcrumb.Item>{t('documents')}</Breadcrumb.Item>
     </Breadcrumb.List>

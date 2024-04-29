@@ -7,7 +7,7 @@ import Section from '../section/section';
 import Upload from './components/upload';
 
 const Uploads = () => {
-  const { t } = useTranslation('user-details', { keyPrefix: 'uploads' });
+  const { t } = useTranslation('entity-documents', { keyPrefix: 'uploads' });
 
   return (
     <Section title={t('title')} IconComponent={IcoUpload24} id={t('title')}>

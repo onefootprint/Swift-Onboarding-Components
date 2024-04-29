@@ -15,6 +15,8 @@ const dupeKindToTranslationKey: Record<DupeKind, string> = {
   [DupeKind.ssn9]: 'dupe-kinds.ssn9',
   [DupeKind.email]: 'dupe-kinds.email',
   [DupeKind.phoneNumber]: 'dupe-kinds.phone-number',
+  [DupeKind.deviceId]: 'dupe-kinds.device-id',
+  [DupeKind.cookieId]: 'dupe-kinds.cookie-id',
 };
 
 const Row = ({ duplicateDataItem }: RowProps) => {

@@ -141,6 +141,10 @@ export type { GetRolesRequest, GetRolesResponse } from './get-roles';
 export type { GetRulesResponse } from './get-rules';
 export type { GetTenantsRequest, GetTenantsResponse } from './get-tenants';
 export type { GetTimelineRequest, GetTimelineResponse } from './get-timeline';
+export type {
+  GetUserInsightsRequest,
+  GetUserInsightsResponse,
+} from './get-user-insights';
 export type { IdentifyRequest, IdentifyResponse } from './identify';
 export { AUTH_HEADER, SANDBOX_ID_HEADER } from './identify';
 export type {

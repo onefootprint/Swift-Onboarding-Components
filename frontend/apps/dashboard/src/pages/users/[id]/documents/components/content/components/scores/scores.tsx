@@ -13,7 +13,7 @@ export type ScoresProps = {
 };
 
 const Scores = ({ document, data, face }: ScoresProps) => {
-  const { t } = useTranslation('user-details', { keyPrefix: 'scores' });
+  const { t } = useTranslation('entity-documents', { keyPrefix: 'scores' });
 
   return (
     <Section title="Scores" IconComponent={IcoSpeedometer24} id="scores">

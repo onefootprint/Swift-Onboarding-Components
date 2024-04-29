@@ -13,7 +13,7 @@ type ContentProps = {
 };
 
 const Content = ({ doc }: ContentProps) => {
-  const { t } = useTranslation('user-details');
+  const { t } = useTranslation('entity-documents');
   // eslint-disable-next-line no-console
   console.log(doc);
 

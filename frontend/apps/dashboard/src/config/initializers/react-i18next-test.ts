@@ -6,9 +6,10 @@ import authentication from '../locales/en/authentication.json';
 import businesses from '../locales/en/businesses.json';
 import common from '../locales/en/common.json';
 import domainRestrictions from '../locales/en/domain-restrictions.json';
+import entityDetails from '../locales/en/entity-details.json';
+import entityDocuments from '../locales/en/entity-documents.json';
 import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
-import userDetails from '../locales/en/user-details.json';
 import users from '../locales/en/users.json';
 
 i18next.use(initReactI18next).init({
@@ -20,7 +21,8 @@ i18next.use(initReactI18next).init({
       businesses,
       common,
       users,
-      'user-details': userDetails,
+      'entity-documents': entityDocuments,
+      'entity-details': entityDetails,
       lists,
       ui,
     },
@@ -34,7 +36,8 @@ i18next.use(initReactI18next).init({
     'internal',
     'lists',
     'users',
-    'user-details',
+    'entity-documents',
+    'entity-details',
     'domain-restrictions',
     'ui',
   ],

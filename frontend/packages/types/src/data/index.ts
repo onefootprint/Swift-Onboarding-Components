@@ -243,6 +243,8 @@ export {
   WatchlistCheckStatus,
 } from './timeline';
 export { default as UsLegalStatus } from './us-legal-status';
+export type { UserInsights } from './user-insights';
+export { UserInsightsUnit } from './user-insights';
 export type {
   VaultArrayData,
   VaultBusiness,

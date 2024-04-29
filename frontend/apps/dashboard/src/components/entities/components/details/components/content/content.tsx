@@ -9,6 +9,7 @@ import {
   Breadcrumb,
   DeviceInsights,
   Header,
+  OtherInsights,
   PinnedNotes,
   RiskSignals,
   Vault,
@@ -49,7 +50,10 @@ const Content = () => {
           <DuplicateData />
         </Box>
       )}
-      <DeviceInsights />
+      <Box marginBottom={9}>
+        <DeviceInsights />
+      </Box>
+      <OtherInsights />
     </Box>
   );
 };

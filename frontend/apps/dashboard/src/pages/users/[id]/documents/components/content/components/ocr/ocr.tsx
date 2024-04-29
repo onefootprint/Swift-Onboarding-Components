@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Section from '../section';
 
 const Ocr = () => {
-  const { t } = useTranslation('user-details', {
+  const { t } = useTranslation('entity-documents', {
     keyPrefix: 'ocr',
   });
 
