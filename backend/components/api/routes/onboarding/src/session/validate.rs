@@ -59,8 +59,8 @@ pub async fn post(
             let sv = ScopedVault::get(conn, &sv_id)?;
             let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
             let (wf, biz_wf) = if let Some(wf_id) = wf_id {
-                let (wf, _) = Workflow::get_all(conn, &wf_id)?;
-                let user_mrs = ManualReview::get_active(conn, &wf_id)?;
+                let (wf, sv) = Workflow::get_all(conn, &wf_id)?;
+                let user_mrs = ManualReview::get_active(conn, &sv.id)?;
                 let obc_id = wf
                     .ob_configuration_id
                     .as_ref()
@@ -73,7 +73,7 @@ pub async fn post(
                         is_business: (),
                     };
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, id)?;
-                    let biz_mrs = ManualReview::get_active(conn, &biz_wf.id)?;
+                    let biz_mrs = ManualReview::get_active(conn, &biz_sv.id)?;
                     Some((biz_sv, biz_wf, biz_mrs))
                 } else {
                     None

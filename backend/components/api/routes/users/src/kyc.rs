@@ -185,7 +185,7 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (wf, sv) = Workflow::get_all(conn, &wf.id)?;
-            let mrs = ManualReview::get_active(conn, &wf.id)?;
+            let mrs = ManualReview::get_active(conn, &sv.id)?;
             Ok((wf, sv, mrs))
         })
         .await?;

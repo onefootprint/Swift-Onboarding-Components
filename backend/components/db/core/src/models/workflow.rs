@@ -568,7 +568,8 @@ impl Workflow {
 
     #[tracing::instrument("Workflow::update", skip_all)]
     pub fn update(wf: Locked<Self>, conn: &mut TxnPgConn, update: WorkflowUpdate) -> DbResult<Self> {
-        let requires_manual_review_before_update = !ManualReview::get_active(conn, &wf.id)?.is_empty();
+        let requires_manual_review_before_update =
+            !ManualReview::get_active(conn, &wf.scoped_vault_id)?.is_empty();
         if update.update.authorized_at.is_some() {
             let update = ScopedVaultUpdate {
                 is_billable: Some(true),
@@ -617,7 +618,7 @@ impl Workflow {
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
             let tenant = Tenant::get(conn, &sv.tenant_id)?;
             // !! it's important that code in the same txn that is going to write a review does it before this update call
-            let requires_manual_review_after_update = !ManualReview::get_active(conn, &wf.id)?.is_empty();
+            let requires_manual_review_after_update = !ManualReview::get_active(conn, &sv.id)?.is_empty();
             // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics currently really mean we have to fire it when we make a
             // decision for the first time or in a redo flow
             // If the current Workflow status is not pass/fail but the new status is, fire OnboardingCompleted (ie anytime a Workflow completes)

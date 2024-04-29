@@ -38,7 +38,7 @@ use newtypes::{
 #[test_state_case(UserKind::Sandbox(newtypes::WorkflowFixtureResult::DocumentDecision), Failure)]
 #[test_state_case(UserKind::Live, PassWithManualReview)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
+async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(
         state,
@@ -212,12 +212,14 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
 
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(doc_outcome.expected_onboarding_decision(), wf.status.unwrap());
-    assert_eq!(doc_outcome.expect_manual_review(), !mrs.is_empty());
+    let expect_mr = doc_outcome.expect_manual_review();
+    assert_eq!(expect_mr, !mrs.is_empty());
 
+    let t_id = &tenant.id;
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
             // redo document
-            redo_document_and_pass(state, user_kind, &wf, &obd, &tenant.id, risk_signals_for_doc).await
+            redo_document_and_pass(state, user_kind, &wf, &obd, t_id, risk_signals_for_doc, expect_mr).await
         }
         UserKind::Live => {
             assert_have_same_elements(
@@ -250,7 +252,8 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
 
             // redo document
             if !doc_passed_with_review {
-                redo_document_and_pass(state, user_kind, &wf, &obd, &tenant.id, risk_signals_for_doc).await
+                redo_document_and_pass(state, user_kind, &wf, &obd, t_id, risk_signals_for_doc, expect_mr)
+                    .await
             }
         }
     }
@@ -264,6 +267,7 @@ async fn redo_document_and_pass(
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
     previous_risk_signals: Vec<RiskSignal>,
+    expect_mr: bool,
 ) {
     // Trigger Redo workflow
     let sv_id = prior_wf.scoped_vault_id.clone();
@@ -334,11 +338,11 @@ async fn redo_document_and_pass(
         state,
         vec![OnboardingStatusChanged(
             ExpectedStatus(OnboardingStatus::Pass),
-            ExpectedRequiresManualReview(false),
+            ExpectedRequiresManualReview(expect_mr),
         )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Pass),
-            ExpectedRequiresManualReview(false),
+            ExpectedRequiresManualReview(expect_mr),
         )],
     );
 

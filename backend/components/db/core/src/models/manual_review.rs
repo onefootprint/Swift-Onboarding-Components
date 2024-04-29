@@ -62,12 +62,6 @@ struct ManualReviewUpdate {
     completed_by_actor: Option<Option<DbActor>>,
 }
 
-#[derive(derive_more::From)]
-pub enum ManualReviewIdentifier<'a> {
-    ScopedVault(&'a ScopedVaultId),
-    Workflow(&'a WorkflowId),
-}
-
 impl ManualReview {
     #[tracing::instrument("ManualReview::apply_actions", skip_all)]
     pub fn apply_actions(
@@ -121,22 +115,11 @@ impl ManualReview {
     }
 
     #[tracing::instrument("ManualReview::get_active", skip_all)]
-    pub fn get_active<'a, T: Into<ManualReviewIdentifier<'a>>>(
-        conn: &mut PgConn,
-        id: T,
-    ) -> DbResult<Vec<Self>> {
-        let mut query = manual_review::table
+    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+        let results = manual_review::table
             .filter(manual_review::completed_at.is_null())
-            .into_boxed();
-        match id.into() {
-            ManualReviewIdentifier::Workflow(wf_id) => {
-                query = query.filter(manual_review::workflow_id.eq(wf_id));
-            }
-            ManualReviewIdentifier::ScopedVault(sv_id) => {
-                query = query.filter(manual_review::scoped_vault_id.eq(sv_id));
-            }
-        }
-        let result = query.get_results(conn)?;
-        Ok(result)
+            .filter(manual_review::scoped_vault_id.eq(sv_id))
+            .get_results(conn)?;
+        Ok(results)
     }
 }

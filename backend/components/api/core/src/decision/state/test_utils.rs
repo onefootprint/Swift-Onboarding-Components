@@ -194,7 +194,7 @@ pub async fn query_data(
 
             let wf = Workflow::get(conn, &wfid)?;
             let obd = OnboardingDecision::get_active(conn, &wfid)?;
-            let mrs = ManualReview::get_active(conn, &wfid)?;
+            let mrs = ManualReview::get_active(conn, &svid)?;
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid)?;
 
             Ok((wf, wfe, mrs, obd, rs))
