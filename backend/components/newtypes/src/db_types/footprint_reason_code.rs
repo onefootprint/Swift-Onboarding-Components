@@ -832,11 +832,11 @@ footprint_reason_code_enum! {
         DocumentVisiblePhotoFeaturesNotVerified,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document MRZ line formatting check fail", severity = SignalSeverity::Medium,  description = "The MRZ of the document was not in the correct format"]
+        #[note = "Document MRZ line formatting check fail", severity = SignalSeverity::Low,  description = "The MRZ of the document was not in the correct format. This check looks at whether the MRZ lines are correct length and whether we can parse the data in the MRZ."]
         DocumentMrzLineFormatCheck,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document QR validation failed", severity = SignalSeverity::Medium,  description = "The check digit extracted from the QR code does not match the OCR value from the MRZ or the URL of the QR code is incorrect."]
+        #[note = "Document QR validation failed", severity = SignalSeverity::Low,  description = "The check digit extracted from the QR code does not match the OCR value from the MRZ or the URL of the QR code is incorrect, or the QR code was unable to be read due to a poor quality image captured."]
         DocumentQrCodeCheck,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
@@ -982,7 +982,7 @@ footprint_reason_code_enum! {
         DocumentNumberCrosscheckMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "OCR document number does not match barcode document number", severity = SignalSeverity::Medium,  description = "The OCR document number does not match the document number extracted from the barcode or MRZ"]
+        #[note = "OCR document number does not match barcode or QR code document number", severity = SignalSeverity::Medium,  description = "The OCR document number does not match the document number extracted from the barcode or QR code"]
         DocumentNumberCrosscheckDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
