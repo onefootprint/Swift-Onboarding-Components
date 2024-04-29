@@ -21,7 +21,7 @@ const Details = () => {
 
   const getDrawerTitle = () => {
     if (data) {
-      if (data.scopes.length) {
+      if (data.scopes?.length) {
         const scopesTitle = createCapitalStringList(data.scopes);
         return amlMedia.length
           ? `${t(
