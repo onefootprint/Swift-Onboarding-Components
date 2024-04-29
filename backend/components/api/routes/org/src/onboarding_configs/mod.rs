@@ -3,6 +3,7 @@ use paperclip::actix::web;
 mod get;
 mod patch;
 mod post;
+mod validation;
 
 #[cfg(test)]
 mod tests;
