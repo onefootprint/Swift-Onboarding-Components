@@ -5,6 +5,7 @@ use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 
 use serde::{Deserialize, Serialize};
+use serde_with::DeserializeFromStr;
 use strum::EnumDiscriminants;
 use strum_macros::{AsRefStr, EnumString};
 
@@ -117,12 +118,19 @@ pub struct RunIncodeStuckWorkflowArgs {
     pub workflow_id: WorkflowId,
 }
 
-#[derive(Debug, strum::Display, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, strum::Display, Clone, Eq, PartialEq, Serialize, Deserialize, EnumDiscriminants)]
+#[strum_discriminants(
+    name(WebhookEventKind),
+    vis(pub),
+    derive(strum_macros::EnumString, DeserializeFromStr),
+    strum(serialize_all = "snake_case")
+)]
 pub enum WebhookEvent {
     OnboardingCompleted(OnboardingCompletedPayload),
     OnboardingStatusChanged(OnboardingStatusChangedPayload),
     WatchlistCheckCompleted(WatchlistCheckCompletedPayload),
 }
+
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct OnboardingCompletedPayload {
     pub fp_id: FpId,

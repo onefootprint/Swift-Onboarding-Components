@@ -7,6 +7,7 @@ mod risk;
 mod sandbox_tenant;
 mod task;
 mod token_reveal;
+mod webhooks;
 mod workflow;
 
 use actix_web::web;
@@ -28,6 +29,7 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(aws_selfie_doc::post)
         .service(default_rules::add_default_rules)
         .service(sandbox_tenant::post)
+        .service(webhooks::post)
         .service(org::update_business_info)
         .service(org::get_business_info);
 }
