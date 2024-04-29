@@ -71,6 +71,8 @@ urlencoding = "2.1.2"
 macros = { path = "../../../macros" }
 paste = "1.0"
 
+openai = { workspace = true }
+
 [dev-dependencies]
 test-case = { workspace = true }
 enclave = { path = "../../../enclave/enclave" }

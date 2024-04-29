@@ -1,4 +1,6 @@
+import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import { EntityKind } from '@onefootprint/types';
+import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,4 +19,9 @@ const Details = () => {
   );
 };
 
-export default Details;
+export default withLDProvider({
+  clientSideID: LAUNCH_DARKLY_CLIENT_SIDE_ID,
+  reactOptions: {
+    useCamelCaseFlagKeys: false,
+  },
+})(Details);

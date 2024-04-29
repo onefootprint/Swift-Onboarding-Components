@@ -41,6 +41,7 @@ members = [
     "components/selfie_doc",
     "external_tools/ditto",
     "external_tools/hooky",
+    "internal_tools/ai_playground",
 ]
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }
@@ -175,3 +176,4 @@ mime = "0.3.16"
 regex = "1.5"
 anyhow = "1.0.79"
 workos = "0.2"
+openai = "1.0.0-alpha.14"

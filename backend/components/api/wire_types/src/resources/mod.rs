@@ -150,3 +150,6 @@ pub use google_oauth::*;
 
 mod user_insight;
 pub use user_insight::*;
+
+mod user_ai_summary;
+pub use user_ai_summary::*;

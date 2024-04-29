@@ -55,6 +55,8 @@ export type {
   EntitiesVaultDecryptResponse,
   GetAccessEventsRequest,
   GetAccessEventsResponse,
+  GetAiSummarizeRequest,
+  GetAiSummarizeResponse,
   GetAuthRoleResponse,
   GetAuthRolesOrg,
   GetAuthRolesRequest,

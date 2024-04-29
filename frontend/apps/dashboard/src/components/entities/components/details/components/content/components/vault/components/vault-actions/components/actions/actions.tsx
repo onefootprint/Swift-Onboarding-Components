@@ -1,21 +1,25 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { EntityKind, RoleScopeKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
+import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
 import AddToListDialog from '../add-to-list-dialog';
 import RequestMoreInfoDialog from '../request-more-info-dialog';
+import SummarizeAiDialog from '../summarize-ai-dialog';
 import UpdateAuthDialog from '../update-auth-dialog';
 
 enum ActionDialog {
   auth,
   requestMoreInfo,
   addToList,
+  summarize,
 }
 
 const Actions = ({ entity }: WithEntityProps) => {
@@ -24,6 +28,10 @@ const Actions = ({ entity }: WithEntityProps) => {
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
 
   const shouldShowActionsDropdown = entity.kind === EntityKind.person;
+  const { AiPreviewFeaturesEnabledOrgIds } = useFlags();
+  const orgIds = new Set<string>(AiPreviewFeaturesEnabledOrgIds);
+  const { data } = useOrgSession();
+  const showAiFeatures = data && orgIds.has(data.id);
 
   const handleCloseDialog = () => {
     setOpenDialog(null);
@@ -40,6 +48,9 @@ const Actions = ({ entity }: WithEntityProps) => {
   // const handleOpenAddToListDialog = () => {
   //   setOpenDialog(ActionDialog.addToList);
   // };
+  const handleOpenSummarizeDialog = () => {
+    setOpenDialog(ActionDialog.summarize);
+  };
 
   return shouldShowActionsDropdown ? (
     <>
@@ -81,6 +92,11 @@ const Actions = ({ entity }: WithEntityProps) => {
               {t('add-to-list.label')}
             </Dropdown.Item>
           </PermissionGate> */}
+          {showAiFeatures && (
+            <Dropdown.Item onSelect={handleOpenSummarizeDialog}>
+              {t('summarize.label')}
+            </Dropdown.Item>
+          )}
         </Dropdown.Content>
       </Dropdown.Root>
       <RequestMoreInfoDialog
@@ -93,6 +109,10 @@ const Actions = ({ entity }: WithEntityProps) => {
       />
       <AddToListDialog
         open={openDialog === ActionDialog.addToList}
+        onClose={handleCloseDialog}
+      />
+      <SummarizeAiDialog
+        open={openDialog === ActionDialog.summarize}
         onClose={handleCloseDialog}
       />
     </>

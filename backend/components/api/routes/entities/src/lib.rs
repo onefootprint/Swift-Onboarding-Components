@@ -1,6 +1,7 @@
 use api_core::*;
 use paperclip::actix::web;
 
+mod ai_summarize;
 mod annotations;
 mod auth_events;
 mod client_token;
@@ -42,5 +43,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(rule_set_result::get_latest_workflow_decision)
         .service(rule_set_result::get)
         .service(user_insight::get)
-        .service(dupes::get_dupes);
+        .service(dupes::get_dupes)
+        .service(ai_summarize::get);
 }

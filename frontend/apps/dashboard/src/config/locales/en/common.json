@@ -523,7 +523,8 @@
       "actions": {
         "title": "User actions",
         "edit": "Edit user information",
-        "request": "Request more information"
+        "request": "Request more information",
+        "summarize": "Summarize with AI"
       },
       "footer": {
         "navigate-up": "Navigate up",
@@ -1264,6 +1265,12 @@
         "edit-user": {
           "label": "Edit user information",
           "not-allowed": "You're not allowed to edit user information"
+        },
+        "summarize": {
+          "label": "Summarize with AI",
+          "title": "Summarize user identity results",
+          "detail": "Using AI, Footprint will create a human-readable summary of the user's verification decision, including manual review annotations, risk signals, rules triggered, authentication events, and timeline attributes.",
+          "generate": "Re-generate summary"
         },
         "request-more-info": {
           "label": "Request more information",

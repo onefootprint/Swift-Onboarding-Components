@@ -1,0 +1,15 @@
+[package]
+name = "ai_playground"
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+edition.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+openai = "1.0.0-alpha.14"
+tokio = { version = "1.0", features = ["full"] }
+dotenv = "0.15.0"
+reqwest = { version = "0.12", features = ["json"] }
+anyhow = "1.0"

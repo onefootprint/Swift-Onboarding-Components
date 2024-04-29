@@ -159,6 +159,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub neuro_id_config: NeuroIdConfig,
+
+    #[envconfig(from = "OPENAI_API_KEY")]
+    pub openai_api_key: String,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T> {

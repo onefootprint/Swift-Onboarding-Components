@@ -259,6 +259,9 @@ impl State {
             stytch_client,
         );
 
+        // set the openai api key
+        openai::set_key(config.openai_api_key.clone());
+
         // Initialize custom prometheus metrics
         // NOTE: we also have this `prometheus::init` that can be wrapped in actix to emit
         // metrics for each API request. But we already have enough coverage from otel traces.

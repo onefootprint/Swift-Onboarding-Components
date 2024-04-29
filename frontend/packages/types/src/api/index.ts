@@ -55,6 +55,10 @@ export type {
   GetAccessEventsResponse,
 } from './get-access-events';
 export type {
+  GetAiSummarizeRequest,
+  GetAiSummarizeResponse,
+} from './get-ai-summarize';
+export type {
   GetAuthRoleResponse,
   GetAuthRolesOrg,
   GetAuthRolesRequest,

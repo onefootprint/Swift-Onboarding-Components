@@ -209,6 +209,9 @@ pub enum ApiErrorKind {
 
     #[error("Timeout handling request")]
     ResponseTimeout,
+
+    #[error("AI completion Error")]
+    OpenAiCompletionError(String),
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -402,6 +405,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::InvalidHeaderValue(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::HeaderToStrError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::ResponseTimeout => StatusCode::GATEWAY_TIMEOUT,
+            ApiErrorKind::OpenAiCompletionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

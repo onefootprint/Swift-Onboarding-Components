@@ -11,13 +11,13 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     cronTasks:
-    - args:
-      - create-overdue-watchlist-check-tasks
-      - --limit=1000
-      cpuUnits: 512
-      memoryMB: 1024
-      name: overdue-watchlist
-      schedule: cron(0 17 * * ? *)
+      - args:
+          - create-overdue-watchlist-check-tasks
+          - --limit=1000
+        cpuUnits: 512
+        memoryMB: 1024
+        name: overdue-watchlist
+        schedule: cron(0 17 * * ? *)
     db:
       deletionProtection: false
       maxAcus: 16
@@ -122,6 +122,8 @@ config:
         secure: v1:PE+0+YWFXIu38AN6:/Cg0fli8qt45dtfYHups9Ba+6oagHDX9bbjrR41i8EBGclFPHG5dQ4KFseqg4H5eJA==
       apiKeyTest:
         secure: v1:8idImQrp1iNa9PA/:wbzYF/kBn1w5utO10/NjpQvnk71fL7/6iL6Lp9nVNPJI9rxXpSYEiMYGYpTImaFe7g==
+    openaiApiKey:
+      secure: v1:du0pxYZ+lwWtlim8:hSjpDmZFOnSWbcBmaMWPTNsNEKs4hDoZ1Zg+wSwBiVJyVFfREo3n3+qwg1HulbTMCuDS0eCa0/vnHi/dpVUCvezaAg==
     resources:
       cpuUnits: 256
       maxInstances: 6
@@ -162,7 +164,7 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      phoneNumber: "+15105883668"
+      phoneNumber: '+15105883668'
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
     twilioBackup:
@@ -171,17 +173,17 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      phoneNumber: "+15105883668"
+      phoneNumber: '+15105883668'
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
     workerTasks:
-    - args:
-      - execute-tasks
-      - --batch-size=100
-      - --poll-period-ms=1000
-      cpuUnits: 512
-      memoryMB: 1024
-      name: execute-tasks
+      - args:
+          - execute-tasks
+          - --batch-size=100
+          - --poll-period-ms=1000
+        cpuUnits: 512
+        memoryMB: 1024
+        name: execute-tasks
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

@@ -11,19 +11,19 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     cronTasks:
-    - args:
-      - create-overdue-watchlist-check-tasks
-      - --limit=1000
-      cpuUnits: 1024
-      memoryMB: 2048
-      name: overdue-watchlist
-      schedule: cron(0 17 * * ? *)
-    - args:
-      - generate-invoices
-      cpuUnits: 1024
-      memoryMB: 2048
-      name: generate-invoices
-      schedule: cron(0 * * * ? *)
+      - args:
+          - create-overdue-watchlist-check-tasks
+          - --limit=1000
+        cpuUnits: 1024
+        memoryMB: 2048
+        name: overdue-watchlist
+        schedule: cron(0 17 * * ? *)
+      - args:
+          - generate-invoices
+        cpuUnits: 1024
+        memoryMB: 2048
+        name: generate-invoices
+        schedule: cron(0 * * * ? *)
     db:
       deletionProtection: true
       maxAcus: 64
@@ -32,7 +32,7 @@ config:
       assets: i.onefp.net
       base: api.onefootprint.com
       frontendBase: onefootprint.com
-      prefix: ""
+      prefix: ''
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -126,6 +126,8 @@ config:
         secure: v1:iKIx28wCAXMwkjAB:LsdkiIu8bqhWS4zX9TEGr/935oL8qaFinKeT5Tdi5eY5TFfXPtmG1nsDZufxHhkA+g==
       apiKeyTest:
         secure: v1:El9JuX14SRD+34/B:Y4vGbXddnQ3zl+vHcc8jKihlmF9l0OqxOj1hUCJv7YZSPYVgqbeMDQh3v7hicnyM1Q==
+    openaiApiKey:
+      secure: v1:+HiZvlcAp+99FP7D:afNMGxYpT3FL6RJu/6QsSrLAtGAjlmSFANNuMxdtIlkejK8CZMucv5qUQWqrKLx+wOmAqwfeDyMzlpBJyLcCKfJPZQ==
     resources:
       cpuUnits: 4096
       maxInstances: 50
@@ -166,7 +168,7 @@ config:
         secure: v1:Md3FtwNwl+7bxKrr:ihwacs4t71LgGl8FlkIdS4XuCKbyvVEkaNmUku27OFcThcrr87SuH9GLz1RiTvezia4=
       apiKeySecret:
         secure: v1:6Sct1OQ1Y3A0QapO:dA7CqK0HR3NsmSDgJAR/kicJY7+i7k5KLfugEoCHIn1MqTsQ6BFOv0qKbqVWWT27
-      phoneNumber: "+14152129648"
+      phoneNumber: '+14152129648'
       whatsappOtpTemplateId: HX728369d784be2b98babfae0e399b8d1f
       whatsappSenderId: MGf4b90d6bc32195702ba16a4606f049bf
     twilioBackup:
@@ -175,17 +177,17 @@ config:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
-      phoneNumber: "+15105883668"
+      phoneNumber: '+15105883668'
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
     workerTasks:
-    - args:
-      - execute-tasks
-      - --batch-size=50
-      - --poll-period-ms=500
-      cpuUnits: 1024
-      memoryMB: 2048
-      name: execute-tasks
+      - args:
+          - execute-tasks
+          - --batch-size=50
+          - --poll-period-ms=500
+        cpuUnits: 1024
+        memoryMB: 2048
+        name: execute-tasks
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
