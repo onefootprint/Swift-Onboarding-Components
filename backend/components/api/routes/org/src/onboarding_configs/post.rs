@@ -1,6 +1,7 @@
 use crate::{
     auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
     errors::{tenant::TenantError, ApiError, ApiResult},
+    onboarding_configs::validation::ObConfigurationArgsToValidate,
     types::response::ResponseData,
     utils::db2api::DbToApi,
     State,
@@ -12,8 +13,9 @@ use db::models::{
 };
 use feature_flag::BoolFlag;
 use newtypes::{
-    CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant, DocumentAndCountryConfiguration,
-    DocumentRequestConfig, EnhancedAml, Iso3166TwoDigitCountryCode, ObConfigurationKind,
+    AdverseMediaListKind, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant,
+    DocumentAndCountryConfiguration, DocumentRequestConfig, EnhancedAml, EnhancedAmlOption,
+    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -67,26 +69,6 @@ pub async fn post(
     let tenant_id = &tenant.id;
     let actor = auth.actor().into();
 
-    request.validate_flags(&state, &tenant.id)?;
-
-    // Newer auth playbooks will have the kind specified in API
-    // TODO deprecate this when we start receiving the kind from all requests
-    match &request.kind {
-        None => root_span.record("meta", "without_kind"),
-        Some(_) => root_span.record("meta", "with_kind"),
-    };
-    let is_kyc = request
-        .must_collect_data
-        .iter()
-        .all(|d| d.parent().data_identifier_kind() != DataIdentifierDiscriminant::Business);
-    let kind = request.kind.unwrap_or(if is_kyc {
-        ObConfigurationKind::Kyc
-    } else {
-        ObConfigurationKind::Kyb
-    });
-    request.validate(kind)?;
-
-    let enhanced_aml = request.get_enhanced_aml(&tenant.id);
     let CreateOnboardingConfigurationRequest {
         name,
         must_collect_data,
@@ -105,11 +87,44 @@ pub async fn post(
         document_types_and_countries,
         documents_to_collect,
         curp_validation_enabled,
-
-        // More advanced logic for these fields
-        enhanced_aml: _,
-        kind: _,
+        enhanced_aml,
+        kind,
     } = request.into_inner();
+
+    // First, map some of the API format to the format we write to the DB
+    if let Some(r) = &enhanced_aml {
+        if !r.enhanced_aml && (r.adverse_media || r.ofac || r.pep) {
+            return Err(TenantError::ValidationError(
+                "cannot set adverse_media, ofac, or pep if enhanced_aml = false".to_owned(),
+            )
+            .into());
+        }
+        if r.enhanced_aml && !(r.adverse_media || r.ofac || r.pep) {
+            return Err(TenantError::ValidationError(
+                "at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true".to_owned(),
+            )
+            .into());
+        }
+    }
+    let enhanced_aml = enhanced_aml
+        .map(|r| r.into())
+        .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
+        .unwrap_or(EnhancedAmlOption::No);
+
+    // Newer auth playbooks will have the kind specified in API
+    // TODO deprecate this when we start receiving the kind from all requests
+    match &kind {
+        None => root_span.record("meta", "without_kind"),
+        Some(_) => root_span.record("meta", "with_kind"),
+    };
+    let is_kyc = must_collect_data
+        .iter()
+        .all(|d| d.parent().data_identifier_kind() != DataIdentifierDiscriminant::Business);
+    let kind = kind.unwrap_or(if is_kyc {
+        ObConfigurationKind::Kyc
+    } else {
+        ObConfigurationKind::Kyb
+    });
 
     // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them
     // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags
@@ -145,17 +160,7 @@ pub async fn post(
         curp_validation_enabled: curp_validation_enabled.unwrap_or(false),
     };
 
-    let restrictions = vec![
-        (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Kyc),
-        (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Document), // Separate flag?
-        (tenant.is_prod_kyb_playbook_restricted, ObConfigurationKind::Kyb),
-        (tenant.is_prod_auth_playbook_restricted, ObConfigurationKind::Auth),
-    ];
-    for (is_restricted, restricted_kind) in restrictions {
-        if is_live && is_restricted && kind == restricted_kind {
-            return Err(TenantError::CannotCreateProdPlaybook(kind).into());
-        }
-    }
+    let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;
 
     let ff_client = state.feature_flag_client.clone();
     let (obc, actor, rs) = state
@@ -173,4 +178,29 @@ pub async fn post(
     Ok(Json(ResponseData::ok(
         api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone())),
     )))
+}
+
+fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<EnhancedAmlOption> {
+    if tenant_id.is_coba() {
+        Some(EnhancedAmlOption::Yes {
+            ofac: true,
+            pep: true,
+            adverse_media: false,
+            continuous_monitoring: true,
+            adverse_media_lists: None,
+        })
+    } else if tenant_id.is_composer() {
+        Some(EnhancedAmlOption::Yes {
+            ofac: true,
+            pep: true,
+            adverse_media: true,
+            continuous_monitoring: false,
+            adverse_media_lists: Some(vec![
+                AdverseMediaListKind::FinancialCrime,
+                AdverseMediaListKind::Fraud,
+            ]),
+        })
+    } else {
+        None
+    }
 }

@@ -365,7 +365,13 @@ def test_config_create(sandbox_tenant):
         ),
         (
             dict(
-                must_collect_data=["dob", "full_address", "email", "phone_number"],
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
                 optional_data=[],
                 can_access_data=[],
                 kind="kyc",
@@ -381,7 +387,7 @@ def test_config_create(sandbox_tenant):
                 allow_us_residents=True,
                 allow_us_territories=True,
             ),
-            "Missing required data options: name, ssn9 for cip: alpaca",
+            "Missing required data options: ssn9 for cip: alpaca",
         ),
         (
             dict(
@@ -483,7 +489,7 @@ def test_config_create(sandbox_tenant):
                 skip_confirm=True,
                 enhanced_aml=dict(
                     enhanced_aml=False,
-                    ofac=True,
+                    ofac=False,
                     pep=False,
                     adverse_media=False,
                 ),

@@ -1,11 +1,13 @@
+use db::models::ob_configuration::NewObConfigurationArgs;
 use newtypes::{
-    CipKind, CollectedDataOption as CDO, CountryRestriction, CustomDocumentConfig, DataIdentifier,
-    DocTypeRestriction, DocumentCdoInfo, DocumentRequestConfig, EnhancedAml, ObConfigurationKind, Selfie,
+    CipKind, CollectedDataOption as CDO, CountryRestriction, CustomDocumentConfig, DataIdentifier, DbActor,
+    DocTypeRestriction, DocumentCdoInfo, DocumentRequestConfig, EnhancedAmlOption, ObConfigurationKind,
+    Selfie, TenantId,
 };
 use std::str::FromStr;
 use test_case::test_case;
 
-use super::{post::CreateOnboardingConfigurationRequest, validation::validate_must_collect_for_cip};
+use super::validation::ObConfigurationArgsToValidate;
 
 #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => true)]
 #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![CDO::Name, CDO::Ssn4, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))] => false)] // could be true, but client doesn't do this
@@ -27,28 +29,32 @@ use super::{post::CreateOnboardingConfigurationRequest, validation::validate_mus
 #[test_case(vec![CDO::Name], vec![CDO::Ssn4, CDO::Ssn9], vec![] => false)]
 #[test_case(vec![CDO::Name], vec![CDO::Ssn4], vec![CDO::Ssn9] => false)]
 fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: Vec<CDO>) -> bool {
-    let req = CreateOnboardingConfigurationRequest {
+    let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
+        tenant_id: TenantId::test_data("flerp".into()),
+        is_live: true,
+        author: DbActor::Footprint,
         must_collect_data,
-        optional_data: Some(optional_data),
+        optional_data,
         can_access_data,
         cip_kind: None,
-        is_no_phone_flow: Some(false),
-        is_doc_first_flow: false,
+        is_no_phone_flow: false,
+        is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
         skip_kyc: false,
+        skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: Some(EnhancedAml::default()),
-        allow_us_residents: Some(true),
-        allow_us_territories: Some(false),
-        kind: Some(ObConfigurationKind::Kyc),
-        skip_confirm: None,
+        enhanced_aml: EnhancedAmlOption::No,
+        allow_us_residents: true,
+        allow_us_territory_residents: false,
+        kind: ObConfigurationKind::Kyc,
+        skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
-        curp_validation_enabled: None,
+        curp_validation_enabled: false,
     };
-    req.validate_inner().is_ok()
+    ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
 
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email], vec![], vec![] => true)]
@@ -60,28 +66,32 @@ fn test_is_no_phone_flow(
     optional_data: Vec<CDO>,
     can_access_data: Vec<CDO>,
 ) -> bool {
-    let req = CreateOnboardingConfigurationRequest {
+    let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
+        tenant_id: TenantId::test_data("flerp".into()),
+        is_live: true,
+        author: DbActor::Footprint,
         must_collect_data,
-        optional_data: Some(optional_data),
+        optional_data,
         can_access_data,
         cip_kind: None,
-        is_no_phone_flow: Some(true),
-        is_doc_first_flow: false,
+        is_no_phone_flow: true,
+        is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
         skip_kyc: false,
+        skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: Some(EnhancedAml::default()),
-        allow_us_residents: Some(true),
-        allow_us_territories: Some(false),
-        kind: Some(ObConfigurationKind::Kyc),
-        skip_confirm: None,
+        enhanced_aml: EnhancedAmlOption::No,
+        allow_us_residents: true,
+        allow_us_territory_residents: false,
+        kind: ObConfigurationKind::Kyc,
+        skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
-        curp_validation_enabled: None,
+        curp_validation_enabled: false,
     };
-    req.validate(ObConfigurationKind::Kyc).is_ok()
+    ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
 
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![], false => true)]
@@ -92,56 +102,64 @@ fn test_is_doc_first(
     can_access_data: Vec<CDO>,
     allow_international: bool,
 ) -> bool {
-    let req = CreateOnboardingConfigurationRequest {
+    let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
+        tenant_id: TenantId::test_data("flerp".into()),
+        is_live: true,
+        author: DbActor::Footprint,
         must_collect_data,
-        optional_data: None,
+        optional_data: vec![],
         can_access_data,
         cip_kind: None,
-        is_no_phone_flow: Some(false),
-        is_doc_first_flow: true,
+        is_no_phone_flow: false,
+        is_doc_first: true,
         allow_international_residents: allow_international,
         international_country_restrictions: None,
         skip_kyc: false,
+        skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: Some(EnhancedAml::default()),
-        allow_us_residents: Some(true),
-        allow_us_territories: Some(false),
-        kind: Some(ObConfigurationKind::Kyc),
-        skip_confirm: None,
+        enhanced_aml: EnhancedAmlOption::No,
+        allow_us_residents: true,
+        allow_us_territory_residents: false,
+        kind: ObConfigurationKind::Kyc,
+        skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
-        curp_validation_enabled: None,
+        curp_validation_enabled: false,
     };
-    req.validate(ObConfigurationKind::Kyc).is_ok()
+    ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
 
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], true => true)]
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], false => true)]
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], false => false)]
 fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool {
-    let req = CreateOnboardingConfigurationRequest {
+    let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
-        must_collect_data: must_collect_data.clone(),
-        optional_data: None,
-        can_access_data: must_collect_data,
+        tenant_id: TenantId::test_data("flerp".into()),
+        is_live: true,
+        author: DbActor::Footprint,
+        must_collect_data,
+        optional_data: vec![],
+        can_access_data: vec![],
         cip_kind: None,
-        is_no_phone_flow: Some(false),
-        is_doc_first_flow: false,
+        is_no_phone_flow: false,
+        is_doc_first: false,
         allow_international_residents: allow_international,
         international_country_restrictions: None,
         skip_kyc: true,
+        skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: Some(EnhancedAml::default()),
-        allow_us_residents: Some(true),
-        allow_us_territories: Some(false),
-        kind: Some(ObConfigurationKind::Kyc),
-        skip_confirm: None,
+        enhanced_aml: EnhancedAmlOption::No,
+        allow_us_residents: true,
+        allow_us_territory_residents: false,
+        kind: ObConfigurationKind::Kyc,
+        skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
-        curp_validation_enabled: None,
+        curp_validation_enabled: false,
     };
-    req.validate(ObConfigurationKind::Kyc).is_ok()
+    ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
 
 #[test_case(vec![] => true)]
@@ -153,28 +171,32 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
 #[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "".to_owned(), description: None})] => false; "custom-with-empty-name")]
 #[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("custom.hi").unwrap(), name: "Hi".to_owned(), description: None})] => false; "custom-with-non-doc-DI")]
 fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
-    let req = CreateOnboardingConfigurationRequest {
+    let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),
+        tenant_id: TenantId::test_data("flerp".into()),
+        is_live: true,
+        author: DbActor::Footprint,
         must_collect_data: vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber],
-        optional_data: None,
+        optional_data: vec![],
         can_access_data: vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber],
         cip_kind: None,
-        is_no_phone_flow: Some(false),
-        is_doc_first_flow: false,
+        is_no_phone_flow: false,
+        is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
         skip_kyc: false,
+        skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: Some(EnhancedAml::default()),
-        allow_us_residents: Some(true),
-        allow_us_territories: Some(false),
-        kind: Some(ObConfigurationKind::Kyc),
-        skip_confirm: None,
+        enhanced_aml: EnhancedAmlOption::No,
+        allow_us_residents: true,
+        allow_us_territory_residents: false,
+        kind: ObConfigurationKind::Kyc,
+        skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect,
-        curp_validation_enabled: None,
+        curp_validation_enabled: false,
     };
-    req.validate(ObConfigurationKind::Kyc).is_ok()
+    ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
 
 #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob] => false)]
@@ -183,5 +205,36 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
 #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::Nationality] => false)]
 #[test_case(CipKind::Apex, vec![] => true)]
 fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
-    validate_must_collect_for_cip(kind, &must_collect_data).is_ok()
+    let args = NewObConfigurationArgs {
+        name: "Flerp".to_owned(),
+        tenant_id: TenantId::test_data("flerp".into()),
+        is_live: true,
+        author: DbActor::Footprint,
+        must_collect_data,
+        optional_data: vec![],
+        can_access_data: vec![],
+        cip_kind: Some(kind),
+        is_no_phone_flow: false,
+        is_doc_first: false,
+        allow_international_residents: false,
+        international_country_restrictions: None,
+        skip_kyc: false,
+        skip_kyb: false,
+        doc_scan_for_optional_ssn: None,
+        enhanced_aml: EnhancedAmlOption::Yes {
+            ofac: true,
+            pep: true,
+            adverse_media: true,
+            continuous_monitoring: true,
+            adverse_media_lists: None,
+        },
+        allow_us_residents: true,
+        allow_us_territory_residents: true,
+        kind: ObConfigurationKind::Kyc,
+        skip_confirm: false,
+        document_types_and_countries: None,
+        documents_to_collect: vec![],
+        curp_validation_enabled: false,
+    };
+    ObConfigurationArgsToValidate(args).validate_for_cip(kind).is_ok()
 }

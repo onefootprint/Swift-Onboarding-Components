@@ -3,20 +3,35 @@ use crate::{
     State,
 };
 use api_core::errors::{AssertionError, ValidationError};
+use db::models::{ob_configuration::NewObConfigurationArgs, tenant::Tenant};
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, AdverseMediaListKind, CipKind, CollectedData as CD, CollectedDataOption as CDO,
-    CollectedDataOptionKind as CDOK, DataIdentifierDiscriminant, DocumentRequestConfig, EnhancedAmlOption,
-    ObConfigurationKind, TenantId,
+    output::Csv, CipKind, CollectedData as CD, CollectedDataOption as CDO, CollectedDataOptionKind as CDOK,
+    DataIdentifierDiscriminant, DocumentRequestConfig, EnhancedAmlOption, ObConfigurationKind, TenantId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
-use super::post::CreateOnboardingConfigurationRequest;
+#[derive(derive_more::Deref)]
+/// Wrapper around NewObConfigurationArgs to perform some validation
+pub struct ObConfigurationArgsToValidate(pub(super) NewObConfigurationArgs);
 
-impl CreateOnboardingConfigurationRequest {
+impl ObConfigurationArgsToValidate {
     const ALLOWED_OPTIONAL_FIELDS: [CDO; 2] = [CDO::Ssn4, CDO::Ssn9];
+
+    pub(super) fn validate(
+        state: &State,
+        args: NewObConfigurationArgs,
+        tenant: &Tenant,
+    ) -> ApiResult<NewObConfigurationArgs> {
+        let args = Self(args);
+        args.validate_inner()?;
+        args.validate_kind()?;
+        args.validate_flags(state, &tenant.id)?;
+        args.validate_tenant_restrictions(tenant)?;
+        Ok(args.0)
+    }
 
     /// Core validation business logic, separated from checking simple required fields
     pub(super) fn validate_inner(&self) -> ApiResult<()> {
@@ -41,7 +56,7 @@ impl CreateOnboardingConfigurationRequest {
             .collect::<ApiResult<HashMap<_, _>>>()
         };
 
-        let optional_data = self.optional_data.clone().unwrap_or_default();
+        let optional_data = self.optional_data.clone();
         let unallowed_optional_data_cdos: Vec<_> = optional_data
             .iter()
             .filter(|cdo| !Self::ALLOWED_OPTIONAL_FIELDS.contains(cdo))
@@ -54,13 +69,9 @@ impl CreateOnboardingConfigurationRequest {
             .into());
         }
 
-        if self.is_no_phone_flow.unwrap_or(false) {
+        if self.is_no_phone_flow {
             let collect_phone = self.must_collect_data.contains(&CDO::PhoneNumber)
-                || self
-                    .optional_data
-                    .as_ref()
-                    .map(|od| od.contains(&CDO::PhoneNumber))
-                    .unwrap_or(false);
+                || self.optional_data.contains(&CDO::PhoneNumber);
             if collect_phone {
                 return Err(TenantError::ValidationError(
                     "Cannot collect phone if is_no_phone_flow is true".to_owned(),
@@ -73,7 +84,7 @@ impl CreateOnboardingConfigurationRequest {
             .iter()
             .find(|cdo| matches!(cdo, CDO::Document(_)));
 
-        if self.is_doc_first_flow {
+        if self.is_doc_first {
             if doc_cdo.is_none() {
                 return Err(TenantError::ValidationError(
                     "Must collect document if is_doc_first is true".to_owned(),
@@ -91,7 +102,7 @@ impl CreateOnboardingConfigurationRequest {
             }
         }
 
-        if self.curp_validation_enabled.unwrap_or(false) && doc_cdo.is_none() {
+        if self.curp_validation_enabled && doc_cdo.is_none() {
             return Err(TenantError::ValidationError(
                 "Must collect document if `curp_validation_enabled=true".to_owned(),
             )
@@ -220,28 +231,13 @@ impl CreateOnboardingConfigurationRequest {
         Ok(())
     }
 
-    pub(super) fn validate(&self, kind: ObConfigurationKind) -> ApiResult<()> {
-        self.validate_inner()?;
-        self.validate_enhanced_aml()?;
-        self.validate_kind(kind)?;
-        Ok(())
-    }
-
-    pub(super) fn get_enhanced_aml(&self, tenant_id: &TenantId) -> EnhancedAmlOption {
-        self.enhanced_aml
-            .clone()
-            .map(|r| r.into())
-            .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
-            .unwrap_or(EnhancedAmlOption::No)
-    }
-
-    fn validate_kind(&self, kind: ObConfigurationKind) -> ApiResult<()> {
+    fn validate_kind(&self) -> ApiResult<()> {
         // Check for required fields based on playbook kind
-        let required_fields = match kind {
+        let required_fields = match self.kind {
             ObConfigurationKind::Auth => vec![CDOK::Email, CDOK::PhoneNumber],
             ObConfigurationKind::Kyb => vec![CDOK::BusinessName, CDOK::BusinessAddress],
             ObConfigurationKind::Kyc => {
-                if self.is_no_phone_flow.unwrap_or(false) {
+                if self.is_no_phone_flow {
                     vec![CDOK::Name, CDOK::FullAddress, CDOK::Email]
                 } else {
                     vec![CDOK::Name, CDOK::FullAddress, CDOK::Email, CDOK::PhoneNumber]
@@ -256,14 +252,14 @@ impl CreateOnboardingConfigurationRequest {
         if !missing_required_fields.is_empty() {
             return Err(TenantError::ValidationError(format!(
                 "Playbook of kind {} must collect {}",
-                kind,
+                self.kind,
                 Csv(missing_required_fields)
             ))
             .into());
         }
 
         // Check for disallowed fields based on playbook kind
-        let is_field_allowed = match kind {
+        let is_field_allowed = match self.kind {
             ObConfigurationKind::Auth => |cdo: &CDO| -> bool { matches!(cdo, CDO::Email | CDO::PhoneNumber) },
             ObConfigurationKind::Kyb => |_: &CDO| -> bool { true },
             ObConfigurationKind::Kyc => |cdo: &CDO| -> bool {
@@ -280,18 +276,18 @@ impl CreateOnboardingConfigurationRequest {
         if !collected_disallowed_fields.is_empty() {
             return Err(TenantError::ValidationError(format!(
                 "Playbooks of kind {} cannot collect {}",
-                kind,
+                self.kind,
                 Csv(collected_disallowed_fields),
             ))
             .into());
         }
 
         // Document playbooks must not run KYC
-        if kind == ObConfigurationKind::Document {
+        if self.kind == ObConfigurationKind::Document {
             if !self.skip_kyc {
                 return Err(ValidationError("Playbook of kind document must skip KYC").into());
             }
-            if !self.skip_confirm.unwrap_or(false) {
+            if !self.skip_confirm {
                 return Err(ValidationError("Playbook of kind document must skip confirm").into());
             }
         }
@@ -299,28 +295,8 @@ impl CreateOnboardingConfigurationRequest {
         Ok(())
     }
 
-    fn validate_enhanced_aml(&self) -> ApiResult<()> {
-        if let Some(r) = &self.enhanced_aml {
-            if !r.enhanced_aml && (r.adverse_media || r.ofac || r.pep) {
-                return Err(TenantError::ValidationError(
-                    "cannot set adverse_media, ofac, or pep if enhanced_aml = false".to_owned(),
-                )
-                .into());
-            }
-            if r.enhanced_aml && !(r.adverse_media || r.ofac || r.pep) {
-                return Err(TenantError::ValidationError(
-                    "at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true"
-                        .to_owned(),
-                )
-                .into());
-            }
-        }
-
-        Ok(())
-    }
-
     fn validate_countries(&self) -> ApiResult<()> {
-        if self.allow_us_residents == Some(false) && !self.allow_international_residents {
+        if !self.allow_us_residents && !self.allow_international_residents {
             return Err(TenantError::ValidationError(
                 "Must set one of allow_us_residents or allow_international_residents to true".to_owned(),
             )
@@ -344,7 +320,7 @@ impl CreateOnboardingConfigurationRequest {
             }
         }
 
-        if self.allow_us_territories == Some(true)
+        if self.allow_us_territory_residents
             && self.international_country_restrictions.is_none()
             && self.allow_international_residents
         {
@@ -356,8 +332,24 @@ impl CreateOnboardingConfigurationRequest {
         Ok(())
     }
 
-    fn validate_for_cip(&self, kind: CipKind, enhanced_aml: EnhancedAmlOption) -> Result<(), TenantError> {
-        validate_must_collect_for_cip(kind, &self.must_collect_data)?;
+    pub(super) fn validate_for_cip(&self, kind: CipKind) -> Result<(), TenantError> {
+        let missing_cdos = kind
+            .required_cdos()
+            .into_iter()
+            .filter(|c| !self.must_collect_data.contains(c))
+            .collect_vec();
+        if !missing_cdos.is_empty() {
+            return Err(TenantError::MissingCdosForCip(missing_cdos.into(), kind));
+        } else if kind == CipKind::Alpaca
+            && self
+                .must_collect_data
+                .iter()
+                .any(|cdo| matches!(cdo, CDO::Document(_)))
+        {
+            return Err(TenantError::ValidationError(
+                "Cannot specify documents in Playbook and be using an Alpaca CIP".to_owned(),
+            ));
+        }
 
         // Residency
         if self.allow_international_residents {
@@ -366,7 +358,7 @@ impl CreateOnboardingConfigurationRequest {
             ));
         };
 
-        if !(self.allow_us_residents.unwrap_or(false) && self.allow_us_territories.unwrap_or(false)) {
+        if !(self.allow_us_residents && self.allow_us_territory_residents) {
             return Err(TenantError::ValidationError(
                 "Cannot create Alpaca playbook without allow_us_residents=true && allow_us_territories=true"
                     .to_owned(),
@@ -385,7 +377,7 @@ impl CreateOnboardingConfigurationRequest {
             ));
         }
         // AML
-        match enhanced_aml {
+        match self.enhanced_aml {
             EnhancedAmlOption::No => Err(TenantError::ValidationError(
                 "Must choose EnhancedAmlOption Alpaca playbook".to_owned(),
             )),
@@ -408,11 +400,11 @@ impl CreateOnboardingConfigurationRequest {
     }
 
     pub(super) fn validate_flags(&self, state: &State, tenant_id: &TenantId) -> ApiResult<()> {
-        if matches!(self.kind, Some(ObConfigurationKind::Auth)) {
+        if matches!(self.kind, ObConfigurationKind::Auth) {
             // Not strictly necessary, but just a warm-up for better per-config-kind validation
             let unallowed_flags = vec![
-                (self.is_no_phone_flow == Some(true), "is_no_phone_flow"),
-                (self.is_doc_first_flow, "is_doc_first_flow"),
+                (self.is_no_phone_flow, "is_no_phone_flow"),
+                (self.is_doc_first, "is_doc_first_flow"),
                 (
                     self.allow_international_residents,
                     "allow_international_residents",
@@ -423,10 +415,10 @@ impl CreateOnboardingConfigurationRequest {
                 ),
                 (self.skip_kyc, "skip_kyc"),
                 (
-                    self.enhanced_aml.as_ref().is_some_and(|e| e.enhanced_aml),
+                    matches!(self.enhanced_aml, EnhancedAmlOption::Yes { .. }),
                     "enhanced_aml",
                 ),
-                (self.skip_confirm.unwrap_or(false), "skip_confirm"),
+                (self.skip_confirm, "skip_confirm"),
             ];
             if let Some((_, f)) = unallowed_flags.into_iter().find(|(v, _)| *v) {
                 return Err(
@@ -442,7 +434,7 @@ impl CreateOnboardingConfigurationRequest {
         let cip_kind = self.cip_kind.or(is_alpaca_tenant.then_some(CipKind::Alpaca));
 
         if let Some(cip_kind) = cip_kind {
-            self.validate_for_cip(cip_kind, self.get_enhanced_aml(tenant_id))?
+            self.validate_for_cip(cip_kind)?
         }
 
         let can_make_no_phone_obc = !state.config.service_config.is_production()
@@ -450,7 +442,7 @@ impl CreateOnboardingConfigurationRequest {
             || state
                 .feature_flag_client
                 .flag(BoolFlag::TenantCanMakeNoPhoneObc(tenant_id));
-        if self.is_no_phone_flow.unwrap_or(false) && !can_make_no_phone_obc {
+        if self.is_no_phone_flow && !can_make_no_phone_obc {
             return Err(TenantError::ValidationError(
                 "Unable to create config with is_no_phone_flow = true".to_owned(),
             )
@@ -460,7 +452,7 @@ impl CreateOnboardingConfigurationRequest {
         let can_make_doc_first = state
             .feature_flag_client
             .flag(BoolFlag::TenantCanMakeDocFirstObc(tenant_id));
-        if self.is_doc_first_flow && !can_make_doc_first {
+        if self.is_doc_first && !can_make_doc_first {
             return Err(TenantError::ValidationError(
                 "Unable to create config with is_doc_first = true".to_owned(),
             )
@@ -469,53 +461,19 @@ impl CreateOnboardingConfigurationRequest {
 
         Ok(())
     }
-}
 
-fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<EnhancedAmlOption> {
-    if tenant_id.is_coba() {
-        Some(EnhancedAmlOption::Yes {
-            ofac: true,
-            pep: true,
-            adverse_media: false,
-            continuous_monitoring: true,
-            adverse_media_lists: None,
-        })
-    } else if tenant_id.is_composer() {
-        Some(EnhancedAmlOption::Yes {
-            ofac: true,
-            pep: true,
-            adverse_media: true,
-            continuous_monitoring: false,
-            adverse_media_lists: Some(vec![
-                AdverseMediaListKind::FinancialCrime,
-                AdverseMediaListKind::Fraud,
-            ]),
-        })
-    } else {
-        None
-    }
-}
-
-pub(super) fn validate_must_collect_for_cip(
-    kind: CipKind,
-    must_collect_data: &[CDO],
-) -> Result<(), TenantError> {
-    let missing_cdos = kind
-        .required_cdos()
-        .into_iter()
-        .filter(|c| !must_collect_data.contains(c))
-        .collect_vec();
-    if !missing_cdos.is_empty() {
-        Err(TenantError::MissingCdosForCip(missing_cdos.into(), kind))
-    } else if kind == CipKind::Alpaca
-        && must_collect_data
-            .iter()
-            .any(|cdo| matches!(cdo, CDO::Document(_)))
-    {
-        Err(TenantError::ValidationError(
-            "Cannot specify documents in Playbook and be using an Alpaca CIP".to_owned(),
-        ))
-    } else {
+    pub(super) fn validate_tenant_restrictions(&self, tenant: &Tenant) -> ApiResult<()> {
+        let restrictions = vec![
+            (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Kyc),
+            (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Document), // Separate flag?
+            (tenant.is_prod_kyb_playbook_restricted, ObConfigurationKind::Kyb),
+            (tenant.is_prod_auth_playbook_restricted, ObConfigurationKind::Auth),
+        ];
+        for (is_restricted, restricted_kind) in restrictions {
+            if self.is_live && is_restricted && self.kind == restricted_kind {
+                return Err(TenantError::CannotCreateProdPlaybook(self.kind).into());
+            }
+        }
         Ok(())
     }
 }
