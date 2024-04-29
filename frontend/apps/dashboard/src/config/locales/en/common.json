@@ -463,7 +463,8 @@
     "business_dba": "Business DBA",
     "beneficial_owners": "Business beneficial owners",
     "selfie": "Selfie image",
-    "native_device": "Native Device"
+    "native_device": "Native Device",
+    "behavior": "Behavior"
   },
   "components": {
     "risk-signals-glossary": {
