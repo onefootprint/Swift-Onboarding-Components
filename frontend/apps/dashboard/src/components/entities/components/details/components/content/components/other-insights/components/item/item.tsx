@@ -48,41 +48,24 @@ const capitalizeFirstLetter = (string: string) =>
 
 const formatValue = (value: string, unit: UserInsightsUnit) => {
   if (unit === UserInsightsUnit.TimeInMs) {
-    const milliseconds = Number.parseInt(value, 10);
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const remainingSeconds = seconds % 60;
-    const remainingMinutes = minutes % 60;
-    const remainingHours = hours % 24;
+    if (unit === UserInsightsUnit.TimeInMs) {
+      const milliseconds = Number.parseInt(value, 10);
+      const seconds = Math.floor(milliseconds / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
 
-    if (days > 0) {
+      if (minutes > 0) {
+        return {
+          value: `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`,
+          unit: 'min',
+        };
+      }
       return {
-        value: `${days} days, ${remainingHours}h ${remainingMinutes}:${remainingSeconds
-          .toString()
-          .padStart(2, '0')}`,
-        unit: 'day',
+        value: `${seconds}`,
+        unit: 's',
       };
     }
-    if (hours > 0) {
-      return {
-        value: `${hours}h ${remainingMinutes}:${remainingSeconds
-          .toString()
-          .padStart(2, '0')}`,
-        unit: 'hour',
-      };
-    }
-    if (minutes > 0) {
-      return {
-        value: `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`,
-        unit: 'min',
-      };
-    }
-    return {
-      value: `${seconds}`,
-      unit: 's',
-    };
+    return { value, unit: null };
   }
   return { value, unit: null };
 };
