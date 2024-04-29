@@ -1,4 +1,4 @@
-use crate::PgConn;
+use crate::{models::ob_configuration::NewObConfigurationArgs, PgConn};
 use newtypes::{
     CipKind, CollectedDataOption as CDO, DbActor, DocumentAndCountryConfiguration, EnhancedAmlOption,
     Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
@@ -7,33 +7,32 @@ use newtypes::{
 use crate::models::ob_configuration::ObConfiguration;
 
 pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfiguration {
-    ObConfiguration::create(
-        conn,
-        "Flerp config".to_owned(),
-        tenant_id.clone(),
-        vec![CDO::PhoneNumber],
-        vec![],
-        vec![CDO::PhoneNumber],
+    let args = NewObConfigurationArgs {
+        name: "Flerp config".to_owned(),
+        tenant_id: tenant_id.clone(),
+        must_collect_data: vec![CDO::PhoneNumber],
+        optional_data: vec![],
+        can_access_data: vec![CDO::PhoneNumber],
         is_live,
-        None,
-        false,
-        false,
-        false,
-        None,
-        DbActor::Footprint,
-        false,
-        None,
-        EnhancedAmlOption::No,
-        true,
-        false,
-        ObConfigurationKind::Kyc,
-        false,
-        false,
-        None,
-        vec![],
-        false,
-    )
-    .expect("Could not create ob config")
+        cip_kind: None,
+        is_no_phone_flow: false,
+        is_doc_first: false,
+        allow_international_residents: false,
+        international_country_restrictions: None,
+        author: DbActor::Footprint,
+        skip_kyc: false,
+        doc_scan_for_optional_ssn: None,
+        enhanced_aml: EnhancedAmlOption::No,
+        allow_us_residents: true,
+        allow_us_territory_residents: false,
+        kind: ObConfigurationKind::Kyc,
+        skip_kyb: false,
+        skip_confirm: false,
+        document_types_and_countries: None,
+        documents_to_collect: vec![],
+        curp_validation_enabled: false,
+    };
+    ObConfiguration::create(conn, args).expect("Could not create ob config")
 }
 
 pub struct ObConfigurationOpts {
@@ -83,31 +82,48 @@ pub fn create_with_opts(
     tenant_id: &TenantId,
     opts: ObConfigurationOpts,
 ) -> ObConfiguration {
-    ObConfiguration::create(
-        conn,
-        opts.name,
-        tenant_id.clone(),
-        opts.must_collect_data,
-        opts.optional_data,
-        opts.can_access_data,
-        opts.is_live,
-        opts.cip_kind,
-        opts.is_no_phone_flow,
-        opts.is_doc_first,
-        opts.allow_international_residents,
-        opts.international_country_restrictions,
-        opts.author,
-        opts.skip_kyc,
-        opts.doc_scan_for_optional_ssn,
-        opts.enhanced_aml,
-        true,
-        false,
-        opts.kind,
-        false,
-        false,
-        opts.document_types_and_countries,
-        vec![],
-        false,
-    )
-    .expect("Could not create ob config")
+    let ObConfigurationOpts {
+        name,
+        must_collect_data,
+        optional_data,
+        can_access_data,
+        is_live,
+        cip_kind,
+        is_no_phone_flow,
+        is_doc_first,
+        allow_international_residents,
+        international_country_restrictions,
+        author,
+        skip_kyc,
+        doc_scan_for_optional_ssn,
+        enhanced_aml,
+        kind,
+        document_types_and_countries,
+    } = opts;
+    let args = NewObConfigurationArgs {
+        name,
+        tenant_id: tenant_id.clone(),
+        must_collect_data,
+        optional_data,
+        can_access_data,
+        is_live,
+        cip_kind,
+        is_no_phone_flow,
+        is_doc_first,
+        allow_international_residents,
+        international_country_restrictions,
+        author,
+        skip_kyc,
+        doc_scan_for_optional_ssn,
+        enhanced_aml,
+        allow_us_residents: true,
+        allow_us_territory_residents: false,
+        kind,
+        skip_kyb: false,
+        skip_confirm: false,
+        document_types_and_countries,
+        documents_to_collect: vec![],
+        curp_validation_enabled: false,
+    };
+    ObConfiguration::create(conn, args).expect("Could not create ob config")
 }
