@@ -34,7 +34,7 @@
     "i18next": "^23.7.16",
     "isemail": "^3.2.0",
     "lodash": "^4.17.21",
-    "next": "14.1.4",
+    "next": "14.2.3",
     "react-dom": "^18",
     "react-hook-form": "^7.47.0",
     "react-i18next": "^14.0.0",

@@ -23,7 +23,7 @@
     "file-saver": "^2.0.5",
     "mockdate": "^3.0.5",
     "msw": "^1.1.0",
-    "next": "14.1.4",
+    "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
     "resize-observer-polyfill": "^1.5.1",
