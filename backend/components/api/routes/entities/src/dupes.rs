@@ -101,6 +101,8 @@ pub async fn get_dupes(
         })
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
+        // don't return dupes if there are no dupe kinds
+        .filter(|(d, _, _)| !d.is_empty())
         .map(|(d, vw, data)| api_wire_types::SameTenantDupe::from_db((d, vw, &auth, data)))
         .collect();
 
