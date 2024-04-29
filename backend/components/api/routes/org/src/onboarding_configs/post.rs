@@ -161,7 +161,6 @@ pub async fn post(
     };
 
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;
-
     let ff_client = state.feature_flag_client.clone();
     let (obc, actor, rs) = state
         .db_pool

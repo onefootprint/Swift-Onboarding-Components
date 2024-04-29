@@ -26,6 +26,8 @@ pub struct OnboardingConfiguration {
     pub is_doc_first_flow: bool,
     pub author: Option<Actor>,
     pub skip_kyc: bool,
+    pub skip_kyb: bool,
+    pub skip_confirm: bool,
     pub enhanced_aml: EnhancedAml,
     pub doc_scan_for_optional_ssn: Option<CollectedDataOption>,
     pub kind: ObConfigurationKind,
@@ -34,6 +36,7 @@ pub struct OnboardingConfiguration {
     pub rule_set: Option<RuleSet>, // theoretically we have a RuleSet for every OBC but this might not always be the case (ie mb Auth playbooks won't always have this?) and just to be a bit more defensive about a super important model here we make it optional (avoid nasty potential errors in inner joining on rule_set on OBC queries and such which is a wide blast radius for just this rule set version stuff here)
     pub cip_kind: Option<CipKind>,
     pub documents_to_collect: Vec<DocumentRequestConfig>,
+    pub curp_validation_enabled: bool,
 }
 
 /// The public onboarding configuration

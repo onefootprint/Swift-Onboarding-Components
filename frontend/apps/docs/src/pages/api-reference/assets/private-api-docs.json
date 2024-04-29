@@ -981,6 +981,44 @@
                 ]
             }
         },
+        "/entities/{fp_id}/ai_summarize": {
+            "post": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Computes a human-readable summary of the user's detail page.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserAiSummary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/annotations": {
             "get": {
                 "tags": [
@@ -5098,6 +5136,54 @@
                 ]
             }
         },
+        "/org/onboarding_configs/{id}/copy": {
+            "post": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Copies the provided onboarding configuration into the provided tenant and provided sandbox mode.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CopyPlaybookRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingConfiguration"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/onboarding_configs/{id}/rules": {
             "get": {
                 "tags": [
@@ -9052,6 +9138,18 @@
                     "latest_version"
                 ]
             },
+            "CopyPlaybookRequest": {
+                "type": "object",
+                "properties": {
+                    "is_live": {
+                        "description": "The target is_live for the copied playbook",
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "is_live"
+                ]
+            },
             "CreateAnnotationRequest": {
                 "type": "object",
                 "properties": {
@@ -11540,6 +11638,17 @@
                         "type": "number",
                         "format": "double"
                     },
+                    "review_status": {
+                        "description": "Non-null for images uploaded via bifrost",
+                        "type": "string",
+                        "enum": [
+                            "unreviewed",
+                            "pending_machine_review",
+                            "reviewed_by_machine",
+                            "pending_human_review",
+                            "reviewed_by_human"
+                        ]
+                    },
                     "selfie_score": {
                         "type": "number",
                         "format": "double"
@@ -11550,7 +11659,7 @@
                         "format": "date-time"
                     },
                     "status": {
-                        "description": "Non-null for images uploaded via the UI",
+                        "description": "Non-null for images uploaded via bifrost",
                         "type": "string",
                         "enum": [
                             "pending",
@@ -12258,7 +12367,9 @@
                                         "enum": [
                                             "ssn9",
                                             "email",
-                                            "phone_number"
+                                            "phone_number",
+                                            "device_id",
+                                            "cookie_id"
                                         ]
                                     }
                                 },
@@ -13207,6 +13318,16 @@
                         "type": "string",
                         "format": "date-time"
                     },
+                    "manual_review_kinds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "rule_triggered",
+                                "document_needs_review"
+                            ]
+                        }
+                    },
                     "ordering_id": {
                         "type": "integer",
                         "format": "int64"
@@ -13677,6 +13798,7 @@
                     "is_portable",
                     "kind",
                     "last_activity_at",
+                    "manual_review_kinds",
                     "ordering_id",
                     "requires_manual_review",
                     "start_timestamp",
@@ -20739,6 +20861,9 @@
                                     "type": "string",
                                     "format": "date-time"
                                 },
+                                "curp_validation_enabled": {
+                                    "type": "boolean"
+                                },
                                 "doc_scan_for_optional_ssn": {
                                     "type": "string",
                                     "enum": [
@@ -20793,6 +20918,12 @@
                                         "country_specific",
                                         "global"
                                     ]
+                                },
+                                "documents_to_collect": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
                                 },
                                 "enhanced_aml": {
                                     "type": "object",
@@ -21173,6 +21304,12 @@
                                         "version"
                                     ]
                                 },
+                                "skip_confirm": {
+                                    "type": "boolean"
+                                },
+                                "skip_kyb": {
+                                    "type": "boolean"
+                                },
                                 "skip_kyc": {
                                     "type": "boolean"
                                 },
@@ -21190,6 +21327,8 @@
                                 "allow_us_territory_residents",
                                 "can_access_data",
                                 "created_at",
+                                "curp_validation_enabled",
+                                "documents_to_collect",
                                 "enhanced_aml",
                                 "id",
                                 "is_doc_first_flow",
@@ -21201,6 +21340,8 @@
                                 "must_collect_data",
                                 "name",
                                 "optional_data",
+                                "skip_confirm",
+                                "skip_kyb",
                                 "skip_kyc",
                                 "status"
                             ]
@@ -21705,6 +21846,9 @@
                         "type": "string",
                         "format": "date-time"
                     },
+                    "curp_validation_enabled": {
+                        "type": "boolean"
+                    },
                     "doc_scan_for_optional_ssn": {
                         "type": "string",
                         "enum": [
@@ -21759,6 +21903,12 @@
                             "country_specific",
                             "global"
                         ]
+                    },
+                    "documents_to_collect": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "enhanced_aml": {
                         "type": "object",
@@ -22139,6 +22289,12 @@
                             "version"
                         ]
                     },
+                    "skip_confirm": {
+                        "type": "boolean"
+                    },
+                    "skip_kyb": {
+                        "type": "boolean"
+                    },
                     "skip_kyc": {
                         "type": "boolean"
                     },
@@ -22156,6 +22312,8 @@
                     "allow_us_territory_residents",
                     "can_access_data",
                     "created_at",
+                    "curp_validation_enabled",
+                    "documents_to_collect",
                     "enhanced_aml",
                     "id",
                     "is_doc_first_flow",
@@ -22167,6 +22325,8 @@
                     "must_collect_data",
                     "name",
                     "optional_data",
+                    "skip_confirm",
+                    "skip_kyb",
                     "skip_kyc",
                     "status"
                 ]
@@ -25510,6 +25670,29 @@
                     }
                 }
             },
+            "UserAiSummary": {
+                "type": "object",
+                "properties": {
+                    "conclusion": {
+                        "type": "string"
+                    },
+                    "detailed_summary": {
+                        "type": "string"
+                    },
+                    "high_level_summary": {
+                        "type": "string"
+                    },
+                    "risk_signal_summary": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "conclusion",
+                    "detailed_summary",
+                    "high_level_summary",
+                    "risk_signal_summary"
+                ]
+            },
             "UserInsight": {
                 "type": "object",
                 "properties": {
@@ -25527,6 +25710,14 @@
                             "Workflow"
                         ]
                     },
+                    "unit": {
+                        "type": "string",
+                        "enum": [
+                            "DurationMs",
+                            "Boolean",
+                            "String"
+                        ]
+                    },
                     "value": {
                         "type": "string"
                     }
@@ -25535,6 +25726,7 @@
                     "description",
                     "name",
                     "scope",
+                    "unit",
                     "value"
                 ]
             },

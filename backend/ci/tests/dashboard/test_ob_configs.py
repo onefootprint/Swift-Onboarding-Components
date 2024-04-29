@@ -1,4 +1,5 @@
 import pytest
+from tests.types import ObConfiguration
 from tests.utils import (
     get,
     post,
@@ -803,3 +804,40 @@ def test_default_rules(sandbox_tenant):
     assert len(expected_rules) == len(rules) and all(
         expected_rules.count(x) == rules.count(x) for x in expected_rules
     )
+
+
+def test_copy_playbook(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config to copy", must_collect_data, must_collect_data
+    )
+    original = get(f"org/onboarding_configs/{obc.id}", None, *sandbox_tenant.db_auths)
+    assert not original["is_live"]
+
+    data = dict(name="My copied playbook", is_live=True)
+    body = post(f"org/onboarding_configs/{obc.id}/copy", data, *sandbox_tenant.db_auths)
+    assert body["is_live"]
+    assert body["name"] == "My copied playbook"
+
+    copied_fields = [
+        "must_collect_data",
+        "can_access_data",
+        "cip_kind",
+        "optional_data",
+        "is_no_phone_flow",
+        "is_doc_first_flow",
+        "allow_international_residents",
+        "international_country_restrictions",
+        "skip_kyc",
+        "skip_kyb",
+        "skip_confirm",
+        "doc_scan_for_optional_ssn",
+        "enhanced_aml",
+        "allow_us_residents",
+        "allow_us_territory_residents",
+        "kind",
+        "document_types_and_countries",
+        "documents_to_collect",
+        "curp_validation_enabled",
+    ]
+    for field in copied_fields:
+        assert body[field] == original[field]

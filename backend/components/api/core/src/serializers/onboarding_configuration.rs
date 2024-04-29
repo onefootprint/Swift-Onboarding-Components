@@ -132,6 +132,8 @@ impl
             international_country_restrictions,
             is_doc_first,
             skip_kyc,
+            skip_kyb,
+            skip_confirm,
             enhanced_aml,
             allow_us_residents,
             allow_us_territory_residents,
@@ -140,6 +142,7 @@ impl
             document_types_and_countries,
             documents_to_collect,
             cip_kind,
+            curp_validation_enabled,
             ..
         } = ob_config;
 
@@ -159,6 +162,8 @@ impl
             international_country_restrictions,
             author: author.map(Actor::from_db),
             skip_kyc,
+            skip_kyb,
+            skip_confirm,
             enhanced_aml: enhanced_aml.into(),
             allow_us_residents,
             allow_us_territory_residents,
@@ -169,6 +174,7 @@ impl
             rule_set: rule_set.map(|rs| api_wire_types::RuleSet { version: rs.version }),
             cip_kind,
             documents_to_collect: documents_to_collect.unwrap_or_default(),
+            curp_validation_enabled,
         }
     }
 }
