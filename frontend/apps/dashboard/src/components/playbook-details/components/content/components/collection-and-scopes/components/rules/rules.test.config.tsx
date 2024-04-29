@@ -7,12 +7,16 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
+  ActorKind,
+  IdDI,
+  ListKind,
+  ListRuleOp,
   type OnboardingConfig,
   OnboardingConfigKind,
   OnboardingConfigStatus,
+  RiskSignalRuleOp,
   type Rule,
   RuleAction,
-  RuleOp,
 } from '@onefootprint/types';
 
 export const kycPlaybookFixture: OnboardingConfig = {
@@ -127,9 +131,9 @@ export const failMultiFieldRuleFixture = {
   createdAt: '2021-11-26T16:52:52.535896Z',
   isShadow: false,
   ruleExpression: [
-    { field: 'name_matches', op: RuleOp.notEq, value: true },
-    { field: 'id_not_located', op: RuleOp.eq, value: true },
-    { field: 'watchlist_hit_ofac', op: RuleOp.eq, value: true },
+    { field: 'name_matches', op: RiskSignalRuleOp.notEq, value: true },
+    { field: 'id_not_located', op: RiskSignalRuleOp.eq, value: true },
+    { field: 'watchlist_hit_ofac', op: RiskSignalRuleOp.eq, value: true },
   ],
 };
 
@@ -140,7 +144,7 @@ export const manualReviewRuleFixture = {
   ruleExpression: [
     {
       field: 'watchlist_hit_ofac',
-      op: RuleOp.eq,
+      op: RiskSignalRuleOp.eq,
       value: true,
     },
   ],
@@ -154,7 +158,7 @@ export const passRuleFixture = {
   ruleExpression: [
     {
       field: 'document_is_permit_or_provisional_license',
-      op: RuleOp.eq,
+      op: RiskSignalRuleOp.eq,
       value: true,
     },
   ],
@@ -168,7 +172,7 @@ export const stepUpRuleFixture = {
   ruleExpression: [
     {
       field: 'dob_does_not_match',
-      op: RuleOp.eq,
+      op: RiskSignalRuleOp.eq,
       value: true,
     },
   ],
@@ -183,7 +187,7 @@ export const rulesFixture: Rule[] = [
     ruleExpression: [
       {
         field: 'subject_deceased',
-        op: RuleOp.eq,
+        op: RiskSignalRuleOp.eq,
         value: true,
       },
     ],
@@ -197,8 +201,21 @@ export const rulesFixture: Rule[] = [
     ruleExpression: [
       {
         field: 'id_flagged',
-        op: RuleOp.eq,
+        op: RiskSignalRuleOp.eq,
         value: true,
+      },
+    ],
+    isShadow: false,
+  },
+  {
+    ruleId: 'rule_I3lDFDQl6u8EBteVfTaeTn',
+    action: RuleAction.fail,
+    createdAt: '2024-04-05T23:37:22.943739Z',
+    ruleExpression: [
+      {
+        field: IdDI.email,
+        op: ListRuleOp.isIn,
+        value: '1',
       },
     ],
     isShadow: false,
@@ -206,6 +223,38 @@ export const rulesFixture: Rule[] = [
   manualReviewRuleFixture,
   passRuleFixture,
 ];
+
+export const listsFixture = {
+  data: [
+    {
+      id: '1',
+      actor: {
+        kind: ActorKind.footprint,
+      },
+      alias: 'my_list',
+      created_at: 'date',
+      kind: ListKind.emailAddress,
+      name: 'Email List',
+      entries_count: 0,
+      used_in_playbook: false,
+    },
+    {
+      id: '2',
+      actor: {
+        kind: ActorKind.footprint,
+      },
+      alias: 'my_list2',
+      created_at: 'date',
+      kind: ListKind.ssn9,
+      name: 'SSN List',
+      entries_count: 0,
+      used_in_playbook: false,
+    },
+  ],
+  meta: {
+    count: 10,
+  },
+};
 
 export const selectOption = async (label: string) => {
   const newOption = screen.getByRole('option', {
@@ -242,21 +291,20 @@ export const startAdding = async (title: string) => {
   return { section };
 };
 
-export const isPrecededByNotBadge = ({
+export const isNotTriggered = ({
   row,
   text,
 }: {
   row: HTMLElement;
   text: string;
 }) => {
-  const rowNodes = Array.from(
-    Array.from(Array.from(row.children)[0].children)[0].children,
-  );
-  const notBadge = within(row).getByText('not');
-  const notIndex = rowNodes.indexOf(notBadge);
-  const notFieldElement = within(row).getByText(text);
-  const fieldIndex = rowNodes.indexOf(notFieldElement);
-  return notIndex === fieldIndex - 1;
+  const ruleChip = within(row).getByRole('group', {
+    name: text,
+  });
+  const chipNodes = Array.from(ruleChip.children);
+  const fieldIndex = chipNodes.indexOf(within(ruleChip).getByText(text));
+  const isNotIndex = chipNodes.indexOf(within(ruleChip).getByText('is not'));
+  return isNotIndex === fieldIndex + 1;
 };
 
 export const withRules = (
@@ -397,3 +445,10 @@ export const withRiskSignals = () => {
     ],
   });
 };
+
+export const withLists = (response = listsFixture) =>
+  mockRequest({
+    method: 'get',
+    path: '/org/lists',
+    response,
+  });

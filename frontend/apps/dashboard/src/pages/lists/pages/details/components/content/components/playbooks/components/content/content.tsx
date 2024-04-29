@@ -50,22 +50,13 @@ const Content = ({ list }: ContentProps) => {
                   {rule.ruleExpression.map((expression, index) => (
                     <>
                       {/* TODO: replace with Claudio's new component */}
-                      <Text
-                        key={`${expression.field}-${expression.op}-${expression.value}`}
-                        variant="body-3"
-                      >
+                      <Text key={JSON.stringify(expression)} variant="body-3">
                         {expression.field}
                       </Text>
-                      <Text
-                        key={`${expression.field}-${expression.op}-${expression.value}`}
-                        variant="body-3"
-                      >
+                      <Text key={JSON.stringify(expression)} variant="body-3">
                         {expression.op}
                       </Text>
-                      <Text
-                        key={`${expression.field}-${expression.op}-${expression.value}`}
-                        variant="body-3"
-                      >
+                      <Text key={JSON.stringify(expression)} variant="body-3">
                         {expression.value}
                       </Text>
                       {index < rule.ruleExpression.length - 1 && (

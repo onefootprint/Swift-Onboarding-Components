@@ -1,29 +1,31 @@
-import { RuleOp } from '@onefootprint/types';
+import { RiskSignalRuleOp } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 export type OpBadgeProps = {
-  defaultValue: RuleOp;
+  defaultValue: RiskSignalRuleOp;
   isEditable: boolean;
-  onClick: (newValue: RuleOp) => void;
+  onClick: (newValue: RiskSignalRuleOp) => void;
 };
 
 const OpBadge = ({ defaultValue, isEditable, onClick }: OpBadgeProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row',
   });
-  const [isSelected, setIsSelected] = useState(defaultValue === RuleOp.notEq);
+  const [isSelected, setIsSelected] = useState(
+    defaultValue === RiskSignalRuleOp.notEq,
+  );
 
   useEffect(() => {
-    setIsSelected(defaultValue === RuleOp.notEq);
+    setIsSelected(defaultValue === RiskSignalRuleOp.notEq);
   }, [defaultValue]);
 
   const handleClick = () => {
     setIsSelected(currentIsSelected => {
       const newIsSelected = !currentIsSelected;
-      onClick(newIsSelected ? RuleOp.notEq : RuleOp.eq);
+      onClick(newIsSelected ? RiskSignalRuleOp.notEq : RiskSignalRuleOp.eq);
       return newIsSelected;
     });
   };

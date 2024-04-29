@@ -6,14 +6,14 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { RuleOp } from '@onefootprint/types';
+import { RiskSignalRuleOp } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUserFirmEmployee } from 'src/config/tests';
 
 import type { RulesProps } from './rules';
 import Rules from './rules';
 import {
-  isPrecededByNotBadge,
+  isNotTriggered,
   kybPlaybookFixture,
   kycPlaybookFixture,
   manualReviewRuleFixture,
@@ -22,6 +22,7 @@ import {
   startEditing,
   stepUpRuleFixture,
   withEditRules,
+  withLists,
   withRiskSignals,
   withRules,
   withRulesError,
@@ -61,19 +62,20 @@ describe('<Rules />', () => {
       beforeEach(() => {
         withRules();
         withRiskSignals();
+        withLists();
       });
 
       it('should show all rules', async () => {
         await renderRulesAndWaitFinishLoading();
 
-        const nots = screen.getAllByText('not');
+        const nots = screen.getAllByText('is not');
         expect(nots).toHaveLength(1);
 
         const failSection = screen.getByRole('group', {
           name: 'Fail',
         });
         const failRows = within(failSection).getAllByRole('row');
-        expect(failRows).toHaveLength(3);
+        expect(failRows).toHaveLength(4);
 
         // Check alphabetical sorting and that "not" precedes the correct field
         expect(within(failRows[0]).getByText('id_flagged')).toBeInTheDocument();
@@ -84,7 +86,7 @@ describe('<Rules />', () => {
           within(failRows[1]).getByText('name_matches'),
         ).toBeInTheDocument();
         expect(
-          isPrecededByNotBadge({
+          isNotTriggered({
             row: failRows[1],
             text: 'name_matches',
           }),
@@ -95,6 +97,8 @@ describe('<Rules />', () => {
         expect(
           within(failRows[2]).getByText('subject_deceased'),
         ).toBeInTheDocument();
+        expect(within(failRows[3]).getByText('id.email')).toBeInTheDocument();
+        expect(within(failRows[3]).getByText('1')).toBeInTheDocument();
 
         const manualRevSection = screen.getByRole('group', {
           name: 'Fail + Manual review',
@@ -149,14 +153,19 @@ describe('<Rules />', () => {
         ).toEqual(6);
         expect(
           screen.getAllByRole('button', {
-            name: 'and',
+            name: 'Add risk signal condition',
           }).length,
-        ).toEqual(5);
+        ).toEqual(6);
+        expect(
+          screen.getAllByRole('button', {
+            name: 'Add list condition',
+          }).length,
+        ).toEqual(6);
         expect(
           screen.getAllByRole('button', {
             name: 'delete',
           }).length,
-        ).toEqual(5);
+        ).toEqual(6);
         expect(
           screen.getByRole('button', {
             name: 'Save changes',
@@ -176,7 +185,7 @@ describe('<Rules />', () => {
             ruleExpression: [
               {
                 field: 'address_alert_longevity',
-                op: RuleOp.notEq,
+                op: RiskSignalRuleOp.notEq,
                 value: true,
               },
             ],
@@ -186,12 +195,12 @@ describe('<Rules />', () => {
             ruleExpression: [
               {
                 field: 'document_is_permit_or_provisional_license',
-                op: RuleOp.eq,
+                op: RiskSignalRuleOp.eq,
                 value: true,
               },
               {
                 field: 'name_matches',
-                op: RuleOp.eq,
+                op: RiskSignalRuleOp.eq,
                 value: true,
               },
             ],
@@ -200,17 +209,22 @@ describe('<Rules />', () => {
         await renderRulesAndWaitFinishLoading();
         await startEditing();
 
-        // Edit Fail 'id_flagged' rule's not toggle and field
+        // Edit Fail 'id_flagged' rule's op and field
         const failSection = screen.getByRole('group', {
           name: 'Fail',
         });
         const [failRow] = within(failSection).getAllByRole('row');
 
-        const notBadge = within(failRow).getByText('not');
-        await userEvent.click(notBadge);
+        const opSelectTrigger = within(failRow).getByText('is');
+        await userEvent.click(opSelectTrigger);
         await waitFor(() => {
-          expect(notBadge).toHaveAttribute('data-is-selected', 'true');
+          expect(
+            screen.getByRole('option', {
+              name: 'is',
+            }),
+          ).toBeInTheDocument();
         });
+        await selectOption('is not');
         await waitFor(() => {
           expect(
             within(failRow).getByText('Pending change'),
@@ -230,14 +244,14 @@ describe('<Rules />', () => {
           expect(selectList).not.toBeInTheDocument();
         });
 
-        // Edit Pass 'document_is_permit_or_provisional_license' rule by adding a not field
+        // Edit Pass 'document_is_permit_or_provisional_license' rule by adding an is not field
         const passSection = screen.getByRole('group', {
           name: 'Pass + Manual review',
         });
         const passRow = within(passSection).getByRole('row');
 
         const addFieldButton = within(passRow).getByRole('button', {
-          name: 'and',
+          name: 'Add risk signal condition',
         });
         await userEvent.click(addFieldButton);
         await waitFor(() => {
@@ -249,13 +263,18 @@ describe('<Rules />', () => {
           ).toBeInTheDocument();
         });
 
-        const newNotBadge = within(passRow).getAllByText('not')[1];
-        await userEvent.click(newNotBadge);
+        const newOpTrigger = within(passRow).getAllByText('is')[1];
+        await userEvent.click(newOpTrigger);
         await waitFor(() => {
-          expect(newNotBadge).toHaveAttribute('data-is-selected', 'true');
+          expect(
+            screen.getByRole('option', {
+              name: 'is',
+            }),
+          ).toBeInTheDocument();
         });
+        await selectOption('is not');
 
-        const passSelectTrigger = within(passRow).getByText('Select...');
+        const passSelectTrigger = within(passRow).getByText('risk signal');
         await userEvent.click(passSelectTrigger);
         await screen.findByRole('listbox', {
           name: 'Risk signals',
@@ -288,7 +307,7 @@ describe('<Rules />', () => {
         });
         const failRows = within(editedFailSection).getAllByRole('row');
         await waitFor(() => {
-          expect(failRows).toHaveLength(3);
+          expect(failRows).toHaveLength(4);
         });
         await waitFor(() => {
           expect(
@@ -297,7 +316,7 @@ describe('<Rules />', () => {
         });
         await waitFor(() => {
           expect(
-            isPrecededByNotBadge({
+            isNotTriggered({
               row: failRows[0],
               text: 'address_alert_longevity',
             }),
@@ -322,7 +341,7 @@ describe('<Rules />', () => {
         });
         await waitFor(() => {
           expect(
-            isPrecededByNotBadge({
+            isNotTriggered({
               row: newPassRow,
               text: 'name_matches',
             }),
@@ -342,7 +361,7 @@ describe('<Rules />', () => {
             ...manualReviewRuleFixture,
             ruleId: 'newId',
             ruleExpression: [
-              { field: 'id_flagged', op: RuleOp.eq, value: true },
+              { field: 'id_flagged', op: RiskSignalRuleOp.eq, value: true },
             ],
           },
         ]);
@@ -397,7 +416,14 @@ describe('<Rules />', () => {
         });
 
         const stepUpRow = within(stepUpSection).getByRole('row');
-        const stepUpTrigger = within(stepUpRow).getByText('Select...');
+        const stepUpFieldButton = within(stepUpRow).getByRole('button', {
+          name: 'Add risk signal condition',
+        });
+        await userEvent.click(stepUpFieldButton);
+        await waitFor(() => {
+          expect(stepUpFieldButton).toBeDisabled();
+        });
+        const stepUpTrigger = within(stepUpRow).getByText('risk signal');
         await userEvent.click(stepUpTrigger);
         await screen.findByRole('listbox', {
           name: 'Risk signals',
@@ -425,7 +451,14 @@ describe('<Rules />', () => {
         });
 
         const manRevRow = within(manRevSection).getAllByRole('row')[1];
-        const manRevTrigger = within(manRevRow).getByText('Select...');
+        const manRevFieldButton = within(manRevRow).getByRole('button', {
+          name: 'Add risk signal condition',
+        });
+        await userEvent.click(manRevFieldButton);
+        await waitFor(() => {
+          expect(manRevFieldButton).toBeDisabled();
+        });
+        const manRevTrigger = within(manRevRow).getByText('risk signal');
         await userEvent.click(manRevTrigger);
         await screen.findByRole('listbox', {
           name: 'Risk signals',
@@ -481,16 +514,23 @@ describe('<Rules />', () => {
           name: 'Fail',
         });
         const failRows = within(failSection).getAllByRole('row');
-        const notBadge = within(failRows[0]).getByText('not');
-        await userEvent.click(notBadge);
+
+        const opSelectTrigger = within(failRows[0]).getByText('is');
+        await userEvent.click(opSelectTrigger);
         await waitFor(() => {
-          expect(notBadge).toHaveAttribute('data-is-selected', 'true');
+          expect(
+            screen.getByRole('option', {
+              name: 'is',
+            }),
+          ).toBeInTheDocument();
         });
+        await selectOption('is not');
         await waitFor(() => {
           expect(
             within(failRows[0]).getByText('Pending change'),
           ).toBeInTheDocument();
         });
+
         const failSelectTrigger = within(failRows[0]).getByText('id_flagged');
         await userEvent.click(failSelectTrigger);
         await screen.findByRole('listbox', {
@@ -582,16 +622,26 @@ describe('<Rules />', () => {
         await renderRulesAndWaitFinishLoading();
         await startEditing();
 
-        // Edit Fail 'id_flagged' rule's not toggle and field
+        // Edit Fail 'id_flagged' rule's op and field
         const failSection = screen.getByRole('group', {
           name: 'Fail',
         });
         const failRows = within(failSection).getAllByRole('row');
 
-        const notBadge = within(failRows[0]).getByText('not');
-        await userEvent.click(notBadge);
+        const opSelectTrigger = within(failRows[0]).getByText('is');
+        await userEvent.click(opSelectTrigger);
         await waitFor(() => {
-          expect(notBadge).toHaveAttribute('data-is-selected', 'true');
+          expect(
+            screen.getByRole('option', {
+              name: 'is',
+            }),
+          ).toBeInTheDocument();
+        });
+        await selectOption('is not');
+        await waitFor(() => {
+          expect(
+            within(failRows[0]).getByText('Pending change'),
+          ).toBeInTheDocument();
         });
 
         const failSelectTrigger = within(failRows[0]).getByText('id_flagged');
@@ -651,7 +701,14 @@ describe('<Rules />', () => {
         });
 
         const stepUpRow = within(stepUpSection).getByRole('row');
-        const stepUpTrigger = within(stepUpRow).getByText('Select...');
+        const addFieldButton = within(stepUpRow).getByRole('button', {
+          name: 'Add risk signal condition',
+        });
+        await userEvent.click(addFieldButton);
+        await waitFor(() => {
+          expect(addFieldButton).toBeDisabled();
+        });
+        const stepUpTrigger = within(stepUpRow).getByText('risk signal');
         await userEvent.click(stepUpTrigger);
         await screen.findByRole('listbox', {
           name: 'Risk signals',
@@ -682,7 +739,7 @@ describe('<Rules />', () => {
         expect(screen.queryAllByText('Pending change').length).toEqual(0);
         expect(screen.queryAllByText('Pending deletion').length).toEqual(0);
 
-        expect(within(failSection).getAllByRole('row')).toHaveLength(3);
+        expect(within(failSection).getAllByRole('row')).toHaveLength(4);
         expect(within(failRows[0]).getByText('id_flagged')).toBeInTheDocument();
         expect(
           within(failRows[2]).getByText('subject_deceased'),
@@ -701,6 +758,7 @@ describe('<Rules />', () => {
   describe('when it is a KYB playbook', () => {
     it('should show an alert', async () => {
       withRules(kybPlaybookFixture.id);
+      withLists();
       await renderRules({ playbook: kybPlaybookFixture });
 
       await waitFor(() => {

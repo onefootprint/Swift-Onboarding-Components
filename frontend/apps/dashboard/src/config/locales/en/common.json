@@ -1605,8 +1605,8 @@
           },
           "rule-set-results": {
             "onboarding-decision": "Onboarding decision",
-            "triggered": "Rules triggered",
-            "not-triggered": "Rules not triggered",
+            "is-present": "Rules present",
+            "is-not-present": "Rules not present",
             "fail": {
               "title": "Fail"
             },
@@ -2582,15 +2582,51 @@
             "if": "if ",
             "and": " and ",
             "not": "not",
-            "add": "and",
+            "add-risk-signal": "Add risk signal condition",
+            "add-list": "Add list condition",
             "delete": "Delete rule",
             "empty-aria-label": "Empty rule",
             "risk-signals-select": {
               "title": "Risk signals",
               "aria-label": "Open risk signals select",
-              "placeholder": "Select...",
+              "placeholder": "risk signal",
               "delete": "Delete",
               "search": "Search by name or description"
+            },
+            "rule-chip": {
+              "risk-signal": {
+                "field-placeholder": "risk signal",
+                "value-placeholder": "triggered"
+              },
+              "op": {
+                "trigger-aria-label": "Open ops",
+                "aria-label": "Rule ops",
+                "eq": "is",
+                "not_eq": "is not",
+                "is_in": "is",
+                "is_not_in": "is not"
+              },
+              "list": {
+                "field": {
+                  "placeholder": "vault data",
+                  "trigger-aria-label": "Open data identifiers",
+                  "aria-label": "Rule data identifiers",
+                  "search-placeholder": "Search vault data...",
+                  "empty": "There is no vault data corresponding to this kind of list",
+                  "search-empty": "No results",
+                  "validation-note": "Showing options that match the type of list selected: <b>{{type}}</b>"
+                },
+                "in": "in",
+                "value": {
+                  "placeholder": "list",
+                  "trigger-aria-label": "Open lists",
+                  "aria-label": "Rule lists",
+                  "search-placeholder": "Search lists...",
+                  "empty": "There are no lists corresponding to this kind of vault data",
+                  "validation-note": "Showing options that match the type of data selected: <b>{{type}}</b>"
+                },
+                "empty-option": "Clear"
+              }
             },
             "pending-change": "Pending change",
             "pending-deletion": "Pending deletion",

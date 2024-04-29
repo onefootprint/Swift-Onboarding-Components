@@ -27,9 +27,9 @@ const ActionResultSection = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
   });
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedResultGroup, setSelectedResultGroup] =
-    useState<RuleResultGroup>(RuleResultGroup.triggered);
+    useState<RuleResultGroup>(RuleResultGroup.isPresent);
   const actionName = kebabCase(actionSection);
   const stepUpActions = [
     RuleAction.stepUpIdentitySsn,
@@ -44,12 +44,12 @@ const ActionResultSection = ({
   };
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(isCurrentlyOpen => !isCurrentlyOpen);
+    setIsOpen(isCurrentlyOpen => !isCurrentlyOpen);
   };
 
-  const selectResultGroup = (group: RuleResultGroup) => {
+  const onChange = (group: RuleResultGroup) => {
     setSelectedResultGroup(group);
-    setIsDropdownOpen(false);
+    setIsOpen(false);
   };
 
   return (
@@ -63,8 +63,8 @@ const ActionResultSection = ({
         <Text variant="label-3" color={textColors[actionName]}>
           {t(`${actionName}.title` as ParseKeys<'common'>)}
         </Text>
-        <Dropdown.Root open={isDropdownOpen} onOpenChange={toggleDropdown}>
-          <CustomDropdownTrigger aria-label="Rule result group options">
+        <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
+          <CustomDropdownTrigger aria-label="Rule result groups">
             <Stack align="center">
               <Text variant="body-3">
                 {t(kebabCase(selectedResultGroup) as ParseKeys<'common'>)}
@@ -83,7 +83,7 @@ const ActionResultSection = ({
                     key={group}
                     role="option"
                     aria-label={label}
-                    onClick={() => selectResultGroup(group)}
+                    onClick={() => onChange(group)}
                   >
                     <Text variant="body-3">{label}</Text>
                     {group === selectedResultGroup && <IcoCheck16 />}

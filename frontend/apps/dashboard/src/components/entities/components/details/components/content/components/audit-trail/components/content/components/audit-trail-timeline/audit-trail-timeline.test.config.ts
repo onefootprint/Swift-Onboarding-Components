@@ -18,8 +18,8 @@ import {
   LivenessIssuer,
   LivenessSource,
   OnboardingDecisionRuleAction,
+  RiskSignalRuleOp,
   RuleAction,
-  RuleOp,
   TimelineEventKind,
   TriggerKind,
   Vendor,
@@ -270,7 +270,7 @@ export const ruleResultsFixture: RuleResult[] = [
       ruleExpression: [
         {
           field: 'subject_deceased',
-          op: RuleOp.eq,
+          op: RiskSignalRuleOp.eq,
           value: true,
         },
       ],
@@ -285,9 +285,9 @@ export const ruleResultsFixture: RuleResult[] = [
       createdAt: '2021-11-26T16:52:52.535896Z',
       isShadow: false,
       ruleExpression: [
-        { field: 'name_matches', op: RuleOp.notEq, value: true },
-        { field: 'id_not_located', op: RuleOp.eq, value: true },
-        { field: 'watchlist_hit_ofac', op: RuleOp.eq, value: true },
+        { field: 'name_matches', op: RiskSignalRuleOp.notEq, value: true },
+        { field: 'id_not_located', op: RiskSignalRuleOp.eq, value: true },
+        { field: 'watchlist_hit_ofac', op: RiskSignalRuleOp.eq, value: true },
       ],
     },
   },
@@ -300,7 +300,7 @@ export const ruleResultsFixture: RuleResult[] = [
       ruleExpression: [
         {
           field: 'id_flagged',
-          op: RuleOp.eq,
+          op: RiskSignalRuleOp.eq,
           value: true,
         },
       ],
@@ -316,7 +316,7 @@ export const ruleResultsFixture: RuleResult[] = [
       ruleExpression: [
         {
           field: 'watchlist_hit_ofac',
-          op: RuleOp.eq,
+          op: RiskSignalRuleOp.eq,
           value: true,
         },
       ],
@@ -332,7 +332,7 @@ export const ruleResultsFixture: RuleResult[] = [
       ruleExpression: [
         {
           field: 'document_is_permit_or_provisional_license',
-          op: RuleOp.eq,
+          op: RiskSignalRuleOp.eq,
           value: true,
         },
       ],

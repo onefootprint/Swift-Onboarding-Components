@@ -1,6 +1,11 @@
-import { screen, userEvent } from '@onefootprint/test-utils';
+import { mockRequest, screen, userEvent } from '@onefootprint/test-utils';
 import type { Rule } from '@onefootprint/types';
-import { RuleAction, RuleOp } from '@onefootprint/types';
+import {
+  ActorKind,
+  ListKind,
+  RiskSignalRuleOp,
+  RuleAction,
+} from '@onefootprint/types';
 
 export const entityIdFixure = 'fp_id_yCZehsWNeywHnk5JqL20u';
 export const obcIdFixure = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
@@ -13,7 +18,7 @@ export const ruleResultResponseFixture: Record<
   obConfigurationId: obcIdFixure,
   ruleResults: {
     [RuleAction.fail]: {
-      triggered: [
+      isPresent: [
         {
           ruleId: 'rule_MsUPlKcWagUEbpB4SIIzlp',
           action: RuleAction.fail,
@@ -21,7 +26,7 @@ export const ruleResultResponseFixture: Record<
           ruleExpression: [
             {
               field: 'subject_deceased',
-              op: RuleOp.eq,
+              op: RiskSignalRuleOp.eq,
               value: true,
             },
           ],
@@ -33,13 +38,17 @@ export const ruleResultResponseFixture: Record<
           createdAt: '2021-11-26T16:52:52.535896Z',
           isShadow: false,
           ruleExpression: [
-            { field: 'name_matches', op: RuleOp.notEq, value: true },
-            { field: 'id_not_located', op: RuleOp.eq, value: true },
-            { field: 'watchlist_hit_ofac', op: RuleOp.eq, value: true },
+            { field: 'name_matches', op: RiskSignalRuleOp.notEq, value: true },
+            { field: 'id_not_located', op: RiskSignalRuleOp.eq, value: true },
+            {
+              field: 'watchlist_hit_ofac',
+              op: RiskSignalRuleOp.eq,
+              value: true,
+            },
           ],
         },
       ],
-      notTriggered: [
+      isNotPresent: [
         {
           ruleId: 'rule_sufY6KAthSHuaWS9bzo8xt',
           action: RuleAction.fail,
@@ -47,7 +56,7 @@ export const ruleResultResponseFixture: Record<
           ruleExpression: [
             {
               field: 'id_flagged',
-              op: RuleOp.eq,
+              op: RiskSignalRuleOp.eq,
               value: true,
             },
           ],
@@ -56,8 +65,8 @@ export const ruleResultResponseFixture: Record<
       ],
     },
     [RuleAction.manualReview]: {
-      triggered: [],
-      notTriggered: [
+      isPresent: [],
+      isNotPresent: [
         {
           ruleId: 'rule_y0szjzoMrHRhevmzeTvHSV',
           action: RuleAction.manualReview,
@@ -65,7 +74,7 @@ export const ruleResultResponseFixture: Record<
           ruleExpression: [
             {
               field: 'watchlist_hit_ofac',
-              op: RuleOp.eq,
+              op: RiskSignalRuleOp.eq,
               value: true,
             },
           ],
@@ -74,8 +83,8 @@ export const ruleResultResponseFixture: Record<
       ],
     },
     [RuleAction.passWithManualReview]: {
-      triggered: [],
-      notTriggered: [
+      isPresent: [],
+      isNotPresent: [
         {
           ruleId: 'rule_QCzXqumr8OLk71ABBk9yEN',
           action: RuleAction.passWithManualReview,
@@ -83,7 +92,7 @@ export const ruleResultResponseFixture: Record<
           ruleExpression: [
             {
               field: 'document_is_permit_or_provisional_license',
-              op: RuleOp.eq,
+              op: RiskSignalRuleOp.eq,
               value: true,
             },
           ],
@@ -92,8 +101,8 @@ export const ruleResultResponseFixture: Record<
       ],
     },
     [RuleAction.stepUpIdentitySsn]: {
-      triggered: [],
-      notTriggered: [
+      isPresent: [],
+      isNotPresent: [
         {
           ruleId: 'rule_wcvtmwTlJRDG7y8kKt0ME5',
           action: RuleAction.stepUpIdentitySsn,
@@ -101,7 +110,7 @@ export const ruleResultResponseFixture: Record<
           ruleExpression: [
             {
               field: 'dob_does_not_match',
-              op: RuleOp.eq,
+              op: RiskSignalRuleOp.eq,
               value: true,
             },
           ],
@@ -110,19 +119,58 @@ export const ruleResultResponseFixture: Record<
       ],
     },
     [RuleAction.stepUpPoA]: {
-      triggered: [],
-      notTriggered: [],
+      isPresent: [],
+      isNotPresent: [],
     },
     [RuleAction.stepUpIdentity]: {
-      triggered: [],
-      notTriggered: [],
+      isPresent: [],
+      isNotPresent: [],
     },
+  },
+};
+
+export const listsFixture = {
+  data: [
+    {
+      id: '1',
+      actor: {
+        kind: ActorKind.footprint,
+      },
+      alias: 'my_list',
+      created_at: 'date',
+      kind: ListKind.emailAddress,
+      name: 'Email List',
+      entries_count: 0,
+      used_in_playbook: false,
+    },
+    {
+      id: '2',
+      actor: {
+        kind: ActorKind.footprint,
+      },
+      alias: 'my_list2',
+      created_at: 'date',
+      kind: ListKind.ssn9,
+      name: 'SSN List',
+      entries_count: 0,
+      used_in_playbook: false,
+    },
+  ],
+  meta: {
+    count: 10,
   },
 };
 
 export const selectRulesNotTriggered = async () => {
   const newOption = screen.getByRole('option', {
-    name: 'Rules not triggered',
+    name: 'Rules not present',
   });
   await userEvent.click(newOption);
 };
+
+export const withLists = (response = listsFixture) =>
+  mockRequest({
+    method: 'get',
+    path: '/org/lists',
+    response,
+  });

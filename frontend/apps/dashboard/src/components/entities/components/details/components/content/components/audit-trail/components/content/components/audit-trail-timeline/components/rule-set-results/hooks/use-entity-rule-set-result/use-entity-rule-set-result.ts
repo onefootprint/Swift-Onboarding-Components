@@ -53,8 +53,8 @@ const useEntityRuleSetResult = ({
 
         Object.values(RuleAction).forEach(action => {
           formattedRuleResults[action] = {
-            triggered: [],
-            notTriggered: [],
+            isPresent: [],
+            isNotPresent: [],
           };
         });
 
@@ -63,9 +63,9 @@ const useEntityRuleSetResult = ({
         );
         sortedRuleResults.forEach(({ result, rule }) => {
           if (result) {
-            (formattedRuleResults[rule.action].triggered as Rule[]).push(rule);
+            (formattedRuleResults[rule.action].isPresent as Rule[]).push(rule);
           } else {
-            (formattedRuleResults[rule.action].notTriggered as Rule[]).push(
+            (formattedRuleResults[rule.action].isNotPresent as Rule[]).push(
               rule,
             );
           }

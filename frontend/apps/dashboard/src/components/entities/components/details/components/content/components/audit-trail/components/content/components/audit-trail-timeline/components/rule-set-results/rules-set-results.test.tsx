@@ -12,6 +12,7 @@ import RuleSetResults from './rule-set-results';
 import {
   ruleResultResponseFixture,
   selectRulesNotTriggered,
+  withLists,
 } from './rules-set-results.test.config';
 
 const renderRules = ({ data, isLoading, errorMessage }: RuleSetResultsProps) =>
@@ -25,6 +26,10 @@ const renderRules = ({ data, isLoading, errorMessage }: RuleSetResultsProps) =>
 
 describe('<Rules />', () => {
   describe('when data is passed in', () => {
+    beforeEach(() => {
+      withLists();
+    });
+
     it('should show only triggered rules by default', () => {
       renderRules({ data: ruleResultResponseFixture, isLoading: false });
 
@@ -79,17 +84,17 @@ describe('<Rules />', () => {
       const failSection = screen.getByRole('group', {
         name: 'Fail',
       });
-      await userEvent.click(within(failSection).getByText('Rules triggered'));
+      await userEvent.click(within(failSection).getByText('Rules present'));
       await waitFor(() => {
         expect(
-          within(failSection).getByLabelText('Rule result group options'),
+          within(failSection).getByLabelText('Rule result groups'),
         ).toBeInTheDocument();
       });
       selectRulesNotTriggered();
       await waitFor(() => {
         expect(
           screen.queryByRole('option', {
-            name: 'Rules not triggered',
+            name: 'Rules not present',
           }),
         ).not.toBeInTheDocument();
       });
@@ -99,17 +104,17 @@ describe('<Rules />', () => {
       const stepUpSection = screen.getByRole('group', {
         name: 'Step-up',
       });
-      await userEvent.click(within(stepUpSection).getByText('Rules triggered'));
+      await userEvent.click(within(stepUpSection).getByText('Rules present'));
       await waitFor(() => {
         expect(
-          within(stepUpSection).getByLabelText('Rule result group options'),
+          within(stepUpSection).getByLabelText('Rule result groups'),
         ).toBeInTheDocument();
       });
       selectRulesNotTriggered();
       await waitFor(() => {
         expect(
           screen.queryByRole('option', {
-            name: 'Rules not triggered',
+            name: 'Rules not present',
           }),
         ).not.toBeInTheDocument();
       });
@@ -137,17 +142,17 @@ describe('<Rules />', () => {
       const manRevSection = screen.getByRole('group', {
         name: 'Fail + Manual review',
       });
-      await userEvent.click(within(manRevSection).getByText('Rules triggered'));
+      await userEvent.click(within(manRevSection).getByText('Rules present'));
       await waitFor(() => {
         expect(
-          within(manRevSection).getByLabelText('Rule result group options'),
+          within(manRevSection).getByLabelText('Rule result groups'),
         ).toBeInTheDocument();
       });
       selectRulesNotTriggered();
       await waitFor(() => {
         expect(
           screen.queryByRole('option', {
-            name: 'Rules not triggered',
+            name: 'Rules not present',
           }),
         ).not.toBeInTheDocument();
       });
@@ -160,18 +165,18 @@ describe('<Rules />', () => {
         name: 'Pass + Manual review',
       });
       await userEvent.click(
-        within(passManRevSection).getByText('Rules triggered'),
+        within(passManRevSection).getByText('Rules present'),
       );
       await waitFor(() => {
         expect(
-          within(passManRevSection).getByLabelText('Rule result group options'),
+          within(passManRevSection).getByLabelText('Rule result groups'),
         ).toBeInTheDocument();
       });
       selectRulesNotTriggered();
       await waitFor(() => {
         expect(
           screen.queryByRole('option', {
-            name: 'Rules not triggered',
+            name: 'Rules not present',
           }),
         ).not.toBeInTheDocument();
       });

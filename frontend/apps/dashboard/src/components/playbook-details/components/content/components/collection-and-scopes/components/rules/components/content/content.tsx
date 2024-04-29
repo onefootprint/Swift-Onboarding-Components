@@ -2,9 +2,10 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import type {
   EditedRule,
+  ListRuleField,
   OnboardingConfig,
+  RiskSignalRuleField,
   Rule,
-  RuleField,
 } from '@onefootprint/types';
 import { OnboardingConfigKind, RuleAction } from '@onefootprint/types';
 import {
@@ -34,7 +35,7 @@ export type ContentProps = {
 export type AddedRuleWithId = {
   tempId: string;
   ruleAction: RuleAction;
-  ruleExpression: RuleField[];
+  ruleExpression: (RiskSignalRuleField | ListRuleField)[];
 };
 
 const Content = ({
@@ -84,6 +85,11 @@ const Content = ({
 
   const handleDeleteRule = (id: string) => {
     setDeletedRuleIds(currentIds => [...currentIds, id]);
+    if (editedRules.map(({ ruleId }) => ruleId).includes(id)) {
+      setEditedRules(currentRules =>
+        currentRules.filter(({ ruleId }) => ruleId !== id),
+      );
+    }
   };
 
   const handleUndoDeleteRule = (id: string) => {
@@ -126,16 +132,21 @@ const Content = ({
   };
 
   const handleSave = () => {
-    const add = addedRules
-      .filter(rule => rule.ruleExpression.some(ruleField => ruleField.field))
-      .map((rule: AddedRuleWithId) => {
-        const newRule = cloneDeep(rule);
-        delete newRule['tempId' as keyof AddedRuleWithId];
-        return newRule;
-      });
     const fields = {
-      add,
-      delete: deletedRuleIds,
+      add: addedRules
+        .filter(rule => rule.ruleExpression.some(ruleField => ruleField.field))
+        .map((rule: AddedRuleWithId) => {
+          const newRule = cloneDeep(rule);
+          delete newRule['tempId' as keyof AddedRuleWithId];
+          return newRule;
+        }),
+      delete: deletedRuleIds.concat(
+        editedRules // Also delete all rules that were edited to be empty
+          .filter(
+            rule => !rule.ruleExpression.some(ruleField => ruleField.field),
+          )
+          .map(rule => rule.ruleId),
+      ),
       edit: editedRules.filter(rule =>
         rule.ruleExpression.some(ruleField => ruleField.field),
       ),

@@ -1,16 +1,23 @@
 import {
+  IcoBroadcast16,
   IcoClockSmall16,
-  IcoPlusSmall16,
+  IcoDotsHorizontal16,
   IcoReturn16,
+  IcoShuffle16,
   IcoTrash16,
 } from '@onefootprint/icons';
-import type { EditedRule, Rule, RuleField } from '@onefootprint/types';
-import { RuleOp } from '@onefootprint/types';
 import {
-  Badge,
+  type EditedRule,
+  type ListRuleField,
+  ListRuleOp,
+  type RiskSignalRuleField,
+  RiskSignalRuleOp,
+  type Rule,
+} from '@onefootprint/types';
+import {
+  Button,
   createFontStyles,
   IconButton,
-  LinkButton,
   Stack,
   Text,
   useToast,
@@ -20,8 +27,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import OpBadge from './components/op-badge';
-import RiskSignalSelect from './components/risk-signal-select';
+import { ListRuleChip, RiskSignalRuleChip } from './components/rule-chip';
 
 export type RulesActionRowProps = {
   isEditing: boolean;
@@ -45,9 +51,9 @@ const RulesActionRow = ({
   });
   const [isPendingChange, setIsPendingChange] = useState(false);
   const [isPendingDeletion, setIsPendingDeletion] = useState(false);
-  const [expressions, setExpressions] = useState<RuleField[]>(
-    rule.ruleExpression,
-  );
+  const [expressions, setExpressions] = useState<
+    (RiskSignalRuleField | ListRuleField)[]
+  >(rule.ruleExpression);
   const toast = useToast();
 
   useEffect(() => {
@@ -56,36 +62,31 @@ const RulesActionRow = ({
     setIsPendingDeletion(false);
   }, [rule, isEditing]);
 
-  const handleEditRule = (newExpression: RuleField[]) => {
+  const handleEditRule = (
+    newExpression: (RiskSignalRuleField | ListRuleField)[],
+  ) => {
     onEdit?.({
       ruleId: rule.ruleId,
-      ruleExpression: newExpression[newExpression.length - 1].field // Remove empty trailing fields
-        ? newExpression
-        : newExpression.slice(0, -1),
+      ruleExpression:
+        newExpression.length && !newExpression[newExpression.length - 1].field // Remove empty trailing fields
+          ? newExpression.slice(0, -1)
+          : newExpression,
     });
     setIsPendingChange(!isEqual(newExpression, rule.ruleExpression));
   };
 
   // Using index instead of expression in case the rule has the same expression multiple times
-  const handleToggleOp = (index: number) => (newOp: RuleOp) => {
-    setExpressions(currentExpressions => {
-      const newExpressions = [...currentExpressions];
-      newExpressions[index] = { ...newExpressions[index], op: newOp };
-      handleEditRule(newExpressions);
-      return newExpressions;
-    });
-  };
+  const handleChangeExpression =
+    (index: number) => (newExpression: RiskSignalRuleField | ListRuleField) => {
+      setExpressions(currentExpressions => {
+        const newExpressions = [...currentExpressions];
+        newExpressions[index] = newExpression;
+        handleEditRule(newExpressions);
+        return newExpressions;
+      });
+    };
 
-  const handleChangeField = (index: number) => (newField: string) => {
-    setExpressions(currentExpressions => {
-      const newExpressions = [...currentExpressions];
-      newExpressions[index] = { ...newExpressions[index], field: newField };
-      handleEditRule(newExpressions);
-      return newExpressions;
-    });
-  };
-
-  const handleDeleteField = (index: number) => {
+  const handleDeleteExpression = (index: number) => {
     setExpressions(currentExpressions => {
       const newExpressions = currentExpressions
         .slice(0, index)
@@ -95,11 +96,26 @@ const RulesActionRow = ({
     });
   };
 
-  const handleAddField = () => {
+  const handleAddRiskSignalExpression = () => {
     setExpressions(currentExpressions => {
       const newExpressions = [
         ...currentExpressions,
-        { field: '', op: RuleOp.eq, value: true },
+        { field: '', op: RiskSignalRuleOp.eq, value: true },
+      ];
+      handleEditRule(newExpressions);
+      return newExpressions;
+    });
+  };
+
+  const handleAddListExpression = () => {
+    setExpressions(currentExpressions => {
+      const newExpressions = [
+        ...currentExpressions,
+        {
+          field: undefined,
+          op: ListRuleOp.isIn,
+          value: '',
+        },
       ];
       handleEditRule(newExpressions);
       return newExpressions;
@@ -128,35 +144,46 @@ const RulesActionRow = ({
   };
 
   return (
-    <RulesListItem role="row" aria-label={rule.ruleExpression[0].field}>
+    <RulesListItem
+      role="row"
+      aria-label={rule.ruleExpression.map(({ field }) => field).join(', ')}
+    >
       <Stack justify="space-between" align="start">
-        <div>
-          {t('if')}
-          {expressions.map((expression, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <React.Fragment key={`${index} ${expression.field}`}>
-              {index > 0 && <AndContainer>{t('and')}</AndContainer>}
-              <OpBadge
-                defaultValue={expression.op}
-                isEditable={isEditing}
-                onClick={handleToggleOp(index)}
-              />
-              {isEditing ? (
-                <RiskSignalSelect
-                  value={expression.field}
-                  onDelete={
-                    expressions.length > 1
-                      ? () => handleDeleteField(index)
-                      : undefined
-                  }
-                  onChange={handleChangeField(index)}
-                />
-              ) : (
-                <Badge variant="info">{expression.field}</Badge>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+        <Stack align="center" gap={3} flexWrap="wrap">
+          <Text variant="body-4">{t('if')}</Text>
+          {expressions.length ? (
+            expressions.map((expression, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <React.Fragment key={`${index} ${expression.field}`}>
+                {index > 0 && (
+                  <Text variant="body-4" paddingLeft={2} paddingRight={2}>
+                    {t('and')}
+                  </Text>
+                )}
+                {expression.op === ListRuleOp.isIn ||
+                expression.op === ListRuleOp.isNotIn ? (
+                  <ListRuleChip
+                    isEditing={isPendingDeletion ? false : isEditing}
+                    defaultExpression={expression}
+                    onDelete={() => handleDeleteExpression(index)}
+                    onChange={handleChangeExpression(index)}
+                  />
+                ) : (
+                  <RiskSignalRuleChip
+                    isEditing={isPendingDeletion ? false : isEditing}
+                    defaultExpression={expression as RiskSignalRuleField}
+                    onDelete={() => handleDeleteExpression(index)}
+                    onChange={handleChangeExpression(index)}
+                  />
+                )}
+              </React.Fragment>
+            ))
+          ) : (
+            <EmptyExpression>
+              <IcoDotsHorizontal16 color="quaternary" />
+            </EmptyExpression>
+          )}
+        </Stack>
         <Stack align="center">
           {isEditing && (isPendingChange || isPendingDeletion) && (
             <div>
@@ -174,27 +201,52 @@ const RulesActionRow = ({
           )}
         </Stack>
       </Stack>
-      {isEditing && !isPendingDeletion && (
-        <Stack gap={7} direction="column" width="100%">
-          <LinkButton
-            iconComponent={IcoPlusSmall16}
-            iconPosition="left"
-            disabled={expressions.some(expression => expression.field === '')}
-            onClick={handleAddField}
-          >
-            {t('add')}
-          </LinkButton>
-        </Stack>
-      )}
-      {(isPendingChange || isPendingDeletion) && (
-        <Stack align="center" gap={2}>
-          <IcoClockSmall16 color={isPendingChange ? 'tertiary' : 'error'} />
-          <Text
-            variant="caption-1"
-            color={isPendingChange ? 'tertiary' : 'error'}
-          >
-            {isPendingChange ? t('pending-change') : t('pending-deletion')}
-          </Text>
+      {isEditing && (
+        <Stack justify="space-between" align="center">
+          <Stack gap={3} width="100%">
+            <ButtonContainer>
+              <Button
+                variant="secondary"
+                prefixIcon={IcoBroadcast16}
+                disabled={
+                  isPendingDeletion ||
+                  expressions.some(
+                    expression => !expression.field || !expression.value,
+                  )
+                }
+                onClick={handleAddRiskSignalExpression}
+              >
+                {t('add-risk-signal')}
+              </Button>
+            </ButtonContainer>
+            <ButtonContainer>
+              <Button
+                variant="secondary"
+                prefixIcon={IcoShuffle16}
+                disabled={
+                  isPendingDeletion ||
+                  expressions.some(
+                    expression => !expression.field || !expression.value,
+                  )
+                }
+                onClick={handleAddListExpression}
+              >
+                {t('add-list')}
+              </Button>
+            </ButtonContainer>
+          </Stack>
+          {(isPendingChange || isPendingDeletion) && (
+            <Stack align="center" gap={2} width="fit-content">
+              <IcoClockSmall16 color={isPendingChange ? 'tertiary' : 'error'} />
+              <Text
+                variant="caption-1"
+                color={isPendingChange ? 'tertiary' : 'error'}
+                width="max-content"
+              >
+                {isPendingChange ? t('pending-change') : t('pending-deletion')}
+              </Text>
+            </Stack>
+          )}
         </Stack>
       )}
     </RulesListItem>
@@ -204,9 +256,8 @@ const RulesActionRow = ({
 const RulesListItem = styled(Stack)`
   ${({ theme }) => css`
     flex-direction: column;
-    gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[3]} ${theme.spacing[4]} ${theme.spacing[4]}
-      ${theme.spacing[4]};
+    gap: ${theme.spacing[6]};
+    padding: ${theme.spacing[4]};
     ${createFontStyles('body-4')}
     line-height: 240%;
 
@@ -216,9 +267,22 @@ const RulesListItem = styled(Stack)`
   `}
 `;
 
-const AndContainer = styled.span`
+const EmptyExpression = styled(Stack)`
   ${({ theme }) => css`
-    padding: 0 ${theme.spacing[2]};
+    height: 24px;
+    width: 55px;
+    justify-content: center;
+    align-items: center;
+    background-color: ${theme.backgroundColor.secondary};
+    border-radius: ${theme.borderRadius.full};
+  `}
+`;
+
+const ButtonContainer = styled.span`
+  ${({ theme }) => css`
+    button[disabled] svg path {
+      stroke: ${theme.color.quaternary};
+    }
   `}
 `;
 

@@ -195,15 +195,17 @@ export type { Rolebinding } from './rolebinding';
 export type {
   AddedRule,
   EditedRule,
+  ListRuleField,
+  RiskSignalRuleField,
   Rule,
-  RuleField,
   RuleResult,
 } from './rule';
 export {
+  ListRuleOp,
   OnboardingDecisionRuleAction,
+  RiskSignalRuleOp,
   RuleAction,
   RuleActionSection,
-  RuleOp,
   RuleResultGroup,
 } from './rule';
 export { IdDocOutcome, OverallOutcome } from './sandbox-outcomes-type';

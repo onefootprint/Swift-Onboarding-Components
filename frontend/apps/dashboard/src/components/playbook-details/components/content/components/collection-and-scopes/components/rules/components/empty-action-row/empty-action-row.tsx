@@ -1,12 +1,23 @@
-import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
-import type { RuleAction, RuleField } from '@onefootprint/types';
-import { RuleOp } from '@onefootprint/types';
-import { IconButton, LinkButton, Stack } from '@onefootprint/ui';
+import {
+  IcoBroadcast16,
+  IcoDotsHorizontal16,
+  IcoShuffle16,
+  IcoTrash16,
+} from '@onefootprint/icons';
+import type {
+  ListRuleField,
+  RiskSignalRuleField,
+  RuleAction,
+} from '@onefootprint/types';
+import { ListRuleOp, RiskSignalRuleOp } from '@onefootprint/types';
+import { Button, IconButton, Stack, Text } from '@onefootprint/ui';
 import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import OpBadge from 'src/components/rules-action-row/components/op-badge';
-import RiskSignalSelect from 'src/components/rules-action-row/components/risk-signal-select';
+import {
+  ListRuleChip,
+  RiskSignalRuleChip,
+} from 'src/components/rules-action-row/components/rule-chip';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -28,50 +39,40 @@ const EmptyActionRow = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row',
   });
-  const emptyExpressions = [
-    {
-      field: '',
-      op: RuleOp.eq,
-      value: true,
-    } as RuleField,
-  ];
-  const [expressions, setExpressions] = useState(emptyExpressions);
+  const [expressions, setExpressions] = useState<
+    (RiskSignalRuleField | ListRuleField)[]
+  >([]);
 
   const ref = useRef<HTMLDivElement>(null);
   useEffectOnce(() => {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
-  const handleChange = (newExpression: RuleField[]) => {
+  const handleChange = (
+    newExpression: (RiskSignalRuleField | ListRuleField)[],
+  ) => {
     onEdit({
       ruleAction: action,
-      ruleExpression: newExpression[newExpression.length - 1].field // Remove empty trailing fields
-        ? newExpression
-        : newExpression.slice(0, -1),
+      ruleExpression:
+        newExpression.length && !newExpression[newExpression.length - 1].field // Remove empty trailing fields
+          ? newExpression.slice(0, -1)
+          : newExpression,
       tempId,
     });
   };
 
   // Using index instead of expression in case the rule has the same expression multiple times
-  const handleToggleOp = (index: number) => (newOp: RuleOp) => {
-    setExpressions(currentExpressions => {
-      const newExpressions = [...currentExpressions];
-      newExpressions[index] = { ...newExpressions[index], op: newOp };
-      handleChange(newExpressions);
-      return newExpressions;
-    });
-  };
+  const handleChangeExpression =
+    (index: number) => (newExpression: RiskSignalRuleField | ListRuleField) => {
+      setExpressions(currentExpressions => {
+        const newExpressions = [...currentExpressions];
+        newExpressions[index] = newExpression;
+        handleChange(newExpressions);
+        return newExpressions;
+      });
+    };
 
-  const handleChangeField = (index: number) => (newField: string) => {
-    setExpressions(currentExpressions => {
-      const newExpressions = [...currentExpressions];
-      newExpressions[index] = { ...newExpressions[index], field: newField };
-      handleChange(newExpressions);
-      return newExpressions;
-    });
-  };
-
-  const handleDeleteField = (index: number) => {
+  const handleDeleteExpression = (index: number) => {
     setExpressions(currentExpressions => {
       const newExpressions = currentExpressions
         .slice(0, index)
@@ -81,11 +82,26 @@ const EmptyActionRow = ({
     });
   };
 
-  const handleAddField = () => {
+  const handleAddRiskSignalExpression = () => {
     setExpressions(currentExpressions => {
       const newExpressions = [
         ...currentExpressions,
-        { field: '', op: RuleOp.eq, value: true },
+        { field: '', op: RiskSignalRuleOp.eq, value: true },
+      ];
+      handleChange(newExpressions);
+      return newExpressions;
+    });
+  };
+
+  const handleAddListExpression = () => {
+    setExpressions(currentExpressions => {
+      const newExpressions = [
+        ...currentExpressions,
+        {
+          field: undefined,
+          op: ListRuleOp.isIn,
+          value: '',
+        },
       ];
       handleChange(newExpressions);
       return newExpressions;
@@ -95,45 +111,68 @@ const EmptyActionRow = ({
   return (
     <RulesListEmptyItem ref={ref} role="row" aria-label={t('empty-aria-label')}>
       <Stack justify="space-between" align="start">
-        <div>
-          {t('if')}
-          {expressions.map(({ field, op }, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <React.Fragment key={`${index} ${field}`}>
-              {index > 0 && t('and')}
-              <OpBadge
-                defaultValue={op}
-                isEditable
-                onClick={handleToggleOp(index)}
-              />
-              <RiskSignalSelect
-                value={field}
-                onDelete={
-                  expressions.length > 1
-                    ? () => handleDeleteField(index)
-                    : undefined
-                }
-                onChange={handleChangeField(index)}
-              />
-            </React.Fragment>
-          ))}
-        </div>
+        <Stack align="center" rowGap={2} columnGap={3} flexWrap="wrap">
+          <Text variant="body-4">{t('if')}</Text>
+          {expressions.length ? (
+            expressions.map((expression, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <React.Fragment key={`${index} ${expression.field}`}>
+                {index > 0 && (
+                  <Text variant="body-4" paddingLeft={2} paddingRight={2}>
+                    {t('and')}
+                  </Text>
+                )}
+                {expression.op === ListRuleOp.isIn ||
+                expression.op === ListRuleOp.isNotIn ? (
+                  <ListRuleChip
+                    isEditing
+                    defaultExpression={expression}
+                    onDelete={() => handleDeleteExpression(index)}
+                    onChange={handleChangeExpression(index)}
+                  />
+                ) : (
+                  <RiskSignalRuleChip
+                    isEditing
+                    defaultExpression={expression as RiskSignalRuleField}
+                    onDelete={() => handleDeleteExpression(index)}
+                    onChange={handleChangeExpression(index)}
+                  />
+                )}
+              </React.Fragment>
+            ))
+          ) : (
+            <EmptyExpression>
+              <IcoDotsHorizontal16 color="quaternary" />
+            </EmptyExpression>
+          )}
+        </Stack>
         <div>
           <IconButton aria-label="delete" onClick={() => onDelete(tempId)}>
             <IcoTrash16 color="error" />
           </IconButton>
         </div>
       </Stack>
-      <Stack direction="column" gap={7}>
-        <LinkButton
-          variant="label-4"
-          iconComponent={IcoPlusSmall16}
-          iconPosition="left"
-          disabled={expressions.some(expression => expression.field === '')}
-          onClick={handleAddField}
+      <Stack gap={3} width="100%">
+        <Button
+          variant="secondary"
+          prefixIcon={IcoBroadcast16}
+          disabled={expressions.some(
+            expression => !expression.field || !expression.value,
+          )}
+          onClick={handleAddRiskSignalExpression}
         >
-          {t('add')}
-        </LinkButton>
+          {t('add-risk-signal')}
+        </Button>
+        <Button
+          variant="secondary"
+          prefixIcon={IcoShuffle16}
+          disabled={expressions.some(
+            expression => !expression.field || !expression.value,
+          )}
+          onClick={handleAddListExpression}
+        >
+          {t('add-list')}
+        </Button>
       </Stack>
     </RulesListEmptyItem>
   );
@@ -142,7 +181,7 @@ const EmptyActionRow = ({
 const RulesListEmptyItem = styled(Stack)`
   ${({ theme }) => css`
     flex-direction: column;
-    gap: ${theme.spacing[4]};
+    gap: ${theme.spacing[6]};
     padding: ${theme.spacing[3]} ${theme.spacing[4]} ${theme.spacing[4]}
       ${theme.spacing[4]};
     ${createFontStyles('body-4')}
@@ -151,6 +190,17 @@ const RulesListEmptyItem = styled(Stack)`
     &:not(:last-child) {
       border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     }
+  `}
+`;
+
+const EmptyExpression = styled(Stack)`
+  ${({ theme }) => css`
+    height: 24px;
+    width: 55px;
+    justify-content: center;
+    align-items: center;
+    background-color: ${theme.backgroundColor.secondary};
+    border-radius: ${theme.borderRadius.full};
   `}
 `;
 

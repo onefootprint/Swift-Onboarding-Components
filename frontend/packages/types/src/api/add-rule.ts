@@ -1,9 +1,9 @@
-import type { Rule, RuleAction, RuleField } from '../data';
+import type { RiskSignalRuleField, Rule, RuleAction } from '../data';
 
 type AddRuleFields = {
   action: RuleAction;
   name?: string;
-  rule_expression?: RuleField[];
+  rule_expression?: RiskSignalRuleField[];
 };
 
 export type AddRuleRequest = {

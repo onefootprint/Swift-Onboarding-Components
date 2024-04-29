@@ -1,7 +1,4 @@
-export enum RuleOp {
-  eq = 'eq',
-  notEq = 'not_eq',
-}
+import type { DataIdentifier } from './di';
 
 export enum OnboardingDecisionRuleAction {
   fail = 'fail',
@@ -29,10 +26,26 @@ export enum RuleActionSection {
   passWithManualReview = 'pass_with_manual_review',
 }
 
-export type RuleField = {
+export enum RiskSignalRuleOp {
+  eq = 'eq',
+  notEq = 'not_eq',
+}
+
+export enum ListRuleOp {
+  isIn = 'is_in',
+  isNotIn = 'is_not_in',
+}
+
+export type RiskSignalRuleField = {
   field: string;
-  op: RuleOp;
+  op: RiskSignalRuleOp;
   value: boolean;
+};
+
+export type ListRuleField = {
+  field: DataIdentifier | undefined;
+  op: ListRuleOp;
+  value: string;
 };
 
 export type Rule = {
@@ -40,18 +53,18 @@ export type Rule = {
   createdAt: string;
   isShadow: boolean;
   name?: string;
-  ruleExpression: RuleField[];
+  ruleExpression: (RiskSignalRuleField | ListRuleField)[];
   ruleId: string;
 };
 
 export type AddedRule = {
   ruleAction: RuleAction;
-  ruleExpression: RuleField[];
+  ruleExpression: (RiskSignalRuleField | ListRuleField)[];
 };
 
 export type EditedRule = {
   ruleId: string;
-  ruleExpression: RuleField[];
+  ruleExpression: (RiskSignalRuleField | ListRuleField)[];
 };
 
 export type RuleResult = {
@@ -60,6 +73,6 @@ export type RuleResult = {
 };
 
 export enum RuleResultGroup {
-  triggered = 'triggered',
-  notTriggered = 'notTriggered',
+  isPresent = 'isPresent',
+  isNotPresent = 'isNotPresent',
 }

@@ -4,12 +4,9 @@ import {
   ComboboxList,
   ComboboxProvider,
 } from '@ariakit/react';
-import { IcoChevronDown16, IcoTrash16 } from '@onefootprint/icons';
 import {
-  Box,
   createFontStyles,
   createOverlayBackground,
-  LinkButton,
   Text,
 } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
@@ -25,21 +22,17 @@ import {
 } from 'react-virtualized';
 import styled, { css } from 'styled-components';
 
-import useRiskSignals from '../../../../hooks/use-risk-signals';
+import useRiskSignals from '../../../../../../hooks/use-risk-signals';
+import CustomTrigger from '../custom-trigger';
 
 const ITEM_HEIGHT = 64;
 
 type RiskSignalSelectProps = {
   value?: string;
-  onDelete?: () => void;
   onChange: (value: string) => void;
 };
 
-const RiskSignalSelect = ({
-  value,
-  onDelete,
-  onChange,
-}: RiskSignalSelectProps) => {
+const RiskSignalSelect = ({ value, onChange }: RiskSignalSelectProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row.risk-signals-select',
   });
@@ -100,7 +93,7 @@ const RiskSignalSelect = ({
           style={style}
         >
           <ComboboxItem>
-            <Text variant="body-4" truncate>
+            <Text variant="caption-1" truncate>
               {option.label}
             </Text>
             <Text variant="caption-4" color="tertiary">
@@ -113,92 +106,63 @@ const RiskSignalSelect = ({
   };
 
   return (
-    <Box position="relative" display="inline-block">
-      <SelectPrimitive.Root
-        defaultValue={value}
-        value={value}
-        onValueChange={onChange}
+    <SelectPrimitive.Root
+      defaultValue={value}
+      value={value}
+      onValueChange={onChange}
+      open={open}
+      onOpenChange={setOpen}
+    >
+      <ComboboxProvider
         open={open}
-        onOpenChange={setOpen}
+        setOpen={setOpen}
+        resetValueOnHide
+        includesBaseElement={false}
+        setValue={nextValue => {
+          setSearchValue(nextValue);
+        }}
       >
-        <ComboboxProvider
-          open={open}
-          setOpen={setOpen}
-          resetValueOnHide
-          includesBaseElement={false}
-          setValue={nextValue => {
-            setSearchValue(nextValue);
-          }}
+        <CustomTrigger
+          isOpen={open}
+          ariaLabel={t('aria-label')}
+          color={selectedSignal ? 'primary' : 'tertiary'}
         >
-          <Trigger role="button" aria-label={t('aria-label')} type="button">
-            <>
-              {selectedSignal || t('placeholder')}
-              <IcoChevronDown16 color="info" />
-            </>
-          </Trigger>
-          <Content position="popper" sideOffset={4} align="end">
-            <Header>
-              <HeaderControls>
-                <Text variant="label-4">{t('title')}</Text>
-                <LinkButton
-                  destructive
-                  iconComponent={IcoTrash16}
-                  iconPosition="left"
-                  disabled={!onDelete}
-                  onClick={onDelete}
-                >
-                  {t('delete')}
-                </LinkButton>
-              </HeaderControls>
-              <Search
-                autoSelect
-                placeholder={t('search')}
-                onBlurCapture={event => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                }}
-              />
-            </Header>
-            {matches.length > 0 ? (
-              <ComboboxList role="listbox" aria-label={t('title')}>
-                <AutoSizer>
-                  {({ width }) => (
-                    <List
-                      key={listKey}
-                      width={width}
-                      height={350}
-                      deferredMeasurementCache={cache.current}
-                      rowCount={matches.length}
-                      rowHeight={cache.current.rowHeight}
-                      rowRenderer={renderRow}
-                      overscanRowCount={10}
-                    />
-                  )}
-                </AutoSizer>
-              </ComboboxList>
-            ) : null}
-          </Content>
-        </ComboboxProvider>
-      </SelectPrimitive.Root>
-    </Box>
+          {selectedSignal || t('placeholder')}
+        </CustomTrigger>
+        <Content position="popper" sideOffset={4} align="end">
+          <Header>
+            <Search
+              autoSelect
+              placeholder={t('search')}
+              onBlurCapture={event => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
+            />
+          </Header>
+          {matches.length > 0 ? (
+            <ComboboxList role="listbox" aria-label={t('title')}>
+              <AutoSizer>
+                {({ width }) => (
+                  <List
+                    key={listKey}
+                    width={width}
+                    height={350}
+                    deferredMeasurementCache={cache.current}
+                    rowCount={matches.length}
+                    rowHeight={cache.current.rowHeight}
+                    rowRenderer={renderRow}
+                    overscanRowCount={10}
+                  />
+                )}
+              </AutoSizer>
+            </ComboboxList>
+          ) : null}
+        </Content>
+      </ComboboxProvider>
+    </SelectPrimitive.Root>
   );
 };
-
-const Trigger = styled(SelectPrimitive.Trigger)`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-1')};
-    align-items: center;
-    background-color: ${theme.backgroundColor.info};
-    border-radius: ${theme.borderRadius.xl};
-    border: 0;
-    gap: ${theme.spacing[2]};
-    color: ${theme.color.info};
-    cursor: pointer;
-    display: inline-flex;
-    justify-content: center;
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  `}
-`;
 
 const Header = styled.header`
   position: sticky;
@@ -208,21 +172,9 @@ const Header = styled.header`
   z-index: 1;
 `;
 
-const HeaderControls = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    background-color: ${theme.backgroundColor.secondary};
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    display: flex;
-    height: 40px;
-    justify-content: space-between;
-    padding: 0 ${theme.spacing[5]};
-  `}
-`;
-
 const Search = styled(Combobox)`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('caption-1')};
     border: none;
     border-bottom: 1px solid ${theme.borderColor.tertiary};
     color: ${theme.color.primary};

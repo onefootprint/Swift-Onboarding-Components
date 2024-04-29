@@ -1,9 +1,9 @@
-import type { Rule, RuleField } from '../data';
+import type { RiskSignalRuleField, Rule } from '../data';
 
 type EditRuleFields = {
   is_shadow?: boolean;
   name?: string;
-  rule_expression?: RuleField[];
+  rule_expression?: RiskSignalRuleField[];
 };
 
 export type EditRuleRequest = {
