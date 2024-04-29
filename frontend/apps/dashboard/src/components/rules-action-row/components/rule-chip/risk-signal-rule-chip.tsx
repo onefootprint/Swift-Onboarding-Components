@@ -14,8 +14,8 @@ import OpSelect from './components/op-select';
 import RiskSignalSelect from './components/risk-signal-select';
 
 type RiskSignalRuleChipProps = {
-  isEditing: boolean;
   defaultExpression: RiskSignalRuleField;
+  isEditing?: boolean;
   onDelete?: () => void;
   onChange?: (expression: RiskSignalRuleField | ListRuleField) => void;
 };

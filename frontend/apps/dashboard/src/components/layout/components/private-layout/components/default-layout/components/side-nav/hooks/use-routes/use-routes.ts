@@ -7,6 +7,7 @@ import {
   IcoKey16,
   IcoLayer0116,
   IcoSettings16,
+  IcoShuffle16,
   IcoStore16,
   IcoUsers16,
   IcoWebhook16,
@@ -60,11 +61,11 @@ const useRoutes = (): Route[] => {
           Icon: IcoBook16,
           text: t('playbooks'),
         },
-        // {
-        //   href: '/lists',
-        //   Icon: IcoBook16,
-        //   text: t('lists'),
-        // },
+        {
+          href: '/lists',
+          Icon: IcoShuffle16,
+          text: t('lists'),
+        },
         {
           href: '/api-keys',
           Icon: IcoKey16,

@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import Rule from './components/rule';
+
 type ContentProps = {
   list: ListDetails;
 };
@@ -16,8 +18,7 @@ const Content = ({ list }: ContentProps) => {
 
   const handleClickPlaybook = (playbookId: string) => {
     router.push({
-      pathname: '/playbooks',
-      query: { ob_config_id: playbookId },
+      pathname: `/playbooks/${playbookId}`,
     });
   };
 
@@ -41,30 +42,9 @@ const Content = ({ list }: ContentProps) => {
             <Text variant="label-4" color="tertiary" minWidth="44px">
               {t('in-rule')}
             </Text>
-            <Stack gap={3} direction="row" flexWrap="wrap" align="center">
-              <Text variant="body-4" color="primary">
-                {t('if')}
-              </Text>
+            <Stack gap={3} direction="column">
               {playbook.rules.map(rule => (
-                <Stack gap={3} direction="row" key={rule.ruleId}>
-                  {rule.ruleExpression.map((expression, index) => (
-                    <>
-                      {/* TODO: replace with Claudio's new component */}
-                      <Text key={JSON.stringify(expression)} variant="body-3">
-                        {expression.field}
-                      </Text>
-                      <Text key={JSON.stringify(expression)} variant="body-3">
-                        {expression.op}
-                      </Text>
-                      <Text key={JSON.stringify(expression)} variant="body-3">
-                        {expression.value}
-                      </Text>
-                      {index < rule.ruleExpression.length - 1 && (
-                        <Text variant="body-3">{t('and')}</Text>
-                      )}
-                    </>
-                  ))}
-                </Stack>
+                <Rule key={rule.ruleId} rule={rule} />
               ))}
             </Stack>
           </Stack>

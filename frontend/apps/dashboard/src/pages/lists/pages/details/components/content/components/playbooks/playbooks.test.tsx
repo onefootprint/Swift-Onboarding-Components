@@ -12,6 +12,7 @@ import {
   withListDetails,
   withListDetailsNoPlaybooks,
   withListError,
+  withLists,
 } from './playbooks.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -22,6 +23,7 @@ describe('<Playbooks />', () => {
 
   beforeEach(() => {
     asAdminUser();
+    withLists();
     useRouterSpy({
       pathname: `/lists/${listId}`,
       query: { id: listId },
@@ -72,8 +74,11 @@ describe('<Playbooks />', () => {
         expect(screen.getByText('Playbook 2')).toBeInTheDocument();
       });
 
-      expect(screen.getByText('test@onefootprint.com')).toBeInTheDocument();
-      expect(screen.getByText('test2@onefootprint.com')).toBeInTheDocument();
+      expect(screen.getByText('some_rule')).toBeInTheDocument();
+      expect(screen.getByText('triggered')).toBeInTheDocument();
+      expect(screen.getByText('id.email')).toBeInTheDocument();
+      expect(screen.getByText('in')).toBeInTheDocument();
+      expect(screen.getByText('list_1')).toBeInTheDocument();
     });
   });
 });

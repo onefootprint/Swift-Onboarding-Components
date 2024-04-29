@@ -21,8 +21,8 @@ import dataIdentifiersForListKind from './utils/data-identifiers-for-list-kind';
 import listKindsForDataIdentifier from './utils/list-kinds-for-data-identifier';
 
 type ListRuleChipProps = {
-  isEditing: boolean;
   defaultExpression: ListRuleField;
+  isEditing?: boolean;
   onDelete?: () => void;
   onChange?: (expression: RiskSignalRuleField | ListRuleField) => void;
 };

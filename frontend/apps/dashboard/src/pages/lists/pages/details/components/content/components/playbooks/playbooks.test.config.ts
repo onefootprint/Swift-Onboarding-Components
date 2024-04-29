@@ -25,15 +25,20 @@ const listDetailsFixture = {
   playbooks: [
     {
       id: 'playbook_1',
+      key: 'playbook_1',
       name: 'Playbook 1',
       rules: [
         {
+          action: 'fail',
+          createdAt: '01/01/2001',
+          isShadow: false,
           ruleId: 'rule_1',
+          name: 'rule_1',
           ruleExpression: [
             {
-              field: 'email',
-              op: 'is',
-              value: 'test@onefootprint.com',
+              field: 'some_rule',
+              op: 'eq',
+              value: true,
             },
           ],
         },
@@ -41,15 +46,20 @@ const listDetailsFixture = {
     },
     {
       id: 'playbook_2',
+      key: 'playbook_2',
       name: 'Playbook 2',
       rules: [
         {
+          action: 'fail',
+          createdAt: '01/01/2001',
+          isShadow: false,
           ruleId: 'rule_2',
+          name: 'rule_2',
           ruleExpression: [
             {
-              field: 'email',
-              op: 'is',
-              value: 'test2@onefootprint.com',
+              field: 'id.email',
+              op: 'is_in',
+              value: 'list_1',
             },
           ],
         },
@@ -82,4 +92,43 @@ export const withListError = (listId: string) =>
         message: 'Something went wrong',
       },
     },
+  });
+
+const listsFixture = {
+  data: [
+    {
+      id: '1',
+      actor: {
+        kind: ActorKind.footprint,
+      },
+      alias: 'my_list',
+      created_at: 'date',
+      kind: ListKind.emailAddress,
+      name: 'Email List',
+      entries_count: 0,
+      used_in_playbook: false,
+    },
+    {
+      id: '2',
+      actor: {
+        kind: ActorKind.footprint,
+      },
+      alias: 'my_list2',
+      created_at: 'date',
+      kind: ListKind.ssn9,
+      name: 'SSN List',
+      entries_count: 0,
+      used_in_playbook: false,
+    },
+  ],
+  meta: {
+    count: 10,
+  },
+};
+
+export const withLists = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/lists',
+    response: listsFixture,
   });

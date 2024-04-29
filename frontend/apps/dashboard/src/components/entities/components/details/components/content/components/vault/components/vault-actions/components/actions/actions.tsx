@@ -45,9 +45,10 @@ const Actions = ({ entity }: WithEntityProps) => {
     setOpenDialog(ActionDialog.auth);
   };
 
-  // const handleOpenAddToListDialog = () => {
-  //   setOpenDialog(ActionDialog.addToList);
-  // };
+  const handleOpenAddToListDialog = () => {
+    setOpenDialog(ActionDialog.addToList);
+  };
+
   const handleOpenSummarizeDialog = () => {
     setOpenDialog(ActionDialog.summarize);
   };
@@ -83,15 +84,14 @@ const Actions = ({ entity }: WithEntityProps) => {
               {t('update-auth-methods.label')}
             </Dropdown.Item>
           </PermissionGate>
-          {/* TODO: uncomment when releasing lists */}
-          {/* <PermissionGate
+          <PermissionGate
             scopeKind={RoleScopeKind.writeLists}
             fallbackText={t('add-to-list.not-allowed')}
           >
             <Dropdown.Item onSelect={handleOpenAddToListDialog}>
               {t('add-to-list.label')}
             </Dropdown.Item>
-          </PermissionGate> */}
+          </PermissionGate>
           {showAiFeatures && (
             <Dropdown.Item onSelect={handleOpenSummarizeDialog}>
               {t('summarize.label')}
