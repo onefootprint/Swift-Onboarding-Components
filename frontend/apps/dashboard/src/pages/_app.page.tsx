@@ -1,4 +1,5 @@
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -36,6 +37,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       <ObserveCollectorProvider appName="dashboard">
         <CustomDesignSystemProvider>
           <ReactQueryProvider>
+            <ReactQueryDevtools />
             <GlobalStyle $hasMinWidth={!isResponsive} />
             <ErrorBoundary>
               <Layout name={pageProps.layout}>

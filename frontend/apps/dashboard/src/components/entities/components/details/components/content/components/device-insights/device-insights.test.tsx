@@ -7,7 +7,8 @@ import {
 import type { Entity } from '@onefootprint/types';
 import { EntityKind } from '@onefootprint/types';
 import React from 'react';
-import Provider from 'src/components/entities/components/details/hooks/use-entity-context';
+
+import Provider from '@/entity/hooks/use-entity-context';
 
 import { entityFixture } from '../../../../details.test.config';
 import DeviceInsights from './device-insights';

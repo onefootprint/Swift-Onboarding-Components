@@ -1,3 +1,4 @@
+import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
@@ -9,13 +10,19 @@ import Scores from './components/scores';
 import Uploads from './components/uploads';
 
 type ContentProps = {
-  doc: Record<string, string>;
+  doc: Record<DataIdentifier, VaultValue>;
+  meta: {
+    notFound: boolean;
+    isEncrypted: boolean;
+  };
 };
 
-const Content = ({ doc }: ContentProps) => {
+const Content = ({ doc, meta }: ContentProps) => {
   const { t } = useTranslation('entity-documents');
   // eslint-disable-next-line no-console
-  console.log(doc);
+  console.log('>>> doc', doc);
+  // eslint-disable-next-line no-console
+  console.log('>>> meta', meta);
 
   return (
     <>
