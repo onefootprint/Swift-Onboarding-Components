@@ -264,15 +264,16 @@ const Camera = ({
           mediaStream ? 'defined' : 'undefined'
         }, mediaStream active: ${mediaStream?.active}, onCanPlayTriggered: ${onCanPlayTriggered}, isVideoPlaying: ${isVideoPlaying}`,
       );
-      if (!onCanPlayTriggered) {
-        return;
-      }
       if (isVideoPlaying) {
         logWarn('Video already playing: useInterval');
         return;
       }
       if (!videoRef.current) {
         logError('Video ref not initialized: useInterval');
+        return;
+      }
+      if (videoRef.current.readyState < 2) {
+        logWarn('Video not ready to play: useInterval');
         return;
       }
       videoRef.current
