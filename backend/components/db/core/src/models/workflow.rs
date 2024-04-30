@@ -390,7 +390,7 @@ impl Workflow {
 
     /// Gets the latest workflow that the user completed that is "reonboard-able"
     #[tracing::instrument("Workflow::latest", skip_all)]
-    pub fn latest(
+    pub fn latest_reonboardable(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         only_completed: bool,

@@ -215,24 +215,55 @@ def test_retrigger_onboard(sandbox_tenant, must_collect_data):
 
 
 @pytest.mark.parametrize(
-    "document_config",
+    "document_configs,expected_docs,expected_mr",
     [
-        dict(kind="identity", data=dict(collect_selfie=False)),
-        dict(kind="proof_of_ssn", data=dict()),
-        dict(kind="proof_of_address", data=dict()),
-        dict(kind="custom", data=dict(name="My special doc", identifier="document.custom.my_special_doc")),
+        (
+            [dict(kind="identity", data=dict(collect_selfie=False))],
+            {"drivers_license": "reviewed_by_machine"},
+            False,
+        ),
+        (
+            [
+                dict(kind="identity", data=dict(collect_selfie=False)),
+                dict(kind="proof_of_ssn", data=dict()),
+            ],
+            {
+                "drivers_license": "reviewed_by_machine",
+                "ssn_card": "pending_human_review",
+            },
+            True,
+        ),
+        (
+            [dict(kind="proof_of_address", data=dict())],
+            {"proof_of_address": "pending_human_review"},
+            True,
+        ),
+        (
+            [
+                dict(
+                    kind="custom",
+                    data=dict(
+                        name="My special doc",
+                        identifier="document.custom.my_special_doc",
+                    ),
+                )
+            ],
+            {"custom": "pending_human_review"},
+            True,
+        ),
     ],
 )
-def test_collect_document(document_config, sandbox_tenant):
+def test_collect_document(document_configs, sandbox_tenant, expected_docs, expected_mr):
     bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
 
+    status = bifrost.validate_response["user"]["status"]
     fp_id = sandbox_user.fp_id
 
     # Trigger recollect document
     trigger = dict(
         kind="document",
-        data=dict(configs=[document_config]),
+        data=dict(configs=document_configs),
     )
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
 
@@ -240,16 +271,33 @@ def test_collect_document(document_config, sandbox_tenant):
     def pre_run(bifrost):
         # Check that requirements are what we expect
         requirements = bifrost.get_status()["all_requirements"]
-        assert requirements[0]["kind"] == "collect_document"
-        assert requirements[0]["config"]["kind"] == document_config["kind"]
-        assert not requirements[0]["is_met"]
+        assert any(i["kind"] == "collect_document" for i in requirements)
+        assert set(
+            i["config"]["kind"] for i in requirements if i["kind"] == "collect_document"
+        ) == set(i["kind"] for i in document_configs)
+        assert all(
+            not i["is_met"] for i in requirements if i["kind"] == "collect_document"
+        )
 
     complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)
 
-    users_docs = get(f"users/{fp_id}/documents", None, sandbox_tenant.sk.key)
-    # currently we request iddoc + proof of ssn doc for proof_of_ssn triggers
-    expected_len = 2 if trigger["kind"] == "proof_of_ssn" else 1
-    assert len(users_docs) == expected_len
+    # Test tenant-facing API
+    body = get(f"users/{fp_id}/documents", None, sandbox_tenant.sk.key)
+    assert set(i["document_type"] for i in body) == set(expected_docs)
+
+    # And dashboard-facing API
+    body = get(f"entities/{fp_id}/documents", None, *sandbox_tenant.db_auths)
+    assert set(i["kind"] for i in body) == set(expected_docs)
+    for kind, review_status in expected_docs.items():
+        assert (
+            next(i for i in body if i["kind"] == kind)["review_status"] == review_status
+        )
+
+    body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == status, "Status shouldn't have changed from doc"
+    assert body["requires_manual_review"] == expected_mr
+    if expected_mr:
+        assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
 @pytest.mark.parametrize(

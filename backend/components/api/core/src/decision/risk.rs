@@ -1,11 +1,13 @@
+use itertools::{chain, Itertools};
 use newtypes::{
-    DbActor, DecisionStatus, ManualReviewKind, OnboardingStatus, ReviewReason, RuleSetResultId,
-    VerificationResultId, WorkflowId, WorkflowSource,
+    DbActor, DecisionStatus, DocumentRequestConfig, DocumentReviewStatus, ManualReviewKind, OnboardingStatus,
+    ReviewReason, RuleSetResultId, VerificationResultId, WorkflowId, WorkflowSource,
 };
 
 use db::{
     models::{
         data_lifetime::DataLifetime,
+        identity_document::IdentityDocument,
         manual_review::{ManualReviewAction, ManualReviewArgs},
         ob_configuration::ObConfiguration,
         onboarding_decision::NewDecisionArgs,
@@ -50,11 +52,30 @@ pub fn save_final_decision(
         DataLifetime::get_current_seqno(conn)?
     };
 
-    let manual_review = decision.create_manual_review().then_some(ManualReviewArgs {
+    let rules_manual_review = decision.create_manual_review().then_some(ManualReviewArgs {
         kind: ManualReviewKind::RuleTriggered,
         action: ManualReviewAction::GetOrCreate { review_reasons },
     });
-    let manual_reviews = manual_review.into_iter().collect();
+    let doc_manual_review = {
+        let docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
+        let docs_needing_human_review = docs
+            .into_iter()
+            .filter(|(d, _)| d.review_status == DocumentReviewStatus::PendingHumanReview)
+            .collect_vec();
+        let review_reasons = docs_needing_human_review
+            .iter()
+            .filter_map(|(_, dr)| match dr.config {
+                DocumentRequestConfig::Identity { .. } => None,
+                DocumentRequestConfig::ProofOfSsn {} => Some(ReviewReason::ProofOfSsnDocument),
+                DocumentRequestConfig::ProofOfAddress {} => Some(ReviewReason::ProofOfAddressDocument),
+                DocumentRequestConfig::Custom { .. } => Some(ReviewReason::CustomDocument),
+            })
+            .collect_vec();
+        (!docs_needing_human_review.is_empty()).then_some(ManualReviewArgs {
+            kind: ManualReviewKind::DocumentNeedsReview,
+            action: ManualReviewAction::GetOrCreate { review_reasons },
+        })
+    };
 
     let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
     let status = match decision {
@@ -68,10 +89,20 @@ pub fn save_final_decision(
             Some(OnboardingStatus::Incomplete) | Some(OnboardingStatus::Pending) | None => None,
         },
     };
-    // Fall back to pass for now
-    // TODO in future, fail if we're raising manual review for docs
-    let status = status.unwrap_or(DecisionStatus::Pass);
+    let status = status.unwrap_or_else(|| {
+        // The rules engine didn't have any rule triggered
+        if doc_manual_review.is_some() && !sv.status.is_some_and(|s| s == OnboardingStatus::Pass) {
+            // Fail the user if there's a document MR and the user isn't already passing.
+            // This is a kind of implicit rule.
+            // TODO save on the OnboardingDecision when we take this implicit rule
+            DecisionStatus::Fail
+        } else {
+            // Otherwise, no rules were triggered, default to pass!
+            DecisionStatus::Pass
+        }
+    });
 
+    let manual_reviews = chain(rules_manual_review, doc_manual_review).collect();
     if status == DecisionStatus::StepUp {
         tracing::error!(%wf_id, "Saving final decision with non-terminal status");
     }

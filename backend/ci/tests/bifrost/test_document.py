@@ -107,9 +107,13 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
         for r in bifrost.handled_requirements
     )
 
+    # The user should be put in manual review for the custom document
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     assert any(i["identifier"] == "document.custom.utility_bill" for i in body["data"])
+    assert body["requires_manual_review"]
+    assert body["manual_review_kinds"] == ["document_needs_review"]
 
+    # Check the timeline event from uploading the doc
     body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
     event = next(
         i["event"]["data"] for i in body if i["event"]["kind"] == "document_uploaded"
@@ -117,9 +121,27 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
     assert event["config"]["data"]["identifier"] == "document.custom.utility_bill"
     assert event["config"]["data"]["name"] == "Utility bill"
 
+    # And check the documents API
     body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
     assert body[0]["kind"] == "custom"
+    assert body[0]["status"] == "complete"
+    assert body[0]["review_status"] == "pending_human_review"
     assert body[0]["uploads"][0]["identifier"] == "document.custom.utility_bill"
+
+    # Manually review the user
+    data = dict(
+        annotation=dict(note="Looks good to me", is_pinned=False), status="pass"
+    )
+    post(f"entities/{user.fp_id}/decisions", data, *sandbox_tenant.db_auths)
+
+    # Now, the user shouldn't require manual review
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert not body["requires_manual_review"]
+    assert not body["manual_review_kinds"]
+
+    # And the document should be marked as reviewed
+    body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
+    assert body[0]["review_status"] == "reviewed_by_human"
 
 
 def test_upload_documents_with_ob_config_restriction_legacy_version(

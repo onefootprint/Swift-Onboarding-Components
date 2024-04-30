@@ -63,8 +63,8 @@ pub async fn post(
             } else {
                 // For all other trigger kinds, just associate the last playbook with the WFR.
                 // This applies the same rules to from the last playbook to the WF that this creates.
-                let (_, obc) =
-                    Workflow::latest(conn, &sv.id, false)?.ok_or(UserError::NoCompleteOnboardings)?;
+                let (_, obc) = Workflow::latest_reonboardable(conn, &sv.id, false)?
+                    .ok_or(UserError::NoCompleteOnboardings)?;
                 obc
             };
             if obc.kind == ObConfigurationKind::Auth {

@@ -88,7 +88,6 @@ class IdentifyClient:
             headers.append(self.auth_token)
         body = post("hosted/identify", data, *headers)
         assert body["user"]
-        print(body["user"])
         assert kind in body["user"]["available_challenge_kinds"]
         token = FpAuth(body["user"]["token"])
 

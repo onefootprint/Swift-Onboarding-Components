@@ -41,7 +41,7 @@ pub async fn get(
             } else {
                 vec![]
             };
-            let latest_completed_wf = Workflow::latest(conn, &sv.id, true)?.map(|(wf, _)| wf);
+            let latest_completed_wf = Workflow::latest_reonboardable(conn, &sv.id, true)?.map(|(wf, _)| wf);
 
             Ok((behavior, latest_completed_wf))
         })

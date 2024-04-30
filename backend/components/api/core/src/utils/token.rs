@@ -73,7 +73,7 @@ pub fn create_token(
             (TokenCreationPurpose::ApiInherit, Some(obc_id), Some(wfr))
         }
         TokenOperationKind::Reonboard => {
-            let (_, obc) = Workflow::latest(conn, &sv.id, true)?.ok_or(ValidationError(
+            let (_, obc) = Workflow::latest_reonboardable(conn, &sv.id, true)?.ok_or(ValidationError(
                 "Cannot reonboard user - user has no complete onboardings.",
             ))?;
             (TokenCreationPurpose::ApiReonboard, Some(obc.id), None)
