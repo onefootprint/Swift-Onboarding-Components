@@ -117,7 +117,7 @@ export async function CreateAssetCdn(
 
       forwardedValues: {
         cookies: { forward: 'none' },
-        queryString: false,
+        queryString: true,
       },
 
       minTtl: 0,

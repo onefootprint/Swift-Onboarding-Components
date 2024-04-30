@@ -85,6 +85,12 @@ function createAssetsBucket(
         indexDocument: 'index.html',
         errorDocument: '404.html',
       },
+      corsRules: [
+        {
+          allowedOrigins: ['*'],
+          allowedMethods: ['GET', 'HEAD'],
+        },
+      ],
     },
     {
       provider,
