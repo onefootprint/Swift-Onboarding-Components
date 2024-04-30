@@ -1,10 +1,13 @@
 import type { DataIdentifier } from '@onefootprint/types';
 import { BusinessDI, IdDI, ListKind } from '@onefootprint/types';
 
-const listKindsForDataIdentifier = (di?: DataIdentifier): ListKind[] => {
+import { IP_ADDRESS_DATA_IDENTIFIER } from '../data-identifiers-for-list-kind';
+
+const listKindsForDataIdentifier = (
+  di?: DataIdentifier | string,
+): ListKind[] => {
   if (!di) {
-    // TODO: adjust when ipAddress is implemented on the BE
-    return Object.values(ListKind).filter(kind => kind !== ListKind.ipAddress);
+    return Object.values(ListKind);
   }
 
   switch (di) {
@@ -19,6 +22,10 @@ const listKindsForDataIdentifier = (di?: DataIdentifier): ListKind[] => {
 
     case IdDI.ssn9: {
       return [ListKind.ssn9];
+    }
+
+    case IP_ADDRESS_DATA_IDENTIFIER: {
+      return [ListKind.ipAddress];
     }
 
     default:

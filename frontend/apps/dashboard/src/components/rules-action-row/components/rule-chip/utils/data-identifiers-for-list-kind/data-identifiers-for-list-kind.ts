@@ -6,9 +6,13 @@ import {
   ListKind,
 } from '@onefootprint/types';
 
-const dataIdentifiersForListKind = (listKind?: ListKind): DataIdentifier[] => {
+export const IP_ADDRESS_DATA_IDENTIFIER = 'ip_address';
+
+const dataIdentifiersForListKind = (
+  listKind?: ListKind,
+): (DataIdentifier | string)[] => {
   if (!listKind) {
-    return DataIdentifierKeys;
+    return [...DataIdentifierKeys, IP_ADDRESS_DATA_IDENTIFIER].sort();
   }
 
   switch (listKind) {
@@ -24,6 +28,10 @@ const dataIdentifiersForListKind = (listKind?: ListKind): DataIdentifier[] => {
 
     case ListKind.ssn9: {
       return [IdDI.ssn9];
+    }
+
+    case ListKind.ipAddress: {
+      return [IP_ADDRESS_DATA_IDENTIFIER];
     }
 
     default:

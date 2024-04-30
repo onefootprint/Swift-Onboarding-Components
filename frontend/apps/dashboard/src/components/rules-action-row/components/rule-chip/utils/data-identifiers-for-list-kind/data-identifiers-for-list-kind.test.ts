@@ -5,13 +5,16 @@ import {
   ListKind,
 } from '@onefootprint/types';
 
-import dataIdentifiersForListKind from './data-identifiers-for-list-kind';
+import dataIdentifiersForListKind, {
+  IP_ADDRESS_DATA_IDENTIFIER,
+} from './data-identifiers-for-list-kind';
 
 describe('dataIdentifiersForListKind', () => {
   describe('when no ListKind is inputted', () => {
     it('should return all DIs', () => {
-      expect(dataIdentifiersForListKind()).toEqual(DataIdentifierKeys);
-      expect(dataIdentifiersForListKind(undefined)).toEqual(DataIdentifierKeys);
+      const allDIs = [...DataIdentifierKeys, IP_ADDRESS_DATA_IDENTIFIER].sort();
+      expect(dataIdentifiersForListKind()).toEqual(allDIs);
+      expect(dataIdentifiersForListKind(undefined)).toEqual(allDIs);
     });
   });
 
@@ -57,7 +60,9 @@ describe('dataIdentifiersForListKind', () => {
 
   describe('when ListKind.ipAddress is inputted', () => {
     it('should return id.phone_number', () => {
-      expect(dataIdentifiersForListKind(ListKind.ipAddress)).toEqual([]);
+      expect(dataIdentifiersForListKind(ListKind.ipAddress)).toEqual([
+        IP_ADDRESS_DATA_IDENTIFIER,
+      ]);
     });
   });
 });

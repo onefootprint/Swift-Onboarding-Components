@@ -1,1 +1,4 @@
-export { default } from './data-identifiers-for-list-kind';
+export {
+  default,
+  IP_ADDRESS_DATA_IDENTIFIER,
+} from './data-identifiers-for-list-kind';
