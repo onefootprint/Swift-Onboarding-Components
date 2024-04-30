@@ -255,7 +255,10 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
         *sandbox_tenant.db_auths,
         status_code=400,
     )
-    assert resp["error"]["message"] == "Vaulted field id.email can not be matched against list with kind ssn9"
+    assert (
+        resp["error"]["message"]
+        == "Vaulted field id.email can not be matched against list with kind ssn9"
+    )
 
     # [POST] Create a rule with a list that accepts exact matches on a field.
     post(
@@ -326,7 +329,10 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
         *sandbox_tenant.db_auths,
         status_code=400,
     )
-    assert resp["error"]["message"] == "Vaulted field id.email can not be matched against list with kind ssn9"
+    assert (
+        resp["error"]["message"]
+        == "Vaulted field id.email can not be matched against list with kind ssn9"
+    )
 
     # [PATCH] Augment a playbook with a rule with a list that accepts exact matches on a field.
     patch(
@@ -391,39 +397,77 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
         *sandbox_tenant.db_auths,
     )
 
-    resp = get(f"/org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths)
-    assert len([
-            rule for rule in resp
-            if rule["rule_expression"] == [{
-                "field": "id.email",
-                "op": "is_in",
-                "value": ssn9_list["id"],
-            }]
-        ]) == 0
-    assert len([
-            rule for rule in resp
-            if rule["rule_expression"] == [{
-                "field": "id.email",
-                "op": "is_in",
-                "value": email_addr_list["id"],
-            }]
-        ]) == 2
-    assert len([
-            rule for rule in resp
-            if rule["rule_expression"] == [{
-                "field": "id.email",
-                "op": "is_in",
-                "value": email_domain_list["id"],
-            }]
-        ]) == 2
-    assert len([
-            rule for rule in resp
-            if rule["rule_expression"] == [{
-                "field": "custom.other_email",
-                "op": "is_in",
-                "value": email_addr_list["id"],
-            }]
-        ]) == 2
+    resp = get(
+        f"/org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths
+    )
+    assert (
+        len(
+            [
+                rule
+                for rule in resp
+                if rule["rule_expression"]
+                == [
+                    {
+                        "field": "id.email",
+                        "op": "is_in",
+                        "value": ssn9_list["id"],
+                    }
+                ]
+            ]
+        )
+        == 0
+    )
+    assert (
+        len(
+            [
+                rule
+                for rule in resp
+                if rule["rule_expression"]
+                == [
+                    {
+                        "field": "id.email",
+                        "op": "is_in",
+                        "value": email_addr_list["id"],
+                    }
+                ]
+            ]
+        )
+        == 2
+    )
+    assert (
+        len(
+            [
+                rule
+                for rule in resp
+                if rule["rule_expression"]
+                == [
+                    {
+                        "field": "id.email",
+                        "op": "is_in",
+                        "value": email_domain_list["id"],
+                    }
+                ]
+            ]
+        )
+        == 2
+    )
+    assert (
+        len(
+            [
+                rule
+                for rule in resp
+                if rule["rule_expression"]
+                == [
+                    {
+                        "field": "custom.other_email",
+                        "op": "is_in",
+                        "value": email_addr_list["id"],
+                    }
+                ]
+            ]
+        )
+        == 2
+    )
 
 
 def test_update(sandbox_tenant):
@@ -608,9 +652,15 @@ def test_create_list_entry(sandbox_tenant):
     # add multiple
     entries = post(
         f"/org/lists/{list_id}/entries",
-        dict(entries=["bobertotech.com", "badppl.org", "somethingelseketchy.net",
-                      # Duplicate is ignored
-                      "badppl.org"]),
+        dict(
+            entries=[
+                "bobertotech.com",
+                "badppl.org",
+                "somethingelseketchy.net",
+                # Duplicate is ignored
+                "badppl.org",
+            ]
+        ),
         *sandbox_tenant.db_auths,
     )
     assert len(entries) == 3
@@ -653,12 +703,15 @@ def test_create_list_entry_format_canonicalization(sandbox_tenant):
             kind="ssn9",
             entries=[
                 "000-45-6789",
-            ]
+            ],
         ),
         *sandbox_tenant.db_auths,
         status_code=400,
     )
-    assert resp["error"]["message"] == "Invalid SSN9: Leading three digit number must not be 000, 666, or a value between 900 and 999 (inclusive)"
+    assert (
+        resp["error"]["message"]
+        == "Invalid SSN9: Leading three digit number must not be 000, 666, or a value between 900 and 999 (inclusive)"
+    )
 
     # Entries can be given in the list creation call.
     resp = post(
@@ -669,7 +722,7 @@ def test_create_list_entry_format_canonicalization(sandbox_tenant):
             kind="ssn9",
             entries=[
                 "123-45-6789",
-            ]
+            ],
         ),
         *sandbox_tenant.db_auths,
     )
@@ -678,11 +731,13 @@ def test_create_list_entry_format_canonicalization(sandbox_tenant):
     # Valid SSNs are canonicalized.
     entries = post(
         f"/org/lists/{list_id}/entries",
-        dict(entries=[
-            "234-56-2983",
-            "345671234",
-            "456-781234",
-        ]),
+        dict(
+            entries=[
+                "234-56-2983",
+                "345671234",
+                "456-781234",
+            ]
+        ),
         *sandbox_tenant.db_auths,
     )
     assert len(entries) == 3
@@ -692,7 +747,9 @@ def test_create_list_entry_format_canonicalization(sandbox_tenant):
 
     # Listing all entries inclues entries given when list was created.
     entries = get(f"/org/lists/{list_id}/entries", None, *sandbox_tenant.db_auths)
-    assert set([e["data"] for e in entries]) == set(["123456789", "234562983", "345671234", "456781234"])
+    assert set([e["data"] for e in entries]) == set(
+        ["123456789", "234562983", "345671234", "456781234"]
+    )
 
 
 def test_create_list_entry_no_permissions(sandbox_tenant):

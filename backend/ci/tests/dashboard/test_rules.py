@@ -1,6 +1,14 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.utils import _gen_random_str, _gen_random_sandbox_id, create_ob_config, get, post, patch, delete
+from tests.utils import (
+    _gen_random_str,
+    _gen_random_sandbox_id,
+    create_ob_config,
+    get,
+    post,
+    patch,
+    delete,
+)
 
 
 @pytest.fixture(scope="function")
@@ -13,48 +21,68 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
 @pytest.mark.parametrize(
     "data,error",
     [
-        (dict(
-            name="My awesome rule",
-            rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
-            action="pass_with_manual_review",
-        ), None),
-        (dict(
-            name="My awesome rule",
-            rule_expression=[
-                {"field": "name_does_not_match", "op": "eq", "value": True}
-            ],
-            action="step_up.identity",
-        ), None),
-        (dict(
-            name="My awesome rule",
-            rule_expression=[
-                {"field": "dob_does_not_match", "op": "eq", "value": True}
-            ],
-            action="manual_review",
-        ), None),
-        (dict(
-            name="My awesome rule",
-            rule_expression=[
-                {"field": "address_does_not_match", "op": "eq", "value": True}
-            ],
-            action="fail",
-        ), None),
-        (dict(
-            name=None,
-            rule_expression=[
-                {"field": "ssn_does_not_match", "op": "eq", "value": True}
-            ],
-            action="fail",
-        ), None),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "id_flagged", "op": "not_eq", "value": True}
+                ],
+                action="pass_with_manual_review",
+            ),
+            None,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "name_does_not_match", "op": "eq", "value": True}
+                ],
+                action="step_up.identity",
+            ),
+            None,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "dob_does_not_match", "op": "eq", "value": True}
+                ],
+                action="manual_review",
+            ),
+            None,
+        ),
+        (
+            dict(
+                name="My awesome rule",
+                rule_expression=[
+                    {"field": "address_does_not_match", "op": "eq", "value": True}
+                ],
+                action="fail",
+            ),
+            None,
+        ),
+        (
+            dict(
+                name=None,
+                rule_expression=[
+                    {"field": "ssn_does_not_match", "op": "eq", "value": True}
+                ],
+                action="fail",
+            ),
+            None,
+        ),
         # mixing business rules and person rules
-        (dict(
-            name=None,
-            rule_expression=[
-                {"field": "ssn_does_not_match", "op": "eq", "value": True},
-                {"field": "business_name_match", "op": "eq", "value": True}
-            ],
-            action="fail",
-        ), "Cannot make a rule expression that includes both Person and Business signals"),
+        (
+            dict(
+                name=None,
+                rule_expression=[
+                    {"field": "ssn_does_not_match", "op": "eq", "value": True},
+                    {"field": "business_name_match", "op": "eq", "value": True},
+                ],
+                action="fail",
+            ),
+            "Cannot make a rule expression that includes both Person and Business signals",
+        ),
     ],
 )
 def test_create(sandbox_tenant, data, error):
@@ -68,12 +96,11 @@ def test_create(sandbox_tenant, data, error):
         f"/org/onboarding_configs/{sandbox_tenant.default_ob_config.id}/rules",
         data,
         *sandbox_tenant.db_auths,
-        status_code=400 if error is not None else 200
+        status_code=400 if error is not None else 200,
     )
     if error is not None:
-        assert res['error']['message'] == error
+        assert res["error"]["message"] == error
         return
-        
 
     # TODO: assert actor later
     assert res["rule_id"] is not None
@@ -82,7 +109,7 @@ def test_create(sandbox_tenant, data, error):
     assert res["rule_expression"] == data["rule_expression"]
     assert res["is_shadow"] == False
     assert res["action"] == data["action"]
-    assert res["kind"] == 'person'
+    assert res["kind"] == "person"
 
     # OBC has rule_set.version and it has incremented from rule change
     obc2 = get(
@@ -98,14 +125,14 @@ def test_create(sandbox_tenant, data, error):
             name=None,
             rule_expression=[
                 {"field": "business_name_match", "op": "eq", "value": True},
-                {"field": "tin_not_found", "op": "eq", "value": True}
+                {"field": "tin_not_found", "op": "eq", "value": True},
             ],
             action="fail",
         ),
         *sandbox_tenant.db_auths,
     )
 
-    assert business_rule['kind'] =='business'
+    assert business_rule["kind"] == "business"
 
 
 def test_list(sandbox_tenant, obc):
@@ -196,14 +223,14 @@ def test_patch(sandbox_tenant, obc):
         status_code=400,
     )
 
-    # a patch that has mixed person and business rule instance kind should error 
+    # a patch that has mixed person and business rule instance kind should error
     patch(
         f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
         dict(
             is_shadow=True,
             rule_expression=[
                 {"field": "business_name_match", "op": "eq", "value": True},
-                {"field": "document_selfie_glasses", "op": "eq", "value": True}
+                {"field": "document_selfie_glasses", "op": "eq", "value": True},
             ],
         ),
         *sandbox_tenant.db_auths,
@@ -281,7 +308,10 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
 
     sandbox_id = _gen_random_sandbox_id()
     obc = create_ob_config(
-        sandbox_tenant, "Baseline", must_collect_data, can_access_data,
+        sandbox_tenant,
+        "Baseline",
+        must_collect_data,
+        can_access_data,
         # These are the necessary arguments to skip KYC so the status is only
         # dependent on rules evaluation.
         skip_kyc=True,
@@ -351,7 +381,7 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     stepup_event = [
         i for i in timeline if i["event"]["kind"] == "onboarding_decision"
     ].pop()
-    rule_set_result_id = stepup_event['event']['data']['decision']['rule_set_result_id']
+    rule_set_result_id = stepup_event["event"]["data"]["decision"]["rule_set_result_id"]
 
     # Get the client IP address for the integration tests.
     user = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
@@ -537,7 +567,7 @@ def test_multi_edit(sandbox_tenant, obc):
         *sandbox_tenant.db_auths,
     )
 
-     # should have 4 rules now: 2 we edited (and did not delete) and 2 new ones we added
+    # should have 4 rules now: 2 we edited (and did not delete) and 2 new ones we added
     assert set([r["rule_expression"][0]["field"] for r in rules]) == set(
         [
             "address_located_is_not_standard_hospital",
@@ -547,7 +577,7 @@ def test_multi_edit(sandbox_tenant, obc):
         ]
     )
 
-     # assert rule_set.version has incremented on OBC
+    # assert rule_set.version has incremented on OBC
     reloaded_obc = get(
         f"org/onboarding_configs/{obc.id}",
         None,
@@ -555,7 +585,6 @@ def test_multi_edit(sandbox_tenant, obc):
     )
     assert reloaded_obc["rule_set"]["version"] == 2
 
-    
     # trying to edit rules to mix business and person should error
     patch(
         f"/org/onboarding_configs/{obc.id}/rules",
@@ -575,23 +604,23 @@ def test_multi_edit(sandbox_tenant, obc):
                             "field": "browser_tampering",
                             "op": "eq",
                             "value": True,
-                        }
+                        },
                     ],
                 ),
             ],
-            delete=[]
+            delete=[],
         ),
         *sandbox_tenant.db_auths,
-        status_code=400
+        status_code=400,
     )
 
-     # trying to add rules to mix business and person should error
+    # trying to add rules to mix business and person should error
     patch(
         f"/org/onboarding_configs/{obc.id}/rules",
         dict(
             expected_rule_set_version=2,
             add=[
-                 dict(
+                dict(
                     rule_action="manual_review",
                     rule_expression=[
                         {
@@ -603,15 +632,15 @@ def test_multi_edit(sandbox_tenant, obc):
                             "field": "browser_tampering",
                             "op": "eq",
                             "value": True,
-                        }
+                        },
                     ],
                 ),
             ],
             edit=[],
-            delete=[]
+            delete=[],
         ),
         *sandbox_tenant.db_auths,
-        status_code=400
+        status_code=400,
     )
 
     # however, if you edit a rule to be totally business that's fine
@@ -633,19 +662,19 @@ def test_multi_edit(sandbox_tenant, obc):
                             "field": "tin_does_not_match",
                             "op": "eq",
                             "value": True,
-                        }
+                        },
                     ],
                 ),
             ],
-            delete=[]
+            delete=[],
         ),
         *sandbox_tenant.db_auths,
-        status_code=200
+        status_code=200,
     )
-    
+
     # we now have 4 rules, and 1 has 2 business related rules inside
     assert len(rules) == 4
-    assert set(['person', 'business']) == set([r['kind'] for r in rules])
+    assert set(["person", "business"]) == set([r["kind"] for r in rules])
 
     all_fields = []
     for r in rules:
@@ -657,10 +686,9 @@ def test_multi_edit(sandbox_tenant, obc):
             "address_located_is_not_standard_college",
             "business_name_match",
             "tin_does_not_match",
-            "browser_tampering"
+            "browser_tampering",
         ]
     )
-   
 
     # assert rule_set.version has incremented on OBC
     obc = get(
