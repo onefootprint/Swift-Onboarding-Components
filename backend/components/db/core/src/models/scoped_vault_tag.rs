@@ -33,10 +33,12 @@ pub struct DeactivateTagUpdate {
 impl ScopedVaultTag {
     #[tracing::instrument("ScopedVaultTag::get_active", skip_all)]
     pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> Result<Vec<Self>, DbError> {
-        Ok(scoped_vault_tag::table
+        let tags = scoped_vault_tag::table
             .filter(scoped_vault_tag::scoped_vault_id.eq(sv_id))
             .filter(scoped_vault_tag::deactivated_seqno.is_null())
-            .get_results(conn)?)
+            .order_by(scoped_vault_tag::created_at.asc())
+            .get_results(conn)?;
+        Ok(tags)
     }
 
     #[tracing::instrument("ScopedVaultTag::deactivate", skip_all)]
