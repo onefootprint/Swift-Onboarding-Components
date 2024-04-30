@@ -53,9 +53,6 @@ use crate::{
     State,
 };
 
-// TODO: how do we want to model sandbox here 🤔? Could (1) do entirely seperatly from workflow, (2) special case it within workflow, (3) model it as an immediate transition from DataCollection -> Complete
-// (2) is probs the best, I can imagine someone like Follow wanting to test the full workflow in sandbox
-
 /////////////////////
 /// DataCollection
 /// ////////////////

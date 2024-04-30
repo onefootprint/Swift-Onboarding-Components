@@ -79,13 +79,11 @@ impl ObConfigurationArgsToValidate {
                 .into());
             }
         }
-        let doc_cdo = self
-            .must_collect_data
-            .iter()
-            .find(|cdo| matches!(cdo, CDO::Document(_)));
+
+        let is_collecting_doc = self.collects_document();
 
         if self.is_doc_first {
-            if doc_cdo.is_none() {
+            if !is_collecting_doc {
                 return Err(TenantError::ValidationError(
                     "Must collect document if is_doc_first is true".to_owned(),
                 )
@@ -102,14 +100,14 @@ impl ObConfigurationArgsToValidate {
             }
         }
 
-        if self.curp_validation_enabled && doc_cdo.is_none() {
+        if self.curp_validation_enabled && !is_collecting_doc {
             return Err(TenantError::ValidationError(
                 "Must collect document if `curp_validation_enabled=true".to_owned(),
             )
             .into());
         }
 
-        if self.skip_kyc && !self.allow_international_residents && doc_cdo.is_none() {
+        if self.skip_kyc && !self.allow_international_residents && !is_collecting_doc {
             return Err(TenantError::ValidationError(
                 "Cannot specify skip_kyc if allow_international_residents=false and no Document is collected in must_collect_data"
                     .to_owned(),
@@ -126,7 +124,7 @@ impl ObConfigurationArgsToValidate {
             .iter()
             .any(|ssn_cdo| optional_data.contains(ssn_cdo))
         {
-            if doc_cdo.is_some() && self.doc_scan_for_optional_ssn.is_some() {
+            if is_collecting_doc && self.doc_scan_for_optional_ssn.is_some() {
                 return Err(TenantError::ValidationError(
                     "Cannot specify doc_scan_for_optional_ssn if already collecting a document".to_owned(),
                 )
@@ -214,6 +212,16 @@ impl ObConfigurationArgsToValidate {
         Ok(())
     }
 
+    fn collects_document(&self) -> bool {
+        // WIP while we are migrating to documents_to_collect
+        let has_document_cdo = self
+            .must_collect_data
+            .iter()
+            .any(|d| CDOK::from(d) == CDOK::Document);
+        let has_other_document = !self.documents_to_collect.is_empty();
+        has_document_cdo || has_other_document
+    }
+
     fn validate_documents(&self) -> ApiResult<()> {
         if self
             .documents_to_collect
@@ -243,7 +251,7 @@ impl ObConfigurationArgsToValidate {
                     vec![CDOK::Name, CDOK::FullAddress, CDOK::Email, CDOK::PhoneNumber]
                 }
             }
-            ObConfigurationKind::Document => vec![CDOK::Document],
+            ObConfigurationKind::Document => vec![],
         };
         let missing_required_fields: Vec<_> = required_fields
             .into_iter()
@@ -256,6 +264,10 @@ impl ObConfigurationArgsToValidate {
                 Csv(missing_required_fields)
             ))
             .into());
+        }
+
+        if self.kind == ObConfigurationKind::Document && !self.collects_document() {
+            return ValidationError("Playbook of kind document must collect document").into();
         }
 
         // Check for disallowed fields based on playbook kind
@@ -366,12 +378,7 @@ impl ObConfigurationArgsToValidate {
         };
 
         // Document
-        let doc_cdo = self
-            .must_collect_data
-            .iter()
-            .find(|cdo| matches!(cdo, CDO::Document(_)));
-
-        if doc_cdo.is_some() {
+        if self.collects_document() {
             return Err(TenantError::ValidationError(
                 "Cannot collect document for Alpaca playbook".to_owned(),
             ));

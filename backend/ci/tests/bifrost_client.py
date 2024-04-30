@@ -96,6 +96,24 @@ class BifrostClient:
         self.auth_token = auth_token
         self.sandbox_id = sandbox_id
 
+        # Extract the fixture result from the sandbox_id
+        # Bifrost today no longer does this, just haven't updated the BifrostClient to pass
+        # fixture results in another way
+        SANDBOX_OUTCOMES = {
+            "fail": "fail",
+            "manualreview": "manual_review",
+            "stepup": "step_up",
+            "document_decision": "document_decision",
+        }
+        if sandbox_id is None:
+            self.fixture_result = None
+        else:
+            r = None
+            for prefix, fixture_result in SANDBOX_OUTCOMES.items():
+                if sandbox_id.startswith(prefix):
+                    r = fixture_result
+            self.fixture_result = r or "pass"
+
         phone_number = override_phone or FIXTURE_PHONE_NUMBER
         email = override_email or FIXTURE_EMAIL
         if sandbox_id:
@@ -290,15 +308,15 @@ class BifrostClient:
         if requirement["config"]["kind"] == "identity":
             us_docs = requirement["supported_country_and_doc_types"].get("US")
             mx_docs = requirement["supported_country_and_doc_types"].get("MX")
-            supported_doc_types =  us_docs if us_docs is not None else []
-            supported_doc_types_mx =  mx_docs if mx_docs is not None else []
-            
+            supported_doc_types = us_docs if us_docs is not None else []
+            supported_doc_types_mx = mx_docs if mx_docs is not None else []
+
             if "drivers_license" in supported_doc_types:
                 doc_kind = "drivers_license"
                 country_code = "US"
                 sides.append("back")
             elif "voter_identification" in supported_doc_types_mx:
-                # Kind of a hack 
+                # Kind of a hack
                 doc_kind = "voter_identification"
                 country_code = "MX"
                 sides.append("back")
@@ -374,20 +392,7 @@ class BifrostClient:
         post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)
 
     def handle_process(self, **kwargs):
-        # Extract the fixture result from the sandbox_id
-        # Bifrost today no longer does this, just haven't updated the BifrostClient to pass
-        # fixture results in another way
-        if self.sandbox_id is None:
-            fixture_result = None
-        elif self.sandbox_id.startswith("fail"):
-            fixture_result = "fail"
-        elif self.sandbox_id.startswith("manualreview"):
-            fixture_result = "manual_review"
-        elif self.sandbox_id.startswith("stepup"):
-            fixture_result = "step_up"
-        else:
-            fixture_result = "pass"
-        body = dict(fixture_result=fixture_result) if fixture_result else None
+        body = dict(fixture_result=self.fixture_result) if self.fixture_result else None
         post("hosted/onboarding/process", body, self.auth_token, **kwargs)
 
     def validate(self, **kwargs):

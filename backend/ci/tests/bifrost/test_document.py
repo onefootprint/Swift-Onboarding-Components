@@ -5,6 +5,7 @@ from tests.utils import (
     open_multipart_file,
     post,
     get,
+    patch,
     get_requirement_from_requirements,
 )
 
@@ -83,6 +84,9 @@ def test_upload_documents(doc_request_sandbox_ob_config):
 
 
 def test_upload_custom_document(sandbox_tenant, must_collect_data):
+    """
+    Test onboarding onto a KYC playbook that also collects a custom document
+    """
     obc = create_ob_config(
         sandbox_tenant,
         "Custom doc",
@@ -101,17 +105,20 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
     )
 
     bifrost = BifrostClient.new(obc)
+    bifrost.fixture_result = "document_decision"
     user = bifrost.run()
     assert any(
         r["kind"] == "collect_document" and r["config"]["kind"] == "custom"
         for r in bifrost.handled_requirements
     )
 
-    # The user should be put in manual review for the custom document
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     assert any(i["identifier"] == "document.custom.utility_bill" for i in body["data"])
+    # The user should be put in manual review for the custom document
     assert body["requires_manual_review"]
     assert body["manual_review_kinds"] == ["document_needs_review"]
+    # And their status should be failed because no rules matched and there's a doc ManualReview
+    assert body["status"] == "fail"
 
     # Check the timeline event from uploading the doc
     body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
@@ -142,6 +149,44 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
     # And the document should be marked as reviewed
     body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
     assert body[0]["review_status"] == "reviewed_by_human"
+
+
+@pytest.mark.parametrize("initial_fixture_result", ["pass", "fail"])
+def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
+    """
+    Test a document-only playbook that doesn't have any rules.
+    We should leave the SV status untouched, but still be able to raise a manual review.
+    """
+    # First, make a user
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost.fixture_result = initial_fixture_result
+    user = bifrost.run()
+    assert bifrost.validate_response["user"]["status"] == initial_fixture_result
+
+    doc_playbook = create_ob_config(
+        sandbox_tenant,
+        "Doc request config",
+        [],
+        [],
+        kind="document",
+        documents_to_collect=[dict(kind="proof_of_address", data=dict())],
+        skip_kyc=True,
+        skip_confirm=True,
+    )
+    body = get(
+        f"org/onboarding_configs/{doc_playbook.id}/rules",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    assert not body, "Non-id doc playbook should not have any rules"
+
+    # Onboard the user to the doc-only playbook
+    bifrost = BifrostClient.inherit(doc_playbook, bifrost.sandbox_id)
+    bifrost.fixture_result = "document_decision"
+    user2 = bifrost.run()
+    # The initial status should remain unchanged
+    assert bifrost.validate_response["user"]["status"] == initial_fixture_result
+    assert user2.fp_id == user.fp_id
 
 
 def test_upload_documents_with_ob_config_restriction_legacy_version(
