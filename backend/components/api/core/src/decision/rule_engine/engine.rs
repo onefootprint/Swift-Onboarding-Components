@@ -17,7 +17,7 @@ use db::{
         list_entry::ListWithDecryptedEntries,
         ob_configuration::ObConfiguration,
         risk_signal::RiskSignal,
-        rule_instance::RuleInstance,
+        rule_instance::{IncludeRules, RuleInstance},
         rule_result::RuleResult,
         rule_set_result::{NewRuleResultArgs, NewRuleSetResultArgs, RuleSetResult},
     },
@@ -38,6 +38,7 @@ pub struct EvaluateWorkflowDecisionArgs<'a> {
     pub vault_data: &'a VaultDataForRules,
     pub lists: &'a HashMap<ListId, ListWithDecryptedEntries>,
     pub is_fixture: bool,
+    pub include_rules: IncludeRules,
 }
 
 #[tracing::instrument(skip_all)]
@@ -54,6 +55,7 @@ pub fn evaluate_workflow_decision<'a>(
         vault_data,
         lists,
         is_fixture,
+        include_rules,
     } = args;
     let doc_reqs = DocumentRequest::get_all(conn, wf_id)?;
     let doc_collected = doc_reqs
@@ -91,6 +93,7 @@ pub fn evaluate_workflow_decision<'a>(
         &insight_events,
         lists,
         &rule_eval_config,
+        include_rules,
     )?;
 
     let Some((rule_set_result, _)) = rules_output else {
@@ -161,6 +164,7 @@ impl VaultDataForRules {
     }
 }
 
+
 #[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all)]
 pub fn evaluate_rules(
@@ -174,9 +178,10 @@ pub fn evaluate_rules(
     insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
     rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
+    rule_kinds: IncludeRules,
 ) -> ApiResult<Option<(RuleSetResult, Vec<RuleResult>)>> {
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
-    let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, obc_id)?;
+    let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, obc_id, rule_kinds)?;
     if rules.is_empty() {
         if obc.kind == ObConfigurationKind::Document {
             // Document-only playbooks are allowed to have no rules if they want to maintain
@@ -335,6 +340,7 @@ mod tests {
             &[],
             &HashMap::new(),
             &config,
+            IncludeRules::All,
         )
         .unwrap()
         .unwrap();

@@ -5,7 +5,10 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
-use db::{models::rule_instance::RuleInstance, DbError};
+use db::{
+    models::rule_instance::{IncludeRules, RuleInstance},
+    DbError,
+};
 use itertools::Itertools;
 use newtypes::ObConfigurationId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -27,7 +30,7 @@ pub async fn list_rules_for_playbook(
     let rules = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
-            RuleInstance::list(conn, &tenant_id, is_live, &ob_config_id)
+            RuleInstance::list(conn, &tenant_id, is_live, &ob_config_id, IncludeRules::All)
         })
         .await?;
 

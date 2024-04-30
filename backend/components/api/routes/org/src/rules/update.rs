@@ -13,7 +13,7 @@ use db::{
     models::{
         list::List,
         ob_configuration::ObConfiguration,
-        rule_instance::{MultiRuleUpdate, NewRule, RuleInstance, RuleInstanceUpdate},
+        rule_instance::{IncludeRules, MultiRuleUpdate, NewRule, RuleInstance, RuleInstanceUpdate},
     },
     PgConn,
 };
@@ -106,7 +106,13 @@ pub async fn multi_update_rules(
 
             RuleInstance::bulk_edit(conn, &obc, &actor.into(), update)?;
             // retrieve and return full latest list of Rules for FE for convenience
-            Ok(RuleInstance::list(conn, &tenant_id, is_live, &obc.id)?)
+            Ok(RuleInstance::list(
+                conn,
+                &tenant_id,
+                is_live,
+                &obc.id,
+                IncludeRules::All,
+            )?)
         })
         .await?;
 

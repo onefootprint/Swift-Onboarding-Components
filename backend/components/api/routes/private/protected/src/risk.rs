@@ -30,14 +30,21 @@ use api_core::{
 };
 use chrono::Utc;
 use db::models::{
-    data_lifetime::DataLifetime, decision_intent::DecisionIntent, ob_configuration::ObConfiguration,
-    risk_signal::RiskSignal, rule_instance::RuleInstance, scoped_vault::ScopedVault,
-    verification_request::VerificationRequest, verification_result::VerificationResult, workflow::Workflow,
+    data_lifetime::DataLifetime,
+    decision_intent::DecisionIntent,
+    ob_configuration::ObConfiguration,
+    risk_signal::RiskSignal,
+    rule_instance::{IncludeRules, RuleInstance},
+    scoped_vault::ScopedVault,
+    verification_request::VerificationRequest,
+    verification_result::VerificationResult,
+    workflow::Workflow,
 };
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, FpId, RiskSignalGroupKind, RiskSignalId, RuleAction, RuleSetResultKind, TenantId,
-    Vendor, VendorAPI, VerificationRequestId, VerificationResultId, WorkflowId,
+    DecisionIntentId, FpId, RiskSignalGroupKind, RiskSignalId, RuleAction, RuleInstanceKind,
+    RuleSetResultKind, TenantId, VaultKind, Vendor, VendorAPI, VerificationRequestId, VerificationResultId,
+    WorkflowId,
 };
 use std::{collections::HashMap, str::FromStr};
 
@@ -89,7 +96,7 @@ async fn make_vendor_calls(
                 VerificationRequest::create(conn, (&sv.id, &decision_intent.id, vendor_api).into())?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
-            let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
+            let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, IncludeRules::All)?;
             Ok((vec![request], uvw, rules))
         })
         .await?;
@@ -161,10 +168,16 @@ async fn make_decision(
     let decision = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
+            let res = ScopedVault::bulk_get(conn, vec![fp_id.clone()], &tenant_id, true)?;
+            let (sv, vault) = res.first().ok_or(OnboardingError::NoWorkflow)?;
+            let vault_id = sv.vault_id.clone();
             let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
             let wf = Workflow::lock(conn, &wf.id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+            let rule_instance_kind = match vault.kind {
+                VaultKind::Person => RuleInstanceKind::Person,
+                VaultKind::Business => RuleInstanceKind::Business,
+            };
 
             let risk_signals = fetch_latest_risk_signals_map(conn, &sv.id)?;
             let vres_ids = risk_signals.verification_result_ids();
@@ -178,11 +191,11 @@ async fn make_decision(
                 vault_data: &VaultDataForRules::empty(), // TODO
                 lists: &HashMap::new(),                  // TODO mb
                 is_fixture: false,
+                include_rules: IncludeRules::Kind(rule_instance_kind),
             };
             let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
             let d = decision.clone();
-            let output =
-                common::handle_rules_output(conn, wf, sv.vault_id, vres_ids, decision, rsr_id, vec![])?;
+            let output = common::handle_rules_output(conn, wf, vault_id, vres_ids, decision, rsr_id, vec![])?;
             if matches!(output, DecisionOutput::NonTerminal) {
                 return Err(AssertionError("Non-terminal rule action").into());
             }
@@ -246,7 +259,7 @@ async fn shadow_run(
                 .collect();
 
             let (obc, _) = ObConfiguration::get(conn, &wfid)?;
-            let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
+            let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, IncludeRules::All)?;
 
             Ok((memory_only_requests, uvw, rules))
         })

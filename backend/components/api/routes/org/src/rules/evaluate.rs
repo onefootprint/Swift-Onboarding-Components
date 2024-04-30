@@ -19,7 +19,9 @@ use api_core::{
 };
 use api_wire_types::{EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
 use db::models::{
-    list::List, ob_configuration::ObConfiguration, rule_instance::RuleInstance,
+    list::List,
+    ob_configuration::ObConfiguration,
+    rule_instance::{IncludeRules, RuleInstance},
     rule_set_result::RuleSetResult,
 };
 use itertools::{chain, Itertools};
@@ -70,7 +72,7 @@ pub async fn evaluate_rule(
         .db_query(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
 
-            let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc_id)?;
+            let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc_id, IncludeRules::All)?;
             let rule_set_results =
                 RuleSetResult::sample_for_eval(conn, &obc.id, start_timestamp, end_timestamp, 100)?;
 

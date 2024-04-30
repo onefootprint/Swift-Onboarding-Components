@@ -353,11 +353,9 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             )?;
         };
 
-        Ok(KycState::from(KycDecisioning {
-            wf_id: self.wf_id,
-            sv_id: self.sv_id,
-            t_id: self.t_id,
-        }))
+        Ok(KycState::from(KycDecisioning::new(
+            self.wf_id, self.sv_id, self.t_id,
+        )))
     }
 }
 
@@ -379,11 +377,11 @@ impl KycDecisioning {
     pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
-        Ok(KycDecisioning {
-            wf_id: workflow.id,
-            sv_id: workflow.scoped_vault_id.clone(),
-            t_id: sv.tenant_id,
-        })
+        Ok(KycDecisioning::new(
+            workflow.id,
+            workflow.scoped_vault_id.clone(),
+            sv.tenant_id,
+        ))
     }
 }
 
@@ -406,11 +404,12 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     ) -> ApiResult<Self::AsyncRes> {
         let svid = self.sv_id.clone();
         let wfid = self.wf_id.clone();
+        let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
-                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
+                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
                 let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling a new seqno inside the RSR write itself
                 let vw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&svid, seqno))?;
@@ -461,6 +460,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             vault_data: &vault_data_for_rules,
             lists: &lists_for_rules,
             is_fixture: fixture_decision.is_some(),
+            include_rules: self.include_rules,
         };
         let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
         // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture decision
@@ -564,11 +564,9 @@ impl OnAction<DocCollected, KycState> for KycDocCollection {
         _async_res: Self::AsyncRes,
         _conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        Ok(KycState::from(KycDecisioning {
-            wf_id: self.wf_id,
-            sv_id: self.sv_id,
-            t_id: self.t_id,
-        }))
+        Ok(KycState::from(KycDecisioning::new(
+            self.wf_id, self.sv_id, self.t_id,
+        )))
     }
 }
 

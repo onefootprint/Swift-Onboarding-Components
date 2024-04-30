@@ -20,10 +20,16 @@ use crate::{
     State,
 };
 use async_trait::async_trait;
-use db::models::{ob_configuration::ObConfiguration, vault::Vault, workflow::Workflow as DbWorkflow};
+use db::models::{
+    ob_configuration::ObConfiguration, rule_instance::IncludeRules, vault::Vault,
+    workflow::Workflow as DbWorkflow,
+};
 use feature_flag::FeatureFlagClient;
-use newtypes::{DocumentConfig, Locked, RuleSetResultKind, ScopedVaultId, TenantId, WorkflowId};
+use newtypes::{
+    DocumentConfig, Locked, RuleInstanceKind, RuleSetResultKind, ScopedVaultId, TenantId, WorkflowId,
+};
 use std::{collections::HashMap, sync::Arc};
+
 
 ///
 /// States
@@ -170,6 +176,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             vault_data: &VaultDataForRules::empty(), // TODO
             lists: &HashMap::new(),                  // TODO mb
             is_fixture: fixture_decision.is_some(),
+            include_rules: IncludeRules::Kind(RuleInstanceKind::Person), // TODO: change when maybe we have rules based on biz docs?
         };
         let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
 

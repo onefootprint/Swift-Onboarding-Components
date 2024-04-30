@@ -268,6 +268,7 @@ crate::util::impl_enum_string_diesel!(RuleSetResultKind);
     AsExpression,
     FromSqlRow,
     EnumString,
+    EnumIter,
     Apiv2Schema,
     SerializeDisplay,
     DeserializeFromStr,

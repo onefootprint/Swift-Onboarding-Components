@@ -15,6 +15,7 @@ use newtypes::{
     output::Csv, DataLifetimeSeqno, DbActor, ListId, Locked, ObConfigurationId, RuleAction, RuleExpression,
     RuleId, RuleInstanceId, RuleInstanceKind, TenantId,
 };
+use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_instance)]
@@ -371,12 +372,19 @@ impl RuleInstance {
         tenant_id: &TenantId,
         is_live: bool,
         ob_config_id: &ObConfigurationId,
+        include_rules: IncludeRules,
     ) -> DbResult<Vec<Self>> {
+        let kinds = match include_rules {
+            IncludeRules::All => RuleInstanceKind::iter().collect(),
+            IncludeRules::Kind(k) => vec![k, RuleInstanceKind::Any],
+        };
+
         let res = rule_instance::table
             .inner_join(ob_configuration::table)
             .filter(ob_configuration::tenant_id.eq(tenant_id))
             .filter(ob_configuration::is_live.eq(is_live))
             .filter(ob_configuration::id.eq(ob_config_id))
+            .filter(rule_instance::kind.eq_any(kinds))
             .filter(rule_instance::deactivated_at.is_null())
             .select(rule_instance::all_columns)
             .order_by((rule_instance::created_at.asc(), rule_instance::id))
@@ -435,6 +443,12 @@ impl RuleInstance {
             .collect();
         Ok(res)
     }
+}
+
+#[derive(Clone, Copy)]
+pub enum IncludeRules {
+    All,
+    Kind(RuleInstanceKind),
 }
 
 #[cfg(test)]
@@ -719,7 +733,7 @@ mod tests {
         assert_eq!(5, rules.len());
         assert_eq!(
             5,
-            RuleInstance::list(conn, &t.id, obc.is_live, &obc.id)
+            RuleInstance::list(conn, &t.id, obc.is_live, &obc.id, IncludeRules::All)
                 .unwrap()
                 .len()
         );
@@ -815,7 +829,7 @@ mod tests {
         // list should return 5 rules. we started with 5, deleted 2, and added 2 (and edited 2)
         assert_eq!(
             5,
-            RuleInstance::list(conn, &t.id, obc.is_live, &obc.id)
+            RuleInstance::list(conn, &t.id, obc.is_live, &obc.id, IncludeRules::All)
                 .unwrap()
                 .len()
         );

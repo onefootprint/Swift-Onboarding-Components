@@ -274,10 +274,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
                 &self.wf_id,
                 fixture_decision,
             )?;
-            Ok(KybState::from(KybDecisioning {
-                wf_id: self.wf_id,
-                t_id: self.t_id,
-            }))
+            Ok(KybState::from(KybDecisioning::new(self.wf_id, self.t_id)))
         } else {
             Ok(KybState::from(KybAwaitingAsyncVendors {
                 wf_id: self.wf_id,
@@ -339,10 +336,7 @@ impl OnAction<AsyncVendorCallsCompleted, KybState> for KybAwaitingAsyncVendors {
         _async_res: (),
         _conn: &mut db::TxnPgConn,
     ) -> ApiResult<KybState> {
-        Ok(KybState::from(KybDecisioning {
-            wf_id: self.wf_id,
-            t_id: self.t_id,
-        }))
+        Ok(KybState::from(KybDecisioning::new(self.wf_id, self.t_id)))
     }
 }
 
@@ -364,10 +358,7 @@ impl KybDecisioning {
     pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
-        Ok(KybDecisioning {
-            wf_id: workflow.id,
-            t_id: sv.tenant_id,
-        })
+        Ok(KybDecisioning::new(workflow.id, sv.tenant_id))
     }
 }
 
@@ -389,12 +380,13 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         let wfid = self.wf_id.clone();
+        let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let wf = DbWorkflow::get(conn, &wfid)?;
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
-                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
+                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
                 let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling a new seqno inside the RSR write itself
                 let vw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&wf.scoped_vault_id, seqno))?;
@@ -462,6 +454,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 &insight_events,
                 &lists_for_rules,
                 &RuleEvalConfig::default(),
+                self.include_rules,
             )? {
                 let decision = Decision::RulesExecuted {
                     should_commit: false, // never commit business data for now

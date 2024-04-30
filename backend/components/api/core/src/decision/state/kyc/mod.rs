@@ -9,9 +9,9 @@ use super::{
 };
 use crate::{errors::ApiResult, State};
 use async_trait::async_trait;
-use db::models::workflow::Workflow as DbWorkflow;
+use db::models::{rule_instance::IncludeRules, workflow::Workflow as DbWorkflow};
 use enum_dispatch::enum_dispatch;
-use newtypes::{ScopedVaultId, TenantId, WorkflowId};
+use newtypes::{RuleInstanceKind, ScopedVaultId, TenantId, WorkflowId};
 
 ///
 /// States
@@ -38,6 +38,17 @@ pub struct KycDecisioning {
     #[allow(unused)]
     sv_id: ScopedVaultId,
     t_id: TenantId,
+    include_rules: IncludeRules,
+}
+impl KycDecisioning {
+    pub fn new(wf_id: WorkflowId, sv_id: ScopedVaultId, t_id: TenantId) -> Self {
+        Self {
+            wf_id,
+            sv_id,
+            t_id,
+            include_rules: IncludeRules::Kind(RuleInstanceKind::Person),
+        }
+    }
 }
 
 #[derive(Clone)]
