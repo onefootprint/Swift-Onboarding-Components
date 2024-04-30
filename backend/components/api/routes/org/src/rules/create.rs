@@ -8,7 +8,7 @@ use crate::{
 use api_core::{decision::rule_engine::validation::validate_rule_expression, ApiError};
 use api_wire_types::CreateRuleRequest;
 use db::models::{list::List, ob_configuration::ObConfiguration, rule_instance::RuleInstance};
-use newtypes::ObConfigurationId;
+use newtypes::{ObConfigurationId, RuleInstanceKind};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 /// Note: Being deprecated in favor of bulk edit API
@@ -39,6 +39,7 @@ pub async fn create_rule(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let list_ids = rule_expression.list_ids();
             let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
+            // TODO: validate kind
             let rule_expression = validate_rule_expression(rule_expression, &lists, is_live)?;
 
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id.into_inner(), &tenant_id, is_live))?;
@@ -50,6 +51,7 @@ pub async fn create_rule(
                 name,
                 rule_expression,
                 action,
+                RuleInstanceKind::Person,
             )?)
         })
         .await?;

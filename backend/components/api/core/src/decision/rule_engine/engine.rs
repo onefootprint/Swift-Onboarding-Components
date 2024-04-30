@@ -233,8 +233,8 @@ mod tests {
     use macros::db_test_case;
     use newtypes::{
         BooleanOperator as BO, DbActor, DecisionIntentKind, DocumentRequestKind, FootprintReasonCode as FRC,
-        RiskSignalGroupKind, RiskSignalId, RuleAction, RuleAction as RA, RuleExpression as RE,
-        RuleExpressionCondition as REC, VendorAPI,
+        RiskSignalGroupKind, RiskSignalId, RuleAction as RA, RuleExpression as RE,
+        RuleExpressionCondition as REC, RuleInstanceKind, VendorAPI,
     };
 
     #[db_test_case(vec![TRule(
@@ -295,14 +295,25 @@ mod tests {
         rules: Vec<TRule>,
         risk_signals: Vec<FRC>,
         doc_collected: bool,
-    ) -> Option<RuleAction> {
+    ) -> Option<RA> {
         // Setup
         let (sv, obc) = make_user(conn);
         let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
         let rules = rules
             .into_iter()
-            .map(|r| RuleInstance::create(conn, &obc, &DbActor::Footprint, None, r.0, r.1).unwrap())
+            .map(|r| {
+                RuleInstance::create(
+                    conn,
+                    &obc,
+                    &DbActor::Footprint,
+                    None,
+                    r.0,
+                    r.1,
+                    RuleInstanceKind::Person,
+                )
+                .unwrap()
+            })
             .collect_vec();
         let risk_signals = make_risk_signals(conn, &sv.id, risk_signals);
 

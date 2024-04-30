@@ -933,6 +933,7 @@ diesel::table! {
         rule_expression -> Jsonb,
         action -> Text,
         is_shadow -> Bool,
+        kind -> Text,
     }
 }
 

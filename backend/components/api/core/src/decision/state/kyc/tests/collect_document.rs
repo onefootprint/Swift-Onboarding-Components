@@ -31,7 +31,7 @@ use newtypes::{
     BooleanOperator, CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus,
     DocTypeRestriction, DocumentCdoInfo, DocumentConfig, DocumentRequestConfig, FootprintReasonCode,
     KycState, OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleExpression, RuleExpressionCondition,
-    Selfie, TenantId, VendorAPI, WorkflowFixtureResult, WorkflowSource, WorkflowState,
+    RuleInstanceKind, Selfie, TenantId, VendorAPI, WorkflowFixtureResult, WorkflowSource, WorkflowState,
 };
 
 #[test_state_case(UserKind::Live, Failure)]
@@ -84,6 +84,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
                         value: true,
                     }]),
                     RuleAction::PassWithManualReview,
+                    RuleInstanceKind::Person,
                 )
                 .unwrap();
 

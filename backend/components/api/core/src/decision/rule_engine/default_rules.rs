@@ -12,7 +12,7 @@ use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
     BooleanOperator, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant as DID, DbActor,
     EnhancedAmlOption, FootprintReasonCode as FRC, Locked, ObConfigurationKind, RuleAction, RuleAction as RA,
-    RuleExpression, RuleExpressionCondition,
+    RuleExpression, RuleExpressionCondition, RuleInstanceKind,
 };
 
 pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
@@ -127,8 +127,8 @@ pub fn base_kyb_rules() -> Vec<(RuleExpression, RuleAction)> {
 pub fn default_rules_for_obc(
     obc: &ObConfiguration,
     ff_client: Option<Arc<dyn FeatureFlagClient>>,
-) -> Vec<(RuleExpression, RuleAction)> {
-    let mut rules = vec![];
+) -> Vec<(RuleExpression, RuleAction, RuleInstanceKind)> {
+    let mut person_rules = vec![];
 
     // KYC
     let has_kyc = obc.must_collect_data.iter().any(|d| {
@@ -143,21 +143,21 @@ pub fn default_rules_for_obc(
     let optional_ssn = obc.optional_data.contains(&CDO::Ssn9) || obc.optional_data.contains(&CDO::Ssn4);
 
     if !obc.skip_kyc && has_kyc {
-        rules.append(&mut base_kyc_rules());
+        person_rules.append(&mut base_kyc_rules());
 
         if must_collect_ssn || optional_ssn {
-            rules.append(&mut ssn_rules());
+            person_rules.append(&mut ssn_rules());
         }
     }
 
     if optional_ssn {
-        rules.append(&mut vec![(if_risk_signal(FRC::SsnNotProvided), RA::ManualReview)]);
+        person_rules.append(&mut vec![(if_risk_signal(FRC::SsnNotProvided), RA::ManualReview)]);
     }
 
     // Alpaca
     if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
-        rules.append(&mut alpaca_kyc_field_validation_rules());
-        rules.append(&mut alpaca_doc_field_validation_rules());
+        person_rules.append(&mut alpaca_kyc_field_validation_rules());
+        person_rules.append(&mut alpaca_doc_field_validation_rules());
     }
 
     // If collection of a Doc is possible, then include Document related rules
@@ -165,7 +165,7 @@ pub fn default_rules_for_obc(
         || obc.document_cdo_for_optional_ssn().is_some()
         || matches!(obc.cip_kind, Some(CipKind::Alpaca))
     {
-        rules.append(&mut base_doc_rules(matches!(obc.cip_kind, Some(CipKind::Alpaca))));
+        person_rules.append(&mut base_doc_rules(matches!(obc.cip_kind, Some(CipKind::Alpaca))));
     }
 
     // AML
@@ -196,29 +196,39 @@ pub fn default_rules_for_obc(
             }
         };
         aml_risk_signals.into_iter().for_each(|rs| {
-            rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
+            person_rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
 
             if ff_client
                 .clone()
                 .map(|ff| ff.flag(BoolFlag::StepUpOnAmlHit(&obc.key)))
                 .unwrap_or(false)
             {
-                rules.push((if_risk_signal(rs), RA::identity_stepup()));
+                person_rules.push((if_risk_signal(rs), RA::identity_stepup()));
             }
         });
     }
 
+
     // KYB
-    if !obc.skip_kyb
+    let business_rules = if !obc.skip_kyb
         && obc
             .must_collect_data
             .iter()
             .any(|d| d.parent().data_identifier_kind() == DID::Business)
     {
-        rules.append(&mut base_kyb_rules());
+        base_kyb_rules()
+    } else {
+        vec![]
     }
+    .into_iter()
+    .map(|(r, a)| (r, a, RuleInstanceKind::Business));
 
-    rules
+
+    person_rules
+        .into_iter()
+        .map(|(r, a)| (r, a, RuleInstanceKind::Person))
+        .chain(business_rules)
+        .collect()
 }
 
 #[tracing::instrument(skip_all)]
@@ -243,10 +253,11 @@ pub fn save_default_rules_for_obc(
         &DbActor::Footprint,
         rules
             .into_iter()
-            .map(|(e, a)| NewRule {
+            .map(|(e, a, kind)| NewRule {
                 rule_expression: e,
                 action: a,
                 name: None,
+                kind,
             })
             .collect(),
     )?;
@@ -304,7 +315,10 @@ mod tests {
 
         assert_have_same_elements(
             expected,
-            default_rules_for_obc(&obc, Some(MockFFClient::new().into_mock())),
+            default_rules_for_obc(&obc, Some(MockFFClient::new().into_mock()))
+                .into_iter()
+                .map(|(r, a, _)| (r, a))
+                .collect(),
         )
     }
 }

@@ -13,7 +13,7 @@ use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     output::Csv, DataLifetimeSeqno, DbActor, ListId, Locked, ObConfigurationId, RuleAction, RuleExpression,
-    RuleId, RuleInstanceId, TenantId,
+    RuleId, RuleInstanceId, RuleInstanceKind, TenantId,
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -36,6 +36,7 @@ pub struct RuleInstance {
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
     pub is_shadow: bool, // not yet used
+    pub kind: RuleInstanceKind,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -53,6 +54,7 @@ pub struct NewRuleInstance<'a> {
     // These two would only be set when inserting a new rule_instance, when a Rule is being deleted
     pub deactivated_at: Option<DateTime<Utc>>,
     pub deactivated_seqno: Option<DataLifetimeSeqno>,
+    pub kind: RuleInstanceKind,
 }
 
 #[derive(Debug, Clone)]
@@ -60,6 +62,7 @@ pub struct NewRule {
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
     pub name: Option<String>,
+    pub kind: RuleInstanceKind,
 }
 
 #[derive(Debug, Clone)]
@@ -186,6 +189,7 @@ impl RuleInstance {
                 is_shadow: false,
                 deactivated_at: None,
                 deactivated_seqno: None,
+                kind: r.kind,
             })
             .collect();
 
@@ -241,7 +245,8 @@ impl RuleInstance {
                 action: existing.action,
                 is_shadow: update.is_shadow.unwrap_or(existing.is_shadow),
                 deactivated_at: update.deactivate.then_some(now),
-                deactivated_seqno: update.deactivate.then_some(seqno), // when we delete rules, we write a new rule_instance row which has deactivated_seqno set
+                deactivated_seqno: update.deactivate.then_some(seqno), // when we delete rules, we write a new rule_instance row which has deactivated_seqno set,
+                kind: existing.kind,
             })
             .collect_vec();
 
@@ -285,6 +290,7 @@ impl RuleInstance {
         name: Option<String>,
         rule_expression: RuleExpression,
         action: RuleAction,
+        kind: RuleInstanceKind,
     ) -> DbResult<Self> {
         Self::bulk_edit(
             conn,
@@ -296,6 +302,7 @@ impl RuleInstance {
                     rule_expression,
                     action,
                     name,
+                    kind,
                 }],
                 updates: vec![],
             },
@@ -454,8 +461,16 @@ mod tests {
             value: true,
         }]);
         let action = RuleAction::ManualReview;
-        let rule =
-            RuleInstance::create(conn, &obc, &DbActor::Footprint, None, expression.clone(), action).unwrap();
+        let rule = RuleInstance::create(
+            conn,
+            &obc,
+            &DbActor::Footprint,
+            None,
+            expression.clone(),
+            action,
+            RuleInstanceKind::Person,
+        )
+        .unwrap();
         assert_eq!(expression, rule.rule_expression);
         assert_eq!(action, rule.action);
         assert!(rule.deactivated_seqno.is_none());
@@ -486,6 +501,7 @@ mod tests {
             }]),
             action: RuleAction::ManualReview,
             name: None,
+            kind: RuleInstanceKind::Person,
         };
         let r2 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
@@ -495,6 +511,7 @@ mod tests {
             }]),
             action: RuleAction::Fail,
             name: None,
+            kind: RuleInstanceKind::Person,
         };
         let r3 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
@@ -504,6 +521,7 @@ mod tests {
             }]),
             action: RuleAction::Fail,
             name: None,
+            kind: RuleInstanceKind::Person,
         };
 
         let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
@@ -545,6 +563,7 @@ mod tests {
             ]),
             action: RuleAction::ManualReview,
             name: None,
+            kind: RuleInstanceKind::Person,
         };
         // r2 references list2
         let r2 = NewRule {
@@ -563,6 +582,7 @@ mod tests {
             ]),
             action: RuleAction::Fail,
             name: None,
+            kind: RuleInstanceKind::Person,
         };
         // r3 references no list
         let r3 = NewRule {
@@ -573,6 +593,7 @@ mod tests {
             }]),
             action: RuleAction::Fail,
             name: None,
+            kind: RuleInstanceKind::Person,
         };
 
         RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
@@ -604,6 +625,7 @@ mod tests {
             Some("name1".to_owned()),
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
+            RuleInstanceKind::Person,
         )
         .unwrap();
         assert_eq!(
@@ -675,6 +697,7 @@ mod tests {
                         rule_expression: tests::fixtures::rule::example_rule_expression(),
                         action: RuleAction::Fail,
                         name: None,
+                        kind: RuleInstanceKind::Person,
                     })
                     .collect(),
                 updates: vec![],
@@ -710,6 +733,7 @@ mod tests {
                         rule_expression: tests::fixtures::rule::example_rule_expression(),
                         action: RuleAction::ManualReview,
                         name: None,
+                        kind: RuleInstanceKind::Person,
                     })
                     .collect(),
                 updates: vec![
@@ -803,6 +827,7 @@ mod tests {
             Some("name1".to_owned()),
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::StepUp(StepUpKind::Identity),
+            RuleInstanceKind::Person,
         )
         .unwrap();
 
@@ -816,6 +841,7 @@ mod tests {
             Some("name1".to_owned()),
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
+            RuleInstanceKind::Person,
         )
         .unwrap();
 

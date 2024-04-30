@@ -18,7 +18,7 @@ use db::{
     PgConn,
 };
 use itertools::{chain, Itertools};
-use newtypes::{ListId, ObConfigurationId, RuleId, TenantId};
+use newtypes::{ListId, ObConfigurationId, RuleId, RuleInstanceKind, TenantId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 /// Note: Being deprecated in favor of bulk edit API
@@ -141,6 +141,8 @@ fn validate_request(
                 rule_expression,
                 action: a.rule_action,
                 name: None, // TODO: we dont actaully use name yet so remove this
+                // TODO: validate
+                kind: RuleInstanceKind::Person,
             })
         })
         .collect::<ApiResult<Vec<_>>>()?;

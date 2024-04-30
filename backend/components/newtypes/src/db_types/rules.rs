@@ -256,6 +256,20 @@ pub enum RuleSetResultKind {
 
 crate::util::impl_enum_string_diesel!(RuleSetResultKind);
 
+
+#[derive(
+    Debug, Eq, PartialEq, Display, Hash, Clone, Copy, AsExpression, FromSqlRow, EnumString, PartialOrd, Ord,
+)]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum RuleInstanceKind {
+    Person,
+    Business,
+    Any,
+}
+
+crate::util::impl_enum_string_diesel!(RuleInstanceKind);
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -316,6 +330,12 @@ mod tests {
     #[test_case(RuleAction::identity_stepup(), RuleAction::ManualReview => Ordering::Greater)]
     #[test_case(RuleAction::Fail, RuleAction::identity_stepup() => Ordering::Greater)]
     fn test_ra_cmp(ra1: RuleAction, ra2: RuleAction) -> Ordering {
+        ra1.cmp(&ra2)
+    }
+
+    #[test_case(RuleInstanceKind::Person, RuleInstanceKind::Any => Ordering::Less)]
+    #[test_case(RuleInstanceKind::Business, RuleInstanceKind::Any => Ordering::Less)]
+    fn test_rik_cmp(ra1: RuleInstanceKind, ra2: RuleInstanceKind) -> Ordering {
         ra1.cmp(&ra2)
     }
 }

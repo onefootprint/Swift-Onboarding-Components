@@ -1,0 +1,1 @@
+ALTER TABLE rule_instance DROP COLUMN kind;

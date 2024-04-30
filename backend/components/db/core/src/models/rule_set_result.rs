@@ -243,7 +243,7 @@ mod tests {
     use macros::db_test;
     use newtypes::{
         DbActor, DecisionIntentKind, DecisionStatus, FootprintReasonCode as FRC, KycState, Locked,
-        RiskSignalGroupKind, VendorAPI, WorkflowState,
+        RiskSignalGroupKind, RuleInstanceKind, VendorAPI, WorkflowState,
     };
 
     #[db_test]
@@ -266,6 +266,7 @@ mod tests {
             None,
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
+            RuleInstanceKind::Person,
         )
         .unwrap();
 
@@ -276,6 +277,7 @@ mod tests {
             None,
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
+            RuleInstanceKind::Person,
         )
         .unwrap();
 
@@ -286,6 +288,7 @@ mod tests {
             None,
             tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
+            RuleInstanceKind::Person,
         )
         .unwrap();
 

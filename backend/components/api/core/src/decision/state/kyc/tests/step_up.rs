@@ -25,8 +25,8 @@ use feature_flag::BoolFlag;
 use macros::{test_state, test_state_case};
 use newtypes::{
     BooleanOperator, CollectedDataOption as CDO, DbActor, DbUserTimelineEvent, DbUserTimelineEventKind,
-    DecisionStatus, DocumentRequestKind, FootprintReasonCode, FootprintReasonCode as FRC, KycState,
-    OnboardingStatus, RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, WorkflowState,
+    DecisionStatus, DocumentRequestKind, FootprintReasonCode as FRC, KycState, OnboardingStatus, RuleAction,
+    RuleExpression, RuleExpressionCondition, RuleInstanceKind, StepUpKind, WorkflowState,
 };
 
 #[test_state_case(StepUpKind::Identity)]
@@ -58,7 +58,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let expr = RuleExpression(vec![RuleExpressionCondition::RiskSignal {
-                field: FootprintReasonCode::DobCouldNotMatch,
+                field: FRC::DobCouldNotMatch,
                 op: BooleanOperator::Equals,
                 value: true,
             }]);
@@ -70,6 +70,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
                 None,
                 expr,
                 RuleAction::StepUp(step_up_kind),
+                RuleInstanceKind::Person,
             )
             .unwrap();
 
@@ -238,34 +239,37 @@ async fn test_multi_stage_step_up(state: &mut State) {
         .db_transaction(move |conn| -> ApiResult<_> {
             let kyc_stepup_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
-                    field: FootprintReasonCode::DobCouldNotMatch,
+                    field: FRC::DobCouldNotMatch,
                     op: BooleanOperator::Equals,
                     value: true,
                 }]),
                 action: RuleAction::StepUp(identity_stepup),
                 name: None,
+                kind: RuleInstanceKind::Person,
             };
 
             // here we rely on the ordering of RuleActions to choose StepUp the first time, then
             // the next time, we'll be ineligible to stepup because we already collected a doc
             let poa_stepup_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
-                    field: FootprintReasonCode::DocumentOcrDobDoesNotMatch,
+                    field: FRC::DocumentOcrDobDoesNotMatch,
                     op: BooleanOperator::Equals,
                     value: true,
                 }]),
                 action: RuleAction::StepUp(proof_of_address_stepup),
                 name: None,
+                kind: RuleInstanceKind::Person,
             };
 
             let poa_review_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
-                    field: FootprintReasonCode::DocumentOcrDobDoesNotMatch,
+                    field: FRC::DocumentOcrDobDoesNotMatch,
                     op: BooleanOperator::Equals,
                     value: true,
                 }]),
                 action: RuleAction::ManualReview,
                 name: None,
+                kind: RuleInstanceKind::Person,
             };
 
             let obc = ObConfiguration::lock(conn, &obc_id).unwrap();
