@@ -21,10 +21,10 @@ const getD2PStatus = async (
   }
 
   const data = await response.json();
-  const appearance = parse(data.meta.style_params);
+  const appearance = parse(data.meta.style_params) as FootprintAppearance;
   return {
     variant: appearance.variant,
-    fontSrc: appearance.font_src,
+    fontSrc: appearance.fontSrc,
     rules: appearance.rules,
     variables: appearance.variables,
   };
