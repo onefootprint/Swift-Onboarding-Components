@@ -18,7 +18,7 @@ const Section = ({
   id,
   actions,
 }: SectionProps) => (
-  <Box aria-label={title} id={id} data-testid={id}>
+  <Box aria-label={title} id={id} role="group">
     <Header>
       <Text tag="h2" variant="label-1" gap={3} display="flex">
         <IconComponent />
@@ -27,14 +27,14 @@ const Section = ({
       {actions}
     </Header>
     <Divider marginBottom={7} />
-    {children}
+    <Box position="relative">{children}</Box>
   </Box>
 );
 
 const Header = styled.header`
   ${({ theme }) => css`
-    display: flex;
     align-items: flex-end;
+    display: flex;
     flex-direction: column wrap;
     justify-content: space-between;
     margin-bottom: ${theme.spacing[3]};

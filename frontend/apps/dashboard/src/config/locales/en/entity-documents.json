@@ -12,7 +12,8 @@
   "scores": {
     "document": "Document",
     "extracted": "Extracted data",
-    "face": "Face match"
+    "face": "Face match",
+    "encrypted": "Encrypted"
   },
   "uploads": {
     "title": "Uploaded"

@@ -3,6 +3,7 @@ import {
   customRender,
   screen,
   waitFor,
+  within,
 } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -54,7 +55,7 @@ describe('Documents', () => {
     });
 
     describe('when the data is encrypted', () => {
-      it('should show a banner', async () => {
+      it('should show a banner saying the data is encrypted', async () => {
         renderDocuments();
 
         await waitFor(() => {
@@ -62,6 +63,16 @@ describe('Documents', () => {
             'This data is encrypted for this user. Please decrypt to reveal.',
           );
           expect(banner).toBeInTheDocument();
+        });
+      });
+
+      it('should show that is encrypted in the scores section', async () => {
+        renderDocuments();
+
+        const scores = await screen.findByRole('group', { name: 'Scores' });
+        await waitFor(() => {
+          const encryptedMessage = within(scores).getByText('Encrypted');
+          expect(encryptedMessage).toBeInTheDocument();
         });
       });
     });

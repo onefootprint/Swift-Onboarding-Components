@@ -33,7 +33,12 @@ const Content = ({ doc, meta }: ContentProps) => {
         </Box>
       )}
       <Box marginBottom={7}>
-        <Scores document={97} data={95} face={98} />
+        <Scores
+          document={97}
+          data={95}
+          face={98}
+          isEncrypted={meta.isEncrypted}
+        />
       </Box>
       <Box marginBottom={7}>
         <Uploads />
