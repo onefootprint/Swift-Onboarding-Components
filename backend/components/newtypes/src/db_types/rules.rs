@@ -3,7 +3,7 @@ use crate::{
     DecisionStatus, DocumentRequestConfig, DocumentRequestKind,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::v2::models::DataType;
+use paperclip::{actix::Apiv2Schema, v2::models::DataType};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{AsRefStr, IntoEnumIterator, ParseError};
 use strum_macros::{Display, EnumIter, EnumString};
@@ -258,7 +258,21 @@ crate::util::impl_enum_string_diesel!(RuleSetResultKind);
 
 
 #[derive(
-    Debug, Eq, PartialEq, Display, Hash, Clone, Copy, AsExpression, FromSqlRow, EnumString, PartialOrd, Ord,
+    Debug,
+    Eq,
+    PartialEq,
+    Display,
+    Hash,
+    Clone,
+    Copy,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    Apiv2Schema,
+    SerializeDisplay,
+    DeserializeFromStr,
+    PartialOrd,
+    Ord,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

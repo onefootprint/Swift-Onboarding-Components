@@ -1,6 +1,6 @@
 use newtypes::{
     FpId, ListId, ObConfigurationId, OnboardingStatus, RuleAction, RuleExpression, RuleExpressionCondition,
-    RuleId,
+    RuleId, RuleInstanceKind,
 };
 use std::collections::HashMap;
 
@@ -26,6 +26,7 @@ pub struct Rule {
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
     pub is_shadow: bool,
+    pub kind: RuleInstanceKind,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

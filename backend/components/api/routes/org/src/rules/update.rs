@@ -49,14 +49,18 @@ pub async fn update_rule(
     let rule = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let rule_expression = rule_expression
+            let rule_expression_and_kind = rule_expression
                 .map(|expr| -> ApiResult<_> {
                     let list_ids = expr.list_ids();
                     let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
                     validate_rule_expression(expr, &lists, is_live)
                 })
-                .transpose()?
-                .map(|(expr, _)| expr);
+                .transpose()?;
+
+            let (expression, kind) = match rule_expression_and_kind {
+                Some((e, k)) => (Some(e), Some(k)),
+                None => (None, None),
+            };
 
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
@@ -65,7 +69,7 @@ pub async fn update_rule(
                 conn,
                 &obc,
                 &actor.into(),
-                RuleInstanceUpdate::update(rule_id, name, rule_expression, is_shadow),
+                RuleInstanceUpdate::update(rule_id, name, expression, is_shadow, kind),
             )?)
         })
         .await?;
@@ -169,12 +173,13 @@ fn validate_request(
         .unwrap_or_default()
         .into_iter()
         .map(|e| {
-            let (rule_expression, _) = validate_rule_expression(e.rule_expression, &lists, is_live)?;
+            let (rule_expression, kind) = validate_rule_expression(e.rule_expression, &lists, is_live)?;
             Ok(RuleInstanceUpdate::update(
                 e.rule_id,
                 None,
                 Some(rule_expression.clone()),
                 None,
+                Some(kind),
             ))
         })
         .collect::<ApiResult<Vec<_>>>()?;

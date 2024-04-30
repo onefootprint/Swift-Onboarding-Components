@@ -11,6 +11,7 @@ impl DbToApi<RuleInstance> for api_wire_types::Rule {
             rule_expression,
             action,
             is_shadow,
+            kind,
             ..
         } = rule;
 
@@ -21,6 +22,7 @@ impl DbToApi<RuleInstance> for api_wire_types::Rule {
             rule_expression,
             action,
             is_shadow,
+            kind,
         }
     }
 }

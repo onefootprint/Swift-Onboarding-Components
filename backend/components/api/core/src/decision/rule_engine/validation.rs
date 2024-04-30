@@ -161,3 +161,125 @@ pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) ->
         RuleInstanceKind::Person
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use crate::{ApiError, ApiErrorKind};
+
+    use super::*;
+    use chrono::Utc;
+    use newtypes::{BooleanOperator, FootprintReasonCode as FRC, IsIn, ListId, SealedVaultDataKey, TenantId, ListKind, ListAlias, DbActor, DataLifetimeSeqno};
+    use test_case::test_case;
+
+    fn test_list_id() -> ListId {
+        ListId::from("l1234".to_string())
+    }
+    fn test_list(kind: ListKind) -> List {
+        List {
+            id: test_list_id(),
+            created_at: Utc::now(),
+            created_seqno: DataLifetimeSeqno::default(),
+            _created_at: Utc::now(),
+            _updated_at: Utc::now(),
+            deactivated_at: None,
+            deactivated_seqno: None,
+            tenant_id: TenantId::from_str("t1234").unwrap(),
+            is_live: true,
+            actor: DbActor::Footprint,
+            name: "l1".into(),
+            alias: ListAlias::from_str("la1234").unwrap(),
+            kind,
+            e_data_key: SealedVaultDataKey(vec![]),
+        }
+    }
+
+    fn validation_error(s: &str) -> ApiError {
+        ValidationError(s).into()
+    }
+
+    #[test_case(vec![
+        RuleExpressionCondition::RiskSignal {
+            field: FRC::DobCouldNotMatch,
+            op: BooleanOperator::Equals,
+            value: true,
+        },
+        RuleExpressionCondition::RiskSignal {
+            field: FRC::IdNotLocated,
+            op: BooleanOperator::Equals,
+            value: true,
+        },
+        RuleExpressionCondition::DeviceInsight(
+            DeviceInsightOperation::IsIn {
+                field: DeviceInsightField::IpAddress,
+                op: IsIn::IsIn,
+                value: test_list_id(),
+            }, 
+        )
+    ], Ok(RuleInstanceKind::Person))]
+    #[test_case(vec![
+        RuleExpressionCondition::RiskSignal {
+            field: FRC::BusinessAddressIncompleteMatch,
+            op: BooleanOperator::Equals,
+            value: true,
+        },
+        RuleExpressionCondition::RiskSignal {
+            field: FRC::BusinessAddressCloseMatch,
+            op: BooleanOperator::Equals,
+            value: true,
+        },
+        RuleExpressionCondition::DeviceInsight(
+            DeviceInsightOperation::IsIn {
+                field: DeviceInsightField::IpAddress,
+                op: IsIn::IsIn,
+                value: test_list_id(),
+            }, 
+        )
+    ], Ok(RuleInstanceKind::Business))]
+    #[test_case(vec![
+        RuleExpressionCondition::DeviceInsight(
+            DeviceInsightOperation::IsIn {
+                field: DeviceInsightField::IpAddress,
+                op: IsIn::IsIn,
+                value: test_list_id(),
+            }, 
+        )], Ok(RuleInstanceKind::Any))]
+
+    #[test_case(vec![
+        RuleExpressionCondition::RiskSignal {
+            field: FRC::BusinessAddressIncompleteMatch,
+            op: BooleanOperator::Equals,
+            value: true,
+        },
+        RuleExpressionCondition::RiskSignal {
+            field: FRC::IdNotLocated,
+            op: BooleanOperator::Equals,
+            value: true,
+        },
+       ], Err(validation_error("Cannot make a rule expression that includes both Person and Business signals")))]
+    fn test_validate_rule_expression_for_rule_instance_kind(recs: Vec<RuleExpressionCondition>, expected_kind: ApiResult<RuleInstanceKind>) {
+        let unvalidated = UnvalidatedRuleExpression(recs);
+        let lists = HashMap::from_iter([(test_list_id(), test_list(ListKind::IpAddress))]);
+
+        let rule_instance_kind = validate_rule_expression(unvalidated, &lists, true).map(|(_, rik)| rik);
+        match (rule_instance_kind, expected_kind) {
+            (Ok(rik), Ok(expected_rik)) => assert_eq!(rik, expected_rik),
+            (Err(err), Err(expected_err)) => {
+                let ApiErrorKind::ValidationError(s) = err.kind() else {
+                    panic!("wrong error received");
+                };
+                let ApiErrorKind::ValidationError(s1) = expected_err.kind() else {
+                    panic!("wrong error kind for expected");
+                };
+
+                assert_eq!(s, s1);
+
+            },
+            (Ok(_), Err(_)) => panic!("expected value should be successful"),
+            (Err(_), Ok(_)) => panic!("expected value should be error"),
+        }
+        
+    }
+}

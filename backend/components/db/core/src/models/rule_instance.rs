@@ -72,6 +72,7 @@ pub struct RuleInstanceUpdate {
     rule_expression: Option<RuleExpression>,
     is_shadow: Option<bool>, // TODO: remove, we don't actually use this currently
     deactivate: bool,
+    kind: Option<RuleInstanceKind>,
 }
 
 impl RuleInstanceUpdate {
@@ -80,6 +81,7 @@ impl RuleInstanceUpdate {
         name: Option<Option<String>>,
         rule_expression: Option<RuleExpression>,
         is_shadow: Option<bool>,
+        kind: Option<RuleInstanceKind>,
     ) -> Self {
         Self {
             rule_id,
@@ -87,6 +89,7 @@ impl RuleInstanceUpdate {
             rule_expression,
             is_shadow,
             deactivate: false,
+            kind,
         }
     }
 
@@ -97,6 +100,7 @@ impl RuleInstanceUpdate {
             rule_expression: None,
             is_shadow: None,
             deactivate: true,
+            kind: None,
         }
     }
 }
@@ -246,7 +250,7 @@ impl RuleInstance {
                 is_shadow: update.is_shadow.unwrap_or(existing.is_shadow),
                 deactivated_at: update.deactivate.then_some(now),
                 deactivated_seqno: update.deactivate.then_some(seqno), // when we delete rules, we write a new rule_instance row which has deactivated_seqno set,
-                kind: existing.kind,
+                kind: update.kind.unwrap_or(existing.kind),
             })
             .collect_vec();
 
@@ -646,6 +650,7 @@ mod tests {
                 rule_expression: Some(tests::fixtures::rule::example_rule_expression()),
                 is_shadow: Some(false),
                 deactivate: false,
+                kind: None,
             },
         )
         .unwrap();
@@ -743,12 +748,14 @@ mod tests {
                         None,
                         Some(tests::fixtures::rule::example_rule_expression2()),
                         None,
+                        None,
                     ),
                     // edit rule1
                     RuleInstanceUpdate::update(
                         rules[1].rule_id.clone(),
                         None,
                         Some(tests::fixtures::rule::example_rule_expression3()),
+                        None,
                         None,
                     ),
                     //delete rule2

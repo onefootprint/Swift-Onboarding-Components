@@ -141,7 +141,6 @@ pub async fn evaluate_rule(
             .ok_or(AssertionError(&format!("Rule not found: {}", edit_rule_id)))?;
         let (expression, _) = edit_rule_expression;
 
-
         edit_rules.push(Rule {
             expression,
             action: curr_rule.action,
