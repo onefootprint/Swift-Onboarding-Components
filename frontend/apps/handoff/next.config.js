@@ -34,23 +34,22 @@ const LOG_ROCKET_CONNECT_SRC = [
 
 const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
 
-const DEV_CONNECT_SRC = (IS_DEV ? [
-  'http://localhost:8000',
-  'http://127.0.0.1:8000',
-] : []).join(' ');
+const DEV_CONNECT_SRC = (
+  IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []
+).join(' ');
 
 const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
   connect-src 'self' ${DEV_CONNECT_SRC} vitals.vercel-insights.com vercel.live *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com *.launchdarkly.com ${OBSERVE_CONNECT_SRC} ${LOG_ROCKET_CONNECT_SRC} ${SENTRY_CONNECT_SRC};
   default-src 'self' vitals.vercel-insights.com;
-  font-src 'self' fonts.googleapis.com fonts.gstatic.com;
+  font-src 'self' fonts.googleapis.com fonts.gstatic.com i.onefp.net;
   form-action 'self';
   frame-ancestors 'self';
   frame-src 'self' vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net cdn.jsdelivr.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: vercel.live vitals.vercel-insights.com maps.googleapis.com fpnpmcdn.net js.dvnfo.com blob: https://cdn.jsdelivr.net docs.opencv.org elements.stytch.com ${LOG_ROCKET_SCRIPT_SRC} ${SENTRY_SCRIPT_SRC};
-  style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net i.onefp.net;
   worker-src 'self' blob:;
 `;
 
