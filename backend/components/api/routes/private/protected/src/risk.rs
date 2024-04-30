@@ -179,9 +179,8 @@ async fn make_decision(
                 lists: &HashMap::new(),                  // TODO mb
                 is_fixture: false,
             };
-            let (rule_set_result, decision) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
+            let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
             let d = decision.clone();
-            let rsr_id = Some(rule_set_result.id);
             let output =
                 common::handle_rules_output(conn, wf, sv.vault_id, vres_ids, decision, rsr_id, vec![])?;
             if matches!(output, DecisionOutput::NonTerminal) {

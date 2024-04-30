@@ -465,7 +465,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             lists: &lists_for_rules,
             is_fixture: fixture_decision.is_some(),
         };
-        let (rule_set_result, decision) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
+        let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
         // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture decision
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
@@ -486,7 +486,6 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             decision
         };
 
-        let rsr_id = Some(rule_set_result.id);
         let output = common::handle_rules_output(conn, wf, v.id, vres_ids, decision, rsr_id, review_reasons)?;
         match output {
             DecisionOutput::Terminal => Ok(KycState::from(KycComplete)),

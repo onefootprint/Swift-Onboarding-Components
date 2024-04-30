@@ -450,7 +450,8 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 .into_iter()
                 .collect();
 
-            let (rsr, _) = decision::rule_engine::engine::evaluate_rules(
+            // TODO should we be using evaluate_workflow_decision?
+            if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
                 conn,
                 &sv.id,
                 &obc.id,
@@ -461,25 +462,26 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 &insight_events,
                 &lists_for_rules,
                 &RuleEvalConfig::default(),
-            )?;
-            (
-                Decision {
+            )? {
+                let decision = Decision::RulesExecuted {
                     should_commit: false, // never commit business data for now
                     create_manual_review: rsr
                         .action_triggered
                         .map(|r| r.should_create_review())
                         .unwrap_or(false),
                     action: rsr.action_triggered,
-                },
-                Some(rsr.id),
-            )
+                };
+                (decision, Some(rsr.id))
+            } else {
+                (Decision::RulesNotExecuted, None)
+            }
         };
 
         // TODO should we use common::save_decision as well in order to handle step-ups in KYB?
         // or no, because this only applies to business entities? then where are we saving the
         // decision / applying step up for the user entity?
         // or yes, but it just no-ops?
-        risk::save_final_decision(conn, &wf.id, vres_ids, &decision, rsr_id, vec![])?;
+        risk::save_final_decision(conn, &wf.id, vres_ids, decision, rsr_id, vec![])?;
 
         Ok(KybState::from(KybComplete {}))
     }

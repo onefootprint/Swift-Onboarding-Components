@@ -259,7 +259,7 @@ impl From<FixtureDecision> for Decision {
             DecisionStatus::Pass => None,
         };
 
-        Decision {
+        Decision::RulesExecuted {
             should_commit: decision_status == DecisionStatus::Pass,
             create_manual_review,
             action,

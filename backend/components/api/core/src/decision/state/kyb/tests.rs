@@ -72,12 +72,12 @@ async fn kyc_bo(state: &mut State, person_wf: &DbWorkflow) {
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let decision = Decision {
+            let decision = Decision::RulesExecuted {
                 should_commit: false,
                 create_manual_review: false,
                 action: None,
             };
-            risk::save_final_decision(conn, &wf.id, vec![], &decision, None, vec![])
+            risk::save_final_decision(conn, &wf.id, vec![], decision, None, vec![])
         })
         .await
         .unwrap();

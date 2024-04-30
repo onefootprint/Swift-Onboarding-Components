@@ -212,10 +212,14 @@ pub fn handle_rules_output(
     v_id: VaultId,
     vres_ids: Vec<VerificationResultId>,
     rules_output: Decision,
-    rsr_id: Option<RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
+    rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<DecisionOutput> {
-    if let Some(RuleAction::StepUp(suk)) = rules_output.action {
+    if let Decision::RulesExecuted {
+        action: Some(RuleAction::StepUp(suk)),
+        ..
+    } = rules_output
+    {
         let doc_reqs = suk
             .to_doc_configs()
             .into_iter()
@@ -238,7 +242,7 @@ pub fn handle_rules_output(
         Workflow::update(wf, conn, update)?;
         Ok(DecisionOutput::NonTerminal)
     } else {
-        risk::save_final_decision(conn, &wf.id, vres_ids, &rules_output, rsr_id, vec![])?;
+        risk::save_final_decision(conn, &wf.id, vres_ids, rules_output, rsr_id, vec![])?;
         Ok(DecisionOutput::Terminal)
     }
 }

@@ -1,6 +1,6 @@
 use newtypes::{
-    DbActor, DecisionStatus, ManualReviewKind, ReviewReason, RuleSetResultId, VerificationResultId,
-    WorkflowId, WorkflowSource,
+    DbActor, DecisionStatus, ManualReviewKind, OnboardingStatus, ReviewReason, RuleSetResultId,
+    VerificationResultId, WorkflowId, WorkflowSource,
 };
 
 use db::{
@@ -28,8 +28,8 @@ pub fn save_final_decision(
     conn: &mut TxnPgConn,
     wf_id: &WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
-    decision: &Decision,
-    rule_set_result_id: Option<RuleSetResultId>, // TODO: mb just pass in RuleSetResult at this point and then get Decision from that? just need to pull should_commit out of Decision
+    decision: Decision,
+    rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     let wf = Workflow::lock(conn, wf_id)?;
@@ -39,7 +39,7 @@ pub fn save_final_decision(
     // If we should commit, portablize all data for the onboarding
     // But, don't portabalize vaults from no-phone onboardings,
     // and don't portablize vaults from tenant-initiated flows via POST /kyc
-    let seqno = if decision.should_commit && !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
+    let seqno = if decision.should_commit() && !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
         // We may decide to start portablizing data from tenant-initiated workflows, but leave
         // the vaults un-identifiable.
         // Make sure our product stats reflect this if we do so
@@ -50,18 +50,27 @@ pub fn save_final_decision(
         DataLifetime::get_current_seqno(conn)?
     };
 
-    let manual_review = decision.create_manual_review.then_some(ManualReviewArgs {
+    let manual_review = decision.create_manual_review().then_some(ManualReviewArgs {
         kind: ManualReviewKind::RuleTriggered,
         action: ManualReviewAction::GetOrCreate { review_reasons },
     });
     let manual_reviews = manual_review.into_iter().collect();
 
+    let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
+    let status = match decision {
+        Decision::RulesExecuted { action, .. } => action.map(DecisionStatus::from),
+        // If rules didn't execute, default to the existing scoped vault status
+        Decision::RulesNotExecuted => match sv.status {
+            Some(OnboardingStatus::Pass) => Some(DecisionStatus::Pass),
+            Some(OnboardingStatus::Fail) => Some(DecisionStatus::Fail),
+            // If the first playbook you onboard onto doesn't have rules, it will pass/fail you
+            // according to logic below
+            Some(OnboardingStatus::Incomplete) | Some(OnboardingStatus::Pending) | None => None,
+        },
+    };
     // Fall back to pass for now
-    // TODO in future, fail if we're raising manual review for docs, or fall back to existing status
-    let status = decision
-        .action
-        .map(DecisionStatus::from)
-        .unwrap_or(DecisionStatus::Pass);
+    // TODO in future, fail if we're raising manual review for docs
+    let status = status.unwrap_or(DecisionStatus::Pass);
 
     if status == DecisionStatus::StepUp {
         tracing::error!(%wf_id, "Saving final decision with non-terminal status");
@@ -75,7 +84,7 @@ pub fn save_final_decision(
         actor: DbActor::Footprint,
         seqno,
         manual_reviews,
-        rule_set_result_id,
+        rule_set_result_id: rsr_id,
     };
 
     let update = WorkflowUpdate::set_decision(&wf, decision);

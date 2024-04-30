@@ -25,8 +25,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    DocumentRequestKind, ListId, ObConfigurationId, RiskSignalGroupKind, RuleExpressionCondition,
-    RuleSetResultKind, ScopedVaultId, WorkflowId,
+    DocumentRequestKind, ListId, ObConfigurationId, ObConfigurationKind, RiskSignalGroupKind,
+    RuleExpressionCondition, RuleSetResultId, RuleSetResultKind, ScopedVaultId, WorkflowId,
 };
 
 pub struct EvaluateWorkflowDecisionArgs<'a> {
@@ -44,7 +44,7 @@ pub struct EvaluateWorkflowDecisionArgs<'a> {
 pub fn evaluate_workflow_decision<'a>(
     conn: &mut TxnPgConn,
     args: EvaluateWorkflowDecisionArgs<'a>,
-) -> ApiResult<(RuleSetResult, Decision)> {
+) -> ApiResult<(Decision, Option<RuleSetResultId>)> {
     let EvaluateWorkflowDecisionArgs {
         sv_id,
         obc_id,
@@ -80,7 +80,7 @@ pub fn evaluate_workflow_decision<'a>(
     let insight_events: Vec<InsightEvent> =
         InsightEvent::get_for_workflow(conn, wf_id)?.into_iter().collect();
 
-    let (rule_set_result, _rule_results) = evaluate_rules(
+    let rules_output = evaluate_rules(
         conn,
         sv_id,
         obc_id,
@@ -93,6 +93,9 @@ pub fn evaluate_workflow_decision<'a>(
         &rule_eval_config,
     )?;
 
+    let Some((rule_set_result, _)) = rules_output else {
+        return Ok((Decision::RulesNotExecuted, None));
+    };
     let should_commit_rules: Vec<_> = [base_kyc_rules(), super::default_rules::ssn_rules()]
         .concat()
         .into_iter()
@@ -109,7 +112,7 @@ pub fn evaluate_workflow_decision<'a>(
         lists,
         &rule_eval_config,
     );
-    let decision = Decision {
+    let decision = Decision::RulesExecuted {
         should_commit: !is_fixture && should_commit_action.is_none(),
         create_manual_review: rule_set_result
             .action_triggered
@@ -117,7 +120,7 @@ pub fn evaluate_workflow_decision<'a>(
             .unwrap_or(false),
         action: rule_set_result.action_triggered,
     };
-    Ok((rule_set_result, decision))
+    Ok((decision, Some(rule_set_result.id)))
 }
 
 #[derive(derive_more::Deref)]
@@ -171,10 +174,17 @@ pub fn evaluate_rules(
     insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
     rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
-) -> ApiResult<(RuleSetResult, Vec<RuleResult>)> {
+) -> ApiResult<Option<(RuleSetResult, Vec<RuleResult>)>> {
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
     let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, obc_id)?;
     if rules.is_empty() {
+        if obc.kind == ObConfigurationKind::Document {
+            // Document-only playbooks are allowed to have no rules if they want to maintain
+            // the existing status.
+            // One day, we should probably further generalize this to be a "collection-only"
+            // playbook that just doesn't run rules
+            return Ok(None);
+        }
         return Err(crate::decision::Error::from(RuleError::NoRulesForPlaybook(obc.id)).into());
     }
 
@@ -207,7 +217,7 @@ pub fn evaluate_rules(
         },
     )?;
 
-    Ok(rule_set_result)
+    Ok(Some(rule_set_result))
 }
 
 #[cfg(test)]
@@ -315,6 +325,7 @@ mod tests {
             &HashMap::new(),
             &config,
         )
+        .unwrap()
         .unwrap();
 
         // Assertions
