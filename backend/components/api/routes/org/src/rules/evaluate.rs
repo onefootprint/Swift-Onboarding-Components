@@ -23,7 +23,7 @@ use db::models::{
     rule_set_result::RuleSetResult,
 };
 use itertools::{chain, Itertools};
-use newtypes::{ListId, ObConfigurationId, RuleAction, RuleExpression, RuleId};
+use newtypes::{ListId, ObConfigurationId, RuleAction, RuleExpression, RuleId, RuleInstanceKind};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 /*
@@ -85,7 +85,7 @@ pub async fn evaluate_rule(
             .collect();
             let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
 
-            let adds: Vec<(RuleExpression, RuleAction)> = add
+            let adds: Vec<((RuleExpression, RuleInstanceKind), RuleAction)> = add
                 .into_iter()
                 .flatten()
                 .map(|rule| -> ApiResult<_> {
@@ -96,7 +96,7 @@ pub async fn evaluate_rule(
                 })
                 .collect::<ApiResult<_>>()?;
 
-            let edits: Vec<(RuleId, RuleExpression)> = edit
+            let edits: Vec<(RuleId, (RuleExpression, RuleInstanceKind))> = edit
                 .into_iter()
                 .flatten()
                 .map(|rule| -> ApiResult<_> {
@@ -139,15 +139,17 @@ pub async fn evaluate_rule(
         let curr_rule = current_rules
             .remove(&edit_rule_id)
             .ok_or(AssertionError(&format!("Rule not found: {}", edit_rule_id)))?;
+        let (expression, _) = edit_rule_expression;
+
 
         edit_rules.push(Rule {
-            expression: edit_rule_expression,
+            expression,
             action: curr_rule.action,
         });
     }
 
     // For every add, add that rule to the rules
-    let add_rules = adds.into_iter().map(|(rule_expression, rule_action)| Rule {
+    let add_rules = adds.into_iter().map(|((rule_expression, _), rule_action)| Rule {
         expression: rule_expression,
         action: rule_action,
     });

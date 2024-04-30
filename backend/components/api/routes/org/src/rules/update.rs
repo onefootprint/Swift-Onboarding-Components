@@ -18,7 +18,7 @@ use db::{
     PgConn,
 };
 use itertools::{chain, Itertools};
-use newtypes::{ListId, ObConfigurationId, RuleId, RuleInstanceKind, TenantId};
+use newtypes::{ListId, ObConfigurationId, RuleId, TenantId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 /// Note: Being deprecated in favor of bulk edit API
@@ -55,7 +55,8 @@ pub async fn update_rule(
                     let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
                     validate_rule_expression(expr, &lists, is_live)
                 })
-                .transpose()?;
+                .transpose()?
+                .map(|(expr, _)| expr);
 
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
@@ -136,13 +137,13 @@ fn validate_request(
         .unwrap_or_default()
         .into_iter()
         .map(|a| -> ApiResult<_> {
-            let rule_expression = validate_rule_expression(a.rule_expression, &lists, is_live)?;
+            let (rule_expression, rule_instance_kind) =
+                validate_rule_expression(a.rule_expression, &lists, is_live)?;
             Ok(NewRule {
                 rule_expression,
                 action: a.rule_action,
                 name: None, // TODO: we dont actaully use name yet so remove this
-                // TODO: validate
-                kind: RuleInstanceKind::Person,
+                kind: rule_instance_kind,
             })
         })
         .collect::<ApiResult<Vec<_>>>()?;
@@ -168,7 +169,7 @@ fn validate_request(
         .unwrap_or_default()
         .into_iter()
         .map(|e| {
-            let rule_expression = validate_rule_expression(e.rule_expression, &lists, is_live)?;
+            let (rule_expression, _) = validate_rule_expression(e.rule_expression, &lists, is_live)?;
             Ok(RuleInstanceUpdate::update(
                 e.rule_id,
                 None,
