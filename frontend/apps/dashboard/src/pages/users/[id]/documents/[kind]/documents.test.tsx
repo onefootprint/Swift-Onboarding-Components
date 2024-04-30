@@ -41,4 +41,29 @@ describe('Documents', () => {
       });
     });
   });
+
+  describe('when the document is found', () => {
+    beforeEach(() => {
+      useRouterSpy({
+        pathname: `/users/${entityIdFixture}/documents/document.drivers_license`,
+        query: {
+          id: entityIdFixture,
+          kind: 'document.drivers_license',
+        },
+      });
+    });
+
+    describe('when the data is encrypted', () => {
+      it('should show a banner', async () => {
+        renderDocuments();
+
+        await waitFor(() => {
+          const banner = screen.getByText(
+            'This data is encrypted for this user. Please decrypt to reveal.',
+          );
+          expect(banner).toBeInTheDocument();
+        });
+      });
+    });
+  });
 });

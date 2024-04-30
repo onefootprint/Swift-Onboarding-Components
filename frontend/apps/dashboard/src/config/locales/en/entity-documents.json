@@ -6,6 +6,9 @@
     "details": "User details",
     "documents": "Documents"
   },
+  "decrypt": {
+    "info": "This data is encrypted for this user. Please decrypt to reveal."
+  },
   "scores": {
     "document": "Document",
     "extracted": "Extracted data",
