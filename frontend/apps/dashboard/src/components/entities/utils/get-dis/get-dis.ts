@@ -46,7 +46,9 @@ const sort = (attributes: DataIdentifier[]) =>
 
 export const getCustomDIs = (data: EntityVault) => {
   const attributes = Object.keys(data);
-  const filtered = attributes.filter(attr => attr.startsWith('custom'));
+  const filtered = attributes.filter(
+    attr => attr.startsWith('custom') || attr.startsWith('document.custom'),
+  );
   return filtered as DataIdentifier[];
 };
 

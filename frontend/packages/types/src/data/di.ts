@@ -322,7 +322,12 @@ export type CardDI<T extends string = string> =
   | `card.${T}.${CardDIField.expirationMonth}`
   | `card.${T}.${CardDIField.expirationYear}`;
 
-export type CustomDI<T extends string = string> = `custom.${T}`;
+export type CustomDocumentIdentifier<T extends string = string> =
+  `document.custom.${T}`;
+
+export type CustomDI<T extends string = string> =
+  | `custom.${T}`
+  | CustomDocumentIdentifier<T>;
 
 export const DataIdentifierKeys = [
   ...Object.values(BusinessDI),

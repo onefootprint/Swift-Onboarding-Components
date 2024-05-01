@@ -108,7 +108,9 @@ export const hasEntityCards = (entity: Entity) =>
   entity.attributes.some(attr => attr.startsWith('card'));
 
 export const hasEntityCustomData = (entity: Entity) =>
-  entity.attributes.some(attr => attr.startsWith('custom'));
+  entity.attributes.some(
+    attr => attr.startsWith('custom') || attr.startsWith('document.custom'),
+  );
 
 export const hasEntityDocuments = (entity: Entity) => {
   const values = Object.values(DocumentDI);

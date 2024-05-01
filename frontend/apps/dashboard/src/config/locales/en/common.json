@@ -1319,6 +1319,9 @@
             "proof-of-address": {
               "title": "Proof of address"
             },
+            "custom-document": {
+              "title": "Custom document"
+            },
             "onboard": {
               "title": "Onboard onto a playbook",
               "use-playbook": "Use playbook",

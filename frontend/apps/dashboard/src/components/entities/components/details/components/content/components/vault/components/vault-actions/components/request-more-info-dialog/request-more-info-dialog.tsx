@@ -53,7 +53,15 @@ const RequestMoreInfoDialog = ({
   });
 
   const handleGenerateLink = (data: TriggerFormData) => {
-    const { kind: triggerKind, collectSelfie, note, playbook } = data;
+    const {
+      kind: triggerKind,
+      collectSelfie,
+      note,
+      playbook,
+      customDocumentName,
+      customDocumentIdentifier,
+      customDocumentDescription,
+    } = data;
     const kind = triggerKind?.value;
     if (!kind) {
       return;
@@ -94,6 +102,21 @@ const RequestMoreInfoDialog = ({
           {
             kind: DocumentRequestKind.ProofOfAddress,
             data: {},
+          },
+        ];
+      } else if (
+        kind === RequestMoreInfoKind.CustomDocument &&
+        customDocumentName &&
+        customDocumentIdentifier
+      ) {
+        configs = [
+          {
+            kind: DocumentRequestKind.Custom,
+            data: {
+              name: customDocumentName,
+              identifier: customDocumentIdentifier,
+              description: customDocumentDescription,
+            },
           },
         ];
       } else {

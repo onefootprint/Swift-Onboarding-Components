@@ -3,6 +3,7 @@ import {
   OrgFrequentNoteKind,
   WorkflowStatus,
 } from '@onefootprint/types';
+import type { CustomDocumentIdentifier } from '@onefootprint/types/src/data/di';
 import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
 import type { SelectOption } from '@onefootprint/ui';
 import { Select, Shimmer, Stack, Toggle } from '@onefootprint/ui';
@@ -10,6 +11,7 @@ import React, { useEffect } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import AnimatedContainer from 'src/components/animated-container';
+import CustomDocRequestForm from 'src/components/custom-doc-request-form';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
 import usePlaybookOptions from 'src/pages/home/hooks/use-playbook-options';
 import styled, { css } from 'styled-components';
@@ -22,6 +24,7 @@ export enum RequestMoreInfoKind {
   ProofOfAddress = 'proof_of_address',
   ProofOfSsn = 'proof_of_ssn',
   IdDocument = 'id_document',
+  CustomDocument = 'custom_document',
 }
 
 type RequestKindSelectOption = {
@@ -32,6 +35,9 @@ type RequestKindSelectOption = {
 export type TriggerFormData = {
   kind?: RequestKindSelectOption;
   collectSelfie: boolean;
+  customDocumentName?: string;
+  customDocumentIdentifier?: CustomDocumentIdentifier;
+  customDocumentDescription?: string;
   playbook?: SelectOption;
   note?: string;
 };
@@ -83,6 +89,10 @@ const RequestMoreInfoForm = ({
     {
       label: t('onboard.title'),
       value: RequestMoreInfoKind.Onboard,
+    },
+    {
+      label: t('custom-document.title'),
+      value: RequestMoreInfoKind.CustomDocument,
     },
   ];
 
@@ -178,6 +188,25 @@ const RequestMoreInfoForm = ({
             ) : (
               <Shimmer sx={{ height: '38px', width: '100%' }} />
             )}
+          </AnimatedContainer>
+          <AnimatedContainer
+            isExpanded={triggerKind === RequestMoreInfoKind.CustomDocument}
+          >
+            <Stack
+              direction="column"
+              gap={5}
+              padding={5}
+              borderRadius="default"
+              borderStyle="solid"
+              borderWidth={1}
+              borderColor="primary"
+            >
+              <CustomDocRequestForm
+                customDocNameFormField="customDocumentName"
+                customDocIdentifierFormField="customDocumentIdentifier"
+                customDocDescriptionFormField="customDocumentDescription"
+              />
+            </Stack>
           </AnimatedContainer>
         </Stack>
         <FrequentNotesTextArea
