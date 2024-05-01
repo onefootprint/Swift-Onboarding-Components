@@ -1302,29 +1302,33 @@
           "send-request": "Send request",
           "next": "Next",
           "cancel": "Cancel",
-          "prompt": "What would you like to request from this user?",
           "form": {
+            "kind": {
+              "label": "Request from user",
+              "placeholder": "Select option",
+              "cannot-request-info": "Cannot request more info from this user until they onboard onto a playbook",
+              "required-error": "You need to select an option before requesting more information from a user."
+            },
             "id-photo": {
-              "title": "Re-upload ID photo",
-              "collect-selfie": "Collect selfie"
+              "title": "Upload ID photo",
+              "collect-selfie": "Request a selfie"
             },
             "proof-of-ssn": {
-              "title": "Upload proof of SSN"
+              "title": "Proof of SSN"
             },
             "proof-of-address": {
-              "title": "Upload proof of address"
+              "title": "Proof of address"
             },
             "onboard": {
-              "title": "Onboard onto playbook",
+              "title": "Onboard onto a playbook",
+              "use-playbook": "Use playbook",
               "select-a-playbook": "Select a playbook...",
               "playbook-required": "Playbook is required"
             },
             "note-for-user": {
               "label": "Note for user (optional)",
               "placeholder": "We need you to check if there's a typo in the address information you provided..."
-            },
-            "cannot-request-info": "Cannot request more info from this user until they onboard onto a playbook",
-            "error": "You need to select an option before requesting more information from a user."
+            }
           },
           "link": {
             "header-generated": "Link generated!",

@@ -1,8 +1,10 @@
 import {
   createUseRouterSpy,
   customRender,
+  fireEvent,
   mockRequest,
   screen,
+  selectEvents,
   userEvent,
   waitFor,
   waitForElementToBeRemoved,
@@ -56,7 +58,10 @@ describe('<Actions />', () => {
       path: `/org/onboarding_configs`,
       statusCode: 200,
       response: {
-        data: [{ id: 'obc_123', name: 'Test playbook' }],
+        data: [
+          { id: 'obc_id_123', name: 'Test playbook-1' },
+          { id: 'obc_id_456', name: 'Test playbook-2' },
+        ],
       },
     });
     asAdminUser();
@@ -85,23 +90,47 @@ describe('<Actions />', () => {
           const dialog = screen.getByRole('dialog', {
             name: 'Request more information',
           });
-          const reuploadPhotoRadio = screen.getByRole('radio', {
-            name: 'Onboard onto playbook',
+          const kindSelect = screen.getByRole('button', {
+            name: 'Select option',
           });
-          await userEvent.click(reuploadPhotoRadio);
+          await selectEvents.openMenu(kindSelect);
           await waitFor(() => {
-            expect(screen.getByText('Test playbook')).toBeInTheDocument();
+            const playbookOption = screen.getByRole('option', {
+              name: 'Onboard onto a playbook',
+            });
+            expect(playbookOption).toBeInTheDocument();
           });
-
-          const noteTextArea = screen.getByRole('textbox', {
-            name: 'Note for user (optional)',
+          const playbookOption = screen.getByRole('option', {
+            name: 'Onboard onto a playbook',
           });
-          await userEvent.type(noteTextArea, 'Lorem ipsum');
+          fireEvent.click(playbookOption);
+          await waitFor(() => {
+            const playbookSelect = screen.getByRole('button', {
+              name: 'Select a playbook...',
+            });
+            expect(playbookSelect).toBeInTheDocument();
+          });
+          const playbookSelect = screen.getByRole('button', {
+            name: 'Select a playbook...',
+          });
+          await selectEvents.openMenu(playbookSelect);
+          const testPlaybookOption = screen.getByRole('option', {
+            name: 'Test playbook-2',
+          });
+          fireEvent.click(testPlaybookOption);
+          await waitFor(() => {
+            const playbookSelector = screen.queryByRole('button', {
+              name: 'Select a playbook...',
+            });
+            expect(playbookSelector).not.toBeInTheDocument();
+          });
 
           const nextButton = screen.getByRole('button', {
             name: 'Next',
           });
           await userEvent.click(nextButton);
+
+          // We should then render the link on the next page
           await waitFor(() => {
             expect(
               screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
@@ -144,23 +173,47 @@ describe('<Actions />', () => {
           const dialog = screen.getByRole('dialog', {
             name: 'Request more information',
           });
-          const reuploadPhotoRadio = screen.getByRole('radio', {
-            name: 'Onboard onto playbook',
+          const kindSelect = screen.getByRole('button', {
+            name: 'Select option',
           });
-          await userEvent.click(reuploadPhotoRadio);
+          await selectEvents.openMenu(kindSelect);
           await waitFor(() => {
-            expect(screen.getByText('Test playbook')).toBeInTheDocument();
+            const playbookOption = screen.getByRole('option', {
+              name: 'Onboard onto a playbook',
+            });
+            expect(playbookOption).toBeInTheDocument();
           });
-
-          const noteTextArea = screen.getByRole('textbox', {
-            name: 'Note for user (optional)',
+          const playbookOption = screen.getByRole('option', {
+            name: 'Onboard onto a playbook',
           });
-          await userEvent.type(noteTextArea, 'Lorem ipsum');
+          fireEvent.click(playbookOption);
+          await waitFor(() => {
+            const playbookSelect = screen.getByRole('button', {
+              name: 'Select a playbook...',
+            });
+            expect(playbookSelect).toBeInTheDocument();
+          });
+          const playbookSelect = screen.getByRole('button', {
+            name: 'Select a playbook...',
+          });
+          await selectEvents.openMenu(playbookSelect);
+          const testPlaybookOption = screen.getByRole('option', {
+            name: 'Test playbook-2',
+          });
+          fireEvent.click(testPlaybookOption);
+          await waitFor(() => {
+            const playbookSelector = screen.queryByRole('button', {
+              name: 'Select a playbook...',
+            });
+            expect(playbookSelector).not.toBeInTheDocument();
+          });
 
           const nextButton = screen.getByRole('button', {
             name: 'Next',
           });
           await userEvent.click(nextButton);
+
+          // We should then render the link on the next page
           await waitFor(() => {
             expect(
               screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
@@ -200,12 +253,39 @@ describe('<Actions />', () => {
         const dropdownItem = screen.getByText('Request more information');
         await userEvent.click(dropdownItem);
 
-        const reuploadPhotoRadio = screen.getByRole('radio', {
-          name: 'Onboard onto playbook',
+        const kindSelect = screen.getByRole('button', {
+          name: 'Select option',
         });
-        await userEvent.click(reuploadPhotoRadio);
+        await selectEvents.openMenu(kindSelect);
         await waitFor(() => {
-          expect(screen.getByText('Test playbook')).toBeInTheDocument();
+          const playbookOption = screen.getByRole('option', {
+            name: 'Onboard onto a playbook',
+          });
+          expect(playbookOption).toBeInTheDocument();
+        });
+        const playbookOption = screen.getByRole('option', {
+          name: 'Onboard onto a playbook',
+        });
+        fireEvent.click(playbookOption);
+        await waitFor(() => {
+          const playbookSelect = screen.getByRole('button', {
+            name: 'Select a playbook...',
+          });
+          expect(playbookSelect).toBeInTheDocument();
+        });
+        const playbookSelect = screen.getByRole('button', {
+          name: 'Select a playbook...',
+        });
+        await selectEvents.openMenu(playbookSelect);
+        const testPlaybookOption = screen.getByRole('option', {
+          name: 'Test playbook-2',
+        });
+        fireEvent.click(testPlaybookOption);
+        await waitFor(() => {
+          const playbookSelector = screen.queryByRole('button', {
+            name: 'Select a playbook...',
+          });
+          expect(playbookSelector).not.toBeInTheDocument();
         });
 
         const nextButton = screen.getByRole('button', {

@@ -53,7 +53,11 @@ const RequestMoreInfoDialog = ({
   });
 
   const handleGenerateLink = (data: TriggerFormData) => {
-    const { kind, collectSelfie, note, playbook } = data;
+    const { kind: triggerKind, collectSelfie, note, playbook } = data;
+    const kind = triggerKind?.value;
+    if (!kind) {
+      return;
+    }
     let trigger: WorkflowRequestConfig;
     if (kind === RequestMoreInfoKind.Onboard && playbook) {
       trigger = {

@@ -5,15 +5,7 @@ import {
 } from '@onefootprint/types';
 import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
 import type { SelectOption } from '@onefootprint/ui';
-import {
-  Checkbox,
-  Radio,
-  Select,
-  Shimmer,
-  Stack,
-  Text,
-  Tooltip,
-} from '@onefootprint/ui';
+import { Select, Shimmer, Stack, Toggle } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -32,8 +24,13 @@ export enum RequestMoreInfoKind {
   IdDocument = 'id_document',
 }
 
+type RequestKindSelectOption = {
+  label: string;
+  value: RequestMoreInfoKind;
+};
+
 export type TriggerFormData = {
-  kind: RequestMoreInfoKind;
+  kind?: RequestKindSelectOption;
   collectSelfie: boolean;
   playbook?: SelectOption;
   note?: string;
@@ -49,7 +46,7 @@ const RequestMoreInfoForm = ({
   formId,
 }: RequestMoreInfoFormProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.request-more-info',
+    keyPrefix: 'pages.entity.actions.request-more-info.form',
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
@@ -61,18 +58,33 @@ const RequestMoreInfoForm = ({
     ],
   });
 
-  const methods = useForm<TriggerFormData>();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    control,
-    setValue,
-  } = methods;
+  const methods = useForm<TriggerFormData>({
+    defaultValues: {
+      collectSelfie: false,
+    },
+  });
+  const { register, handleSubmit, watch, control, setValue } = methods;
 
-  const triggerKind = watch('kind');
+  const triggerKind = watch('kind')?.value;
   const selectedPlaybook = watch('playbook');
+  const requestOptions = [
+    {
+      label: t('id-photo.title'),
+      value: RequestMoreInfoKind.IdDocument,
+    },
+    {
+      label: t('proof-of-ssn.title'),
+      value: RequestMoreInfoKind.ProofOfSsn,
+    },
+    {
+      label: t('proof-of-address.title'),
+      value: RequestMoreInfoKind.ProofOfAddress,
+    },
+    {
+      label: t('onboard.title'),
+      value: RequestMoreInfoKind.Onboard,
+    },
+  ];
 
   useEffect(() => {
     // Once the playbooks load, select the playbook the user last onboarded onto as the default
@@ -91,6 +103,15 @@ const RequestMoreInfoForm = ({
     wf =>
       wf.status === WorkflowStatus.pass || wf.status === WorkflowStatus.fail,
   );
+  const getRequestKindError = (option?: RequestKindSelectOption) => {
+    if (!option) return t('kind.required-error');
+    if (option?.value !== RequestMoreInfoKind.Onboard) {
+      if (!hasPriorOnboarding) {
+        return t('kind.cannot-request-info');
+      }
+    }
+    return undefined;
+  };
 
   const handleBeforeSubmit = (data: TriggerFormData) => {
     onSubmit(data);
@@ -99,106 +120,71 @@ const RequestMoreInfoForm = ({
   return (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-        <Text variant="label-3">{t('prompt')}</Text>
-        <Stack paddingBottom={2} direction="column" gap={4}>
-          <div>
-            <Tooltip
-              disabled={hasPriorOnboarding}
-              position="left"
-              text={t('form.cannot-request-info')}
-            >
-              <Radio
-                value={RequestMoreInfoKind.IdDocument}
-                label={t('form.id-photo.title')}
-                disabled={!hasPriorOnboarding}
-                {...register('kind', { required: true })}
+        <Stack direction="column" gap={5}>
+          <Controller
+            control={control}
+            name="kind"
+            rules={{
+              validate: {
+                required: getRequestKindError,
+              },
+            }}
+            render={select => (
+              <Select
+                label={t('kind.label')}
+                options={requestOptions}
+                value={select.field.value}
+                onChange={select.field.onChange}
+                placeholder={t('kind.placeholder')}
+                hasError={!!select.fieldState.error}
+                hint={select.fieldState.error?.message}
               />
-            </Tooltip>
-            <AnimatedContainer
-              isExpanded={triggerKind === RequestMoreInfoKind.IdDocument}
-              marginLeft={8}
-              marginTop={4}
-            >
-              <Checkbox
-                label={t('form.id-photo.collect-selfie')}
-                {...register('collectSelfie', { required: false })}
+            )}
+          />
+          <AnimatedContainer
+            isExpanded={triggerKind === RequestMoreInfoKind.IdDocument}
+          >
+            <Toggle
+              label={t('id-photo.collect-selfie')}
+              checked={watch('collectSelfie')}
+              {...register('collectSelfie')}
+            />
+          </AnimatedContainer>
+          <AnimatedContainer
+            isExpanded={triggerKind === RequestMoreInfoKind.Onboard}
+          >
+            {playbooksData?.length ? (
+              <Controller
+                control={control}
+                name="playbook"
+                rules={{
+                  required: triggerKind === RequestMoreInfoKind.Onboard,
+                }}
+                render={select => (
+                  <Select
+                    label={t('onboard.use-playbook')}
+                    hasError={!!select.fieldState.error}
+                    hint={
+                      select.fieldState.error && t('onboard.playbook-required')
+                    }
+                    placeholder={t('onboard.select-a-playbook')}
+                    onBlur={select.field.onBlur}
+                    onChange={select.field.onChange}
+                    options={playbooksData}
+                    value={select.field.value}
+                  />
+                )}
               />
-            </AnimatedContainer>
-          </div>
-          <Tooltip
-            disabled={hasPriorOnboarding}
-            position="left"
-            text={t('form.cannot-request-info')}
-          >
-            <Radio
-              value={RequestMoreInfoKind.ProofOfSsn}
-              label={t('form.proof-of-ssn.title')}
-              disabled={!hasPriorOnboarding}
-              {...register('kind', { required: true })}
-            />
-          </Tooltip>
-          <Tooltip
-            disabled={hasPriorOnboarding}
-            position="left"
-            text={t('form.cannot-request-info')}
-          >
-            <Radio
-              value={RequestMoreInfoKind.ProofOfAddress}
-              label={t('form.proof-of-address.title')}
-              disabled={!hasPriorOnboarding}
-              {...register('kind', { required: true })}
-            />
-          </Tooltip>
-          <div>
-            <Radio
-              value={RequestMoreInfoKind.Onboard}
-              label={t('form.onboard.title')}
-              {...register('kind', { required: true })}
-            />
-            <AnimatedContainer
-              isExpanded={triggerKind === RequestMoreInfoKind.Onboard}
-              marginLeft={8}
-              marginTop={2}
-            >
-              {playbooksData?.length ? (
-                <Controller
-                  control={control}
-                  name="playbook"
-                  rules={{
-                    required: triggerKind === RequestMoreInfoKind.Onboard,
-                  }}
-                  render={select => (
-                    <Select
-                      hasError={!!select.fieldState.error}
-                      size="compact"
-                      hint={
-                        select.fieldState.error &&
-                        t('form.onboard.playbook-required')
-                      }
-                      placeholder={t('form.onboard.select-a-playbook')}
-                      onBlur={select.field.onBlur}
-                      onChange={select.field.onChange}
-                      options={playbooksData}
-                      value={select.field.value}
-                    />
-                  )}
-                />
-              ) : (
-                <Shimmer sx={{ height: '38px', width: '100%' }} />
-              )}
-            </AnimatedContainer>
-          </div>
-          {errors.kind && (
-            <Text variant="body-4" color="error">
-              {t('form.error')}
-            </Text>
-          )}
+            ) : (
+              <Shimmer sx={{ height: '38px', width: '100%' }} />
+            )}
+          </AnimatedContainer>
         </Stack>
         <FrequentNotesTextArea
           kind={OrgFrequentNoteKind.Trigger}
           formField="note"
-          label={t('form.note-for-user.label')}
-          placeholder={t('form.note-for-user.placeholder')}
+          label={t('note-for-user.label')}
+          placeholder={t('note-for-user.placeholder')}
         />
       </StyledForm>
     </FormProvider>
