@@ -1,5 +1,5 @@
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentReviewStatus, DocumentSide, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId, WorkflowId
+    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentReviewStatus, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId, WorkflowId
 };
 
 use crate::{
@@ -15,7 +15,7 @@ use feature_flag::BoolFlag;
 
 use crate::decision::vendor::incode::states::vault_complete_images;
 use db::models::{
-    decision_intent::DecisionIntent, document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier}, document_upload::{DocumentUpload, NewDocumentUploadArgs}, identity_document::{IdentityDocument, IdentityDocumentUpdate, NewIdentityDocumentArgs}, incode_verification_session::IncodeVerificationSession, insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, user_consent::UserConsent, user_timeline::UserTimeline, vault::Vault, workflow::Workflow
+    data_lifetime::DataLifetime, decision_intent::DecisionIntent, document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier}, document_upload::{DocumentUpload, NewDocumentUploadArgs}, identity_document::{IdentityDocument, IdentityDocumentUpdate, NewIdentityDocumentArgs}, incode_verification_session::IncodeVerificationSession, insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, user_consent::UserConsent, user_timeline::UserTimeline, vault::Vault, workflow::Workflow
 };
 
 use super::meta_headers::MetaHeaders;
@@ -365,7 +365,12 @@ pub async fn complete_non_identity_document(
             let dk = id_doc.document_type;
             let uvw = VaultWrapper::lock_for_onboarding(conn, &sv_id)?;
             // TODO: doc_type might need to come from incode once we get to that point
-            let (_, seqno) = vault_complete_images(conn, &uvw, dk, &id_doc)?;
+            let seqno = if dk != IdDocKind::Custom {
+                let (_, seqno) = vault_complete_images(conn, &uvw, dk, &id_doc)?;
+                seqno
+            } else {
+                DataLifetime::get_current_seqno(conn)?
+            };
             // Create a timeline event
             let info = newtypes::DocumentUploadedInfo {
                 id: id_doc_id.clone(),
