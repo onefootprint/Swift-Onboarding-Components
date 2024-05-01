@@ -1,21 +1,27 @@
 use actix_web::{post, web, web::Json};
 use api_core::{
     auth::{
-        session::{tenant::FirmEmployeeSession, AuthSessionData, UpdateSession},
+        session::{tenant::FirmEmployeeSession, AuthSessionData, GetSessionForUpdate, UpdateSession},
         tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
         AuthError,
     },
     errors::ApiResult,
     types::{JsonApiResponse, ResponseData},
-    utils::db2api::DbToApi,
+    utils::{db2api::DbToApi, session::AuthSession},
     State,
 };
 use db::models::tenant::Tenant;
-use newtypes::TenantId;
+use newtypes::{SessionAuthToken, TenantId};
 
 #[derive(Debug, serde::Deserialize)]
 struct AssumeRequest {
-    pub tenant_id: TenantId,
+    tenant_id: TenantId,
+}
+
+#[derive(Debug, serde::Serialize)]
+struct AssumeResponse {
+    tenant: api_wire_types::Organization,
+    token: SessionAuthToken,
 }
 
 #[post("/private/assume")]
@@ -23,7 +29,7 @@ async fn post(
     state: web::Data<State>,
     auth: FirmEmployeeAuthContext,
     request: Json<AssumeRequest>,
-) -> JsonApiResponse<api_wire_types::Organization> {
+) -> JsonApiResponse<AssumeResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
     let auth_method = auth.auth_method;
     let firm_employee = auth.tenant_user.clone();
@@ -36,7 +42,8 @@ async fn post(
         return Err(AuthError::NotAllowedForIntegrationTestUser.into());
     }
 
-    let tenant = state
+    let expires_at = auth.clone().session().expires_at;
+    let (tenant, token) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             // Verify the tenant_id is real
@@ -47,12 +54,17 @@ async fn post(
                 tenant_id,
                 auth_method,
             };
-            auth.update_session(conn, &session_sealing_key, AuthSessionData::FirmEmployee(session))?;
-            Ok(tenant)
+            let session = AuthSessionData::FirmEmployee(session);
+            // TODO stop updating in place once the client starts using the new token
+            auth.update_session(conn, &session_sealing_key, session.clone())?;
+            // The new token will expire at the same time as the existing token to prevent allowing
+            // perpetually re-creating a new token for yourself
+            let (token, _) = AuthSession::create_sync(conn, &session_sealing_key, session, expires_at)?;
+            Ok((tenant, token))
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
-        tenant,
-    ))))
+    let tenant = api_wire_types::Organization::from_db(tenant);
+    let result = AssumeResponse { tenant, token };
+    ResponseData::ok(result).json()
 }

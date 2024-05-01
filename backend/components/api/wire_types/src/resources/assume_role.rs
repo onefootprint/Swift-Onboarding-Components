@@ -1,5 +1,5 @@
 use crate::*;
-use newtypes::{PartnerTenantId, TenantId};
+use newtypes::{PartnerTenantId, SessionAuthToken, TenantId};
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct AssumeRoleRequest {
@@ -8,6 +8,7 @@ pub struct AssumeRoleRequest {
 
 #[derive(serde::Serialize, Apiv2Schema)]
 pub struct AssumeRoleResponse {
+    pub token: SessionAuthToken,
     pub user: OrganizationMember,
     pub tenant: Organization,
 }
@@ -19,6 +20,7 @@ pub struct AssumePartnerRoleRequest {
 
 #[derive(serde::Serialize, Apiv2Schema)]
 pub struct AssumePartnerRoleResponse {
+    pub token: SessionAuthToken,
     pub user: OrganizationMember,
     pub partner_tenant: PartnerOrganization,
 }

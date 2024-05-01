@@ -2,13 +2,15 @@ use crate::State;
 use actix_web::{post, web, web::Json};
 use api_core::{
     auth::{
-        session::{tenant::FirmEmployeeSession, AuthSessionData, UpdateSession},
+        session::{tenant::FirmEmployeeSession, AuthSessionData, GetSessionForUpdate, UpdateSession},
         tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
     },
     errors::{ApiResult, ValidationError},
-    types::{EmptyResponse, JsonApiResponse, ResponseData},
+    types::{JsonApiResponse, ResponseData},
+    utils::session::AuthSession,
 };
 use db::models::tenant::{NewTenant, Tenant};
+use newtypes::SessionAuthToken;
 
 #[derive(serde::Deserialize)]
 pub struct SandboxTenantRequest {
@@ -16,12 +18,17 @@ pub struct SandboxTenantRequest {
     domains: Vec<String>,
 }
 
+#[derive(serde::Serialize)]
+struct SandboxTenantResponse {
+    token: SessionAuthToken,
+}
+
 #[post("/private/sandbox_tenant")]
 pub async fn post(
     state: web::Data<State>,
     request: Json<SandboxTenantRequest>,
     auth: FirmEmployeeAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<SandboxTenantResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
     let SandboxTenantRequest { name, domains } = request.into_inner();
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
@@ -29,7 +36,8 @@ pub async fn post(
     let tenant_user_id = auth.tenant_user.id.clone();
     let auth_method = auth.data.auth_method;
     let sealing_key = state.session_sealing_key.clone();
-    state
+    let expires_at = auth.clone().session().expires_at;
+    let token = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             if Tenant::is_domain_already_claimed(conn, &domains)? {
@@ -50,14 +58,19 @@ pub async fn post(
             };
             let tenant = Tenant::create(conn, new_tenant)?;
             // Update the auth session to be impersonating the newly created tenant
+            // TODO stop updating in place once the client starts using the new token
             let session = FirmEmployeeSession {
                 tenant_user_id,
                 tenant_id: tenant.id,
                 auth_method,
             };
-            auth.update_session(conn, &sealing_key, AuthSessionData::FirmEmployee(session))?;
-            Ok(())
+            let session = AuthSessionData::FirmEmployee(session);
+            auth.update_session(conn, &sealing_key, session.clone())?;
+            // The new token will expire at the same time as the existing token to prevent allowing
+            // perpetually re-creating a new token for yourself
+            let (token, _) = AuthSession::create_sync(conn, &sealing_key, session, expires_at)?;
+            Ok(token)
         })
         .await?;
-    ResponseData::ok(EmptyResponse {}).json()
+    ResponseData::ok(SandboxTenantResponse { token }).json()
 }

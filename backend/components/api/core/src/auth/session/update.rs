@@ -8,7 +8,7 @@ use db::PgConn;
 /// session data for this auth token
 pub trait AllowSessionUpdate {}
 
-pub(super) trait GetSessionForUpdate {
+pub trait GetSessionForUpdate {
     fn session(self) -> AuthSession;
 }
 

@@ -1,11 +1,11 @@
 use api_core::{
     auth::{
-        session::{tenant::TenantRbSession, UpdateSession},
+        session::{tenant::TenantRbSession, AuthSessionData, GetSessionForUpdate, UpdateSession},
         tenant::{AnyOrgSessionAuth, AnyTenantSessionAuth},
     },
-    errors::{ApiError, AssertionError},
+    errors::{ApiError, ApiResult, AssertionError},
     types::response::ResponseData,
-    utils::db2api::DbToApi,
+    utils::{db2api::DbToApi, session::AuthSession},
     State,
 };
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
@@ -39,18 +39,23 @@ fn post(
         }
     };
 
-    let session_data = TenantRbSession::create(rb.id.clone(), auth_method).into();
-
+    let session_data: AuthSessionData = TenantRbSession::create(rb.id.clone(), auth_method).into();
+    let expires_at = tenant_auth.clone().session().expires_at;
     let session_sealing_key = state.session_sealing_key.clone();
-    // Update the auth session to contain the newly assumed role.
-    // We update the existing session (and keep the same expiry) rather than issuing a new one to
-    // prevent perpetually re-creating yourself a new token
-    state
+    let token = state
         .db_pool
-        .db_query(move |conn| tenant_auth.update_session(conn, &session_sealing_key, session_data))
+        .db_query(move |conn| -> ApiResult<_> {
+            // TODO stop updating in place once the client starts using the new token
+            tenant_auth.update_session(conn, &session_sealing_key, session_data.clone())?;
+            // The new token will expire at the same time as the existing token to prevent allowing
+            // perpetually re-creating a new token for yourself
+            let (token, _) = AuthSession::create_sync(conn, &session_sealing_key, session_data, expires_at)?;
+            Ok(token)
+        })
         .await?;
 
     let data = AssumeRoleResponse {
+        token,
         user: OrganizationMember::from_db((tenant_user, rb, tenant_role)),
         tenant: Organization::from_db(tenant),
     };
