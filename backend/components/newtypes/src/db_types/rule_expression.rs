@@ -7,6 +7,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Eq, PartialEq, Apiv2Schema)]
 pub struct RuleExpression(pub Vec<RuleExpressionCondition>);
 
+impl RuleExpression {
+    pub fn list_ids(&self) -> Vec<ListId> {
+        self.0.iter().filter_map(|c| c.list_id().cloned()).collect()
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Eq, PartialEq, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(untagged)]

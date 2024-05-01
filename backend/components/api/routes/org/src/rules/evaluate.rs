@@ -14,12 +14,14 @@ use api_core::{
             eval::{Rule, RuleEvalConfig},
             validation::validate_rule_expression,
         },
+        state::common::saturate_list_entries,
     },
     errors::AssertionError,
 };
 use api_wire_types::{EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
 use db::models::{
     list::List,
+    list_entry::ListEntry,
     ob_configuration::ObConfiguration,
     rule_instance::{IncludeRules, RuleInstance},
     rule_set_result::RuleSetResult,
@@ -56,7 +58,8 @@ pub async fn evaluate_rule(
     request: Json<EvaluateRuleRequest>,
 ) -> ApiResult<Json<ResponseData<api_wire_types::RuleEvalResults>>> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?; // TODO: new guard for this ?
-    let tenant_id = auth.tenant().id.clone();
+    let tenant = auth.tenant();
+    let tenant_id = tenant.id.clone();
     let is_live = auth.is_live()?;
     let obc_id = ob_config_id.into_inner();
 
@@ -67,7 +70,7 @@ pub async fn evaluate_rule(
         start_timestamp,
         end_timestamp,
     } = request.into_inner();
-    let (current_rules, historical_results, adds, edits) = state
+    let (current_rules, historical_results, adds, edits, lists_with_entries) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
@@ -76,7 +79,8 @@ pub async fn evaluate_rule(
             let rule_set_results =
                 RuleSetResult::sample_for_eval(conn, &obc.id, start_timestamp, end_timestamp, 100)?;
 
-            let list_ids: Vec<ListId> = chain(
+            let list_ids: Vec<ListId> = chain!(
+                rules.iter().flat_map(|rule| rule.rule_expression.list_ids()),
                 add.iter()
                     .flatten()
                     .flat_map(|rule| rule.rule_expression.list_ids()),
@@ -85,6 +89,7 @@ pub async fn evaluate_rule(
                     .flat_map(|rule| rule.rule_expression.list_ids()),
             )
             .collect();
+            tracing::info!(?list_ids, "the list ids are");
             let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
 
             let adds: Vec<((RuleExpression, RuleInstanceKind), RuleAction)> = add
@@ -109,9 +114,13 @@ pub async fn evaluate_rule(
                 })
                 .collect::<ApiResult<_>>()?;
 
-            Ok((rules, rule_set_results, adds, edits))
+            let lists_with_entries = ListEntry::list_bulk(conn, &list_ids)?;
+
+            Ok((rules, rule_set_results, adds, edits, lists_with_entries))
         })
         .await?;
+
+    let lists = saturate_list_entries(&state, tenant, lists_with_entries).await?;
 
     let mut current_rules: HashMap<RuleId, Rule> = current_rules
         .into_iter()
@@ -173,7 +182,7 @@ pub async fn evaluate_rule(
                 frcs,
                 &vault_data,
                 &insight_events,
-                &HashMap::new(),
+                &lists,
                 &RuleEvalConfig::default(),
             );
             api_wire_types::RuleEvalResult {

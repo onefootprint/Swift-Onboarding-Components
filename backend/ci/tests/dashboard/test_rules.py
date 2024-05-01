@@ -1,4 +1,6 @@
+import arrow
 import pytest
+from datetime import datetime, timedelta
 from tests.bifrost_client import BifrostClient
 from tests.utils import (
     _gen_random_str,
@@ -403,6 +405,22 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
 
     assert rsr["rule_results"][-1]["rule"]["rule_id"] == non_matching_rule["rule_id"]
     assert rsr["rule_results"][-1]["result"] == False
+
+    # Backtesting with no change yields the same result.
+    start_timestamp = arrow.get(stepup_event["timestamp"]).shift(hours=-1)
+    end_timestamp = start_timestamp.shift(hours=2)
+
+    start_timestamp = datetime.fromisoformat(stepup_event["timestamp"]) - timedelta(hours=1)
+    end_timestamp = start_timestamp + timedelta(hours=2)
+    resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
+        "start_timestamp": start_timestamp.isoformat(),
+        "end_timestamp": end_timestamp.isoformat(),
+    }, *sandbox_tenant.db_auths)
+    backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
+    assert backtest_result["current_status"] == "fail"
+    assert backtest_result["historical_action_triggered"] == "fail"
+
+    # TODO: Backtesting with the matching rule deleted yields a pass.
 
 
 def test_delete(sandbox_tenant, obc):
