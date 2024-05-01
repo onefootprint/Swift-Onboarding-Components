@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { ImgProcessorsContextProvider } from '../components/image-processors';
 import { MissingPermissionsSheetProvider } from '../components/missing-permissions-sheet';
 import { MachineProvider } from './components/machine-provider';
 import Router from './pages/router';
@@ -21,7 +22,9 @@ type NonIdDocFlowProps = {
 const NonIdDocFlow = ({ initialContext, onDone }: NonIdDocFlowProps) => (
   <MachineProvider args={initialContext}>
     <MissingPermissionsSheetProvider device={initialContext.device}>
-      <Router onDone={onDone} />
+      <ImgProcessorsContextProvider>
+        <Router onDone={onDone} />
+      </ImgProcessorsContextProvider>
     </MissingPermissionsSheetProvider>
   </MachineProvider>
 );

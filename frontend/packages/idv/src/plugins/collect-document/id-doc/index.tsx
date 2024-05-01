@@ -3,10 +3,10 @@ import { OpenCvProvider } from 'opencv-react-ts';
 import React from 'react';
 
 import { useL10nContext } from '../../../components/l10n-provider';
+import { ImgProcessorsContextProvider } from '../components/image-processors';
 import { MissingPermissionsSheetProvider } from '../components/missing-permissions-sheet';
 import { FaceModelProvider } from '../hooks/use-face-model-loader';
 import { getCountryCodeFromLocale } from '../utils/get-country-from-code';
-import { ImgProcessorsContextProvider } from './components/image-processors';
 import { MachineProvider } from './components/machine-provider';
 import Router from './pages/router';
 import type { IdDocProps } from './types';

@@ -24,6 +24,7 @@ enum ImageProcessingStepError {
   resize = 'Error while resizing image',
   compress = 'Error while compressing image',
   other = 'Unknown Error',
+  final = 'Please try another image',
 }
 
 const isError = (x: unknown): x is Error => x instanceof Error;
@@ -50,7 +51,7 @@ const errorHandler =
     }
     toast.show({
       title: 'Uh-oh',
-      description: `${step}. Please upload another image.`,
+      description: `${step}.`,
     });
   };
 
@@ -193,6 +194,9 @@ const runProcessFileScript = async (
   logInfo(`extraCompressed: ${extraCompressed}`);
 
   const final = [compressOutput, resizeOutput, heicOutput].find(isFileOrBlob);
+  if (!final || isError(final)) {
+    onError(ImageProcessingStepError.final);
+  }
   return final && !isError(final)
     ? { file: final, extraCompressed }
     : undefined;
