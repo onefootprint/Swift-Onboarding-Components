@@ -16,10 +16,10 @@ pub struct GenerateInvoices {
 impl GenerateInvoices {
     #[tracing::instrument("GenerateInvoices::run", skip_all)]
     pub async fn run(self, _config: Config, state: State) -> Result<()> {
-        // Subtract 8 hours so we always generate the invoice for last month
+        // Subtract 5 hours so we always generate the invoice for last month
         let billing_date = self
             .billing_date
-            .unwrap_or_else(|| (Utc::now() - Duration::hours(8)).date_naive());
+            .unwrap_or_else(|| (Utc::now() - Duration::hours(5)).date_naive());
 
         info!(%billing_date, "generating invoices...",);
 
