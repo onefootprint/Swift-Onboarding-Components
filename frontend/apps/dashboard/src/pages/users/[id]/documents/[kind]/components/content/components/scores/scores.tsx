@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import Section from '../section/section';
+import Section from '../section';
 
 export type ScoresProps = {
   document: number | null;

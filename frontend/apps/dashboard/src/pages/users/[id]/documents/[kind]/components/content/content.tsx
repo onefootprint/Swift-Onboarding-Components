@@ -1,12 +1,14 @@
 import type { Document } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React from 'react';
 
 import DecryptBanner from './components/decrypt-banner';
 import Navigation from './components/navigation';
 import OCR from './components/ocr';
 import Scores from './components/scores';
+import SessionSelect from './components/session-select';
 import Uploads from './components/uploads';
+import useCurrentSession from './hooks/use-current-session';
 
 type ContentProps = {
   documents: Document[];
@@ -17,15 +19,7 @@ type ContentProps = {
 };
 
 const Content = ({ documents, meta }: ContentProps) => {
-  const [currentDocument, setCurrentDocument] = useState(() => documents.at(0));
-  // eslint-disable-next-line no-console
-  console.log('>>> doc', documents);
-  // eslint-disable-next-line no-console
-  console.log('>>> meta', meta);
-  // eslint-disable-next-line no-console
-  console.log('currentDocument', currentDocument);
-  // eslint-disable-next-line no-console
-  console.log('currentDocument', setCurrentDocument);
+  const [currentDocument, setCurrentDocument] = useCurrentSession(documents);
 
   return currentDocument ? (
     <section>
@@ -37,6 +31,13 @@ const Content = ({ documents, meta }: ContentProps) => {
           <DecryptBanner />
         </Box>
       )}
+      <Box marginBottom={7}>
+        <SessionSelect
+          onChange={setCurrentDocument}
+          options={documents}
+          selected={currentDocument}
+        />
+      </Box>
       <Box marginBottom={7}>
         <Scores
           document={currentDocument.documentScore}

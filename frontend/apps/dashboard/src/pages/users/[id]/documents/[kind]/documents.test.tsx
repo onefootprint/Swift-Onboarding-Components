@@ -69,5 +69,34 @@ describe('Documents', () => {
         });
       });
     });
+
+    describe('session selector', () => {
+      describe('when there is no query parameter with session', () => {
+        it('should show the first session selected', async () => {
+          await renderDocumentsAndWait();
+
+          const select = screen.getByText('4/29/24, 6:38 PM');
+          expect(select).toBeInTheDocument();
+        });
+      });
+
+      describe('when there is a query parameter with session', () => {
+        it('should show the session selected', async () => {
+          useRouterSpy({
+            pathname: `/users/${entityFixture.id}/documents/drivers_license`,
+            query: {
+              id: entityFixture.id,
+              kind: 'drivers_license',
+              session: '2024-04-30T19%3A56%3A43.368966Z',
+            },
+          });
+
+          await renderDocumentsAndWait();
+
+          const select = screen.getByText('4/30/24, 7:56 PM');
+          expect(select).toBeInTheDocument();
+        });
+      });
+    });
   });
 });

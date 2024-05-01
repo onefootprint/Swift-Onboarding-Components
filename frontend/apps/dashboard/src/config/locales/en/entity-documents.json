@@ -9,6 +9,9 @@
   "decrypt": {
     "info": "This data is encrypted for this user. Please decrypt to reveal."
   },
+  "session-select": {
+    "label": "Session from"
+  },
   "scores": {
     "document": "Document",
     "ocr": "Extracted data",
