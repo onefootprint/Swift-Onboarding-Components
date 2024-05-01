@@ -89,6 +89,58 @@ export async function CreateAssetCdn(
     region: Region.USEast1,
   });
 
+  // Configure CORS and security headers.
+  const responsePolicy = new aws.cloudfront.ResponseHeadersPolicy(
+    'asset-cdn-origin-response-policy',
+    {
+      comment: 'security-headers',
+      corsConfig: {
+        accessControlAllowCredentials: false,
+        accessControlAllowHeaders: {
+          // Implicitly excludes Authorization header.
+          items: ['*'],
+        },
+        accessControlAllowMethods: {
+          items: ['GET', 'HEAD', 'OPTIONS'],
+        },
+        accessControlAllowOrigins: {
+          // CloudFront allows a wider range of origin specifications than CORS
+          // headers themselves.
+          // https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/understanding-response-headers-policies.html
+          items: ['http://localhost:*', 'https://*.onefootprint.com'],
+        },
+        // When set to true and the origin response contains a CORS header
+        // that's also in the policy, CloudFront adds the CORS header in the
+        // policy to the response. CloudFront then sends that response to the
+        // viewer. CloudFront ignores the header that it received from the
+        // origin.
+        originOverride: true,
+      },
+      securityHeadersConfig: {
+        strictTransportSecurity: {
+          accessControlMaxAgeSec: 31536000,
+          override: false,
+        },
+        frameOptions: {
+          frameOption: 'SAMEORIGIN',
+          override: false,
+        },
+        contentTypeOptions: {
+          override: true,
+        },
+        xssProtection: {
+          protection: true,
+          modeBlock: true,
+          override: true,
+        },
+        referrerPolicy: {
+          referrerPolicy: 'strict-origin-when-cross-origin',
+          override: true,
+        },
+      },
+    },
+  );
+
   // create the CDN
   const distributionArgs: aws.cloudfront.DistributionArgs = {
     enabled: true,
@@ -118,7 +170,13 @@ export async function CreateAssetCdn(
       forwardedValues: {
         cookies: { forward: 'none' },
         queryString: true,
+        headers: [
+          'Access-Control-Request-Headers',
+          'Access-Control-Request-Method',
+          'Origin',
+        ],
       },
+      responseHeadersPolicyId: responsePolicy.id,
 
       minTtl: 0,
       defaultTtl: 10 * 60,
