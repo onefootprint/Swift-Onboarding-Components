@@ -46,7 +46,7 @@
     "focus-trap-react": "^10.2.1",
     "framer-motion": "^10.12.4",
     "google-libphonenumber": "^3.2.32",
-    "heic2any": "^0.0.3",
+    "heic2any": "^0.0.4",
     "isemail": "^3.2.0",
     "launchdarkly-react-client-sdk": "^3.0.9",
     "lodash": "^4.17.21",
