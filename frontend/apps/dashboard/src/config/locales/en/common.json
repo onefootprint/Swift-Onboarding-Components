@@ -660,6 +660,28 @@
       "or": "or",
       "title": "You're in sandbox mode. To activate your account,",
       "toggle": "turn sandbox mode off."
+    },
+    "custom-doc-request-form": {
+      "document-name": {
+        "label": "Document name",
+        "placeholder": "City verification",
+        "errors": {
+          "required": "Please enter a document name"
+        },
+        "tooltip": "Specify a clear name for the document to help users understand what kind of document to upload."
+      },
+      "document-identifier": {
+        "label": "Identifier",
+        "errors": {
+          "required": "Please enter a document identifier",
+          "no-special-characters": "Only letters, numbers, underscores, and hyphens are allowed"
+        },
+        "tooltip": "Use this string to retrieve the document from the vault."
+      },
+      "document-description": {
+        "label": "Description (optional)",
+        "tooltip": "Use this as a hint or additional help to guide users on the documents they need to upload."
+      }
     }
   },
   "pages": {
