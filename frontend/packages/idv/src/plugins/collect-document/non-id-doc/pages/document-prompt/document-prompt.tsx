@@ -33,7 +33,11 @@ const DocumentPrompt = () => {
   const guidelines = useGuidelines(documentRequestKind);
   const { title, description } = useTitleAndDescription(config);
   let alertMessage: string | undefined;
-  if (obConfigSupportedCountries && obConfigSupportedCountries.length === 1) {
+  if (
+    obConfigSupportedCountries &&
+    obConfigSupportedCountries.length === 1 &&
+    documentRequestKind === DocumentRequestKind.ProofOfAddress
+  ) {
     alertMessage = t('single-country-alert', {
       country: getCountryNameFromCode(obConfigSupportedCountries[0]),
     });
