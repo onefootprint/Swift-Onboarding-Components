@@ -155,10 +155,10 @@ where
         // Log into the single user, updating the last_login_at and name (if new)
         let ((tenant_user, rb, tenant_role, _), is_first_login) = state
             .db_pool
-            .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id))
+            .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method))
             .await?;
 
-        let session = TenantRbSession::create(&t_pt, rb.id.clone(), auth_method)?.into();
+        let session = TenantRbSession::create(rb.id.clone(), auth_method).into();
         let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
 
         let requires_onboarding = match &t_pt {

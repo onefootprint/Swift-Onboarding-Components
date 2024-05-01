@@ -13,5 +13,4 @@ pub struct CopyPlaybookRequest {
     pub name: String,
     /// The target is_live for the copied playbook
     pub is_live: bool,
-    // TODO one day support tenant_id here
 }

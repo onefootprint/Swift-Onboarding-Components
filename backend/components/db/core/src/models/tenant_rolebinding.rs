@@ -5,7 +5,8 @@ use super::{
     tenant_user::TenantUser,
 };
 use crate::{
-    helpers::TenantOrPartnerTenant, DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn,
+    helpers::{TenantOrPartnerTenant, WorkosAuthIdentity},
+    DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn,
 };
 use chrono::{DateTime, Utc};
 use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
@@ -13,7 +14,7 @@ use derive_more::From;
 use diesel::{dsl::not, prelude::*, Queryable};
 use newtypes::{
     OrgIdentifierRef, PartnerTenantId, TenantId, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant,
-    TenantRolebindingId, TenantUserId,
+    TenantRolebindingId, TenantUserId, WorkosAuthMethod,
 };
 
 #[derive(Debug, Clone, Queryable, Selectable)]
@@ -278,7 +279,11 @@ impl TenantRolebinding {
 
     /// Log into a given TenantRolebinding
     #[tracing::instrument("TenantRolebinding::login", skip_all)]
-    pub fn login<'a, T>(conn: &mut TxnPgConn, id: T) -> DbResult<(TenantUserInfo, IsFirstLogin)>
+    pub fn login<'a, T>(
+        conn: &mut TxnPgConn,
+        id: T,
+        auth_method: WorkosAuthMethod,
+    ) -> DbResult<(TenantUserInfo, IsFirstLogin)>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
@@ -294,6 +299,9 @@ impl TenantRolebinding {
             TenantOrPartnerTenant::Tenant(t) => (&user.id, &t.id).into(),
             TenantOrPartnerTenant::PartnerTenant(pt) => (&user.id, &pt.id).into(),
         };
+        if !t_pt.supports_auth_method(auth_method) {
+            return Err(DbError::UnsupportedAuthMethod);
+        }
         let rb = Self::update(conn, rb_id, rb_update)?;
         Ok(((user, rb, role, t_pt), is_first_login))
     }

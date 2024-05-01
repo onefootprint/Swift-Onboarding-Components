@@ -290,6 +290,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::UnexpectedRuleSetVersion(_, _) => StatusCode::BAD_REQUEST,
         DbError::ValidationError(_) => StatusCode::BAD_REQUEST,
         DbError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::UnsupportedAuthMethod => StatusCode::UNAUTHORIZED,
     }
 }
 

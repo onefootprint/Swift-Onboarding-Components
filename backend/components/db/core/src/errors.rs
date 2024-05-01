@@ -98,6 +98,8 @@ pub enum DbError {
     ListEntryAlreadyDeactivated,
     #[error("Expected version {0} but latest version is {1}")]
     UnexpectedRuleSetVersion(i32, i32),
+    #[error("Your organization administrator has disabled the ability to log in using this auth method. Please retry using another auth method.")]
+    UnsupportedAuthMethod,
     #[error("{0}")]
     ValidationError(String),
     #[error("{0}")]

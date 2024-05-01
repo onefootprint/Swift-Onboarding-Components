@@ -66,8 +66,6 @@ pub enum AuthError {
     BusinessNotRequired,
     #[error("Cannot log in as a non-person vault")]
     NonPersonVault,
-    #[error("Your organization administrator has disabled the ability to log in using this auth method. Please retry using another auth method.")]
-    UnsupportedAuthMethod,
     #[error("Workflow state does not allow {0}")]
     MissingWorkflowGuard(newtypes::WorkflowGuard),
     #[error("You are not allowed to access this preview API. Please contact us if you'd like to use this functionality.")]

@@ -1,11 +1,5 @@
-use crate::{
-    auth::{tenant::ClientTenantScope, AuthError},
-    errors::ApiResult,
-};
-use db::helpers::WorkosAuthIdentity;
-use newtypes::{
-    FpId, TenantApiKeyId, TenantId, TenantKind, TenantRolebindingId, TenantUserId, WorkosAuthMethod,
-};
+use crate::auth::tenant::ClientTenantScope;
+use newtypes::{FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId, WorkosAuthMethod};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// Basic auth used for dashboard sessions - this represents an authenticated TenantUser at a
@@ -17,22 +11,11 @@ pub struct TenantRbSession {
 }
 
 impl TenantRbSession {
-    pub fn create<'a, T>(
-        tenant_or_partner_tenant: &'a T,
-        rb_id: TenantRolebindingId,
-        auth_method: WorkosAuthMethod,
-    ) -> ApiResult<Self>
-    where
-        T: WorkosAuthIdentity,
-        &'a T: Into<TenantKind>,
-    {
-        if !tenant_or_partner_tenant.supports_auth_method(auth_method) {
-            return Err(AuthError::UnsupportedAuthMethod.into());
-        }
-        Ok(Self {
+    pub fn create(rb_id: TenantRolebindingId, auth_method: WorkosAuthMethod) -> Self {
+        Self {
             tenant_rolebinding_id: rb_id,
             auth_method,
-        })
+        }
     }
 }
 

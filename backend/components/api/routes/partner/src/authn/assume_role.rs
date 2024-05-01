@@ -31,7 +31,7 @@ fn post(
 
     let ((tenant_user, rb, tenant_role, t_pt), _) = state
         .db_pool
-        .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &partner_tenant_id)))
+        .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &partner_tenant_id), auth_method))
         .await?;
 
     let tenant = match t_pt {
@@ -41,7 +41,7 @@ fn post(
         }
     };
 
-    let session_data = TenantRbSession::create(&tenant, rb.id.clone(), auth_method)?.into();
+    let session_data = TenantRbSession::create(rb.id.clone(), auth_method).into();
 
     let session_sealing_key = state.session_sealing_key.clone();
     // Update the auth session to contain the newly assumed role.
