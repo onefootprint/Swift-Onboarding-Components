@@ -3,31 +3,33 @@ import {
   customRender,
   screen,
   waitFor,
-  within,
+  waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Provider from '@/entity/hooks/use-entity-context';
-
 import Documents from './documents';
-import { entityFixture, entityIdFixture } from './documents.test.config';
+import { entityFixture, withDocuments } from './documents.test.config';
 
 describe('Documents', () => {
   const useRouterSpy = createUseRouterSpy();
 
-  const renderDocuments = () =>
-    customRender(
-      <Provider kind={entityFixture.kind} listPath="">
-        <Documents entity={entityFixture} />
-      </Provider>,
+  const renderDocuments = () => customRender(<Documents />);
+
+  const renderDocumentsAndWait = async () => {
+    renderDocuments();
+
+    await waitForElementToBeRemoved(() =>
+      screen.queryByRole('progressbar', { name: 'Loading documents' }),
     );
+  };
 
   describe('when the document is not found', () => {
     beforeEach(() => {
+      withDocuments();
       useRouterSpy({
-        pathname: `/users/${entityIdFixture}/documents/lorem`,
+        pathname: `/users/${entityFixture.id}/documents/lorem`,
         query: {
-          id: entityIdFixture,
+          id: entityFixture.id,
           kind: 'lorem',
         },
       });
@@ -45,34 +47,25 @@ describe('Documents', () => {
 
   describe('when the document is found', () => {
     beforeEach(() => {
+      withDocuments();
       useRouterSpy({
-        pathname: `/users/${entityIdFixture}/documents/document.drivers_license`,
+        pathname: `/users/${entityFixture.id}/documents/drivers_license`,
         query: {
-          id: entityIdFixture,
-          kind: 'document.drivers_license',
+          id: entityFixture.id,
+          kind: 'drivers_license',
         },
       });
     });
 
     describe('when the data is encrypted', () => {
       it('should show a banner saying the data is encrypted', async () => {
-        renderDocuments();
+        await renderDocumentsAndWait();
 
         await waitFor(() => {
           const banner = screen.getByText(
             'This data is encrypted for this user. Please decrypt to reveal.',
           );
           expect(banner).toBeInTheDocument();
-        });
-      });
-
-      it('should show that is encrypted in the scores section', async () => {
-        renderDocuments();
-
-        const scores = await screen.findByRole('group', { name: 'Scores' });
-        await waitFor(() => {
-          const encryptedMessage = within(scores).getByText('Encrypted');
-          expect(encryptedMessage).toBeInTheDocument();
         });
       });
     });

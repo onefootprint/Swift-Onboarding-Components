@@ -1,4 +1,4 @@
-import { IcoLock16, IcoSpeedometer24 } from '@onefootprint/icons';
+import { IcoSpeedometer24 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,12 +8,11 @@ import Section from '../section/section';
 
 export type ScoresProps = {
   document: number | null;
-  data: number | null;
-  face: number | null;
-  isEncrypted?: boolean;
+  ocr: number | null;
+  selfie: number | null;
 };
 
-const Scores = ({ document, data, face, isEncrypted }: ScoresProps) => {
+const Scores = ({ document, ocr, selfie }: ScoresProps) => {
   const { t } = useTranslation('entity-documents', { keyPrefix: 'scores' });
 
   return (
@@ -30,35 +29,29 @@ const Scores = ({ document, data, face, isEncrypted }: ScoresProps) => {
             </Text>
           </Text>
         </Item>
-        <Item aria-label={t('extracted')} aria-hidden>
+        <Item aria-label={t('ocr')} aria-hidden>
           <Text color="tertiary" variant="body-4">
-            {t('extracted')}
+            {t('ocr')}
           </Text>
           <Text color="success" variant="heading-1">
-            {data || '--'}/
+            {ocr || '--'}/
             <Text variant="heading-3" tag="span">
               100
             </Text>
           </Text>
         </Item>
-        <Item aria-label={t('face')} aria-hidden>
+        <Item aria-label={t('selfie')} aria-hidden>
           <Text color="tertiary" variant="body-4">
-            {t('face')}
+            {t('selfie')}
           </Text>
           <Text color="success" variant="heading-1">
-            {face || '--'}/
+            {selfie || '--'}/
             <Text variant="heading-3" tag="span">
               100
             </Text>
           </Text>
         </Item>
       </Container>
-      {isEncrypted && (
-        <EncryptedContainer>
-          <LockIcon />
-          <Text variant="label-4">{t('encrypted')}</Text>
-        </EncryptedContainer>
-      )}
     </Section>
   );
 };
@@ -86,28 +79,6 @@ const Item = styled.div`
       padding-left: ${theme.spacing[6]};
     }
   `};
-`;
-
-const EncryptedContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    backdrop-filter: blur(${theme.spacing[3]});
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: ${theme.borderRadius.default};
-    display: flex;
-    gap: ${theme.spacing[2]};
-    height: calc(100% - 2px);
-    justify-content: center;
-    left: ${theme.borderWidth[1]};
-    position: absolute;
-    top: ${theme.borderWidth[1]};
-    width: calc(100% - 2px);
-  `};
-`;
-
-const LockIcon = styled(IcoLock16)`
-  position: relative;
-  top: -1px;
 `;
 
 export default Scores;

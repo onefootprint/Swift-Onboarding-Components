@@ -1,16 +1,19 @@
+import { mockRequest } from '@onefootprint/test-utils';
+import type { Document, Entity } from '@onefootprint/types';
 import {
   DataKind,
   DocumentDI,
-  type Entity,
   EntityKind,
   EntityStatus,
   IdDI,
+  IdDocImageTypes,
+  IdDocStatus,
+  SupportedIdDocTypes,
+  UploadSource,
 } from '@onefootprint/types';
 
-export const entityIdFixture = 'fp_id_yCZehsWNeywHnk5JqL20u';
-
 export const entityFixture: Entity = {
-  id: 'fp_id_test_QOh434DshKo5rDNaASPMXD',
+  id: 'fp_id_yCZehsWNeywHnk5JqL20u',
   isIdentifiable: true,
   kind: EntityKind.person,
   startTimestamp: '2024-04-29T18:37:37.903573Z',
@@ -309,3 +312,82 @@ export const entityFixture: Entity = {
     DocumentDI.driversLicenseClassifiedDocumentType,
   ],
 };
+
+export const documentsFixture: Document[] = [
+  {
+    kind: SupportedIdDocTypes.driversLicense,
+    startedAt: '2024-04-30T19:56:43.368966Z',
+    status: IdDocStatus.complete,
+    completedVersion: 15271928,
+    uploads: [
+      {
+        timestamp: '2024-04-30T19:57:01.565634Z',
+        side: IdDocImageTypes.front,
+        failureReasons: [],
+        version: 15271906,
+        isExtraCompressed: false,
+      },
+      {
+        timestamp: '2024-04-30T19:57:11.681977Z',
+        side: IdDocImageTypes.back,
+        failureReasons: [],
+        version: 15271914,
+        isExtraCompressed: false,
+      },
+      {
+        timestamp: '2024-04-30T19:57:21.226280Z',
+        side: IdDocImageTypes.selfie,
+        failureReasons: [],
+        version: 15271924,
+        isExtraCompressed: false,
+      },
+    ],
+    documentScore: 100.0,
+    selfieScore: 100.0,
+    ocrConfidenceScore: 99.0,
+    uploadSource: UploadSource.Desktop,
+  },
+  {
+    kind: SupportedIdDocTypes.driversLicense,
+    startedAt: '2024-04-29T18:38:42.202788Z',
+    status: IdDocStatus.complete,
+    completedVersion: 15187172,
+    uploads: [
+      {
+        timestamp: '2024-04-29T18:38:55.713656Z',
+        side: IdDocImageTypes.front,
+        failureReasons: [],
+        version: 15187121,
+        isExtraCompressed: false,
+      },
+      {
+        timestamp: '2024-04-29T18:39:32.050157Z',
+        side: IdDocImageTypes.selfie,
+        failureReasons: [],
+        version: 15187168,
+        isExtraCompressed: false,
+      },
+      {
+        timestamp: '2024-04-29T18:39:05.987436Z',
+        side: IdDocImageTypes.back,
+        failureReasons: [],
+        version: 15187130,
+        isExtraCompressed: false,
+      },
+    ],
+    documentScore: 100.0,
+    selfieScore: 100.0,
+    ocrConfidenceScore: 99.0,
+    uploadSource: UploadSource.Desktop,
+  },
+];
+
+export const withDocuments = (
+  entity = entityFixture,
+  response = documentsFixture,
+) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/documents`,
+    response,
+  });

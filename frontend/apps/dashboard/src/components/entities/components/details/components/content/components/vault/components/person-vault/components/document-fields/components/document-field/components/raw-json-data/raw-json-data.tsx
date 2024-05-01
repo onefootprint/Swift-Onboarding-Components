@@ -15,7 +15,7 @@ import CollapsibleSection from './components/collapsible-section';
 type RawJsonDataProps = {
   vault: EntityVault;
   documentType: SupportedIdDocTypes;
-  curpCompletedVersion?: string;
+  curpCompletedVersion?: string | null;
 };
 
 const getRawJsonData = ({

@@ -1,6 +1,6 @@
-import type { DataIdentifier, VaultValue } from '@onefootprint/types';
+import type { Document } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 
 import DecryptBanner from './components/decrypt-banner';
 import Navigation from './components/navigation';
@@ -9,20 +9,25 @@ import Scores from './components/scores';
 import Uploads from './components/uploads';
 
 type ContentProps = {
-  doc: Record<DataIdentifier, VaultValue>;
+  documents: Document[];
   meta: {
     notFound: boolean;
     isEncrypted: boolean;
   };
 };
 
-const Content = ({ doc, meta }: ContentProps) => {
+const Content = ({ documents, meta }: ContentProps) => {
+  const [currentDocument, setCurrentDocument] = useState(() => documents.at(0));
   // eslint-disable-next-line no-console
-  console.log('>>> doc', doc);
+  console.log('>>> doc', documents);
   // eslint-disable-next-line no-console
   console.log('>>> meta', meta);
+  // eslint-disable-next-line no-console
+  console.log('currentDocument', currentDocument);
+  // eslint-disable-next-line no-console
+  console.log('currentDocument', setCurrentDocument);
 
-  return (
+  return currentDocument ? (
     <section>
       <Box marginBottom={7}>
         <Navigation />
@@ -34,10 +39,9 @@ const Content = ({ doc, meta }: ContentProps) => {
       )}
       <Box marginBottom={7}>
         <Scores
-          document={97}
-          data={95}
-          face={98}
-          isEncrypted={meta.isEncrypted}
+          document={currentDocument.documentScore}
+          ocr={currentDocument.ocrConfidenceScore}
+          selfie={currentDocument.selfieScore}
         />
       </Box>
       <Box marginBottom={7}>
@@ -45,7 +49,7 @@ const Content = ({ doc, meta }: ContentProps) => {
       </Box>
       <OCR />
     </section>
-  );
+  ) : null;
 };
 
 export default Content;

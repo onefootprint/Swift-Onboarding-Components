@@ -11,8 +11,8 @@
   },
   "scores": {
     "document": "Document",
-    "extracted": "Extracted data",
-    "face": "Face match",
+    "ocr": "Extracted data",
+    "selfie": "Face match",
     "encrypted": "Encrypted"
   },
   "uploads": {

@@ -28,7 +28,7 @@ export type Document = {
   selfieScore: number | null;
   ocrConfidenceScore: number | null;
   uploadSource: UploadSource;
-  curpCompletedVersion?: string;
+  curpCompletedVersion?: string | null;
 };
 
 export enum RawJsonKinds {

@@ -1,54 +1,29 @@
 import { getErrorMessage } from '@onefootprint/request';
-import type {
-  DataIdentifier,
-  Entity,
-  EntityVault,
-  VaultValue,
-} from '@onefootprint/types';
 import { useRouter } from 'next/router';
 
-import useEntityVaultWithTransforms from '@/entities/hooks/use-entity-vault-with-transforms';
+import useCurrentEntityDocuments from '@/entity/hooks/use-current-entity-documents';
 
-const useDocuments = (entity: Entity) => {
+const useDocuments = () => {
   const router = useRouter();
-  const { kind } = router.query;
-  const { isReady } = router;
-  const { data, isLoading, error } = useEntityVaultWithTransforms(
-    entity.id,
-    entity,
-  );
-  const documents = getDocuments(data?.vault, kind);
-  const hasKind =
-    typeof kind === 'string' &&
-    data?.dataKinds &&
-    Object.keys(data.dataKinds || {}).some(key => key.startsWith(kind));
+  const entityQuery = useCurrentEntityDocuments();
+
+  const getMeta = () => {
+    const { kind } = router.query;
+    const hasKind = entityQuery.data?.some(doc => doc.kind === kind);
+    const isReady = router.isReady && entityQuery.isFetched;
+
+    return {
+      notFound: isReady ? !hasKind : false,
+      kind,
+      isEncrypted: true,
+    };
+  };
 
   return {
-    data: documents,
-    meta: {
-      notFound: (isReady && data && !hasKind) || false,
-      isEncrypted: Object.values(documents || {}).every(doc => doc === null),
-    },
-    isLoading,
-    error,
-    errorMessage: error ? getErrorMessage(error) : null,
+    ...entityQuery,
+    errorMessage: entityQuery.error ? getErrorMessage(entityQuery.error) : null,
+    meta: getMeta(),
   };
-};
-
-const getDocuments = (entityVault?: EntityVault, kind?: string | string[]) => {
-  if (!kind || typeof kind !== 'string' || !entityVault) {
-    return null;
-  }
-  return Object.keys(entityVault).reduce(
-    (acc, key) => {
-      const keyCasted = key as DataIdentifier;
-      if (key.startsWith(kind)) {
-        acc[keyCasted] = entityVault[keyCasted];
-      }
-      return acc;
-    },
-    {} as Record<DataIdentifier, VaultValue>,
-  );
 };
 
 export default useDocuments;

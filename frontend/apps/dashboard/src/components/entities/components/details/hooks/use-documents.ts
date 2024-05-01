@@ -31,6 +31,7 @@ const useDocuments = (id: string) => {
     ['entities', id, 'documents', requestParams, authHeaders],
     () => getDocuments(authHeaders, { ...requestParams }),
     {
+      enabled: !!id,
       select: documents => {
         documents.sort((doc1, doc2) => {
           if (!doc1.startedAt || !doc2.startedAt) return 0;
