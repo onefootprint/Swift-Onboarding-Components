@@ -279,7 +279,9 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
         ],
         rule_action="fail",
     )
-    update_rules(obc.id, 1, *sandbox_tenant.db_auths, add=[matching_rule, non_matching_rule]) 
+    update_rules(
+        obc.id, 1, *sandbox_tenant.db_auths, add=[matching_rule, non_matching_rule]
+    )
 
     # Rerun Bifrost in a new sandbox.
     sandbox_id = _gen_random_sandbox_id()
@@ -349,57 +351,53 @@ def test_multi_edit(sandbox_tenant, must_collect_data):
     )
 
     # edit 2 rules, add 2 new ones, and delete the rest
-    rules = patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
+    add = [
         dict(
-            expected_rule_set_version=1,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "address_located_is_not_standard_hospital",
-                            "op": "eq",
-                            "value": True,
-                        }
-                    ],
-                ),
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "address_located_is_not_standard_college",
-                            "op": "eq",
-                            "value": True,
-                        }
-                    ],
-                ),
+            rule_action="manual_review",
+            rule_expression=[
+                {
+                    "field": "address_located_is_not_standard_hospital",
+                    "op": "eq",
+                    "value": True,
+                }
             ],
-            edit=[
-                dict(
-                    rule_id=default_rules[0]["rule_id"],
-                    rule_expression=[
-                        {
-                            "field": "browser_automation",
-                            "op": "eq",
-                            "value": True,
-                        }
-                    ],
-                ),
-                dict(
-                    rule_id=default_rules[1]["rule_id"],
-                    rule_expression=[
-                        {
-                            "field": "browser_tampering",
-                            "op": "eq",
-                            "value": True,
-                        }
-                    ],
-                ),
-            ],
-            delete=[r["rule_id"] for r in default_rules[2:]],
         ),
-        *sandbox_tenant.db_auths,
+        dict(
+            rule_action="manual_review",
+            rule_expression=[
+                {
+                    "field": "address_located_is_not_standard_college",
+                    "op": "eq",
+                    "value": True,
+                }
+            ],
+        ),
+    ]
+    edit = [
+        dict(
+            rule_id=default_rules[0]["rule_id"],
+            rule_expression=[
+                {
+                    "field": "browser_automation",
+                    "op": "eq",
+                    "value": True,
+                }
+            ],
+        ),
+        dict(
+            rule_id=default_rules[1]["rule_id"],
+            rule_expression=[
+                {
+                    "field": "browser_tampering",
+                    "op": "eq",
+                    "value": True,
+                }
+            ],
+        ),
+    ]
+    delete = [r["rule_id"] for r in default_rules[2:]]
+    rules = update_rules(
+        obc.id, 1, *sandbox_tenant.db_auths, add=add, edit=edit, delete=delete
     )
 
     # should have 4 rules now: 2 we edited (and did not delete) and 2 new ones we added
@@ -421,91 +419,48 @@ def test_multi_edit(sandbox_tenant, must_collect_data):
     assert reloaded_obc["rule_set"]["version"] == 2
 
     # trying to edit rules to mix business and person should error
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=2,
-            add=[],
-            edit=[
-                dict(
-                    rule_id=default_rules[0]["rule_id"],
-                    rule_expression=[
-                        {
-                            "field": "business_name_match",
-                            "op": "eq",
-                            "value": True,
-                        },
-                        {
-                            "field": "browser_tampering",
-                            "op": "eq",
-                            "value": True,
-                        },
-                    ],
-                ),
-            ],
-            delete=[],
-        ),
-        *sandbox_tenant.db_auths,
-        status_code=400,
+    invalid_expr = [
+        {
+            "field": "business_name_match",
+            "op": "eq",
+            "value": True,
+        },
+        {
+            "field": "browser_tampering",
+            "op": "eq",
+            "value": True,
+        },
+    ]
+    edit = dict(
+        rule_id=default_rules[0]["rule_id"],
+        rule_expression=invalid_expr,
     )
+    update_rules(obc.id, 2, *sandbox_tenant.db_auths, edit=[edit], status_code=400)
 
     # trying to add rules to mix business and person should error
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=2,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "business_name_match",
-                            "op": "eq",
-                            "value": True,
-                        },
-                        {
-                            "field": "browser_tampering",
-                            "op": "eq",
-                            "value": True,
-                        },
-                    ],
-                ),
-            ],
-            edit=[],
-            delete=[],
-        ),
-        *sandbox_tenant.db_auths,
-        status_code=400,
+    rule = dict(
+        rule_action="manual_review",
+        rule_expression=invalid_expr,
     )
+    update_rules(obc.id, 2, *sandbox_tenant.db_auths, add=[rule], status_code=400)
 
     # however, if you edit a rule to be totally business that's fine
-    rules = patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=2,
-            add=[],
-            edit=[
-                dict(
-                    rule_id=default_rules[0]["rule_id"],
-                    rule_expression=[
-                        {
-                            "field": "business_name_match",
-                            "op": "eq",
-                            "value": True,
-                        },
-                        {
-                            "field": "tin_does_not_match",
-                            "op": "eq",
-                            "value": True,
-                        },
-                    ],
-                ),
-            ],
-            delete=[],
-        ),
-        *sandbox_tenant.db_auths,
-        status_code=200,
+    edit = dict(
+        rule_id=default_rules[0]["rule_id"],
+        rule_expression=[
+            {
+                "field": "business_name_match",
+                "op": "eq",
+                "value": True,
+            },
+            {
+                "field": "tin_does_not_match",
+                "op": "eq",
+                "value": True,
+            },
+        ],
     )
+    rules = update_rules(obc.id, 2, *sandbox_tenant.db_auths, edit=[edit])
 
     # we now have 4 rules, and 1 has 2 business related rules inside
     assert len(rules) == 4
@@ -550,61 +505,46 @@ def test_blocklist_rules(sandbox_tenant, must_collect_data):
     )
 
     # creating a blocklist rule using the newly created list's id works
-    rules = patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=1,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.ssn9",
-                            "op": "is_in",
-                            "value": list["id"],
-                        }
-                    ],
-                )
-            ],
-        ),
-        *sandbox_tenant.db_auths,
+    rule = dict(
+        rule_action="manual_review",
+        rule_expression=[
+            {
+                "field": "id.ssn9",
+                "op": "is_in",
+                "value": list["id"],
+            }
+        ],
     )
+    rules = update_rules(obc.id, 1, *sandbox_tenant.db_auths, add=[rule])
 
     assert rules[-1]["rule_expression"] == [
         {"field": "id.ssn9", "op": "is_in", "value": list["id"]}
     ]
 
     # error if an unknown list id is given
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
+    add = [
         dict(
-            expected_rule_set_version=1,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "ip.ssn9",
-                            "op": "is_in",
-                            "value": list["id"],
-                        }
-                    ],
-                ),
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "ip.ssn9",
-                            "op": "is_in",
-                            "value": "lst_abc123",
-                        }
-                    ],
-                ),
+            rule_action="manual_review",
+            rule_expression=[
+                {
+                    "field": "ip.ssn9",
+                    "op": "is_in",
+                    "value": list["id"],
+                }
             ],
         ),
-        *sandbox_tenant.db_auths,
-        status_code=400,
-    )
+        dict(
+            rule_action="manual_review",
+            rule_expression=[
+                {
+                    "field": "ip.ssn9",
+                    "op": "is_in",
+                    "value": "lst_abc123",
+                }
+            ],
+        ),
+    ]
+    update_rules(obc.id, 1, *sandbox_tenant.db_auths, add=add, status_code=400)
 
 
 # TODO: add vault data rule validation tests

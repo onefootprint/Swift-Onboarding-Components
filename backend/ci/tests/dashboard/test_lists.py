@@ -100,56 +100,42 @@ def test_list(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     # use list2 in a rule in obc1
-    patch(
-        f"/org/onboarding_configs/{obc1.id}/rules",
-        dict(
-            expected_rule_set_version=1,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.email",
-                            "op": "is_in",
-                            "value": list2["id"],
-                        }
-                    ],
-                ),
-            ],
-        ),
-        *sandbox_tenant.db_auths,
+    rule = dict(
+        rule_action="manual_review",
+        rule_expression=[
+            {
+                "field": "id.email",
+                "op": "is_in",
+                "value": list2["id"],
+            }
+        ],
     )
+    update_rules(obc1.id, 1, add=[rule], *sandbox_tenant.db_auths)
 
     # use list2 and list3 in a rule in obc2
-    patch(
-        f"/org/onboarding_configs/{obc2.id}/rules",
+    rules = [
         dict(
-            expected_rule_set_version=1,
-            add=[
-                dict(
-                    rule_action="fail",
-                    rule_expression=[
-                        {
-                            "field": "id.email",
-                            "op": "is_in",
-                            "value": list2["id"],
-                        }
-                    ],
-                ),
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.phone_number",
-                            "op": "is_in",
-                            "value": list3["id"],
-                        }
-                    ],
-                ),
+            rule_action="fail",
+            rule_expression=[
+                {
+                    "field": "id.email",
+                    "op": "is_in",
+                    "value": list2["id"],
+                }
             ],
         ),
-        *sandbox_tenant.db_auths,
-    )
+        dict(
+            rule_action="manual_review",
+            rule_expression=[
+                {
+                    "field": "id.phone_number",
+                    "op": "is_in",
+                    "value": list3["id"],
+                }
+            ],
+        ),
+    ]
+    update_rules(obc2.id, 1, add=rules, *sandbox_tenant.db_auths)
 
     lists = get(f"/org/lists", None, *sandbox_tenant.db_auths)["data"]
     lists = iter(lists)
@@ -240,6 +226,27 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
         sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
     )
 
+    ssn_rule_expr = {
+        "field": "id.email",
+        "op": "is_in",
+        "value": ssn9_list["id"],
+    }
+    email_rule_expr = {
+        "field": "id.email",
+        "op": "is_in",
+        "value": email_addr_list["id"],
+    }
+    domain_rule_expr = {
+        "field": "id.email",
+        "op": "is_in",
+        "value": email_domain_list["id"],
+    }
+    custom_rule_expr = {
+        "field": "custom.other_email",
+        "op": "is_in",
+        "value": email_addr_list["id"],
+    }
+
     # [POST] Try to create a rule with a mismatching field and list type.
     rule = dict(
         rule_action="manual_review",
@@ -260,64 +267,30 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     # [POST] Create a rule with a list that accepts exact matches on a field.
-    rule = dict(
-        rule_action="manual_review",
-        rule_expression=[
-            {
-                "field": "id.email",
-                "op": "is_in",
-                "value": email_addr_list["id"],
-            }
-        ],
-    )
+    rule = dict(rule_action="manual_review", rule_expression=[email_rule_expr])
     update_rules(obc.id, 1, add=[rule], *sandbox_tenant.db_auths)
 
     # [POST] Create a rule with a list that accepts transformed matches on a field.
+    rule = dict(rule_action="manual_review", rule_expression=[domain_rule_expr])
+    update_rules(obc.id, 2, add=[rule], *sandbox_tenant.db_auths)
+
+    # [POST] Create a rule matching against a custom list.
+    rule = dict(rule_action="manual_review", rule_expression=[custom_rule_expr])
+    update_rules(obc.id, 3, add=[rule], *sandbox_tenant.db_auths)
+
+    # [PATCH] Try to augment a playbook with a rule with a mismatching field and list type.
     rule = dict(
         rule_action="manual_review",
         rule_expression=[
             {
                 "field": "id.email",
                 "op": "is_in",
-                "value": email_domain_list["id"],
+                "value": ssn9_list["id"],
             }
         ],
     )
-    update_rules(obc.id, 2, add=[rule], *sandbox_tenant.db_auths)
-
-    # [POST] Create a rule matching against a custom list.
-    rule = dict(
-        rule_action="manual_review",
-        rule_expression=[
-            {
-                "field": "custom.other_email",
-                "op": "is_in",
-                "value": email_addr_list["id"],
-            }
-        ],
-    )
-    update_rules(obc.id, 3, add=[rule], *sandbox_tenant.db_auths)
-
-    # [PATCH] Try to augment a playbook with a rule with a mismatching field and list type.
-    resp = patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=4,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.email",
-                            "op": "is_in",
-                            "value": ssn9_list["id"],
-                        }
-                    ],
-                ),
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-        status_code=400,
+    resp = update_rules(
+        obc.id, 4, add=[rule], *sandbox_tenant.db_auths, status_code=400
     )
     assert (
         resp["error"]["message"]
@@ -325,139 +298,24 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     # [PATCH] Augment a playbook with a rule with a list that accepts exact matches on a field.
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=4,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.email",
-                            "op": "is_in",
-                            "value": email_domain_list["id"],
-                        }
-                    ],
-                ),
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-    )
+    rule = dict(rule_action="manual_review", rule_expression=[domain_rule_expr])
+    update_rules(obc.id, 4, add=[rule], *sandbox_tenant.db_auths)
 
     # [PATCH] Augment a playbook with a rule with a list that accepts transformed matches on a field.
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=5,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.email",
-                            "op": "is_in",
-                            "value": email_addr_list["id"],
-                        }
-                    ],
-                ),
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-    )
+    rule = dict(rule_action="manual_review", rule_expression=[email_rule_expr])
+    update_rules(obc.id, 5, add=[rule], *sandbox_tenant.db_auths)
 
     # [PATCH] Augment a playbook with a rule matching against a custom DI.
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=6,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "custom.other_email",
-                            "op": "is_in",
-                            "value": email_addr_list["id"],
-                        }
-                    ],
-                ),
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-    )
+    rule = dict(rule_action="manual_review", rule_expression=[custom_rule_expr])
+    update_rules(obc.id, 6, add=[rule], *sandbox_tenant.db_auths)
 
     resp = get(
         f"/org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths
     )
-    assert (
-        len(
-            [
-                rule
-                for rule in resp
-                if rule["rule_expression"]
-                == [
-                    {
-                        "field": "id.email",
-                        "op": "is_in",
-                        "value": ssn9_list["id"],
-                    }
-                ]
-            ]
-        )
-        == 0
-    )
-    assert (
-        len(
-            [
-                rule
-                for rule in resp
-                if rule["rule_expression"]
-                == [
-                    {
-                        "field": "id.email",
-                        "op": "is_in",
-                        "value": email_addr_list["id"],
-                    }
-                ]
-            ]
-        )
-        == 2
-    )
-    assert (
-        len(
-            [
-                rule
-                for rule in resp
-                if rule["rule_expression"]
-                == [
-                    {
-                        "field": "id.email",
-                        "op": "is_in",
-                        "value": email_domain_list["id"],
-                    }
-                ]
-            ]
-        )
-        == 2
-    )
-    assert (
-        len(
-            [
-                rule
-                for rule in resp
-                if rule["rule_expression"]
-                == [
-                    {
-                        "field": "custom.other_email",
-                        "op": "is_in",
-                        "value": email_addr_list["id"],
-                    }
-                ]
-            ]
-        )
-        == 2
-    )
+    assert len([r for r in resp if r["rule_expression"] == [ssn_rule_expr]]) == 0
+    assert len([r for r in resp if r["rule_expression"] == [email_rule_expr]]) == 2
+    assert len([r for r in resp if r["rule_expression"] == [domain_rule_expr]]) == 2
+    assert len([r for r in resp if r["rule_expression"] == [custom_rule_expr]]) == 2
 
 
 def test_update(sandbox_tenant):
