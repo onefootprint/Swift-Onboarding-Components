@@ -8,6 +8,7 @@ import {
 import React from 'react';
 import {
   asAdminUser,
+  asAdminUserInSandbox,
   asAdminUserRestrictedToSandbox,
   resetUser,
 } from 'src/config/tests';
@@ -16,6 +17,7 @@ import { type CopyProps } from './copy';
 import {
   CopyWithButton,
   playbookFixture,
+  withModes,
   withPlaybookCopy,
   withPlaybookCopyError,
 } from './copy.test.config';
@@ -27,6 +29,7 @@ describe('<Copy />', () => {
     useRouterSpy({
       pathname: '/playbooks',
     });
+    withModes();
   });
 
   const renderCopy = async ({
@@ -144,6 +147,32 @@ describe('<Copy />', () => {
         await waitFor(() => {
           expect(pushMockFn).toHaveBeenCalledWith({
             pathname: '/playbooks/ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
+          });
+        });
+      });
+
+      describe('when the user copies a playbook to a different mode', () => {
+        beforeEach(() => {
+          asAdminUserInSandbox();
+        });
+
+        it('should show a toast with a message about the mode switch', async () => {
+          await renderCopy();
+
+          const mode = screen.getByRole('button', { name: 'Live' });
+          await userEvent.click(mode);
+
+          const cta = screen.getByRole('button', { name: 'Copy to target' });
+          await userEvent.click(cta);
+
+          const toastCta = await screen.findByRole('button', {
+            name: 'Go to copied playbook',
+          });
+          await userEvent.click(toastCta);
+
+          await waitFor(() => {
+            const toast = screen.getByText('Changed to Live');
+            expect(toast).toBeInTheDocument();
           });
         });
       });

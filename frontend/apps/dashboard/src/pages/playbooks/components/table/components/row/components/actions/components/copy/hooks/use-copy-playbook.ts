@@ -3,6 +3,7 @@ import request from '@onefootprint/request';
 import type {
   CopyPlaybookRequest,
   CopyPlaybookResponse,
+  OnboardingConfig,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -31,11 +32,28 @@ const useCopyPlaybook = () => {
   const { t } = useTranslation('playbooks', {
     keyPrefix: 'copy.form.feedback',
   });
-  const { authHeaders } = useSession();
+  const { authHeaders, isLive, setIsLive } = useSession();
   const queryClient = useQueryClient();
   const showErrorToast = useRequestErrorToast();
   const toast = useToast();
   const router = useRouter();
+
+  const handleCtaClick = async (playbook: OnboardingConfig) => {
+    const needsToSwitchMode = playbook.isLive !== isLive;
+
+    if (needsToSwitchMode) {
+      await setIsLive(playbook.isLive);
+      const newMode = playbook.isLive ? 'Live' : 'Sandbox';
+      toast.show({
+        description: t('mode.description', { mode: newMode }),
+        title: t('mode.title', { mode: newMode }),
+      });
+    }
+
+    router.push({
+      pathname: `/playbooks/${playbook.id}`,
+    });
+  };
 
   return useMutation({
     mutationFn: (data: CopyPlaybookRequest) => copyPlaybook(authHeaders, data),
@@ -47,11 +65,7 @@ const useCopyPlaybook = () => {
         title: t('success.title'),
         cta: {
           label: t('success.cta'),
-          onClick: () => {
-            router.push({
-              pathname: `/playbooks/${response.id}`,
-            });
-          },
+          onClick: () => handleCtaClick(response),
         },
       });
       queryClient.invalidateQueries();

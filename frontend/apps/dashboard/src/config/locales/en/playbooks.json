@@ -23,6 +23,10 @@
           "title": "Playbook copied successfully",
           "description": "Playbook copied in the {{mode}} environment.",
           "cta": "Go to copied playbook"
+        },
+        "mode": {
+          "title": "Changed to {{mode}}",
+          "description": "Given the playbook is in the {{mode}} environment, we've switched to this mode."
         }
       },
       "cancel": "Cancel",

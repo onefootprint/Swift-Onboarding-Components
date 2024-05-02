@@ -63,8 +63,28 @@ export const withPlaybookCopy = (playbook = playbookFixture) =>
       ...playbookFixture,
       id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
       name: `${playbook.name} (copy)`,
+      isLive: true,
     },
   });
+
+export const withModes = () => {
+  mockRequest({
+    method: 'get',
+    path: '/org/member',
+    response: {
+      data: [],
+      meta: {
+        next: null,
+        count: null,
+      },
+    },
+  });
+  mockRequest({
+    method: 'post',
+    path: '/org/auth/logout',
+    response: {},
+  });
+};
 
 export const CopyWithButton = ({
   playbook = playbookFixture,
