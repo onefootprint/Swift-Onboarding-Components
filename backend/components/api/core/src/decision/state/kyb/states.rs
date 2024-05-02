@@ -446,7 +446,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
                 conn,
                 &sv.id,
-                &obc.id,
+                &obc,
                 Some(&self.wf_id),
                 RuleSetResultKind::WorkflowDecision,
                 &kyb_rs,

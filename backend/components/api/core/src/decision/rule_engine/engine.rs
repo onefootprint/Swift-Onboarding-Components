@@ -82,10 +82,11 @@ pub fn evaluate_workflow_decision<'a>(
     let insight_events: Vec<InsightEvent> =
         InsightEvent::get_for_workflow(conn, wf_id)?.into_iter().collect();
 
+    let (obc, _) = ObConfiguration::get(conn, obc_id)?;
     let rules_output = evaluate_rules(
         conn,
         sv_id,
-        obc_id,
+        &obc,
         Some(wf_id),
         kind,
         &risk_signals,
@@ -115,8 +116,9 @@ pub fn evaluate_workflow_decision<'a>(
         lists,
         &rule_eval_config,
     );
+    let is_kyc_playbook = obc.kind == ObConfigurationKind::Kyc;
     let decision = Decision::RulesExecuted {
-        should_commit: !is_fixture && should_commit_action.is_none(),
+        should_commit: !is_fixture && is_kyc_playbook && should_commit_action.is_none(),
         create_manual_review: rule_set_result
             .action_triggered
             .map(|ra| ra.should_create_review())
@@ -170,7 +172,7 @@ impl VaultDataForRules {
 pub fn evaluate_rules(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
-    obc_id: &ObConfigurationId,
+    obc: &ObConfiguration,
     wf_id: Option<&WorkflowId>,
     kind: RuleSetResultKind,
     risk_signals: &[RiskSignal],
@@ -180,8 +182,7 @@ pub fn evaluate_rules(
     rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
     rule_kinds: IncludeRules,
 ) -> ApiResult<Option<(RuleSetResult, Vec<RuleResult>)>> {
-    let (obc, _) = ObConfiguration::get(conn, obc_id)?;
-    let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, obc_id, rule_kinds)?;
+    let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kinds)?;
     if rules.is_empty() {
         if obc.kind == ObConfigurationKind::Document {
             // Document-only playbooks are allowed to have no rules if they want to maintain
@@ -190,7 +191,7 @@ pub fn evaluate_rules(
             // playbook that just doesn't run rules
             return Ok(None);
         }
-        return Err(crate::decision::Error::from(RuleError::NoRulesForPlaybook(obc.id)).into());
+        return Err(crate::decision::Error::from(RuleError::NoRulesForPlaybook(obc.id.clone())).into());
     }
 
     let (rule_results, action_triggered) = eval::evaluate_rule_set(
@@ -205,7 +206,7 @@ pub fn evaluate_rules(
     let rule_set_result = RuleSetResult::create(
         conn,
         NewRuleSetResultArgs {
-            ob_configuration_id: obc_id,
+            ob_configuration_id: &obc.id,
             scoped_vault_id: sv_id,
             workflow_id: wf_id,
             kind,
@@ -328,7 +329,7 @@ mod tests {
         let (rule_set_result, rule_results) = evaluate_rules(
             conn,
             &sv.id,
-            &obc.id,
+            &obc,
             None,
             RuleSetResultKind::Adhoc,
             &risk_signals,
