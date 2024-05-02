@@ -4,6 +4,7 @@
     "form": {
       "name": {
         "label": "Playbook name",
+        "base": "{{name}} (copy)",
         "placeholder": "Playbook name",
         "errors": {
           "required": "Please enter a name for the Playbook."
