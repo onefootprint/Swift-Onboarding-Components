@@ -2,6 +2,7 @@ import arrow
 import pytest
 from datetime import datetime, timedelta
 from tests.bifrost_client import BifrostClient
+from tests.dashboard.utils import update_rules
 from tests.utils import (
     _gen_random_str,
     _gen_random_sandbox_id,
@@ -9,15 +10,7 @@ from tests.utils import (
     get,
     post,
     patch,
-    delete,
 )
-
-
-@pytest.fixture(scope="function")
-def obc(sandbox_tenant, must_collect_data, can_access_data):
-    return create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
-    )
 
 
 @pytest.mark.parametrize(
@@ -29,7 +22,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
                 rule_expression=[
                     {"field": "id_flagged", "op": "not_eq", "value": True}
                 ],
-                action="pass_with_manual_review",
+                rule_action="pass_with_manual_review",
             ),
             None,
         ),
@@ -39,7 +32,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
                 rule_expression=[
                     {"field": "name_does_not_match", "op": "eq", "value": True}
                 ],
-                action="step_up.identity",
+                rule_action="step_up.identity",
             ),
             None,
         ),
@@ -49,7 +42,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
                 rule_expression=[
                     {"field": "dob_does_not_match", "op": "eq", "value": True}
                 ],
-                action="manual_review",
+                rule_action="manual_review",
             ),
             None,
         ),
@@ -59,7 +52,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
                 rule_expression=[
                     {"field": "address_does_not_match", "op": "eq", "value": True}
                 ],
-                action="fail",
+                rule_action="fail",
             ),
             None,
         ),
@@ -69,7 +62,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
                 rule_expression=[
                     {"field": "ssn_does_not_match", "op": "eq", "value": True}
                 ],
-                action="fail",
+                rule_action="fail",
             ),
             None,
         ),
@@ -81,7 +74,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
                     {"field": "ssn_does_not_match", "op": "eq", "value": True},
                     {"field": "business_name_match", "op": "eq", "value": True},
                 ],
-                action="fail",
+                rule_action="fail",
             ),
             "Cannot make a rule expression that includes both Person and Business signals",
         ),
@@ -94,24 +87,26 @@ def test_create(sandbox_tenant, data, error):
         *sandbox_tenant.db_auths,
     )
 
-    res = post(
-        f"/org/onboarding_configs/{sandbox_tenant.default_ob_config.id}/rules",
-        data,
+    res = update_rules(
+        obc1["id"],
+        obc1["rule_set"]["version"],
         *sandbox_tenant.db_auths,
+        add=[data],
         status_code=400 if error is not None else 200,
     )
     if error is not None:
         assert res["error"]["message"] == error
         return
 
+    rule = next(r for r in res if r["rule_expression"] == data["rule_expression"])
     # TODO: assert actor later
-    assert res["rule_id"] is not None
-    assert res["created_at"] is not None
-    assert res["name"] == data["name"]
-    assert res["rule_expression"] == data["rule_expression"]
-    assert res["is_shadow"] == False
-    assert res["action"] == data["action"]
-    assert res["kind"] == "person"
+    assert rule["rule_id"] is not None
+    assert rule["created_at"] is not None
+    assert rule["name"] == data["name"]
+    assert rule["rule_expression"] == data["rule_expression"]
+    assert rule["is_shadow"] == False
+    assert rule["action"] == data["rule_action"]
+    assert rule["kind"] == "person"
 
     # OBC has rule_set.version and it has incremented from rule change
     obc2 = get(
@@ -121,123 +116,49 @@ def test_create(sandbox_tenant, data, error):
     )
     assert obc2["rule_set"]["version"] == obc1["rule_set"]["version"] + 1
 
-    business_rule = post(
-        f"/org/onboarding_configs/{sandbox_tenant.default_ob_config.id}/rules",
-        dict(
-            name=None,
-            rule_expression=[
-                {"field": "business_name_match", "op": "eq", "value": True},
-                {"field": "tin_not_found", "op": "eq", "value": True},
-            ],
-            action="fail",
-        ),
-        *sandbox_tenant.db_auths,
+
+def test_create_business_rule(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
     )
+    rule = dict(
+        name="My fancy business rule",
+        rule_expression=[
+            {"field": "business_name_match", "op": "eq", "value": True},
+            {"field": "tin_not_found", "op": "eq", "value": True},
+        ],
+        rule_action="fail",
+    )
+    res = update_rules(obc.id, 1, *sandbox_tenant.db_auths, add=[rule])
+    rule = next(r for r in res if r["name"] == rule["name"])
+    assert rule["kind"] == "business"
 
-    assert business_rule["kind"] == "business"
 
-
-def test_list(sandbox_tenant, obc):
+def test_list(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
+    )
     # Note: obc will have a default set of rules it is created with
     rules = [
-        post(
-            f"/org/onboarding_configs/{obc.id}/rules",
-            dict(
-                rule_expression=[{"field": "id_flagged", "op": "eq", "value": True}],
-                action="fail" if i % 2 == 0 else "step_up",
-            ),
-            *sandbox_tenant.db_auths,
+        dict(
+            name=f"Rule {i}",
+            rule_expression=[{"field": "id_flagged", "op": "eq", "value": True}],
+            rule_action="fail" if i % 2 == 0 else "step_up",
         )
         for i in range(6)
     ]
+    res = update_rules(obc.id, 1, *sandbox_tenant.db_auths, add=rules)
 
-    res = get(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        None,
-        *sandbox_tenant.db_auths,
-    )
-    num_default_rules = len(res) - len(rules)
-    for i in range(len(rules)):
-        assert res[num_default_rules + i]["rule_id"] == rules[i]["rule_id"]
-        assert res[num_default_rules + i]["created_at"] == rules[i]["created_at"]
-        assert res[num_default_rules + i]["name"] == rules[i]["name"]
-        assert (
-            res[num_default_rules + i]["rule_expression"] == rules[i]["rule_expression"]
+    for rule in rules:
+        r = next(r for r in res if r["name"] == rule["name"])
+        assert r["rule_expression"] == rule["rule_expression"]
+        expected_rule_action = (
+            "step_up.identity"
+            if rule["rule_action"] == "step_up"
+            else rule["rule_action"]
         )
-        assert res[num_default_rules + i]["action"] == rules[i]["action"]
-        assert res[num_default_rules + i]["is_shadow"] == rules[i]["is_shadow"]
-
-
-def test_patch(sandbox_tenant, obc):
-    # Note: obc will have a default set of rules it is created with
-    rule = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="Cool Rule",
-            rule_expression=[
-                {"field": "document_selfie_mask", "op": "eq", "value": True}
-            ],
-            action="fail",
-        ),
-        *sandbox_tenant.db_auths,
-    )
-
-    update1 = patch(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
-        dict(name="New Name"),
-        *sandbox_tenant.db_auths,
-    )
-
-    assert update1["rule_id"] == rule["rule_id"]
-    assert update1["name"] == "New Name"
-
-    update2 = patch(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
-        dict(
-            is_shadow=True,
-            rule_expression=[
-                {"field": "document_selfie_glasses", "op": "eq", "value": True}
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-    )
-
-    assert update2["name"] == "New Name"
-    assert update2["is_shadow"] == True
-    assert update2["rule_expression"] == [
-        {"field": "document_selfie_glasses", "op": "eq", "value": True}
-    ]
-
-    rules = get(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        None,
-        *sandbox_tenant.db_auths,
-    )
-    assert rules[-1]["rule_expression"] == [
-        {"field": "document_selfie_glasses", "op": "eq", "value": True}
-    ]
-
-    # a patch that contains no field to update should error
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
-        dict(),
-        *sandbox_tenant.db_auths,
-        status_code=400,
-    )
-
-    # a patch that has mixed person and business rule instance kind should error
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
-        dict(
-            is_shadow=True,
-            rule_expression=[
-                {"field": "business_name_match", "op": "eq", "value": True},
-                {"field": "document_selfie_glasses", "op": "eq", "value": True},
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-        status_code=400,
-    )
+        assert r["action"] == expected_rule_action
+        assert not r["is_shadow"]
 
 
 def test_get_rule_set_result(sandbox_tenant, must_collect_data):
@@ -245,26 +166,19 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
         sandbox_tenant, "Rules yo", must_collect_data, must_collect_data
     )
 
-    rule1 = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="My awesome rule",
-            rule_expression=[
-                {"field": "ssn_does_not_match", "op": "eq", "value": True}
-            ],
-            action="manual_review",
-        ),
-        *sandbox_tenant.db_auths,
+    rule1 = dict(
+        name="My awesome rule1",
+        rule_expression=[{"field": "ssn_does_not_match", "op": "eq", "value": True}],
+        rule_action="manual_review",
     )
-    rule2 = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="My awesome rule",
-            rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
-            action="fail",
-        ),
-        *sandbox_tenant.db_auths,
+    rule2 = dict(
+        name="My awesome rule2",
+        rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
+        rule_action="fail",
     )
+    res = update_rules(obc.id, 1, *sandbox_tenant.db_auths, add=[rule1, rule2])
+    rule1 = next(r for r in res if r["name"] == rule1["name"])
+    rule2 = next(r for r in res if r["name"] == rule2["name"])
 
     bifrost = BifrostClient.new(obc)
     user = bifrost.run()
@@ -285,10 +199,14 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
     for rsr in [rsr1, rsr2]:
         assert rsr["ob_configuration_id"] == obc.id
         assert rsr["action_triggered"] == "fail"
-        assert rsr["rule_results"][-2]["rule"] == rule1
-        assert rsr["rule_results"][-2]["result"] == False
-        assert rsr["rule_results"][-1]["rule"] == rule2
-        assert rsr["rule_results"][-1]["result"] == True
+        rule1_rsr = next(
+            r for r in rsr["rule_results"] if r["rule"]["name"] == rule1["name"]
+        )
+        assert rule1_rsr["result"] == False
+        rule2_rsr = next(
+            r for r in rsr["rule_results"] if r["rule"]["name"] == rule2["name"]
+        )
+        assert rule2_rsr["result"] == True
 
 
 def new_list(kind, entries, sandbox_tenant):
@@ -339,36 +257,29 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     assert ip_address != other_ip_address
     ip_list_without_match = new_list("ip_address", [other_ip_address], sandbox_tenant)
 
-    matching_rule = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="Should match",
-            rule_expression=[
-                {
-                    "field": "ip_address",
-                    "op": "is_in",
-                    "value": ip_list_with_match["id"],
-                },
-            ],
-            action="fail",
-        ),
-        *sandbox_tenant.db_auths,
+    matching_rule = dict(
+        name="Should match",
+        rule_expression=[
+            {
+                "field": "ip_address",
+                "op": "is_in",
+                "value": ip_list_with_match["id"],
+            },
+        ],
+        rule_action="fail",
     )
-    non_matching_rule = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="Should not match",
-            rule_expression=[
-                {
-                    "field": "ip_address",
-                    "op": "is_in",
-                    "value": ip_list_without_match["id"],
-                },
-            ],
-            action="fail",
-        ),
-        *sandbox_tenant.db_auths,
+    non_matching_rule = dict(
+        name="Should not match",
+        rule_expression=[
+            {
+                "field": "ip_address",
+                "op": "is_in",
+                "value": ip_list_without_match["id"],
+            },
+        ],
+        rule_action="fail",
     )
+    update_rules(obc.id, 1, *sandbox_tenant.db_auths, add=[matching_rule, non_matching_rule]) 
 
     # Rerun Bifrost in a new sandbox.
     sandbox_id = _gen_random_sandbox_id()
@@ -400,11 +311,14 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
         *sandbox_tenant.db_auths,
     )
 
-    assert rsr["rule_results"][-2]["rule"]["rule_id"] == matching_rule["rule_id"]
-    assert rsr["rule_results"][-2]["result"] == True
-
-    assert rsr["rule_results"][-1]["rule"]["rule_id"] == non_matching_rule["rule_id"]
-    assert rsr["rule_results"][-1]["result"] == False
+    rule_result = next(
+        r for r in rsr["rule_results"] if r["rule"]["name"] == matching_rule["name"]
+    )
+    assert rule_result["result"] == True
+    rule_result = next(
+        r for r in rsr["rule_results"] if r["rule"]["name"] == non_matching_rule["name"]
+    )
+    assert rule_result["result"] == False
 
     # Backtesting with no change yields the same result.
     start_timestamp = arrow.get(stepup_event["timestamp"]).shift(hours=-1)
@@ -423,107 +337,10 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     # TODO: Backtesting with the matching rule deleted yields a pass.
 
 
-def test_delete(sandbox_tenant, obc):
-    # Setup a few rules
-    rule1 = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="Cool Rule",
-            rule_expression=[
-                {"field": "document_selfie_mask", "op": "eq", "value": True}
-            ],
-            action="fail",
-        ),
-        *sandbox_tenant.db_auths,
+def test_multi_edit(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
     )
-    rule2 = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="Cool Rule",
-            rule_expression=[
-                {"field": "ssn_does_not_match", "op": "eq", "value": True}
-            ],
-            action="manual_review",
-        ),
-        *sandbox_tenant.db_auths,
-    )
-    rule3 = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="Cool Rule",
-            rule_expression=[
-                {"field": "name_does_not_match", "op": "eq", "value": True}
-            ],
-            action="fail",
-        ),
-        *sandbox_tenant.db_auths,
-    )
-    # also update rule3 just exercise updates + deletes together
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule3['rule_id']}",
-        dict(name="New Name"),
-        *sandbox_tenant.db_auths,
-    )
-
-    # Test DELETE
-
-    # delete rule2
-    delete(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule2['rule_id']}",
-        dict(name="New Name"),
-        *sandbox_tenant.db_auths,
-    )
-
-    rules = [
-        r["rule_id"]
-        for r in get(
-            f"/org/onboarding_configs/{obc.id}/rules",
-            None,
-            *sandbox_tenant.db_auths,
-        )
-    ]
-    assert len([r for r in rules if r in [rule1["rule_id"], rule3["rule_id"]]]) == 2
-
-    # attempt to patch now deleted rule2 should error
-    patch(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule2['rule_id']}",
-        dict(name="uhoh"),
-        *sandbox_tenant.db_auths,
-        status_code=404,
-    )
-
-    # delete rule1
-    delete(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule1['rule_id']}",
-        dict(name="New Name"),
-        *sandbox_tenant.db_auths,
-    )
-
-    # delete rule3
-    delete(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule3['rule_id']}",
-        dict(name="New Name"),
-        *sandbox_tenant.db_auths,
-    )
-
-    assert (
-        len(
-            [
-                r
-                for r in get(
-                    f"/org/onboarding_configs/{obc.id}/rules",
-                    None,
-                    *sandbox_tenant.db_auths,
-                )
-                if r["rule_id"]
-                in [rule1["rule_id"], rule2["rule_id"], rule3["rule_id"]]
-            ]
-        )
-        == 0
-    )
-
-
-def test_multi_edit(sandbox_tenant, obc):
     # When OBC's are created they are given a default set of rules
     default_rules = get(
         f"/org/onboarding_configs/{obc.id}/rules",
@@ -717,7 +534,10 @@ def test_multi_edit(sandbox_tenant, obc):
     assert obc["rule_set"]["version"] == 3
 
 
-def test_blocklist_rules(sandbox_tenant, obc):
+def test_blocklist_rules(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
+    )
     nonce = _gen_random_str(5)
     list = post(
         f"/org/lists",

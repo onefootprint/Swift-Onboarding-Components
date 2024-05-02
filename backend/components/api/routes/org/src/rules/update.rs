@@ -152,7 +152,7 @@ fn validate_request(
             Ok(NewRule {
                 rule_expression,
                 action: a.rule_action,
-                name: None, // TODO: we dont actaully use name yet so remove this
+                name: a.name,
                 kind: rule_instance_kind,
             })
         })

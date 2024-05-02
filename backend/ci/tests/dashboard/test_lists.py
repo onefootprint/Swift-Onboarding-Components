@@ -1,5 +1,6 @@
 import pytest
 from tests.utils import _gen_random_str, create_ob_config, post, get, delete, patch
+from tests.dashboard.utils import update_rules
 
 
 def test_create(sandbox_tenant):
@@ -240,20 +241,18 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     # [POST] Try to create a rule with a mismatching field and list type.
-    resp = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            action="manual_review",
-            rule_expression=[
-                {
-                    "field": "id.email",
-                    "op": "is_in",
-                    "value": ssn9_list["id"],
-                }
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-        status_code=400,
+    rule = dict(
+        rule_action="manual_review",
+        rule_expression=[
+            {
+                "field": "id.email",
+                "op": "is_in",
+                "value": ssn9_list["id"],
+            }
+        ],
+    )
+    resp = update_rules(
+        obc.id, 1, add=[rule], *sandbox_tenant.db_auths, status_code=400
     )
     assert (
         resp["error"]["message"]
@@ -261,52 +260,43 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     # [POST] Create a rule with a list that accepts exact matches on a field.
-    post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            action="manual_review",
-            rule_expression=[
-                {
-                    "field": "id.email",
-                    "op": "is_in",
-                    "value": email_addr_list["id"],
-                }
-            ],
-        ),
-        *sandbox_tenant.db_auths,
+    rule = dict(
+        rule_action="manual_review",
+        rule_expression=[
+            {
+                "field": "id.email",
+                "op": "is_in",
+                "value": email_addr_list["id"],
+            }
+        ],
     )
+    update_rules(obc.id, 1, add=[rule], *sandbox_tenant.db_auths)
 
     # [POST] Create a rule with a list that accepts transformed matches on a field.
-    post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            action="manual_review",
-            rule_expression=[
-                {
-                    "field": "id.email",
-                    "op": "is_in",
-                    "value": email_domain_list["id"],
-                }
-            ],
-        ),
-        *sandbox_tenant.db_auths,
+    rule = dict(
+        rule_action="manual_review",
+        rule_expression=[
+            {
+                "field": "id.email",
+                "op": "is_in",
+                "value": email_domain_list["id"],
+            }
+        ],
     )
+    update_rules(obc.id, 2, add=[rule], *sandbox_tenant.db_auths)
 
     # [POST] Create a rule matching against a custom list.
-    post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            action="manual_review",
-            rule_expression=[
-                {
-                    "field": "custom.other_email",
-                    "op": "is_in",
-                    "value": email_addr_list["id"],
-                }
-            ],
-        ),
-        *sandbox_tenant.db_auths,
+    rule = dict(
+        rule_action="manual_review",
+        rule_expression=[
+            {
+                "field": "custom.other_email",
+                "op": "is_in",
+                "value": email_addr_list["id"],
+            }
+        ],
     )
+    update_rules(obc.id, 3, add=[rule], *sandbox_tenant.db_auths)
 
     # [PATCH] Try to augment a playbook with a rule with a mismatching field and list type.
     resp = patch(
@@ -965,59 +955,50 @@ def test_rule_list_id_validation(sandbox_tenant, must_collect_data, can_access_d
         *sandbox_tenant.db_auths,
     )
 
-    rule = post(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            name="Test Rule",
-            rule_expression=[
-                {
-                    "field": "id.ssn9",
-                    "op": "is_in",
-                    "value": ssn9_list["id"],
-                }
-            ],
-            action="manual_review",
-        ),
-        *sandbox_tenant.db_auths,
+    rule = dict(
+        name="My fun test Rule",
+        rule_expression=[
+            {
+                "field": "id.ssn9",
+                "op": "is_in",
+                "value": ssn9_list["id"],
+            }
+        ],
+        rule_action="manual_review",
     )
-    rule_id = rule["rule_id"]
+    body = update_rules(obc.id, 1, add=[rule], *sandbox_tenant.db_auths)
+    rule_id = next(
+        r["rule_id"] for r in body if r["rule_expression"] == rule["rule_expression"]
+    )
 
     # Try patching the rule with a non-existent list ID
-    resp = patch(
-        f"/org/onboarding_configs/{obc.id}/rules/{rule_id}",
-        dict(
-            rule_expression=[
-                {
-                    "field": "id.email",
-                    "op": "is_in",
-                    "value": "not_a_real_list_id",
-                }
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-        status_code=400,
+    rule_update = dict(
+        rule_id=rule_id,
+        rule_expression=[
+            {
+                "field": "id.email",
+                "op": "is_in",
+                "value": "not_a_real_list_id",
+            }
+        ],
+    )
+    resp = update_rules(
+        obc.id, 2, edit=[rule_update], status_code=400, *sandbox_tenant.db_auths
     )
     assert resp["error"]["message"] == "List with ID not_a_real_list_id not found"
 
     # Try creating a new rule with a non-exising list ID
-    resp = patch(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        dict(
-            expected_rule_set_version=1,
-            add=[
-                dict(
-                    rule_action="manual_review",
-                    rule_expression=[
-                        {
-                            "field": "id.email",
-                            "op": "is_in",
-                            "value": "not_a_real_list_id",
-                        }
-                    ],
-                ),
-            ],
-        ),
-        *sandbox_tenant.db_auths,
-        status_code=400,
+    new_rule = dict(
+        rule_action="manual_review",
+        rule_expression=[
+            {
+                "field": "id.email",
+                "op": "is_in",
+                "value": "not_a_real_list_id",
+            }
+        ],
+    )
+    resp = update_rules(
+        obc.id, 3, add=[new_rule], status_code=400, *sandbox_tenant.db_auths
     )
     assert resp["error"]["message"] == "List with ID not_a_real_list_id not found"

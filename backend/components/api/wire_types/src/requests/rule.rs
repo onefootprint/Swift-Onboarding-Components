@@ -25,6 +25,8 @@ pub struct MultiUpdateRuleRequest {
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateRule {
+    #[serde(default)]
+    pub name: Option<String>,
     pub rule_expression: UnvalidatedRuleExpression,
     pub rule_action: RuleAction,
 }
