@@ -18,7 +18,7 @@ use db::{
         ob_configuration::ObConfiguration,
         onboarding_decision::OnboardingDecision,
         risk_signal::RiskSignal,
-        rule_instance::RuleInstance,
+        rule_instance::{NewRule, RuleInstance},
         workflow::{NewWorkflowArgs, Workflow},
     },
     test_helpers::assert_have_same_elements,
@@ -73,20 +73,20 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let obc = ObConfiguration::lock(conn, &obc_id2).unwrap();
-                RuleInstance::create(
-                    conn,
-                    &obc,
-                    &DbActor::Footprint,
-                    None,
-                    RuleExpression(vec![RuleExpressionCondition::RiskSignal {
+                let rule = NewRule {
+                    rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                         field: FootprintReasonCode::DocumentIsPermitOrProvisionalLicense,
                         op: BooleanOperator::Equals,
                         value: true,
                     }]),
-                    RuleAction::PassWithManualReview,
-                    RuleInstanceKind::Person,
-                )
-                .unwrap();
+                    action: RuleAction::PassWithManualReview,
+                    name: None,
+                    kind: RuleInstanceKind::Person,
+                };
+                RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
+                    .unwrap()
+                    .pop()
+                    .unwrap();
 
                 Ok(())
             })

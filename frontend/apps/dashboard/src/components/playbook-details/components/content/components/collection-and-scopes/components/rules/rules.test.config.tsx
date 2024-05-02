@@ -339,16 +339,6 @@ export const withEditRules = (
     response: response ?? [],
   });
 
-export const withDeleteRule = (
-  ruleId: string,
-  playbookId: string = kycPlaybookFixture.id,
-) =>
-  mockRequest({
-    method: 'delete',
-    path: `/org/onboarding_configs/${playbookId}/rules/${ruleId}`,
-    response: {},
-  });
-
 export const withAddRule = (
   response: Rule,
   playbookId: string = kycPlaybookFixture.id,

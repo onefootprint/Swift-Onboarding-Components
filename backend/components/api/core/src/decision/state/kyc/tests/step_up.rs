@@ -63,16 +63,13 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
                 value: true,
             }]);
             let obc = ObConfiguration::lock(conn, &obc_id).unwrap();
-            RuleInstance::create(
-                conn,
-                &obc,
-                &DbActor::Footprint,
-                None,
-                expr,
-                RuleAction::StepUp(step_up_kind),
-                RuleInstanceKind::Person,
-            )
-            .unwrap();
+            let rule = NewRule {
+                rule_expression: expr,
+                action: RuleAction::StepUp(step_up_kind),
+                name: None,
+                kind: RuleInstanceKind::Person,
+            };
+            RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule]).unwrap();
 
             Ok(())
         })

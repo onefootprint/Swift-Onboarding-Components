@@ -229,7 +229,7 @@ pub fn evaluate_rules(
 mod tests {
     use super::*;
     use db::{
-        models::scoped_vault::ScopedVault,
+        models::{rule_instance::NewRule, scoped_vault::ScopedVault},
         test_helpers::assert_have_same_elements,
         tests::{fixtures::ob_configuration::ObConfigurationOpts, prelude::*},
     };
@@ -307,19 +307,14 @@ mod tests {
 
         let rules = rules
             .into_iter()
-            .map(|r| {
-                RuleInstance::create(
-                    conn,
-                    &obc,
-                    &DbActor::Footprint,
-                    None,
-                    r.0,
-                    r.1,
-                    RuleInstanceKind::Person,
-                )
-                .unwrap()
+            .map(|r| NewRule {
+                rule_expression: r.0,
+                action: r.1,
+                name: None,
+                kind: RuleInstanceKind::Person,
             })
             .collect_vec();
+        let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, rules).unwrap();
         let risk_signals = make_risk_signals(conn, &sv.id, risk_signals);
 
         // Eval

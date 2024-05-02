@@ -8,7 +8,7 @@ use crate::{
     State,
 };
 use api_core::{decision::rule_engine::validation::validate_rule_expression, errors::ValidationError};
-use api_wire_types::{MultiUpdateRuleRequest, UpdateRuleRequest};
+use api_wire_types::MultiUpdateRuleRequest;
 use db::{
     models::{
         list::List,
@@ -18,64 +18,8 @@ use db::{
     PgConn,
 };
 use itertools::{chain, Itertools};
-use newtypes::{ListId, ObConfigurationId, RuleId, TenantId};
+use newtypes::{ListId, ObConfigurationId, TenantId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
-
-/// Note: Being deprecated in favor of bulk edit API
-#[api_v2_operation(description = "Updates a Rule", tags(Playbooks, Organization, Private, Rules))]
-#[actix::patch("/org/onboarding_configs/{obc_id}/rules/{rule_id}")]
-pub async fn update_rule(
-    state: web::Data<State>,
-    auth: TenantSessionAuth,
-    path: web::Path<(ObConfigurationId, RuleId)>,
-    request: Json<UpdateRuleRequest>,
-) -> ApiResult<Json<ResponseData<api_wire_types::Rule>>> {
-    let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
-    let tenant_id = auth.tenant().id.clone();
-    let is_live = auth.is_live()?;
-    let actor = auth.actor();
-
-    let (ob_config_id, rule_id) = path.into_inner();
-    let UpdateRuleRequest {
-        name,
-        rule_expression,
-        is_shadow,
-    } = request.into_inner();
-
-    if name.is_none() && rule_expression.is_none() && is_shadow.is_none() {
-        return Err(ValidationError("No field given to update").into());
-    }
-
-    let rule = state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let rule_expression_and_kind = rule_expression
-                .map(|expr| -> ApiResult<_> {
-                    let list_ids = expr.list_ids();
-                    let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
-                    validate_rule_expression(expr, &lists, is_live)
-                })
-                .transpose()?;
-
-            let (expression, kind) = match rule_expression_and_kind {
-                Some((e, k)) => (Some(e), Some(k)),
-                None => (None, None),
-            };
-
-            let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
-            let obc = ObConfiguration::lock(conn, &obc.id)?;
-
-            Ok(RuleInstance::update(
-                conn,
-                &obc,
-                &actor.into(),
-                RuleInstanceUpdate::update(rule_id, name, expression, is_shadow, kind),
-            )?)
-        })
-        .await?;
-
-    ResponseData::ok(api_wire_types::Rule::from_db(rule)).json()
-}
 
 #[api_v2_operation(
     description = "Performs 1 or more edits (additions, deletions, edits) to rules for the playbooks",

@@ -5375,112 +5375,6 @@
                 ]
             }
         },
-        "/org/onboarding_configs/{obc_id}/rules/{rule_id}": {
-            "delete": {
-                "tags": [
-                    "Playbooks",
-                    "Organization",
-                    "Private",
-                    "Rules"
-                ],
-                "summary": "Note: Being deprecated in favor of bulk edit API",
-                "description": "Deletes a Rule",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "obc_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
-                    {
-                        "in": "path",
-                        "name": "rule_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Playbooks",
-                    "Organization",
-                    "Private",
-                    "Rules"
-                ],
-                "summary": "Note: Being deprecated in favor of bulk edit API",
-                "description": "Updates a Rule",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "obc_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
-                    {
-                        "in": "path",
-                        "name": "rule_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateRuleRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Rule"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
         "/org/partners/{partnership_id}/documents/{document_id}/assignments": {
             "post": {
                 "tags": [
@@ -9144,10 +9038,14 @@
                     "is_live": {
                         "description": "The target is_live for the copied playbook",
                         "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
                     }
                 },
                 "required": [
-                    "is_live"
+                    "is_live",
+                    "name"
                 ]
             },
             "CreateAnnotationRequest": {
@@ -25498,23 +25396,6 @@
                     },
                     "website_url": {
                         "type": "string"
-                    }
-                }
-            },
-            "UpdateRuleRequest": {
-                "type": "object",
-                "properties": {
-                    "is_shadow": {
-                        "type": "boolean"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "rule_expression": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
                     }
                 }
             },

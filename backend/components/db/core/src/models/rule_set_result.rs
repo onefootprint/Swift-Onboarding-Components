@@ -231,7 +231,7 @@ mod tests {
         models::{
             ob_configuration::ObConfiguration,
             risk_signal::RiskSignal,
-            rule_instance::RuleInstance,
+            rule_instance::{NewRule, RuleInstance},
             scoped_vault::ScopedVault,
             workflow::{Workflow, WorkflowUpdate},
         },
@@ -259,38 +259,27 @@ mod tests {
         let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
         let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
 
-        let rule1 = RuleInstance::create(
-            conn,
-            &obc,
-            &DbActor::Footprint,
-            None,
-            tests::fixtures::rule::example_rule_expression(),
-            RuleAction::Fail,
-            RuleInstanceKind::Person,
-        )
-        .unwrap();
-
-        let rule2 = RuleInstance::create(
-            conn,
-            &obc,
-            &DbActor::Footprint,
-            None,
-            tests::fixtures::rule::example_rule_expression(),
-            RuleAction::Fail,
-            RuleInstanceKind::Person,
-        )
-        .unwrap();
-
-        let rule3 = RuleInstance::create(
-            conn,
-            &obc,
-            &DbActor::Footprint,
-            None,
-            tests::fixtures::rule::example_rule_expression(),
-            RuleAction::Fail,
-            RuleInstanceKind::Person,
-        )
-        .unwrap();
+        let rules = vec![
+            NewRule {
+                name: None,
+                rule_expression: tests::fixtures::rule::example_rule_expression(),
+                action: RuleAction::Fail,
+                kind: RuleInstanceKind::Person,
+            },
+            NewRule {
+                name: None,
+                rule_expression: tests::fixtures::rule::example_rule_expression(),
+                action: RuleAction::Fail,
+                kind: RuleInstanceKind::Person,
+            },
+            NewRule {
+                name: None,
+                rule_expression: tests::fixtures::rule::example_rule_expression(),
+                action: RuleAction::Fail,
+                kind: RuleInstanceKind::Person,
+            },
+        ];
+        let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, rules).unwrap();
 
         let di = crate::models::decision_intent::DecisionIntent::create(
             conn,
@@ -311,6 +300,14 @@ mod tests {
         )
         .unwrap();
 
+        let new_rule_results = rules
+            .iter()
+            .enumerate()
+            .map(|(i, r)| NewRuleResultArgs {
+                rule_instance_id: &r.id,
+                result: i % 2 == 0,
+            })
+            .collect_vec();
         let (rule_set_result, rule_results) = RuleSetResult::create(
             conn,
             NewRuleSetResultArgs {
@@ -319,20 +316,7 @@ mod tests {
                 workflow_id: None,
                 kind: RuleSetResultKind::Adhoc,
                 action_triggered: Some(RuleAction::ManualReview),
-                rule_results: vec![
-                    NewRuleResultArgs {
-                        rule_instance_id: &rule1.id,
-                        result: true,
-                    },
-                    NewRuleResultArgs {
-                        rule_instance_id: &rule2.id,
-                        result: false,
-                    },
-                    NewRuleResultArgs {
-                        rule_instance_id: &rule3.id,
-                        result: true,
-                    },
-                ],
+                rule_results: new_rule_results.clone(),
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
                 allowed_actions: RuleAction::all_rule_actions(),
             },
@@ -347,7 +331,10 @@ mod tests {
         assert!(!rule_set_result.allowed_actions.unwrap().is_empty());
 
         assert_have_same_elements(
-            vec![(rule1.id, true), (rule2.id, false), (rule3.id, true)],
+            new_rule_results
+                .into_iter()
+                .map(|r| (r.rule_instance_id.clone(), r.result))
+                .collect_vec(),
             rule_results
                 .into_iter()
                 .map(|r| (r.rule_instance_id, r.result))

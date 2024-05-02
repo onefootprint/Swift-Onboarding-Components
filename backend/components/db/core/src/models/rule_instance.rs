@@ -287,35 +287,6 @@ impl RuleInstance {
         Ok(rule_instances)
     }
 
-    #[tracing::instrument("RuleInstance::create", skip_all)]
-    pub fn create(
-        conn: &mut TxnPgConn,
-        obc: &Locked<ObConfiguration>,
-        actor: &DbActor,
-        name: Option<String>,
-        rule_expression: RuleExpression,
-        action: RuleAction,
-        kind: RuleInstanceKind,
-    ) -> DbResult<Self> {
-        Self::bulk_edit(
-            conn,
-            obc,
-            actor,
-            MultiRuleUpdate {
-                expected_rule_set_version: None, // clients using this `create` method aren't yet sending this
-                new_rules: vec![NewRule {
-                    rule_expression,
-                    action,
-                    name,
-                    kind,
-                }],
-                updates: vec![],
-            },
-        )?
-        .pop()
-        .ok_or(DbError::IncorrectNumberOfRowsUpdated)
-    }
-
     #[tracing::instrument("RuleInstance::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
@@ -333,27 +304,6 @@ impl RuleInstance {
                 updates: vec![],
             },
         )
-    }
-
-    #[tracing::instrument("RuleInstance::update", skip_all)]
-    pub fn update(
-        conn: &mut TxnPgConn,
-        obc: &Locked<ObConfiguration>,
-        actor: &DbActor,
-        update: RuleInstanceUpdate,
-    ) -> DbResult<Self> {
-        Self::bulk_edit(
-            conn,
-            obc,
-            actor,
-            MultiRuleUpdate {
-                expected_rule_set_version: None, // clients using this `update` method aren't yet sending this
-                new_rules: vec![],
-                updates: vec![update],
-            },
-        )?
-        .pop()
-        .ok_or(DbError::IncorrectNumberOfRowsUpdated)
     }
 
     #[tracing::instrument("RuleInstance::get", skip_all)]
@@ -479,16 +429,16 @@ mod tests {
             value: true,
         }]);
         let action = RuleAction::ManualReview;
-        let rule = RuleInstance::create(
-            conn,
-            &obc,
-            &DbActor::Footprint,
-            None,
-            expression.clone(),
+        let rule = NewRule {
+            name: None,
+            rule_expression: expression.clone(),
             action,
-            RuleInstanceKind::Person,
-        )
-        .unwrap();
+            kind: RuleInstanceKind::Person,
+        };
+        let rule = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
+            .unwrap()
+            .pop()
+            .unwrap();
         assert_eq!(expression, rule.rule_expression);
         assert_eq!(action, rule.action);
         assert!(rule.deactivated_seqno.is_none());
@@ -636,16 +586,16 @@ mod tests {
         );
         let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
-        let rule = RuleInstance::create(
-            conn,
-            &obc,
-            &DbActor::Footprint,
-            Some("name1".to_owned()),
-            tests::fixtures::rule::example_rule_expression(),
-            RuleAction::Fail,
-            RuleInstanceKind::Person,
-        )
-        .unwrap();
+        let rule = NewRule {
+            name: Some("name1".to_owned()),
+            rule_expression: tests::fixtures::rule::example_rule_expression(),
+            action: RuleAction::Fail,
+            kind: RuleInstanceKind::Person,
+        };
+        let rule = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
+            .unwrap()
+            .pop()
+            .unwrap();
         assert_eq!(
             1,
             RuleSetVersion::get_active(conn, &obc.id)
@@ -654,19 +604,27 @@ mod tests {
                 .version
         );
 
-        let updated_rule = RuleInstance::update(
+
+        let update = RuleInstanceUpdate {
+            rule_id: rule.rule_id.clone(),
+            name: Some(Some("name2".to_owned())),
+            rule_expression: Some(tests::fixtures::rule::example_rule_expression()),
+            is_shadow: Some(false),
+            deactivate: false,
+            kind: None,
+        };
+        let updated_rule = RuleInstance::bulk_edit(
             conn,
             &obc,
             &DbActor::Footprint,
-            RuleInstanceUpdate {
-                rule_id: rule.rule_id.clone(),
-                name: Some(Some("name2".to_owned())),
-                rule_expression: Some(tests::fixtures::rule::example_rule_expression()),
-                is_shadow: Some(false),
-                deactivate: false,
-                kind: None,
+            MultiRuleUpdate {
+                expected_rule_set_version: None, // clients using this `update` method aren't yet sending this
+                new_rules: vec![],
+                updates: vec![update],
             },
         )
+        .unwrap()
+        .pop()
         .unwrap();
 
         assert_eq!(rule.rule_id, updated_rule.rule_id);
@@ -826,6 +784,7 @@ mod tests {
         assert_eq!(RuleAction::ManualReview, new_rules[0].action);
         assert_eq!(RuleAction::ManualReview, new_rules[1].action);
 
+
         // list should return 5 rules. we started with 5, deleted 2, and added 2 (and edited 2)
         assert_eq!(
             5,
@@ -841,31 +800,31 @@ mod tests {
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
         let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
 
-        let rule1 = RuleInstance::create(
-            conn,
-            &obc,
-            &DbActor::Footprint,
-            Some("name1".to_owned()),
-            tests::fixtures::rule::example_rule_expression(),
-            RuleAction::StepUp(StepUpKind::Identity),
-            RuleInstanceKind::Person,
-        )
-        .unwrap();
+        let rule1 = NewRule {
+            name: Some("name1".to_owned()),
+            rule_expression: tests::fixtures::rule::example_rule_expression(),
+            action: RuleAction::StepUp(StepUpKind::Identity),
+            kind: RuleInstanceKind::Person,
+        };
+        let rule1 = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule1])
+            .unwrap()
+            .pop()
+            .unwrap();
 
         let reloaded_rule1 = RuleInstance::get(conn, &rule1.rule_id).unwrap();
         assert_eq!(reloaded_rule1.action, RuleAction::StepUp(StepUpKind::Identity));
 
-        let rule2 = RuleInstance::create(
-            conn,
-            &obc,
-            &DbActor::Footprint,
-            Some("name1".to_owned()),
-            tests::fixtures::rule::example_rule_expression(),
-            RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
-            RuleInstanceKind::Person,
-        )
-        .unwrap();
 
+        let rule2 = NewRule {
+            name: Some("name1".to_owned()),
+            rule_expression: tests::fixtures::rule::example_rule_expression(),
+            action: RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
+            kind: RuleInstanceKind::Person,
+        };
+        let rule2 = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule2])
+            .unwrap()
+            .pop()
+            .unwrap();
         let reloaded_rule2 = RuleInstance::get(conn, &rule2.rule_id).unwrap();
         assert_eq!(
             reloaded_rule2.action,
