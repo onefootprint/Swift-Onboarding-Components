@@ -21,8 +21,6 @@ pub enum BoolFlag<'a> {
     EnableExperianInNonProd(&'a ObConfigurationKey),
     #[strum(to_string = "EnableLexisInNonProd")]
     EnableLexisInNonProd(&'a ObConfigurationKey),
-    #[strum(to_string = "DisableAllScanOnboardingCalls")]
-    DisableAllScanOnboarding,
     #[strum(to_string = "DisableAllSocureIdvCalls")]
     DisableAllSocure,
     #[strum(to_string = "DisableSelfieChecking")]
@@ -71,10 +69,6 @@ pub enum BoolFlag<'a> {
     CreateKycWorkflowForAlpacaOnboardings(&'a ObConfigurationKey),
     #[strum(to_string = "StepUpOnAmlHit")]
     StepUpOnAmlHit(&'a ObConfigurationKey),
-    #[strum(to_string = "UseBackupTwilioCredentials")]
-    UseBackupTwilioCredentials(&'a str),
-    #[strum(to_string = "PreferWhatsapp")]
-    PreferWhatsapp(&'a str),
     #[strum(to_string = "MakeLexisCall")]
     MakeLexisCall(&'a TenantId),
     #[strum(to_string = "IsVaultProxyPreConfiguredEndpointEnabled")]
@@ -87,6 +81,12 @@ pub enum BoolFlag<'a> {
     RequireCaptureOnStepUp(&'a ObConfigurationKey),
     #[strum(to_string = "TenantCanViewNeuro")]
     TenantCanViewNeuro(&'a TenantId),
+
+    // Migrate to modern Rollout format
+    #[strum(to_string = "UseBackupTwilioCredentialsRollout")]
+    UseBackupTwilioCredentials(&'a str),
+    #[strum(to_string = "PreferWhatsappRollout")]
+    PreferWhatsapp(&'a str),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -105,7 +105,6 @@ impl<'a> BoolFlag<'a> {
             Self::EnableExperianInNonProd(k) => Some(k.to_string()),
             Self::EnableLexisInNonProd(k) => Some(k.to_string()),
             Self::EnableSocureInNonProd(k) => Some(k.to_string()),
-            Self::DisableAllScanOnboarding => None,
             Self::DisableAllSocure => None,
             Self::CanCleanUpPhoneNumber(k) => Some(k.leak_to_string()),
             Self::CanCleanUpTenant(k) => Some(k.to_string()),
@@ -152,7 +151,6 @@ impl<'a> BoolFlag<'a> {
             Self::EnableSocureInNonProd(_) => false,
             Self::EnableExperianInNonProd(_) => false,
             Self::EnableLexisInNonProd(_) => false,
-            Self::DisableAllScanOnboarding => false,
             Self::DisableAllSocure => false,
             Self::CanCleanUpPhoneNumber(_) => false,
             Self::CanCleanUpTenant(_) => false,
@@ -187,12 +185,26 @@ impl<'a> BoolFlag<'a> {
             Self::TenantCanViewNeuro(_) => false,
         }
     }
+
+    /// LaunchDarkly is hugely overkill for boolean flags. We generally just check if a tenant ID,
+    /// obc key, or user identifier is in a list of values.
+    /// In order to reduce LaunchDarkly cost, some flags have been migrated to perform this
+    /// "is in list" operation here instead of on the LaunchDarkly side
+    pub fn is_migrated_to_new_format(&self) -> bool {
+        #[allow(clippy::match_like_matches_macro)]
+        match self {
+            Self::PreferWhatsapp(_) => true,
+            Self::UseBackupTwilioCredentials(_) => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq, strum::Display)]
 pub enum JsonFlag<'a> {
     #[strum(to_string = "BillingProfile")]
     BillingProfile(&'a TenantId),
+
     #[strum(to_string = "AvailableOtpVendorPriorities")]
     AvailableOtpVendorPriorities(&'a str),
 }

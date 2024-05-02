@@ -1,11 +1,14 @@
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
 use mockall::{automock, predicate::*};
 use newtypes::Uuid;
+use rollout::LdRollout;
 use std::sync::Arc;
 use thiserror::Error;
 
 mod flags;
 pub use flags::*;
+
+mod rollout;
 
 #[derive(Debug, Error)]
 #[allow(clippy::enum_variant_names)]
@@ -34,6 +37,7 @@ impl Drop for ManagedClient {
 pub struct LaunchDarklyFeatureFlagClient {
     launch_darkly_client: Option<Arc<ManagedClient>>,
 }
+
 
 impl LaunchDarklyFeatureFlagClient {
     #[allow(clippy::new_without_default)]
@@ -65,7 +69,12 @@ impl LaunchDarklyFeatureFlagClient {
     }
 
     fn get_bool_flag<'a>(&self, flag: &'a BoolFlag<'a>) -> Result<bool, Error> {
-        let key = flag.key().unwrap_or_else(|| Uuid::new_v4().to_string());
+        if flag.is_migrated_to_new_format() {
+            // We're going to do this "is in list" operation on the client side
+            return self.get_rollout_bool_flag(flag);
+        }
+        // Legacy flag that still relies on LaunchDarkly evaluation logic
+        let key = flag.key().unwrap_or("global".into());
         let context = ContextBuilder::new(key)
             .build()
             .map_err(Error::ContextBuilderError)?;
@@ -77,6 +86,26 @@ impl LaunchDarklyFeatureFlagClient {
         }
         let val = detail.value.unwrap_or_else(|| flag.default());
         Ok(val)
+    }
+
+    /// More modern implementation of get_bool_flag.
+    fn get_rollout_bool_flag<'a>(&self, flag: &'a BoolFlag<'a>) -> Result<bool, Error> {
+        // Use a single, fixed key for all contexts. We're not using LaunchDarkly to evaluate
+        // a flag based on the context - we'll do that evluation on our side.
+        let context = ContextBuilder::new("global")
+            .build()
+            .map_err(Error::ContextBuilderError)?;
+        let client = &self.unwrap_client()?.inner;
+        // Fetch the rollout JSON value from launch darkly
+        let default_rollout = LdRollout::default(flag.default())?;
+        let detail = client.json_variation_detail(&context, &flag.flag_name(), default_rollout.clone());
+        if let launchdarkly_server_sdk::Reason::Error { error } = detail.reason {
+            return Err(Error::LdError(error));
+        }
+        let rollout = detail.value.unwrap_or(default_rollout);
+        let rollout: LdRollout = serde_json::value::from_value(rollout)?;
+        // And evaluate whether the key is included in the rollout locally
+        Ok(rollout.evaluate(flag.key()))
     }
 
     fn log_flag<T: std::fmt::Debug>(result: &Result<T, Error>, flag_name: String) {

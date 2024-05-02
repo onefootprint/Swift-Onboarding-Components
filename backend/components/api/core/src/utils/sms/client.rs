@@ -89,11 +89,9 @@ impl SmsClient {
     /// We don't use the backup client - but in case there's a problem with the main account,
     /// we could quickly divert traffic to the fallback
     pub(super) fn twilio_client(&self, recipient_e164: &PiiString) -> &twilio::Client {
-        // Don't want to send raw phone number to launch darkly
-        let h_recipient = h_recipient(recipient_e164);
-        let flag = BoolFlag::UseBackupTwilioCredentials(&h_recipient);
+        let flag = BoolFlag::UseBackupTwilioCredentials(recipient_e164.leak());
         let use_backup_twilio = self.ff_client.flag(flag);
-        tracing::info!(%use_backup_twilio, %h_recipient, has_backup=%self.twilio_client_backup.is_some(), "Choosing twilio client");
+        tracing::info!(%use_backup_twilio, has_backup=%self.twilio_client_backup.is_some(), "Choosing twilio client");
         match (use_backup_twilio, self.twilio_client_backup.as_ref()) {
             (true, Some(backup_client)) => backup_client,
             _ => &self.twilio_client,
@@ -162,6 +160,7 @@ impl SmsClient {
         destination: PhoneNumber,
         mut tx: Option<Sender<ApiError>>,
     ) -> ApiResult<()> {
+        // TODO rm this
         let h_recipient = h_recipient(&destination.e164());
 
         // Assemble the list of vendors we will use to attempt to send the message.
@@ -190,8 +189,9 @@ impl SmsClient {
                 SmsVendorKind::TwilioWhatsapp => {
                     // Try sending via whatsapp only if the message supports it and the user resides in a
                     // country that prefers whatsapp
+                    let e164 = destination.e164();
                     let user_prefers_whatsapp = destination.prefers_whatsapp()
-                        || self.ff_client.flag(BoolFlag::PreferWhatsapp(&h_recipient));
+                        || self.ff_client.flag(BoolFlag::PreferWhatsapp(e164.leak()));
                     message.supports_whatsapp() && user_prefers_whatsapp
                 }
                 _ => true,

@@ -92,6 +92,7 @@ pub async fn evaluate_rule(
             tracing::info!(?list_ids, "the list ids are");
             let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
 
+            // TODO can we share this validation?
             let adds: Vec<((RuleExpression, RuleInstanceKind), RuleAction)> = add
                 .into_iter()
                 .flatten()
