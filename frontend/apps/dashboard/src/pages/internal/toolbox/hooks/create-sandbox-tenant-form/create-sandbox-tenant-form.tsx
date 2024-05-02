@@ -23,7 +23,7 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
     formState: { errors },
   } = methods;
   const router = useRouter();
-  const { refreshUserPermissions, setIsLive } = useSession();
+  const { logIn } = useSession();
 
   const handleBeforeSubmit = async (data: CreateSandboxTenantFormData) => {
     const requestData = {
@@ -31,13 +31,12 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
       domains: [data.domain],
     };
     createSandboxTenantMutation.mutate(requestData, {
-      onSuccess: async () => {
+      onSuccess: async ({ token }) => {
         toast.show({
           title: 'Success',
           description: `Created tenant`,
         });
-        await setIsLive(false);
-        await refreshUserPermissions({});
+        await logIn({ auth: token, newIsLive: false });
         router.push('/settings');
       },
     });

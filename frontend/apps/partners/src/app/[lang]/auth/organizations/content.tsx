@@ -43,10 +43,10 @@ const OrganizationsPageContent = ({
     postPartnerAuthAssumeRole(token, tenantId)
       .then(res => {
         update({
-          auth: token,
+          auth: res.token,
           user: res.user ? getUserPayload(res.user) : undefined,
         });
-        createAuthCookie(token).then(() => {
+        createAuthCookie(res.token).then(() => {
           router.push(DEFAULT_PRIVATE_ROUTE);
         });
       })

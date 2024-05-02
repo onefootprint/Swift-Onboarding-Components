@@ -9,11 +9,16 @@ export type PostAssumeRequest = {
   tenantId: string;
 };
 
+export type PostAssumeResponse = {
+  token: string;
+  tenant: Organization;
+};
+
 const postAssumeTenantReadOnly = async (
   authHeaders: AuthHeaders,
   tenantId: string,
 ) => {
-  const { data } = await request<Organization>({
+  const { data } = await request<PostAssumeResponse>({
     method: 'POST',
     url: '/private/assume',
     headers: authHeaders,

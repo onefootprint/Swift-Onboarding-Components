@@ -32,8 +32,8 @@ const Data = ({
     assumeRoleMutation.mutate(
       { tenantId, authToken },
       {
-        async onSuccess() {
-          await logIn({ auth: authToken });
+        async onSuccess({ token }) {
+          await logIn({ auth: token });
           router.push(DEFAULT_PUBLIC_ROUTE);
         },
         onError: showErrorToast,

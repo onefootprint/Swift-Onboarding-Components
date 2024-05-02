@@ -3,6 +3,7 @@ import { DASHBOARD_AUTHORIZATION_HEADER } from '@/config/constants';
 import baseFetch from './base-fetch';
 
 type AssumePartnerRoleResponse = {
+  token: string;
   partnerTenant: {
     allowDomainAccess: boolean;
     domains: Array<string>;

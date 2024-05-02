@@ -31,15 +31,15 @@ const Tenants = () => {
   };
 
   const useAssumeTenantMutation = useAssumeTenant();
-  const { refreshUserPermissions } = useSession();
+  const { logIn } = useSession();
   const router = useRouter();
 
   const handleAssumeTenant = (tenant: Tenant) => {
     useAssumeTenantMutation.mutate(
       { tenantId: tenant.id },
       {
-        onSuccess: async () => {
-          await refreshUserPermissions({});
+        onSuccess: async ({ token }) => {
+          await logIn({ auth: token });
           router.push('/users');
         },
       },

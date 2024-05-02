@@ -56,6 +56,7 @@ export const withOrgAuthRolesError = () =>
   });
 
 export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
+  token: 'dbtok_new',
   user: {
     id: 'orguser_0WFrWMZwP0C65s21w9lBBy',
     email: 'jane@onefootprint.com',

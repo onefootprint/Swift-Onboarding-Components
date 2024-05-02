@@ -80,7 +80,11 @@ const useSession = () => {
     authHeaders[DASHBOARD_ALLOW_ASSUMED_WRITES] = JSON.stringify(true);
   }
 
-  const logIn = async (session: { auth: string; meta?: MetaSession }) => {
+  const logIn = async (session: {
+    auth: string;
+    meta?: MetaSession;
+    newIsLive?: boolean;
+  }) => {
     // Update local storage with the auth and meta ASAP
     update({ auth: session.auth });
     if (session.meta) {
@@ -88,7 +92,10 @@ const useSession = () => {
     }
     setRequestedOrgId(undefined);
     // Then asynchronously fetch user and tenant info from the backend for the new auth
-    await refreshPermissions({ newAuthToken: session.auth, newIsLive: isLive });
+    await refreshPermissions({
+      newAuthToken: session.auth,
+      newIsLive: session.newIsLive ?? isLive,
+    });
   };
 
   const refreshPermissions = async ({
@@ -139,18 +146,6 @@ const useSession = () => {
       logOut();
       showRequestErrorToast(error);
     }
-  };
-
-  const refreshUserPermissions = async ({
-    newIsLive,
-  }: {
-    newIsLive?: boolean;
-  }) => {
-    if (!data.auth) return;
-    await refreshPermissions({
-      newAuthToken: data.auth,
-      newIsLive: newIsLive !== undefined ? newIsLive : isLive,
-    });
   };
 
   const logOut = () => {
@@ -213,7 +208,6 @@ const useSession = () => {
     dangerouslyCastedData,
     data,
     isLoggedIn,
-    refreshUserPermissions,
     logIn,
     logOut,
     setOrg,

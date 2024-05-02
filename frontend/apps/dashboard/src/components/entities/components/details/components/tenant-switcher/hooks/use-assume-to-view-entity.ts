@@ -30,7 +30,7 @@ const useAssumeToViewEntity = (options: {
   const router = useRouter();
   const {
     authHeaders,
-    refreshUserPermissions,
+    logIn,
     data: { org },
     setIsLive,
   } = useSession();
@@ -62,8 +62,8 @@ const useAssumeToViewEntity = (options: {
       useAssumeTenantMutation.mutate(
         { tenantId: response.tenantId },
         {
-          onSuccess: async () => {
-            await refreshUserPermissions({ newIsLive: response.isLive });
+          onSuccess: async ({ token }) => {
+            await logIn({ auth: token, newIsLive: response.isLive });
             queryClient.invalidateQueries();
             changeRouteIfNeeded();
           },

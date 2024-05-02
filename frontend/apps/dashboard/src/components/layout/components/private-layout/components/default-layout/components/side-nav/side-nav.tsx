@@ -38,8 +38,8 @@ const Nav = () => {
     assumeRoleMutation.mutate(
       { tenantId, authToken },
       {
-        async onSuccess() {
-          await logIn({ auth: authToken });
+        async onSuccess({ token }) {
+          await logIn({ auth: token });
           router.reload();
         },
         onError: showErrorToast,

@@ -9,11 +9,15 @@ type CreateSandboxTenantRequest = {
   domains: string[];
 };
 
+type CreateSandboxTenantResponse = {
+  token: string;
+};
+
 const submitCreateSandboxTenantRequest = async (
   authHeaders: AuthHeaders,
   data: CreateSandboxTenantRequest,
 ) => {
-  const response = await request<{}>({
+  const response = await request<CreateSandboxTenantResponse>({
     method: 'POST',
     url: `/private/sandbox_tenant`,
     headers: authHeaders,
