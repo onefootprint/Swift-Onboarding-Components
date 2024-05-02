@@ -202,10 +202,7 @@ impl<'a> BoolFlag<'a> {
 
 #[derive(Debug, Eq, PartialEq, strum::Display)]
 pub enum JsonFlag<'a> {
-    #[strum(to_string = "BillingProfile")]
-    BillingProfile(&'a TenantId),
-
-    #[strum(to_string = "AvailableOtpVendorPriorities")]
+    #[strum(to_string = "AvailableOtpVendorPrioritiesRollout")]
     AvailableOtpVendorPriorities(&'a str),
 }
 
@@ -216,14 +213,12 @@ impl<'a> JsonFlag<'a> {
 
     pub(crate) fn key(&self) -> Option<String> {
         match self {
-            Self::BillingProfile(k) => Some(k.to_string()),
             Self::AvailableOtpVendorPriorities(k) => Some(k.to_string()),
         }
     }
 
     pub(crate) fn default(&self) -> serde_json::Value {
         match self {
-            Self::BillingProfile(_) => json!({}),
             Self::AvailableOtpVendorPriorities(_) => json!(null),
         }
     }

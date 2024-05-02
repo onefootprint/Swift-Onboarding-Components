@@ -3921,6 +3921,7 @@ dependencies = [
 name = "feature_flag"
 version = "0.1.0"
 dependencies = [
+ "itertools",
  "launchdarkly-server-sdk",
  "mockall",
  "newtypes",

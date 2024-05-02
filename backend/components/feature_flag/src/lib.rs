@@ -1,7 +1,7 @@
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
 use mockall::{automock, predicate::*};
-use newtypes::Uuid;
-use rollout::LdRollout;
+use rollout::{JsonLdRollout, LdRollout};
+use serde_json::json;
 use std::sync::Arc;
 use thiserror::Error;
 
@@ -90,22 +90,11 @@ impl LaunchDarklyFeatureFlagClient {
 
     /// More modern implementation of get_bool_flag.
     fn get_rollout_bool_flag<'a>(&self, flag: &'a BoolFlag<'a>) -> Result<bool, Error> {
-        // Use a single, fixed key for all contexts. We're not using LaunchDarkly to evaluate
-        // a flag based on the context - we'll do that evluation on our side.
-        let context = ContextBuilder::new("global")
-            .build()
-            .map_err(Error::ContextBuilderError)?;
         let client = &self.unwrap_client()?.inner;
-        // Fetch the rollout JSON value from launch darkly
-        let default_rollout = LdRollout::default(flag.default())?;
-        let detail = client.json_variation_detail(&context, &flag.flag_name(), default_rollout.clone());
-        if let launchdarkly_server_sdk::Reason::Error { error } = detail.reason {
-            return Err(Error::LdError(error));
-        }
-        let rollout = detail.value.unwrap_or(default_rollout);
-        let rollout: LdRollout = serde_json::value::from_value(rollout)?;
-        // And evaluate whether the key is included in the rollout locally
-        Ok(rollout.evaluate(flag.key()))
+        let rollout = get_rollout_flag_value::<LdRollout>(client, &flag.flag_name())?;
+        // Evaluate whether the key is included in the rollout locally
+        let value = rollout.map(|r| r.evaluate(flag.key())).unwrap_or(flag.default());
+        Ok(value)
     }
 
     fn log_flag<T: std::fmt::Debug>(result: &Result<T, Error>, flag_name: String) {
@@ -116,6 +105,29 @@ impl LaunchDarklyFeatureFlagClient {
             Err(ref err) => tracing::warn!(flag_name=%flag_name, error=%err, "LaunchDarklyError"),
         }
     }
+}
+
+/// Grabs the static rollout value from LaunchDarkly and parses into the provided T, which is
+/// one of LdRollout or JsonLdRollout.
+/// Returns Ok(None) as the default evaluation.
+fn get_rollout_flag_value<T>(client: &Client, flag_name: &str) -> Result<Option<T>, Error>
+where
+    T: serde::de::DeserializeOwned + serde::ser::Serialize,
+{
+    // Use a single, fixed key for all contexts. We're not using LaunchDarkly to evaluate
+    // a flag based on the context - we'll do that evluation on our side.
+    let context = ContextBuilder::new("global")
+        .build()
+        .map_err(Error::ContextBuilderError)?;
+
+    // Fetch the rollout JSON value from launch darkly
+    let detail = client.json_variation_detail(&context, flag_name, json!(null));
+    if let launchdarkly_server_sdk::Reason::Error { error } = detail.reason {
+        return Err(Error::LdError(error));
+    }
+    let val = detail.value.unwrap_or(json!(null));
+    let val = serde_json::value::from_value(val)?;
+    Ok(val)
 }
 
 #[automock]
@@ -130,6 +142,8 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
     fn flag<'a>(&self, flag: BoolFlag<'a>) -> bool {
         let result = self.get_bool_flag(&flag);
         Self::log_flag(&result, flag.flag_name());
+        // Catch errors reading the value from LD by returning the default value - we will
+        // log an error if we can't evaluate the flag, but shouldn't stop program execution
         result.unwrap_or_else(|_| flag.default())
     }
 }
@@ -137,23 +151,25 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
 impl LaunchDarklyFeatureFlagClient {
     /// Fetches the value for the provided JsonFlag and deserializes into T
     #[tracing::instrument(skip(self))]
-    pub fn json_flag<'a, T>(&self, flag: JsonFlag<'a>) -> Result<T, Error>
+    pub fn json_flag<'a, T>(&self, flag: JsonFlag<'a>) -> Result<T, serde_json::Error>
     where
         T: serde::de::DeserializeOwned,
     {
-        // Could put this on the FeatureFlagClient trait if we want to mock it
-        let key = flag.key().unwrap_or_else(|| Uuid::new_v4().to_string());
-        let context = ContextBuilder::new(key)
-            .build()
-            .map_err(Error::ContextBuilderError)?;
-        let client = &self.unwrap_client()?.inner;
-        let detail = client.json_variation_detail(&context, &flag.flag_name(), flag.default());
-        if let launchdarkly_server_sdk::Reason::Error { error } = detail.reason {
-            return Err(Error::LdError(error));
-        }
-        let val = detail.value.unwrap_or_else(|| flag.default());
-        let val = serde_json::value::from_value(val)?;
-        Ok(val)
+        let evaluate_flag = || -> Result<serde_json::Value, Error> {
+            let client = &self.unwrap_client()?.inner;
+            let rollout = get_rollout_flag_value::<JsonLdRollout>(client, &flag.flag_name())?;
+            let value = rollout
+                .and_then(|r| r.evaluate(flag.key()))
+                .unwrap_or(flag.default());
+            Ok(value)
+        };
+        let result = evaluate_flag();
+        Self::log_flag(&result, flag.flag_name());
+        // Catch errors reading the value from LD by returning the default value - we will
+        // log an error if we can't evaluate the flag, but shouldn't stop program execution
+        let value = result.unwrap_or_else(|_| flag.default());
+        // Then parse the feteched value into T as a convenience
+        serde_json::value::from_value(value)
     }
 }
 

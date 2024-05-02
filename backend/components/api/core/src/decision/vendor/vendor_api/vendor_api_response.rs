@@ -243,6 +243,7 @@ fn build_verification_identifier_map_entry(
 // In many cases at the moment, we still have functions that return VendorResults.
 // We also still need some things that VendorResults has that this map doesn't (like VerificationResultId). Eventually
 // will get rid of this, but it's non-trivial
+#[tracing::instrument(skip_all)]
 pub fn build_vendor_response_map_from_vendor_results(
     vendor_results: &[VendorResult],
 ) -> ApiResult<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)> {

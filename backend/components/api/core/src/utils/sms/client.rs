@@ -13,7 +13,7 @@ use itertools::Itertools;
 use newtypes::{
     output::Csv,
     sms_message::{SmsMessage, SmsMessageKind},
-    Base64Data, PhoneNumber, PiiString, SandboxId, VaultId,
+    PhoneNumber, PiiString, SandboxId, VaultId,
 };
 use std::fmt::Debug;
 use tokio::sync::oneshot::{self, Receiver, Sender};
@@ -39,13 +39,6 @@ pub struct SmsClient {
     /// AWS pinpoint SMS client
     pub(super) pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
     pub(super) ff_client: LaunchDarklyFeatureFlagClient,
-}
-
-/// For any phone-number specific flags, we don't want to be sending the plaintext phone number to
-/// LD to get the experiment assignment. So, we hash phone numbers before passing them to
-/// LD
-fn h_recipient(e164: &PiiString) -> String {
-    Base64Data::into_string_standard(sha256(e164.leak().as_bytes()).to_vec()).0
 }
 
 impl SmsClient {
@@ -160,17 +153,15 @@ impl SmsClient {
         destination: PhoneNumber,
         mut tx: Option<Sender<ApiError>>,
     ) -> ApiResult<()> {
-        // TODO rm this
-        let h_recipient = h_recipient(&destination.e164());
-
+        let e164 = destination.e164();
         // Assemble the list of vendors we will use to attempt to send the message.
         // This launchdarkly flag controls both (1) which vendors are available and
         // (2) the priority of which to use first.
         // We can use this flag to quickly switch away from vendors who are misbehaving without a deploy
-        let vendors_str: String = self
+        let vendors = self
             .ff_client
-            .json_flag(JsonFlag::AvailableOtpVendorPriorities(&h_recipient))?;
-        let vendor_kinds = match serde_json::de::from_str::<Option<Vec<SmsVendorKind>>>(&vendors_str) {
+            .json_flag::<Option<Vec<SmsVendorKind>>>(JsonFlag::AvailableOtpVendorPriorities(e164.leak()));
+        let vendor_kinds = match vendors {
             Err(err) => {
                 tracing::error!(
                     ?err,
@@ -181,7 +172,7 @@ impl SmsClient {
             Ok(Some(vendors)) => vendors,
             Ok(None) => SmsVendorKind::default_vendors(),
         };
-        tracing::info!(vendors=%Csv(vendor_kinds.clone()), %h_recipient, "Selected SMS vendors");
+        tracing::info!(vendors=%Csv(vendor_kinds.clone()), "Selected SMS vendors");
 
         let vendors = vendor_kinds
             .iter()
@@ -189,7 +180,6 @@ impl SmsClient {
                 SmsVendorKind::TwilioWhatsapp => {
                     // Try sending via whatsapp only if the message supports it and the user resides in a
                     // country that prefers whatsapp
-                    let e164 = destination.e164();
                     let user_prefers_whatsapp = destination.prefers_whatsapp()
                         || self.ff_client.flag(BoolFlag::PreferWhatsapp(e164.leak()));
                     message.supports_whatsapp() && user_prefers_whatsapp
