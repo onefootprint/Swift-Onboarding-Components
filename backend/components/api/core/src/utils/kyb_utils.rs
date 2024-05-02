@@ -15,7 +15,6 @@ use crate::{
 use db::models::{
     business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant, workflow::Workflow,
 };
-use futures::FutureExt;
 use itertools::Itertools;
 use newtypes::{
     email::Email, sms_message::SmsMessage, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, KybState,
@@ -62,6 +61,7 @@ pub async fn decrypt_basic_business_info(
 }
 
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
+#[tracing::instrument(skip_all)]
 pub async fn send_secondary_bo_links(
     state: &State,
     wf: &Workflow,
@@ -89,7 +89,8 @@ pub async fn send_secondary_bo_links(
 
     // TODO what happens when the session expires? similar to email link
     let duration = Duration::days(30);
-    let auth_token_futs = secondary_bos
+    let sealing_key = state.session_sealing_key.clone();
+    let sessions_to_make = secondary_bos
         .into_iter()
         .filter(|bo| bo.kind == BusinessOwnerKind::Secondary)
         .map(|bo| {
@@ -99,10 +100,19 @@ pub async fn send_secondary_bo_links(
             };
             (bo.link_id, session_data)
         })
-        .map(|(l_id, d)| AuthSession::create(state, d.into(), duration).map(|t| t.map(|t| (l_id, t))));
-
-    // TODO batch this
-    let tokens = futures::future::try_join_all(auth_token_futs).await?;
+        .collect_vec();
+    let tokens = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<Vec<_>> {
+            sessions_to_make
+                .into_iter()
+                .map(|(l_id, d)| -> ApiResult<_> {
+                    let (token, _) = AuthSession::create_sync(conn, &sealing_key, d.into(), duration)?;
+                    Ok((l_id, token))
+                })
+                .collect()
+        })
+        .await?;
 
     // Generate a link for each business owner
     let inviter = PiiString::new(format!(

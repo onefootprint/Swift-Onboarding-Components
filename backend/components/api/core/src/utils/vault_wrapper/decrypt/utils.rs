@@ -101,6 +101,7 @@ pub enum DecryptedBusinessOwners {
 }
 
 impl VaultWrapper<Business> {
+    #[tracing::instrument(skip_all)]
     pub async fn decrypt_business_owners(
         &self,
         db_pool: &DbPool,

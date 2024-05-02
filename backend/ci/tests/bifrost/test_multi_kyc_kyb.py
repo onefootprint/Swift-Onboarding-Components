@@ -29,20 +29,16 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
     )
 
 
-@pytest.fixture(scope="session")
-def primary_bo(kyb_sandbox_ob_config):
+@pytest.mark.flaky
+def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
     bifrost = BifrostClient.new(kyb_sandbox_ob_config)
     # We could get rate limited sending the SMS to the secondary BO in POST /hosted/onboarding/process
-    user = try_until_success(lambda: bifrost.run(), 60)
+    primary_bo = try_until_success(lambda: bifrost.run(), 60, retry_interval_s=15)
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "incomplete"
-    assert user.fp_id
-    assert user.fp_bid
-    return user
+    assert primary_bo.fp_id
+    assert primary_bo.fp_bid
 
-
-@pytest.mark.flaky
-def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # Extract the link sent to the secondary BO's phone number and verify it contains references to
     # the business and the BO that invited them
     bos = primary_bo.client.data["business.kyced_beneficial_owners"]

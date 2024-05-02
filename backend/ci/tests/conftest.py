@@ -4,7 +4,6 @@ import time
 import pytest
 from twilio.rest import Client
 from tests.constants import (
-    CUSTODIAN_AUTH,
     IT_TWILIO_ACCOUNT_SID,
     IT_TWILIO_SECRET_AUTH_TOKEN,
     TENANT_ID1,
@@ -14,8 +13,6 @@ from tests.constants import (
     LIVE_PHONE_NUMBER,
     EMAIL,
 )
-from tests.headers import DashboardAuth
-from tests.types import PartnerTenant
 from tests.utils import (
     EXPECTED_SERVER_VERSION_GIT_HASH,
     IncorrectServerVersion,
@@ -23,10 +20,8 @@ from tests.utils import (
     create_tenant,
     create_partner_tenant,
     create_ob_config,
-    _gen_random_sandbox_id,
     _gen_random_n_digit_number,
     patch,
-    post,
     clean_up_user,
 )
 
