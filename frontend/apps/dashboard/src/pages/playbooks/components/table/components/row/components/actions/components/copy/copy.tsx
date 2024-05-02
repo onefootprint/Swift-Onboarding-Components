@@ -2,10 +2,9 @@ import { IcoCode16, IcoUser16 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Dialog, RadioSelect, Stack, TextInput } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
-import styled, { css } from 'styled-components';
 
 export type CopyHandler = {
   launch: () => void;
@@ -17,6 +16,7 @@ export type CopyProps = {
 
 type FormData = {
   name: string;
+  mode: 'sandbox' | 'live';
 };
 
 const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
@@ -24,10 +24,18 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
   const form = useForm<FormData>({
     defaultValues: {
       name: t('form.name.base', { name: playbook.name }),
+      mode: 'sandbox',
     },
   });
   const org = useOrgSession();
   const [open, setOpen] = useState(false);
+
+  const resetForm = () => {
+    form.reset({
+      name: t('form.name.base', { name: playbook.name }),
+      mode: 'sandbox',
+    });
+  };
 
   useImperativeHandle(
     ref,
@@ -39,6 +47,12 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
 
   const handleClose = () => {
     setOpen(false);
+    resetForm();
+  };
+
+  const handleSubmit = (formData: FormData) => {
+    // eslint-disable-next-line no-console
+    console.log(formData);
   };
 
   return (
@@ -47,7 +61,8 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
       open={open}
       primaryButton={{
         label: t('form.cta'),
-        onClick: () => {},
+        type: 'submit',
+        form: 'copy-playbook-form',
       }}
       secondaryButton={{
         label: t('form.cancel'),
@@ -56,7 +71,7 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
       size="compact"
       title={t('title')}
     >
-      <Content>
+      <form id="copy-playbook-form" onSubmit={form.handleSubmit(handleSubmit)}>
         <Stack gap={7} direction="column">
           <TextInput
             autoFocus
@@ -64,37 +79,37 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
             placeholder={t('form.name.placeholder')}
             {...form.register('name', { required: true })}
           />
-          <RadioSelect
-            label={t('form.target.label')}
-            size="compact"
-            value="sandbox"
-            options={[
-              {
-                IconComponent: IcoCode16,
-                title: t('form.target.options.sandbox'),
-                value: 'sandbox',
-              },
-              {
-                disabled: org.data?.isSandboxRestricted,
-                disabledHint: t('form.target.hint'),
-                IconComponent: IcoUser16,
-                title: t('form.target.options.live'),
-                value: 'live',
-              },
-            ]}
+          <Controller
+            control={form.control}
+            name="mode"
+            defaultValue="sandbox"
+            render={({ field }) => (
+              <RadioSelect
+                label={t('form.target.label')}
+                onChange={field.onChange}
+                options={[
+                  {
+                    IconComponent: IcoCode16,
+                    title: t('form.target.options.sandbox'),
+                    value: 'sandbox',
+                  },
+                  {
+                    disabled: org.data?.isSandboxRestricted,
+                    disabledHint: t('form.target.hint'),
+                    IconComponent: IcoUser16,
+                    title: t('form.target.options.live'),
+                    value: 'live',
+                  },
+                ]}
+                size="compact"
+                value={field.value}
+              />
+            )}
           />
         </Stack>
-      </Content>
+      </form>
     </Dialog>
   );
 });
-
-const Content = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default Copy;
