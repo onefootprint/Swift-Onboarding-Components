@@ -29,7 +29,8 @@ use async_trait::async_trait;
 use db::models::{tenant::Tenant, tenant_user::TenantUser};
 use newtypes::{DataLifetimeSource, DbActor, TenantApiKeyId, TenantScope, TenantUserId, WorkosAuthMethod};
 
-pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAssumeAuthContext>;
+pub type TenantSessionAuth<const IS_SECONDARY: bool = false> =
+    Either<TenantRbAuthContext<IS_SECONDARY>, FirmEmployeeAssumeAuthContext<IS_SECONDARY>>;
 
 pub type PartnerTenantSessionAuth = PartnerTenantRbAuthContext;
 

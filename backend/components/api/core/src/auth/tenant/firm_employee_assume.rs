@@ -50,14 +50,19 @@ pub struct FirmEmployeeAssumeAuth {
     name = "X-Fp-Dashboard-Authorization",
     description = "Short-lived auth token for a firm-employee dashboard user assuming a tenant."
 )]
-pub struct ParsedFirmEmployeeAssumeAuth(pub(super) FirmEmployeeAssumeAuth);
+pub struct ParsedFirmEmployeeAssumeAuth<const IS_SECONDARY: bool>(pub(super) FirmEmployeeAssumeAuth);
 
 /// A shorthand for the extractor for an auth session in which a firm employee has assumed anther tenant
-pub type FirmEmployeeAssumeAuthContext = SessionContext<ParsedFirmEmployeeAssumeAuth>;
+pub type FirmEmployeeAssumeAuthContext<const IS_SECONDARY: bool> =
+    SessionContext<ParsedFirmEmployeeAssumeAuth<IS_SECONDARY>>;
 
-impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
+impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth<IS_SECONDARY> {
     fn header_names() -> Vec<&'static str> {
-        vec!["X-Fp-Dashboard-Authorization"]
+        if IS_SECONDARY {
+            vec!["X-Fp-Dashboard-Authorization-Secondary"]
+        } else {
+            vec!["X-Fp-Dashboard-Authorization"]
+        }
     }
 
     fn try_load_session(
@@ -110,7 +115,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
     }
 }
 
-impl GetFirmEmployee for FirmEmployeeAssumeAuthContext {
+impl<const IS_SECONDARY: bool> GetFirmEmployee for FirmEmployeeAssumeAuthContext<IS_SECONDARY> {
     fn firm_employee_user(&self) -> ApiResult<TenantUser> {
         let tu = &self.0.tenant_user;
         if !tu.is_firm_employee {
@@ -156,7 +161,7 @@ impl FirmEmployeeAssumeAuth {
     }
 }
 
-impl CanCheckTenantGuard for FirmEmployeeAssumeAuthContext {
+impl<const IS_SECONDARY: bool> CanCheckTenantGuard for FirmEmployeeAssumeAuthContext<IS_SECONDARY> {
     type Auth = Box<dyn TenantAuth>;
 
     fn token_scopes(&self) -> Vec<TenantScope> {
@@ -251,7 +256,7 @@ mod test {
             auth_method: WorkosAuthMethod::GoogleOauth,
             requested_allow_writes,
         };
-        let data = ParsedFirmEmployeeAssumeAuth(data);
+        let data = ParsedFirmEmployeeAssumeAuth::<false>(data);
         let auth = SessionContext::create_fixture(data, session_data);
         auth.token_scopes()
     }

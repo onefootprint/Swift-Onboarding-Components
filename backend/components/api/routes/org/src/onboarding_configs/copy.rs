@@ -7,7 +7,7 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
-use api_core::types::JsonApiResponse;
+use api_core::{self, errors::ValidationError, types::JsonApiResponse};
 use api_wire_types::{CopyPlaybookRequest, CreateRule, MultiUpdateRuleRequest, UnvalidatedRuleExpression};
 use db::models::{
     ob_configuration::{NewObConfigurationArgs, ObConfiguration},
@@ -27,18 +27,38 @@ async fn post(
     state: web::Data<State>,
     ob_config_id: web::Path<ObConfigurationId>,
     request: Json<CopyPlaybookRequest>,
-    auth: TenantSessionAuth,
+    source_auth: TenantSessionAuth,
+    // target_auth allows the client to provide a secondary auth token to specify the destination
+    // tenant to where we'll copy the playbook.
+    // NOTE: x-is-live and x-allow-assumed-writes are shared between both auth extractors unfort
+    target_auth: Option<TenantSessionAuth<true>>,
 ) -> JsonApiResponse<api_wire_types::OnboardingConfiguration> {
-    let auth = auth.check_guard(TenantGuard::Read)?;
-    let tenant_id = auth.tenant().id.clone();
-    let is_live = auth.is_live()?;
+    let (source_auth, target_actor, target_tenant) = if let Some(target_auth) = target_auth {
+        // Copying into another tenant. Check read permissions at source tenant and write at destination
+        let source_auth = source_auth.check_guard(TenantGuard::Read)?;
+        let target_auth = target_auth.check_guard(TenantGuard::OnboardingConfiguration)?;
+        let source_actor = source_auth.actor();
+        let target_actor = target_auth.actor();
+        if source_actor.tenant_user_id()? != target_actor.tenant_user_id()? {
+            return ValidationError("Target tenant auth is using a different principal").into();
+        }
+        let target_tenant = target_auth.tenant().clone();
+        (source_auth, target_actor, target_tenant)
+    } else {
+        // Copying into same tenant - make sure we have write permissions here
+        let source_auth = source_auth.check_guard(TenantGuard::OnboardingConfiguration)?;
+        let target_actor = source_auth.actor();
+        let target_tenant = source_auth.tenant().clone();
+        (source_auth, target_actor, target_tenant)
+    };
+    let tenant_id = source_auth.tenant().id.clone();
+    let is_live = source_auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
 
     let CopyPlaybookRequest {
         is_live: target_is_live,
         name,
     } = request.into_inner();
-    let target_tenant = auth.tenant().clone();
 
     let target_tenant_id = target_tenant.id.clone();
     let (obc, rules) = state
@@ -51,12 +71,11 @@ async fn post(
         .await?;
 
     let tt_id = target_tenant.id.clone();
-    let args = copy_playbook(obc, auth.actor().into(), tt_id, target_is_live, name);
+    let args = copy_playbook(obc, target_actor.clone().into(), tt_id, target_is_live, name);
     let args = ObConfigurationArgsToValidate::validate(&state, args, &target_tenant)?;
 
     let rules = rules.into_iter().map(copy_rule).collect_vec();
 
-    let actor = auth.actor();
     let (obc, actor, rs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -75,7 +94,7 @@ async fn post(
             // exist in the target tenant
             let rules_update =
                 validate_rules_request(conn, &target_tenant_id, target_is_live, add_rules_request)?;
-            RuleInstance::bulk_edit(conn, &obc, &actor.into(), rules_update)?;
+            RuleInstance::bulk_edit(conn, &obc, &target_actor.into(), rules_update)?;
 
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;
@@ -157,7 +176,7 @@ fn copy_playbook(
         author: _,
         name: _,
 
-        // TODO maybe we should copy appearance one day. But it's not really used today.
+        // Maybe we should copy appearance one day. But it's not really used today.
         appearance_id: _,
     } = pb;
 

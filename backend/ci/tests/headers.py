@@ -38,6 +38,10 @@ class DashboardAuth(BaseAuth):
     HEADER_NAME = "x-fp-dashboard-authorization"
 
 
+class SecondaryDashboardAuth(BaseAuth):
+    HEADER_NAME = "x-fp-dashboard-authorization-secondary"
+
+
 class ClientTokenAuth(BaseAuth):
     HEADER_NAME = "x-fp-authorization"
 

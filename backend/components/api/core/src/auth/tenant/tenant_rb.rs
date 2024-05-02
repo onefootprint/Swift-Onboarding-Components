@@ -45,11 +45,15 @@ pub struct TenantRbAuth {
     name = "X-Fp-Dashboard-Authorization",
     description = "Short-lived token for an authenticated dashboard user."
 )]
-pub struct ParsedTenantRbAuth(pub(super) TenantRbAuth);
+pub struct ParsedTenantRbAuth<const IS_SECONDARY: bool>(pub(super) TenantRbAuth);
 
-impl ExtractableAuthSession for ParsedTenantRbAuth {
+impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedTenantRbAuth<IS_SECONDARY> {
     fn header_names() -> Vec<&'static str> {
-        vec!["X-Fp-Dashboard-Authorization"]
+        if IS_SECONDARY {
+            vec!["X-Fp-Dashboard-Authorization-Secondary"]
+        } else {
+            vec!["X-Fp-Dashboard-Authorization"]
+        }
     }
 
     fn try_load_session(
@@ -93,7 +97,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
     }
 }
 
-impl SessionContext<ParsedTenantRbAuth> {
+impl<const IS_SECONDARY: bool> SessionContext<ParsedTenantRbAuth<IS_SECONDARY>> {
     pub fn rolebinding(&self) -> Option<&TenantRolebinding> {
         Some(&self.0.tenant_rolebinding)
     }
@@ -106,9 +110,10 @@ impl TenantRbAuth {
 }
 
 /// A shorthand for the commonly used ParsedTenantRbAuth context
-pub type TenantRbAuthContext = SessionContext<ParsedTenantRbAuth>;
+pub type TenantRbAuthContext<const IS_SECONDARY: bool = false> =
+    SessionContext<ParsedTenantRbAuth<IS_SECONDARY>>;
 
-impl CanCheckTenantGuard for TenantRbAuthContext {
+impl<const IS_SECONDARY: bool> CanCheckTenantGuard for TenantRbAuthContext<IS_SECONDARY> {
     type Auth = Box<dyn TenantAuth>;
 
     fn token_scopes(&self) -> Vec<TenantScope> {
@@ -146,7 +151,7 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
     }
 }
 
-impl GetFirmEmployee for TenantRbAuthContext {
+impl<const IS_SECONDARY: bool> GetFirmEmployee for TenantRbAuthContext<IS_SECONDARY> {
     fn firm_employee_user(&self) -> ApiResult<TenantUser> {
         let tu = &self.0.tenant_user;
         if !tu.is_firm_employee {

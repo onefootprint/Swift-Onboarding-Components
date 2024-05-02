@@ -9,7 +9,9 @@ from tests.utils import (
 )
 from tests.dashboard.utils import update_rules
 from tests.headers import (
+    IsLive,
     PublishableOnboardingKey,
+    SecondaryDashboardAuth,
 )
 from tests.identify_client import IdentifyClient
 
@@ -807,7 +809,25 @@ def test_default_rules(sandbox_tenant):
     )
 
 
-def test_copy_playbook(sandbox_tenant):
+@pytest.mark.parametrize(
+    "copy_to_different_target_tenant, target_is_live",
+    [(False, False), (False, True), (True, False), (True, True)],
+)
+def test_copy_playbook(
+    sandbox_tenant, foo_sandbox_tenant, copy_to_different_target_tenant, target_is_live
+):
+    copy_auths = sandbox_tenant.db_auths
+    if copy_to_different_target_tenant:
+        target_tenant_token = foo_sandbox_tenant.auth_token
+        # When copying to a different tenant, we provide the target tenant's auth token
+        copy_auths.append(SecondaryDashboardAuth(foo_sandbox_tenant.auth_token.value))
+    else:
+        target_tenant_token = sandbox_tenant.auth_token
+    target_tenant_read_auths = [
+        target_tenant_token,
+        IsLive("true" if target_is_live else "false"),
+    ]
+
     obc = create_ob_config(
         sandbox_tenant,
         "Test OB Config to copy",
@@ -826,15 +846,21 @@ def test_copy_playbook(sandbox_tenant):
     original = get(f"org/onboarding_configs/{obc.id}", None, *sandbox_tenant.db_auths)
     assert not original["is_live"]
 
-    data = dict(name="My copied playbook", is_live=True)
-    copied = post(
-        f"org/onboarding_configs/{obc.id}/copy", data, *sandbox_tenant.db_auths
+    data = dict(
+        name="My copied playbook",
+        is_live=target_is_live,
     )
-    assert copied["is_live"]
+    copied = post(f"org/onboarding_configs/{obc.id}/copy", data, *copy_auths)
+    assert copied["is_live"] == target_is_live
     assert copied["name"] == "My copied playbook"
 
+    # And test fetching using the target tenant's auth
+    copied_id = copied["id"]
+    copied = get(f"org/onboarding_configs/{copied_id}", None, *target_tenant_read_auths)
+    assert copied["is_live"] == target_is_live
+    assert copied["name"] == "My copied playbook"
     copied_rules = get(
-        f"org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths
+        f"org/onboarding_configs/{copied_id}/rules", None, *target_tenant_read_auths
     )
 
     # Ensure that the fields were copied
@@ -872,4 +898,37 @@ def test_copy_playbook(sandbox_tenant):
     )
     assert set(serialized_rule(r) for r in copied_rules) == set(
         serialized_rule(r) for r in original_rules
+    )
+    overlapping_rule_ids = set(r["rule_id"] for r in copied_rules) & set(
+        r["rule_id"] for r in original_rules
+    )
+    assert len(overlapping_rule_ids) == 0
+
+
+def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):
+    obc = sandbox_tenant.default_ob_config
+    # Try copying to same tenant
+    data = dict(name="My copied playbook", is_live=True)
+    body = post(
+        f"org/onboarding_configs/{obc.id}/copy",
+        data,
+        *sandbox_tenant.ro_db_auths,
+        status_code=401,
+    )
+    assert (
+        body["error"]["message"]
+        == "Not allowed: required permission is missing: OnboardingConfiguration"
+    )
+
+    # Try copying to another tenant with insufficient write permissions at that tenant
+    body = post(
+        f"org/onboarding_configs/{obc.id}/copy",
+        data,
+        *sandbox_tenant.db_auths,
+        SecondaryDashboardAuth(foo_sandbox_tenant.ro_auth_token.value),
+        status_code=401,
+    )
+    assert (
+        body["error"]["message"]
+        == "Not allowed: required permission is missing: OnboardingConfiguration"
     )
