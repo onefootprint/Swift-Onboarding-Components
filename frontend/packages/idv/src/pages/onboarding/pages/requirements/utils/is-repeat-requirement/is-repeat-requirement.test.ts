@@ -21,24 +21,66 @@ describe('isRepeatRequirement', () => {
     {
       a: {
         kind: OnboardingRequirementKind.idDoc,
-        documentRequestKind: DocumentRequestKind.Identity,
+        config: {
+          kind: DocumentRequestKind.Identity,
+        },
       },
       b: {
         kind: OnboardingRequirementKind.idDoc,
-        documentRequestKind: DocumentRequestKind.ProofOfAddress,
+        config: {
+          kind: DocumentRequestKind.ProofOfAddress,
+        },
       },
       x: false,
     },
     {
       a: {
         kind: OnboardingRequirementKind.idDoc,
-        documentRequestKind: DocumentRequestKind.Identity,
+        config: {
+          kind: DocumentRequestKind.Identity,
+        },
       },
       b: {
         kind: OnboardingRequirementKind.idDoc,
-        documentRequestKind: DocumentRequestKind.Identity,
+        config: {
+          kind: DocumentRequestKind.Identity,
+        },
       },
       x: true,
+    },
+    {
+      a: {
+        kind: OnboardingRequirementKind.idDoc,
+        config: {
+          kind: DocumentRequestKind.Custom,
+          name: 'flerp',
+        },
+      },
+      b: {
+        kind: OnboardingRequirementKind.idDoc,
+        config: {
+          kind: DocumentRequestKind.Custom,
+          name: 'flerp',
+        },
+      },
+      x: true,
+    },
+    {
+      a: {
+        kind: OnboardingRequirementKind.idDoc,
+        config: {
+          kind: DocumentRequestKind.Custom,
+          name: 'flerp',
+        },
+      },
+      b: {
+        kind: OnboardingRequirementKind.idDoc,
+        config: {
+          kind: DocumentRequestKind.Custom,
+          name: 'derp',
+        },
+      },
+      x: false,
     },
     {
       a: { kind: OnboardingRequirementKind.collectKycData },

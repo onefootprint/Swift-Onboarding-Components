@@ -42,11 +42,7 @@ export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
   isMet: boolean;
   documentRequestId: string;
-  shouldCollectSelfie: boolean;
-  shouldCollectConsent: boolean;
-  supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
   uploadMode: DocumentUploadMode;
-  documentRequestKind: DocumentRequestKind;
   config: DocumentRequirementConfig;
 };
 

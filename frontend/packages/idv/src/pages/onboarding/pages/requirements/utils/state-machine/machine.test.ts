@@ -26,23 +26,8 @@ const livenessRequirement: RegisterPasskeyRequirement = {
 const idDocRequirement: IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc,
   isMet: false,
-  shouldCollectSelfie: true,
-  shouldCollectConsent: true,
   uploadMode: 'default',
   documentRequestId: 'id',
-  supportedCountryAndDocTypes: {
-    us: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
-    ca: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
-  },
-  documentRequestKind: DocumentRequestKind.Identity,
   config: {
     kind: DocumentRequestKind.Identity,
     shouldCollectConsent: false,

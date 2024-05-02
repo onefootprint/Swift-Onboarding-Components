@@ -18,12 +18,8 @@ const livenessReq: RegisterPasskeyRequirement = {
 const idDocReq: IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc,
   isMet: false,
-  shouldCollectSelfie: true,
-  shouldCollectConsent: true,
   uploadMode: 'default',
-  supportedCountryAndDocTypes: {},
   documentRequestId: 'id',
-  documentRequestKind: DocumentRequestKind.Identity,
   config: {
     kind: DocumentRequestKind.Identity,
     shouldCollectConsent: true,

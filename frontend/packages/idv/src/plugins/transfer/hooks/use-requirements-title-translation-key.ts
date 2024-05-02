@@ -19,7 +19,7 @@ const useRequirementsTitle = (
 
   const documentKind =
     documents.length === 1
-      ? getDocumentRequestLabel(documents[0].documentRequestKind)
+      ? getDocumentRequestLabel(documents[0].config.kind)
       : t('documents');
 
   if (transferringLiveness && transferringIdDoc) {

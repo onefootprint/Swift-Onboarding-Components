@@ -85,25 +85,7 @@ const idDocRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.idDoc,
   isMet: false,
   documentRequestId: 'id',
-  shouldCollectConsent: false,
-  shouldCollectSelfie: false,
   uploadMode: 'allow_upload',
-  supportedCountryAndDocTypes: {
-    us: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-    ],
-    ca: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
-  },
-  documentRequestKind: DocumentRequestKind.Identity,
   config: {
     kind: DocumentRequestKind.Identity,
     shouldCollectConsent: false,
