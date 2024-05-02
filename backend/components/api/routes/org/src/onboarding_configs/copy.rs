@@ -2,17 +2,20 @@ use crate::{
     auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
     errors::ApiResult,
     onboarding_configs::validation::ObConfigurationArgsToValidate,
+    rules::validate_rules_request,
     types::response::ResponseData,
     utils::db2api::DbToApi,
     State,
 };
-use api_core::{decision::rule_engine, types::JsonApiResponse};
-use api_wire_types::CopyPlaybookRequest;
+use api_core::types::JsonApiResponse;
+use api_wire_types::{CopyPlaybookRequest, CreateRule, MultiUpdateRuleRequest, UnvalidatedRuleExpression};
 use db::models::{
     ob_configuration::{NewObConfigurationArgs, ObConfiguration},
+    rule_instance::{IncludeRules, RuleInstance},
     rule_set_version::RuleSetVersion,
 };
-use newtypes::ObConfigurationId;
+use itertools::Itertools;
+use newtypes::{DbActor, ObConfigurationId, TenantId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
@@ -30,15 +33,96 @@ async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
-    let (obc, _rs) = state
+
+    let CopyPlaybookRequest {
+        is_live: target_is_live,
+        name,
+    } = request.into_inner();
+    let target_tenant = auth.tenant().clone();
+
+    let target_tenant_id = target_tenant.id.clone();
+    let (obc, rules) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
-            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
-            Ok((obc, rs))
+            let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
+            Ok((obc, rules))
         })
         .await?;
 
+    let tt_id = target_tenant.id.clone();
+    let args = copy_playbook(obc, auth.actor().into(), tt_id, target_is_live, name);
+    let args = ObConfigurationArgsToValidate::validate(&state, args, &target_tenant)?;
+
+    let rules = rules.into_iter().map(copy_rule).collect_vec();
+
+    let actor = auth.actor();
+    let (obc, actor, rs) = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            // Create the copied playbook
+            let obc: ObConfiguration = ObConfiguration::create(conn, args)?;
+            let obc = ObConfiguration::lock(conn, &obc.id)?;
+
+            // And add the copied rules into the new playbook
+            let add_rules_request = MultiUpdateRuleRequest {
+                expected_rule_set_version: 0,
+                add: Some(rules),
+                edit: None,
+                delete: None,
+            };
+            // TODO this will error if we try to copy a rule that references a list that doesn't
+            // exist in the target tenant
+            let rules_update =
+                validate_rules_request(conn, &target_tenant_id, target_is_live, add_rules_request)?;
+            RuleInstance::bulk_edit(conn, &obc, &actor.into(), rules_update)?;
+
+            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
+            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
+            Ok((obc, actor, rs))
+        })
+        .await?;
+    let result =
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone()));
+    ResponseData::ok(result).json()
+}
+
+fn copy_rule(r: RuleInstance) -> CreateRule {
+    let RuleInstance {
+        name,
+        rule_expression,
+        action,
+        is_shadow,
+
+        // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
+        // field is added
+        id: _,
+        created_at: _,
+        created_seqno: _,
+        _created_at: _,
+        _updated_at: _,
+        deactivated_at: _,
+        deactivated_seqno: _,
+        rule_id: _,
+        ob_configuration_id: _,
+        actor: _,
+        kind: _,
+    } = r;
+    CreateRule {
+        name,
+        rule_action: action,
+        rule_expression: UnvalidatedRuleExpression(rule_expression.0),
+        is_shadow,
+    }
+}
+
+fn copy_playbook(
+    pb: ObConfiguration,
+    author: DbActor,
+    target_tenant_id: TenantId,
+    target_is_live: bool,
+    name: String,
+) -> NewObConfigurationArgs {
     let ObConfiguration {
         must_collect_data,
         can_access_data,
@@ -75,20 +159,14 @@ async fn post(
 
         // TODO maybe we should copy appearance one day. But it's not really used today.
         appearance_id: _,
-    } = obc;
+    } = pb;
 
-    let CopyPlaybookRequest {
+    NewObConfigurationArgs {
+        author,
+        tenant_id: target_tenant_id,
         is_live: target_is_live,
         name,
-    } = request.into_inner();
-    let target_tenant = auth.tenant().clone();
-
-    let args = NewObConfigurationArgs {
-        author: auth.actor().into(),
-        tenant_id: target_tenant.id.clone(),
-        is_live: target_is_live,
         // Copied fields
-        name,
         must_collect_data,
         can_access_data,
         cip_kind,
@@ -108,23 +186,5 @@ async fn post(
         document_types_and_countries,
         curp_validation_enabled,
         documents_to_collect: documents_to_collect.unwrap_or_default(),
-    };
-    let args = ObConfigurationArgsToValidate::validate(&state, args, &target_tenant)?;
-
-    let ff_client = state.feature_flag_client.clone();
-    let (obc, actor, rs) = state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let obc: ObConfiguration = ObConfiguration::create(conn, args)?;
-            let obc = ObConfiguration::lock(conn, &obc.id)?;
-            // TODO don't save default rules
-            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))?;
-            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
-            let rs = RuleSetVersion::get_active(conn, &obc.id)?;
-            Ok((obc, actor, rs))
-        })
-        .await?;
-    let result =
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone()));
-    ResponseData::ok(result).json()
+    }
 }

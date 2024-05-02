@@ -43,7 +43,7 @@ pub async fn multi_update_rules(
     let rules = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let update = validate_request(conn, &tenant_id, is_live, req)?;
+            let update = validate_rules_request(conn, &tenant_id, is_live, req)?;
 
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
@@ -72,7 +72,7 @@ pub async fn multi_update_rules(
     ResponseData::ok(rules.into_iter().map(api_wire_types::Rule::from_db).collect_vec()).json()
 }
 
-fn validate_request(
+pub(crate) fn validate_rules_request(
     conn: &mut PgConn,
     tenant_id: &TenantId,
     is_live: bool,
@@ -99,14 +99,15 @@ fn validate_request(
     let new_rules = add
         .unwrap_or_default()
         .into_iter()
-        .map(|a| -> ApiResult<_> {
+        .map(|r| -> ApiResult<_> {
             let (rule_expression, rule_instance_kind) =
-                validate_rule_expression(a.rule_expression, &lists, is_live)?;
+                validate_rule_expression(r.rule_expression, &lists, is_live)?;
             Ok(NewRule {
                 rule_expression,
-                action: a.rule_action,
-                name: a.name,
                 kind: rule_instance_kind,
+                action: r.rule_action,
+                name: r.name,
+                is_shadow: r.is_shadow,
             })
         })
         .collect::<ApiResult<Vec<_>>>()?;

@@ -1,5 +1,5 @@
 import pytest
-from tests.types import ObConfiguration
+import json
 from tests.utils import (
     get,
     post,
@@ -7,6 +7,7 @@ from tests.utils import (
     create_ob_config,
     _gen_random_sandbox_id,
 )
+from tests.dashboard.utils import update_rules
 from tests.headers import (
     PublishableOnboardingKey,
 )
@@ -806,18 +807,37 @@ def test_default_rules(sandbox_tenant):
     )
 
 
-def test_copy_playbook(sandbox_tenant, must_collect_data):
+def test_copy_playbook(sandbox_tenant):
     obc = create_ob_config(
-        sandbox_tenant, "Test OB Config to copy", must_collect_data, must_collect_data
+        sandbox_tenant,
+        "Test OB Config to copy",
+        ["name", "full_address", "email", "phone_number", "nationality"],
+        ["name", "full_address", "email", "phone_number", "nationality", "ssn4"],
+        optional_data=["ssn9"],
+        is_doc_first_flow=True,
+        skip_confirm=True,
+        documents_to_collect=[dict(kind="proof_of_address", data=dict())],
     )
+    # Add a rule to this obc
+    new_rule_exp = {"field": "address_city_matches", "op": "eq", "value": True}
+    new_rule = dict(rule_action="manual_review", rule_expression=[new_rule_exp])
+    original_rules = update_rules(obc.id, 1, add=[new_rule], *sandbox_tenant.db_auths)
+
     original = get(f"org/onboarding_configs/{obc.id}", None, *sandbox_tenant.db_auths)
     assert not original["is_live"]
 
     data = dict(name="My copied playbook", is_live=True)
-    body = post(f"org/onboarding_configs/{obc.id}/copy", data, *sandbox_tenant.db_auths)
-    assert body["is_live"]
-    assert body["name"] == "My copied playbook"
+    copied = post(
+        f"org/onboarding_configs/{obc.id}/copy", data, *sandbox_tenant.db_auths
+    )
+    assert copied["is_live"]
+    assert copied["name"] == "My copied playbook"
 
+    copied_rules = get(
+        f"org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths
+    )
+
+    # Ensure that the fields were copied
     copied_fields = [
         "must_collect_data",
         "can_access_data",
@@ -840,4 +860,16 @@ def test_copy_playbook(sandbox_tenant, must_collect_data):
         "curp_validation_enabled",
     ]
     for field in copied_fields:
-        assert body[field] == original[field]
+        assert copied[field] == original[field]
+
+    # Ensure that the rules were copied too.
+    # Compare a hashable representation of the rules
+    serialized_rule = lambda r: (
+        r["action"],
+        json.dumps(r["rule_expression"]),
+        r["is_shadow"],
+        r["name"],
+    )
+    assert set(serialized_rule(r) for r in copied_rules) == set(
+        serialized_rule(r) for r in original_rules
+    )

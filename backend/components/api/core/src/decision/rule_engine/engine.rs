@@ -312,6 +312,7 @@ mod tests {
                 action: r.1,
                 name: None,
                 kind: RuleInstanceKind::Person,
+                is_shadow: false,
             })
             .collect_vec();
         let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, rules).unwrap();

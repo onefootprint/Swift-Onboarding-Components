@@ -3,6 +3,8 @@ mod evaluate;
 mod list;
 mod update;
 
+pub(crate) use update::*;
+
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(list::list_rules_for_playbook)

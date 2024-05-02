@@ -18,8 +18,11 @@ pub struct UpdateRuleRequest {
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct MultiUpdateRuleRequest {
     pub expected_rule_set_version: i32,
+    #[serde(default)]
     pub add: Option<Vec<CreateRule>>,
+    #[serde(default)]
     pub edit: Option<Vec<EditRule>>,
+    #[serde(default)]
     pub delete: Option<Vec<RuleId>>,
 }
 
@@ -29,6 +32,8 @@ pub struct CreateRule {
     pub name: Option<String>,
     pub rule_expression: UnvalidatedRuleExpression,
     pub rule_action: RuleAction,
+    #[serde(default)]
+    pub is_shadow: bool,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

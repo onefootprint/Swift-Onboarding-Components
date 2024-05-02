@@ -258,6 +258,7 @@ pub fn save_default_rules_for_obc(
                 action: a,
                 name: None,
                 kind,
+                is_shadow: false,
             })
             .collect(),
     )?;

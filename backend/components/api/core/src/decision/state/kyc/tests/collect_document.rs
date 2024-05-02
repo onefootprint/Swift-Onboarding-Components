@@ -82,6 +82,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
                     action: RuleAction::PassWithManualReview,
                     name: None,
                     kind: RuleInstanceKind::Person,
+                    is_shadow: false,
                 };
                 RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
                     .unwrap()

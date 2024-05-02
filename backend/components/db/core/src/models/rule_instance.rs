@@ -64,6 +64,7 @@ pub struct NewRule {
     pub action: RuleAction,
     pub name: Option<String>,
     pub kind: RuleInstanceKind,
+    pub is_shadow: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -434,6 +435,7 @@ mod tests {
             rule_expression: expression.clone(),
             action,
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
         let rule = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
             .unwrap()
@@ -470,6 +472,7 @@ mod tests {
             action: RuleAction::ManualReview,
             name: None,
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
         let r2 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
@@ -480,6 +483,7 @@ mod tests {
             action: RuleAction::Fail,
             name: None,
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
         let r3 = NewRule {
             rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
@@ -490,6 +494,7 @@ mod tests {
             action: RuleAction::Fail,
             name: None,
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
 
         let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
@@ -532,6 +537,7 @@ mod tests {
             action: RuleAction::ManualReview,
             name: None,
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
         // r2 references list2
         let r2 = NewRule {
@@ -551,6 +557,7 @@ mod tests {
             action: RuleAction::Fail,
             name: None,
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
         // r3 references no list
         let r3 = NewRule {
@@ -562,6 +569,7 @@ mod tests {
             action: RuleAction::Fail,
             name: None,
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
 
         RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![r1, r2, r3]).unwrap();
@@ -591,6 +599,7 @@ mod tests {
             rule_expression: tests::fixtures::rule::example_rule_expression(),
             action: RuleAction::Fail,
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
         let rule = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule])
             .unwrap()
@@ -675,6 +684,7 @@ mod tests {
                         action: RuleAction::Fail,
                         name: None,
                         kind: RuleInstanceKind::Person,
+                        is_shadow: false,
                     })
                     .collect(),
                 updates: vec![],
@@ -711,6 +721,7 @@ mod tests {
                         action: RuleAction::ManualReview,
                         name: None,
                         kind: RuleInstanceKind::Person,
+                        is_shadow: false,
                     })
                     .collect(),
                 updates: vec![
@@ -805,6 +816,7 @@ mod tests {
             rule_expression: tests::fixtures::rule::example_rule_expression(),
             action: RuleAction::StepUp(StepUpKind::Identity),
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
         let rule1 = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule1])
             .unwrap()
@@ -820,6 +832,7 @@ mod tests {
             rule_expression: tests::fixtures::rule::example_rule_expression(),
             action: RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
             kind: RuleInstanceKind::Person,
+            is_shadow: false,
         };
         let rule2 = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule2])
             .unwrap()

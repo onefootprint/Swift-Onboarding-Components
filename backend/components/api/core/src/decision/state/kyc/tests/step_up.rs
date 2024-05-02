@@ -68,6 +68,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
                 action: RuleAction::StepUp(step_up_kind),
                 name: None,
                 kind: RuleInstanceKind::Person,
+                is_shadow: false,
             };
             RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, vec![rule]).unwrap();
 
@@ -243,6 +244,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
                 action: RuleAction::StepUp(identity_stepup),
                 name: None,
                 kind: RuleInstanceKind::Person,
+                is_shadow: false,
             };
 
             // here we rely on the ordering of RuleActions to choose StepUp the first time, then
@@ -256,6 +258,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
                 action: RuleAction::StepUp(proof_of_address_stepup),
                 name: None,
                 kind: RuleInstanceKind::Person,
+                is_shadow: false,
             };
 
             let poa_review_rule = NewRule {
@@ -267,6 +270,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
                 action: RuleAction::ManualReview,
                 name: None,
                 kind: RuleInstanceKind::Person,
+                is_shadow: false,
             };
 
             let obc = ObConfiguration::lock(conn, &obc_id).unwrap();

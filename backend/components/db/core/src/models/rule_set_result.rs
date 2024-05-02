@@ -265,18 +265,21 @@ mod tests {
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
                 action: RuleAction::Fail,
                 kind: RuleInstanceKind::Person,
+                is_shadow: false,
             },
             NewRule {
                 name: None,
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
                 action: RuleAction::Fail,
                 kind: RuleInstanceKind::Person,
+                is_shadow: false,
             },
             NewRule {
                 name: None,
                 rule_expression: tests::fixtures::rule::example_rule_expression(),
                 action: RuleAction::Fail,
                 kind: RuleInstanceKind::Person,
+                is_shadow: false,
             },
         ];
         let rules = RuleInstance::bulk_create(conn, &obc, &DbActor::Footprint, rules).unwrap();
