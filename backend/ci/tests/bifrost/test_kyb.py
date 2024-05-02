@@ -3,6 +3,7 @@ from tests.utils import (
     patch,
     post,
     get_requirement_from_requirements,
+    create_ob_config,
 )
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER
@@ -152,10 +153,62 @@ def test_one_click_kyb(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new(kyb_sandbox_ob_config)
     user = bifrost.run()
 
-    phone_number = bifrost.data["id.phone_number"]
     sandbox_id = bifrost.sandbox_id
     bifrost2 = BifrostClient.inherit(kyb_sandbox_ob_config, sandbox_id)
     user2 = bifrost2.run()
     assert user.fp_id == user2.fp_id
     assert user.fp_bid
     assert user.fp_bid == user2.fp_bid
+
+
+@pytest.mark.parametrize(
+    "beneficial_owners",
+    [
+        "dont_collect",
+        "collect_without_kyc",
+        "collect_with_single_kyc",
+        "collect_with_multi_kyc",
+    ],
+)
+def test_business_owners(sandbox_tenant, beneficial_owners):
+    must_collect_data = []
+    user_cdos = ["name", "ssn9", "full_address", "email", "phone_number", "nationality"]
+    business_cdos = [
+        "business_name",
+        "business_tin",
+        "business_address",
+        "business_phone_number",
+        "business_website",
+    ]
+    if beneficial_owners == "dont_collect":
+        must_collect_data = business_cdos
+        skip_kyc = True
+    elif beneficial_owners == "collect_without_kyc":
+        must_collect_data = business_cdos + user_cdos + ["business_beneficial_owners"]
+        skip_kyc = True
+    elif beneficial_owners == "collect_with_single_kyc":
+        must_collect_data = business_cdos + user_cdos + ["business_beneficial_owners"]
+        skip_kyc = False
+    elif beneficial_owners == "collect_with_multi_kyc":
+        must_collect_data = (
+            business_cdos + user_cdos + ["business_kyced_beneficial_owners"]
+        )
+        skip_kyc = False
+
+    obc = create_ob_config(
+        sandbox_tenant,
+        f"KYB config BOs: {beneficial_owners}",
+        must_collect_data,
+        must_collect_data,
+        skip_kyc=skip_kyc,
+    )
+    bifrost = BifrostClient.new(obc)
+    bifrost.run()
+
+    # Just because we're not running it in this test
+    expected_business_status = (
+        "incomplete" if beneficial_owners == "collect_with_multi_kyc" else "pass"
+    )
+    assert bifrost.validate_response["business"]["status"] == expected_business_status
+    # TODO: do we really want the status to be pass when skip_kyc is true? maybe we just set to none
+    assert bifrost.validate_response["user"]["status"] == "pass"

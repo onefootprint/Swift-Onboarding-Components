@@ -107,9 +107,13 @@ impl ObConfigurationArgsToValidate {
             .into());
         }
 
-        if self.skip_kyc && !self.allow_international_residents && !is_collecting_doc {
+        if self.skip_kyc
+            && !self.allow_international_residents
+            && !is_collecting_doc
+            && self.kind != ObConfigurationKind::Kyb
+        {
             return Err(TenantError::ValidationError(
-                "Cannot specify skip_kyc if allow_international_residents=false and no Document is collected in must_collect_data"
+                "Can only skip_kyc if allow_international_residents or Document is collected or kind is Kyb"
                     .to_owned(),
             )
             .into());

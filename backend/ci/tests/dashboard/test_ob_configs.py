@@ -616,7 +616,7 @@ def test_doc_only(sandbox_tenant):
         (
             ["name", "full_address", "phone_number", "email"],
             False,
-            "Validation error: Cannot specify skip_kyc if allow_international_residents=false and no Document is collected in must_collect_data",
+            "Validation error: Can only skip_kyc if allow_international_residents or Document is collected or kind is Kyb",
         ),
     ],  # don't allow skip_kyc=true if US only and doc isn't being collected
 )
