@@ -18,7 +18,7 @@ use db::{
     PgConn,
 };
 use itertools::{chain, Itertools};
-use newtypes::{ListId, ObConfigurationId, TenantId};
+use newtypes::{DocumentRequestConfig, ListId, ObConfigurationId, ObConfigurationKind, TenantId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -50,13 +50,22 @@ pub async fn multi_update_rules(
 
             RuleInstance::bulk_edit(conn, &obc, &actor.into(), update)?;
             // retrieve and return full latest list of Rules for FE for convenience
-            Ok(RuleInstance::list(
-                conn,
-                &tenant_id,
-                is_live,
-                &obc.id,
-                IncludeRules::All,
-            )?)
+            let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
+
+            // Make sure we're not removing all rules, unless this is a document-only playbook for
+            // a custom doc
+            let is_pb_allowed_to_have_no_rules = obc.kind == ObConfigurationKind::Document
+                && obc.must_collect_data.is_empty()
+                && obc
+                    .documents_to_collect
+                    .clone()
+                    .unwrap_or_default()
+                    .iter()
+                    .all(|d| !matches!(d, DocumentRequestConfig::Identity { .. }));
+            if rules.is_empty() && !is_pb_allowed_to_have_no_rules {
+                return Err(ValidationError("Proceeding would remove all rules on your playbook").into());
+            }
+            Ok(rules)
         })
         .await?;
 

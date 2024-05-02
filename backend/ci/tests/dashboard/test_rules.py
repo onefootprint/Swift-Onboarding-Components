@@ -345,9 +345,7 @@ def test_multi_edit(sandbox_tenant, must_collect_data):
     )
     # When OBC's are created they are given a default set of rules
     default_rules = get(
-        f"/org/onboarding_configs/{obc.id}/rules",
-        None,
-        *sandbox_tenant.db_auths,
+        f"/org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths
     )
 
     # edit 2 rules, add 2 new ones, and delete the rest
@@ -548,3 +546,26 @@ def test_blocklist_rules(sandbox_tenant, must_collect_data):
 
 
 # TODO: add vault data rule validation tests
+
+
+def test_cannot_delete_all_rules(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
+    )
+    default_rules = get(
+        f"/org/onboarding_configs/{obc.id}/rules", None, *sandbox_tenant.db_auths
+    )
+    body = patch(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            expected_rule_set_version=1,
+            add=[],
+            edit=[],
+            delete=[r["rule_id"] for r in default_rules],
+        ),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+    assert (
+        body["error"]["message"] == "Proceeding would remove all rules on your playbook"
+    )
