@@ -172,6 +172,8 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         }
 
         if obc.skip_kyb {
+            // TODO one day we should move this into vendor calls + decisioning but have the
+            // decisioning code clear the status
             // Handling skip_kyb flow
             // Since we're not running KYB, let's set the sv status to None
             ScopedVault::clear_business_status(conn, &wf.id)?;

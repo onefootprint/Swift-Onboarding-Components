@@ -74,23 +74,25 @@ impl<Type> VaultWrapper<Type> {
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
 pub enum DecryptedBusinessOwners {
-    KybWithoutBos, // for Apiture we are introducing the concept of running KYB without any BO's
-    // Either a Single-KYC or Multi-KYC KYB flow was started and a new Business Vault was created and a BusinessOwner and Person Vault/ScopedVault/Onboarding was created for the Primary BO
-    // However, they dropped off before they submitted the BO's information so we have no BO VaultData for either the Primary or potential Secondary BO's
-    KYBStart {
+    /// This business was created via API and doesn't even have a user linked via bifrost
+    NoVaultedOrLinkedBos,
+    /// There isn't yet any vaulted business owner information for this business.
+    /// This could happen because the playbook isn't collecting information.
+    /// Or this could happen if the user just hasn't filled out BO information yet.
+    NoVaultedBos {
         primary_bo: BusinessOwner,
         primary_bo_vault: UserData,
     },
-    // Single-KYC KYB flow after BO's information has been submitted. There is BDK::BeneficialOwners VaultData for both the Primary BO and the Secondary BO's
-    SingleKYC {
+    /// Single-KYC KYB flow after BO's information has been submitted. There is BDK::BeneficialOwners VaultData for both the Primary BO and the Secondary BO's
+    SingleKyc {
         primary_bo: BusinessOwner,
         primary_bo_vault: UserData,
         primary_bo_data: BusinessOwnerData,
         secondary_bos: Vec<BusinessOwnerData>,
     },
-    // Multi-KYC KYB flow after BO's information has been submitted. There is BDK::KycedBeneficialOwners VaultData for both the Primary BO and the Secondary BO's
-    // There are also BusinessOwner's for every Secondary BO. For Secondary BO's that have started Bifrost, we will have a Person Vault/ScopedVault/Onboarding.
-    MultiKYC {
+    /// Multi-KYC KYB flow after BO's information has been submitted. There is BDK::KycedBeneficialOwners VaultData for both the Primary BO and the Secondary BO's
+    /// There are also BusinessOwner's for every Secondary BO. For Secondary BO's that have started Bifrost, we will have a Person Vault/ScopedVault/Onboarding.
+    MultiKyc {
         primary_bo: BusinessOwner,
         primary_bo_vault: UserData,
         primary_bo_data: KycedBusinessOwnerData,
@@ -132,7 +134,7 @@ impl VaultWrapper<Business> {
                 }
                 let primary_bo_data = vault_bos.remove(0);
 
-                Ok(DecryptedBusinessOwners::SingleKYC {
+                Ok(DecryptedBusinessOwners::SingleKyc {
                     primary_bo,
                     primary_bo_vault,
                     primary_bo_data,
@@ -166,7 +168,7 @@ impl VaultWrapper<Business> {
                 let primary_bo = pbo.1;
                 let primary_bo_vault = pbo.2.ok_or(BusinessError::PrimaryBoHasNoVault)?;
 
-                Ok(DecryptedBusinessOwners::MultiKYC {
+                Ok(DecryptedBusinessOwners::MultiKyc {
                     primary_bo,
                     primary_bo_vault,
                     primary_bo_data,
@@ -180,16 +182,19 @@ impl VaultWrapper<Business> {
                     return Err(BusinessError::TooManyBos.into());
                 }
                 let pbo = bos.pop();
+                // Should we even distinguish between these two cases here? or just let the caller
                 if let Some(pbo) = pbo {
                     let primary_bo = pbo.0;
                     let primary_bo_vault = pbo.1.ok_or(BusinessError::PrimaryBoHasNoVault)?;
 
-                    Ok(DecryptedBusinessOwners::KYBStart {
+                    // NoVaultedBos
+                    Ok(DecryptedBusinessOwners::NoVaultedBos {
                         primary_bo,
                         primary_bo_vault,
                     })
                 } else {
-                    Ok(DecryptedBusinessOwners::KybWithoutBos)
+                    // NoVaultedOrLinkedBos
+                    Ok(DecryptedBusinessOwners::NoVaultedOrLinkedBos)
                 }
             }
             (Some(_), Some(_)) => Err(BusinessError::KycedAndNonKycedBos.into()),

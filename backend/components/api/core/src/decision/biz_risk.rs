@@ -30,17 +30,16 @@ pub async fn get_bo_obds(
         .await?;
 
     let sv_ids = match dbo {
-        DecryptedBusinessOwners::KYBStart {
-            primary_bo: _,
-            primary_bo_vault: _,
-        } => Err(ApiError::from(OnboardingError::BusinessOwnersNotSet)),
-        DecryptedBusinessOwners::SingleKYC {
+        DecryptedBusinessOwners::NoVaultedOrLinkedBos | DecryptedBusinessOwners::NoVaultedBos { .. } => {
+            vec![]
+        }
+        DecryptedBusinessOwners::SingleKyc {
             primary_bo: _,
             primary_bo_vault,
             primary_bo_data: _,
             secondary_bos: _,
-        } => Ok(vec![primary_bo_vault.0.id]),
-        DecryptedBusinessOwners::MultiKYC {
+        } => vec![primary_bo_vault.0.id],
+        DecryptedBusinessOwners::MultiKyc {
             primary_bo: _,
             primary_bo_vault,
             primary_bo_data: _,
@@ -58,10 +57,9 @@ pub async fn get_bo_obds(
                 })
                 .collect::<ApiResult<Vec<_>>>()?;
             v.extend(secondary_bo_wfs);
-            Ok(v)
+            v
         }
-        DecryptedBusinessOwners::KybWithoutBos => Ok(vec![]),
-    }?;
+    };
 
     let obc_id = wf.ob_configuration_id.ok_or(OnboardingError::NoObcForWorkflow)?;
     let wfs = db_pool

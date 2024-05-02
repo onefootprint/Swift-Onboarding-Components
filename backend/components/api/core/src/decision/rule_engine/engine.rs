@@ -20,13 +20,14 @@ use db::{
         rule_instance::{IncludeRules, RuleInstance},
         rule_result::RuleResult,
         rule_set_result::{NewRuleResultArgs, NewRuleSetResultArgs, RuleSetResult},
+        vault::Vault,
     },
     TxnPgConn,
 };
 use itertools::Itertools;
 use newtypes::{
     DocumentRequestKind, ListId, ObConfigurationId, ObConfigurationKind, RiskSignalGroupKind,
-    RuleExpressionCondition, RuleSetResultId, RuleSetResultKind, ScopedVaultId, WorkflowId,
+    RuleExpressionCondition, RuleSetResultId, RuleSetResultKind, ScopedVaultId, VaultKind, WorkflowId,
 };
 
 pub struct EvaluateWorkflowDecisionArgs<'a> {
@@ -184,11 +185,21 @@ pub fn evaluate_rules(
 ) -> ApiResult<Option<(RuleSetResult, Vec<RuleResult>)>> {
     let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kinds)?;
     if rules.is_empty() {
-        if obc.kind == ObConfigurationKind::Document {
+        let v = Vault::get(conn, sv_id)?;
+        let can_have_no_rules = match obc.kind {
             // Document-only playbooks are allowed to have no rules if they want to maintain
             // the existing status.
             // One day, we should probably further generalize this to be a "collection-only"
             // playbook that just doesn't run rules
+            ObConfigurationKind::Document => true, // and theoretically, should have docs_to_collect.all(is_custom)
+            ObConfigurationKind::Kyc => false,     // We could support this some day for skip_kyc
+            ObConfigurationKind::Kyb => {
+                (obc.skip_kyc && v.kind == VaultKind::Person)
+                    || (obc.skip_kyb && v.kind == VaultKind::Business)
+            }
+            ObConfigurationKind::Auth => true,
+        };
+        if can_have_no_rules {
             return Ok(None);
         }
         return Err(crate::decision::Error::from(RuleError::NoRulesForPlaybook(obc.id.clone())).into());

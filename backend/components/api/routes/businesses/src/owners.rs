@@ -56,11 +56,12 @@ pub async fn get(
 
 fn business_owner_infos(decrypted_bos: DecryptedBusinessOwners) -> Vec<BusinessOwnerInfo> {
     match decrypted_bos {
-        DecryptedBusinessOwners::KYBStart {
+        DecryptedBusinessOwners::NoVaultedOrLinkedBos => vec![],
+        DecryptedBusinessOwners::NoVaultedBos {
             primary_bo,
             primary_bo_vault,
         } => vec![(None, Some(primary_bo), Some(primary_bo_vault))],
-        DecryptedBusinessOwners::SingleKYC {
+        DecryptedBusinessOwners::SingleKyc {
             primary_bo,
             primary_bo_vault,
             primary_bo_data,
@@ -78,7 +79,7 @@ fn business_owner_infos(decrypted_bos: DecryptedBusinessOwners) -> Vec<BusinessO
             );
             v
         }
-        DecryptedBusinessOwners::MultiKYC {
+        DecryptedBusinessOwners::MultiKyc {
             primary_bo,
             primary_bo_vault,
             primary_bo_data,
@@ -96,6 +97,5 @@ fn business_owner_infos(decrypted_bos: DecryptedBusinessOwners) -> Vec<BusinessO
             );
             v
         }
-        DecryptedBusinessOwners::KybWithoutBos => vec![],
     }
 }

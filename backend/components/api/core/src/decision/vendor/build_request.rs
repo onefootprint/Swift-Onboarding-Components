@@ -167,11 +167,12 @@ pub async fn build_business_data_from_verification_request(
         .decrypt_business_owners(db_pool, enclave_client, &sv.tenant_id)
         .await?;
     let business_owners = match dbo {
-        DecryptedBusinessOwners::KYBStart {
+        DecryptedBusinessOwners::NoVaultedOrLinkedBos => vec![],
+        DecryptedBusinessOwners::NoVaultedBos {
             primary_bo: _,
             primary_bo_vault: _,
         } => return Err(ApiError::from(BusinessError::BoOnboardingNotComplete)),
-        DecryptedBusinessOwners::SingleKYC {
+        DecryptedBusinessOwners::SingleKyc {
             primary_bo: _,
             primary_bo_vault: _,
             primary_bo_data,
@@ -184,7 +185,7 @@ pub async fn build_business_data_from_verification_request(
                 .map(BoData::from)
                 .collect()
         }
-        DecryptedBusinessOwners::MultiKYC {
+        DecryptedBusinessOwners::MultiKyc {
             primary_bo: _,
             primary_bo_vault,
             primary_bo_data: _,
@@ -227,7 +228,6 @@ pub async fn build_business_data_from_verification_request(
                 })
                 .collect()
         }
-        DecryptedBusinessOwners::KybWithoutBos => vec![],
     };
 
     // Get remaining Business vault data

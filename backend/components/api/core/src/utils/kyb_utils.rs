@@ -12,7 +12,9 @@ use crate::{
     },
     State,
 };
-use db::models::{business_owner::BusinessOwner, tenant::Tenant, workflow::Workflow};
+use db::models::{
+    business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant, workflow::Workflow,
+};
 use futures::FutureExt;
 use itertools::Itertools;
 use newtypes::{
@@ -156,12 +158,20 @@ pub async fn send_secondary_bo_links(
 }
 
 #[tracing::instrument(skip(state))]
-pub async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> ApiResult<bool> {
+async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> ApiResult<bool> {
     let svid = biz_wf.scoped_vault_id.clone();
 
-    let bvw = state
+    let obc_id = biz_wf
+        .ob_configuration_id
+        .clone()
+        .ok_or(OnboardingError::NoObcForWorkflow)?;
+    let (bvw, obc) = state
         .db_pool
-        .db_query(move |conn| VaultWrapper::<Business>::build_for_tenant(conn, &svid))
+        .db_query(move |conn| -> ApiResult<_> {
+            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &svid)?;
+            let (obc, _) = ObConfiguration::get(conn, &obc_id)?;
+            Ok((bvw, obc))
+        })
         .await?;
 
     let dbo = bvw
@@ -174,15 +184,21 @@ pub async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -
     };
 
     let bo_kyc_is_complete = match dbo {
-        DecryptedBusinessOwners::KYBStart {
+        DecryptedBusinessOwners::NoVaultedOrLinkedBos => {
+            tracing::info!(?biz_wf, "[should_run_kyb] NoVaultedOrLinkedBos");
+            // For cases where kyb is manually run via /kyb without BOs, we allow running KYB
+            true
+        }
+        DecryptedBusinessOwners::NoVaultedBos {
             primary_bo: _,
             primary_bo_vault: _,
         } => {
-            tracing::info!(?biz_wf, "[should_run_kyb] KYBStart");
-            false
+            tracing::info!(?biz_wf, "[should_run_kyb] NoVaultedBos");
+            // If the playbook is skipping KYC of BOs, we can consider KYC complete
+            obc.skip_kyc
         }
         // For Single-KYC KYB, only need the primary BO to have completed KYC
-        DecryptedBusinessOwners::SingleKYC {
+        DecryptedBusinessOwners::SingleKyc {
             primary_bo: _,
             primary_bo_vault,
             primary_bo_data: _,
@@ -192,7 +208,7 @@ pub async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -
             has_decision(primary_bo_vault.0.status)
         }
         // For Multi-KYC KYB, we need the primary BO and all secondary BOs to have completed KYC
-        DecryptedBusinessOwners::MultiKYC {
+        DecryptedBusinessOwners::MultiKyc {
             primary_bo: _,
             primary_bo_vault,
             primary_bo_data: _,
@@ -210,11 +226,6 @@ pub async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -
                 && secondary_bos
                     .into_iter()
                     .all(|b| b.2.map(|d| has_decision(d.0.status)).unwrap_or(false))
-        }
-        DecryptedBusinessOwners::KybWithoutBos => {
-            tracing::info!(?biz_wf, "[should_run_kyb] KybWithoutBos");
-            // For cases where kyb is manually run via /kyb without BOs, we allow running KYB
-            true
         }
     };
 
