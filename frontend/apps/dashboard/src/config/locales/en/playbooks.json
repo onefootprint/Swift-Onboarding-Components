@@ -1,0 +1,24 @@
+{
+  "copy": {
+    "title": "Copying playbook",
+    "form": {
+      "name": {
+        "label": "Playbook name",
+        "placeholder": "Playbook name",
+        "errors": {
+          "required": "Please enter a name for the Playbook."
+        }
+      },
+      "target": {
+        "label": "Target environment",
+        "options": {
+          "live": "Live",
+          "sandbox": "Sandbox"
+        },
+        "hint": "You're not allowed to copy playbooks to the live environment."
+      },
+      "cancel": "Cancel",
+      "cta": "Copy to target"
+    }
+  }
+}

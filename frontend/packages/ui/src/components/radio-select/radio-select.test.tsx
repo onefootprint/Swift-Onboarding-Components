@@ -46,12 +46,29 @@ describe('<RadioSelect />', () => {
       expect(screen.getByTestId('radio-select-test-id')).toBeInTheDocument();
     });
 
-    it('has selected option', () => {
-      renderRadioSelect({
-        value: 'Item 2',
+    describe('when an option is selected', () => {
+      it('should have selected option', () => {
+        renderRadioSelect({
+          value: 'Item 2',
+          options: [
+            {
+              title: 'Item 1',
+              description: 'Description 1',
+              IconComponent: IcoAndroid16,
+              value: 'Item 1',
+            },
+            {
+              title: 'Item 2',
+              description: 'Description 2',
+              IconComponent: IcoApple16,
+              value: 'Item 2',
+            },
+          ],
+        });
+
+        const option = screen.getByRole('button', { name: 'Item 2' });
+        expect(option).toHaveAttribute('aria-selected', 'true');
       });
-      const option = screen.getByLabelText('Item 2') as HTMLButtonElement;
-      expect(option).toHaveAttribute('aria-selected', 'true');
     });
 
     describe('when clicking on an option', () => {
@@ -60,8 +77,10 @@ describe('<RadioSelect />', () => {
         renderRadioSelect({
           onChange: onChangeMockFn,
         });
-        const option = screen.getByLabelText('Item 2') as HTMLButtonElement;
+
+        const option = screen.getByRole('button', { name: 'Item 2' });
         await userEvent.click(option);
+
         expect(onChangeMockFn).toHaveBeenCalled();
       });
     });

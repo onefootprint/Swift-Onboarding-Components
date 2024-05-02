@@ -2,6 +2,7 @@ import noop from 'lodash/noop';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import Label from '../label';
 import Stack from '../stack';
 import Text from '../text';
 import type {
@@ -11,70 +12,77 @@ import type {
 import RadioSelectOption from './components/radio-select-option';
 
 export type RadioSelectProps = {
-  options: RadioSelectOptionFields[] | GroupedRadioSelectOptionFields[];
-  value?: string;
+  label?: string;
   onChange?: (value: string) => void;
-  testID?: string;
+  options: RadioSelectOptionFields[] | GroupedRadioSelectOptionFields[];
   size?: 'compact' | 'default';
+  testID?: string;
+  value?: string;
 };
 
 const RadioSelect = ({
-  options,
-  value,
+  label,
   onChange,
-  testID,
+  options,
   size,
+  testID,
+  value,
 }: RadioSelectProps) => (
-  <OptionsContainer data-testid={testID} direction="column" gap={3}>
-    {options.map(option => {
-      if ('label' in option) {
+  <Stack direction="column">
+    {label && <Label>{label}</Label>}
+    <OptionsContainer data-testid={testID} direction="column" gap={3}>
+      {options.map(option => {
+        if ('label' in option) {
+          return (
+            <GroupContainer key={option.label} direction="column" gap={4}>
+              <Text
+                variant={size === 'compact' ? 'label-3' : 'label-2'}
+                color="secondary"
+              >
+                {option.label}
+              </Text>
+              {option.options.map(subOption => (
+                <RadioSelectOption
+                  key={subOption.value}
+                  value={subOption.value}
+                  title={subOption.title}
+                  description={subOption.description}
+                  IconComponent={subOption.IconComponent}
+                  disabled={subOption.disabled}
+                  disabledHint={subOption.disabledHint}
+                  onClick={
+                    subOption.disabled
+                      ? noop
+                      : () => onChange?.(subOption.value)
+                  }
+                  selected={subOption.value === value}
+                  size={size}
+                />
+              ))}
+            </GroupContainer>
+          );
+        }
         return (
-          <GroupContainer key={option.label} direction="column" gap={4}>
-            <Text
-              variant={size === 'compact' ? 'label-3' : 'label-2'}
-              color="secondary"
-            >
-              {option.label}
-            </Text>
-            {option.options.map(subOption => (
-              <RadioSelectOption
-                key={subOption.value}
-                value={subOption.value}
-                title={subOption.title}
-                description={subOption.description}
-                IconComponent={subOption.IconComponent}
-                disabled={subOption.disabled}
-                disabledHint={subOption.disabledHint}
-                onClick={
-                  subOption.disabled ? noop : () => onChange?.(subOption.value)
-                }
-                selected={subOption.value === value}
-                size={size}
-              />
-            ))}
-          </GroupContainer>
+          <RadioSelectOption
+            key={option.value}
+            value={option.value}
+            title={option.title}
+            description={option.description}
+            IconComponent={option.IconComponent}
+            disabled={option.disabled}
+            disabledHint={option.disabledHint}
+            onClick={option.disabled ? noop : () => onChange?.(option.value)}
+            selected={option.value === value}
+            size={size}
+          />
         );
-      }
-      return (
-        <RadioSelectOption
-          key={option.value}
-          value={option.value}
-          title={option.title}
-          description={option.description}
-          IconComponent={option.IconComponent}
-          disabled={option.disabled}
-          disabledHint={option.disabledHint}
-          onClick={option.disabled ? noop : () => onChange?.(option.value)}
-          selected={option.value === value}
-          size={size}
-        />
-      );
-    })}
-  </OptionsContainer>
+      })}
+    </OptionsContainer>
+  </Stack>
 );
 
 const OptionsContainer = styled(Stack)`
-  span {
+  div[data-tooltip-trigger='true'] {
     width: 100%;
   }
 `;

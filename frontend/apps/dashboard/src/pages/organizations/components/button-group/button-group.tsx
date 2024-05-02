@@ -7,7 +7,7 @@ const ButtonGroup = styled.div<{ isLoading?: boolean }>`
     flex-direction: column;
     width: 100%;
 
-    span {
+    div[data-tooltip-trigger='true'] {
       height: 46px;
       margin: 0;
       width: 100%;

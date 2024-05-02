@@ -80,12 +80,13 @@ describe('<WhoToOnboard />', () => {
       const onSubmit = jest.fn();
       renderWhoToOnboard({ onSubmit });
 
-      expect(screen.getByText('Onboard people')).not.toHaveAttribute(
-        'disabled',
-      );
-      expect(
-        screen.getByText('Onboard businesses and their beneficial owners'),
-      ).toHaveAttribute('disabled');
+      const kycOption = screen.getByRole('button', { name: 'Onboard people' });
+      expect(kycOption).not.toHaveAttribute('disabled');
+
+      const kybOption = screen.getByRole('button', {
+        name: 'Onboard businesses and their beneficial owners',
+      });
+      expect(kybOption).toHaveAttribute('disabled');
     });
 
     it('both disabled when both restricted', async () => {
@@ -98,10 +99,13 @@ describe('<WhoToOnboard />', () => {
       const onSubmit = jest.fn();
       renderWhoToOnboard({ onSubmit });
 
-      expect(screen.getByText('Onboard people')).toHaveAttribute('disabled');
-      expect(
-        screen.getByText('Onboard businesses and their beneficial owners'),
-      ).toHaveAttribute('disabled');
+      const kycOption = screen.getByRole('button', { name: 'Onboard people' });
+      expect(kycOption).toHaveAttribute('disabled');
+
+      const kybOption = screen.getByRole('button', {
+        name: 'Onboard businesses and their beneficial owners',
+      });
+      expect(kybOption).toHaveAttribute('disabled');
     });
 
     it('both enabled when no restrictions', async () => {

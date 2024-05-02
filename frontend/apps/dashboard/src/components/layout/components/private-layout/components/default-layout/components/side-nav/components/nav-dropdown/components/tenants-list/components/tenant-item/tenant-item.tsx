@@ -47,7 +47,8 @@ const ItemContainer = styled(Dropdown.Item)`
   ${({ theme }) => css`
     padding: ${theme.spacing[3]} ${theme.spacing[5]};
     height: ${OPTION_HEIGHT};
-    span {
+
+    div[data-tooltip-trigger='true'] {
       width: 100%;
     }
   `}

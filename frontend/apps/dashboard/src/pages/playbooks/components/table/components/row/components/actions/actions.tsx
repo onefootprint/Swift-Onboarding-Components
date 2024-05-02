@@ -6,6 +6,8 @@ import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
+// import type { CopyHandler } from './components/copy';
+// import Copy from './components/copy';
 import type { CopyLinkHandler } from './components/copy-link';
 import CopyLink from './components/copy-link';
 import type { EditNameHandler } from './components/edit-name';
@@ -24,6 +26,7 @@ const Actions = ({ playbook }: ActionsProps) => {
   });
   const statusRef = useRef<StatusHandler>(null);
   const editNameRef = useRef<EditNameHandler>(null);
+  // const copyRef = useRef<CopyHandler>(null);
   const copyLinkRef = useRef<CopyLinkHandler>(null);
   const canShowLink =
     kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
@@ -35,6 +38,10 @@ const Actions = ({ playbook }: ActionsProps) => {
   const launchEditName = () => {
     editNameRef.current?.launch();
   };
+
+  // const launchCopy = () => {
+  //   copyRef.current?.launch();
+  // };
 
   const copyLinkToClipboard = () => {
     copyLinkRef.current?.launch();
@@ -57,7 +64,7 @@ const Actions = ({ playbook }: ActionsProps) => {
               onSelect={copyLinkToClipboard}
               onClick={event => event.stopPropagation()}
             >
-              {t('get-link.cta')}
+              {t('get-link')}
             </Dropdown.Item>
           )}
           <Dropdown.Item
@@ -66,6 +73,12 @@ const Actions = ({ playbook }: ActionsProps) => {
           >
             {t('edit-name.cta')}
           </Dropdown.Item>
+          {/* <Dropdown.Item
+            onSelect={launchCopy}
+            onClick={event => event.stopPropagation()}
+          >
+            {t('copy')}
+          </Dropdown.Item> */}
           <Dropdown.Item
             onSelect={handleToggleStatus}
             onClick={event => event.stopPropagation()}
@@ -80,6 +93,7 @@ const Actions = ({ playbook }: ActionsProps) => {
       <Status playbook={playbook} key={status} ref={statusRef} />
       <EditName playbook={playbook} ref={editNameRef} key={name} />
       <CopyLink playbook={playbook} ref={copyLinkRef} />
+      {/* <Copy playbook={playbook} ref={copyRef} /> */}
     </Stack>
   );
 };

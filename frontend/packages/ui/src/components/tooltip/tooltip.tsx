@@ -52,7 +52,7 @@ const Tooltip = ({
           onClick={() => handleOpenChange(!open)}
           asChild
         >
-          <TriggerContainer>{children}</TriggerContainer>
+          <TriggerContainer data-tooltip-trigger>{children}</TriggerContainer>
         </TooltipPrimitive.Trigger>
         {(open || controlledOpen) && !disabled ? (
           <TooltipContainer
@@ -94,7 +94,7 @@ const TooltipContainer = styled(TooltipPrimitive.Content)`
   `}
 `;
 
-const TriggerContainer = styled.span`
+const TriggerContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;

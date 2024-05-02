@@ -1,12 +1,10 @@
 'use client';
 
 import type { Icon } from '@onefootprint/icons';
-import React, { useRef } from 'react';
-import styled from 'styled-components';
-import { useHover } from 'usehooks-ts';
+import React from 'react';
 
 import Tooltip from '../../../tooltip';
-import Content from '../content';
+import Content from './components/content';
 
 export type RadioSelectOptionFields = {
   title: string | JSX.Element;
@@ -39,9 +37,6 @@ const RadioSelectOption = ({
   onClick,
   IconComponent,
 }: RadioSelectOptionProps) => {
-  const optionRef = useRef(null);
-  const isHovered = useHover(optionRef);
-
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onClick();
@@ -50,47 +45,26 @@ const RadioSelectOption = ({
   return disabled && disabledHint ? (
     <Tooltip text={disabledHint} aria-disabled={disabled} alignment="start">
       <Content
-        title={title}
         description={description}
+        disabled={disabled}
         IconComponent={IconComponent}
         selected={selected}
-        hovered={isHovered}
-        disabled={disabled}
         size={size}
+        title={title}
       />
     </Tooltip>
   ) : (
-    <Option
-      aria-label={typeof title === 'string' ? title : 'option'}
-      aria-selected={selected}
+    <Content
+      description={description}
+      disabled={disabled}
+      IconComponent={IconComponent}
       key={value}
       onClick={handleClick}
-      type="button"
-      ref={optionRef}
-    >
-      <Content
-        title={title}
-        description={description}
-        IconComponent={IconComponent}
-        selected={selected}
-        hovered={isHovered}
-        disabled={disabled}
-        size={size}
-      />
-    </Option>
+      selected={selected}
+      size={size}
+      title={title}
+    />
   );
 };
-
-const Option = styled.button`
-  all: unset;
-  cursor: pointer;
-  pointer-events: auto;
-  transition: all 0.2s ease-out;
-
-  :disabled {
-    cursor: default;
-    pointer-events: none;
-  }
-`;
 
 export default RadioSelectOption;

@@ -9,6 +9,7 @@ import type entityDetails from '../config/locales/en/entity-details.json';
 import type entityDocuments from '../config/locales/en/entity-documents.json';
 import type internalResource from '../config/locales/en/internal.json';
 import type listsResource from '../config/locales/en/lists.json';
+import type playbookResource from '../config/locales/en/playbooks.json';
 import type usersResource from '../config/locales/en/users.json';
 
 declare module 'i18next' {
@@ -27,6 +28,7 @@ declare module 'i18next' {
       request: typeof requestResource;
       ui: typeof uiResource;
       users: typeof usersResource;
+      playbooks: typeof playbookResource;
     };
   }
 }

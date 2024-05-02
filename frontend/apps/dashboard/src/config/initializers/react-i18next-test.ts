@@ -10,6 +10,7 @@ import entityDetails from '../locales/en/entity-details.json';
 import entityDocuments from '../locales/en/entity-documents.json';
 import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
+import playbooks from '../locales/en/playbooks.json';
 import users from '../locales/en/users.json';
 
 i18next.use(initReactI18next).init({
@@ -25,6 +26,7 @@ i18next.use(initReactI18next).init({
       'entity-details': entityDetails,
       lists,
       ui,
+      playbooks,
     },
   },
   lng: 'en',
@@ -40,6 +42,7 @@ i18next.use(initReactI18next).init({
     'entity-details',
     'domain-restrictions',
     'ui',
+    'playbooks',
   ],
   returnNull: false,
   interpolation: {

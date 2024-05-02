@@ -2456,9 +2456,8 @@
               }
             }
           },
-          "get-link": {
-            "cta": "Get shareable link"
-          }
+          "get-link": "Get shareable link",
+          "copy": "Copy playbook"
         },
         "empty-state": "You haven't created any playbooks.",
         "row": {
