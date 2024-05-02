@@ -7,32 +7,27 @@ use crate::{
 };
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
 use newtypes::TenantIosAppMetaId;
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-struct TenantIosAppMetaRevealRequest {
-    id: TenantIosAppMetaId,
-}
+use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
     description = "Decrypts a specific ios app metadata entry",
     tags(OrgSettings, Organization, Private)
 )]
-#[post("/org/app_meta/ios/{id}/reveal")]
+#[post("/org/app_meta/ios/{meta_id}/reveal")]
 /// Note, we make this a post because it does a decrypt operation. In the future, we may
 /// make an access event for it
 async fn post(
     state: web::Data<State>,
-    path: web::Path<TenantIosAppMetaRevealRequest>,
+    meta_id: web::Path<TenantIosAppMetaId>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::TenantIosAppMeta> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
-    let id = path.into_inner().id;
+    let meta_id = meta_id.into_inner();
     let result = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let result = TenantIosAppMeta::get(conn, id, &tenant_id)?;
+            let result = TenantIosAppMeta::get(conn, meta_id, &tenant_id)?;
             Ok(result)
         })
         .await?;

@@ -24,7 +24,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Deletes a business."
 ))]
 #[api_v2_operation(description = "Deletes a user.", tags(Users, Deprecated))]
-#[actix::delete("/users/{fp_id}")]
+#[actix::delete("/users/{fp_id:fp_[_A-Za-z0-9]*}")]
 pub async fn delete(
     state: web::Data<State>,
     path: FpIdPath,

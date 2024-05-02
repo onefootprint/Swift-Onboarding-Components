@@ -11,17 +11,17 @@ use newtypes::ListId;
 use paperclip::actix::{api_v2_operation, patch, web};
 
 #[api_v2_operation(description = "Updates an existing list", tags(Lists, Organization, Private))]
-#[patch("/org/lists/{id}")]
+#[patch("/org/lists/{list_id}")]
 pub async fn patch(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-    path: web::Path<ListId>,
+    list_id: web::Path<ListId>,
     request: web::Json<UpdateListRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let id = path.into_inner();
+    let list_id = list_id.into_inner();
 
     let UpdateListRequest { name, alias } = request.into_inner();
 
@@ -31,7 +31,7 @@ pub async fn patch(
             if List::find(conn, &tenant_id, is_live, &name, &alias)?.is_some() {
                 return Err(ValidationError("List with that name already exists").into());
             }
-            List::update(conn, &tenant_id, is_live, &id, name, alias)?;
+            List::update(conn, &tenant_id, is_live, &list_id, name, alias)?;
             Ok(())
         })
         .await?;

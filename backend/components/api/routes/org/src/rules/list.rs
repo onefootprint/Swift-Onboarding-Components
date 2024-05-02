@@ -17,7 +17,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
     description = "List all Rules for the playbook",
     tags(Playbooks, Organization, Private, Rules)
 )]
-#[actix::get("/org/onboarding_configs/{id}/rules")]
+#[actix::get("/org/onboarding_configs/{obc_id}/rules")]
 pub async fn list_rules_for_playbook(
     state: web::Data<State>,
     auth: TenantSessionAuth,

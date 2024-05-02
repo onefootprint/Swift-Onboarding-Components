@@ -20,3 +20,14 @@ api_route_partner = { path = "../partner" }
 api_route_webhooks = { path = "../webhooks" }
 api_route_integrations = { path = "../integrations" }
 paperclip = { workspace = true }
+actix-web = { workspace = true }
+
+[dev_dependencies]
+actix-rt = "2.7.0"
+serde = { workspace = true }
+serde_json = { workspace = true }
+openapiv3 = "1.0.3"
+regex = { workspace = true }
+rand_regex = "0.17.0"
+rand = { workspace = true }
+

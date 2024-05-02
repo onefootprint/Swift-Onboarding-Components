@@ -11,7 +11,7 @@ use newtypes::ListId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(tags(Lists, Organization, Private), description = "Returns a blocklist.")]
-#[get("/org/lists/{id}")]
+#[get("/org/lists/{list_id}")]
 async fn get_detail(
     state: web::Data<State>,
     list_id: web::Path<ListId>,

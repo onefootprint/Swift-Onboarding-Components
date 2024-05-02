@@ -50,7 +50,7 @@ There is nuance when you are backtesting over onboardings that span other subseq
     description = "Evaluates a hypothetical rule against a sample of recent onboardings",
     tags(Playbooks, Organization, Private, Rules)
 )]
-#[actix::post("/org/onboarding_configs/{id}/rules/evaluate")]
+#[actix::post("/org/onboarding_configs/{obc_id}/rules/evaluate")]
 pub async fn evaluate_rule(
     state: web::Data<State>,
     auth: TenantSessionAuth,

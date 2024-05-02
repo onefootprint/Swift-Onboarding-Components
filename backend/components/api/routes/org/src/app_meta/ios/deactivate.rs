@@ -13,18 +13,18 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Delete a tenant iOS app metadata for the organization.",
     tags(OrgSettings, Organization, Private)
 )]
-#[actix::delete("/org/app_meta/ios/{id}")]
+#[actix::delete("/org/app_meta/ios/{meta_id}")]
 pub async fn deactivate(
     state: web::Data<State>,
-    path: web::Path<TenantIosAppMetaId>,
+    meta_id: web::Path<TenantIosAppMetaId>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
-    let id = path.into_inner();
+    let meta_id = meta_id.into_inner();
     state
         .db_pool
-        .db_query(move |conn| -> DbResult<_> { TenantIosAppMeta::deactivate(conn, &id, &tenant_id) })
+        .db_query(move |conn| -> DbResult<_> { TenantIosAppMeta::deactivate(conn, &meta_id, &tenant_id) })
         .await?;
 
     EmptyResponse::ok().json()

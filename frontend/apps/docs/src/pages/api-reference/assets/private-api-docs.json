@@ -3374,7 +3374,7 @@
                 ]
             }
         },
-        "/org/app_meta/android/{id}": {
+        "/org/app_meta/android/{meta_id}": {
             "delete": {
                 "tags": [
                     "OrgSettings",
@@ -3385,7 +3385,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "id",
+                        "name": "meta_id",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -3410,48 +3410,7 @@
                         "Dashboard Token": []
                     }
                 ]
-            }
-        },
-        "/org/app_meta/android/{id}/reveal": {
-            "post": {
-                "tags": [
-                    "OrgSettings",
-                    "Organization",
-                    "Private"
-                ],
-                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
-                "description": "Decrypts a specific android app metadata entry",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TenantAndroidAppMeta"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
-        "/org/app_meta/android/{meta_id}": {
+            },
             "patch": {
                 "tags": [
                     "OrgSettings",
@@ -3480,6 +3439,45 @@
                     },
                     "required": true
                 },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TenantAndroidAppMeta"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/android/{meta_id}/reveal": {
+            "post": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
+                "description": "Decrypts a specific android app metadata entry",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -3564,7 +3562,7 @@
                 ]
             }
         },
-        "/org/app_meta/ios/{id}": {
+        "/org/app_meta/ios/{meta_id}": {
             "delete": {
                 "tags": [
                     "OrgSettings",
@@ -3575,7 +3573,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "id",
+                        "name": "meta_id",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -3600,48 +3598,7 @@
                         "Dashboard Token": []
                     }
                 ]
-            }
-        },
-        "/org/app_meta/ios/{id}/reveal": {
-            "post": {
-                "tags": [
-                    "OrgSettings",
-                    "Organization",
-                    "Private"
-                ],
-                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
-                "description": "Decrypts a specific ios app metadata entry",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TenantIosAppMeta"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
-        "/org/app_meta/ios/{meta_id}": {
+            },
             "patch": {
                 "tags": [
                     "OrgSettings",
@@ -3670,6 +3627,45 @@
                     },
                     "required": true
                 },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TenantIosAppMeta"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/app_meta/ios/{meta_id}/reveal": {
+            "post": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
+                "description": "Decrypts a specific ios app metadata entry",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -4263,90 +4259,6 @@
                 ]
             }
         },
-        "/org/lists/{id}": {
-            "get": {
-                "tags": [
-                    "Lists",
-                    "Organization",
-                    "Private"
-                ],
-                "description": "Returns a blocklist.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ListDetails"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Lists",
-                    "Organization",
-                    "Private"
-                ],
-                "description": "Updates an existing list",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateListRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
         "/org/lists/{id}/timeline": {
             "get": {
                 "tags": [
@@ -4433,6 +4345,42 @@
             }
         },
         "/org/lists/{list_id}": {
+            "get": {
+                "tags": [
+                    "Lists",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns a blocklist.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "list_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListDetails"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
             "delete": {
                 "tags": [
                     "Lists",
@@ -4451,6 +4399,52 @@
                         "style": "simple"
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Lists",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Updates an existing list",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "list_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateListRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5184,7 +5178,7 @@
                 ]
             }
         },
-        "/org/onboarding_configs/{id}/rules": {
+        "/org/onboarding_configs/{obc_id}/rules": {
             "get": {
                 "tags": [
                     "Playbooks",
@@ -5196,7 +5190,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "id",
+                        "name": "obc_id",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -5237,7 +5231,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "id",
+                        "name": "obc_id",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -5272,58 +5266,7 @@
                         "Dashboard Token": []
                     }
                 ]
-            }
-        },
-        "/org/onboarding_configs/{id}/rules/evaluate": {
-            "post": {
-                "tags": [
-                    "Playbooks",
-                    "Organization",
-                    "Private",
-                    "Rules"
-                ],
-                "description": "Evaluates a hypothetical rule against a sample of recent onboardings",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EvaluateRuleRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RuleEvalResults"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
-        "/org/onboarding_configs/{obc_id}/rules": {
+            },
             "patch": {
                 "tags": [
                     "Playbooks",
@@ -5363,6 +5306,161 @@
                                     "items": {
                                         "$ref": "#/components/schemas/Rule"
                                     }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/onboarding_configs/{obc_id}/rules/evaluate": {
+            "post": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private",
+                    "Rules"
+                ],
+                "description": "Evaluates a hypothetical rule against a sample of recent onboardings",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "obc_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EvaluateRuleRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RuleEvalResults"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/onboarding_configs/{obc_id}/rules/{rule_id}": {
+            "delete": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private",
+                    "Rules"
+                ],
+                "summary": "Note: Being deprecated in favor of bulk edit API",
+                "description": "Deletes a Rule",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "obc_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "rule_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private",
+                    "Rules"
+                ],
+                "summary": "Note: Being deprecated in favor of bulk edit API",
+                "description": "Updates a Rule",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "obc_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "rule_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateRuleRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Rule"
                                 }
                             }
                         }
@@ -20178,6 +20276,14 @@
                                             "is_shadow": {
                                                 "type": "boolean"
                                             },
+                                            "kind": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Person",
+                                                    "Business",
+                                                    "Any"
+                                                ]
+                                            },
                                             "name": {
                                                 "type": "string"
                                             },
@@ -20195,6 +20301,7 @@
                                             "action",
                                             "created_at",
                                             "is_shadow",
+                                            "kind",
                                             "rule_expression",
                                             "rule_id"
                                         ]
@@ -24872,6 +24979,14 @@
                     "is_shadow": {
                         "type": "boolean"
                     },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "Person",
+                            "Business",
+                            "Any"
+                        ]
+                    },
                     "name": {
                         "type": "string"
                     },
@@ -24889,6 +25004,7 @@
                     "action",
                     "created_at",
                     "is_shadow",
+                    "kind",
                     "rule_expression",
                     "rule_id"
                 ]
@@ -25025,6 +25141,14 @@
                                         "is_shadow": {
                                             "type": "boolean"
                                         },
+                                        "kind": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Person",
+                                                "Business",
+                                                "Any"
+                                            ]
+                                        },
                                         "name": {
                                             "type": "string"
                                         },
@@ -25042,6 +25166,7 @@
                                         "action",
                                         "created_at",
                                         "is_shadow",
+                                        "kind",
                                         "rule_expression",
                                         "rule_id"
                                     ]
