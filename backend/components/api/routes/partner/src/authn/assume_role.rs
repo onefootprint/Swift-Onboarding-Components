@@ -11,7 +11,10 @@ use api_core::{
 use api_wire_types::{
     AssumePartnerRoleRequest, AssumePartnerRoleResponse, OrganizationMember, PartnerOrganization,
 };
-use db::{helpers::TenantOrPartnerTenant, models::tenant_rolebinding::TenantRolebinding};
+use db::{
+    helpers::TenantOrPartnerTenant,
+    models::tenant_rolebinding::{TenantRbLoginResult, TenantRolebinding},
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
@@ -29,19 +32,25 @@ fn post(
     let auth_method = pt_auth.auth_method();
     let tu_id = pt_auth.clone().tenant_user_id()?;
 
-    let ((tenant_user, rb, tenant_role, t_pt), _) = state
+    let login_result = state
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &partner_tenant_id), auth_method))
         .await?;
 
+    let session_data = TenantRbSession::create(&login_result).into();
+    let TenantRbLoginResult {
+        t_user,
+        rb,
+        role,
+        t_pt,
+        ..
+    } = login_result;
     let tenant = match t_pt {
         TenantOrPartnerTenant::PartnerTenant(pt) => pt,
         TenantOrPartnerTenant::Tenant(_) => {
             return Err(AssertionError("expected partner tenant, found tenant").into());
         }
     };
-
-    let session_data = TenantRbSession::create(rb.id.clone(), auth_method).into();
     let session_sealing_key = state.session_sealing_key.clone();
     let expires_at = pt_auth.session().expires_at;
     let token = state
@@ -56,7 +65,7 @@ fn post(
 
     let data = AssumePartnerRoleResponse {
         token,
-        user: OrganizationMember::from_db((tenant_user, rb, tenant_role)),
+        user: OrganizationMember::from_db((t_user, rb, role)),
         partner_tenant: PartnerOrganization::from_db(tenant),
     };
     ResponseData::ok(data).json()

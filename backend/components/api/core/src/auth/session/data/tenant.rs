@@ -1,4 +1,5 @@
 use crate::auth::tenant::ClientTenantScope;
+use db::models::tenant_rolebinding::TenantRbLoginResult;
 use newtypes::{FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId, WorkosAuthMethod};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -11,10 +12,10 @@ pub struct TenantRbSession {
 }
 
 impl TenantRbSession {
-    pub fn create(rb_id: TenantRolebindingId, auth_method: WorkosAuthMethod) -> Self {
+    pub fn create(login_info: &TenantRbLoginResult) -> Self {
         Self {
-            tenant_rolebinding_id: rb_id,
-            auth_method,
+            tenant_rolebinding_id: login_info.rb.id.clone(),
+            auth_method: login_info.auth_method,
         }
     }
 }

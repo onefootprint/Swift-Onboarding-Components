@@ -34,6 +34,16 @@ pub type IsFirstLogin = bool;
 pub type TenantUserInfo = (TenantUser, TenantRolebinding, TenantRole, TenantOrPartnerTenant);
 pub type BasicTenantUserInfo = (TenantUser, TenantRolebinding, TenantRole);
 
+#[non_exhaustive] // Prevents composing outside of this crate
+pub struct TenantRbLoginResult {
+    pub t_user: TenantUser,
+    pub rb: TenantRolebinding,
+    pub role: TenantRole,
+    pub t_pt: TenantOrPartnerTenant,
+    pub is_first_login: IsFirstLogin,
+    pub auth_method: WorkosAuthMethod,
+}
+
 #[derive(From)]
 pub enum TenantRolebindingIdentifier<'a> {
     Id(&'a TenantRolebindingId),
@@ -283,7 +293,7 @@ impl TenantRolebinding {
         conn: &mut TxnPgConn,
         id: T,
         auth_method: WorkosAuthMethod,
-    ) -> DbResult<(TenantUserInfo, IsFirstLogin)>
+    ) -> DbResult<TenantRbLoginResult>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
@@ -303,7 +313,15 @@ impl TenantRolebinding {
             return Err(DbError::UnsupportedAuthMethod);
         }
         let rb = Self::update(conn, rb_id, rb_update)?;
-        Ok(((user, rb, role, t_pt), is_first_login))
+        let result = TenantRbLoginResult {
+            t_user: user,
+            rb,
+            role,
+            t_pt,
+            is_first_login,
+            auth_method,
+        };
+        Ok(result)
     }
 
     #[tracing::instrument("TenantRolebinding::update", skip_all)]

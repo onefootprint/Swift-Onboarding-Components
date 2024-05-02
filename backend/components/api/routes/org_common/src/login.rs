@@ -15,7 +15,7 @@ use db::{
     models::{
         partner_tenant::{NewPartnerTenant, PartnerTenant},
         tenant::{NewTenant, Tenant},
-        tenant_rolebinding::TenantRolebinding,
+        tenant_rolebinding::{TenantRbLoginResult, TenantRolebinding},
         tenant_user::TenantUser,
     },
 };
@@ -153,17 +153,24 @@ where
 
     let resp = if let Some((rb, t_pt)) = single_rb_and_t_pt {
         // Log into the single user, updating the last_login_at and name (if new)
-        let ((tenant_user, rb, tenant_role, _), is_first_login) = state
+        let login_result = state
             .db_pool
             .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method))
             .await?;
 
-        let session = TenantRbSession::create(rb.id.clone(), auth_method).into();
+        let session = TenantRbSession::create(&login_result).into();
+        let TenantRbLoginResult {
+            t_user,
+            rb,
+            role,
+            is_first_login,
+            ..
+        } = login_result;
         let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
 
         let requires_onboarding = match &t_pt {
             TenantOrPartnerTenant::Tenant(tenant) => {
-                tenant_role.scopes.contains(&TenantScope::Admin)
+                role.scopes.contains(&TenantScope::Admin)
                     && (tenant.website_url.is_none() || tenant.company_size.is_none())
             }
             TenantOrPartnerTenant::PartnerTenant(_) => false,
@@ -181,7 +188,7 @@ where
             created_new_tenant,
             is_first_login,
             requires_onboarding,
-            user: Some(OrganizationMember::from_db((tenant_user, rb, tenant_role))),
+            user: Some(OrganizationMember::from_db((t_user, rb, role))),
             tenant,
             partner_tenant,
         }
