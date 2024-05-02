@@ -3,7 +3,7 @@ use std::sync::Arc;
 use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
-        session::{get_is_live, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo},
+        session::{get_is_live, AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -145,10 +145,6 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
         DataLifetimeSource::Tenant
     }
 }
-
-// Allow calling SessionContext<T>::update for T=ParsedTenantRbAuth, only for mutating a token to be used
-// for impersonation or selecting a tenant at login.
-impl AllowSessionUpdate for ParsedTenantRbAuth {}
 
 impl GetFirmEmployee for TenantRbAuthContext {
     fn firm_employee_user(&self) -> ApiResult<TenantUser> {

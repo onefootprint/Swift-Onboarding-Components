@@ -1,6 +1,6 @@
 use api_core::{
     auth::{
-        session::{tenant::TenantRbSession, AuthSessionData, GetSessionForUpdate, UpdateSession},
+        session::{tenant::TenantRbSession, GetSessionForUpdate},
         tenant::{AnyOrgSessionAuth, AnyPartnerTenantSessionAuth},
     },
     errors::{ApiError, ApiResult, AssertionError},
@@ -41,14 +41,12 @@ fn post(
         }
     };
 
-    let session_data: AuthSessionData = TenantRbSession::create(rb.id.clone(), auth_method).into();
+    let session_data = TenantRbSession::create(rb.id.clone(), auth_method).into();
     let session_sealing_key = state.session_sealing_key.clone();
-    let expires_at = pt_auth.clone().session().expires_at;
+    let expires_at = pt_auth.session().expires_at;
     let token = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            // TODO stop updating in place once the client starts using the new token
-            pt_auth.update_session(conn, &session_sealing_key, session_data.clone())?;
             // The new token will expire at the same time as the existing token to prevent allowing
             // perpetually re-creating a new token for yourself
             let (token, _) = AuthSession::create_sync(conn, &session_sealing_key, session_data, expires_at)?;

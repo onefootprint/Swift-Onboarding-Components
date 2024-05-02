@@ -2,7 +2,7 @@ use crate::State;
 use actix_web::{post, web, web::Json};
 use api_core::{
     auth::{
-        session::{tenant::FirmEmployeeSession, AuthSessionData, GetSessionForUpdate, UpdateSession},
+        session::{tenant::FirmEmployeeSession, AuthSessionData, GetSessionForUpdate},
         tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
     },
     errors::{ApiResult, ValidationError},
@@ -65,7 +65,6 @@ pub async fn post(
                 auth_method,
             };
             let session = AuthSessionData::FirmEmployee(session);
-            auth.update_session(conn, &sealing_key, session.clone())?;
             // The new token will expire at the same time as the existing token to prevent allowing
             // perpetually re-creating a new token for yourself
             let (token, _) = AuthSession::create_sync(conn, &sealing_key, session, expires_at)?;

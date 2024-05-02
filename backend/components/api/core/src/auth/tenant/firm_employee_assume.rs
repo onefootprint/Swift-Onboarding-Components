@@ -3,7 +3,7 @@ use std::sync::Arc;
 use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
-        session::{get_is_live, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo},
+        session::{get_is_live, AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -120,10 +120,6 @@ impl GetFirmEmployee for FirmEmployeeAssumeAuthContext {
         Ok(tu.clone())
     }
 }
-
-// Allow calling SessionContext<T>::update for T=ParsedFirmEmployeeAssumeAuth, only for mutating a token to be used
-// for impersonation
-impl AllowSessionUpdate for ParsedFirmEmployeeAssumeAuth {}
 
 impl FirmEmployeeAssumeAuth {
     fn token_scopes(&self) -> Vec<TenantScope> {

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::{
     auth::{
         session::{
-            tenant::WorkOsSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
+            tenant::WorkOsSession, AuthSessionData, ExtractableAuthSession, RequestInfo,
         },
         AuthError,
     },
@@ -62,5 +62,3 @@ impl ExtractableAuthSession for WorkOsSessionData {
         root_span.record("auth_method", "workos");
     }
 }
-
-impl AllowSessionUpdate for WorkOsSessionData {}

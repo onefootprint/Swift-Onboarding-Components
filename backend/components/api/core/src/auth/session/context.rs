@@ -1,4 +1,4 @@
-use super::{AllowSessionUpdate, ExtractableAuthSession, GetSessionForUpdate};
+use super::{ExtractableAuthSession, GetSessionForUpdate};
 use crate::{
     auth::{tenant::InvalidateAuth, AuthError},
     errors::{ApiError, ApiResult, AssertionError},
@@ -73,10 +73,7 @@ impl<T> SessionContext<T> {
     }
 }
 
-impl<T> GetSessionForUpdate for SessionContext<T>
-where
-    T: AllowSessionUpdate,
-{
+impl<T> GetSessionForUpdate for SessionContext<T> {
     fn session(self) -> AuthSession {
         self.session
     }

@@ -1,7 +1,7 @@
 use actix_web::{post, web, web::Json};
 use api_core::{
     auth::{
-        session::{tenant::FirmEmployeeSession, AuthSessionData, GetSessionForUpdate, UpdateSession},
+        session::{tenant::FirmEmployeeSession, AuthSessionData, GetSessionForUpdate},
         tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
         AuthError,
     },
@@ -42,7 +42,7 @@ async fn post(
         return Err(AuthError::NotAllowedForIntegrationTestUser.into());
     }
 
-    let expires_at = auth.clone().session().expires_at;
+    let expires_at = auth.session().expires_at;
     let (tenant, token) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -55,8 +55,6 @@ async fn post(
                 auth_method,
             };
             let session = AuthSessionData::FirmEmployee(session);
-            // TODO stop updating in place once the client starts using the new token
-            auth.update_session(conn, &session_sealing_key, session.clone())?;
             // The new token will expire at the same time as the existing token to prevent allowing
             // perpetually re-creating a new token for yourself
             let (token, _) = AuthSession::create_sync(conn, &session_sealing_key, session, expires_at)?;

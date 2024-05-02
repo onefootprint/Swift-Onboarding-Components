@@ -6,7 +6,7 @@ use db::PgConn;
 /// Marker trait for Ts wrapped by SessionContext<T>. When this trait is implemented for T,
 /// you'll be able to call SessionContext<T>.update_session(...) to transparently replace the
 /// session data for this auth token
-pub trait AllowSessionUpdate {}
+pub trait AllowSessionUpdate: GetSessionForUpdate {}
 
 pub trait GetSessionForUpdate {
     fn session(self) -> AuthSession;
@@ -38,7 +38,7 @@ pub trait UpdateSession {
 
 impl<T> UpdateSession for T
 where
-    T: GetSessionForUpdate,
+    T: AllowSessionUpdate,
 {
     fn update_session(
         self, // Intentionally consume to prevent reading stale value

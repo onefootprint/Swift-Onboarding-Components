@@ -3,7 +3,7 @@ use std::sync::Arc;
 use super::{AuthActor, CanCheckTenantGuard, PartnerTenantAuth};
 use crate::{
     auth::{
-        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo},
+        session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -131,7 +131,3 @@ impl PartnerTenantAuth for SessionContext<PartnerTenantRbAuth> {
         self.tenant_role.scopes.clone()
     }
 }
-
-// Allow calling SessionContext<T>::update for T=ParsedPartnerTenantRbAuth, only for mutating a token to be used
-// for impersonation or selecting a tenant at login.
-impl AllowSessionUpdate for ParsedPartnerTenantRbAuth {}

@@ -68,8 +68,9 @@ impl UserAuth for UserSessionContext {
     }
 }
 
-// Allow calling SessionContext<T>::update for T=UserSessionContext
-impl AllowSessionUpdate for UserSessionContext {}
+// Allow calling SessionContext<UserSessionContext>::update
+// TODO this is now the only place where we mutate sessions. Probably want to get rid of it
+impl AllowSessionUpdate for SessionContext<UserSessionContext> {}
 
 impl UserSessionContext {
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {

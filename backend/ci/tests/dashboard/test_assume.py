@@ -1,5 +1,6 @@
 import pytest
 from tests.utils import create_tenant, patch, post, get
+from tests.headers import DashboardAuth
 
 
 @pytest.fixture(scope="session")
@@ -7,15 +8,14 @@ def assumed_token(tenant, sandbox_tenant_data):
     # Same tenant as the sandbox_tenant, but we call the `private/test_tenant` endpoint again
     # to make an auth token that is only used in this test
     original_tenant = create_tenant(*sandbox_tenant_data)
-    auth_token = original_tenant.auth_token
-    data = dict(tenant_id=tenant.id)
+    original_token = original_tenant.auth_token
 
     # Check that the auth token is for the sandbox tenant
-    body = get("org", None, auth_token)
+    body = get("org", None, original_token)
     assert body["id"] == original_tenant.id
     assert body["name"] == "Footprint Sandbox Integration Testing"
 
-    body = get("org/member", None, auth_token)
+    body = get("org/member", None, original_token)
     assert body["is_firm_employee"]
     assert not body.get("is_assumed_session")
 
@@ -23,29 +23,36 @@ def assumed_token(tenant, sandbox_tenant_data):
     post(
         "private/assume",
         dict(tenant_id="org_id_that_looks_real"),
-        auth_token,
+        original_token,
         status_code=401,
     )
+
+    data = dict(tenant_id=tenant.id)
 
     # Cannot assume with a secret key
     post("private/assume", data, tenant.sk.key, status_code=401)
 
     # Correct use
-    post("private/assume", data, auth_token)
+    body = post("private/assume", data, original_token)
+    new_token = DashboardAuth(body["token"])
 
-    # Can re-assume with the same token
-    post("private/assume", data, auth_token)
+    # Can re-assume with the same token or new token
+    post("private/assume", data, original_token)
+    post("private/assume", data, new_token)
 
-    # Now, the auth token sees different data!
-    body = get("org", None, auth_token)
+    # Now, the new auth token sees different data!
+    body = get("org", None, new_token)
     assert body["id"] == tenant.id
     assert body["name"] == "Footprint Live Integration Testing"
 
-    body = get("org/member", None, auth_token)
+    body = get("org", None, original_token)
+    assert body["id"] == original_tenant.id
+
+    body = get("org/member", None, new_token)
     assert body["is_firm_employee"]
     assert body.get("is_assumed_session")
 
-    return auth_token
+    return new_token
 
 
 @pytest.mark.parametrize(

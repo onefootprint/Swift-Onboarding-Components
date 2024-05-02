@@ -1,6 +1,6 @@
 use crate::{
     auth::{
-        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo},
+        session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -105,7 +105,3 @@ impl FirmEmployeeAuthContext {
         Ok(result)
     }
 }
-
-// Allow calling SessionContext<T>::update for T=FirmEmployeeAuth, only for mutating a token to be used
-// for impersonation
-impl AllowSessionUpdate for FirmEmployeeAuth {}
