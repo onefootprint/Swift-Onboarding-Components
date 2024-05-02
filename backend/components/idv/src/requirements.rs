@@ -114,6 +114,7 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::IncodeCurpValidation => false,
         VendorAPI::IncodeGovernmentValidation => false,
         VendorAPI::NeuroIdAnalytics => false,
+        VendorAPI::IncodeApproveSession => false,
     }
 }
 
@@ -157,6 +158,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         | VendorAPI::IncodeCurpValidation
         | VendorAPI::IncodeGovernmentValidation
         | VendorAPI::NeuroIdAnalytics
+        | VendorAPI::IncodeApproveSession
         | VendorAPI::IdologyPa => false,
     }
 }

@@ -88,6 +88,7 @@ pub enum VendorAPI {
     IncodeProcessFace,
     IncodeCurpValidation,
     IncodeGovernmentValidation,
+    IncodeApproveSession,
     StytchLookup,
     FootprintDeviceAttestation,
     AwsRekognition,
@@ -124,6 +125,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeProcessFace => Self::Incode,
             VendorAPI::IncodeCurpValidation => Self::Incode,
             VendorAPI::IncodeGovernmentValidation => Self::Incode,
+            VendorAPI::IncodeApproveSession => Self::Incode,
             VendorAPI::StytchLookup => Self::Stytch,
             VendorAPI::FootprintDeviceAttestation => Self::Footprint,
             VendorAPI::AwsRekognition => Self::Footprint,
@@ -173,6 +175,7 @@ impl VendorAPI {
             | VendorAPI::LexisFlexId
             | VendorAPI::IncodeCurpValidation
             | VendorAPI::NeuroIdAnalytics
+            | VendorAPI::IncodeApproveSession
             | VendorAPI::IncodeGovernmentValidation => false,
         }
     }

@@ -34,6 +34,7 @@ pub enum WrappedVendorAPI {
     IncodeProcessFace,
     IncodeCurpValidation,
     IncodeIneData,
+    IncodeApproveSession,
     StytchLookup,
     FootprintDeviceAttestation,
     AwsRekognition,
@@ -74,6 +75,7 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::IncodeCurpValidation => Self::IncodeCurpValidation,
             VendorAPI::IncodeGovernmentValidation => Self::IncodeIneData,
             VendorAPI::NeuroIdAnalytics => Self::NeuroIdAnalytics,
+            VendorAPI::IncodeApproveSession => Self::IncodeApproveSession,
         }
     }
 }
@@ -111,6 +113,7 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::IncodeCurpValidation => VendorAPI::IncodeCurpValidation,
             WrappedVendorAPI::IncodeIneData => VendorAPI::IncodeGovernmentValidation,
             WrappedVendorAPI::NeuroIdAnalytics => VendorAPI::NeuroIdAnalytics,
+            WrappedVendorAPI::IncodeApproveSession => VendorAPI::IncodeApproveSession,
         }
     }
 }

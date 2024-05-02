@@ -126,6 +126,7 @@ pub fn scrub_raw_error_vendor_response(
         VendorAPI::IncodeCurpValidation => scrub_response::<IncodeCurpValidation>(raw_response),
         VendorAPI::IncodeGovernmentValidation => scrub_response::<IncodeIneData>(raw_response),
         VendorAPI::NeuroIdAnalytics => scrub_response::<NeuroIdAnalytics>(raw_response),
+        VendorAPI::IncodeApproveSession => scrub_response::<IncodeApproveSession>(raw_response),
     }
 }
 
@@ -189,6 +190,7 @@ fn build_parsed_vendor_response_map_entry(
         VendorAPI::IncodeCurpValidation => insert_map_entry(map, IncodeCurpValidation, raw_response)?,
         VendorAPI::IncodeGovernmentValidation => insert_map_entry(map, IncodeIneData, raw_response)?,
         VendorAPI::NeuroIdAnalytics => insert_map_entry(map, NeuroIdAnalytics, raw_response)?,
+        VendorAPI::IncodeApproveSession => insert_map_entry(map, IncodeApproveSession, raw_response)?,
     };
 
     Ok(())
@@ -234,6 +236,7 @@ fn build_verification_identifier_map_entry(
         VendorAPI::IncodeCurpValidation => map.insert(IncodeCurpValidation, request_and_result),
         VendorAPI::IncodeGovernmentValidation => map.insert(IncodeIneData, request_and_result),
         VendorAPI::NeuroIdAnalytics => map.insert(NeuroIdAnalytics, request_and_result),
+        VendorAPI::IncodeApproveSession => map.insert(IncodeApproveSession, request_and_result),
     };
 }
 
@@ -408,6 +411,10 @@ impl TypedMapKey<VendorAPIResponseMarker> for NeuroIdAnalytics {
     type Value = serde_json::Value;
 }
 
+impl TypedMapKey<VendorAPIResponseMarker> for IncodeApproveSession {
+    type Value = serde_json::Value;
+}
+
 /// Verification Request and Result map, used in conjunction with the above map for reason codes
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyExpectID {
     type Value = VerificationRequestAndResult;
@@ -500,6 +507,10 @@ impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeIneData {
 }
 
 impl TypedMapKey<VendorAPIResponseIdsMarker> for NeuroIdAnalytics {
+    type Value = VerificationRequestAndResult;
+}
+
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeApproveSession {
     type Value = VerificationRequestAndResult;
 }
 

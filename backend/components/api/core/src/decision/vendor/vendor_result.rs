@@ -255,6 +255,8 @@ fn deserialize_from_vendor_api(
         VendorAPI::NeuroIdAnalytics => {
             ParsedResponse::NeuroIdAnalytics(serde_json::from_value(raw_response)?)
         }
+        // never used
+        VendorAPI::IncodeApproveSession => ParsedResponse::IncodeRawResponse(raw_response.into()),
     };
 
     Ok(res)
