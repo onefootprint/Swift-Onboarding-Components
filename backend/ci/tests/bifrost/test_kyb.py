@@ -203,6 +203,10 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
         skip_kyc=skip_kyc,
     )
     bifrost = BifrostClient.new(obc)
+    # Make sure we don't send an sms to the secondary BO
+    bifrost.data["business.kyced_beneficial_owners"][1][
+        "phone_number"
+    ] = FIXTURE_PHONE_NUMBER
     bifrost.run()
 
     # Just because we're not running it in this test
