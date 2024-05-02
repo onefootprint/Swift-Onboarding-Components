@@ -1,0 +1,11 @@
+**/__mocks__
+**/.cache
+**/.DS_Store
+**/.env.*
+**/.jest-cache
+**/.storybook
+**/.vercel
+**/*.test.ts
+**/*.test.tsx
+**/dist
+**/node_modules

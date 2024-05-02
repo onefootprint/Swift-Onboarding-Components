@@ -8,11 +8,12 @@ const uToken = process.env.E2E_UPDATE_UTOKEN || '';
 
 const email = 'sandbox@onefootprint.com';
 
-test('Update auth methods by providing email #ci #debug', async ({
+test('Update auth methods by providing email #ci', async ({
   browserName,
   isMobile,
   page,
 }) => {
+  test.slow();
   test.skip(!isMobile, 'It will only run in mobile'); // eslint-disable-line playwright/no-skipped-test
   expect(uToken, 'Missing E2E_UPDATE_UTOKEN').toBeTruthy();
 

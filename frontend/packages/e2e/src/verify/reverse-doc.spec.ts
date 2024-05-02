@@ -53,8 +53,7 @@ test('reverse-doc #ci', async ({ browser, isMobile, page }) => {
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });
-  const verifying = frame.getByText(/verifying/i).first();
-  await verifying.waitFor({ state: 'attached', timeout: 2000 });
+  await expect(frame.locator('input[type="tel"]')).not.toBeAttached();
 
   if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
     const newPage = await doTransferFromMobile({

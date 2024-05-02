@@ -1,19 +1,23 @@
 /** @type {import('next').NextConfig} */
 
+const IS_CI = process.env.CI === 'true';
 const IS_DEV = process.env.NODE_ENV === 'development';
 const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
 
-const DEV_CONNECT_SRC = (IS_DEV ? [
-  'http://localhost:8000',
-  'http://127.0.0.1:8000',
-] : []).join(' ');
+const DEV_CONNECT_SRC = (
+  IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []
+).join(' ');
 
-const DEV_FRAME_SRC = (IS_DEV ? [
-  'http://localhost:3000',
-  'http://localhost:3010',
-  'http://localhost:3011',
-] : []).join(' ');
+const DEV_FRAME_SRC = (
+  IS_DEV || IS_CI
+    ? [
+        'http://localhost:3000',
+        'http://localhost:3010',
+        'http://localhost:3011',
+      ]
+    : []
+).join(' ');
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;

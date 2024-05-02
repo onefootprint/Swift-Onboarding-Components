@@ -7,9 +7,10 @@ const key = process.env.E2E_AUTH_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
 const email = 'bruno@onefootprint.com';
 
 test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
+  test.slow();
+
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
-  if (isMobile) test.setTimeout(90000); // eslint-disable-line playwright/no-conditional-in-test
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
   await page.goto(

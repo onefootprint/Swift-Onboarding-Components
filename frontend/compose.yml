@@ -1,0 +1,32 @@
+services:
+  apps:
+    container_name: apps
+    build:
+      context: .
+      dockerfile: .docker/apps.Dockerfile
+    tty: true
+    healthcheck:
+      test: ["CMD", "echo", "0"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 6s
+      start_interval: 6s
+    network_mode: "host"
+  
+  tester:
+    container_name: tester
+    depends_on:
+      apps:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: .docker/playwright.Dockerfile
+      extra_hosts:
+        - localhost:host-gateway
+    volumes:
+      - ./packages/e2e/playwright-report:/e2e/playwright-report
+    tty: true
+    command: npx playwright test --workers=12 --reporter=html -g "#ci"
+    network_mode: "host"
+    
