@@ -1292,8 +1292,13 @@
         "summarize": {
           "label": "Summarize with AI",
           "title": "Summarize user identity results",
-          "detail": "Using AI, Footprint will create a human-readable summary of the user's verification decision, including manual review annotations, risk signals, rules triggered, authentication events, and timeline attributes.",
-          "generate": "Re-generate summary"
+          "detail": "Using AI, Footprint creates a human-readable summary of the user's verification decision, including manual review annotations, risk signals, rules triggered, authentication events, and timeline attributes.",
+          "generate": "Re-generate summary",
+          "generating-summary": "Generating summary...",
+          "summary": "Summary",
+          "details": "Details",
+          "risk-signal-analysis": "Risk signal analysis",
+          "conclusion": "Conclusion"
         },
         "request-more-info": {
           "label": "Request more information",
