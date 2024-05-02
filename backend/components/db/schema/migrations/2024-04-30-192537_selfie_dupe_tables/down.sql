@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS incode_customer_session;

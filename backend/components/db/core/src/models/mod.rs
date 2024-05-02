@@ -25,6 +25,7 @@ pub mod fingerprint;
 pub mod fingerprint_visit_event;
 pub mod google_device_attest;
 pub mod identity_document;
+pub mod incode_customer_session;
 pub mod incode_verification_session;
 pub mod incode_verification_session_event;
 pub mod insight_event;

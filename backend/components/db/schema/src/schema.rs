@@ -503,6 +503,21 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    incode_customer_session (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        scoped_vault_id -> Text,
+        tenant_id -> Text,
+        incode_verification_session_id -> Text,
+        incode_customer_id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     incode_verification_session (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -1633,6 +1648,9 @@ diesel::joinable!(google_device_attestation -> vault (vault_id));
 diesel::joinable!(google_device_attestation -> webauthn_credential (webauthn_credential_id));
 diesel::joinable!(identity_document -> document_request (request_id));
 diesel::joinable!(identity_document -> insight_event (insight_event_id));
+diesel::joinable!(incode_customer_session -> incode_verification_session (incode_verification_session_id));
+diesel::joinable!(incode_customer_session -> scoped_vault (scoped_vault_id));
+diesel::joinable!(incode_customer_session -> tenant (tenant_id));
 diesel::joinable!(incode_verification_session -> identity_document (identity_document_id));
 diesel::joinable!(incode_verification_session_event -> identity_document (identity_document_id));
 diesel::joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));
@@ -1753,6 +1771,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     google_device_attestation,
     identity_document,
     identity_document_backup,
+    incode_customer_session,
     incode_verification_session,
     incode_verification_session_event,
     insight_event,
