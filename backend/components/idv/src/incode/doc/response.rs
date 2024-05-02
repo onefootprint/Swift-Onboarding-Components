@@ -143,6 +143,25 @@ pub struct FetchScoresResponse {
     pub overall: Option<ValueStatusKey>,
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AddCustomerResponse {
+    pub success: bool,
+    #[serde(rename = "uuid")]
+    pub customer_id: Option<String>,
+    // Access token to be used for newly created customer, in case approval was successful.
+    // Note: it has diff permissions than the omni/start one AFAICT
+    pub token: Option<String>,
+    pub total_score: Option<String>,
+    pub existing_customer: Option<bool>,
+}
+
+impl IncodeClientErrorCustomFailureReasons for AddCustomerResponse {
+    fn custom_failure_reasons(_e: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        None
+    }
+}
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Liveness {
@@ -302,6 +321,8 @@ pub struct FaceRecognition {
     pub applied_rule: Option<serde_json::Value>,
     // Shows how much face from ID matches the selfie,
     pub overall: Option<ValueStatusKey>,
+    // Incode can identity a user across sessions
+    pub customer_id: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

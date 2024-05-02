@@ -342,6 +342,22 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    pub async fn add_customer(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+    ) -> Result<reqwest::Response, IncodeError> {
+        let url = self.client_adapter.api_url("omni/process/approve")?;
+        let response = footprint_http_client
+            .client
+            .post(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
+
+        Ok(response)
+    }
+
     fn session_results_are_not_ready(error: &IncodeError) -> bool {
         matches!(error, IncodeError::ResultsNotReady)
     }
@@ -539,8 +555,8 @@ mod tests {
             doc::{
                 request::DocumentSide,
                 response::{
-                    AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessFaceResponse,
-                    ProcessIdResponse,
+                    AddCustomerResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
+                    ProcessFaceResponse, ProcessIdResponse,
                 },
             },
             government_validation::{
@@ -715,6 +731,21 @@ mod tests {
         //
         // Fetch Scores
         //
+        let add_customer_res = authenticated_client
+            .add_customer(&fp_client)
+            .await
+            .expect("add customer failed");
+
+        // selfie is a monkey picture, so i think maybe incode doesn't store monkey pics since monkeys cannot consent to BIPA or GDPR
+        let customer_res = IncodeAPIResult::<AddCustomerResponse>::from_response(add_customer_res)
+            .await
+            .0
+            .into_success()
+            .unwrap();
+
+        assert!(!customer_res.success);
+
+
         let raw_fetch_scores_res = authenticated_client
             .fetch_scores(&fp_client)
             .await
