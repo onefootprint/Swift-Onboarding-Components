@@ -16,6 +16,8 @@ export type {
   CollectKycDataRequirement,
   ConsentRequest,
   ConsentResponse,
+  CopyPlaybookRequest,
+  CopyPlaybookResponse,
   CreateListRequest,
   CreateListResponse,
   CreateMembersRequest,

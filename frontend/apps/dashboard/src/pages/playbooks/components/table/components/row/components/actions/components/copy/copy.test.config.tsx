@@ -1,3 +1,4 @@
+import { mockRequest } from '@onefootprint/test-utils';
 import type { OnboardingConfig } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
@@ -41,6 +42,28 @@ export const playbookFixture: OnboardingConfig = {
     version: 1,
   },
 };
+
+export const withPlaybookCopyError = (playbook = playbookFixture) =>
+  mockRequest({
+    method: 'post',
+    path: `/org/onboarding_configs/${playbook.id}/copy`,
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withPlaybookCopy = (playbook = playbookFixture) =>
+  mockRequest({
+    method: 'post',
+    path: `/org/onboarding_configs/${playbook.id}/copy`,
+    response: {
+      ...playbookFixture,
+      name: `${playbook.name} (copy)`,
+    },
+  });
 
 export const CopyWithButton = ({
   playbook = playbookFixture,

@@ -12,7 +12,11 @@ import {
 } from 'src/config/tests';
 
 import { type CopyProps } from './copy';
-import { CopyWithButton, playbookFixture } from './copy.test.config';
+import {
+  CopyWithButton,
+  playbookFixture,
+  withPlaybookCopyError,
+} from './copy.test.config';
 
 describe('<Copy />', () => {
   const renderCopy = async ({
@@ -61,6 +65,27 @@ describe('<Copy />', () => {
 
       const liveOption = screen.getByRole('button', { name: 'Live' });
       expect(liveOption).toBeEnabled();
+    });
+  });
+
+  describe('when copying a playbook', () => {
+    describe('when the request fails', () => {
+      beforeEach(() => {
+        asAdminUser();
+        withPlaybookCopyError();
+      });
+
+      it('should display an error message', async () => {
+        await renderCopy();
+
+        const cta = screen.getByRole('button', { name: 'Copy to target' });
+        await userEvent.click(cta);
+
+        await waitFor(() => {
+          const errorMessage = screen.getByText('Something went wrong');
+          expect(errorMessage).toBeInTheDocument();
+        });
+      });
     });
   });
 });

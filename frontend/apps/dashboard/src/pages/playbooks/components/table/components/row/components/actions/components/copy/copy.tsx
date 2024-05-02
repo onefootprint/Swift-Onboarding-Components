@@ -6,6 +6,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
 
+import useCopyPlaybook from './hooks/use-copy-playbook';
+
 export type CopyHandler = {
   launch: () => void;
 };
@@ -28,6 +30,7 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
     },
   });
   const org = useOrgSession();
+  const copyPlaybookMutation = useCopyPlaybook();
   const [open, setOpen] = useState(false);
 
   const resetForm = () => {
@@ -51,8 +54,18 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
   };
 
   const handleSubmit = (formData: FormData) => {
-    // eslint-disable-next-line no-console
-    console.log(formData);
+    copyPlaybookMutation.mutate(
+      {
+        name: formData.name,
+        playbookId: playbook.id,
+        isLive: formData.mode === 'live',
+      },
+      {
+        onSuccess: () => {
+          handleClose();
+        },
+      },
+    );
   };
 
   return (
@@ -63,10 +76,12 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
         label: t('form.cta'),
         type: 'submit',
         form: 'copy-playbook-form',
+        loading: copyPlaybookMutation.isLoading,
       }}
       secondaryButton={{
         label: t('form.cancel'),
         onClick: handleClose,
+        disabled: copyPlaybookMutation.isLoading,
       }}
       size="compact"
       title={t('title')}
