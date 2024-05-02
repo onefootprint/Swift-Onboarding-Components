@@ -27,6 +27,7 @@ pub enum DupeKind {
     PhoneNumber,
     DeviceId,
     CookieId,
+    Selfie,
 }
 
 impl TryFrom<DataIdentifier> for DupeKind {

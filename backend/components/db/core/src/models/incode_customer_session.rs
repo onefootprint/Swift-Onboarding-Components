@@ -2,9 +2,12 @@ use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::incode_customer_session;
 use diesel::prelude::*;
+use itertools::Itertools;
 use newtypes::{
-    IncodeCustomerId, IncodeCustomerSessionId, IncodeVerificationSessionId, ScopedVaultId, TenantId,
+    DupeKind, IncodeCustomerId, IncodeCustomerSessionId, IncodeVerificationSessionId, ScopedVaultId, TenantId,
 };
+
+use super::scoped_vault::ScopedVault;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = incode_customer_session)]
@@ -72,6 +75,37 @@ impl IncodeCustomerSession {
 
 
         Ok(res)
+    }
+}
+
+pub struct IncodeSelfieDupesResult {
+    pub internal: Vec<(DupeKind, ScopedVaultId)>,
+}
+
+impl IncodeCustomerSession {
+    #[tracing::instrument("IncodeCustomerSession::get_dupes_for_tenant", skip_all)]
+    pub fn get_dupes_for_tenant(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<IncodeSelfieDupesResult> {
+        let customer_ids: Vec<IncodeCustomerId> = Self::list(conn, &sv.id)?
+            .into_iter()
+            .map(|s| s.incode_customer_id)
+            .unique()
+            .collect();
+
+        let matches = incode_customer_session::table
+            .filter(incode_customer_session::tenant_id.eq(&sv.tenant_id))
+            .filter(
+                incode_customer_session::incode_customer_id
+                    .eq_any(customer_ids)
+            )
+            .filter(incode_customer_session::scoped_vault_id.ne(&sv.id))
+            .select(incode_customer_session::scoped_vault_id)
+            .get_results(conn)?
+            .into_iter()
+            .unique() // need this because other sv could go through multiple wfs with same selfie
+            .map(|sv| (DupeKind::Selfie, sv))
+            .collect();
+
+        Ok(IncodeSelfieDupesResult { internal: matches })
     }
 }
 
