@@ -18,6 +18,13 @@
         },
         "hint": "You're not allowed to copy playbooks to the live environment."
       },
+      "feedback": {
+        "success": {
+          "title": "Playbook copied successfully",
+          "description": "Playbook copied in the {{mode}} environment.",
+          "cta": "Go to copied playbook"
+        }
+      },
       "cancel": "Cancel",
       "cta": "Copy to target"
     }

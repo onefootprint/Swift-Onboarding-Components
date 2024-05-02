@@ -1,4 +1,5 @@
 import {
+  createUseRouterSpy,
   customRender,
   screen,
   userEvent,
@@ -15,10 +16,19 @@ import { type CopyProps } from './copy';
 import {
   CopyWithButton,
   playbookFixture,
+  withPlaybookCopy,
   withPlaybookCopyError,
 } from './copy.test.config';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<Copy />', () => {
+  beforeEach(() => {
+    useRouterSpy({
+      pathname: '/playbooks',
+    });
+  });
+
   const renderCopy = async ({
     playbook = playbookFixture,
   }: Partial<CopyProps> = {}) => {
@@ -84,6 +94,57 @@ describe('<Copy />', () => {
         await waitFor(() => {
           const errorMessage = screen.getByText('Something went wrong');
           expect(errorMessage).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when the request succeeds', () => {
+      beforeEach(() => {
+        asAdminUser();
+        withPlaybookCopy();
+      });
+
+      it('should display a success message', async () => {
+        const pushMockFn = jest.fn();
+        useRouterSpy({
+          pathname: '/playbooks',
+          push: pushMockFn,
+        });
+
+        await renderCopy();
+
+        const cta = screen.getByRole('button', { name: 'Copy to target' });
+        await userEvent.click(cta);
+
+        await waitFor(() => {
+          const successMessage = screen.getByText(
+            'Playbook copied successfully',
+          );
+          expect(successMessage).toBeInTheDocument();
+        });
+      });
+
+      it('should redirect to the playbook page when clicking on the toast cta', async () => {
+        const pushMockFn = jest.fn();
+        useRouterSpy({
+          pathname: '/playbooks',
+          push: pushMockFn,
+        });
+
+        await renderCopy();
+
+        const cta = screen.getByRole('button', { name: 'Copy to target' });
+        await userEvent.click(cta);
+
+        const toastCta = await screen.findByRole('button', {
+          name: 'Go to copied playbook',
+        });
+        await userEvent.click(toastCta);
+
+        await waitFor(() => {
+          expect(pushMockFn).toHaveBeenCalledWith({
+            pathname: '/playbooks/ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
+          });
         });
       });
     });

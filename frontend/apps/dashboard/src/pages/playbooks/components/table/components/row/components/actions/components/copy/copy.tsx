@@ -97,7 +97,6 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
           <Controller
             control={form.control}
             name="mode"
-            defaultValue="sandbox"
             render={({ field }) => (
               <RadioSelect
                 label={t('form.target.label')}

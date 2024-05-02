@@ -61,6 +61,7 @@ export const withPlaybookCopy = (playbook = playbookFixture) =>
     path: `/org/onboarding_configs/${playbook.id}/copy`,
     response: {
       ...playbookFixture,
+      id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
       name: `${playbook.name} (copy)`,
     },
   });
