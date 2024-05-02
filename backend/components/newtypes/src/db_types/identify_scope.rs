@@ -1,11 +1,13 @@
 use chrono::Duration;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
+use serde_with::SerializeDisplay;
 use strum_macros::{Display, EnumString};
 
 #[derive(
     Debug,
     Display,
+    SerializeDisplay,
     Clone,
     Copy,
     Eq,

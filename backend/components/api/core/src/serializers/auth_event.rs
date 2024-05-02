@@ -11,7 +11,9 @@ impl DbToApi<LoadedAuthEvent> for api_wire_types::AuthEvent {
             attested_devices,
         } = event;
 
-        let AuthEvent { created_at, .. } = event;
+        let AuthEvent {
+            created_at, scope, ..
+        } = event;
 
         let linked_attestations = if let Some(attested_devices) = attested_devices {
             attested_devices
@@ -55,6 +57,7 @@ impl DbToApi<LoadedAuthEvent> for api_wire_types::AuthEvent {
 
         Self {
             created_at,
+            scope,
             insight: insight.map(api_wire_types::InsightEvent::from_db),
             linked_attestations,
             kind: event.kind,

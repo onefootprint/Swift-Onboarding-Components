@@ -1,5 +1,5 @@
 use crate::*;
-use newtypes::{AuthEventKind, ModernAuthEventKind};
+use newtypes::{AuthEventKind, IdentifyScope, ModernAuthEventKind};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
@@ -10,6 +10,7 @@ pub struct AuthEvent {
     pub linked_attestations: Vec<AttestedDeviceData>,
     pub kind: AuthEventKind,
     pub created_at: DateTime<Utc>,
+    pub scope: IdentifyScope,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
