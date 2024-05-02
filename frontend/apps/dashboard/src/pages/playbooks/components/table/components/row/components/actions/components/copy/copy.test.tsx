@@ -5,26 +5,16 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
+import {
+  asAdminUser,
+  asAdminUserRestrictedToSandbox,
+  resetUser,
+} from 'src/config/tests';
 
-import Copy, { type CopyHandler, type CopyProps } from './copy';
-import playbookFixture from './copy.test.config';
+import { type CopyProps } from './copy';
+import { CopyWithButton, playbookFixture } from './copy.test.config';
 
 describe('<Copy />', () => {
-  const CopyWithButton = ({
-    playbook = playbookFixture,
-  }: Partial<CopyProps>) => {
-    const ref = React.useRef<CopyHandler>(null);
-
-    return (
-      <>
-        <button onClick={() => ref.current?.launch()} type="button">
-          Open
-        </button>
-        <Copy ref={ref} playbook={playbook} />
-      </>
-    );
-  };
-
   const renderCopy = async ({
     playbook = playbookFixture,
   }: Partial<CopyProps> = {}) => {
@@ -37,10 +27,40 @@ describe('<Copy />', () => {
     });
   };
 
+  afterEach(() => {
+    resetUser();
+  });
+
   it('should initialize the name with the playbook name + (copy)', async () => {
     await renderCopy();
 
     const nameInput = screen.getByDisplayValue('People verification (copy)');
     expect(nameInput).toBeInTheDocument();
+  });
+
+  describe('when the user is restricted to create live ob configs', () => {
+    beforeEach(() => {
+      asAdminUserRestrictedToSandbox();
+    });
+
+    it('should disable the "Live" option', async () => {
+      await renderCopy();
+
+      const liveOption = screen.getByRole('button', { name: 'Live' });
+      expect(liveOption).toBeDisabled();
+    });
+  });
+
+  describe('when the user is not restricted to create live ob configs', () => {
+    beforeEach(() => {
+      asAdminUser();
+    });
+
+    it("should enable the 'Live' option", async () => {
+      await renderCopy();
+
+      const liveOption = screen.getByRole('button', { name: 'Live' });
+      expect(liveOption).toBeEnabled();
+    });
   });
 });

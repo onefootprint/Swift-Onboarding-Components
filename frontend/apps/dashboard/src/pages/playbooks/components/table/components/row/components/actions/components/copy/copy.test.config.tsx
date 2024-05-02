@@ -4,8 +4,11 @@ import {
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
+import React from 'react';
 
-const playbookFixture: OnboardingConfig = {
+import Copy, { type CopyHandler, type CopyProps } from './copy';
+
+export const playbookFixture: OnboardingConfig = {
   author: {
     kind: 'organization',
     member: 'Jane doe',
@@ -37,6 +40,21 @@ const playbookFixture: OnboardingConfig = {
   ruleSet: {
     version: 1,
   },
+};
+
+export const CopyWithButton = ({
+  playbook = playbookFixture,
+}: Partial<CopyProps>) => {
+  const ref = React.useRef<CopyHandler>(null);
+
+  return (
+    <>
+      <button onClick={() => ref.current?.launch()} type="button">
+        Open
+      </button>
+      <Copy ref={ref} playbook={playbook} />
+    </>
+  );
 };
 
 export default playbookFixture;

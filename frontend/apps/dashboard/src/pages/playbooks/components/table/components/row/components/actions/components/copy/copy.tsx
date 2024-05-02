@@ -4,6 +4,7 @@ import { Dialog, RadioSelect, Stack, TextInput } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
 export type CopyHandler = {
@@ -25,6 +26,7 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
       name: t('form.name.base', { name: playbook.name }),
     },
   });
+  const org = useOrgSession();
   const [open, setOpen] = useState(false);
 
   useImperativeHandle(
@@ -65,16 +67,19 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
           <RadioSelect
             label={t('form.target.label')}
             size="compact"
+            value="sandbox"
             options={[
               {
-                title: t('form.target.options.live'),
-                value: 'live',
-                IconComponent: IcoUser16,
-              },
-              {
+                IconComponent: IcoCode16,
                 title: t('form.target.options.sandbox'),
                 value: 'sandbox',
-                IconComponent: IcoCode16,
+              },
+              {
+                disabled: org.data?.isSandboxRestricted,
+                disabledHint: t('form.target.hint'),
+                IconComponent: IcoUser16,
+                title: t('form.target.options.live'),
+                value: 'live',
               },
             ]}
           />

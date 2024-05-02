@@ -174,3 +174,14 @@ export const asAssumedUser = () => {
     },
   });
 };
+
+export const asAdminUserRestrictedToSandbox = () =>
+  asAdminUserWithOrg({
+    id: 'org_UT091oogB4RJv1QbBesp2h',
+    name: 'Retro Bank',
+    isSandboxRestricted: true,
+    isLive: false,
+    isProdKybPlaybookRestricted: true,
+    isProdAuthPlaybookRestricted: true,
+    isProdKycPlaybookRestricted: true,
+  });
