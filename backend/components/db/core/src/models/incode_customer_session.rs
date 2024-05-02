@@ -1,4 +1,4 @@
-use crate::{DbResult, TxnPgConn};
+use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::incode_customer_session;
 use diesel::prelude::*;
@@ -30,8 +30,9 @@ struct NewIncodeCustomerSession {
 }
 
 impl IncodeCustomerSession {
+    #[tracing::instrument("IncodeCustomerSession::create", skip_all)]
     pub fn create(
-        conn: &mut TxnPgConn,
+        conn: &mut PgConn,
         scoped_vault_id: ScopedVaultId,
         tenant_id: TenantId,
         incode_verification_session_id: IncodeVerificationSessionId,
@@ -47,8 +48,41 @@ impl IncodeCustomerSession {
 
         let res: IncodeCustomerSession = diesel::insert_into(incode_customer_session::table)
             .values(new)
-            .get_result(conn.conn())?;
+            .get_result(conn)?;
 
         Ok(res)
     }
+
+    #[tracing::instrument("IncodeCustomerSession::list", skip_all)]
+    pub fn list<'a, T: Into<IncodeCustomerSessionIdentifier<'a>>>(
+        conn: &mut PgConn,
+        id: T,
+    ) -> DbResult<Vec<Self>> {
+        let res = match id.into() {
+            IncodeCustomerSessionIdentifier::ScopedVaultId { id } => incode_customer_session::table
+                .filter(incode_customer_session::scoped_vault_id.eq(id))
+                .get_results(conn)?,
+            IncodeCustomerSessionIdentifier::ScopedVaultIdAndSession { id, session } => {
+                incode_customer_session::table
+                    .filter(incode_customer_session::scoped_vault_id.eq(id))
+                    .filter(incode_customer_session::incode_verification_session_id.eq(session))
+                    .get_results(conn)?
+            }
+        };
+
+
+        Ok(res)
+    }
+}
+
+
+#[derive(derive_more::From)]
+pub enum IncodeCustomerSessionIdentifier<'a> {
+    ScopedVaultId {
+        id: &'a ScopedVaultId,
+    },
+    ScopedVaultIdAndSession {
+        id: &'a ScopedVaultId,
+        session: &'a IncodeVerificationSessionId,
+    },
 }

@@ -25,9 +25,10 @@ use async_trait::async_trait;
 use db::{
     models::{
         decision_intent::DecisionIntent, identity_document::IdentityDocument,
-        ob_configuration::ObConfiguration, verification_result::VerificationResult,
+        incode_customer_session::IncodeCustomerSession, ob_configuration::ObConfiguration,
+        verification_result::VerificationResult,
     },
-    DbPool, TxnPgConn,
+    DbPool, DbResult, TxnPgConn,
 };
 use feature_flag::BoolFlag;
 use http::StatusCode;
@@ -35,14 +36,18 @@ use idv::{
     footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
     incode::{
         client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
-        doc::{response::FetchScoresResponse, IncodeFetchOCRRequest, IncodeFetchScoresRequest},
+        doc::{
+            response::{AddCustomerResponse, FetchScoresResponse},
+            IncodeFetchOCRRequest, IncodeFetchScoresRequest,
+        },
+        IncodeResponse,
     },
     ParsedResponse, VendorResponse,
 };
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataRequest, DecisionIntentKind,
-    DocumentKind, DocumentSide, Fingerprints, IdentityDocumentId, PiiJsonValue, ScopedVaultId, VendorAPI,
-    VendorValidatedCountryCode, WorkflowId,
+    DocumentKind, DocumentSide, Fingerprints, IdentityDocumentId, IncodeVerificationSessionId, PiiJsonValue,
+    ScopedVaultId, VendorAPI, VendorValidatedCountryCode, WorkflowId,
 };
 use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
 use tracing::Instrument;
@@ -176,6 +181,26 @@ impl IncodeStateTransition for FetchScores {
                 Err(err) => tracing::warn!(err=?err, scoped_vault_id=%sv_id2, log_msg),
             }
         }.in_current_span());
+
+
+        let db_pool2 = db_pool.clone();
+        let ctx2 = ctx.clone();
+        let ivs = session.id.clone();
+        let creds2 = session.credentials.clone();
+        tokio::spawn(
+            async move {
+                let svid = ctx2.sv_id.clone();
+                let resp = add_customer_and_save_session(&db_pool2, creds2, ctx2, ivs).await;
+
+                match resp {
+                    Ok(_) => {}
+                    Err(err) => {
+                        tracing::warn!(err=?err, scoped_vault_id=%svid, "Error approving incode session")
+                    }
+                }
+            }
+            .in_current_span(),
+        );
 
         let args = PreCompleteArgs {
             obc: &obc,
@@ -346,4 +371,81 @@ async fn mark_status_as_complete(credentials: IncodeCredentialsWithToken) -> Api
         .map_err(map_to_api_error)?;
 
     Ok(res)
+}
+
+#[tracing::instrument(skip_all)]
+async fn add_customer_and_save_session(
+    db_pool: &DbPool,
+    credentials: IncodeCredentialsWithToken,
+    ctx: IncodeContext,
+    ivs_id: IncodeVerificationSessionId,
+) -> ApiResult<()> {
+    let sv_id2 = ctx.sv_id.clone();
+    let ivs_id2 = ivs_id.clone();
+
+    // check existing
+    let existing = db_pool
+        .db_query(move |conn| -> DbResult<_> { IncodeCustomerSession::list(conn, (&sv_id2, &ivs_id2)) })
+        .await?;
+
+    if !existing.is_empty() {
+        tracing::info!(
+            ivs_id = %&ivs_id,
+            sv_id = %&ctx.sv_id,
+            "already have incode customer for ivs"
+        );
+        return Ok(());
+    }
+    // Otherwise, let's approve
+    let http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())?;
+    let client = IncodeClientAdapter::new(credentials.credentials).map_err(map_to_api_error)?;
+    let authenticated_client =
+        AuthenticatedIncodeClientAdapter::new(client, credentials.authentication_token)
+            .map_err(map_to_api_error)?;
+
+    let resp = authenticated_client.add_customer(&http_client).await;
+    let res = match resp {
+        Ok(r) => Ok(IncodeResponse::from_response(r).await),
+        Err(e) => Err(e),
+    };
+
+    // Save vres
+    let session_args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeApproveSession, &ctx);
+    let _ = session_args.save(db_pool).await?;
+
+
+    let parsed: AddCustomerResponse = res
+        .map_err(map_to_api_error)?
+        .result
+        .into_success()
+        .map_err(map_to_api_error)?;
+
+    let log_success = parsed.success;
+    let mut log_created_customer = false;
+    let log_total_score = parsed.total_score.clone();
+    let log_sv_id = ctx.sv_id.clone();
+    let log_ivs_id = ivs_id.clone();
+    if let Some(customer_id) = parsed.customer_id {
+        if parsed.success {
+            db_pool
+                .db_query(move |conn| -> DbResult<_> {
+                    IncodeCustomerSession::create(conn, ctx.sv_id, ctx.tenant_id, ivs_id, customer_id.into())
+                })
+                .await?;
+
+            log_created_customer = true;
+        }
+    }
+
+    tracing::info!(
+        success=?log_success,
+        created_customer=?log_created_customer,
+        total_score=?log_total_score,
+        sv_id=?log_sv_id,
+        ivs_id=?log_ivs_id,
+        "IncodeCustomerSession creation result"
+    );
+
+
+    Ok(())
 }
