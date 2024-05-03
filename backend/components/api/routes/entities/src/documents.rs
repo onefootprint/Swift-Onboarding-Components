@@ -28,6 +28,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: TenantSessionAuth,
+    // TODO eventually support filtering on seqno here
 ) -> JsonApiResponse<Vec<api_wire_types::Document>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

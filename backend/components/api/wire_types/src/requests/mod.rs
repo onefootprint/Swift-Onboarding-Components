@@ -96,3 +96,6 @@ pub use skip_passkey_register::*;
 
 pub mod roles;
 pub use self::roles::*;
+
+pub mod seqno;
+pub use self::seqno::*;

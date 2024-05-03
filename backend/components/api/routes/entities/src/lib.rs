@@ -5,6 +5,7 @@ mod ai_summarize;
 mod annotations;
 mod auth_events;
 mod client_token;
+mod data;
 mod decisions;
 mod documents;
 mod dupes;
@@ -26,6 +27,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(client_token::get::get)
         .service(get::detail::get)
         .service(get::search::post)
+        .service(data::get)
         .service(annotations::get)
         .service(annotations::patch)
         .service(annotations::post)

@@ -25,8 +25,6 @@ pub struct Entity {
     pub start_timestamp: DateTime<Utc>,
     pub watchlist_check: Option<WatchlistCheck>,
     pub ordering_id: i64,
-    /// Metadata on the data that exists in this vault
-    pub data: Vec<EntityAttribute>,
     // These are a representation of the associated workflows
     pub status: Option<EntityStatus>,
     pub requires_manual_review: bool,
@@ -39,6 +37,9 @@ pub struct Entity {
     pub last_activity_at: DateTime<Utc>,
     pub label: Option<LabelKind>,
 
+    /// Metadata on the data that exists in this vault
+    /// DEPRECATED. remove this once the frontend starts hitting the data-specific API
+    pub data: Vec<EntityAttribute>,
     /// DEPRECATED.
     /// The list of attributes populated on this vault.
     pub attributes: Vec<DataIdentifier>,
