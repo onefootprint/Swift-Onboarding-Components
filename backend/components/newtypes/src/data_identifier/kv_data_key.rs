@@ -1,16 +1,22 @@
 use crate::{
-    AllData, CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, KvDataKey, NtResult, PiiJsonValue,
-    PiiString, Validate, ValidateArgs,
+    AllData, CleanAndValidate, CollectedData, DataIdentifier, DataIdentifierValue,
+    IsDataIdentifierDiscriminant, KvDataKey, NtResult, PiiJsonValue, ValidateArgs,
 };
 
-impl Validate for KvDataKey {
-    fn validate(
+impl CleanAndValidate for KvDataKey {
+    type Parsed = ();
+
+    fn clean_and_validate(
         self,
         value: PiiJsonValue,
         _: ValidateArgs,
         _: &AllData,
-    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
-        Ok(vec![(self.into(), value.to_piistring()?)])
+    ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
+        Ok(DataIdentifierValue {
+            di: self.into(),
+            value: value.to_piistring()?,
+            parsed: (),
+        })
     }
 }
 

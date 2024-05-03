@@ -3,8 +3,8 @@ use super::{
     Error, VResult,
 };
 use crate::{
-    email::Email, AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, DataIdentifier, NtResult,
-    PhoneNumber, PiiJsonValue, PiiString, Validate, ValidateArgs,
+    email::Email, AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, CleanAndValidate,
+    DataIdentifierValue, NtResult, PhoneNumber, PiiJsonValue, PiiString, ValidateArgs,
 };
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -12,13 +12,15 @@ use serde_with::DeserializeFromStr;
 use strum::EnumString;
 use url::{Host, Url};
 
-impl Validate for BDK {
-    fn validate(
+impl CleanAndValidate for BDK {
+    type Parsed = ();
+
+    fn clean_and_validate(
         self,
         value: PiiJsonValue,
         args: ValidateArgs,
         all_data: &AllData,
-    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+    ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
         let value = match self {
             BDK::Name => value.as_string()?,
             BDK::Dba => value.as_string()?,
@@ -36,7 +38,12 @@ impl Validate for BDK {
             BDK::CorporationType => utils::parse_enum::<CorporationType>(value.as_string()?)?,
         };
         let value = utils::validate_not_empty(value)?;
-        Ok(vec![(self.into(), value)])
+
+        Ok(DataIdentifierValue {
+            di: self.into(),
+            value,
+            parsed: (),
+        })
     }
 }
 
@@ -208,7 +215,7 @@ mod test {
     use std::collections::HashMap;
 
     use super::{KycedBusinessOwnerData, BDK::*};
-    use crate::{BusinessDataKind as BDK, PiiJsonValue, Validate, ValidateArgs};
+    use crate::{BusinessDataKind as BDK, CleanAndValidate, PiiJsonValue, ValidateArgs};
     use serde_json::json;
     use test_case::test_case;
 
@@ -241,14 +248,13 @@ mod test {
     #[test_case(BeneficialOwners, "[{\"first_name\": \"Piip\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}, {\"first_name\": \"Marco\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}]" => None)]
     #[test_case(BeneficialOwners, "I am not json" => None)]
     fn test_clean_and_validate_field_not_bifrost(bdk: BDK, pii: &str) -> Option<String> {
-        bdk.validate(
+        bdk.clean_and_validate(
             PiiJsonValue::string(pii),
             ValidateArgs::for_tests(),
             &HashMap::new(),
         )
         .ok()
-        .and_then(|pii| pii.into_iter().next())
-        .map(|pii| pii.1.leak_to_string())
+        .map(|div| div.value.leak_to_string())
     }
 
     #[test]
@@ -263,16 +269,13 @@ mod test {
         }]);
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners
-            .validate(
+            .clean_and_validate(
                 PiiJsonValue::string(&input_str),
                 ValidateArgs::for_tests(),
                 &HashMap::new(),
             )
             .unwrap()
-            .into_iter()
-            .next()
-            .unwrap()
-            .1;
+            .value;
         let result: Vec<KycedBusinessOwnerData> = serde_json::de::from_str(result.leak()).unwrap();
         let owner = result.into_iter().next().unwrap();
         assert!(owner.link_id.to_string().starts_with("bo_link_"));
@@ -292,7 +295,7 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(
+        let result = BDK::KycedBeneficialOwners.clean_and_validate(
             PiiJsonValue::string(&input_str),
             ValidateArgs::for_tests(),
             &HashMap::new(),
@@ -309,7 +312,7 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(
+        let result = BDK::KycedBeneficialOwners.clean_and_validate(
             PiiJsonValue::string(&input_str),
             ValidateArgs::for_tests(),
             &HashMap::new(),
@@ -332,7 +335,7 @@ mod test {
         }]);
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
-        let result = BDK::KycedBeneficialOwners.validate(
+        let result = BDK::KycedBeneficialOwners.clean_and_validate(
             PiiJsonValue::string(&input_str),
             ValidateArgs::for_tests(),
             &HashMap::new(),

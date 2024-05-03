@@ -1,11 +1,12 @@
 use crate::{
     data_identifier::DiValidationError,
     fingerprinter::{FingerprintScope, Fingerprinter, GlobalFingerprintKind},
-    CollectedDataOption, DataIdentifier, DataValidationError, Error, Fingerprint, FingerprintScopeKind,
-    IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType, TenantId, Validate,
+    CleanAndValidate, CollectedDataOption, DataIdentifier, DataValidationError, DeriveValues, Error,
+    Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString,
+    StorageType, TenantId,
 };
 use either::Either::{Left, Right};
-use itertools::Itertools;
+use itertools::{chain, Itertools};
 use std::{
     clone::Clone,
     collections::{HashMap, HashSet},
@@ -155,7 +156,7 @@ impl DataRequest<()> {
                     (k, v)
                 }
             })
-            .partition_map(|(k, v)| match k.clone().validate(v, args, &all_data) {
+            .partition_map(|(k, v)| match k.clone().clean_and_validate(v, args, &all_data) {
                 Ok(v) => Left(v),
                 Err(err) => Right((k, err)),
             });
@@ -163,15 +164,24 @@ impl DataRequest<()> {
             return Err(DataValidationError::FieldValidationError(errors).into());
         }
 
+        let derived_data = cleaned_data
+            .iter()
+            .flat_map(|cleaned| cleaned.derive_values())
+            .map(Into::into)
+            .collect_vec();
+        let cleaned_and_derived_data = chain(cleaned_data, derived_data).collect_vec();
+
         // NOTE: we're missing any derived fields that are JSON. But we don't have any of those yet...
         let json_fields = all_data
             .into_iter()
             .filter(|(_, v)| !v.is_string())
             .map(|(k, _)| k)
             .collect();
-        let cleaned_data = cleaned_data.into_iter().flatten().collect();
         let request = Self {
-            data: cleaned_data,
+            data: cleaned_and_derived_data
+                .into_iter()
+                .map(|div| (div.di, div.value))
+                .collect(),
             // Initially create the request with no fingerprints - they need to be added with an
             // async function
             json_fields,

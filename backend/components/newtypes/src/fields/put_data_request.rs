@@ -4,8 +4,8 @@ use either::Either;
 use itertools::Itertools;
 
 use crate::{
-    flat_api_object_map_type, DataIdentifier, DataRequest, DataValidationError, DiValidationError,
-    DocumentKind, NtResult, PiiJsonValue, PiiValueKind, ValidateArgs,
+    flat_api_object_map_type, CardDataKind, DataIdentifier, DataRequest, DataValidationError,
+    DiValidationError, DocumentKind, NtResult, PiiJsonValue, PiiValueKind, ValidateArgs,
 };
 
 flat_api_object_map_type!(
@@ -33,6 +33,13 @@ impl RawDataRequest {
                         DocumentKind::OcrData(_, _) => None,  // allow vaulting OCR data
                         DocumentKind::Barcodes(_, _) => None, // allow vaulting barcodes
                         _ => Some(DiValidationError::CannotVaultDocument.into()),
+                    },
+                    DataIdentifier::Card(k) => match k.kind {
+                        CardDataKind::ExpMonth
+                        | CardDataKind::ExpYear
+                        | CardDataKind::Last4
+                        | CardDataKind::Issuer => Some(DiValidationError::CannotSpecifyDerivedEntry.into()),
+                        _ => None,
                     },
                     _ => None,
                 };

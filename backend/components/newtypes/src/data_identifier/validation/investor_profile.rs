@@ -1,19 +1,21 @@
 use super::{utils, Error};
 use crate::{
-    AllData, DataIdentifier, InvestorProfileKind as IPK, NtResult, PiiJsonValue, PiiString, Validate,
-    ValidateArgs,
+    AllData, CleanAndValidate, DataIdentifierValue, InvestorProfileKind as IPK, NtResult, PiiJsonValue,
+    PiiString, ValidateArgs,
 };
 use itertools::Itertools;
 use serde_with::DeserializeFromStr;
 use strum_macros::EnumString;
 
-impl Validate for IPK {
-    fn validate(
+impl CleanAndValidate for IPK {
+    type Parsed = ();
+
+    fn clean_and_validate(
         self,
         value: PiiJsonValue,
         _: ValidateArgs,
         _: &AllData,
-    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+    ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
         // Don't want anything to be empty
         let value = match self {
             Self::EmploymentStatus => utils::parse_enum::<EmploymentStatus>(value.as_string()?)?,
@@ -55,7 +57,12 @@ impl Validate for IPK {
             Self::PoliticalOrganization => value.as_string()?,
         };
         let value = utils::validate_not_empty(value)?;
-        Ok(vec![(self.into(), value)])
+
+        Ok(DataIdentifierValue {
+            di: self.into(),
+            value,
+            parsed: (),
+        })
     }
 }
 

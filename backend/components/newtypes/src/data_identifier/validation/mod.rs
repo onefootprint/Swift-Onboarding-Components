@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    CollectedDataOption, DataIdentifier, NtResult, PiiJsonValue, PiiString, PiiValueKind, ValidateArgs,
+    CollectedDataOption, DataIdentifier, DataIdentifierValue, NtResult, PiiJsonValue, PiiValueKind,
+    ValidateArgs,
 };
 
 mod business;
@@ -12,22 +13,26 @@ mod investor_profile;
 mod utils;
 
 pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
-pub use card::CardIssuer;
-pub use identity::{UsLegalStatus, VisaKind};
+pub use card::{CardData, CardExpiration, CardIssuer, CardNumber, LuhnValidatedCardNumber};
+pub use identity::{IdentityData, UsLegalStatus, VisaKind};
 pub use investor_profile::Declaration;
 pub use utils::AgeHelper;
 pub type AllData = HashMap<DataIdentifier, PiiJsonValue>;
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
 
-pub trait Validate {
+pub trait CleanAndValidate {
+    /// Optional structured data representing the value. When this is set, we use it to derive
+    /// other DIs
+    type Parsed;
+
     /// Performs basic cleaning and validation for all data that we store in our vaults.
-    fn validate(
+    fn clean_and_validate(
         self,
         value: PiiJsonValue,
         args: ValidateArgs,
         all_data: &AllData,
-    ) -> NtResult<Vec<(DataIdentifier, PiiString)>>;
+    ) -> NtResult<DataIdentifierValue<Self::Parsed>>;
 }
 
 #[derive(Debug, thiserror::Error)]

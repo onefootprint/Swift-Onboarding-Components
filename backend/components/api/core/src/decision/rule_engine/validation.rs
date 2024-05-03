@@ -2,9 +2,9 @@ use crate::errors::{ApiResult, AssertionError, ValidationError};
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
 use newtypes::{
-    AllData, BusinessDataKind, DataIdentifier, DeviceInsightField, DeviceInsightOperation, IdentityDataKind,
-    ListId, ListKind, PiiJsonValue, RuleExpression, RuleExpressionCondition, RuleInstanceKind, Validate,
-    ValidateArgs, VaultOperation,
+    AllData, BusinessDataKind, CleanAndValidate, DataIdentifier, DeviceInsightField, DeviceInsightOperation,
+    IdentityDataKind, ListId, ListKind, PiiJsonValue, RuleExpression, RuleExpressionCondition,
+    RuleInstanceKind, ValidateArgs, VaultOperation,
 };
 use std::collections::HashMap;
 
@@ -19,7 +19,7 @@ pub fn validate_rule_expression(
             RuleExpressionCondition::VaultData(vault_op) => match vault_op {
                 VaultOperation::Equals { field, op: _, value } => {
                     let all_data = AllData::new();
-                    field.clone().validate(
+                    field.clone().clean_and_validate(
                         PiiJsonValue::from_piistring(value.clone()),
                         ValidateArgs {
                             for_bifrost: false,
@@ -171,7 +171,10 @@ mod tests {
 
     use super::*;
     use chrono::Utc;
-    use newtypes::{BooleanOperator, FootprintReasonCode as FRC, IsIn, ListId, SealedVaultDataKey, TenantId, ListKind, ListAlias, DbActor, DataLifetimeSeqno};
+    use newtypes::{
+        BooleanOperator, DataLifetimeSeqno, DbActor, FootprintReasonCode as FRC, IsIn, ListAlias, ListId,
+        ListKind, SealedVaultDataKey, TenantId,
+    };
     use test_case::test_case;
 
     fn test_list_id() -> ListId {
@@ -216,7 +219,7 @@ mod tests {
                 field: DeviceInsightField::IpAddress,
                 op: IsIn::IsIn,
                 value: test_list_id(),
-            }, 
+            },
         )
     ], Ok(RuleInstanceKind::Person))]
     #[test_case(vec![
@@ -235,7 +238,7 @@ mod tests {
                 field: DeviceInsightField::IpAddress,
                 op: IsIn::IsIn,
                 value: test_list_id(),
-            }, 
+            },
         )
     ], Ok(RuleInstanceKind::Business))]
     #[test_case(vec![
@@ -244,9 +247,8 @@ mod tests {
                 field: DeviceInsightField::IpAddress,
                 op: IsIn::IsIn,
                 value: test_list_id(),
-            }, 
+            },
         )], Ok(RuleInstanceKind::Any))]
-
     #[test_case(vec![
         RuleExpressionCondition::RiskSignal {
             field: FRC::BusinessAddressIncompleteMatch,
@@ -259,7 +261,10 @@ mod tests {
             value: true,
         },
        ], Err(validation_error("Cannot make a rule expression that includes both Person and Business signals")))]
-    fn test_validate_rule_expression_for_rule_instance_kind(recs: Vec<RuleExpressionCondition>, expected_kind: ApiResult<RuleInstanceKind>) {
+    fn test_validate_rule_expression_for_rule_instance_kind(
+        recs: Vec<RuleExpressionCondition>,
+        expected_kind: ApiResult<RuleInstanceKind>,
+    ) {
         let unvalidated = UnvalidatedRuleExpression(recs);
         let lists = HashMap::from_iter([(test_list_id(), test_list(ListKind::IpAddress))]);
 
@@ -275,11 +280,9 @@ mod tests {
                 };
 
                 assert_eq!(s, s1);
-
-            },
+            }
             (Ok(_), Err(_)) => panic!("expected value should be successful"),
             (Err(_), Ok(_)) => panic!("expected value should be error"),
         }
-        
     }
 }

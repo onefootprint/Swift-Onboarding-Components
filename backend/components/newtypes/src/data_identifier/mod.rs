@@ -20,6 +20,7 @@ mod card_data_kind;
 mod collected_data;
 mod contact_info_kind;
 mod decryptable_identifier;
+mod derived;
 mod document_kind;
 mod id_doc_kind;
 mod identity_data_kind;
@@ -33,6 +34,7 @@ pub use self::{
     collected_data::*,
     contact_info_kind::*,
     decryptable_identifier::*,
+    derived::*,
     document_kind::*,
     id_doc_kind::*,
     identity_data_kind::*,
@@ -84,9 +86,43 @@ pub enum DataIdentifier {
     Card(CardInfo),
 }
 
+// non_exhaustive ensures values are only constructed via CleanAndValidate.
+#[non_exhaustive]
+pub struct DataIdentifierValue<P = ()> {
+    pub di: DataIdentifier,
+    pub value: PiiString,
+
+    /// Optional structured data representing the value. When this is set, we use it to derive
+    /// other DIs
+    pub parsed: P,
+}
+
+impl<T> From<DataIdentifierValue> for DataIdentifierValue<Option<T>> {
+    fn from(value: DataIdentifierValue) -> Self {
+        DataIdentifierValue {
+            di: value.di,
+            value: value.value,
+            parsed: None,
+        }
+    }
+}
+
+impl<T> From<DataIdentifierValue<T>> for DataIdentifierValue<Option<ParsedDataIdentifier>>
+where
+    T: Into<ParsedDataIdentifier>,
+{
+    fn from(value: DataIdentifierValue<T>) -> Self {
+        DataIdentifierValue {
+            di: value.di,
+            value: value.value,
+            parsed: Some(value.parsed.into()),
+        }
+    }
+}
+
 /// Contains all of the functionality that each nested type of DataIdentifier must provide
 pub trait IsDataIdentifierDiscriminant:
-    Hash + Eq + Clone + TryFrom<DataIdentifier> + Into<DataIdentifier> + Validate
+    Hash + Eq + Clone + TryFrom<DataIdentifier> + Into<DataIdentifier> + CleanAndValidate
 {
     /// Maps the DI variant to the CollectedData variant that contains this DI
     fn parent(&self) -> Option<CollectedData>;
@@ -129,28 +165,35 @@ impl DataIdentifier {
     }
 }
 
-impl Validate for DataIdentifier {
-    /// Validate the value for the given DataIdentifier.
-    /// Returns an Ok result with all of entries to be vaulted (including derived entries).
+#[derive(derive_more::From)]
+pub enum ParsedDataIdentifier {
+    Id(Option<IdentityData>),
+    Card(Option<CardData>),
+}
+
+impl CleanAndValidate for DataIdentifier {
+    type Parsed = Option<ParsedDataIdentifier>;
+
+    /// Clean and validate the value for the given DataIdentifier.
     /// Each entry's value is represented as a PiiString when saved in the vault, even if the
     /// input type was a JSON.
-    fn validate(
+    fn clean_and_validate(
         self,
         value: PiiJsonValue,
         args: ValidateArgs,
         all_data: &AllData,
-    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+    ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
         if value.is_string() && self.expected_json_format() {
             // TODO make this return a hard validation error at some point
             tracing::error!(di=%self, "Tried to vault data in incorrect format");
         }
         match self {
-            Self::Id(s) => s.validate(value, args, all_data),
-            Self::Custom(s) => s.validate(value, args, all_data),
-            Self::Business(s) => s.validate(value, args, all_data),
-            Self::InvestorProfile(s) => s.validate(value, args, all_data),
-            Self::Document(s) => s.validate(value, args, all_data),
-            Self::Card(s) => s.validate(value, args, all_data),
+            Self::Id(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
+            Self::Custom(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
+            Self::Business(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
+            Self::InvestorProfile(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
+            Self::Document(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
+            Self::Card(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
         }
     }
 }

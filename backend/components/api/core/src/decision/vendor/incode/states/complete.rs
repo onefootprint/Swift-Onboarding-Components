@@ -36,10 +36,10 @@ use db::{
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentKind, DocumentReviewStatus,
-    Fingerprints, FootprintReasonCode, IdDocKind, IdentityDataKind as IDK, IdentityDocumentId,
-    IdentityDocumentStatus, IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue,
-    PiiString, ScopedVaultId, ScrubbedPiiString, Validate, ValidateArgs, VendorAPI,
+    CleanAndValidate, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentKind,
+    DocumentReviewStatus, Fingerprints, FootprintReasonCode, IdDocKind, IdentityDataKind as IDK,
+    IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK,
+    PiiJsonValue, PiiString, ScopedVaultId, ScrubbedPiiString, ValidateArgs, VendorAPI,
     VendorValidatedCountryCode, VerificationResultId,
 };
 use std::collections::HashMap;
@@ -163,7 +163,11 @@ fn doc_first_id_data(
     // Don't add OCR data that fails validation - don't want it to block sign up
     all_data
         .into_iter()
-        .filter(|(k, v)| k.clone().validate(v.clone(), validate_args, &raw_data).is_ok())
+        .filter(|(k, v)| {
+            k.clone()
+                .clean_and_validate(v.clone(), validate_args, &raw_data)
+                .is_ok()
+        })
         .collect()
 }
 

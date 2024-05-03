@@ -5,21 +5,29 @@ use super::{
 use crate::{
     email::Email,
     ssn::{Ssn4, Ssn9},
-    AllData, DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, NtResult, PhoneNumber,
-    PiiJsonValue, PiiString, Validate, ValidateArgs, DATE_FORMAT,
+    AllData, CleanAndValidate, DataIdentifierValue, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode,
+    NtResult, PhoneNumber, PiiJsonValue, PiiString, ValidateArgs, DATE_FORMAT,
 };
 use chrono::{Datelike, NaiveDate, Utc};
 use serde_with::DeserializeFromStr;
 use std::str::FromStr;
 use strum_macros::EnumString;
 
-impl Validate for IDK {
-    fn validate(
+pub enum IdentityData {
+    // TODO: Make this Ssn9(Ssn9) once we decide on one of old_clean_and_validate_ssn9 or
+    // new_clean_and_validate_ssn9.
+    Sss9(PiiString),
+}
+
+impl CleanAndValidate for IDK {
+    type Parsed = Option<IdentityData>;
+
+    fn clean_and_validate(
         self,
         value: PiiJsonValue,
         args: ValidateArgs,
         all_data: &AllData,
-    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+    ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
         // Generally don't want anything to be empty
         let value = match self {
             IDK::FirstName => validate_name(value.as_string()?, args.for_bifrost)?,
@@ -47,15 +55,22 @@ impl Validate for IDK {
                     Ok(())
                 })?
             }
-            // Special one that returns derived entries
             IDK::Ssn9 => {
                 let ssn9 = clean_and_validate_ssn9(value.as_string()?)?;
-                let ssn4 = PiiString::new(ssn9.leak().chars().skip(ssn9.leak().len() - 4).collect());
-                return Ok(vec![(IDK::Ssn9.into(), ssn9), (IDK::Ssn4.into(), ssn4)]);
+                return Ok(DataIdentifierValue {
+                    di: self.into(),
+                    value: ssn9.clone(),
+                    parsed: Some(IdentityData::Sss9(ssn9)),
+                });
             }
         };
         let value = utils::validate_not_empty(value)?;
-        Ok(vec![(self.into(), value)])
+
+        Ok(DataIdentifierValue {
+            di: self.into(),
+            value,
+            parsed: None,
+        })
     }
 }
 
@@ -240,7 +255,7 @@ mod test {
     use std::collections::HashMap;
 
     use super::IDK::*;
-    use crate::{IdentityDataKind as IDK, PiiJsonValue, Validate, ValidateArgs};
+    use crate::{CleanAndValidate, IdentityDataKind as IDK, PiiJsonValue, ValidateArgs};
     use test_case::test_case;
 
     #[test_case(FirstName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]
@@ -275,14 +290,13 @@ mod test {
     #[test_case(Nationality, "US" => Some("US".to_owned()))]
     #[test_case(Nationality, "Flerp" => None)]
     fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
-        idk.validate(
+        idk.clean_and_validate(
             PiiJsonValue::string(pii),
             ValidateArgs::for_non_portable(true),
             &HashMap::new(),
         )
         .ok()
-        .and_then(|pii| pii.into_iter().next())
-        .map(|pii| pii.1.leak_to_string())
+        .map(|div| div.value.leak_to_string())
     }
 
     #[test_case(Dob, "1876-12-25" => None)]
@@ -305,9 +319,8 @@ mod test {
             for_bifrost: true,
             ..ValidateArgs::for_tests()
         };
-        idk.validate(PiiJsonValue::string(pii), args, &HashMap::new())
+        idk.clean_and_validate(PiiJsonValue::string(pii), args, &HashMap::new())
             .ok()
-            .and_then(|pii| pii.into_iter().next())
-            .map(|pii| pii.1.leak_to_string())
+            .map(|div| div.value.leak_to_string())
     }
 }
