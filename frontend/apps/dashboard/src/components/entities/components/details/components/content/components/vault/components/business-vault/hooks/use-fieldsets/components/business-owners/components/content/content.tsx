@@ -104,6 +104,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
               hint={boHintText(businessOwner)}
               renderValue={() => renderValue(index)}
               renderLabel={() => renderLabel(businessOwner)}
+              skipRegisterFieldToDecryptForm={index > 0}
             />
           </FieldContainer>
         ))}

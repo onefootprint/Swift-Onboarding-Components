@@ -23,6 +23,7 @@ export type FieldProps = {
     isValueDecrypted: boolean,
   ) => React.ReactNode;
   status?: React.ReactNode;
+  skipRegisterFieldToDecryptForm?: boolean;
 };
 
 const Field = ({
@@ -32,6 +33,7 @@ const Field = ({
   renderValue,
   renderLabel,
   status,
+  skipRegisterFieldToDecryptForm,
 }: FieldProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.decrypt' });
   const { register } = useFormContext();
@@ -41,6 +43,9 @@ const Field = ({
   const label = customLabel ?? field.label;
   const ariaLabel = typeof customLabel === 'string' ? customLabel : field.label;
   const isChecked = field.isDecrypted || decrypt.inProgressDecryptingAll;
+  const registerField = skipRegisterFieldToDecryptForm
+    ? undefined
+    : register(field.name);
 
   return (
     <Container role="row" aria-label={ariaLabel}>
@@ -53,7 +58,7 @@ const Field = ({
           <Box>
             <Checkbox
               checked={isChecked || undefined}
-              {...register(field.name)}
+              {...registerField}
               disabled={field.disabled}
               label={label}
               hint={hint}
