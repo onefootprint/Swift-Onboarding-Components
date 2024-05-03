@@ -95,14 +95,15 @@ pub async fn get(
         .map_err(|e| ApiErrorKind::OpenAiCompletionError(e.to_string()))?;
 
     let response = completion.choices.first().and_then(|c| c.message.content.clone());
-    let response =
-        response.ok_or_else(|| ApiErrorKind::OpenAiCompletionError("No response from OpenAI".to_string()))?;
+    let response = response
+        .ok_or_else(|| ApiErrorKind::OpenAiCompletionError("No response from AI model".to_string()))?;
     let AiSummaryObject {
         high_level_summary,
         detailed_summary,
         risk_signal_summary,
         conclusion,
-    } = serde_json::from_str(&response)?;
+    } = serde_json::from_str(&response)
+        .map_err(|_| ApiErrorKind::OpenAiCompletionError("Invalid format from AI model".to_string()))?;
 
     ResponseData::ok(UserAiSummary {
         high_level_summary,
