@@ -1,6 +1,6 @@
-import { IcoCheck16, IcoInfo16 } from '@onefootprint/icons';
+import {  IcoInfo16 } from '@onefootprint/icons';
 import { UserInsightsUnit } from '@onefootprint/types';
-import { Stack, Text, Tooltip } from '@onefootprint/ui';
+import { Badge, Stack, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -70,12 +70,12 @@ const formatValue = (value: string, unit: UserInsightsUnit) => {
   if (unit === UserInsightsUnit.Boolean) {
     if (value === 'false') {
       return {
-        value: '--',
+        value: <Badge variant="error">No</Badge>,
         unit: null,
       };
     }
     return {
-      value: <IcoCheck16 color="success" />,
+      value: <Badge variant="success">Yes</Badge>,
       unit: null,
     };
   }
