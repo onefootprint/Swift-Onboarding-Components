@@ -42,7 +42,6 @@ const StateSelect = ({ value }: StateSelectProps) => {
       <NativeSelect
         data-private
         aria-label="state"
-        placeholder="Select"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField)}
       >

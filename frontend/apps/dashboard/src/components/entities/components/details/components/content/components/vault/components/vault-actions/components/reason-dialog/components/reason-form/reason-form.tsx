@@ -52,7 +52,6 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
       <Label htmlFor={useId()}>{t('form.reason.label')}</Label>
       <NativeSelect
         defaultValue={t('form.reason.options.customer-verification')}
-        placeholder={t('form.reason.placeholder')}
         {...register('reason', {
           required: true,
           onChange: ({ target }) =>

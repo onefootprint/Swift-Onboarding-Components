@@ -63,7 +63,6 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
           <FormLabel htmlFor="method">{t('method.label')}</FormLabel>
           <NativeSelect
             id="method"
-            placeholder={t('method.placeholder')}
             {...register('method', {
               required: {
                 value: true,

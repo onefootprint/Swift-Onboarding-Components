@@ -60,7 +60,6 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
           <FormLabel htmlFor="method">{t('content-type.label')}</FormLabel>
           <NativeSelect
             id="method"
-            placeholder={t('content-type.placeholder')}
             {...register('ingressSettings.contentType')}
           >
             <option value="none">None</option>

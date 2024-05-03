@@ -44,7 +44,6 @@ const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
       <NativeSelect
         data-private
         aria-label="Country of birth"
-        placeholder="Select"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {
           validate: (input: string) => {
