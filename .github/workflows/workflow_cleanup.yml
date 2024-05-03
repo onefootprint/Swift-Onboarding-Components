@@ -1,9 +1,6 @@
 name: Workflow cleanup
 
 on:
-  schedule:
-    - cron: '0 12 * * 1-5' # This will run the job every day at 12:00 PM on weekdays (Monday to Friday)
-
   workflow_dispatch:
     inputs:
       days:
