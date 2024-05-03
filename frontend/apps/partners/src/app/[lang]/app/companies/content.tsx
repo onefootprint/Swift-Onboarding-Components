@@ -26,9 +26,9 @@ const CompaniesContent = ({ companies }: CompaniesContentProps) => {
   const { t } = useTranslation('common');
   const [search, setSearch] = useState<string>('');
 
-  const sortedCompanies = companies.toSorted((a, b) =>
-    a.companyName.localeCompare(b.companyName),
-  );
+  const sortedCompanies = companies
+    .slice()
+    .sort((a, b) => a.companyName.localeCompare(b.companyName));
 
   const handleRowClick = (company: PartnerCompany) => {
     router.push(`/app/companies/${company.id}`);
