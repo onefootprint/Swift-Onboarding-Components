@@ -101,7 +101,11 @@ const createTransferMachine = (initialContext: MachineContext) =>
             continueOnDesktop: [
               {
                 target: 'confirmContinueOnDesktop',
-                cond: ctx => !!ctx.missingRequirements.documents.length,
+                cond: ctx =>
+                  !!ctx.missingRequirements.documents.length &&
+                  ctx.missingRequirements.documents.some(
+                    req => req.uploadMode !== 'allow_upload',
+                  ),
                 description:
                   'The document upload experience is better on mobile, so if the user is trying to upload on desktop, warn them we recommend they continue on mobile.',
               },
