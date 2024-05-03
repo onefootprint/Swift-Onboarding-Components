@@ -1,0 +1,2 @@
+ALTER TABLE user_timeline
+    ALTER COLUMN seqno DROP NOT NULL;

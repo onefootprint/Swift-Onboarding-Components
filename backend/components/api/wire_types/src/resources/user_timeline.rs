@@ -1,5 +1,5 @@
 use newtypes::{
-    ActionKind, AuthMethodKind, CollectedDataOption, ExternalIntegrationKind, LabelKind,
+    ActionKind, AuthMethodKind, CollectedDataOption, DataLifetimeSeqno, ExternalIntegrationKind, LabelKind,
     WorkflowRequestConfig,
 };
 
@@ -13,6 +13,7 @@ use crate::{
 
 pub struct UserTimeline {
     pub event: UserTimelineEvent,
+    pub seqno: DataLifetimeSeqno,
     pub timestamp: DateTime<Utc>,
 }
 

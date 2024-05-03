@@ -44,7 +44,7 @@ pub struct UserTimeline {
     /// application code
     pub is_backfilled: bool,
     /// The seqno at which this user timeline event was created
-    pub seqno: Option<DataLifetimeSeqno>,
+    pub seqno: DataLifetimeSeqno,
 }
 
 #[derive(Debug, Clone, Insertable)]

@@ -11,9 +11,13 @@ use crate::utils::db2api::DbToApi;
 impl DbToApi<UserTimelineInfo> for api_wire_types::UserTimeline {
     fn from_db(target: UserTimelineInfo) -> Self {
         let UserTimelineInfo(ut, saturated_event) = target;
-        let UserTimeline { timestamp, .. } = ut;
+        let UserTimeline { timestamp, seqno, .. } = ut;
         let event = api_wire_types::UserTimelineEvent::from_db(saturated_event);
-        Self { timestamp, event }
+        Self {
+            timestamp,
+            seqno,
+            event,
+        }
     }
 }
 
