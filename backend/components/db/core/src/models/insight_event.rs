@@ -1,8 +1,11 @@
+use std::collections::HashMap;
+
 use crate::{DbError, DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{insight_event, workflow};
 use diesel::{prelude::*, Insertable, Queryable, RunQueryDsl};
-use newtypes::{InsightEventId, WorkflowId};
+use itertools::Itertools;
+use newtypes::{InsightEventId, ObConfigurationId, ScopedVaultId, WorkflowId};
 
 #[derive(Debug, Clone, Default, Queryable, Insertable, Selectable)]
 #[diesel(table_name = insight_event)]
@@ -88,5 +91,24 @@ impl InsightEvent {
             .optional()?;
 
         Ok(insight_event)
+    }
+
+    pub fn get_latest_for_obc(
+        conn: &mut PgConn,
+        obc_id: &ObConfigurationId,
+        sv_ids: &[ScopedVaultId],
+    ) -> DbResult<HashMap<ScopedVaultId, Vec<InsightEvent>>> {
+        let results: Vec<(ScopedVaultId, InsightEvent)> = workflow::table
+            .inner_join(insight_event::table)
+            .filter(workflow::ob_configuration_id.eq(obc_id))
+            .filter(workflow::scoped_vault_id.eq_any(sv_ids))
+            // For each SV, get the latest associated insight event for the given OBC.
+            .distinct_on(workflow::scoped_vault_id)
+            .order((workflow::scoped_vault_id, insight_event::timestamp.desc()))
+            .select((workflow::scoped_vault_id, insight_event::all_columns))
+            .get_results(conn)?;
+
+        let grouped = results.into_iter().into_group_map();
+        Ok(grouped)
     }
 }

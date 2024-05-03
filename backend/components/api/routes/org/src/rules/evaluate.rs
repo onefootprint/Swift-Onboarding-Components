@@ -20,6 +20,7 @@ use api_core::{
 };
 use api_wire_types::{EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
 use db::models::{
+    insight_event::InsightEvent,
     list::List,
     list_entry::ListEntry,
     ob_configuration::ObConfiguration,
@@ -70,7 +71,7 @@ pub async fn evaluate_rule(
         start_timestamp,
         end_timestamp,
     } = request.into_inner();
-    let (current_rules, historical_results, adds, edits, lists_with_entries) = state
+    let (current_rules, historical_results, adds, edits, lists_with_entries, insight_events) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
@@ -117,7 +118,23 @@ pub async fn evaluate_rule(
 
             let lists_with_entries = ListEntry::list_bulk(conn, &list_ids)?;
 
-            Ok((rules, rule_set_results, adds, edits, lists_with_entries))
+            let insight_events = InsightEvent::get_latest_for_obc(
+                conn,
+                &obc_id,
+                &rule_set_results
+                    .iter()
+                    .map(|(sv, _, _)| sv.id.clone())
+                    .collect_vec(),
+            )?;
+
+            Ok((
+                rules,
+                rule_set_results,
+                adds,
+                edits,
+                lists_with_entries,
+                insight_events,
+            ))
         })
         .await?;
 
@@ -176,13 +193,15 @@ pub async fn evaluate_rule(
         .map(|(sv, rsr, rs)| {
             let frcs = &rs.into_iter().map(|r| r.reason_code).collect_vec();
             let vault_data = VaultDataForRules::empty(); // TODO: add support for this, need to bulk query VW's for every onboarding
-            let insight_events = []; // TODO: implement
+
+            let no_insight_events = vec![];
+            let sv_insight_events = insight_events.get(&sv.id).unwrap_or(&no_insight_events);
 
             let (_, action_triggered) = decision::rule_engine::eval::evaluate_rule_set(
                 all_rules.clone(),
                 frcs,
                 &vault_data,
-                &insight_events,
+                sv_insight_events,
                 &lists,
                 &RuleEvalConfig::default(),
             );

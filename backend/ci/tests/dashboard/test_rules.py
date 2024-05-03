@@ -316,10 +316,12 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     rule_result = next(
         r for r in rsr["rule_results"] if r["rule"]["name"] == matching_rule["name"]
     )
+    matching_rule_id =  rule_result["rule"]["rule_id"]
     assert rule_result["result"] == True
     rule_result = next(
         r for r in rsr["rule_results"] if r["rule"]["name"] == non_matching_rule["name"]
     )
+    non_matching_rule_id = rule_result["rule"]["rule_id"]
     assert rule_result["result"] == False
 
     # Backtesting with no change yields the same result.
@@ -333,10 +335,18 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
         "end_timestamp": end_timestamp.isoformat(),
     }, *sandbox_tenant.db_auths)
     backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
-    assert backtest_result["current_status"] == "fail"
     assert backtest_result["historical_action_triggered"] == "fail"
+    assert backtest_result["backtest_action_triggered"] == "fail"
 
-    # TODO: Backtesting with the matching rule deleted yields a pass.
+    # Backtesting with the matching rule deleted yields a pass.
+    resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
+        "start_timestamp": start_timestamp.isoformat(),
+        "end_timestamp": end_timestamp.isoformat(),
+        "delete": [matching_rule_id, non_matching_rule_id],
+    }, *sandbox_tenant.db_auths)
+    backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
+    assert backtest_result["historical_action_triggered"] == "fail"
+    assert backtest_result["backtest_action_triggered"] == None
 
 
 def test_multi_edit(sandbox_tenant, must_collect_data):
