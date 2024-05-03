@@ -1,16 +1,16 @@
 use crate::{
     auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiError,
     get::{search::decrypt_visible_attrs, EntityDetailResponse},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::VaultWrapper,
     State,
 };
 use api_core::{
+    errors::ApiResult,
     utils::{db2api::DbToApi, fp_id_path::FpIdPath, vault_wrapper::TenantVw},
     ApiErrorKind,
 };
-use db::{models::scoped_vault::ScopedVault, scoped_vault::ScopedVaultListQueryParams};
+use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
@@ -24,33 +24,14 @@ pub async fn get(
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EntityDetailResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    let tenant = auth.tenant();
+    let tenant_id = auth.tenant().id.clone();
+    let fp_id = fp_id.into_inner();
+    let is_live = auth.is_live()?;
 
-    let query_params = ScopedVaultListQueryParams {
-        tenant_id: tenant.id.clone(),
-        is_live: auth.is_live()?,
-        requires_manual_review: None,
-        watchlist_hit: None,
-        statuses: vec![],
-        search: None,
-        fp_id: Some(fp_id.into_inner()),
-        timestamp_lte: None,
-        timestamp_gte: None,
-        kind: None,
-        // Show these entities in detail view
-        only_visible: false,
-        is_created_via_api: None,
-        playbook_ids: None,
-        has_outstanding_workflow_request: None,
-        external_id: None,
-        labels: vec![],
-    };
     let (entity, vw) = state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
-            let (sv, _) = db::scoped_vault::list_authorized_for_tenant(conn, query_params, None, 1)?
-                .pop()
-                .ok_or(ApiErrorKind::ResourceNotFound)?;
+        .db_query(move |conn| -> ApiResult<_> {
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let entity = ScopedVault::bulk_get_serializable_info(conn, vec![sv.id.clone()])?
                 .remove(&sv.id)
