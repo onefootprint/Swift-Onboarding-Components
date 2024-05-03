@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY unique_active_per_alias_tenant_id_is_live;
