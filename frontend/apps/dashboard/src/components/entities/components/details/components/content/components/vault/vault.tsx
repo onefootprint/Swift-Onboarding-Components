@@ -40,6 +40,10 @@ const Vault = ({ entity }: VaultProps) => {
     Object.keys(formData).forEach((key: string) => {
       const di = `id.${key}` as DataIdentifier; // Currently only IdDI data is editable
       let value = formData[key];
+
+      // TODO: this logic depends on the fact that we only can edit IdDI data for now. Need to make it more generic
+      if (typeof value === 'object' && !Array.isArray(value) && value !== null)
+        return;
       if (value === (EMPTY_SELECT_VALUE as VaultValue)) {
         value = null;
       }
