@@ -103,6 +103,7 @@ def test_config_create(sandbox_tenant):
         name="Acme Bank Loan",
         must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
         can_access_data=["ssn4", "phone_number", "email", "name", "full_address"],
+        kind="kyc",
     )
     body = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
     ob_config = body
@@ -534,7 +535,7 @@ def test_config_create(sandbox_tenant):
     ],
 )
 def test_config_create_validation(sandbox_tenant, config_data, expected_error):
-    data = {"name": "Acme Bank Loan"}
+    data = {"name": "Acme Bank Loan", "kind": "kyc"}
     data.update(config_data)
 
     # Test validation errors
@@ -557,13 +558,9 @@ def test_no_phone_obc(sandbox_tenant):
         optional_data=[],
         can_access_data=collect_data,
         is_no_phone_flow=True,
+        kind="kyc",
     )
-    res = post(
-        "org/onboarding_configs",
-        data,
-        *sandbox_tenant.db_auths,
-        status_code=200,
-    )
+    res = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
 
     assert res["is_no_phone_flow"] == True
     assert res["must_collect_data"] == collect_data
@@ -629,6 +626,7 @@ def test_skip_kyc(
         can_access_data=collect_data,
         allow_international_residents=allow_international_residents,
         skip_kyc=True,
+        kind="kyc",
     )
     res = post(
         "org/onboarding_configs",
@@ -691,6 +689,7 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
         optional_data=[],
         can_access_data=must_collect_data,
         enhanced_aml=enhanced_aml,
+        kind="kyc",
     )
     res = post(
         "org/onboarding_configs",
@@ -751,6 +750,7 @@ def test_business_only_obc(sandbox_tenant):
         name="Let's skip the phone",
         must_collect_data=collect_data,
         can_access_data=collect_data,
+        kind="kyb",
     )
     res = post(
         "org/onboarding_configs",
@@ -771,6 +771,7 @@ def test_default_rules(sandbox_tenant):
             name="test_default_rules",
             must_collect_data=collect_data,
             can_access_data=collect_data,
+            kind="kyc",
         ),
         *sandbox_tenant.db_auths,
     )

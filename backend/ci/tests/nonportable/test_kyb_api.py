@@ -19,7 +19,11 @@ def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
         "business_address",
     ]
     obc = create_ob_config(
-        sandbox_tenant, "Business-only config", must_collect_data, must_collect_data
+        sandbox_tenant,
+        "Business-only config",
+        must_collect_data,
+        must_collect_data,
+        kind="kyb",
     )
 
     # make API-created Business vault with no BO data present

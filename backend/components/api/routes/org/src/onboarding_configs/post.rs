@@ -6,16 +6,16 @@ use crate::{
     utils::db2api::DbToApi,
     State,
 };
-use api_core::{decision::rule_engine, telemetry::RootSpan};
+use api_core::decision::rule_engine;
 use db::models::{
     ob_configuration::{NewObConfigurationArgs, ObConfiguration},
     rule_set_version::RuleSetVersion,
 };
 use feature_flag::BoolFlag;
 use newtypes::{
-    AdverseMediaListKind, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant,
-    DocumentAndCountryConfiguration, DocumentRequestConfig, EnhancedAml, EnhancedAmlOption,
-    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
+    AdverseMediaListKind, CipKind, CollectedDataOption as CDO, DocumentAndCountryConfiguration,
+    DocumentRequestConfig, EnhancedAml, EnhancedAmlOption, Iso3166TwoDigitCountryCode, ObConfigurationKind,
+    TenantId,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -43,7 +43,7 @@ pub struct CreateOnboardingConfigurationRequest {
     pub allow_us_residents: Option<bool>,
     // TODO: drop this option
     pub allow_us_territories: Option<bool>,
-    pub kind: Option<ObConfigurationKind>,
+    pub kind: ObConfigurationKind,
     pub skip_confirm: Option<bool>,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     #[serde(default)]
@@ -61,7 +61,6 @@ pub async fn post(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     request: Json<CreateOnboardingConfigurationRequest>,
-    root_span: RootSpan,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let is_live = auth.is_live()?;
@@ -110,21 +109,6 @@ pub async fn post(
         .map(|r| r.into())
         .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
         .unwrap_or(EnhancedAmlOption::No);
-
-    // Newer auth playbooks will have the kind specified in API
-    // TODO deprecate this when we start receiving the kind from all requests
-    match &kind {
-        None => root_span.record("meta", "without_kind"),
-        Some(_) => root_span.record("meta", "with_kind"),
-    };
-    let is_kyc = must_collect_data
-        .iter()
-        .all(|d| d.parent().data_identifier_kind() != DataIdentifierDiscriminant::Business);
-    let kind = kind.unwrap_or(if is_kyc {
-        ObConfigurationKind::Kyc
-    } else {
-        ObConfigurationKind::Kyb
-    });
 
     // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them
     // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags

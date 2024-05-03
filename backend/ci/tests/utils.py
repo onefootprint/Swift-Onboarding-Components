@@ -312,13 +312,13 @@ def create_ob_config(
         "allow_international_residents": allow_international_residents,
         "international_country_restrictions": international_country_restrictions,
         "doc_scan_for_optional_ssn": doc_scan_for_optional_ssn,
-        "kind": kind,
+        "kind": kind or "kyc",
         "skip_confirm": skip_confirm,
         "enhanced_aml": enhanced_aml,
         "document_types_and_countries": document_types_and_countries,
         "documents_to_collect": documents_to_collect or [],
         "curp_validation_enabled": curp_validation_enabled,
-        "skip_kyc": skip_kyc
+        "skip_kyc": skip_kyc,
     }
     auths = override_auths if override_auths else tenant.db_auths
     body = post("org/onboarding_configs", ob_conf_data, *auths)

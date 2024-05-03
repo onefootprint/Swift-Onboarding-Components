@@ -26,6 +26,7 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
         "Multi-KYC Business config",
         must_collect_data + kyb_cdos,
         can_access_data + kyb_cdos,
+        kind="kyb",
     )
 
 
