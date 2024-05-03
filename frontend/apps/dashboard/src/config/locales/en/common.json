@@ -664,7 +664,7 @@
     "custom-doc-request-form": {
       "document-name": {
         "label": "Document name",
-        "placeholder": "City verification",
+        "placeholder": "Utility bill",
         "errors": {
           "required": "Please enter a document name"
         },
