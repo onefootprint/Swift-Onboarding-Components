@@ -306,8 +306,8 @@ class BifrostClient:
         country_code = None
         sides = ["front"]
         if requirement["config"]["kind"] == "identity":
-            us_docs = requirement["supported_country_and_doc_types"].get("US")
-            mx_docs = requirement["supported_country_and_doc_types"].get("MX")
+            us_docs = requirement["config"]["supported_country_and_doc_types"].get("US")
+            mx_docs = requirement["config"]["supported_country_and_doc_types"].get("MX")
             supported_doc_types = us_docs if us_docs is not None else []
             supported_doc_types_mx = mx_docs if mx_docs is not None else []
 
@@ -320,6 +320,9 @@ class BifrostClient:
                 doc_kind = "voter_identification"
                 country_code = "MX"
                 sides.append("back")
+
+            if requirement["config"]["should_collect_selfie"]:
+                sides.append("selfie")
         elif requirement["config"]["kind"] == "proof_of_ssn":
             doc_kind = "ssn_card"
         elif requirement["config"]["kind"] == "proof_of_address":
@@ -329,9 +332,6 @@ class BifrostClient:
             doc_kind = "custom"
         else:
             assert False, "BifrostClient can't handle this document requirement"
-
-        if requirement["should_collect_selfie"]:
-            sides.append("selfie")
 
         data = {
             "request_id": requirement["document_request_id"],

@@ -1,4 +1,4 @@
-use std::{collections::HashMap, str::FromStr};
+use std::str::FromStr;
 
 use crate::{
     auth::user::CheckUserWfAuthContext,
@@ -488,48 +488,16 @@ fn get_requirement_inner(
                                 DocumentUploadMode::Default
                             }
                         }
-                        // TODO also AllowUpload
                         DocumentRequestKind::ProofOfSsn => DocumentUploadMode::Default,
                         DocumentRequestKind::ProofOfAddress => DocumentUploadMode::AllowUpload,
                         // TODO this might be a new mode - select between capture or upload, no preference
                         DocumentRequestKind::Custom => DocumentUploadMode::AllowUpload,
                     };
 
-                    // TODO remove both of these when we deprecate old fields, these are only to
-                    // compute the old versions of the fields for backcompat
-                    let (should_collect_selfie, should_collect_consent) =
-                        if let CollectDocumentConfig::Identity {
-                            should_collect_selfie,
-                            should_collect_consent,
-                            ..
-                        } = &config
-                        {
-                            (*should_collect_selfie, *should_collect_consent)
-                        } else {
-                            (false, false)
-                        };
-                    let supported_country_and_doc_types = match config {
-                        CollectDocumentConfig::Identity {
-                            ref supported_country_and_doc_types,
-                            ..
-                        } => supported_country_and_doc_types.clone(),
-                        CollectDocumentConfig::ProofOfSsn {} => {
-                            obc.supported_countries_and_doc_types_for_proof_of_ssn().0
-                        }
-                        CollectDocumentConfig::ProofOfAddress {} => {
-                            obc.supported_countries_and_doc_types_for_proof_of_address(country)
-                                .0
-                        }
-                        CollectDocumentConfig::Custom(_) => HashMap::new(),
-                    };
 
                     let req = OnboardingRequirement::CollectDocument {
                         document_request_id: dr.id.clone(),
-                        should_collect_selfie,
-                        should_collect_consent,
-                        supported_country_and_doc_types,
                         upload_mode,
-                        document_request_kind: (&config).into(),
                         config,
                     };
 

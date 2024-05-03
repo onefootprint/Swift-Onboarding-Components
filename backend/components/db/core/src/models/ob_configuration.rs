@@ -209,25 +209,6 @@ impl ObConfiguration {
         }
     }
 
-    pub fn supported_countries_and_doc_types_for_proof_of_ssn(
-        &self,
-    ) -> SupportedDocumentAndCountryMappingForBifrost {
-        SupportedDocumentAndCountryMappingForBifrost(HashMap::from_iter(vec![(
-            Iso3166TwoDigitCountryCode::US,
-            vec![IdDocKind::SsnCard],
-        )]))
-    }
-
-    pub fn supported_countries_and_doc_types_for_proof_of_address(
-        &self,
-        country: Option<Iso3166TwoDigitCountryCode>,
-    ) -> SupportedDocumentAndCountryMappingForBifrost {
-        SupportedDocumentAndCountryMappingForBifrost(HashMap::from_iter(vec![(
-            country.unwrap_or(Iso3166TwoDigitCountryCode::US),
-            IdDocKind::proof_of_address_docs(),
-        )]))
-    }
-
     pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
         self.document_cdo().and_then(|cdo| cdo.restricted_id_doc_kinds())
     }

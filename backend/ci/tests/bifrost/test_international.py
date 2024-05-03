@@ -65,7 +65,9 @@ def test_user_without_documents_international(
     )
 
     # now we have to collect a document since they are non-US
-    country_doc_mapping = doc_requirement_after["supported_country_and_doc_types"]
+    country_doc_mapping = doc_requirement_after["config"][
+        "supported_country_and_doc_types"
+    ]
     n_countries = 0
     for country, doc_types in country_doc_mapping.items():
         # all non-US have only passport
@@ -98,10 +100,10 @@ def test_with_documents_handles_international_address(
     doc_requirement = get_requirement_from_requirements(
         "collect_document", status["all_requirements"]
     )
-    assert doc_requirement["should_collect_selfie"]
+    assert doc_requirement["config"]["should_collect_selfie"]
     # we'll accept any country
 
-    country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
+    country_doc_mapping = doc_requirement["config"]["supported_country_and_doc_types"]
     n_countries = 0
     for country, doc_types in country_doc_mapping.items():
         # all non-US have only passport
@@ -135,9 +137,9 @@ def test_with_documents_handles_international_address_restricted_documents(
     doc_requirement = get_requirement_from_requirements(
         "collect_document", status["all_requirements"]
     )
-    assert doc_requirement["should_collect_selfie"]
+    assert doc_requirement["config"]["should_collect_selfie"]
 
-    country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
+    country_doc_mapping = doc_requirement["config"]["supported_country_and_doc_types"]
     assert country_doc_mapping["MX"] == ["passport"]
     assert country_doc_mapping["NO"] == ["passport"]
     # we have all countries allowed for passport
@@ -167,7 +169,7 @@ def test_with_documents_handles_international_address_restricted_documents_with_
     doc_requirement_before_address = get_requirement_from_requirements(
         "collect_document", status_before_address["all_requirements"]
     )
-    country_doc_mapping_before_address = doc_requirement_before_address[
+    country_doc_mapping_before_address = doc_requirement_before_address["config"][
         "supported_country_and_doc_types"
     ]
     assert set(country_doc_mapping_before_address["US"]) == set(
@@ -185,9 +187,9 @@ def test_with_documents_handles_international_address_restricted_documents_with_
     doc_requirement = get_requirement_from_requirements(
         "collect_document", status["all_requirements"]
     )
-    assert doc_requirement["should_collect_selfie"]
+    assert doc_requirement["config"]["should_collect_selfie"]
 
-    country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
+    country_doc_mapping = doc_requirement["config"]["supported_country_and_doc_types"]
     assert country_doc_mapping["MX"] == ["passport"]
     assert country_doc_mapping["NO"] == ["passport"]
     assert country_doc_mapping["US"] == ["passport"]

@@ -40,15 +40,7 @@ pub enum OnboardingRequirement {
     /// A document needs to be collected
     CollectDocument {
         document_request_id: DocumentRequestId,
-        /// TODO rm
-        should_collect_selfie: bool,
-        /// TODO rm
-        should_collect_consent: bool,
-        /// TODO rm
-        supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
         upload_mode: DocumentUploadMode,
-        /// TODO rm
-        document_request_kind: DocumentRequestKind,
         config: CollectDocumentConfig,
     },
     /// The client needs to display the authorization consent page and confirm the user authorizes access
@@ -170,11 +162,7 @@ impl OnboardingRequirement {
             Self::RegisterPasskey => false,
             Self::CollectDocument {
                 document_request_id: _,
-                should_collect_consent: _,
-                should_collect_selfie: _,
-                supported_country_and_doc_types: _,
                 upload_mode: _,
-                document_request_kind: _,
                 config: _,
             } => false,
             Self::Process => false,
@@ -231,11 +219,7 @@ mod test {
         for dr_kind in DocumentRequestKind::iter() {
             base.push(OnboardingRequirement::CollectDocument {
                 document_request_id: DocumentRequestId::from_str("dr12").unwrap(),
-                should_collect_selfie: false,
-                should_collect_consent: false,
-                supported_country_and_doc_types: HashMap::new(),
                 upload_mode: DocumentUploadMode::AllowUpload,
-                document_request_kind: dr_kind,
                 config: match dr_kind {
                     DocumentRequestKind::Identity => CollectDocumentConfig::Identity {
                         should_collect_selfie: false,
