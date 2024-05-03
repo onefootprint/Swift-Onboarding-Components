@@ -1405,6 +1405,7 @@ diesel::table! {
         vault_id -> Text,
         event_kind -> Text,
         is_backfilled -> Bool,
+        seqno -> Nullable<Int8>,
     }
 }
 

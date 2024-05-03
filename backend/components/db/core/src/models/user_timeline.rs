@@ -9,13 +9,14 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::user_timeline;
 use diesel::{prelude::*, Insertable, Queryable};
 use newtypes::{
-    AuthMethodUpdatedInfo, CollectedDataOption, DataIdentifier, DbUserTimelineEvent, DbUserTimelineEventKind,
-    ExternalIntegrationInfo, ScopedVaultId, UserTimelineId, VaultId,
+    AuthMethodUpdatedInfo, CollectedDataOption, DataIdentifier, DataLifetimeSeqno, DbUserTimelineEvent,
+    DbUserTimelineEventKind, ExternalIntegrationInfo, ScopedVaultId, UserTimelineId, VaultId,
 };
 
 use super::{
     annotation::AnnotationInfo,
     auth_event::AuthEvent,
+    data_lifetime::DataLifetime,
     document_request::DocumentRequest,
     identity_document::IdentityDocument,
     insight_event::InsightEvent,
@@ -42,6 +43,8 @@ pub struct UserTimeline {
     /// True if the event was created manually via a backfill script. This is never set to true by
     /// application code
     pub is_backfilled: bool,
+    /// The seqno at which this user timeline event was created
+    pub seqno: Option<DataLifetimeSeqno>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -52,6 +55,7 @@ pub struct NewUserTimeline {
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
     pub event_kind: DbUserTimelineEventKind,
+    pub seqno: DataLifetimeSeqno,
 }
 
 pub struct SaturatedDataCollectedEvent {
@@ -95,12 +99,14 @@ impl UserTimeline {
     {
         let event = event.into();
         let event_kind = (&event).into();
+        let seqno = DataLifetime::get_current_seqno(conn)?;
         let new = NewUserTimeline {
             event,
             scoped_vault_id,
             vault_id,
             timestamp: chrono::Utc::now(),
             event_kind,
+            seqno,
         };
         diesel::insert_into(user_timeline::table)
             .values(new)
