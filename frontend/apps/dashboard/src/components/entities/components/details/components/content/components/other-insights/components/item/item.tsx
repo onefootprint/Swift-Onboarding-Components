@@ -1,4 +1,4 @@
-import { IcoCheck16, IcoClose16, IcoInfo16 } from '@onefootprint/icons';
+import { IcoCheck16, IcoInfo16 } from '@onefootprint/icons';
 import { UserInsightsUnit } from '@onefootprint/types';
 import { Stack, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
@@ -70,7 +70,7 @@ const formatValue = (value: string, unit: UserInsightsUnit) => {
   if (unit === UserInsightsUnit.Boolean) {
     if (value === 'false') {
       return {
-        value: <IcoClose16 color="error" />,
+        value: '--',
         unit: null,
       };
     }
