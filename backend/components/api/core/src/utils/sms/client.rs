@@ -102,6 +102,7 @@ impl SmsClient {
     ) -> ApiResult<()> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
+            tracing::info!("Fixture phone number. Not sending SMS");
             return Ok(());
         }
         RateLimit {

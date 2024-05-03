@@ -18,6 +18,7 @@ pub struct RateLimit<'a> {
 }
 
 impl<'a> RateLimit<'a> {
+    #[tracing::instrument(skip_all)]
     pub(super) async fn enforce_and_update(&self, state: &State) -> ApiResult<()> {
         let RateLimit { period, key, scope } = *self;
 
@@ -32,6 +33,7 @@ impl<'a> RateLimit<'a> {
                     if time_since_last_sent < period {
                         // num_seconds() only returns count of whole seconds, so we add one to avoid returning 0 seconds as time remaining
                         let time_remaining = (period - time_since_last_sent).num_seconds() + 1;
+                        tracing::info!(%time_remaining, "Rate limited");
                         return Err(ErrorWithCode::RateLimited(time_remaining).into());
                     }
                 }
