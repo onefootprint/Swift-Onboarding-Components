@@ -54,6 +54,7 @@ pub async fn post(
                 s3_url,
                 DataLifetimeSource::LikelyHosted,
                 None,
+                true,
             )?;
             Ok(doc)
         })

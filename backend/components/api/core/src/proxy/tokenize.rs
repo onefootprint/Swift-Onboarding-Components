@@ -205,6 +205,7 @@ pub async fn vault_pii(
                                             s3_url,
                                             source,
                                             Some(actor.clone()),
+                                            true,
                                         )
                                     },
                                 )

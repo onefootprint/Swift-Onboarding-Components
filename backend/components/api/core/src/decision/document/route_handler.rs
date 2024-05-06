@@ -219,6 +219,7 @@ pub async fn handle_document_upload(
                 s3_url,
                 source,
                 None,
+                false,
             )?;
             let args = NewDocumentUploadArgs {
                 document_id: id_doc.id,

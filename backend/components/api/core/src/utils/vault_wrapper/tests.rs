@@ -911,6 +911,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
             S3Url::from("test".to_string()),
             DataLifetimeSource::LikelyHosted,
             None,
+            false,
         )
         .unwrap();
 

@@ -140,6 +140,7 @@ impl WriteableVw<Person> {
         s3_url: S3Url,
         source: DataLifetimeSource,
         actor: Option<AuthActor>,
+        make_timeline_event: bool,
     ) -> ApiResult<(DocumentData, DataLifetimeSeqno)> {
         let new_doc = NewDocument {
             kind,
@@ -150,7 +151,7 @@ impl WriteableVw<Person> {
             source,
         };
 
-        let (docs, seqno) = self.put_documents_unsafe(conn, vec![new_doc], actor)?;
+        let (docs, seqno) = self.put_documents_unsafe(conn, vec![new_doc], actor, make_timeline_event)?;
         let doc = docs
             .into_iter()
             .next()
@@ -165,15 +166,15 @@ impl WriteableVw<Person> {
         conn: &mut TxnPgConn,
         docs: Vec<NewDocument>,
         actor: Option<AuthActor>,
+        make_timeline_event: bool,
     ) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
         let su_id = self.scoped_vault_id.clone();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let kinds = docs.iter().map(|d| d.kind.clone()).collect_vec();
-        DataLifetime::bulk_deactivate_kinds(conn, &su_id, kinds, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &su_id, kinds.clone(), seqno)?;
 
-        let actor = actor.map(|a| a.into());
         let docs = docs
             .into_iter()
             .map(|d| {
@@ -196,10 +197,14 @@ impl WriteableVw<Person> {
                     e_data_key,
                     seqno,
                     source,
-                    actor.clone(),
+                    actor.clone().map(|a| a.into()),
                 )
             })
             .collect::<db::DbResult<Vec<_>>>()?;
+
+        if make_timeline_event {
+            self.add_timeline_event(conn, kinds, actor, false)?;
+        }
 
         Ok((docs, seqno))
     }

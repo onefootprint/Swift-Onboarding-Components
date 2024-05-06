@@ -135,6 +135,7 @@ async fn post_upload_inner(
     let (e_data_key, s3_url) =
         utils::vault_wrapper::seal_file_and_upload_to_s3(state, &file, &di, &vault, &scoped_vault.id).await?;
 
+    // TODO make a timeline event here
     let actor = auth.actor();
     state
         .db_pool
@@ -163,7 +164,7 @@ async fn post_upload_inner(
                 None
             };
             let docs = vec![Some(doc), derived_doc].into_iter().flatten().collect();
-            let doc = uvw.put_documents_unsafe(conn, docs, Some(actor))?;
+            let doc = uvw.put_documents_unsafe(conn, docs, Some(actor), true)?;
 
             let insight_event_id = insight.insert_with_conn(conn)?.id;
 

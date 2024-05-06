@@ -308,7 +308,7 @@ pub fn vault_complete_images(
             }
         })
         .collect_vec();
-    vw.put_documents_unsafe(conn, docs, None)
+    vw.put_documents_unsafe(conn, docs, None, false)
 }
 
 pub struct CompleteArgs<'a> {
