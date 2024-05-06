@@ -40,7 +40,7 @@ def test_vault_create_write_decrypt(tenant):
 
     response = get(f"entities/{fp_id}/vault", params, tenant.sk.key)
     for k in ALL_VAULT_DATA:
-        assert response[k]
+        assert response[k] == True
     assert response["custom.insurance_id"] == False
 
     # decrypt the data
@@ -235,3 +235,48 @@ def test_delete(sandbox_tenant):
     assert access_events[0]["kind"] == "delete"
     assert set(access_events[1]["targets"]) == {"id.phone_number"}
     assert access_events[1]["kind"] == "delete"
+
+
+def test_card_expiration_transform(tenant):
+    # Create the vault
+    body = post("users/", {}, tenant.sk.key)
+    user = body
+    fp_id = user["id"]
+    assert fp_id
+
+    # https://docs.onefootprint.com/vault/apis#vault-fields-card-fields
+    expiration_transforms = [
+        ("01/2023", "01/2023"),
+        ("02/34", "02/2034"),
+        ("03-45", "03/2045"),
+        ("04-56", "04/2056"),
+    ]
+
+    for exp_input, exp_vaulted in expiration_transforms:
+        # Set the expiration date.
+        update_data = {
+            "card.testing.expiration": exp_input,
+        }
+        patch(f"entities/{fp_id}/vault", update_data, tenant.sk.key)
+
+        # Ensure the new fields are available.
+        expected_data = {
+            "card.testing.expiration": exp_vaulted,
+            "card.testing.expiration_month": exp_vaulted.split("/")[0],
+            "card.testing.expiration_year": exp_vaulted.split("/")[1],
+        }
+
+        params = {"fields": ", ".join(expected_data.keys())}
+        response = get(f"entities/{fp_id}/vault", params, tenant.sk.key)
+
+        for k in expected_data:
+            assert response[k] == True
+
+        # Decrypt and check format.
+        data = dict(
+            reason="test",
+            fields=list(expected_data.keys()),
+        )
+        body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key)
+        for f in expected_data:
+            assert body[f] == expected_data[f]

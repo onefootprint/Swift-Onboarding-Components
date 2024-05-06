@@ -169,7 +169,7 @@ fn parse_expiration(alias: &AliasId, value: PiiString) -> NtResult<(PiiString, C
     let expiration = Expiration::parse(&value)?;
 
     Ok((
-        value.clone(),
+        expiration.clone().into(),
         CardData::Expiration(CardExpiration {
             alias: alias.clone(),
             expiration,
@@ -311,8 +311,12 @@ fn validate_cc_cvc(value: PiiString, alias: &AliasId, all_data: &AllData) -> VRe
 mod test {
     use std::collections::HashMap;
 
-    use super::{CDK, CDK::*, CI};
-    use crate::{AliasId, CleanAndValidate, DataIdentifier, PiiJsonValue, PiiString, ValidateArgs};
+    use super::{
+        parse_expiration,
+        CDK::{self, *},
+        CI,
+    };
+    use crate::{AliasId, CardData, CleanAndValidate, DataIdentifier, PiiJsonValue, PiiString, ValidateArgs};
     use test_case::test_case;
 
     // Invalid prefix
@@ -407,5 +411,20 @@ mod test {
     #[test_case("Ben 😃 Bitdiddle" => true)]
     fn test_card_name(name: &str) -> bool {
         super::validate_card_name(PiiString::from(name)).is_ok()
+    }
+
+    #[test]
+    fn test_exp_year_formatting() {
+        let alias = AliasId::fixture();
+        let (cleaned, card_data) = parse_expiration(&alias, PiiString::from("12/35")).unwrap();
+        assert_eq!(cleaned.leak(), "12/2035");
+
+        match card_data {
+            CardData::Expiration(ce) => {
+                assert_eq!(ce.expiration.month.leak(), "12");
+                assert_eq!(ce.expiration.year.leak(), "2035");
+            }
+            _ => panic!("wrong type for card_data"),
+        }
     }
 }
