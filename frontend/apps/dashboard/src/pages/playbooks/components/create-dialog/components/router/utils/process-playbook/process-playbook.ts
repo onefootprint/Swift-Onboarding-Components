@@ -9,12 +9,14 @@ import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
   BusinessInformation,
   NameFormData,
-  OnboardingTemplate,
   PlaybookKind,
   ResidencyFormData,
   SummaryFormData,
 } from '@/playbooks/utils/machine/types';
-import { CountryRestriction } from '@/playbooks/utils/machine/types';
+import {
+  CountryRestriction,
+  OnboardingTemplate,
+} from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
   playbook: SummaryFormData;
@@ -147,7 +149,7 @@ const processPlaybook = ({
     docScanForOptionalSsn,
     documentTypesAndCountries,
     ...getResidency(residencyForm),
-    cipKind: template === 'alpaca' ? 'alpaca' : undefined,
+    cipKind: template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
   };
 };
 

@@ -14,7 +14,10 @@ import styled, { css } from 'styled-components';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
-import { PlaybookKind } from '@/playbooks/utils/machine/types';
+import {
+  OnboardingTemplate,
+  PlaybookKind,
+} from '@/playbooks/utils/machine/types';
 
 import DocEditor from './components/doc-editor';
 import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
@@ -44,7 +47,8 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     values.idDocKind.length > 0 ||
     Object.keys(values.countrySpecificIdDocKind).length > 0;
   const [showIdDocEditor, setShowIdDocEditor] = useState(false);
-  const canEdit = !internationalOnly && meta.onboardingTemplate !== 'alpaca';
+  const canEdit =
+    !internationalOnly && meta.onboardingTemplate !== OnboardingTemplate.Alpaca;
   const allowUsTerritoryResidents = meta.residency?.allowUsTerritories;
 
   return (

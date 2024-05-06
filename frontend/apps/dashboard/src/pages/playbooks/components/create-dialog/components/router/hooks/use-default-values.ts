@@ -14,10 +14,12 @@ import {
   defaultPlaybookValuesKYC,
   defaultResidencyFormData,
   defaultResidencyFormDataAlpaca,
+  OnboardingTemplate,
 } from '@/playbooks/utils/machine/types';
 
 const useDefaultValues = (context: MachineContext): DefaultValues => {
-  const isAlpacaPlaybook = context.onboardingTemplate === 'alpaca';
+  const isAlpacaPlaybook =
+    context.onboardingTemplate === OnboardingTemplate.Alpaca;
   if (isAuth(context.kind)) {
     return {
       ...defaultPlaybookValuesAuth,

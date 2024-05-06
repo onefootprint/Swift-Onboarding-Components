@@ -9,7 +9,10 @@ import type {
   SummaryFormData,
   SummaryMeta,
 } from '@/playbooks/utils/machine/types';
-import { PlaybookKind } from '@/playbooks/utils/machine/types';
+import {
+  OnboardingTemplate,
+  PlaybookKind,
+} from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 
@@ -45,7 +48,9 @@ const Summary = ({
     const internationalOnly =
       meta.residency?.allowInternationalResidents &&
       !meta.residency.allowUsResidents;
-    const canEdit = !internationalOnly && meta.onboardingTemplate !== 'alpaca';
+    const canEdit =
+      !internationalOnly &&
+      meta.onboardingTemplate !== OnboardingTemplate.Alpaca;
     return canEdit
       ? t('title.default-editable')
       : t('title.default-non-editable');
@@ -60,7 +65,8 @@ const Summary = ({
       !meta.residency.allowUsResidents;
 
     if (internationalOnly) return t('subtitle.international-only');
-    if (meta.onboardingTemplate === 'alpaca') return t('subtitle.alpaca');
+    if (meta.onboardingTemplate === OnboardingTemplate.Alpaca)
+      return t('subtitle.alpaca');
     return t(`subtitle.default`);
   };
 

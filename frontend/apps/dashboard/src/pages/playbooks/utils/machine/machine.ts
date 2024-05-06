@@ -1,7 +1,7 @@
 import { assign, createMachine } from 'xstate';
 
 import type { MachineContext, MachineEvents } from './types';
-import { PlaybookKind } from './types';
+import { OnboardingTemplate, PlaybookKind } from './types';
 
 export const createPlaybookMachine = () =>
   createMachine(
@@ -41,7 +41,8 @@ export const createPlaybookMachine = () =>
                 target: 'residency',
                 actions: ['assignOnboardingTemplate'],
                 cond: (_, event) =>
-                  event.payload.onboardingTemplate === 'custom',
+                  event.payload.onboardingTemplate ===
+                  OnboardingTemplate.Custom,
               },
               {
                 target: 'nameYourPlaybook',
@@ -85,7 +86,7 @@ export const createPlaybookMachine = () =>
                 target: 'residency',
                 cond: context =>
                   context.kind === PlaybookKind.Kyc &&
-                  context.onboardingTemplate === 'custom',
+                  context.onboardingTemplate === OnboardingTemplate.Custom,
               },
               {
                 target: 'onboardingTemplates',
@@ -170,7 +171,7 @@ export const createPlaybookMachine = () =>
         })),
         assignOnboardingTemplate: assign((context, event) => {
           const template = event.payload.onboardingTemplate;
-          if (template === 'custom') {
+          if (template === OnboardingTemplate.Custom) {
             return {
               ...context,
               onboardingTemplate: template,

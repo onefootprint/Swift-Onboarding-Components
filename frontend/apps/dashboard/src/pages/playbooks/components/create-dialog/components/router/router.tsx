@@ -10,10 +10,11 @@ import styled, { css } from 'styled-components';
 
 import { getAuthFixedPayload, isAuth, isIdDoc } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
-import type {
-  MachineContext,
-  Personal,
-  VerificationChecksFormData,
+import {
+  type MachineContext,
+  OnboardingTemplate,
+  type Personal,
+  type VerificationChecksFormData,
 } from '@/playbooks/utils/machine/types';
 
 import Name from './components/name-your-playbook';
@@ -56,7 +57,7 @@ const Router = ({ onCreate }: RouterProps) => {
   const requiresIdDoc =
     (idDocKinds ?? []).length > 0 ||
     Object.keys(countrySpecificIdDocKinds ?? {}).length > 0;
-  const isAlpaca = onboardingTemplate === 'alpaca';
+  const isAlpaca = onboardingTemplate === OnboardingTemplate.Alpaca;
 
   const createPlaybook = (
     context: MachineContext,

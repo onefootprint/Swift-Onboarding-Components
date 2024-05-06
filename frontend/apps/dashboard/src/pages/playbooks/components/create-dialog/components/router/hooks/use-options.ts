@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
-import type { OnboardingTemplate } from '@/playbooks/utils/machine/types';
-import { PlaybookKind } from '@/playbooks/utils/machine/types';
+import {
+  OnboardingTemplate,
+  PlaybookKind,
+} from '@/playbooks/utils/machine/types';
 
 type UseOptionsProps = {
   template?: OnboardingTemplate;
@@ -30,7 +32,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
     { value: 'summary', label: t('dialog.summary.nav') },
   ];
-  if (template === 'custom') {
+  if (template === OnboardingTemplate.Custom) {
     kycOptions[0].options?.push({
       value: 'residency',
       label: t('dialog.residency.nav'),

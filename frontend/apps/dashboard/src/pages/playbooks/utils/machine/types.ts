@@ -223,7 +223,10 @@ export const defaultPlaybookValuesKYB: SummaryFormData = {
   businessInformation: defaultBusinessInformation,
 };
 
-export type OnboardingTemplate = 'alpaca' | 'custom';
+export enum OnboardingTemplate {
+  Custom = 'custom',
+  Alpaca = 'alpaca',
+}
 
 export type MachineContext = {
   kind: PlaybookKind;

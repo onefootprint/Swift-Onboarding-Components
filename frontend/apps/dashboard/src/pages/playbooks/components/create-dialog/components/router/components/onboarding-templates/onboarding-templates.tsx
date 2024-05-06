@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { OnboardingTemplate } from '../../../../../../utils/machine/types';
+import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
 export type TemplateFormData = {
   template: OnboardingTemplate;
@@ -25,7 +25,7 @@ const OnboardingTemplates = ({
     keyPrefix: 'pages.playbooks.dialog.onboarding-templates',
   });
   const { handleSubmit, control } = useForm<TemplateFormData>({
-    defaultValues: { template: 'custom' },
+    defaultValues: { template: OnboardingTemplate.Custom },
   });
 
   const submit = (data: TemplateFormData) => {
@@ -46,7 +46,7 @@ const OnboardingTemplates = ({
         <Controller
           control={control}
           name="template"
-          defaultValue="custom"
+          defaultValue={OnboardingTemplate.Custom}
           render={({ field }) => (
             <>
               <RadioSelect

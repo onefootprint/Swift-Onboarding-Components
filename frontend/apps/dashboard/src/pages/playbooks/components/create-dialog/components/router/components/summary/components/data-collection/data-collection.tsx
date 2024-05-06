@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { isAuth, isIdDoc, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
 import styled, { css } from 'styled-components';
 
-import type { SummaryMeta } from '@/playbooks/utils/machine/types';
+import {
+  OnboardingTemplate,
+  type SummaryMeta,
+} from '@/playbooks/utils/machine/types';
 
 import Auth from './components/auth';
 import Business from './components/business';
@@ -20,7 +23,7 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.summary.data-collection',
   });
-  const isAlpaca = meta.onboardingTemplate === 'alpaca';
+  const isAlpaca = meta.onboardingTemplate === OnboardingTemplate.Alpaca;
 
   if (isAuth(meta.kind)) {
     return (
