@@ -2,7 +2,11 @@ import {
   DEFAULT_COUNTRY,
   getCountryFromCode,
 } from '@onefootprint/global-constants';
-import type { IdDocRequirement } from '@onefootprint/types';
+import type {
+  DocumentRequirementConfig,
+  IdDocRequirement,
+} from '@onefootprint/types';
+import { isIdentitydDoc } from '@onefootprint/types';
 import { useMachine } from '@xstate/react';
 import React, { useEffect } from 'react';
 
@@ -19,12 +23,12 @@ export type IdDocProps = {
 };
 
 const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
+  const analytics = useAnalytics();
   const [state, send] = useMachine(() => createMachine(requirement));
   const { currentSide, collectingDocumentMeta } = state.context;
-  const { shouldCollectConsent, supportedCountryAndDocTypes } =
-    state.context.requirement || {};
-
-  const analytics = useAnalytics();
+  const { shouldCollectConsent, supportedCountryAndDocTypes } = getIdDocConfig(
+    requirement.config,
+  );
   const country =
     getCountryFromCode(
       collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,
@@ -92,6 +96,13 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
     );
   }
   return null;
+};
+
+const getIdDocConfig = (config?: DocumentRequirementConfig) => {
+  if (!isIdentitydDoc(config)) {
+    throw new Error('Only identify document configs are supported');
+  }
+  return config;
 };
 
 export default IdDoc;

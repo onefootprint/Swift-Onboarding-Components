@@ -1,6 +1,6 @@
 import { getCountryFromCode } from '@onefootprint/global-constants';
 import type { CountryCode, IdDocRequirement } from '@onefootprint/types';
-import { UploadDocumentSide } from '@onefootprint/types';
+import { isIdentitydDoc, UploadDocumentSide } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { MachineContext, MachineEvents } from './types';
@@ -145,14 +145,25 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
     },
   );
 
-const getInitialCountry = ({
-  supportedCountryAndDocTypes,
-}: IdDocRequirement) => {
-  const hasUS =
-    supportedCountryAndDocTypes.US || supportedCountryAndDocTypes.us;
-  if (hasUS) return getCountryFromCode('US').value;
-  const firstCountry = Object.keys(supportedCountryAndDocTypes).at(0);
-  return getCountryFromCode(firstCountry as CountryCode).value;
+const getInitialCountry = (requirement: IdDocRequirement) => {
+  if (isIdentitydDoc(requirement.config)) {
+    const { supportedCountryAndDocTypes } = requirement.config;
+
+    // Check for 'US' considering case sensitivity
+    const hasUS =
+      supportedCountryAndDocTypes.US || supportedCountryAndDocTypes.us;
+    if (hasUS) {
+      const value = getCountryFromCode('US')?.value;
+      if (value) return value;
+    }
+
+    // Get the first country from the supportedCountryAndDocTypes object
+    const firstCountryCode = Object.keys(supportedCountryAndDocTypes)[0];
+    const value = getCountryFromCode(firstCountryCode as CountryCode)?.value;
+    if (value) return value;
+  }
+
+  throw new Error('Invalid requirement config for getting initial country');
 };
 
 export default createIdDocMachine;
