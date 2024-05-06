@@ -31,7 +31,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 is_prefill,
             }) => {
                 // Get the extra attributes that aren't encompassed by the attributes
-                let dangling_attributes = targets.into_iter().filter(|di| {
+                let dangling_attributes = targets.iter().filter(|di| {
                     !attributes
                         .iter()
                         .any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(di))
@@ -51,6 +51,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 let cdos = attributes.into_iter().chain(edited_cdos).unique().collect_vec();
                 Self::DataCollected(api_wire_types::user_timeline::DataCollectedInfo {
                     attributes: cdos,
+                    targets,
                     actor: actor.map(api_wire_types::Actor::from_db),
                     is_prefill,
                 })
