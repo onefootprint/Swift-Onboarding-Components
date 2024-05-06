@@ -1743,7 +1743,7 @@
           "header": {
             "fp-id": "Footprint ID",
             "exact-match": "Exact match",
-            "status": "Onboarding status",
+            "status": "Status",
             "created-at": "Created at",
             "name": "Name"
           }

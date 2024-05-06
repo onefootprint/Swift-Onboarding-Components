@@ -43,7 +43,7 @@ describe('<DuplicateData/>', () => {
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Footprint ID')).toBeInTheDocument();
     expect(screen.getByText('Exact match')).toBeInTheDocument();
-    expect(screen.getByText('Onboarding status')).toBeInTheDocument();
+    expect(screen.getByText('Status')).toBeInTheDocument();
     expect(screen.getByText('Created at')).toBeInTheDocument();
 
     // Renders correct number of rows

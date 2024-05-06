@@ -27,10 +27,10 @@ const DuplicateData = () => {
   const isSameTenantDataEmpty = !duplicateData?.sameTenant?.length;
 
   const columns = [
-    { text: t('table.header.name'), width: '16%' },
+    { text: t('table.header.name'), width: '12%' },
     { text: t('table.header.fp-id'), width: '25%' },
-    { text: t('table.header.exact-match'), width: '25%' },
-    { text: t('table.header.status'), width: '17%' },
+    { text: t('table.header.exact-match'), width: '33%' },
+    { text: t('table.header.status'), width: '13%' },
     { text: t('table.header.created-at'), width: '17%' },
   ];
 
