@@ -21,11 +21,7 @@ const getSignalsAsync = async (
       if (error) {
         reject(error);
       } else {
-        if (!result.attestation) {
-          throw new Error('Attestation is empty');
-        } else {
-          resolve(result.attestation);
-        }
+        resolve(result.attestation || null);
       }
     });
   });
@@ -81,13 +77,12 @@ const getAttestation = async ({
     deviceResponseJson,
     attestationChallenge,
   );
-  if (!attestation) {
-    throw new Error('Attestation is empty');
+  if (attestation) {
+    await createDeviceAttestation(authToken, {
+      attestation,
+      state,
+    });
   }
-  await createDeviceAttestation(authToken, {
-    attestation,
-    state,
-  });
 };
 
 const useAttestDevice = () => {
