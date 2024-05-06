@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     decision::{
-        features::risk_signals::{risk_signal_group_struct::Doc, save_risk_signals, RiskSignalGroupStruct},
+        features::risk_signals::{risk_signal_group_struct::Doc, RiskSignalGroupStruct},
         tests::test_helpers::{self, FixtureData},
         vendor::{self, vendor_trait::MockVendorAPICall},
     },
@@ -590,14 +590,8 @@ pub async fn mock_incode_doc_collection(
                 group: Doc,
             };
             // incode state machine defaults this to not hidden
-            save_risk_signals(
-                conn,
-                &scoped_vault_id,
-                rsg.footprint_reason_codes,
-                RiskSignalGroupKind::Doc,
-                false,
-            )
-            .unwrap();
+            let rcs = rsg.footprint_reason_codes;
+            RiskSignal::bulk_create(conn, &scoped_vault_id, rcs, RiskSignalGroupKind::Doc, false)?;
 
             Ok(())
         })

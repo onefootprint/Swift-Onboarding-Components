@@ -32,7 +32,7 @@ use crate::{
             risk_signals::{
                 fetch_latest_risk_signals_map, parse_reason_codes, parse_reason_codes_from_vendor_result,
                 risk_signal_group_struct::{Aml, Kyc},
-                save_risk_signals, RiskSignalGroupStruct,
+                RiskSignalGroupStruct,
             },
         },
         onboarding::Decision,
@@ -302,18 +302,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 // TODO: only call this once and re-use for aml portion below
             };
 
-            let kyc_risk_signals = kyc_risk_signals
+            let rses = kyc_risk_signals
                 .footprint_reason_codes
                 .into_iter()
                 .chain(user_input_risk_signals)
                 .collect();
-            save_risk_signals(
-                conn,
-                &self.sv_id,
-                kyc_risk_signals,
-                RiskSignalGroupKind::Kyc,
-                false,
-            )?;
+            RiskSignal::bulk_create(conn, &self.sv_id, rses, RiskSignalGroupKind::Kyc, false)?;
         }
 
         // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
@@ -335,22 +329,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     &watchlist_result_response,
                 )
             };
-            save_risk_signals(
-                conn,
-                &self.sv_id,
-                aml_risk_signals.footprint_reason_codes,
-                RiskSignalGroupKind::Aml,
-                false,
-            )?;
+            let rcs = aml_risk_signals.footprint_reason_codes;
+            RiskSignal::bulk_create(conn, &self.sv_id, rcs, RiskSignalGroupKind::Aml, false)?;
         } else if let Some(kyc_vendor_result) = kyc_vendor_result {
             let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(&vw, kyc_vendor_result)?;
-            save_risk_signals(
-                conn,
-                &self.sv_id,
-                aml_risk_signals.footprint_reason_codes,
-                RiskSignalGroupKind::Aml,
-                false,
-            )?;
+            let rcs = aml_risk_signals.footprint_reason_codes;
+            RiskSignal::bulk_create(conn, &self.sv_id, rcs, RiskSignalGroupKind::Aml, false)?;
         };
 
         Ok(KycState::from(KycDecisioning::new(

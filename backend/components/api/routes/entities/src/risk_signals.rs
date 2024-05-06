@@ -67,6 +67,7 @@ pub async fn get(
 ) -> JsonApiResponse<RiskSignalsListResponse> {
     // Some tracing to track when tenants have stopped using this API
     if let Either::Right(_) = &auth {
+        // Apiture and fractional are still using this
         root_span.record("meta", "tenant_api_key_auth");
     } else {
         root_span.record("meta", "dashboard_auth");

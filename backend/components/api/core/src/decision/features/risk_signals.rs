@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use db::models::risk_signal::{IncludeHidden, NewRiskSignalInfo, RiskSignal};
+use db::models::risk_signal::{IncludeHidden, RiskSignal};
 use idv::ParsedResponse;
 use newtypes::{
     FootprintReasonCode, IdentityDataKind as IDK, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
@@ -120,25 +120,6 @@ pub fn parse_reason_codes(
         ParsedResponse::NeuroIdAnalytics(ref r) => neuro_id::footprint_reason_codes(r).into_iter().collect(),
         _ => vec![],
     }
-}
-
-pub fn save_risk_signals(
-    conn: &mut db::TxnPgConn,
-    scoped_vault_id: &ScopedVaultId,
-    new_risk_signals: Vec<NewRiskSignalInfo>,
-    risk_signal_group_kind: RiskSignalGroupKind,
-    hidden: bool,
-) -> Result<(), ApiError> {
-    RiskSignal::bulk_create(
-        conn,
-        scoped_vault_id,
-        new_risk_signals,
-        risk_signal_group_kind,
-        // default to hiding for things using this code path
-        hidden,
-    )?;
-
-    Ok(())
 }
 
 //
