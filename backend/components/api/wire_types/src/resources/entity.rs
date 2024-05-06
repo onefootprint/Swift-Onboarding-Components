@@ -37,9 +37,9 @@ pub struct Entity {
     pub last_activity_at: DateTime<Utc>,
     pub label: Option<LabelKind>,
 
-    /// Metadata on the data that exists in this vault
-    /// DEPRECATED. remove this once the frontend starts hitting the data-specific API
+    /// Metadata on the data that exists in this vault.
     pub data: Vec<EntityAttribute>,
+
     /// DEPRECATED.
     /// The list of attributes populated on this vault.
     pub attributes: Vec<DataIdentifier>,
