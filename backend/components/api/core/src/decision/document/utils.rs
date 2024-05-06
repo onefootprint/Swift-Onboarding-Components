@@ -24,7 +24,7 @@ pub fn get_side_info(
     side: Option<DocumentSide>,
 ) -> ApiResult<(MissingSides, Option<i64>)> {
     let existing_sides = id_doc
-        .images(conn, true)?
+        .images(conn, true, None)?
         .into_iter()
         .map(|u| u.side)
         .collect_vec();

@@ -152,7 +152,7 @@ impl IdentityDocument {
             .get_result(conn.conn())
             .optional()?;
         if let Some(existing) = existing {
-            let has_no_uploads = existing.images(conn, false)?.is_empty();
+            let has_no_uploads = existing.images(conn, false, None)?.is_empty();
             if existing.document_type == document_type
                 && existing.country_code == country_code.map(|c| c.to_string())
                 && existing.fixture_result == fixture_result
@@ -308,12 +308,20 @@ impl IdentityDocument {
     }
 
     #[tracing::instrument("IdentityDocument::images", skip_all)]
-    pub fn images(&self, conn: &mut PgConn, only_active: bool) -> DbResult<Vec<DocumentUpload>> {
+    pub fn images(
+        &self,
+        conn: &mut PgConn,
+        only_active: bool,
+        at_seqno: Option<DataLifetimeSeqno>,
+    ) -> DbResult<Vec<DocumentUpload>> {
         let mut query = document_upload::table
             .filter(document_upload::document_id.eq(&self.id))
             .into_boxed();
+        if let Some(seqno) = at_seqno {
+            query = query.filter(document_upload::created_seqno.le(seqno));
+        }
         if only_active {
-            query = query.filter(document_upload::deactivated_at.is_null())
+            query = query.filter(document_upload::deactivated_at.is_null());
         }
         let results = query.get_results(conn)?;
         Ok(results)

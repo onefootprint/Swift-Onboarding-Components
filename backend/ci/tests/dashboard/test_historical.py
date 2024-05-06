@@ -1,5 +1,6 @@
 from tests.bifrost_client import BifrostClient
-from tests.utils import get
+from tests.utils import get, create_ob_config, post
+from tests.utils import open_multipart_file
 
 
 def test_historical_data(sandbox_tenant):
@@ -48,3 +49,86 @@ def test_historical_data(sandbox_tenant):
     body = get(f"entities/{user.fp_id}/data", data, *sandbox_tenant.db_auths)
     dis = set(i["identifier"] for i in body)
     assert not dis, "Should no longer have any data"
+
+
+def test_historical_documents(sandbox_tenant, must_collect_data):
+    # First, make a user with lots of documents
+    data = [*must_collect_data, "document.drivers_license.us_only.require_selfie"]
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Lots of documents",
+        data,
+        data,
+        documents_to_collect=[
+            dict(
+                kind="custom",
+                data=dict(
+                    name="Utility bill",
+                    identifier="document.custom.utility_bill",
+                    description="Please upload a utility bill that shows your full name and address.",
+                ),
+            )
+        ],
+    )
+    bifrost = BifrostClient.new(obc)
+    user = bifrost.run()
+    post(
+        f"users/{user.fp_id}/vault/document.id_card.front.image/upload",
+        None,
+        sandbox_tenant.sk.key,
+        files=open_multipart_file("drivers_license.front.png", "image/png")(),
+    )
+
+    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    print(timeline)
+
+    dl_uploaded_event = next(
+        te
+        for te in timeline
+        if te["event"]["kind"] == "document_uploaded"
+        and te["event"]["data"]["document_type"] == "drivers_license"
+    )
+    utility_bill_event = next(
+        te
+        for te in timeline
+        if te["event"]["kind"] == "document_uploaded"
+        and te["event"]["data"]["document_type"] == "custom"
+    )
+    api_id_card_event = next(
+        te
+        for te in timeline
+        if te["event"]["kind"] == "data_collected"
+        and "document.id_card.front.image" in te["event"]["data"]["targets"]
+    )
+    assert dl_uploaded_event["seqno"] < utility_bill_event["seqno"]
+    assert utility_bill_event["seqno"] < api_id_card_event["seqno"]
+
+    # At each of these timeline events, we should see all documents that have been uploaded so far
+    tests = [
+        (dl_uploaded_event, {"drivers_license"}),
+        (utility_bill_event, {"drivers_license", "custom"}),
+        (api_id_card_event, {"drivers_license", "custom", "id_card"}),
+    ]
+    for te, expected_docs in tests:
+        data = dict(seqno=te["seqno"])
+        body = get(f"entities/{user.fp_id}/documents", data, *sandbox_tenant.db_auths)
+        visible_docs = {i["kind"] for i in body}
+        assert visible_docs == expected_docs
+
+    # If we look at a seqno from the middle of uploading DL, we should only see the sides that were
+    # uploaded at that time
+    body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
+    dl_doc = next(d for d in body if d["kind"] == "drivers_license")
+    uploaded_sides = set()
+    for upload in dl_doc["uploads"]:
+        uploaded_sides.add(upload["side"])
+        data = dict(seqno=upload["version"])
+        body = get(f"entities/{user.fp_id}/documents", data, *sandbox_tenant.db_auths)
+        assert {i["kind"] for i in body} == {"drivers_license"}
+        visible_sides = {i["side"] for i in body[0]["uploads"]}
+        assert visible_sides == uploaded_sides
+
+    # If we look at the earliest seqno, we should see no documents
+    data = dict(seqno=timeline[-1]["seqno"] - 100)
+    body = get(f"entities/{user.fp_id}/documents", data, *sandbox_tenant.db_auths)
+    assert not body

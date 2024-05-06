@@ -226,7 +226,7 @@ pub async fn mock_enclave_s3_client(
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let (identity_document, _) = IdentityDocument::get(conn, &document_id)?;
-            identity_document.images(conn, true)
+            identity_document.images(conn, true, None)
         })
         .await
         .unwrap()

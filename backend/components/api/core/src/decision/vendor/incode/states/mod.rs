@@ -163,7 +163,7 @@ pub async fn save_incode_fixtures(
                 .pop()
                 .ok_or(AssertionError("missing vres in incode fixture"))?;
 
-            let doc_uploads = iddoc.images(conn, true)?;
+            let doc_uploads = iddoc.images(conn, true, None)?;
 
             Ok((vres, doc_uploads))
         })

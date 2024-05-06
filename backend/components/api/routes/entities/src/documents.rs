@@ -28,23 +28,24 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: TenantSessionAuth,
-    // TODO eventually support filtering on seqno here
+    filters: web::Query<api_wire_types::GetHistoricalDataRequest>,
 ) -> JsonApiResponse<Vec<api_wire_types::Document>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
 
+    let api_wire_types::GetHistoricalDataRequest { seqno } = filters.into_inner();
+
     let (id_docs, api_docs) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let documents = IdentityDocument::list(conn, &sv.id)?;
             let id_docs = documents
                 .into_iter()
                 .map(|(doc, dr)| -> ApiResult<_> {
-                    let images = doc.images(conn, false)?;
+                    let images = doc.images(conn, false, seqno)?;
                     Ok((doc, dr, images))
                 })
                 .filter_ok(|(_, _, images)| !images.is_empty())
@@ -63,7 +64,9 @@ pub async fn get(
             // Documents can also be uploaded via tenant-facing API or via the dashboard.
             // So we have to add these in here...
             // TODO we won't show historical versions of documents uploaded here, even though we
-            // show multiple ID document sessions
+            // show multiple ID document sessions.
+            // We'd need to support fetching even deactivated DLs from the database
+            let vw: TenantVw<Any> = VaultWrapper::build_for_tenant_version(conn, &sv.id, seqno)?;
             let api_docs = vw
                 .populated_dis()
                 .into_iter()

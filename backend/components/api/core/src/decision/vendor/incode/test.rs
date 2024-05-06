@@ -347,7 +347,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             UserConsent::create(conn, Utc::now(), ie.id, note, false, wf_id)?;
 
             let id_doc = db::tests::fixtures::identity_document::create(conn, Some(doc_request.id));
-            assert!(!id_doc.images(conn, true)?.is_empty());
+            assert!(!id_doc.images(conn, true, None)?.is_empty());
 
             Ok((di, id_doc))
         })
@@ -424,7 +424,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
 
             // Check we cleared out the front image to retry
             let (doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
-            assert!(doc.images(conn, true)?.is_empty());
+            assert!(doc.images(conn, true, None)?.is_empty());
 
             // Now, add our images to the vault as if the user hit the POST /document APi again
             let s3_url = S3Url::test_data("".into());

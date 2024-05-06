@@ -116,7 +116,7 @@ impl IncodeStateTransition for FetchScores {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
                 let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
-                let doc_uploads = id_doc.images(conn, true)?;
+                let doc_uploads = id_doc.images(conn, true, None)?;
                 Ok((obc, vw, id_doc, doc_uploads))
             })
             .await?;

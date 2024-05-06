@@ -291,7 +291,7 @@ pub fn vault_complete_images(
     // we vault the complete images for
     let doc_type_for_latest_upload = id_doc.document_type;
     let docs = id_doc
-        .images(conn, true)?
+        .images(conn, true, None)?
         .into_iter()
         .map(|u| {
             let di = DocumentKind::LatestUpload(doc_type_for_latest_upload, u.side).into();
