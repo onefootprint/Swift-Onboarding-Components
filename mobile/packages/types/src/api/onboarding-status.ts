@@ -3,6 +3,7 @@ import type {
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '../data/collected-data-option';
+import { DocumentRequestKind } from '../data/document-request-config';
 import type { SupportedIdDocTypes } from '../data/id-doc-type';
 import type { PublicOnboardingConfig } from '../data/onboarding-config';
 
@@ -44,10 +45,39 @@ export type IdDocSupportedCountryAndDocTypes = Record<
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
   isMet: boolean;
-  shouldCollectConsent: boolean;
-  shouldCollectSelfie: boolean;
-  supportedCountryAndDocTypes: IdDocSupportedCountryAndDocTypes;
+  documentRequestId: string;
+  uploadMode: DocumentUploadMode;
+  config: DocumentRequirementConfig;
 };
+
+export type DocumentUploadMode = 'default' | 'allow_upload' | 'capture_only';
+
+export type IdDocRequirementConfig = {
+  kind: DocumentRequestKind.Identity;
+  shouldCollectSelfie: boolean;
+  shouldCollectConsent: boolean;
+  supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
+};
+
+export type ProofOfAddressRequirementConfig = {
+  kind: DocumentRequestKind.ProofOfAddress;
+};
+
+export type ProofOfSsnRequirementConfig = {
+  kind: DocumentRequestKind.ProofOfSsn;
+};
+
+export type CustomDocumentRequirementConfig = {
+  kind: DocumentRequestKind.Custom;
+  name: string;
+  description?: string;
+};
+
+export type DocumentRequirementConfig =
+  | IdDocRequirementConfig
+  | ProofOfAddressRequirementConfig
+  | ProofOfSsnRequirementConfig
+  | CustomDocumentRequirementConfig;
 
 export type LivenessRequirement = {
   kind: OnboardingRequirementKind.liveness;
@@ -111,3 +141,8 @@ export const getRequirement = <K extends OnboardingRequirementKind>(
   const found = reqs.find(req => req.kind === kind);
   return found as RequirementForKind<K> | undefined;
 };
+
+export const isIdentitydDoc = (
+  config?: DocumentRequirementConfig,
+): config is IdDocRequirementConfig =>
+  config?.kind === DocumentRequestKind.Identity;

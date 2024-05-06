@@ -25,6 +25,7 @@ export { default as DecisionStatus } from './decision-status';
 export * from './decrypted-document';
 export * from './decrypted-id-doc';
 export * from './di';
+export * from './document-request-config';
 export * from './entity';
 export * from './id-di-data';
 export { default as IdDocBadImageError } from './id-doc-bad-image-error';
