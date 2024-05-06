@@ -2,11 +2,53 @@ use crate::errors::{ApiResult, AssertionError, ValidationError};
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
 use newtypes::{
-    AllData, BusinessDataKind, CleanAndValidate, DataIdentifier, DeviceInsightField, DeviceInsightOperation,
-    IdentityDataKind, ListId, ListKind, PiiJsonValue, RuleExpression, RuleExpressionCondition,
-    RuleInstanceKind, ValidateArgs, VaultOperation,
+    AllData, BusinessDataKind, CardDataKind, CleanAndValidate, DataIdentifier, DeviceInsightField,
+    DeviceInsightOperation, IdentityDataKind, ListId, ListKind, PiiJsonValue, RuleExpression,
+    RuleExpressionCondition, RuleInstanceKind, ValidateArgs, VaultOperation,
 };
 use std::collections::HashMap;
+
+// We only support quality rules for DIs that are not sensitive (low cardinality and un-interesting
+// even when correlated with other non-sensitive DIs). This helps avoid leaking sensitive data or
+// using backtesting of vault equality rules to brute-force sensitive data.
+fn di_supports_equality_rules(field: &DataIdentifier) -> bool {
+    match field {
+        DataIdentifier::Id(kind) => match kind {
+            IdentityDataKind::Country | IdentityDataKind::UsLegalStatus | IdentityDataKind::VisaKind => true,
+            IdentityDataKind::FirstName
+            | IdentityDataKind::MiddleName
+            | IdentityDataKind::LastName
+            | IdentityDataKind::Dob
+            | IdentityDataKind::Ssn4
+            | IdentityDataKind::Ssn9
+            | IdentityDataKind::AddressLine1
+            | IdentityDataKind::AddressLine2
+            | IdentityDataKind::City
+            | IdentityDataKind::State
+            | IdentityDataKind::Zip
+            | IdentityDataKind::Email
+            | IdentityDataKind::PhoneNumber
+            | IdentityDataKind::VisaExpirationDate
+            | IdentityDataKind::Nationality
+            | IdentityDataKind::Citizenships => false,
+        },
+        DataIdentifier::Card(card_info) => match card_info.kind {
+            CardDataKind::BillingCountry | CardDataKind::Issuer => true,
+            CardDataKind::Number
+            | CardDataKind::Expiration
+            | CardDataKind::Cvc
+            | CardDataKind::Name
+            | CardDataKind::BillingZip
+            | CardDataKind::ExpMonth
+            | CardDataKind::ExpYear
+            | CardDataKind::Last4 => false,
+        },
+        DataIdentifier::Custom(_) => false,
+        DataIdentifier::Business(_) => false,
+        DataIdentifier::InvestorProfile(_) => false,
+        DataIdentifier::Document(_) => false,
+    }
+}
 
 pub fn validate_rule_expression(
     rule_expression: UnvalidatedRuleExpression,
@@ -18,6 +60,13 @@ pub fn validate_rule_expression(
             RuleExpressionCondition::RiskSignal { .. } => {}
             RuleExpressionCondition::VaultData(vault_op) => match vault_op {
                 VaultOperation::Equals { field, op: _, value } => {
+                    if !di_supports_equality_rules(field) {
+                        return ValidationError(&format!(
+                            "Vaulted field {} does not support equality rules",
+                            field
+                        ))
+                        .into();
+                    }
                     let all_data = AllData::new();
                     field.clone().clean_and_validate(
                         PiiJsonValue::from_piistring(value.clone()),
@@ -167,13 +216,14 @@ pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) ->
 mod tests {
     use std::str::FromStr;
 
-    use crate::{ApiError, ApiErrorKind};
+    use crate::ApiError;
 
     use super::*;
     use chrono::Utc;
     use newtypes::{
-        BooleanOperator, DataLifetimeSeqno, DbActor, FootprintReasonCode as FRC, IsIn, ListAlias, ListId,
-        ListKind, SealedVaultDataKey, TenantId,
+        data_identifier::Error as DiValidationError, AliasId, BooleanOperator, CardInfo,
+        DataIdentifier as DI, DataLifetimeSeqno, DbActor, Equals, Error as NewtypeError,
+        FootprintReasonCode as FRC, IsIn, ListAlias, ListId, ListKind, SealedVaultDataKey, TenantId,
     };
     use test_case::test_case;
 
@@ -261,6 +311,69 @@ mod tests {
             value: true,
         },
        ], Err(validation_error("Cannot make a rule expression that includes both Person and Business signals")))]
+    #[test_case(vec![
+        RuleExpressionCondition::VaultData(
+            VaultOperation::Equals {
+                field: DI::Id(IdentityDataKind::Email),
+                op: Equals::Equals,
+                value: "abc@123.com".into(),
+            }
+        ),
+    ], Err(validation_error("Vaulted field id.email does not support equality rules")))]
+    #[test_case(vec![
+        RuleExpressionCondition::VaultData(
+            VaultOperation::Equals {
+                field: DI::Id(IdentityDataKind::Ssn9),
+                op: Equals::DoesNotEqual,
+                value: "123-12-1234".into(),
+            }
+        ),
+    ], Err(validation_error("Vaulted field id.ssn9 does not support equality rules")))]
+    #[test_case(vec![
+        RuleExpressionCondition::VaultData(
+            VaultOperation::Equals {
+                field: DI::Business(BusinessDataKind::Name),
+                op: Equals::Equals,
+                value: "Acme Inc.".into(),
+            }
+        ),
+    ], Err(validation_error("Vaulted field business.name does not support equality rules")))]
+    #[test_case(vec![
+        RuleExpressionCondition::VaultData(
+            VaultOperation::Equals {
+                field: DI::Card(CardInfo{ alias: AliasId::fixture(), kind: CardDataKind::Issuer}),
+                op: Equals::Equals,
+                value: "visa".into(),
+            }
+        ),
+    ], Ok(RuleInstanceKind::Person))]
+    #[test_case(vec![
+        RuleExpressionCondition::VaultData(
+            VaultOperation::Equals {
+                field: DI::Card(CardInfo{ alias: AliasId::fixture(), kind: CardDataKind::BillingCountry}),
+                op: Equals::DoesNotEqual,
+                value: "US".into(),
+            }
+        ),
+    ], Ok(RuleInstanceKind::Person))]
+    #[test_case(vec![
+        RuleExpressionCondition::VaultData(
+            VaultOperation::Equals {
+                field: DI::Card(CardInfo{ alias: AliasId::fixture(), kind: CardDataKind::BillingCountry}),
+                op: Equals::DoesNotEqual,
+                value: "not-a-country".into(),
+            }
+        ),
+    ], Err(ApiError::from(NewtypeError::ParsingError(DiValidationError::InvalidCountry))))]
+    #[test_case(vec![
+        RuleExpressionCondition::VaultData(
+            VaultOperation::Equals {
+                field: DI::Id(IdentityDataKind::VisaKind),
+                op: Equals::Equals,
+                value: "not-a-visa-kind".into(),
+            }
+        ),
+    ], Err(ApiError::from(NewtypeError::ParsingError(DiValidationError::CannotParseEnum(strum::ParseError::VariantNotFound)))))]
     fn test_validate_rule_expression_for_rule_instance_kind(
         recs: Vec<RuleExpressionCondition>,
         expected_kind: ApiResult<RuleInstanceKind>,
@@ -272,17 +385,11 @@ mod tests {
         match (rule_instance_kind, expected_kind) {
             (Ok(rik), Ok(expected_rik)) => assert_eq!(rik, expected_rik),
             (Err(err), Err(expected_err)) => {
-                let ApiErrorKind::ValidationError(s) = err.kind() else {
-                    panic!("wrong error received");
-                };
-                let ApiErrorKind::ValidationError(s1) = expected_err.kind() else {
-                    panic!("wrong error kind for expected");
-                };
-
-                assert_eq!(s, s1);
+                if err.to_string() != expected_err.to_string() {
+                    panic!("expected {:?}, got {:?}", expected_err, err);
+                }
             }
-            (Ok(_), Err(_)) => panic!("expected value should be successful"),
-            (Err(_), Ok(_)) => panic!("expected value should be error"),
+            (got, expected) => panic!("expected {:?}, got {:?}", expected, got),
         }
     }
 }

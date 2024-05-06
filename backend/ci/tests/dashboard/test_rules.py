@@ -555,9 +555,6 @@ def test_blocklist_rules(sandbox_tenant, must_collect_data):
     update_rules(obc.id, 1, *sandbox_tenant.db_auths, add=add, status_code=400)
 
 
-# TODO: add vault data rule validation tests
-
-
 def test_cannot_delete_all_rules(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
