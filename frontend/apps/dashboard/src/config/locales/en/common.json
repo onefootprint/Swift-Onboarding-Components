@@ -2617,6 +2617,7 @@
             "not": "not",
             "add-risk-signal": "Add risk signal condition",
             "add-list": "Add list condition",
+            "add-list-tooltip": "First create a list to add a list condition",
             "delete": "Delete rule",
             "empty-aria-label": "Empty rule",
             "risk-signals-select": {

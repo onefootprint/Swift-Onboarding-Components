@@ -12,8 +12,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import useLists from '@/lists/pages/list/hooks/use-lists';
-
 import DISelect from './components/di-select';
 import ListSelect from './components/list-select';
 import OpSelect from './components/op-select';
@@ -23,6 +21,7 @@ import listKindsForDataIdentifier from './utils/list-kinds-for-data-identifier';
 type ListRuleChipProps = {
   defaultExpression: ListRuleField;
   isEditing?: boolean;
+  lists?: List[];
   onDelete?: () => void;
   onChange?: (expression: RiskSignalRuleField | ListRuleField) => void;
 };
@@ -30,17 +29,17 @@ type ListRuleChipProps = {
 const ListRuleChip = ({
   isEditing,
   defaultExpression,
+  lists = [],
   onDelete,
   onChange,
 }: ListRuleChipProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row.rule-chip',
   });
-  const { data: lists } = useLists();
   const [ruleExpression, setRuleExpression] =
     useState<ListRuleField>(defaultExpression);
   const [selectedList, setSelectedList] = useState<List | undefined>(
-    lists?.data.find(({ id }) => id === ruleExpression.value),
+    lists.find(({ id }) => id === ruleExpression.value),
   );
 
   useEffect(() => {
@@ -48,10 +47,8 @@ const ListRuleChip = ({
   }, [defaultExpression]);
 
   useEffect(() => {
-    setSelectedList(
-      lists?.data.find(({ id }) => id === defaultExpression.value),
-    );
-  }, [defaultExpression, lists?.data]);
+    setSelectedList(lists.find(({ id }) => id === defaultExpression.value));
+  }, [defaultExpression, lists]);
 
   const handleListFieldChange = (newField: string) => {
     setRuleExpression(currentExpression => {
@@ -133,7 +130,7 @@ const ListRuleChip = ({
         <ListSelect
           defaultList={selectedList}
           di={ruleExpression.field}
-          lists={lists?.data}
+          lists={lists}
           onChange={handleListValueChange}
         />
       </ExpressionContainer>

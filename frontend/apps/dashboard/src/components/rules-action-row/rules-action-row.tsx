@@ -20,12 +20,15 @@ import {
   IconButton,
   Stack,
   Text,
+  Tooltip,
   useToast,
 } from '@onefootprint/ui';
 import { isEqual } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+
+import useLists from '@/lists/pages/list/hooks/use-lists';
 
 import { ListRuleChip, RiskSignalRuleChip } from './components/rule-chip';
 
@@ -49,6 +52,7 @@ const RulesActionRow = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row',
   });
+  const { data: lists } = useLists();
   const [isPendingChange, setIsPendingChange] = useState(false);
   const [isPendingDeletion, setIsPendingDeletion] = useState(false);
   const [expressions, setExpressions] = useState<
@@ -165,6 +169,7 @@ const RulesActionRow = ({
                   <ListRuleChip
                     isEditing={isPendingDeletion ? false : isEditing}
                     defaultExpression={expression}
+                    lists={lists?.data}
                     onDelete={() => handleDeleteExpression(index)}
                     onChange={handleChangeExpression(index)}
                   />
@@ -204,7 +209,7 @@ const RulesActionRow = ({
       {isEditing && (
         <Stack justify="space-between" align="center">
           <Stack gap={3} width="100%">
-            <ButtonContainer>
+            <ButtonContainer data-is-broadcast>
               <Button
                 variant="secondary"
                 prefixIcon={IcoBroadcast16}
@@ -219,20 +224,26 @@ const RulesActionRow = ({
                 {t('add-risk-signal')}
               </Button>
             </ButtonContainer>
-            <ButtonContainer>
-              <Button
-                variant="secondary"
-                prefixIcon={IcoShuffle16}
-                disabled={
-                  isPendingDeletion ||
-                  expressions.some(
-                    expression => !expression.field || !expression.value,
-                  )
-                }
-                onClick={handleAddListExpression}
+            <ButtonContainer data-is-broadcast={false}>
+              <Tooltip
+                text={t('add-list-tooltip')}
+                disabled={!!lists?.data.length}
               >
-                {t('add-list')}
-              </Button>
+                <Button
+                  variant="secondary"
+                  prefixIcon={IcoShuffle16}
+                  disabled={
+                    !lists?.data.length ||
+                    isPendingDeletion ||
+                    expressions.some(
+                      expression => !expression.field || !expression.value,
+                    )
+                  }
+                  onClick={handleAddListExpression}
+                >
+                  {t('add-list')}
+                </Button>
+              </Tooltip>
             </ButtonContainer>
           </Stack>
           {(isPendingChange || isPendingDeletion) && (
@@ -257,7 +268,7 @@ const RulesListItem = styled(Stack)`
   ${({ theme }) => css`
     flex-direction: column;
     gap: ${theme.spacing[6]};
-    padding: ${theme.spacing[4]};
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
     ${createFontStyles('body-4')}
     line-height: 240%;
 
@@ -282,6 +293,18 @@ const ButtonContainer = styled.span`
   ${({ theme }) => css`
     button[disabled] svg path {
       stroke: ${theme.color.quaternary};
+    }
+
+    &[data-is-broadcast='true'] {
+      button svg path {
+        stroke: none;
+      }
+    }
+
+    &[data-is-broadcast='false'] {
+      button[disabled] svg path {
+        fill: none !important;
+      }
     }
   `}
 `;

@@ -21,6 +21,8 @@ import {
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
+import useLists from '@/lists/pages/list/hooks/use-lists';
+
 import type { AddedRuleWithId } from '../content';
 
 export type EmptyActionRowProps = {
@@ -39,6 +41,7 @@ const EmptyActionRow = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row',
   });
+  const { data: lists } = useLists();
   const [expressions, setExpressions] = useState<
     (RiskSignalRuleField | ListRuleField)[]
   >([]);
@@ -127,6 +130,7 @@ const EmptyActionRow = ({
                   <ListRuleChip
                     isEditing
                     defaultExpression={expression}
+                    lists={lists?.data}
                     onDelete={() => handleDeleteExpression(index)}
                     onChange={handleChangeExpression(index)}
                   />
