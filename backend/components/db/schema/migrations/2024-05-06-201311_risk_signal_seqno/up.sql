@@ -1,0 +1,1 @@
+ALTER TABLE risk_signal ADD COLUMN seqno BIGINT;

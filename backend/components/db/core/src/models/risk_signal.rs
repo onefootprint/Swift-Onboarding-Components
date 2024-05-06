@@ -4,14 +4,14 @@ use db_schema::schema::{risk_signal, risk_signal_group, scoped_vault};
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalGroupId, RiskSignalGroupKind, RiskSignalId,
-    ScopedVaultId, TenantId, VendorAPI, VerificationResultId,
+    DataLifetimeSeqno, FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalGroupId,
+    RiskSignalGroupKind, RiskSignalId, ScopedVaultId, TenantId, VendorAPI, VerificationResultId,
 };
 use std::collections::HashMap;
 #[cfg(test)]
 use std::str::FromStr;
 
-use super::risk_signal_group::RiskSignalGroup;
+use super::{data_lifetime::DataLifetime, risk_signal_group::RiskSignalGroup};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = risk_signal)]
@@ -27,6 +27,7 @@ pub struct RiskSignal {
     pub hidden: bool,
     pub vendor_api: VendorAPI,
     pub risk_signal_group_id: RiskSignalGroupId,
+    pub seqno: Option<DataLifetimeSeqno>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -39,6 +40,7 @@ pub struct NewRiskSignal {
     pub hidden: bool,
     pub vendor_api: VendorAPI,
     pub risk_signal_group_id: RiskSignalGroupId,
+    pub seqno: DataLifetimeSeqno,
 }
 
 pub struct IncludeHidden(pub bool);
@@ -70,6 +72,7 @@ impl RiskSignal {
         hidden: bool,
         rsg_id: RiskSignalGroupId,
     ) -> DbResult<Vec<Self>> {
+        let seqno = DataLifetime::get_current_seqno(conn)?;
         let new_risk_signals: Vec<NewRiskSignal> = signals
             .into_iter()
             .unique()
@@ -81,6 +84,7 @@ impl RiskSignal {
                 hidden,
                 vendor_api,
                 risk_signal_group_id: rsg_id.clone(),
+                seqno,
             })
             .collect();
 
@@ -166,6 +170,7 @@ impl RiskSignal {
         scoped_vault_id: &ScopedVaultId,
         include_hidden: IncludeHidden,
     ) -> DbResult<Vec<(RiskSignalGroupKind, Self)>> {
+        // TODO only select the RSGs that have risk signals active at the provided seqno
         let rsg: Vec<RiskSignalGroup> = risk_signal_group::table
             .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
             .order((risk_signal_group::kind, risk_signal_group::created_at.desc()))
@@ -187,9 +192,7 @@ impl RiskSignal {
         let res = risk_signals
             .into_iter()
             .filter_map(|rs| {
-                let rsg_id = rs.risk_signal_group_id.clone();
-                let rsg_kind = rsg_map.get(&rsg_id).cloned();
-
+                let rsg_kind = rsg_map.get(&rs.risk_signal_group_id).cloned();
                 rsg_kind.map(|kind| (kind, rs))
             })
             .collect();
@@ -261,6 +264,7 @@ impl RiskSignal {
 
     #[cfg(test)]
     fn _bulk_create_for_test(conn: &mut PgConn, new: NewRiskSignals) -> DbResult<Vec<Self>> {
+        let seqno = DataLifetime::get_current_seqno(conn)?;
         let new_risk_signals: Vec<NewRiskSignal> = match new {
             NewRiskSignals::LegacyObd {
                 onboarding_decision_id,
@@ -275,6 +279,7 @@ impl RiskSignal {
                     hidden: false,
                     vendor_api,
                     risk_signal_group_id: RiskSignalGroupId::from_str("rsg123").unwrap(),
+                    seqno,
                 })
                 .collect(),
             NewRiskSignals::NewVres { signals } => signals
@@ -287,6 +292,7 @@ impl RiskSignal {
                     hidden: false,
                     vendor_api,
                     risk_signal_group_id: RiskSignalGroupId::from_str("rsg123").unwrap(),
+                    seqno,
                 })
                 .collect(),
         };
