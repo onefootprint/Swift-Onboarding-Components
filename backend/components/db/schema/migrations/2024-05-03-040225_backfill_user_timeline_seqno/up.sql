@@ -1,6 +1,7 @@
 -- I've made some modifications to this backfill after it's been run in dev and prod to better support folks' local environments
-CREATE INDEX CONCURRENTLY user_timeline_for_backfill ON user_timeline(timestamp, id) WHERE seqno IS NULL;
-CREATE INDEX CONCURRENTLY data_lifetime_for_backfill ON data_lifetime(created_at, created_seqno);
+-- These should be concurretly but this has already run in dev/prod
+CREATE INDEX user_timeline_for_backfill ON user_timeline(timestamp, id) WHERE seqno IS NULL;
+CREATE INDEX data_lifetime_for_backfill ON data_lifetime(created_at, created_seqno);
 
 -- Lookahead of 1 min to backfill seqnos
 WITH user_timelines_to_update AS (
@@ -57,5 +58,6 @@ WHERE user_timeline.id = ut.id;
 UPDATE user_timeline SET seqno = 0 WHERE seqno IS NULL;
 
 
-DROP INDEX CONCURRENTLY user_timeline_for_backfill;
-DROP INDEX CONCURRENTLY data_lifetime_for_backfill;
+-- These should be concurretly but this has already run in dev/prod
+DROP INDEX user_timeline_for_backfill;
+DROP INDEX data_lifetime_for_backfill;
