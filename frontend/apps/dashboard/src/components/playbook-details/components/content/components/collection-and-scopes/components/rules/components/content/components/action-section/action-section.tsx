@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import RulesActionRow from 'src/components/rules-action-row';
 import styled, { css } from 'styled-components';
 
-import type { AddedRuleWithId } from '../content';
+import type { AddedRuleWithId } from '../..';
 import EmptyActionRow from '../empty-action-row';
 
 export type ActionSectionProps = {

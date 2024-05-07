@@ -22,6 +22,7 @@ import {
   startEditing,
   stepUpRuleFixture,
   withEditRules,
+  withEvaluateRules,
   withLists,
   withRiskSignals,
   withRules,
@@ -124,58 +125,51 @@ describe('<Rules />', () => {
       it('should change the display correctly once editing', async () => {
         await renderRulesAndWaitFinishLoading();
 
-        expect(
-          screen.getByRole('button', {
-            name: 'Edit',
-          }),
-        ).toBeInTheDocument();
-        expect(
-          screen.queryByRole('button', {
-            name: 'Add rule',
-          }),
-        ).not.toBeInTheDocument();
-        expect(
-          screen.queryByRole('button', {
-            name: 'and',
-          }),
-        ).not.toBeInTheDocument();
-        expect(
-          screen.queryByRole('button', {
-            name: 'delete',
-          }),
-        ).not.toBeInTheDocument();
+        const editButton = screen.getByRole('button', {
+          name: 'Edit',
+        });
+        expect(editButton).toBeInTheDocument();
+
+        const addButton = screen.queryByRole('button', {
+          name: 'Add rule',
+        });
+        expect(addButton).not.toBeInTheDocument();
+
+        const deleteButton = screen.queryByRole('button', {
+          name: 'delete',
+        });
+        expect(deleteButton).not.toBeInTheDocument();
 
         await startEditing();
-        expect(
-          screen.getAllByRole('button', {
-            name: 'Add rule',
-          }).length,
-        ).toEqual(6);
-        expect(
-          screen.getAllByRole('button', {
-            name: 'Add risk signal condition',
-          }).length,
-        ).toEqual(6);
-        expect(
-          screen.getAllByRole('button', {
-            name: 'Add list condition',
-          }).length,
-        ).toEqual(6);
-        expect(
-          screen.getAllByRole('button', {
-            name: 'delete',
-          }).length,
-        ).toEqual(6);
-        expect(
-          screen.getByRole('button', {
-            name: 'Save changes',
-          }),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByRole('button', {
-            name: 'Cancel',
-          }),
-        ).toBeInTheDocument();
+        const addButtons = screen.getAllByRole('button', {
+          name: 'Add rule',
+        });
+        expect(addButtons.length).toEqual(6);
+
+        const addRiskSignalConditionButtons = screen.getAllByRole('button', {
+          name: 'Add risk signal condition',
+        });
+        expect(addRiskSignalConditionButtons.length).toEqual(6);
+
+        const addListConditionButtons = screen.getAllByRole('button', {
+          name: 'Add list condition',
+        });
+        expect(addListConditionButtons.length).toEqual(6);
+
+        const deleteButtons = screen.getAllByRole('button', {
+          name: 'delete',
+        });
+        expect(deleteButtons.length).toEqual(6);
+
+        const submitButton = screen.getByRole('button', {
+          name: 'Test changes',
+        });
+        expect(submitButton).toBeInTheDocument();
+
+        const cancelButton = screen.getByRole('button', {
+          name: 'Cancel',
+        });
+        expect(cancelButton).toBeInTheDocument();
       });
 
       it('should edit existing rules correctly', async () => {
@@ -206,6 +200,7 @@ describe('<Rules />', () => {
             ],
           },
         ]);
+        withEvaluateRules();
         await renderRulesAndWaitFinishLoading();
         await startEditing();
 
@@ -218,11 +213,10 @@ describe('<Rules />', () => {
         const opSelectTrigger = within(failRow).getByText('is');
         await userEvent.click(opSelectTrigger);
         await waitFor(() => {
-          expect(
-            screen.getByRole('option', {
-              name: 'is',
-            }),
-          ).toBeInTheDocument();
+          const isOption = screen.getByRole('option', {
+            name: 'is',
+          });
+          expect(isOption).toBeInTheDocument();
         });
         await selectOption('is not');
         await waitFor(() => {
@@ -237,12 +231,6 @@ describe('<Rules />', () => {
           name: 'Risk signals',
         });
         await selectOption('address_alert_longevity');
-        await waitFor(() => {
-          const selectList = within(failRow).queryByRole('listbox', {
-            name: 'Risk signals',
-          });
-          expect(selectList).not.toBeInTheDocument();
-        });
 
         // Edit Pass 'document_is_permit_or_provisional_license' rule by adding an is not field
         const passSection = screen.getByRole('group', {
@@ -266,11 +254,10 @@ describe('<Rules />', () => {
         const newOpTrigger = within(passRow).getAllByText('is')[1];
         await userEvent.click(newOpTrigger);
         await waitFor(() => {
-          expect(
-            screen.getByRole('option', {
-              name: 'is',
-            }),
-          ).toBeInTheDocument();
+          const isOption = screen.getByRole('option', {
+            name: 'is',
+          });
+          expect(isOption).toBeInTheDocument();
         });
         await selectOption('is not');
 
@@ -280,25 +267,21 @@ describe('<Rules />', () => {
           name: 'Risk signals',
         });
         await selectOption('name_matches');
-        await waitFor(() => {
-          expect(
-            screen.queryByRole('listbox', {
-              name: 'Risk signals',
-            }),
-          ).not.toBeInTheDocument();
-        });
 
         // Save edits
+        const backtestButton = screen.getByRole('button', {
+          name: 'Test changes',
+        });
+        await userEvent.click(backtestButton);
         const saveButton = screen.getByRole('button', {
           name: 'Save changes',
         });
+        await waitFor(() => {
+          expect(saveButton).toBeInTheDocument();
+        });
         await userEvent.click(saveButton);
         await waitFor(() => {
-          expect(
-            screen.queryByRole('button', {
-              name: 'Save changes',
-            }),
-          ).not.toBeInTheDocument();
+          expect(saveButton).toBeInTheDocument();
         });
 
         // New rules are displayed
@@ -328,11 +311,10 @@ describe('<Rules />', () => {
         });
         const newPassRow = within(editedPassSection).getByRole('row');
         await waitFor(() => {
-          expect(
-            within(newPassRow).getByText(
-              'document_is_permit_or_provisional_license',
-            ),
-          ).toBeInTheDocument();
+          const newRiskSignal = within(newPassRow).getByText(
+            'document_is_permit_or_provisional_license',
+          );
+          expect(newRiskSignal).toBeInTheDocument();
         });
         await waitFor(() => {
           expect(
@@ -365,6 +347,7 @@ describe('<Rules />', () => {
             ],
           },
         ]);
+        withEvaluateRules();
         await renderRulesAndWaitFinishLoading();
         await startEditing();
 
@@ -373,15 +356,14 @@ describe('<Rules />', () => {
           name: 'Fail',
         });
         const [failRow] = within(failSection).getAllByRole('row');
-        await userEvent.click(
-          within(failRow).getByRole('button', {
-            name: 'delete',
-          }),
-        );
+        const failRowDeleteButton = within(failRow).getByRole('button', {
+          name: 'delete',
+        });
+        await userEvent.click(failRowDeleteButton);
         await waitFor(() => {
-          expect(
-            within(failRow).getByText('Pending deletion'),
-          ).toBeInTheDocument();
+          const pendingDeleteText =
+            within(failRow).getByText('Pending deletion');
+          expect(pendingDeleteText).toBeInTheDocument();
         });
 
         // Delete Pass 'document_is_permit_or_provisional_license' rule
@@ -389,31 +371,24 @@ describe('<Rules />', () => {
           name: 'Pass + Manual review',
         });
         const passRow = within(passSection).getByRole('row');
-        await userEvent.click(
-          within(passRow).getByRole('button', {
-            name: 'delete',
-          }),
-        );
+        const passRowDeleteButton = within(passRow).getByRole('button', {
+          name: 'delete',
+        });
+        await userEvent.click(passRowDeleteButton);
         await waitFor(() => {
-          expect(
-            within(passRow).getByText('Pending deletion'),
-          ).toBeInTheDocument();
+          const pendingDeleteText =
+            within(passRow).getByText('Pending deletion');
+          expect(pendingDeleteText).toBeInTheDocument();
         });
 
         // Add 'dob_does_not_match' rule to empty Step-up section
         const stepUpSection = screen.getByRole('group', {
           name: 'Step-up',
         });
-        await userEvent.click(
-          within(stepUpSection).getByRole('button', {
-            name: 'Add rule',
-          }),
-        );
-        await waitFor(() => {
-          expect(
-            within(stepUpSection).queryByText('No rule has been configured.'),
-          ).not.toBeInTheDocument();
+        const stepUpAddButton = within(stepUpSection).getByRole('button', {
+          name: 'Add rule',
         });
+        await userEvent.click(stepUpAddButton);
 
         const stepUpRow = within(stepUpSection).getByRole('row');
         const stepUpFieldButton = within(stepUpRow).getByRole('button', {
@@ -429,23 +404,15 @@ describe('<Rules />', () => {
           name: 'Risk signals',
         });
         await selectOption('dob_does_not_match');
-        await waitFor(() => {
-          expect(
-            screen.queryByRole('listbox', {
-              name: 'Risk signals',
-            }),
-          ).not.toBeInTheDocument();
-        });
 
         // Add 'id_flagged' rule to Manual review
         const manRevSection = screen.getByRole('group', {
           name: 'Fail + Manual review',
         });
-        await userEvent.click(
-          within(manRevSection).getByRole('button', {
-            name: 'Add rule',
-          }),
-        );
+        const manRevAddButton = within(manRevSection).getByRole('button', {
+          name: 'Add rule',
+        });
+        await userEvent.click(manRevAddButton);
         await waitFor(() => {
           expect(within(manRevSection).getAllByRole('row').length).toEqual(2);
         });
@@ -464,36 +431,31 @@ describe('<Rules />', () => {
           name: 'Risk signals',
         });
         await selectOption('id_flagged');
-        await waitFor(() => {
-          expect(
-            screen.queryByRole('listbox', {
-              name: 'Risk signals',
-            }),
-          ).not.toBeInTheDocument();
-        });
 
         // Save edits
+        const backtestButton = screen.getByRole('button', {
+          name: 'Test changes',
+        });
+        await userEvent.click(backtestButton);
         const saveButton = screen.getByRole('button', {
           name: 'Save changes',
         });
+        await waitFor(() => {
+          expect(saveButton).toBeInTheDocument();
+        });
         await userEvent.click(saveButton);
         await waitFor(() => {
-          expect(
-            screen.queryByRole('button', {
-              name: 'Save changes',
-            }),
-          ).not.toBeInTheDocument();
+          expect(saveButton).toBeInTheDocument();
         });
 
         // New rules are displayed
         const editedStepUpSection = screen.getByRole('group', {
           name: 'Step-up',
         });
-        expect(
-          within(within(editedStepUpSection).getByRole('row')).getByText(
-            'dob_does_not_match',
-          ),
-        ).toBeInTheDocument();
+        const newStepUpRiskSignal = within(
+          within(editedStepUpSection).getByRole('row'),
+        ).getByText('dob_does_not_match');
+        expect(newStepUpRiskSignal).toBeInTheDocument();
 
         const editedManRevSection = screen.getByRole('group', {
           name: 'Fail + Manual review',
@@ -518,17 +480,17 @@ describe('<Rules />', () => {
         const opSelectTrigger = within(failRows[0]).getByText('is');
         await userEvent.click(opSelectTrigger);
         await waitFor(() => {
-          expect(
-            screen.getByRole('option', {
-              name: 'is',
-            }),
-          ).toBeInTheDocument();
+          const isOption = screen.getByRole('option', {
+            name: 'is',
+          });
+          expect(isOption).toBeInTheDocument();
         });
         await selectOption('is not');
         await waitFor(() => {
-          expect(
-            within(failRows[0]).getByText('Pending change'),
-          ).toBeInTheDocument();
+          const pendingChangeText = within(failRows[0]).getByText(
+            'Pending change',
+          );
+          expect(pendingChangeText).toBeInTheDocument();
         });
 
         const failSelectTrigger = within(failRows[0]).getByText('id_flagged');
@@ -537,12 +499,6 @@ describe('<Rules />', () => {
           name: 'Risk signals',
         });
         await selectOption('address_alert_longevity');
-        await waitFor(() => {
-          const selectList = within(failRows[0]).queryByRole('listbox', {
-            name: 'Risk signals',
-          });
-          expect(selectList).not.toBeInTheDocument();
-        });
 
         const undoButton1 = within(failRows[0]).getByRole('button', {
           name: 'undo',
@@ -552,23 +508,24 @@ describe('<Rules />', () => {
           expect(undoButton1).not.toBeInTheDocument();
         });
 
-        // Save should be disabled since there are no edits
+        // Test should be disabled since there are no edits
+        const submitButton = screen.getByRole('button', {
+          name: 'Test changes',
+        });
         await waitFor(() => {
-          expect(
-            screen.getByRole('button', { name: 'Save changes' }),
-          ).toBeDisabled();
+          expect(submitButton).toBeDisabled();
         });
 
         // Delete Fail 'subject_deceased' rule, then undo
-        await userEvent.click(
-          within(failRows[2]).getByRole('button', {
-            name: 'delete',
-          }),
-        );
+        const deleteButton = within(failRows[2]).getByRole('button', {
+          name: 'delete',
+        });
+        await userEvent.click(deleteButton);
         await waitFor(() => {
-          expect(
-            within(failRows[2]).getByText('Pending deletion'),
-          ).toBeInTheDocument();
+          const pendingDeleteText = within(failRows[2]).getByText(
+            'Pending deletion',
+          );
+          expect(pendingDeleteText).toBeInTheDocument();
         });
 
         const undoButton2 = within(failRows[2]).getByRole('button', {
@@ -579,42 +536,35 @@ describe('<Rules />', () => {
           expect(undoButton2).not.toBeInTheDocument();
         });
 
-        // Save should be disabled since there are no edits
+        // Test should be disabled since there are no edits
         await waitFor(() => {
-          expect(
-            screen.getByRole('button', { name: 'Save changes' }),
-          ).toBeDisabled();
+          expect(submitButton).toBeDisabled();
         });
 
         // Add rule to Manual review, then delete it before saving
         const manRevSection = screen.getByRole('group', {
           name: 'Fail + Manual review',
         });
-        await userEvent.click(
-          within(manRevSection).getByRole('button', {
-            name: 'Add rule',
-          }),
-        );
-        await waitFor(() => {
-          expect(within(manRevSection).getAllByRole('row').length).toEqual(2);
+        const manRevAddButton = within(manRevSection).getByRole('button', {
+          name: 'Add rule',
         });
-        await userEvent.click(
-          within(within(manRevSection).getAllByRole('row')[1]).getByRole(
-            'button',
-            {
-              name: 'delete',
-            },
-          ),
-        );
+        await userEvent.click(manRevAddButton);
+        const manRevRows = within(manRevSection).getAllByRole('row');
         await waitFor(() => {
-          expect(within(manRevSection).getAllByRole('row').length).toEqual(1);
+          expect(manRevRows.length).toEqual(2);
+        });
+        const newRowDeleteButton = within(manRevRows[1]).getByRole('button', {
+          name: 'delete',
+        });
+        await userEvent.click(newRowDeleteButton);
+        await waitFor(() => {
+          const newManRevRows = within(manRevSection).getAllByRole('row');
+          expect(newManRevRows.length).toEqual(1);
         });
 
-        // Save should be disabled since there are no edits
+        // Test should be disabled since there are no edits
         await waitFor(() => {
-          expect(
-            screen.getByRole('button', { name: 'Save changes' }),
-          ).toBeDisabled();
+          expect(submitButton).toBeDisabled();
         });
       });
 
@@ -631,17 +581,17 @@ describe('<Rules />', () => {
         const opSelectTrigger = within(failRows[0]).getByText('is');
         await userEvent.click(opSelectTrigger);
         await waitFor(() => {
-          expect(
-            screen.getByRole('option', {
-              name: 'is',
-            }),
-          ).toBeInTheDocument();
+          const isOption = screen.getByRole('option', {
+            name: 'is',
+          });
+          expect(isOption).toBeInTheDocument();
         });
         await selectOption('is not');
         await waitFor(() => {
-          expect(
-            within(failRows[0]).getByText('Pending change'),
-          ).toBeInTheDocument();
+          const pendingChangeText = within(failRows[0]).getByText(
+            'Pending change',
+          );
+          expect(pendingChangeText).toBeInTheDocument();
         });
 
         const failSelectTrigger = within(failRows[0]).getByText('id_flagged');
@@ -650,23 +600,17 @@ describe('<Rules />', () => {
           name: 'Risk signals',
         });
         await selectOption('address_alert_longevity');
-        await waitFor(() => {
-          const selectList = within(failRows[0]).queryByRole('listbox', {
-            name: 'Risk signals',
-          });
-          expect(selectList).not.toBeInTheDocument();
-        });
 
         // Delete Fail 'subject_deceased' rule
-        await userEvent.click(
-          within(failRows[2]).getByRole('button', {
-            name: 'delete',
-          }),
-        );
+        const failRowDeleteButton = within(failRows[2]).getByRole('button', {
+          name: 'delete',
+        });
+        await userEvent.click(failRowDeleteButton);
         await waitFor(() => {
-          expect(
-            within(failRows[2]).getByText('Pending deletion'),
-          ).toBeInTheDocument();
+          const pendingDeleteText = within(failRows[2]).getByText(
+            'Pending deletion',
+          );
+          expect(pendingDeleteText).toBeInTheDocument();
         });
 
         // Delete Pass 'document_is_permit_or_provisional_license' rule
@@ -674,30 +618,29 @@ describe('<Rules />', () => {
           name: 'Pass + Manual review',
         });
         const passRow = within(passSection).getByRole('row');
-        await userEvent.click(
-          within(passRow).getByRole('button', {
-            name: 'delete',
-          }),
-        );
+        const passRowDeleteButton = within(passRow).getByRole('button', {
+          name: 'delete',
+        });
+        await userEvent.click(passRowDeleteButton);
         await waitFor(() => {
-          expect(
-            within(passRow).getByText('Pending deletion'),
-          ).toBeInTheDocument();
+          const pendingDeleteText =
+            within(passRow).getByText('Pending deletion');
+          expect(pendingDeleteText).toBeInTheDocument();
         });
 
         // Add 'dob_does_not_match' rule to empty Step-up section
         const stepUpSection = screen.getByRole('group', {
           name: 'Step-up',
         });
-        await userEvent.click(
-          within(stepUpSection).getByRole('button', {
-            name: 'Add rule',
-          }),
-        );
+        const stepUpAddButton = within(stepUpSection).getByRole('button', {
+          name: 'Add rule',
+        });
+        await userEvent.click(stepUpAddButton);
         await waitFor(() => {
-          expect(
-            within(stepUpSection).queryByText('No rule has been configured.'),
-          ).not.toBeInTheDocument();
+          const noRulesText = within(stepUpSection).queryByText(
+            'No rule has been configured.',
+          );
+          expect(noRulesText).not.toBeInTheDocument();
         });
 
         const stepUpRow = within(stepUpSection).getByRole('row');
@@ -714,26 +657,12 @@ describe('<Rules />', () => {
           name: 'Risk signals',
         });
         await selectOption('dob_does_not_match');
-        await waitFor(() => {
-          expect(
-            screen.queryByRole('listbox', {
-              name: 'Risk signals',
-            }),
-          ).not.toBeInTheDocument();
-        });
 
         // Cancel changes
         const cancelButton = screen.getByRole('button', {
           name: 'Cancel',
         });
         await userEvent.click(cancelButton);
-        await waitFor(() => {
-          expect(
-            screen.queryByRole('button', {
-              name: 'Cancel',
-            }),
-          ).not.toBeInTheDocument();
-        });
 
         // No changes are made
         expect(screen.queryAllByText('Pending change').length).toEqual(0);

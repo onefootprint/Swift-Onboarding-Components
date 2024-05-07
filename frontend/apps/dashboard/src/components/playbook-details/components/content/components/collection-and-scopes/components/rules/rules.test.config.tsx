@@ -6,16 +6,19 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
+import type {
+  OnboardingConfig,
+  Rule,
+  RuleBacktestingData,
+} from '@onefootprint/types';
 import {
   ActorKind,
   IdDI,
   ListKind,
   ListRuleOp,
-  type OnboardingConfig,
   OnboardingConfigKind,
   OnboardingConfigStatus,
   RiskSignalRuleOp,
-  type Rule,
   RuleAction,
 } from '@onefootprint/types';
 
@@ -256,6 +259,16 @@ export const listsFixture = {
   },
 };
 
+export const emptyBacktestedRulesFixture: RuleBacktestingData = {
+  results: [],
+  stats: {
+    countByHistoricalActionTriggered: {},
+    countByBacktestActionTriggered: {},
+    countByHistoricalAndBacktestActionTriggered: {},
+    total: 0,
+  },
+};
+
 export const selectOption = async (label: string) => {
   const newOption = screen.getByRole('option', {
     name: label,
@@ -440,5 +453,15 @@ export const withLists = (response = listsFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/lists',
+    response,
+  });
+
+export const withEvaluateRules = (
+  playbookId: string = kycPlaybookFixture.id,
+  response: RuleBacktestingData = emptyBacktestedRulesFixture,
+) =>
+  mockRequest({
+    method: 'post',
+    path: `/org/onboarding_configs/${playbookId}/rules/evaluate`,
     response,
   });

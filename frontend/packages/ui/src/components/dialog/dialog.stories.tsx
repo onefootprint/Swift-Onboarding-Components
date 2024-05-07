@@ -98,6 +98,14 @@ export default {
         type: { summary: 'object', required: true },
       },
     },
+    headerButton: {
+      control: 'object',
+      description:
+        'The header button, which is rendered on the right of the title',
+      table: {
+        type: { summary: 'object', required: true },
+      },
+    },
     isConfirmation: {
       control: 'boolean',
       description: 'Whether the dialog is a confirmation dialog',
@@ -146,6 +154,7 @@ const Template: Story<DialogProps> = ({
           ariaLabel: headerIconAriaLabel,
         }}
         linkButton={undefined}
+        headerButton={undefined}
         onClose={() => {
           setOpen(false);
           onClose();
@@ -220,6 +229,7 @@ const OnlyPrimaryTemplate: Story<DialogProps> = ({
     <>
       <Dialog
         linkButton={undefined}
+        headerButton={undefined}
         headerIcon={{
           component: SelectedIcon,
           onClick: onHeaderIconClick,
@@ -283,6 +293,7 @@ const LinkTemplate: Story<DialogProps> = ({
         primaryButton={primaryButton}
         linkButton={linkButton}
         secondaryButton={undefined}
+        headerButton={undefined}
         size={size}
         testID={testID}
         open={open}

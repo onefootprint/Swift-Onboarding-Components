@@ -20,9 +20,11 @@ import ScrollArea from '../scroll-area';
 import Text from '../text';
 import type {
   DialogAllButtons,
+  DialogAllExceptHeaderButtons,
   DialogHeaderIcon,
   DialogNoButtons,
   DialogOnlyButtons,
+  DialogOnlyHeaderButton,
   DialogOnlyPrimaryButton,
   DialogPrimaryAndLinkButtons,
   DialogSize,
@@ -40,9 +42,11 @@ export type DialogProps = {
   disableResponsiveness?: boolean;
 } & (
   | DialogOnlyPrimaryButton
+  | DialogOnlyHeaderButton
   | DialogOnlyButtons
   | DialogPrimaryAndLinkButtons
   | DialogNoButtons
+  | DialogAllExceptHeaderButtons
   | DialogAllButtons
 );
 
@@ -61,6 +65,7 @@ const Dialog = ({
   open,
   primaryButton,
   secondaryButton = undefined,
+  headerButton = undefined,
   size = 'default',
   testID,
   title,
@@ -110,6 +115,22 @@ const Dialog = ({
               </IconButton>
             </CloseContainer>
             <Text variant="label-2">{title}</Text>
+
+            <HeaderButtonContainer>
+              {headerButton && (
+                <Button
+                  disabled={headerButton.disabled}
+                  form={headerButton.form}
+                  loading={headerButton.loading}
+                  loadingAriaLabel={headerButton.loadingAriaLabel}
+                  onClick={headerButton.onClick}
+                  type={headerButton.type}
+                  variant="primary"
+                >
+                  {headerButton.label}
+                </Button>
+              )}
+            </HeaderButtonContainer>
           </Header>
           <ScrollArea
             paddingTop={7}
@@ -268,6 +289,13 @@ const CloseContainer = styled.div`
   ${({ theme }) => css`
     position: absolute;
     left: ${theme.spacing[5]};
+  `}
+`;
+
+const HeaderButtonContainer = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    right: ${theme.spacing[5]};
   `}
 `;
 

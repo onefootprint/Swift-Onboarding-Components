@@ -199,13 +199,16 @@ export { RoleKind, RoleScopeKind, supportedRoleKinds } from './role';
 export type { Rolebinding } from './rolebinding';
 export type {
   AddedRule,
+  BacktestedOnboarding,
   EditedRule,
   ListRuleField,
   RiskSignalRuleField,
   Rule,
+  RuleBacktestingData,
   RuleResult,
 } from './rule';
 export {
+  BacktestingRuleAction,
   ListRuleOp,
   OnboardingDecisionRuleAction,
   RiskSignalRuleOp,

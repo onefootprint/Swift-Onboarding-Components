@@ -2596,7 +2596,7 @@
           "edit-bar": {
             "editing-rules": "Editing rules",
             "tooltip": "Changes will only take effect if you click \"Save changes\"",
-            "save-changes": "Save changes"
+            "test-changes": "Test changes"
           },
           "success-toast": {
             "title": "Success!",
@@ -2688,6 +2688,40 @@
               "title": "Rule is pending deletion",
               "description": "This will only take effect if you save your changes",
               "undo": "Undo"
+            }
+          },
+          "backtesting": {
+            "title": "Review rule changes",
+            "save": "Save changes",
+            "no-onboardings": "This playbook did not have any onboardings during this time period. Please try a different date range.",
+            "affected": {
+              "heading": "{{count}} out of {{total}} total onboardings matched",
+              "description": "If these rules existed in the selected period they would've affected {{count}} onboardings.",
+              "aria-label": "Affected onboardings table",
+              "empty": "No onboardings would be affected.",
+              "header": {
+                "id": "Footprint ID",
+                "current-status": "Current onboarding status",
+                "historical-outcome": "Original rule outcome",
+                "backtested-outcome": "Backtested rule outcome",
+                "historical-tooltip": "Rule outcomes based on existing rules at the time of these onboardings",
+                "backtested-tooltip": "If the rules that are being tested existed at the time of these onboardings, rule outcomes may or may not have been different."
+              }
+            },
+            "historical": {
+              "heading": "Original rule outcomes",
+              "description": "Rule outcomes based on existing rules at the time of the onboardings above."
+            },
+            "backtested": {
+              "heading": "Backtested rule outcomes",
+              "description": "If the rules that are being tested existed at the time of the onboardings above, the rule outcomes would've been these instead:"
+            },
+            "correlation": {
+              "heading": "Original rule outcomes to Backtested rule outcomes",
+              "description": "Correlation between original and backtested rule outcomes.",
+              "action-list": "Rule outcomes that were originally <color>{{action}}</color> would:",
+              "same": "Still evaluate to <color>{{action}}</color>",
+              "changed": "Evaluate to <color>{{action}}</color> instead"
             }
           }
         }

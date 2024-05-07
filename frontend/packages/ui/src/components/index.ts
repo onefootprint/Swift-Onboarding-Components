@@ -33,11 +33,13 @@ export { default as DateSelectorSheet } from './date-selector-sheet';
 export { default as DateRangeSelector } from './date-selector-sheet';
 export type {
   DialogAllButtons,
+  DialogAllExceptHeaderButtons,
   DialogButton,
   DialogHeaderIcon,
   DialogLinkButton,
   DialogNoButtons,
   DialogOnlyButtons,
+  DialogOnlyHeaderButton,
   DialogOnlyPrimaryButton,
   DialogPrimaryAndLinkButtons,
   DialogProps,

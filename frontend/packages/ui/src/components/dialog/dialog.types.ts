@@ -29,28 +29,47 @@ export type DialogOnlyPrimaryButton = {
   primaryButton: DialogButton;
   secondaryButton?: never;
   linkButton?: never;
+  headerButton?: never;
+};
+
+export type DialogOnlyHeaderButton = {
+  primaryButton?: never;
+  secondaryButton?: never;
+  linkButton?: never;
+  headerButton: DialogButton;
 };
 
 export type DialogOnlyButtons = {
   primaryButton: DialogButton;
   secondaryButton: DialogButton;
   linkButton?: never;
+  headerButton?: never;
 };
 
 export type DialogPrimaryAndLinkButtons = {
   primaryButton: DialogButton;
   secondaryButton?: never;
   linkButton: DialogLinkButton;
+  headerButton?: never;
 };
 
 export type DialogNoButtons = {
   primaryButton?: never;
   secondaryButton?: never;
   linkButton?: never;
+  headerButton?: never;
+};
+
+export type DialogAllExceptHeaderButtons = {
+  primaryButton: DialogButton;
+  secondaryButton: DialogButton;
+  linkButton?: DialogButton;
+  headerButton?: never;
 };
 
 export type DialogAllButtons = {
   primaryButton: DialogButton;
   secondaryButton: DialogButton;
   linkButton?: DialogButton;
+  headerButton?: DialogButton;
 };

@@ -21,7 +21,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
-import ActionSection from '../action-section';
+import ActionSection from './components/action-section';
+import BacktestingDialog from './components/backtesting-dialog';
 import useEditRules from './hooks/use-edit-rules';
 
 export type ContentProps = {
@@ -49,6 +50,7 @@ const Content = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules',
   });
+  const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [addedRules, setAddedRules] = useState<AddedRuleWithId[]>([]);
   const [deletedRuleIds, setDeletedRuleIds] = useState<string[]>([]);
@@ -131,25 +133,26 @@ const Content = ({
     toggleDisableHeading(false);
   };
 
-  const handleSave = () => {
-    const fields = {
-      add: addedRules
-        .filter(rule => rule.ruleExpression.some(ruleField => ruleField.field))
-        .map((rule: AddedRuleWithId) => {
-          const newRule = cloneDeep(rule);
-          delete newRule['tempId' as keyof AddedRuleWithId];
-          return newRule;
-        }),
-      delete: deletedRuleIds.concat(
-        editedRules // Also delete all rules that were edited to be empty
-          .filter(
-            rule => !rule.ruleExpression.some(ruleField => ruleField.field),
-          )
-          .map(rule => rule.ruleId),
-      ),
+  const formatRuleFields = () => {
+    const add = addedRules
+      .filter(rule => rule.ruleExpression.some(ruleField => ruleField.field))
+      .map((rule: AddedRuleWithId) => {
+        const newRule = cloneDeep(rule);
+        delete newRule['tempId' as keyof AddedRuleWithId];
+        return newRule;
+      });
+    return {
+      add,
+      delete: deletedRuleIds,
       edit: editedRules.filter(rule =>
         rule.ruleExpression.some(ruleField => ruleField.field),
       ),
+    };
+  };
+
+  const handleSave = () => {
+    const fields = {
+      ...formatRuleFields(),
       expectedRuleSetVersion: playbook.ruleSet.version,
     };
     editMutation.mutate(
@@ -226,15 +229,25 @@ const Content = ({
                   disabled={[addedRules, deletedRuleIds, editedRules].every(
                     arr => arr.length === 0,
                   )}
-                  onClick={handleSave}
+                  onClick={() => setOpen(true)}
                 >
-                  {t('edit-bar.save-changes')}
+                  {t('edit-bar.test-changes')}
                 </Button>
               </Stack>
             </Stack>
           </EditBar>
         )}
       </Stack>
+      {open && (
+        <BacktestingDialog
+          open={open}
+          playbookId={playbook.id}
+          ruleEdits={formatRuleFields()}
+          isSaveLoading={editMutation.isLoading}
+          onSave={handleSave}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </>
   );
 };

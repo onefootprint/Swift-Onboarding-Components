@@ -55,6 +55,10 @@ export type {
   EntitiesVaultDecryptResponse,
 } from './entities-vault-decrypt';
 export type {
+  EvaluateRulesRequest,
+  EvaluateRulesResponse,
+} from './evaluate-rules';
+export type {
   GetAccessEventsRequest,
   GetAccessEventsResponse,
 } from './get-access-events';

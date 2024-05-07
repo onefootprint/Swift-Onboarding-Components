@@ -42,6 +42,7 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
       onOpenChange,
       onClickOutside,
       onChange,
+      alignment = 'start',
     },
     ref,
   ) => {
@@ -129,7 +130,7 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
         {open && (
           <Popover.Content
             sideOffset={8}
-            align="start"
+            align={alignment}
             forceMount
             asChild
             onPointerDownOutside={onClickOutside}

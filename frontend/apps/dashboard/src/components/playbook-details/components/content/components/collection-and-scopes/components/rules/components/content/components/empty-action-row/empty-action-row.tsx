@@ -23,7 +23,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import useLists from '@/lists/pages/list/hooks/use-lists';
 
-import type { AddedRuleWithId } from '../content';
+import type { AddedRuleWithId } from '../..';
 
 export type EmptyActionRowProps = {
   action: RuleAction;
