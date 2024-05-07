@@ -24,8 +24,10 @@ use crate::{
 use async_trait::async_trait;
 use db::{
     models::{
-        decision_intent::DecisionIntent, identity_document::IdentityDocument,
-        incode_customer_session::IncodeCustomerSession, ob_configuration::ObConfiguration,
+        decision_intent::DecisionIntent,
+        identity_document::{DocumentImageArgs, IdentityDocument},
+        incode_customer_session::IncodeCustomerSession,
+        ob_configuration::ObConfiguration,
         verification_result::VerificationResult,
     },
     DbPool, DbResult, TxnPgConn,
@@ -116,7 +118,7 @@ impl IncodeStateTransition for FetchScores {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
                 let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
-                let doc_uploads = id_doc.images(conn, true, None)?;
+                let doc_uploads = id_doc.images(conn, DocumentImageArgs::default())?;
                 Ok((obc, vw, id_doc, doc_uploads))
             })
             .await?;

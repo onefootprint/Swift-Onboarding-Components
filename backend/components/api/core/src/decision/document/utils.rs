@@ -1,5 +1,8 @@
 use db::{
-    models::{document_upload::DocumentUpload, identity_document::IdentityDocument},
+    models::{
+        document_upload::DocumentUpload,
+        identity_document::{DocumentImageArgs, IdentityDocument},
+    },
     TxnPgConn,
 };
 use itertools::Itertools;
@@ -24,7 +27,7 @@ pub fn get_side_info(
     side: Option<DocumentSide>,
 ) -> ApiResult<(MissingSides, Option<i64>)> {
     let existing_sides = id_doc
-        .images(conn, true, None)?
+        .images(conn, DocumentImageArgs::default())?
         .into_iter()
         .map(|u| u.side)
         .collect_vec();

@@ -152,7 +152,11 @@ impl IdentityDocument {
             .get_result(conn.conn())
             .optional()?;
         if let Some(existing) = existing {
-            let has_no_uploads = existing.images(conn, false, None)?.is_empty();
+            let args = DocumentImageArgs {
+                only_active: false,
+                ..DocumentImageArgs::default()
+            };
+            let has_no_uploads = existing.images(conn, args)?.is_empty();
             if existing.document_type == document_type
                 && existing.country_code == country_code.map(|c| c.to_string())
                 && existing.fixture_result == fixture_result
@@ -307,26 +311,6 @@ impl IdentityDocument {
         Ok(res)
     }
 
-    #[tracing::instrument("IdentityDocument::images", skip_all)]
-    pub fn images(
-        &self,
-        conn: &mut PgConn,
-        only_active: bool,
-        at_seqno: Option<DataLifetimeSeqno>,
-    ) -> DbResult<Vec<DocumentUpload>> {
-        let mut query = document_upload::table
-            .filter(document_upload::document_id.eq(&self.id))
-            .into_boxed();
-        if let Some(seqno) = at_seqno {
-            query = query.filter(document_upload::created_seqno.le(seqno));
-        }
-        if only_active {
-            query = query.filter(document_upload::deactivated_at.is_null());
-        }
-        let results = query.get_results(conn)?;
-        Ok(results)
-    }
-
     #[tracing::instrument("IdentityDocument::get_billable_count", skip_all)]
     pub fn get_billable_count(
         conn: &mut PgConn,
@@ -352,5 +336,36 @@ impl IdentityDocument {
             .select(count_star())
             .get_result(conn)?;
         Ok(count)
+    }
+}
+
+pub struct DocumentImageArgs {
+    pub only_active: bool,
+    pub at_seqno: Option<DataLifetimeSeqno>,
+}
+
+impl Default for DocumentImageArgs {
+    fn default() -> Self {
+        Self {
+            only_active: true,
+            at_seqno: None,
+        }
+    }
+}
+
+impl IdentityDocument {
+    #[tracing::instrument("IdentityDocument::images", skip_all)]
+    pub fn images(&self, conn: &mut PgConn, args: DocumentImageArgs) -> DbResult<Vec<DocumentUpload>> {
+        let mut query = document_upload::table
+            .filter(document_upload::document_id.eq(&self.id))
+            .into_boxed();
+        if let Some(seqno) = args.at_seqno {
+            query = query.filter(document_upload::created_seqno.le(seqno));
+        }
+        if args.only_active {
+            query = query.filter(document_upload::deactivated_at.is_null());
+        }
+        let results = query.get_results(conn)?;
+        Ok(results)
     }
 }

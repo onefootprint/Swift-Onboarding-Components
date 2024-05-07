@@ -2,8 +2,11 @@ use std::{str::FromStr, sync::Arc};
 
 use chrono::Utc;
 use db::models::{
-    decision_intent::DecisionIntent, document_upload::DocumentUpload, identity_document::IdentityDocument,
-    incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
+    decision_intent::DecisionIntent,
+    document_upload::DocumentUpload,
+    identity_document::{DocumentImageArgs, IdentityDocument},
+    incode_verification_session::IncodeVerificationSession,
+    ob_configuration::ObConfiguration,
     verification_request::VerificationRequest,
 };
 
@@ -163,7 +166,7 @@ pub async fn save_incode_fixtures(
                 .pop()
                 .ok_or(AssertionError("missing vres in incode fixture"))?;
 
-            let doc_uploads = iddoc.images(conn, true, None)?;
+            let doc_uploads = iddoc.images(conn, DocumentImageArgs::default())?;
 
             Ok((vres, doc_uploads))
         })

@@ -2,7 +2,11 @@ use std::sync::Arc;
 
 use crate::{decision::vendor::vendor_trait::MockVendorAPICall, State};
 use crypto::aead::SealingKey;
-use db::{models::identity_document::IdentityDocument, tests::MockFFClient, DbResult};
+use db::{
+    models::identity_document::{DocumentImageArgs, IdentityDocument},
+    tests::MockFFClient,
+    DbResult,
+};
 use feature_flag::BoolFlag;
 use idv::incode::{
     doc::{
@@ -226,7 +230,7 @@ pub async fn mock_enclave_s3_client(
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let (identity_document, _) = IdentityDocument::get(conn, &document_id)?;
-            identity_document.images(conn, true, None)
+            identity_document.images(conn, DocumentImageArgs::default())
         })
         .await
         .unwrap()

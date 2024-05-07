@@ -25,7 +25,7 @@ use db::{
         data_lifetime::DataLifetime,
         document_data::DocumentData,
         document_upload::DocumentUpload,
-        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        identity_document::{DocumentImageArgs, IdentityDocument, IdentityDocumentUpdate},
         ob_configuration::ObConfiguration,
         risk_signal::RiskSignal,
         user_timeline::UserTimeline,
@@ -291,7 +291,7 @@ pub fn vault_complete_images(
     // we vault the complete images for
     let doc_type_for_latest_upload = id_doc.document_type;
     let docs = id_doc
-        .images(conn, true, None)?
+        .images(conn, DocumentImageArgs::default())?
         .into_iter()
         .map(|u| {
             let di = DocumentKind::LatestUpload(doc_type_for_latest_upload, u.side).into();

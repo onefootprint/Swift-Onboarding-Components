@@ -12,7 +12,10 @@ use api_core::{
         vault_wrapper::{Any, TenantVw, VaultWrapper},
     },
 };
-use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
+use db::models::{
+    identity_document::{DocumentImageArgs, IdentityDocument},
+    scoped_vault::ScopedVault,
+};
 use itertools::{chain, Itertools};
 use newtypes::{
     CustomDocumentConfig, DataIdentifier, DocumentKind, DocumentRequestConfig, DocumentSide, IdDocKind,
@@ -45,7 +48,11 @@ pub async fn get(
             let id_docs = documents
                 .into_iter()
                 .map(|(doc, dr)| -> ApiResult<_> {
-                    let images = doc.images(conn, false, seqno)?;
+                    let args = DocumentImageArgs {
+                        only_active: false,
+                        at_seqno: seqno,
+                    };
+                    let images = doc.images(conn, args)?;
                     Ok((doc, dr, images))
                 })
                 .filter_ok(|(_, _, images)| !images.is_empty())
