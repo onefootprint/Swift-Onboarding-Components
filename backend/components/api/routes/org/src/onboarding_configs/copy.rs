@@ -84,17 +84,19 @@ async fn post(
             let obc = ObConfiguration::lock(conn, &obc.id)?;
 
             // And add the copied rules into the new playbook
-            let add_rules_request = MultiUpdateRuleRequest {
-                expected_rule_set_version: 0,
-                add: Some(rules),
-                edit: None,
-                delete: None,
-            };
-            // TODO this will error if we try to copy a rule that references a list that doesn't
-            // exist in the target tenant
-            let rules_update =
-                validate_rules_request(conn, &target_tenant_id, target_is_live, add_rules_request)?;
-            RuleInstance::bulk_edit(conn, &obc, &target_actor.into(), rules_update)?;
+            if !rules.is_empty() {
+                let add_rules_request = MultiUpdateRuleRequest {
+                    expected_rule_set_version: 0,
+                    add: Some(rules),
+                    edit: None,
+                    delete: None,
+                };
+                // TODO this will error if we try to copy a rule that references a list that doesn't
+                // exist in the target tenant
+                let rules_update =
+                    validate_rules_request(conn, &target_tenant_id, target_is_live, add_rules_request)?;
+                RuleInstance::bulk_edit(conn, &obc, &target_actor.into(), rules_update)?;
+            }
 
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc.into_inner())?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;
