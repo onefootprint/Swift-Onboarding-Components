@@ -188,8 +188,8 @@ const getDocDis = ({ dis, documents, vaultData }: GetDocDIsProps) => {
         });
         // get the specific upload images for each document
         uploads.forEach(upload => {
-          const { version, side } = upload;
-          const di = `document.${idDocType}.${side}.latest_upload:${version}`;
+          const { version, identifier } = upload;
+          const di = `${identifier}:${version}`;
           dis.push(di);
         });
       });

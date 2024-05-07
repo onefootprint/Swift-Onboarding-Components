@@ -26,9 +26,9 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
   });
   const { formatTime } = useIntl();
 
-  const getImgBase64Data = (side: IdDocImageTypes, version: string) => {
+  const getImgBase64Data = (upload: DocumentUpload) => {
     const vaultIndex =
-      `document.${currentDocument?.kind}.${side}.latest_upload:${version}` as DataIdentifier;
+      `${upload.identifier}:${upload.version}` as DataIdentifier;
     const hasVaultValue = vaultIndex in vault;
     if (hasVaultValue) {
       const vaultValue = vault[vaultIndex];
@@ -129,10 +129,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
             </Title>
             <HoverableImage
               isSuccess={upload.failureReasons.length === 0}
-              base64Data={getImgBase64Data(
-                upload.side,
-                upload.version.toString(),
-              )}
+              base64Data={getImgBase64Data(upload)}
               documentName={t(
                 `document-types.${currentDocument.kind}` as ParseKeys<'common'>,
               )}

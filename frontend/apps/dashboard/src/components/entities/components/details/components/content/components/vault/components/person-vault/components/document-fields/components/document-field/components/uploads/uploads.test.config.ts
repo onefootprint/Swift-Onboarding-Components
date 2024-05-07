@@ -29,6 +29,7 @@ export const idCardMobile: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardFront,
     },
   ],
 };
@@ -49,6 +50,7 @@ export const idCardDesktop: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardFront,
     },
   ],
 };
@@ -69,6 +71,7 @@ export const idCardApi: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardFront,
     },
   ],
 };
@@ -89,6 +92,7 @@ export const successfulIDCardDocument: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardFront,
     },
     {
       version: 676,
@@ -96,6 +100,7 @@ export const successfulIDCardDocument: Document = {
       side: IdDocImageTypes.back,
       timestamp: '2022-05-08T03:16:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardBack,
     },
     {
       version: 677,
@@ -103,6 +108,7 @@ export const successfulIDCardDocument: Document = {
       side: IdDocImageTypes.selfie,
       timestamp: '2022-05-09T05:27:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardSelfie,
     },
   ],
 };
@@ -123,6 +129,7 @@ export const failedIdCardDocument: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardFront,
     },
     {
       version: 676,
@@ -130,6 +137,7 @@ export const failedIdCardDocument: Document = {
       side: IdDocImageTypes.back,
       timestamp: '2022-05-08T03:16:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardBack,
     },
     {
       version: 677,
@@ -137,6 +145,7 @@ export const failedIdCardDocument: Document = {
       side: IdDocImageTypes.selfie,
       timestamp: '2022-05-09T05:27:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardSelfie,
     },
   ],
 };

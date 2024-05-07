@@ -1,3 +1,4 @@
+import type { DataIdentifier } from './di';
 import type {
   IdDocImageTypes,
   IdDocStatus,
@@ -10,6 +11,7 @@ export type DocumentUpload = {
   side: IdDocImageTypes;
   timestamp: string;
   isExtraCompressed: boolean;
+  identifier: DataIdentifier;
 };
 
 export enum UploadSource {

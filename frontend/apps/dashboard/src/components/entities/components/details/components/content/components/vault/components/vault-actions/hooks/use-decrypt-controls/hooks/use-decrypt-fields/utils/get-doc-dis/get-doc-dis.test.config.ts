@@ -53,6 +53,7 @@ export const idCardDocument1: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardFront,
     },
     {
       version: 125,
@@ -60,6 +61,7 @@ export const idCardDocument1: Document = {
       side: IdDocImageTypes.back,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardBack,
     },
     {
       version: 124,
@@ -67,6 +69,7 @@ export const idCardDocument1: Document = {
       side: IdDocImageTypes.selfie,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardSelfie,
     },
   ],
   documentScore: 70,
@@ -87,6 +90,7 @@ export const idCardDocument2: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardFront,
     },
     {
       version: 260,
@@ -94,6 +98,7 @@ export const idCardDocument2: Document = {
       side: IdDocImageTypes.back,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardBack,
     },
     {
       version: 270,
@@ -101,6 +106,7 @@ export const idCardDocument2: Document = {
       side: IdDocImageTypes.selfie,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestIdCardSelfie,
     },
   ],
   documentScore: 70,
@@ -121,6 +127,7 @@ export const driversLicenseDocument1: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseFront,
     },
     {
       version: 460,
@@ -128,6 +135,7 @@ export const driversLicenseDocument1: Document = {
       side: IdDocImageTypes.back,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseBack,
     },
     {
       version: 470,
@@ -135,6 +143,7 @@ export const driversLicenseDocument1: Document = {
       side: IdDocImageTypes.selfie,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseSelfie,
     },
   ],
   documentScore: null,
@@ -155,6 +164,7 @@ export const driversLicenseDocument2: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseFront,
     },
     {
       version: 790,
@@ -162,6 +172,7 @@ export const driversLicenseDocument2: Document = {
       side: IdDocImageTypes.back,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseBack,
     },
     {
       version: 791,
@@ -169,6 +180,7 @@ export const driversLicenseDocument2: Document = {
       side: IdDocImageTypes.selfie,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseSelfie,
     },
   ],
   documentScore: null,
@@ -189,6 +201,7 @@ export const incompleteDriversLicense: Document = {
       side: IdDocImageTypes.front,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseFront,
     },
     {
       version: 790,
@@ -196,6 +209,7 @@ export const incompleteDriversLicense: Document = {
       side: IdDocImageTypes.back,
       timestamp: '2020-01-01T00:00:00.000Z',
       isExtraCompressed: false,
+      identifier: DocumentDI.latestDriversLicenseBack,
     },
   ],
   documentScore: null,

@@ -326,6 +326,7 @@ export const documentsFixture: Document[] = [
         failureReasons: [],
         version: 15271906,
         isExtraCompressed: false,
+        identifier: DocumentDI.latestDriversLicenseFront,
       },
       {
         timestamp: '2024-04-30T19:57:11.681977Z',
@@ -333,6 +334,7 @@ export const documentsFixture: Document[] = [
         failureReasons: [],
         version: 15271914,
         isExtraCompressed: false,
+        identifier: DocumentDI.latestDriversLicenseBack,
       },
       {
         timestamp: '2024-04-30T19:57:21.226280Z',
@@ -340,6 +342,7 @@ export const documentsFixture: Document[] = [
         failureReasons: [],
         version: 15271924,
         isExtraCompressed: false,
+        identifier: DocumentDI.latestDriversLicenseSelfie,
       },
     ],
     documentScore: 100.0,
@@ -359,6 +362,7 @@ export const documentsFixture: Document[] = [
         failureReasons: [],
         version: 15187121,
         isExtraCompressed: false,
+        identifier: DocumentDI.latestDriversLicenseFront,
       },
       {
         timestamp: '2024-04-29T18:39:32.050157Z',
@@ -366,6 +370,7 @@ export const documentsFixture: Document[] = [
         failureReasons: [],
         version: 15187168,
         isExtraCompressed: false,
+        identifier: DocumentDI.latestDriversLicenseSelfie,
       },
       {
         timestamp: '2024-04-29T18:39:05.987436Z',
@@ -373,6 +378,7 @@ export const documentsFixture: Document[] = [
         failureReasons: [],
         version: 15187130,
         isExtraCompressed: false,
+        identifier: DocumentDI.latestDriversLicenseBack,
       },
     ],
     documentScore: 100.0,
