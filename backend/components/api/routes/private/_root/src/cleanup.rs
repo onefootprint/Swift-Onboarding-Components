@@ -10,7 +10,14 @@ use api_core::{
     ApiErrorKind, State,
 };
 use api_wire_types::IdentifyId;
-use db::models::{tenant::Tenant, vault::Vault};
+use db::{
+    errors::OptionalExtension,
+    models::{
+        scoped_vault::{ScopedVault, ScopedVaultIdentifier},
+        tenant::Tenant,
+        vault::Vault,
+    },
+};
 use feature_flag::BoolFlag;
 use newtypes::{email::Email, PhoneNumber};
 
@@ -19,6 +26,7 @@ use newtypes::{email::Email, PhoneNumber};
 pub enum Request {
     PhoneNumber(PhoneNumber),
     Email(Email),
+    Id(String),
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -84,6 +92,16 @@ async fn post(
             } else {
                 None
             }
+        }
+        Request::Id(id) => {
+            state
+                .db_pool
+                .db_query(move |conn| -> ApiResult<_> {
+                    let id = ScopedVaultIdentifier::SuperAdminView { identifier: &id };
+                    let sv = ScopedVault::get(conn, id).optional()?;
+                    Ok(sv.map(|sv| sv.vault_id))
+                })
+                .await?
         }
     };
 

@@ -121,6 +121,7 @@ pub enum ScopedVaultIdentifier<'a> {
         is_live: IsLive,
     },
     /// Only used in firm-employee-authed GET /private/entities API
+    #[from(ignore)]
     SuperAdminView {
         /// Either an fp id or a scoped vault id
         identifier: &'a str,
