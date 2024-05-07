@@ -68,6 +68,8 @@ pub struct Tenant {
     pub support_phone: Option<String>,
     /// Website that shows in embedded support views
     pub support_website: Option<String>,
+    /// The tenant that this tenant belongs to
+    pub super_tenant_id: Option<TenantId>
 }
 
 impl Tenant {

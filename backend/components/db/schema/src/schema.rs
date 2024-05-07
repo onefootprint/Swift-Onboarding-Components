@@ -1193,6 +1193,7 @@ diesel::table! {
         support_email -> Nullable<Text>,
         support_phone -> Nullable<Text>,
         support_website -> Nullable<Text>,
+        super_tenant_id -> Nullable<Text>,
     }
 }
 
