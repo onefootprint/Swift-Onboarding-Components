@@ -1,11 +1,11 @@
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::{risk_signal, risk_signal_group, scoped_vault};
+use db_schema::schema::{risk_signal, risk_signal_group};
 use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalGroupId,
-    RiskSignalGroupKind, RiskSignalId, ScopedVaultId, TenantId, VendorAPI, VerificationResultId,
+    DataLifetimeSeqno, FootprintReasonCode, OnboardingDecisionId, RiskSignalGroupId, RiskSignalGroupKind,
+    RiskSignalId, ScopedVaultId, VendorAPI, VerificationResultId,
 };
 use std::collections::HashMap;
 #[cfg(test)]
@@ -114,34 +114,14 @@ impl RiskSignal {
             .collect()
     }
 
-    fn query<'a>(
-        fp_id: &'a FpId,
-        tenant_id: &'a TenantId,
-        is_live: bool,
-    ) -> risk_signal::BoxedQuery<'a, diesel::pg::Pg> {
-        let risk_signal_group_ids = risk_signal_group::table
-            .inner_join(scoped_vault::table)
-            .filter(scoped_vault::fp_id.eq(fp_id))
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::is_live.eq(is_live))
-            .filter(scoped_vault::deactivated_at.is_null())
-            .select(risk_signal_group::id);
-        risk_signal::table
-            .filter(risk_signal::risk_signal_group_id.eq_any(risk_signal_group_ids))
-            .into_boxed()
-    }
-
-    #[tracing::instrument("RiskSignal::get_tenant_visible", skip_all)]
-    pub fn get_tenant_visible(
-        conn: &mut PgConn,
-        id: &RiskSignalId,
-        fp_id: &FpId,
-        tenant_id: &TenantId,
-        is_live: bool,
-    ) -> DbResult<Self> {
-        let signal = Self::query(fp_id, tenant_id, is_live)
+    #[tracing::instrument("RiskSignal::get", skip_all)]
+    pub fn get(conn: &mut PgConn, id: &RiskSignalId, sv_id: &ScopedVaultId) -> DbResult<Self> {
+        let signal = risk_signal::table
+            .inner_join(risk_signal_group::table)
+            .filter(risk_signal_group::scoped_vault_id.eq(sv_id))
             .filter(risk_signal::id.eq(id))
             .filter(risk_signal::hidden.eq(false))
+            .select(risk_signal::all_columns)
             .get_result::<Self>(conn)?;
         Ok(signal)
     }
@@ -213,11 +193,26 @@ impl RiskSignal {
         Ok(rows_updated)
     }
 
+    #[tracing::instrument("RiskSignal::list_by_verification_result_id", skip_all)]
+    pub fn list_by_verification_result_id(
+        conn: &mut PgConn,
+        vres_id: &VerificationResultId,
+    ) -> DbResult<Vec<Self>> {
+        let results = risk_signal::table
+            .filter(risk_signal::verification_result_id.eq(vres_id))
+            .get_results(conn)?;
+        Ok(results)
+    }
+}
+
+
+impl RiskSignal {
     // Historically, we were writing RiskSignal's with onboarding_decision_id as a foreign key.
     // Now OBD_id is optional and soon new RiskSignal's will be created with onboarding_decision_id = None and instead have
     // verification_result_id set
     // This function currently preserves legacy behavior in that it will return RS's created within the context of a certain onboarding_decision_id.
     // Legacy RS's will be retrieved as usual through rs.obd_id, but new RS's are retrieved via the onboarding_decision_verification_result_junction table
+    #[cfg(test)]
     #[tracing::instrument("RiskSignal::list_tenant_visible_by_onboarding_decision_id", skip_all)]
     fn list_tenant_visible_by_onboarding_decision_id(
         conn: &mut PgConn,
@@ -243,17 +238,6 @@ impl RiskSignal {
         let all_ids = ids.into_iter().chain(ids2.into_iter()).unique().collect_vec();
         let results = risk_signal::table
             .filter(risk_signal::id.eq_any(all_ids))
-            .get_results(conn)?;
-        Ok(results)
-    }
-
-    #[tracing::instrument("RiskSignal::list_by_verification_result_id", skip_all)]
-    pub fn list_by_verification_result_id(
-        conn: &mut PgConn,
-        vres_id: &VerificationResultId,
-    ) -> DbResult<Vec<Self>> {
-        let results = risk_signal::table
-            .filter(risk_signal::verification_result_id.eq(vres_id))
             .get_results(conn)?;
         Ok(results)
     }

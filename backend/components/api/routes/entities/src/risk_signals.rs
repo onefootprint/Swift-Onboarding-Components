@@ -275,7 +275,8 @@ async fn get_risk_signal_and_maybe_aml_detail(
     let (rs, vreq_vres_key_obc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let rs = RiskSignal::get_tenant_visible(conn, &risk_signal_id, &fp_id, &tenant_id, is_live)?;
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
             let vreq_vres_key = if rs.reason_code.is_aml() {
                 // we only need to read the vres if it was an Aml risk signal and we need to populate the `aml` portion of the response
                 let (vreq, vres) = VerificationResult::get(conn, &rs.verification_result_id)?;
