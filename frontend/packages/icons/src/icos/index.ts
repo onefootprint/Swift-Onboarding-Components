@@ -213,6 +213,8 @@ export { default as IcoLockOpen16 } from './ico-lock-open-16';
 export { default as IcoLockOpen24 } from './ico-lock-open-24';
 export { default as IcoLogOut16 } from './ico-log-out-16';
 export { default as IcoLogOut24 } from './ico-log-out-24';
+export { default as IcoMapPinDefault } from './ico-map-pin-default-colored';
+export { default as IcoMapPinSelected } from './ico-map-pin-selected-colored';
 export { default as IcoMastercard16 } from './ico-mastercard-colored-16';
 export { default as IcoMastercard24 } from './ico-mastercard-colored-24';
 export { default as IcoMaximize16 } from './ico-maximize-16';
