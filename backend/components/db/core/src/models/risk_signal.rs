@@ -47,6 +47,9 @@ pub struct NewRiskSignal {
 
 pub type NewRiskSignalInfo = (FootprintReasonCode, VendorAPI, VerificationResultId);
 
+#[derive(derive_more::Deref)]
+pub struct AtSeqno(pub Option<DataLifetimeSeqno>);
+
 impl RiskSignal {
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
     pub fn bulk_create(
@@ -148,29 +151,38 @@ impl RiskSignal {
     pub fn latest_by_risk_signal_group_kinds(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
+        at_seqno: AtSeqno,
     ) -> DbResult<Vec<(RiskSignalGroupKind, Self)>> {
-        // TODO only select the RSGs that have risk signals active at the provided seqno
-        let rsg: Vec<RiskSignalGroup> = risk_signal_group::table
+        // First, fetch the most recent RSGs per kind that has any visible RSes
+        let mut query = risk_signal_group::table
             .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
+            .filter(risk_signal::hidden.eq(false))
+            .inner_join(risk_signal::table)
             .order((risk_signal_group::kind, risk_signal_group::created_at.desc()))
             .distinct_on(risk_signal_group::kind)
-            .get_results(conn)?;
-        let rsg_ids: Vec<RiskSignalGroupId> = rsg.iter().map(|r| r.id.clone()).collect();
-        let rsg_map: HashMap<RiskSignalGroupId, RiskSignalGroupKind> =
-            rsg.into_iter().map(|r| (r.id, r.kind)).collect();
+            .select(risk_signal_group::all_columns)
+            .into_boxed();
+        if let Some(at_seqno) = at_seqno.as_ref() {
+            query = query.filter(risk_signal::seqno.le(at_seqno));
+        }
+        let rsgs = query.get_results::<RiskSignalGroup>(conn)?;
+        let rsg_kinds: HashMap<_, _> = rsgs.into_iter().map(|r| (r.id, r.kind)).collect();
+        let rsg_ids = rsg_kinds.keys().cloned().collect_vec();
 
-        let risk_signals = risk_signal::table
+        // Then, fetch the visible RSes in each RSG
+        let mut query = risk_signal::table
             .filter(risk_signal::risk_signal_group_id.eq_any(rsg_ids))
             .filter(risk_signal::hidden.eq(false))
-            .get_results::<Self>(conn)?;
+            .into_boxed();
+        if let Some(at_seqno) = at_seqno.as_ref() {
+            query = query.filter(risk_signal::seqno.le(at_seqno));
+        }
+        let risk_signals = query.get_results::<Self>(conn)?;
 
         // construct output
         let res = risk_signals
             .into_iter()
-            .filter_map(|rs| {
-                let rsg_kind = rsg_map.get(&rs.risk_signal_group_id).cloned();
-                rsg_kind.map(|kind| (kind, rs))
-            })
+            .filter_map(|rs| rsg_kinds.get(&rs.risk_signal_group_id).map(|kind| (*kind, rs)))
             .collect();
 
         Ok(res)

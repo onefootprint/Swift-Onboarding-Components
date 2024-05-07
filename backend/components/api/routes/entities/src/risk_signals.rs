@@ -12,6 +12,7 @@ use api_core::{
 };
 use db::models::{
     access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
+    risk_signal::AtSeqno,
 };
 use newtypes::{
     AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DbActor,
@@ -61,6 +62,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     filters: web::Query<RiskSignalFilters>,
+    version: web::Query<api_wire_types::GetHistoricalDataRequest>,
     // TODO remove SecretTenantAuthContext here when everyone has migrated to the new GET /users/<>/risk_signals API
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     root_span: RootSpan,
@@ -77,12 +79,13 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
     let can_view_neuro = tenant_can_view_neuro(&state, &tenant_id);
+    let api_wire_types::GetHistoricalDataRequest { seqno } = version.into_inner();
 
     let signals = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id)
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(seqno))
         })
         .await?
         .into_iter()

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::{AtSeqno, RiskSignal};
 use idv::ParsedResponse;
 use newtypes::{
     FootprintReasonCode, IdentityDataKind as IDK, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
@@ -148,7 +148,7 @@ pub fn fetch_latest_risk_signals_map(
 ) -> Result<RiskSignalsForDecision, ApiError> {
     let mut db_risk_signals_map: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
         // We don't make decisions on hidden risk signals
-        RiskSignal::latest_by_risk_signal_group_kinds(conn, scoped_vault_id)?
+        RiskSignal::latest_by_risk_signal_group_kinds(conn, scoped_vault_id, AtSeqno(None))?
             .into_iter()
             .fold(HashMap::new(), |mut acc, (kind, rs)| {
                 acc.entry(kind).or_default().push(rs);

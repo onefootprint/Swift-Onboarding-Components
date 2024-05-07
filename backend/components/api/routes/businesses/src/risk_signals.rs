@@ -6,7 +6,10 @@ use crate::{
 };
 use api_core::utils::fp_id_path::FpIdPath;
 use db::{
-    models::{risk_signal::RiskSignal, scoped_vault::ScopedVault},
+    models::{
+        risk_signal::{AtSeqno, RiskSignal},
+        scoped_vault::ScopedVault,
+    },
     DbResult,
 };
 use itertools::Itertools;
@@ -36,7 +39,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id)
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(None))
         })
         .await?
         .into_iter()

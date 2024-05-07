@@ -28,10 +28,18 @@ use chrono::{DateTime, Utc};
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
-        annotation::Annotation, document_request::DocumentRequest, identity_document::IdentityDocument,
-        insight_event::InsightEvent, manual_review::ManualReview, ob_configuration::ObConfiguration,
-        onboarding_decision::OnboardingDecision, risk_signal::RiskSignal, scoped_vault::ScopedVault,
-        user_timeline::UserTimeline, verification_request::VerificationRequest, workflow::Workflow,
+        annotation::Annotation,
+        document_request::DocumentRequest,
+        identity_document::IdentityDocument,
+        insight_event::InsightEvent,
+        manual_review::ManualReview,
+        ob_configuration::ObConfiguration,
+        onboarding_decision::OnboardingDecision,
+        risk_signal::{AtSeqno, RiskSignal},
+        scoped_vault::ScopedVault,
+        user_timeline::UserTimeline,
+        verification_request::VerificationRequest,
+        workflow::Workflow,
     },
 };
 use idv::ParsedResponse;
@@ -212,7 +220,7 @@ pub(crate) async fn create_cip_request(
             let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
-            let risk_signals = RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id)?
+            let risk_signals = RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, AtSeqno(None))?
                 .into_iter()
                 .map(|(_, rs)| rs)
                 .collect_vec();

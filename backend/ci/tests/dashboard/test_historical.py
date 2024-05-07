@@ -132,3 +132,27 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
     data = dict(seqno=timeline[-1]["seqno"] - 100)
     body = get(f"entities/{user.fp_id}/documents", data, *sandbox_tenant.db_auths)
     assert not body
+
+
+def test_historical_risk_signals(sandbox_tenant):
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    user = bifrost.run()
+
+    body = get(f"entities/{user.fp_id}/risk_signals", None, *sandbox_tenant.db_auths)
+    assert body, "Should have risk signals"
+
+    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+
+    # First even should have no risk signals
+    first_event = timeline[-1]
+    data = dict(seqno=first_event["seqno"])
+    body = get(f"entities/{user.fp_id}/risk_signals", data, *sandbox_tenant.db_auths)
+    assert not body, "Should not have risk signals at first timeline event"
+
+    # Event with decision should have risk signals
+    decision_event = next(
+        te for te in timeline if te["event"]["kind"] == "onboarding_decision"
+    )
+    data = dict(seqno=decision_event["seqno"])
+    body = get(f"entities/{user.fp_id}/risk_signals", data, *sandbox_tenant.db_auths)
+    assert body, "Should have risk signals at decision event"
