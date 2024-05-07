@@ -27,7 +27,9 @@ pub struct RiskSignal {
     pub hidden: bool,
     pub vendor_api: VendorAPI,
     pub risk_signal_group_id: RiskSignalGroupId,
-    pub seqno: Option<DataLifetimeSeqno>,
+    /// The seqno at which the risk signal was created.
+    /// NOTE: this was backfilled using vreq.seqno on May 6th, 2024
+    pub seqno: DataLifetimeSeqno,
 }
 
 #[derive(Debug, Clone, Insertable)]

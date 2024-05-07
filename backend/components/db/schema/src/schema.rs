@@ -914,7 +914,7 @@ diesel::table! {
         hidden -> Bool,
         vendor_api -> Text,
         risk_signal_group_id -> Text,
-        seqno -> Nullable<Int8>,
+        seqno -> Int8,
     }
 }
 

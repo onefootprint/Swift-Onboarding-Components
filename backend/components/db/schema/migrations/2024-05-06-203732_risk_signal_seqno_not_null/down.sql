@@ -1,0 +1,1 @@
+ALTER TABLE risk_signal ALTER COLUMN seqno DROP NOT NULL;
