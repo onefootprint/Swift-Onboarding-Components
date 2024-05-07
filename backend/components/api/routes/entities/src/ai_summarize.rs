@@ -6,7 +6,10 @@ use crate::{
 };
 use api_core::{utils::fp_id_path::FpIdPath, ApiError, ApiErrorKind};
 use api_wire_types::UserAiSummary;
-use db::models::{risk_signal::IncludeHidden, scoped_vault::ScopedVault};
+use db::models::{
+    annotation::Annotation, auth_event::AuthEvent, risk_signal::RiskSignal, rule_set_result::RuleSetResult,
+    scoped_vault::ScopedVault,
+};
 use newtypes::{ExternalId, FpId, OnboardingStatus};
 use openai::chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole};
 use paperclip::actix::{api_v2_operation, post, web};
@@ -32,21 +35,10 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let (auth_events, _) = db::models::auth_event::AuthEvent::list(conn, &sv.id, None)?;
-            let annotations = db::models::annotation::Annotation::list(
-                conn,
-                fp_id.clone(),
-                tenant_id.clone(),
-                is_live,
-                None,
-            )?;
-            let risk_signals = db::models::risk_signal::RiskSignal::latest_by_risk_signal_group_kinds(
-                conn,
-                &sv.id,
-                IncludeHidden(false),
-            )?;
-            let rule_set_result =
-                db::models::rule_set_result::RuleSetResult::latest_workflow_decision(conn, &sv.id)?;
+            let (auth_events, _) = AuthEvent::list(conn, &sv.id, None)?;
+            let annotations = Annotation::list(conn, fp_id.clone(), tenant_id.clone(), is_live, None)?;
+            let risk_signals = RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id)?;
+            let rule_set_result = RuleSetResult::latest_workflow_decision(conn, &sv.id)?;
 
             Ok((sv, rule_set_result, risk_signals, auth_events, annotations))
         })

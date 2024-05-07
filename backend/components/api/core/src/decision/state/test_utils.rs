@@ -17,7 +17,7 @@ use db::{
         manual_review::ManualReview,
         ob_configuration::ObConfiguration,
         onboarding_decision::OnboardingDecision,
-        risk_signal::{IncludeHidden, RiskSignal},
+        risk_signal::RiskSignal,
         rule_instance::RuleInstance,
         rule_result::RuleResult,
         rule_set_result::RuleSetResult,
@@ -188,7 +188,7 @@ pub async fn query_data(
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, IncludeHidden(false))
+            let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid)
                 .unwrap()
                 .into_iter()
                 .map(|(_, rs)| rs)

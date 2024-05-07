@@ -45,8 +45,6 @@ pub struct NewRiskSignal {
     pub seqno: DataLifetimeSeqno,
 }
 
-pub struct IncludeHidden(pub bool);
-
 pub type NewRiskSignalInfo = (FootprintReasonCode, VendorAPI, VerificationResultId);
 
 impl RiskSignal {
@@ -170,7 +168,6 @@ impl RiskSignal {
     pub fn latest_by_risk_signal_group_kinds(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
-        include_hidden: IncludeHidden,
     ) -> DbResult<Vec<(RiskSignalGroupKind, Self)>> {
         // TODO only select the RSGs that have risk signals active at the provided seqno
         let rsg: Vec<RiskSignalGroup> = risk_signal_group::table
@@ -182,13 +179,10 @@ impl RiskSignal {
         let rsg_map: HashMap<RiskSignalGroupId, RiskSignalGroupKind> =
             rsg.into_iter().map(|r| (r.id, r.kind)).collect();
 
-        let mut query = risk_signal::table
+        let risk_signals = risk_signal::table
             .filter(risk_signal::risk_signal_group_id.eq_any(rsg_ids))
-            .into_boxed();
-        if !include_hidden.0 {
-            query = query.filter(risk_signal::hidden.eq(false));
-        }
-        let risk_signals: Vec<RiskSignal> = query.get_results(conn)?;
+            .filter(risk_signal::hidden.eq(false))
+            .get_results::<Self>(conn)?;
 
         // construct output
         let res = risk_signals
