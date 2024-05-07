@@ -4,10 +4,8 @@ const useOptions = () => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   return {
-    clickableIcons: false,
+    fullscreenControl: false,
     disableDefaultUI: true,
-    disableDoubleClickZoom: true,
-    gestureHandling: 'none',
     keyboardShortcuts: false,
     styles: isDark ? darkStyles : lightStyles,
   };

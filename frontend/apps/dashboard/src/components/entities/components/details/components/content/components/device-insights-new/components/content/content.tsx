@@ -1,10 +1,4 @@
-import {
-  BusinessDI,
-  type Entity,
-  IdDI,
-  IdentifyScope,
-  type Liveness,
-} from '@onefootprint/types';
+import { type Entity, IdentifyScope, type Liveness } from '@onefootprint/types';
 import { Divider, MultiSelect, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +7,12 @@ import styled, { css } from 'styled-components';
 import type { Marker } from '../map';
 import Map from '../map';
 import AddressCard from './components/address-card';
-import { AddressType } from './components/address-card/types';
+import AddressCardIcon from './components/address-card/components/address-card-icon';
+import AddressType from './components/address-card/types';
 import ContainerWithToggle from './components/container-with-toggle';
 import InsightEventCard from './components/insight-event-card';
+import useAddressCoordinates from './hooks/use-address-coordinates';
+import useMultiSelectOptions from './hooks/use-multi-select-options';
 import getIconForLivenessEvent from './utils/get-icon-for-liveness-event';
 import getKeyForLiveness from './utils/get-key-for-liveness';
 
@@ -24,114 +21,127 @@ export type ContentProps = {
   livenessData: Liveness[];
 };
 
-enum OptionValue {
-  businessAddress = 'businessAddress',
-  residentialAddress = 'residentialAddress',
-  onboarding = 'onboarding',
-  auth = 'auth',
-}
-
-type Option = { label: string; value: OptionValue };
-
 const Content = ({ entity, livenessData }: ContentProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.device-insights',
   });
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [detailsHidden, setDetailsHidden] = useState(false);
-
-  const options: Option[] = [];
   const cards: JSX.Element[] = [];
   const allMarkers: (Marker | null)[] = [];
-  if (livenessData.length) {
-    const scopes: IdentifyScope[] = Array.from(
-      new Set(livenessData.map(liveness => liveness.scope)),
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const {
+    options,
+    isOnboardingSelected,
+    isAuthSelected,
+    isBusinessAddressSelected,
+    isResidentialAddressSelected,
+    handleOptionsChange,
+  } = useMultiSelectOptions(entity, livenessData);
+
+  let insightEvents = livenessData;
+  if (!isOnboardingSelected) {
+    insightEvents = insightEvents.filter(
+      liveness => liveness.scope !== IdentifyScope.onboarding,
     );
-    scopes.forEach(scope => {
-      if (scope === IdentifyScope.onboarding || scope === IdentifyScope.auth) {
-        options.push({
-          value:
-            scope === IdentifyScope.onboarding
-              ? OptionValue.onboarding
-              : OptionValue.auth,
-          label: t(`scope.${scope}`),
-        });
-      }
-    });
   }
-
-  const hasBusinessAddress = entity.attributes.includes(
-    BusinessDI.addressLine1,
-  );
-  if (hasBusinessAddress) {
-    options.push({
-      value: OptionValue.businessAddress,
-      label: t('select.business-address'),
-    });
+  if (!isAuthSelected) {
+    insightEvents = insightEvents.filter(
+      liveness => liveness.scope !== IdentifyScope.auth,
+    );
   }
-  const hasResidentialAddress = entity.attributes.includes(IdDI.addressLine1);
-  if (hasResidentialAddress) {
-    options.push({
-      value: OptionValue.residentialAddress,
-      label: t('select.residential-address'),
-    });
-  }
+  insightEvents.forEach(liveness => {
+    const lat = liveness.insight.latitude;
+    const lng = liveness.insight.longitude;
+    const isSelected = selectedIndex === allMarkers.length;
+    cards.push(
+      <InsightEventCard
+        key={getKeyForLiveness(liveness)}
+        liveness={liveness}
+      />,
+    );
+    if (lat !== null && lng !== null) {
+      allMarkers.push({
+        lat,
+        lng,
+        icon: getIconForLivenessEvent(
+          liveness,
+          isSelected ? 'quinary' : 'primary',
+        ),
+        isSelected,
+      });
+    } else {
+      allMarkers.push(null);
+    }
+  });
 
-  const [selectedOptionsSet, setSelectedOptionsSet] = useState<
-    Set<OptionValue>
-  >(new Set(options.map(e => e.value)));
-  const handleOptionsChange = (newOptions: readonly Option[]) => {
-    setSelectedOptionsSet(new Set(newOptions.map(e => e.value)));
-  };
-
-  if (selectedOptionsSet.has(OptionValue.onboarding)) {
-    livenessData.forEach(liveness => {
-      const lat = liveness.insight.latitude;
-      const lng = liveness.insight.longitude;
-      const hasLocation = lat !== null && lng !== null;
-      const isSelected = selectedIndex === allMarkers.length;
-      allMarkers.push(
-        hasLocation
-          ? {
-              lat,
-              lng,
-              icon: getIconForLivenessEvent(
-                liveness,
-                isSelected ? 'primary' : 'quinary',
-              ),
-              isSelected,
-            }
-          : null,
-      );
-      cards.push(
-        <InsightEventCard
-          key={getKeyForLiveness(liveness)}
-          liveness={liveness}
-        />,
-      );
-    });
-  }
-
-  // TODO: add markers with getCoordinatesFromAddress
-  if (selectedOptionsSet.has(OptionValue.businessAddress)) {
+  const {
+    lat: businessLat,
+    lng: businessLng,
+    isLoading: businessCoordLoading,
+  } = useAddressCoordinates(entity, AddressType.business);
+  if (isBusinessAddressSelected) {
     cards.push(
       <AddressCard
-        key="business-address"
+        key={AddressType.business}
         type={AddressType.business}
         entity={entity}
+        isLoading={businessCoordLoading}
       />,
     );
+
+    if (businessLat && businessLng) {
+      const isSelected = selectedIndex === allMarkers.length;
+      allMarkers.push({
+        lat: businessLat,
+        lng: businessLng,
+        icon: (
+          <AddressCardIcon
+            type={AddressType.business}
+            color={isSelected ? 'quinary' : 'primary'}
+          />
+        ),
+        isSelected,
+      });
+    } else {
+      allMarkers.push(null);
+    }
   }
 
-  if (selectedOptionsSet.has(OptionValue.residentialAddress)) {
+  const {
+    lat: residentialLat,
+    lng: residentialLng,
+    isLoading: residentialCoordLoading,
+  } = useAddressCoordinates(entity, AddressType.residential);
+  if (isResidentialAddressSelected) {
     cards.push(
       <AddressCard
-        key="residential-address"
+        key={AddressType.residential}
         type={AddressType.residential}
         entity={entity}
+        isLoading={residentialCoordLoading}
       />,
     );
+
+    if (residentialLat && residentialLng) {
+      const isSelected = selectedIndex === allMarkers.length;
+      allMarkers.push({
+        lat: residentialLat,
+        lng: residentialLng,
+        icon: (
+          <AddressCardIcon
+            type={AddressType.residential}
+            color={isSelected ? 'quinary' : 'primary'}
+          />
+        ),
+        isSelected,
+      });
+    } else {
+      allMarkers.push(null);
+    }
   }
+
+  const markers = allMarkers.filter(Boolean) as Marker[];
 
   return (
     <Container>
@@ -159,10 +169,30 @@ const Content = ({ entity, livenessData }: ContentProps) => {
           )}
         </CardsContainer>
       </ContainerWithToggle>
-      <Map markers={allMarkers.filter(Boolean) as Marker[]} />
+      <MapContainer data-smaller={!detailsHidden}>
+        <Map markers={markers} />
+      </MapContainer>
     </Container>
   );
 };
+
+const MapContainer = styled.div`
+  ${({ theme }) => css`
+    height: 584px;
+    width: 100%;
+    height: calc(100% + 20px);
+    border-radius: ${theme.borderRadius.default};
+    overflow: hidden;
+    position: relative;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(0);
+
+    &[data-smaller='true'] {
+      transform: translateX(214px);
+    }
+  `}
+`;
 
 const Container = styled.div`
   ${({ theme }) => css`

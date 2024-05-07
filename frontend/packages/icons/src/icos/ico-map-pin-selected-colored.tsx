@@ -8,8 +8,8 @@ const IcoMapPinSelected = ({
   testID,
 }: IconProps) => (
   <svg
-    width={24}
-    height={32}
+    width={36}
+    height={48}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     data-testid={testID}
@@ -19,7 +19,7 @@ const IcoMapPinSelected = ({
     data-colored
   >
     <path
-      d="M12 0C5.333 0 0 5.333 0 12s5.333 12 12 20c6.667-8 12-13.333 12-20S18.667 0 12 0Z"
+      d="M18 0C8 0 0 8 0 18s8 18 18 30c10-12 18-20 18-30S28 0 18 0Z"
       fill="#4A24DB"
     />
   </svg>

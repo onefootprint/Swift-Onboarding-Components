@@ -1,21 +1,22 @@
-import type { BusinessDI, Entity, IdDI } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 import { AnimatedLoadingSpinner, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import FieldValue from '../../../../../vault/components/field/components/field-value';
 import { useDecryptControls } from '../../../../../vault/components/vault-actions';
-import useField from '../../../../../vault/hooks/use-field';
+import useAddressFieldsProps from '../../hooks/use-address-fields-props';
 import CardBase from '../card-base';
 import CardRow from '../card-row';
 import AddressCardIcon from './components/address-card-icon';
-import { type AddressType, attributesByType } from './types';
+import type AddressType from './types';
 
 type AddressCardProps = {
   type: AddressType;
   entity: Entity;
   isSelected?: boolean;
   onSelect?: () => void;
+  isLoading?: boolean;
 };
 
 const AddressCard = ({
@@ -23,23 +24,23 @@ const AddressCard = ({
   entity,
   isSelected,
   onSelect,
+  isLoading,
 }: AddressCardProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.device-insights.address-card',
   });
-  const getProps = useField(entity);
-  const dis = attributesByType[type].filter(di =>
-    entity.decryptableAttributes.includes(di),
-  );
-  const disSet = new Set(dis);
-  const filteredAttributes = entity.data
-    .filter(attr => disSet.has(attr.identifier as IdDI | BusinessDI))
-    .map(attr => attr.identifier) as (IdDI | BusinessDI)[];
-  const sortedAttributes = filteredAttributes.sort(
-    (a, b) => dis.indexOf(a) - dis.indexOf(b),
-  );
-  const attributesProps = sortedAttributes.map(getProps);
-  const rows: JSX.Element[] = attributesProps.map(prop => (
+
+  const { getAddressFieldsProps, getAddressDis } =
+    useAddressFieldsProps(entity);
+
+  const headerIcon = <AddressCardIcon type={type} />;
+
+  const headerText =
+    type === 'business'
+      ? t('business.header-text')
+      : t('residential.header-text');
+
+  const rows = getAddressFieldsProps(type).map(prop => (
     <CardRow
       key={prop.label}
       label={prop.label}
@@ -47,23 +48,34 @@ const AddressCard = ({
     />
   ));
 
-  let cta;
+  const handleClick = () => {
+    const dis = getAddressDis(type);
+    decryptControls.submitAllFields(dis);
+  };
+
+  const decryptableSet = new Set(entity.decryptableAttributes);
+
+  const encryptedFields = getAddressFieldsProps(type).filter(
+    prop => !prop.isDecrypted,
+  );
+  const canDecryptFields =
+    encryptedFields.length > 0
+      ? encryptedFields.every(
+          field => decryptableSet.has(field.name) && field.canDecrypt,
+        )
+      : false;
   const decryptControls = useDecryptControls();
-  const shouldDecrypt = attributesProps.some(prop => !prop.isDecrypted);
-  const canDecrypt = shouldDecrypt && !!entity.decryptableAttributes.length;
-  if (canDecrypt) {
-    if (decryptControls.isLoading) {
-      cta = <AnimatedLoadingSpinner animationStart size={22} color="accent" />;
-    } else {
-      cta = (
-        <LinkButton
-          onClick={() => {
-            decryptControls.submitAllFields(dis);
-          }}
-        >
-          {t('cta')}
-        </LinkButton>
+  const isCtaLoading = isLoading || decryptControls.isLoading;
+  const isCtaVisible = canDecryptFields || isCtaLoading;
+
+  let ctaElem;
+  if (isCtaVisible) {
+    if (isCtaLoading) {
+      ctaElem = (
+        <AnimatedLoadingSpinner animationStart size={22} color="accent" />
       );
+    } else {
+      ctaElem = <LinkButton onClick={handleClick}>{t('cta')}</LinkButton>;
     }
   }
 
@@ -71,14 +83,10 @@ const AddressCard = ({
     <CardBase
       isSelected={isSelected}
       onSelect={onSelect}
-      headerIcon={<AddressCardIcon type={type} />}
-      headerText={
-        type === 'business'
-          ? t('business.header-text')
-          : t('residential.header-text')
-      }
+      headerIcon={headerIcon}
+      headerText={headerText}
       rows={rows}
-      cta={cta}
+      cta={ctaElem}
     />
   );
 };
