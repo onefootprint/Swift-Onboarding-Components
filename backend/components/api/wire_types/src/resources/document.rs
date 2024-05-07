@@ -1,7 +1,7 @@
 use crate::*;
 use newtypes::{
-    DataIdentifier, DataLifetimeSeqno, DocumentReviewStatus, DocumentScanDeviceType, DocumentSide, IdDocKind,
-    IdentityDocumentStatus,
+    DataIdentifier, DataLifetimeSeqno, DocumentReviewStatus, DocumentScanDeviceType, DocumentSide, DocumentKind,
+    DocumentStatus,
 };
 
 use serde_with::SerializeDisplay;
@@ -26,11 +26,11 @@ impl From<DocumentScanDeviceType> for UploadSource {
 
 #[derive(Debug, Serialize, Apiv2Schema)]
 pub struct Document {
-    pub kind: IdDocKind,
+    pub kind: DocumentKind,
     /// Non-null for images uploaded via the UI
     pub started_at: Option<DateTime<Utc>>,
     /// Non-null for images uploaded via bifrost
-    pub status: Option<IdentityDocumentStatus>,
+    pub status: Option<DocumentStatus>,
     /// Non-null for images uploaded via bifrost
     pub review_status: Option<DocumentReviewStatus>,
     pub completed_version: Option<DataLifetimeSeqno>,
@@ -56,6 +56,6 @@ pub struct DocumentUpload {
 #[derive(Debug, Serialize, Apiv2Schema)]
 pub struct PublicDocument {
     /// Document type of the successfully uploaded document. Can be used to fetch from vault
-    pub document_type: IdDocKind,
+    pub document_type: DocumentKind,
     pub created_at: DateTime<Utc>,
 }

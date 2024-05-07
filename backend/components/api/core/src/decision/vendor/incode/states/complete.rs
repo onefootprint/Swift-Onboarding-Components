@@ -23,9 +23,9 @@ use async_trait::async_trait;
 use db::{
     models::{
         data_lifetime::DataLifetime,
+        document::{Document, DocumentImageArgs, DocumentUpdate},
         document_data::DocumentData,
         document_upload::DocumentUpload,
-        identity_document::{DocumentImageArgs, IdentityDocument, IdentityDocumentUpdate},
         ob_configuration::ObConfiguration,
         risk_signal::RiskSignal,
         user_timeline::UserTimeline,
@@ -36,11 +36,11 @@ use db::{
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use itertools::Itertools;
 use newtypes::{
-    CleanAndValidate, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentKind,
-    DocumentReviewStatus, Fingerprints, FootprintReasonCode, IdDocKind, IdentityDataKind as IDK,
-    IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK,
-    PiiJsonValue, PiiString, ScopedVaultId, ScrubbedPiiString, ValidateArgs, VendorAPI,
-    VendorValidatedCountryCode, VerificationResultId,
+    CleanAndValidate, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentDiKind,
+    DocumentId, DocumentKind, DocumentReviewStatus, DocumentStatus, Fingerprints, FootprintReasonCode,
+    IdentityDataKind as IDK, IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue,
+    PiiString, ScopedVaultId, ScrubbedPiiString, ValidateArgs, VendorAPI, VendorValidatedCountryCode,
+    VerificationResultId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -53,7 +53,7 @@ pub struct Complete {}
 #[derive(Copy, Clone)]
 pub(super) struct PreCompleteArgs<'a> {
     pub obc: &'a ObConfiguration,
-    pub id_doc: &'a IdentityDocument,
+    pub id_doc: &'a Document,
     pub vw: &'a VaultWrapper,
     pub dk: ValidatedIdDocKind,
     pub expect_selfie: bool,
@@ -86,7 +86,7 @@ pub(super) async fn compute_ocr_data<'a>(
         .0
         .into_iter()
         .map(|pif| {
-            let di = DocumentKind::OcrData(dk.0, pif.odk).into();
+            let di = DocumentDiKind::OcrData(dk.0, pif.odk).into();
             let v = PiiJsonValue::from_piistring(pif.value);
             (di, v)
         })
@@ -284,8 +284,8 @@ pub(super) fn compute_risk_signals<'a>(
 pub fn vault_complete_images(
     conn: &mut TxnPgConn,
     vw: &WriteableVw<Person>,
-    dk: IdDocKind,
-    id_doc: &IdentityDocument,
+    dk: DocumentKind,
+    id_doc: &Document,
 ) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
     // When we vault .latest_upload, we use the document_type that is provided by the user, not the eventual doc_type from incode which is the one
     // we vault the complete images for
@@ -294,10 +294,10 @@ pub fn vault_complete_images(
         .images(conn, DocumentImageArgs::default())?
         .into_iter()
         .map(|u| {
-            let di = DocumentKind::LatestUpload(doc_type_for_latest_upload, u.side).into();
+            let di = DocumentDiKind::LatestUpload(doc_type_for_latest_upload, u.side).into();
             let mime_type = vw.get_mime_type(&di).unwrap_or("image/png");
             let file_extension = mime_type_to_extension(mime_type).unwrap_or("png");
-            let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
+            let kind = DocumentDiKind::from_id_doc_kind(dk, u.side).into();
             NewDocument {
                 mime_type: mime_type.to_owned(),
                 filename: format!("{}.{}", kind, file_extension),
@@ -314,7 +314,7 @@ pub fn vault_complete_images(
 pub struct CompleteArgs<'a> {
     pub vault: &'a Vault,
     pub sv_id: &'a ScopedVaultId,
-    pub id_doc_id: &'a IdentityDocumentId,
+    pub id_doc_id: &'a DocumentId,
     pub dk: ValidatedIdDocKind,
     pub country_code: Option<VendorValidatedCountryCode>,
     pub ocr_data: DataRequest<Fingerprints>,
@@ -337,7 +337,7 @@ impl Complete {
             rs,
         } = args;
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
-        let (id_doc, _) = IdentityDocument::get(conn, id_doc_id)?;
+        let (id_doc, _) = Document::get(conn, id_doc_id)?;
         let validated_doc_kind = dk.into_inner();
 
         // Create a timeline event
@@ -352,7 +352,7 @@ impl Complete {
 
         // Clear all OCR data for this document kind, even if we're not replacing it
         let odks_to_clear = ODK::iter()
-            .map(|odk| DocumentKind::OcrData(validated_doc_kind, odk).into())
+            .map(|odk| DocumentDiKind::OcrData(validated_doc_kind, odk).into())
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::bulk_deactivate_kinds(conn, sv_id, odks_to_clear, seqno)?;
@@ -368,18 +368,18 @@ impl Complete {
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence();
         let selfie_score = score_response.selfie_match().0;
 
-        let update = IdentityDocumentUpdate {
+        let update = DocumentUpdate {
             completed_seqno: Some(seqno),
             document_score,
             selfie_score,
             ocr_confidence_score,
-            status: Some(IdentityDocumentStatus::Complete),
+            status: Some(DocumentStatus::Complete),
             vaulted_document_type: Some(validated_doc_kind),
             curp_completed_seqno: None,
             validated_country_code: country_code.map(|c| c.0),
             review_status: Some(DocumentReviewStatus::ReviewedByMachine),
         };
-        IdentityDocument::update(conn, id_doc_id, update)?;
+        Document::update(conn, id_doc_id, update)?;
 
         // TODO: still need to fingerprint data afterwards!
 

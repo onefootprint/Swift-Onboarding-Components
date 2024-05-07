@@ -24,7 +24,7 @@ use strum_macros::{AsRefStr, EnumString};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum IdentityDocumentStatus {
+pub enum DocumentStatus {
     /// We should generate a requirement to collect this document. Either have documents to upload
     /// or haven't yet received a vendor response
     Pending,
@@ -33,9 +33,9 @@ pub enum IdentityDocumentStatus {
     /// Processed response from vendor and they told us they could extract info from the image
     Complete,
 }
-crate::util::impl_enum_str_diesel!(IdentityDocumentStatus);
+crate::util::impl_enum_str_diesel!(DocumentStatus);
 
-impl IdentityDocumentStatus {
+impl DocumentStatus {
     pub fn is_terminal(&self) -> bool {
         match self {
             Self::Pending => false,

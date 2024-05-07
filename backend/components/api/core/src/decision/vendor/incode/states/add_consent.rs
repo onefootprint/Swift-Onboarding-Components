@@ -14,28 +14,28 @@ use crate::{
 use async_trait::async_trait;
 use db::{
     models::{
-        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        document::{Document, DocumentUpdate},
         user_consent::UserConsent,
     },
     DbPool, TxnPgConn,
 };
 use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
-use newtypes::{DocumentReviewStatus, IdentityDocumentId, IdentityDocumentStatus, VendorAPI};
+use newtypes::{DocumentId, DocumentReviewStatus, DocumentStatus, VendorAPI};
 
 /// Add Consent
 pub struct AddConsent {}
 
 impl AddConsent {
-    pub fn enter(conn: &mut TxnPgConn, id_doc_id: &IdentityDocumentId) -> ApiResult<()> {
-        // Update IdentityDocument to status = complete so we clear the Bifrost req
+    pub fn enter(conn: &mut TxnPgConn, id_doc_id: &DocumentId) -> ApiResult<()> {
+        // Update Document to status = complete so we clear the Bifrost req
         // TODO: we are setting status to complete here but set completed_seqno later- is that gunna cause any problems??
         // It would actually be nice to write the timeline event, vault the docs, etc here but it sounds like the problem is our DI data model requires us to know the doc type and we can't confirm that until the processing part of the flow is complete
-        let update = IdentityDocumentUpdate {
-            status: Some(IdentityDocumentStatus::Complete),
+        let update = DocumentUpdate {
+            status: Some(DocumentStatus::Complete),
             review_status: Some(DocumentReviewStatus::PendingMachineReview),
             ..Default::default()
         };
-        IdentityDocument::update(conn, id_doc_id, update)?;
+        Document::update(conn, id_doc_id, update)?;
         Ok(())
     }
 }

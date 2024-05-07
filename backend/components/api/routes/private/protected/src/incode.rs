@@ -8,7 +8,7 @@ use api_core::{
 };
 use api_wire_types::DocumentResponse;
 use db::models::{
-    decision_intent::DecisionIntent, identity_document::IdentityDocument,
+    decision_intent::DecisionIntent, document::Document,
     incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
     scoped_vault::ScopedVault,
 };
@@ -54,7 +54,7 @@ pub async fn rerun_machine(
         .db_transaction(move |conn| -> ApiResult<_> {
             let old_session =
                 IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
-            let (id_doc, dr) = IdentityDocument::get(conn, &old_session.identity_document_id)?;
+            let (id_doc, dr) = Document::get(conn, &old_session.identity_document_id)?;
             let su = ScopedVault::get(conn, &dr.workflow_id)?;
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su.id))?;
             let (obc, _) = ObConfiguration::get(conn, &dr.workflow_id)?;

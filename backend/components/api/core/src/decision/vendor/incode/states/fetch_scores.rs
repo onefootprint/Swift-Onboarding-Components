@@ -25,7 +25,7 @@ use async_trait::async_trait;
 use db::{
     models::{
         decision_intent::DecisionIntent,
-        identity_document::{DocumentImageArgs, IdentityDocument},
+        document::{Document, DocumentImageArgs},
         incode_customer_session::IncodeCustomerSession,
         ob_configuration::ObConfiguration,
         verification_result::VerificationResult,
@@ -48,7 +48,7 @@ use idv::{
 };
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataRequest, DecisionIntentKind,
-    DocumentKind, DocumentSide, Fingerprints, IdentityDocumentId, IncodeVerificationSessionId, PiiJsonValue,
+    DocumentDiKind, DocumentId, DocumentSide, Fingerprints, IncodeVerificationSessionId, PiiJsonValue,
     ScopedVaultId, VendorAPI, VendorValidatedCountryCode, WorkflowId,
 };
 use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
@@ -117,7 +117,7 @@ impl IncodeStateTransition for FetchScores {
             .db_query(move |conn| -> ApiResult<_> {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
-                let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
+                let (id_doc, _) = Document::get(conn, &id_doc_id)?;
                 let doc_uploads = id_doc.images(conn, DocumentImageArgs::default())?;
                 Ok((obc, vw, id_doc, doc_uploads))
             })
@@ -283,26 +283,26 @@ async fn run_aws_inner(
     client: AwsSelfieDocClient,
     sv_id: ScopedVaultId,
     wf_id: WorkflowId,
-    id_doc_id: IdentityDocumentId,
+    id_doc_id: DocumentId,
 ) -> ApiResult<Option<(CompareFacesResponse, VerificationResult)>> {
     let sv_id2 = sv_id.clone();
     let (id_doc, vw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
+            let (id_doc, _) = Document::get(conn, &id_doc_id)?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id2)?;
             Ok((id_doc, vw))
         })
         .await?;
 
     // At this point, until we reach `Complete`, we have not vaulted the images under the DocumentKind::Image DIs
-    let doc_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentKind::LatestUpload(
+    let doc_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentDiKind::LatestUpload(
         id_doc.document_type,
         DocumentSide::Front,
     ))
     .into();
 
     // make this conditional
-    let selfie_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentKind::LatestUpload(
+    let selfie_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentDiKind::LatestUpload(
         id_doc.document_type,
         DocumentSide::Selfie,
     ))

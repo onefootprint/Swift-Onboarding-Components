@@ -7,16 +7,16 @@ use crate::{
 
 use db::{
     models::{
+        document::{Document, DocumentImageArgs},
         document_upload::DocumentUpload,
-        identity_document::{DocumentImageArgs, IdentityDocument},
         scoped_vault::ScopedVault,
         verification_request::VerificationRequest,
     },
     DbPool,
 };
 use newtypes::{
-    email::Email, BoData, BusinessData, BusinessDataKind as BDK, DataIdentifier, DocVData, DocumentSide,
-    EncryptedVaultPrivateKey, IdentityDataKind as IDK, IdentityDocumentId, IdvData, PhoneNumber, PiiBytes,
+    email::Email, BoData, BusinessData, BusinessDataKind as BDK, DataIdentifier, DocVData, DocumentId,
+    DocumentSide, EncryptedVaultPrivateKey, IdentityDataKind as IDK, IdvData, PhoneNumber, PiiBytes,
     PiiString, ScopedVaultId,
 };
 use std::{collections::HashMap, str::FromStr};
@@ -108,12 +108,12 @@ async fn decrypt_documents(
 #[tracing::instrument(skip_all)]
 pub async fn build_docv_data_from_identity_doc(
     state: &State,
-    identity_document_id: IdentityDocumentId,
+    identity_document_id: DocumentId,
 ) -> ApiResult<DocVData> {
     let (doc, images, uvw) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (doc, dr) = IdentityDocument::get(conn, &identity_document_id)?;
+            let (doc, dr) = Document::get(conn, &identity_document_id)?;
             let images = doc.images(conn, DocumentImageArgs::default())?;
             // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
             // This would allow us to re-use the uvw util to decrypt an image

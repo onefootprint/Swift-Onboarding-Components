@@ -20,7 +20,7 @@ use db::models::{
 use macros::route_alias;
 use newtypes::{
     AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DbActor,
-    DocumentKind, FpId, PiiBytes,
+    DocumentDiKind, FpId, PiiBytes,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
 
@@ -149,9 +149,9 @@ async fn post_upload_inner(
                 s3_url,
                 source,
             };
-            let derived_doc = if let DataIdentifier::Document(DocumentKind::Image(kind, side)) = di {
+            let derived_doc = if let DataIdentifier::Document(DocumentDiKind::Image(kind, side)) = di {
                 // Derive latest_upload DI if the image is vaulted
-                let latest_upload_kind = DocumentKind::LatestUpload(kind, side).into();
+                let latest_upload_kind = DocumentDiKind::LatestUpload(kind, side).into();
                 Some(NewDocument {
                     filename: format!("{}", latest_upload_kind),
                     kind: latest_upload_kind,

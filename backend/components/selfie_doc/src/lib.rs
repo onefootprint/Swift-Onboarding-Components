@@ -168,7 +168,7 @@ impl AwsSelfieDocClient {
             return Ok(AnalyzeIdResult::NoIdentityDocument);
         };
 
-        Ok(AnalyzeIdResult::FoundIdentityDocumentMetadata(res.into()))
+        Ok(AnalyzeIdResult::FoundDocumentMetadata(res.into()))
     }
 }
 impl AwsSelfieDocClient {

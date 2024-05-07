@@ -1,14 +1,14 @@
 use newtypes::{
-    DocumentRequestId, DocumentScanDeviceType, DocumentSide, IdDocKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason, Iso3166TwoDigitCountryCode,
+    DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestId, DocumentScanDeviceType, DocumentSide,
+    DocumentStatus, IncodeFailureReason, Iso3166TwoDigitCountryCode,
 };
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
-pub struct CreateIdentityDocumentRequest {
-    pub document_type: IdDocKind,
+pub struct CreateDocumentRequest {
+    pub document_type: DocumentKind,
     pub country_code: Option<Iso3166TwoDigitCountryCode>,
-    pub fixture_result: Option<IdentityDocumentFixtureResult>,
+    pub fixture_result: Option<DocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
     pub device_type: Option<DocumentScanDeviceType>,
     // TODO make required
@@ -16,8 +16,8 @@ pub struct CreateIdentityDocumentRequest {
 }
 
 #[derive(Debug, Apiv2Schema, serde::Serialize)]
-pub struct CreateIdentityDocumentResponse {
-    pub id: IdentityDocumentId,
+pub struct CreateDocumentResponse {
+    pub id: DocumentId,
 }
 
 /// Status of identity document collection
@@ -31,12 +31,12 @@ pub enum DocumentResponseStatus {
 }
 
 // This is temporary
-impl From<IdentityDocumentStatus> for DocumentResponseStatus {
-    fn from(document_request_status: IdentityDocumentStatus) -> Self {
+impl From<DocumentStatus> for DocumentResponseStatus {
+    fn from(document_request_status: DocumentStatus) -> Self {
         match document_request_status {
-            IdentityDocumentStatus::Pending => Self::Pending,
-            IdentityDocumentStatus::Failed => Self::Error,
-            IdentityDocumentStatus::Complete => Self::Complete,
+            DocumentStatus::Pending => Self::Pending,
+            DocumentStatus::Failed => Self::Error,
+            DocumentStatus::Complete => Self::Complete,
         }
     }
 }

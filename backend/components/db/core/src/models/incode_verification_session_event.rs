@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::incode_verification_session_event;
 use diesel::prelude::*;
 use newtypes::{
-    IdentityDocumentId, IncodeFailureReason, IncodeVerificationSessionEventId, IncodeVerificationSessionId,
+    DocumentId, IncodeFailureReason, IncodeVerificationSessionEventId, IncodeVerificationSessionId,
     IncodeVerificationSessionKind, IncodeVerificationSessionState,
 };
 
@@ -16,7 +16,7 @@ pub struct IncodeVerificationSessionEvent {
     pub created_at: DateTime<Utc>,
     pub incode_verification_session_id: IncodeVerificationSessionId,
     pub incode_verification_session_state: IncodeVerificationSessionState,
-    pub identity_document_id: IdentityDocumentId,
+    pub identity_document_id: DocumentId,
     pub kind: IncodeVerificationSessionKind,
     /// Not used by application code anywhere, just used for debugging
     #[diesel(deserialize_as = NonNullVec<IncodeFailureReason>)]
@@ -31,7 +31,7 @@ pub struct NewIncodeVerificationSessionEvent {
     pub created_at: DateTime<Utc>,
     pub incode_verification_session_id: IncodeVerificationSessionId,
     pub incode_verification_session_state: IncodeVerificationSessionState,
-    pub identity_document_id: IdentityDocumentId,
+    pub identity_document_id: DocumentId,
     pub kind: IncodeVerificationSessionKind,
     pub latest_failure_reasons: Vec<IncodeFailureReason>,
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
@@ -43,7 +43,7 @@ impl IncodeVerificationSessionEvent {
         conn: &mut TxnPgConn,
         incode_verification_session_id: IncodeVerificationSessionId,
         incode_verification_session_state: IncodeVerificationSessionState,
-        identity_document_id: IdentityDocumentId,
+        identity_document_id: DocumentId,
         latest_failure_reasons: Vec<IncodeFailureReason>,
         kind: IncodeVerificationSessionKind,
         ignored_failure_reasons: Vec<IncodeFailureReason>,

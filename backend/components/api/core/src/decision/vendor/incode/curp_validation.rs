@@ -4,8 +4,8 @@ use db::{
     models::{
         billing_event::BillingEvent,
         decision_intent::DecisionIntent,
+        document::{Document, DocumentUpdate},
         document_request::DocumentRequest,
-        identity_document::{IdentityDocument, IdentityDocumentUpdate},
         incode_verification_session::IncodeVerificationSession,
         ob_configuration::ObConfiguration,
         scoped_vault::ScopedVault,
@@ -20,8 +20,8 @@ use idv::{
 use itertools::Itertools;
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, BillingEventKind, DataIdentifier, DataLifetimeSeqno,
-    DataLifetimeSource, DataRequest, DecisionIntentId, DocumentKind, DocumentRequestKind, Fingerprints,
-    IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment,
+    DataLifetimeSource, DataRequest, DecisionIntentId, DocumentDiKind, DocumentFixtureResult, DocumentId,
+    DocumentKind, DocumentRequestKind, Fingerprints, IncodeConfigurationId, IncodeEnvironment,
     IncodeSessionId, IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode, OcrDataKind as ODK,
     PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
 };
@@ -60,7 +60,7 @@ pub async fn run_curp_validation_check(
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
-            let id_documents = IdentityDocument::list_completed_sent_to_incode_by_wf_id(conn, &wf_id2)?;
+            let id_documents = Document::list_completed_sent_to_incode_by_wf_id(conn, &wf_id2)?;
             let latest_results =
                 VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &di_id)?;
 
@@ -77,7 +77,7 @@ pub async fn run_curp_validation_check(
     }
 
     // Handle both sandbox and prod
-    let id_doc_helper = IdentityDocumentForCurpHelper::new(id_documents);
+    let id_doc_helper = DocumentForCurpHelper::new(id_documents);
     let id_doc_fixture = id_doc_helper.fixture();
     let should_sent_curp_request = id_doc_helper.get_incode_environment(state, &tenant_id, sv.is_live);
 
@@ -168,8 +168,8 @@ pub async fn run_curp_validation_check(
                     )?;
 
                     // set curp completed seqno so we can render historical responses in the dashboard
-                    let update = IdentityDocumentUpdate::set_curp_completed_seqno(seqno);
-                    let _ = IdentityDocument::update(conn, &iddoc_id, update)?;
+                    let update = DocumentUpdate::set_curp_completed_seqno(seqno);
+                    let _ = Document::update(conn, &iddoc_id, update)?;
 
                     let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
                     // create billing event
@@ -223,18 +223,12 @@ pub async fn run_curp_validation_check(
 
 type ShouldSendCurpRequest = Option<IncodeEnvironment>;
 /// We want to be able to handle the case where documents are provided in sandbox
-pub struct IdentityDocumentForCurpHelper {
-    pub sent_to_vendor: Option<IdentityDocument>,
-    pub other: Option<IdentityDocument>,
+pub struct DocumentForCurpHelper {
+    pub sent_to_vendor: Option<Document>,
+    pub other: Option<Document>,
 }
-impl IdentityDocumentForCurpHelper {
-    pub fn new(
-        id_documents: Vec<(
-            IdentityDocument,
-            DocumentRequest,
-            Option<IncodeVerificationSession>,
-        )>,
-    ) -> Self {
+impl DocumentForCurpHelper {
+    pub fn new(id_documents: Vec<(Document, DocumentRequest, Option<IncodeVerificationSession>)>) -> Self {
         let (sent_to_vendor, other): (Vec<_>, Vec<_>) = id_documents
             .into_iter()
             // only take identity docs
@@ -250,7 +244,7 @@ impl IdentityDocumentForCurpHelper {
         }
     }
 
-    pub fn fixture(&self) -> Option<IdentityDocumentFixtureResult> {
+    pub fn fixture(&self) -> Option<DocumentFixtureResult> {
         self.sent_to_vendor
             .as_ref()
             .and_then(|i| i.fixture_result)
@@ -266,13 +260,13 @@ impl IdentityDocumentForCurpHelper {
         tenant_id: &TenantId,
         is_live: bool,
     ) -> ShouldSendCurpRequest {
-        let fixture: Option<IdentityDocumentFixtureResult> = self.fixture();
+        let fixture: Option<DocumentFixtureResult> = self.fixture();
         let is_sandbox = !is_live;
         let can_make_incode_request_in_sandbox = !is_live
             && state
                 .feature_flag_client
                 .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(tenant_id))
-            && matches!(fixture, Some(IdentityDocumentFixtureResult::Real),);
+            && matches!(fixture, Some(DocumentFixtureResult::Real),);
 
         if is_sandbox {
             // TODO: Does this actually do anything w/ Renapo? Check w/ incode. maybe should just return sandbox responses always
@@ -286,7 +280,7 @@ impl IdentityDocumentForCurpHelper {
         }
     }
 
-    pub fn identity_document_for_sandbox(&self) -> Option<IdentityDocument> {
+    pub fn identity_document_for_sandbox(&self) -> Option<Document> {
         self.sent_to_vendor.as_ref().or(self.other.as_ref()).cloned() //rm cloned
     }
 }
@@ -317,8 +311,8 @@ fn get_config_id(env: IncodeEnvironment) -> IncodeConfigurationId {
 async fn get_curp_for_check(
     enclave_client: &EnclaveClient,
     vw: &VaultWrapper,
-    id_document: Option<&IdentityDocument>,
-) -> ApiResult<(Option<PiiString>, IdentityDocument)> {
+    id_document: Option<&Document>,
+) -> ApiResult<(Option<PiiString>, Document)> {
     if let Some(id_doc) = id_document {
         let Some(vaulted_document_type) = id_doc.vaulted_document_type else {
             return Ok((None, id_doc.clone()));
@@ -329,7 +323,7 @@ async fn get_curp_for_check(
             return Ok((None, id_doc.clone()));
         }
 
-        let di = DataIdentifier::from(DocumentKind::OcrData(vaulted_document_type, ODK::Curp));
+        let di = DataIdentifier::from(DocumentDiKind::OcrData(vaulted_document_type, ODK::Curp));
         // We should always get CURP on a voter ID
         // TODO: In the future we could have a risk signal or something for this i suppose. arguably this should go before the decryption, but just to observe incode
         // weirdness
@@ -356,21 +350,17 @@ async fn save_canned_response(
     sv_id: ScopedVaultId,
     di_id: DecisionIntentId,
     public_key: VaultPublicKey,
-    identity_document_fixture: Option<IdentityDocumentFixtureResult>,
+    identity_document_fixture: Option<DocumentFixtureResult>,
     tenant_id: &TenantId,
-    id_doc_kind: IdDocKind,
-    id_doc_id: IdentityDocumentId,
+    id_doc_kind: DocumentKind,
+    id_doc_id: DocumentId,
 ) -> ApiResult<VendorResult> {
     let canned_res = match identity_document_fixture {
         Some(decision) => match decision {
-            IdentityDocumentFixtureResult::Pass => idv::test_fixtures::incode_curp_validation_good_curp(),
-            IdentityDocumentFixtureResult::Fail => {
-                idv::test_fixtures::incode_curp_validation_bad_curp("01", "06")
-            }
+            DocumentFixtureResult::Pass => idv::test_fixtures::incode_curp_validation_good_curp(),
+            DocumentFixtureResult::Fail => idv::test_fixtures::incode_curp_validation_bad_curp("01", "06"),
             // shouldn't happen
-            IdentityDocumentFixtureResult::Real => {
-                idv::test_fixtures::incode_curp_validation_bad_curp("01", "06")
-            }
+            DocumentFixtureResult::Real => idv::test_fixtures::incode_curp_validation_bad_curp("01", "06"),
         },
         None => idv::test_fixtures::incode_curp_validation_good_curp(),
     };
@@ -404,8 +394,8 @@ async fn save_canned_response(
             let seqno = vault_curp_response(conn, &sv_id, vault_data)?;
 
             // set curp completed seqno so we can render historical responses in the dashboard
-            let update = IdentityDocumentUpdate::set_curp_completed_seqno(seqno);
-            let _ = IdentityDocument::update(conn, &id_doc_id, update)?;
+            let update = DocumentUpdate::set_curp_completed_seqno(seqno);
+            let _ = Document::update(conn, &id_doc_id, update)?;
 
 
             let vendor_result = VendorResult {
@@ -423,13 +413,13 @@ async fn save_canned_response(
 
 pub async fn pre_vault(
     enclave_client: &EnclaveClient,
-    id_doc_kind: IdDocKind,
+    id_doc_kind: DocumentKind,
     response: PiiJsonValue,
     is_live: bool,
     tenant_id: &TenantId,
 ) -> ApiResult<DataRequest<Fingerprints>> {
     let data = vec![(
-        DocumentKind::OcrData(id_doc_kind, ODK::CurpValidationResponse).into(),
+        DocumentDiKind::OcrData(id_doc_kind, ODK::CurpValidationResponse).into(),
         response,
     )];
     let mut validate_args = ValidateArgs::for_bifrost(is_live);
@@ -452,10 +442,10 @@ pub fn vault_curp_response(
     Ok(result.seqno)
 }
 
-fn id_doc_expects_curp(id_doc: &IdentityDocument) -> bool {
+fn id_doc_expects_curp(id_doc: &Document) -> bool {
     matches!(
         id_doc.vaulted_document_type.unwrap_or(id_doc.document_type),
-        IdDocKind::VoterIdentification | IdDocKind::Passport
+        DocumentKind::VoterIdentification | DocumentKind::Passport
     ) && matches!(
         id_doc.vendor_validated_country_code().map(|v| v.0),
         Some(Iso3166TwoDigitCountryCode::MX)

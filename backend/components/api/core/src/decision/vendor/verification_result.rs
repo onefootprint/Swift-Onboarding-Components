@@ -15,7 +15,7 @@ use db::{
 };
 use idv::VendorResponse;
 use newtypes::{
-    DecisionIntentId, EncryptedVaultPrivateKey, IdentityDocumentId, PiiJsonValue, ScopedVaultId,
+    DecisionIntentId, EncryptedVaultPrivateKey, DocumentId, PiiJsonValue, ScopedVaultId,
     ScrubbedPiiJsonValue, SealedVaultBytes, VaultPublicKey, VendorAPI, VerificationRequestId,
     VerificationResultId,
 };
@@ -191,7 +191,7 @@ pub struct SaveVerificationResultArgs {
     pub should_save_verification_request: ShouldSaveVerificationRequest,
     pub decision_intent_id: DecisionIntentId,
     pub scoped_vault_id: ScopedVaultId,
-    pub identity_document_id: Option<IdentityDocumentId>,
+    pub identity_document_id: Option<DocumentId>,
 }
 impl SaveVerificationResultArgs {
     pub async fn save(self, db_pool: &DbPool) -> ApiResult<(VerificationResultId, VerificationRequestId)> {

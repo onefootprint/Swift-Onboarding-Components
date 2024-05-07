@@ -29,8 +29,8 @@ use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
         annotation::Annotation,
+        document::Document,
         document_request::DocumentRequest,
-        identity_document::IdentityDocument,
         insight_event::InsightEvent,
         manual_review::ManualReview,
         ob_configuration::ObConfiguration,
@@ -45,14 +45,14 @@ use db::{
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
-    format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentKind, ExternalIntegrationInfo,
-    ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind, IdentityDataKind, MatchLevel, OcrDataKind,
-    PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
+    format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentDiKind, DocumentKind,
+    ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdentityDataKind,
+    MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::collections::HashSet;
 use DataIdentifier::*;
-use DocumentKind::*;
+use DocumentDiKind::*;
 use IdentityDataKind::*;
 
 #[api_v2_operation(
@@ -241,8 +241,8 @@ pub(crate) async fn create_cip_request(
                     (mr, Some(obd_manual), annotation)
                 }
             };
-            let latest_identity_document_and_request: Option<(IdentityDocument, DocumentRequest)> =
-                IdentityDocument::list_by_wf_id(conn, &wf.id)?
+            let latest_identity_document_and_request: Option<(Document, DocumentRequest)> =
+                Document::list_by_wf_id(conn, &wf.id)?
                 .into_iter()
                 .filter(|(i, dr)| i.is_upload_complete() && dr.kind.is_identity())
                 // sort just for safety, we shouldn't have more than 1 completed doc per wf
@@ -325,9 +325,9 @@ pub(crate) async fn create_cip_request(
                 Id(UsLegalStatus),
                 Id(Zip),
                 Id(Country),
-                Document(OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber)),
-                Document(OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber)),
-                Document(OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)),
+                Document(OcrData(DocumentKind::DriversLicense, OcrDataKind::DocumentNumber)),
+                Document(OcrData(DocumentKind::IdCard, OcrDataKind::DocumentNumber)),
+                Document(OcrData(DocumentKind::Passport, OcrDataKind::DocumentNumber)),
             ],
         )
         .await?;
@@ -423,9 +423,9 @@ fn kyc(
     };
     // find a gov't id number if we have one
     let id_number = vec![
-        OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber),
-        OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber),
-        OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber),
+        OcrData(DocumentKind::DriversLicense, OcrDataKind::DocumentNumber),
+        OcrData(DocumentKind::IdCard, OcrDataKind::DocumentNumber),
+        OcrData(DocumentKind::Passport, OcrDataKind::DocumentNumber),
     ]
     .into_iter()
     .flat_map(|id| decrypted_data.get_di(id).ok())
@@ -640,7 +640,7 @@ fn document_and_photo(
     vendor_results: &[VendorResult],
     decrypted_data: &DecryptUncheckedResult,
     check_started_at: DateTime<Utc>,
-    identity_document: IdentityDocument,
+    identity_document: Document,
     document_request: DocumentRequest,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
     let expect_selfie = document_request.should_collect_selfie();
@@ -663,7 +663,7 @@ fn document_and_photo(
     let ocr_name = ok_or(ocr_response.name.as_ref(), "missing ocr name".into())?;
     let dk = ok_or(
         identity_document.vaulted_document_type,
-        "missing vaulted_document_type on IdentityDocument".into(),
+        "missing vaulted_document_type on Document".into(),
     )?;
     let document_type = Some(dk.try_into()?);
     let dob = ocr_response.dob().map(PiiString::from).ok();

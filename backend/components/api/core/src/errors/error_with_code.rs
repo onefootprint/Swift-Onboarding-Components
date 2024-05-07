@@ -38,7 +38,7 @@ pub enum ErrorWithCode {
         message = "E109",
         detailed_message = "Identity document is not pending upload"
     )]
-    IdentityDocumentNotPending,
+    DocumentNotPending,
     #[strum(message = "E110", detailed_message = "Invalid file upload: body missing")]
     InvalidFileUploadMissing,
     #[strum(message = "E111", detailed_message = "Missing content type (mime)")]
@@ -78,7 +78,7 @@ impl ErrorWithCode {
             Self::CannotRegisterPasskey => StatusCode::BAD_REQUEST,
             Self::LoginChallengeUserNotFound => StatusCode::BAD_REQUEST,
             Self::OnlyOneIdentifier => StatusCode::BAD_REQUEST,
-            Self::IdentityDocumentNotPending => StatusCode::BAD_REQUEST,
+            Self::DocumentNotPending => StatusCode::BAD_REQUEST,
             Self::InvalidFileUploadMissing => StatusCode::BAD_REQUEST,
             Self::MissingMimeType => StatusCode::BAD_REQUEST,
             Self::InvalidMimeType(_) => StatusCode::BAD_REQUEST,

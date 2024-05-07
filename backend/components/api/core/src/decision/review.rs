@@ -4,7 +4,7 @@ use db::{
     models::{
         annotation::Annotation,
         data_lifetime::DataLifetime,
-        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        document::{Document, DocumentUpdate},
         manual_review::{ManualReviewAction, ManualReviewArgs},
         onboarding_decision::NewDecisionArgs,
         scoped_vault::ScopedVault,
@@ -48,16 +48,16 @@ pub fn save_review_decision(
     {
         // If we're clearing a ManualReview for DocumentNeedsReview, we should also implicitly
         // update the ID docs to be reviewed
-        let id_docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
+        let id_docs = Document::list_by_wf_id(conn, &wf.id)?;
         let reviewed_docs = id_docs
             .into_iter()
             .filter(|(doc, _)| doc.review_status == DocumentReviewStatus::PendingHumanReview);
         for (doc, _) in reviewed_docs {
-            let update = IdentityDocumentUpdate {
+            let update = DocumentUpdate {
                 review_status: Some(DocumentReviewStatus::ReviewedByHuman),
                 ..Default::default()
             };
-            IdentityDocument::update(conn, &doc.id, update)?;
+            Document::update(conn, &doc.id, update)?;
         }
     }
 

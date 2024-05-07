@@ -13,12 +13,12 @@ use api_core::{
     },
 };
 use db::models::{
-    identity_document::{DocumentImageArgs, IdentityDocument},
+    document::{Document, DocumentImageArgs},
     scoped_vault::ScopedVault,
 };
 use itertools::{chain, Itertools};
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DocumentKind, DocumentRequestConfig, DocumentSide, IdDocKind,
+    CustomDocumentConfig, DataIdentifier, DocumentDiKind, DocumentKind, DocumentRequestConfig, DocumentSide,
 };
 use paperclip::actix::{api_v2_operation, get, web};
 
@@ -44,7 +44,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let documents = IdentityDocument::list(conn, &sv.id)?;
+            let documents = Document::list(conn, &sv.id)?;
             let id_docs = documents
                 .into_iter()
                 .map(|(doc, dr)| -> ApiResult<_> {
@@ -83,13 +83,13 @@ pub async fn get(
                     // This will be a little derpy if an API-uploaded document is replaced by a
                     // bifrost-uploaded document...
                     match di {
-                        DataIdentifier::Document(DocumentKind::LatestUpload(kind, side)) => {
+                        DataIdentifier::Document(DocumentDiKind::LatestUpload(kind, side)) => {
                             let already_contains = id_docs.iter().any(|d| d.0.document_type == kind);
                             (!already_contains).then_some((kind, (side, dl)))
                         }
-                        DataIdentifier::Document(DocumentKind::Custom(_)) => {
+                        DataIdentifier::Document(DocumentDiKind::Custom(_)) => {
                             let already_contains = custom_dis.iter().any(|i| **i == di);
-                            (!already_contains).then_some((IdDocKind::Custom, (DocumentSide::Front, dl)))
+                            (!already_contains).then_some((DocumentKind::Custom, (DocumentSide::Front, dl)))
                         }
                         _ => None,
                     }

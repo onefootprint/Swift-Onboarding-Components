@@ -8,7 +8,7 @@ use chrono::{NaiveDateTime, Utc};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    DataIdentifier, FootprintReasonCode, IdDocKind, IdentityDataKind, PiiString, VerificationResultId,
+    DataIdentifier, FootprintReasonCode, DocumentKind, IdentityDataKind, PiiString, VerificationResultId,
 };
 
 #[derive(Default, Clone, PartialEq, Eq)]
@@ -94,7 +94,7 @@ pub fn footprint_reason_codes(
     vault_data: IncodeOcrComparisonDataFields,
     // not all documents collect will have selfie
     expect_selfie: bool,
-    dk: IdDocKind,
+    dk: DocumentKind,
 ) -> Result<Vec<FootprintReasonCode>, idv::Error> {
     let score_reason_codes = reason_codes_from_score_response(&scores, &ocr, expect_selfie, dk);
     let ocr_reason_codes = pii_matching_reason_codes_from_ocr_response(&ocr, vault_data);
@@ -106,7 +106,7 @@ pub fn reason_codes_from_score_response(
     scores_res: &FetchScoresResponse,
     ocr_res: &FetchOCRResponse,
     expect_selfie: bool,
-    dk: IdDocKind,
+    dk: DocumentKind,
 ) -> Vec<FootprintReasonCode> {
     // Overall score
     //
@@ -261,7 +261,7 @@ pub fn drivers_license_features_from_ocr_response(res: &FetchOCRResponse) -> Vec
 
 const OCR_CONFIDENCE_SCORE_THRESHOLD: f32 = 0.70;
 
-fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRResponse, dk: IdDocKind) -> bool {
+fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRResponse, dk: DocumentKind) -> bool {
     let parsed_odks: Vec<ParsedIncodeField> = ParsedIncodeFields::from_fetch_ocr_res(ocr_res).0;
     let all_expected_fields_present_and_high_confidence =
         dk.expected_ciritical_ocr_data_kinds().into_iter().all(|odk| {
@@ -579,7 +579,7 @@ mod tests {
                 &parsed,
                 &ocr_parsed,
                 expect_selfie,
-                IdDocKind::DriversLicense,
+                DocumentKind::DriversLicense,
             ),
             expected,
         )
@@ -599,7 +599,7 @@ mod tests {
             }
         });
         let frcs =
-            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, IdDocKind::DriversLicense);
+            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, DocumentKind::DriversLicense);
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
 
         // partial fail
@@ -611,7 +611,7 @@ mod tests {
         });
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
         let frcs =
-            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, IdDocKind::DriversLicense);
+            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, DocumentKind::DriversLicense);
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
@@ -624,7 +624,7 @@ mod tests {
         });
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
         let frcs =
-            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, IdDocKind::DriversLicense);
+            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, DocumentKind::DriversLicense);
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
         // wasn't read
@@ -636,7 +636,7 @@ mod tests {
         });
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
         let frcs =
-            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, IdDocKind::DriversLicense);
+            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, DocumentKind::DriversLicense);
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
     }
@@ -662,7 +662,7 @@ mod tests {
     }
 
     #[test_case(
-        IdDocKind::DriversLicense, 
+        DocumentKind::DriversLicense, 
         DocTestOpts::default(), 
         FetchOCRResponse {
             name: Some(OCRName {
@@ -686,7 +686,7 @@ mod tests {
         } 
         => true)]
     #[test_case(
-        IdDocKind::DriversLicense, 
+        DocumentKind::DriversLicense, 
         DocTestOpts::default(), 
         FetchOCRResponse {
             name: Some(OCRName {
@@ -710,7 +710,7 @@ mod tests {
         } 
         => false)]
     #[test_case(
-        IdDocKind::DriversLicense, 
+        DocumentKind::DriversLicense, 
         DocTestOpts::default(), 
         FetchOCRResponse {
             name: Some(OCRName {
@@ -726,7 +726,7 @@ mod tests {
         } 
         => true)]
     #[test_case(
-        IdDocKind::DriversLicense, 
+        DocumentKind::DriversLicense, 
         DocTestOpts::default(), 
         FetchOCRResponse {
             name: Some(OCRName {
@@ -742,7 +742,7 @@ mod tests {
         } 
         => false)]
     #[test_case(
-        IdDocKind::IdCard, 
+        DocumentKind::IdCard, 
         DocTestOpts::default(), 
         FetchOCRResponse {
             name: Some(OCRName {
@@ -753,7 +753,7 @@ mod tests {
         } 
         => true)]
     #[test_case(
-        IdDocKind::Passport, 
+        DocumentKind::Passport, 
         DocTestOpts::default(), 
         FetchOCRResponse {
             name: Some(OCRName {
@@ -764,7 +764,7 @@ mod tests {
         } 
         => false)]
     #[test_case(
-        IdDocKind::IdCard, 
+        DocumentKind::IdCard, 
         DocTestOpts {
             ocr_confidence: Fail,
            ..Default::default() 
@@ -777,7 +777,7 @@ mod tests {
             ..Default::default()
         } 
         => false)]
-    fn test_ocr_was_successful(dk: IdDocKind, score_opts: DocTestOpts, ocr_res: FetchOCRResponse) -> bool {
+    fn test_ocr_was_successful(dk: DocumentKind, score_opts: DocTestOpts, ocr_res: FetchOCRResponse) -> bool {
         let scores_res: FetchScoresResponse =
             serde_json::from_value(idv::test_fixtures::incode_fetch_scores_response(score_opts)).unwrap();
         ocr_was_successful(&scores_res, &ocr_res, dk)

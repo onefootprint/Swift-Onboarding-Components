@@ -3,9 +3,9 @@ use db::{
     models::{
         data_lifetime::DataLifetime,
         decision_intent::DecisionIntent,
+        document::{Document, DocumentImageArgs},
         document_request::DocumentRequest,
         document_upload::{DocumentUpload, NewDocumentUploadArgs},
-        identity_document::{DocumentImageArgs, IdentityDocument},
         incode_verification_session::IncodeVerificationSession,
         incode_verification_session_event::IncodeVerificationSessionEvent,
         insight_event::InsightEvent,
@@ -25,9 +25,9 @@ use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     CollectedDataOption, CountryRestriction, DecisionIntentKind, DocTypeRestriction, DocVData,
-    DocumentCdoInfo, DocumentRequestKind, DocumentSide, IdDocKind, IdentityDocumentStatus,
-    IncodeFailureReason, IncodeVerificationSessionState, PiiString, RiskSignalGroupKind, S3Url,
-    SealedVaultDataKey, Selfie, VendorAPI,
+    DocumentCdoInfo, DocumentKind, DocumentRequestKind, DocumentSide, DocumentStatus, IncodeFailureReason,
+    IncodeVerificationSessionState, PiiString, RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie,
+    VendorAPI,
 };
 
 use super::IncodeContext;
@@ -97,7 +97,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
 
             Ok((
                 di,
-                db::tests::fixtures::identity_document::create(conn, Some(doc_request.id)),
+                db::tests::fixtures::document::create(conn, Some(doc_request.id)),
             ))
         })
         .await
@@ -110,7 +110,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         front_image: Some(PiiString::from(small_front_image())),
         back_image: None, // only upload one document at a time
         selfie_image: None,
-        document_type: Some(IdDocKind::IdCard),
+        document_type: Some(DocumentKind::IdCard),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
         country_code: Some(PiiString::from("USA")),
@@ -346,7 +346,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             let note = "I, Bob Boberto, consent to NOTHING".into();
             UserConsent::create(conn, Utc::now(), ie.id, note, false, wf_id)?;
 
-            let id_doc = db::tests::fixtures::identity_document::create(conn, Some(doc_request.id));
+            let id_doc = db::tests::fixtures::document::create(conn, Some(doc_request.id));
             assert!(!id_doc.images(conn, DocumentImageArgs::default())?.is_empty());
 
             Ok((di, id_doc))
@@ -361,7 +361,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         front_image: Some(PiiString::from(non_document_image())),
         back_image: None,
         selfie_image: None,
-        document_type: Some(IdDocKind::IdCard),
+        document_type: Some(DocumentKind::IdCard),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
         country_code: Some(PiiString::from("USA")),
@@ -423,7 +423,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             );
 
             // Check we cleared out the front image to retry
-            let (doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
+            let (doc, _) = Document::get(conn, &id_doc_id)?;
             assert!(doc.images(conn, DocumentImageArgs::default())?.is_empty());
 
             // Now, add our images to the vault as if the user hit the POST /document APi again
@@ -538,8 +538,8 @@ async fn test_fail(state: &State, is_selfie: bool) {
             assert!(score_result.id_validation.is_some());
 
             // Check business logic bookkeeping
-            let (id_doc, _) = IdentityDocument::get(conn, &id_doc.id)?;
-            assert_eq!(id_doc.status, IdentityDocumentStatus::Complete);
+            let (id_doc, _) = Document::get(conn, &id_doc.id)?;
+            assert_eq!(id_doc.status, DocumentStatus::Complete);
 
             Ok(())
         })

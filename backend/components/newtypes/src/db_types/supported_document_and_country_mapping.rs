@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{IdDocKind, Iso3166TwoDigitCountryCode};
+use crate::{DocumentKind, Iso3166TwoDigitCountryCode};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -11,11 +11,11 @@ use strum::IntoEnumIterator;
 // This will be deprecated
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, derive_more::Deref)]
 pub struct SupportedDocumentAndCountryMappingForBifrost(
-    pub HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
+    pub HashMap<Iso3166TwoDigitCountryCode, Vec<DocumentKind>>,
 );
 
 impl SupportedDocumentAndCountryMappingForBifrost {
-    pub fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+    pub fn supported_countries_for_doc_type(&self, doc_type: DocumentKind) -> Vec<Iso3166TwoDigitCountryCode> {
         self.0
             .iter()
             .filter_map(|(country, doc_types)| doc_types.contains(&doc_type).then_some(country))
@@ -25,12 +25,12 @@ impl SupportedDocumentAndCountryMappingForBifrost {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq)]
-pub struct CountrySpecificDocumentMapping(pub HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>);
+pub struct CountrySpecificDocumentMapping(pub HashMap<Iso3166TwoDigitCountryCode, Vec<DocumentKind>>);
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq)]
 pub struct DocumentAndCountryConfiguration {
     // Documents available in all countries
-    pub global: Vec<IdDocKind>,
+    pub global: Vec<DocumentKind>,
     // Country specific configurations, could override global document types set
     pub country_specific: CountrySpecificDocumentMapping,
 }
@@ -59,7 +59,7 @@ mod tests {
     fn test_country_specific_document_mapping_serialization() {
         let mapping = CountrySpecificDocumentMapping(HashMap::from_iter(vec![(
             Iso3166TwoDigitCountryCode::US,
-            vec![IdDocKind::DriversLicense],
+            vec![DocumentKind::DriversLicense],
         )]));
         let ser = serde_json::to_value(mapping.clone()).unwrap();
         let deser: CountrySpecificDocumentMapping = serde_json::from_value(ser).unwrap();
@@ -74,10 +74,10 @@ mod tests {
     fn test_document_and_country_configuration_serialization() {
         let mapping = CountrySpecificDocumentMapping(HashMap::from_iter(vec![(
             Iso3166TwoDigitCountryCode::US,
-            vec![IdDocKind::DriversLicense],
+            vec![DocumentKind::DriversLicense],
         )]));
         let doc_config = DocumentAndCountryConfiguration {
-            global: vec![IdDocKind::Passport],
+            global: vec![DocumentKind::Passport],
             country_specific: mapping,
         };
         let ser = serde_json::to_value(doc_config.clone()).unwrap();

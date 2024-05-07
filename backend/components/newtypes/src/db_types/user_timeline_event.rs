@@ -1,6 +1,6 @@
 use crate::{
     util::impl_enum_string_diesel, ActionKind, AnnotationId, AuthEventId, AuthMethodKind,
-    CollectedDataOption, DataIdentifier, DbActor, DocumentRequestId, IdentityDocumentId, LabelId,
+    CollectedDataOption, DataIdentifier, DbActor, DocumentRequestId, DocumentId, LabelId,
     LivenessEventId, ObConfigurationId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
     WorkflowId, WorkflowRequestId,
 };
@@ -146,7 +146,7 @@ pub struct BiometricRegisteredInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DocumentUploadedInfo {
-    pub id: IdentityDocumentId,
+    pub id: DocumentId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

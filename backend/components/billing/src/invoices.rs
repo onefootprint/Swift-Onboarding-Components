@@ -5,7 +5,7 @@ use db::{
         access_event::AccessEvent,
         billing_event::BillingEvent,
         billing_profile::BillingProfile,
-        identity_document::IdentityDocument,
+        document::Document,
         scoped_vault::{ScopedVault, ScopedVaultPiiFilters},
         tenant::{Tenant, UpdateTenant},
         watchlist_check::WatchlistCheck,
@@ -37,7 +37,7 @@ pub async fn create_bill_for_tenant(
             let pii = ScopedVault::count_billable(conn, &t_id, i.end, ScopedVaultPiiFilters::None)?;
             let kyc = Workflow::get_kyc_kyb_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
             let kyb = Workflow::get_kyc_kyb_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
-            let id_docs = IdentityDocument::get_billable_count(conn, &t_id, i.start, i.end)?;
+            let id_docs = Document::get_billable_count(conn, &t_id, i.start, i.end)?;
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
 
             // These billing schemes are only used by some tenants, so only count them conditionally

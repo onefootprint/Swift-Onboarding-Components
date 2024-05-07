@@ -8,7 +8,7 @@ use api_core::{
     utils::file_upload::handle_file_upload,
 };
 
-use newtypes::{DocumentSide, IdentityDocumentId, WorkflowGuard};
+use newtypes::{DocumentSide, DocumentId, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
 
 const MIN_DOCUMENT_SIZE_IN_BYTES: usize = 100;
@@ -22,7 +22,7 @@ const MAX_DOCUMENT_SIZE_IN_BYTES: usize = 5_242_880;
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
-    args: web::Path<(IdentityDocumentId, DocumentSide)>,
+    args: web::Path<(DocumentId, DocumentSide)>,
     mut payload: Multipart,
     request: HttpRequest,
     meta: MetaHeaders,

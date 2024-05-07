@@ -4,11 +4,11 @@ use itertools::Itertools;
 use strum::ParseError;
 use strum_macros::{Display, EnumString};
 
-use crate::IdDocKind;
+use crate::DocumentKind;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub enum DocTypeRestriction {
-    Restrict(Vec<IdDocKind>),
+    Restrict(Vec<DocumentKind>),
     None,
 }
 
@@ -30,7 +30,7 @@ impl FromStr for DocTypeRestriction {
             s => {
                 let doc_types = s
                     .split(',')
-                    .map(IdDocKind::from_str)
+                    .map(DocumentKind::from_str)
                     .collect::<Result<_, Self::Err>>()?;
                 Ok(Self::Restrict(doc_types))
             }
@@ -56,7 +56,7 @@ pub enum Selfie {
 pub struct DocumentCdoInfo(pub DocTypeRestriction, pub CountryRestriction, pub Selfie);
 
 impl DocumentCdoInfo {
-    pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
+    pub fn restricted_id_doc_kinds(&self) -> Option<Vec<DocumentKind>> {
         match self.doc_type_restriction() {
             DocTypeRestriction::Restrict(types) => Some(types),
             DocTypeRestriction::None => None,
@@ -138,7 +138,7 @@ mod test {
     use test_case::test_case;
 
     use super::{CountryRestriction, DocTypeRestriction, DocumentCdoInfo, Selfie};
-    use crate::IdDocKind;
+    use crate::DocumentKind;
 
     #[test_case(
         DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None),
@@ -149,15 +149,15 @@ mod test {
         "document_and_selfie"
     )]
     #[test_case(
-        DocumentCdoInfo(DocTypeRestriction::Restrict(vec![IdDocKind::DriversLicense]), CountryRestriction::None, Selfie::RequireSelfie),
+        DocumentCdoInfo(DocTypeRestriction::Restrict(vec![DocumentKind::DriversLicense]), CountryRestriction::None, Selfie::RequireSelfie),
         "document.drivers_license.none.require_selfie"
     )]
     #[test_case(
-        DocumentCdoInfo(DocTypeRestriction::Restrict(vec![IdDocKind::DriversLicense, IdDocKind::IdCard]), CountryRestriction::UsOnly, Selfie::None),
+        DocumentCdoInfo(DocTypeRestriction::Restrict(vec![DocumentKind::DriversLicense, DocumentKind::IdCard]), CountryRestriction::UsOnly, Selfie::None),
         "document.drivers_license,id_card.us_only.none"
     )]
     #[test_case(
-        DocumentCdoInfo(DocTypeRestriction::Restrict(vec![IdDocKind::DriversLicense, IdDocKind::IdCard]), CountryRestriction::UsOnly, Selfie::RequireSelfie),
+        DocumentCdoInfo(DocTypeRestriction::Restrict(vec![DocumentKind::DriversLicense, DocumentKind::IdCard]), CountryRestriction::UsOnly, Selfie::RequireSelfie),
         "document.drivers_license,id_card.us_only.require_selfie"
     )]
     fn test_repr(info: DocumentCdoInfo, expected_repr: &str) {

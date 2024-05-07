@@ -7,7 +7,7 @@ use newtypes::{
 use db::{
     models::{
         data_lifetime::DataLifetime,
-        identity_document::IdentityDocument,
+        document::Document,
         manual_review::{ManualReviewAction, ManualReviewArgs},
         ob_configuration::ObConfiguration,
         onboarding_decision::NewDecisionArgs,
@@ -57,7 +57,7 @@ pub fn save_final_decision(
         action: ManualReviewAction::GetOrCreate { review_reasons },
     });
     let doc_manual_review = {
-        let docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
+        let docs = Document::list_by_wf_id(conn, &wf.id)?;
         let docs_needing_human_review = docs
             .into_iter()
             .filter(|(d, _)| d.review_status == DocumentReviewStatus::PendingHumanReview)

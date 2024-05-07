@@ -3,8 +3,8 @@ use std::{str::FromStr, sync::Arc};
 use chrono::Utc;
 use db::models::{
     decision_intent::DecisionIntent,
+    document::{Document, DocumentImageArgs},
     document_upload::DocumentUpload,
-    identity_document::{DocumentImageArgs, IdentityDocument},
     incode_verification_session::IncodeVerificationSession,
     ob_configuration::ObConfiguration,
     verification_request::VerificationRequest,
@@ -59,7 +59,7 @@ use crate::{
 };
 use db::models::verification_result::{NewVerificationResult, VerificationResult};
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, IdDocKind, IncodeFailureReason,
+    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, DocumentKind, IncodeFailureReason,
     IncodeVerificationSessionId, IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode,
     Iso3166TwoDigitCountryCode, ScopedVaultId, ScrubbedPiiString, TenantId, VendorAPI, WorkflowId,
 };
@@ -70,7 +70,7 @@ pub struct VerificationSession {
     pub kind: IncodeVerificationSessionKind,
     pub credentials: IncodeCredentialsWithToken,
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
-    pub document_type: IdDocKind,
+    pub document_type: DocumentKind,
     pub hard_errored: bool,
 }
 
@@ -92,7 +92,7 @@ pub async fn save_incode_fixtures(
     su_id: &ScopedVaultId,
     wf_id: &WorkflowId,
     obc: ObConfiguration,
-    id_doc: IdentityDocument,
+    id_doc: Document,
     should_collect_selfie: bool,
 ) -> ApiResult<()> {
     let wf_id = wf_id.clone();
@@ -216,13 +216,13 @@ pub async fn save_incode_fixtures(
 // Struct that represents a document kind that has been validated as the type indicated by a vendor, in this case incode
 // For example, we don't want to be vaulting something as a Passport that is in fact, a driver's license
 #[derive(Clone, Copy)]
-pub struct ValidatedIdDocKind(IdDocKind);
+pub struct ValidatedIdDocKind(DocumentKind);
 impl ValidatedIdDocKind {
-    pub fn into_inner(self) -> IdDocKind {
+    pub fn into_inner(self) -> DocumentKind {
         self.0
     }
 
-    pub fn new_for_fixture(id_doc_kind: IdDocKind) -> Self {
+    pub fn new_for_fixture(id_doc_kind: DocumentKind) -> Self {
         Self(id_doc_kind)
     }
 }
@@ -253,7 +253,7 @@ fn parse_type_of_id(
     let Some(type_of_id) = type_of_id else {
         return Ok(Err(IncodeFailureReason::UnknownDocumentType));
     };
-    let Ok(id_doc_kind) = IdDocKind::try_from((type_of_id, document_sub_type)) else {
+    let Ok(id_doc_kind) = DocumentKind::try_from((type_of_id, document_sub_type)) else {
         return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
     };
     if id_doc_kind != expected_doc_type
@@ -273,7 +273,7 @@ fn parse_type_of_id(
         return Ok(Err(IncodeFailureReason::UnknownCountryCode));
     };
 
-    if expected_country != provided_country && id_doc_kind != IdDocKind::Passport {
+    if expected_country != provided_country && id_doc_kind != DocumentKind::Passport {
         // TODO: maybe also check if here expected_country is allowed by OBC?
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }

@@ -1,4 +1,4 @@
-use crate::{DataIdentifier, DocumentKind, NtResult, ValidationError};
+use crate::{DataIdentifier, DocumentDiKind, NtResult, ValidationError};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use itertools::Itertools;
@@ -98,7 +98,7 @@ impl DocumentRequestConfig {
         }
         if custom_docs
             .iter()
-            .any(|d| !matches!(d.identifier, DataIdentifier::Document(DocumentKind::Custom(_))))
+            .any(|d| !matches!(d.identifier, DataIdentifier::Document(DocumentDiKind::Custom(_))))
         {
             return ValidationError(
                 "Must use identifier starting with document.custom. for custom documents",

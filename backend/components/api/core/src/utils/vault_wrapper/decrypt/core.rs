@@ -10,7 +10,7 @@ use enclave_proxy::DataTransformer;
 use futures_util::StreamExt;
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, DataIdentifier, DocumentKind, EncryptedVaultPrivateKey, PiiBytes, PiiJsonValue, PiiString,
+    output::Csv, DataIdentifier, DocumentDiKind, EncryptedVaultPrivateKey, PiiBytes, PiiJsonValue, PiiString,
     VaultDataFormat,
 };
 use std::collections::HashMap;
@@ -61,8 +61,8 @@ impl<Type> VaultWrapper<Type> {
     /// get the mime type
     fn get_vaulted_data(&self, di: &DataIdentifier) -> Option<VaultedData> {
         // This is weird - get the mime type from the document row
-        if let &DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) = di {
-            let di: DataIdentifier = DocumentKind::from_id_doc_kind(doc_kind, side).into();
+        if let &DataIdentifier::Document(DocumentDiKind::MimeType(doc_kind, side)) = di {
+            let di: DataIdentifier = DocumentDiKind::from_id_doc_kind(doc_kind, side).into();
             let document = self.data(&di)?.doc()?;
             return Some(VaultedData::NonPrivate(
                 &document.mime_type,

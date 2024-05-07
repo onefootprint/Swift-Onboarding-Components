@@ -1,10 +1,10 @@
 use super::{Error, VResult};
 use crate::{
-    AllData, CleanAndValidate, DataIdentifierValue, DocumentKind, NtResult, PiiJsonValue, PiiString,
+    AllData, CleanAndValidate, DataIdentifierValue, DocumentDiKind, NtResult, PiiJsonValue, PiiString,
     PiiValueKind, ValidateArgs,
 };
 
-impl CleanAndValidate for DocumentKind {
+impl CleanAndValidate for DocumentDiKind {
     type Parsed = ();
 
     fn clean_and_validate(
@@ -14,8 +14,8 @@ impl CleanAndValidate for DocumentKind {
         _: &AllData,
     ) -> NtResult<DataIdentifierValue<Self::Parsed>> {
         match self {
-            DocumentKind::Barcodes(_, _) => Ok(validate_barcodes(self, value)?),
-            DocumentKind::OcrData(_, odk) => {
+            DocumentDiKind::Barcodes(_, _) => Ok(validate_barcodes(self, value)?),
+            DocumentDiKind::OcrData(_, odk) => {
                 if odk.is_json() {
                     Ok(DataIdentifierValue {
                         di: self.into(),
@@ -30,11 +30,11 @@ impl CleanAndValidate for DocumentKind {
                     })
                 }
             }
-            DocumentKind::Image(_, _)
-            | DocumentKind::MimeType(_, _)
-            | DocumentKind::LatestUpload(_, _)
-            | DocumentKind::FinraComplianceLetter
-            | DocumentKind::Custom(_) => Ok(DataIdentifierValue {
+            DocumentDiKind::Image(_, _)
+            | DocumentDiKind::MimeType(_, _)
+            | DocumentDiKind::LatestUpload(_, _)
+            | DocumentDiKind::FinraComplianceLetter
+            | DocumentDiKind::Custom(_) => Ok(DataIdentifierValue {
                 di: self.into(),
                 value: value.as_string()?,
                 parsed: (),
@@ -44,7 +44,7 @@ impl CleanAndValidate for DocumentKind {
 }
 
 
-fn validate_barcodes(doc_kind: DocumentKind, value: PiiJsonValue) -> VResult<DataIdentifierValue<()>> {
+fn validate_barcodes(doc_kind: DocumentDiKind, value: PiiJsonValue) -> VResult<DataIdentifierValue<()>> {
     let value_kind = PiiValueKind::from(&value);
     if value_kind != PiiValueKind::Array {
         return Err(Error::IncorrectDataType(PiiValueKind::Array, value_kind));

@@ -21,7 +21,7 @@ use strum_macros::{AsRefStr, EnumString};
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum IdentityDocumentFixtureResult {
+pub enum DocumentFixtureResult {
     /// Document was not verified (random failing reason codes are generated)
     Fail,
     /// Document was verified (e.g. not tampered, all checks passing)
@@ -29,4 +29,4 @@ pub enum IdentityDocumentFixtureResult {
     // TODO: could add other enums for different fail cases
     Real,
 }
-crate::util::impl_enum_str_diesel!(IdentityDocumentFixtureResult);
+crate::util::impl_enum_str_diesel!(DocumentFixtureResult);

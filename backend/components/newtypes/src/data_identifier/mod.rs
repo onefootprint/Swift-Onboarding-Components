@@ -21,8 +21,8 @@ mod collected_data;
 mod contact_info_kind;
 mod decryptable_identifier;
 mod derived;
-mod document_kind;
-mod id_doc_kind;
+mod doc_kind;
+mod document_di_kind;
 mod identity_data_kind;
 mod investor_profile_kind;
 mod kv_data_key;
@@ -35,8 +35,8 @@ pub use self::{
     contact_info_kind::*,
     decryptable_identifier::*,
     derived::*,
-    document_kind::*,
-    id_doc_kind::*,
+    doc_kind::*,
+    document_di_kind::*,
     identity_data_kind::*,
     investor_profile_kind::*,
     validation::{Error as DiValidationError, *},
@@ -82,7 +82,7 @@ pub enum DataIdentifier {
     Custom(KvDataKey),
     Business(BusinessDataKind),
     InvestorProfile(InvestorProfileKind),
-    Document(DocumentKind),
+    Document(DocumentDiKind),
     Card(CardInfo),
 }
 
@@ -232,7 +232,7 @@ impl DataIdentifier {
                 DataIdentifierDiscriminant::InvestorProfile => InvestorProfileKind::iter()
                     .map(DataIdentifier::from)
                     .collect_vec(),
-                DataIdentifierDiscriminant::Document => DocumentKind::api_examples()
+                DataIdentifierDiscriminant::Document => DocumentDiKind::api_examples()
                     .into_iter()
                     .map(DataIdentifier::from)
                     .collect_vec(),
@@ -296,7 +296,7 @@ impl FromStr for DataIdentifier {
                 InvestorProfileKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?,
             ),
             DataIdentifierDiscriminant::Document => {
-                Self::Document(DocumentKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+                Self::Document(DocumentDiKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
             DataIdentifierDiscriminant::Card => {
                 Self::Card(CardInfo::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
@@ -329,7 +329,7 @@ impl DataIdentifier {
                 .into_iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),
-            DocumentKind::searchable()
+            DocumentDiKind::searchable()
                 .into_iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),
@@ -386,7 +386,7 @@ impl_enum_string_diesel!(DataIdentifier);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{AliasId, DocumentSide, IdDocKind};
+    use crate::{AliasId, DocumentKind, DocumentSide};
     use itertools::Itertools;
     use test_case::test_case;
 
@@ -396,12 +396,12 @@ mod tests {
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
-    #[test_case(DataIdentifier::Document(DocumentKind::Image(IdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.image")]
-    #[test_case(DataIdentifier::Document(DocumentKind::MimeType(IdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.mime_type")]
-    #[test_case(DataIdentifier::Document(DocumentKind::LatestUpload(IdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.latest_upload")]
-    #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
+    #[test_case(DataIdentifier::Document(DocumentDiKind::Image(DocumentKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.image")]
+    #[test_case(DataIdentifier::Document(DocumentDiKind::MimeType(DocumentKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.mime_type")]
+    #[test_case(DataIdentifier::Document(DocumentDiKind::LatestUpload(DocumentKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.latest_upload")]
+    #[test_case(DataIdentifier::Document(DocumentDiKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
     #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.expiration_month")]
-    #[test_case(DataIdentifier::Document(DocumentKind::OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber)) => "document.drivers_license.document_number")]
+    #[test_case(DataIdentifier::Document(DocumentDiKind::OcrData(DocumentKind::DriversLicense, OcrDataKind::DocumentNumber)) => "document.drivers_license.document_number")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -412,12 +412,12 @@ mod tests {
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
-    #[test_case("document.drivers_license.front.image" => DataIdentifier::Document(DocumentKind::Image(IdDocKind::DriversLicense, DocumentSide::Front)))]
-    #[test_case("document.drivers_license.front.mime_type" => DataIdentifier::Document(DocumentKind::MimeType(IdDocKind::DriversLicense, DocumentSide::Front)))]
-    #[test_case("document.drivers_license.front.latest_upload" => DataIdentifier::Document(DocumentKind::LatestUpload(IdDocKind::DriversLicense, DocumentSide::Front)))]
-    #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
+    #[test_case("document.drivers_license.front.image" => DataIdentifier::Document(DocumentDiKind::Image(DocumentKind::DriversLicense, DocumentSide::Front)))]
+    #[test_case("document.drivers_license.front.mime_type" => DataIdentifier::Document(DocumentDiKind::MimeType(DocumentKind::DriversLicense, DocumentSide::Front)))]
+    #[test_case("document.drivers_license.front.latest_upload" => DataIdentifier::Document(DocumentDiKind::LatestUpload(DocumentKind::DriversLicense, DocumentSide::Front)))]
+    #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentDiKind::FinraComplianceLetter))]
     #[test_case("card.hayesvalley.expiration_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
-    #[test_case("document.passport.document_number" => DataIdentifier::Document(DocumentKind::OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)))]
+    #[test_case("document.passport.document_number" => DataIdentifier::Document(DocumentDiKind::OcrData(DocumentKind::Passport, OcrDataKind::DocumentNumber)))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
@@ -440,7 +440,7 @@ mod tests {
                 .into_iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),
-            DocumentKind::api_examples()
+            DocumentDiKind::api_examples()
                 .into_iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),
@@ -470,7 +470,7 @@ mod tests {
                 .collect_vec(),
             IdentityDataKind::iter().map(DataIdentifier::from).collect_vec(),
             BusinessDataKind::iter().map(DataIdentifier::from).collect_vec(),
-            DocumentKind::api_examples()
+            DocumentDiKind::api_examples()
                 .into_iter()
                 .map(DataIdentifier::from)
                 .collect_vec(),

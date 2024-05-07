@@ -1,6 +1,7 @@
 use alpaca::{
     types::account::{
-        Contact, CreateAccountRequest, Disclosures, Document, DocumentType, Identity, TaxIdType,
+        Contact, CreateAccountRequest, Disclosures, Document as AlpacaDocument, DocumentType, Identity,
+        TaxIdType,
     },
     AlpacaCip,
 };
@@ -17,10 +18,10 @@ use api_core::{
 use api_wire_types::{
     AlpacaCreateAccountRequest, AlpacaCreateAccountResponse, DeprecatedAlpacaCreateAccountRequest,
 };
-use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
+use db::models::{document::Document, scoped_vault::ScopedVault};
 use newtypes::{
-    email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, IdDocKind, IdentityDataKind as IDK,
-    InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
+    email::Email, DataIdentifier as DI, Declaration, DocumentDiKind as DK, DocumentKind,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
@@ -120,7 +121,7 @@ async fn create_create_account_request(
         .db_pool
         .db_query(move |conn| -> ApiResult<(TenantVw<Person>, _)> {
             let sv = ScopedVault::get(conn, (&req.fp_user_id, &tenant_id, is_live))?;
-            let doc = IdentityDocument::get_latest_complete(conn, sv.id.clone())?;
+            let doc = Document::get_latest_complete(conn, sv.id.clone())?;
             let uvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             Ok((uvw, doc))
         })
@@ -186,10 +187,10 @@ async fn create_create_account_request(
         let documents = doc_info
             .di_pairs
             .into_iter()
-            .map(|(latest_doc_di, mime_di)| -> ApiResult<Document> {
+            .map(|(latest_doc_di, mime_di)| -> ApiResult<AlpacaDocument> {
                 let content = decrypted.rm_di(latest_doc_di)?.into();
                 let mime_type = decrypted.rm_di(mime_di)?;
-                Ok(Document {
+                Ok(AlpacaDocument {
                     document_type: DocumentType::IdentityVerification,
                     document_sub_type: Some(doc_info.id_doc_kind.to_string()),
                     content,
@@ -248,7 +249,7 @@ async fn create_create_account_request(
 }
 
 struct DocInfo {
-    id_doc_kind: IdDocKind,
+    id_doc_kind: DocumentKind,
     di_pairs: Vec<(DI, DI)>, // (LatestUpload, MimeType)
 }
 

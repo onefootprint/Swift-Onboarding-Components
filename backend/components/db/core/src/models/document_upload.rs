@@ -7,7 +7,7 @@ use diesel::{
     Queryable,
 };
 use newtypes::{
-    DataLifetimeSeqno, DocumentSide, DocumentUploadId, IdentityDocumentId, IncodeFailureReason, S3Url,
+    DataLifetimeSeqno, DocumentSide, DocumentUploadId, DocumentId, IncodeFailureReason, S3Url,
     SealedVaultDataKey,
 };
 
@@ -18,7 +18,7 @@ pub struct DocumentUpload {
     pub id: DocumentUploadId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub document_id: IdentityDocumentId,
+    pub document_id: DocumentId,
     pub side: DocumentSide,
     pub s3_url: S3Url,
     pub e_data_key: SealedVaultDataKey,
@@ -51,7 +51,7 @@ pub struct DocumentUpload {
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = document_upload)]
 struct NewDocumentUploadRow {
-    document_id: IdentityDocumentId,
+    document_id: DocumentId,
     side: DocumentSide,
     s3_url: S3Url,
     e_data_key: SealedVaultDataKey,
@@ -75,7 +75,7 @@ struct DocumentUploadUpdate {
 
 #[derive(Debug)]
 pub struct NewDocumentUploadArgs {
-    pub document_id: IdentityDocumentId,
+    pub document_id: DocumentId,
     pub side: DocumentSide,
     pub s3_url: S3Url,
     pub e_data_key: SealedVaultDataKey,
@@ -138,7 +138,7 @@ impl DocumentUpload {
     #[tracing::instrument("DocumentUpload::set_failure_reasons", skip_all)]
     pub fn set_failure_reasons(
         conn: &mut TxnPgConn,
-        document_id: &IdentityDocumentId,
+        document_id: &DocumentId,
         side: DocumentSide,
         failure_reasons: Vec<IncodeFailureReason>,
         deactivate: bool,
@@ -161,7 +161,7 @@ impl DocumentUpload {
     #[tracing::instrument("DocumentUpload::count_failed_attempts", skip_all)]
     pub fn count_failed_attempts(
         conn: &mut PgConn,
-        document_id: &IdentityDocumentId,
+        document_id: &DocumentId,
     ) -> DbResult<Vec<(DocumentSide, i64)>> {
         let results = document_upload::table
             .filter(document_upload::document_id.eq(document_id))

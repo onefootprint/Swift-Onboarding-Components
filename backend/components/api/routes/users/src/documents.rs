@@ -5,7 +5,7 @@ use crate::{
     State,
 };
 use api_core::{errors::ApiResult, types::JsonApiResponse, utils::fp_id_path::FpIdPath};
-use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
+use db::models::{document::Document, scoped_vault::ScopedVault};
 use itertools::Itertools;
 use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web};
@@ -31,7 +31,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let id_docs: Vec<IdentityDocument> = IdentityDocument::list(conn, &sv.id)?
+            let id_docs: Vec<Document> = Document::list(conn, &sv.id)?
                 .into_iter()
                 .map(|(i, _)| i)
                 .filter(|i| i.completed_seqno.is_some())

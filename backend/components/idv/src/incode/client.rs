@@ -15,7 +15,7 @@ use crate::{
     incode::error::Error as IncodeError,
 };
 use newtypes::{
-    vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
+    vendor_credentials::IncodeCredentials, DocVData, DocumentKind, IncodeConfigurationId, IncodeSessionId,
     IncodeVerificationSessionId, IncodeVerificationSessionKind, IncodeWatchlistResultRef, PiiString,
 };
 use reqwest::header;
@@ -514,7 +514,7 @@ impl AuthenticatedIncodeClientAdapter {
     }
 }
 
-fn url_path_for_document_side(document_type: &IdDocKind, document_side: &DocumentSide) -> String {
+fn url_path_for_document_side(document_type: &DocumentKind, document_side: &DocumentSide) -> String {
     // Not all documents have backs
     let front_only = document_type.front_only();
 
@@ -543,7 +543,7 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 #[cfg(test)]
 mod tests {
     use newtypes::{
-        incode::IncodeStatus, vendor_credentials::IncodeCredentials, DocVData, IdDocKind,
+        incode::IncodeStatus, vendor_credentials::IncodeCredentials, DocVData, DocumentKind,
         IncodeConfigurationId, IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
         PiiString,
     };
@@ -622,19 +622,19 @@ mod tests {
             front_image: Some(PiiString::from(
                 load_image_and_encode_as_b64("fake_incode_front.jpg").0,
             )),
-            document_type: Some(IdDocKind::DriversLicense),
+            document_type: Some(DocumentKind::DriversLicense),
             ..Default::default()
         };
         let back_docv_data = DocVData {
             back_image: Some(PiiString::from(
                 load_image_and_encode_as_b64("fake_incode_back.jpg").0,
             )),
-            document_type: Some(IdDocKind::DriversLicense),
+            document_type: Some(DocumentKind::DriversLicense),
             ..Default::default()
         };
         let selfie_docv_data = DocVData {
             selfie_image: Some(PiiString::from(load_image_and_encode_as_b64("fake_selfie.jpg").0)),
-            document_type: Some(IdDocKind::DriversLicense),
+            document_type: Some(DocumentKind::DriversLicense),
             ..Default::default()
         };
 

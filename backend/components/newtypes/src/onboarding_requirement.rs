@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     CollectedDataOption, CustomDocumentConfig, DocumentRequestId, DocumentRequestKind, DocumentUploadMode,
-    IdDocKind, Iso3166TwoDigitCountryCode,
+    DocumentKind, Iso3166TwoDigitCountryCode,
 };
 use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
@@ -59,7 +59,7 @@ pub enum CollectDocumentConfig {
     Identity {
         should_collect_selfie: bool,
         should_collect_consent: bool,
-        supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
+        supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<DocumentKind>>,
     },
     ProofOfSsn {},
     ProofOfAddress {},
@@ -173,7 +173,7 @@ impl OnboardingRequirement {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct AuthorizeFields {
     pub collected_data: Vec<CollectedDataOption>,
-    pub document_types: Vec<IdDocKind>,
+    pub document_types: Vec<DocumentKind>,
 }
 
 #[cfg(test)]

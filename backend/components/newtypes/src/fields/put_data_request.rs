@@ -5,7 +5,7 @@ use itertools::Itertools;
 
 use crate::{
     flat_api_object_map_type, CardDataKind, DataIdentifier, DataRequest, DataValidationError,
-    DiValidationError, DocumentKind, NtResult, PiiJsonValue, PiiValueKind, ValidateArgs,
+    DiValidationError, DocumentDiKind, NtResult, PiiJsonValue, PiiValueKind, ValidateArgs,
 };
 
 flat_api_object_map_type!(
@@ -30,8 +30,8 @@ impl RawDataRequest {
             .filter_map(|di| {
                 let err = match di {
                     DataIdentifier::Document(k) => match k {
-                        DocumentKind::OcrData(_, _) => None,  // allow vaulting OCR data
-                        DocumentKind::Barcodes(_, _) => None, // allow vaulting barcodes
+                        DocumentDiKind::OcrData(_, _) => None,  // allow vaulting OCR data
+                        DocumentDiKind::Barcodes(_, _) => None, // allow vaulting barcodes
                         _ => Some(DiValidationError::CannotVaultDocument.into()),
                     },
                     DataIdentifier::Card(k) => match k.kind {

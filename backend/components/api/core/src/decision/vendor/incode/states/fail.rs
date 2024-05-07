@@ -11,7 +11,7 @@ use crate::{
 use async_trait::async_trait;
 use db::{
     models::{
-        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        document::{Document, DocumentUpdate},
         risk_signal::RiskSignal,
         user_timeline::UserTimeline,
         verification_request::VerificationRequest,
@@ -19,8 +19,8 @@ use db::{
     DbPool, TxnPgConn,
 };
 use newtypes::{
-    DecisionIntentId, FootprintReasonCode, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId,
-    VaultId, VendorAPI, VerificationResultId,
+    DecisionIntentId, DocumentId, DocumentStatus, FootprintReasonCode, ScopedVaultId, VaultId, VendorAPI,
+    VerificationResultId,
 };
 
 // TODO this is more like the other workflow state transitions where it has behavior that must be
@@ -35,16 +35,16 @@ impl Fail {
         di_id: &DecisionIntentId,
         sv_id: &ScopedVaultId,
         vault_id: &VaultId,
-        id_doc_id: &IdentityDocumentId,
+        id_doc_id: &DocumentId,
     ) -> ApiResult<()> {
         // Mark the id doc as failed
-        let update = IdentityDocumentUpdate {
+        let update = DocumentUpdate {
             completed_seqno: None,
             document_score: None,
             selfie_score: None,
             ocr_confidence_score: None,
             vaulted_document_type: None,
-            status: Some(IdentityDocumentStatus::Failed),
+            status: Some(DocumentStatus::Failed),
             curp_completed_seqno: None,
             validated_country_code: None,
             review_status: None,
@@ -70,7 +70,7 @@ impl Fail {
             false,
         );
 
-        IdentityDocument::update(conn, id_doc_id, update)?;
+        Document::update(conn, id_doc_id, update)?;
         // Create a timeline event
         let info = newtypes::DocumentUploadedInfo {
             id: id_doc_id.clone(),

@@ -1,5 +1,5 @@
 use crate::{
-    BusinessDataKind as BDK, CollectedData, DataIdentifier, DocumentCdoInfo, DocumentKind as DK,
+    BusinessDataKind as BDK, CollectedData, DataIdentifier, DocumentCdoInfo, DocumentDiKind as DK,
     IdentityDataKind as IDK, InvestorProfileKind as IPK, Selfie, TenantScope,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};

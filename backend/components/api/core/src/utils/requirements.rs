@@ -8,8 +8,8 @@ use crate::{
 };
 use db::{
     models::{
+        document::Document,
         document_request::DocumentRequest,
-        identity_document::IdentityDocument,
         liveness_event::LivenessEvent,
         ob_configuration::ObConfiguration,
         user_consent::UserConsent,
@@ -22,8 +22,8 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     AlpacaKycState, AuthorizeFields, CollectDocumentConfig, CollectedDataOption,
-    DataIdentifierDiscriminant as DID, Declaration, DocumentCdoInfo, DocumentKind, DocumentRequestConfig,
-    DocumentRequestKind, DocumentUploadMode, IdentityDataKind as IDK, IdentityDocumentStatus,
+    DataIdentifierDiscriminant as DID, Declaration, DocumentCdoInfo, DocumentDiKind, DocumentRequestConfig,
+    DocumentRequestKind, DocumentStatus, DocumentUploadMode, IdentityDataKind as IDK,
     InvestorProfileKind as IPK, Iso3166TwoDigitCountryCode, KycState, LivenessSource, OnboardingRequirement,
     OnboardingRequirementKind, ScopedVaultId, Selfie, UsLegalStatus, VaultId, WorkflowState,
 };
@@ -394,7 +394,7 @@ fn get_requirement_inner(
                         // The finra compliance doc is missing if any of the declarations require a doc and we don't
                         // yet have one on file
                         declarations.iter().any(|d| d.requires_finra_compliance_doc())
-                            && !vw.has_field(&DocumentKind::FinraComplianceLetter.into())
+                            && !vw.has_field(&DocumentDiKind::FinraComplianceLetter.into())
                     } else {
                         false
                     };
@@ -451,11 +451,9 @@ fn get_requirement_inner(
             document_requests
                 .into_iter()
                 .map(|dr| -> ApiResult<_> {
-                    let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
-                    let should_render = id_doc.is_empty()
-                        || id_doc
-                            .into_iter()
-                            .any(|d| d.status == IdentityDocumentStatus::Pending);
+                    let id_doc = Document::list_by_request_id(conn, &dr.id)?;
+                    let should_render =
+                        id_doc.is_empty() || id_doc.into_iter().any(|d| d.status == DocumentStatus::Pending);
                     if !should_render {
                         return Ok(None);
                     }
@@ -511,7 +509,7 @@ fn get_requirement_inner(
         OnboardingRequirementKind::Authorize => {
             let (document_types, skipped_selfie) = if obc.can_access_document() {
                 // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-                let id_docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
+                let id_docs = Document::list_by_wf_id(conn, &wf.id)?;
                 let doc_types = id_docs
                         .iter()
                         // check we've actually completed the document, it's not just an empty id doc

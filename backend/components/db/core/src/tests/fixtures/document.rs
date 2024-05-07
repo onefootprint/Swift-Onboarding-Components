@@ -3,25 +3,25 @@ use std::str::FromStr;
 use crate::{
     models::{
         data_lifetime::DataLifetime,
+        document::{Document, NewDocumentArgs},
         document_upload::{DocumentUpload, NewDocumentUploadArgs},
-        identity_document::{IdentityDocument, NewIdentityDocumentArgs},
         insight_event::CreateInsightEvent,
     },
     TxnPgConn,
 };
-use newtypes::{DocumentRequestId, DocumentSide, IdDocKind, S3Url, SealedVaultDataKey};
+use newtypes::{DocumentKind, DocumentRequestId, DocumentSide, S3Url, SealedVaultDataKey};
 
-pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> IdentityDocument {
-    let args = NewIdentityDocumentArgs {
+pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Document {
+    let args = NewDocumentArgs {
         request_id: request_id.unwrap_or_else(|| DocumentRequestId::from_str("test_derp").unwrap()),
-        document_type: IdDocKind::DriversLicense,
+        document_type: DocumentKind::DriversLicense,
         country_code: Some(newtypes::Iso3166TwoDigitCountryCode::US),
         fixture_result: None,
         skip_selfie: None,
         device_type: None,
         insight: CreateInsightEvent { ..Default::default() },
     };
-    let doc = IdentityDocument::get_or_create(conn, args).unwrap();
+    let doc = Document::get_or_create(conn, args).unwrap();
     let key = SealedVaultDataKey(vec![]);
     let s3_url = S3Url::test_data("".into());
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();

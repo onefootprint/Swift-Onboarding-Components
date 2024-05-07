@@ -1,6 +1,6 @@
 use crate::{
     BusinessDataKind as BDK, CollectedData as CD, CollectedDataOption as CDO, DataIdentifier as DI,
-    DocumentKind as DK, IdentityDataKind as IDK, InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
+    DocumentDiKind as DK, IdentityDataKind as IDK, InvestorProfileKind as IPK, IsDataIdentifierDiscriminant,
     KvDataKey,
 };
 use itertools::Itertools;

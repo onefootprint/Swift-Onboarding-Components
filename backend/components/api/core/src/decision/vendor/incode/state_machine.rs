@@ -18,7 +18,7 @@ use crate::{
 };
 use db::{
     models::{
-        decision_intent::DecisionIntent, identity_document::IdentityDocument,
+        decision_intent::DecisionIntent, document::Document,
         incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
         vault::Vault,
     },
@@ -27,7 +27,7 @@ use db::{
 use feature_flag::FeatureFlagClient;
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, DecisionIntentKind, DocVData,
-    DocumentRequestId, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason,
+    DocumentId, DocumentRequestId, IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason,
     IncodeVerificationSessionKind, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId,
     TenantId, WorkflowId,
 };
@@ -40,7 +40,7 @@ pub type IsReady = bool;
 pub struct IncodeContext {
     pub di_id: DecisionIntentId,
     pub sv_id: ScopedVaultId,
-    pub id_doc_id: IdentityDocumentId,
+    pub id_doc_id: DocumentId,
     pub wf_id: WorkflowId,
     pub obc: ObConfiguration,
     pub vault: Vault,
@@ -135,7 +135,7 @@ impl IncodeStateMachine {
                     existing
                 } else {
                     // Create a brand new session
-                    let (id_doc, doc_request) = IdentityDocument::get(conn, &id_doc_id)?;
+                    let (id_doc, doc_request) = Document::get(conn, &id_doc_id)?;
                     let session_kind = if doc_request.should_collect_selfie() && !id_doc.should_skip_selfie()
                     {
                         IncodeVerificationSessionKind::Selfie
@@ -246,7 +246,7 @@ impl IncodeStateMachine {
         let (di, id_doc, doc_req, obc, uvw) = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let (id_doc, doc_req) = IdentityDocument::get(conn, &idi)?;
+                let (id_doc, doc_req) = Document::get(conn, &idi)?;
 
                 let di = DecisionIntent::get_or_create_for_workflow(
                     conn,

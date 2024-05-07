@@ -1,7 +1,7 @@
 use db::{
     models::{
+        document::{Document, DocumentImageArgs},
         document_upload::DocumentUpload,
-        identity_document::{DocumentImageArgs, IdentityDocument},
     },
     TxnPgConn,
 };
@@ -22,7 +22,7 @@ impl MissingSides {
 
 pub fn get_side_info(
     conn: &mut TxnPgConn,
-    id_doc: &IdentityDocument,
+    id_doc: &Document,
     should_collect_selfie: bool,
     side: Option<DocumentSide>,
 ) -> ApiResult<(MissingSides, Option<i64>)> {

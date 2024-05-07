@@ -10,7 +10,7 @@ use newtypes::{
     incode::{
         IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType, IncodeStatus, IncodeTest,
     },
-    IdDocKind, IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
+    DocumentKind, DocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
     Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiInt, ScrubbedPiiLong,
     ScrubbedPiiString, UsState, UsStateFull, DATE_FORMAT,
 };
@@ -252,17 +252,17 @@ impl FetchScoresResponse {
         Self::score_and_status(&self.face_recognition.as_ref().and_then(|i| i.overall.clone()))
     }
 
-    pub fn fixture_response(fixture: Option<IdentityDocumentFixtureResult>) -> Result<Self, IncodeError> {
+    pub fn fixture_response(fixture: Option<DocumentFixtureResult>) -> Result<Self, IncodeError> {
         let doc_opts = if let Some(f) = fixture {
             match f {
-                IdentityDocumentFixtureResult::Fail => Ok(DocTestOpts {
+                DocumentFixtureResult::Fail => Ok(DocTestOpts {
                     overall: IncodeStatus::Fail,
                     tamper: IncodeStatus::Fail,
                     fake: IncodeStatus::Fail,
                     ..Default::default()
                 }),
-                IdentityDocumentFixtureResult::Pass => Ok(DocTestOpts::default()),
-                IdentityDocumentFixtureResult::Real => Err(IncodeError::FixtureResultMismatch),
+                DocumentFixtureResult::Pass => Ok(DocTestOpts::default()),
+                DocumentFixtureResult::Real => Err(IncodeError::FixtureResultMismatch),
             }
         } else {
             Ok(DocTestOpts::default())
@@ -512,11 +512,11 @@ pub struct IncodeOcrFixtureResponseFields {
 }
 
 impl IncodeOcrFixtureResponseFields {
-    pub fn set_doc_kind_fields(mut self, doc_kind: IdDocKind) -> Self {
+    pub fn set_doc_kind_fields(mut self, doc_kind: DocumentKind) -> Self {
         let (curp, type_of_id) = {
             let (type_of_id, _) = doc_kind.into();
             let curp = match doc_kind {
-                IdDocKind::VoterIdentification | IdDocKind::Passport => Some(test_fixtures::TEST_CURP.into()),
+                DocumentKind::VoterIdentification | DocumentKind::Passport => Some(test_fixtures::TEST_CURP.into()),
                 _ => None,
             };
 
@@ -610,9 +610,9 @@ impl FetchOCRResponse {
         ) {
             (Some(state), Some(class), Some(doc_type), doc_sub_type) => {
                 // Only apply these to DLs
-                let is_dl = IdDocKind::try_from((doc_type, doc_sub_type))
+                let is_dl = DocumentKind::try_from((doc_type, doc_sub_type))
                     .ok()
-                    .map(|dk| dk == IdDocKind::DriversLicense)
+                    .map(|dk| dk == DocumentKind::DriversLicense)
                     .is_some_and(|is_dl| is_dl);
 
                 if is_dl {
@@ -927,7 +927,7 @@ pub struct OcrDataConfidence {
 mod tests {
     use newtypes::{
         incode::{IncodeDocumentRestriction, IncodeDocumentType, IncodeStatus, IncodeTest},
-        IdDocKind, IncodeFailureReason, PiiLong, ScrubbedPiiLong,
+        DocumentKind, IncodeFailureReason, PiiLong, ScrubbedPiiLong,
     };
 
     use crate::{
@@ -1146,7 +1146,7 @@ mod tests {
 
     #[test]
     fn test_ocr_fixture() {
-        let (type_of_id, _) = IdDocKind::DriversLicense.into();
+        let (type_of_id, _) = DocumentKind::DriversLicense.into();
         let opts = IncodeOcrFixtureResponseFields {
             first_name: Some("Bobby".to_string().into()),
             last_name: Some("Bobierto".to_string().into()),
@@ -1169,7 +1169,7 @@ mod tests {
         );
 
         // now set diff fields
-        let mx_opts = opts.set_doc_kind_fields(IdDocKind::VoterIdentification);
+        let mx_opts = opts.set_doc_kind_fields(DocumentKind::VoterIdentification);
         let raw_response = FetchOCRResponse::fixture_response(Some(mx_opts));
         let parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();
         assert!(parsed.curp.is_some());

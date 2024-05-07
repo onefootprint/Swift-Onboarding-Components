@@ -27,7 +27,7 @@ use crate::{DocumentRequestKind, DocumentSide, OcrDataKind as ODK};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum IdDocKind {
+pub enum DocumentKind {
     IdCard,
     DriversLicense,
     Passport,
@@ -50,27 +50,27 @@ pub enum IdDocKind {
     Custom,
 }
 
-impl From<IdDocKind> for DocumentRequestKind {
-    fn from(value: IdDocKind) -> Self {
+impl From<DocumentKind> for DocumentRequestKind {
+    fn from(value: DocumentKind) -> Self {
         match value {
-            IdDocKind::IdCard => Self::Identity,
-            IdDocKind::DriversLicense => Self::Identity,
-            IdDocKind::Passport => Self::Identity,
-            IdDocKind::PassportCard => Self::Identity,
-            IdDocKind::Permit => Self::Identity,
-            IdDocKind::Visa => Self::Identity,
-            IdDocKind::ResidenceDocument => Self::Identity,
-            IdDocKind::VoterIdentification => Self::Identity,
-            IdDocKind::SsnCard => Self::ProofOfSsn,
-            IdDocKind::ProofOfAddress => Self::ProofOfAddress,
-            IdDocKind::Custom => Self::Custom,
+            DocumentKind::IdCard => Self::Identity,
+            DocumentKind::DriversLicense => Self::Identity,
+            DocumentKind::Passport => Self::Identity,
+            DocumentKind::PassportCard => Self::Identity,
+            DocumentKind::Permit => Self::Identity,
+            DocumentKind::Visa => Self::Identity,
+            DocumentKind::ResidenceDocument => Self::Identity,
+            DocumentKind::VoterIdentification => Self::Identity,
+            DocumentKind::SsnCard => Self::ProofOfSsn,
+            DocumentKind::ProofOfAddress => Self::ProofOfAddress,
+            DocumentKind::Custom => Self::Custom,
         }
     }
 }
 
-crate::util::impl_enum_string_diesel!(IdDocKind);
+crate::util::impl_enum_string_diesel!(DocumentKind);
 
-impl IdDocKind {
+impl DocumentKind {
     pub fn sides(&self) -> Vec<DocumentSide> {
         match self {
             Self::DriversLicense => vec![DocumentSide::Front, DocumentSide::Back],
@@ -93,14 +93,14 @@ impl IdDocKind {
         self.sides() == vec![DocumentSide::Front]
     }
 
-    pub fn identity_docs() -> Vec<IdDocKind> {
-        IdDocKind::iter()
+    pub fn identity_docs() -> Vec<DocumentKind> {
+        DocumentKind::iter()
             .filter(|id| DocumentRequestKind::from(*id) == DocumentRequestKind::Identity)
             .collect()
     }
 
-    pub fn proof_of_address_docs() -> Vec<IdDocKind> {
-        IdDocKind::iter()
+    pub fn proof_of_address_docs() -> Vec<DocumentKind> {
+        DocumentKind::iter()
             .filter(|id| DocumentRequestKind::from(*id) == DocumentRequestKind::ProofOfAddress)
             .collect()
     }
@@ -109,30 +109,30 @@ impl IdDocKind {
     // for one of these for a given doc, then we should produce the DocumentOcrNotSuccessful risk signal as a way to indicate to users/rules this
     pub fn expected_ciritical_ocr_data_kinds(&self) -> Vec<ODK> {
         match self {
-            IdDocKind::IdCard => vec![ODK::FullName],
-            IdDocKind::DriversLicense => vec![
+            DocumentKind::IdCard => vec![ODK::FullName],
+            DocumentKind::DriversLicense => vec![
                 ODK::FullName,
                 ODK::Dob,
                 ODK::FullAddress,
                 ODK::DocumentNumber,
                 ODK::ExpiresAt,
             ], // TODO: should Gender, IssuedAt be here too? These seem less "critical" but are still present
-            IdDocKind::Passport => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passports out there and stuff like DOB is def not ubiquitous
-            IdDocKind::PassportCard => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passport cards out there and stuff like DOB is def not ubiquitous
-            IdDocKind::Permit => vec![
+            DocumentKind::Passport => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passports out there and stuff like DOB is def not ubiquitous
+            DocumentKind::PassportCard => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passport cards out there and stuff like DOB is def not ubiquitous
+            DocumentKind::Permit => vec![
                 ODK::FullName,
                 ODK::Dob,
                 ODK::FullAddress,
                 ODK::DocumentNumber,
                 ODK::ExpiresAt,
             ],
-            IdDocKind::Visa => vec![ODK::FullName],
-            IdDocKind::ResidenceDocument => vec![ODK::FullName],
-            IdDocKind::VoterIdentification => vec![ODK::FullName],
+            DocumentKind::Visa => vec![ODK::FullName],
+            DocumentKind::ResidenceDocument => vec![ODK::FullName],
+            DocumentKind::VoterIdentification => vec![ODK::FullName],
             // In actuality, We don't parse anything from these.
-            IdDocKind::SsnCard => vec![],
-            IdDocKind::ProofOfAddress => vec![],
-            IdDocKind::Custom => vec![],
+            DocumentKind::SsnCard => vec![],
+            DocumentKind::ProofOfAddress => vec![],
+            DocumentKind::Custom => vec![],
         }
     }
 }
@@ -147,23 +147,23 @@ pub enum AlpacaDocumentType {
     ProofOfAddress,
 }
 
-impl TryFrom<IdDocKind> for AlpacaDocumentType {
+impl TryFrom<DocumentKind> for AlpacaDocumentType {
     type Error = crate::Error;
 
-    fn try_from(value: IdDocKind) -> Result<Self, Self::Error> {
+    fn try_from(value: DocumentKind) -> Result<Self, Self::Error> {
         let msg = "not a supported alpaca document type";
         match value {
-            IdDocKind::IdCard => Ok(AlpacaDocumentType::NationalId),
-            IdDocKind::DriversLicense => Ok(AlpacaDocumentType::DriversLicense),
-            IdDocKind::Passport => Ok(AlpacaDocumentType::Passport),
-            IdDocKind::PassportCard => Ok(AlpacaDocumentType::NationalId),
-            IdDocKind::Visa => Ok(AlpacaDocumentType::Visa),
-            IdDocKind::Permit => Err(crate::Error::Custom(msg.into())),
-            IdDocKind::ResidenceDocument => Err(crate::Error::Custom(msg.into())),
-            IdDocKind::VoterIdentification => Err(crate::Error::Custom(msg.into())),
-            IdDocKind::SsnCard => Err(crate::Error::Custom(msg.into())),
-            IdDocKind::ProofOfAddress => Ok(AlpacaDocumentType::ProofOfAddress),
-            IdDocKind::Custom => Err(crate::Error::Custom(msg.into())),
+            DocumentKind::IdCard => Ok(AlpacaDocumentType::NationalId),
+            DocumentKind::DriversLicense => Ok(AlpacaDocumentType::DriversLicense),
+            DocumentKind::Passport => Ok(AlpacaDocumentType::Passport),
+            DocumentKind::PassportCard => Ok(AlpacaDocumentType::NationalId),
+            DocumentKind::Visa => Ok(AlpacaDocumentType::Visa),
+            DocumentKind::Permit => Err(crate::Error::Custom(msg.into())),
+            DocumentKind::ResidenceDocument => Err(crate::Error::Custom(msg.into())),
+            DocumentKind::VoterIdentification => Err(crate::Error::Custom(msg.into())),
+            DocumentKind::SsnCard => Err(crate::Error::Custom(msg.into())),
+            DocumentKind::ProofOfAddress => Ok(AlpacaDocumentType::ProofOfAddress),
+            DocumentKind::Custom => Err(crate::Error::Custom(msg.into())),
         }
     }
 }

@@ -90,7 +90,7 @@ define_newtype_id!(
 define_newtype_id!(AppearanceId, String, "Identifier for an appearance");
 
 define_newtype_id!(DocumentRequestId, String, "Identifier for a DocumentRequest");
-define_newtype_id!(IdentityDocumentId, String, "Identifier for an IdentityDocument");
+define_newtype_id!(DocumentId, String, "Identifier for an Document");
 define_newtype_id!(
     IncodeCustomerSessionId,
     String,

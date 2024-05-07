@@ -8,7 +8,7 @@ use crate::{
     utils::file_upload::FileUpload,
     ApiErrorKind, State,
 };
-use api_wire_types::CreateIdentityDocumentRequest;
+use api_wire_types::CreateDocumentRequest;
 use chrono::Utc;
 use db::{
     models::{
@@ -20,17 +20,17 @@ use db::{
 };
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentSide, IdDocKind,
-    IdentityDocumentFixtureResult, Iso3166TwoDigitCountryCode, PiiBytes, Selfie, WorkflowFixtureResult,
+    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentFixtureResult,
+    DocumentKind, DocumentSide, Iso3166TwoDigitCountryCode, PiiBytes, Selfie, WorkflowFixtureResult,
 };
 
 /// Test we require consent, or we'll error uploading a side
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]
 #[test_state_case(UserKind::Live, Selfie::None)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass), Selfie::RequireSelfie)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass), Selfie::None)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Real), Selfie::None)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Real), Selfie::RequireSelfie)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Pass), Selfie::RequireSelfie)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Pass), Selfie::None)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Real), Selfie::None)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Real), Selfie::RequireSelfie)]
 #[tokio::test]
 async fn test_require_consent(state: &mut State, user_kind: UserKind, require_selfie: Selfie) {
     let obc_opts = ObConfigurationOpts {
@@ -51,9 +51,9 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
         super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result, None).await;
     let dr = dr.unwrap();
 
-    let id_doc_req = CreateIdentityDocumentRequest {
+    let id_doc_req = CreateDocumentRequest {
         request_id: Some(dr.id),
-        document_type: IdDocKind::DriversLicense,
+        document_type: DocumentKind::DriversLicense,
         country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,
@@ -125,14 +125,14 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
 
 /// Test that we only allow going through doc flow if there's a pending document request
 #[test_state_case(UserKind::Live)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass))]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Real))]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Pass))]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Real))]
 #[tokio::test]
 async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     let obc_opts = ObConfigurationOpts {
         // restrict to DL
         must_collect_data: vec![CollectedDataOption::Document(DocumentCdoInfo(
-            DocTypeRestriction::Restrict(vec![IdDocKind::DriversLicense]),
+            DocTypeRestriction::Restrict(vec![DocumentKind::DriversLicense]),
             CountryRestriction::None,
             Selfie::None,
         ))],
@@ -151,9 +151,9 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     //
     // Add Passport, but we only accept DL
     //
-    let id_doc_req = CreateIdentityDocumentRequest {
+    let id_doc_req = CreateDocumentRequest {
         request_id: Some(dr.id.clone()),
-        document_type: IdDocKind::Passport,
+        document_type: DocumentKind::Passport,
         country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,
@@ -179,9 +179,9 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     //
     // Add DL, but wrong country
     //
-    let id_doc_req = CreateIdentityDocumentRequest {
+    let id_doc_req = CreateDocumentRequest {
         request_id: Some(dr.id.clone()),
-        document_type: IdDocKind::DriversLicense,
+        document_type: DocumentKind::DriversLicense,
         country_code: Some(Iso3166TwoDigitCountryCode::ZA),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,

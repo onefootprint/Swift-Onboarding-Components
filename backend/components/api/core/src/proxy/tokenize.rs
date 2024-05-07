@@ -19,7 +19,7 @@ use futures::future::try_join_all;
 use itertools::Itertools;
 use newtypes::{
     AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DataRequest,
-    DbActor, DocumentKind, FpId, PiiBytes, PiiString, S3Url, SealedVaultDataKey, StorageType, TenantId,
+    DbActor, DocumentDiKind, FpId, PiiBytes, PiiString, S3Url, SealedVaultDataKey, StorageType, TenantId,
     ValidateArgs,
 };
 use std::collections::HashMap;
@@ -57,11 +57,11 @@ pub async fn vault_pii(
         let mime_types = values
             .iter()
             .filter_map(|(di, filters, pii)| {
-                if let DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) = di {
+                if let DataIdentifier::Document(DocumentDiKind::MimeType(doc_kind, side)) = di {
                     // (edge case): apply the filter on the mime_type if it exists
                     filters
                         .apply_str::<String>(pii.leak())
-                        .map(|mt| Some((DocumentKind::from_id_doc_kind(*doc_kind, *side), mt)))
+                        .map(|mt| Some((DocumentDiKind::from_id_doc_kind(*doc_kind, *side), mt)))
                         .map_err(ApiError::from)
                         .transpose()
                 } else {
@@ -228,7 +228,7 @@ pub async fn vault_pii(
 struct EncryptedDocumentToStore {
     e_data_key: SealedVaultDataKey,
     s3_url: S3Url,
-    kind: DocumentKind,
+    kind: DocumentDiKind,
     filename: String,
     mime_type: String,
 }
@@ -240,7 +240,7 @@ async fn encrypt_document(
     state: &State,
     file_data: PiiString,
     filters: DataTransforms,
-    doc_kind: DocumentKind,
+    doc_kind: DocumentDiKind,
     mime_type: Option<&String>,
     fp_id: FpId,
     tenant_id: TenantId,

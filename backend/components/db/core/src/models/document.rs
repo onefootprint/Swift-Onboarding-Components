@@ -10,10 +10,10 @@ use diesel::{
 use std::collections::HashMap;
 
 use newtypes::{
-    DataLifetimeSeqno, DocumentRequestId, DocumentReviewStatus, DocumentScanDeviceType, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeVerificationSessionState, InsightEventId, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId,
-    VendorValidatedCountryCode, WorkflowId,
+    DataLifetimeSeqno, DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestId,
+    DocumentReviewStatus, DocumentScanDeviceType, DocumentStatus, IncodeVerificationSessionState,
+    InsightEventId, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, VendorValidatedCountryCode,
+    WorkflowId,
 };
 
 use super::{
@@ -23,11 +23,11 @@ use super::{
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = identity_document)]
-pub struct IdentityDocument {
-    pub id: IdentityDocumentId,
+pub struct Document {
+    pub id: DocumentId,
     pub request_id: DocumentRequestId,
     /// This is the stated document type, selected by the user, not necessarily the true document type
-    pub document_type: IdDocKind,
+    pub document_type: DocumentKind,
     pub country_code: Option<String>,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -39,14 +39,14 @@ pub struct IdentityDocument {
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
     /// Represents progress collecting the user's document
-    pub status: IdentityDocumentStatus,
-    pub fixture_result: Option<IdentityDocumentFixtureResult>,
+    pub status: DocumentStatus,
+    pub fixture_result: Option<DocumentFixtureResult>,
     // Indicating that the client cannot collect selfie for some reason
     pub skip_selfie: Option<bool>,
     // the device type that was used to collect this document (currently provided by bifrost, in the future perhaps derived from Stytch)
     pub device_type: Option<DocumentScanDeviceType>,
     // the document_type we stored this in the vault as
-    pub vaulted_document_type: Option<IdDocKind>,
+    pub vaulted_document_type: Option<DocumentKind>,
     pub curp_completed_seqno: Option<DataLifetimeSeqno>,
     /// The confirmed document country (usually confirmed by a vendor)
     validated_country_code: Option<Iso3166TwoDigitCountryCode>,
@@ -55,7 +55,7 @@ pub struct IdentityDocument {
     pub insight_event_id: Option<InsightEventId>,
 }
 
-impl IdentityDocument {
+impl Document {
     pub fn should_skip_selfie(&self) -> bool {
         matches!(self.skip_selfie, Some(true))
     }
@@ -65,7 +65,7 @@ impl IdentityDocument {
     }
 
     pub fn is_upload_complete(&self) -> bool {
-        matches!(self.status, IdentityDocumentStatus::Complete)
+        matches!(self.status, DocumentStatus::Complete)
     }
 
     pub fn vendor_validated_country_code(&self) -> Option<VendorValidatedCountryCode> {
@@ -74,11 +74,11 @@ impl IdentityDocument {
 }
 
 #[derive(Debug, Clone)]
-pub struct NewIdentityDocumentArgs {
+pub struct NewDocumentArgs {
     pub request_id: DocumentRequestId,
-    pub document_type: IdDocKind,
+    pub document_type: DocumentKind,
     pub country_code: Option<Iso3166TwoDigitCountryCode>,
-    pub fixture_result: Option<IdentityDocumentFixtureResult>,
+    pub fixture_result: Option<DocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
     pub device_type: Option<DocumentScanDeviceType>,
     pub insight: CreateInsightEvent,
@@ -86,13 +86,13 @@ pub struct NewIdentityDocumentArgs {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = identity_document)]
-struct NewIdentityDocumentRow {
+struct NewDocumentRow {
     request_id: DocumentRequestId,
-    document_type: IdDocKind,
+    document_type: DocumentKind,
     country_code: Option<Iso3166TwoDigitCountryCode>,
     created_at: DateTime<Utc>,
-    status: IdentityDocumentStatus,
-    fixture_result: Option<IdentityDocumentFixtureResult>,
+    status: DocumentStatus,
+    fixture_result: Option<DocumentFixtureResult>,
     skip_selfie: bool,
     device_type: Option<DocumentScanDeviceType>,
     review_status: DocumentReviewStatus,
@@ -101,19 +101,19 @@ struct NewIdentityDocumentRow {
 
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = identity_document)]
-pub struct IdentityDocumentUpdate {
+pub struct DocumentUpdate {
     pub completed_seqno: Option<DataLifetimeSeqno>,
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
-    pub status: Option<IdentityDocumentStatus>,
-    pub vaulted_document_type: Option<IdDocKind>,
+    pub status: Option<DocumentStatus>,
+    pub vaulted_document_type: Option<DocumentKind>,
     pub curp_completed_seqno: Option<DataLifetimeSeqno>,
     pub validated_country_code: Option<Iso3166TwoDigitCountryCode>,
     pub review_status: Option<DocumentReviewStatus>,
 }
 
-impl IdentityDocumentUpdate {
+impl DocumentUpdate {
     pub fn set_curp_completed_seqno(seqno: DataLifetimeSeqno) -> Self {
         Self {
             curp_completed_seqno: Some(seqno),
@@ -122,16 +122,16 @@ impl IdentityDocumentUpdate {
     }
 }
 
-impl IdentityDocument {
-    #[tracing::instrument("IdentityDocument::get_or_create", skip_all)]
-    /// Returns the existing IdentityDocument with this args if uploads haven't began. Otherwise
-    /// creates a new IdentityDocument and deactivates the old ones
-    pub fn get_or_create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
+impl Document {
+    #[tracing::instrument("Document::get_or_create", skip_all)]
+    /// Returns the existing Document with this args if uploads haven't began. Otherwise
+    /// creates a new Document and deactivates the old ones
+    pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentArgs) -> DbResult<Self> {
         let dr = document_request::table
             .filter(document_request::id.eq(&args.request_id))
             .for_no_key_update()
             .get_result::<DocumentRequest>(conn.conn())?;
-        let NewIdentityDocumentArgs {
+        let NewDocumentArgs {
             request_id,
             document_type,
             country_code,
@@ -148,7 +148,7 @@ impl IdentityDocument {
         // See if we can use an existing Pending IdDoc instead of making a new one
         let existing: Option<Self> = identity_document::table
             .filter(identity_document::request_id.eq(&request_id))
-            .filter(identity_document::status.eq(IdentityDocumentStatus::Pending))
+            .filter(identity_document::status.eq(DocumentStatus::Pending))
             .get_result(conn.conn())
             .optional()?;
         if let Some(existing) = existing {
@@ -175,15 +175,15 @@ impl IdentityDocument {
         diesel::update(identity_document::table)
             .filter(identity_document::request_id.eq(&request_id))
             // TODO it might be nice to use the deactivated_at model here too
-            .filter(identity_document::status.eq(IdentityDocumentStatus::Pending))
-            .set(identity_document::status.eq(IdentityDocumentStatus::Failed))
+            .filter(identity_document::status.eq(DocumentStatus::Pending))
+            .set(identity_document::status.eq(DocumentStatus::Failed))
             .execute(conn.conn())?;
-        let new = NewIdentityDocumentRow {
+        let new = NewDocumentRow {
             request_id,
             document_type,
             country_code,
             created_at: Utc::now(),
-            status: IdentityDocumentStatus::Pending,
+            status: DocumentStatus::Pending,
             fixture_result,
             skip_selfie: skip_selfie.unwrap_or(false),
             device_type,
@@ -200,12 +200,8 @@ impl IdentityDocument {
     }
 
     /// Get the identity document, and the associated document request
-    #[tracing::instrument("IdentityDocument::update", skip(conn, update))]
-    pub fn update(
-        conn: &mut PgConn,
-        id: &IdentityDocumentId,
-        update: IdentityDocumentUpdate,
-    ) -> DbResult<Self> {
+    #[tracing::instrument("Document::update", skip(conn, update))]
+    pub fn update(conn: &mut PgConn, id: &DocumentId, update: DocumentUpdate) -> DbResult<Self> {
         let res = diesel::update(identity_document::table)
             .filter(identity_document::id.eq(id))
             .set(update)
@@ -215,8 +211,8 @@ impl IdentityDocument {
     }
 
     /// Get the identity document, and the associated document request
-    #[tracing::instrument("IdentityDocument::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &IdentityDocumentId) -> DbResult<(Self, DocumentRequest)> {
+    #[tracing::instrument("Document::get", skip_all)]
+    pub fn get(conn: &mut PgConn, id: &DocumentId) -> DbResult<(Self, DocumentRequest)> {
         let res = identity_document::table
             .filter(identity_document::id.eq(id))
             .inner_join(document_request::table)
@@ -227,7 +223,7 @@ impl IdentityDocument {
     }
 
     /// Get the identity document, and the associated document request
-    #[tracing::instrument("IdentityDocument::get_by_request_id", skip_all)]
+    #[tracing::instrument("Document::get_by_request_id", skip_all)]
     pub fn list_by_request_id(conn: &mut PgConn, request_id: &DocumentRequestId) -> DbResult<Vec<Self>> {
         let res = identity_document::table
             .filter(identity_document::request_id.eq(request_id))
@@ -236,11 +232,11 @@ impl IdentityDocument {
         Ok(res)
     }
 
-    #[tracing::instrument("IdentityDocument::get_bulk_with_requests", skip_all)]
+    #[tracing::instrument("Document::get_bulk_with_requests", skip_all)]
     pub fn get_bulk_with_requests(
         conn: &mut PgConn,
-        ids: Vec<&IdentityDocumentId>,
-    ) -> DbResult<HashMap<IdentityDocumentId, (Self, DocumentRequest)>> {
+        ids: Vec<&DocumentId>,
+    ) -> DbResult<HashMap<DocumentId, (Self, DocumentRequest)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(identity_document::id.eq_any(ids))
@@ -253,7 +249,7 @@ impl IdentityDocument {
     }
 
     /// Get all the documents collected for a given scoped vault over all workflows
-    #[tracing::instrument("IdentityDocument::list", skip_all)]
+    #[tracing::instrument("Document::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
@@ -266,7 +262,7 @@ impl IdentityDocument {
         Ok(results)
     }
 
-    #[tracing::instrument("IdentityDocument::list_by_wf_id", skip_all)]
+    #[tracing::instrument("Document::list_by_wf_id", skip_all)]
     pub fn list_by_wf_id(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Vec<(Self, DocumentRequest)>> {
         let results = identity_document::table
             .inner_join(document_request::table)
@@ -276,7 +272,7 @@ impl IdentityDocument {
         Ok(results)
     }
 
-    #[tracing::instrument("IdentityDocument::list_sent_to_incode_by_wf_id", skip_all)]
+    #[tracing::instrument("Document::list_sent_to_incode_by_wf_id", skip_all)]
     pub fn list_completed_sent_to_incode_by_wf_id(
         conn: &mut PgConn,
         wf_id: &WorkflowId,
@@ -295,14 +291,14 @@ impl IdentityDocument {
         Ok(results)
     }
 
-    #[tracing::instrument("IdentityDocument::get_latest_complete", skip_all)]
+    #[tracing::instrument("Document::get_latest_complete", skip_all)]
     pub fn get_latest_complete(
         conn: &mut PgConn,
         sv_id: ScopedVaultId,
-    ) -> DbResult<Option<(IdentityDocument, DocumentRequest)>> {
+    ) -> DbResult<Option<(Document, DocumentRequest)>> {
         let res = identity_document::table
             .inner_join(document_request::table)
-            .filter(identity_document::status.eq(IdentityDocumentStatus::Complete))
+            .filter(identity_document::status.eq(DocumentStatus::Complete))
             .filter(document_request::scoped_vault_id.eq(sv_id))
             .order_by(identity_document::completed_seqno.desc())
             .first(conn)
@@ -311,7 +307,7 @@ impl IdentityDocument {
         Ok(res)
     }
 
-    #[tracing::instrument("IdentityDocument::get_billable_count", skip_all)]
+    #[tracing::instrument("Document::get_billable_count", skip_all)]
     pub fn get_billable_count(
         conn: &mut PgConn,
         t_id: &TenantId,
@@ -353,8 +349,8 @@ impl Default for DocumentImageArgs {
     }
 }
 
-impl IdentityDocument {
-    #[tracing::instrument("IdentityDocument::images", skip_all)]
+impl Document {
+    #[tracing::instrument("Document::images", skip_all)]
     pub fn images(&self, conn: &mut PgConn, args: DocumentImageArgs) -> DbResult<Vec<DocumentUpload>> {
         let mut query = document_upload::table
             .filter(document_upload::document_id.eq(&self.id))

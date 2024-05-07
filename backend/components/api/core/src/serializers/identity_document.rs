@@ -1,11 +1,11 @@
-use db::models::{document_request::DocumentRequest, identity_document::IdentityDocument};
+use db::models::{document::Document, document_request::DocumentRequest};
 use newtypes::DocumentScanDeviceType;
 
 use crate::utils::db2api::DbToApi;
 
-impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::DocumentUploadedTimelineEvent {
-    fn from_db((identity_doc, document_request): (IdentityDocument, DocumentRequest)) -> Self {
-        let IdentityDocument {
+impl DbToApi<(Document, DocumentRequest)> for api_wire_types::DocumentUploadedTimelineEvent {
+    fn from_db((identity_doc, document_request): (Document, DocumentRequest)) -> Self {
+        let Document {
             document_type,
             status,
             device_type,

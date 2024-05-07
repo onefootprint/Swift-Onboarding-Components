@@ -6,7 +6,7 @@ use db_schema::schema::{
 };
 use diesel::{pg::Pg, prelude::*};
 use newtypes::{
-    DocumentSide, IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeEnvironment,
+    DocumentId, DocumentSide, IncodeAuthorizationToken, IncodeConfigurationId, IncodeEnvironment,
     IncodeFailureReason, IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
     IncodeVerificationSessionPurpose, IncodeVerificationSessionState, Locked, WorkflowId,
 };
@@ -26,8 +26,8 @@ pub struct IncodeVerificationSession {
     pub incode_authentication_token: Option<IncodeAuthorizationToken>,
     pub incode_authentication_token_expires_at: Option<DateTime<Utc>>,
 
-    /// There is one IncodeVerificationSession for each IdentityDocument
-    pub identity_document_id: IdentityDocumentId,
+    /// There is one IncodeVerificationSession for each Document
+    pub identity_document_id: DocumentId,
     pub state: IncodeVerificationSessionState,
     pub completed_at: Option<DateTime<Utc>>,
     pub kind: IncodeVerificationSessionKind,
@@ -50,7 +50,7 @@ struct NewIncodeVerificationSession {
     created_at: DateTime<Utc>,
     state: IncodeVerificationSessionState,
     incode_configuration_id: IncodeConfigurationId,
-    identity_document_id: IdentityDocumentId,
+    identity_document_id: DocumentId,
     kind: IncodeVerificationSessionKind,
     latest_failure_reasons: Vec<IncodeFailureReason>,
     ignored_failure_reasons: Vec<IncodeFailureReason>,
@@ -65,7 +65,7 @@ pub struct UpdateIncodeVerificationSession {
     pub incode_session_id: Option<IncodeSessionId>,
     pub incode_authentication_token: Option<IncodeAuthorizationToken>,
     pub incode_authentication_token_expires_at: Option<DateTime<Utc>>,
-    pub identity_document_id: Option<IdentityDocumentId>,
+    pub identity_document_id: Option<DocumentId>,
     pub completed_at: Option<DateTime<Utc>>,
     pub state: Option<IncodeVerificationSessionState>,
     pub latest_failure_reasons: Option<Vec<IncodeFailureReason>>,
@@ -119,7 +119,7 @@ impl IncodeVerificationSession {
     #[tracing::instrument("IncodeVerificationSession::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
-        identity_document_id: IdentityDocumentId,
+        identity_document_id: DocumentId,
         configuration_id: IncodeConfigurationId,
         kind: IncodeVerificationSessionKind,
         incode_environment: Option<IncodeEnvironment>,
@@ -242,7 +242,7 @@ impl IncodeVerificationSession {
 #[derive(derive_more::From)]
 pub enum IncodeSessionIdentifier<'a> {
     Id(&'a IncodeVerificationSessionId),
-    IdDoc(&'a IdentityDocumentId),
+    IdDoc(&'a DocumentId),
 }
 
 impl IncodeVerificationSession {

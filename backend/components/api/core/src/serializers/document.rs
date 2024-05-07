@@ -1,19 +1,19 @@
 use api_wire_types::{DocumentImageError, UploadSource};
 use db::models::{
-    data_lifetime::DataLifetime, document_request::DocumentRequest, document_upload::DocumentUpload,
-    identity_document::IdentityDocument,
+    data_lifetime::DataLifetime, document::Document, document_request::DocumentRequest,
+    document_upload::DocumentUpload,
 };
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DocumentKind, DocumentRequestConfig, DocumentScanDeviceType,
-    DocumentSide, IdDocKind,
+    CustomDocumentConfig, DataIdentifier, DocumentDiKind, DocumentKind, DocumentRequestConfig,
+    DocumentScanDeviceType, DocumentSide,
 };
 
 use crate::utils::db2api::DbToApi;
 
-/// Document info from IdentityDocuments, created via hosted bifrost
-pub type DocumentInfo = (IdentityDocument, DocumentRequest, Vec<DocumentUpload>);
+/// Document info from Documents, created via hosted bifrost
+pub type DocumentInfo = (Document, DocumentRequest, Vec<DocumentUpload>);
 /// Document info from the vault, created via API
-pub type DocumentVaultInfo = (IdDocKind, Vec<(DocumentSide, DataLifetime)>);
+pub type DocumentVaultInfo = (DocumentKind, Vec<(DocumentSide, DataLifetime)>);
 
 impl DbToApi<DocumentInfo> for api_wire_types::Document {
     fn from_db((doc, dr, uploads): DocumentInfo) -> Self {
@@ -23,7 +23,7 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             .map(api_wire_types::DocumentUpload::from_db)
             .collect();
 
-        let IdentityDocument {
+        let Document {
             created_at,
             document_type,
             completed_seqno,
@@ -54,10 +54,8 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
     }
 }
 
-impl<'a> DbToApi<(&'a IdentityDocument, &'a DocumentRequest, DocumentUpload)>
-    for api_wire_types::DocumentUpload
-{
-    fn from_db((doc, dr, upload): (&'a IdentityDocument, &'a DocumentRequest, DocumentUpload)) -> Self {
+impl<'a> DbToApi<(&'a Document, &'a DocumentRequest, DocumentUpload)> for api_wire_types::DocumentUpload {
+    fn from_db((doc, dr, upload): (&'a Document, &'a DocumentRequest, DocumentUpload)) -> Self {
         let DocumentUpload {
             created_at,
             side,
@@ -72,7 +70,7 @@ impl<'a> DbToApi<(&'a IdentityDocument, &'a DocumentRequest, DocumentUpload)>
             .collect();
         let identifier = match dr.config {
             DocumentRequestConfig::Custom(CustomDocumentConfig { ref identifier, .. }) => identifier.clone(),
-            _ => DataIdentifier::Document(DocumentKind::LatestUpload(doc.document_type, upload.side)),
+            _ => DataIdentifier::Document(DocumentDiKind::LatestUpload(doc.document_type, upload.side)),
         };
         Self {
             timestamp: created_at,
@@ -121,8 +119,8 @@ impl DbToApi<(DocumentSide, DataLifetime)> for api_wire_types::DocumentUpload {
     }
 }
 
-impl DbToApi<IdentityDocument> for api_wire_types::PublicDocument {
-    fn from_db(id_doc: IdentityDocument) -> Self {
+impl DbToApi<Document> for api_wire_types::PublicDocument {
+    fn from_db(id_doc: Document) -> Self {
         Self {
             document_type: id_doc.vaulted_document_type.unwrap_or(id_doc.document_type), // unwrap_or for backwards compat
             created_at: id_doc.created_at,

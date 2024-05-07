@@ -1,4 +1,4 @@
-use crate::{FootprintReasonCode as FRC, IdDocKind};
+use crate::{FootprintReasonCode as FRC, DocumentKind};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::Display;
 use strum_macros::{EnumIter, EnumString};
@@ -353,7 +353,7 @@ pub enum IncodeDocumentType {
     NonParsableDocType(String),
 }
 
-impl<'a> TryFrom<(&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>)> for IdDocKind {
+impl<'a> TryFrom<(&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>)> for DocumentKind {
     type Error = crate::Error;
 
     fn try_from(
@@ -378,29 +378,29 @@ impl<'a> TryFrom<(&'a IncodeDocumentType, Option<&'a IncodeDocumentSubType>)> fo
     }
 }
 
-impl From<IdDocKind> for (Option<IncodeDocumentType>, Option<IncodeDocumentSubType>) {
-    fn from(value: IdDocKind) -> Self {
+impl From<DocumentKind> for (Option<IncodeDocumentType>, Option<IncodeDocumentSubType>) {
+    fn from(value: DocumentKind) -> Self {
         match value {
-            IdDocKind::IdCard => (
+            DocumentKind::IdCard => (
                 Some(IncodeDocumentType::IdentificationCard),
                 Some(IncodeDocumentSubType::IdentificationCard),
             ),
-            IdDocKind::DriversLicense => (
+            DocumentKind::DriversLicense => (
                 Some(IncodeDocumentType::DriversLicense),
                 Some(IncodeDocumentSubType::DriversLicense),
             ),
-            IdDocKind::Passport => (Some(IncodeDocumentType::Passport), None),
-            IdDocKind::PassportCard => (
+            DocumentKind::Passport => (Some(IncodeDocumentType::Passport), None),
+            DocumentKind::PassportCard => (
                 Some(IncodeDocumentType::TravelDocument),
                 Some(IncodeDocumentSubType::PassportCardAllages),
             ),
-            IdDocKind::Permit => (Some(IncodeDocumentType::Permit), None),
-            IdDocKind::Visa => (Some(IncodeDocumentType::Visa), None),
-            IdDocKind::ResidenceDocument => (Some(IncodeDocumentType::ResidenceDocument), None),
-            IdDocKind::VoterIdentification => (Some(IncodeDocumentType::VoterIdentification), None),
-            IdDocKind::SsnCard => (None, None),
-            IdDocKind::ProofOfAddress => (None, None),
-            IdDocKind::Custom => (None, None),
+            DocumentKind::Permit => (Some(IncodeDocumentType::Permit), None),
+            DocumentKind::Visa => (Some(IncodeDocumentType::Visa), None),
+            DocumentKind::ResidenceDocument => (Some(IncodeDocumentType::ResidenceDocument), None),
+            DocumentKind::VoterIdentification => (Some(IncodeDocumentType::VoterIdentification), None),
+            DocumentKind::SsnCard => (None, None),
+            DocumentKind::ProofOfAddress => (None, None),
+            DocumentKind::Custom => (None, None),
         }
     }
 }
@@ -470,23 +470,23 @@ mod tests {
 
     use strum::IntoEnumIterator;
 
-    use crate::IdDocKind;
+    use crate::DocumentKind;
 
     use super::{IncodeDocumentSubType, IncodeDocumentType};
 
     #[test]
     fn test_we_added_incode_kind_to_id_doc_kind_mapping() {
-        let mut incode_doc_types_mapped_to_our_doc_types: Vec<IdDocKind> = IncodeDocumentType::iter()
-            .filter_map(|dt| IdDocKind::try_from((&dt, None)).ok())
+        let mut incode_doc_types_mapped_to_our_doc_types: Vec<DocumentKind> = IncodeDocumentType::iter()
+            .filter_map(|dt| DocumentKind::try_from((&dt, None)).ok())
             .collect();
         incode_doc_types_mapped_to_our_doc_types.push(
-            IdDocKind::try_from((
+            DocumentKind::try_from((
                 &IncodeDocumentType::TravelDocument,
                 Some(&IncodeDocumentSubType::PassportCardAllages),
             ))
             .unwrap(),
         );
-        IdDocKind::identity_docs().iter().for_each(|doc_kind| {
+        DocumentKind::identity_docs().iter().for_each(|doc_kind| {
             assert!(
                 incode_doc_types_mapped_to_our_doc_types.contains(doc_kind),
                 "{}",

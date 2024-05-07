@@ -5,7 +5,7 @@ use std::collections::HashMap;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum AnalyzeIdResult {
-    FoundIdentityDocumentMetadata(AnalyzeIdMetadata),
+    FoundDocumentMetadata(AnalyzeIdMetadata),
     NoIdentityDocument,
     FoundMultipleDocuments,
 }

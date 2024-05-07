@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{scoped_vault, vault, verification_request, verification_result};
 use diesel::{prelude::*, Insertable};
 use newtypes::{
-    DataLifetimeSeqno, DecisionIntentId, IdentityDocumentId, ScopedVaultId, Vendor, VendorAPI,
+    DataLifetimeSeqno, DecisionIntentId, DocumentId, ScopedVaultId, Vendor, VendorAPI,
     VerificationRequestId,
 };
 
@@ -23,7 +23,7 @@ pub struct VerificationRequest {
     pub uvw_snapshot_seqno: DataLifetimeSeqno,
     // If we are verifying an identity document, we want to know exactly which one we were verifying since there
     // could be multiple in the vault, seqno doesn't help us
-    pub identity_document_id: Option<IdentityDocumentId>,
+    pub identity_document_id: Option<DocumentId>,
     pub scoped_vault_id: ScopedVaultId,
     pub decision_intent_id: DecisionIntentId,
 }
@@ -35,7 +35,7 @@ struct NewVerificationRequestRow {
     timestamp: DateTime<Utc>,
     vendor_api: VendorAPI,
     uvw_snapshot_seqno: DataLifetimeSeqno,
-    identity_document_id: Option<IdentityDocumentId>,
+    identity_document_id: Option<DocumentId>,
     scoped_vault_id: ScopedVaultId,
     decision_intent_id: DecisionIntentId,
 }
@@ -44,7 +44,7 @@ struct NewVerificationRequestRow {
 pub struct NewVerificationRequestArgs<'a> {
     pub scoped_vault_id: &'a ScopedVaultId,
     pub decision_intent_id: &'a DecisionIntentId,
-    pub identity_document_id: Option<&'a IdentityDocumentId>,
+    pub identity_document_id: Option<&'a DocumentId>,
     pub vendor_api: VendorAPI,
 }
 
@@ -52,7 +52,7 @@ impl<'a> NewVerificationRequestArgs<'a> {
     pub fn new(
         scoped_vault_id: &'a ScopedVaultId,
         decision_intent_id: &'a DecisionIntentId,
-        identity_document_id: Option<&'a IdentityDocumentId>,
+        identity_document_id: Option<&'a DocumentId>,
         vendor_api: VendorAPI,
     ) -> Self {
         Self {
@@ -80,7 +80,7 @@ impl<'a>
     From<(
         &'a ScopedVaultId,
         &'a DecisionIntentId,
-        Option<&'a IdentityDocumentId>,
+        Option<&'a DocumentId>,
         VendorAPI,
     )> for NewVerificationRequestArgs<'a>
 {
@@ -88,7 +88,7 @@ impl<'a>
         value: (
             &'a ScopedVaultId,
             &'a DecisionIntentId,
-            Option<&'a IdentityDocumentId>,
+            Option<&'a DocumentId>,
             VendorAPI,
         ),
     ) -> Self {
@@ -112,7 +112,7 @@ impl VerificationRequest {
         scoped_vault_id: ScopedVaultId,
         vendor_apis: Vec<VendorAPI>,
         decision_intent_id: &DecisionIntentId,
-        identity_document_id: Option<&IdentityDocumentId>,
+        identity_document_id: Option<&DocumentId>,
     ) -> Result<Vec<Self>, crate::DbError> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let requests: Vec<_> = vendor_apis
@@ -238,7 +238,7 @@ impl VerificationRequest {
         conn: &mut PgConn,
         vendor_api: VendorAPI,
         scoped_vault_id: ScopedVaultId,
-        identity_document_id: IdentityDocumentId,
+        identity_document_id: DocumentId,
         decision_intent_id: &DecisionIntentId,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_next_seqno(conn)?;

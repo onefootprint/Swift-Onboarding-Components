@@ -3,12 +3,12 @@ use crate::{
     utils::file_upload::FileUpload,
     State,
 };
-use api_wire_types::{CreateIdentityDocumentRequest, DocumentResponse};
+use api_wire_types::{CreateDocumentRequest, DocumentResponse};
 use chrono::Utc;
 use db::{
     models::{
+        document::Document,
         document_request::{DocumentRequest, NewDocumentRequestArgs},
-        identity_document::IdentityDocument,
         incode_verification_session::IncodeVerificationSession,
         incode_verification_session_event::IncodeVerificationSessionEvent,
         insight_event::{CreateInsightEvent, InsightEvent},
@@ -23,10 +23,10 @@ use db::{
 
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentRequestConfig,
-    DocumentRequestKind, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId,
-    IdentityDocumentStatus, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes,
-    RiskSignalGroupKind, ScopedVaultId, Selfie, TenantId, WorkflowFixtureResult,
+    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentFixtureResult,
+    DocumentId, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentSide, DocumentStatus,
+    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind, ScopedVaultId,
+    Selfie, TenantId, WorkflowFixtureResult,
 };
 
 use super::{
@@ -39,10 +39,10 @@ use super::{
 
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]
 #[test_state_case(UserKind::Live, Selfie::None)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass), Selfie::RequireSelfie)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass), Selfie::None)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Real), Selfie::None)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Real), Selfie::RequireSelfie)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Pass), Selfie::RequireSelfie)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Pass), Selfie::None)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Real), Selfie::None)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Real), Selfie::RequireSelfie)]
 #[tokio::test]
 async fn test_e2e_document_upload_for_all_identity_document_types(
     state: &mut State,
@@ -66,7 +66,7 @@ async fn test_e2e_document_upload_for_all_identity_document_types(
     //
     // Setup
     //
-    for doc_type in IdDocKind::identity_docs() {
+    for doc_type in DocumentKind::identity_docs() {
         // can't use map bc closure + mutable ref for state
         let test_case = DocumentUploadTestCase::new(user_kind, doc_type, require_selfie);
         e2e_inner(state, test_case).await;
@@ -74,19 +74,19 @@ async fn test_e2e_document_upload_for_all_identity_document_types(
 }
 
 #[test_state_case(UserKind::Live)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass))]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Pass))]
 #[tokio::test]
 async fn test_proof_of_ssn(state: &mut State, user_kind: UserKind) {
-    let test_case = DocumentUploadTestCase::new(user_kind, IdDocKind::SsnCard, Selfie::None);
+    let test_case = DocumentUploadTestCase::new(user_kind, DocumentKind::SsnCard, Selfie::None);
 
     e2e_inner(state, test_case).await;
 }
 
 #[test_state_case(UserKind::Live)]
-#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass))]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Pass))]
 #[tokio::test]
 async fn test_proof_of_address(state: &mut State, user_kind: UserKind) {
-    for doc_type in IdDocKind::proof_of_address_docs() {
+    for doc_type in DocumentKind::proof_of_address_docs() {
         let test_case = DocumentUploadTestCase::new(user_kind, doc_type, Selfie::None);
 
         e2e_inner(state, test_case).await;
@@ -140,7 +140,7 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
     };
 
     let wf_id = wf.id.clone();
-    let id_doc_req = CreateIdentityDocumentRequest {
+    let id_doc_req = CreateDocumentRequest {
         request_id: Some(dr.id),
         document_type: test_case.document_type,
         country_code: Some(Iso3166TwoDigitCountryCode::US),
@@ -200,7 +200,7 @@ async fn upload_and_process(
     tenant_id: TenantId,
     sv_id: ScopedVaultId,
     vault: Vault,
-    document_id: IdentityDocumentId,
+    document_id: DocumentId,
 ) -> DocumentResponse {
     // only make incode requests for live users
     if test_case.make_incode_calls() {
@@ -242,7 +242,7 @@ async fn upload_and_process_inner(
     state: &mut State,
     workflow: Workflow,
     sv_id: ScopedVaultId,
-    document_id: IdentityDocumentId,
+    document_id: DocumentId,
     tenant_id: TenantId,
     vault: Vault,
     side: DocumentSide,
@@ -294,7 +294,7 @@ async fn assertions(
     state: &State,
     test_case: DocumentUploadTestCase,
     sv_id: &ScopedVaultId,
-    document_id: IdentityDocumentId,
+    document_id: DocumentId,
 ) {
     let rs = query_risk_signals(state, sv_id, RiskSignalGroupKind::Doc).await;
     if test_case.is_non_identity_document_flow() {
@@ -315,8 +315,8 @@ async fn assertions(
         state
             .db_pool
             .db_query(move |conn| -> DbResult<_> {
-                let (id_doc, _) = IdentityDocument::get(conn, &document_id)?;
-                assert_eq!(id_doc.status, IdentityDocumentStatus::Complete);
+                let (id_doc, _) = Document::get(conn, &document_id)?;
+                assert_eq!(id_doc.status, DocumentStatus::Complete);
 
                 // Assert the state machine visited all states we expect
                 let events = IncodeVerificationSessionEvent::get_for_session_id(conn, &ivs.id)?;
@@ -358,7 +358,7 @@ async fn assertions(
 // Assert incode_verification_session is in the correct state
 async fn assert_ivs_in_state(
     state: &State,
-    document_id: IdentityDocumentId,
+    document_id: DocumentId,
     incode_session_state: IncodeVerificationSessionState,
 ) -> IncodeVerificationSession {
     state

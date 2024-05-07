@@ -1,5 +1,5 @@
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentReviewStatus, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId, WorkflowId
+    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentDiKind, DocumentRequestConfig, DocumentRequestKind, DocumentReviewStatus, DocumentSide, DocumentKind, DocumentFixtureResult, DocumentId, DocumentStatus, ScopedVaultId, TenantId, WorkflowId
 };
 
 use crate::{
@@ -10,12 +10,12 @@ use crate::{
 };
 
 use crate::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VaultWrapper, VwArgs};
-use api_wire_types::{CreateIdentityDocumentRequest, DocumentResponse};
+use api_wire_types::{CreateDocumentRequest, DocumentResponse};
 use feature_flag::BoolFlag;
 
 use crate::decision::vendor::incode::states::vault_complete_images;
 use db::models::{
-    data_lifetime::DataLifetime, decision_intent::DecisionIntent, document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier}, document_upload::{DocumentUpload, NewDocumentUploadArgs}, identity_document::{IdentityDocument, IdentityDocumentUpdate, NewIdentityDocumentArgs}, incode_verification_session::IncodeVerificationSession, insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, user_consent::UserConsent, user_timeline::UserTimeline, vault::Vault, workflow::Workflow
+    data_lifetime::DataLifetime, decision_intent::DecisionIntent, document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier}, document_upload::{DocumentUpload, NewDocumentUploadArgs}, document::{Document, DocumentUpdate, NewDocumentArgs}, incode_verification_session::IncodeVerificationSession, insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, user_consent::UserConsent, user_timeline::UserTimeline, vault::Vault, workflow::Workflow
 };
 
 use super::meta_headers::MetaHeaders;
@@ -23,13 +23,13 @@ use super::meta_headers::MetaHeaders;
 /// Route handler for "/hosted/user/documents"
 pub async fn handle_document_create(
     state: &State,
-    create_identity_document_request: CreateIdentityDocumentRequest,
+    create_identity_document_request: CreateDocumentRequest,
     tenant_id: TenantId,
     sv_id: ScopedVaultId,
     wf_id: WorkflowId,
     insight: CreateInsightEvent
-) -> ApiResult<IdentityDocumentId> {
-    let CreateIdentityDocumentRequest {
+) -> ApiResult<DocumentId> {
+    let CreateDocumentRequest {
         document_type,
         country_code,
         fixture_result,
@@ -68,7 +68,7 @@ pub async fn handle_document_create(
         let id = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let args = NewIdentityDocumentArgs {
+                let args = NewDocumentArgs {
                     request_id: dr.id,
                     document_type,
                     country_code,
@@ -77,7 +77,7 @@ pub async fn handle_document_create(
                     device_type,
                     insight
                 };
-                let id_doc = IdentityDocument::get_or_create(conn, args)?;
+                let id_doc = Document::get_or_create(conn, args)?;
                 Ok(id_doc.id)
             })
             .await?;
@@ -113,7 +113,7 @@ pub async fn handle_document_create(
                     return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
                 }
 
-                if matches!(fixture_result, IdentityDocumentFixtureResult::Real) && 
+                if matches!(fixture_result, DocumentFixtureResult::Real) && 
                     !ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id)) {
                     return Err(OnboardingError::RealDocumentFixtureNotAllowed.into());
                 }
@@ -136,7 +136,7 @@ pub async fn handle_document_create(
                 false
             };
             
-            let args = NewIdentityDocumentArgs {
+            let args = NewDocumentArgs {
                 request_id: dr.id,
                 document_type,
                 country_code: Some(country_code),
@@ -146,7 +146,7 @@ pub async fn handle_document_create(
                 insight
             };
 
-            let id_doc = IdentityDocument::get_or_create(conn, args)?;
+            let id_doc = Document::get_or_create(conn, args)?;
             Ok(id_doc)
         })
         .await?;
@@ -162,7 +162,7 @@ pub async fn handle_document_upload(
     sv_id: ScopedVaultId,
     meta: MetaHeaders,
     file: FileUpload,
-    document_id: IdentityDocumentId,
+    document_id: DocumentId,
     side: DocumentSide,
 ) -> ApiResult<()> {
     let wf_id = workflow.id.clone();
@@ -171,15 +171,15 @@ pub async fn handle_document_upload(
     let (id_doc, doc_request, uvw, user_consent) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (id_doc, doc_request) = IdentityDocument::get(conn, &document_id)?;
+            let (id_doc, doc_request) = Document::get(conn, &document_id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
             let user_consent = UserConsent::get_for_workflow(conn, &wf_id)?;
             Ok((id_doc, doc_request, uvw, user_consent))
         })
         .await?;
 
-    if id_doc.status != IdentityDocumentStatus::Pending {
-        return Err(ErrorWithCode::IdentityDocumentNotPending.into());
+    if id_doc.status != DocumentStatus::Pending {
+        return Err(ErrorWithCode::DocumentNotPending.into());
     }
     let should_collect_selfie = doc_request.should_collect_selfie() && !id_doc.should_skip_selfie();
     if side == DocumentSide::Selfie && !should_collect_selfie {
@@ -192,7 +192,7 @@ pub async fn handle_document_upload(
     // Upload the image to s3
     let di = match &doc_request.config {
         DocumentRequestConfig::Custom(CustomDocumentConfig { identifier, .. }) => identifier.clone(),
-        _ => DataIdentifier::from(DocumentKind::LatestUpload(id_doc.document_type, side)),
+        _ => DataIdentifier::from(DocumentDiKind::LatestUpload(id_doc.document_type, side)),
     };
     let su_id = sv_id.clone();
     let (e_data_key, s3_url) = seal_file_and_upload_to_s3(state, &file, &di, &uvw.vault, &su_id).await?;
@@ -260,7 +260,7 @@ pub async fn handle_document_process(
     sv_id: ScopedVaultId,
     wf_id: WorkflowId,
     tenant_id: TenantId,
-    doc_id: IdentityDocumentId,
+    doc_id: DocumentId,
 ) -> ApiResult<DocumentResponse> {
     let su_id = sv_id.clone();
     let wf_id2 = wf_id.clone();
@@ -276,7 +276,7 @@ pub async fn handle_document_process(
             )?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
-            let (id_doc, dr) = IdentityDocument::get(conn, &doc_id)?;
+            let (id_doc, dr) = Document::get(conn, &doc_id)?;
             let side_from_session: Option<DocumentSide> = IncodeVerificationSession::get(conn, &id_doc.id)?
                 .and_then(|session| session.side_from_session());
 
@@ -356,7 +356,7 @@ pub async fn handle_document_process(
 
 pub async fn complete_non_identity_document(
     state: &State,
-    id_doc: IdentityDocument,
+    id_doc: Document,
     sv_id: ScopedVaultId,
 ) -> ApiResult<()> {
     state
@@ -366,7 +366,7 @@ pub async fn complete_non_identity_document(
             let dk = id_doc.document_type;
             let uvw = VaultWrapper::lock_for_onboarding(conn, &sv_id)?;
             // TODO: doc_type might need to come from incode once we get to that point
-            let seqno = if dk != IdDocKind::Custom {
+            let seqno = if dk != DocumentKind::Custom {
                 let (_, seqno) = vault_complete_images(conn, &uvw, dk, &id_doc)?;
                 seqno
             } else {
@@ -379,19 +379,19 @@ pub async fn complete_non_identity_document(
             UserTimeline::create(conn, info, uvw.vault.id.clone(), sv_id.clone())?;
             // mark identity doc as complete
 
-            let update = IdentityDocumentUpdate {
+            let update = DocumentUpdate {
                 completed_seqno: Some(seqno),
                 document_score: None,
                 selfie_score: None,
                 ocr_confidence_score: None,
-                status: Some(IdentityDocumentStatus::Complete),
+                status: Some(DocumentStatus::Complete),
                 vaulted_document_type: Some(dk),
                 curp_completed_seqno: None,
                 validated_country_code: None,
                 // Non-ID docs need to be reviewed by a human - put them into a review required state
                 review_status: Some(DocumentReviewStatus::PendingHumanReview),
             };
-            IdentityDocument::update(conn, &id_doc_id, update)?;
+            Document::update(conn, &id_doc_id, update)?;
 
             Ok(())
         })

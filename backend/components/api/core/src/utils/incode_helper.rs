@@ -10,8 +10,8 @@ use crate::{
 use api_wire_types::{DocumentImageError, DocumentResponse};
 use db::{
     models::{
+        document::{Document, DocumentUpdate},
         document_request::DocumentRequest,
-        identity_document::{IdentityDocument, IdentityDocumentUpdate},
         incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession},
         ob_configuration::ObConfiguration,
     },
@@ -19,8 +19,8 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    DecisionIntentId, DocumentSide, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeVerificationSessionState, TenantId, WorkflowId,
+    DecisionIntentId, DocumentId, DocumentSide, DocumentStatus, IncodeVerificationSessionState, TenantId,
+    WorkflowId,
 };
 use std::sync::Arc;
 
@@ -28,7 +28,7 @@ use std::sync::Arc;
 #[allow(clippy::too_many_arguments)]
 pub async fn handle_incode_request(
     state: &State,
-    identity_document_id: IdentityDocumentId,
+    identity_document_id: DocumentId,
     tenant_id: TenantId,
     obc: ObConfiguration,
     decision_intent_id: DecisionIntentId,
@@ -129,13 +129,13 @@ pub async fn handle_incode_request(
                 .db_pool
                 .db_transaction(move |conn| -> ApiResult<_> {
                     // mb lock??
-                    let (iddoc, _) = IdentityDocument::get(conn, &id_doc_id)?;
-                    if iddoc.status == IdentityDocumentStatus::Pending {
-                        IdentityDocument::update(
+                    let (iddoc, _) = Document::get(conn, &id_doc_id)?;
+                    if iddoc.status == DocumentStatus::Pending {
+                        Document::update(
                             conn,
                             &id_doc_id,
-                            IdentityDocumentUpdate {
-                                status: Some(IdentityDocumentStatus::Complete),
+                            DocumentUpdate {
+                                status: Some(DocumentStatus::Complete),
                                 ..Default::default()
                             },
                         )?;
@@ -153,11 +153,7 @@ pub async fn handle_incode_request(
 }
 
 #[tracing::instrument(skip(db_pool))]
-async fn on_incode_hard_error(
-    db_pool: &DbPool,
-    err: ApiError,
-    id_doc_id: &IdentityDocumentId,
-) -> ApiResult<()> {
+async fn on_incode_hard_error(db_pool: &DbPool, err: ApiError, id_doc_id: &DocumentId) -> ApiResult<()> {
     tracing::error!(?err, "IncodeMachineError");
     let id_doc_id = id_doc_id.clone();
     if matches!(

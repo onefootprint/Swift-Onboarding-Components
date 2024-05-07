@@ -3,7 +3,7 @@ use idv::incode::{
     IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    DecisionIntentId, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment, ScopedVaultId,
+    DecisionIntentId, DocumentId, IncodeConfigurationId, IncodeEnvironment, ScopedVaultId,
     VaultPublicKey, VendorAPI,
 };
 
@@ -24,7 +24,7 @@ impl SaveVerificationResultArgs {
         request_result: &Result<IncodeResponse<T>, idv::incode::error::Error>,
         decision_intent_id: DecisionIntentId,
         scoped_vault_id: ScopedVaultId,
-        identity_document_id: Option<IdentityDocumentId>,
+        identity_document_id: Option<DocumentId>,
         vault_public_key: VaultPublicKey,
         should_save_verification_request: ShouldSaveVerificationRequest,
     ) -> Self

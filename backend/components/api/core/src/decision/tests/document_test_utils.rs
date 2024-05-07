@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::{decision::vendor::vendor_trait::MockVendorAPICall, State};
 use crypto::aead::SealingKey;
 use db::{
-    models::identity_document::{DocumentImageArgs, IdentityDocument},
+    models::document::{Document, DocumentImageArgs},
     tests::MockFFClient,
     DbResult,
 };
@@ -19,19 +19,19 @@ use idv::incode::{
     IncodeResponse, IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    DocumentRequestKind, DocumentSide, EncryptedVaultPrivateKey, IdDocKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, S3Url, SealedVaultBytes, Selfie, TenantId,
+    DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestKind, DocumentSide,
+    EncryptedVaultPrivateKey, S3Url, SealedVaultBytes, Selfie, TenantId,
 };
 
 #[derive(Clone, Copy)]
 pub enum UserKind {
     Live,
-    Sandbox(IdentityDocumentFixtureResult),
+    Sandbox(DocumentFixtureResult),
     Demo,
 }
 
 impl UserKind {
-    pub fn identity_doc_fixture(&self) -> Option<IdentityDocumentFixtureResult> {
+    pub fn identity_doc_fixture(&self) -> Option<DocumentFixtureResult> {
         match self {
             UserKind::Live => None,
             UserKind::Sandbox(f) => Some(*f),
@@ -43,12 +43,12 @@ impl UserKind {
 #[derive(Clone)]
 pub struct DocumentUploadTestCase {
     pub user_kind: UserKind,
-    pub document_type: IdDocKind,
+    pub document_type: DocumentKind,
     pub require_selfie: Selfie,
 }
 
 impl DocumentUploadTestCase {
-    pub fn new(user_kind: UserKind, document_type: IdDocKind, include_selfie: Selfie) -> Self {
+    pub fn new(user_kind: UserKind, document_type: DocumentKind, include_selfie: Selfie) -> Self {
         DocumentUploadTestCase {
             user_kind,
             document_type,
@@ -60,7 +60,7 @@ impl DocumentUploadTestCase {
         matches!(self.require_selfie, Selfie::RequireSelfie) && !self.is_non_identity_document_flow()
     }
 
-    pub fn identity_doc_fixture(&self) -> Option<IdentityDocumentFixtureResult> {
+    pub fn identity_doc_fixture(&self) -> Option<DocumentFixtureResult> {
         self.user_kind.identity_doc_fixture()
     }
 
@@ -69,11 +69,7 @@ impl DocumentUploadTestCase {
     }
 
     pub fn make_incode_calls(&self) -> bool {
-        (self.user_is_live()
-            || matches!(
-                self.user_kind,
-                UserKind::Sandbox(IdentityDocumentFixtureResult::Real)
-            ))
+        (self.user_is_live() || matches!(self.user_kind, UserKind::Sandbox(DocumentFixtureResult::Real)))
             && !self.is_non_identity_document_flow()
     }
 
@@ -84,7 +80,7 @@ impl DocumentUploadTestCase {
 
 // Mock incode returning various responses to use
 // TODO: a lot of these will be parameterized in future
-pub fn mock_incode_request(state: &mut State, id_doc_kind: IdDocKind, require_selfie: bool) {
+pub fn mock_incode_request(state: &mut State, id_doc_kind: DocumentKind, require_selfie: bool) {
     let mut mock_incode_start_onboarding = MockVendorAPICall::<
         IncodeStartOnboardingRequest,
         IncodeResponse<OnboardingStartResponse>,
@@ -221,7 +217,7 @@ pub fn mock_incode_request(state: &mut State, id_doc_kind: IdDocKind, require_se
 // bc the enclave client needs to decrypt bytes encrypted in a certain format with a specific key
 pub async fn mock_enclave_s3_client(
     state: &mut State,
-    document_id: IdentityDocumentId,
+    document_id: DocumentId,
     e_vault_private_key: &EncryptedVaultPrivateKey,
 ) {
     let mut mock_s3_client_enclave = crate::s3::MockS3Client::new();
@@ -229,7 +225,7 @@ pub async fn mock_enclave_s3_client(
     let (data_keys, s3_urls): (Vec<SealedVaultBytes>, Vec<S3Url>) = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
-            let (identity_document, _) = IdentityDocument::get(conn, &document_id)?;
+            let (identity_document, _) = Document::get(conn, &document_id)?;
             identity_document.images(conn, DocumentImageArgs::default())
         })
         .await
@@ -287,15 +283,12 @@ pub fn mock_s3_put_object(state: &mut State) {
 
 pub fn mock_ff_client(
     state: &mut State,
-    identity_document_fixture: Option<IdentityDocumentFixtureResult>,
+    identity_document_fixture: Option<DocumentFixtureResult>,
     tenant_id: TenantId,
 ) {
     let mut mock_ff_client = MockFFClient::new();
 
-    if matches!(
-        identity_document_fixture,
-        Some(IdentityDocumentFixtureResult::Real)
-    ) {
+    if matches!(identity_document_fixture, Some(DocumentFixtureResult::Real)) {
         mock_ff_client.mock(|c| {
             c.expect_flag()
                 .withf(move |f| *f == BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id))

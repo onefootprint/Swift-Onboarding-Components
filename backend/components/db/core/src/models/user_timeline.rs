@@ -17,8 +17,8 @@ use super::{
     annotation::AnnotationInfo,
     auth_event::AuthEvent,
     data_lifetime::DataLifetime,
+    document::Document,
     document_request::DocumentRequest,
-    identity_document::IdentityDocument,
     insight_event::InsightEvent,
     ob_configuration::ObConfiguration,
     onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo},
@@ -70,7 +70,7 @@ pub struct SaturatedDataCollectedEvent {
 pub enum SaturatedTimelineEvent {
     DataCollected(SaturatedDataCollectedEvent),
     OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
-    DocumentUploaded((IdentityDocument, DocumentRequest)),
+    DocumentUploaded((Document, DocumentRequest)),
     Liveness(LivenessEvent, InsightEvent),
     Annotation(AnnotationInfo),
     WatchlistCheck(WatchlistCheck),
@@ -152,7 +152,7 @@ impl UserTimeline {
             DbUserTimelineEvent::Liveness(ref e) => Some(&e.id),
             _ => None,
         });
-        let identity_document_ids = results.iter().flat_map(|ut| match ut.event {
+        let document_ids = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::DocumentUploaded(ref e) => Some(&e.id),
             _ => None,
         });
@@ -198,8 +198,7 @@ impl UserTimeline {
         let decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
         let annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
         let liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
-        let identity_documents_and_requests =
-            IdentityDocument::get_bulk_with_requests(conn, identity_document_ids.collect())?;
+        let document_ids_and_requests = Document::get_bulk_with_requests(conn, document_ids.collect())?;
         let actors: HashMap<_, _> = saturate_actors(conn, db_actors.collect())?.into_iter().collect();
         let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
         let ob_configs = ObConfiguration::get_bulk(conn, ob_config_ids.collect())?;
@@ -246,7 +245,7 @@ impl UserTimeline {
                         )
                     }
                     DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
-                        identity_documents_and_requests
+                        document_ids_and_requests
                             .get(&e.id)
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone(),

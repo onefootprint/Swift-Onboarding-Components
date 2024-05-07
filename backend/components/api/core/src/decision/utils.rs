@@ -15,7 +15,7 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    DecisionStatus, IdentityDocumentFixtureResult, OnboardingStatus, RiskSignalGroupKind, TenantId,
+    DecisionStatus, DocumentFixtureResult, OnboardingStatus, RiskSignalGroupKind, TenantId,
     VendorAPI, WorkflowFixtureResult, WorkflowId,
 };
 
@@ -91,7 +91,7 @@ type ShouldInitiateRealDocumentRequests = bool;
 /// Determines whether production identity document requests should be made, and if not, what the outcome should be
 pub async fn should_initiate_requests_for_document(
     vault: &Vault,
-    document_decision: Option<IdentityDocumentFixtureResult>,
+    document_decision: Option<DocumentFixtureResult>,
 ) -> ApiResult<ShouldInitiateRealDocumentRequests> {
     // We allow identity documents to be tested in sandbox against incode demo environment, if a tenant is flagged in
     // We use a flag since not all tenants should have this enabled by default (they might need to sign incode terms and be advised that they can only do this for testing purposes)
@@ -103,7 +103,7 @@ pub async fn should_initiate_requests_for_document(
         //     .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
         Ok(matches!(
             document_decision,
-            Some(IdentityDocumentFixtureResult::Real)
+            Some(DocumentFixtureResult::Real)
         ))
     // guard against prod vaults from providing document fixtures (we prevent this in the API route that starts the flow, but double checking never hurt nobody)
     } else if document_decision.is_some() {

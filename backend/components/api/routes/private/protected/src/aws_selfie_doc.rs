@@ -82,7 +82,7 @@ pub async fn post(
     ResponseData::ok(ComparisonAndDocOcrResult {
         comparison_result,
         analyzed_id_scores: match analyzed_id {
-            AnalyzeIdResult::FoundIdentityDocumentMetadata(m) => m.scores(),
+            AnalyzeIdResult::FoundDocumentMetadata(m) => m.scores(),
             _ => HashMap::new(),
         },
     })
