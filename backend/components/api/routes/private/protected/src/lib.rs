@@ -1,6 +1,7 @@
 mod aws_selfie_doc;
 mod decrypt;
 mod default_rules;
+mod fix_card_expiration_year;
 mod incode;
 mod org;
 mod risk;
@@ -17,6 +18,7 @@ pub use api_core::{auth::protected_auth::ProtectedAuth, State};
 pub fn configure(config: &mut web::ServiceConfig) {
     config
         .service(check)
+        .service(fix_card_expiration_year::post)
         .service(risk::make_vendor_calls)
         .service(risk::make_decision)
         .service(risk::shadow_run)

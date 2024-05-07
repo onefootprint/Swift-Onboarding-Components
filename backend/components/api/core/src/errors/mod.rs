@@ -212,6 +212,9 @@ pub enum ApiErrorKind {
 
     #[error("AI completion Error")]
     OpenAiCompletionError(String),
+
+    #[error("Regex error: {0}")]
+    RegexError(#[from] regex::Error),
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -407,6 +410,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::HeaderToStrError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::ResponseTimeout => StatusCode::GATEWAY_TIMEOUT,
             ApiErrorKind::OpenAiCompletionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::RegexError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
