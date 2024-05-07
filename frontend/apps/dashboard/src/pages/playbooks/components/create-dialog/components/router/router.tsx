@@ -64,7 +64,11 @@ const Router = ({ onCreate }: RouterProps) => {
     verificationChecks: VerificationChecksFormData,
   ) => {
     const { playbook, nameForm, residencyForm } = context;
-    const { skipKyc, amlFormData: enhancedAml } = verificationChecks;
+    const {
+      skipKyc: shouldSkipKyc,
+      amlFormData: enhancedAml,
+      kycOptionForBeneficialOwners,
+    } = verificationChecks;
     if (!playbook || !nameForm || !enhancedAml) {
       return;
     }
@@ -84,12 +88,15 @@ const Router = ({ onCreate }: RouterProps) => {
       docScanForOptionalSsn,
       documentTypesAndCountries,
       cipKind,
+      skipKyc,
     } = processPlaybook({
       kind,
       nameForm,
       playbook,
       residencyForm,
       template: onboardingTemplate,
+      skipKyc: shouldSkipKyc,
+      kycOptionForBeneficialOwners,
     });
     mutation.mutate(
       {
@@ -274,6 +281,11 @@ const Router = ({ onCreate }: RouterProps) => {
             requiresDoc={requiresIdDoc}
             allowInternationalResident={
               state.context.residencyForm?.allowInternationalResidents
+            }
+            isKyb={state.context.kind === 'kyb'}
+            collectBO={
+              state.context.playbook?.businessInformation
+                ?.business_beneficial_owners
             }
           />
         )}

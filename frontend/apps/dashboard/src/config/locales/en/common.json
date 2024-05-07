@@ -2814,15 +2814,15 @@
           "person": {
             "title": {
               "kyb": {
-                "main": "KYC of a beneficial owner",
-                "tooltip": "To successfully verify a business we also need to verify its beneficial owner's identity."
+                "main": "Beneficial owners",
+                "tooltip": "For a stronger verification of the business, you may also verify its beneficial owners' identities."
               },
               "kyc": "Personal information & docs"
             },
             "edit": "Edit",
             "editing": {
               "kyc": "Edit personal information & docs",
-              "kyb": "Edit KYC of a beneficial owner"
+              "kyb": "Edit beneficial owners"
             },
             "basic-information": {
               "title": "Basic information"
@@ -2830,6 +2830,9 @@
             "us-residents": {
               "title": "U.S. residents",
               "empty": "U.S. residents aren't allowed to be onboarded."
+            },
+            "beneficial-owner-collect": {
+              "toggle": "Collect beneficial owners' information"
             },
             "non-us-residents": {
               "title": "Non U.S. residents",
@@ -2991,13 +2994,31 @@
             "footer": {
               "label": "Note:",
               "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+            },
+            "disabled-tooltip": {
+              "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable AML monitoring."
             }
           },
           "kyc-check": {
             "title": "Know Your Customer (KYC)",
+            "disabled-tooltip": {
+              "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable KYC checks.",
+              "must-collect-id-doc": "You must collect ID document information to disable KYC checks."
+            },
             "toggle": {
-              "label": "Perform database checks with collected identity data",
-              "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
+              "personal": {
+                "label": "Perform database checks with collected identity data",
+                "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
+              },
+              "business": {
+                "label": "Run KYC on beneficial owners",
+                "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
+              }
+            },
+            "bo-options": {
+              "all-bos": "On all business owners",
+              "only-primary-bo": "Only on business' primary owner",
+              "only-primary-bo-hint": "The person who fills out this form"
             }
           }
         }
@@ -3045,7 +3066,7 @@
         "business": "Business",
         "basic_information": "Basic information",
         "other": "Other",
-        "business-beneficial-owners": "Beneficial owners",
+        "business-beneficial-owners": "Collect beneficial owners’ information",
         "business-type": "Legal entity type",
         "business-website": "Business website",
         "business-phone-number": "Business phone",

@@ -55,7 +55,6 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.name]: false,
           [CollectedKybDataOption.address]: false,
           [CollectedKybDataOption.tin]: false,
-          [CollectedKybDataOption.beneficialOwners]: false,
         },
       },
       kind: PlaybookKind.Kyb,
@@ -65,9 +64,26 @@ describe('processPlaybook', () => {
     expect(mustCollectData).toContain(CollectedKybDataOption.name);
     expect(mustCollectData).toContain(CollectedKybDataOption.address);
     expect(mustCollectData).toContain(CollectedKybDataOption.tin);
-    expect(mustCollectData).toContain(
-      CollectedKybDataOption.kycedBeneficialOwners,
-    );
+  });
+
+  it('should not include any KYC fields in mustCollectData if KYB beneficial owners is not collected', () => {
+    const { mustCollectData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYB,
+        businessInformation: {
+          ...defaultBusinessInformation,
+          [CollectedKybDataOption.beneficialOwners]: false,
+        },
+      },
+      kind: PlaybookKind.Kyb,
+      nameForm: defaultNameFormData,
+    });
+
+    expect(mustCollectData).not.toContain(CollectedKycDataOption.email);
+    expect(mustCollectData).not.toContain(CollectedKycDataOption.phoneNumber);
+    expect(mustCollectData).not.toContain(CollectedKycDataOption.name);
+    expect(mustCollectData).not.toContain(CollectedKycDataOption.dob);
+    expect(mustCollectData).not.toContain(CollectedKycDataOption.address);
   });
 
   it('should include full SSN in optional data but not mustCollectData if it is optional', () => {

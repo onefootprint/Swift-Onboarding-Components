@@ -1,5 +1,12 @@
 import { IcoWarning16 } from '@onefootprint/icons';
-import { Checkbox, Divider, Stack, Text, Toggle } from '@onefootprint/ui';
+import {
+  Checkbox,
+  Divider,
+  Stack,
+  Text,
+  Toggle,
+  Tooltip,
+} from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -9,9 +16,10 @@ import type { VerificationChecksFormData } from '@/playbooks/utils/machine/types
 
 export type AMLProps = {
   showError: boolean;
+  disabled?: boolean;
 };
 
-const AML = ({ showError }: AMLProps) => {
+const AML = ({ showError, disabled }: AMLProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.verification-checks.aml-monitoring',
   });
@@ -33,12 +41,18 @@ const AML = ({ showError }: AMLProps) => {
         {t('title')}
       </Text>
       <Stack gap={5} direction="column">
-        <Toggle
-          label={t('aml.label')}
-          hint={t('aml.hint')}
-          checked={isAmlChecked}
-          {...register('amlFormData.enhancedAml')}
-        />
+        <Tooltip
+          disabled={!disabled}
+          text={t('disabled-tooltip.must-collect-beneficial-owners')}
+        >
+          <Toggle
+            label={t('aml.label')}
+            hint={t('aml.hint')}
+            checked={isAmlChecked}
+            disabled={disabled}
+            {...register('amlFormData.enhancedAml')}
+          />
+        </Tooltip>
         {isAmlChecked && (
           <>
             <Divider variant="secondary" />

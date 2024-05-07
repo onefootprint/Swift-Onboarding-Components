@@ -66,8 +66,14 @@ export const defaultResidencyFormDataAlpaca: ResidencyFormData = {
   allowInternationalResidents: false,
 };
 
+export enum KycOptionsForBeneficialOwners {
+  all = 'all',
+  primary = 'primary',
+}
+
 export type VerificationChecksFormData = {
   skipKyc?: boolean;
+  kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
   amlFormData: AMLFormData;
 };
 

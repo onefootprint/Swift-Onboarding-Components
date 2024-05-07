@@ -2,6 +2,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
+  BusinessInformation,
   Personal,
   SummaryFormData,
 } from '@/playbooks/utils/machine/types';
@@ -13,8 +14,11 @@ import {
 import Editing from './editing';
 
 export type EditingWithContextProps = {
+  startingValues?: {
+    personal?: Partial<Personal>;
+    businessInformation?: Partial<BusinessInformation>;
+  };
   kind?: PlaybookKind;
-  startingValues?: Partial<Personal>;
 };
 
 const EditingWithContext = ({
@@ -26,7 +30,10 @@ const EditingWithContext = ({
       ...defaultPlaybookValuesKYC,
       personal: {
         ...defaultPlaybookValuesKYC.personal,
-        ...startingValues,
+        ...startingValues?.personal,
+      },
+      businessInformation: {
+        ...startingValues?.businessInformation,
       },
     },
   });

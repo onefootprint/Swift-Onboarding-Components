@@ -17,6 +17,8 @@ describe('VerificationChecks', () => {
     onSubmit = jest.fn(),
     requiresDoc = false,
     allowInternationalResident = false,
+    isKyb = false,
+    collectBO = false,
   }: Partial<VerificationChecksProps>) => {
     customRender(
       <VerificationChecks
@@ -26,18 +28,20 @@ describe('VerificationChecks', () => {
         onSubmit={onSubmit}
         requiresDoc={requiresDoc}
         allowInternationalResident={allowInternationalResident}
+        isKyb={isKyb}
+        collectBO={collectBO}
       />,
     );
   };
 
   describe('initial state', () => {
-    it('should only show the "AML monitoring" option', () => {
+    it('should show the "AML monitoring" option and kyc check should be disabled', () => {
       renderAml({});
 
-      const kycCheck = screen.queryAllByRole('switch', {
+      const kycCheck = screen.getByRole('switch', {
         name: 'Perform database checks with collected identity data',
       });
-      expect(kycCheck).toHaveLength(0);
+      expect(kycCheck).toBeDisabled();
 
       const aml = screen.getByRole('switch', {
         name: 'Enhanced AML monitoring',
@@ -62,13 +66,77 @@ describe('VerificationChecks', () => {
   });
 
   describe('kyc check', () => {
-    it('should show the "KYC check" option', () => {
+    it('should show the "KYC check" option for KYC kind with requires doc', () => {
       renderAml({ requiresDoc: true });
 
       const kycCheck = screen.getByRole('switch', {
         name: 'Perform database checks with collected identity data',
       });
-      expect(kycCheck).toBeInTheDocument();
+      expect(kycCheck).toBeEnabled();
+    });
+
+    it('should not show KYC check option if allowInternationalResident is true', () => {
+      renderAml({ allowInternationalResident: true });
+
+      const kycCheck = screen.queryByRole('switch', {
+        name: 'Perform database checks with collected identity data',
+      });
+      expect(kycCheck).not.toBeInTheDocument();
+    });
+
+    it('should show the "KYC check" option as disabled and truthy if doc is not required', () => {
+      renderAml({ requiresDoc: false });
+
+      const kycCheck = screen.getByRole('switch', {
+        name: 'Perform database checks with collected identity data',
+      });
+      expect(kycCheck).toBeDisabled();
+      expect(kycCheck).toBeChecked();
+    });
+
+    it('should show the "KYC check" option as disabled anf falsy for KYB kind with collectBO false', () => {
+      renderAml({ isKyb: true });
+
+      const kycCheck = screen.getByRole('switch', {
+        name: 'Run KYC on beneficial owners',
+      });
+      expect(kycCheck).toBeDisabled();
+      expect(kycCheck).not.toBeChecked();
+    });
+
+    it('should show the "KYC check" option as enabled and truthy for KYB kind with collectBO true', () => {
+      renderAml({ isKyb: true, collectBO: true });
+
+      const kycCheck = screen.getByRole('switch', {
+        name: 'Run KYC on beneficial owners',
+      });
+      expect(kycCheck).toBeEnabled();
+      expect(kycCheck).toBeChecked();
+    });
+
+    it('can choose between primary or all owners when KYC check is enabled for KYB kind', async () => {
+      renderAml({ isKyb: true, collectBO: true });
+
+      const kycCheck = screen.getByRole('switch', {
+        name: 'Run KYC on beneficial owners',
+      });
+      expect(kycCheck).toBeEnabled();
+      expect(kycCheck).toBeChecked();
+
+      const primaryOwners = screen.getByRole('radio', {
+        name: "Only on business' primary owner",
+      });
+      expect(primaryOwners).toBeChecked();
+
+      const allOwners = screen.getByRole('radio', {
+        name: 'On all business owners',
+      });
+      expect(allOwners).not.toBeChecked();
+
+      await userEvent.click(allOwners);
+
+      expect(allOwners).toBeChecked();
+      expect(primaryOwners).not.toBeChecked();
     });
   });
 

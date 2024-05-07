@@ -13,7 +13,7 @@ import DisplayValue from './components/display-value';
 
 type DisplayValueProps = ComponentProps<typeof DisplayValue>;
 type CollectedInformationProps = {
-  title: string;
+  title?: string;
   subtitle?: string;
   options?: Option;
 };
@@ -28,9 +28,11 @@ const CollectedInformation = ({
 
   return (
     <Container>
-      <Text variant="label-3" color="secondary">
-        {title}
-      </Text>
+      {title && (
+        <Text variant="label-3" color="secondary">
+          {title}
+        </Text>
+      )}
       {options && (
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => {

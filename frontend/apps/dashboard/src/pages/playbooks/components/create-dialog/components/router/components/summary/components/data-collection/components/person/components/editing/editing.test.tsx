@@ -1,5 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import { SupportedIdDocTypes } from '@onefootprint/types';
+import {
+  CollectedKybDataOption,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
 import React from 'react';
 import {
   asAdminUser,
@@ -34,7 +37,9 @@ describe('<Editing />', () => {
   });
 
   it('should disable save button if ID doc not selected', async () => {
-    renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
+    renderEditing({
+      startingValues: { personal: { idDoc: true, idDocKind: [] } },
+    });
     const saveButton = screen.getByRole('button', { name: 'Save' });
     expect(saveButton).toBeDisabled();
   });
@@ -42,8 +47,10 @@ describe('<Editing />', () => {
   it('should not show warning if ID doc selected', async () => {
     renderEditing({
       startingValues: {
-        idDoc: true,
-        idDocKind: [SupportedIdDocTypes.driversLicense],
+        personal: {
+          idDoc: true,
+          idDocKind: [SupportedIdDocTypes.driversLicense],
+        },
       },
     });
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -53,13 +60,17 @@ describe('<Editing />', () => {
   });
 
   it('save button should be disabled if ID doc not selected', async () => {
-    renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
+    renderEditing({
+      startingValues: { personal: { idDoc: true, idDocKind: [] } },
+    });
     const saveButton = screen.getByRole('button', { name: 'Save' });
     expect(saveButton).toBeDisabled();
   });
 
   it('should show selfie option when just ID doc is selected', async () => {
-    renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
+    renderEditing({
+      startingValues: { personal: { idDoc: true, idDocKind: [] } },
+    });
     expect(
       screen.getByText('Request a selfie after ID upload'),
     ).toBeInTheDocument();
@@ -74,9 +85,48 @@ describe('<Editing />', () => {
 
   it('should show correct title for KYB', async () => {
     renderEditing({ kind: PlaybookKind.Kyb });
-    expect(
-      screen.getByText('Edit KYC of a beneficial owner'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Edit beneficial owners')).toBeInTheDocument();
+  });
+
+  it('should show beneficial owners collection option when KYB', () => {
+    renderEditing({ kind: PlaybookKind.Kyb });
+    const collectBoToogle = screen.getByRole('switch', {
+      name: "Collect beneficial owners' information",
+    });
+    expect(collectBoToogle).toBeInTheDocument();
+  });
+
+  it('should not show beneficial owners collection option when KYC', () => {
+    renderEditing({ kind: PlaybookKind.Kyc });
+    const collectBoToogle = screen.queryByRole('switch', {
+      name: "Collect beneficial owners' information",
+    });
+    expect(collectBoToogle).not.toBeInTheDocument();
+  });
+
+  it('should not show KYC options when collect BO is turned off in a KYB flow', async () => {
+    renderEditing({
+      kind: PlaybookKind.Kyb,
+      startingValues: {
+        businessInformation: {
+          [CollectedKybDataOption.beneficialOwners]: true,
+        },
+      },
+    });
+    const collectBoToogle = screen.getByRole('switch', {
+      name: "Collect beneficial owners' information",
+    });
+    expect(collectBoToogle).toBeChecked();
+    const idScanOption = screen.getByRole('switch', {
+      name: 'Request users to scan an ID document',
+    });
+    expect(idScanOption).toBeInTheDocument();
+    await userEvent.click(collectBoToogle);
+    expect(collectBoToogle).not.toBeChecked();
+    const idDocOptionRemoved = screen.queryByRole('switch', {
+      name: 'Request users to scan an ID document',
+    });
+    expect(idDocOptionRemoved).not.toBeInTheDocument();
   });
 
   it('should show no phone flow option if firm employee', async () => {

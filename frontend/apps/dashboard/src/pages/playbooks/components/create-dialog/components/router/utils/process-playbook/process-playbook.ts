@@ -15,6 +15,7 @@ import type {
 } from '@/playbooks/utils/machine/types';
 import {
   CountryRestriction,
+  KycOptionsForBeneficialOwners,
   OnboardingTemplate,
 } from '@/playbooks/utils/machine/types';
 
@@ -24,13 +25,14 @@ type ProcessPlaybookProps = {
   residencyForm?: ResidencyFormData;
   nameForm: NameFormData;
   template?: OnboardingTemplate;
+  skipKyc?: boolean;
+  kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
 };
 
 const getRequiredKybCollectFields = () => [
   CollectedKybDataOption.name,
   CollectedKybDataOption.address,
   CollectedKybDataOption.tin,
-  CollectedKybDataOption.kycedBeneficialOwners,
 ];
 
 const getRequiredKycCollectFields = () => [
@@ -46,10 +48,58 @@ const processPlaybook = ({
   playbook,
   residencyForm,
   template,
+  skipKyc,
+  kycOptionForBeneficialOwners,
 }: ProcessPlaybookProps) => {
   const mustCollectData: CollectedDataOption[] = [];
   const optionalData: CollectedDataOption[] = [];
   const { personal, businessInformation } = playbook;
+  let shouldSkipKyc = skipKyc;
+
+  // KYB field handling;
+  const optionalKYBFields = [
+    CollectedKybDataOption.corporationType,
+    CollectedKybDataOption.website,
+    CollectedKybDataOption.phoneNumber,
+  ];
+
+  if (isKyb(kind) && businessInformation) {
+    const requiredKybFields = getRequiredKybCollectFields();
+    mustCollectData.push(...requiredKybFields);
+    const collectBO =
+      businessInformation[CollectedKybDataOption.beneficialOwners];
+    if (collectBO && !skipKyc) {
+      if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.all) {
+        mustCollectData.push(CollectedKybDataOption.kycedBeneficialOwners);
+      } else if (
+        kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.primary
+      ) {
+        mustCollectData.push(CollectedKybDataOption.beneficialOwners);
+      }
+    } else if (collectBO && skipKyc) {
+      mustCollectData.push(CollectedKybDataOption.beneficialOwners);
+    } else if (!collectBO) {
+      // If we are not collecting beneficial owners, we should skip KYC by default
+      shouldSkipKyc = true;
+    }
+    optionalKYBFields.forEach(field => {
+      if (businessInformation[field as keyof BusinessInformation]) {
+        mustCollectData.push(field);
+      }
+    });
+  }
+  const omitBeneficialOwnersKycForKybPlaybook =
+    isKyb(kind) &&
+    !businessInformation?.[CollectedKybDataOption.beneficialOwners];
+  if (omitBeneficialOwnersKycForKybPlaybook) {
+    return getNoBoKycOptions({
+      mustCollectData,
+      optionalData,
+      nameForm,
+      shouldSkipKyc,
+      residencyForm,
+    });
+  }
 
   const requiredKycFields = getRequiredKycCollectFields();
   if (isAuth(kind)) {
@@ -110,23 +160,6 @@ const processPlaybook = ({
     mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
 
-  // KYB field handling;
-  const optionalKYBFields = [
-    CollectedKybDataOption.corporationType,
-    CollectedKybDataOption.website,
-    CollectedKybDataOption.phoneNumber,
-  ];
-
-  if (isKyb(kind) && businessInformation) {
-    const requiredKybFields = getRequiredKybCollectFields();
-    mustCollectData.push(...requiredKybFields);
-    optionalKYBFields.forEach(field => {
-      if (businessInformation[field as keyof BusinessInformation]) {
-        mustCollectData.push(field);
-      }
-    });
-  }
-
   const { name } = nameForm;
   // We removed the ability to configure canAccessData separately from mustCollectData (and optionalData).
   // No tenants are currently using this, so we simplify the playbook creation flow by always
@@ -146,6 +179,7 @@ const processPlaybook = ({
     name,
     optionalData,
     skipConfirm,
+    skipKyc: shouldSkipKyc,
     docScanForOptionalSsn,
     documentTypesAndCountries,
     ...getResidency(residencyForm),
@@ -183,6 +217,42 @@ const getResidency = (residencyForm?: ResidencyFormData) => {
       : allowUsTerritories,
     allowInternationalResidents,
     internationalCountryRestrictions: null,
+  };
+};
+
+const getNoBoKycOptions = ({
+  mustCollectData,
+  optionalData,
+  nameForm,
+  shouldSkipKyc,
+  residencyForm,
+}: {
+  mustCollectData: CollectedDataOption[];
+  optionalData: CollectedDataOption[];
+  nameForm: NameFormData;
+  shouldSkipKyc?: boolean;
+  residencyForm?: ResidencyFormData;
+}) => {
+  const { name } = nameForm;
+  const canAccessData = mustCollectData.concat(optionalData);
+  const documentTypesAndCountries = {
+    countrySpecific: {},
+    global: [],
+  };
+  const skipConfirm = false;
+  return {
+    canAccessData,
+    isDocFirstFlow: false,
+    isNoPhoneFlow: false,
+    mustCollectData,
+    name,
+    optionalData,
+    skipConfirm,
+    skipKyc: shouldSkipKyc,
+    documentTypesAndCountries,
+    ...getResidency(residencyForm),
+    cipKind: undefined,
+    docScanForOptionalSsn: undefined,
   };
 };
 

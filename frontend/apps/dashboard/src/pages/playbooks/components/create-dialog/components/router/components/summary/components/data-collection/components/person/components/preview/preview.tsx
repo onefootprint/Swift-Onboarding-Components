@@ -1,12 +1,5 @@
-import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
-import {
-  Box,
-  Checkbox,
-  Divider,
-  LinkButton,
-  Text,
-  Tooltip,
-} from '@onefootprint/ui';
+import { CollectedKybDataOption } from '@onefootprint/types';
+import { Box, Checkbox, Divider, LinkButton, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +13,7 @@ import {
 } from '@/playbooks/utils/machine/types';
 
 import DocEditor from './components/doc-editor';
+import PreviewHeader from './components/doc-editor/preview-header';
 import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
 
 type PreviewProps = {
@@ -33,6 +27,10 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   });
   const { getValues, register } = useFormContext();
   const values: Personal = getValues('personal');
+  const collectBO = getValues(
+    `businessInformation.${CollectedKybDataOption.beneficialOwners}`,
+  );
+  const isKyb = meta.kind === PlaybookKind.Kyb;
   const isIdDocFirstFlowEnabled = useIdDocFirstFlowEnabled(
     meta.kind === PlaybookKind.Kyc,
   );
@@ -51,35 +49,38 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     !internationalOnly && meta.onboardingTemplate !== OnboardingTemplate.Alpaca;
   const allowUsTerritoryResidents = meta.residency?.allowUsTerritories;
 
+  if (isKyb && !collectBO) {
+    return (
+      <Container>
+        <PreviewHeader
+          meta={meta}
+          canEdit={canEdit}
+          onStartEditing={onStartEditing}
+        />
+        <CollectedInformation
+          options={{
+            businessBeneficialOwners: !!collectBO,
+          }}
+        />
+      </Container>
+    );
+  }
+
   return (
     <Container>
-      <Header>
-        {meta.kind === PlaybookKind.Kyb ? (
-          <TitleContainer>
-            <Text variant="label-3">{t('title.kyb.main')}</Text>
-            <Tooltip
-              alignment="center"
-              position="right"
-              text={t('title.kyb.tooltip')}
-            >
-              <IcoInfo16 testID="info-tooltip" />
-            </Tooltip>
-          </TitleContainer>
-        ) : (
-          <Text variant="label-3">{t('title.kyc')}</Text>
-        )}
-        {canEdit && (
-          <LinkButton
-            iconComponent={IcoPencil16}
-            iconPosition="left"
-            onClick={onStartEditing}
-            variant="label-4"
-          >
-            {t('edit')}
-          </LinkButton>
-        )}
-      </Header>
+      <PreviewHeader
+        meta={meta}
+        canEdit={canEdit}
+        onStartEditing={onStartEditing}
+      />
       <FormElementsContainer>
+        {isKyb && (
+          <CollectedInformation
+            options={{
+              businessBeneficialOwners: !!collectBO,
+            }}
+          />
+        )}
         <CollectedInformation
           title={t('basic-information.title')}
           options={{
@@ -170,21 +171,6 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     </Container>
   );
 };
-
-const Header = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const TitleContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: ${theme.spacing[2]};
-  `}
-`;
 
 const Container = styled.div`
   ${({ theme }) => css`

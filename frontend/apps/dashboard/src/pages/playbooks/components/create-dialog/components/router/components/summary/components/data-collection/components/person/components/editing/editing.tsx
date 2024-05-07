@@ -1,4 +1,7 @@
-import { CollectedKycDataOption } from '@onefootprint/types';
+import {
+  CollectedKybDataOption,
+  CollectedKycDataOption,
+} from '@onefootprint/types';
 import {
   Box,
   Button,
@@ -42,6 +45,10 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   );
   const isSsnOptional = !!watch('personal.ssnOptional');
   const shouldStepUpIdDoc = !!watch('personal.ssnDocScanStepUp');
+  const collectBO = !!watch(
+    `businessInformation.${CollectedKybDataOption.beneficialOwners}`,
+  );
+  const isKyb = kind === PlaybookKind.Kyb;
 
   const showNoPhoneFlow =
     (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) &&
@@ -79,12 +86,11 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     setValue('personal.countrySpecificIdDocKind', {});
   };
 
-  const title =
-    kind === PlaybookKind.Kyb ? (
-      <Text variant="label-3">{t('editing.kyb')}</Text>
-    ) : (
-      <Text variant="label-3">{t('editing.kyc')}</Text>
-    );
+  const title = isKyb ? (
+    <Text variant="label-3">{t('editing.kyb')}</Text>
+  ) : (
+    <Text variant="label-3">{t('editing.kyc')}</Text>
+  );
 
   const isSaveDisabled = () => {
     if (
@@ -97,11 +103,71 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     return false;
   };
 
-  return (
-    <EditingContainer>
-      {showNoPhoneFlow && (
+  if (isKyb && !collectBO) {
+    return (
+      <EditingContainer>
         <Section>
           {title}
+          <Controller
+            control={control}
+            name={`businessInformation.${CollectedKybDataOption.beneficialOwners}`}
+            render={({ field }) => (
+              <ToggleContainer>
+                <Toggle
+                  onBlur={field.onBlur}
+                  onChange={nextValue => {
+                    field.onChange(nextValue);
+                  }}
+                  checked={field.value}
+                  label={t('beneficial-owner-collect.toggle')}
+                />
+              </ToggleContainer>
+            )}
+          />
+        </Section>
+        <ButtonContainer>
+          <Button
+            fullWidth
+            variant="primary"
+            onClick={handleSave}
+            disabled={isSaveDisabled()}
+          >
+            {allT('save')}
+          </Button>
+          <Button variant="secondary" fullWidth onClick={handleCancel}>
+            {allT('cancel')}
+          </Button>
+        </ButtonContainer>
+      </EditingContainer>
+    );
+  }
+
+  return (
+    <EditingContainer>
+      {isKyb && (
+        <Section>
+          {title}
+          <Controller
+            control={control}
+            name={`businessInformation.${CollectedKybDataOption.beneficialOwners}`}
+            render={({ field }) => (
+              <ToggleContainer>
+                <Toggle
+                  onBlur={field.onBlur}
+                  onChange={nextValue => {
+                    field.onChange(nextValue);
+                  }}
+                  checked={field.value}
+                  label={t('beneficial-owner-collect.toggle')}
+                />
+              </ToggleContainer>
+            )}
+          />
+        </Section>
+      )}
+      {showNoPhoneFlow && (
+        <Section>
+          {!isKyb && title}
           <Text paddingBottom={2} variant="label-1">
             {t('basic-information.title')}
           </Text>
@@ -125,7 +191,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         </Section>
       )}
       <Section>
-        {!showNoPhoneFlow && title}
+        {!isKyb && !showNoPhoneFlow && title}
         <Text paddingBottom={3} variant="label-1">
           {t('us-residents.title')}
         </Text>

@@ -1,4 +1,5 @@
 import { IcoPencil16 } from '@onefootprint/icons';
+import { CollectedKybDataOption } from '@onefootprint/types';
 import { LinkButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
@@ -22,7 +23,9 @@ const Preview = ({ onStartEditing }: PreviewProps) => {
   const businessInformation: BusinessInformation = getValues(
     'businessInformation',
   );
-  const formValues = Object.keys(businessInformation);
+  const formValues = Object.keys(businessInformation).filter(
+    cdo => cdo !== CollectedKybDataOption.beneficialOwners,
+  );
 
   return (
     <Container>

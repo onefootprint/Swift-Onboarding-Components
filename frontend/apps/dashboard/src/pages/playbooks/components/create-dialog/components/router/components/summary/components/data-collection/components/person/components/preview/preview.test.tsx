@@ -1,5 +1,6 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import {
+  CollectedKybDataOption,
   CollectedKycDataOption,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
@@ -23,7 +24,7 @@ const renderForm = ({ startingValues, kind }: PreviewWithContextProps) => {
 
 describe('<Preview />', () => {
   it("should show SSN only once when we aren't showing", () => {
-    renderForm({ startingValues: { ssn: false } });
+    renderForm({ startingValues: { personal: { ssn: false } } });
     expect(screen.getAllByText('SSN').length).toBe(1);
   });
 
@@ -39,24 +40,28 @@ describe('<Preview />', () => {
 
   it('should show SSN only once when we are showing', () => {
     renderForm({
-      startingValues: { ssn: true, ssnKind: CollectedKycDataOption.ssn9 },
+      startingValues: {
+        personal: { ssn: true, ssnKind: CollectedKycDataOption.ssn9 },
+      },
     });
     expect(screen.getAllByText('SSN').length).toBe(1);
   });
 
   it('should not show ID doc when not id doc is not selected', () => {
-    renderForm({ startingValues: { idDoc: false } });
+    renderForm({ startingValues: { personal: { idDoc: false } } });
     expect(screen.queryAllByText('ID document scan').length).toBe(0);
   });
 
   it('should show ID doc only once when we are showing', () => {
     renderForm({
       startingValues: {
-        idDoc: true,
-        idDocKind: [
-          SupportedIdDocTypes.idCard,
-          SupportedIdDocTypes.driversLicense,
-        ],
+        personal: {
+          idDoc: true,
+          idDocKind: [
+            SupportedIdDocTypes.idCard,
+            SupportedIdDocTypes.driversLicense,
+          ],
+        },
       },
     });
     expect(screen.getAllByText('ID document scan').length).toBe(1);
@@ -69,15 +74,57 @@ describe('<Preview />', () => {
 
   it('should show correct title for KYB flow', async () => {
     renderForm({ kind: PlaybookKind.Kyb });
-    expect(screen.getByText('KYC of a beneficial owner')).toBeInTheDocument();
+    expect(screen.getByText('Beneficial owners')).toBeInTheDocument();
     const tooltip = screen.getByTestId('info-tooltip');
     expect(tooltip).toBeInTheDocument();
     await userEvent.click(tooltip);
     expect(
       screen.getAllByText(
-        "To successfully verify a business we also need to verify its beneficial owner's identity.",
+        "For a stronger verification of the business, you may also verify its beneficial owners' identities.",
       ).length,
     ).toBeGreaterThanOrEqual(1);
+  });
+
+  it("should show beneficial owners collection option when it's a KYB flow", () => {
+    renderForm({ kind: PlaybookKind.Kyb });
+    const collectBOText = screen.getByText(
+      'Collect beneficial owners’ information',
+    );
+    expect(collectBOText).toBeInTheDocument();
+  });
+
+  it("should not show beneficial owners collection option when it's a KYC flow", () => {
+    renderForm({ kind: PlaybookKind.Kyc });
+    const collectBOText = screen.queryByText(
+      'Collect beneficial owners’ information',
+    );
+    expect(collectBOText).not.toBeInTheDocument();
+  });
+
+  it('should not show KYC basic data options when BO collection is turned off in a KYB flow', () => {
+    renderForm({
+      kind: PlaybookKind.Kyb,
+      startingValues: {
+        businessInformation: {
+          [CollectedKybDataOption.beneficialOwners]: false,
+        },
+      },
+    });
+    const basicInfo = screen.queryByText('Basic information');
+    expect(basicInfo).not.toBeInTheDocument();
+  });
+
+  it('should show KYC basic data options when BO collection is turned on in a KYB flow', async () => {
+    renderForm({
+      kind: PlaybookKind.Kyb,
+      startingValues: {
+        businessInformation: {
+          [CollectedKybDataOption.beneficialOwners]: true,
+        },
+      },
+    });
+    const basicInfo = screen.getByText('Basic information');
+    expect(basicInfo).toBeInTheDocument();
   });
 
   it('should show doc first flow option if firm employee and ID doc kind exists and kind is KYC', async () => {
@@ -85,8 +132,10 @@ describe('<Preview />', () => {
     renderForm({
       kind: PlaybookKind.Kyc,
       startingValues: {
-        idDoc: true,
-        idDocKind: [SupportedIdDocTypes.driversLicense],
+        personal: {
+          idDoc: true,
+          idDocKind: [SupportedIdDocTypes.driversLicense],
+        },
       },
     });
 
@@ -100,8 +149,10 @@ describe('<Preview />', () => {
     renderForm({
       kind: PlaybookKind.Kyc,
       startingValues: {
-        idDoc: true,
-        idDocKind: [SupportedIdDocTypes.driversLicense],
+        personal: {
+          idDoc: true,
+          idDocKind: [SupportedIdDocTypes.driversLicense],
+        },
       },
     });
 
@@ -116,8 +167,10 @@ describe('<Preview />', () => {
     renderForm({
       kind: PlaybookKind.Kyb,
       startingValues: {
-        idDoc: true,
-        idDocKind: [SupportedIdDocTypes.driversLicense],
+        personal: {
+          idDoc: true,
+          idDocKind: [SupportedIdDocTypes.driversLicense],
+        },
       },
     });
     expect(
@@ -137,8 +190,10 @@ describe('<Preview />', () => {
     renderForm({
       kind: PlaybookKind.Kyc,
       startingValues: {
-        idDoc: true,
-        idDocKind: [],
+        personal: {
+          idDoc: true,
+          idDocKind: [],
+        },
       },
     });
     expect(
@@ -158,11 +213,13 @@ describe('<Preview />', () => {
     renderForm({
       kind: PlaybookKind.Kyc,
       startingValues: {
-        idDoc: true,
-        idDocKind: [
-          SupportedIdDocTypes.driversLicense,
-          SupportedIdDocTypes.idCard,
-        ],
+        personal: {
+          idDoc: true,
+          idDocKind: [
+            SupportedIdDocTypes.driversLicense,
+            SupportedIdDocTypes.idCard,
+          ],
+        },
       },
     });
     expect(

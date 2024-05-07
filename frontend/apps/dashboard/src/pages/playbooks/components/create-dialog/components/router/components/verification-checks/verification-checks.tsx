@@ -2,9 +2,10 @@ import { Button, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type {
-  AMLFormData,
-  VerificationChecksFormData,
+import {
+  type AMLFormData,
+  KycOptionsForBeneficialOwners,
+  type VerificationChecksFormData,
 } from 'src/pages/playbooks/utils/machine/types';
 import styled, { css } from 'styled-components';
 
@@ -16,6 +17,8 @@ export type VerificationChecksProps = {
   isLoading: boolean;
   requiresDoc?: boolean;
   allowInternationalResident?: boolean;
+  isKyb?: boolean;
+  collectBO?: boolean;
   onBack: () => void;
   onSubmit: (formData: VerificationChecksFormData) => void;
 };
@@ -25,6 +28,8 @@ const VerificationChecks = ({
   isLoading,
   requiresDoc,
   allowInternationalResident,
+  isKyb,
+  collectBO,
   onBack,
   onSubmit,
 }: VerificationChecksProps) => {
@@ -32,11 +37,14 @@ const VerificationChecks = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.verification-checks',
   });
-  const canRunKyc = !allowInternationalResident;
+  const canRunKyc = isKyb ? collectBO : !allowInternationalResident;
+  const showSkipKyc = !allowInternationalResident;
   const formMethods = useForm<VerificationChecksFormData>({
     defaultValues: {
       skipKyc: !canRunKyc,
       amlFormData: defaultAmlValues,
+      kycOptionForBeneficialOwners:
+        isKyb && canRunKyc ? KycOptionsForBeneficialOwners.primary : undefined,
     },
   });
   const { watch, handleSubmit } = formMethods;
@@ -47,6 +55,7 @@ const VerificationChecks = ({
   const adverseMedia = watch('amlFormData.adverseMedia');
   const isMissingSelection = !!isAmlChecked && !ofac && !pep && !adverseMedia;
   const [showError, setShowError] = useState(false);
+  const disableAml = isKyb && !collectBO;
 
   const handleBeforeSubmit = (formData: VerificationChecksFormData) => {
     if (isMissingSelection) {
@@ -67,8 +76,14 @@ const VerificationChecks = ({
             {t('subtitle')}
           </Text>
         </Header>
-        {requiresDoc && canRunKyc && <KycCheck />}
-        <Aml showError={showError} />
+        {showSkipKyc && (
+          <KycCheck
+            isKyb={isKyb}
+            collectBO={collectBO}
+            requiresDoc={requiresDoc}
+          />
+        )}
+        <Aml showError={showError} disabled={disableAml} />
         <ButtonContainer>
           <Button variant="secondary" onClick={onBack} disabled={isLoading}>
             {allT('back')}
