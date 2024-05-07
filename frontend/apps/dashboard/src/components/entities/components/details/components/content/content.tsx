@@ -7,14 +7,16 @@ import {
   AuditTrail,
   Banner,
   Breadcrumb,
+  DecryptMachineProvider,
   DeviceInsights,
+  DuplicateData,
+  EditProvider,
   Header,
   OtherInsights,
   PinnedNotes,
   RiskSignals,
   Vault,
 } from './components';
-import DuplicateData from './components/duplicate-data';
 
 const Content = () => {
   const { kind } = useEntityContext();
@@ -58,4 +60,12 @@ const Content = () => {
   );
 };
 
-export default Content;
+const ContentWithProviders = () => (
+  <EditProvider>
+    <DecryptMachineProvider>
+      <Content />
+    </DecryptMachineProvider>
+  </EditProvider>
+);
+
+export default ContentWithProviders;

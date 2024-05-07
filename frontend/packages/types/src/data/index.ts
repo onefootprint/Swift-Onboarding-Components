@@ -143,7 +143,12 @@ export type {
   LivenessAttribute,
   LivenessMetadata,
 } from './liveness';
-export { LivenessIssuer, LivenessKind, LivenessSource } from './liveness';
+export {
+  IdentifyScope,
+  LivenessIssuer,
+  LivenessKind,
+  LivenessSource,
+} from './liveness';
 export type { LivenessCheckInfo } from './liveness-check-info';
 export type { MatchSignal } from './match-signal';
 export { MatchLevel } from './match-signal';

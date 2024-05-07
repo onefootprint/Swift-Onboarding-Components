@@ -21,6 +21,7 @@ import {
   EntityKind,
   EntityStatus,
   IdDI,
+  IdentifyScope,
   InvestorProfileDI,
   LivenessKind,
   LivenessSource,
@@ -130,6 +131,7 @@ export const livenessFixture: Liveness[] = [
     linkedAttestations: [],
     source: LivenessSource.skipped,
     attributes: null,
+    scope: IdentifyScope.onboarding,
     insight: {
       timestamp: '2023-03-29T23:08:33.147280Z',
       ipAddress: '73.222.157.30',

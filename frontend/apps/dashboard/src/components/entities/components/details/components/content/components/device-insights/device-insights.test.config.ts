@@ -1,6 +1,10 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { InsightEvent, Liveness } from '@onefootprint/types';
-import { LivenessKind, LivenessSource } from '@onefootprint/types';
+import {
+  IdentifyScope,
+  LivenessKind,
+  LivenessSource,
+} from '@onefootprint/types';
 
 export const insight: InsightEvent = {
   city: 'San Francisco',
@@ -24,6 +28,7 @@ export const biometricCred: Liveness = {
   source: LivenessSource.webauthnAttestation,
   linkedAttestations: [],
   kind: LivenessKind.passkey,
+  scope: IdentifyScope.onboarding,
 };
 
 export const livenessDataFixture = [biometricCred];

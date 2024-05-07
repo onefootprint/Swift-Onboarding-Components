@@ -427,6 +427,7 @@ export {
   IdDocOutcome,
   IdDocRegionality,
   IdDocStatus,
+  IdentifyScope,
   InvestorProfileAnnualIncome,
   InvestorProfileDeclaration,
   InvestorProfileDI,

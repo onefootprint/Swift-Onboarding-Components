@@ -4,7 +4,7 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import configureReactI18next from 'src/config/initializers/react-i18next';
 
-import EditProvider from '../../edit-machine/machine-provider';
+import EditProvider from '../../../../edit-machine/machine-provider';
 
 type WrapperProps = {
   children: React.ReactNode;

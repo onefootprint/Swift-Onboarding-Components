@@ -12,9 +12,7 @@ import { useEntityContext } from '@/entity/hooks/use-entity-context';
 import type { WithEntityProps } from '../../../with-entity';
 import BusinessVault from './components/business-vault';
 import DecryptForm from './components/decrypt-form';
-import DecryptProvider from './components/decrypt-machine';
 import EditForm from './components/edit-form';
-import EditProvider from './components/edit-machine';
 import PersonVault from './components/person-vault';
 import VaultActionControls, {
   useDecryptControls,
@@ -123,12 +121,4 @@ const Vault = ({ entity }: VaultProps) => {
   );
 };
 
-const VaultWithDecryptProvider = ({ entity }: VaultProps) => (
-  <EditProvider>
-    <DecryptProvider>
-      <Vault entity={entity} />
-    </DecryptProvider>
-  </EditProvider>
-);
-
-export default VaultWithDecryptProvider;
+export default Vault;

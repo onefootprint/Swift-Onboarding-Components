@@ -1,11 +1,18 @@
 import type { InsightEvent } from './insight-event';
 
+export enum IdentifyScope {
+  my1fp = 'my1fp',
+  onboarding = 'onboarding',
+  auth = 'auth',
+}
+
 export type Liveness = {
   source: LivenessSource;
   attributes: LivenessAttribute | null;
   insight: InsightEvent;
   kind: LivenessKind;
   linkedAttestations: LivenessAttestation[];
+  scope: IdentifyScope;
 };
 
 export enum LivenessKind {

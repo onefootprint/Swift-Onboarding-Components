@@ -1,6 +1,6 @@
 import type { DataIdentifier } from '@onefootprint/types';
 
-import type { DecryptFormData } from '../../vault.types';
+import type { DecryptFormData } from '../vault/vault.types';
 
 export enum State {
   idle = 'idle',
