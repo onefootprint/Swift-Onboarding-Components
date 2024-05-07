@@ -3,7 +3,7 @@ use std::{fmt::Display, str::FromStr};
 use itertools::Itertools;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 
-use crate::{DataIdentifier, DataLifetimeSeqno, EnumDotNotationError};
+use crate::{DataIdentifier, DataLifetimeSeqno};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, DeserializeFromStr, SerializeDisplay)]
 pub struct VersionedDataIdentifier {
@@ -36,8 +36,6 @@ impl paperclip::actix::OperationModifier for VersionedDataIdentifier {}
 
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum VersionedDataIdentifierError {
-    #[error("Cannot parse DataIdentifier: {0}")]
-    CannotParseDi(#[from] EnumDotNotationError),
     #[error("Cannot parse version: {0}")]
     CannotParseVersion(String),
     #[error("No data identifier provided: {0}")]
@@ -51,7 +49,7 @@ pub enum VersionedDataIdentifierError {
 }
 
 impl FromStr for VersionedDataIdentifier {
-    type Err = VersionedDataIdentifierError;
+    type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if !s.contains(':') {
@@ -60,7 +58,7 @@ impl FromStr for VersionedDataIdentifier {
         } else {
             let parts = s.split(':').collect_vec();
             if parts.len() > 2 {
-                return Err(VersionedDataIdentifierError::InvalidFormat);
+                return Err(VersionedDataIdentifierError::InvalidFormat.into());
             }
             let di = parts
                 .first()
@@ -72,7 +70,7 @@ impl FromStr for VersionedDataIdentifier {
             let version = DataLifetimeSeqno::from_str(version)
                 .map_err(|_| VersionedDataIdentifierError::CannotParseVersion((*version).to_string()))?;
             if version < DataLifetimeSeqno::from(0) {
-                return Err(VersionedDataIdentifierError::InvalidVersion);
+                return Err(VersionedDataIdentifierError::InvalidVersion.into());
             }
             Ok(Self {
                 di,

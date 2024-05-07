@@ -42,8 +42,8 @@ pub use self::{
     validation::{Error as DiValidationError, *},
 };
 use crate::{
-    fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, EnumDotNotationError, KvDataKey,
-    NtResult, PiiJsonValue, PiiString, ValidateArgs,
+    fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, KvDataKey, NtResult, PiiJsonValue,
+    PiiString, ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -270,36 +270,36 @@ impl paperclip::actix::OperationModifier for DataIdentifier {}
 /// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.
 /// We serialize DIs as `prefix.suffix`
 impl FromStr for DataIdentifier {
-    type Err = EnumDotNotationError;
+    type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let period_idx = s
             .find('.')
-            .ok_or_else(|| EnumDotNotationError::CannotParse(s.to_owned()))?;
+            .ok_or_else(|| crate::Error::CannotParseDi(s.to_owned()))?;
         let prefix = &s[..period_idx];
         let suffix = &s[(period_idx + 1)..];
         let prefix = DataIdentifierDiscriminant::from_str(prefix)
-            .map_err(|_| EnumDotNotationError::CannotParsePrefix(prefix.to_owned()))?;
+            .map_err(|_| crate::Error::CannotParseDi(s.to_owned()))?;
+        let cannot_parse_err = crate::Error::CannotParseDi(s.to_owned());
         // Parse the suffix differently depending on the prefix
-        let cannot_parse_suffix_err = EnumDotNotationError::CannotParseSuffix(suffix.to_owned());
         let result = match prefix {
             DataIdentifierDiscriminant::Id => {
-                Self::Id(IdentityDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+                Self::Id(IdentityDataKind::from_str(suffix).map_err(|_| cannot_parse_err)?)
             }
             DataIdentifierDiscriminant::Custom => {
-                Self::Custom(KvDataKey::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+                Self::Custom(KvDataKey::from_str(suffix).map_err(|_| cannot_parse_err)?)
             }
             DataIdentifierDiscriminant::Business => {
-                Self::Business(BusinessDataKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+                Self::Business(BusinessDataKind::from_str(suffix).map_err(|_| cannot_parse_err)?)
             }
-            DataIdentifierDiscriminant::InvestorProfile => Self::InvestorProfile(
-                InvestorProfileKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?,
-            ),
+            DataIdentifierDiscriminant::InvestorProfile => {
+                Self::InvestorProfile(InvestorProfileKind::from_str(suffix).map_err(|_| cannot_parse_err)?)
+            }
             DataIdentifierDiscriminant::Document => {
-                Self::Document(DocumentDiKind::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+                Self::Document(DocumentDiKind::from_str(suffix).map_err(|_| cannot_parse_err)?)
             }
             DataIdentifierDiscriminant::Card => {
-                Self::Card(CardInfo::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
+                Self::Card(CardInfo::from_str(suffix).map_err(|_| cannot_parse_err)?)
             }
         };
         Ok(result)

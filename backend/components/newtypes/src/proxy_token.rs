@@ -83,7 +83,7 @@ impl ProxyToken {
 
         Ok(Self {
             fp_id,
-            identifier: DataIdentifier::from_str(&data_identifier).map_err(ProxyTokenError::from)?,
+            identifier: DataIdentifier::from_str(&data_identifier)?,
             filter_functions,
         })
     }
@@ -127,8 +127,6 @@ impl paperclip::v2::schema::Apiv2Schema for ProxyToken {
 pub enum ProxyTokenError {
     #[error("Missing or invalid components.")]
     InvalidTokenComponents,
-    #[error("Invalid data type identifier: {0}.")]
-    InvalidDataIdentifier(#[from] crate::EnumDotNotationError),
     #[error("Cannot mix global footprint token with fully-qualified proxy tokens. Please remove the header 'x-fp-id' or remove the 'fp_id.' prefix from proxy tokens.")]
     CannotMixFullyQualifiedProxyTokens,
     #[error("Missing or invalid fp_id in proxy token.")]
