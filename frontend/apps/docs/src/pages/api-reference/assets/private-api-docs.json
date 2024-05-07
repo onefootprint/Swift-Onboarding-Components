@@ -1377,6 +1377,16 @@
                             "type": "string"
                         },
                         "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "seqno",
+                        "description": "The seqno at which to load historical data",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
                     }
                 ],
                 "responses": {
@@ -1607,6 +1617,16 @@
                                     "high"
                                 ]
                             }
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "seqno",
+                        "description": "The seqno at which to load historical data",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
                         },
                         "style": "form"
                     }
