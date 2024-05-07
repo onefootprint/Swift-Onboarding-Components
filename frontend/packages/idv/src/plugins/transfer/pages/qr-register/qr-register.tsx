@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { useL10nContext } from '../../../../components/l10n-provider';
-import { useCreateHandoffUrl, useGetD2PStatus } from '../../../../hooks';
+import { useGetD2PStatus } from '../../../../hooks';
 import SmsButtonWithCountdown from '../../components/sms-button-with-countdown';
+import useCreateHandoffUrl from '../../hooks/use-create-handoff-url';
 import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
 import useHandleD2PStatusUpdate from '../../hooks/use-handle-d2p-status-update';
 import useTransferMachine from '../../hooks/use-machine';
@@ -31,12 +32,13 @@ const QRRegister = () => {
     idDocOutcome,
   } = state.context;
   const l10n = useL10nContext();
-
   const url = useCreateHandoffUrl({
+    missingRequirements,
     authToken: scopedAuthToken,
     onboardingConfig: config,
     language,
   });
+  const urlStr = url?.toString();
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
@@ -83,11 +85,11 @@ const QRRegister = () => {
             subtitle={linkSentToPhoneSubtitle}
             icon={IcoSmartphone40}
           />
-          <SmsButtonWithCountdown authToken={scopedAuthToken} url={url} />
+          <SmsButtonWithCountdown authToken={scopedAuthToken} url={urlStr} />
         </Grid.Item>
         <QRSection
           text={t('transfer.pages.qr-register.qr-code.instructions')}
-          qrValue={url}
+          qrValue={url?.toString() ?? ''}
           isLoading={isLoading}
         />
         <ContinueOnDesktop />

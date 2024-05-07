@@ -1,4 +1,3 @@
-export { default as useCreateHandoffUrl } from './use-create-handoff-url';
 export type { DeviceInfo } from './use-device-info';
 export {
   checkDeviceInfo,

@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import { useL10nContext } from '../../../../components/l10n-provider';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import { useCreateHandoffUrl } from '../../../../hooks';
+import useCreateHandoffUrl from '../../hooks/use-create-handoff-url';
 import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
 import useTransferMachine from '../../hooks/use-machine';
 
@@ -19,14 +19,23 @@ const NewTabRequest = () => {
     keyPrefix: 'transfer.pages.new-tab-requested',
   });
   const [state, send] = useTransferMachine();
-  const { authToken, device, config, scopedAuthToken, idDocOutcome } =
-    state.context;
+  const {
+    authToken,
+    device,
+    config,
+    scopedAuthToken,
+    idDocOutcome,
+    missingRequirements,
+  } = state.context;
   const l10n = useL10nContext();
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,
     onboardingConfig: config,
     language,
+    missingRequirements,
   });
+  const urlStr = url?.toString();
+
   const { mutation } = useGenerateScopedAuthToken({
     authToken,
     device,
@@ -44,14 +53,14 @@ const NewTabRequest = () => {
   });
 
   const handleClick = () => {
-    if (!url) {
+    if (!urlStr) {
       return;
     }
 
     // Open new window on desktop, new tab on mobile
     const isMobile = device.type === 'mobile' || device.type === 'tablet';
     const tab = window.open(
-      url,
+      urlStr,
       '_blank',
       !isMobile
         ? 'height=800px,width=600px,location=no,menubar=no,status=no,toolbar=no,left=100px,top=100px'
