@@ -6,6 +6,7 @@ import useOrgSession from 'src/hooks/use-org-session';
 
 import Form from './components/form';
 import useCopyPlaybook from './hooks/use-copy-playbook';
+import useTenantsOptions from './hooks/use-tenants-options';
 
 export type CopyHandler = {
   launch: () => void;
@@ -24,6 +25,7 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'copy' });
   const org = useOrgSession();
   const copyPlaybookMutation = useCopyPlaybook();
+  const tenantsQuery = useTenantsOptions();
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
@@ -71,11 +73,13 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
       size="compact"
       title={t('title')}
     >
-      <Form
-        isOrgSandboxRestricted={org.data?.isSandboxRestricted}
-        onSubmit={handleSubmit}
-        playbook={playbook}
-      />
+      {tenantsQuery.data && (
+        <Form
+          isOrgSandboxRestricted={org.data?.isSandboxRestricted}
+          onSubmit={handleSubmit}
+          playbook={playbook}
+        />
+      )}
     </Dialog>
   );
 });

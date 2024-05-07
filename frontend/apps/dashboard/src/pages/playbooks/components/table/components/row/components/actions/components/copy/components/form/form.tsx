@@ -34,7 +34,12 @@ const Form = ({
   });
 
   return (
-    <form id="copy-playbook-form" onSubmit={form.handleSubmit(onSubmit)}>
+    <form
+      id="copy-playbook-form"
+      data-testid="copy-playbook-form"
+      onSubmit={form.handleSubmit(onSubmit)}
+      aria-label="Copy playbook"
+    >
       <Stack gap={7} direction="column">
         <TextInput
           autoFocus

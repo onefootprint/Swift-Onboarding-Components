@@ -17,6 +17,7 @@ import { type CopyProps } from './copy';
 import {
   CopyWithButton,
   playbookFixture,
+  withAuthRoles,
   withModes,
   withPlaybookCopy,
   withPlaybookCopyError,
@@ -30,6 +31,15 @@ describe('<Copy />', () => {
       pathname: '/playbooks',
     });
     withModes();
+    withAuthRoles();
+  });
+
+  beforeEach(() => {
+    asAdminUser();
+  });
+
+  afterEach(() => {
+    resetUser();
   });
 
   const renderCopy = async ({
@@ -42,11 +52,12 @@ describe('<Copy />', () => {
       const modal = screen.getByRole('dialog', { name: 'Copying playbook' });
       expect(modal).toBeInTheDocument();
     });
-  };
 
-  afterEach(() => {
-    resetUser();
-  });
+    await waitFor(() => {
+      const form = screen.getByTestId('copy-playbook-form');
+      expect(form).toBeInTheDocument();
+    });
+  };
 
   it('should initialize the name with the playbook name + (copy)', async () => {
     await renderCopy();
@@ -69,10 +80,6 @@ describe('<Copy />', () => {
   });
 
   describe('when the user is not restricted to create live ob configs', () => {
-    beforeEach(() => {
-      asAdminUser();
-    });
-
     it("should enable the 'Live' option", async () => {
       await renderCopy();
 
@@ -84,7 +91,6 @@ describe('<Copy />', () => {
   describe('when copying a playbook', () => {
     describe('when the request fails', () => {
       beforeEach(() => {
-        asAdminUser();
         withPlaybookCopyError();
       });
 
