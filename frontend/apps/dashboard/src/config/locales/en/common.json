@@ -1763,12 +1763,32 @@
       },
       "device-insights": {
         "title": "Device insights",
+        "date-and-time": "Date & time",
         "ip-address": "IP address",
         "biometrics": "Biometrics",
         "region": "Region",
         "country": "Country",
         "verified": "Verified",
         "not_verified": "Not verified",
+        "scope": {
+          "onboarding": "Onboarding",
+          "auth": "Auth",
+          "my1fp": "My One Footprint"
+        },
+        "select": {
+          "business-address": "Business address",
+          "residential-address": "Home address"
+        },
+        "empty": "No device insights shown.",
+        "address-card": {
+          "cta": "Decrypt full address",
+          "business": {
+            "header-text": "Business address"
+          },
+          "residential": {
+            "header-text": "Home address"
+          }
+        },
         "instant-app": {
           "label": "Instant App · ",
           "yes": "Yes",

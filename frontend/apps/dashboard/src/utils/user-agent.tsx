@@ -1,3 +1,4 @@
+import type { Color } from '@onefootprint/design-tokens';
 import {
   IcoAndroid24,
   IcoApple24,
@@ -16,6 +17,7 @@ export const icoForUserAgent = (
   userAgentStr: string,
   isInstantApp?: boolean,
   isAppClip?: boolean,
+  color?: Color,
 ) => {
   const userAgent = UAParser(userAgentStr || '');
   if (
@@ -23,16 +25,16 @@ export const icoForUserAgent = (
     userAgent.device.vendor?.toLowerCase() === 'apple' ||
     isAppClip
   ) {
-    return <IcoApple24 />;
+    return <IcoApple24 color={color} />;
   }
   if (userAgent.os.name?.toLowerCase() === 'android' || isInstantApp) {
-    return <IcoAndroid24 />;
+    return <IcoAndroid24 color={color} />;
   }
   if (userAgent.device.type?.toLowerCase() === 'mobile') {
-    return <IcoPhone24 />;
+    return <IcoPhone24 color={color} />;
   }
   if (isBot(userAgent)) {
-    return <IcoCode24 />;
+    return <IcoCode24 color={color} />;
   }
   if (
     userAgent.os.name?.toLowerCase() === 'mac os' ||
@@ -40,9 +42,9 @@ export const icoForUserAgent = (
     userAgent.os.name?.toLowerCase() === 'windows' ||
     userAgent.device.type === undefined
   ) {
-    return <IcoLaptop24 />;
+    return <IcoLaptop24 color={color} />;
   }
-  return <IcoUser24 />;
+  return <IcoUser24 color={color} />;
 };
 
 export const displayForUserAgent = (

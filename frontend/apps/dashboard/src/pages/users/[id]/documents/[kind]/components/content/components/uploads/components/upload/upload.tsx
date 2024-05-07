@@ -19,13 +19,10 @@ type ItemProps = {
 };
 
 const Upload = ({ title, srcs, status, attempts, source, when }: ItemProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [front, cover] = srcs;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [img, setImage] = useState(front);
-  // TODO: REMOVE
-  // eslint-disable-next-line no-console
-  console.log('cover', cover);
-  // eslint-disable-next-line no-console
-  console.log('setImage', setImage);
 
   return (
     <Container>
