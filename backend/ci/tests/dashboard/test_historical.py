@@ -80,7 +80,6 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
     )
 
     timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    print(timeline)
 
     dl_uploaded_event = next(
         te
@@ -119,8 +118,9 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
     # uploaded at that time
     body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
     dl_doc = next(d for d in body if d["kind"] == "drivers_license")
+    ordered_uploads = sorted(dl_doc["uploads"], key=lambda x: x["version"])
     uploaded_sides = set()
-    for upload in dl_doc["uploads"]:
+    for upload in ordered_uploads:
         uploaded_sides.add(upload["side"])
         data = dict(seqno=upload["version"])
         body = get(f"entities/{user.fp_id}/documents", data, *sandbox_tenant.db_auths)
