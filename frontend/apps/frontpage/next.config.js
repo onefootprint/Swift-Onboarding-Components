@@ -14,9 +14,7 @@ const withMDX = require('@next/mdx')({
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 
-const DEV_FRAME_SRC = (IS_DEV ? [
-  'http://localhost:3000',
-] : []).join(' ');
+const DEV_FRAME_SRC = (IS_DEV ? ['http://localhost:3000'] : []).join(' ');
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
@@ -85,6 +83,15 @@ module.exports = withPlugins([withMDX], {
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  async redirects() {
+    return [
+      {
+        source: '/bloom-case-study',
+        destination: '/customer-stories/bloom',
+        permanent: true,
+      },
+    ];
   },
   transpilePackages: [
     '@onefootprint/ui',
