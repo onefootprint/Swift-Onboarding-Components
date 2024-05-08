@@ -12,7 +12,7 @@ type LayoutProps = {
   children: React.ReactNode;
 };
 
-const CASE_STUDY_URL = '/bloom-case-study';
+const CASE_STUDY_URL = '/customer-stories/flexcar';
 
 const Layout = ({ children }: LayoutProps) => {
   const router = useRouter();

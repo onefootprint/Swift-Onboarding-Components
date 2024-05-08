@@ -1,0 +1,95 @@
+import { CaseStudyLayout } from '../components/case-study-layout';
+import { IcoMountain24, IcoLightBulb24 } from '@onefootprint/icons';
+import { Stack } from '@onefootprint/ui';
+import { Challenge } from '../components/challenge';
+import { IconTitle } from '../components/icon-title';
+import { Banner } from '../components/banner';
+import { Result } from '../components/result';
+import { Quote } from '../components/quote';
+import SEO from 'src/components/seo';
+
+<SEO
+  title="Flexcar: A Case Study on Enhancing Security Through Identity Verification in Auto Loan Replacement Product"
+  description="Flexcar leads the transformation in urban mobility by offering secure, technology-driven car alternatives, demonstrating a digitized auto-segment free from fraud."
+  image="/customer-stories/bloom-og.png"
+  og={{
+    image: '/customer-stories/flexcar-og.png',
+  }}
+  twitter={{
+    image: '/customer-stories/flexcar-og.png',
+  }}
+/>
+
+<CaseStudyLayout
+  companyDetails={{
+    name: 'Flexcar',
+    industry: "Car rental",
+    website: "https://www.flexcar.com/",
+    logo: "/customer-stories/flexcar/flexcar-logo.png",
+    customerSince: "2023",
+    title: "Flexcar: A Case Study on Enhancing Security Through Identity Verification in Auto Loan Replacement Product",
+    subtitle: "Flexcar leads the transformation in urban mobility by offering secure, technology-driven car alternatives, demonstrating a digitized auto-segment free from fraud."
+}}>
+
+In a world increasingly defined by mobility and shared resources, alternatives to car ownership have emerged as pivotal players, revolutionizing the way people navigate urban landscapes. At the forefront of this transformative wave is Flexcar. By leveraging technology and embracing the ethos of right-sized mobility solutions, Flexcar has not only addressed the growing demand for on-demand transportation but has done so in a way that shows we can digitize the auto-segment without incurring fraud.
+
+<Challenge>
+
+- As the popularity of new alternatives to traditional ownership surges, so
+  does the risk of misuse and fraudulent activities within the system. People
+  expect renting or buying a car should be as easy as ordering groceries.
+  Companies are forced to remove friction in the process in order to compete.
+  This has led to a surge in fraud across auto lending and auto rental.
+  According to findings by the Aite Group, synthetic identity fraud leads to
+  around $50 billion in losses.
+
+- Ensuring that the individuals accessing
+  Flexcar's fleet are who they claim to be is paramount to maintaining the
+  safety and reliability of the service. This challenge is present throughout
+  the customer lifecycle, from account creation and vehicle pickup all the way
+  to vehicle return.
+
+- The repercussions of servicing a fraudulent applicant can
+  be severe and multifaceted. Property damage, financial losses, and legal
+  complications are just a few of the potential pitfalls. Without rigorous
+  identity verification measures, car rental companies expose themselves to
+  significant financial losses, potential damage to their fleet, and
+  reputational harm.
+
+- Before Footprint, Flexcar was using a variety of tools to
+  onboard users and prevent fraud. This approach led to issues with data entry,
+  gaps in verification, and uninterpretable risk signals, resulting in a
+  manipulatable onboarding flow. Flexcar experienced fraud-related losses as a
+  consequence.
+
+</Challenge>
+
+#### Solution
+
+Jon Coombs, Director of Product Management at Flexcar, and Michael Zambrano, Executive Head of Risk at Flexcar, chose Footprint because it could help them manage problems across identity, security, and authentication. Jon said “Flexcar turned to Footprint with a clear goal: rein in fraud without adding unnecessary friction, which would pose significant user experience challenges in an increasingly competitive market.ˮ
+
+Flexcar wanted to minimize clicks while catching more fraud. Michael, who has over a decade of experience at companies such as Santander and SoFi, was especially focused on the security aspect of Footprint. Michael was attracted to “how Footprint is able to onboard users while offloading the storage of PII. Weʼre able to access the data we need while leveraging Footprintʼs secure vaulting for the collection and storage.ˮ
+
+Footprint deployed our “autoˮ flow, where we first collect a driverʼs license. This allows us to OCR data and pre-fill many of the identity verification inputs, cutting down clicks.
+
+With the Footprint app clip, passkeys and front-end fraud indicators, Footprint was able to offer Flexcar one intuitive dashboard, where they can analyze risk signals, configure step-up rules and act on various indicators.
+
+Looking ahead, Flexcar plans on expanding their Footprint use case to manage proof of address solutions, secure updating of contact methods, geographical verification, and point-of-delivery verification for its expanded delivery service.
+
+#### Results
+
+<Result>
+
+- The results were visible immediately. With Footprintʼs Auto Flow, the document verification rate (including selfie matching) was **96%**
+- **Over 99%** of barcodes could be read successfully, demonstrating the power of App Clip capture
+- With the machine learning models we use to analyze driver licenses for potential manipulations, Footprint was able to **detect meaningful fraud**. This included hundreds of cases each of **barcode data not matching OCR data, document images being pictures of screens, and paper documents**.
+- With Footprintʼs vault, Flexcar is able to save and compute on **all of their users data**, implementing block lists for any users who end up being fraudulent, strengthening their protection as they continue to expand
+
+</Result>
+
+<Banner cta="Get a demo" title="Ready to start?">
+  If you're looking to onboard customers quickly and securely store their
+  sensitive data, we'd love to help.
+</Banner>
+
+</CaseStudyLayout>

@@ -11,6 +11,7 @@ enum Labels {
   Logo = 'Logo',
   Industry = 'Industry',
   CustomerSince = 'Customer Since',
+  Website = 'Website',
 }
 
 const SummaryCard = ({
@@ -18,6 +19,7 @@ const SummaryCard = ({
   logo,
   industry,
   customerSince,
+  website,
 }: CompanyDetailsProps) => (
   <Container direction="column">
     <Header align="center" justify="center" padding={5}>
@@ -37,6 +39,9 @@ const SummaryCard = ({
       {industry && <Field label={Labels.Industry} value={industry} />}
       {customerSince && (
         <Field label={Labels.CustomerSince} value={customerSince} />
+      )}
+      {website && (
+        <Field label={Labels.Website} value={website} href={website} />
       )}
     </Stack>
   </Container>

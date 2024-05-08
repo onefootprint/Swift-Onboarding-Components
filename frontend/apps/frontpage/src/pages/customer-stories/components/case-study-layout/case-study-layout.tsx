@@ -43,6 +43,7 @@ const CaseStudyLayout = ({
           logo={companyDetails.logo}
           industry={companyDetails.industry}
           customerSince={companyDetails.customerSince}
+          website={companyDetails.website}
         />
       </SummaryRail>
     </ArticleContainer>
