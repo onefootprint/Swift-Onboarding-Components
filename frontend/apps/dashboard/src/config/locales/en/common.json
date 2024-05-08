@@ -1311,8 +1311,8 @@
               "title": "Upload ID photo",
               "collect-selfie": "Request a selfie"
             },
-            "proof-of-ssn": {
-              "title": "Proof of SSN"
+            "proof-of-ssn-and-id-doc": {
+              "title": "Proof of SSN and ID photo"
             },
             "proof-of-address": {
               "title": "Proof of address"

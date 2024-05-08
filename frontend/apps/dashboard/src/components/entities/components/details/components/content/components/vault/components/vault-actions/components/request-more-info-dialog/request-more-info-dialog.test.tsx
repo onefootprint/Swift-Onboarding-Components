@@ -135,12 +135,12 @@ describe('<RequestMoreInfoDialog />', () => {
       await selectEvents.openMenu(kindSelect);
       await waitFor(() => {
         const proofOfSsnOption = screen.getByRole('option', {
-          name: 'Proof of SSN',
+          name: 'Proof of SSN and ID photo',
         });
         expect(proofOfSsnOption).toBeInTheDocument();
       });
       const proofOfSsnOption = screen.getByRole('option', {
-        name: 'Proof of SSN',
+        name: 'Proof of SSN and ID photo',
       });
       fireEvent.click(proofOfSsnOption);
       await waitFor(() => {

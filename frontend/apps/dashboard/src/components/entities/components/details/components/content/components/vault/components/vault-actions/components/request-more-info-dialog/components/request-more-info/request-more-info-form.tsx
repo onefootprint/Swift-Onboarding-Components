@@ -22,7 +22,7 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 export enum RequestMoreInfoKind {
   Onboard = 'onboard',
   ProofOfAddress = 'proof_of_address',
-  ProofOfSsn = 'proof_of_ssn',
+  ProofOfSsnAndIdDoc = 'proof_of_ssn_and_id_doc',
   IdDocument = 'id_document',
   CustomDocument = 'custom_document',
 }
@@ -79,8 +79,8 @@ const RequestMoreInfoForm = ({
       value: RequestMoreInfoKind.IdDocument,
     },
     {
-      label: t('proof-of-ssn.title'),
-      value: RequestMoreInfoKind.ProofOfSsn,
+      label: t('proof-of-ssn-and-id-doc.title'),
+      value: RequestMoreInfoKind.ProofOfSsnAndIdDoc,
     },
     {
       label: t('proof-of-address.title'),

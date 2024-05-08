@@ -83,7 +83,7 @@ const RequestMoreInfoDialog = ({
             },
           },
         ];
-      } else if (kind === RequestMoreInfoKind.ProofOfSsn) {
+      } else if (kind === RequestMoreInfoKind.ProofOfSsnAndIdDoc) {
         configs = [
           // For now, we are implicitly requesting an ID doc alongside PoSsn
           {
