@@ -89,6 +89,12 @@ export const defaultResidencyFormDataCarRental: ResidencyFormData = {
   allowInternationalResidents: false,
 };
 
+export const defaultResidencyFormDataCreditCard: ResidencyFormData = {
+  allowUsResidents: true,
+  allowUsTerritories: false,
+  allowInternationalResidents: false,
+};
+
 export type VerificationChecksFormData = {
   skipKyc?: boolean;
   kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
@@ -131,6 +137,13 @@ export const defaultAmlFormDataTenantScreening: AMLFormData = {
 };
 
 export const defaultAmlFormDataCarRental: AMLFormData = {
+  enhancedAml: false,
+  ofac: false,
+  pep: false,
+  adverseMedia: false,
+};
+
+export const defaultAmlFormDataCreditCard: AMLFormData = {
   enhancedAml: false,
   ofac: false,
   pep: false,
@@ -307,6 +320,34 @@ export const defaultPlaybookValuesCarRental: SummaryFormData = {
   },
 };
 
+export const defaultPlaybookValuesCreditCard: SummaryFormData = {
+  kind: PlaybookKind.Kyc,
+  personal: {
+    [CollectedKycDataOption.address]: true,
+    [CollectedKycDataOption.dob]: true,
+    [CollectedKycDataOption.phoneNumber]: true,
+    [CollectedKycDataOption.usLegalStatus]: false,
+    email: true,
+    idDoc: false,
+    idDocKind: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passportCard,
+      SupportedIdDocTypes.visa,
+      SupportedIdDocTypes.residenceDocument,
+      SupportedIdDocTypes.workPermit,
+      SupportedIdDocTypes.voterIdentification,
+    ],
+    countrySpecificIdDocKind: {},
+    selfie: true,
+    ssn: true,
+    ssnDocScanStepUp: true,
+    ssnKind: CollectedKycDataOption.ssn9,
+    ssnOptional: true,
+  },
+};
+
 export const defaultPlaybookValuesIdDoc: SummaryFormData = {
   kind: PlaybookKind.IdDoc,
   personal: {
@@ -336,6 +377,7 @@ export enum OnboardingTemplate {
   Apex = 'apex',
   TenantScreening = 'tenant-screening',
   CarRental = 'car-rental',
+  CreditCard = 'credit-card',
 }
 
 export type MachineContext = {

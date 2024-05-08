@@ -3,6 +3,7 @@ import {
   IcoApex24,
   IcoBuilding24,
   IcoCar24,
+  IcoCreditcard24,
   IcoLayer0124,
 } from '@onefootprint/icons';
 import { Button, RadioSelect, Text } from '@onefootprint/ui';
@@ -107,6 +108,18 @@ const OnboardingTemplates = ({
                       description: t('industries.car-rental.description'),
                       value: OnboardingTemplate.CarRental,
                       IconComponent: IcoCar24,
+                    },
+                  ]}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+                <RadioSelect
+                  options={[
+                    {
+                      title: t('industries.credit-card.title'),
+                      description: t('industries.credit-card.description'),
+                      value: OnboardingTemplate.CreditCard,
+                      IconComponent: IcoCreditcard24,
                     },
                   ]}
                   value={field.value}

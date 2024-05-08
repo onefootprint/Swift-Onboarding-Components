@@ -44,6 +44,7 @@ const Summary = ({
     [OnboardingTemplate.Apex]: t('subtitle.apex'),
     [OnboardingTemplate.TenantScreening]: t('subtitle.tenant-screening'),
     [OnboardingTemplate.CarRental]: t('subtitle.car-rental'),
+    [OnboardingTemplate.CreditCard]: t('subtitle.credit-card'),
   };
 
   const getTitle = (): string => {

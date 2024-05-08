@@ -207,6 +207,15 @@ const Router = ({ onCreate }: RouterProps) => {
       return;
     }
 
+    if (onboardingTemplate === OnboardingTemplate.CreditCard && nameForm) {
+      const verificationChecksForm = {
+        skipKyc: false,
+        amlFormData: defaultValues.aml,
+      };
+      createFixedTemplatePlaybook(verificationChecksForm);
+      return;
+    }
+
     send('playbookSubmitted', { payload: { formData } });
   };
 

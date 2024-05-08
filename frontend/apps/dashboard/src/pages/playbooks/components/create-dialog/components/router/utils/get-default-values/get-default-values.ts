@@ -8,12 +8,14 @@ import {
   defaultAmlFormDataAlpaca,
   defaultAmlFormDataApex,
   defaultAmlFormDataCarRental,
+  defaultAmlFormDataCreditCard,
   defaultAmlFormDataTenantScreening,
   defaultNameFormData,
   defaultPlaybookValuesAlpaca,
   defaultPlaybookValuesApex,
   defaultPlaybookValuesAuth,
   defaultPlaybookValuesCarRental,
+  defaultPlaybookValuesCreditCard,
   defaultPlaybookValuesIdDoc,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
@@ -22,6 +24,7 @@ import {
   defaultResidencyFormDataAlpaca,
   defaultResidencyFormDataApex,
   defaultResidencyFormDataCarRental,
+  defaultResidencyFormDataCreditCard,
   defaultResidencyFormDataTenantScreening,
   OnboardingTemplate,
 } from '@/playbooks/utils/machine/types';
@@ -32,6 +35,7 @@ const templateToDefaultValuesKYC = {
   [OnboardingTemplate.Custom]: defaultPlaybookValuesKYC,
   [OnboardingTemplate.TenantScreening]: defaultPlaybookValuesTenantScreening,
   [OnboardingTemplate.CarRental]: defaultPlaybookValuesCarRental,
+  [OnboardingTemplate.CreditCard]: defaultPlaybookValuesCreditCard,
 };
 
 const templateToDefaultAml = {
@@ -40,6 +44,7 @@ const templateToDefaultAml = {
   [OnboardingTemplate.Custom]: defaultAmlFormData,
   [OnboardingTemplate.TenantScreening]: defaultAmlFormDataTenantScreening,
   [OnboardingTemplate.CarRental]: defaultAmlFormDataCarRental,
+  [OnboardingTemplate.CreditCard]: defaultAmlFormDataCreditCard,
 };
 
 const templateToDefaultResidency = {
@@ -48,6 +53,7 @@ const templateToDefaultResidency = {
   [OnboardingTemplate.Custom]: defaultResidencyFormData,
   [OnboardingTemplate.TenantScreening]: defaultResidencyFormDataTenantScreening,
   [OnboardingTemplate.CarRental]: defaultResidencyFormDataCarRental,
+  [OnboardingTemplate.CreditCard]: defaultResidencyFormDataCreditCard,
 };
 
 const getDefaultValues = (context: MachineContext): DefaultValues => {

@@ -87,6 +87,21 @@ describe('<OnboardingTemplates />', () => {
     });
   });
 
+  it("when credit-card is selected, onSubmit is called with 'credit-card'", async () => {
+    const onSubmit = jest.fn();
+    const onBack = jest.fn();
+    renderOnboardingTemplates({ onSubmit, onBack });
+    const creditCardOption = screen.getByRole('button', {
+      name: 'Credit card',
+    });
+    await userEvent.click(creditCardOption);
+    const nextButton = screen.getByRole('button', { name: 'Next' });
+    await userEvent.click(nextButton);
+    expect(onSubmit).toHaveBeenCalledWith({
+      template: OnboardingTemplate.CreditCard,
+    });
+  });
+
   it('when tenant-screening is selected, onSubmit is called with tenant-screening', async () => {
     const onSubmit = jest.fn();
     const onBack = jest.fn();

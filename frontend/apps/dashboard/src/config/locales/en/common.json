@@ -2786,6 +2786,10 @@
             "car-rental": {
               "title": "Car rental",
               "description": "Perfect for seemlessly verifying drivers"
+            },
+            "credit-card": {
+              "title": "Credit card",
+              "description": "Optimized for screening credit applicants"
             }
           }
         },
@@ -2837,7 +2841,8 @@
             "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
             "apex": "Here's your Playbook configuration based on Apex's CIP.",
             "tenant-screening": "Here's your playbook configuration based on your selected template",
-            "car-rental": "Here's your playbook configuration based on your selected template"
+            "car-rental": "Here's your playbook configuration based on your selected template",
+            "credit-card": "Here's your playbook configuration based on your selected template"
           },
           "data-collection": {
             "investor-profile": {
