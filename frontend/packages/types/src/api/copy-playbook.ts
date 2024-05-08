@@ -5,6 +5,7 @@ export type CopyPlaybookRequest = {
   name: string;
   playbookId: string;
   tenantId: string;
+  tenantName: string;
 };
 
 export type CopyPlaybookResponse = OnboardingConfig;

@@ -24,7 +24,7 @@
       "feedback": {
         "success": {
           "title": "Playbook copied successfully",
-          "description": "Playbook has been copied {{orgName}} organization, to the {{mode}} environment.",
+          "description": "Playbook has been copied to {{orgName}} (using {{mode}} environment).",
           "cta": "Go to copied playbook"
         },
         "mode": {

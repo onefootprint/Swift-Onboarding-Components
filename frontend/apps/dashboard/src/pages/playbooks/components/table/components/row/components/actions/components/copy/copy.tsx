@@ -19,6 +19,7 @@ type FormData = {
   name: string;
   mode: 'sandbox' | 'live';
   tenantId: string;
+  tenantName: string;
 };
 
 const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
@@ -46,6 +47,7 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
         playbookId: playbook.id,
         isLive: formData.mode === 'live',
         tenantId: formData.tenantId,
+        tenantName: formData.tenantName,
       },
       {
         onSuccess: () => {

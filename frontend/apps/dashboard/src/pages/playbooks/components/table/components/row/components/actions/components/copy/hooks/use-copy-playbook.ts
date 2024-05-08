@@ -86,7 +86,7 @@ const useCopyPlaybook = () => {
       toast.show({
         description: t('success.description', {
           mode: payload.isLive ? 'Live' : 'Sandbox',
-          orgName: data.org?.name,
+          orgName: payload.tenantName,
         }),
         title: t('success.title'),
         cta: {

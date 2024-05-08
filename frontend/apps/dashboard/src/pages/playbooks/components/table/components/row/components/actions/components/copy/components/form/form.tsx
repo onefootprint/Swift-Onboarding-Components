@@ -17,7 +17,7 @@ type FormData = {
 };
 
 export type FormProps = {
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: FormData & { tenantName: string }) => void;
   playbook: OnboardingConfig;
   tenants: {
     label: string;
@@ -46,12 +46,16 @@ const Form = ({ onSubmit, playbook, tenants }: FormProps) => {
     tenant => tenant.value === selectedTenantId,
   );
 
+  const handleSubmit = (data: FormData) => {
+    onSubmit({ ...data, tenantName: selectedTenant?.label || '' });
+  };
+
   return (
     <form
       aria-label="Copy playbook"
       data-testid="copy-playbook-form"
       id="copy-playbook-form"
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(handleSubmit)}
     >
       <Stack gap={7} direction="column">
         <TextInput

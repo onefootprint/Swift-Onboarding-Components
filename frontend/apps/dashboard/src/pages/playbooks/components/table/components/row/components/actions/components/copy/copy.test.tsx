@@ -169,7 +169,7 @@ describe('<Copy />', () => {
 
         await waitFor(() => {
           const toastDescription = screen.getByText(
-            'Playbook has been copied Acme organization, to the Sandbox environment.',
+            'Playbook has been copied to Footprint Live (using Sandbox environment).',
           );
           expect(toastDescription).toBeInTheDocument();
         });
