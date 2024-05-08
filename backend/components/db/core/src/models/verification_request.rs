@@ -1,10 +1,10 @@
 use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::{scoped_vault, vault, verification_request, verification_result};
+use db_schema::schema::{decision_intent, scoped_vault, vault, verification_request, verification_result};
 use diesel::{prelude::*, Insertable};
 use newtypes::{
-    DataLifetimeSeqno, DecisionIntentId, DocumentId, ScopedVaultId, Vendor, VendorAPI,
-    VerificationRequestId,
+    DataLifetimeSeqno, DecisionIntentId, DocumentId, ScopedVaultId, Vendor, VendorAPI, VerificationRequestId,
+    WorkflowId,
 };
 
 use super::{data_lifetime::DataLifetime, vault::Vault, verification_result::VerificationResult};
@@ -210,6 +210,37 @@ impl VerificationRequest {
             ))
             .distinct_on(verification_request::vendor_api)
             .get_results(conn)?;
+
+        Ok(req_and_res)
+    }
+
+    #[tracing::instrument(
+        "VerificationRequest::get_latest_request_and_successful_result_for_vendor_api",
+        skip_all
+    )]
+    pub fn get_latest_request_and_successful_result_for_vendor_api(
+        conn: &mut PgConn,
+        workflow_id: &WorkflowId,
+        vendor_api: VendorAPI,
+    ) -> DbResult<Option<RequestAndResult>> {
+        let req_and_res: Option<RequestAndResult> = verification_request::table
+            .inner_join(decision_intent::table)
+            .filter(decision_intent::workflow_id.eq(workflow_id))
+            .filter(verification_request::vendor_api.eq(vendor_api))
+            .inner_join(verification_result::table)
+            .filter(verification_result::is_error.eq(false))
+            .select((
+                verification_request::all_columns,
+                verification_result::all_columns,
+            ))
+            .order((
+                verification_request::vendor_api,
+                verification_request::uvw_snapshot_seqno.desc(),
+                verification_request::timestamp.desc(), // tie breaker if seq_no has a tie
+            ))
+            .distinct_on(verification_request::vendor_api)
+            .get_result(conn)
+            .optional()?;
 
         Ok(req_and_res)
     }
