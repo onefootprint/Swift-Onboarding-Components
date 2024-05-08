@@ -29,6 +29,10 @@ def main(input_file, dry_run, batch_size, api_base, custodian_key):
             progress_bar.update(batch_size)
 
 
+def count_expiration_dis(m):
+    return len(set([(fp_id, di) for fp_id, dis in m.items() for di in dis if di.endswith(".expiration")]))
+
+
 def migrate_batch(batch, dry_run, api_base, custodian_key):
     resp = requests.post(
         f"{api_base}/private/protected/fix_card_expiration_year",
@@ -49,11 +53,12 @@ def migrate_batch(batch, dry_run, api_base, custodian_key):
     sys.stdout.flush()
     resp.raise_for_status()
 
-    updated = len(b["updated"])
-    would_update = len(b["would_update"])
-    skipped_old_seqno = len(b["skipped_old_seqno"])
-    skipped_already_correct = len(b["skipped_already_correct"])
+    updated = count_expiration_dis(b["updated"])
+    would_update = count_expiration_dis(b["would_update"])
+    skipped_old_seqno = count_expiration_dis(b["skipped_old_seqno"])
+    skipped_already_correct = count_expiration_dis(b["skipped_already_correct"])
     assert len(batch) == updated + would_update + skipped_old_seqno + skipped_already_correct
+
 
 if __name__ == "__main__":
     main()

@@ -8,8 +8,8 @@ use crate::{
 };
 use itertools::Itertools;
 use newtypes::{
-    put_data_request::RawDataRequest, CardDataKind, DataIdentifier, DataLifetimeSeqno, FpId, PiiJsonValue,
-    ScopedVaultId, ValidateArgs,
+    put_data_request::RawDataRequest, CardDataKind, CleanAndValidate, DataIdentifier, DataLifetimeSeqno,
+    FpId, PiiJsonValue, ScopedVaultId, ValidateArgs,
 };
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -126,7 +126,7 @@ pub async fn fix_card_expiration_year(
 
     let mut skipped_already_correct_dis: HashMap<FpId, Vec<DataIdentifier>> = HashMap::new();
 
-    let bad_date_format = Regex::new(r"^(\d{2})/(\d{2})$")?;
+    let correct_date_format = Regex::new(r"^\d{2}/\d{4}$")?;
 
     let mut updates = vec![];
     let mut sv_id_to_fp_id = HashMap::new();
@@ -143,44 +143,57 @@ pub async fn fix_card_expiration_year(
 
         // Check if the date is already in the correct format.
         let expiration = pii_json.clone().as_string().map_err(newtypes::Error::from)?;
-        let Some(bad_date) = bad_date_format.captures(expiration.leak()) else {
+
+        let div = di.clone().clean_and_validate(
+            pii_json.clone(),
+            ValidateArgs {
+                // Card expiration parsing doesn't branch on any of these arguments.
+                for_bifrost: false,
+                allow_dangling_keys: false,
+                ignore_luhn_validation: false,
+                is_live: *is_live,
+            },
+            // Not used for card expiration.
+            &HashMap::new(),
+        )?;
+        let fixed_expiration = div.value;
+
+        if !correct_date_format.is_match(fixed_expiration.leak()) {
+            // We can assert this since validation was not broken, just the vaulted format.
+            return AssertionError("Fixed expiration should match correct date format").into();
+        };
+
+        if fixed_expiration == expiration {
             skipped_already_correct_dis
                 .entry(fp_id.clone())
                 .or_default()
                 .push(op.identifier.clone());
             continue;
-        };
-
-        // Transform the date.
-        let fixed_expiration = format!(
-            "{}/20{}",
-            bad_date
-                .get(1)
-                .ok_or(AssertionError("Missing capture group"))?
-                .as_str(),
-            bad_date
-                .get(2)
-                .ok_or(AssertionError("Missing capture group"))?
-                .as_str()
-        );
-
-        // Double check that we got the transormation right.
-        if fixed_expiration.len() != "MM/YYYY".len() {
-            return AssertionError("Incorrect fixed expiration length").into();
         }
-        if &fixed_expiration[2..5] != "/20" {
+
+        // Double check that we got the transformation right.
+        let (original_month, original_year) = expiration
+            .leak()
+            .split_once(['-', '/'])
+            .ok_or(AssertionError("No month"))?;
+
+        if original_year.len() == 2 && &fixed_expiration.leak()[2..5] != "/20" {
             return AssertionError("Incorrect middle characters").into();
         }
-        if fixed_expiration[..2] != expiration.leak()[..2] {
+
+        if fixed_expiration.leak()[..2].trim_start_matches('0') != original_month.trim_start_matches('0') {
             return AssertionError("Incorrect month").into();
         }
-        if fixed_expiration[5..] != expiration.leak()[3..] {
+        if fixed_expiration.leak()[5..] != original_year[original_year.len() - 2..] {
             return AssertionError("Incorrect year").into();
         }
 
         // Build the data update request.
         let raw_dr = RawDataRequest {
-            map: HashMap::from([(op.identifier.clone(), PiiJsonValue::string(&fixed_expiration))]),
+            map: HashMap::from([(
+                op.identifier.clone(),
+                PiiJsonValue::from_piistring(fixed_expiration),
+            )]),
         };
         let patch_dr = raw_dr.clean_and_validate(ValidateArgs {
             for_bifrost: false,

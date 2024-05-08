@@ -238,21 +238,50 @@ def test_delete(sandbox_tenant):
 
 
 def test_card_expiration_transform(tenant):
-    # Create the vault
-    body = post("users/", {}, tenant.sk.key)
-    user = body
-    fp_id = user["id"]
-    assert fp_id
-
     # https://docs.onefootprint.com/vault/apis#vault-fields-card-fields
     expiration_transforms = [
+        # MM/YYYY (not transformed)
         ("01/2023", "01/2023"),
-        ("02/34", "02/2034"),
-        ("03-45", "03/2045"),
-        ("04-56", "04/2056"),
+        ("12/2023", "12/2023"),
+        ("02/0000", "02/0000"),
+        ("03/1990", "03/1990"),
+
+        # MM-YYYY
+        ("01-2023", "01/2023"),
+        ("12-2023", "12/2023"),
+        ("02-0000", "02/0000"),
+        ("03-1990", "03/1990"),
+
+        # MM/YY
+        ("01/23", "01/2023"),
+        ("12/23", "12/2023"),
+        ("02/00", "02/2000"),
+        ("03/90", "03/2090"),
+
+        # MM-YY
+        ("01-23", "01/2023"),
+        ("12-23", "12/2023"),
+        ("02-00", "02/2000"),
+        ("03-90", "03/2090"),
+
+        # M/YY
+        ("1/23", "01/2023"),
+        ("2/00", "02/2000"),
+        ("3/90", "03/2090"),
+
+        # M-YY
+        ("1-23", "01/2023"),
+        ("2-00", "02/2000"),
+        ("3-90", "03/2090"),
     ]
 
     for exp_input, exp_vaulted in expiration_transforms:
+        # Create the vault
+        body = post("users", {}, tenant.sk.key)
+        user = body
+        fp_id = user["id"]
+        assert fp_id
+
         # Set the expiration date.
         update_data = {
             "card.testing.expiration": exp_input,
@@ -280,3 +309,52 @@ def test_card_expiration_transform(tenant):
         body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key)
         for f in expected_data:
             assert body[f] == expected_data[f]
+
+    # Create a fresh vault
+    body = post("users", {}, tenant.sk.key)
+    user = body
+    fp_id = user["id"]
+    assert fp_id
+
+    bad_formats = [
+        "January 2023",
+        "Jan 2023",
+        "Jan. 2023",
+        "January 23",
+        "Jan 23",
+        "Jan23",
+        "Jan2023",
+        "",
+        "1/2",
+        "1-2",
+        "12",
+        "1",
+        "1/",
+        "1-",
+        "/1",
+        "-1",
+        "01/0",
+        "01-0",
+        "01/",
+        "01-",
+        "/00",
+        "-00",
+        "01/99999",
+        "01-99999",
+        "111/22",
+        "111-22",
+        "111/222",
+        "111-222",
+        "012023",
+        "0123",
+        "13/23",
+        "13-23",
+        "100/23",
+        "100-23",
+    ]
+
+    for bad_exp in bad_formats:
+        update_data = {
+            "card.testing.expiration": bad_exp,
+        }
+        patch(f"entities/{fp_id}/vault", update_data, tenant.sk.key, status_code=400)
