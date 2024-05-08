@@ -4,6 +4,7 @@ import type {
   CopyPlaybookRequest,
   CopyPlaybookResponse,
   OnboardingConfig,
+  OrgAssumeRoleResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,41 +14,64 @@ import useSession, { type AuthHeaders } from 'src/hooks/use-session';
 
 const copyPlaybook = async (
   authHeaders: AuthHeaders,
-  { playbookId, name, isLive }: CopyPlaybookRequest,
+  { playbookId, name, isLive, tenantId }: CopyPlaybookRequest,
 ) => {
-  const response = await request<CopyPlaybookResponse>({
+  const assumeResponse = await request<OrgAssumeRoleResponse>({
+    method: 'POST',
+    url: '/org/auth/assume_role',
+    headers: authHeaders,
+    data: {
+      tenantId,
+    },
+  });
+
+  const copyResponse = await request<CopyPlaybookResponse>({
     method: 'POST',
     url: `/org/onboarding_configs/${playbookId}/copy`,
-    headers: authHeaders,
+    headers: {
+      ...authHeaders,
+      'x-fp-dashboard-authorization-secondary': assumeResponse.data.token,
+    },
     data: {
       name,
       isLive,
     },
   });
 
-  return response.data;
+  return copyResponse.data;
 };
 
 const useCopyPlaybook = () => {
   const { t } = useTranslation('playbooks', {
     keyPrefix: 'copy.form.feedback',
   });
-  const { authHeaders, isLive, setIsLive } = useSession();
   const queryClient = useQueryClient();
   const showErrorToast = useRequestErrorToast();
   const toast = useToast();
   const router = useRouter();
+  const { authHeaders, isLive, setIsLive, data } = useSession();
 
-  const handleCtaClick = async (playbook: OnboardingConfig) => {
+  const handleCtaClick = async (
+    playbook: OnboardingConfig,
+    payload: CopyPlaybookRequest,
+  ) => {
+    const needsToAssumeTenant = payload.tenantId !== data.org?.id;
     const needsToSwitchMode = playbook.isLive !== isLive;
+
+    if (needsToAssumeTenant && data.auth) {
+      router.push({
+        pathname: '/switch-org',
+        query: {
+          tenant_id: payload.tenantId,
+          mode: playbook.isLive ? 'live' : 'sandbox',
+          redirect_url: `/playbooks/${playbook.id}`,
+        },
+      });
+      return;
+    }
 
     if (needsToSwitchMode) {
       await setIsLive(playbook.isLive);
-      const newMode = playbook.isLive ? 'Live' : 'Sandbox';
-      toast.show({
-        description: t('mode.description', { mode: newMode }),
-        title: t('mode.title', { mode: newMode }),
-      });
     }
 
     router.push({
@@ -56,16 +80,18 @@ const useCopyPlaybook = () => {
   };
 
   return useMutation({
-    mutationFn: (data: CopyPlaybookRequest) => copyPlaybook(authHeaders, data),
+    mutationFn: (payload: CopyPlaybookRequest) =>
+      copyPlaybook(authHeaders, payload),
     onSuccess: (response, payload) => {
       toast.show({
         description: t('success.description', {
           mode: payload.isLive ? 'Live' : 'Sandbox',
+          orgName: data.org?.name,
         }),
         title: t('success.title'),
         cta: {
           label: t('success.cta'),
-          onClick: () => handleCtaClick(response),
+          onClick: () => handleCtaClick(response, payload),
         },
       });
       queryClient.invalidateQueries();

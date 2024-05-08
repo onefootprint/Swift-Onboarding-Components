@@ -2,7 +2,6 @@ import type { OnboardingConfig } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useOrgSession from 'src/hooks/use-org-session';
 
 import Form from './components/form';
 import useCopyPlaybook from './hooks/use-copy-playbook';
@@ -19,11 +18,11 @@ export type CopyProps = {
 type FormData = {
   name: string;
   mode: 'sandbox' | 'live';
+  tenantId: string;
 };
 
 const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'copy' });
-  const org = useOrgSession();
   const copyPlaybookMutation = useCopyPlaybook();
   const tenantsQuery = useTenantsOptions();
   const [open, setOpen] = useState(false);
@@ -46,6 +45,7 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
         name: formData.name,
         playbookId: playbook.id,
         isLive: formData.mode === 'live',
+        tenantId: formData.tenantId,
       },
       {
         onSuccess: () => {
@@ -75,9 +75,9 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
     >
       {tenantsQuery.data && (
         <Form
-          isOrgSandboxRestricted={org.data?.isSandboxRestricted}
           onSubmit={handleSubmit}
           playbook={playbook}
+          tenants={tenantsQuery.data}
         />
       )}
     </Dialog>

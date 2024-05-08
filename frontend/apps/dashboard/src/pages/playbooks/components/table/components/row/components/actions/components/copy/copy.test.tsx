@@ -8,15 +8,16 @@ import {
 import React from 'react';
 import {
   asAdminUser,
-  asAdminUserInSandbox,
   asAdminUserRestrictedToSandbox,
   resetUser,
 } from 'src/config/tests';
 
 import { type CopyProps } from './copy';
 import {
+  authRolesFixture,
   CopyWithButton,
   playbookFixture,
+  withAssumeRole,
   withAuthRoles,
   withModes,
   withPlaybookCopy,
@@ -32,6 +33,7 @@ describe('<Copy />', () => {
     });
     withModes();
     withAuthRoles();
+    withAssumeRole();
   });
 
   beforeEach(() => {
@@ -66,6 +68,31 @@ describe('<Copy />', () => {
     expect(nameInput).toBeInTheDocument();
   });
 
+  it('should display a select with the list of tenants', async () => {
+    await renderCopy();
+
+    const select = screen.getByRole('combobox', { name: 'Tenant' });
+    expect(select).toBeInTheDocument();
+
+    authRolesFixture.forEach(({ name }) => {
+      const option = screen.getByRole('option', { name });
+      expect(option).toBeInTheDocument();
+    });
+  });
+
+  describe('when there is only one tenant', () => {
+    beforeEach(() => {
+      withAuthRoles([]);
+    });
+
+    it('should hide the tenant select', async () => {
+      await renderCopy();
+
+      const select = screen.queryByRole('combobox', { name: 'Tenant' });
+      expect(select).not.toBeInTheDocument();
+    });
+  });
+
   describe('when the user is restricted to create live ob configs', () => {
     beforeEach(() => {
       asAdminUserRestrictedToSandbox();
@@ -73,6 +100,11 @@ describe('<Copy />', () => {
 
     it('should disable the "Live" option', async () => {
       await renderCopy();
+
+      const tenantWithoutPermission = screen.getByRole('option', {
+        name: 'Retro Bank',
+      });
+      await userEvent.click(tenantWithoutPermission);
 
       const liveOption = screen.getByRole('button', { name: 'Live' });
       expect(liveOption).toBeDisabled();
@@ -82,6 +114,11 @@ describe('<Copy />', () => {
   describe('when the user is not restricted to create live ob configs', () => {
     it("should enable the 'Live' option", async () => {
       await renderCopy();
+
+      const tenantWithPermission = screen.getByRole('option', {
+        name: 'Footprint Live',
+      });
+      await userEvent.click(tenantWithPermission);
 
       const liveOption = screen.getByRole('button', { name: 'Live' });
       expect(liveOption).toBeEnabled();
@@ -126,10 +163,15 @@ describe('<Copy />', () => {
         await userEvent.click(cta);
 
         await waitFor(() => {
-          const successMessage = screen.getByText(
-            'Playbook copied successfully',
+          const toastTitle = screen.getByText('Playbook copied successfully');
+          expect(toastTitle).toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+          const toastDescription = screen.getByText(
+            'Playbook has been copied Acme organization, to the Sandbox environment.',
           );
-          expect(successMessage).toBeInTheDocument();
+          expect(toastDescription).toBeInTheDocument();
         });
       });
 
@@ -152,33 +194,13 @@ describe('<Copy />', () => {
 
         await waitFor(() => {
           expect(pushMockFn).toHaveBeenCalledWith({
-            pathname: '/playbooks/ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
-          });
-        });
-      });
-
-      describe('when the user copies a playbook to a different mode', () => {
-        beforeEach(() => {
-          asAdminUserInSandbox();
-        });
-
-        it('should show a toast with a message about the mode switch', async () => {
-          await renderCopy();
-
-          const mode = screen.getByRole('button', { name: 'Live' });
-          await userEvent.click(mode);
-
-          const cta = screen.getByRole('button', { name: 'Copy to target' });
-          await userEvent.click(cta);
-
-          const toastCta = await screen.findByRole('button', {
-            name: 'Go to copied playbook',
-          });
-          await userEvent.click(toastCta);
-
-          await waitFor(() => {
-            const toast = screen.getByText('Changed to Live');
-            expect(toast).toBeInTheDocument();
+            pathname: '/switch-org',
+            query: {
+              mode: 'live',
+              redirect_url:
+                '/playbooks/ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
+              tenant_id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
+            },
           });
         });
       });

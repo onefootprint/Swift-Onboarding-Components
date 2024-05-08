@@ -6,7 +6,7 @@ export type Member = {
   email: string;
   firstName: string | null;
   lastName: string | null;
-  role: Role;
+  role: Exclude<Role, 'numActiveUsers' | 'numActiveApiKeys'>;
   // Optional since FirmEmployee sessions don't have a rolebinding
   rolebinding: Rolebinding | null;
 };

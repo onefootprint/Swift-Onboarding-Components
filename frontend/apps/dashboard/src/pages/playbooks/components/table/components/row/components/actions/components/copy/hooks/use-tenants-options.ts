@@ -32,6 +32,10 @@ const useTenantsOptions = () => {
         res.map(tenant => ({
           label: tenant.name,
           value: tenant.id,
+          meta: {
+            isProdKycPlaybookRestricted: tenant.isProdKycPlaybookRestricted,
+            isProdKybPlaybookRestricted: tenant.isProdKybPlaybookRestricted,
+          },
         })),
     },
   );

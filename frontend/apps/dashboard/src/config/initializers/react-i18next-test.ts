@@ -11,38 +11,41 @@ import entityDocuments from '../locales/en/entity-documents.json';
 import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import playbooks from '../locales/en/playbooks.json';
+import switchOrg from '../locales/en/switch-org.json';
 import users from '../locales/en/users.json';
 
 i18next.use(initReactI18next).init({
   resources: {
     en: {
       'domain-restrictions': domainRestrictions,
+      'entity-details': entityDetails,
+      'entity-documents': entityDocuments,
+      'switch-org': switchOrg,
       authentication,
-      internal,
       businesses,
       common,
-      users,
-      'entity-documents': entityDocuments,
-      'entity-details': entityDetails,
+      internal,
       lists,
-      ui,
       playbooks,
+      ui,
+      users,
     },
   },
   lng: 'en',
   defaultNS: 'common',
   ns: [
-    'common',
     'authetication',
     'businesses',
+    'common',
+    'domain-restrictions',
+    'entity-details',
+    'entity-documents',
     'internal',
     'lists',
-    'users',
-    'entity-documents',
-    'entity-details',
-    'domain-restrictions',
-    'ui',
     'playbooks',
+    'switch-org',
+    'ui',
+    'users',
   ],
   returnNull: false,
   interpolation: {

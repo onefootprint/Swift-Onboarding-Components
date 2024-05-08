@@ -10,6 +10,7 @@ import type entityDocuments from '../config/locales/en/entity-documents.json';
 import type internalResource from '../config/locales/en/internal.json';
 import type listsResource from '../config/locales/en/lists.json';
 import type playbookResource from '../config/locales/en/playbooks.json';
+import type switchOrgresource from '../config/locales/en/switch-org.json';
 import type usersResource from '../config/locales/en/users.json';
 
 declare module 'i18next' {
@@ -20,15 +21,16 @@ declare module 'i18next' {
       'domain-restrictions': typeof domainRestrictionsResource;
       'entity-details': typeof entityDetails;
       'entity-documents': typeof entityDocuments;
+      'switch-org': typeof switchOrgresource;
       authentication: typeof authentication;
       businesses: typeof businessesResource;
       common: typeof commonResource;
       internal: typeof internalResource;
       lists: typeof listsResource;
+      playbooks: typeof playbookResource;
       request: typeof requestResource;
       ui: typeof uiResource;
       users: typeof usersResource;
-      playbooks: typeof playbookResource;
     };
   }
 }

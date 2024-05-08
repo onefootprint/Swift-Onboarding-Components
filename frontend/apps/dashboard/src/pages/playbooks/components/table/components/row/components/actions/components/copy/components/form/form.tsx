@@ -1,9 +1,10 @@
 import { IcoCode16, IcoUser16 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
-import { RadioSelect, Stack, TextInput } from '@onefootprint/ui';
+import { NativeSelect, RadioSelect, Stack, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import useOrgSession from 'src/hooks/use-org-session';
 
 export type CopyHandler = {
   launch: () => void;
@@ -11,34 +12,46 @@ export type CopyHandler = {
 
 type FormData = {
   name: string;
+  tenantId: string;
   mode: 'sandbox' | 'live';
 };
 
 export type FormProps = {
-  playbook: OnboardingConfig;
   onSubmit: (data: FormData) => void;
-  isOrgSandboxRestricted?: boolean;
+  playbook: OnboardingConfig;
+  tenants: {
+    label: string;
+    value: string;
+    meta: {
+      isProdKycPlaybookRestricted: boolean;
+      isProdKybPlaybookRestricted: boolean;
+    };
+  }[];
 };
 
-const Form = ({
-  onSubmit,
-  playbook,
-  isOrgSandboxRestricted = false,
-}: FormProps) => {
+const Form = ({ onSubmit, playbook, tenants }: FormProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'copy' });
+  const org = useOrgSession();
   const form = useForm<FormData>({
     defaultValues: {
       name: t('form.name.base', { name: playbook.name }),
       mode: 'sandbox',
+      tenantId: tenants.find(
+        tenant => tenant.value === org.dangerouslyCastedData.id,
+      )?.value,
     },
   });
+  const selectedTenantId = form.watch('tenantId');
+  const selectedTenant = tenants.find(
+    tenant => tenant.value === selectedTenantId,
+  );
 
   return (
     <form
-      id="copy-playbook-form"
-      data-testid="copy-playbook-form"
-      onSubmit={form.handleSubmit(onSubmit)}
       aria-label="Copy playbook"
+      data-testid="copy-playbook-form"
+      id="copy-playbook-form"
+      onSubmit={form.handleSubmit(onSubmit)}
     >
       <Stack gap={7} direction="column">
         <TextInput
@@ -47,6 +60,18 @@ const Form = ({
           placeholder={t('form.name.placeholder')}
           {...form.register('name', { required: true })}
         />
+        {tenants.length > 1 && (
+          <NativeSelect
+            {...form.register('tenantId', { required: true })}
+            label={t('form.tenant.label')}
+          >
+            {tenants.map(tenant => (
+              <option key={tenant.value} value={tenant.value}>
+                {tenant.label}
+              </option>
+            ))}
+          </NativeSelect>
+        )}
         <Controller
           control={form.control}
           name="mode"
@@ -61,7 +86,7 @@ const Form = ({
                   value: 'sandbox',
                 },
                 {
-                  disabled: isOrgSandboxRestricted,
+                  disabled: selectedTenant?.meta.isProdKycPlaybookRestricted,
                   disabledHint: t('form.target.hint'),
                   IconComponent: IcoUser16,
                   title: t('form.target.options.live'),

@@ -1,8 +1,31 @@
+import React, { useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createText } from '../../utils';
+import Label from '../label';
 
-const NativeSelect = styled.select`
+export type NativeSelectProps =
+  React.SelectHTMLAttributes<HTMLSelectElement> & {
+    label?: string;
+  };
+
+const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
+  ({ children, id: baseId, label, ...props }: NativeSelectProps, ref) => {
+    const internalId = useId();
+    const id = baseId || internalId;
+
+    return (
+      <div className="fp-dropdown">
+        {label && <Label htmlFor={id}>{label}</Label>}
+        <Select {...props} id={id} ref={ref}>
+          {children}
+        </Select>
+      </div>
+    );
+  },
+);
+
+const Select = styled.select`
   ${({ theme }) => {
     const { input } = theme.components;
 

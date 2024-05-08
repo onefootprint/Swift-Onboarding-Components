@@ -10,6 +10,9 @@
           "required": "Please enter a name for the Playbook."
         }
       },
+      "tenant": {
+        "label": "Tenant"
+      },
       "target": {
         "label": "Target environment",
         "options": {
@@ -21,12 +24,20 @@
       "feedback": {
         "success": {
           "title": "Playbook copied successfully",
-          "description": "Playbook copied in the {{mode}} environment.",
+          "description": "Playbook has been copied {{orgName}} organization, to the {{mode}} environment.",
           "cta": "Go to copied playbook"
         },
         "mode": {
           "title": "Changed to {{mode}}",
-          "description": "Given the playbook is in the {{mode}} environment, we've switched to this mode."
+          "description": "Given you copied the playbook to {{mode}} environment, we've switched to this mode."
+        },
+        "tenant": {
+          "title": "Changed to {{mode}}",
+          "description": "Given you copied the playbook to another organization, we've switched to this new org."
+        },
+        "tenant-and-mode": {
+          "title": "Changed to org {{name}}({{mode}})",
+          "description": "Given you copied the playbook to another organization and environment, we've switched to this new org and mode."
         }
       },
       "cancel": "Cancel",

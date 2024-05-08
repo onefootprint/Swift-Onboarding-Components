@@ -2,11 +2,14 @@ import { mockRequest } from '@onefootprint/test-utils';
 import type {
   GetAuthRoleResponse,
   OnboardingConfig,
+  OrgAssumeRoleResponse,
 } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
   OnboardingConfigKind,
   OnboardingConfigStatus,
+  RoleKind,
+  RoleScopeKind,
 } from '@onefootprint/types';
 import React from 'react';
 
@@ -102,6 +105,58 @@ export const authRolesFixture: GetAuthRoleResponse = [
     companySize: null,
   },
 ];
+
+export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
+  token: 'dbtok_AiOqOM04E6wX3jM2Dd97IbSMbfpqdKoT8o',
+  user: {
+    id: 'orguser_k0yUYuO2fFCwMHFPShuK77',
+    email: 'jane@onefootprint.com',
+    firstName: 'Jane',
+    lastName: 'Doe',
+    role: {
+      id: 'orgrole_VFgjE8N8C4iG3GqlkBFoj',
+      name: 'Admin',
+      scopes: [
+        {
+          kind: RoleScopeKind.admin,
+        },
+      ],
+      isImmutable: true,
+      createdAt: '2023-08-04T18:06:06.919345Z',
+      kind: RoleKind.dashboardUser,
+      numActiveUsers: 0,
+      numActiveApiKeys: 0,
+    },
+    rolebinding: {
+      lastLoginAt: '2024-05-08T13:25:04.283787Z',
+    },
+  },
+  tenant: {
+    id: 'org_UT091oogB4RJv1QbBesp2h',
+    name: 'Retro Bank',
+    logoUrl:
+      'https://i.onefp.net/ol/m9IjQQ7_cqcDSOmnFJYs98pFGxYv81xjILx-mOpuzLk/Wn4KS4sJpxmpLUmL2usPBl.png',
+    isSandboxRestricted: true,
+    websiteUrl: 'https://retro-bank.com',
+    domains: [],
+    allowDomainAccess: false,
+    isProdKycPlaybookRestricted: true,
+    isProdKybPlaybookRestricted: true,
+    supportEmail: null,
+    supportPhone: null,
+    supportWebsite: null,
+    isDomainAlreadyClaimed: false,
+    companySize: null,
+  },
+};
+
+export const withAssumeRole = () => {
+  mockRequest({
+    method: 'post',
+    path: '/org/auth/assume_role',
+    response: orgAssumeRoleFixture,
+  });
+};
 
 export const withPlaybookCopyError = (playbook = playbookFixture) =>
   mockRequest({

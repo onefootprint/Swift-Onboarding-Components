@@ -88,6 +88,7 @@ export type { LinkButtonProps, LinkButtonVariant } from './link-button';
 export { default as LinkButton } from './link-button';
 export type { MultiSelectProps } from './multi-select';
 export { default as MultiSelect } from './multi-select';
+export type { NativeSelectProps } from './native-select';
 export { default as NativeSelect } from './native-select';
 export { default as Overlay } from './overlay';
 export type { PaginationProps } from './pagination';

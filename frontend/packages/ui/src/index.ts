@@ -52,6 +52,7 @@ export type {
   LinkButtonProps,
   LinkButtonVariant,
   MultiSelectProps,
+  NativeSelectProps,
   NextToast,
   PaginationProps,
   PhoneInputProps,
