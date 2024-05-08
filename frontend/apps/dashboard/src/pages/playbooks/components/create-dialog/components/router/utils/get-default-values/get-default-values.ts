@@ -7,6 +7,7 @@ import {
   defaultAmlFormData,
   defaultAmlFormDataAlpaca,
   defaultAmlFormDataApex,
+  defaultAmlFormDataTenantScreening,
   defaultNameFormData,
   defaultPlaybookValuesAlpaca,
   defaultPlaybookValuesApex,
@@ -14,9 +15,11 @@ import {
   defaultPlaybookValuesIdDoc,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
+  defaultPlaybookValuesTenantScreening,
   defaultResidencyFormData,
   defaultResidencyFormDataAlpaca,
   defaultResidencyFormDataApex,
+  defaultResidencyFormDataTenantScreening,
   OnboardingTemplate,
 } from '@/playbooks/utils/machine/types';
 
@@ -24,18 +27,21 @@ const templateToDefaultValuesKYC = {
   [OnboardingTemplate.Alpaca]: defaultPlaybookValuesAlpaca,
   [OnboardingTemplate.Apex]: defaultPlaybookValuesApex,
   [OnboardingTemplate.Custom]: defaultPlaybookValuesKYC,
+  [OnboardingTemplate.TenantScreening]: defaultPlaybookValuesTenantScreening,
 };
 
 const templateToDefaultAml = {
   [OnboardingTemplate.Alpaca]: defaultAmlFormDataAlpaca,
   [OnboardingTemplate.Apex]: defaultAmlFormDataApex,
   [OnboardingTemplate.Custom]: defaultAmlFormData,
+  [OnboardingTemplate.TenantScreening]: defaultAmlFormDataTenantScreening,
 };
 
 const templateToDefaultResidency = {
   [OnboardingTemplate.Alpaca]: defaultResidencyFormDataAlpaca,
   [OnboardingTemplate.Apex]: defaultResidencyFormDataApex,
   [OnboardingTemplate.Custom]: defaultResidencyFormData,
+  [OnboardingTemplate.TenantScreening]: defaultResidencyFormDataTenantScreening,
 };
 
 const getDefaultValues = (context: MachineContext): DefaultValues => {

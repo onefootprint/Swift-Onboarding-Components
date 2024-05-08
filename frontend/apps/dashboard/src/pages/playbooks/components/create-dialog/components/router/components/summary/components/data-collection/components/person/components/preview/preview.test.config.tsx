@@ -8,6 +8,7 @@ import type {
 } from '@/playbooks/utils/machine/types';
 import {
   defaultPlaybookValuesKYC,
+  OnboardingTemplate,
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
@@ -44,6 +45,7 @@ const PreviewWithContext = ({
           onStartEditing={() => {}}
           meta={{
             kind: kind || PlaybookKind.Kyc,
+            onboardingTemplate: OnboardingTemplate.Custom,
             residency: {
               allowUsResidents: true,
               allowUsTerritories: false,

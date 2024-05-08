@@ -1,10 +1,11 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
 import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 
 export enum PlaybookKind {
@@ -76,6 +77,12 @@ export const defaultResidencyFormDataApex: ResidencyFormData = {
   allowInternationalResidents: false,
 };
 
+export const defaultResidencyFormDataTenantScreening: ResidencyFormData = {
+  allowUsResidents: true,
+  allowUsTerritories: false,
+  allowInternationalResidents: false,
+};
+
 export type VerificationChecksFormData = {
   skipKyc?: boolean;
   kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
@@ -108,6 +115,13 @@ export const defaultAmlFormDataApex: AMLFormData = {
   ofac: true,
   pep: true,
   adverseMedia: true,
+};
+
+export const defaultAmlFormDataTenantScreening: AMLFormData = {
+  enhancedAml: false,
+  ofac: false,
+  pep: false,
+  adverseMedia: false,
 };
 
 export type DefaultValues = {
@@ -237,6 +251,32 @@ export const defaultPlaybookValuesApex: SummaryFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
+export const defaultPlaybookValuesTenantScreening: SummaryFormData = {
+  kind: PlaybookKind.Kyc,
+  personal: {
+    [CollectedKycDataOption.address]: true,
+    [CollectedKycDataOption.dob]: true,
+    [CollectedKycDataOption.phoneNumber]: true,
+    [CollectedKycDataOption.usLegalStatus]: false,
+    email: true,
+    idDoc: true,
+    idDocKind: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.residenceDocument,
+      SupportedIdDocTypes.passportCard,
+      SupportedIdDocTypes.visa,
+      SupportedIdDocTypes.workPermit,
+    ],
+    countrySpecificIdDocKind: {},
+    selfie: true,
+    ssn: true,
+    ssnKind: CollectedKycDataOption.ssn9,
+    ssnOptional: true,
+  },
+};
+
 export const defaultPlaybookValuesIdDoc: SummaryFormData = {
   kind: PlaybookKind.IdDoc,
   personal: {
@@ -264,6 +304,7 @@ export enum OnboardingTemplate {
   Custom = 'custom',
   Alpaca = 'alpaca',
   Apex = 'apex',
+  TenantScreening = 'tenant-screening',
 }
 
 export type MachineContext = {

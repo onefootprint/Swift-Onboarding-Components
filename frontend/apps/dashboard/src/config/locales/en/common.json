@@ -2776,6 +2776,13 @@
               "title": "Apex",
               "description": "Satisfies Apex's KYC / AML policies and procedures"
             }
+          },
+          "industries": {
+            "title": "Industries",
+            "tenant-screening": {
+              "title": "Tenant screening",
+              "description": "Optimized for verifying applications in the real estate industry"
+            }
           }
         },
         "residency": {
@@ -2824,7 +2831,8 @@
             "id-doc": "All selected documents will be presented as viable upload options for users to select from.",
             "default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
             "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
-            "apex": "Here's your Playbook configuration based on Apex's CIP."
+            "apex": "Here's your Playbook configuration based on Apex's CIP.",
+            "tenant-screening": "Here's your playbook configuration based on your selected template"
           },
           "data-collection": {
             "investor-profile": {

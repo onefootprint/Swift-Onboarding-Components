@@ -45,8 +45,10 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     values.idDocKind.length > 0 ||
     Object.keys(values.countrySpecificIdDocKind).length > 0;
   const [showIdDocEditor, setShowIdDocEditor] = useState(false);
-  const canEdit =
-    !internationalOnly && meta.onboardingTemplate === OnboardingTemplate.Custom;
+  const isFixedPlaybook =
+    meta.onboardingTemplate === OnboardingTemplate.Alpaca ||
+    meta.onboardingTemplate === OnboardingTemplate.Apex;
+  const canEdit = !internationalOnly && !isFixedPlaybook;
   const allowUsTerritoryResidents = meta.residency?.allowUsTerritories;
 
   if (isKyb && !collectBO) {
@@ -146,7 +148,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
             </LinkButton>
           ))}
       </FormElementsContainer>
-      {isIdDocFirstFlowEnabled && (
+      {isIdDocFirstFlowEnabled && !isFixedPlaybook && (
         <Subsection>
           <Checkbox
             label={t('id-doc-first.label')}

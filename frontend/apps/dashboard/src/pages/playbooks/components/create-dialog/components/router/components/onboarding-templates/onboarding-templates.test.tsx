@@ -72,6 +72,21 @@ describe('<OnboardingTemplates />', () => {
     expect(onSubmit).toHaveBeenCalledWith({ template: 'apex' });
   });
 
+  it('when tenant-screening is selected, onSubmit is called with tenant-screening', async () => {
+    const onSubmit = jest.fn();
+    const onBack = jest.fn();
+    renderOnboardingTemplates({ onSubmit, onBack });
+    const tenantScreeningOption = screen.getByRole('button', {
+      name: 'Tenant screening',
+    });
+    await userEvent.click(tenantScreeningOption);
+    const nextButton = screen.getByRole('button', { name: 'Next' });
+    await userEvent.click(nextButton);
+    expect(onSubmit).toHaveBeenCalledWith({
+      template: OnboardingTemplate.TenantScreening,
+    });
+  });
+
   it('when back is pressed, back is called correctly', async () => {
     const onSubmit = jest.fn();
     const onBack = jest.fn();

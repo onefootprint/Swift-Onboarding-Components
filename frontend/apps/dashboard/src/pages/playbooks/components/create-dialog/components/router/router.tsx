@@ -189,6 +189,15 @@ const Router = ({ onCreate }: RouterProps) => {
       return;
     }
 
+    if (onboardingTemplate === OnboardingTemplate.TenantScreening && nameForm) {
+      const verificationChecksForm = {
+        skipKyc: false,
+        amlFormData: defaultValues.aml,
+      };
+      createFixedTemplatePlaybook(verificationChecksForm);
+      return;
+    }
+
     send('playbookSubmitted', { payload: { formData } });
   };
 
