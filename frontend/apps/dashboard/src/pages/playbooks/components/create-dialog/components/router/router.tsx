@@ -138,10 +138,11 @@ const Router = ({ onCreate }: RouterProps) => {
 
   const createFixedTemplatePlaybook = (
     verificationChecksForm: VerificationChecksFormData,
+    formData: SummaryFormData,
   ) => {
     const context = getFixedTemplatePlaybook(
       state.context,
-      defaultValues.playbook,
+      formData,
       verificationChecksForm,
       defaultValues,
     );
@@ -176,7 +177,7 @@ const Router = ({ onCreate }: RouterProps) => {
         skipKyc: false,
         amlFormData: defaultValues.aml,
       };
-      createFixedTemplatePlaybook(verificationChecksForm);
+      createFixedTemplatePlaybook(verificationChecksForm, formData);
       return;
     }
 
@@ -185,7 +186,7 @@ const Router = ({ onCreate }: RouterProps) => {
         skipKyc: false,
         amlFormData: defaultValues.aml,
       };
-      createFixedTemplatePlaybook(verificationChecksForm);
+      createFixedTemplatePlaybook(verificationChecksForm, formData);
       return;
     }
 
@@ -194,7 +195,7 @@ const Router = ({ onCreate }: RouterProps) => {
         skipKyc: false,
         amlFormData: defaultValues.aml,
       };
-      createFixedTemplatePlaybook(verificationChecksForm);
+      createFixedTemplatePlaybook(verificationChecksForm, formData);
       return;
     }
 
@@ -203,7 +204,7 @@ const Router = ({ onCreate }: RouterProps) => {
         skipKyc: false,
         amlFormData: defaultValues.aml,
       };
-      createFixedTemplatePlaybook(verificationChecksForm);
+      createFixedTemplatePlaybook(verificationChecksForm, formData);
       return;
     }
 
@@ -212,7 +213,7 @@ const Router = ({ onCreate }: RouterProps) => {
         skipKyc: false,
         amlFormData: defaultValues.aml,
       };
-      createFixedTemplatePlaybook(verificationChecksForm);
+      createFixedTemplatePlaybook(verificationChecksForm, formData);
       return;
     }
 

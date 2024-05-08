@@ -38,6 +38,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     data: { user, org },
   } = useSession();
   const ssnOpen = watch('personal.ssn');
+  const ssnKind = watch('personal.ssnKind');
   const shouldCollectIdDoc = watch('personal.idDoc');
   const selectedGlobalDocs = watch('personal.idDocKind');
   const selectedCountrySpecificDocs = watch(
@@ -79,6 +80,12 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
 
   const resetSsnDocStepUp = () => {
     setValue('personal.ssnDocScanStepUp', false);
+  };
+
+  const setSsnType = (nextValue: React.ChangeEvent<HTMLInputElement>) => {
+    if (nextValue.target.checked && !ssnKind) {
+      setValue('personal.ssnKind', CollectedKycDataOption.ssn9);
+    }
   };
 
   const resetDocs = () => {
@@ -206,6 +213,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                 onChange={nextValue => {
                   field.onChange(nextValue);
                   resetSsnDocStepUp();
+                  setSsnType(nextValue);
                 }}
                 checked={field.value}
                 label={t('ssn.toggle')}
