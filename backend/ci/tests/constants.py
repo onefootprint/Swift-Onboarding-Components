@@ -35,11 +35,11 @@ if NUM_WORKERS is not None:
     # Filter the set of phone numbers that could be used by this worker
     NUM_WORKERS = int(NUM_WORKERS)
     WORKER_IDX = int(os.environ.get("PYTEST_XDIST_WORKER").removeprefix("gw"))
-    assert (
-        len(ALL_PHONE_NUMBERS) >= NUM_WORKERS
-    ), f"Must have at least as many live phone numbers as there are live workers. Num phone numbers: {len(ALL_PHONE_NUMBERS)}, num workers: {NUM_WORKERS}"
+    num_phone_numbers = len(ALL_PHONE_NUMBERS)
     ALL_PHONE_NUMBERS = [
-        p for (i, p) in enumerate(ALL_PHONE_NUMBERS) if i % NUM_WORKERS == WORKER_IDX
+        p
+        for (i, p) in enumerate(ALL_PHONE_NUMBERS)
+        if WORKER_IDX % num_phone_numbers == i
     ]
 
 phone_idx = random.randint(0, len(ALL_PHONE_NUMBERS) - 1)

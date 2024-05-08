@@ -90,7 +90,7 @@ jobs:
         working-directory: ./backend/ci
         run: |
           set -o pipefail
-          pytest -n 4 tests/ 2>&1 | tee integration_test_output.txt
+          pytest -n 6 tests/ 2>&1 | tee integration_test_output.txt
         env:
           EXPECTED_SERVER_VERSION: ${{ steps.components.outputs.expectedServerVersion }}
 

@@ -316,7 +316,7 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     rule_result = next(
         r for r in rsr["rule_results"] if r["rule"]["name"] == matching_rule["name"]
     )
-    matching_rule_id =  rule_result["rule"]["rule_id"]
+    matching_rule_id = rule_result["rule"]["rule_id"]
     assert rule_result["result"] == True
     rule_result = next(
         r for r in rsr["rule_results"] if r["rule"]["name"] == non_matching_rule["name"]
@@ -328,22 +328,28 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     start_timestamp = arrow.get(stepup_event["timestamp"]).shift(hours=-1)
     end_timestamp = start_timestamp.shift(hours=2)
 
-    start_timestamp = datetime.fromisoformat(stepup_event["timestamp"]) - timedelta(hours=1)
-    end_timestamp = start_timestamp + timedelta(hours=2)
-    resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
-        "start_timestamp": start_timestamp.isoformat(),
-        "end_timestamp": end_timestamp.isoformat(),
-    }, *sandbox_tenant.db_auths)
+    resp = post(
+        f"org/onboarding_configs/{obc.id}/rules/evaluate",
+        {
+            "start_timestamp": start_timestamp.isoformat(),
+            "end_timestamp": end_timestamp.isoformat(),
+        },
+        *sandbox_tenant.db_auths,
+    )
     backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
     assert backtest_result["historical_action_triggered"] == "fail"
     assert backtest_result["backtest_action_triggered"] == "fail"
 
     # Backtesting with the matching rule deleted yields a pass.
-    resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
-        "start_timestamp": start_timestamp.isoformat(),
-        "end_timestamp": end_timestamp.isoformat(),
-        "delete": [matching_rule_id, non_matching_rule_id],
-    }, *sandbox_tenant.db_auths)
+    resp = post(
+        f"org/onboarding_configs/{obc.id}/rules/evaluate",
+        {
+            "start_timestamp": start_timestamp.isoformat(),
+            "end_timestamp": end_timestamp.isoformat(),
+            "delete": [matching_rule_id, non_matching_rule_id],
+        },
+        *sandbox_tenant.db_auths,
+    )
     backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
     assert backtest_result["historical_action_triggered"] == "fail"
     assert backtest_result["backtest_action_triggered"] == None

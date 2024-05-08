@@ -145,7 +145,7 @@ jobs:
         working-directory: ./backend/ci
         run: |
           set -ox pipefail
-          pytest -n 4 tests/ 2>&1 | tee integration_test_output.txt
+          pytest -n 6 tests/ 2>&1 | tee integration_test_output.txt
           kill ${{ steps.backend_run_local.outputs.server_pid }}
 
       - name: Create results for PR
