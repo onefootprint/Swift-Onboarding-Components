@@ -1,5 +1,5 @@
 use newtypes::{
-    output::Csv, CollectedDataOption, DocumentKind, Iso3166TwoDigitCountryCode, ObConfigurationKind,
+    output::Csv, CollectedDataOption, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationKind,
     OnboardingRequirementKind, WorkflowId,
 };
 use thiserror::Error;
@@ -47,7 +47,7 @@ pub enum OnboardingError {
     #[error("Unsupported document country. Supported document countries: {0}")]
     UnsupportedDocumentCountryForDocumentType(Csv<Iso3166TwoDigitCountryCode>),
     #[error("Unsupported document type. Supported document types: {0}")]
-    UnsupportedDocumentType(Csv<DocumentKind>),
+    UnsupportedDocumentType(Csv<IdDocKind>),
     #[error("Cannot use a fixture result for a non-sandbox Vault")]
     CannotCreateFixtureResultForNonSandbox,
     #[error("User not allowed to set fixture_result=Real")]

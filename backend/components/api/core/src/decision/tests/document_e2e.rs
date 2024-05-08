@@ -25,8 +25,8 @@ use macros::test_state_case;
 use newtypes::{
     CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentFixtureResult,
     DocumentId, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentSide, DocumentStatus,
-    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind, ScopedVaultId,
-    Selfie, TenantId, WorkflowFixtureResult,
+    IdDocKind, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind,
+    ScopedVaultId, Selfie, TenantId, WorkflowFixtureResult,
 };
 
 use super::{
@@ -66,9 +66,9 @@ async fn test_e2e_document_upload_for_all_identity_document_types(
     //
     // Setup
     //
-    for doc_type in DocumentKind::identity_docs() {
+    for doc_type in IdDocKind::identity_docs() {
         // can't use map bc closure + mutable ref for state
-        let test_case = DocumentUploadTestCase::new(user_kind, doc_type, require_selfie);
+        let test_case = DocumentUploadTestCase::new(user_kind, doc_type.into(), require_selfie);
         e2e_inner(state, test_case).await;
     }
 }
@@ -86,11 +86,9 @@ async fn test_proof_of_ssn(state: &mut State, user_kind: UserKind) {
 #[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Pass))]
 #[tokio::test]
 async fn test_proof_of_address(state: &mut State, user_kind: UserKind) {
-    for doc_type in DocumentKind::proof_of_address_docs() {
-        let test_case = DocumentUploadTestCase::new(user_kind, doc_type, Selfie::None);
+    let test_case = DocumentUploadTestCase::new(user_kind, DocumentKind::ProofOfAddress, Selfie::None);
 
-        e2e_inner(state, test_case).await;
-    }
+    e2e_inner(state, test_case).await;
 }
 
 async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {

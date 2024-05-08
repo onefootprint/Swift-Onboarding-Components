@@ -6,7 +6,7 @@ mod state_machine;
 pub mod states;
 
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::{output::Csv, DocumentKind, IncodeConfigurationId, Iso3166TwoDigitCountryCode, TenantId};
+use newtypes::{output::Csv, IdDocKind, IncodeConfigurationId, Iso3166TwoDigitCountryCode, TenantId};
 pub use state_machine::*;
 
 use crate::{
@@ -46,7 +46,7 @@ pub fn get_config_id(
 // TODO: better home for this?
 pub fn validate_doc_type_is_allowed(
     obc: &ObConfiguration,
-    document_type: DocumentKind,
+    document_type: IdDocKind,
     residential_country: Option<Iso3166TwoDigitCountryCode>,
     country_code: Iso3166TwoDigitCountryCode,
 ) -> ApiResult<()> {

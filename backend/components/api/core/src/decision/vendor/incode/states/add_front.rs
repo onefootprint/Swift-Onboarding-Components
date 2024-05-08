@@ -19,7 +19,7 @@ use db::{DbPool, TxnPgConn};
 use either::Either;
 use idv::incode::doc::IncodeAddFrontRequest;
 
-use newtypes::{DocVData, DocumentSide, IncodeFailureReason, VendorAPI};
+use newtypes::{DocVData, DocumentKind, DocumentSide, IncodeFailureReason, VendorAPI};
 
 pub struct AddFront {
     add_side_response_helper: AddSideResponseHelper,
@@ -132,7 +132,10 @@ impl IncodeStateTransition for AddFront {
     }
 
     fn next_state(session: &VerificationSession) -> IncodeState {
-        if session.document_type.sides().contains(&DocumentSide::Back) {
+        if DocumentKind::from(session.document_type)
+            .sides()
+            .contains(&DocumentSide::Back)
+        {
             AddBack::new()
         } else if session.kind.requires_selfie() {
             AddSelfie::new()

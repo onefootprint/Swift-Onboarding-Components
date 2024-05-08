@@ -1,5 +1,5 @@
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentDiKind, DocumentRequestConfig, DocumentRequestKind, DocumentReviewStatus, DocumentSide, DocumentKind, DocumentFixtureResult, DocumentId, DocumentStatus, ScopedVaultId, TenantId, WorkflowId
+    DataLifetimeSource, DecisionIntentKind, DocumentFixtureResult, DocumentId, DocumentRequestKind, DocumentReviewStatus, DocumentSide, DocumentStatus, IdDocKind, ScopedVaultId, TenantId, WorkflowId
 };
 
 use crate::{
@@ -93,6 +93,7 @@ pub async fn handle_document_create(
         .await?;
 
     let residential_country = uvw.get_decrypted_country(state).await?;
+    let document_type = IdDocKind::try_from(document_type)?;
 
     let id_doc = state
         .db_pool
@@ -138,7 +139,7 @@ pub async fn handle_document_create(
             
             let args = NewDocumentArgs {
                 request_id: dr.id,
-                document_type,
+                document_type: document_type.into(),
                 country_code: Some(country_code),
                 fixture_result,
                 skip_selfie: Some(should_skip_selfie),
@@ -168,20 +169,20 @@ pub async fn handle_document_upload(
     let wf_id = workflow.id.clone();
     let wf_id2 = wf_id.clone();
     let su_id = sv_id.clone();
-    let (id_doc, doc_request, uvw, user_consent) = state
+    let (doc, doc_request, uvw, user_consent) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (id_doc, doc_request) = Document::get(conn, &document_id)?;
+            let (doc, doc_request) = Document::get(conn, &document_id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
             let user_consent = UserConsent::get_for_workflow(conn, &wf_id)?;
-            Ok((id_doc, doc_request, uvw, user_consent))
+            Ok((doc, doc_request, uvw, user_consent))
         })
         .await?;
 
-    if id_doc.status != DocumentStatus::Pending {
+    if doc.status != DocumentStatus::Pending {
         return Err(ErrorWithCode::DocumentNotPending.into());
     }
-    let should_collect_selfie = doc_request.should_collect_selfie() && !id_doc.should_skip_selfie();
+    let should_collect_selfie = doc_request.should_collect_selfie() && !doc.should_skip_selfie();
     if side == DocumentSide::Selfie && !should_collect_selfie {
         return Err(OnboardingError::NotExpectingSelfie.into());
     }
@@ -190,17 +191,14 @@ pub async fn handle_document_upload(
     }
 
     // Upload the image to s3
-    let di = match &doc_request.config {
-        DocumentRequestConfig::Custom(CustomDocumentConfig { identifier, .. }) => identifier.clone(),
-        _ => DataIdentifier::from(DocumentDiKind::LatestUpload(id_doc.document_type, side)),
-    };
+    let di = doc.identifier(&doc_request.config, side)?;
     let su_id = sv_id.clone();
     let (e_data_key, s3_url) = seal_file_and_upload_to_s3(state, &file, &di, &uvw.vault, &su_id).await?;
 
     // Create uploads for the document
     // Check if we should be initiating requests (e.g. check if we are testing)
     let should_initiate_reqs =
-        crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result)
+        crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, doc.fixture_result)
             .await?
             && doc_request.kind.should_initiate_incode_requests();
 
@@ -222,7 +220,7 @@ pub async fn handle_document_upload(
                 false,
             )?;
             let args = NewDocumentUploadArgs {
-                document_id: id_doc.id,
+                document_id: doc.id,
                 side,
                 s3_url: d.s3_url,
                 e_data_key: d.e_data_key,
@@ -366,7 +364,9 @@ pub async fn complete_non_identity_document(
             let dk = id_doc.document_type;
             let uvw = VaultWrapper::lock_for_onboarding(conn, &sv_id)?;
             // TODO: doc_type might need to come from incode once we get to that point
-            let seqno = if dk != DocumentKind::Custom {
+            let govt_issued_doc_kind = IdDocKind::try_from(dk).ok();
+            let seqno = if let Some(dk) = govt_issued_doc_kind {
+                // TODO this is weird, only for PoA and PoSsn. We shouldn't do this for them either
                 let (_, seqno) = vault_complete_images(conn, &uvw, dk, &id_doc)?;
                 seqno
             } else {

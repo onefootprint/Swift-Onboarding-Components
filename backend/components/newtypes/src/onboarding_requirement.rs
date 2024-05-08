@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    CollectedDataOption, CustomDocumentConfig, DocumentRequestId, DocumentRequestKind, DocumentUploadMode,
-    DocumentKind, Iso3166TwoDigitCountryCode,
+    CollectedDataOption, CustomDocumentConfig, DocumentKind, DocumentRequestId, DocumentRequestKind,
+    DocumentUploadMode, IdDocKind, Iso3166TwoDigitCountryCode,
 };
 use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
@@ -59,7 +59,7 @@ pub enum CollectDocumentConfig {
     Identity {
         should_collect_selfie: bool,
         should_collect_consent: bool,
-        supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<DocumentKind>>,
+        supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
     },
     ProofOfSsn {},
     ProofOfAddress {},

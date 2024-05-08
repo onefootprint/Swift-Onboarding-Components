@@ -10,7 +10,7 @@ use newtypes::{
     incode::{
         IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType, IncodeStatus, IncodeTest,
     },
-    DocumentKind, DocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
+    IdDocKind, DocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
     Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiInt, ScrubbedPiiLong,
     ScrubbedPiiString, UsState, UsStateFull, DATE_FORMAT,
 };
@@ -512,11 +512,11 @@ pub struct IncodeOcrFixtureResponseFields {
 }
 
 impl IncodeOcrFixtureResponseFields {
-    pub fn set_doc_kind_fields(mut self, doc_kind: DocumentKind) -> Self {
+    pub fn set_doc_kind_fields(mut self, doc_kind: IdDocKind) -> Self {
         let (curp, type_of_id) = {
             let (type_of_id, _) = doc_kind.into();
             let curp = match doc_kind {
-                DocumentKind::VoterIdentification | DocumentKind::Passport => Some(test_fixtures::TEST_CURP.into()),
+                IdDocKind::VoterIdentification | IdDocKind::Passport => Some(test_fixtures::TEST_CURP.into()),
                 _ => None,
             };
 
@@ -610,9 +610,9 @@ impl FetchOCRResponse {
         ) {
             (Some(state), Some(class), Some(doc_type), doc_sub_type) => {
                 // Only apply these to DLs
-                let is_dl = DocumentKind::try_from((doc_type, doc_sub_type))
+                let is_dl = IdDocKind::try_from((doc_type, doc_sub_type))
                     .ok()
-                    .map(|dk| dk == DocumentKind::DriversLicense)
+                    .map(|dk| dk == IdDocKind::DriversLicense)
                     .is_some_and(|is_dl| is_dl);
 
                 if is_dl {
@@ -927,7 +927,7 @@ pub struct OcrDataConfidence {
 mod tests {
     use newtypes::{
         incode::{IncodeDocumentRestriction, IncodeDocumentType, IncodeStatus, IncodeTest},
-        DocumentKind, IncodeFailureReason, PiiLong, ScrubbedPiiLong,
+        IdDocKind, IncodeFailureReason, PiiLong, ScrubbedPiiLong,
     };
 
     use crate::{
@@ -1146,7 +1146,7 @@ mod tests {
 
     #[test]
     fn test_ocr_fixture() {
-        let (type_of_id, _) = DocumentKind::DriversLicense.into();
+        let (type_of_id, _) = IdDocKind::DriversLicense.into();
         let opts = IncodeOcrFixtureResponseFields {
             first_name: Some("Bobby".to_string().into()),
             last_name: Some("Bobierto".to_string().into()),
@@ -1169,7 +1169,7 @@ mod tests {
         );
 
         // now set diff fields
-        let mx_opts = opts.set_doc_kind_fields(DocumentKind::VoterIdentification);
+        let mx_opts = opts.set_doc_kind_fields(IdDocKind::VoterIdentification);
         let raw_response = FetchOCRResponse::fixture_response(Some(mx_opts));
         let parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();
         assert!(parsed.curp.is_some());

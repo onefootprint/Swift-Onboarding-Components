@@ -201,7 +201,7 @@ mod test {
     use crate::auth::{tenant::IsGuardMet, Any};
     use newtypes::{
         BusinessDataKind as BDK, CollectedDataOption as CDO, DataIdentifier as DI, DocumentDiKind,
-        DocumentSide, DocumentKind, IdentityDataKind as IDK, KvDataKey, TenantScope as TS,
+        DocumentSide, IdDocKind, IdentityDataKind as IDK, KvDataKey, TenantScope as TS,
     };
     use std::str::FromStr;
     use test_case::test_case;
@@ -235,20 +235,20 @@ mod test {
     // CanDecrypt custom
     #[test_case(&[TS::Decrypt{data: CDO::Name}], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => false)]
     #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => true)]
-    #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(DocumentKind::Passport, DocumentSide::Front))]) => false)]
-    #[test_case(&[TS::Decrypt{data: CDO::Name}], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(DocumentKind::IdCard, DocumentSide::Selfie))]) => false)]
+    #[test_case(&[TS::DecryptCustom], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
+    #[test_case(&[TS::Decrypt{data: CDO::Name}], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(IdDocKind::IdCard, DocumentSide::Selfie))]) => false)]
     // CanDecrypt identity docs
     #[test_case(&[TS::DecryptDocumentAndSelfie], CanDecrypt::new(vec![KvDataKey::from_str("custom.key").unwrap()]) => false)]
-    #[test_case(&[TS::DecryptDocumentAndSelfie], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(DocumentKind::Passport, DocumentSide::Front))]) => true)]
-    #[test_case(&[TS::DecryptDocumentAndSelfie], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(DocumentKind::IdCard, DocumentSide::Selfie))]) => true)]
-    #[test_case(&[TS::DecryptDocument], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(DocumentKind::Passport, DocumentSide::Front))]) => true)]
-    #[test_case(&[TS::DecryptDocument], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(DocumentKind::IdCard, DocumentSide::Selfie))]) => false)]
+    #[test_case(&[TS::DecryptDocumentAndSelfie], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => true)]
+    #[test_case(&[TS::DecryptDocumentAndSelfie], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(IdDocKind::IdCard, DocumentSide::Selfie))]) => true)]
+    #[test_case(&[TS::DecryptDocument], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => true)]
+    #[test_case(&[TS::DecryptDocument], CanDecrypt::new(vec![DI::Document(DocumentDiKind::Image(IdDocKind::IdCard, DocumentSide::Selfie))]) => false)]
     // CanDecrypt complex
-    #[test_case(&[TS::DecryptCustom, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Document(DocumentDiKind::Image(DocumentKind::Passport, DocumentSide::Front))]) => false)]
+    #[test_case(&[TS::DecryptCustom, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Document(DocumentDiKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
     #[test_case(&[TS::DecryptCustom, TS::Decrypt{data: CDO::Ssn9}, TS::Decrypt{data: CDO::BusinessName}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Business(BDK::Name), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
     #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap())]) => true)]
-    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentDiKind::Image(DocumentKind::Passport, DocumentSide::Front))]) => true)]
-    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::FirstName), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentDiKind::Image(DocumentKind::Passport, DocumentSide::Front))]) => false)]
+    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::Ssn4), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentDiKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => true)]
+    #[test_case(&[TS::DecryptCustom, TS::DecryptDocumentAndSelfie, TS::Decrypt{data: CDO::Ssn9}], CanDecrypt::new(vec![DI::Id(IDK::FirstName), DI::Custom(KvDataKey::from_str("custom.key").unwrap()), DI::Document(DocumentDiKind::Image(IdDocKind::Passport, DocumentSide::Front))]) => false)]
     //
     // Test Admin
     //

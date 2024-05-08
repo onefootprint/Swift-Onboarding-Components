@@ -37,7 +37,7 @@ use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use itertools::Itertools;
 use newtypes::{
     CleanAndValidate, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentDiKind,
-    DocumentId, DocumentKind, DocumentReviewStatus, DocumentStatus, Fingerprints, FootprintReasonCode,
+    DocumentId, DocumentReviewStatus, DocumentStatus, Fingerprints, FootprintReasonCode, IdDocKind,
     IdentityDataKind as IDK, IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue,
     PiiString, ScopedVaultId, ScrubbedPiiString, ValidateArgs, VendorAPI, VendorValidatedCountryCode,
     VerificationResultId,
@@ -284,17 +284,17 @@ pub(super) fn compute_risk_signals<'a>(
 pub fn vault_complete_images(
     conn: &mut TxnPgConn,
     vw: &WriteableVw<Person>,
-    dk: DocumentKind,
+    dk: IdDocKind,
     id_doc: &Document,
 ) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
     // When we vault .latest_upload, we use the document_type that is provided by the user, not the eventual doc_type from incode which is the one
     // we vault the complete images for
-    let doc_type_for_latest_upload = id_doc.document_type;
+    let doc_type = IdDocKind::try_from(id_doc.document_type)?;
     let docs = id_doc
         .images(conn, DocumentImageArgs::default())?
         .into_iter()
         .map(|u| {
-            let di = DocumentDiKind::LatestUpload(doc_type_for_latest_upload, u.side).into();
+            let di = DocumentDiKind::LatestUpload(doc_type, u.side).into();
             let mime_type = vw.get_mime_type(&di).unwrap_or("image/png");
             let file_extension = mime_type_to_extension(mime_type).unwrap_or("png");
             let kind = DocumentDiKind::from_id_doc_kind(dk, u.side).into();
@@ -374,7 +374,7 @@ impl Complete {
             selfie_score,
             ocr_confidence_score,
             status: Some(DocumentStatus::Complete),
-            vaulted_document_type: Some(validated_doc_kind),
+            vaulted_document_type: Some(validated_doc_kind.into()),
             curp_completed_seqno: None,
             validated_country_code: country_code.map(|c| c.0),
             review_status: Some(DocumentReviewStatus::ReviewedByMachine),

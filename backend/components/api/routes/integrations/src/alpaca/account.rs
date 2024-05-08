@@ -20,7 +20,7 @@ use api_wire_types::{
 };
 use db::models::{document::Document, scoped_vault::ScopedVault};
 use newtypes::{
-    email::Email, DataIdentifier as DI, Declaration, DocumentDiKind as DK, DocumentKind,
+    email::Email, DataIdentifier as DI, Declaration, DocumentDiKind as DK, IdDocKind,
     IdentityDataKind as IDK, InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -129,27 +129,29 @@ async fn create_create_account_request(
 
     tracing::info!(?doc, "create_create_account_request");
 
-    let doc_info = doc.map(|(id, _)| {
-        // Get the document type that we used to vault the verified images. This is how incode
-        // classified the document, which in rare cases may be different from how the user
-        // classified the document
-        let document_kind = id.vaulted_document_type.unwrap_or(id.document_type);
-        let di_pairs = id
-            .document_type
-            .sides()
-            .into_iter()
-            .map(|s| {
-                (
-                    DI::from(DK::Image(document_kind, s)),
-                    DI::from(DK::MimeType(document_kind, s)),
-                )
+    let doc_info = doc
+        .map(|(id, _)| -> ApiResult<_> {
+            // Get the document type that we used to vault the verified images. This is how incode
+            // classified the document, which in rare cases may be different from how the user
+            // classified the document
+            let document_kind = id.vaulted_document_type.unwrap_or(id.document_type).try_into()?;
+            let di_pairs = id
+                .document_type
+                .sides()
+                .into_iter()
+                .map(|s| {
+                    (
+                        DI::from(DK::Image(document_kind, s)),
+                        DI::from(DK::MimeType(document_kind, s)),
+                    )
+                })
+                .collect::<Vec<_>>();
+            Ok(DocInfo {
+                id_doc_kind: document_kind,
+                di_pairs,
             })
-            .collect::<Vec<_>>();
-        DocInfo {
-            id_doc_kind: document_kind,
-            di_pairs,
-        }
-    });
+        })
+        .transpose()?;
 
     let mut decrypted = uvw
         .decrypt_unchecked(
@@ -249,7 +251,7 @@ async fn create_create_account_request(
 }
 
 struct DocInfo {
-    id_doc_kind: DocumentKind,
+    id_doc_kind: IdDocKind,
     di_pairs: Vec<(DI, DI)>, // (LatestUpload, MimeType)
 }
 

@@ -45,9 +45,10 @@ use db::{
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
-    format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentDiKind, DocumentKind,
-    ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdentityDataKind,
-    MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
+    format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentDiKind,
+    ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind,
+    IdentityDataKind, MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId,
+    Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::collections::HashSet;
@@ -325,9 +326,12 @@ pub(crate) async fn create_cip_request(
                 Id(UsLegalStatus),
                 Id(Zip),
                 Id(Country),
-                Document(OcrData(DocumentKind::DriversLicense, OcrDataKind::DocumentNumber)),
-                Document(OcrData(DocumentKind::IdCard, OcrDataKind::DocumentNumber)),
-                Document(OcrData(DocumentKind::Passport, OcrDataKind::DocumentNumber)),
+                Document(OcrData(
+                    IdDocKind::DriversLicense,
+                    OcrDataKind::DocumentNumber,
+                )),
+                Document(OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber)),
+                Document(OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)),
             ],
         )
         .await?;
@@ -423,9 +427,9 @@ fn kyc(
     };
     // find a gov't id number if we have one
     let id_number = vec![
-        OcrData(DocumentKind::DriversLicense, OcrDataKind::DocumentNumber),
-        OcrData(DocumentKind::IdCard, OcrDataKind::DocumentNumber),
-        OcrData(DocumentKind::Passport, OcrDataKind::DocumentNumber),
+        OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber),
+        OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber),
+        OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber),
     ]
     .into_iter()
     .flat_map(|id| decrypted_data.get_di(id).ok())
@@ -665,7 +669,6 @@ fn document_and_photo(
         identity_document.vaulted_document_type,
         "missing vaulted_document_type on Document".into(),
     )?;
-    let document_type = Some(dk.try_into()?);
     let dob = ocr_response.dob().map(PiiString::from).ok();
     let over_18_check = ocr_response.age().ok().map(|a| a >= 18).unwrap_or(true); // If age wasn't OCR'd properly, we assume the reviewer confirmed they are over 18
 
@@ -677,7 +680,7 @@ fn document_and_photo(
         score_response,
         incode_vault_data,
         expect_selfie,
-        dk,
+        dk.try_into()?,
     )?;
 
     let document_result_helper = DocumentCipResultHelper::new(&frcs);
@@ -710,7 +713,7 @@ fn document_and_photo(
             .as_ref()
             .map(|p| (*p).leak().into())
             .map(|d| vec![d]),
-        document_type,
+        document_type: Some(dk.try_into()?),
         age_validation: CipResult::clear(over_18_check),
         data_comparison: data_comparison_overall,
         data_comparison_breakdown,

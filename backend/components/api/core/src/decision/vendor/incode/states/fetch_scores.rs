@@ -15,7 +15,6 @@ use crate::{
             VendorAPIError,
         },
     },
-    enclave_client::EnclaveClient,
     errors::{ApiResult, AssertionError},
     utils::vault_wrapper::{Any, EnclaveDecryptOperation, Pii, VaultWrapper},
     vendor_clients::IncodeClients,
@@ -48,10 +47,10 @@ use idv::{
 };
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataRequest, DecisionIntentKind,
-    DocumentDiKind, DocumentId, DocumentSide, Fingerprints, IncodeVerificationSessionId, PiiJsonValue,
-    ScopedVaultId, VendorAPI, VendorValidatedCountryCode, WorkflowId,
+    DocumentDiKind, DocumentSide, Fingerprints, IncodeVerificationSessionId, PiiJsonValue, VendorAPI,
+    VendorValidatedCountryCode,
 };
-use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
+use selfie_doc::compare::CompareFacesResponse;
 use tracing::Instrument;
 
 pub struct FetchScores {
@@ -262,30 +261,17 @@ impl IncodeStateTransition for FetchScores {
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn run_aws_rekognition(
+async fn run_aws_rekognition(
     db_pool: &DbPool,
     ctx: &IncodeContext,
 ) -> ApiResult<Option<(CompareFacesResponse, VerificationResult)>> {
-    let enclave_client = ctx.enclave_client.clone();
-    let pool = db_pool.clone();
+    let enclave_client = &ctx.enclave_client;
     let id_doc_id = ctx.id_doc_id.clone();
     let sv_id = ctx.sv_id.clone();
     let wf_id = ctx.wf_id.clone();
-    let aws_client = ctx.aws_selfie_client.clone();
+    let client = &ctx.aws_selfie_client;
 
-    // Run AWS selfie<>doc comparison in order to compare results
-    run_aws_inner(&pool, &enclave_client, aws_client, sv_id, wf_id, id_doc_id).await
-}
-
-async fn run_aws_inner(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-    client: AwsSelfieDocClient,
-    sv_id: ScopedVaultId,
-    wf_id: WorkflowId,
-    id_doc_id: DocumentId,
-) -> ApiResult<Option<(CompareFacesResponse, VerificationResult)>> {
-    let sv_id2 = sv_id.clone();
+    let sv_id2 = ctx.sv_id.clone();
     let (id_doc, vw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (id_doc, _) = Document::get(conn, &id_doc_id)?;
@@ -293,20 +279,14 @@ async fn run_aws_inner(
             Ok((id_doc, vw))
         })
         .await?;
+    let doc_kind = id_doc.document_type.try_into()?;
 
     // At this point, until we reach `Complete`, we have not vaulted the images under the DocumentKind::Image DIs
-    let doc_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentDiKind::LatestUpload(
-        id_doc.document_type,
-        DocumentSide::Front,
-    ))
-    .into();
-
+    let doc_id_op: EnclaveDecryptOperation =
+        DataIdentifier::Document(DocumentDiKind::LatestUpload(doc_kind, DocumentSide::Front)).into();
     // make this conditional
-    let selfie_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentDiKind::LatestUpload(
-        id_doc.document_type,
-        DocumentSide::Selfie,
-    ))
-    .into();
+    let selfie_id_op: EnclaveDecryptOperation =
+        DataIdentifier::Document(DocumentDiKind::LatestUpload(doc_kind, DocumentSide::Selfie)).into();
 
     let results = vw
         .fn_decrypt_unchecked_raw(enclave_client, vec![doc_id_op.clone(), selfie_id_op.clone()])

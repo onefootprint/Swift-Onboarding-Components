@@ -11,7 +11,7 @@ use db::{
 use itertools::Itertools;
 use macros::db_test;
 use newtypes::{
-    BusinessDataKind as BDK, DataIdentifier, DataLifetimeSource, DocumentDiKind, DocumentSide, DocumentKind,
+    BusinessDataKind as BDK, DataIdentifier, DataLifetimeSource, DocumentDiKind, DocumentSide, IdDocKind,
     IdentityDataKind as IDK, InvestorProfileKind as IPK, KvDataKey, PiiString, S3Url, SealedVaultBytes,
     VaultDataFormat,
 };
@@ -904,7 +904,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     let _ = uvw
         .put_document_unsafe(
             conn,
-            DocumentDiKind::Image(DocumentKind::DriversLicense, DocumentSide::Front).into(),
+            DocumentDiKind::Image(IdDocKind::DriversLicense, DocumentSide::Front).into(),
             "image/png".into(),
             "filename.png".into(),
             newtypes::SealedVaultDataKey(vec![0x01]),
@@ -939,7 +939,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
         custom_key1.into(),
         custom_key2.into(),
         // Assert identity doc DL is not portable
-        DocumentDiKind::Image(DocumentKind::DriversLicense, DocumentSide::Front).into(),
+        DocumentDiKind::Image(IdDocKind::DriversLicense, DocumentSide::Front).into(),
         IPK::AnnualIncome.into(),
         IPK::NetWorth.into(),
         IPK::InvestmentGoals.into(),

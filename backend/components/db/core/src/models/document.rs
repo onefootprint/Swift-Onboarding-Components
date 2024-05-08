@@ -10,8 +10,9 @@ use diesel::{
 use std::collections::HashMap;
 
 use newtypes::{
-    DataLifetimeSeqno, DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestId,
-    DocumentReviewStatus, DocumentScanDeviceType, DocumentStatus, IncodeVerificationSessionState,
+    CustomDocumentConfig, DataIdentifier, DataLifetimeSeqno, DocumentDiKind, DocumentFixtureResult,
+    DocumentId, DocumentKind, DocumentRequestConfig, DocumentRequestId, DocumentReviewStatus,
+    DocumentScanDeviceType, DocumentSide, DocumentStatus, IdDocKind, IncodeVerificationSessionState,
     InsightEventId, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, VendorValidatedCountryCode,
     WorkflowId,
 };
@@ -332,6 +333,24 @@ impl Document {
             .select(count_star())
             .get_result(conn)?;
         Ok(count)
+    }
+
+    /// Logic to extract the DI for a given Document row. It can be derived from GovtIssuedDocKinds,
+    /// but must be fetched from the DocumentRequestConfig for custom docs
+    pub fn identifier(&self, config: &DocumentRequestConfig, side: DocumentSide) -> DbResult<DataIdentifier> {
+        let from_doc_type = IdDocKind::try_from(self.document_type)
+            .ok()
+            .map(|k| DataIdentifier::from(DocumentDiKind::LatestUpload(k, side)));
+        let from_custom_type =
+            if let DocumentRequestConfig::Custom(CustomDocumentConfig { identifier, .. }) = config {
+                Some(identifier.clone())
+            } else {
+                None
+            };
+        let di = from_doc_type
+            .or(from_custom_type)
+            .ok_or(ValidationError("No document DI found"))?;
+        Ok(di)
     }
 }
 

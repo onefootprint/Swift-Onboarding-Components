@@ -140,6 +140,8 @@ pub enum Error {
     ParseIpAddrError(#[from] std::net::AddrParseError),
     #[error("{0}")]
     ValidationError(String),
+    #[error("{0}")]
+    AssertionError(String),
 }
 
 use std::collections::HashMap;

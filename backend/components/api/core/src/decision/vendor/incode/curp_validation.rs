@@ -21,9 +21,10 @@ use itertools::Itertools;
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, BillingEventKind, DataIdentifier, DataLifetimeSeqno,
     DataLifetimeSource, DataRequest, DecisionIntentId, DocumentDiKind, DocumentFixtureResult, DocumentId,
-    DocumentKind, DocumentRequestKind, Fingerprints, IncodeConfigurationId, IncodeEnvironment,
-    IncodeSessionId, IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode, OcrDataKind as ODK,
-    PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
+    DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind, IncodeConfigurationId,
+    IncodeEnvironment, IncodeSessionId, IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode,
+    OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey,
+    VendorAPI, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -84,8 +85,12 @@ pub async fn run_curp_validation_check(
     match should_sent_curp_request {
         Some(environment) => {
             // only consider documents sent to a vendor we we're actually sending curp requests
-            let id_doc = id_doc_helper.sent_to_vendor;
-            let (maybe_curp, iddoc) = get_curp_for_check(&state.enclave_client, &vw, id_doc.as_ref()).await?;
+            let doc = id_doc_helper.sent_to_vendor;
+            let (maybe_curp, iddoc) = get_curp_for_check(&state.enclave_client, &vw, doc.as_ref()).await?;
+            let doc_kind = iddoc
+                .vaulted_document_type
+                .unwrap_or(iddoc.document_type)
+                .try_into()?;
             let Some(curp) = maybe_curp else {
                 // Nothing to do here, we've already checked if it's the appropriate document type
                 return Ok(None);
@@ -142,7 +147,7 @@ pub async fn run_curp_validation_check(
             let is_live = matches!(environment, IncodeEnvironment::Production);
             let vault_data = pre_vault(
                 &state.enclave_client,
-                iddoc.vaulted_document_type.unwrap_or(iddoc.document_type),
+                doc_kind,
                 // TODO: fix this in upstack PR
                 raw_response.clone(),
                 is_live,
@@ -192,10 +197,13 @@ pub async fn run_curp_validation_check(
             Ok(Some(vendor_result))
         }
         None => {
-            let id_doc = id_doc_helper.identity_document_for_sandbox();
-            if let Some(doc) = id_doc {
-                let id_doc_kind = doc.vaulted_document_type.unwrap_or(doc.document_type);
-                let vendor_result = if id_doc_expects_curp(&doc) {
+            let doc = id_doc_helper.identity_document_for_sandbox();
+            if let Some(doc) = doc {
+                let doc_kind = doc
+                    .vaulted_document_type
+                    .unwrap_or(doc.document_type)
+                    .try_into()?;
+                let vendor_result = if doc_expects_curp(&doc) {
                     Some(
                         save_canned_response(
                             state,
@@ -204,7 +212,7 @@ pub async fn run_curp_validation_check(
                             vw.vault.public_key.clone(),
                             id_doc_fixture,
                             &tenant_id,
-                            id_doc_kind,
+                            doc_kind,
                             doc.id,
                         )
                         .await?,
@@ -313,15 +321,17 @@ async fn get_curp_for_check(
     vw: &VaultWrapper,
     id_document: Option<&Document>,
 ) -> ApiResult<(Option<PiiString>, Document)> {
-    if let Some(id_doc) = id_document {
-        let Some(vaulted_document_type) = id_doc.vaulted_document_type else {
-            return Ok((None, id_doc.clone()));
-        };
-
+    if let Some(doc) = id_document {
         // We only expect a CURP for voter ID now
-        if !id_doc_expects_curp(id_doc) {
-            return Ok((None, id_doc.clone()));
+        if !doc_expects_curp(doc) {
+            return Ok((None, doc.clone()));
         }
+        let Some(vaulted_document_type) = doc
+            .vaulted_document_type
+            .and_then(|t| IdDocKind::try_from(t).ok())
+        else {
+            return Ok((None, doc.clone()));
+        };
 
         let di = DataIdentifier::from(DocumentDiKind::OcrData(vaulted_document_type, ODK::Curp));
         // We should always get CURP on a voter ID
@@ -330,12 +340,12 @@ async fn get_curp_for_check(
         let decrypted_curp = if vw.get(&di).is_some() {
             vw.decrypt_unchecked_single(enclave_client, di).await?
         } else {
-            tracing::error!(id_doc=?id_doc.id, "{}", format!("missing curp for {:?}", id_doc.vaulted_document_type));
+            tracing::error!(doc=?doc.id, "{}", format!("missing curp for {:?}", doc.vaulted_document_type));
 
             None
         };
 
-        Ok((decrypted_curp, id_doc.clone()))
+        Ok((decrypted_curp, doc.clone()))
     } else {
         Err(ApiError::from(decision::Error::from(
             decision::CurpValidationError::NoDocumentFoundForWorkflow,
@@ -352,7 +362,7 @@ async fn save_canned_response(
     public_key: VaultPublicKey,
     identity_document_fixture: Option<DocumentFixtureResult>,
     tenant_id: &TenantId,
-    id_doc_kind: DocumentKind,
+    id_doc_kind: IdDocKind,
     id_doc_id: DocumentId,
 ) -> ApiResult<VendorResult> {
     let canned_res = match identity_document_fixture {
@@ -413,7 +423,7 @@ async fn save_canned_response(
 
 pub async fn pre_vault(
     enclave_client: &EnclaveClient,
-    id_doc_kind: DocumentKind,
+    id_doc_kind: IdDocKind,
     response: PiiJsonValue,
     is_live: bool,
     tenant_id: &TenantId,
@@ -442,12 +452,12 @@ pub fn vault_curp_response(
     Ok(result.seqno)
 }
 
-fn id_doc_expects_curp(id_doc: &Document) -> bool {
+fn doc_expects_curp(doc: &Document) -> bool {
     matches!(
-        id_doc.vaulted_document_type.unwrap_or(id_doc.document_type),
+        doc.vaulted_document_type.unwrap_or(doc.document_type),
         DocumentKind::VoterIdentification | DocumentKind::Passport
     ) && matches!(
-        id_doc.vendor_validated_country_code().map(|v| v.0),
+        doc.vendor_validated_country_code().map(|v| v.0),
         Some(Iso3166TwoDigitCountryCode::MX)
     )
 }

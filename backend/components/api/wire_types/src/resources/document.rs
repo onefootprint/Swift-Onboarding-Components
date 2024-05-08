@@ -1,7 +1,7 @@
 use crate::*;
 use newtypes::{
-    DataIdentifier, DataLifetimeSeqno, DocumentReviewStatus, DocumentScanDeviceType, DocumentSide, DocumentKind,
-    DocumentStatus,
+    DataIdentifier, DataLifetimeSeqno, DocumentKind, DocumentReviewStatus, DocumentScanDeviceType,
+    DocumentSide, DocumentStatus,
 };
 
 use serde_with::SerializeDisplay;

@@ -21,7 +21,7 @@ use db::{
 use macros::test_state_case;
 use newtypes::{
     CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentFixtureResult,
-    DocumentKind, DocumentSide, Iso3166TwoDigitCountryCode, PiiBytes, Selfie, WorkflowFixtureResult,
+    DocumentSide, IdDocKind, Iso3166TwoDigitCountryCode, PiiBytes, Selfie, WorkflowFixtureResult,
 };
 
 /// Test we require consent, or we'll error uploading a side
@@ -53,7 +53,7 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
 
     let id_doc_req = CreateDocumentRequest {
         request_id: Some(dr.id),
-        document_type: DocumentKind::DriversLicense,
+        document_type: IdDocKind::DriversLicense.into(),
         country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,
@@ -132,7 +132,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     let obc_opts = ObConfigurationOpts {
         // restrict to DL
         must_collect_data: vec![CollectedDataOption::Document(DocumentCdoInfo(
-            DocTypeRestriction::Restrict(vec![DocumentKind::DriversLicense]),
+            DocTypeRestriction::Restrict(vec![IdDocKind::DriversLicense]),
             CountryRestriction::None,
             Selfie::None,
         ))],
@@ -153,7 +153,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     //
     let id_doc_req = CreateDocumentRequest {
         request_id: Some(dr.id.clone()),
-        document_type: DocumentKind::Passport,
+        document_type: IdDocKind::Passport.into(),
         country_code: Some(Iso3166TwoDigitCountryCode::US),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,
@@ -181,7 +181,7 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     //
     let id_doc_req = CreateDocumentRequest {
         request_id: Some(dr.id.clone()),
-        document_type: DocumentKind::DriversLicense,
+        document_type: IdDocKind::DriversLicense.into(),
         country_code: Some(Iso3166TwoDigitCountryCode::ZA),
         fixture_result: user_kind.identity_doc_fixture(),
         skip_selfie: None,

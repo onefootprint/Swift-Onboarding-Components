@@ -1,5 +1,5 @@
 use crate::{
-    AliasId, CollectedData, DataIdentifier, DocumentKind, DocumentSide, IsDataIdentifierDiscriminant,
+    AliasId, CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant,
     StorageType,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -28,28 +28,28 @@ pub enum DocumentDiKind {
     /// represents the verified image for a document
     /// document.[doc_kind].[side].image
     #[strum_discriminants(strum(to_string = "image"))]
-    Image(DocumentKind, DocumentSide),
+    Image(IdDocKind, DocumentSide),
     /// represents the mime type of a document
     /// document.[doc_kind].[side].mime_type
     #[strum_discriminants(strum(to_string = "mime_type"))]
-    MimeType(DocumentKind, DocumentSide),
+    MimeType(IdDocKind, DocumentSide),
 
     /// represents the latest upload of a document
     /// document.[doc_kind].[side].latest_upload - TODO one day latest_upload_mime_type?
     #[strum_discriminants(strum(to_string = "latest_upload"))]
-    LatestUpload(DocumentKind, DocumentSide),
+    LatestUpload(IdDocKind, DocumentSide),
 
     /// represents barcodes capture on this side of the document
     /// document.[doc_kind].[side].barcodes
     #[strum_discriminants(strum(to_string = "barcodes"))]
-    Barcodes(DocumentKind, DocumentSide),
+    Barcodes(IdDocKind, DocumentSide),
+
+    /// Extracted OCR information from the image
+    OcrData(IdDocKind, OcrDataKind),
 
     /// Letter signed by a compliance officer granting permission to carry an account, required by FINFRA rules in certain cases
     #[strum_discriminants(strum(to_string = "finra_compliance_letter"))]
     FinraComplianceLetter,
-
-    /// Extracted OCR information from the image
-    OcrData(DocumentKind, OcrDataKind),
 
     /// Custom document
     #[strum_discriminants(strum(to_string = "custom"))]
@@ -138,7 +138,7 @@ impl DocumentDiKind {
         }
     }
 
-    pub fn from_id_doc_kind(kind: DocumentKind, side: DocumentSide) -> Self {
+    pub fn from_id_doc_kind(kind: IdDocKind, side: DocumentSide) -> Self {
         Self::Image(kind, side)
     }
 }
@@ -159,7 +159,7 @@ impl DocumentDiKind {
 
 impl DocumentDiKind {
     pub fn searchable() -> Vec<Self> {
-        DocumentKind::iter()
+        IdDocKind::iter()
             .map(|k| Self::OcrData(k, OcrDataKind::DocumentNumber))
             .collect()
     }
@@ -176,10 +176,10 @@ impl std::str::FromStr for DocumentDiKind {
         let suffix = parts.last().ok_or(strum::ParseError::VariantNotFound)?;
         let variant = DocumentKindDiscriminant::from_str(suffix);
 
-        let get_parts = || -> Result<(DocumentKind, DocumentSide), _> {
+        let get_parts = || -> Result<(IdDocKind, DocumentSide), _> {
             let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
             let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
-            let prefix = DocumentKind::from_str(prefix)?;
+            let prefix = IdDocKind::from_str(prefix)?;
             let suffix = DocumentSide::from_str(suffix)?;
             Ok((prefix, suffix))
         };
@@ -216,7 +216,7 @@ impl std::str::FromStr for DocumentDiKind {
         // Ocr data
         let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
         let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
-        if let Ok(prefix) = DocumentKind::from_str(prefix) {
+        if let Ok(prefix) = IdDocKind::from_str(prefix) {
             if let Ok(suffix) = OcrDataKind::from_str(suffix) {
                 return Ok(Self::OcrData(prefix, suffix));
             }
@@ -261,15 +261,14 @@ impl std::fmt::Display for DocumentDiKind {
 impl DocumentDiKind {
     /// Enumerate all possible DIs for DocumentKind that we'll display in API docs
     pub fn api_examples() -> Vec<Self> {
-        let id_doc_types = DocumentKind::iter()
-            .filter(|d| d != &DocumentKind::Custom)
-            .flat_map(|k| {
-                // Purposefully omitting LatestUpload here
-                let image_types =
-                    DocumentSide::iter().flat_map(move |s| vec![Self::Image(k, s), Self::MimeType(k, s)]);
-                let ocr_types = OcrDataKind::iter().map(move |dk| Self::OcrData(k, dk));
-                image_types.chain(ocr_types)
-            });
+        let id_doc_types = IdDocKind::iter().flat_map(|k| {
+            // Purposefully omitting LatestUpload here
+            let image_types =
+                DocumentSide::iter().flat_map(move |s| vec![Self::Image(k, s), Self::MimeType(k, s)]);
+            let ocr_types = OcrDataKind::iter().map(move |dk| Self::OcrData(k, dk));
+            image_types.chain(ocr_types)
+        });
+        // TODO proof of SSN and proof of address
         let simple_types = vec![Self::FinraComplianceLetter, Self::Custom(AliasId::fixture())];
         id_doc_types.chain(simple_types).collect()
     }

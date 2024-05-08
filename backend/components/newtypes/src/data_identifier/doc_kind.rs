@@ -27,7 +27,43 @@ use crate::{DocumentRequestKind, DocumentSide, OcrDataKind as ODK};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
+/// The set of values we can use for identity_document.document_type
 pub enum DocumentKind {
+    IdCard,
+    DriversLicense,
+    Passport,
+    PassportCard,
+    Permit,
+    Visa,
+    ResidenceDocument,
+    VoterIdentification,
+    SsnCard,
+    ProofOfAddress,
+    Custom,
+}
+
+crate::util::impl_enum_string_diesel!(DocumentKind);
+
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Eq,
+    PartialEq,
+    Hash,
+    DeserializeFromStr,
+    SerializeDisplay,
+    EnumString,
+    Apiv2Schema,
+    EnumIter,
+    macros::SerdeAttr,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+/// This is the set of document kinds that are verifiable with incode. They are govt-issued docs,
+/// and they all support having a selfie uploaded alongside them.
+pub enum IdDocKind {
     IdCard,
     DriversLicense,
     Passport,
@@ -44,11 +80,52 @@ pub enum DocumentKind {
     //
 
     // Proof of ssn
+    // TODO these don't necessarily belong here?
     SsnCard,
-    // Proof of address
     ProofOfAddress,
-    Custom,
 }
+
+
+impl TryFrom<DocumentKind> for IdDocKind {
+    type Error = crate::Error;
+
+    fn try_from(value: DocumentKind) -> Result<Self, Self::Error> {
+        match value {
+            DocumentKind::IdCard => Ok(IdDocKind::IdCard),
+            DocumentKind::DriversLicense => Ok(IdDocKind::DriversLicense),
+            DocumentKind::Passport => Ok(IdDocKind::Passport),
+            DocumentKind::PassportCard => Ok(IdDocKind::PassportCard),
+            DocumentKind::Permit => Ok(IdDocKind::Permit),
+            DocumentKind::Visa => Ok(IdDocKind::Visa),
+            DocumentKind::ResidenceDocument => Ok(IdDocKind::ResidenceDocument),
+            DocumentKind::VoterIdentification => Ok(IdDocKind::VoterIdentification),
+            DocumentKind::SsnCard => Ok(IdDocKind::SsnCard),
+            DocumentKind::ProofOfAddress => Ok(IdDocKind::ProofOfAddress),
+            DocumentKind::Custom => Err(crate::Error::AssertionError(
+                "Cannot map into GovtIssuedDocKind".into(),
+            )),
+        }
+    }
+}
+
+// TODO rm?
+impl From<IdDocKind> for DocumentKind {
+    fn from(value: IdDocKind) -> Self {
+        match value {
+            IdDocKind::IdCard => DocumentKind::IdCard,
+            IdDocKind::DriversLicense => DocumentKind::DriversLicense,
+            IdDocKind::Passport => DocumentKind::Passport,
+            IdDocKind::PassportCard => DocumentKind::PassportCard,
+            IdDocKind::Permit => DocumentKind::Permit,
+            IdDocKind::Visa => DocumentKind::Visa,
+            IdDocKind::ResidenceDocument => DocumentKind::ResidenceDocument,
+            IdDocKind::VoterIdentification => DocumentKind::VoterIdentification,
+            IdDocKind::SsnCard => DocumentKind::SsnCard,
+            IdDocKind::ProofOfAddress => DocumentKind::ProofOfAddress,
+        }
+    }
+}
+
 
 impl From<DocumentKind> for DocumentRequestKind {
     fn from(value: DocumentKind) -> Self {
@@ -68,8 +145,6 @@ impl From<DocumentKind> for DocumentRequestKind {
     }
 }
 
-crate::util::impl_enum_string_diesel!(DocumentKind);
-
 impl DocumentKind {
     pub fn sides(&self) -> Vec<DocumentSide> {
         match self {
@@ -88,51 +163,43 @@ impl DocumentKind {
             Self::Custom => vec![DocumentSide::Front],
         }
     }
+}
 
-    pub fn front_only(&self) -> bool {
-        self.sides() == vec![DocumentSide::Front]
-    }
-
-    pub fn identity_docs() -> Vec<DocumentKind> {
-        DocumentKind::iter()
-            .filter(|id| DocumentRequestKind::from(*id) == DocumentRequestKind::Identity)
-            .collect()
-    }
-
-    pub fn proof_of_address_docs() -> Vec<DocumentKind> {
-        DocumentKind::iter()
-            .filter(|id| DocumentRequestKind::from(*id) == DocumentRequestKind::ProofOfAddress)
+impl IdDocKind {
+    // TODO rm?
+    pub fn identity_docs() -> Vec<IdDocKind> {
+        IdDocKind::iter()
+            .filter(|id| DocumentRequestKind::from(DocumentKind::from(*id)) == DocumentRequestKind::Identity)
             .collect()
     }
 
     // Given the type of document, what are the expected/critical fields we expect to parse from that doc. If we don't parse (or have a very low confidence score)
     // for one of these for a given doc, then we should produce the DocumentOcrNotSuccessful risk signal as a way to indicate to users/rules this
-    pub fn expected_ciritical_ocr_data_kinds(&self) -> Vec<ODK> {
+    pub fn expected_critical_ocr_data_kinds(&self) -> Vec<ODK> {
         match self {
-            DocumentKind::IdCard => vec![ODK::FullName],
-            DocumentKind::DriversLicense => vec![
+            IdDocKind::IdCard => vec![ODK::FullName],
+            IdDocKind::DriversLicense => vec![
                 ODK::FullName,
                 ODK::Dob,
                 ODK::FullAddress,
                 ODK::DocumentNumber,
                 ODK::ExpiresAt,
             ], // TODO: should Gender, IssuedAt be here too? These seem less "critical" but are still present
-            DocumentKind::Passport => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passports out there and stuff like DOB is def not ubiquitous
-            DocumentKind::PassportCard => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passport cards out there and stuff like DOB is def not ubiquitous
-            DocumentKind::Permit => vec![
+            IdDocKind::Passport => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passports out there and stuff like DOB is def not ubiquitous
+            IdDocKind::PassportCard => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passport cards out there and stuff like DOB is def not ubiquitous
+            IdDocKind::Permit => vec![
                 ODK::FullName,
                 ODK::Dob,
                 ODK::FullAddress,
                 ODK::DocumentNumber,
                 ODK::ExpiresAt,
             ],
-            DocumentKind::Visa => vec![ODK::FullName],
-            DocumentKind::ResidenceDocument => vec![ODK::FullName],
-            DocumentKind::VoterIdentification => vec![ODK::FullName],
+            IdDocKind::Visa => vec![ODK::FullName],
+            IdDocKind::ResidenceDocument => vec![ODK::FullName],
+            IdDocKind::VoterIdentification => vec![ODK::FullName],
             // In actuality, We don't parse anything from these.
-            DocumentKind::SsnCard => vec![],
-            DocumentKind::ProofOfAddress => vec![],
-            DocumentKind::Custom => vec![],
+            IdDocKind::SsnCard => vec![],
+            IdDocKind::ProofOfAddress => vec![],
         }
     }
 }

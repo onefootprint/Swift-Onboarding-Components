@@ -1,6 +1,6 @@
-use crate::models::ob_configuration::ObConfiguration;
 use crate::{
     diesel::RunQueryDsl,
+    models::ob_configuration::ObConfiguration,
     test_helpers::assert_have_same_elements,
     tests::{fixtures, fixtures::ob_configuration::ObConfigurationOpts, prelude::*},
 };
@@ -8,7 +8,7 @@ use chrono::Utc;
 use macros::db_test;
 use newtypes::{
     AdverseMediaListKind, ApiKeyStatus, CipKind, CollectedDataOption, CountrySpecificDocumentMapping,
-    DocumentAndCountryConfiguration, DocumentCdoInfo, EnhancedAmlOption, DocumentKind,
+    DocumentAndCountryConfiguration, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
     Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId,
 };
 use std::{collections::HashMap, str::FromStr};
@@ -154,12 +154,12 @@ fn test_supported_country_mapping_us_only(residential_country: Option<Iso3166Two
     // US has the 3 documents indicated
     assert_eq!(
         mapping.get(&Iso3166TwoDigitCountryCode::US).cloned().unwrap(),
-        vec![DocumentKind::DriversLicense, DocumentKind::Passport, DocumentKind::IdCard]
+        vec![IdDocKind::DriversLicense, IdDocKind::Passport, IdDocKind::IdCard]
     );
     // we also allow a passport from any country
     Iso3166TwoDigitCountryCode::iter()
         .filter(|c| !c.is_us_including_territories())
-        .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![DocumentKind::Passport]))
+        .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
 }
 
 #[test]
@@ -175,16 +175,16 @@ fn test_supported_country_mapping_override_for_coba() {
         .filter(|c| *c != Iso3166TwoDigitCountryCode::MX)
         .for_each(|c| {
             let supported = obc.supported_country_mapping_for_document(Some(c));
-            assert_eq!(supported.get(&c).cloned().unwrap(), vec![DocumentKind::Passport])
+            assert_eq!(supported.get(&c).cloned().unwrap(), vec![IdDocKind::Passport])
         });
 
     let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
     assert_have_same_elements(
         supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
         vec![
-            DocumentKind::Passport,
-            DocumentKind::DriversLicense,
-            DocumentKind::VoterIdentification,
+            IdDocKind::Passport,
+            IdDocKind::DriversLicense,
+            IdDocKind::VoterIdentification,
         ],
     );
     // Second form of ID: Mexican Resident Card
@@ -202,13 +202,13 @@ fn test_supported_country_mapping_override_for_coba() {
             .get(&Iso3166TwoDigitCountryCode::MX)
             .cloned()
             .unwrap(),
-        vec![DocumentKind::ResidenceDocument],
+        vec![IdDocKind::ResidenceDocument],
     );
 
     let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
     assert_have_same_elements(
         supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
-        vec![DocumentKind::ResidenceDocument],
+        vec![IdDocKind::ResidenceDocument],
     );
 
     // Second form of ID: Any additional document (voters ID, drivers license, etc)
@@ -227,11 +227,11 @@ fn test_supported_country_mapping_override_for_coba() {
             .cloned()
             .unwrap(),
         vec![
-            DocumentKind::ResidenceDocument,
-            DocumentKind::DriversLicense,
-            DocumentKind::Visa,
-            DocumentKind::VoterIdentification,
-            DocumentKind::IdCard,
+            IdDocKind::ResidenceDocument,
+            IdDocKind::DriversLicense,
+            IdDocKind::Visa,
+            IdDocKind::VoterIdentification,
+            IdDocKind::IdCard,
         ],
     );
 
@@ -239,11 +239,11 @@ fn test_supported_country_mapping_override_for_coba() {
     assert_have_same_elements(
         supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
         vec![
-            DocumentKind::ResidenceDocument,
-            DocumentKind::DriversLicense,
-            DocumentKind::Visa,
-            DocumentKind::VoterIdentification,
-            DocumentKind::IdCard,
+            IdDocKind::ResidenceDocument,
+            IdDocKind::DriversLicense,
+            IdDocKind::Visa,
+            IdDocKind::VoterIdentification,
+            IdDocKind::IdCard,
         ],
     );
 
@@ -262,13 +262,13 @@ fn test_supported_country_mapping_override_for_coba() {
             .get(&Iso3166TwoDigitCountryCode::MX)
             .cloned()
             .unwrap(),
-        vec![DocumentKind::DriversLicense],
+        vec![IdDocKind::DriversLicense],
     );
 
     let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
     assert_have_same_elements(
         supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
-        vec![DocumentKind::DriversLicense],
+        vec![IdDocKind::DriversLicense],
     )
 }
 
@@ -322,13 +322,13 @@ fn test_supported_country_mapping_allow_international(
             if is_us {
                 assert_eq!(
                     mapping.get(&Iso3166TwoDigitCountryCode::US).cloned().unwrap(),
-                    vec![DocumentKind::DriversLicense, DocumentKind::Passport]
+                    vec![IdDocKind::DriversLicense, IdDocKind::Passport]
                 );
             } else {
                 // country is !US, we only can submit US passports
                 assert_eq!(
                     mapping.get(&Iso3166TwoDigitCountryCode::US).cloned().unwrap(),
-                    vec![DocumentKind::Passport]
+                    vec![IdDocKind::Passport]
                 );
             }
         }
@@ -336,7 +336,7 @@ fn test_supported_country_mapping_allow_international(
         None => {
             assert_eq!(
                 mapping.get(&Iso3166TwoDigitCountryCode::US).cloned().unwrap(),
-                vec![DocumentKind::DriversLicense, DocumentKind::Passport]
+                vec![IdDocKind::DriversLicense, IdDocKind::Passport]
             );
         }
     }
@@ -344,14 +344,14 @@ fn test_supported_country_mapping_allow_international(
     // in all cases, non-US can just upload passport
     Iso3166TwoDigitCountryCode::iter()
         .filter(|c| !c.is_us_including_territories())
-        .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![DocumentKind::Passport]))
+        .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
 }
 
-#[test_case(Some("document.passport.none.none") => Some(vec![DocumentKind::Passport]))]
-#[test_case(Some("document.passport,drivers_license.none.none") => Some(vec![DocumentKind::Passport, DocumentKind::DriversLicense]))]
+#[test_case(Some("document.passport.none.none") => Some(vec![IdDocKind::Passport]))]
+#[test_case(Some("document.passport,drivers_license.none.none") => Some(vec![IdDocKind::Passport, IdDocKind::DriversLicense]))]
 #[test_case(None => None)]
 #[test_case(Some("full_address") => None)] // obc will fail when getting created anyways
-fn test_doc_scan_for_optional_ssn(cdo: Option<&str>) -> Option<Vec<DocumentKind>> {
+fn test_doc_scan_for_optional_ssn(cdo: Option<&str>) -> Option<Vec<IdDocKind>> {
     let obc = ObConfiguration {
         id: ObConfigurationId::from_str("1234").unwrap(),
         key: ObConfigurationKey::from_str("obk1").unwrap(),
@@ -437,25 +437,25 @@ fn test_cip_kind_documents(cip: Option<CipKind>, residential_country: Option<Iso
                     assert!(mapping.keys().len() == 2);
                     assert_eq!(
                         mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
-                        vec![DocumentKind::DriversLicense, DocumentKind::IdCard,]
+                        vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
                     );
                     assert_eq!(
                         mapping.get(&country).unwrap().clone(),
-                        vec![DocumentKind::DriversLicense, DocumentKind::IdCard,]
+                        vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
                     );
                 }
                 Some(_) => {
                     assert!(mapping.keys().len() == 1);
                     assert_eq!(
                         mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
-                        vec![DocumentKind::DriversLicense, DocumentKind::IdCard,]
+                        vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
                     );
                 }
                 None => {
                     assert!(mapping.keys().len() == 1);
                     assert_eq!(
                         mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
-                        vec![DocumentKind::DriversLicense, DocumentKind::IdCard,]
+                        vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
                     );
                 }
             },
@@ -470,7 +470,7 @@ fn test_cip_kind_documents(cip: Option<CipKind>, residential_country: Option<Iso
 fn test_document_types_and_countries() {
     let supported = CountrySpecificDocumentMapping(HashMap::from_iter(vec![(
         Iso3166TwoDigitCountryCode::CA,
-        vec![DocumentKind::DriversLicense],
+        vec![IdDocKind::DriversLicense],
     )]));
     let doc_config = DocumentAndCountryConfiguration {
         global: vec![],
@@ -516,7 +516,7 @@ fn test_document_types_and_countries() {
     assert_eq!(mapping.keys().len(), 1);
     assert_eq!(
         mapping.get(&Iso3166TwoDigitCountryCode::CA).unwrap().clone(),
-        vec![DocumentKind::DriversLicense]
+        vec![IdDocKind::DriversLicense]
     );
 }
 
@@ -524,7 +524,7 @@ fn test_document_types_and_countries() {
 fn test_document_and_countries_field_with_cip_kind() {
     let supported = CountrySpecificDocumentMapping(HashMap::from_iter(vec![(
         Iso3166TwoDigitCountryCode::PR,
-        vec![DocumentKind::Visa],
+        vec![IdDocKind::Visa],
     )]));
     let doc_config = DocumentAndCountryConfiguration {
         global: vec![],
@@ -573,7 +573,7 @@ fn test_document_and_countries_field_with_cip_kind() {
     // we respect alpaca overrides
     assert_eq!(
         mapping.get(&Iso3166TwoDigitCountryCode::PR).unwrap().clone(),
-        vec![DocumentKind::DriversLicense, DocumentKind::IdCard]
+        vec![IdDocKind::DriversLicense, IdDocKind::IdCard]
     );
 }
 
@@ -647,11 +647,11 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
 pub fn test_document_and_countries_roundtrip(conn: &mut TestPgConn) {
     let t = fixtures::tenant::create(conn);
     let supported = CountrySpecificDocumentMapping(HashMap::from_iter(vec![
-        (Iso3166TwoDigitCountryCode::CA, vec![DocumentKind::DriversLicense]),
-        (Iso3166TwoDigitCountryCode::MX, vec![DocumentKind::DriversLicense]),
+        (Iso3166TwoDigitCountryCode::CA, vec![IdDocKind::DriversLicense]),
+        (Iso3166TwoDigitCountryCode::MX, vec![IdDocKind::DriversLicense]),
     ]));
     let document_types_and_countries = Some(DocumentAndCountryConfiguration {
-        global: vec![DocumentKind::Passport],
+        global: vec![IdDocKind::Passport],
         country_specific: supported,
     });
 

@@ -8,6 +8,7 @@ use api_core::{
     errors::ApiResult,
     types::JsonApiResponse,
     utils::{
+        db2api::TryDbToApi,
         fp_id_path::FpIdPath,
         vault_wrapper::{Any, TenantVw, VaultWrapper},
     },
@@ -84,8 +85,8 @@ pub async fn get(
                     // bifrost-uploaded document...
                     match di {
                         DataIdentifier::Document(DocumentDiKind::LatestUpload(kind, side)) => {
-                            let already_contains = id_docs.iter().any(|d| d.0.document_type == kind);
-                            (!already_contains).then_some((kind, (side, dl)))
+                            let already_contains = id_docs.iter().any(|d| d.0.document_type == kind.into());
+                            (!already_contains).then_some((kind.into(), (side, dl)))
                         }
                         DataIdentifier::Document(DocumentDiKind::Custom(_)) => {
                             let already_contains = custom_dis.iter().any(|i| **i == di);
@@ -101,7 +102,10 @@ pub async fn get(
         .await?;
 
     let response = chain(
-        id_docs.into_iter().map(api_wire_types::Document::from_db),
+        id_docs
+            .into_iter()
+            .map(api_wire_types::Document::try_from_db)
+            .collect::<ApiResult<Vec<_>>>()?,
         api_docs.into_iter().map(api_wire_types::Document::from_db),
     )
     .collect::<Vec<_>>();

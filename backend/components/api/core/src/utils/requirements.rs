@@ -509,8 +509,8 @@ fn get_requirement_inner(
         OnboardingRequirementKind::Authorize => {
             let (document_types, skipped_selfie) = if obc.can_access_document() {
                 // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-                let id_docs = Document::list_by_wf_id(conn, &wf.id)?;
-                let doc_types = id_docs
+                let docs = Document::list_by_wf_id(conn, &wf.id)?;
+                let doc_types = docs
                         .iter()
                         // check we've actually completed the document, it's not just an empty id doc
                         // TODO: maybe we should revisit this empty ID doc shell design?
@@ -518,7 +518,7 @@ fn get_requirement_inner(
                         .unique()
                         .collect();
                 // unless all were skipped, we need to authorize since we may have collected it
-                let selfie_skipped = id_docs.iter().all(|(id, _)| id.should_skip_selfie());
+                let selfie_skipped = docs.iter().all(|(id, _)| id.should_skip_selfie());
                 (doc_types, selfie_skipped)
             } else {
                 (vec![], false)

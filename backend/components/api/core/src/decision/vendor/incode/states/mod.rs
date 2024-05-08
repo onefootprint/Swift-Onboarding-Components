@@ -59,9 +59,10 @@ use crate::{
 };
 use db::models::verification_result::{NewVerificationResult, VerificationResult};
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, DocumentKind, IncodeFailureReason,
-    IncodeVerificationSessionId, IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode,
-    Iso3166TwoDigitCountryCode, ScopedVaultId, ScrubbedPiiString, TenantId, VendorAPI, WorkflowId,
+    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, IdDocKind,
+    IncodeFailureReason, IncodeVerificationSessionId, IncodeVerificationSessionKind,
+    Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, ScopedVaultId, ScrubbedPiiString, TenantId,
+    VendorAPI, WorkflowId,
 };
 
 #[derive(Clone)]
@@ -70,7 +71,7 @@ pub struct VerificationSession {
     pub kind: IncodeVerificationSessionKind,
     pub credentials: IncodeCredentialsWithToken,
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
-    pub document_type: DocumentKind,
+    pub document_type: IdDocKind,
     pub hard_errored: bool,
 }
 
@@ -108,11 +109,12 @@ pub async fn save_incode_fixtures(
     } else {
         None
     };
+    let doc_type = id_doc.document_type.try_into()?;
     let uv_public_key = vw.vault.public_key.clone();
     let fixture_opts: Option<IncodeOcrFixtureResponseFields> =
         ocr_comparison_fields.clone().map(|o| o.into());
-    let fixture_opts = fixture_opts.map(|f| f.set_doc_kind_fields(id_doc.document_type)); // meh, will clean up when writing more rust tests simulating incode responses
-                                                                                          // Save OCR
+    let fixture_opts = fixture_opts.map(|f| f.set_doc_kind_fields(doc_type)); // meh, will clean up when writing more rust tests simulating incode responses
+                                                                              // Save OCR
     let raw_ocr_response = FetchOCRResponse::fixture_response(fixture_opts);
     let ocr_response: FetchOCRResponse = serde_json::from_value(raw_ocr_response.clone())?;
     let e_ocr_response = vendor::verification_result::encrypt_verification_result_response(
@@ -175,7 +177,7 @@ pub async fn save_incode_fixtures(
     let args = PreCompleteArgs {
         obc: &obc,
         id_doc: &id_doc,
-        dk: ValidatedIdDocKind(id_doc.document_type),
+        dk: ValidatedIdDocKind(doc_type),
         vw: &vw,
         expect_selfie: should_collect_selfie,
         fetch_ocr_response: &ocr_response,
@@ -195,7 +197,7 @@ pub async fn save_incode_fixtures(
                 vault: &vw.vault,
                 sv_id: &suid,
                 id_doc_id: &id_doc.id,
-                dk: ValidatedIdDocKind::new_for_fixture(id_doc.document_type),
+                dk: ValidatedIdDocKind::new_for_fixture(doc_type),
                 ocr_data,
                 score_response,
                 rs,
@@ -216,13 +218,13 @@ pub async fn save_incode_fixtures(
 // Struct that represents a document kind that has been validated as the type indicated by a vendor, in this case incode
 // For example, we don't want to be vaulting something as a Passport that is in fact, a driver's license
 #[derive(Clone, Copy)]
-pub struct ValidatedIdDocKind(DocumentKind);
+pub struct ValidatedIdDocKind(IdDocKind);
 impl ValidatedIdDocKind {
-    pub fn into_inner(self) -> DocumentKind {
+    pub fn into_inner(self) -> IdDocKind {
         self.0
     }
 
-    pub fn new_for_fixture(id_doc_kind: DocumentKind) -> Self {
+    pub fn new_for_fixture(id_doc_kind: IdDocKind) -> Self {
         Self(id_doc_kind)
     }
 }
@@ -253,7 +255,7 @@ fn parse_type_of_id(
     let Some(type_of_id) = type_of_id else {
         return Ok(Err(IncodeFailureReason::UnknownDocumentType));
     };
-    let Ok(id_doc_kind) = DocumentKind::try_from((type_of_id, document_sub_type)) else {
+    let Ok(id_doc_kind) = IdDocKind::try_from((type_of_id, document_sub_type)) else {
         return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
     };
     if id_doc_kind != expected_doc_type
@@ -273,7 +275,7 @@ fn parse_type_of_id(
         return Ok(Err(IncodeFailureReason::UnknownCountryCode));
     };
 
-    if expected_country != provided_country && id_doc_kind != DocumentKind::Passport {
+    if expected_country != provided_country && id_doc_kind != IdDocKind::Passport {
         // TODO: maybe also check if here expected_country is allowed by OBC?
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }

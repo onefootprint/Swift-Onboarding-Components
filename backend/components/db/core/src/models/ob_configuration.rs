@@ -10,7 +10,7 @@ use itertools::Itertools;
 use newtypes::{
     ApiKeyStatus, AppearanceId, AuthMethodKind, CipKind, CollectedDataOption as CDO,
     DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo,
-    DocumentRequestConfig, EnhancedAmlOption, DocumentKind, Iso3166TwoDigitCountryCode, Locked,
+    DocumentRequestConfig, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, Locked,
     ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
     SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
 };
@@ -76,7 +76,7 @@ impl ObConfiguration {
             match cip {
                 CipKind::Alpaca => {
                     // In the general case, we need to accept a document that might have address
-                    let alpaca_doc_types = vec![DocumentKind::DriversLicense, DocumentKind::IdCard];
+                    let alpaca_doc_types = vec![IdDocKind::DriversLicense, IdDocKind::IdCard];
                     // Alpaca supports territories: https://www.notion.so/onefootprint/Alpaca-US-Territory-31c04ec7d2b64cc5ad9cbbde0c026af2?pvs=4
                     // Allow docs from 1) the US or 2) from the territory the person said they were living in
                     let alpaca_allowed_countries: Vec<Iso3166TwoDigitCountryCode> = vec![
@@ -113,16 +113,16 @@ impl ObConfiguration {
         {
             kinds
         } else {
-            DocumentKind::identity_docs()
+            IdDocKind::identity_docs()
         };
 
         let doc_country_mapping_helper = self.get_supported_country_struct();
 
         // For each id doc kind configured, compute which countries we support
-        let countries_and_doc_types: Vec<(Iso3166TwoDigitCountryCode, DocumentKind)> = id_doc_kinds
+        let countries_and_doc_types: Vec<(Iso3166TwoDigitCountryCode, IdDocKind)> = id_doc_kinds
             .into_iter()
             .flat_map(|doc_type| {
-                let out: Vec<(Iso3166TwoDigitCountryCode, DocumentKind)> = doc_country_mapping_helper
+                let out: Vec<(Iso3166TwoDigitCountryCode, IdDocKind)> = doc_country_mapping_helper
                     .supported_countries_for_doc_type(doc_type)
                     .into_iter()
                     .map(|c| (c, doc_type))
@@ -132,10 +132,10 @@ impl ObConfiguration {
             })
             .collect();
 
-        let map: HashMap<Iso3166TwoDigitCountryCode, Vec<DocumentKind>> = countries_and_doc_types
+        let map: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>> = countries_and_doc_types
             .into_iter()
             .fold(HashMap::new(), |mut acc: HashMap<_, _>, (country, doc_type)| {
-                let is_passport = doc_type == DocumentKind::Passport;
+                let is_passport = doc_type == IdDocKind::Passport;
                 // Don't allow non-passport if we are displaying possible document types for an international residential address
                 //   - This is the case _even if the person has a US document type that would have been supported had they been living in the US_
                 //
@@ -209,11 +209,11 @@ impl ObConfiguration {
         }
     }
 
-    pub fn restricted_id_doc_kinds(&self) -> Option<Vec<DocumentKind>> {
+    pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
         self.document_cdo().and_then(|cdo| cdo.restricted_id_doc_kinds())
     }
 
-    pub fn optional_ssn_restricted_id_doc_kinds(&self) -> Option<Vec<DocumentKind>> {
+    pub fn optional_ssn_restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
         self.document_cdo_for_optional_ssn()
             .and_then(|cdo| cdo.restricted_id_doc_kinds())
     }
@@ -245,24 +245,29 @@ impl ObConfiguration {
 }
 
 trait SupportedCountriesForDocType {
-    fn supported_countries_for_doc_type(&self, doc_type: DocumentKind) -> Vec<Iso3166TwoDigitCountryCode>;
+    fn supported_countries_for_doc_type(
+        &self,
+        doc_type: IdDocKind,
+    ) -> Vec<Iso3166TwoDigitCountryCode>;
     fn is_override(&self) -> bool;
 }
 struct Findigs;
 impl SupportedCountriesForDocType for Findigs {
-    fn supported_countries_for_doc_type(&self, doc_type: DocumentKind) -> Vec<Iso3166TwoDigitCountryCode> {
+    fn supported_countries_for_doc_type(
+        &self,
+        doc_type: IdDocKind,
+    ) -> Vec<Iso3166TwoDigitCountryCode> {
         match doc_type {
-            DocumentKind::IdCard => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::DriversLicense => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::PassportCard => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
-            DocumentKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
-            DocumentKind::VoterIdentification => vec![],
-            DocumentKind::SsnCard => vec![],
-            DocumentKind::ProofOfAddress => vec![],
-            DocumentKind::Custom => vec![],
+            IdDocKind::IdCard => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::DriversLicense => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::PassportCard => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::VoterIdentification => vec![],
+            IdDocKind::SsnCard => vec![],
+            IdDocKind::ProofOfAddress => vec![],
         }
     }
 
@@ -272,19 +277,21 @@ impl SupportedCountriesForDocType for Findigs {
 }
 struct Coba;
 impl SupportedCountriesForDocType for Coba {
-    fn supported_countries_for_doc_type(&self, doc_type: DocumentKind) -> Vec<Iso3166TwoDigitCountryCode> {
+    fn supported_countries_for_doc_type(
+        &self,
+        doc_type: IdDocKind,
+    ) -> Vec<Iso3166TwoDigitCountryCode> {
         match doc_type {
-            DocumentKind::IdCard => vec![Iso3166TwoDigitCountryCode::MX],
-            DocumentKind::DriversLicense => vec![Iso3166TwoDigitCountryCode::MX],
-            DocumentKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::PassportCard => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::Permit => vec![Iso3166TwoDigitCountryCode::MX],
-            DocumentKind::Visa => vec![Iso3166TwoDigitCountryCode::MX],
-            DocumentKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::MX],
-            DocumentKind::VoterIdentification => vec![Iso3166TwoDigitCountryCode::MX],
-            DocumentKind::SsnCard => vec![],
-            DocumentKind::ProofOfAddress => vec![],
-            DocumentKind::Custom => vec![],
+            IdDocKind::IdCard => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::DriversLicense => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::PassportCard => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::VoterIdentification => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::SsnCard => vec![],
+            IdDocKind::ProofOfAddress => vec![],
         }
     }
 
@@ -294,20 +301,22 @@ impl SupportedCountriesForDocType for Coba {
 }
 struct Default;
 impl SupportedCountriesForDocType for Default {
-    fn supported_countries_for_doc_type(&self, doc_type: DocumentKind) -> Vec<Iso3166TwoDigitCountryCode> {
+    fn supported_countries_for_doc_type(
+        &self,
+        doc_type: IdDocKind,
+    ) -> Vec<Iso3166TwoDigitCountryCode> {
         let all_us_and_territories = Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories();
         match doc_type {
-            DocumentKind::IdCard => all_us_and_territories,
-            DocumentKind::DriversLicense => all_us_and_territories,
-            DocumentKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::PassportCard => Iso3166TwoDigitCountryCode::iter().collect(),
-            DocumentKind::Permit => all_us_and_territories,
-            DocumentKind::Visa => all_us_and_territories,
-            DocumentKind::ResidenceDocument => all_us_and_territories,
-            DocumentKind::VoterIdentification => all_us_and_territories,
-            DocumentKind::SsnCard => vec![],
-            DocumentKind::ProofOfAddress => vec![],
-            DocumentKind::Custom => vec![],
+            IdDocKind::IdCard => all_us_and_territories,
+            IdDocKind::DriversLicense => all_us_and_territories,
+            IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::PassportCard => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::Permit => all_us_and_territories,
+            IdDocKind::Visa => all_us_and_territories,
+            IdDocKind::ResidenceDocument => all_us_and_territories,
+            IdDocKind::VoterIdentification => all_us_and_territories,
+            IdDocKind::SsnCard => vec![],
+            IdDocKind::ProofOfAddress => vec![],
         }
     }
 

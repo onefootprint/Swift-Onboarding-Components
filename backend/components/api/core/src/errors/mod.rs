@@ -283,6 +283,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::SandboxMismatch => StatusCode::BAD_REQUEST,
         DbError::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
+        DbError::NewtypesError(newtypes::Error::AssertionError(_)) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::NewtypesError(_) => StatusCode::BAD_REQUEST,
         DbError::InsufficientTenantScopes(_) => StatusCode::BAD_REQUEST,
         DbError::NonUniqueTenantScopes => StatusCode::BAD_REQUEST,
