@@ -36,7 +36,7 @@ const handleFileUpload = ({
     (allowPdf && files[0].type === 'application/pdf');
   if (!fileTypeAllowed) {
     Logger.warn(
-      'Image upload failed on desktop mode. User attempted to upload an unsupported file format',
+      `Image upload failed on desktop mode. User attempted to upload an unsupported file format ${files[0].type}`,
       'id-doc-photo-prompt',
     );
     onError([IdDocImageUploadError.fileTypeNotAllowed]);
