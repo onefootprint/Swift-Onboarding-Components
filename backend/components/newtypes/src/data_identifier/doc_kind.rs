@@ -2,7 +2,6 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::{DocumentRequestKind, DocumentSide, OcrDataKind as ODK};
@@ -19,7 +18,7 @@ use crate::{DocumentRequestKind, DocumentSide, OcrDataKind as ODK};
     SerializeDisplay,
     EnumString,
     Apiv2Schema,
-    EnumIter,
+    EnumIter, // TODO rm?
     AsExpression,
     FromSqlRow,
     macros::SerdeAttr,
@@ -29,6 +28,7 @@ use crate::{DocumentRequestKind, DocumentSide, OcrDataKind as ODK};
 #[diesel(sql_type = Text)]
 /// The set of values we can use for identity_document.document_type
 pub enum DocumentKind {
+    // TODO should we nest IdDocKind here?
     IdCard,
     DriversLicense,
     Passport,
@@ -72,17 +72,6 @@ pub enum IdDocKind {
     Visa,
     ResidenceDocument,
     VoterIdentification,
-
-    //
-    // All of these options are slightly different from the above... they only have a front,
-    // cannot have selfie or back. They are not yet verified. And they are stored in sometimes
-    // different DIs
-    //
-
-    // Proof of ssn
-    // TODO these don't necessarily belong here?
-    SsnCard,
-    ProofOfAddress,
 }
 
 
@@ -99,16 +88,13 @@ impl TryFrom<DocumentKind> for IdDocKind {
             DocumentKind::Visa => Ok(IdDocKind::Visa),
             DocumentKind::ResidenceDocument => Ok(IdDocKind::ResidenceDocument),
             DocumentKind::VoterIdentification => Ok(IdDocKind::VoterIdentification),
-            DocumentKind::SsnCard => Ok(IdDocKind::SsnCard),
-            DocumentKind::ProofOfAddress => Ok(IdDocKind::ProofOfAddress),
-            DocumentKind::Custom => Err(crate::Error::AssertionError(
-                "Cannot map into GovtIssuedDocKind".into(),
-            )),
+            DocumentKind::SsnCard | DocumentKind::ProofOfAddress | DocumentKind::Custom => {
+                Err(crate::Error::AssertionError("Cannot map into IdDocKind".into()))
+            }
         }
     }
 }
 
-// TODO rm?
 impl From<IdDocKind> for DocumentKind {
     fn from(value: IdDocKind) -> Self {
         match value {
@@ -120,8 +106,6 @@ impl From<IdDocKind> for DocumentKind {
             IdDocKind::Visa => DocumentKind::Visa,
             IdDocKind::ResidenceDocument => DocumentKind::ResidenceDocument,
             IdDocKind::VoterIdentification => DocumentKind::VoterIdentification,
-            IdDocKind::SsnCard => DocumentKind::SsnCard,
-            IdDocKind::ProofOfAddress => DocumentKind::ProofOfAddress,
         }
     }
 }
@@ -166,13 +150,6 @@ impl DocumentKind {
 }
 
 impl IdDocKind {
-    // TODO rm?
-    pub fn identity_docs() -> Vec<IdDocKind> {
-        IdDocKind::iter()
-            .filter(|id| DocumentRequestKind::from(DocumentKind::from(*id)) == DocumentRequestKind::Identity)
-            .collect()
-    }
-
     // Given the type of document, what are the expected/critical fields we expect to parse from that doc. If we don't parse (or have a very low confidence score)
     // for one of these for a given doc, then we should produce the DocumentOcrNotSuccessful risk signal as a way to indicate to users/rules this
     pub fn expected_critical_ocr_data_kinds(&self) -> Vec<ODK> {
@@ -197,9 +174,6 @@ impl IdDocKind {
             IdDocKind::Visa => vec![ODK::FullName],
             IdDocKind::ResidenceDocument => vec![ODK::FullName],
             IdDocKind::VoterIdentification => vec![ODK::FullName],
-            // In actuality, We don't parse anything from these.
-            IdDocKind::SsnCard => vec![],
-            IdDocKind::ProofOfAddress => vec![],
         }
     }
 }

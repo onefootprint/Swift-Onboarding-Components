@@ -24,10 +24,11 @@ use api_core::{
 };
 use api_wire_types::DecryptResponse;
 use db::models::{insight_event::CreateInsightEvent, scoped_vault::ScopedVault};
-use itertools::Itertools;
+use itertools::{chain, Itertools};
 use macros::route_alias;
 use newtypes::{
-    output::Csv, AccessEventPurpose, DataLifetimeSeqno, FilterFunction, FpId, VersionedDataIdentifier,
+    output::Csv, AccessEventPurpose, DataIdentifier, DataLifetimeSeqno, DocumentDiKind, FilterFunction, FpId,
+    PiiJsonValue, VersionedDataIdentifier,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::Deserialize;
@@ -85,13 +86,14 @@ pub async fn post(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> JsonApiResponse<DecryptResponse> {
+) -> JsonApiResponse<TempDecryptResponse> {
     let request = request.into_inner();
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
 
     let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
-    Ok(result)
+    let result = TempDecryptResponse::build(result.0.data);
+    ResponseData::ok(result).json()
 }
 
 #[route_alias(post(
@@ -222,3 +224,49 @@ pub(super) async fn post_inner(
 
     ResponseData::ok(out).json()
 }
+
+
+impl TempDecryptResponse {
+    fn build(resp: DecryptResponse) -> Self {
+        // Temporarily, while we're migrating away from old ProofOfAddress DIs, manually include
+        // the old DI in the response.
+        // This assumes we're not decrypting with versions
+        let map = resp
+            .into_iter()
+            .flat_map(|(vdi, val)| {
+                let extra_entry =
+                    if matches!(vdi.di, DataIdentifier::Document(DocumentDiKind::ProofOfAddress)) {
+                        Some(("document.proof_of_address.front.image".to_string(), val.clone()))
+                    } else if matches!(vdi.di, DataIdentifier::Document(DocumentDiKind::SsnCard)) {
+                        Some(("document.ssn_card.front.image".to_string(), val.clone()))
+                    } else {
+                        None
+                    };
+                chain(extra_entry, Some((vdi.to_string(), val)))
+            })
+            .collect();
+        Self { map }
+    }
+}
+
+/// Temporary to support these in-progress DI migrations
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, derive_more::Deref, derive_more::DerefMut)]
+pub struct TempDecryptResponse {
+    #[serde(flatten)]
+    pub map: std::collections::HashMap<String, Option<PiiJsonValue>>,
+}
+
+impl paperclip::v2::schema::Apiv2Schema for TempDecryptResponse {
+    fn name() -> Option<String> {
+        DecryptResponse::name()
+    }
+
+    fn description() -> &'static str {
+        DecryptResponse::description()
+    }
+
+    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+        DecryptResponse::raw_schema()
+    }
+}
+impl paperclip::actix::OperationModifier for TempDecryptResponse {}

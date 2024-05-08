@@ -28,6 +28,7 @@ use newtypes::{
     IdDocKind, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind,
     ScopedVaultId, Selfie, TenantId, WorkflowFixtureResult,
 };
+use strum::IntoEnumIterator;
 
 use super::{
     document_test_utils::{
@@ -66,7 +67,7 @@ async fn test_e2e_document_upload_for_all_identity_document_types(
     //
     // Setup
     //
-    for doc_type in IdDocKind::identity_docs() {
+    for doc_type in IdDocKind::iter() {
         // can't use map bc closure + mutable ref for state
         let test_case = DocumentUploadTestCase::new(user_kind, doc_type.into(), require_selfie);
         e2e_inner(state, test_case).await;

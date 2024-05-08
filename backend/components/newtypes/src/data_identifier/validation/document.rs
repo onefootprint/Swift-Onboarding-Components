@@ -34,6 +34,8 @@ impl CleanAndValidate for DocumentDiKind {
             | DocumentDiKind::MimeType(_, _)
             | DocumentDiKind::LatestUpload(_, _)
             | DocumentDiKind::FinraComplianceLetter
+            | DocumentDiKind::SsnCard
+            | DocumentDiKind::ProofOfAddress
             | DocumentDiKind::Custom(_) => Ok(DataIdentifierValue {
                 di: self.into(),
                 value: value.as_string()?,

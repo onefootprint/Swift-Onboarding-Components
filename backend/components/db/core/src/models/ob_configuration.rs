@@ -113,7 +113,7 @@ impl ObConfiguration {
         {
             kinds
         } else {
-            IdDocKind::identity_docs()
+            IdDocKind::iter().collect()
         };
 
         let doc_country_mapping_helper = self.get_supported_country_struct();
@@ -245,18 +245,12 @@ impl ObConfiguration {
 }
 
 trait SupportedCountriesForDocType {
-    fn supported_countries_for_doc_type(
-        &self,
-        doc_type: IdDocKind,
-    ) -> Vec<Iso3166TwoDigitCountryCode>;
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode>;
     fn is_override(&self) -> bool;
 }
 struct Findigs;
 impl SupportedCountriesForDocType for Findigs {
-    fn supported_countries_for_doc_type(
-        &self,
-        doc_type: IdDocKind,
-    ) -> Vec<Iso3166TwoDigitCountryCode> {
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
         match doc_type {
             IdDocKind::IdCard => Iso3166TwoDigitCountryCode::iter().collect(),
             IdDocKind::DriversLicense => Iso3166TwoDigitCountryCode::iter().collect(),
@@ -266,8 +260,6 @@ impl SupportedCountriesForDocType for Findigs {
             IdDocKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
             IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
             IdDocKind::VoterIdentification => vec![],
-            IdDocKind::SsnCard => vec![],
-            IdDocKind::ProofOfAddress => vec![],
         }
     }
 
@@ -277,10 +269,7 @@ impl SupportedCountriesForDocType for Findigs {
 }
 struct Coba;
 impl SupportedCountriesForDocType for Coba {
-    fn supported_countries_for_doc_type(
-        &self,
-        doc_type: IdDocKind,
-    ) -> Vec<Iso3166TwoDigitCountryCode> {
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
         match doc_type {
             IdDocKind::IdCard => vec![Iso3166TwoDigitCountryCode::MX],
             IdDocKind::DriversLicense => vec![Iso3166TwoDigitCountryCode::MX],
@@ -290,8 +279,6 @@ impl SupportedCountriesForDocType for Coba {
             IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::MX],
             IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::MX],
             IdDocKind::VoterIdentification => vec![Iso3166TwoDigitCountryCode::MX],
-            IdDocKind::SsnCard => vec![],
-            IdDocKind::ProofOfAddress => vec![],
         }
     }
 
@@ -301,10 +288,7 @@ impl SupportedCountriesForDocType for Coba {
 }
 struct Default;
 impl SupportedCountriesForDocType for Default {
-    fn supported_countries_for_doc_type(
-        &self,
-        doc_type: IdDocKind,
-    ) -> Vec<Iso3166TwoDigitCountryCode> {
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
         let all_us_and_territories = Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories();
         match doc_type {
             IdDocKind::IdCard => all_us_and_territories,
@@ -315,8 +299,6 @@ impl SupportedCountriesForDocType for Default {
             IdDocKind::Visa => all_us_and_territories,
             IdDocKind::ResidenceDocument => all_us_and_territories,
             IdDocKind::VoterIdentification => all_us_and_territories,
-            IdDocKind::SsnCard => vec![],
-            IdDocKind::ProofOfAddress => vec![],
         }
     }
 

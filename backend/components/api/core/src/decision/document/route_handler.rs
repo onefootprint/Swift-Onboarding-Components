@@ -1,11 +1,12 @@
 use newtypes::{
-    DataLifetimeSource, DecisionIntentKind, DocumentFixtureResult, DocumentId, DocumentRequestKind, DocumentReviewStatus, DocumentSide, DocumentStatus, IdDocKind, ScopedVaultId, TenantId, WorkflowId
+    DataLifetimeSource, DecisionIntentKind, DocumentFixtureResult, DocumentId, DocumentRequestKind,
+    DocumentReviewStatus, DocumentSide, DocumentStatus, IdDocKind, ScopedVaultId, TenantId, WorkflowId,
 };
 
 use crate::{
     decision,
     errors::{error_with_code::ErrorWithCode, onboarding::OnboardingError, ApiResult, ValidationError},
-    utils::file_upload::FileUpload,
+    utils::{file_upload::FileUpload, vault_wrapper::Any},
     State,
 };
 
@@ -13,9 +14,19 @@ use crate::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VaultWrapp
 use api_wire_types::{CreateDocumentRequest, DocumentResponse};
 use feature_flag::BoolFlag;
 
-use crate::decision::vendor::incode::states::vault_complete_images;
 use db::models::{
-    data_lifetime::DataLifetime, decision_intent::DecisionIntent, document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier}, document_upload::{DocumentUpload, NewDocumentUploadArgs}, document::{Document, DocumentUpdate, NewDocumentArgs}, incode_verification_session::IncodeVerificationSession, insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, user_consent::UserConsent, user_timeline::UserTimeline, vault::Vault, workflow::Workflow
+    data_lifetime::DataLifetime,
+    decision_intent::DecisionIntent,
+    document::{Document, DocumentUpdate, NewDocumentArgs},
+    document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier},
+    document_upload::{DocumentUpload, NewDocumentUploadArgs},
+    incode_verification_session::IncodeVerificationSession,
+    insight_event::CreateInsightEvent,
+    ob_configuration::ObConfiguration,
+    user_consent::UserConsent,
+    user_timeline::UserTimeline,
+    vault::Vault,
+    workflow::Workflow,
 };
 
 use super::meta_headers::MetaHeaders;
@@ -27,7 +38,7 @@ pub async fn handle_document_create(
     tenant_id: TenantId,
     sv_id: ScopedVaultId,
     wf_id: WorkflowId,
-    insight: CreateInsightEvent
+    insight: CreateInsightEvent,
 ) -> ApiResult<DocumentId> {
     let CreateDocumentRequest {
         document_type,
@@ -75,7 +86,7 @@ pub async fn handle_document_create(
                     fixture_result: None,
                     skip_selfie: None,
                     device_type,
-                    insight
+                    insight,
                 };
                 let id_doc = Document::get_or_create(conn, args)?;
                 Ok(id_doc.id)
@@ -98,8 +109,9 @@ pub async fn handle_document_create(
     let id_doc = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let country_code = country_code.ok_or(ValidationError("Identity document requires country code"))?;
-            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;         
+            let country_code =
+                country_code.ok_or(ValidationError("Identity document requires country code"))?;
+            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
             crate::decision::vendor::incode::validate_doc_type_is_allowed(
                 &obc,
                 document_type,
@@ -114,16 +126,16 @@ pub async fn handle_document_create(
                     return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
                 }
 
-                if matches!(fixture_result, DocumentFixtureResult::Real) && 
-                    !ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id)) {
+                if matches!(fixture_result, DocumentFixtureResult::Real)
+                    && !ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id))
+                {
                     return Err(OnboardingError::RealDocumentFixtureNotAllowed.into());
                 }
             }
 
             // we don't want any tenant to be able to skip selfie by default, eventually this will
             // be in the OBC
-            let can_tenant_skip_selfie = ff_client
-                .flag(BoolFlag::CanSkipSelfie(&tenant_id));
+            let can_tenant_skip_selfie = ff_client.flag(BoolFlag::CanSkipSelfie(&tenant_id));
 
             let should_skip_selfie = if skip_selfie == Some(true) && dr.should_collect_selfie() {
                 if can_tenant_skip_selfie {
@@ -136,7 +148,7 @@ pub async fn handle_document_create(
             } else {
                 false
             };
-            
+
             let args = NewDocumentArgs {
                 request_id: dr.id,
                 document_type: document_type.into(),
@@ -144,7 +156,7 @@ pub async fn handle_document_create(
                 fixture_result,
                 skip_selfie: Some(should_skip_selfie),
                 device_type,
-                insight
+                insight,
             };
 
             let id_doc = Document::get_or_create(conn, args)?;
@@ -198,8 +210,7 @@ pub async fn handle_document_upload(
     // Create uploads for the document
     // Check if we should be initiating requests (e.g. check if we are testing)
     let should_initiate_reqs =
-        crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, doc.fixture_result)
-            .await?
+        crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, doc.fixture_result).await?
             && doc_request.kind.should_initiate_incode_requests();
 
     state
@@ -362,23 +373,14 @@ pub async fn complete_non_identity_document(
         .db_transaction(move |conn| -> ApiResult<()> {
             let id_doc_id = id_doc.id.clone();
             let dk = id_doc.document_type;
-            let uvw = VaultWrapper::lock_for_onboarding(conn, &sv_id)?;
-            // TODO: doc_type might need to come from incode once we get to that point
-            let govt_issued_doc_kind = IdDocKind::try_from(dk).ok();
-            let seqno = if let Some(dk) = govt_issued_doc_kind {
-                // TODO this is weird, only for PoA and PoSsn. We shouldn't do this for them either
-                let (_, seqno) = vault_complete_images(conn, &uvw, dk, &id_doc)?;
-                seqno
-            } else {
-                DataLifetime::get_current_seqno(conn)?
-            };
+            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id)?;
+            let seqno = DataLifetime::get_current_seqno(conn)?;
             // Create a timeline event
             let info = newtypes::DocumentUploadedInfo {
                 id: id_doc_id.clone(),
             };
             UserTimeline::create(conn, info, uvw.vault.id.clone(), sv_id.clone())?;
             // mark identity doc as complete
-
             let update = DocumentUpdate {
                 completed_seqno: Some(seqno),
                 document_score: None,

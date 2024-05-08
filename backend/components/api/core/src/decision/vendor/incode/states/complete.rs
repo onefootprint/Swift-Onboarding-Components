@@ -281,7 +281,7 @@ pub(super) fn compute_risk_signals<'a>(
 
 /// Now that we have the correct type of the document, add the images to the vault under the correct type
 #[tracing::instrument(skip_all)]
-pub fn vault_complete_images(
+fn vault_complete_images(
     conn: &mut TxnPgConn,
     vw: &WriteableVw<Person>,
     dk: IdDocKind,

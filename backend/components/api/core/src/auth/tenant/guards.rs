@@ -130,7 +130,9 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
             // While Custom + Document permissions are very easy to determine
             DataIdentifier::Custom(_) => Right(token_scopes.contains(&TenantScope::DecryptCustom)),
             // TODO can we simplify document permissions?
-            DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Front))
+            DataIdentifier::Document(DocumentDiKind::SsnCard)
+            | DataIdentifier::Document(DocumentDiKind::ProofOfAddress)
+            | DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Front))
             | DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Back))
             | DataIdentifier::Document(DocumentDiKind::LatestUpload(_, DocumentSide::Front))
             | DataIdentifier::Document(DocumentDiKind::LatestUpload(_, DocumentSide::Back))

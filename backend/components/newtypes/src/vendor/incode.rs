@@ -398,9 +398,6 @@ impl From<IdDocKind> for (Option<IncodeDocumentType>, Option<IncodeDocumentSubTy
             IdDocKind::Visa => (Some(IncodeDocumentType::Visa), None),
             IdDocKind::ResidenceDocument => (Some(IncodeDocumentType::ResidenceDocument), None),
             IdDocKind::VoterIdentification => (Some(IncodeDocumentType::VoterIdentification), None),
-            // TODO
-            IdDocKind::SsnCard => (None, None),
-            IdDocKind::ProofOfAddress => (None, None),
         }
     }
 }
@@ -486,9 +483,9 @@ mod tests {
             ))
             .unwrap(),
         );
-        IdDocKind::identity_docs().iter().for_each(|doc_kind| {
+        IdDocKind::iter().for_each(|doc_kind| {
             assert!(
-                incode_doc_types_mapped_to_our_doc_types.contains(doc_kind),
+                incode_doc_types_mapped_to_our_doc_types.contains(&doc_kind),
                 "{}",
                 format!(
                     "Make sure you add {} to TryFrom<&'a IncodeDocumentType> for IdDocKind",

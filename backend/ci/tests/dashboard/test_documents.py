@@ -130,7 +130,7 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
     """
     obc = create_ob_config(
         sandbox_tenant,
-        "Doc request config",
+        "Lots of docs config",
         must_collect_data + ["document_and_selfie"],
         must_collect_data + ["document_and_selfie"],
         curp_validation_enabled=True,
@@ -273,3 +273,30 @@ def test_decrypt_historical(user_with_documents):
             "document.drivers_license.document_number",
         ]
     )
+
+
+def test_legacy_poa_dis(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "PoA request config",
+        must_collect_data,
+        must_collect_data,
+        documents_to_collect=[
+            dict(kind="proof_of_ssn", data=dict()),
+            dict(kind="proof_of_address", data=dict()),
+        ],
+    )
+    bifrost = BifrostClient.new(obc)
+    user = bifrost.run()
+
+    TESTS = [
+        ["document.proof_of_address.image", "document.proof_of_address.front.image"],
+        ["document.ssn_card.image", "document.ssn_card.front.image"],
+    ]
+    for test in TESTS:
+        for di in test:
+            data = dict(fields=[di], reason="Testing legacy decrypt")
+            body = post(
+                f"entities/{user.fp_id}/vault/decrypt", data, sandbox_tenant.sk.key
+            )
+            assert body[test[0]] == body[test[1]]

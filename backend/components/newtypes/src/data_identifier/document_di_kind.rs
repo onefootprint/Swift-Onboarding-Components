@@ -50,6 +50,11 @@ pub enum DocumentDiKind {
     /// Letter signed by a compliance officer granting permission to carry an account, required by FINFRA rules in certain cases
     #[strum_discriminants(strum(to_string = "finra_compliance_letter"))]
     FinraComplianceLetter,
+    // .image suffix in case we one day have extracted attributes
+    #[strum_discriminants(strum(to_string = "ssn_card.image"))]
+    SsnCard,
+    #[strum_discriminants(strum(to_string = "proof_of_address.image"))]
+    ProofOfAddress,
 
     /// Custom document
     #[strum_discriminants(strum(to_string = "custom"))]
@@ -112,7 +117,9 @@ impl IsDataIdentifierDiscriminant for DocumentDiKind {
             | DocumentDiKind::OcrData(_, _)
             | DocumentDiKind::MimeType(_, _)
             | DocumentDiKind::LatestUpload(_, _)
-            | DocumentDiKind::Custom(_) => None,
+            | DocumentDiKind::Custom(_)
+            | DocumentDiKind::ProofOfAddress
+            | DocumentDiKind::SsnCard => None,
             DocumentDiKind::FinraComplianceLetter => Some(CollectedData::InvestorProfile),
         }
     }
@@ -128,6 +135,9 @@ impl DocumentDiKind {
                 DocumentSide::Selfie => vec![mime::IMAGE_JPEG, mime::IMAGE_PNG],
             },
             DocumentDiKind::FinraComplianceLetter => vec![mime::APPLICATION_PDF],
+            DocumentDiKind::SsnCard | DocumentDiKind::ProofOfAddress => {
+                vec![mime::APPLICATION_PDF, mime::IMAGE_JPEG, mime::IMAGE_PNG]
+            }
             DocumentDiKind::Barcodes(_, _)
             | DocumentDiKind::OcrData(_, _)
             | DocumentDiKind::MimeType(_, _)
@@ -150,7 +160,9 @@ impl DocumentDiKind {
             DocumentDiKind::Image(_, _)
             | DocumentDiKind::FinraComplianceLetter
             | DocumentDiKind::LatestUpload(_, _)
-            | DocumentDiKind::Custom(_) => StorageType::DocumentData,
+            | DocumentDiKind::Custom(_)
+            | DocumentDiKind::ProofOfAddress
+            | DocumentDiKind::SsnCard => StorageType::DocumentData,
             DocumentDiKind::MimeType(_, _) => StorageType::DocumentMetadata,
             DocumentDiKind::OcrData(_, _) | DocumentDiKind::Barcodes(_, _) => StorageType::VaultData,
         }
@@ -184,6 +196,28 @@ impl std::str::FromStr for DocumentDiKind {
             Ok((prefix, suffix))
         };
 
+        // Custom parsing for simple doc types
+        if let Ok(DocumentKindDiscriminant::FinraComplianceLetter) = DocumentKindDiscriminant::from_str(s) {
+            return Ok(Self::FinraComplianceLetter);
+        }
+        if let Ok(DocumentKindDiscriminant::SsnCard) = DocumentKindDiscriminant::from_str(s) {
+            tracing::info!(legacy_repr=%false, "Parsed SSN card DI");
+            return Ok(Self::SsnCard);
+        }
+        if let Ok(DocumentKindDiscriminant::ProofOfAddress) = DocumentKindDiscriminant::from_str(s) {
+            tracing::info!(legacy_repr=%false, "Parsed PoA DI");
+            return Ok(Self::ProofOfAddress);
+        }
+        // TODO remove these legacy-parsed DIs after all clients are updated and values are backfilled
+        if s == "ssn_card.front.image" || s == "ssn_card.front.latest_upload" {
+            tracing::info!(legacy_repr=%true, "Parsed SSN card DI");
+            return Ok(Self::SsnCard);
+        }
+        if s == "proof_of_address.front.image" || s == "proof_of_address.front.latest_upload" {
+            tracing::info!(legacy_repr=%true, "Parsed PoA DI");
+            return Ok(Self::ProofOfAddress);
+        }
+
         // First try parsing govt-isued ID types based on the suffix, like mime_type or latest_upload
         let variant: Option<DocumentDiKind> = match variant {
             Ok(DocumentKindDiscriminant::LatestUpload) => {
@@ -206,11 +240,6 @@ impl std::str::FromStr for DocumentDiKind {
         };
         if let Some(variant) = variant {
             return Ok(variant);
-        }
-
-        // Custom parsing for FinraComplianceLetter
-        if let Ok(DocumentKindDiscriminant::FinraComplianceLetter) = DocumentKindDiscriminant::from_str(s) {
-            return Ok(Self::FinraComplianceLetter);
         }
 
         // Ocr data
@@ -253,7 +282,9 @@ impl std::fmt::Display for DocumentDiKind {
             DocumentDiKind::Custom(alias) => {
                 write!(f, "custom.{}", alias)
             }
-            DocumentDiKind::FinraComplianceLetter => write!(f, "{}", DocumentKindDiscriminant::from(self)),
+            DocumentDiKind::FinraComplianceLetter
+            | DocumentDiKind::ProofOfAddress
+            | DocumentDiKind::SsnCard => write!(f, "{}", DocumentKindDiscriminant::from(self)),
         }
     }
 }
@@ -268,8 +299,12 @@ impl DocumentDiKind {
             let ocr_types = OcrDataKind::iter().map(move |dk| Self::OcrData(k, dk));
             image_types.chain(ocr_types)
         });
-        // TODO proof of SSN and proof of address
-        let simple_types = vec![Self::FinraComplianceLetter, Self::Custom(AliasId::fixture())];
+        let simple_types = vec![
+            Self::FinraComplianceLetter,
+            Self::ProofOfAddress,
+            Self::SsnCard,
+            Self::Custom(AliasId::fixture()),
+        ];
         id_doc_types.chain(simple_types).collect()
     }
 }

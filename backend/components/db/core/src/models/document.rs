@@ -338,18 +338,27 @@ impl Document {
     /// Logic to extract the DI for a given Document row. It can be derived from GovtIssuedDocKinds,
     /// but must be fetched from the DocumentRequestConfig for custom docs
     pub fn identifier(&self, config: &DocumentRequestConfig, side: DocumentSide) -> DbResult<DataIdentifier> {
-        let from_doc_type = IdDocKind::try_from(self.document_type)
-            .ok()
-            .map(|k| DataIdentifier::from(DocumentDiKind::LatestUpload(k, side)));
-        let from_custom_type =
-            if let DocumentRequestConfig::Custom(CustomDocumentConfig { identifier, .. }) = config {
-                Some(identifier.clone())
-            } else {
-                None
-            };
-        let di = from_doc_type
-            .or(from_custom_type)
-            .ok_or(ValidationError("No document DI found"))?;
+        let di = match self.document_type {
+            DocumentKind::IdCard
+            | DocumentKind::DriversLicense
+            | DocumentKind::Passport
+            | DocumentKind::PassportCard
+            | DocumentKind::Permit
+            | DocumentKind::Visa
+            | DocumentKind::ResidenceDocument
+            | DocumentKind::VoterIdentification => {
+                let id_doc_kind = IdDocKind::try_from(self.document_type)?;
+                DataIdentifier::from(DocumentDiKind::LatestUpload(id_doc_kind, side))
+            }
+            DocumentKind::SsnCard => DataIdentifier::from(DocumentDiKind::SsnCard),
+            DocumentKind::ProofOfAddress => DataIdentifier::from(DocumentDiKind::ProofOfAddress),
+            DocumentKind::Custom => {
+                let DocumentRequestConfig::Custom(CustomDocumentConfig { identifier, .. }) = config else {
+                    return ValidationError("Custom document doesn't have identifier").into();
+                };
+                identifier.clone()
+            }
+        };
         Ok(di)
     }
 }

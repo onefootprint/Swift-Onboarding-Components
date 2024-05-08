@@ -402,6 +402,8 @@ mod tests {
     #[test_case(DataIdentifier::Document(DocumentDiKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
     #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.expiration_month")]
     #[test_case(DataIdentifier::Document(DocumentDiKind::OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber)) => "document.drivers_license.document_number")]
+    #[test_case(DataIdentifier::Document(DocumentDiKind::SsnCard) => "document.ssn_card.image")]
+    #[test_case(DataIdentifier::Document(DocumentDiKind::ProofOfAddress) => "document.proof_of_address.image")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -418,6 +420,13 @@ mod tests {
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentDiKind::FinraComplianceLetter))]
     #[test_case("card.hayesvalley.expiration_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
     #[test_case("document.passport.document_number" => DataIdentifier::Document(DocumentDiKind::OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)))]
+    #[test_case("document.ssn_card.image" => DataIdentifier::Document(DocumentDiKind::SsnCard))]
+    #[test_case("document.proof_of_address.image" => DataIdentifier::Document(DocumentDiKind::ProofOfAddress))]
+    // Support the legacy formats
+    #[test_case("document.ssn_card.front.image" => DataIdentifier::Document(DocumentDiKind::SsnCard))]
+    #[test_case("document.ssn_card.front.latest_upload" => DataIdentifier::Document(DocumentDiKind::SsnCard))]
+    #[test_case("document.proof_of_address.front.image" => DataIdentifier::Document(DocumentDiKind::ProofOfAddress))]
+    #[test_case("document.proof_of_address.front.latest_upload" => DataIdentifier::Document(DocumentDiKind::ProofOfAddress))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
