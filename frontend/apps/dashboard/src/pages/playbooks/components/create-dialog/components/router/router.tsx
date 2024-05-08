@@ -190,33 +190,6 @@ const Router = ({ onCreate }: RouterProps) => {
       return;
     }
 
-    if (onboardingTemplate === OnboardingTemplate.TenantScreening && nameForm) {
-      const verificationChecksForm = {
-        skipKyc: false,
-        amlFormData: defaultValues.aml,
-      };
-      createFixedTemplatePlaybook(verificationChecksForm, formData);
-      return;
-    }
-
-    if (onboardingTemplate === OnboardingTemplate.CarRental && nameForm) {
-      const verificationChecksForm = {
-        skipKyc: false,
-        amlFormData: defaultValues.aml,
-      };
-      createFixedTemplatePlaybook(verificationChecksForm, formData);
-      return;
-    }
-
-    if (onboardingTemplate === OnboardingTemplate.CreditCard && nameForm) {
-      const verificationChecksForm = {
-        skipKyc: false,
-        amlFormData: defaultValues.aml,
-      };
-      createFixedTemplatePlaybook(verificationChecksForm, formData);
-      return;
-    }
-
     send('playbookSubmitted', { payload: { formData } });
   };
 

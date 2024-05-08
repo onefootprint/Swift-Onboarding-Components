@@ -11,6 +11,9 @@ type UseOptionsProps = {
 
 const useOptions = ({ template }: UseOptionsProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
+  const isEditableKycTemplate =
+    template !== OnboardingTemplate.Apex &&
+    template !== OnboardingTemplate.Alpaca;
 
   const defaultOptions = [
     { value: 'whoToOnboard', label: t('dialog.who-to-onboard.nav') },
@@ -32,7 +35,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
     { value: 'summary', label: t('dialog.summary.nav') },
   ];
-  if (template === OnboardingTemplate.Custom) {
+  if (isEditableKycTemplate) {
     kycOptions[0].options?.push({
       value: 'residency',
       label: t('dialog.residency.nav'),
