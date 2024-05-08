@@ -41,7 +41,8 @@ export enum EntityStatus {
   manualReview = 'manual_review',
   pass = 'pass',
   pending = 'pending',
-  none = 'none', // Onboarding hasn't started for this vault
+  // Onboarding hasn't started for this vault
+  none = 'none',
 }
 
 export type Transforms = {
