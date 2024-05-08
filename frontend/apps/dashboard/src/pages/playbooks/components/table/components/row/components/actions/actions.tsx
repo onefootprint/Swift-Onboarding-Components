@@ -73,12 +73,17 @@ const Actions = ({ playbook }: ActionsProps) => {
           >
             {t('edit-name.cta')}
           </Dropdown.Item>
-          <Dropdown.Item
-            onSelect={launchCopy}
-            onClick={event => event.stopPropagation()}
+          <PermissionGate
+            scopeKind={RoleScopeKind.onboardingConfiguration}
+            fallbackText={t('not-allowed')}
           >
-            {t('copy')}
-          </Dropdown.Item>
+            <Dropdown.Item
+              onSelect={launchCopy}
+              onClick={event => event.stopPropagation()}
+            >
+              {t('copy')}
+            </Dropdown.Item>
+          </PermissionGate>
           <Dropdown.Item
             onSelect={handleToggleStatus}
             onClick={event => event.stopPropagation()}
