@@ -83,6 +83,12 @@ export const defaultResidencyFormDataTenantScreening: ResidencyFormData = {
   allowInternationalResidents: false,
 };
 
+export const defaultResidencyFormDataCarRental: ResidencyFormData = {
+  allowUsResidents: true,
+  allowUsTerritories: false,
+  allowInternationalResidents: false,
+};
+
 export type VerificationChecksFormData = {
   skipKyc?: boolean;
   kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
@@ -118,6 +124,13 @@ export const defaultAmlFormDataApex: AMLFormData = {
 };
 
 export const defaultAmlFormDataTenantScreening: AMLFormData = {
+  enhancedAml: false,
+  ofac: false,
+  pep: false,
+  adverseMedia: false,
+};
+
+export const defaultAmlFormDataCarRental: AMLFormData = {
   enhancedAml: false,
   ofac: false,
   pep: false,
@@ -277,6 +290,23 @@ export const defaultPlaybookValuesTenantScreening: SummaryFormData = {
   },
 };
 
+export const defaultPlaybookValuesCarRental: SummaryFormData = {
+  kind: PlaybookKind.Kyc,
+  personal: {
+    [CollectedKycDataOption.address]: true,
+    [CollectedKycDataOption.dob]: true,
+    [CollectedKycDataOption.phoneNumber]: true,
+    [CollectedKycDataOption.usLegalStatus]: false,
+    email: true,
+    idDoc: true,
+    idDocKind: [SupportedIdDocTypes.driversLicense],
+    countrySpecificIdDocKind: {},
+    selfie: true,
+    ssn: false,
+    idDocFirst: true,
+  },
+};
+
 export const defaultPlaybookValuesIdDoc: SummaryFormData = {
   kind: PlaybookKind.IdDoc,
   personal: {
@@ -305,6 +335,7 @@ export enum OnboardingTemplate {
   Alpaca = 'alpaca',
   Apex = 'apex',
   TenantScreening = 'tenant-screening',
+  CarRental = 'car-rental',
 }
 
 export type MachineContext = {

@@ -43,6 +43,7 @@ const Summary = ({
     [OnboardingTemplate.Alpaca]: t('subtitle.alpaca'),
     [OnboardingTemplate.Apex]: t('subtitle.apex'),
     [OnboardingTemplate.TenantScreening]: t('subtitle.tenant-screening'),
+    [OnboardingTemplate.CarRental]: t('subtitle.car-rental'),
   };
 
   const getTitle = (): string => {
