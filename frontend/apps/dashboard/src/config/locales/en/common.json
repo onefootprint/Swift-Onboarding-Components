@@ -2761,14 +2761,21 @@
         "onboarding-templates": {
           "nav": "Templates",
           "title": "Templates",
-          "subtitle": "Configure your own KYC settings or select a pre-defined template from an external provider.",
+          "subtitle": "Configure your own KYC settings or select a pre-defined template.",
           "custom": {
             "title": "Custom",
             "description": "Configure your own KYC settings"
           },
-          "alpaca": {
-            "title": "Alpaca",
-            "description": "Use a template that satisfies Alpaca's KYC/AML policies and procedures"
+          "brokerage-partner": {
+            "title": "Brokerage Partner",
+            "alpaca": {
+              "title": "Alpaca",
+              "description": "Satisfies Alpaca's KYC / AML policies and procedures"
+            },
+            "apex": {
+              "title": "Apex",
+              "description": "Satisfies Apex's KYC / AML policies and procedures"
+            }
           }
         },
         "residency": {
@@ -2816,7 +2823,8 @@
             "auth": "Here's how your auth configuration is going to work",
             "id-doc": "All selected documents will be presented as viable upload options for users to select from.",
             "default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-            "alpaca": "Here's your Playbook configuration based on Alpaca's CIP."
+            "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
+            "apex": "Here's your Playbook configuration based on Apex's CIP."
           },
           "data-collection": {
             "investor-profile": {

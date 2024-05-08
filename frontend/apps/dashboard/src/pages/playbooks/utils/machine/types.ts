@@ -70,6 +70,11 @@ export enum KycOptionsForBeneficialOwners {
   all = 'all',
   primary = 'primary',
 }
+export const defaultResidencyFormDataApex: ResidencyFormData = {
+  allowUsResidents: true,
+  allowUsTerritories: true,
+  allowInternationalResidents: false,
+};
 
 export type VerificationChecksFormData = {
   skipKyc?: boolean;
@@ -92,6 +97,13 @@ export const defaultAmlFormData: AMLFormData = {
 };
 
 export const defaultAmlFormDataAlpaca: AMLFormData = {
+  enhancedAml: true,
+  ofac: true,
+  pep: true,
+  adverseMedia: true,
+};
+
+export const defaultAmlFormDataApex: AMLFormData = {
   enhancedAml: true,
   ofac: true,
   pep: true,
@@ -206,6 +218,25 @@ export const defaultPlaybookValuesAlpaca: SummaryFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
+export const defaultPlaybookValuesApex: SummaryFormData = {
+  kind: PlaybookKind.Kyc,
+  personal: {
+    [CollectedKycDataOption.address]: true,
+    [CollectedKycDataOption.dob]: true,
+    [CollectedKycDataOption.phoneNumber]: true,
+    [CollectedKycDataOption.usLegalStatus]: true,
+    email: true,
+    idDoc: false,
+    idDocKind: [],
+    countrySpecificIdDocKind: {},
+    selfie: false,
+    ssn: true,
+    ssnDocScanStepUp: false,
+    ssnKind: CollectedKycDataOption.ssn9,
+  },
+  [CollectedInvestorProfileDataOption.investorProfile]: false,
+};
+
 export const defaultPlaybookValuesIdDoc: SummaryFormData = {
   kind: PlaybookKind.IdDoc,
   personal: {
@@ -232,6 +263,7 @@ export const defaultPlaybookValuesKYB: SummaryFormData = {
 export enum OnboardingTemplate {
   Custom = 'custom',
   Alpaca = 'alpaca',
+  Apex = 'apex',
 }
 
 export type MachineContext = {

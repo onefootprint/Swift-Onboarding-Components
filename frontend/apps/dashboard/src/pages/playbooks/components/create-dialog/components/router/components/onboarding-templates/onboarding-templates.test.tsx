@@ -1,5 +1,6 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
+import { OnboardingTemplate } from 'src/pages/playbooks/utils/machine/types';
 
 import OnboardingTemplates from '.';
 import type { OnboardingTemplatesProps } from './onboarding-templates';
@@ -17,34 +18,61 @@ describe('<OnboardingTemplates />', () => {
     renderOnboardingTemplates({ onSubmit, onBack });
     expect(
       screen.getByText(
-        'Configure your own KYC settings or select a pre-defined template from an external provider.',
+        'Configure your own KYC settings or select a pre-defined template.',
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText('Custom')).toBeInTheDocument();
-    expect(screen.getByText('Alpaca')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+    const customPlaybookOption = screen.getByRole('button', {
+      name: 'Custom',
+    });
+    expect(customPlaybookOption).toBeInTheDocument();
+    const alpacaOption = screen.getByRole('button', {
+      name: 'Alpaca',
+    });
+    expect(alpacaOption).toBeInTheDocument();
+    const apexOption = screen.getByRole('button', {
+      name: 'Apex',
+    });
+    expect(apexOption).toBeInTheDocument();
   });
 
-  it('When Alpaca is selected, onSubmit is called with alpaca', async () => {
+  it('when Alpaca is selected, onSubmit is called with alpaca', async () => {
     const onSubmit = jest.fn();
     const onBack = jest.fn();
     renderOnboardingTemplates({ onSubmit, onBack });
-    await userEvent.click(screen.getByText('Alpaca'));
-    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
-    expect(onSubmit).toHaveBeenCalledWith({ template: 'alpaca' });
+    const alpacaOption = screen.getByRole('button', { name: 'Alpaca' });
+    await userEvent.click(alpacaOption);
+    const nextButton = screen.getByRole('button', { name: 'Next' });
+    await userEvent.click(nextButton);
+    expect(onSubmit).toHaveBeenCalledWith({
+      template: OnboardingTemplate.Alpaca,
+    });
   });
 
-  it('When Custom is selected, onSubmit is called with custom', async () => {
+  it('when Custom is selected, onSubmit is called with custom', async () => {
     const onSubmit = jest.fn();
     const onBack = jest.fn();
     renderOnboardingTemplates({ onSubmit, onBack });
-    await userEvent.click(screen.getByText('Custom'));
-    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
-    expect(onSubmit).toHaveBeenCalledWith({ template: 'custom' });
+    const customOption = screen.getByRole('button', { name: 'Custom' });
+    await userEvent.click(customOption);
+    const nextButton = screen.getByRole('button', { name: 'Next' });
+    await userEvent.click(nextButton);
+    expect(onSubmit).toHaveBeenCalledWith({
+      template: OnboardingTemplate.Custom,
+    });
   });
 
-  it('When back is pressed, back is called correctly', async () => {
+  it('when Apex is selected, onSubmit is called with apex', async () => {
+    const onSubmit = jest.fn();
+    const onBack = jest.fn();
+    renderOnboardingTemplates({ onSubmit, onBack });
+    const apexOption = screen.getByRole('button', { name: 'Apex' });
+    await userEvent.click(apexOption);
+    const nextButton = screen.getByRole('button', { name: 'Next' });
+    await userEvent.click(nextButton);
+    expect(onSubmit).toHaveBeenCalledWith({ template: 'apex' });
+  });
+
+  it('when back is pressed, back is called correctly', async () => {
     const onSubmit = jest.fn();
     const onBack = jest.fn();
     renderOnboardingTemplates({ onSubmit, onBack });

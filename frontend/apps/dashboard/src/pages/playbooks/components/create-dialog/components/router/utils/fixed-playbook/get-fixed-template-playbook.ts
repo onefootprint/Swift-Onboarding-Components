@@ -3,10 +3,9 @@ import type {
   MachineContext,
   SummaryFormData,
   VerificationChecksFormData,
-} from '../machine/types';
+} from '@/playbooks/utils/machine/types';
 
-// eslint-disable-next-line import/prefer-default-export
-export const getAlpacaPlaybookContext = (
+const getFixedTemplatePlaybook = (
   context: MachineContext,
   playbook: SummaryFormData,
   verificationChecksForm: VerificationChecksFormData,
@@ -26,3 +25,5 @@ export const getAlpacaPlaybookContext = (
 
   return alpacaContext;
 };
+
+export default getFixedTemplatePlaybook;

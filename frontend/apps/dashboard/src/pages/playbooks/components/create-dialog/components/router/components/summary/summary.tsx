@@ -38,6 +38,12 @@ const Summary = ({
     keyPrefix: 'pages.playbooks.dialog.summary',
   });
 
+  const onboardingTemplateToSubtitleMap = {
+    [OnboardingTemplate.Custom]: t('subtitle.default'),
+    [OnboardingTemplate.Alpaca]: t('subtitle.alpaca'),
+    [OnboardingTemplate.Apex]: t('subtitle.apex'),
+  };
+
   const getTitle = (): string => {
     if (isAuth(meta.kind)) {
       return t('title.auth');
@@ -50,7 +56,7 @@ const Summary = ({
       !meta.residency.allowUsResidents;
     const canEdit =
       !internationalOnly &&
-      meta.onboardingTemplate !== OnboardingTemplate.Alpaca;
+      meta.onboardingTemplate === OnboardingTemplate.Custom;
     return canEdit
       ? t('title.default-editable')
       : t('title.default-non-editable');
@@ -65,9 +71,9 @@ const Summary = ({
       !meta.residency.allowUsResidents;
 
     if (internationalOnly) return t('subtitle.international-only');
-    if (meta.onboardingTemplate === OnboardingTemplate.Alpaca)
-      return t('subtitle.alpaca');
-    return t(`subtitle.default`);
+    return meta.onboardingTemplate
+      ? onboardingTemplateToSubtitleMap[meta.onboardingTemplate]
+      : t('subtitle.default');
   };
 
   const formMethods = useForm<SummaryFormData>({ defaultValues });

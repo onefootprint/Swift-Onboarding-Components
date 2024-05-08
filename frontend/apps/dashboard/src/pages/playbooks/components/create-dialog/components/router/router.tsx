@@ -4,18 +4,17 @@ import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { getAlpacaPlaybookContext } from 'src/pages/playbooks/utils/kind/alpaca';
-import { getDocPlaybookContext } from 'src/pages/playbooks/utils/kind/id-doc';
 import styled, { css } from 'styled-components';
 
-import { getAuthFixedPayload, isAuth, isIdDoc } from '@/playbooks/utils/kind';
+import { isAuth, isIdDoc } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
-import {
-  type MachineContext,
-  OnboardingTemplate,
-  type Personal,
-  type VerificationChecksFormData,
+import type {
+  MachineContext,
+  Personal,
+  SummaryFormData,
+  VerificationChecksFormData,
 } from '@/playbooks/utils/machine/types';
+import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
 import Name from './components/name-your-playbook';
 import OnboardingTemplates from './components/onboarding-templates';
@@ -23,11 +22,16 @@ import Residency from './components/residency';
 import Summary from './components/summary';
 import VerificationChecks from './components/verification-checks';
 import WhoToOnboard from './components/who-to-onboard';
-import useDefaultValues from './hooks/use-default-values';
+import useCreatePlaybook from './hooks/use-create-playbook';
 import useOptions from './hooks/use-options';
+import {
+  getFixedAuthPlaybook,
+  getFixedIdDocPlaybook,
+  getFixedTemplatePlaybook,
+} from './utils/fixed-playbook';
 import getCurrentOption from './utils/get-current-option';
+import getDefaultValues from './utils/get-default-values';
 import processPlaybook from './utils/process-playbook';
-import useCreatePlaybook from './utils/use-create-playbook';
 
 export type RouterProps = {
   onCreate: () => void;
@@ -50,14 +54,13 @@ const Router = ({ onCreate }: RouterProps) => {
     value: state.value as string,
     options,
   });
-  const defaultValues = useDefaultValues(state.context);
+  const defaultValues = getDefaultValues(state.context);
   const idDocKinds = state.context.playbook?.personal.idDocKind;
   const countrySpecificIdDocKinds =
     state.context.playbook?.personal.countrySpecificIdDocKind;
   const requiresIdDoc =
     (idDocKinds ?? []).length > 0 ||
     Object.keys(countrySpecificIdDocKinds ?? {}).length > 0;
-  const isAlpaca = onboardingTemplate === OnboardingTemplate.Alpaca;
 
   const createPlaybook = (
     context: MachineContext,
@@ -131,6 +134,62 @@ const Router = ({ onCreate }: RouterProps) => {
         },
       },
     );
+  };
+
+  const createFixedTemplatePlaybook = (
+    verificationChecksForm: VerificationChecksFormData,
+  ) => {
+    const context = getFixedTemplatePlaybook(
+      state.context,
+      defaultValues.playbook,
+      verificationChecksForm,
+      defaultValues,
+    );
+    createPlaybook(context, verificationChecksForm);
+  };
+
+  const handleSubmitSummary = (formData: SummaryFormData) => {
+    const { nameForm } = state.context;
+    if (isIdDoc(state.context.kind) && nameForm) {
+      const verificationChecksForm = {
+        skipKyc: true,
+        amlFormData: defaultValues.aml,
+      };
+      const idDocContext = getFixedIdDocPlaybook(
+        state.context,
+        formData,
+        verificationChecksForm,
+      );
+      createPlaybook(idDocContext, verificationChecksForm);
+      return;
+    }
+
+    if (isAuth(formData.kind) && nameForm) {
+      const payload = getFixedAuthPlaybook({ nameForm, ...formData });
+      const { verificationChecks, ...ctx } = payload;
+      createPlaybook(ctx, verificationChecks);
+      return;
+    }
+
+    if (onboardingTemplate === OnboardingTemplate.Alpaca && nameForm) {
+      const verificationChecksForm = {
+        skipKyc: false,
+        amlFormData: defaultValues.aml,
+      };
+      createFixedTemplatePlaybook(verificationChecksForm);
+      return;
+    }
+
+    if (onboardingTemplate === OnboardingTemplate.Apex && nameForm) {
+      const verificationChecksForm = {
+        skipKyc: false,
+        amlFormData: defaultValues.aml,
+      };
+      createFixedTemplatePlaybook(verificationChecksForm);
+      return;
+    }
+
+    send('playbookSubmitted', { payload: { formData } });
   };
 
   return (
@@ -222,47 +281,7 @@ const Router = ({ onCreate }: RouterProps) => {
             onBack={() => {
               send('navigationBackward');
             }}
-            onSubmit={formData => {
-              const { nameForm } = state.context;
-              if (isIdDoc(state.context.kind) && nameForm) {
-                const verificationChecksForm = {
-                  skipKyc: true,
-                  amlFormData: defaultValues.aml,
-                };
-                const idDocContext = getDocPlaybookContext(
-                  state.context,
-                  formData,
-                  verificationChecksForm,
-                );
-                createPlaybook(idDocContext, verificationChecksForm);
-                return;
-              }
-
-              if (isAuth(formData.kind) && nameForm) {
-                const payload = getAuthFixedPayload({ nameForm, ...formData });
-                const { verificationChecks, ...ctx } = payload;
-                createPlaybook(ctx, verificationChecks);
-                return;
-              }
-
-              if (isAlpaca && nameForm) {
-                const verificationChecksForm = {
-                  skipKyc: false,
-                  amlFormData: defaultValues.aml,
-                };
-
-                const alpacaContext = getAlpacaPlaybookContext(
-                  state.context,
-                  formData,
-                  verificationChecksForm,
-                  defaultValues,
-                );
-                createPlaybook(alpacaContext, verificationChecksForm);
-                return;
-              }
-
-              send('playbookSubmitted', { payload: { formData } });
-            }}
+            onSubmit={handleSubmitSummary}
             isLastStep={isLastStep}
             isLoading={mutation.isLoading}
           />

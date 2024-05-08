@@ -3,8 +3,7 @@ import type {
   SummaryFormData,
 } from '@/playbooks/utils/machine/types';
 
-// eslint-disable-next-line import/prefer-default-export
-export const getAuthFixedPayload = (
+export const getFixedAuthPlaybook = (
   obj: SummaryFormData & Pick<MachineContext, 'nameForm'>,
 ) => ({
   kind: obj.kind,
@@ -25,3 +24,5 @@ export const getAuthFixedPayload = (
     },
   },
 });
+
+export default getFixedAuthPlaybook;

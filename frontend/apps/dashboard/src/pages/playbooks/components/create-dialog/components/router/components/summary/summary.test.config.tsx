@@ -4,6 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import type { SummaryFormData } from '@/playbooks/utils/machine/types';
 import {
   defaultPlaybookValuesKYC,
+  OnboardingTemplate,
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
@@ -35,6 +36,7 @@ const DataCollectionWithContext = ({
               allowUsTerritories: false,
               allowInternationalResidents: false,
             },
+            onboardingTemplate: OnboardingTemplate.Custom,
           }}
         />
       </form>

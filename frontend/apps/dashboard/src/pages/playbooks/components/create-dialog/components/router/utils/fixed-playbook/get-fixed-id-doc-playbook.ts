@@ -2,10 +2,9 @@ import type {
   MachineContext,
   SummaryFormData,
   VerificationChecksFormData,
-} from '../machine/types';
+} from '@/playbooks/utils/machine/types';
 
-// eslint-disable-next-line import/prefer-default-export
-export const getDocPlaybookContext = (
+export const getFixedIdDocPlaybook = (
   context: MachineContext,
   playbook: SummaryFormData,
   verificationChecksForm: VerificationChecksFormData,
@@ -21,3 +20,5 @@ export const getDocPlaybookContext = (
 
   return idDocContext;
 };
+
+export default getFixedIdDocPlaybook;

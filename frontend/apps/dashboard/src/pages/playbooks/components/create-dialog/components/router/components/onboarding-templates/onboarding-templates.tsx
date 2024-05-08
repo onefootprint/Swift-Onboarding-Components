@@ -1,5 +1,5 @@
-import { IcoAlpaca24, IcoLayer0124 } from '@onefootprint/icons';
-import { Button, Divider, RadioSelect, Text } from '@onefootprint/ui';
+import { IcoAlpaca24, IcoApex24, IcoLayer0124 } from '@onefootprint/icons';
+import { Button, RadioSelect, Text } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -54,26 +54,42 @@ const OnboardingTemplates = ({
                   {
                     title: t('custom.title'),
                     description: t('custom.description'),
-                    value: 'custom',
+                    value: OnboardingTemplate.Custom,
                     IconComponent: IcoLayer0124,
                   },
                 ]}
                 value={field.value}
                 onChange={field.onChange}
               />
-              <Divider />
-              <RadioSelect
-                options={[
-                  {
-                    title: t('alpaca.title'),
-                    description: t('alpaca.description'),
-                    value: 'alpaca',
-                    IconComponent: IcoAlpaca24,
-                  },
-                ]}
-                value={field.value}
-                onChange={field.onChange}
-              />
+              <Section>
+                <SectionHeader>
+                  <Text variant="label-3">{t('brokerage-partner.title')}</Text>
+                </SectionHeader>
+                <RadioSelect
+                  options={[
+                    {
+                      title: t('brokerage-partner.alpaca.title'),
+                      description: t('brokerage-partner.alpaca.description'),
+                      value: OnboardingTemplate.Alpaca,
+                      IconComponent: IcoAlpaca24,
+                    },
+                  ]}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+                <RadioSelect
+                  options={[
+                    {
+                      title: t('brokerage-partner.apex.title'),
+                      description: t('brokerage-partner.apex.description'),
+                      value: OnboardingTemplate.Apex,
+                      IconComponent: IcoApex24,
+                    },
+                  ]}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              </Section>
             </>
           )}
         />
@@ -122,4 +138,21 @@ const Form = styled.form`
     gap: ${theme.spacing[7]};
   `}
 `;
+
+const Section = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[3]};
+  `}
+`;
+
+const SectionHeader = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    padding: ${theme.spacing[3]} 0;
+  `}
+`;
+
 export default OnboardingTemplates;

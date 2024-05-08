@@ -171,7 +171,7 @@ describe('<Router />', () => {
 
         // Templates
         const title = screen.getByText(
-          'Configure your own KYC settings or select a pre-defined template from an external provider.',
+          'Configure your own KYC settings or select a pre-defined template.',
         );
         expect(title).toBeInTheDocument();
       });

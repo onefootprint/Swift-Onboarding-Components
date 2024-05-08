@@ -6,20 +6,41 @@ import type {
 import {
   defaultAmlFormData,
   defaultAmlFormDataAlpaca,
+  defaultAmlFormDataApex,
   defaultNameFormData,
   defaultPlaybookValuesAlpaca,
+  defaultPlaybookValuesApex,
   defaultPlaybookValuesAuth,
   defaultPlaybookValuesIdDoc,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
   defaultResidencyFormData,
   defaultResidencyFormDataAlpaca,
+  defaultResidencyFormDataApex,
   OnboardingTemplate,
 } from '@/playbooks/utils/machine/types';
 
-const useDefaultValues = (context: MachineContext): DefaultValues => {
-  const isAlpacaPlaybook =
-    context.onboardingTemplate === OnboardingTemplate.Alpaca;
+const templateToDefaultValuesKYC = {
+  [OnboardingTemplate.Alpaca]: defaultPlaybookValuesAlpaca,
+  [OnboardingTemplate.Apex]: defaultPlaybookValuesApex,
+  [OnboardingTemplate.Custom]: defaultPlaybookValuesKYC,
+};
+
+const templateToDefaultAml = {
+  [OnboardingTemplate.Alpaca]: defaultAmlFormDataAlpaca,
+  [OnboardingTemplate.Apex]: defaultAmlFormDataApex,
+  [OnboardingTemplate.Custom]: defaultAmlFormData,
+};
+
+const templateToDefaultResidency = {
+  [OnboardingTemplate.Alpaca]: defaultResidencyFormDataAlpaca,
+  [OnboardingTemplate.Apex]: defaultResidencyFormDataApex,
+  [OnboardingTemplate.Custom]: defaultResidencyFormData,
+};
+
+const getDefaultValues = (context: MachineContext): DefaultValues => {
+  const onboardingTemplate =
+    context.onboardingTemplate || OnboardingTemplate.Custom;
   if (isAuth(context.kind)) {
     return {
       ...defaultPlaybookValuesAuth,
@@ -28,26 +49,19 @@ const useDefaultValues = (context: MachineContext): DefaultValues => {
     };
   }
 
-  let defaultValues = defaultPlaybookValuesKYC;
+  let defaultValues = templateToDefaultValuesKYC[onboardingTemplate];
   if (isKyb(context.kind)) {
     defaultValues = defaultPlaybookValuesKYB;
   }
   if (isIdDoc(context.kind)) {
     defaultValues = defaultPlaybookValuesIdDoc;
   }
-  if (isAlpacaPlaybook) {
-    defaultValues = defaultPlaybookValuesAlpaca;
-  }
 
-  let defaultAml = defaultAmlFormData;
-  if (isAlpacaPlaybook) defaultAml = defaultAmlFormDataAlpaca;
+  const defaultAml = templateToDefaultAml[onboardingTemplate];
 
-  let residency = defaultResidencyFormData;
+  let residency = templateToDefaultResidency[onboardingTemplate];
   if (isKyc(context.kind) && context.residencyForm) {
     residency = context.residencyForm;
-  }
-  if (isAlpacaPlaybook) {
-    residency = defaultResidencyFormDataAlpaca;
   }
 
   return {
@@ -58,4 +72,4 @@ const useDefaultValues = (context: MachineContext): DefaultValues => {
   };
 };
 
-export default useDefaultValues;
+export default getDefaultValues;

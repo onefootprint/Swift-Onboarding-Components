@@ -46,7 +46,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     Object.keys(values.countrySpecificIdDocKind).length > 0;
   const [showIdDocEditor, setShowIdDocEditor] = useState(false);
   const canEdit =
-    !internationalOnly && meta.onboardingTemplate !== OnboardingTemplate.Alpaca;
+    !internationalOnly && meta.onboardingTemplate === OnboardingTemplate.Custom;
   const allowUsTerritoryResidents = meta.residency?.allowUsTerritories;
 
   if (isKyb && !collectBO) {
