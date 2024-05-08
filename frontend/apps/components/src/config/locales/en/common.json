@@ -244,6 +244,7 @@
             "expiration_month": "Card expiration (Month)",
             "expiration_year": "Card expiration (Year)",
             "billing_address.zip": "Card billing address (Zip code)",
+            "billing_address.country": "Card billing address (Country)",
             "cvc": "Card security code (CVC)",
             "number_last4": "Card number (last 4)"
           }
