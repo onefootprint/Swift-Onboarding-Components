@@ -38,10 +38,7 @@ use crate::{
             self,
             incode::{curp_validation::run_curp_validation_check, incode_watchlist::WatchlistCheckKind},
             neuro_id::run_neuro_call,
-            vendor_api::{
-                vendor_api_response::build_vendor_response_map_from_vendor_results,
-                vendor_api_struct::IncodeFetchOCR,
-            },
+            vendor_api::{loaders::load_response_for_vendor_api, vendor_api_struct::IncodeFetchOCR},
             vendor_result::VendorResult,
         },
     },
@@ -250,13 +247,12 @@ pub fn handle_rules_output(
 pub async fn maybe_generate_ocr_reason_codes(
     state: &State,
     wf_id: &WorkflowId,
-    sv_id: &ScopedVaultId,
     vw: &VaultWrapper,
 ) -> ApiResult<Option<Vec<NewRiskSignalInfo>>> {
-    let wf_id = wf_id.clone();
+    let wfid = wf_id.clone();
     let (obc, _) = state
         .db_pool
-        .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
+        .db_query(move |conn| ObConfiguration::get(conn, &wfid))
         .await?;
 
     if !obc.is_doc_first {
@@ -265,23 +261,21 @@ pub async fn maybe_generate_ocr_reason_codes(
 
     // TODO: instead of retrieving all results from all vendor calls here, we could just retrieve the ones for the DocScan DI or even just directly retrieve IncodeFetchOCR itself
     // also slightly sketch to query latest by sv_id instead of strictly querying from vres's made within this workflow specifically
-    let vendor_results = &get_latest_vendor_results(state, sv_id).await?;
-
-    // If this is a doc-first OBC, generate OCR mismatch risk signals
-    let (vendor_map, vendor_result_id_map) = build_vendor_response_map_from_vendor_results(vendor_results)?;
-    let Some(fetch_ocr) = vendor_map.get(&IncodeFetchOCR) else {
-        return Ok(None);
-    };
-    let Some(vres) = vendor_result_id_map.get(&IncodeFetchOCR) else {
+    let Some((fetch_ocr, vres_id)) =
+        load_response_for_vendor_api(state, wf_id, &vw.vault.e_private_key, IncodeFetchOCR)
+            .await?
+            .ok()
+    else {
+        tracing::warn!(?wf_id, "error getting incode response for doc first risk signals");
         return Ok(None);
     };
 
     let ocr_comparison_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, vw).await?;
 
     let ocr_reason_codes =
-        incode_docv::pii_matching_reason_codes_from_ocr_response(fetch_ocr, ocr_comparison_data)
+        incode_docv::pii_matching_reason_codes_from_ocr_response(&fetch_ocr, ocr_comparison_data)
             .into_iter()
-            .map(|r| (r, VendorAPI::IncodeFetchOcr, vres.verification_result_id.clone()))
+            .map(|r| (r, VendorAPI::IncodeFetchOcr, vres_id.clone()))
             .collect();
 
     Ok(Some(ocr_reason_codes))

@@ -216,8 +216,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             }
         };
 
-        let ocr_reason_codes =
-            common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id, &vw).await?;
+        let ocr_reason_codes = common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &vw).await?;
 
         Ok(Box::new((
             ocr_reason_codes,
