@@ -198,11 +198,11 @@ export enum DocumentDI {
   passportCardCurp = 'document.passport_card.curp',
   passportCardCurpValidationResponse = 'document.passport_card.curp_validation_response',
 
-  latestSsnCardFront = 'document.ssn_card.front.image',
   latestLeaseFront = 'document.lease.front.image',
   latestBankStatementFront = 'document.bank_statement.front.image',
   latestUtilityBillFront = 'document.utility_bill.front.image',
-  latestProofOfAddressFront = 'document.proof_of_address.front.image',
+  ssnCard = 'document.ssn_card.image',
+  proofOfAddress = 'document.proof_of_address.image',
 }
 
 export type VersionedDocumentDI<Version extends string = string> =

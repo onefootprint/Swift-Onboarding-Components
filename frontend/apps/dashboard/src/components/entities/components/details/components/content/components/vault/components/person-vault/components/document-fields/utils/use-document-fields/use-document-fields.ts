@@ -180,9 +180,9 @@ const useDocumentFields = () => {
       ],
     },
     {
-      main: DocumentDI.latestSsnCardFront,
-      label: t(DocumentDI.latestSsnCardFront),
-      dis: [DocumentDI.latestSsnCardFront],
+      main: DocumentDI.ssnCard,
+      label: t(DocumentDI.ssnCard),
+      dis: [DocumentDI.ssnCard],
     },
     {
       main: DocumentDI.latestLeaseFront,
@@ -200,9 +200,9 @@ const useDocumentFields = () => {
       dis: [DocumentDI.latestUtilityBillFront],
     },
     {
-      main: DocumentDI.latestProofOfAddressFront,
-      label: t(DocumentDI.latestProofOfAddressFront),
-      dis: [DocumentDI.latestProofOfAddressFront],
+      main: DocumentDI.proofOfAddress,
+      label: t(DocumentDI.proofOfAddress),
+      dis: [DocumentDI.proofOfAddress],
     },
   ];
 

@@ -18,11 +18,11 @@ const mainDIs: Partial<Record<DocumentDI, SupportedIdDocTypes>> = {
     SupportedIdDocTypes.residenceDocument,
   [DocumentDI.latestVoterIdentificationFront]:
     SupportedIdDocTypes.voterIdentification,
-  [DocumentDI.latestSsnCardFront]: SupportedIdDocTypes.ssnCard,
+  [DocumentDI.ssnCard]: SupportedIdDocTypes.ssnCard,
   [DocumentDI.latestLeaseFront]: SupportedIdDocTypes.lease,
   [DocumentDI.latestBankStatementFront]: SupportedIdDocTypes.bankStatement,
   [DocumentDI.latestUtilityBillFront]: SupportedIdDocTypes.utilityBill,
-  [DocumentDI.latestProofOfAddressFront]: SupportedIdDocTypes.proofOfAddress,
+  [DocumentDI.proofOfAddress]: SupportedIdDocTypes.proofOfAddress,
   [DocumentDI.latestPassportCardFront]: SupportedIdDocTypes.passportCard,
 };
 

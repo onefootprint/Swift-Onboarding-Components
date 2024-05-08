@@ -323,13 +323,6 @@
         "ref_number": "Passport card reference number",
         "nationality": "Passport card nationality"
       },
-      "ssn_card": {
-        "front": {
-          "image": "SSN Card",
-          "latest_upload": "SSN Card",
-          "mime_type": "SSN Card MIME type"
-        }
-      },
       "lease": {
         "front": {
           "image": "Lease",
@@ -351,12 +344,11 @@
           "mime_type": "Utility Bill MIME type"
         }
       },
+      "ssn_card": {
+        "image": "SSN Card"
+      },
       "proof_of_address": {
-        "front": {
-          "image": "Proof of Address",
-          "latest_upload": "Proof of Address",
-          "mime_type": "Proof of Address MIME type"
-        }
+        "image": "Proof of Address"
       }
     },
     "business": {

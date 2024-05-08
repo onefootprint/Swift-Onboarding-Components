@@ -156,11 +156,11 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
         { di: DocumentDI.latestWorkPermitFront },
         { di: DocumentDI.latestVoterIdentificationFront },
         { di: DocumentDI.latestPassportCardFront },
-        { di: DocumentDI.latestSsnCardFront },
+        { di: DocumentDI.ssnCard },
         { di: DocumentDI.latestLeaseFront },
         { di: DocumentDI.latestUtilityBillFront },
         { di: DocumentDI.latestBankStatementFront },
-        { di: DocumentDI.latestProofOfAddressFront },
+        { di: DocumentDI.proofOfAddress },
       ],
     },
     cards: {
