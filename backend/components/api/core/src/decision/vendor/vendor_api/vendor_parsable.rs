@@ -1,6 +1,6 @@
 use idv::{
     experian::cross_core::response::CrossCoreAPIResponse,
-    idology::expectid::response::ExpectIDResponse,
+    idology::{expectid::response::ExpectIDResponse, pa::response::PaResponse},
     incode::{
         doc::response::{AddCustomerResponse, FetchOCRResponse, FetchScoresResponse},
         watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
@@ -51,4 +51,7 @@ impl VendorParsable for IncodeWatchlistCheck {
 }
 impl VendorParsable for IncodeUpdatedWatchlistResult {
     type ParsedType = UpdatedWatchlistResultResponse;
+}
+impl VendorParsable for IdologyPa {
+    type ParsedType = PaResponse;
 }

@@ -1,13 +1,8 @@
 use crate::{
     decision::{
         vendor::{
-            tenant_vendor_control::TenantVendorControl,
-            vendor_api::{
-                vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
-                vendor_api_struct::IdologyPa,
-            },
-            vendor_trait::VendorAPIResponse,
-            verification_result, VendorAPIError,
+            tenant_vendor_control::TenantVendorControl, vendor_trait::VendorAPIResponse, verification_result,
+            VendorAPIError,
         },
         {self},
     },
@@ -25,28 +20,25 @@ use idv::{
     },
     VendorResponse,
 };
-use newtypes::{DecisionIntentId, FootprintReasonCode, ScopedVaultId, TenantId, VendorAPI};
+use newtypes::{
+    DecisionIntentId, FootprintReasonCode, ScopedVaultId, TenantId, VendorAPI, VerificationResultId,
+};
 
 pub async fn complete_vendor_call(
     state: &State,
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     tenant_id: &TenantId,
-    existing_vendor_results: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap),
+    existing_response: Option<(PaResponse, VerificationResultId)>,
 ) -> ApiResult<Vec<NewRiskSignalInfo>> {
-    let (res_map, ids_map) = existing_vendor_results;
-    let (reason_codes, vres_id) =
-        if let (Some(res), Some(ids)) = (res_map.get(&IdologyPa), ids_map.get(&IdologyPa)) {
-            // we already successfully completed a IdologyPa call for this watchlist task, so just return reason codes from it
-            (
-                parse_reason_codes(res.clone())?,
-                ids.verification_result_id.clone(),
-            )
-        } else {
-            let (res, vres) = make_vendor_call(state, sv_id, di_id, tenant_id).await?;
-            let pa_res = PaResponse::try_from(res.response)?;
-            (parse_reason_codes(pa_res)?, vres.id)
-        };
+    let (reason_codes, vres_id) = if let Some((res, vres_id)) = existing_response {
+        // we already successfully completed a IdologyPa call for this watchlist task, so just return reason codes from it
+        (parse_reason_codes(res.clone())?, vres_id)
+    } else {
+        let (res, vres) = make_vendor_call(state, sv_id, di_id, tenant_id).await?;
+        let pa_res = PaResponse::try_from(res.response)?;
+        (parse_reason_codes(pa_res)?, vres.id)
+    };
 
     Ok(reason_codes
         .into_iter()

@@ -118,6 +118,7 @@ mod tests {
     #[test_state_case(VendorAPI::IncodeFetchOcr)]
     #[test_state_case(VendorAPI::IncodeUpdatedWatchlistResult)]
     #[test_state_case(VendorAPI::IncodeWatchlistCheck)]
+    #[test_state_case(VendorAPI::IdologyPa)]
     #[tokio::test(flavor = "multi_thread")]
     async fn test_load_response_for_vendor_api_for_multiple_apis(state: &mut State, vendor_api: VendorAPI) {
         let FixtureData {
@@ -197,7 +198,17 @@ mod tests {
                 )
                 .await
             }
-            VendorAPI::IdologyPa => todo!(),
+            VendorAPI::IdologyPa => {
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    IdologyPa,
+                )
+                .await
+            }
             VendorAPI::TwilioLookupV2 => todo!(),
             VendorAPI::SocureIdPlus => todo!(),
             VendorAPI::ExperianPreciseId => {
@@ -346,7 +357,7 @@ mod tests {
     fn vendor_api_fixture(vendor_api: VendorAPI) -> serde_json::Value {
         match vendor_api {
             VendorAPI::IdologyExpectId => idv::test_fixtures::test_idology_expectid_response(),
-            VendorAPI::IdologyPa => todo!(),
+            VendorAPI::IdologyPa => idv::test_fixtures::idology_pa_response(),
             VendorAPI::TwilioLookupV2 => todo!(),
             VendorAPI::SocureIdPlus => todo!(),
             VendorAPI::ExperianPreciseId => idv::test_fixtures::experian_cross_core_response(None),

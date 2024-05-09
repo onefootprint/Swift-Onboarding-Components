@@ -1,8 +1,7 @@
 use crate::{
-    decision::{vendor, vendor::vendor_result::VendorResult},
+    decision::vendor::vendor_api::{loaders::load_response_for_vendor_api, vendor_api_struct::IdologyPa},
     errors::AssertionError,
-    task,
-    task::{ExecuteTask, TaskError},
+    task::{self, ExecuteTask, TaskError},
     utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
     ApiError, State,
 };
@@ -17,7 +16,6 @@ use db::{
         task::Task,
         tenant::Tenant,
         user_timeline::UserTimeline,
-        verification_request::VerificationRequest,
         watchlist_check::WatchlistCheck,
     },
     DbResult, TxnPgConn,
@@ -81,7 +79,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         // If we create a new watchlist_check, we either:
         //  - Create it with state Pending and a decision_intent is created at the same time
         //  - Create it with state NotNeeded and no decision_intent is written, meaning no vendor call is to be made
-        let (tenant, sv, obc, uvw, wc, existing_vendor_results) = self
+        let (tenant, sv, obc, uvw, wc) = self
             .state
             .db_pool
             .db_transaction(move |conn| -> Result<_, TaskError> {
@@ -100,13 +98,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 let sv = ScopedVault::get(conn, &sv_id)?;
                 let obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &sv.id)?;
 
-                let existing_vendor_results = if let Some(di_id) = wc.decision_intent_id.as_ref() {
-                    VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, di_id)?
-                } else {
-                    vec![]
-                };
-
-                Ok((tenant, sv, obc, uvw, wc, existing_vendor_results))
+                Ok((tenant, sv, obc, uvw, wc))
             })
             .await?;
 
@@ -127,22 +119,16 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 if !tenant.id.is_fractional() {
                     tracing::error!(%tenant.id, obc_id=obc.map(|o| o.id.to_string()).unwrap_or_default(),"WatchlistCheckTask run with an obc with enhanced_aml=No on a non-Fractional tenant");
                 }
-                // TODO: make a util for this common Vec<RequestAndMaybeResult> -> maps logic
-                let existing_vendor_results = VendorResult::hydrate_vendor_results(
-                    existing_vendor_results,
-                    &self.state.enclave_client,
-                    &uvw.vault.e_private_key,
-                )
-                .await?;
-                let vendor_results: Vec<VendorResult> = existing_vendor_results
-                    .into_iter()
-                    .flat_map(|r| r.into_vendor_result())
-                    .collect();
 
-                let existing_vres_map =
-                    vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results(
-                        &vendor_results,
-                    )?;
+                let existing_response = load_response_for_vendor_api(
+                    &self.state,
+                    di_id.clone(),
+                    &uvw.vault.e_private_key,
+                    IdologyPa,
+                )
+                .await?
+                .ok();
+
                 if idv::requirements::vendor_api_requirements_are_satisfied(
                     &VendorAPI::IdologyPa,
                     uvw.populated().as_slice(),
@@ -152,7 +138,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                         &sv.id,
                         &di_id,
                         &tenant.id,
-                        existing_vres_map,
+                        existing_response,
                     )
                     .await?;
                     WatchlistVendorResult::Completed(reason_codes)

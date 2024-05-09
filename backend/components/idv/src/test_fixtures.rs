@@ -133,6 +133,31 @@ pub fn idology_fake_data_expectid_response() -> serde_json::Value {
             }
     }})
 }
+
+pub fn idology_pa_response() -> serde_json::Value {
+    serde_json::json!({
+        "response": {
+            "error": null,
+            "id-number": 4671490,
+            "qualifiers": {
+                "qualifier": {
+                    "key": "resultcode.pa.dob.not.available",
+                    "message": "PA DOB Not Available"
+                }
+            },
+            "restriction": {
+                "key": "global.watch.list",
+                "message": "Patriot Act Alert",
+                "pa": {
+                    "list": "Politically Exposed Persons",
+                    "score": 94
+                }
+            }
+        }
+    }
+    )
+}
+
 pub fn test_twilio_lookupv2_response() -> serde_json::Value {
     serde_json::json!({
       "country_code": "GB",
