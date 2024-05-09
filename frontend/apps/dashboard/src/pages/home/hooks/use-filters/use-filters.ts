@@ -97,7 +97,7 @@ const getDates = ({
   }
   if (period === 'month-to-date') {
     return {
-      start: subMonths(today, 1),
+      start: startOfMonth(today),
       end: today,
     };
   }
