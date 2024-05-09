@@ -1,5 +1,6 @@
+import { IcoForbid40 } from '@onefootprint/icons';
 import { type Entity, type Liveness } from '@onefootprint/types';
-import { Divider, MultiSelect, Text } from '@onefootprint/ui';
+import { Divider, MultiSelect, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -82,9 +83,39 @@ const Content = ({ entity, livenessData }: ContentProps) => {
 
   if (!cards.length) {
     cards.push(
-      <Text key="empty" variant="body-3" color="tertiary">
-        {t('empty')}
-      </Text>,
+      <Stack
+        display="flex"
+        direction="column"
+        gap={6}
+        justify="center"
+        justifyContent="center"
+        alignItems="center"
+        padding={5}
+        flexGrow={1}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <IcoForbid40 />
+        <Stack
+          width="100%"
+          display="flex"
+          direction="column"
+          gap={3}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text key="empty" variant="label-2" color="tertiary">
+            {t('empty.title')}
+          </Text>
+          <Text
+            key="empty"
+            variant="body-2"
+            color="tertiary"
+            textAlign="center"
+          >
+            {t('empty.description')}
+          </Text>
+        </Stack>
+      </Stack>,
     );
   }
 
@@ -92,8 +123,12 @@ const Content = ({ entity, livenessData }: ContentProps) => {
     onSelectedIdChange(id);
     // Find the card with the selected id and scroll to it
     const card = document.getElementById(`device-insights-card-${id}`);
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const parent = card?.parentElement;
+    if (card && parent) {
+      parent.scrollTo({
+        top: card.offsetTop,
+        behavior: 'smooth',
+      });
     }
   };
 
@@ -153,11 +188,17 @@ const Container = styled.div`
 
 const CardsContainer = styled.div`
   ${({ theme }) => css`
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[4]};
-    overflow-y: auto;
+    height: 100%;
+    overflow-y: scroll;
+    box-sizing: content-box;
+    padding-right: 35px;
+    width: 100%;
     padding-top: ${theme.spacing[3]};
+    padding-bottom: ${theme.spacing[4]};
   `}
 `;
 

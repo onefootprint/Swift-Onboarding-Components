@@ -1,10 +1,16 @@
 import type { Color } from '@onefootprint/design-tokens';
 import {
+  IcoAndroid16,
   IcoAndroid24,
+  IcoApple16,
   IcoApple24,
+  IcoCode16,
   IcoCode24,
+  IcoLaptop16,
   IcoLaptop24,
+  IcoPhone16,
   IcoPhone24,
+  IcoUser16,
   IcoUser24,
 } from '@onefootprint/icons';
 import React from 'react';
@@ -18,6 +24,7 @@ export const icoForUserAgent = (
   isInstantApp?: boolean,
   isAppClip?: boolean,
   color?: Color,
+  size?: 'small' | 'large',
 ) => {
   const userAgent = UAParser(userAgentStr || '');
   if (
@@ -25,16 +32,32 @@ export const icoForUserAgent = (
     userAgent.device.vendor?.toLowerCase() === 'apple' ||
     isAppClip
   ) {
-    return <IcoApple24 color={color} />;
+    return size === 'small' ? (
+      <IcoApple16 color={color} />
+    ) : (
+      <IcoApple24 color={color} />
+    );
   }
   if (userAgent.os.name?.toLowerCase() === 'android' || isInstantApp) {
-    return <IcoAndroid24 color={color} />;
+    return size === 'small' ? (
+      <IcoAndroid16 color={color} />
+    ) : (
+      <IcoAndroid24 color={color} />
+    );
   }
   if (userAgent.device.type?.toLowerCase() === 'mobile') {
-    return <IcoPhone24 color={color} />;
+    return size === 'small' ? (
+      <IcoPhone16 color={color} />
+    ) : (
+      <IcoPhone24 color={color} />
+    );
   }
   if (isBot(userAgent)) {
-    return <IcoCode24 color={color} />;
+    return size === 'small' ? (
+      <IcoCode16 color={color} />
+    ) : (
+      <IcoCode24 color={color} />
+    );
   }
   if (
     userAgent.os.name?.toLowerCase() === 'mac os' ||
@@ -42,9 +65,17 @@ export const icoForUserAgent = (
     userAgent.os.name?.toLowerCase() === 'windows' ||
     userAgent.device.type === undefined
   ) {
-    return <IcoLaptop24 color={color} />;
+    return size === 'small' ? (
+      <IcoLaptop16 color={color} />
+    ) : (
+      <IcoLaptop24 color={color} />
+    );
   }
-  return <IcoUser24 color={color} />;
+  return size === 'small' ? (
+    <IcoUser16 color={color} />
+  ) : (
+    <IcoUser24 color={color} />
+  );
 };
 
 export const displayForUserAgent = (

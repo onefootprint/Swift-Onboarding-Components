@@ -1,7 +1,12 @@
 import type { Entity } from '@onefootprint/types';
-import { AnimatedLoadingSpinner, LinkButton } from '@onefootprint/ui';
+import {
+  AnimatedLoadingSpinner,
+  LinkButton,
+  Stack,
+  Text,
+} from '@onefootprint/ui';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import FieldValue from '../../../../../vault/components/field/components/field-value';
 import { useDecryptControls } from '../../../../../vault/components/vault-actions';
@@ -58,15 +63,12 @@ const AddressCard = ({
   const encryptedFields = getAddressFieldsProps(type).filter(
     prop => !prop.isDecrypted,
   );
-  const canDecryptFields =
-    encryptedFields.length > 0
-      ? encryptedFields.every(
-          field => decryptableSet.has(field.name) && field.canDecrypt,
-        )
-      : false;
+  const decryptableFields = encryptedFields.filter(
+    field => !field || (decryptableSet.has(field.name) && field.canDecrypt),
+  );
   const decryptControls = useDecryptControls();
   const isCtaLoading = isLoading || decryptControls.isLoading;
-  const isCtaVisible = canDecryptFields || isCtaLoading;
+  const isCtaVisible = decryptableFields.length > 0 || isCtaLoading;
 
   let ctaElem;
   if (isCtaVisible) {
@@ -75,7 +77,20 @@ const AddressCard = ({
         <AnimatedLoadingSpinner animationStart size={22} color="accent" />
       );
     } else {
-      ctaElem = <LinkButton onClick={handleClick}>{t('cta')}</LinkButton>;
+      ctaElem = (
+        <Stack width="100%" direction="column" align="flex-start">
+          <Text variant="label-3">
+            <Trans
+              i18nKey="pages.entity.device-insights.address-card.cta.text"
+              components={{
+                link: (
+                  <LinkButton onClick={handleClick}>{t('cta.link')}</LinkButton>
+                ),
+              }}
+            />
+          </Text>
+        </Stack>
+      );
     }
   }
 
@@ -84,7 +99,7 @@ const AddressCard = ({
       id={id}
       isSelected={isSelected}
       onSelect={() => onSelect?.(id)}
-      headerIcon={<AddressCardIcon type={type} />}
+      headerIcon={<AddressCardIcon type={type} size="large" />}
       headerText={headerText}
       rows={rows}
       cta={ctaElem}

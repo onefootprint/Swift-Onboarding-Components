@@ -5,6 +5,7 @@ import { type MapRef } from 'react-map-gl';
 import { Map as MapboxMap, Marker } from 'react-map-gl';
 import styled from 'styled-components';
 
+import GoogleMapsLoader from '../content/utils/google-maps-loader';
 import type { MapMarkerProps } from './components/map-marker';
 
 const PUBLIC_MAP_BOX_TOKEN =
@@ -12,7 +13,7 @@ const PUBLIC_MAP_BOX_TOKEN =
 
 const DEFAULT_ZOOM = 9;
 const MAX_ZOOM = 20;
-const MIN_ZOOM = 3;
+const MIN_ZOOM = 1;
 // Middle of US
 const FALLBACK_LATITUDE = 37.09024;
 const FALLBACK_LONGITUDE = -95.712891;
@@ -41,12 +42,37 @@ const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
   };
 
   useEffect(() => {
-    if (!mapRef.current || !selectedCoords) return;
-    mapRef.current.flyTo({
-      center: [selectedCoords.lng, selectedCoords.lat],
-      zoom: DEFAULT_ZOOM,
-    });
-  }, [selectedCoords]);
+    if (!mapRef.current) return;
+    if (selectedCoords) {
+      mapRef.current.flyTo({
+        center: [selectedCoords.lng, selectedCoords.lat],
+        zoom: DEFAULT_ZOOM,
+      });
+    } else if (!markers.length) {
+      mapRef.current.flyTo({
+        center: [FALLBACK_LONGITUDE, FALLBACK_LATITUDE],
+        zoom: MIN_ZOOM,
+      });
+    } else {
+      GoogleMapsLoader.importLibrary('core').then(() => {
+        // Find the midpoint of all markers and zoom out to see all markers
+        const bounds = new google.maps.LatLngBounds();
+        markers.forEach(marker => {
+          bounds.extend(
+            new google.maps.LatLng(marker.props.lat, marker.props.lng),
+          );
+        });
+        const center = bounds.getCenter();
+        const lat = center.lat();
+        const lng = center.lng();
+        if (!mapRef.current) return;
+        mapRef.current.flyTo({
+          center: [lng, lat],
+          zoom: MIN_ZOOM,
+        });
+      });
+    }
+  }, [selectedCoords, markers]);
 
   return (
     <Container>
@@ -68,6 +94,7 @@ const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
             key={marker.props.id}
             longitude={marker.props.lng}
             latitude={marker.props.lat}
+            anchor="bottom"
           >
             {React.cloneElement(marker, {
               onClick: () => handleMarkerClick(marker.props),

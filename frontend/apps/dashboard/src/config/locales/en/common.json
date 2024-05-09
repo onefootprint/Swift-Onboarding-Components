@@ -1776,9 +1776,15 @@
           "business-address": "Business address",
           "residential-address": "Home address"
         },
-        "empty": "No device insights shown.",
+        "empty": {
+          "title": "No device insights",
+          "description": "Please select the device insights type to view them here and on the map"
+        },
         "address-card": {
-          "cta": "Decrypt full address",
+          "cta": {
+            "link": "Decrypt full address",
+            "text": "<link/> to view location on the map"
+          },
           "business": {
             "header-text": "Business address"
           },

@@ -37,6 +37,14 @@ const useAddressFieldsProps = (entity: Entity) => {
     const sortedAttributes = filteredAttributes.sort(
       (a, b) => dis.indexOf(a) - dis.indexOf(b),
     );
+    // If address line 1 is present, insert address line 2 right afterwards as well
+    if (
+      sortedAttributes.includes(IdDI.addressLine1) &&
+      !sortedAttributes.includes(IdDI.addressLine2)
+    ) {
+      const index = sortedAttributes.indexOf(IdDI.addressLine1);
+      sortedAttributes.splice(index + 1, 0, IdDI.addressLine2);
+    }
     return sortedAttributes;
   };
 

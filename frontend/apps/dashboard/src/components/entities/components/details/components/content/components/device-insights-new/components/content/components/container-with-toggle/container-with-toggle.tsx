@@ -55,11 +55,12 @@ const DetailsContainer = styled.div`
 
 const DetailsWithToggle = styled.div`
   ${({ theme }) => css`
-    position: relative;
     width: 100%;
     height: 100%;
     background-color: ${theme.backgroundColor.primary};
-    padding: ${theme.spacing[4]};
+    padding: ${theme.spacing[4]} ${theme.spacing[4]} 0 ${theme.spacing[4]};
+    overflow: hidden;
+    margin-right: -35px;
     display: flex;
     flex-direction: column;
     border-radius: ${theme.borderRadius.sm} 0 0 ${theme.borderRadius.sm};
@@ -86,7 +87,7 @@ const DetailsToggle = styled.div`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     padding: ${theme.spacing[2]} ${theme.spacing[1]} ${theme.spacing[2]}
       ${theme.spacing[1]};
-    box-shadow: inset 0px 1px 4px 0px #0000001f;
+    box-shadow: 0px 1px 4px 0px #0000001f;
     cursor: pointer;
 
     @media (max-width: 960px) {

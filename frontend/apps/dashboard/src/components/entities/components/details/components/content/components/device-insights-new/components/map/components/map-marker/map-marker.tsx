@@ -37,7 +37,6 @@ const MapMarkerContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateX(-50%) translateY(-100%);
   cursor: pointer;
 `;
 
@@ -62,7 +61,7 @@ const Icon = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -70%);
+  transform: translate(-50%, -90%);
 `;
 
 export default MapMarker;

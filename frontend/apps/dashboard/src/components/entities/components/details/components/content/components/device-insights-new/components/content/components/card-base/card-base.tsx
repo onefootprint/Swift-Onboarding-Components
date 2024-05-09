@@ -22,29 +22,43 @@ const CardBase = ({
   headerText,
   rows,
   cta,
-}: CardBaseProps) => (
-  <Container
-    id={`device-insights-card-${id}`}
-    data-selected={!!isSelected}
-    onClick={onSelect}
-  >
-    {title && (
-      <Header data-selected={!!isSelected}>
-        <Text variant="caption-1">{title}</Text>
-      </Header>
-    )}
-    <Details>
-      <IconContainer>
-        <Icon>{headerIcon}</Icon>
-        <Text variant="label-2" isPrivate>
-          {headerText}
-        </Text>
-      </IconContainer>
-      <Rows>{rows}</Rows>
-      {cta}
-    </Details>
-  </Container>
-);
+}: CardBaseProps) => {
+  const handleSelect = () => {
+    const card = document.getElementById(`device-insights-card-${id}`);
+    const parent = card?.parentElement;
+    if (card && parent) {
+      parent.scrollTo({
+        top: card.offsetTop,
+        behavior: 'smooth',
+      });
+    }
+    onSelect?.();
+  };
+
+  return (
+    <Container
+      id={`device-insights-card-${id}`}
+      data-selected={!!isSelected}
+      onClick={handleSelect}
+    >
+      {title && (
+        <Header data-selected={!!isSelected}>
+          <Text variant="caption-1">{title}</Text>
+        </Header>
+      )}
+      <Details>
+        <IconContainer>
+          <Icon>{headerIcon}</Icon>
+          <Text variant="label-2" isPrivate>
+            {headerText}
+          </Text>
+        </IconContainer>
+        <Rows>{rows}</Rows>
+        {cta}
+      </Details>
+    </Container>
+  );
+};
 
 const Container = styled.div`
   ${({ theme }) => css`
@@ -52,6 +66,12 @@ const Container = styled.div`
     flex-direction: column;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
+    background-color: ${theme.backgroundColor.primary};
+    cursor: pointer;
+
+    &:hover {
+      background-color: ${theme.backgroundColor.secondary};
+    }
 
     &[data-selected='true'] {
       background-color: rgb(245, 243, 252);

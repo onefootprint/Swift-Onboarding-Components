@@ -64,8 +64,13 @@ const useAddressCoordinates = (entity: Entity, type: AddressType) => {
   };
 
   const addressProps = getAddressFieldsProps(type);
+  const decryptableSet = new Set(entity.decryptableAttributes);
   const encryptedFields = addressProps.filter(prop => !prop.isDecrypted);
-  const hasCompleteAddress = encryptedFields.length === 0;
+  const decryptableFields = encryptedFields.filter(
+    field => !field || (decryptableSet.has(field.name) && field.canDecrypt),
+  );
+  const hasCompleteAddress =
+    addressProps.length > 0 && decryptableFields.length === 0;
   const completeAddress = addressProps
     .map(prop => prop.value)
     .filter(v => !!v)

@@ -79,7 +79,7 @@ const useEntries = (
                 lat,
                 lng,
                 getIcon: (color?: Color) =>
-                  getIconForLivenessEvent(liveness, color),
+                  getIconForLivenessEvent(liveness, color, 'small'),
               }
             : undefined,
         };
@@ -105,7 +105,7 @@ const useEntries = (
               lat: businessLat,
               lng: businessLng,
               getIcon: (color?: Color) =>
-                getIconForAddress(AddressType.business, color),
+                getIconForAddress(AddressType.business, color, 'small'),
             }
           : undefined,
       };
@@ -132,7 +132,7 @@ const useEntries = (
               lat: residentialLat,
               lng: residentialLng,
               getIcon: (color?: Color) =>
-                getIconForAddress(AddressType.business, color),
+                getIconForAddress(AddressType.residential, color, 'small'),
             }
           : undefined,
       };
