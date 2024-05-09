@@ -127,17 +127,17 @@ const Company = () => {
       linkedin: 'https://www.linkedin.com/in/ethan-lowman/',
     },
     {
-      name: 'Keagan Long',
-      avatarSrc: '/team/member-keagan.png',
-      role: 'Engineering',
-      linkedin: 'https://www.linkedin.com/in/keagan-long-50597769/',
-    },
-    {
       name: 'Lucas Gelfond',
       avatarSrc: '/team/member-lucas.png',
       role: 'Engineering',
       linkedin: 'https://www.linkedin.com/in/lucasgelfond/',
       twitter: 'https://twitter.com/gucaslelfond',
+    },
+    {
+      name: 'Mike Hreben',
+      avatarSrc: '/team/member-mike.jpeg',
+      role: 'Sales',
+      linkedin: 'https://www.linkedin.com/in/mikehreben/',
     },
     {
       name: 'Pedro Marques',
