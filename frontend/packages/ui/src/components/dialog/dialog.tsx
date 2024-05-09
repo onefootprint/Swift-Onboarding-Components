@@ -75,7 +75,12 @@ const Dialog = ({
   const { t } = useTranslation('ui');
   const dialogRef = useRef<HTMLDivElement>(null);
   useLockedBody(open);
-  useOnClickOutside(dialogRef, onClose);
+  const handleClickOutside = () => {
+    if (size !== 'full-screen') {
+      onClose();
+    }
+  };
+  useOnClickOutside(dialogRef, handleClickOutside);
   useEventListener('keydown', event => {
     if (event.key === 'Escape') {
       onClose();

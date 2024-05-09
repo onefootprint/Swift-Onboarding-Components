@@ -24,6 +24,11 @@ const Toast = ({
 }: ToastProps) => {
   const { t } = useTranslation('ui');
 
+  const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (onClose) onClose();
+  };
+
   return (
     <ToastContainer
       role="alert"
@@ -71,7 +76,7 @@ const Toast = ({
         aria-label={
           closeAriaLabel ?? t('components.toast.close-aria-label-default')
         }
-        onClick={onClose}
+        onClick={handleClose}
         tabIndex={0}
         type="button"
       >
