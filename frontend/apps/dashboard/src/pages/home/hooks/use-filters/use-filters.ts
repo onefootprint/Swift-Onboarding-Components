@@ -1,5 +1,6 @@
 import {
   startOfMonth,
+  startOfQuarter,
   startOfToday,
   startOfYear,
   subDays,
@@ -102,7 +103,7 @@ const getDates = ({
   }
   if (period === 'quarter-to-date') {
     return {
-      start: startOfMonth(today),
+      start: startOfQuarter(today),
       end: today,
     };
   }
