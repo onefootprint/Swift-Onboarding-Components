@@ -154,8 +154,8 @@ jobs:
           echo "account is ${account}"
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
 
-          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${{ inputs.enclaveComponentVersion }}
-          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${{ inputs.enclaveComponentVersion }} enclave:${{ inputs.enclaveComponentVersion }}
+          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${{ inputs.enclaveComponentVersion }}
+          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${{ inputs.enclaveComponentVersion }} enclave:${{ inputs.enclaveComponentVersion }}
 
       - name: Sign EIF and package
         working-directory: ./backend

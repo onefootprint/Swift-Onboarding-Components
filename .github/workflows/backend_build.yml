@@ -166,7 +166,7 @@ jobs:
         run: |
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} && docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} enclave_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} || echo "Image not found"
+          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${{ needs.extract_commit.outputs.enclaveComponentVersion }} && docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${{ needs.extract_commit.outputs.enclaveComponentVersion }} enclave:${{ needs.extract_commit.outputs.enclaveComponentVersion }} || echo "Image not found"
 
       - uses: actions/checkout@v3
         with:
@@ -184,10 +184,10 @@ jobs:
           echo "create image tagged as ${componentVersion}"
 
           # check cache or build
-          docker inspect enclave_pkg:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && make build-enclave-docker && docker tag enclave:latest enclave_pkg:${componentVersion})
+          docker inspect enclave:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && make build-enclave-docker && docker tag enclave:latest enclave:${componentVersion})
 
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker tag enclave_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${componentVersion}
-          docker tag enclave_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${componentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
+          docker tag enclave:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${componentVersion}
+          docker tag enclave:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:latest
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${componentVersion}
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:latest
