@@ -351,6 +351,12 @@ def test_card_expiration_transform(tenant):
         "13-23",
         "100/23",
         "100-23",
+        "00/23",
+        "00/2023",
+        "00/00",
+        "0/23",
+        "0/2023",
+        "0/00",
     ]
 
     for bad_exp in bad_formats:

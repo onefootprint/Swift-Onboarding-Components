@@ -259,7 +259,8 @@ impl Expiration {
     }
 
     fn validate_month(month: &str) -> VResult<PiiString> {
-        if month.parse::<u8>()? > 12 {
+        let month_int = month.parse::<u8>()?;
+        if !(1..=12).contains(&month_int) {
             return Err(Error::InvalidMonth);
         }
         let month = if month.len() == 2 {
@@ -281,7 +282,9 @@ fn validate_cc_cvc(value: PiiString, alias: &AliasId, all_data: &AllData) -> VRe
     if value.leak().chars().any(|c| !c.is_numeric()) {
         return Err(Error::NonDigitCharacter);
     }
-    if value.leak().len() < 3 || value.leak().len() > 4 {
+
+    let len = value.leak().len();
+    if !(len == 3 || len == 4) {
         return Err(Error::InvalidLength);
     }
 
@@ -399,11 +402,74 @@ mod test {
     #[test_case("11/23/25" => None)]
     #[test_case("8/1325" => Some("08/1325".into()))]
     #[test_case("8/4" => None)]
+    #[test_case("1/123" => None)]
+    #[test_case("1/0" => None; "Invalid 1")]
+    #[test_case("1/000" => None; "Invalid 3")]
+    #[test_case("0/0" => None; "Invalid 5")]
+    #[test_case("0/00" => None; "Invalid 6")]
+    #[test_case("0/000" => None; "Invalid 7")]
+    #[test_case("0/0000" => None; "Invalid 8")]
+    #[test_case("0/23" => None; "Invalid 9")]
+    #[test_case("0/123" => None; "Invalid 10")]
+    #[test_case("0/2023" => None; "Invalid 11")]
+    #[test_case("00/0" => None; "Invalid 12")]
+    #[test_case("00/00" => None; "Invalid 13")]
+    #[test_case("00/000" => None; "Invalid 14")]
+    #[test_case("00/0000" => None; "Invalid 15")]
+    #[test_case("00/23" => None; "Invalid 16")]
+    #[test_case("00/123" => None; "Invalid 17")]
+    #[test_case("00/2023" => None; "Invalid 18")]
+    #[test_case("1-0" => None; "Invalid 19")]
+    #[test_case("1-000" => None; "Invalid 21")]
+    #[test_case("0-0" => None; "Invalid 23")]
+    #[test_case("0-00" => None; "Invalid 24")]
+    #[test_case("0-000" => None; "Invalid 25")]
+    #[test_case("0-0000" => None; "Invalid 26")]
+    #[test_case("0-23" => None; "Invalid 27")]
+    #[test_case("0-123" => None; "Invalid 28")]
+    #[test_case("0-2023" => None; "Invalid 29")]
+    #[test_case("00-0" => None; "Invalid 30")]
+    #[test_case("00-00" => None; "Invalid 31")]
+    #[test_case("00-000" => None; "Invalid 32")]
+    #[test_case("00-0000" => None; "Invalid 33")]
+    #[test_case("00-23" => None; "Invalid 34")]
+    #[test_case("00-123" => None; "Invalid 35")]
+    #[test_case("00-2023" => None; "Invalid 36")]
+    #[test_case("January 2023" => None; "Invalid 37")]
+    #[test_case("Jan 2023" => None; "Invalid 38")]
+    #[test_case("Jan. 2023" => None; "Invalid 39")]
+    #[test_case("01/2023" => Some("01/2023".into()); "Valid 1")]
+    #[test_case("12/2023" => Some("12/2023".into()); "Valid 2")]
+    #[test_case("02/0000" => Some("02/0000".into()); "Valid 3")]
+    #[test_case("03/1990" => Some("03/1990".into()); "Valid 4")]
+    #[test_case("01-2023" => Some("01/2023".into()); "Valid 5")]
+    #[test_case("12-2023" => Some("12/2023".into()); "Valid 6")]
+    #[test_case("02-0000" => Some("02/0000".into()); "Valid 7")]
+    #[test_case("03-1990" => Some("03/1990".into()); "Valid 8")]
+    #[test_case("01/23" => Some("01/2023".into()); "Valid 9")]
+    #[test_case("12/23" => Some("12/2023".into()); "Valid 10")]
+    #[test_case("02/00" => Some("02/2000".into()); "Valid 11")]
+    #[test_case("03/90" => Some("03/2090".into()); "Valid 12")]
+    #[test_case("01-23" => Some("01/2023".into()); "Valid 13")]
+    #[test_case("12-23" => Some("12/2023".into()); "Valid 14")]
+    #[test_case("02-00" => Some("02/2000".into()); "Valid 15")]
+    #[test_case("03-90" => Some("03/2090".into()); "Valid 16")]
+    #[test_case("1/23" => Some("01/2023".into()); "Valid 17")]
+    #[test_case("2/00" => Some("02/2000".into()); "Valid 18")]
+    #[test_case("3/90" => Some("03/2090".into()); "Valid 19")]
+    #[test_case("1-23" => Some("01/2023".into()); "Valid 20")]
+    #[test_case("2-00" => Some("02/2000".into()); "Valid 21")]
+    #[test_case("3-90" => Some("03/2090".into()); "Valid 22")]
+    #[test_case("1/00" => Some("01/2000".into()); "Valid 23")]
+    #[test_case("1/0000" => Some("01/0000".into()); "Valid 24")]
+    #[test_case("1-00" => Some("01/2000".into()); "Valid 25")]
+    #[test_case("1-0000" => Some("01/0000".into()); "Valid 26")]
     fn test_expiration(input: &str) -> Option<String> {
-        super::Expiration::parse(&PiiString::from(input))
+        let alias = AliasId::fixture();
+
+        parse_expiration(&alias, PiiString::from(input))
             .ok()
-            .map(PiiString::from)
-            .map(|p| p.leak().to_string())
+            .map(|(cleaned, _)| cleaned.leak().to_string())
     }
 
     #[test_case("Alex Grinman" => true)]
