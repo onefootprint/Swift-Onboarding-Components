@@ -1,7 +1,10 @@
 use idv::{
     experian::cross_core::response::CrossCoreAPIResponse,
     idology::expectid::response::ExpectIDResponse,
-    incode::doc::response::{AddCustomerResponse, FetchOCRResponse, FetchScoresResponse},
+    incode::{
+        doc::response::{AddCustomerResponse, FetchOCRResponse, FetchScoresResponse},
+        watchlist::response::WatchlistResultResponse,
+    },
 };
 use newtypes::VendorAPI;
 use serde::de::DeserializeOwned;
@@ -41,4 +44,8 @@ impl VendorParsable for IncodeFetchOCR {
 }
 impl VendorParsable for IncodeFetchScores {
     type ParsedType = FetchScoresResponse;
+}
+
+impl VendorParsable for IncodeWatchlistCheck {
+    type ParsedType = WatchlistResultResponse;
 }

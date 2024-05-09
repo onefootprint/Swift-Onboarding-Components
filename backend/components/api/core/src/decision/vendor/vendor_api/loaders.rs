@@ -211,7 +211,14 @@ mod tests {
                 true
             }
             VendorAPI::IncodeAddSelfie => todo!(),
-            VendorAPI::IncodeWatchlistCheck => todo!(),
+            VendorAPI::IncodeWatchlistCheck => {
+                load_response_for_vendor_api(state, &wf.id, &uv.e_private_key, IncodeWatchlistCheck)
+                    .await
+                    .unwrap()
+                    .ok()
+                    .unwrap();
+                true
+            }
             VendorAPI::IncodeUpdatedWatchlistResult => todo!(),
             VendorAPI::IncodeGetOnboardingStatus => todo!(),
             VendorAPI::IncodeProcessFace => todo!(),

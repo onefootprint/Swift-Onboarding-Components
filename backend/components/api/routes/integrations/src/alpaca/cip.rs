@@ -7,12 +7,11 @@ use api_core::{
         self,
         features::{self, incode_docv::IncodeOcrComparisonDataFields},
         field_validations::create_field_validation_results,
-        vendor::{
-            vendor_api::{
-                vendor_api_response::build_vendor_response_map_from_vendor_results,
-                vendor_api_struct::{vendor_api_enum_from_struct, IncodeFetchOCR, IncodeFetchScores},
+        vendor::vendor_api::{
+            loaders::load_response_for_vendor_api,
+            vendor_api_struct::{
+                vendor_api_enum_from_struct, IncodeFetchOCR, IncodeFetchScores, IncodeWatchlistCheck,
             },
-            vendor_result::VendorResult,
         },
     },
     errors::{cip_error::CipError, ApiResult},
@@ -38,17 +37,18 @@ use db::{
         risk_signal::{AtSeqno, RiskSignal},
         scoped_vault::ScopedVault,
         user_timeline::UserTimeline,
-        verification_request::VerificationRequest,
         workflow::Workflow,
     },
 };
-use idv::ParsedResponse;
+use idv::incode::{
+    doc::response::{FetchOCRResponse, FetchScoresResponse},
+    watchlist::response::WatchlistResultResponse,
+};
 use itertools::Itertools;
 use newtypes::{
     format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentDiKind,
-    ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind,
-    IdentityDataKind, MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId,
-    Vendor, VendorAPI,
+    ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind, IdentityDataKind,
+    MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::collections::HashSet;
@@ -210,7 +210,6 @@ pub(crate) async fn create_cip_request(
         annotation,
         risk_signals,
         insight,
-        vres,
         latest_identity_document_and_request,
     ) = state
         .db_pool
@@ -261,11 +260,6 @@ pub(crate) async fn create_cip_request(
                 .pop()
                 .map(|(_, actor)| actor);
 
-            let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
-                conn,
-                sv.id.clone(),
-            )?;
-
             Ok((
                 uvw,
                 wf,
@@ -277,7 +271,6 @@ pub(crate) async fn create_cip_request(
                 annotation,
                 risk_signals,
                 insight,
-                vres,
                 latest_identity_document_and_request,
             ))
         })
@@ -292,24 +285,10 @@ pub(crate) async fn create_cip_request(
         ?mr,
         ?annotation,
         ?risk_signals,
-        ?vres,
         collect_document = ?latest_identity_document_and_request.as_ref().map(|(_, dr)| dr.should_collect_selfie()),
         "create_cip_request data"
     );
 
-    let user_vault_private_key = uvw.vault.e_private_key.clone();
-    let document_check_created_at = vres
-        .iter()
-        .find(|(r, _)| r.vendor_api == VendorAPI::IncodeFetchScores)
-        .map(|(r, _)| r._created_at)
-        .unwrap_or(Utc::now());
-
-    let vendor_results = VendorResult::from_verification_results_for_onboarding(
-        vres.into_iter().map(|(vreq, vres)| (vreq, Some(vres))).collect(), // pointless but just to conform to method
-        &state.enclave_client,
-        &user_vault_private_key,
-    )
-    .await?;
     let vd = uvw
         .decrypt_unchecked(
             &state.enclave_client,
@@ -326,10 +305,7 @@ pub(crate) async fn create_cip_request(
                 Id(UsLegalStatus),
                 Id(Zip),
                 Id(Country),
-                Document(OcrData(
-                    IdDocKind::DriversLicense,
-                    OcrDataKind::DocumentNumber,
-                )),
+                Document(OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber)),
                 Document(OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber)),
                 Document(OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)),
             ],
@@ -348,25 +324,46 @@ pub(crate) async fn create_cip_request(
         annotation.as_ref(),
         &vd,
     )?;
+
+    let (watchlist_result_response, _) =
+        load_response_for_vendor_api(state, &wf.id, &uvw.vault.e_private_key, IncodeWatchlistCheck)
+            .await?
+            .ok()
+            .ok_or(CipError::WatchlistResultsNotFoundError)?;
     let watchlist = watchlist(
         &scoped_vault,
         &obc,
         &decision,
         &risk_signals,
-        &vendor_results,
         mr.as_ref(),
+        watchlist_result_response,
     )?;
     let identity = identity(&scoped_vault, &decision, risk_signals);
     let (document, photo) =
         if let Some((identity_document, document_request)) = latest_identity_document_and_request {
+            let (ocr_response, _) =
+                load_response_for_vendor_api(state, &wf.id, &uvw.vault.e_private_key, IncodeFetchOCR)
+                    .await?
+                    .ok()
+                    .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
+                        IncodeFetchOCR,
+                    )))?;
+            let (scores_response, _) =
+                load_response_for_vendor_api(state, &wf.id, &uvw.vault.e_private_key, IncodeFetchScores)
+                    .await?
+                    .ok()
+                    .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
+                        IncodeFetchScores,
+                    )))?;
             document_and_photo(
                 scoped_vault.clone(),
                 mr.as_ref(),
-                &vendor_results,
                 &vd,
-                document_check_created_at,
+                wf._created_at,
                 identity_document,
                 document_request,
+                ocr_response,
+                scores_response,
             )?
         } else {
             (None, None)
@@ -545,14 +542,14 @@ fn identity(
 }
 
 /// helper for building the alpaca idenity sub-response
-#[tracing::instrument(skip(vres))]
+#[tracing::instrument(skip_all)]
 fn watchlist(
     scoped_vault: &ScopedVault,
     obc: &ObConfiguration,
     decision: &OnboardingDecision,
     risk_signals: &[RiskSignal],
-    vres: &[VendorResult],
     mr: Option<&ManualReview>,
+    watchlist_result_response: WatchlistResultResponse,
 ) -> ApiResult<alpaca::Watchlist> {
     let pep: bool = risk_signals
         .iter()
@@ -606,21 +603,11 @@ fn watchlist(
     // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist hits,
     // so we pull them from the Vres on the fly here
 
-    let ParsedResponse::IncodeWatchlistCheck(wc) = vres
-        .iter()
-        .find(|v| matches!(v.response.response, ParsedResponse::IncodeWatchlistCheck(_)))
-        .ok_or(CipError::WatchlistResultsNotFoundError)?
-        .response
-        .response
-        .clone()
-    else {
-        Err(CipError::WatchlistResultsNotFoundError)?
-    };
-
     // For now, we just serialize the raw leaked json blob we get from Incode for each watchlist hit
-    let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, &obc.enhanced_aml())
-        .into_iter()
-        .map(|h| h.leak());
+    let leaked_hits =
+        decision::features::incode_watchlist::get_hits(&watchlist_result_response, &obc.enhanced_aml())
+            .into_iter()
+            .map(|h| h.leak());
     let records_json: Vec<PiiJsonValue> = leaked_hits
         .map(|h| serde_json::to_value(&h).map(PiiJsonValue::new))
         .collect::<Result<Vec<_>, _>>()?;
@@ -638,31 +625,18 @@ fn watchlist(
     })
 }
 
+#[allow(clippy::too_many_arguments)]
 fn document_and_photo(
     scoped_vault: ScopedVault,
     _mr: Option<&ManualReview>,
-    vendor_results: &[VendorResult],
     decrypted_data: &DecryptUncheckedResult,
     check_started_at: DateTime<Utc>,
     identity_document: Document,
     document_request: DocumentRequest,
+    ocr_response: FetchOCRResponse,
+    scores_response: FetchScoresResponse,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
     let expect_selfie = document_request.should_collect_selfie();
-    let (vendor_map, _) = build_vendor_response_map_from_vendor_results(vendor_results)?;
-    let ocr_api = IncodeFetchOCR;
-    let scores_api = IncodeFetchScores;
-    let ocr_response = vendor_map
-        .get(&ocr_api)
-        .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
-            ocr_api,
-        )))?
-        .clone();
-    let score_response = vendor_map
-        .get(&scores_api)
-        .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
-            scores_api,
-        )))?
-        .clone();
 
     let ocr_name = ok_or(ocr_response.name.as_ref(), "missing ocr name".into())?;
     let dk = ok_or(
@@ -677,7 +651,7 @@ fn document_and_photo(
     let incode_vault_data = IncodeOcrComparisonDataFields::from_decrypted_values(decrypted_data);
     let frcs = features::incode_docv::footprint_reason_codes(
         ocr_response.clone(),
-        score_response,
+        scores_response,
         incode_vault_data,
         expect_selfie,
         dk.try_into()?,
