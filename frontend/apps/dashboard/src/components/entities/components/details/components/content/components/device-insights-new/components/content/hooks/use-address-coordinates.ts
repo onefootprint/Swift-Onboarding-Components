@@ -3,6 +3,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import AddressType from '../components/address-card/types';
+import GoogleMapsLoader from '../utils/google-maps-loader';
 import useAddressFieldsProps from './use-address-fields-props';
 
 type Coordinates = {
@@ -13,8 +14,9 @@ type Coordinates = {
 const getCoordinatesFromAddress = async (
   address: string,
 ): Promise<Coordinates | undefined> => {
-  const geocoder = new google.maps.Geocoder();
   try {
+    await GoogleMapsLoader.importLibrary('geocoding');
+    const geocoder = new google.maps.Geocoder();
     const result = await geocoder.geocode({ address });
     return {
       lat: result.results[0].geometry.location.lat(),

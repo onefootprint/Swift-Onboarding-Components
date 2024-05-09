@@ -1,14 +1,21 @@
-import GoogleMap from 'google-maps-react-markers';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
 import React, { useEffect, useRef } from 'react';
-import { GOOGLE_MAPS_API_KEY } from 'src/config/constants';
+import { type MapRef } from 'react-map-gl';
+import { Map as MapboxMap, Marker } from 'react-map-gl';
 import styled from 'styled-components';
 
-import useOptions from './hooks/use-options';
+import type { MapMarkerProps } from './components/map-marker';
 
+const PUBLIC_MAP_BOX_TOKEN =
+  'pk.eyJ1IjoiYmVsY2VvbmVmb290cHJpbnQiLCJhIjoiY2x2empoY2EwMDA5aDJrcGg0Y3RkOTBreiJ9.2TyaEVdUljarrNN4XXoeUA';
+
+const DEFAULT_ZOOM = 9;
+const MAX_ZOOM = 20;
+const MIN_ZOOM = 3;
 // Middle of US
 const FALLBACK_LATITUDE = 37.09024;
 const FALLBACK_LONGITUDE = -95.712891;
-const DEFAULT_ZOOM = 9;
 
 type Coords = {
   lat: number;
@@ -21,68 +28,61 @@ export type MapProps = {
   onSelect: (id: string) => void;
 };
 
-type LoadedArgs = {
-  map: MapRef;
-};
-
-type MapRef = {
-  setCenter: (coords: Coords) => void;
-};
-
 const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
-  const mapRef = useRef<MapRef | null>(null);
+  const mapRef = useRef<MapRef>(null);
 
-  const onGoogleApiLoaded = ({ map }: LoadedArgs) => {
-    mapRef.current = map;
-  };
-
-  const onMarkerClick = (markerId: string, lat: number, lng: number) => {
-    mapRef.current?.setCenter({ lat, lng });
-    onSelect(markerId);
+  const handleMarkerClick = (markerProps: MapMarkerProps) => {
+    if (!mapRef.current) return;
+    mapRef.current.flyTo({
+      center: [markerProps.lng, markerProps.lat],
+      zoom: DEFAULT_ZOOM,
+    });
+    onSelect(markerProps.id);
   };
 
   useEffect(() => {
-    if (selectedCoords) {
-      mapRef.current?.setCenter({
-        lat: selectedCoords.lat,
-        lng: selectedCoords.lng,
-      });
-    }
+    if (!mapRef.current || !selectedCoords) return;
+    mapRef.current.flyTo({
+      center: [selectedCoords.lng, selectedCoords.lat],
+      zoom: DEFAULT_ZOOM,
+    });
   }, [selectedCoords]);
 
-  const options = useOptions();
-
-  return GOOGLE_MAPS_API_KEY ? (
+  return (
     <Container>
-      <GoogleMap
-        apiKey={GOOGLE_MAPS_API_KEY}
-        onGoogleApiLoaded={onGoogleApiLoaded}
-        defaultCenter={{
-          lat: selectedCoords ? selectedCoords.lat : FALLBACK_LATITUDE,
-          lng: selectedCoords ? selectedCoords.lng : FALLBACK_LONGITUDE,
+      <MapboxMap
+        ref={mapRef}
+        mapboxAccessToken={PUBLIC_MAP_BOX_TOKEN}
+        mapStyle="mapbox://styles/mapbox/streets-v12"
+        style={{ width: '100%', height: '100%' }}
+        initialViewState={{
+          latitude: selectedCoords ? selectedCoords.lat : FALLBACK_LATITUDE,
+          longitude: selectedCoords ? selectedCoords.lng : FALLBACK_LONGITUDE,
+          zoom: selectedCoords ? DEFAULT_ZOOM : MIN_ZOOM,
         }}
-        defaultZoom={DEFAULT_ZOOM}
-        options={options}
-        mapMinHeight="100%"
+        maxZoom={MAX_ZOOM}
+        minZoom={MIN_ZOOM}
       >
-        {markers.map(m =>
-          React.cloneElement(m, {
-            onClick: onMarkerClick,
-          }),
-        )}
-      </GoogleMap>
+        {markers.map(marker => (
+          <Marker
+            key={marker.props.id}
+            longitude={marker.props.lng}
+            latitude={marker.props.lat}
+          >
+            {React.cloneElement(marker, {
+              onClick: () => handleMarkerClick(marker.props),
+            })}
+          </Marker>
+        ))}
+      </MapboxMap>
     </Container>
-  ) : null;
+  );
 };
 
 const Container = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-
-  iframe + div {
-    border: none !important;
-  }
 `;
 
 export default Map;

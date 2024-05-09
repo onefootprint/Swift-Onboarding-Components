@@ -23,7 +23,7 @@ const getNextConfig = () => {
 
   const ContentSecurityPolicy = `
     child-src onefootprint.com;
-    connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.launchdarkly.com ${SENTRY_CONNECT_SRC} ${OBSERVE_CONNECT_SRC};
+    connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.launchdarkly.com ${SENTRY_CONNECT_SRC} ${OBSERVE_CONNECT_SRC} *.mapbox.com;
     default-src 'self' vitals.vercel-insights.com data:;
     font-src 'self' fonts.googleapis.com fonts.gstatic.com;
     form-action 'self';

@@ -38,6 +38,7 @@ const MapMarkerContainer = styled.div`
   align-items: center;
   justify-content: center;
   transform: translateX(-50%) translateY(-100%);
+  cursor: pointer;
 `;
 
 const Pin = styled.div`
