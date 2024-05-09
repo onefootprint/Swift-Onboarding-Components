@@ -218,28 +218,42 @@ impl VerificationRequest {
         "VerificationRequest::get_latest_request_and_successful_result_for_vendor_api",
         skip_all
     )]
-    pub fn get_latest_request_and_successful_result_for_vendor_api(
+    pub fn get_latest_request_and_successful_result_for_vendor_api<T>(
         conn: &mut PgConn,
-        workflow_id: &WorkflowId,
+        id: T,
         vendor_api: VendorAPI,
-    ) -> DbResult<Option<RequestAndResult>> {
-        let req_and_res: Option<RequestAndResult> = verification_request::table
-            .inner_join(decision_intent::table)
-            .filter(decision_intent::workflow_id.eq(workflow_id))
+    ) -> DbResult<Option<RequestAndResult>>
+    where
+        T: Into<VReqIdentifier>,
+    {
+        let mut query = verification_request::table
             .filter(verification_request::vendor_api.eq(vendor_api))
             .inner_join(verification_result::table)
             .filter(verification_result::is_error.eq(false))
+            .into_boxed();
+
+        match id.into() {
+            VReqIdentifier::DiId(di_id) => {
+                query = query.filter(verification_request::decision_intent_id.eq(di_id));
+            }
+            VReqIdentifier::WfId(wf_id) => {
+                let di_ids = decision_intent::table
+                    .filter(decision_intent::workflow_id.eq(wf_id))
+                    .select(decision_intent::id);
+                query = query.filter(verification_request::decision_intent_id.eq_any(di_ids));
+            }
+        };
+
+        let req_and_res = query
             .select((
                 verification_request::all_columns,
                 verification_result::all_columns,
             ))
             .order((
-                verification_request::vendor_api,
                 verification_request::uvw_snapshot_seqno.desc(),
                 verification_request::timestamp.desc(), // tie breaker if seq_no has a tie
             ))
-            .distinct_on(verification_request::vendor_api)
-            .get_result(conn)
+            .first(conn)
             .optional()?;
 
         Ok(req_and_res)
@@ -314,6 +328,11 @@ impl VerificationRequest {
     }
 }
 
+#[derive(derive_more::From)]
+pub enum VReqIdentifier {
+    DiId(DecisionIntentId),
+    WfId(WorkflowId),
+}
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -261,8 +261,9 @@ pub async fn maybe_generate_ocr_reason_codes(
 
     // TODO: instead of retrieving all results from all vendor calls here, we could just retrieve the ones for the DocScan DI or even just directly retrieve IncodeFetchOCR itself
     // also slightly sketch to query latest by sv_id instead of strictly querying from vres's made within this workflow specifically
+    let wfid = wf_id.clone();
     let Some((fetch_ocr, vres_id)) =
-        load_response_for_vendor_api(state, wf_id, &vw.vault.e_private_key, IncodeFetchOCR)
+        load_response_for_vendor_api(state, wfid, &vw.vault.e_private_key, IncodeFetchOCR)
             .await?
             .ok()
     else {

@@ -1,10 +1,7 @@
 use db::{
     models::{
-        billing_event::BillingEvent,
-        decision_intent::DecisionIntent,
-        ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault,
-        verification_request::{RequestAndMaybeResult, VerificationRequest},
+        billing_event::BillingEvent, decision_intent::DecisionIntent, ob_configuration::ObConfiguration,
+        scoped_vault::ScopedVault, verification_request::VerificationRequest,
     },
     DbPool,
 };
@@ -33,13 +30,11 @@ use crate::{
         map_to_api_error,
         tenant_vendor_control::TenantVendorControl,
         vendor_api::{
-            vendor_api_response::build_vendor_response_map_from_vendor_results,
+            loaders::load_response_for_vendor_api,
             vendor_api_struct::{IncodeUpdatedWatchlistResult, IncodeWatchlistCheck},
         },
-        vendor_result::VendorResult,
         verification_result::{self, SaveVerificationResultArgs, ShouldSaveVerificationRequest},
     },
-    enclave_client::EnclaveClient,
     errors::ApiResult,
     utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
     State,
@@ -221,35 +216,24 @@ pub async fn run_watchlist_check(
     kind: WatchlistCheckKind,
 ) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
     let svid = di.scoped_vault_id.clone();
-    let diid = di.id.clone();
     let obc_key = obc_key.clone();
-    let (latest_results, tenant_id, vw, obc) = state
+    let (tenant_id, vw, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
-
-            let latest_results =
-                VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &diid)?;
-
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
-
             let (obc, _) = ObConfiguration::get(conn, &obc_key)?;
 
             // Create a BillingEvent once per year for this user
             BillingEvent::create(conn, sv.id.clone(), obc.id.clone(), ContinuousMonitoringPerYear)?;
 
-            Ok((latest_results, sv.tenant_id, vw, obc))
+            Ok((sv.tenant_id, vw, obc))
         })
         .await?;
 
     // Check if a successful result already exists and idempotently return that if so
-    let existing_res = existing_watchlist_check_response(
-        &state.enclave_client,
-        &vw.vault.e_private_key,
-        latest_results,
-        kind.clone(),
-    )
-    .await?;
+    let existing_res =
+        existing_watchlist_check_response(state, &vw.vault.e_private_key, &di.id, kind.clone()).await?;
     if let Some(existing_res) = existing_res {
         return Ok(existing_res);
     }
@@ -284,34 +268,31 @@ pub async fn run_watchlist_check(
 }
 
 async fn existing_watchlist_check_response(
-    enclave_client: &EnclaveClient,
+    state: &State,
     vault_private_key: &EncryptedVaultPrivateKey,
-    latest_results: Vec<RequestAndMaybeResult>,
+    di_id: &DecisionIntentId,
     kind: WatchlistCheckKind,
 ) -> ApiResult<Option<(VerificationResultId, WatchlistResultResponse)>> {
-    let latest_results =
-        VendorResult::hydrate_vendor_results(latest_results, enclave_client, vault_private_key).await?;
-
-    let vendor_results: Vec<VendorResult> = latest_results
-        .into_iter()
-        .flat_map(|r| r.into_vendor_result())
-        .collect();
-
-    let (vres_map, vres_ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
-
-    let (wr, ids) = match kind {
-        WatchlistCheckKind::MakeNewSearch => (
-            vres_map.get(&IncodeWatchlistCheck),
-            vres_ids_map.get(&IncodeWatchlistCheck),
-        ),
-        WatchlistCheckKind::GetUpdatedResults(_) => (
-            vres_map.get(&IncodeUpdatedWatchlistResult).map(|u| &u.0),
-            vres_ids_map.get(&IncodeUpdatedWatchlistResult),
-        ),
+    let response = match kind {
+        WatchlistCheckKind::MakeNewSearch => {
+            load_response_for_vendor_api(state, di_id.clone(), vault_private_key, IncodeWatchlistCheck)
+                .await?
+                .ok()
+        }
+        WatchlistCheckKind::GetUpdatedResults(_) => load_response_for_vendor_api(
+            state,
+            di_id.clone(),
+            vault_private_key,
+            IncodeUpdatedWatchlistResult,
+        )
+        .await?
+        .ok()
+        .map(|(u, vres_id)| (u.0, vres_id)),
     };
 
-    if let (Some(wr), Some(ids)) = (wr, ids) {
-        Ok(Some((ids.verification_result_id.clone(), wr.clone())))
+
+    if let Some((wr, vres_id)) = response {
+        Ok(Some((vres_id, wr)))
     } else {
         Ok(None)
     }

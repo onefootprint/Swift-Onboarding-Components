@@ -3,7 +3,7 @@ use idv::{
     idology::expectid::response::ExpectIDResponse,
     incode::{
         doc::response::{AddCustomerResponse, FetchOCRResponse, FetchScoresResponse},
-        watchlist::response::WatchlistResultResponse,
+        watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
     },
 };
 use newtypes::VendorAPI;
@@ -30,6 +30,7 @@ where
 }
 
 
+// Mapping of a VendorAPI -> the rust struct of the API response
 impl VendorParsable for IncodeApproveSession {
     type ParsedType = AddCustomerResponse;
 }
@@ -45,7 +46,9 @@ impl VendorParsable for IncodeFetchOCR {
 impl VendorParsable for IncodeFetchScores {
     type ParsedType = FetchScoresResponse;
 }
-
 impl VendorParsable for IncodeWatchlistCheck {
     type ParsedType = WatchlistResultResponse;
+}
+impl VendorParsable for IncodeUpdatedWatchlistResult {
+    type ParsedType = UpdatedWatchlistResultResponse;
 }

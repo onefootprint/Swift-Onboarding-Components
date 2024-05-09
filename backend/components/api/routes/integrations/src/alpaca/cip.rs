@@ -325,11 +325,15 @@ pub(crate) async fn create_cip_request(
         &vd,
     )?;
 
-    let (watchlist_result_response, _) =
-        load_response_for_vendor_api(state, &wf.id, &uvw.vault.e_private_key, IncodeWatchlistCheck)
-            .await?
-            .ok()
-            .ok_or(CipError::WatchlistResultsNotFoundError)?;
+    let (watchlist_result_response, _) = load_response_for_vendor_api(
+        state,
+        wf.id.clone(),
+        &uvw.vault.e_private_key,
+        IncodeWatchlistCheck,
+    )
+    .await?
+    .ok()
+    .ok_or(CipError::WatchlistResultsNotFoundError)?;
     let watchlist = watchlist(
         &scoped_vault,
         &obc,
@@ -339,35 +343,36 @@ pub(crate) async fn create_cip_request(
         watchlist_result_response,
     )?;
     let identity = identity(&scoped_vault, &decision, risk_signals);
-    let (document, photo) =
-        if let Some((identity_document, document_request)) = latest_identity_document_and_request {
-            let (ocr_response, _) =
-                load_response_for_vendor_api(state, &wf.id, &uvw.vault.e_private_key, IncodeFetchOCR)
-                    .await?
-                    .ok()
-                    .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
-                        IncodeFetchOCR,
-                    )))?;
-            let (scores_response, _) =
-                load_response_for_vendor_api(state, &wf.id, &uvw.vault.e_private_key, IncodeFetchScores)
-                    .await?
-                    .ok()
-                    .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
-                        IncodeFetchScores,
-                    )))?;
-            document_and_photo(
-                scoped_vault.clone(),
-                mr.as_ref(),
-                &vd,
-                wf._created_at,
-                identity_document,
-                document_request,
-                ocr_response,
-                scores_response,
-            )?
-        } else {
-            (None, None)
-        };
+    let (document, photo) = if let Some((identity_document, document_request)) =
+        latest_identity_document_and_request
+    {
+        let (ocr_response, _) =
+            load_response_for_vendor_api(state, wf.id.clone(), &uvw.vault.e_private_key, IncodeFetchOCR)
+                .await?
+                .ok()
+                .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
+                    IncodeFetchOCR,
+                )))?;
+        let (scores_response, _) =
+            load_response_for_vendor_api(state, wf.id.clone(), &uvw.vault.e_private_key, IncodeFetchScores)
+                .await?
+                .ok()
+                .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
+                    IncodeFetchScores,
+                )))?;
+        document_and_photo(
+            scoped_vault.clone(),
+            mr.as_ref(),
+            &vd,
+            wf._created_at,
+            identity_document,
+            document_request,
+            ocr_response,
+            scores_response,
+        )?
+    } else {
+        (None, None)
+    };
 
     let cip = CipRequest {
         provider_name: vec![alpaca::Provider::Footprint],

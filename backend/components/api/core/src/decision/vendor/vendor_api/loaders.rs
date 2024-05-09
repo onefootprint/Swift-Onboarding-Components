@@ -1,5 +1,8 @@
-use db::{models::verification_request::VerificationRequest, DbResult};
-use newtypes::{EncryptedVaultPrivateKey, VerificationResultId, WorkflowId};
+use db::{
+    models::verification_request::{VReqIdentifier, VerificationRequest},
+    DbResult,
+};
+use newtypes::{EncryptedVaultPrivateKey, VerificationResultId};
 
 use crate::{
     decision::vendor::verification_result::decrypt_verification_result_response, errors::ApiResult, ApiError,
@@ -33,22 +36,23 @@ impl<T> LoadVendorResponseResult<T> {
 // for the given workflow.
 //
 // TODO: It won't load the _actual_ latest response if the latest response was an error, so maybe we need to revisit this at some point, but I think it's prob fine
-pub async fn load_response_for_vendor_api<T>(
+pub async fn load_response_for_vendor_api<T, V>(
     state: &State,
-    wf_id: &WorkflowId,
+    id: V,
     user_vault_private_key: &EncryptedVaultPrivateKey,
     vendor_api_struct: T,
 ) -> ApiResult<LoadVendorResponseResult<T::ParsedType>>
 where
     T: VendorParsable,
+    V: Into<VReqIdentifier> + Clone + Send + 'static,
 {
-    let wfid = wf_id.clone();
+    let id2 = id.clone();
     let vendor_api = vendor_api_struct.vendor_api();
     let requests_and_result = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             VerificationRequest::get_latest_request_and_successful_result_for_vendor_api(
-                conn, &wfid, vendor_api,
+                conn, id2, vendor_api,
             )
         })
         .await?;
@@ -104,13 +108,16 @@ mod tests {
     };
     use idv::test_fixtures::DocTestOpts;
     use macros::test_state_case;
-    use newtypes::{DecisionIntentKind, VendorAPI};
+    use newtypes::{DecisionIntentId, DecisionIntentKind, VendorAPI, WorkflowId};
 
 
     #[test_state_case(VendorAPI::IncodeApproveSession)]
     #[test_state_case(VendorAPI::ExperianPreciseId)]
+    #[test_state_case(VendorAPI::IdologyExpectId)]
     #[test_state_case(VendorAPI::IncodeFetchScores)]
     #[test_state_case(VendorAPI::IncodeFetchOcr)]
+    #[test_state_case(VendorAPI::IncodeUpdatedWatchlistResult)]
+    #[test_state_case(VendorAPI::IncodeWatchlistCheck)]
     #[tokio::test(flavor = "multi_thread")]
     async fn test_load_response_for_vendor_api_for_multiple_apis(state: &mut State, vendor_api: VendorAPI) {
         let FixtureData {
@@ -129,7 +136,7 @@ mod tests {
         let wf_id = wf.id.clone();
         let v_pub_key = uv.public_key.clone();
 
-        state
+        let (vres_id_to_check, di_id) = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let di = DecisionIntent::get_or_create_for_workflow(
@@ -139,50 +146,70 @@ mod tests {
                     DecisionIntentKind::OnboardingKyc,
                 )
                 .unwrap();
-                let args = NewVerificationRequestArgs {
-                    scoped_vault_id: &sv_id,
-                    decision_intent_id: &di.id,
-                    identity_document_id: None,
-                    vendor_api,
-                };
-                let vreq = VerificationRequest::create(conn, args).unwrap();
 
-                let raw = vendor_api_fixture(vendor_api);
-                let pii_json = raw.clone().into();
-                let e_response = encrypt_verification_result_response(&pii_json, &v_pub_key).ok();
-                let new_vres = NewVerificationResult {
-                    request_id: vreq.id.clone(),
-                    response: raw.into(),
-                    timestamp: Utc::now(),
-                    e_response,
-                    is_error: false,
-                };
+                // Save a requests and stash the vres_id of the one we should find via the query
+                let mut vres_id_to_check = None;
+                for val in [(true, true), (false, false), (false, true)] {
+                    let (is_error, should_save_vres) = val;
+                    let args = NewVerificationRequestArgs {
+                        scoped_vault_id: &sv_id,
+                        decision_intent_id: &di.id,
+                        identity_document_id: None,
+                        vendor_api,
+                    };
+                    let vreq = VerificationRequest::create(conn, args).unwrap();
 
-                VerificationResult::bulk_create(conn, vec![new_vres]).unwrap();
-                Ok(())
+                    let raw = vendor_api_fixture(vendor_api);
+                    let pii_json = raw.clone().into();
+                    let e_response = encrypt_verification_result_response(&pii_json, &v_pub_key).ok();
+                    let new_vres = NewVerificationResult {
+                        request_id: vreq.id.clone(),
+                        response: raw.into(),
+                        timestamp: Utc::now(),
+                        e_response,
+                        is_error,
+                    };
+
+                    if should_save_vres {
+                        let mut vres_id = VerificationResult::bulk_create(conn, vec![new_vres]).unwrap();
+
+                        if !is_error {
+                            vres_id_to_check = vres_id.pop().map(|v| v.id);
+                        }
+                    }
+                }
+
+
+                Ok((vres_id_to_check, di.id))
             })
             .await
             .unwrap();
 
         let test_ran = match vendor_api {
             VendorAPI::IdologyExpectId => {
-                load_response_for_vendor_api(state, &wf.id, &uv.e_private_key, IdologyExpectID)
-                    .await
-                    .unwrap()
-                    .ok()
-                    .unwrap();
-                true
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    IdologyExpectID,
+                )
+                .await
             }
             VendorAPI::IdologyPa => todo!(),
             VendorAPI::TwilioLookupV2 => todo!(),
             VendorAPI::SocureIdPlus => todo!(),
             VendorAPI::ExperianPreciseId => {
-                load_response_for_vendor_api(state, &wf.id, &uv.e_private_key, ExperianPreciseID)
-                    .await
-                    .unwrap()
-                    .ok()
-                    .unwrap();
-                true
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    ExperianPreciseID,
+                )
+                .await
             }
             VendorAPI::MiddeskCreateBusiness => todo!(),
             VendorAPI::MiddeskGetBusiness => todo!(),
@@ -193,44 +220,66 @@ mod tests {
             VendorAPI::IncodeAddBack => todo!(),
             VendorAPI::IncodeProcessId => todo!(),
             VendorAPI::IncodeFetchScores => {
-                load_response_for_vendor_api(state, &wf.id, &uv.e_private_key, IncodeFetchScores)
-                    .await
-                    .unwrap()
-                    .ok()
-                    .unwrap();
-                true
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    IncodeFetchScores,
+                )
+                .await
             }
             VendorAPI::IncodeAddPrivacyConsent => todo!(),
             VendorAPI::IncodeAddMlConsent => todo!(),
             VendorAPI::IncodeFetchOcr => {
-                load_response_for_vendor_api(state, &wf.id, &uv.e_private_key, IncodeFetchOCR)
-                    .await
-                    .unwrap()
-                    .ok()
-                    .unwrap();
-                true
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    IncodeFetchOCR,
+                )
+                .await
             }
             VendorAPI::IncodeAddSelfie => todo!(),
             VendorAPI::IncodeWatchlistCheck => {
-                load_response_for_vendor_api(state, &wf.id, &uv.e_private_key, IncodeWatchlistCheck)
-                    .await
-                    .unwrap()
-                    .ok()
-                    .unwrap();
-                true
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    IncodeWatchlistCheck,
+                )
+                .await
             }
-            VendorAPI::IncodeUpdatedWatchlistResult => todo!(),
+            VendorAPI::IncodeUpdatedWatchlistResult => {
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    IncodeUpdatedWatchlistResult,
+                )
+                .await
+            }
             VendorAPI::IncodeGetOnboardingStatus => todo!(),
             VendorAPI::IncodeProcessFace => todo!(),
             VendorAPI::IncodeCurpValidation => todo!(),
             VendorAPI::IncodeGovernmentValidation => todo!(),
             VendorAPI::IncodeApproveSession => {
-                load_response_for_vendor_api(state, &wf.id, &uv.e_private_key, IncodeApproveSession)
-                    .await
-                    .unwrap()
-                    .ok()
-                    .unwrap();
-                true
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    IncodeApproveSession,
+                )
+                .await
             }
             VendorAPI::StytchLookup => todo!(),
             VendorAPI::FootprintDeviceAttestation => todo!(),
@@ -243,6 +292,57 @@ mod tests {
         assert!(test_ran)
     }
 
+    async fn assert_results<T: VendorParsable>(
+        state: &State,
+        wf_id: WorkflowId,
+        di_id: DecisionIntentId,
+        e_key: &EncryptedVaultPrivateKey,
+        vres_id_to_check: Option<VerificationResultId>,
+        vendor_api_struct: T,
+    ) -> bool {
+        let vres_to_check = vres_id_to_check.unwrap();
+        let (_, vres_id) = load_response_for_vendor_api(state, wf_id, e_key, vendor_api_struct.clone())
+            .await
+            .unwrap()
+            .ok()
+            .unwrap();
+
+        assert_eq!(vres_id, vres_to_check);
+
+        // try fetching via DI too
+        let (_, vres_id) = load_response_for_vendor_api(state, di_id.clone(), e_key, vendor_api_struct)
+            .await
+            .unwrap()
+            .ok()
+            .unwrap();
+
+        assert_eq!(vres_id, vres_to_check);
+
+        state
+            .db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let res = VerificationRequest::list(conn, &di_id).unwrap();
+                let res_responses: Vec<_> = res
+                    .clone()
+                    .into_iter()
+                    .filter(|(_, vres)| vres.is_some())
+                    .collect();
+                let res_error: Vec<_> = res
+                    .clone()
+                    .into_iter()
+                    .filter(|(_, vres)| !vres.as_ref().map(|v| v.is_error).unwrap_or(true))
+                    .collect();
+                assert_eq!(res.len(), 3);
+                assert_eq!(res_responses.len(), 2);
+                assert_eq!(res_error.len(), 1);
+
+                Ok(())
+            })
+            .await
+            .unwrap();
+
+        true
+    }
     fn vendor_api_fixture(vendor_api: VendorAPI) -> serde_json::Value {
         match vendor_api {
             VendorAPI::IdologyExpectId => idv::test_fixtures::test_idology_expectid_response(),
@@ -269,7 +369,10 @@ mod tests {
             VendorAPI::IncodeWatchlistCheck => {
                 idv::test_fixtures::incode_watchlist_result_response_yes_hits()
             }
-            VendorAPI::IncodeUpdatedWatchlistResult => todo!(),
+            VendorAPI::IncodeUpdatedWatchlistResult => {
+                // same response struct
+                idv::test_fixtures::incode_watchlist_result_response_yes_hits()
+            }
             VendorAPI::IncodeGetOnboardingStatus => todo!(),
             VendorAPI::IncodeProcessFace => todo!(),
             VendorAPI::IncodeCurpValidation => idv::test_fixtures::incode_curp_validation_good_curp(),
