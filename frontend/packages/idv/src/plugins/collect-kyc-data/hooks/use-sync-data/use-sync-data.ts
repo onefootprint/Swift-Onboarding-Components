@@ -99,7 +99,10 @@ const useSyncData = () => {
           description: t('invalid-inputs.description'),
           variant: 'error',
         });
-        logError('Kyc useSyncData encountered error while syncing data', err);
+        logError(
+          'Kyc useSyncData encountered invalid inputs error while syncing data',
+          err,
+        );
       }
     };
 
