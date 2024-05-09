@@ -20,11 +20,22 @@ export enum UploadSource {
   Api = 'api',
 }
 
+export enum DocumentReviewStatus {
+  Unreviewed = 'unreviewed',
+  PendingMachineReview = 'pending_machine_review',
+  ReviewedByMachine = 'reviewed_by_machine',
+  PendingHumanReview = 'pending_human_review',
+  ReviewedByHuman = 'reviewed_by_human',
+}
+
 export type Document = {
   completedVersion: number | null;
   kind: SupportedIdDocTypes;
   startedAt?: string;
+  /** The status of uploading the document. Null if uploaded manually via vault APIs */
   status?: IdDocStatus;
+  /** The status of whether the document has been reviewed. Null if uploaded manually via vault APIs */
+  reviewStatus?: DocumentReviewStatus;
   uploads: DocumentUpload[];
   documentScore: number | null;
   selfieScore: number | null;

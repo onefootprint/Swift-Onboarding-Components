@@ -1200,9 +1200,13 @@
         "decrypt": "Decrypt",
         "not-allowed": "You're not allowed to decrypt data",
         "status": {
-          "error": "Upload Failed",
-          "success": "Upload Successful",
-          "warning": "Upload Pending"
+          "upload_failed": "Upload failed",
+          "upload_incomplete": "Upload pending",
+          "uploaded_via_api": "Uploaded manually",
+          "pending_machine_review": "Pending",
+          "reviewed_by_machine": "Processed",
+          "pending_human_review": "Review required",
+          "reviewed_by_human": "Reviewed"
         },
         "reason-dialog": {
           "title": "Decrypt data",

@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { useEditControls } from '../../../../../vault-actions';
-import { getDocumentStatus, getDocumentVersion } from '../../utils';
+import { getDocumentVersion } from '../../utils';
 import DocumentStatusBadge from '../document-status-badge';
 import ConfidenceScores from './components/confidence-scores';
 import ExtractedDocumentData from './components/extracted-document-data';
@@ -40,7 +40,6 @@ const DocumentField = ({
     getDocumentVersion(documents[documents.length - 1], documents),
   );
   const { inProgress: showEditView } = useEditControls();
-  const documentStatus = getDocumentStatus({ documents, documentType });
 
   let currentDocument = documents.find(
     document =>
@@ -61,7 +60,10 @@ const DocumentField = ({
           <Text variant="body-3" color="tertiary" tag="label">
             {label}
           </Text>
-          {documentStatus && <DocumentStatusBadge status={documentStatus} />}
+          <DocumentStatusBadge
+            documents={documents}
+            documentType={documentType}
+          />
         </LabelContainer>
         {showEditView ? (
           <Text variant="body-3" color="tertiary">
