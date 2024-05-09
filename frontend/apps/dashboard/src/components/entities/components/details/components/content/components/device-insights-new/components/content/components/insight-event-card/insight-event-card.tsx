@@ -21,12 +21,14 @@ import AboutAppClipAndInstantApp from './components/about-app-clip-and-instant-a
 import getRegion from './utils/get-region';
 
 type InsightEventCardProps = {
+  id: string;
   isSelected?: boolean;
-  onSelect?: () => void;
+  onSelect?: (id: string) => void;
   liveness: Liveness;
 };
 
 const InsightEventCard = ({
+  id,
   liveness,
   isSelected,
   onSelect,
@@ -51,7 +53,6 @@ const InsightEventCard = ({
   };
 
   const fullRegion = getRegion(city, region);
-  const headerIcon = getIconForLivenessEvent(liveness);
   const headerText = displayForUserAgent(
     userAgent ?? '',
     deviceInfo.instantApp,
@@ -143,10 +144,11 @@ const InsightEventCard = ({
 
   return (
     <CardBase
+      id={id}
       isSelected={isSelected}
-      onSelect={onSelect}
+      onSelect={() => onSelect?.(id)}
       title={t(`scope.${scope}`)}
-      headerIcon={headerIcon}
+      headerIcon={getIconForLivenessEvent(liveness)}
       headerText={headerText}
       rows={rows}
     />

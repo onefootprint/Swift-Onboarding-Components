@@ -8,21 +8,24 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-enum OptionValue {
+export enum MultiSelectOptionValue {
   businessAddress = 'businessAddress',
   residentialAddress = 'residentialAddress',
   onboarding = 'onboarding',
   auth = 'auth',
 }
 
-type Option = { label: string; value: OptionValue };
+export type MultiSelectOption = {
+  label: string;
+  value: MultiSelectOptionValue;
+};
 
 const useMultiSelectOptions = (entity: Entity, livenessData: Liveness[]) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.device-insights',
   });
 
-  const options: Option[] = [];
+  const allOptions: MultiSelectOption[] = [];
 
   if (livenessData.length) {
     const scopes: IdentifyScope[] = Array.from(
@@ -30,11 +33,11 @@ const useMultiSelectOptions = (entity: Entity, livenessData: Liveness[]) => {
     );
     scopes.forEach(scope => {
       if (scope === IdentifyScope.onboarding || scope === IdentifyScope.auth) {
-        options.push({
+        allOptions.push({
           value:
             scope === IdentifyScope.onboarding
-              ? OptionValue.onboarding
-              : OptionValue.auth,
+              ? MultiSelectOptionValue.onboarding
+              : MultiSelectOptionValue.auth,
           label: t(`scope.${scope}`),
         });
       }
@@ -45,41 +48,28 @@ const useMultiSelectOptions = (entity: Entity, livenessData: Liveness[]) => {
     BusinessDI.addressLine1,
   );
   if (hasBusinessAddress) {
-    options.push({
-      value: OptionValue.businessAddress,
+    allOptions.push({
+      value: MultiSelectOptionValue.businessAddress,
       label: t('select.business-address'),
     });
   }
   const hasResidentialAddress = entity.attributes.includes(IdDI.addressLine1);
   if (hasResidentialAddress) {
-    options.push({
-      value: OptionValue.residentialAddress,
+    allOptions.push({
+      value: MultiSelectOptionValue.residentialAddress,
       label: t('select.residential-address'),
     });
   }
 
-  const [selectedOptionsSet, setSelectedOptionsSet] = useState<
-    Set<OptionValue>
-  >(new Set(options.map(e => e.value)));
-  const handleOptionsChange = (newOptions: readonly Option[]) => {
-    setSelectedOptionsSet(new Set(newOptions.map(e => e.value)));
+  const [selectedOptions, setSelectedOptions] =
+    useState<MultiSelectOption[]>(allOptions);
+  const handleOptionsChange = (newOptions: readonly MultiSelectOption[]) => {
+    setSelectedOptions([...newOptions]);
   };
 
-  const isOnboardingSelected = selectedOptionsSet.has(OptionValue.onboarding);
-  const isAuthSelected = selectedOptionsSet.has(OptionValue.auth);
-  const isBusinessAddressSelected = selectedOptionsSet.has(
-    OptionValue.businessAddress,
-  );
-  const isResidentialAddressSelected = selectedOptionsSet.has(
-    OptionValue.residentialAddress,
-  );
-
   return {
-    options,
-    isOnboardingSelected,
-    isAuthSelected,
-    isBusinessAddressSelected,
-    isResidentialAddressSelected,
+    allOptions,
+    selectedOptions,
     handleOptionsChange,
   };
 };

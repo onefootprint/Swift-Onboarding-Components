@@ -1,20 +1,19 @@
-import { type Entity, IdentifyScope, type Liveness } from '@onefootprint/types';
+import { type Entity, type Liveness } from '@onefootprint/types';
 import { Divider, MultiSelect, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { Marker } from '../map';
 import Map from '../map';
+import MapMarker from '../map/components/map-marker';
 import AddressCard from './components/address-card';
-import AddressCardIcon from './components/address-card/components/address-card-icon';
 import AddressType from './components/address-card/types';
 import ContainerWithToggle from './components/container-with-toggle';
 import InsightEventCard from './components/insight-event-card';
-import useAddressCoordinates from './hooks/use-address-coordinates';
-import useMultiSelectOptions from './hooks/use-multi-select-options';
-import getIconForLivenessEvent from './utils/get-icon-for-liveness-event';
-import getKeyForLiveness from './utils/get-key-for-liveness';
+import useEntries from './hooks/use-entries';
+import useMultiSelectOptions, {
+  MultiSelectOptionValue,
+} from './hooks/use-multi-select-options';
 
 export type ContentProps = {
   entity: Entity;
@@ -26,122 +25,77 @@ const Content = ({ entity, livenessData }: ContentProps) => {
     keyPrefix: 'pages.entity.device-insights',
   });
   const [detailsHidden, setDetailsHidden] = useState(false);
+
+  const { allOptions, selectedOptions, handleOptionsChange } =
+    useMultiSelectOptions(entity, livenessData);
+
+  const { entries, selectedCoords, selectedId, onSelectedIdChange } =
+    useEntries(entity, livenessData, selectedOptions);
+
   const cards: JSX.Element[] = [];
-  const allMarkers: (Marker | null)[] = [];
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const {
-    options,
-    isOnboardingSelected,
-    isAuthSelected,
-    isBusinessAddressSelected,
-    isResidentialAddressSelected,
-    handleOptionsChange,
-  } = useMultiSelectOptions(entity, livenessData);
-
-  let insightEvents = livenessData;
-  if (!isOnboardingSelected) {
-    insightEvents = insightEvents.filter(
-      liveness => liveness.scope !== IdentifyScope.onboarding,
-    );
-  }
-  if (!isAuthSelected) {
-    insightEvents = insightEvents.filter(
-      liveness => liveness.scope !== IdentifyScope.auth,
-    );
-  }
-  insightEvents.forEach(liveness => {
-    const lat = liveness.insight.latitude;
-    const lng = liveness.insight.longitude;
-    const isSelected = selectedIndex === allMarkers.length;
-    cards.push(
-      <InsightEventCard
-        key={getKeyForLiveness(liveness)}
-        liveness={liveness}
-      />,
-    );
-    if (lat !== null && lng !== null) {
-      allMarkers.push({
-        lat,
-        lng,
-        icon: getIconForLivenessEvent(
-          liveness,
-          isSelected ? 'quinary' : 'primary',
-        ),
-        isSelected,
-      });
-    } else {
-      allMarkers.push(null);
+  const markers: JSX.Element[] = [];
+  Object.entries(entries).forEach(([id, entry]) => {
+    const isSelected = selectedId === id;
+    if (
+      entry.type === MultiSelectOptionValue.businessAddress ||
+      entry.type === MultiSelectOptionValue.residentialAddress
+    ) {
+      const type =
+        entry.type === MultiSelectOptionValue.businessAddress
+          ? AddressType.business
+          : AddressType.residential;
+      cards.push(
+        <AddressCard
+          id={id}
+          key={id}
+          type={type}
+          entity={entity}
+          isLoading={entry.cardIsLoading}
+          isSelected={isSelected}
+          onSelect={onSelectedIdChange}
+        />,
+      );
+    } else if (entry.data) {
+      cards.push(
+        <InsightEventCard
+          id={id}
+          key={id}
+          liveness={entry.data}
+          isSelected={isSelected}
+          onSelect={onSelectedIdChange}
+        />,
+      );
+    }
+    if (entry.marker) {
+      markers.push(
+        <MapMarker
+          key={id}
+          id={id}
+          lat={entry.marker.lat}
+          lng={entry.marker.lng}
+          getIcon={entry.marker.getIcon}
+          isSelected={isSelected}
+        />,
+      );
     }
   });
 
-  const {
-    lat: businessLat,
-    lng: businessLng,
-    isLoading: businessCoordLoading,
-  } = useAddressCoordinates(entity, AddressType.business);
-  if (isBusinessAddressSelected) {
+  if (!cards.length) {
     cards.push(
-      <AddressCard
-        key={AddressType.business}
-        type={AddressType.business}
-        entity={entity}
-        isLoading={businessCoordLoading}
-      />,
+      <Text key="empty" variant="body-3" color="tertiary">
+        {t('empty')}
+      </Text>,
     );
-
-    if (businessLat && businessLng) {
-      const isSelected = selectedIndex === allMarkers.length;
-      allMarkers.push({
-        lat: businessLat,
-        lng: businessLng,
-        icon: (
-          <AddressCardIcon
-            type={AddressType.business}
-            color={isSelected ? 'quinary' : 'primary'}
-          />
-        ),
-        isSelected,
-      });
-    } else {
-      allMarkers.push(null);
-    }
   }
 
-  const {
-    lat: residentialLat,
-    lng: residentialLng,
-    isLoading: residentialCoordLoading,
-  } = useAddressCoordinates(entity, AddressType.residential);
-  if (isResidentialAddressSelected) {
-    cards.push(
-      <AddressCard
-        key={AddressType.residential}
-        type={AddressType.residential}
-        entity={entity}
-        isLoading={residentialCoordLoading}
-      />,
-    );
-
-    if (residentialLat && residentialLng) {
-      const isSelected = selectedIndex === allMarkers.length;
-      allMarkers.push({
-        lat: residentialLat,
-        lng: residentialLng,
-        icon: (
-          <AddressCardIcon
-            type={AddressType.residential}
-            color={isSelected ? 'quinary' : 'primary'}
-          />
-        ),
-        isSelected,
-      });
-    } else {
-      allMarkers.push(null);
+  const handleSelectFromMap = (id: string) => {
+    onSelectedIdChange(id);
+    // Find the card with the selected id and scroll to it
+    const card = document.getElementById(`device-insights-card-${id}`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }
-
-  const markers = allMarkers.filter(Boolean) as Marker[];
+  };
 
   return (
     <Container>
@@ -150,27 +104,19 @@ const Content = ({ entity, livenessData }: ContentProps) => {
         onChangeHidden={setDetailsHidden}
       >
         <MultiSelect
-          defaultValue={options}
-          options={options}
+          options={allOptions}
+          value={selectedOptions}
           onChange={handleOptionsChange}
         />
         <StyledDivider />
-        <CardsContainer>
-          {!cards.length && (
-            <Text variant="body-3" color="tertiary">
-              {t('empty')}
-            </Text>
-          )}
-          {cards.map((card, index) =>
-            React.cloneElement(card, {
-              isSelected: selectedIndex === index,
-              onSelect: () => setSelectedIndex(index),
-            }),
-          )}
-        </CardsContainer>
+        <CardsContainer>{cards}</CardsContainer>
       </ContainerWithToggle>
-      <MapContainer data-smaller={!detailsHidden}>
-        <Map markers={markers} />
+      <MapContainer data-has-overlay={!detailsHidden}>
+        <Map
+          markers={markers}
+          selectedCoords={selectedCoords}
+          onSelect={handleSelectFromMap}
+        />
       </MapContainer>
     </Container>
   );
@@ -180,7 +126,7 @@ const MapContainer = styled.div`
   ${({ theme }) => css`
     height: 584px;
     width: 100%;
-    height: calc(100% + 20px);
+    height: 100%;
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
     position: relative;
@@ -188,7 +134,7 @@ const MapContainer = styled.div`
     transition: transform 0.3s ease-in-out;
     transform: translateX(0);
 
-    &[data-smaller='true'] {
+    &[data-has-overlay='true'] {
       transform: translateX(214px);
     }
   `}

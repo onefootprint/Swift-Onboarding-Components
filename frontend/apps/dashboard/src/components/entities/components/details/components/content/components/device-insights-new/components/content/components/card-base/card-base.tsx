@@ -3,6 +3,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 type CardBaseProps = {
+  id: string;
   isSelected?: boolean;
   onSelect?: () => void;
   title?: string;
@@ -13,6 +14,7 @@ type CardBaseProps = {
 };
 
 const CardBase = ({
+  id,
   isSelected,
   onSelect,
   title,
@@ -21,7 +23,11 @@ const CardBase = ({
   rows,
   cta,
 }: CardBaseProps) => (
-  <Container data-selected={!!isSelected} onClick={onSelect}>
+  <Container
+    id={`device-insights-card-${id}`}
+    data-selected={!!isSelected}
+    onClick={onSelect}
+  >
     {title && (
       <Header data-selected={!!isSelected}>
         <Text variant="caption-1">{title}</Text>

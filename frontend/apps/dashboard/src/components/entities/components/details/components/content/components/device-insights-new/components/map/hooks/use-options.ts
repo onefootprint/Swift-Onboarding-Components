@@ -7,6 +7,8 @@ const useOptions = () => {
     fullscreenControl: false,
     disableDefaultUI: true,
     keyboardShortcuts: false,
+    minZoom: 3,
+    maxZoom: 20,
     styles: isDark ? darkStyles : lightStyles,
   };
 };

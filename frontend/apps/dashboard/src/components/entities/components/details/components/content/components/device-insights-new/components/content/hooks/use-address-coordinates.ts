@@ -1,10 +1,18 @@
 import type { Entity } from '@onefootprint/types';
-import { useEffect, useState } from 'react';
+import type { QueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type AddressType from '../components/address-card/types';
+import AddressType from '../components/address-card/types';
 import useAddressFieldsProps from './use-address-fields-props';
 
-const getCoordinatesFromAddress = async (address: string) => {
+type Coordinates = {
+  lat: number | undefined;
+  lng: number | undefined;
+};
+
+const getCoordinatesFromAddress = async (
+  address: string,
+): Promise<Coordinates | undefined> => {
   const geocoder = new google.maps.Geocoder();
   try {
     const result = await geocoder.geocode({ address });
@@ -17,43 +25,70 @@ const getCoordinatesFromAddress = async (address: string) => {
   }
 };
 
-const useAddressCoordinates = (entity: Entity, type: AddressType) => {
-  const [lat, setLat] = useState<number | undefined>();
-  const [lng, setLng] = useState<number | undefined>();
+const getAddressCoordinates = async (
+  queryClient: QueryClient,
+  entity: Entity,
+  type: AddressType,
+  address: string,
+) => {
+  const getFromCache = () =>
+    queryClient.getQueryData<Coordinates>(['device-insights', entity.id, type]);
 
+  const createInitialData = async (): Promise<Coordinates> => {
+    const coordinates = await getCoordinatesFromAddress(address);
+    return { lat: coordinates?.lat, lng: coordinates?.lng };
+  };
+
+  const possibleData = getFromCache();
+  if (possibleData) return possibleData;
+  const initialData = await createInitialData();
+  return initialData;
+};
+
+const useAddressCoordinates = (entity: Entity, type: AddressType) => {
+  const queryClient = useQueryClient();
   const { getAddressFieldsProps } = useAddressFieldsProps(entity);
+  const update = (newData: Coordinates) => {
+    const prevData = queryClient.getQueryData<Coordinates>([
+      'device-insights',
+      entity.id,
+      type,
+    ]);
+    queryClient.setQueryData(['device-insights', entity.id, type], {
+      ...prevData,
+      lat: newData.lat,
+      lng: newData.lng,
+    });
+  };
+
   const addressProps = getAddressFieldsProps(type);
   const encryptedFields = addressProps.filter(prop => !prop.isDecrypted);
   const hasCompleteAddress = encryptedFields.length === 0;
-  const [isLoading, setIsLoading] = useState<boolean>();
-  const completeAddress = addressProps.map(prop => prop.value).join(', ');
+  const completeAddress = addressProps
+    .map(prop => prop.value)
+    .filter(v => !!v)
+    .join(', ');
+  const addressTypeRequired =
+    entity.kind === 'business' ? AddressType.business : AddressType.residential;
+  const enabled =
+    !!entity &&
+    type === addressTypeRequired &&
+    hasCompleteAddress &&
+    !!completeAddress;
 
-  useEffect(() => {
-    if (!hasCompleteAddress || isLoading) {
-      return;
-    }
-    if (typeof lat !== 'undefined' || typeof lng !== 'undefined') {
-      return;
-    }
-    setIsLoading(true);
-    getCoordinatesFromAddress(completeAddress)
-      .then(coordinates => {
-        if (coordinates) {
-          if (coordinates.lat !== lat) {
-            setLat(coordinates.lat);
-          }
-          if (coordinates.lng !== lng) {
-            setLng(coordinates.lng);
-          }
-        }
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
-  }, [hasCompleteAddress, completeAddress, lat, lng, isLoading]);
+  const query = useQuery<Coordinates>(
+    ['device-insights', entity.id, type],
+    () => getAddressCoordinates(queryClient, entity, type, completeAddress),
+    {
+      enabled,
+    },
+  );
 
-  return { lat, lng, isLoading };
+  return {
+    ...query,
+    update,
+    isLoading: query.isLoading && query.fetchStatus !== 'idle',
+  };
 };
 
 export default useAddressCoordinates;

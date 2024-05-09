@@ -1,87 +1,76 @@
-import GoogleMapReact from 'google-map-react';
-import React, { useMemo } from 'react';
+import GoogleMap from 'google-maps-react-markers';
+import React, { useEffect, useRef } from 'react';
 import { GOOGLE_MAPS_API_KEY } from 'src/config/constants';
 import styled from 'styled-components';
 
-import MapMarker from './components/map-marker';
 import useOptions from './hooks/use-options';
 
 // Middle of US
-export const FALLBACK_LATITUDE = 37.09024;
-export const FALLBACK_LONGITUDE = -95.712891;
-export const GLOBE_LEVEL_ZOOM = 1;
-export const CITY_LEVEL_ZOOM = 13;
+const FALLBACK_LATITUDE = 37.09024;
+const FALLBACK_LONGITUDE = -95.712891;
+const DEFAULT_ZOOM = 9;
 
-export type Marker = {
+type Coords = {
   lat: number;
   lng: number;
-  isSelected?: boolean;
-  icon: JSX.Element;
 };
 
 export type MapProps = {
-  markers: Marker[];
+  markers: JSX.Element[];
+  selectedCoords?: Coords;
+  onSelect: (id: string) => void;
 };
 
-const Map = ({ markers }: MapProps) => {
-  const options = useOptions();
+type LoadedArgs = {
+  map: MapRef;
+};
 
-  const allLats = markers.map(marker => marker.lat);
-  const allLngs = markers.map(marker => marker.lng);
+type MapRef = {
+  setCenter: (coords: Coords) => void;
+};
 
-  const { defaultCenter, defaultZoom } = useMemo(() => {
-    if (!markers.length) {
-      return {
-        defaultCenter: {
-          lat: FALLBACK_LATITUDE,
-          lng: FALLBACK_LONGITUDE,
-        },
-        defaultZoom: GLOBE_LEVEL_ZOOM,
-      };
+const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
+  const mapRef = useRef<MapRef | null>(null);
+
+  const onGoogleApiLoaded = ({ map }: LoadedArgs) => {
+    mapRef.current = map;
+  };
+
+  const onMarkerClick = (markerId: string, lat: number, lng: number) => {
+    mapRef.current?.setCenter({ lat, lng });
+    onSelect(markerId);
+  };
+
+  useEffect(() => {
+    if (selectedCoords) {
+      mapRef.current?.setCenter({
+        lat: selectedCoords.lat,
+        lng: selectedCoords.lng,
+      });
     }
+  }, [selectedCoords]);
 
-    // Set the center of the map to be the average of all the markers
-    const avgLat =
-      markers.reduce((acc, marker) => acc + marker.lat, 0) / markers.length;
-    const avgLng =
-      markers.reduce((acc, marker) => acc + marker.lng, 0) / markers.length;
-    // Set the zoom level to include all markers when centered
-    // Get the distance between the center and the furthest marker
-    const maxDistance = Math.max(
-      ...markers.map(marker =>
-        Math.sqrt((marker.lat - avgLat) ** 2 + (marker.lng - avgLng) ** 2),
-      ),
-    );
-
-    return {
-      defaultCenter: {
-        lat: avgLat,
-        lng: avgLng,
-      },
-      defaultZoom:
-        markers.length === 1 ? CITY_LEVEL_ZOOM : 1 / (maxDistance * 1.5),
-    };
-  }, [...allLats, ...allLngs]);
+  const options = useOptions();
 
   return GOOGLE_MAPS_API_KEY ? (
     <Container>
-      <GoogleMapReact
-        key={`${defaultCenter.lat}-${defaultCenter.lng}`}
-        bootstrapURLKeys={{ key: GOOGLE_MAPS_API_KEY }}
-        defaultCenter={defaultCenter}
-        defaultZoom={defaultZoom}
+      <GoogleMap
+        apiKey={GOOGLE_MAPS_API_KEY}
+        onGoogleApiLoaded={onGoogleApiLoaded}
+        defaultCenter={{
+          lat: selectedCoords ? selectedCoords.lat : FALLBACK_LATITUDE,
+          lng: selectedCoords ? selectedCoords.lng : FALLBACK_LONGITUDE,
+        }}
+        defaultZoom={DEFAULT_ZOOM}
         options={options}
+        mapMinHeight="100%"
       >
-        {markers.map(marker => (
-          <MapMarker
-            key={`${marker.lat}-${marker.lng}`}
-            icon={marker.icon}
-            lat={marker.lat}
-            lng={marker.lng}
-            isSelected={marker.isSelected}
-          />
-        ))}
-      </GoogleMapReact>
+        {markers.map(m =>
+          React.cloneElement(m, {
+            onClick: onMarkerClick,
+          }),
+        )}
+      </GoogleMap>
     </Container>
   ) : null;
 };

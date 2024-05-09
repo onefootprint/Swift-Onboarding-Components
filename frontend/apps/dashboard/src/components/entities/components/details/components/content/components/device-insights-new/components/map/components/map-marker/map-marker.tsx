@@ -1,18 +1,34 @@
+import type { Color } from '@onefootprint/design-tokens';
 import { IcoMapPinDefault, IcoMapPinSelected } from '@onefootprint/icons';
 import React from 'react';
 import styled from 'styled-components';
 
-type MapMarkerProps = {
+export type MapMarkerProps = {
+  id: string;
   lat: number;
   lng: number;
   isSelected?: boolean;
-  icon: JSX.Element;
+  getIcon: (color?: Color) => JSX.Element;
+  onClick?: (id: string, lat: number, lng: number) => void;
 };
 
-const MapMarker = ({ lat, lng, isSelected, icon }: MapMarkerProps) => (
-  <MapMarkerContainer data-selected={isSelected} data-lat={lat} data-lng={lng}>
+const MapMarker = ({
+  id,
+  onClick,
+  lat,
+  lng,
+  isSelected,
+  getIcon,
+}: MapMarkerProps) => (
+  <MapMarkerContainer
+    id={id}
+    onClick={() => onClick?.(id, lat, lng)}
+    data-selected={isSelected}
+    data-lat={lat}
+    data-lng={lng}
+  >
     <Pin>{isSelected ? <IcoMapPinSelected /> : <IcoMapPinDefault />}</Pin>
-    <Icon>{icon}</Icon>
+    <Icon>{getIcon(isSelected ? 'quinary' : 'primary')}</Icon>
   </MapMarkerContainer>
 );
 
@@ -21,7 +37,7 @@ const MapMarkerContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-100%);
 `;
 
 const Pin = styled.div`

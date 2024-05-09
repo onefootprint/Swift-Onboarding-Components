@@ -12,14 +12,16 @@ import AddressCardIcon from './components/address-card-icon';
 import type AddressType from './types';
 
 type AddressCardProps = {
+  id: string;
   type: AddressType;
   entity: Entity;
   isSelected?: boolean;
-  onSelect?: () => void;
+  onSelect?: (id: string) => void;
   isLoading?: boolean;
 };
 
 const AddressCard = ({
+  id,
   type,
   entity,
   isSelected,
@@ -32,8 +34,6 @@ const AddressCard = ({
 
   const { getAddressFieldsProps, getAddressDis } =
     useAddressFieldsProps(entity);
-
-  const headerIcon = <AddressCardIcon type={type} />;
 
   const headerText =
     type === 'business'
@@ -81,9 +81,10 @@ const AddressCard = ({
 
   return (
     <CardBase
+      id={id}
       isSelected={isSelected}
-      onSelect={onSelect}
-      headerIcon={headerIcon}
+      onSelect={() => onSelect?.(id)}
+      headerIcon={<AddressCardIcon type={type} />}
       headerText={headerText}
       rows={rows}
       cta={ctaElem}
