@@ -4,7 +4,7 @@ import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import VerticalBeam from '../../../../../vertical-beam';
+import VerticalBeam from '../../../../../../../../components/vertical-beam';
 import Grid from '../components/grid';
 import Knob from '../components/knob';
 

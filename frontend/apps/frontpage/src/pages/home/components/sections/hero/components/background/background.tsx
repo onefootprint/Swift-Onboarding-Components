@@ -2,10 +2,10 @@ import { media } from '@onefootprint/ui';
 import times from 'lodash/times';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import HorizontalBeam from 'src/pages/home/components/horizontal-beam/horizontal-beam';
+import HorizontalBeam from 'src/components/horizontal-beam/horizontal-beam';
 import styled from 'styled-components';
 
-import VerticalBeam from '../../../../vertical-beam';
+import VerticalBeam from '../../../../../../../components/vertical-beam';
 
 type BackgroundProps = {
   className?: string;

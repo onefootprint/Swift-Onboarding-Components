@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
-import HorizontalBeam from 'src/pages/home/components/horizontal-beam/';
+import HorizontalBeam from 'src/components/horizontal-beam';
 import styled from 'styled-components';
 
 import IllustrationContainer from '../../illustration-container';
