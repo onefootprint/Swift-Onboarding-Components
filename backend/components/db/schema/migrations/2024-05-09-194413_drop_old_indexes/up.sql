@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS unique_speculative_data_lifetime_per_scoped_user;
