@@ -78,29 +78,7 @@ pub fn save_final_decision(
     };
 
     let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
-    let status = match decision {
-        Decision::RulesExecuted { action, .. } => action.map(DecisionStatus::from),
-        // If rules didn't execute, default to the existing scoped vault status
-        Decision::RulesNotExecuted => match sv.status {
-            Some(OnboardingStatus::Pass) => Some(DecisionStatus::Pass),
-            Some(OnboardingStatus::Fail) => Some(DecisionStatus::Fail),
-            // If the first playbook you onboard onto doesn't have rules, it will pass/fail you
-            // according to logic below
-            Some(OnboardingStatus::Incomplete) | Some(OnboardingStatus::Pending) | None => None,
-        },
-    };
-    let status = status.unwrap_or_else(|| {
-        // The rules engine didn't have any rule triggered
-        if doc_manual_review.is_some() && !sv.status.is_some_and(|s| s == OnboardingStatus::Pass) {
-            // Fail the user if there's a document MR and the user isn't already passing.
-            // This is a kind of implicit rule.
-            // TODO save on the OnboardingDecision when we take this implicit rule
-            DecisionStatus::Fail
-        } else {
-            // Otherwise, no rules were triggered, default to pass!
-            DecisionStatus::Pass
-        }
-    });
+    let status = get_final_decision_status(decision, doc_manual_review.is_some(), sv.status);
 
     let manual_reviews = chain(rules_manual_review, doc_manual_review).collect();
     if status == DecisionStatus::StepUp {
@@ -122,4 +100,76 @@ pub fn save_final_decision(
     Workflow::update(wf, conn, update)?;
 
     Ok(())
+}
+
+
+fn get_final_decision_status(
+    decision: Decision,
+    has_doc_mr: bool,
+    existing_status: Option<OnboardingStatus>,
+) -> DecisionStatus {
+    // TODO save on the OnboardingDecision when we take this implicit rule
+    let can_fail_for_doc_review = has_doc_mr && existing_status != Some(OnboardingStatus::Pass);
+
+    match decision {
+        Decision::RulesExecuted { action, .. } => match action.map(DecisionStatus::from) {
+            Some(status) => status,
+            // If there's a document MR and the user doesn't already have a pass status, we'll fail them.
+            // This is a kind of implicit rule.
+            None if can_fail_for_doc_review => DecisionStatus::Fail,
+            // Default to pass if no rules were triggered
+            None => DecisionStatus::Pass,
+        },
+        // If there's a document MR and the user doesn't already have a pass status, we'll fail them.
+        // This is a kind of implicit rule.
+        Decision::RulesNotExecuted if can_fail_for_doc_review => DecisionStatus::Fail,
+        // TODO eventually stop defaulting to pass when no rules executed
+        Decision::RulesNotExecuted => DecisionStatus::Pass,
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use crate::decision::onboarding::Decision;
+
+    use super::get_final_decision_status;
+    use newtypes::{DecisionStatus, OnboardingStatus, RuleAction};
+    use test_case::test_case;
+
+    fn rules_executed(action: Option<RuleAction>) -> Decision {
+        Decision::RulesExecuted {
+            should_commit: true,
+            create_manual_review: false,
+            action,
+        }
+    }
+
+    // Test no existing status, no doc manual review, simple cases
+    #[test_case(Decision::RulesNotExecuted, false, None => DecisionStatus::Pass)]
+    #[test_case(rules_executed(None), false, None => DecisionStatus::Pass)]
+    #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), false, None => DecisionStatus::Pass)]
+    #[test_case(rules_executed(Some(RuleAction::Fail)), false, None => DecisionStatus::Fail)]
+    #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, None => DecisionStatus::Fail)]
+    #[test_case(rules_executed(Some(RuleAction::Fail)), false, Some(OnboardingStatus::Pass) => DecisionStatus::Fail)]
+    #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, Some(OnboardingStatus::Pass) => DecisionStatus::Fail)]
+    // Fail for document MR
+    #[test_case(Decision::RulesNotExecuted, true, None => DecisionStatus::Fail)]
+    #[test_case(Decision::RulesNotExecuted, true, Some(OnboardingStatus::Pending) => DecisionStatus::Fail)]
+    #[test_case(rules_executed(None), true, None => DecisionStatus::Fail)]
+    #[test_case(rules_executed(None), true, Some(OnboardingStatus::Incomplete) => DecisionStatus::Fail)]
+    // Don't set user to fail for doc review if they're already passed
+    #[test_case(Decision::RulesNotExecuted, true, Some(OnboardingStatus::Pass) => DecisionStatus::Pass)]
+    #[test_case(rules_executed(None), true, Some(OnboardingStatus::Pass) => DecisionStatus::Pass)]
+    // Doc manual review doesn't matter much when there's a rule action.
+    #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, Some(OnboardingStatus::Pass) => DecisionStatus::Fail)]
+    // This one is weird behavior - we should probably fail the user if there's a doc MR + PassWithManualReview. But just testing existing behavior for now
+    #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, Some(OnboardingStatus::Pass) => DecisionStatus::Pass)]
+    fn test_get_final_decision_status(
+        decision: Decision,
+        has_doc_mr: bool,
+        existing_status: Option<OnboardingStatus>,
+    ) -> DecisionStatus {
+        get_final_decision_status(decision, has_doc_mr, existing_status)
+    }
 }
