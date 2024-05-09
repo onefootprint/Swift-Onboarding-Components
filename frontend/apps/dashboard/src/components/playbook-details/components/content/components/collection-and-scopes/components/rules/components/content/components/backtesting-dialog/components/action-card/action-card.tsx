@@ -25,9 +25,11 @@ const ActionCard = ({ data, numTotal }: ActionCardProps) => (
           <Text variant="body-3" color={getActionVariant(value)}>
             {getActionText(value)}
           </Text>
-          <Text variant="body-3">{`${count} (${Math.round(
-            (count / numTotal) * 100,
-          )}%)`}</Text>
+          {numTotal && (
+            <Text variant="body-3">{`${count} (${Math.round(
+              (count / numTotal) * 100,
+            )}%)`}</Text>
+          )}
         </ActionRow>
       );
     })}

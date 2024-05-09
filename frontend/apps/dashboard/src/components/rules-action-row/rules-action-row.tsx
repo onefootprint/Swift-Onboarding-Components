@@ -106,7 +106,7 @@ const RulesActionRow = ({
         ...currentExpressions,
         { field: '', op: RiskSignalRuleOp.eq, value: true },
       ];
-      handleEditRule(newExpressions);
+      setIsPendingChange(true);
       return newExpressions;
     });
   };
@@ -121,7 +121,7 @@ const RulesActionRow = ({
           value: '',
         },
       ];
-      handleEditRule(newExpressions);
+      setIsPendingChange(true);
       return newExpressions;
     });
   };

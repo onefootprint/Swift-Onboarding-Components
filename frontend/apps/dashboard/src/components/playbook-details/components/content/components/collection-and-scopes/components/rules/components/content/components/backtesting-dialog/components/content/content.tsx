@@ -92,64 +92,52 @@ const Content = ({ data, dateRange, onFilter }: ContentProps) => {
         {renderHeading('affected', true)}
         <DateFilter dateRange={dateRange} onChange={onFilter} />
       </Stack>
-      {numTotal ? (
-        <>
-          <Stack direction="column" marginBottom={9}>
-            <Table data={getPageResults()} />
-            <Pagination
-              hasNextPage={pagination.hasNextPage}
-              hasPrevPage={pagination.hasPrevPage}
-              onNextPage={loadNextPage}
-              onPrevPage={loadPrevPage}
-              pageIndex={pagination.pageIndex}
-              pageSize={PAGE_SIZE}
-              totalNumResults={numAffected}
-            />
+      <Stack direction="column" marginBottom={9}>
+        <Table data={getPageResults()} isEmpty={!numTotal} />
+        <Pagination
+          hasNextPage={pagination.hasNextPage}
+          hasPrevPage={pagination.hasPrevPage}
+          onNextPage={loadNextPage}
+          onPrevPage={loadPrevPage}
+          pageIndex={pagination.pageIndex}
+          pageSize={PAGE_SIZE}
+          totalNumResults={numAffected}
+        />
+      </Stack>
+      <Divider marginTop={9} marginBottom={9} />
+      <Stack direction="column" marginBottom={9}>
+        {renderHeading('historical')}
+        <ActionCard
+          data={data.stats.countByHistoricalActionTriggered}
+          numTotal={numTotal}
+        />
+      </Stack>
+      <Stack direction="column" marginBottom={9}>
+        {renderHeading('backtested')}
+        <ActionCard
+          data={data.stats.countByBacktestActionTriggered}
+          numTotal={numTotal}
+        />
+      </Stack>
+      {!!numTotal && (
+        <Stack direction="column">
+          {renderHeading('correlation')}
+          <Stack direction="column" gap={5}>
+            {Object.keys(
+              data.stats.countByHistoricalAndBacktestActionTriggered,
+            ).map(sectionAction => (
+              <CorrelationActionCard
+                key={sectionAction}
+                sectionAction={sectionAction as BacktestingRuleAction}
+                data={
+                  data.stats.countByHistoricalAndBacktestActionTriggered[
+                    sectionAction as BacktestingRuleAction
+                  ] || {}
+                }
+              />
+            ))}
           </Stack>
-          <Divider marginTop={9} marginBottom={9} />
-          {data.stats.countByHistoricalActionTriggered && (
-            <Stack direction="column" marginBottom={9}>
-              {renderHeading('historical')}
-              <ActionCard
-                data={data.stats.countByHistoricalActionTriggered}
-                numTotal={numTotal}
-              />
-            </Stack>
-          )}
-          {data.stats.countByBacktestActionTriggered && (
-            <Stack direction="column" marginBottom={9}>
-              {renderHeading('backtested')}
-              <ActionCard
-                data={data.stats.countByBacktestActionTriggered}
-                numTotal={numTotal}
-              />
-            </Stack>
-          )}
-          {data.stats.countByHistoricalAndBacktestActionTriggered && (
-            <Stack direction="column">
-              {renderHeading('correlation')}
-              <Stack direction="column" gap={5}>
-                {Object.keys(
-                  data.stats.countByHistoricalAndBacktestActionTriggered,
-                ).map(sectionAction => (
-                  <CorrelationActionCard
-                    key={sectionAction}
-                    sectionAction={sectionAction as BacktestingRuleAction}
-                    data={
-                      data.stats.countByHistoricalAndBacktestActionTriggered[
-                        sectionAction as BacktestingRuleAction
-                      ] || {}
-                    }
-                  />
-                ))}
-              </Stack>
-            </Stack>
-          )}
-        </>
-      ) : (
-        <Text variant="body-3" paddingTop={3}>
-          {t('no-onboardings')}
-        </Text>
+        </Stack>
       )}
     </Container>
   );

@@ -16,7 +16,7 @@ import {
   Tooltip,
   useToast,
 } from '@onefootprint/ui';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, flatten, isEqual } from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -102,10 +102,20 @@ const Content = ({
 
   const handleEditRule = (rule: EditedRule) => {
     setEditedRules(currentRules => {
-      const newRules = cloneDeep(currentRules);
-      const index = newRules.findIndex(
+      // If the rule is the same as it was originally, don't log it in editedRules
+      const oldRule = flatten(Object.values(actionRules)).find(
+        r => r.ruleId === rule.ruleId,
+      );
+      const index = currentRules.findIndex(
         (r: EditedRule) => r.ruleId === rule.ruleId,
       );
+      if (isEqual(rule.ruleExpression, oldRule?.ruleExpression)) {
+        return index === -1
+          ? currentRules
+          : currentRules.filter((_, i) => i !== index);
+      }
+
+      const newRules = cloneDeep(currentRules);
       if (index === -1) {
         newRules.push(rule);
       } else {
@@ -160,6 +170,7 @@ const Content = ({
       {
         onSuccess: () => {
           resetEdits();
+          setOpen(false);
           toast.show({
             title: t('success-toast.title'),
             description: t('success-toast.description'),

@@ -24,6 +24,6 @@ describe('getActionVariant', () => {
   });
 
   it('should return the neutral variant when the pass action is passed in', () => {
-    expect(getActionVariant(BacktestingRuleAction.pass)).toEqual('neutral');
+    expect(getActionVariant(BacktestingRuleAction.pass)).toEqual('success');
   });
 });

@@ -7,7 +7,7 @@ const getActionVariant = (action: BacktestingRuleAction) => {
     [BacktestingRuleAction.manualReview]: 'warning',
     [BacktestingRuleAction.stepUp]: 'info',
     [BacktestingRuleAction.passWithManualReview]: 'success',
-    [BacktestingRuleAction.pass]: 'neutral',
+    [BacktestingRuleAction.pass]: 'success',
   };
   return actionVariants[action] || 'neutral';
 };

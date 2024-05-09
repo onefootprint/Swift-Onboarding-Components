@@ -2686,12 +2686,12 @@
           "backtesting": {
             "title": "Review rule changes",
             "save": "Save changes",
-            "no-onboardings": "This playbook did not have any onboardings during this time period. Please try a different date range.",
             "affected": {
               "heading": "{{count}} out of {{total}} total onboardings matched",
               "description": "If these rules existed in the selected period they would've affected {{count}} onboardings.",
               "aria-label": "Affected onboardings table",
-              "empty": "No onboardings would be affected.",
+              "none-affected": "No onboardings would've been affected.",
+              "none-total": "This playbook did not have any onboardings during this time period. Please try a different date range.",
               "header": {
                 "id": "Footprint ID",
                 "current-status": "Current onboarding status",

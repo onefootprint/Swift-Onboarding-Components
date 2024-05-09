@@ -1,4 +1,5 @@
 import {
+  createUseRouterSpy,
   customRender,
   screen,
   userEvent,
@@ -29,6 +30,8 @@ import {
   withRulesError,
 } from './rules.test.config';
 
+const useRouterSpy = createUseRouterSpy();
+
 const renderRules = ({
   playbook = kycPlaybookFixture,
 }: Partial<RulesProps>) => {
@@ -49,6 +52,14 @@ describe('<Rules />', () => {
   });
 
   describe('when it is a KYC playbook', () => {
+    useRouterSpy({
+      asPath: `/playbooks/${kycPlaybookFixture.id}`,
+      pathname: `/playbooks/${kycPlaybookFixture.id}`,
+      query: {
+        id: kycPlaybookFixture.id,
+      },
+    });
+
     describe('when the rules request fails', () => {
       it('should show an error message', async () => {
         withRulesError();
@@ -685,6 +696,16 @@ describe('<Rules />', () => {
   });
 
   describe('when it is a KYB playbook', () => {
+    beforeEach(() => {
+      useRouterSpy({
+        asPath: `/playbooks/${kybPlaybookFixture.id}`,
+        pathname: `/playbooks/${kybPlaybookFixture.id}`,
+        query: {
+          id: kybPlaybookFixture.id,
+        },
+      });
+    });
+
     it('should show an alert', async () => {
       withRules(kybPlaybookFixture.id);
       withLists();

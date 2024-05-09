@@ -10,9 +10,10 @@ import Row from '../row';
 
 type TableProps = {
   data: BacktestedOnboarding[];
+  isEmpty: boolean;
 };
 
-const Table = ({ data }: TableProps) => {
+const Table = ({ data, isEmpty }: TableProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.backtesting.affected',
   });
@@ -56,7 +57,7 @@ const Table = ({ data }: TableProps) => {
       <UITable<BacktestedOnboarding>
         aria-label={t('aria-label')}
         columns={columns}
-        emptyStateText={t('empty')}
+        emptyStateText={isEmpty ? t('none-total') : t('none-affected')}
         getAriaLabelForRow={backtestedRule => backtestedRule.fpId}
         getKeyForRow={backtestedRule => backtestedRule.fpId}
         onRowClick={handleRowClick}
