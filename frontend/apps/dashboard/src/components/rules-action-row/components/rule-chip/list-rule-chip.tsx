@@ -184,20 +184,23 @@ const EditContainer = styled(Stack)`
     min-width: fit-content;
     align-items: center;
     border-radius: ${theme.borderRadius.full};
-    padding-right: ${theme.spacing[5]};
+    padding-right: ${theme.spacing[3]};
     background-color: ${theme.backgroundColor.secondary};
   `}
 `;
 
 const DeleteContainer = styled.div`
-  height: 16px;
-  width: 16px;
-  align-content: center;
-  margin-left: -5px;
+  ${({ theme }) => css`
+    height: 16px;
+    width: 16px;
+    display: flex;
+    align-items: center;
+    margin-left: ${theme.spacing[1]};
 
-  > button:hover:enabled {
-    background: transparent;
-  }
+    > button:hover:enabled {
+      background: transparent;
+    }
+  `}
 `;
 
 export default ListRuleChip;

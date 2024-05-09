@@ -2581,6 +2581,7 @@
           "title": "Rules",
           "description": "Define the onboarding logic for your playbook.",
           "empty-rules": "This playbook does not have rules.",
+          "cta-not-allowed": "You're not allowed to edit rules",
           "alerts": {
             "kyb-alert": "These rules are only applied when verifying a Business Owner's identity.",
             "view-only-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access.",

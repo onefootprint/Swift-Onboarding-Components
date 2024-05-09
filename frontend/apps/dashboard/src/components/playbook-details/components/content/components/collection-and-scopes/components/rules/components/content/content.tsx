@@ -7,7 +7,11 @@ import type {
   RiskSignalRuleField,
   Rule,
 } from '@onefootprint/types';
-import { OnboardingConfigKind, RuleAction } from '@onefootprint/types';
+import {
+  OnboardingConfigKind,
+  RoleScopeKind,
+  RuleAction,
+} from '@onefootprint/types';
 import {
   Button,
   InlineAlert,
@@ -19,7 +23,9 @@ import {
 import { cloneDeep, flatten, isEqual } from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import PermissionGate from 'src/components/permission-gate';
 import styled, { createGlobalStyle, css } from 'styled-components';
+import { useEffectOnce } from 'usehooks-ts';
 
 import ActionSection from './components/action-section';
 import BacktestingDialog from './components/backtesting-dialog';
@@ -60,6 +66,13 @@ const Content = ({
   const showRequestErrorToast = useRequestErrorToast();
 
   const getLayoutElement = () => document.getElementById('page-main');
+
+  useEffectOnce(() => () => {
+    // Remove gray and disabled background
+    const layoutElement = getLayoutElement();
+    layoutElement?.classList.remove('editing');
+    toggleDisableHeading(false);
+  });
 
   const handleStartEdit = () => {
     setIsEditing(true);
@@ -137,7 +150,6 @@ const Content = ({
     setEditedRules([]);
     setIsEditing(false);
 
-    // Remove gray and disabled background
     const layoutElement = getLayoutElement();
     layoutElement?.classList.remove('editing');
     toggleDisableHeading(false);
@@ -193,13 +205,19 @@ const Content = ({
             </Text>
           </Stack>
           {shouldAllowEditing && !isEditing && (
-            <Button
-              variant="secondary"
-              disabled={editMutation.isLoading}
-              onClick={handleStartEdit}
+            <PermissionGate
+              scopeKind={RoleScopeKind.onboardingConfiguration}
+              fallbackText={t('cta-not-allowed')}
+              tooltipPosition="left"
             >
-              {allT('edit')}
-            </Button>
+              <Button
+                variant="secondary"
+                disabled={editMutation.isLoading}
+                onClick={handleStartEdit}
+              >
+                {allT('edit')}
+              </Button>
+            </PermissionGate>
           )}
         </Stack>
         {playbook.kind === OnboardingConfigKind.kyb && hasRules && (
