@@ -447,6 +447,7 @@ mod tests {
                     seqno: DataLifetimeSeqno::from(0),
                     manual_reviews: vec![],
                     rule_set_result_id: None,
+                    failed_for_doc_review: false,
                 };
 
                 let wf = Workflow::lock(conn, &wf.id).unwrap();

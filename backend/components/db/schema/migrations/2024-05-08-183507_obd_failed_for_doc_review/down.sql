@@ -1,0 +1,1 @@
+ALTER TABLE onboarding_decision DROP COLUMN failed_for_doc_review;

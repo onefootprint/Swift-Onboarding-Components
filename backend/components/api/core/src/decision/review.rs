@@ -74,6 +74,7 @@ pub fn save_review_decision(
         seqno,
         manual_reviews,
         rule_set_result_id: None,
+        failed_for_doc_review: false,
     };
 
     let update = WorkflowUpdate::set_decision(&wf, new_decision);

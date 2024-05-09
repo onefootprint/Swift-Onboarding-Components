@@ -18,6 +18,8 @@ use newtypes::{
     WorkflowId,
 };
 
+pub type FailedForDocReview = bool;
+
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = onboarding_decision)]
 pub struct OnboardingDecision {
@@ -29,12 +31,14 @@ pub struct OnboardingDecision {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub status: DecisionStatus,
     pub actor: DbActor,
-    // Only non-null for pass decisions made by footprint
     pub seqno: Option<DataLifetimeSeqno>,
     pub workflow_id: WorkflowId,
-    // If this is an OBD from a workflow, this will be the corresponding rule result making that decision
-    // Note: this is NOT currently backfilled so will be null for historical workflows
+    /// If this is an OBD from a workflow, this will be the corresponding rule result making that decision
+    /// Note: this is NOT currently backfilled so will be null for historical workflows
     pub rule_set_result_id: Option<RuleSetResultId>,
+    /// When true, the user had a document manual review. If no other rule action was matched,
+    /// we would fail the user.
+    pub failed_for_doc_review: FailedForDocReview,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -47,6 +51,7 @@ struct NewOnboardingDecisionRow {
     seqno: DataLifetimeSeqno,
     workflow_id: WorkflowId,
     rule_set_result_id: Option<RuleSetResultId>,
+    failed_for_doc_review: FailedForDocReview,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -69,6 +74,7 @@ pub struct NewDecisionArgs {
     /// ManualReviewKind, we'll leave any existing ManualReview for that kind untouched.
     pub manual_reviews: Vec<ManualReviewArgs>,
     pub rule_set_result_id: Option<RuleSetResultId>,
+    pub failed_for_doc_review: FailedForDocReview,
 }
 
 pub type SaturatedOnboardingDecisionInfo = (
@@ -81,6 +87,19 @@ pub type SaturatedOnboardingDecisionInfo = (
 impl OnboardingDecision {
     #[tracing::instrument("OnboardingDecision::create", skip_all)]
     pub(super) fn create(conn: &mut TxnPgConn, wf: &Workflow, args: NewDecisionArgs) -> DbResult<Self> {
+        let NewDecisionArgs {
+            vault_id,
+            logic_git_hash,
+            status,
+            result_ids,
+            annotation_id,
+            actor,
+            seqno,
+            rule_set_result_id,
+            failed_for_doc_review,
+            // Used by caller
+            manual_reviews: _,
+        } = args;
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
             .filter(onboarding_decision::workflow_id.eq(&wf.id))
@@ -90,21 +109,21 @@ impl OnboardingDecision {
 
         // Create the new decision
         let new = NewOnboardingDecisionRow {
-            logic_git_hash: args.logic_git_hash,
+            logic_git_hash,
+            status,
+            actor,
+            seqno,
+            rule_set_result_id,
+            failed_for_doc_review,
             created_at: Utc::now(),
-            status: args.status,
-            actor: args.actor,
-            seqno: args.seqno,
             workflow_id: wf.id.clone(),
-            rule_set_result_id: args.rule_set_result_id,
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)
             .get_result::<Self>(conn.conn())?;
 
         // Create junction rows that join the decision to the results that created them
-        let junction_rows: Vec<_> = args
-            .result_ids
+        let junction_rows: Vec<_> = result_ids
             .into_iter()
             .map(|id| OnboardingDecisionJunction {
                 onboarding_decision_id: result.id.clone(),
@@ -118,9 +137,9 @@ impl OnboardingDecision {
         // Create UserTimeline event for the decision
         let decision_info = OnboardingDecisionInfo {
             id: result.id.clone(),
-            annotation_id: args.annotation_id,
+            annotation_id,
         };
-        UserTimeline::create(conn, decision_info, args.vault_id, wf.scoped_vault_id.clone())?;
+        UserTimeline::create(conn, decision_info, vault_id, wf.scoped_vault_id.clone())?;
         Ok(result)
     }
 

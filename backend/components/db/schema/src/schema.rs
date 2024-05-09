@@ -784,6 +784,7 @@ diesel::table! {
         seqno -> Nullable<Int8>,
         workflow_id -> Text,
         rule_set_result_id -> Nullable<Text>,
+        failed_for_doc_review -> Bool,
     }
 }
 
