@@ -12,7 +12,6 @@ mod transform;
 pub use transform::*;
 
 mod types;
-
 pub use self::{request::*, response::*, types::*};
 
 #[derive(Debug, Clone)]
