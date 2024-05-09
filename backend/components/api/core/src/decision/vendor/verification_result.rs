@@ -15,15 +15,12 @@ use db::{
 };
 use idv::VendorResponse;
 use newtypes::{
-    DecisionIntentId, EncryptedVaultPrivateKey, DocumentId, PiiJsonValue, ScopedVaultId,
+    DecisionIntentId, DocumentId, EncryptedVaultPrivateKey, PiiJsonValue, ScopedVaultId,
     ScrubbedPiiJsonValue, SealedVaultBytes, VaultPublicKey, VendorAPI, VerificationRequestId,
     VerificationResultId,
 };
 
-use super::{
-    make_request::VerificationRequestWithVendorResponse,
-    vendor_api::vendor_api_response::scrub_raw_error_vendor_response, VendorAPIError,
-};
+use super::{make_request::VerificationRequestWithVendorResponse, VendorAPIError};
 
 /// Save a verification result, encrypting the response payload in the process
 pub fn save_verification_results(
@@ -66,14 +63,11 @@ pub fn save_error_verification_results(
         .map(|(req, response)| {
             let (e_response, scrubbed_response) = if let Some(raw_json) = response {
                 let e_response = encrypt_verification_result_response(raw_json, user_vault_public_key)?;
-                let scrubbed_response = match scrub_raw_error_vendor_response(&req.vendor_api, raw_json) {
-                    Ok(s) => s,
-                    Err(err) => {
-                        tracing::error!(?err, "Error in scrub_raw_error_vendor_response");
-                        ScrubbedPiiJsonValue::from(raw_json.leak().clone())
-                    }
-                };
-                (Some(e_response), scrubbed_response)
+                (
+                    Some(e_response),
+                    // there's a ton of PII potentially and it's too hard to keep this scrubbing stuff in sync with both success/error API responses
+                    ScrubbedPiiJsonValue::from(serde_json::json!({})),
+                )
             } else {
                 // response is non-optional on vres. This is a hack
                 let empty_response = ScrubbedPiiJsonValue::from(serde_json::json!({}));
