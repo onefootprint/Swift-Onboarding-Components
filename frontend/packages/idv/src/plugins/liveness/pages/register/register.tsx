@@ -190,16 +190,18 @@ const Register = () => {
               {secondaryButtonText}
             </Button>
           )}
-          <Stack
-            alignItems="center"
-            width="100%"
-            justify="center"
-            paddingTop={3}
-          >
-            <LinkButton onClick={handleOpenBottomSheet}>
-              {t('learn-more.cta')}
-            </LinkButton>
-          </Stack>
+          {!biometricInitMutation.isSuccess && (
+            <Stack
+              alignItems="center"
+              width="100%"
+              justify="center"
+              paddingTop={3}
+            >
+              <LinkButton onClick={handleOpenBottomSheet}>
+                {t('learn-more.cta')}
+              </LinkButton>
+            </Stack>
+          )}
           <BottomSheet
             open={showBottomSheet}
             onClose={handleCloseBottomSheet}
