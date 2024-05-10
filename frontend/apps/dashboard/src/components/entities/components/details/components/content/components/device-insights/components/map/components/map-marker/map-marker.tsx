@@ -1,75 +1,49 @@
-import type { Color } from '@onefootprint/design-tokens';
-import { IcoMapPinDefault, IcoMapPinSelected } from '@onefootprint/icons';
-import { useTheme } from 'next-themes';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-export type MapMarkerProps = {
-  id: string;
+type MapMarkerProps = {
   lat: number;
   lng: number;
-  isSelected?: boolean;
-  getIcon: (color?: Color) => JSX.Element;
-  onClick?: (id: string, lat: number, lng: number) => void;
 };
 
-const MapMarker = ({
-  id,
-  onClick,
-  lat,
-  lng,
-  isSelected,
-  getIcon,
-}: MapMarkerProps) => {
-  const theme = useTheme();
-  const isDark = theme.theme === 'dark';
-  const iconColorDefault = isDark ? 'tertiary' : 'primary';
-  const iconColorSelected = isDark ? 'primary' : 'quinary';
-
-  return (
-    <MapMarkerContainer
-      id={id}
-      onClick={() => onClick?.(id, lat, lng)}
-      data-selected={isSelected}
-      data-lat={lat}
-      data-lng={lng}
-    >
-      <Pin>{isSelected ? <IcoMapPinSelected /> : <IcoMapPinDefault />}</Pin>
-      <Icon>{getIcon(isSelected ? iconColorSelected : iconColorDefault)}</Icon>
-    </MapMarkerContainer>
-  );
-};
+const MapMarker = ({ lat, lng }: MapMarkerProps) => (
+  <MapMarkerContainer>
+    <MapMarkerDot data-lat={lat} data-lng={lng} />
+  </MapMarkerContainer>
+);
 
 const MapMarkerContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-`;
+  ${({ theme }) => css`
+    position: relative;
+    align-items: center;
+    border-radius: 100%;
+    display: flex;
+    height: 324px;
+    justify-content: center;
+    transform: translateX(-50%) translateY(-50%);
+    width: 324px;
 
-const Pin = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  svg {
-    overflow: visible;
-
-    path {
-      filter: drop-shadow(0px 1px 12px rgba(5, 5, 5, 0.18));
+    &::before {
+      background-color: ${theme.backgroundColor.accent};
+      border-radius: 100%;
+      opacity: 0.15;
+      content: '';
+      position: absolute;
+      height: 100%;
+      width: 100%;
     }
-  }
+  `};
 `;
 
-const Icon = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -90%);
+const MapMarkerDot = styled.div`
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.accent};
+    box-shadow: ${theme.elevation[3]};
+    border-radius: ${theme.borderRadius.full};
+    border: ${theme.borderWidth[2]} solid #fff;
+    height: 16px;
+    width: 16px;
+  `};
 `;
 
 export default MapMarker;
