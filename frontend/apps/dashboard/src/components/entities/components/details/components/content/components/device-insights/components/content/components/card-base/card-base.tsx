@@ -1,7 +1,6 @@
-import { primitives } from '@onefootprint/design-tokens';
 import { Text } from '@onefootprint/ui';
-import { useTheme } from 'next-themes';
 import React from 'react';
+import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 type CardBaseProps = {
@@ -25,9 +24,6 @@ const CardBase = ({
   rows,
   cta,
 }: CardBaseProps) => {
-  const theme = useTheme();
-  const isDark = theme.theme === 'dark';
-
   const handleSelect = () => {
     const card = document.getElementById(`device-insights-card-${id}`);
     const parent = card?.parentElement;
@@ -45,15 +41,9 @@ const CardBase = ({
       id={`device-insights-card-${id}`}
       data-selected={!!isSelected}
       onClick={handleSelect}
-      activeBackground={isDark ? primitives.Purple700 : primitives.Purple100}
     >
       {title && (
-        <Header
-          data-selected={!!isSelected}
-          activeBackground={
-            isDark ? primitives.Purple700 : primitives.Purple100
-          }
-        >
+        <Header data-selected={!!isSelected}>
           <Text variant="caption-1">{title}</Text>
         </Header>
       )}
@@ -71,28 +61,43 @@ const CardBase = ({
   );
 };
 
-const Container = styled.div<{ activeBackground: string }>`
-  ${({ theme, activeBackground }) => css`
+const getActiveStyle = (theme: DefaultTheme) => css`
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: ${theme.backgroundColor.accent};
+  opacity: 0.1;
+`;
+
+const Container = styled.div`
+  ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
     background-color: ${theme.backgroundColor.primary};
     cursor: pointer;
+    position: relative;
 
     &:hover {
       background-color: ${theme.backgroundColor.secondary};
     }
 
     &[data-selected='true'] {
-      background-color: ${activeBackground};
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.secondary};
+
+      &::after {
+        ${getActiveStyle(theme)}
+      }
     }
   `};
 `;
 
-const Header = styled.div<{ activeBackground: string }>`
-  ${({ theme, activeBackground }) => css`
+const Header = styled.div`
+  ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -106,7 +111,6 @@ const Header = styled.div<{ activeBackground: string }>`
       0;
 
     &[data-selected='true'] {
-      background-color: ${activeBackground};
       border-bottom: ${theme.borderWidth[1]} solid
         ${theme.borderColor.secondary};
     }

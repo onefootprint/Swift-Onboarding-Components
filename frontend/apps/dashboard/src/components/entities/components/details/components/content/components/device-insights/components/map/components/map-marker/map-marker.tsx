@@ -30,7 +30,6 @@ const MapMarker = ({
     <MapMarkerContainer
       id={id}
       onClick={() => onClick?.(id, lat, lng)}
-      data-selected={isSelected}
       data-lat={lat}
       data-lng={lng}
     >
