@@ -54,8 +54,9 @@ const Declarations = () => {
               sendDeclarationData(declarationData);
             },
             onError: (error: unknown) => {
+              const fileType = files[0].type;
               Logger.error(
-                `Encountered error while uploading declarations files: ${getErrorMessage(
+                `Encountered error while uploading declarations files of type ${fileType}: ${getErrorMessage(
                   error,
                 )}`,
                 'investor-profile-declarations',
