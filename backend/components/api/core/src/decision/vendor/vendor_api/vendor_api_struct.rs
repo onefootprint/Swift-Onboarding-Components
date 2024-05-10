@@ -8,7 +8,7 @@ use strum_macros::{EnumIter, EnumString};
 /// helpful for working with VendorAPIs in application code
 #[derive(Debug, Display, Clone, Copy, Hash, PartialEq, Eq, EnumIter, EnumString, EnumVariantType)]
 #[evt(module = "vendor_api_struct")]
-#[evt(derive(Clone, Hash, PartialEq, Eq))]
+#[evt(derive(Clone, Hash, PartialEq, Eq, Debug))]
 pub enum WrappedVendorAPI {
     IdologyExpectID,
     IdologyPa,

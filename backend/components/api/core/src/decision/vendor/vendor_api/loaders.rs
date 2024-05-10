@@ -36,6 +36,7 @@ impl<T> LoadVendorResponseResult<T> {
 // for the given workflow.
 //
 // TODO: It won't load the _actual_ latest response if the latest response was an error, so maybe we need to revisit this at some point, but I think it's prob fine
+#[tracing::instrument(skip(state, user_vault_private_key))]
 pub async fn load_response_for_vendor_api<T, V>(
     state: &State,
     id: V,
@@ -43,8 +44,8 @@ pub async fn load_response_for_vendor_api<T, V>(
     vendor_api_struct: T,
 ) -> ApiResult<LoadVendorResponseResult<T::ParsedType>>
 where
-    T: VendorParsable,
-    V: Into<VReqIdentifier> + Clone + Send + 'static,
+    T: VendorParsable + std::fmt::Debug,
+    V: Into<VReqIdentifier> + Clone + Send + 'static + std::fmt::Debug,
 {
     let id2 = id.clone();
     let vendor_api = vendor_api_struct.vendor_api();
@@ -57,11 +58,15 @@ where
         })
         .await?;
 
+    let log_msg = "load_response_for_vendor_api failed";
+
     let Some((_, vres)) = requests_and_result else {
+        tracing::warn!(reason = "not found", ?vendor_api, log_msg);
         return Ok(LoadVendorResponseResult::NotFound);
     };
 
     let Some(e_resp) = vres.e_response.as_ref() else {
+        tracing::warn!(reason = "no response", ?vendor_api, log_msg);
         return Ok(LoadVendorResponseResult::NoResponse);
     };
 
@@ -74,12 +79,16 @@ where
 
 
     let Some(pii_json) = decrypted.first().cloned() else {
+        tracing::warn!(reason = "no response after decrypt", ?vendor_api, log_msg);
         return Ok(LoadVendorResponseResult::NoResponse);
     };
 
     match vendor_api_struct.parse(pii_json.into_leak()) {
         Ok(s) => Ok(LoadVendorResponseResult::Success((s, vres.id.clone()))),
-        Err(e) => Ok(LoadVendorResponseResult::Error(e.into())),
+        Err(e) => {
+            tracing::warn!(reason = "deser error", ?vendor_api, log_msg);
+            Ok(LoadVendorResponseResult::Error(e.into()))
+        }
     }
 }
 
@@ -303,7 +312,7 @@ mod tests {
         assert!(test_ran)
     }
 
-    async fn assert_results<T: VendorParsable>(
+    async fn assert_results<T: VendorParsable + std::fmt::Debug>(
         state: &State,
         wf_id: WorkflowId,
         di_id: DecisionIntentId,
