@@ -8,6 +8,7 @@ const useValues = () => {
   const isValidPeriod = options.some(
     ({ value }) => value === filters.values.period,
   );
+
   const period = isValidPeriod
     ? filters.values.period
     : DEFAULT_DATE_FILTER_PERIOD;

@@ -26,12 +26,21 @@ const DateFilter = () => {
   };
 
   const handleSelectChange = (newPeriod: string) => {
-    filters.push({
-      ...filters.query,
-      period: newPeriod as DateFilterPeriod,
-      period_date_start: undefined,
-      period_date_end: undefined,
-    });
+    if (newPeriod === 'custom') {
+      setIsDateSheetOpen(true);
+      filters.push({
+        period: newPeriod as DateFilterPeriod,
+        period_date_start: filters.values.period_date_start?.toISOString(),
+        period_date_end: filters.values.period_date_end?.toISOString(),
+      });
+    } else {
+      filters.push({
+        ...filters.query,
+        period: newPeriod as DateFilterPeriod,
+        period_date_start: undefined,
+        period_date_end: undefined,
+      });
+    }
   };
 
   const handleSheetChange = ({
@@ -62,7 +71,6 @@ const DateFilter = () => {
         startDate={values.start}
         endDate={values.end}
         onChange={handleSheetChange}
-        onOpenChange={handleToggleDataSheet}
         onClickOutside={handleToggleDataSheet}
         open={isDateSheetOpen}
         disableFutureDates
