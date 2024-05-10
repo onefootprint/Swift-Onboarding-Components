@@ -1,7 +1,10 @@
 use db::{
     models::{
-        billing_event::BillingEvent, decision_intent::DecisionIntent, ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault, verification_request::VerificationRequest,
+        billing_event::BillingEvent,
+        decision_intent::DecisionIntent,
+        ob_configuration::ObConfiguration,
+        scoped_vault::ScopedVault,
+        verification_request::{VReqIdentifier, VerificationRequest},
     },
     DbPool,
 };
@@ -274,14 +277,17 @@ async fn existing_watchlist_check_response(
     kind: WatchlistCheckKind,
 ) -> ApiResult<Option<(VerificationResultId, WatchlistResultResponse)>> {
     let response = match kind {
-        WatchlistCheckKind::MakeNewSearch => {
-            load_response_for_vendor_api(state, di_id.clone(), vault_private_key, IncodeWatchlistCheck)
-                .await?
-                .ok()
-        }
+        WatchlistCheckKind::MakeNewSearch => load_response_for_vendor_api(
+            state,
+            VReqIdentifier::DiId(di_id.clone()),
+            vault_private_key,
+            IncodeWatchlistCheck,
+        )
+        .await?
+        .ok(),
         WatchlistCheckKind::GetUpdatedResults(_) => load_response_for_vendor_api(
             state,
-            di_id.clone(),
+            VReqIdentifier::DiId(di_id.clone()),
             vault_private_key,
             IncodeUpdatedWatchlistResult,
         )

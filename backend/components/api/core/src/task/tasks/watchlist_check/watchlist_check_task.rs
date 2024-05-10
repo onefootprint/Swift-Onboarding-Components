@@ -16,6 +16,7 @@ use db::{
         task::Task,
         tenant::Tenant,
         user_timeline::UserTimeline,
+        verification_request::VReqIdentifier,
         watchlist_check::WatchlistCheck,
     },
     DbResult, TxnPgConn,
@@ -122,7 +123,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
 
                 let existing_response = load_response_for_vendor_api(
                     &self.state,
-                    di_id.clone(),
+                    VReqIdentifier::DiId(di_id.clone()),
                     &uvw.vault.e_private_key,
                     IdologyPa,
                 )

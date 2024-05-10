@@ -12,6 +12,7 @@ use db::{
         scoped_vault::ScopedVault,
         tenant::Tenant,
         user_timeline::UserTimeline,
+        verification_request::VReqIdentifier,
         workflow::{Workflow, WorkflowUpdate},
     },
     DbPool, DbResult, PgConn, TxnPgConn,
@@ -262,11 +263,14 @@ pub async fn maybe_generate_ocr_reason_codes(
     // TODO: instead of retrieving all results from all vendor calls here, we could just retrieve the ones for the DocScan DI or even just directly retrieve IncodeFetchOCR itself
     // also slightly sketch to query latest by sv_id instead of strictly querying from vres's made within this workflow specifically
     let wfid = wf_id.clone();
-    let Some((fetch_ocr, vres_id)) =
-        load_response_for_vendor_api(state, wfid, &vw.vault.e_private_key, IncodeFetchOCR)
-            .await?
-            .ok()
-    else {
+    let Some((fetch_ocr, vres_id)) = load_response_for_vendor_api(
+        state,
+        VReqIdentifier::WfId(wfid),
+        &vw.vault.e_private_key,
+        IncodeFetchOCR,
+    )
+    .await?
+    .ok() else {
         tracing::warn!(?wf_id, "error getting incode response for doc first risk signals");
         return Ok(None);
     };

@@ -218,21 +218,18 @@ impl VerificationRequest {
         "VerificationRequest::get_latest_request_and_successful_result_for_vendor_api",
         skip_all
     )]
-    pub fn get_latest_request_and_successful_result_for_vendor_api<T>(
+    pub fn get_latest_request_and_successful_result_for_vendor_api(
         conn: &mut PgConn,
-        id: T,
+        id: VReqIdentifier,
         vendor_api: VendorAPI,
-    ) -> DbResult<Option<RequestAndResult>>
-    where
-        T: Into<VReqIdentifier>,
-    {
+    ) -> DbResult<Option<RequestAndResult>> {
         let mut query = verification_request::table
             .filter(verification_request::vendor_api.eq(vendor_api))
             .inner_join(verification_result::table)
             .filter(verification_result::is_error.eq(false))
             .into_boxed();
 
-        match id.into() {
+        match id {
             VReqIdentifier::DiId(di_id) => {
                 query = query.filter(verification_request::decision_intent_id.eq(di_id));
             }
@@ -241,6 +238,9 @@ impl VerificationRequest {
                     .filter(decision_intent::workflow_id.eq(wf_id))
                     .select(decision_intent::id);
                 query = query.filter(verification_request::decision_intent_id.eq_any(di_ids));
+            }
+            VReqIdentifier::LatestForSv(sv_id) => {
+                query = query.filter(verification_request::scoped_vault_id.eq(sv_id));
             }
         };
 
@@ -328,10 +328,11 @@ impl VerificationRequest {
     }
 }
 
-#[derive(derive_more::From)]
+#[derive(Debug)]
 pub enum VReqIdentifier {
     DiId(DecisionIntentId),
     WfId(WorkflowId),
+    LatestForSv(ScopedVaultId),
 }
 #[cfg(test)]
 mod tests {

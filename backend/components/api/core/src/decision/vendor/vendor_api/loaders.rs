@@ -37,24 +37,20 @@ impl<T> LoadVendorResponseResult<T> {
 //
 // TODO: It won't load the _actual_ latest response if the latest response was an error, so maybe we need to revisit this at some point, but I think it's prob fine
 #[tracing::instrument(skip(state, user_vault_private_key))]
-pub async fn load_response_for_vendor_api<T, V>(
+pub async fn load_response_for_vendor_api<T>(
     state: &State,
-    id: V,
+    id: VReqIdentifier,
     user_vault_private_key: &EncryptedVaultPrivateKey,
     vendor_api_struct: T,
 ) -> ApiResult<LoadVendorResponseResult<T::ParsedType>>
 where
     T: VendorParsable + std::fmt::Debug,
-    V: Into<VReqIdentifier> + Clone + Send + 'static + std::fmt::Debug,
 {
-    let id2 = id.clone();
     let vendor_api = vendor_api_struct.vendor_api();
     let requests_and_result = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
-            VerificationRequest::get_latest_request_and_successful_result_for_vendor_api(
-                conn, id2, vendor_api,
-            )
+            VerificationRequest::get_latest_request_and_successful_result_for_vendor_api(conn, id, vendor_api)
         })
         .await?;
 
@@ -117,7 +113,7 @@ mod tests {
     };
     use idv::test_fixtures::DocTestOpts;
     use macros::test_state_case;
-    use newtypes::{DecisionIntentId, DecisionIntentKind, VendorAPI, WorkflowId};
+    use newtypes::{DecisionIntentId, DecisionIntentKind, ScopedVaultId, VendorAPI, WorkflowId};
 
 
     #[test_state_case(VendorAPI::IncodeApproveSession)]
@@ -195,12 +191,14 @@ mod tests {
             .await
             .unwrap();
 
+        let sv_id2 = su.id.clone();
         let test_ran = match vendor_api {
             VendorAPI::IdologyExpectId => {
                 assert_results(
                     state,
                     wf.id,
                     di_id,
+                    sv_id2,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IdologyExpectID,
@@ -212,6 +210,7 @@ mod tests {
                     state,
                     wf.id,
                     di_id,
+                    sv_id2,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IdologyPa,
@@ -225,6 +224,7 @@ mod tests {
                     state,
                     wf.id,
                     di_id,
+                    sv_id2,
                     &uv.e_private_key,
                     vres_id_to_check,
                     ExperianPreciseID,
@@ -244,6 +244,7 @@ mod tests {
                     state,
                     wf.id,
                     di_id,
+                    sv_id2,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeFetchScores,
@@ -257,6 +258,7 @@ mod tests {
                     state,
                     wf.id,
                     di_id,
+                    sv_id2,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeFetchOCR,
@@ -269,6 +271,7 @@ mod tests {
                     state,
                     wf.id,
                     di_id,
+                    sv_id2,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeWatchlistCheck,
@@ -280,6 +283,7 @@ mod tests {
                     state,
                     wf.id,
                     di_id,
+                    sv_id2,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeUpdatedWatchlistResult,
@@ -295,6 +299,7 @@ mod tests {
                     state,
                     wf.id,
                     di_id,
+                    sv_id2,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeApproveSession,
@@ -316,27 +321,52 @@ mod tests {
         state: &State,
         wf_id: WorkflowId,
         di_id: DecisionIntentId,
+        sv_id: ScopedVaultId,
         e_key: &EncryptedVaultPrivateKey,
         vres_id_to_check: Option<VerificationResultId>,
         vendor_api_struct: T,
     ) -> bool {
         let vres_to_check = vres_id_to_check.unwrap();
-        let (_, vres_id) = load_response_for_vendor_api(state, wf_id, e_key, vendor_api_struct.clone())
-            .await
-            .unwrap()
-            .ok()
-            .unwrap();
+        let (_, vres_id) = load_response_for_vendor_api(
+            state,
+            VReqIdentifier::WfId(wf_id),
+            e_key,
+            vendor_api_struct.clone(),
+        )
+        .await
+        .unwrap()
+        .ok()
+        .unwrap();
 
         assert_eq!(vres_id, vres_to_check);
 
         // try fetching via DI too
-        let (_, vres_id) = load_response_for_vendor_api(state, di_id.clone(), e_key, vendor_api_struct)
-            .await
-            .unwrap()
-            .ok()
-            .unwrap();
+        let (_, vres_id) = load_response_for_vendor_api(
+            state,
+            VReqIdentifier::DiId(di_id.clone()),
+            e_key,
+            vendor_api_struct.clone(),
+        )
+        .await
+        .unwrap()
+        .ok()
+        .unwrap();
 
         assert_eq!(vres_id, vres_to_check);
+
+        // try fetching via SV too
+        let (_, vres_id_sv) = load_response_for_vendor_api(
+            state,
+            VReqIdentifier::LatestForSv(sv_id),
+            e_key,
+            vendor_api_struct,
+        )
+        .await
+        .unwrap()
+        .ok()
+        .unwrap();
+
+        assert_eq!(vres_id_sv, vres_to_check);
 
         state
             .db_pool
