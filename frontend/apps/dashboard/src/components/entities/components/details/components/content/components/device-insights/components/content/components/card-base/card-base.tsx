@@ -1,5 +1,6 @@
 import { Text } from '@onefootprint/ui';
 import React from 'react';
+import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 type CardBaseProps = {
@@ -60,6 +61,17 @@ const CardBase = ({
   );
 };
 
+const getActiveStyle = (theme: DefaultTheme) => css`
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: ${theme.backgroundColor.accent};
+  opacity: 0.1;
+`;
+
 const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
@@ -68,14 +80,18 @@ const Container = styled.div`
     border-radius: ${theme.borderRadius.default};
     background-color: ${theme.backgroundColor.primary};
     cursor: pointer;
+    position: relative;
 
     &:hover {
       background-color: ${theme.backgroundColor.secondary};
     }
 
     &[data-selected='true'] {
-      background-color: rgb(245, 243, 252);
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.secondary};
+
+      &::after {
+        ${getActiveStyle(theme)}
+      }
     }
   `};
 `;
@@ -95,7 +111,6 @@ const Header = styled.div`
       0;
 
     &[data-selected='true'] {
-      background-color: rgb(235, 233, 250);
       border-bottom: ${theme.borderWidth[1]} solid
         ${theme.borderColor.secondary};
     }

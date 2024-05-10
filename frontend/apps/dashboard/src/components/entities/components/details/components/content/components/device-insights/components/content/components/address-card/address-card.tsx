@@ -7,8 +7,8 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 
-import FieldValue from '../../../../../vault/components/field/components/field-value';
 import { useDecryptControls } from '../../../../../vault/components/vault-actions';
 import useAddressFieldsProps from '../../hooks/use-address-fields-props';
 import CardBase from '../card-base';
@@ -49,7 +49,9 @@ const AddressCard = ({
     <CardRow
       key={prop.label}
       label={prop.label}
-      value={<FieldValue field={prop} />}
+      value={
+        <FieldOrPlaceholder data={prop.value} transforms={prop.transforms} />
+      }
     />
   ));
 
