@@ -6,6 +6,9 @@ on:
       commitHash:
         type: string
         required: true
+      rustVersion:
+        type: string
+        required: true
 
     secrets:
       AWS_REGION:
@@ -88,18 +91,26 @@ jobs:
         run: |
           rm .cargo/config.toml
           componentVersion="${{ needs.extract_commit.outputs.apiComponentVersion }}"
+          serverGitHash="${{ needs.extract_commit.outputs.expectedServerVersion }}"
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           echo "using account ${account}"
           echo "create image tagged as ${componentVersion}"
 
+          function build_api {
+            echo "building release mode"
+            docker run --env GIT_HASH="${serverGitHash}" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p api_server --release
+            cp ./target/x86_64-unknown-linux-musl/release/api_server ./out/api_server
+            docker build -t "api:${componentVersion}" -f api.dockerfile .
+          }
+
           # check cache or build
-          docker inspect api:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && make api-release && docker build -t "api:${componentVersion}" -f api.dockerfile .)
+          docker inspect api:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && build_api)
 
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker tag api:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}
-          docker tag api:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
+          docker tag api:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}          
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
+        env:
+          RUST_VERSION: ${{ inputs.rustVersion }}
 
       - name: cache permissions # workaround: move the cargo cache to somewhere it can be cached
         run: |
@@ -136,18 +147,26 @@ jobs:
           git --version
           rm .cargo/config.toml
           componentVersion="${{ needs.extract_commit.outputs.enclaveComponentVersion }}"
+          serverGitHash="${{ needs.extract_commit.outputs.expectedServerVersion }}"
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           echo "using account ${account}"
           echo "create image tagged as ${componentVersion}"
 
+          function build_enclave_proxy {
+            echo "[release] building enclave-proxy"
+            docker run --env GIT_HASH="${serverGitHash}" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p enclave_proxy --features vsock --release
+            cp ./target/x86_64-unknown-linux-musl/release/enclave_proxy ./out/enclave_proxy
+            docker build -t "enclave_proxy_pkg:${componentVersion}" -f enclave_proxy_package.dockerfile .
+          }
+
           # check cache or build
-          docker inspect enclave_proxy_pkg:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && make build-enclave-proxy-release && docker build -t "enclave_proxy_pkg:${componentVersion}" -f enclave_proxy_package.dockerfile .)
+          docker inspect enclave_proxy_pkg:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && build_enclave_proxy)
 
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
           docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${componentVersion}
-          docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${componentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
+        env:
+          RUST_VERSION: ${{ inputs.rustVersion }}
 
   build_enclave:
     name: Build Enclave
@@ -183,11 +202,22 @@ jobs:
           echo "using account ${account}"
           echo "create image tagged as ${componentVersion}"
 
+          function build_enclave_docker {
+            rm -f ./out/enclave
+
+            echo "building enclave"
+            docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t "ne_builder2:${RUST_VERSION}" cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
+
+            cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
+
+            docker build -f enclave.dockerfile -t enclave:${componentVersion} .
+          }
+
           # check cache or build
-          docker inspect enclave:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && make build-enclave-docker && docker tag enclave:latest enclave:${componentVersion})
+          docker inspect enclave:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && build_enclave_docker)
 
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
           docker tag enclave:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${componentVersion}
-          docker tag enclave:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:latest
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${componentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:latest
+        env:
+          RUST_VERSION: ${{ inputs.rustVersion }}

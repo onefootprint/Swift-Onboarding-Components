@@ -21,6 +21,7 @@ jobs:
     uses: ./.github/workflows/backend_build.yml
     with:
       commitHash: ${{ github.event.pull_request.head.sha || github.sha }}
+      rustVersion: 1.77.0
     # don't run for dependabot changes and only run when labeled ephemeral or infra changes detected
     secrets:
       AWS_REGION: ${{ secrets.AWS_REGION }}

@@ -123,15 +123,11 @@ jobs:
           apiComponentVersion="${{ inputs.apiComponentVersion }}"
           enclaveComponentVersion="${{ inputs.enclaveComponentVersion }}"
 
-          docker tag api:${apiComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
           docker tag api:${apiComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${apiComponentVersion}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${apiComponentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest          
 
-          docker tag enclave_proxy_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
           docker tag enclave_proxy_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${enclaveComponentVersion}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${enclaveComponentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -183,10 +179,8 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
           enclaveComponentVersion="${{ inputs.enclaveComponentVersion }}"
 
-          docker tag enclave_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
           docker tag enclave_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${enclaveComponentVersion}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${enclaveComponentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
