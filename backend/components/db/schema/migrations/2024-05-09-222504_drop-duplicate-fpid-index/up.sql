@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS scoped_users_fp_id;
