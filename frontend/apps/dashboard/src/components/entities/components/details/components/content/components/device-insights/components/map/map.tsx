@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes';
 import React, { useEffect, useRef } from 'react';
 import type { MapRef } from 'react-map-gl';
 import { Map as MapboxMap, Marker } from 'react-map-gl';
-import styled, { useTheme as useStyledTheme } from 'styled-components';
+import styled from 'styled-components';
 
 import GoogleMapsLoader from '../content/utils/google-maps-loader';
 import type { MapMarkerProps } from './components/map-marker';
@@ -12,7 +12,7 @@ import type { MapMarkerProps } from './components/map-marker';
 const PUBLIC_MAP_BOX_TOKEN =
   'pk.eyJ1IjoiYmVsY2VvbmVmb290cHJpbnQiLCJhIjoiY2x2empoY2EwMDA5aDJrcGg0Y3RkOTBreiJ9.2TyaEVdUljarrNN4XXoeUA';
 
-const DEFAULT_ZOOM = 11;
+const DEFAULT_ZOOM = 9;
 const MAX_ZOOM = 20;
 const MIN_ZOOM = 1;
 // Middle of US
@@ -34,7 +34,6 @@ const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
   const mapRef = useRef<MapRef>(null);
   const theme = useTheme();
   const isDark = theme.theme === 'dark';
-  const themeStyles = useStyledTheme();
 
   const handleMarkerClick = (markerProps: MapMarkerProps) => {
     if (!mapRef.current) return;
@@ -103,11 +102,6 @@ const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
             longitude={marker.props.lng}
             latitude={marker.props.lat}
             anchor="bottom"
-            style={
-              marker.props.isSelected
-                ? { zIndex: themeStyles.zIndex.popover }
-                : { zIndex: 0 }
-            }
           >
             {React.cloneElement(marker, {
               onClick: () => handleMarkerClick(marker.props),

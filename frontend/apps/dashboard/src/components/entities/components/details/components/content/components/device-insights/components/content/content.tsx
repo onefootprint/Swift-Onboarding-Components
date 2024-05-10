@@ -84,7 +84,6 @@ const Content = ({ entity, livenessData }: ContentProps) => {
   if (!cards.length) {
     cards.push(
       <Stack
-        key="empty"
         display="flex"
         direction="column"
         gap={6}
@@ -104,8 +103,10 @@ const Content = ({ entity, livenessData }: ContentProps) => {
           justifyContent="center"
           alignItems="center"
         >
-          <Text variant="label-2">{t('empty.title')}</Text>
-          <Text variant="body-2" textAlign="center">
+          <Text key="empty" variant="label-2">
+            {t('empty.title')}
+          </Text>
+          <Text key="empty" variant="body-2" textAlign="center">
             {t('empty.description')}
           </Text>
         </Stack>
