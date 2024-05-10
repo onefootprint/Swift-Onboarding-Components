@@ -1,6 +1,4 @@
-import { primitives } from '@onefootprint/design-tokens';
 import { Text } from '@onefootprint/ui';
-import { useTheme } from 'next-themes';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -25,9 +23,6 @@ const CardBase = ({
   rows,
   cta,
 }: CardBaseProps) => {
-  const theme = useTheme();
-  const isDark = theme.theme === 'dark';
-
   const handleSelect = () => {
     const card = document.getElementById(`device-insights-card-${id}`);
     const parent = card?.parentElement;
@@ -45,15 +40,9 @@ const CardBase = ({
       id={`device-insights-card-${id}`}
       data-selected={!!isSelected}
       onClick={handleSelect}
-      activeBackground={isDark ? primitives.Purple700 : primitives.Purple100}
     >
       {title && (
-        <Header
-          data-selected={!!isSelected}
-          activeBackground={
-            isDark ? primitives.Purple700 : primitives.Purple100
-          }
-        >
+        <Header data-selected={!!isSelected}>
           <Text variant="caption-1">{title}</Text>
         </Header>
       )}
@@ -71,8 +60,8 @@ const CardBase = ({
   );
 };
 
-const Container = styled.div<{ activeBackground: string }>`
-  ${({ theme, activeBackground }) => css`
+const Container = styled.div`
+  ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
@@ -85,14 +74,14 @@ const Container = styled.div<{ activeBackground: string }>`
     }
 
     &[data-selected='true'] {
-      background-color: ${activeBackground};
+      background-color: rgb(245, 243, 252);
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.secondary};
     }
   `};
 `;
 
-const Header = styled.div<{ activeBackground: string }>`
-  ${({ theme, activeBackground }) => css`
+const Header = styled.div`
+  ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -106,7 +95,7 @@ const Header = styled.div<{ activeBackground: string }>`
       0;
 
     &[data-selected='true'] {
-      background-color: ${activeBackground};
+      background-color: rgb(235, 233, 250);
       border-bottom: ${theme.borderWidth[1]} solid
         ${theme.borderColor.secondary};
     }

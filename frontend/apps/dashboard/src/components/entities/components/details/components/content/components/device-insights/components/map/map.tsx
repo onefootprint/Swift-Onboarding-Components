@@ -1,122 +1,40 @@
-import 'mapbox-gl/dist/mapbox-gl.css';
+import GoogleMapReact from 'google-map-react';
+import React from 'react';
+import { GOOGLE_MAPS_API_KEY } from 'src/config/constants';
 
-import { useTheme } from 'next-themes';
-import React, { useEffect, useRef } from 'react';
-import type { MapRef } from 'react-map-gl';
-import { Map as MapboxMap, Marker } from 'react-map-gl';
-import styled from 'styled-components';
-
-import GoogleMapsLoader from '../content/utils/google-maps-loader';
-import type { MapMarkerProps } from './components/map-marker';
-
-const PUBLIC_MAP_BOX_TOKEN =
-  'pk.eyJ1IjoiYmVsY2VvbmVmb290cHJpbnQiLCJhIjoiY2x2empoY2EwMDA5aDJrcGg0Y3RkOTBreiJ9.2TyaEVdUljarrNN4XXoeUA';
-
-const DEFAULT_ZOOM = 9;
-const MAX_ZOOM = 20;
-const MIN_ZOOM = 1;
-// Middle of US
-const FALLBACK_LATITUDE = 37.09024;
-const FALLBACK_LONGITUDE = -95.712891;
-
-type Coords = {
-  lat: number;
-  lng: number;
-};
+import MapMarker from './components/map-marker';
+import useOptions from './hooks/use-options';
+import {
+  CITY_LEVEL_ZOOM,
+  FALLBACK_LATITUDE,
+  FALLBACK_LONGITUDE,
+  GLOBE_LEVEL_ZOOM,
+} from './map.constants';
 
 export type MapProps = {
-  markers: JSX.Element[];
-  selectedCoords?: Coords;
-  onSelect: (id: string) => void;
+  latitude: number | null;
+  longitude: number | null;
 };
 
-const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
-  const mapRef = useRef<MapRef>(null);
-  const theme = useTheme();
-  const isDark = theme.theme === 'dark';
-
-  const handleMarkerClick = (markerProps: MapMarkerProps) => {
-    if (!mapRef.current) return;
-    mapRef.current.flyTo({
-      center: [markerProps.lng, markerProps.lat],
-      zoom: DEFAULT_ZOOM,
-    });
-    onSelect(markerProps.id);
+const Map = ({ latitude, longitude }: MapProps) => {
+  const options = useOptions();
+  const hasLocation = latitude && longitude;
+  const location = {
+    lat: hasLocation ? latitude : FALLBACK_LATITUDE,
+    lng: hasLocation ? longitude : FALLBACK_LONGITUDE,
   };
+  const zoom = hasLocation ? CITY_LEVEL_ZOOM : GLOBE_LEVEL_ZOOM;
 
-  useEffect(() => {
-    if (!mapRef.current) return;
-    if (selectedCoords) {
-      mapRef.current.flyTo({
-        center: [selectedCoords.lng, selectedCoords.lat],
-        zoom: DEFAULT_ZOOM,
-      });
-    } else if (!markers.length) {
-      mapRef.current.flyTo({
-        center: [FALLBACK_LONGITUDE, FALLBACK_LATITUDE],
-        zoom: MIN_ZOOM,
-      });
-    } else {
-      GoogleMapsLoader.importLibrary('core').then(() => {
-        // Find the midpoint of all markers and zoom out to see all markers
-        const bounds = new google.maps.LatLngBounds();
-        markers.forEach(marker => {
-          bounds.extend(
-            new google.maps.LatLng(marker.props.lat, marker.props.lng),
-          );
-        });
-        const center = bounds.getCenter();
-        const lat = center.lat();
-        const lng = center.lng();
-        if (!mapRef.current) return;
-        mapRef.current.flyTo({
-          center: [lng, lat],
-          zoom: MIN_ZOOM,
-        });
-      });
-    }
-  }, [selectedCoords, markers]);
-
-  return (
-    <Container>
-      <MapboxMap
-        ref={mapRef}
-        mapboxAccessToken={PUBLIC_MAP_BOX_TOKEN}
-        mapStyle={
-          isDark
-            ? 'mapbox://styles/mapbox/dark-v11'
-            : 'mapbox://styles/mapbox/streets-v12'
-        }
-        style={{ width: '100%', height: '100%' }}
-        initialViewState={{
-          latitude: selectedCoords ? selectedCoords.lat : FALLBACK_LATITUDE,
-          longitude: selectedCoords ? selectedCoords.lng : FALLBACK_LONGITUDE,
-          zoom: selectedCoords ? DEFAULT_ZOOM : MIN_ZOOM,
-        }}
-        maxZoom={MAX_ZOOM}
-        minZoom={MIN_ZOOM}
-      >
-        {markers.map(marker => (
-          <Marker
-            key={marker.props.id}
-            longitude={marker.props.lng}
-            latitude={marker.props.lat}
-            anchor="bottom"
-          >
-            {React.cloneElement(marker, {
-              onClick: () => handleMarkerClick(marker.props),
-            })}
-          </Marker>
-        ))}
-      </MapboxMap>
-    </Container>
-  );
+  return GOOGLE_MAPS_API_KEY ? (
+    <GoogleMapReact
+      bootstrapURLKeys={{ key: GOOGLE_MAPS_API_KEY }}
+      defaultCenter={location}
+      defaultZoom={zoom}
+      options={options}
+    >
+      {hasLocation ? <MapMarker lat={location.lat} lng={location.lng} /> : null}
+    </GoogleMapReact>
+  ) : null;
 };
-
-const Container = styled.div`
-  display: flex;
-  width: 100%;
-  height: 100%;
-`;
 
 export default Map;

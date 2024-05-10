@@ -1773,7 +1773,6 @@
           "my1fp": "My One Footprint"
         },
         "select": {
-          "placeholder": "Select...",
           "business-address": "Business address",
           "residential-address": "Home address"
         },

@@ -6,6 +6,7 @@ export {
   useDecryptMachine,
 } from './decrypt-machine';
 export { default as DeviceInsights } from './device-insights';
+// export { default as DeviceInsights } from './device-insights-new'; // TODO: replace the older implementation when releasing
 export { default as DuplicateData } from './duplicate-data';
 export { default as EditProvider, useEditMachine } from './edit-machine';
 export { default as Header } from './header';
