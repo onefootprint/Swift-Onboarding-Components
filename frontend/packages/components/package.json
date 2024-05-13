@@ -1,16 +1,16 @@
 {
-  "name": "@onefootprint/elements",
+  "name": "@onefootprint/components",
   "private": false,
   "type": "module",
   "version": "0.0.1",
-  "main": "./dist/footprint-elements.umd.js",
-  "module": "./dist/footprint-elements.js",
-  "types": "./dist/footprint-elements.d.ts",
+  "main": "./dist/footprint-components.umd.js",
+  "module": "./dist/footprint-components.js",
+  "types": "./dist/footprint-components.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/footprint-elements.js",
-      "require": "./dist/footprint-elements.umd.js",
-      "types": "./dist/footprint-elements.d.ts"
+      "import": "./dist/footprint-components.js",
+      "require": "./dist/footprint-components.umd.js",
+      "types": "./dist/footprint-components.d.ts"
     }
   },
   "sideEffects": false,

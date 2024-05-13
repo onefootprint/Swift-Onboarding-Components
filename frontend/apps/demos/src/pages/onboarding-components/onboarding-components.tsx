@@ -11,7 +11,7 @@ import CustomSelect, {
   Provider,
   SSN9Input,
   useFootprint,
-} from '@onefootprint/elements';
+} from '@onefootprint/components';
 import {
   Box,
   Button,
