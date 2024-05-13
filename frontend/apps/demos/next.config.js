@@ -84,13 +84,14 @@ const nextConfig = {
     ];
   },
   transpilePackages: [
-    '@onefootprint/ui',
     '@onefootprint/design-tokens',
-    '@onefootprint/icons',
+    '@onefootprint/elements',
     '@onefootprint/global-constants',
     '@onefootprint/hooks',
+    '@onefootprint/icons',
     '@onefootprint/request',
     '@onefootprint/types',
+    '@onefootprint/ui',
     '@radix-ui/react-dialog',
   ],
   async redirects() {

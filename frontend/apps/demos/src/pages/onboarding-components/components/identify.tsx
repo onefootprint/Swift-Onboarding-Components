@@ -3,7 +3,7 @@ import {
   Form,
   PhoneInput,
   useFootprint,
-} from '@onefootprint/components';
+} from '@onefootprint/elements';
 import React from 'react';
 
 import s from '../onboarding-components.module.css';

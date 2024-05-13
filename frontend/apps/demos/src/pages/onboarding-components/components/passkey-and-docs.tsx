@@ -1,4 +1,4 @@
-import { useFootprint } from '@onefootprint/components';
+import { useFootprint } from '@onefootprint/elements';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 

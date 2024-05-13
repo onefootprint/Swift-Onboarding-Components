@@ -7,7 +7,7 @@ import {
   MiddleNameInput,
   SSN9Input,
   useFootprint,
-} from '@onefootprint/components';
+} from '@onefootprint/elements';
 import React from 'react';
 
 import useRequest from '../hooks/use-request';
