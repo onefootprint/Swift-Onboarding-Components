@@ -105,7 +105,7 @@ impl ParsedIncodeFields {
                 pif(
                     ODK::ClassifiedDocumentType,
                     None,
-                    r.type_of_id.clone().map(|s| s.into()),
+                    r.type_of_id.clone().map(|s| s.to_string().into()),
                 ),
             ]
             .into_iter()
@@ -323,7 +323,7 @@ impl ParsedIncodeNames {
     // unclear if its safe to remove all non-letter characters, so for now just remove hyphens and apostrophes
     fn remove_hyphens_and_apostrophes(s: &PiiString) -> PiiString {
         match Regex::new(r#"[-'\"]\s*"#) {
-            Ok(re) => re.replace_all(s.leak(), "").into(),
+            Ok(re) => re.replace_all(s.leak(), "").into_owned().into(),
             Err(err) => {
                 tracing::error!(?err, "Regex error");
                 s.clone()
@@ -701,7 +701,7 @@ mod tests {
             machine_readable_full_name: Some("ALLEN YU CARMACK".into()),
             given_name_mrz: Some("ALLEN".into()),
             last_name_mrz: Some("YU CARMACK".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("ALLEN".into()),
             middle_name: None,
@@ -719,7 +719,7 @@ mod tests {
             machine_readable_full_name: Some("DAVID ALLEN POTTER HENRY BILL".into()),
             given_name_mrz: Some("DAVID ALLEN".into()),
             last_name_mrz: Some("POTTER HENRY BILL".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("DAVID".into()),
             middle_name: Some("ALLEN".into()),
@@ -737,7 +737,7 @@ mod tests {
             paternal_last_name: Some("SMITH".into()),
             given_name: Some("DAN".into()),
             machine_readable_full_name: Some("DAN SMITH".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("DAN".into()),
             middle_name: None,
@@ -754,7 +754,7 @@ mod tests {
             paternal_last_name: Some("JONES".into()),
             given_name: Some("JOHN".into()),
             machine_readable_full_name: Some("JOHN SMITH".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("JOHN".into()),
             middle_name: None,
@@ -786,7 +786,7 @@ mod tests {
             middle_name: Some("RAY".into()),
             given_name: Some("JOHN RAY".into()),
             paternal_last_name: Some("NEWTON".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("JOHN".into()),
             middle_name: Some("RAY".into()),
@@ -801,7 +801,7 @@ mod tests {
             given_name: Some("CHRIS".into()),
             name_suffix: Some("JR".into()),
             paternal_last_name: Some("LEMON".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("CHRIS".into()),
             middle_name: None,
@@ -817,7 +817,7 @@ mod tests {
             middle_name: Some("LOGAN".into()),
             given_name: Some("KARL LOGAN".into()),
             paternal_last_name: Some("PETERS- WHITE".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("KARL".into()),
             middle_name: Some("LOGAN".into()),
@@ -833,7 +833,7 @@ mod tests {
             middle_name: Some("LOGAN".into()),
             given_name: Some("KARL LOGAN".into()),
             paternal_last_name: Some("PETERS-WHITE".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("KARL".into()),
             middle_name: Some("LOGAN".into()),
@@ -849,7 +849,7 @@ mod tests {
             middle_name: Some("J".into()),
             given_name: Some("LOGAN J".into()),
             paternal_last_name: Some("HILTON-BERNS".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("LOGAN".into()),
             middle_name: Some("J".into()),
@@ -864,7 +864,7 @@ mod tests {
             first_name: Some("BOB".into()),
             given_name: Some("BOB".into()),
             paternal_last_name: Some("O'BERTO".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("BOB".into()),
             middle_name: None,
@@ -879,7 +879,7 @@ mod tests {
             first_name: Some("BOB".into()),
             given_name: Some("BOB".into()),
             paternal_last_name: Some("O'BERTO".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("BOB".into()),
             middle_name: None,
@@ -895,7 +895,7 @@ mod tests {
             middle_name: Some("WALLACE".into()),
             given_name: Some("AUSTIN WALLACE".into()),
             paternal_last_name: Some("HOOK".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("AUSTIN".into()),
             middle_name: Some("WALLACE".into()),
@@ -910,7 +910,7 @@ mod tests {
             first_name: Some("MILES".into()),
             given_name: Some("MILES".into()),
             paternal_last_name: Some("RODGER ALTA".into()),
-            ..Default::default()               
+            ..Default::default()
         } => ParsedIncodeNames {
             first_name: Some("MILES".into()),
             middle_name: None,
@@ -932,7 +932,7 @@ mod tests {
         OCRAddress {
             postal_code: Some("12345".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             zip: Some("12345".into()),
             ..Default::default()
@@ -942,7 +942,7 @@ mod tests {
         OCRAddress {
             postal_code: Some("123456789".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             zip: Some("12345".into()),
             ..Default::default()
@@ -952,7 +952,7 @@ mod tests {
         OCRAddress {
             postal_code: Some("67891".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             zip: Some("12345".into()),
             ..Default::default()
@@ -962,7 +962,7 @@ mod tests {
         OCRAddress {
             postal_code: Some("123".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             zip: Some("12345".into()),
             ..Default::default()
@@ -972,7 +972,7 @@ mod tests {
         OCRAddress {
             postal_code: None,
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             zip: Some("12345".into()),
             ..Default::default()
@@ -982,7 +982,7 @@ mod tests {
         OCRAddress {
             postal_code: Some("12345".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             zip: None,
             ..Default::default()
@@ -1004,7 +1004,7 @@ mod tests {
         OCRAddress {
             city: Some("Bobtown".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             city: Some("BOBTOWN".into()),
             ..Default::default()
@@ -1014,7 +1014,7 @@ mod tests {
         OCRAddress {
             city: Some("bobtown".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             city: Some("bobtow".into()),
             ..Default::default()
@@ -1024,7 +1024,7 @@ mod tests {
         OCRAddress {
             city: Some("Bobtown".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             city: Some("Northport".into()),
             ..Default::default()
@@ -1034,7 +1034,7 @@ mod tests {
         OCRAddress {
             city: Some("Bobtown".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             city: Some("Bob".into()),
             ..Default::default()
@@ -1044,7 +1044,7 @@ mod tests {
         OCRAddress {
             city: None,
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             city: Some("bob".into()),
             ..Default::default()
@@ -1054,7 +1054,7 @@ mod tests {
         OCRAddress {
             city: Some("bob".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             city: None,
             ..Default::default()
@@ -1076,7 +1076,7 @@ mod tests {
         OCRAddress {
             state: Some("NY".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             state: Some("NY".into()),
             ..Default::default()
@@ -1086,7 +1086,7 @@ mod tests {
         OCRAddress {
             state: Some("GA".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             state: Some("NY".into()),
             ..Default::default()
@@ -1096,7 +1096,7 @@ mod tests {
         OCRAddress {
             state: None,
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             state: Some("NY".into()),
             ..Default::default()
@@ -1106,7 +1106,7 @@ mod tests {
         OCRAddress {
             state: Some("GA".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             state: None,
             ..Default::default()
@@ -1128,7 +1128,7 @@ mod tests {
         OCRAddress {
             street: Some("1 main St".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("1 MAIN St.".into()),
             ..Default::default()
@@ -1138,7 +1138,7 @@ mod tests {
         OCRAddress {
             street: Some("1 main St".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("    1 MAIN st           %@%@".into()),
             ..Default::default()
@@ -1148,7 +1148,7 @@ mod tests {
         OCRAddress {
             street: Some("1 Main Street".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("1 MAIN St.".into()),
             ..Default::default()
@@ -1158,7 +1158,7 @@ mod tests {
         OCRAddress {
             street: Some("1 Main Street".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("11 Main Street".into()),
             ..Default::default()
@@ -1168,7 +1168,7 @@ mod tests {
         OCRAddress {
             street: Some("1 Street".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("1 Main St".into()),
             ..Default::default()
@@ -1178,7 +1178,7 @@ mod tests {
         OCRAddress {
             street: None,
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("main".into()),
             ..Default::default()
@@ -1188,7 +1188,7 @@ mod tests {
         OCRAddress {
             street: Some("main".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: None,
             ..Default::default()
@@ -1221,7 +1221,7 @@ mod tests {
             city: Some("Boston".into()),
             state: Some("MA".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("13 Main St.".into()),
             zip: Some("12345".into()),
@@ -1239,7 +1239,7 @@ mod tests {
             city: Some("Bosto".into()),
             state: Some("MA".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("13 Main St.".into()),
             zip: Some("12345".into()),
@@ -1258,7 +1258,7 @@ mod tests {
             // Wrong city though
             state: Some("GA".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("13 Main St.".into()),
             zip: Some("12345".into()),
@@ -1274,7 +1274,7 @@ mod tests {
             // Wrong city though
             state: Some("GA".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("13 Main St.".into()),
             zip: Some("12345".into()),
@@ -1287,7 +1287,7 @@ mod tests {
             street: Some("567 Brain street".into()),
             postal_code: Some("555".into()),
             ..Default::default()
-            
+
         }, IncodeOcrAddress {
             street: Some("13 Main St.".into()),
             zip: Some("12345".into()),

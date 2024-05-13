@@ -42,11 +42,15 @@ impl PhoneNumber {
 
     // Maybe make two versions of e164: one with sandbox and one without
     pub fn e164(&self) -> PiiString {
-        self.number.format().mode(phonenumber::Mode::E164).into()
+        self.number
+            .format()
+            .mode(phonenumber::Mode::E164)
+            .to_string()
+            .into()
     }
 
     pub fn country_code(&self) -> PiiString {
-        self.number.country().code().into()
+        self.number.country().code().to_string().into()
     }
 
     pub fn subscriber_number(&self) -> PiiString {
@@ -59,7 +63,11 @@ impl PhoneNumber {
     }
 
     fn national(&self) -> PiiString {
-        self.number.format().mode(phonenumber::Mode::National).into()
+        self.number
+            .format()
+            .mode(phonenumber::Mode::National)
+            .to_string()
+            .into()
     }
 
     /// Formats the PhoneNumber with all digits except the country code and last two scrubbed

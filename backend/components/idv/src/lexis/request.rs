@@ -372,9 +372,9 @@ impl LexisRequest {
                 .map_err(|_| ConversionError::CantParseDob)?;
 
             Some(Dob {
-                year: parsed_dob.year().into(),
-                month: parsed_dob.month().into(),
-                day: parsed_dob.day().into(),
+                year: parsed_dob.year().to_string().into(),
+                month: parsed_dob.month().to_string().into(),
+                day: parsed_dob.day().to_string().into(),
             })
         } else {
             None

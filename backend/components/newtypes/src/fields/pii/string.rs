@@ -61,12 +61,15 @@ impl PiiString {
     }
 }
 
-impl<T> From<T> for PiiString
-where
-    T: Display,
-{
-    fn from(pii: T) -> Self {
-        Self(format!("{}", pii))
+impl From<String> for PiiString {
+    fn from(pii: String) -> Self {
+        Self(pii)
+    }
+}
+
+impl From<&str> for PiiString {
+    fn from(pii: &str) -> Self {
+        Self(pii.to_owned())
     }
 }
 

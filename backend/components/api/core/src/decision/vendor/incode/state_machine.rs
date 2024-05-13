@@ -182,7 +182,7 @@ impl IncodeStateMachine {
                 kind: session.kind,
                 credentials: IncodeCredentialsWithToken {
                     credentials,
-                    authentication_token: token.into(),
+                    authentication_token: token.to_string().into(),
                 },
                 ignored_failure_reasons: session.ignored_failure_reasons,
                 // TODO: be more intelligent about using incode classified doc type here.. but do we trust it?

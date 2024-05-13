@@ -131,8 +131,8 @@ impl TenantUser {
     pub fn name(&self) -> Option<PiiString> {
         match (self.first_name.as_ref(), self.last_name.as_ref()) {
             (None, None) => None,
-            (None, Some(l)) => Some(l.into()),
-            (Some(f), None) => Some(f.into()),
+            (None, Some(l)) => Some(l.clone().into()),
+            (Some(f), None) => Some(f.clone().into()),
             (Some(f), Some(l)) => Some(format!("{} {}", f, l).into()),
         }
     }

@@ -74,7 +74,7 @@ pub(super) fn validate_state(
     value: PiiString,
     provided_country: Option<&PiiJsonValue>,
 ) -> VResult<PiiString> {
-    let us = PiiJsonValue::from_piistring(PiiString::from(Iso3166TwoDigitCountryCode::US));
+    let us = PiiJsonValue::from_piistring(PiiString::new(Iso3166TwoDigitCountryCode::US.to_string()));
     if provided_country == Some(&us) {
         // Validate state is a US state if the country is US
         parse_enum::<UsState>(value)

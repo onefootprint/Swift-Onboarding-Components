@@ -69,7 +69,7 @@ impl DeriveValues for LuhnValidatedCardNumber {
                     alias: self.number.alias.clone(),
                     kind: CardDataKind::Issuer,
                 }),
-                value: PiiString::from(self.issuer),
+                value: PiiString::from(self.issuer.to_string()),
                 parsed: (),
             }),
         )
