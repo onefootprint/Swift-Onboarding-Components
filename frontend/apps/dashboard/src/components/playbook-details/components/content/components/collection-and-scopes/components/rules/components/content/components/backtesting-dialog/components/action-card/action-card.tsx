@@ -21,6 +21,8 @@ const ActionCard = ({ data, numTotal }: ActionCardProps) => (
         <ActionRow
           key={action}
           data-is-last={index === Object.keys(RuleActionSection).length}
+          role="row"
+          aria-label={action}
         >
           <Text variant="body-3" color={getActionVariant(value)}>
             {getActionText(value)}

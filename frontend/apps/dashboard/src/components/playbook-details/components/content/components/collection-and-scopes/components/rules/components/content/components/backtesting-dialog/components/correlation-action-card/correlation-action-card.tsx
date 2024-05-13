@@ -24,7 +24,7 @@ const CorrelationActionCard = ({
   );
 
   return (
-    <Container>
+    <Container role="group" aria-label={`${sectionAction} correlation card`}>
       <Text variant="label-4" marginTop={4} marginBottom={5}>
         <Trans
           i18nKey="pages.playbooks.details.rules.backtesting.correlation.action-list"
@@ -39,7 +39,7 @@ const CorrelationActionCard = ({
           values={{ action: getActionText(sectionActionValue) }}
         />
       </Text>
-      <ActionRow data-is-last={false}>
+      <ActionRow data-is-last={false} role="row">
         <Text variant="body-3">
           <Trans
             i18nKey="pages.playbooks.details.rules.backtesting.correlation.same"
@@ -65,6 +65,7 @@ const CorrelationActionCard = ({
           <ActionRow
             key={rowAction}
             data-is-last={index === rowActions.length - 1}
+            role="row"
           >
             <Text variant="body-3">
               <Trans
