@@ -23,17 +23,6 @@ const DobInput = ({ value }: DobInputProps) => {
   } = useFormContext();
   const formField = editFormFieldName(IdDI.dob);
   const hasError = !!errors[formField];
-  const options = value
-    ? {
-        required: true,
-        // YYYY-MM-DD or YYYY/MM/DD
-        pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
-        validate: (dobVal: string) => !validateDob(dobVal),
-      }
-    : {
-        pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
-        validate: (dobVal: string) => !validateDob(dobVal),
-      };
 
   const getHint = () => {
     const errorByValidationError: Record<DobValidationError, string> = {
@@ -71,10 +60,13 @@ const DobInput = ({ value }: DobInputProps) => {
         placeholder="YYYY-MM-DD"
         hasError={hasError}
         hint={getHint()}
-        value={value as string}
+        defaultValue={value as string}
         inputMode="numeric"
-        mask={{ date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] }}
-        {...register(formField, options)}
+        {...register(formField, {
+          required: !!value,
+          pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/, // YYYY-MM-DD or YYYY/MM/DD
+          validate: (dobVal: string) => !validateDob(dobVal),
+        })}
       />
     </ValueContainer>
   );
