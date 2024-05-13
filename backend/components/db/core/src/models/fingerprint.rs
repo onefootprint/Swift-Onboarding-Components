@@ -26,7 +26,6 @@ pub struct Fingerprint {
     pub _updated_at: DateTime<Utc>,
     /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
     pub kind: DI,
-    pub lifetime_id: Option<DataLifetimeId>,
     /// Version of the fingerprint schema
     pub version: FingerprintVersion,
     /// scope to which fingerprint was created for
@@ -77,7 +76,6 @@ struct NewFingerprintRow<'a> {
     sh_data: Option<FingerprintData>,
     p_data: Option<PiiString>,
     kind: DI,
-    lifetime_id: &'a DataLifetimeId,
     version: FingerprintVersion,
     scope: FingerprintScopeKind,
     is_hidden: bool,
@@ -140,7 +138,6 @@ impl Fingerprint {
                     sh_data,
                     p_data,
                     kind,
-                    lifetime_id,
                     version,
                     scope,
                     is_hidden: false,

@@ -398,7 +398,6 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         kind -> Text,
-        lifetime_id -> Nullable<Text>,
         version -> Text,
         scope -> Text,
         is_hidden -> Bool,
@@ -1655,7 +1654,6 @@ diesel::joinable!(document_request -> rule_set_result (rule_set_result_id));
 diesel::joinable!(document_request -> scoped_vault (scoped_vault_id));
 diesel::joinable!(document_request -> workflow (workflow_id));
 diesel::joinable!(document_upload -> identity_document (document_id));
-diesel::joinable!(fingerprint -> data_lifetime (lifetime_id));
 diesel::joinable!(fingerprint -> scoped_vault (scoped_vault_id));
 diesel::joinable!(fingerprint -> tenant (tenant_id));
 diesel::joinable!(fingerprint -> vault (vault_id));
