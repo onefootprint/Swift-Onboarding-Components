@@ -1,0 +1,1 @@
+ALTER TABLE fingerprint DROP COLUMN lifetime_id;

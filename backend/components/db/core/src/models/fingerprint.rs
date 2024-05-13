@@ -94,7 +94,7 @@ struct NewFingerprintJunction<'a> {
 
 
 impl Fingerprint {
-    #[tracing::instrument("Fingerprint::create", skip_all)]
+    #[tracing::instrument("Fingerprint::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprintArgs>) -> DbResult<()> {
         for fp in fingerprints.iter() {
             if !fp.kind.is_fingerprintable() {
