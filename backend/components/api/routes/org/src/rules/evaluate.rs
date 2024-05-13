@@ -17,6 +17,7 @@ use api_core::{
         state::common::saturate_list_entries,
     },
     errors::AssertionError,
+    utils::vault_wrapper::{Any, VaultWrapper},
 };
 use api_wire_types::{EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
 use db::models::{
@@ -25,7 +26,7 @@ use db::models::{
     list_entry::ListEntry,
     ob_configuration::ObConfiguration,
     rule_instance::{IncludeRules, RuleInstance},
-    rule_set_result::RuleSetResult,
+    rule_set_result::{RuleSetResult, RuleSetResultSample},
 };
 use itertools::{chain, Itertools};
 use newtypes::{ListId, ObConfigurationId, RuleAction, RuleExpression, RuleId, RuleInstanceKind};
@@ -71,14 +72,13 @@ pub async fn evaluate_rule(
         start_timestamp,
         end_timestamp,
     } = request.into_inner();
-    let (current_rules, historical_results, adds, edits, lists_with_entries, insight_events) = state
+    let (current_rules, historical_results, adds, edits, lists_with_entries, vws, insight_events) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
 
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc_id, IncludeRules::All)?;
-            let rule_set_results =
-                RuleSetResult::sample_for_eval(conn, &obc.id, start_timestamp, end_timestamp, 100)?;
+            let samples = RuleSetResult::sample_for_eval(conn, &obc.id, start_timestamp, end_timestamp, 100)?;
 
             let list_ids: Vec<ListId> = chain!(
                 rules.iter().flat_map(|rule| rule.rule_expression.list_ids()),
@@ -90,10 +90,8 @@ pub async fn evaluate_rule(
                     .flat_map(|rule| rule.rule_expression.list_ids()),
             )
             .collect();
-            tracing::info!(?list_ids, "the list ids are");
             let lists = List::bulk_get(conn, &tenant_id, is_live, &list_ids)?;
 
-            // TODO can we share this validation?
             let adds: Vec<((RuleExpression, RuleInstanceKind), RuleAction)> = add
                 .into_iter()
                 .flatten()
@@ -118,21 +116,30 @@ pub async fn evaluate_rule(
 
             let lists_with_entries = ListEntry::list_bulk(conn, &list_ids)?;
 
+            let users = samples
+                .iter()
+                .map(|sample| (sample.scoped_vault.clone(), sample.vault.clone()))
+                .collect_vec();
+            let vws = VaultWrapper::<Any>::multi_get_for_tenant(
+                conn, users, None, // Get latest vault data.
+            )?;
+
             let insight_events = InsightEvent::get_latest_for_obc(
                 conn,
                 &obc_id,
-                &rule_set_results
+                &samples
                     .iter()
-                    .map(|(sv, _, _)| sv.id.clone())
+                    .map(|sample| sample.scoped_vault.id.clone())
                     .collect_vec(),
             )?;
 
             Ok((
                 rules,
-                rule_set_results,
+                samples,
                 adds,
                 edits,
                 lists_with_entries,
+                vws,
                 insight_events,
             ))
         })
@@ -188,31 +195,45 @@ pub async fn evaluate_rule(
         .chain(add_rules)
         .collect_vec();
 
+    let rule_expressions = all_rules.iter().map(|r| &r.expression).collect_vec();
+    let vault_data_by_sv_id =
+        VaultDataForRules::bulk_decrypt_for_rules(&state, vws, &rule_expressions).await?;
+
     let results = historical_results
         .into_iter()
-        .map(|(sv, rsr, rs)| {
-            let frcs = &rs.into_iter().map(|r| r.reason_code).collect_vec();
-            let vault_data = VaultDataForRules::empty(); // TODO: add support for this, need to bulk query VW's for every onboarding
+        .map(|sample| {
+            let RuleSetResultSample {
+                scoped_vault: sv,
+                vault: _,
+                rule_set_result,
+                risk_signals,
+            } = sample;
+
+            let frcs = &risk_signals.into_iter().map(|r| r.reason_code).collect_vec();
 
             let no_insight_events = vec![];
             let sv_insight_events = insight_events.get(&sv.id).unwrap_or(&no_insight_events);
 
+            let no_vault_data = VaultDataForRules::empty();
+            let vault_data = vault_data_by_sv_id.get(&sv.id).unwrap_or(&no_vault_data);
+
             let (_, action_triggered) = decision::rule_engine::eval::evaluate_rule_set(
                 all_rules.clone(),
                 frcs,
-                &vault_data,
+                vault_data,
                 sv_insight_events,
                 &lists,
                 &RuleEvalConfig::default(),
             );
-            api_wire_types::RuleEvalResult {
+
+            Ok(api_wire_types::RuleEvalResult {
                 fp_id: sv.fp_id,
                 current_status: sv.status,
-                historical_action_triggered: rsr.action_triggered,
+                historical_action_triggered: rule_set_result.action_triggered,
                 backtest_action_triggered: action_triggered,
-            }
+            })
         })
-        .collect_vec();
+        .collect::<ApiResult<Vec<_>>>()?;
 
     let stats = get_stats(&results);
     ResponseData::ok(api_wire_types::RuleEvalResults { results, stats }).json()

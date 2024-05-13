@@ -13,9 +13,12 @@ from tests.headers import FpAuth, IsComponentsSdk
 from tests.constants import ID_DATA, FIXTURE_EMAIL
 
 
-def create_user_with_components_token(tenant):
+def create_user_with_components_token(tenant, obc=None):
     sandbox_id = _gen_random_sandbox_id()
-    obc = tenant.default_ob_config
+
+    if obc is None:
+        obc = tenant.default_ob_config
+
     token = (
         IdentifyClient(obc.key, sandbox_id)
         .with_headers(IsComponentsSdk("true"))

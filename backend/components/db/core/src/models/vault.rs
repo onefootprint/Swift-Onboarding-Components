@@ -15,7 +15,7 @@ use super::ob_configuration::IsLive;
 pub type IsFixture = bool;
 pub type IsNew = bool;
 
-#[derive(Debug, Clone, Queryable, Insertable, Identifiable, PartialEq)]
+#[derive(Debug, Clone, Queryable, Insertable, Identifiable, PartialEq, Eq)]
 #[diesel(table_name = vault)]
 pub struct Vault {
     pub id: VaultId,

@@ -6,9 +6,11 @@ use super::{
 };
 use crate::{
     decision::{onboarding::Decision, RuleError},
-    enclave_client::EnclaveClient,
     errors::ApiResult,
-    utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper},
+    utils::vault_wrapper::{
+        bulk_decrypt, BulkDecryptReq, DecryptAccessEventInfo, EnclaveDecryptOperation, TenantVw,
+    },
+    State,
 };
 use db::{
     models::{
@@ -26,8 +28,9 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    DocumentRequestKind, ListId, ObConfigurationId, ObConfigurationKind, RiskSignalGroupKind,
-    RuleExpressionCondition, RuleSetResultId, RuleSetResultKind, ScopedVaultId, VaultKind, WorkflowId,
+    DataIdentifier, DocumentRequestKind, ListId, ObConfigurationId, ObConfigurationKind, PiiJsonValue,
+    RiskSignalGroupKind, RuleExpression, RuleSetResultId, RuleSetResultKind, ScopedVaultId, VaultKind,
+    WorkflowId,
 };
 
 pub struct EvaluateWorkflowDecisionArgs<'a> {
@@ -129,41 +132,80 @@ pub fn evaluate_workflow_decision<'a>(
     Ok((decision, Some(rule_set_result.id)))
 }
 
-#[derive(derive_more::Deref)]
-pub struct VaultDataForRules {
-    vault_data: DecryptUncheckedResult, // at this point could mb even just have this be HashMap<K,V> where we type up which K's correspond to which V's and V's encode the type like String vs Date vs etc
-}
+#[derive(Default, derive_more::Deref)]
+pub struct VaultDataForRules(HashMap<DataIdentifier, PiiJsonValue>);
 
 impl VaultDataForRules {
-    pub async fn decrypt_for_rules(
-        enclave_client: &EnclaveClient,
-        vw: VaultWrapper,
-        rules: &[RuleInstance],
+    pub async fn decrypt_for_rules<T>(
+        state: &State,
+        vw: TenantVw<T>,
+        rule_expressions: &[&RuleExpression],
     ) -> ApiResult<Self> {
-        // could mb query for the VW here too..? gotta somehow use this ish for bulk flow too tho
-        let dis = rules
+        let key = ();
+        let result =
+            Self::bulk_decrypt_for_rules(state, HashMap::from([(key, vw)]), rule_expressions).await?;
+        Ok(result
+            .into_values()
+            .next()
+            .unwrap_or_else(VaultDataForRules::empty))
+    }
+
+    pub async fn bulk_decrypt_for_rules<K, T>(
+        state: &State,
+        vws: HashMap<K, TenantVw<T>>,
+        rule_expressions: &[&RuleExpression],
+    ) -> ApiResult<HashMap<K, Self>>
+    where
+        K: Eq + std::hash::Hash + 'static + Clone,
+    {
+        let dis = rule_expressions
             .iter()
-            .flat_map(|r| &(r.rule_expression.0))
-            .flat_map(|rc| match rc {
-                RuleExpressionCondition::VaultData(vd) => Some(vd.field()),
-                _ => None,
-            })
-            .cloned()
+            .flat_map(|expr| expr.data_identifiers())
+            .unique()
             .collect_vec();
 
-        let vault_data = vw.decrypt_unchecked(enclave_client, &dis).await?;
-        Ok(Self { vault_data })
+        let targets = dis
+            .iter()
+            .map(|di| EnclaveDecryptOperation {
+                identifier: di.clone(),
+                transforms: vec![],
+            })
+            .collect_vec();
+
+        let reqs = vws
+            .iter()
+            .map(|(k, vw)| {
+                let req = BulkDecryptReq {
+                    vw,
+                    targets: targets.clone(),
+                };
+                (k.clone(), req)
+            })
+            .collect();
+
+        let ret = bulk_decrypt(state, reqs, DecryptAccessEventInfo::NoAccessEvent)
+            .await?
+            .into_iter()
+            .map(|(k, decrypted_data)| {
+                let val = Self(
+                    decrypted_data
+                        .into_iter()
+                        .map(|(k, v)| (k.identifier, v))
+                        .collect(),
+                );
+                (k, val)
+            })
+            .collect();
+        Ok(ret)
     }
 
     pub fn empty() -> Self {
-        Self {
-            vault_data: DecryptUncheckedResult::default(),
-        }
+        Self::default()
     }
 
     #[cfg(test)]
-    pub fn new(vault_data: DecryptUncheckedResult) -> Self {
-        Self { vault_data }
+    pub fn new(vault_data: HashMap<DataIdentifier, PiiJsonValue>) -> Self {
+        Self(vault_data)
     }
 }
 

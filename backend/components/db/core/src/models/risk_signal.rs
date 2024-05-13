@@ -13,7 +13,7 @@ use std::str::FromStr;
 
 use super::{data_lifetime::DataLifetime, risk_signal_group::RiskSignalGroup};
 
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Eq, PartialEq)]
 #[diesel(table_name = risk_signal)]
 pub struct RiskSignal {
     pub id: RiskSignalId,

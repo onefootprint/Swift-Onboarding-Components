@@ -1,16 +1,15 @@
-use std::collections::HashMap;
-
 use super::{
     data_lifetime::DataLifetime,
     risk_signal::RiskSignal,
     rule_instance::RuleInstance,
     rule_result::{NewRuleResult, RuleResult},
     scoped_vault::ScopedVault,
+    vault::Vault,
 };
 use crate::{DbResult, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
-    risk_signal, rule_set_result, rule_set_result_risk_signal_junction, scoped_vault, workflow,
+    risk_signal, rule_set_result, rule_set_result_risk_signal_junction, scoped_vault, vault, workflow,
 };
 use diesel::{dsl::not, prelude::*, Insertable, Queryable};
 use itertools::Itertools;
@@ -19,7 +18,7 @@ use newtypes::{
     RuleSetResultKind, ScopedVaultId, WorkflowId,
 };
 
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Eq, PartialEq)]
 #[diesel(table_name = rule_set_result)]
 pub struct RuleSetResult {
     pub id: RuleSetResultId,
@@ -174,9 +173,9 @@ impl RuleSetResult {
         start: DateTime<Utc>,
         end: DateTime<Utc>,
         limit: i64,
-    ) -> DbResult<Vec<(ScopedVault, RuleSetResult, Vec<RiskSignal>)>> {
-        let res: Vec<(ScopedVault, RuleSetResult)> = workflow::table
-            .inner_join(scoped_vault::table)
+    ) -> DbResult<Vec<RuleSetResultSample>> {
+        let res: Vec<(ScopedVault, Vault, RuleSetResult)> = workflow::table
+            .inner_join(scoped_vault::table.inner_join(vault::table))
             .inner_join(rule_set_result::table)
             .filter(scoped_vault::deactivated_at.is_null())
             .filter(workflow::ob_configuration_id.eq(obc_id))
@@ -189,11 +188,15 @@ impl RuleSetResult {
                 workflow::completed_at.desc(),
                 rule_set_result::created_at.asc(),
             ))
-            .select((scoped_vault::all_columns, rule_set_result::all_columns))
+            .select((
+                scoped_vault::all_columns,
+                vault::all_columns,
+                rule_set_result::all_columns,
+            ))
             .limit(limit)
             .get_results(conn)?;
 
-        let rule_set_result_ids = res.iter().map(|(_, rsr)| rsr.id.clone()).collect_vec();
+        let rule_set_result_ids = res.iter().map(|(_, _, rsr)| rsr.id.clone()).collect_vec();
 
         let risk_signals: Vec<(RuleSetResultId, RiskSignal)> = rule_set_result::table
             .filter(rule_set_result::id.eq_any(rule_set_result_ids))
@@ -204,24 +207,34 @@ impl RuleSetResult {
             )
             .select((rule_set_result::id, risk_signal::all_columns))
             .get_results(conn)?;
-        let mut risk_signals: HashMap<RuleSetResultId, Vec<RiskSignal>> =
-            risk_signals
-                .into_iter()
-                .fold(HashMap::new(), |mut hm, (rsr_id, rs)| {
-                    hm.entry(rsr_id).or_default().push(rs);
-                    hm
-                });
+
+        let mut risk_signals_by_rsr = risk_signals.into_iter().into_group_map();
 
         let res = res
             .into_iter()
-            .map(|(sv, rsr)| {
-                let rs = risk_signals.remove(&rsr.id).unwrap_or_default();
-                (sv, rsr, rs)
+            .map(|(scoped_vault, vault, rule_set_result)| {
+                let risk_signals = risk_signals_by_rsr
+                    .remove(&rule_set_result.id)
+                    .unwrap_or_default();
+                RuleSetResultSample {
+                    scoped_vault,
+                    vault,
+                    rule_set_result,
+                    risk_signals,
+                }
             })
             .collect();
 
         Ok(res)
     }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct RuleSetResultSample {
+    pub scoped_vault: ScopedVault,
+    pub vault: Vault,
+    pub rule_set_result: RuleSetResult,
+    pub risk_signals: Vec<RiskSignal>,
 }
 
 #[cfg(test)]
@@ -355,7 +368,7 @@ mod tests {
         );
     }
 
-    fn create_vault(conn: &mut TxnPgConn, obc: &ObConfiguration) -> (ScopedVault, Vec<RiskSignal>) {
+    fn create_vault(conn: &mut TxnPgConn, obc: &ObConfiguration) -> (ScopedVault, Vault, Vec<RiskSignal>) {
         let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
         let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
 
@@ -377,7 +390,7 @@ mod tests {
             false,
         )
         .unwrap();
-        (sv, risk_signals)
+        (sv, uv.into_inner(), risk_signals)
     }
 
     fn create_wf(
@@ -452,55 +465,62 @@ mod tests {
         );
 
         // Vault with 1 WF
-        let (sv, risk_signals) = create_vault(conn, &obc);
-        let wf = create_wf(conn, &sv, &obc.id, Some(DecisionStatus::Pass));
-        let rsr = create_rule_set_result(conn, &obc.id, &sv.id, &wf.id, &risk_signals);
+        let (sv1, uv1, risk_signals_1) = create_vault(conn, &obc);
+        let wf = create_wf(conn, &sv1, &obc.id, Some(DecisionStatus::Pass));
+        let rsr1 = create_rule_set_result(conn, &obc.id, &sv1.id, &wf.id, &risk_signals_1);
 
         // Vault with multiple WF
-        let (sv2, risk_signals2) = create_vault(conn, &obc);
+        let (sv2, uv2, risk_signals_2) = create_vault(conn, &obc);
         let wf2a = create_wf(conn, &sv2, &obc.id, Some(DecisionStatus::Pass));
-        let _rsr2a = create_rule_set_result(conn, &obc.id, &sv2.id, &wf2a.id, &risk_signals2);
+        let _rsr2a = create_rule_set_result(conn, &obc.id, &sv2.id, &wf2a.id, &risk_signals_2);
         let wf2b = create_wf(conn, &sv2, &obc.id, Some(DecisionStatus::Pass));
-        let rsr2b = create_rule_set_result(conn, &obc.id, &sv2.id, &wf2b.id, &risk_signals2);
+        let rsr2b = create_rule_set_result(conn, &obc.id, &sv2.id, &wf2b.id, &risk_signals_2);
 
         // Vault with multiple WF but some incomplete
-        let (sv3, risk_signals3) = create_vault(conn, &obc);
+        let (sv3, uv3, risk_signals_3) = create_vault(conn, &obc);
         let wf3a = create_wf(conn, &sv3, &obc.id, None);
-        let _rsr3a = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3a.id, &risk_signals3);
+        let _rsr3a = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3a.id, &risk_signals_3);
         let wf3b = create_wf(conn, &sv3, &obc.id, Some(DecisionStatus::Pass));
-        let rsr3b = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3b.id, &risk_signals3);
+        let rsr3b = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3b.id, &risk_signals_3);
         let wf3c = create_wf(conn, &sv3, &obc.id, None);
-        let _rsr3c = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3c.id, &risk_signals3);
+        let _rsr3c = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3c.id, &risk_signals_3);
 
         // Vault with 1 WF but multiple rule_set_result's
-        let (sv4, risk_signals4) = create_vault(conn, &obc);
+        let (sv4, uv4, risk_signals_4) = create_vault(conn, &obc);
         let wf4 = create_wf(conn, &sv4, &obc.id, Some(DecisionStatus::Pass));
-        let rsr4a = create_rule_set_result(conn, &obc.id, &sv4.id, &wf4.id, &risk_signals4);
-        let _rsr4b = create_rule_set_result(conn, &obc.id, &sv4.id, &wf4.id, &risk_signals4);
+        let rsr4a = create_rule_set_result(conn, &obc.id, &sv4.id, &wf4.id, &risk_signals_4);
+        let _rsr4b = create_rule_set_result(conn, &obc.id, &sv4.id, &wf4.id, &risk_signals_4);
 
         // Vault with just 1 incomplete WF
-        let (sv5, risk_signals5) = create_vault(conn, &obc);
+        let (sv5, _uv5, risk_signals_5) = create_vault(conn, &obc);
         let wf5 = create_wf(conn, &sv5, &obc.id, None);
-        let _rsr5 = create_rule_set_result(conn, &obc.id, &sv5.id, &wf5.id, &risk_signals5);
+        let _rsr5 = create_rule_set_result(conn, &obc.id, &sv5.id, &wf5.id, &risk_signals_5);
 
         let results =
             RuleSetResult::sample_for_eval(conn, &obc.id, Utc::now() - Duration::hours(1), Utc::now(), 10)
                 .unwrap();
         assert_have_same_elements(
             vec![
-                (sv.id, rsr.id, rs_ids(risk_signals)),
-                (sv2.id, rsr2b.id, rs_ids(risk_signals2)),
-                (sv3.id, rsr3b.id, rs_ids(risk_signals3)),
-                (sv4.id, rsr4a.id, rs_ids(risk_signals4)),
+                (sv1.id, uv1, rsr1, sort_risk_signals(risk_signals_1)),
+                (sv2.id, uv2, rsr2b, sort_risk_signals(risk_signals_2)),
+                (sv3.id, uv3, rsr3b, sort_risk_signals(risk_signals_3)),
+                (sv4.id, uv4, rsr4a, sort_risk_signals(risk_signals_4)),
             ],
             results
                 .into_iter()
-                .map(|(sv, rsr, rs)| (sv.id, rsr.id, rs_ids(rs)))
+                .map(|sample| {
+                    (
+                        sample.scoped_vault.id,
+                        sample.vault,
+                        sample.rule_set_result,
+                        sort_risk_signals(sample.risk_signals),
+                    )
+                })
                 .collect_vec(),
         );
     }
 
-    fn rs_ids(rs: Vec<RiskSignal>) -> Vec<RiskSignalId> {
-        rs.into_iter().map(|r| r.id).sorted().collect()
+    fn sort_risk_signals(rs: Vec<RiskSignal>) -> Vec<RiskSignal> {
+        rs.into_iter().sorted_by_key(|r| r.id.clone()).collect()
     }
 }

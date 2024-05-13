@@ -29,7 +29,7 @@ use newtypes::{
 /// Creates a unique identifier specific to each onboarding configuration.
 /// This allows one user to onboard onto multiple onboarding configurations at the same tenant
 /// while keeping information for each onboarding separate.
-#[derive(Debug, Clone, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable, Eq, PartialEq)]
 #[diesel(table_name = scoped_vault)]
 pub struct ScopedVault {
     pub id: ScopedVaultId,

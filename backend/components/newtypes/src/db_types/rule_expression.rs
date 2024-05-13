@@ -11,6 +11,13 @@ impl RuleExpression {
     pub fn list_ids(&self) -> Vec<ListId> {
         self.0.iter().filter_map(|c| c.list_id().cloned()).collect()
     }
+
+    pub fn data_identifiers(&self) -> Vec<DataIdentifier> {
+        self.0
+            .iter()
+            .filter_map(|c| c.data_identifier().cloned())
+            .collect()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Eq, PartialEq, Apiv2Schema)]
@@ -130,6 +137,13 @@ impl RuleExpressionCondition {
                 op: _,
                 value,
             }) => Some(value),
+            _ => None,
+        }
+    }
+
+    pub fn data_identifier(&self) -> Option<&DataIdentifier> {
+        match self {
+            RuleExpressionCondition::VaultData(op) => Some(op.field()),
             _ => None,
         }
     }

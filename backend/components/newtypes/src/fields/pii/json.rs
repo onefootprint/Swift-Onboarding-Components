@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
+use std::{fmt::Debug, str::FromStr};
 
 use crate::{PiiBytes, PiiString, VResult, VaultDataFormat};
 
@@ -163,6 +163,14 @@ impl<'a> TryFrom<&'a PiiString> for PiiJsonValue {
 
     fn try_from(value: &'a PiiString) -> Result<Self, Self::Error> {
         serde_json::from_str(value.leak()).map(Self::new)
+    }
+}
+
+impl FromStr for PiiJsonValue {
+    type Err = serde_json::Error;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        serde_json::from_str(value).map(Self::new)
     }
 }
 

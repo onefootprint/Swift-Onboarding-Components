@@ -1,6 +1,7 @@
 import arrow
 import pytest
 from datetime import datetime, timedelta
+from tests.bifrost.test_components_sdk import create_user_with_components_token
 from tests.bifrost_client import BifrostClient
 from tests.dashboard.utils import update_rules
 from tests.utils import (
@@ -223,6 +224,178 @@ def new_list(kind, entries, sandbox_tenant):
     )
 
 
+def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
+    sandbox_id = _gen_random_sandbox_id()
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Test Vault Data Rules",
+        must_collect_data,
+        can_access_data,
+        # These are the necessary arguments to skip KYC so the status is only
+        # dependent on rules evaluation.
+        skip_kyc=True,
+        allow_international_residents=True,
+    )
+
+    rule_fail_amex = dict(
+        name="card issuer",
+        rule_expression=[
+            {
+                "field": "card.primary.issuer",
+                "op": "eq",
+                "value": "amex",
+            },
+        ],
+        rule_action="fail",
+    )
+    rule_fail_not_e3_visa = dict(
+        name="visa kind",
+        rule_expression=[
+            {
+                "field": "id.visa_kind",
+                "op": "not_eq",
+                "value": "e3",
+            },
+        ],
+        rule_action="fail",
+    )
+    update_rules(
+        obc.id, 1, *sandbox_tenant.db_auths, add=[rule_fail_amex, rule_fail_not_e3_visa]
+    )
+
+    # Check the status & rule set results for each user.
+    expected_rule_evals = [
+        (
+            "user a",
+            {
+                "card.primary.number": "4428680502681658",  # Visa
+                "id.us_legal_status": "visa",
+                "id.visa_kind": "e1",
+            },
+            "fail",
+            {
+                rule_fail_amex["name"]: False,
+                rule_fail_not_e3_visa["name"]: True,
+            },
+        ),
+        (
+            "user b",
+            {
+                "card.primary.number": "346501315038265",  # Amex
+                "id.us_legal_status": "visa",
+                "id.visa_kind": "e2",
+            },
+            "fail",
+            {
+                rule_fail_amex["name"]: True,
+                rule_fail_not_e3_visa["name"]: True,
+            },
+        ),
+
+        (
+            "user c",
+            {
+                "card.primary.number": "5555555555554444",  # MasterCard
+                "id.us_legal_status": "visa",
+                "id.visa_kind": "e3",
+            },
+            "pass",
+            {
+                rule_fail_amex["name"]: False,
+                rule_fail_not_e3_visa["name"]: False,
+            },
+        ),
+    ]
+
+    for test_name, vault_data, expected_status, expected_rule_results in expected_rule_evals:
+        components_token, token, bifrost = create_user_with_components_token(
+            sandbox_tenant, obc=obc,
+        )
+        patch("hosted/user/vault", vault_data, components_token)
+        user = bifrost.run()
+        fp_id = user.fp_id
+
+        # Check the overall status.
+        user = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
+        assert len(user["workflows"]) == 1, test_name
+        assert user["status"] == expected_status, test_name
+
+        # Fetch the rule set results.
+        timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
+        stepup_event = [
+            i for i in timeline if i["event"]["kind"] == "onboarding_decision"
+        ].pop()
+        rule_set_result_id = stepup_event["event"]["data"]["decision"]["rule_set_result_id"]
+
+        rule_set_result = get(
+            f"entities/{fp_id}/rule_set_result/{rule_set_result_id}",
+            None,
+            *sandbox_tenant.db_auths,
+        )
+
+        # Check rule set results.
+        rule_name_to_id = {}
+        for rule_name, expected_result in expected_rule_results.items():
+            rule_result = next(
+                r for r in rule_set_result["rule_results"] if r["rule"]["name"] == rule_name
+            )
+            rule_name_to_id[rule_name] = rule_result["rule"]["rule_id"]
+            assert rule_result["result"] == expected_result, (test_name, rule_name)
+
+        start_timestamp = arrow.get(stepup_event["timestamp"]).shift(hours=-1)
+        end_timestamp = start_timestamp.shift(hours=2)
+
+        # Backtesting with no change yields the same result.
+        resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
+            "start_timestamp": start_timestamp.isoformat(),
+            "end_timestamp": end_timestamp.isoformat(),
+        }, *sandbox_tenant.db_auths)
+        backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
+        assert backtest_result["historical_action_triggered"] == status_as_action_triggered(expected_status), test_name
+        assert backtest_result["backtest_action_triggered"] == status_as_action_triggered(expected_status), test_name
+
+        # Backtesting with the matching rules deleted yields a pass.
+        resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
+            "start_timestamp": start_timestamp.isoformat(),
+            "end_timestamp": end_timestamp.isoformat(),
+            "delete": [rule_name_to_id[rule_name] for rule_name, matches in expected_rule_results.items() if matches],
+        }, *sandbox_tenant.db_auths)
+        backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
+        assert backtest_result["historical_action_triggered"] == status_as_action_triggered(expected_status), test_name
+        assert backtest_result["backtest_action_triggered"] == None
+
+        # Backtesting with a rule added that matches all users yields a fail.
+        resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
+            "start_timestamp": start_timestamp.isoformat(),
+            "end_timestamp": end_timestamp.isoformat(),
+            "delete": [rule_name_to_id[rule_name] for rule_name, matches in expected_rule_results.items() if matches],
+            "add": [
+                {
+                    "name": "Should fail",
+                    "rule_action": "fail",
+                    "rule_expression": [
+                        {
+                            "field": "id.visa_kind",
+                            "op": "not_eq",
+                            "value": "other",
+                        },
+                    ],
+                },
+            ],
+        }, *sandbox_tenant.db_auths)
+        backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
+        assert backtest_result["historical_action_triggered"] == status_as_action_triggered(expected_status)
+        assert backtest_result["backtest_action_triggered"] == "fail"
+
+def status_as_action_triggered(pass_or_fail):
+    if pass_or_fail == "pass":
+        return None
+    elif pass_or_fail == "fail":
+        return "fail"
+    else:
+        raise Exception(f"Unexpected status: {pass_or_fail}")
+
+
 def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     # Flake note: requires a consistent client IP for the duration of the test.
 
@@ -328,14 +501,10 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     start_timestamp = arrow.get(stepup_event["timestamp"]).shift(hours=-1)
     end_timestamp = start_timestamp.shift(hours=2)
 
-    resp = post(
-        f"org/onboarding_configs/{obc.id}/rules/evaluate",
-        {
-            "start_timestamp": start_timestamp.isoformat(),
-            "end_timestamp": end_timestamp.isoformat(),
-        },
-        *sandbox_tenant.db_auths,
-    )
+    resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
+        "start_timestamp": start_timestamp.isoformat(),
+        "end_timestamp": end_timestamp.isoformat(),
+    }, *sandbox_tenant.db_auths)
     backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
     assert backtest_result["historical_action_triggered"] == "fail"
     assert backtest_result["backtest_action_triggered"] == "fail"

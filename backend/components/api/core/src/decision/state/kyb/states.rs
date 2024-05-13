@@ -19,7 +19,7 @@ use crate::{
         RuleError,
     },
     errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
+    utils::vault_wrapper::{Any, VaultWrapper},
     State,
 };
 use async_trait::async_trait;
@@ -391,15 +391,17 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
                 let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling a new seqno inside the RSR write itself
-                let vw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&wf.scoped_vault_id, seqno))?;
+                let vw =
+                    VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, Some(seqno))?;
 
                 let lists = ListEntry::list_bulk(conn, &common::list_ids_from_rules(&rules))?;
 
                 Ok((tenant, rules, vw, lists))
             })
             .await?;
-        let vault_data_for_rules =
-            VaultDataForRules::decrypt_for_rules(&state.enclave_client, vw, &rules).await?;
+
+        let rule_exprs = rules.iter().map(|r| &r.rule_expression).collect_vec();
+        let vault_data_for_rules = VaultDataForRules::decrypt_for_rules(state, vw, &rule_exprs).await?;
         let lists_for_rules = common::saturate_list_entries(state, &tenant, lists).await?;
         Ok((
             state.feature_flag_client.clone(),

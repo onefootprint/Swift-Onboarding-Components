@@ -15,6 +15,7 @@ use db::models::{
 
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::watchlist::response::WatchlistResultResponse;
+use itertools::Itertools;
 use newtypes::{
     DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, ListId, Locked, OnboardingStatus,
     RiskSignalGroupKind, RuleSetResultKind, VendorAPI, VerificationResultId,
@@ -49,7 +50,7 @@ use crate::{
         vendor::vendor_result::VendorResult,
     },
     errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
+    utils::vault_wrapper::{Any, VaultWrapper},
     State,
 };
 
@@ -395,15 +396,16 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
                 let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling a new seqno inside the RSR write itself
-                let vw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&svid, seqno))?;
+                let vw = VaultWrapper::<Any>::build_for_tenant_version(conn, &svid, Some(seqno))?;
 
                 let lists = ListEntry::list_bulk(conn, &common::list_ids_from_rules(&rules))?;
 
                 Ok((tenant, rules, vw, lists))
             })
             .await?;
-        let vault_data_for_rules =
-            VaultDataForRules::decrypt_for_rules(&state.enclave_client, vw, &rules).await?;
+
+        let rule_exprs = rules.iter().map(|r| &r.rule_expression).collect_vec();
+        let vault_data_for_rules = VaultDataForRules::decrypt_for_rules(state, vw, &rule_exprs).await?;
         let lists_for_rules = common::saturate_list_entries(state, &tenant, lists).await?;
 
         Ok((

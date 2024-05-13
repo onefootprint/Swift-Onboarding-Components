@@ -175,20 +175,33 @@ fn evaluate_condition(
             }
         }
         RuleExpressionCondition::VaultData(vo) => {
-            if let Ok(field_value) = vault_data.get_di(vo.field().clone()) {
+            if let Some(field_value) = vault_data.get(vo.field()) {
+                // n.b. We're returning errors if the field value is not of type string,
+                // since non-string JSON values may have multiple representations.
+                let field_string = field_value
+                    .clone()
+                    .as_string()
+                    .map_err(|_| AssertionError("Only string-typed DIs can be used in vault rules"))?;
                 match vo {
-                    VaultOperation::Equals { field: _, op, value } => match op {
-                        Equals::Equals => field_value.leak_to_string() == *value.leak_to_string(),
-                        Equals::DoesNotEqual => field_value.leak_to_string() != *value.leak_to_string(),
-                    },
+                    VaultOperation::Equals { field: _, op, value } => {
+                        let is_equal = crypto::safe_compare(
+                            field_string.leak().as_bytes(),
+                            value.leak_to_string().as_bytes(),
+                        );
+                        match op {
+                            Equals::Equals => is_equal,
+                            Equals::DoesNotEqual => !is_equal,
+                        }
+                    }
                     VaultOperation::IsIn { field, op, value } => {
                         let list = lists.get(value).ok_or(AssertionError(&format!(
                             "Missing List needed for rule evaluation: {}",
                             value
                         )))?;
+                        let is_in_list = vault_data_is_in_list(field, field_string, list)?;
                         match op {
-                            IsIn::IsIn => vault_data_is_in_list(field, field_value, list)?,
-                            IsIn::IsNotIn => !vault_data_is_in_list(field, field_value, list)?,
+                            IsIn::IsIn => is_in_list,
+                            IsIn::IsNotIn => !is_in_list,
                         }
                     }
                 }
@@ -305,19 +318,14 @@ fn insight_field_value_is_in_list(
 
 #[cfg(test)]
 pub mod tests {
-    use std::collections::HashMap;
-
-    use crate::{
-        decision::rule_engine::engine::VaultDataForRules,
-        utils::vault_wrapper::{DecryptUncheckedResult, EnclaveDecryptOperation},
-    };
-
     use super::*;
+    use crate::decision::rule_engine::engine::VaultDataForRules;
     use newtypes::{
-        BooleanOperator as BO, DataIdentifier, DataIdentifier as DI, FootprintReasonCode as FRC,
-        IdentityDataKind, InvestorProfileKind, PiiString, RuleAction as RA, RuleExpression as RE,
+        BooleanOperator as BO, DataIdentifier as DI, FootprintReasonCode as FRC, IdentityDataKind,
+        InvestorProfileKind, PiiJsonValue, RuleAction as RA, RuleExpression as RE,
         RuleExpressionCondition as REC,
     };
+    use std::collections::HashMap;
     use test_case::test_case;
 
     // just to avoid having to make RuleInstance's. Also proves that we could use evaluate_rules in a RAM-only way (ie for backtesting or whatever)
@@ -463,7 +471,7 @@ pub mod tests {
             &[],
             &HashMap::new(),
             &config,
-        ); // TODO: tests with vault data
+        );
         (rule_results.into_iter().map(|(_, e)| e).collect_vec(), action)
     }
 
@@ -511,7 +519,6 @@ pub mod tests {
     }]), vec![FRC::IdNotLocated, FRC::NameDoesNotMatch, FRC::SsnNotProvided]  => true)]
     pub fn test_evaluate_rule_expression(re: RE, input: Vec<FRC>) -> bool {
         evaluate_rule_expression(&re, &input, &VaultDataForRules::empty(), &[], &HashMap::new()).unwrap()
-        // TODO: vault data rules
     }
 
     #[test_case(REC::RiskSignal {
@@ -556,7 +563,6 @@ pub mod tests {
     }, vec![]  => false)]
     pub fn test_evaluate_condition(cond: REC, input: Vec<FRC>) -> bool {
         evaluate_condition(&cond, &input, &VaultDataForRules::empty(), &[], &HashMap::new()).unwrap()
-        // TODO: vault data condition
     }
 
     #[test_case(
@@ -599,25 +605,20 @@ pub mod tests {
 
     #[test]
     pub fn test_basic_vault_data_setup() {
-        let results: HashMap<EnclaveDecryptOperation, PiiString> = HashMap::from_iter([
+        let vault_data: HashMap<DataIdentifier, PiiJsonValue> = HashMap::from([
             (
-                DataIdentifier::Id(IdentityDataKind::FirstName).into(),
-                "Bob".into(),
+                DataIdentifier::Id(IdentityDataKind::FirstName),
+                "\"Bob\"".parse().unwrap(),
             ),
             (
-                DataIdentifier::InvestorProfile(InvestorProfileKind::Declarations).into(),
-                "[\"affiliated_with_us_broker\"]".into(),
+                DataIdentifier::InvestorProfile(InvestorProfileKind::Declarations),
+                "[\"affiliated_with_us_broker\"]".parse().unwrap(),
             ),
             (
-                DataIdentifier::InvestorProfile(InvestorProfileKind::InvestmentGoals).into(),
-                "[\"buy_a_home\", \"speculation\"]".into(),
+                DataIdentifier::InvestorProfile(InvestorProfileKind::InvestmentGoals),
+                "[\"buy_a_home\", \"speculation\"]".parse().unwrap(),
             ),
         ]);
-        let decrypted_dis = results.keys().cloned().collect();
-        let vault_data = DecryptUncheckedResult {
-            results,
-            decrypted_dis,
-        };
         let vd = VaultDataForRules::new(vault_data);
 
         assert!(evaluate_condition(
@@ -645,6 +646,41 @@ pub mod tests {
             &HashMap::new()
         )
         .unwrap());
+    }
+
+    #[test_case(
+        (DI::Id(IdentityDataKind::VisaKind), Equals::Equals, "e3"),
+        vec![(DI::Id(IdentityDataKind::VisaKind), "e3")]
+    => true)]
+    #[test_case(
+        (DI::Id(IdentityDataKind::VisaKind), Equals::Equals, "e3"),
+        vec![
+            (DI::Id(IdentityDataKind::VisaKind), "other"),
+            (DI::Id(IdentityDataKind::VisaKind), "e3"),
+        ]
+    => true)]
+    #[test_case(
+        (DI::Id(IdentityDataKind::VisaKind), Equals::Equals, "e3"),
+        vec![(DI::Id(IdentityDataKind::VisaKind), "other")]
+    => false)]
+    pub fn test_evaluate_vault_condition_equality(
+        rule: (DI, Equals, &str),
+        vault_data: Vec<(DI, &str)>,
+    ) -> bool {
+        let vault_data = vault_data
+            .into_iter()
+            .map(|(di, v)| (di, PiiJsonValue::string(v)))
+            .collect();
+        let vd = VaultDataForRules::new(vault_data);
+
+        let (rule_field, rule_op, value) = rule;
+        let cond = REC::VaultData(VaultOperation::Equals {
+            field: rule_field,
+            op: rule_op,
+            value: value.into(),
+        });
+
+        evaluate_condition(&cond, &[], &vd, &[], &HashMap::new()).unwrap()
     }
 
     #[test_case(
@@ -735,17 +771,10 @@ pub mod tests {
         let (list_kind, list_entries) = list;
         let (rule_field, rule_op) = rule;
 
-        let results: HashMap<EnclaveDecryptOperation, PiiString> = HashMap::from_iter(
-            vault_data
-                .into_iter()
-                .map(|(di, s)| (di.into(), s.into()))
-                .collect_vec(),
-        );
-        let decrypted_dis = results.keys().cloned().collect();
-        let vault_data = DecryptUncheckedResult {
-            results,
-            decrypted_dis,
-        };
+        let vault_data = vault_data
+            .into_iter()
+            .map(|(di, v)| (di, PiiJsonValue::string(v)))
+            .collect();
         let vd = VaultDataForRules::new(vault_data);
 
         let list = db::tests::fixtures::list::create_in_memory(list_kind);
