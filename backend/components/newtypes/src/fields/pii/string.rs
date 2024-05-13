@@ -5,6 +5,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 
 use serde::{Deserialize, Serialize};
 use std::{
+    convert::Infallible,
     fmt::{Debug, Display},
     str::{FromStr, Utf8Error},
 };
@@ -31,8 +32,8 @@ impl diesel::serialize::ToSql<Text, diesel::pg::Pg> for PiiString {
 
 impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for PiiString {
     fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
-        let str = String::from_sql(value)?;
-        Ok(Self::from_str(&str)?)
+        let s = String::from_sql(value)?;
+        Ok(PiiString::new(s))
     }
 }
 
@@ -70,7 +71,7 @@ where
 }
 
 impl FromStr for PiiString {
-    type Err = crate::Error;
+    type Err = Infallible;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self(s.to_owned()))
