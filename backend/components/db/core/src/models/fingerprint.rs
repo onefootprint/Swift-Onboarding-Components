@@ -26,7 +26,7 @@ pub struct Fingerprint {
     pub _updated_at: DateTime<Utc>,
     /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
     pub kind: DI,
-    pub lifetime_id: DataLifetimeId,
+    pub lifetime_id: Option<DataLifetimeId>,
     /// Version of the fingerprint schema
     pub version: FingerprintVersion,
     /// scope to which fingerprint was created for
@@ -73,6 +73,7 @@ pub struct NewFingerprintArgs<'a> {
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = fingerprint)]
 struct NewFingerprintRow<'a> {
+    id: FingerprintId,
     sh_data: Option<FingerprintData>,
     p_data: Option<PiiString>,
     kind: DI,
@@ -88,9 +89,9 @@ struct NewFingerprintRow<'a> {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = fingerprint_junction)]
-struct NewFingerprintJunction {
+struct NewFingerprintJunction<'a> {
     fingerprint_id: FingerprintId,
-    lifetime_id: DataLifetimeId,
+    lifetime_id: &'a DataLifetimeId,
 }
 
 
@@ -113,7 +114,7 @@ impl Fingerprint {
                 tracing::error!(di=%fp.kind, "Fingerprinting DI that is not globally fingerprintable");
             }
         }
-        let fingerprints = fingerprints
+        let (fingerprints, fp_junctions): (Vec<_>, Vec<_>) = fingerprints
             .into_iter()
             .map(|args| {
                 let NewFingerprintArgs {
@@ -131,11 +132,14 @@ impl Fingerprint {
                     FingerprintDataValue::Hash(data) => (Some(data), None),
                     FingerprintDataValue::Plaintext(data) => (None, Some(data)),
                 };
-                NewFingerprintRow {
+                // I don't trust postgres to always return fingerprints in the order we insert them,
+                // so let's make the ID in RAM so we have a stable identifier
+                let id = FingerprintId::generate();
+                let new_fp = NewFingerprintRow {
+                    id: id.clone(),
                     sh_data,
                     p_data,
                     kind,
-                    // TODO eventually rm once we move reads over to the junction table
                     lifetime_id,
                     version,
                     scope,
@@ -144,21 +148,20 @@ impl Fingerprint {
                     vault_id,
                     tenant_id,
                     is_live,
-                }
+                };
+                let fp_junctions = vec![NewFingerprintJunction {
+                    fingerprint_id: id,
+                    lifetime_id,
+                }];
+                (new_fp, fp_junctions)
             })
-            .collect_vec();
-        let fps = diesel::insert_into(fingerprint::table)
+            .unzip();
+        diesel::insert_into(fingerprint::table)
             .values(fingerprints)
-            .get_results::<Self>(conn.conn())?;
+            .execute(conn.conn())?;
 
         // Insert records in the junction table to show which lifetimes owns which fingerprints
-        let junctions = fps
-            .into_iter()
-            .map(|fp| NewFingerprintJunction {
-                fingerprint_id: fp.id,
-                lifetime_id: fp.lifetime_id,
-            })
-            .collect_vec();
+        let junctions = fp_junctions.into_iter().flatten().collect_vec();
         diesel::insert_into(fingerprint_junction::table)
             .values(junctions)
             .execute(conn.conn())?;

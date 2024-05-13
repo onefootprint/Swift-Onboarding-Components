@@ -1,6 +1,6 @@
 use crate::{
-    AccessEventId, AuditEventId, BoLinkId, BusinessOwnerKind, FpId, NtResult, ObConfigurationKey,
-    PartnerTenantId, RuleId, ScopedVaultId, TenantId, VaultId, VaultKind,
+    AccessEventId, AuditEventId, BoLinkId, BusinessOwnerKind, FingerprintId, FpId, NtResult,
+    ObConfigurationKey, PartnerTenantId, RuleId, ScopedVaultId, TenantId, VaultId, VaultKind,
 };
 use rand::distributions::{Alphanumeric, DistString};
 
@@ -131,6 +131,14 @@ impl RuleId {
             Alphanumeric.sample_string(&mut rand::thread_rng(), Self::LENGTH)
         )
         .into()
+    }
+}
+
+impl FingerprintId {
+    const LENGTH: usize = 22;
+
+    pub fn generate() -> Self {
+        Self(generate_random_id("fprint_", Self::LENGTH))
     }
 }
 

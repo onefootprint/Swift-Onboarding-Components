@@ -398,7 +398,7 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         kind -> Text,
-        lifetime_id -> Text,
+        lifetime_id -> Nullable<Text>,
         version -> Text,
         scope -> Text,
         is_hidden -> Bool,
