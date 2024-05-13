@@ -8,7 +8,8 @@ use diesel::{
 use itertools::Itertools;
 use newtypes::{
     DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId,
-    FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK, ScopedVaultId, TenantId, VaultId,
+    FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
+    VaultId,
 };
 
 use crate::{DbResult, PgConn, TxnPgConn};
@@ -19,7 +20,8 @@ use super::scoped_vault::ScopedVault;
 #[diesel(table_name = fingerprint)]
 pub struct Fingerprint {
     pub id: FingerprintId,
-    pub sh_data: FingerprintData,
+    /// Secure hash of data if this DI is stored encrypted. Cannot be set if p_data is set
+    pub sh_data: Option<FingerprintData>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
@@ -44,11 +46,20 @@ pub struct Fingerprint {
     /// ~Denormalized from data_lifetime. Won't be the exact timestamp from the data_lifetime, but
     /// this is set at the same time the DataLifetimes are deactivated
     pub deactivated_at: Option<DateTime<Utc>>,
+    /// Plaintext data if this DI is stored in plaintext. Cannot be set if sh_data is set
+    pub p_data: Option<PiiString>,
+}
+
+#[derive(Debug, Clone, derive_more::From)]
+/// A fingerprint may have either a hashed value or a plaintext value
+pub enum FingerprintDataValue {
+    Hash(FingerprintData),
+    Plaintext(PiiString),
 }
 
 #[derive(Debug, Clone)]
 pub struct NewFingerprintArgs<'a> {
-    pub sh_data: FingerprintData,
+    pub data: FingerprintDataValue,
     pub kind: DI,
     pub lifetime_id: &'a DataLifetimeId,
     pub version: FingerprintVersion,
@@ -62,7 +73,8 @@ pub struct NewFingerprintArgs<'a> {
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = fingerprint)]
 struct NewFingerprintRow<'a> {
-    sh_data: FingerprintData,
+    sh_data: Option<FingerprintData>,
+    p_data: Option<PiiString>,
     kind: DI,
     lifetime_id: &'a DataLifetimeId,
     version: FingerprintVersion,
@@ -73,8 +85,6 @@ struct NewFingerprintRow<'a> {
     tenant_id: &'a TenantId,
     is_live: bool,
 }
-
-pub type IsUnique = bool;
 
 impl Fingerprint {
     #[tracing::instrument("Fingerprint::create", skip_all)]
@@ -89,19 +99,25 @@ impl Fingerprint {
         }
         let fingerprints = fingerprints
             .into_iter()
-            .map(
-                |NewFingerprintArgs {
-                     sh_data,
-                     kind,
-                     lifetime_id,
-                     version,
-                     scope,
-                     scoped_vault_id,
-                     vault_id,
-                     tenant_id,
-                     is_live,
-                 }| NewFingerprintRow {
+            .map(|args| {
+                let NewFingerprintArgs {
+                    data,
+                    kind,
+                    lifetime_id,
+                    version,
+                    scope,
+                    scoped_vault_id,
+                    vault_id,
+                    tenant_id,
+                    is_live,
+                } = args;
+                let (sh_data, p_data) = match data {
+                    FingerprintDataValue::Hash(data) => (Some(data), None),
+                    FingerprintDataValue::Plaintext(data) => (None, Some(data)),
+                };
+                NewFingerprintRow {
                     sh_data,
+                    p_data,
                     kind,
                     lifetime_id,
                     version,
@@ -111,8 +127,8 @@ impl Fingerprint {
                     vault_id,
                     tenant_id,
                     is_live,
-                },
-            )
+                }
+            })
             .collect_vec();
         diesel::insert_into(fingerprint::table)
             .values(fingerprints)
@@ -157,10 +173,12 @@ impl Fingerprint {
             .filter(fingerprint::scoped_vault_id.eq(&sv.id))
             .filter(fingerprint::deactivated_at.is_null())
             .filter(fingerprint::kind.eq_any(Self::DUPLICATE_FINGERPRINT_KINDS))
-            .select(fingerprint::sh_data)
+            .filter(fingerprint::sh_data.is_not_null())
+            .select(fingerprint::sh_data.assume_not_null())
             .get_results::<FingerprintData>(conn)?;
 
         let q_dupes = fingerprint::table
+            .filter(fingerprint::sh_data.is_not_null())
             .filter(fingerprint::sh_data.eq_any(&sh_datas))
             .filter(fingerprint::deactivated_at.is_null())
             .filter(fingerprint::is_live.eq(sv.is_live))

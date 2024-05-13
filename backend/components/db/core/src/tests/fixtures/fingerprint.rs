@@ -18,7 +18,7 @@ pub fn create(
     sv: &ScopedVault,
 ) {
     let fingerprint = NewFingerprintArgs {
-        sh_data,
+        data: sh_data.into(),
         kind,
         lifetime_id,
         scope,

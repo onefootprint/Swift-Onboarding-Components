@@ -315,6 +315,7 @@ impl Vault {
         let mut query = fingerprint::table
             .inner_join(data_lifetime::table)
             .inner_join(vault::table)
+            .filter(fingerprint::sh_data.is_not_null())
             .filter(fingerprint::sh_data.eq_any(sh_data))
             .filter(fingerprint::is_hidden.eq(false))
             .filter(fingerprint::is_live.eq(sandbox_id.is_none()))
@@ -345,6 +346,7 @@ impl Vault {
                 .inner_join(data_lifetime::table)
                 .inner_join(vault::table)
                 .inner_join(scoped_vault::table)
+                .filter(fingerprint::sh_data.is_not_null())
                 .filter(fingerprint::sh_data.eq_any(sh_data))
                 .filter(fingerprint::is_hidden.eq(false))
                 .filter(fingerprint::deactivated_at.is_null())

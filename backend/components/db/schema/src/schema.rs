@@ -394,7 +394,7 @@ diesel::table! {
 
     fingerprint (id) {
         id -> Text,
-        sh_data -> Bytea,
+        sh_data -> Nullable<Bytea>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         kind -> Text,
@@ -407,6 +407,7 @@ diesel::table! {
         tenant_id -> Text,
         is_live -> Bool,
         deactivated_at -> Nullable<Timestamptz>,
+        p_data -> Nullable<Text>,
     }
 }
 

@@ -101,7 +101,7 @@ impl ValidatedDataRequest {
 
                 Ok(NewFingerprintArgs {
                     kind: kind.clone(),
-                    sh_data: fingerprint,
+                    data: fingerprint.into(),
                     lifetime_id: &vd.lifetime_id,
                     scope,
                     version: newtypes::FingerprintVersion::current(),

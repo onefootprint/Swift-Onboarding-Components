@@ -304,9 +304,10 @@ fn vaults_matching_search(
             .filter(fingerprint::tenant_id.eq(tenant_id))
             .filter(fingerprint::is_live.eq(is_live))
             // Matching filter
+            .filter(fingerprint::sh_data.is_not_null())
             .filter(fingerprint::sh_data.eq_any(all_fps.clone()))
             .filter(fingerprint::is_hidden.eq(false))
-            .select((fingerprint::sh_data, fingerprint::scoped_vault_id))
+            .select((fingerprint::sh_data.assume_not_null(), fingerprint::scoped_vault_id))
             .get_results::<(Fingerprint, ScopedVaultId)>(conn)?
             .into_iter()
             .into_group_map();
