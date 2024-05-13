@@ -29,6 +29,11 @@ define_newtype_id!(
 );
 
 define_newtype_id!(FingerprintId, String, "Identifier for a fingerprint");
+define_newtype_id!(
+    FingerprintJunctionId,
+    String,
+    "Identifier for a fingerprint junction"
+);
 define_newtype_id!(AddressId, String, "Identifier for an address");
 define_newtype_id!(EmailId, String, "Identifier for an email");
 define_newtype_id!(PhoneNumberId, String, "Identifier for a phone number");

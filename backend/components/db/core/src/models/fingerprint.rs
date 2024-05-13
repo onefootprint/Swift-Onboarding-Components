@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use db_schema::schema::fingerprint;
+use db_schema::schema::{fingerprint, fingerprint_junction};
 use diesel::{
     dsl::{count_distinct, not},
     prelude::*,
@@ -86,6 +86,14 @@ struct NewFingerprintRow<'a> {
     is_live: bool,
 }
 
+#[derive(Debug, Clone, Insertable)]
+#[diesel(table_name = fingerprint_junction)]
+struct NewFingerprintJunction {
+    fingerprint_id: FingerprintId,
+    lifetime_id: DataLifetimeId,
+}
+
+
 impl Fingerprint {
     #[tracing::instrument("Fingerprint::create", skip_all)]
     pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprintArgs>) -> DbResult<()> {
@@ -127,6 +135,7 @@ impl Fingerprint {
                     sh_data,
                     p_data,
                     kind,
+                    // TODO eventually rm once we move reads over to the junction table
                     lifetime_id,
                     version,
                     scope,
@@ -138,8 +147,20 @@ impl Fingerprint {
                 }
             })
             .collect_vec();
-        diesel::insert_into(fingerprint::table)
+        let fps = diesel::insert_into(fingerprint::table)
             .values(fingerprints)
+            .get_results::<Self>(conn.conn())?;
+
+        // Insert records in the junction table to show which lifetimes owns which fingerprints
+        let junctions = fps
+            .into_iter()
+            .map(|fp| NewFingerprintJunction {
+                fingerprint_id: fp.id,
+                lifetime_id: fp.lifetime_id,
+            })
+            .collect_vec();
+        diesel::insert_into(fingerprint_junction::table)
+            .values(junctions)
             .execute(conn.conn())?;
         Ok(())
     }

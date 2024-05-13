@@ -14,7 +14,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
     use db_schema::schema::{
         access_event, annotation, audit_event, billing_event, business_owner, contact_info, data_lifetime,
-        decision_intent, document_data, document_request, document_upload, fingerprint,
+        decision_intent, document_data, document_request, document_upload, fingerprint, fingerprint_junction,
         fingerprint_visit_event, identity_document, incode_verification_session,
         incode_verification_session_event, liveness_event, manual_review, middesk_request,
         onboarding_decision, onboarding_decision_verification_result_junction, risk_signal,
@@ -75,16 +75,31 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
             .filter(vault_data::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
-        deleted_rows += diesel::delete(fingerprint::table)
-            .filter(fingerprint::lifetime_id.eq_any(dl_ids.clone()))
-            .execute(conn.conn())?;
-
         deleted_rows += diesel::delete(contact_info::table)
             .filter(contact_info::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(document_data::table)
             .filter(document_data::lifetime_id.eq_any(dl_ids.clone()))
+            .execute(conn.conn())?;
+
+        {
+            // fingerprint junctions
+            let fp_ids = fingerprint_junction::table
+                .filter(fingerprint_junction::lifetime_id.eq_any(dl_ids.clone()))
+                .select(fingerprint_junction::fingerprint_id);
+
+            deleted_rows += diesel::delete(fingerprint::table)
+                .filter(fingerprint::id.eq_any(fp_ids.clone()))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(fingerprint_junction::table)
+                .filter(fingerprint_junction::lifetime_id.eq_any(dl_ids.clone()))
+                .execute(conn.conn())?;
+        }
+
+        deleted_rows += diesel::delete(fingerprint::table)
+            .filter(fingerprint::lifetime_id.eq_any(dl_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(data_lifetime::table)

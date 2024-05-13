@@ -414,6 +414,18 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    fingerprint_junction (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        fingerprint_id -> Text,
+        lifetime_id -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     fingerprint_visit_event (id) {
         id -> Text,
         visitor_id -> Text,
@@ -1647,6 +1659,8 @@ diesel::joinable!(fingerprint -> data_lifetime (lifetime_id));
 diesel::joinable!(fingerprint -> scoped_vault (scoped_vault_id));
 diesel::joinable!(fingerprint -> tenant (tenant_id));
 diesel::joinable!(fingerprint -> vault (vault_id));
+diesel::joinable!(fingerprint_junction -> data_lifetime (lifetime_id));
+diesel::joinable!(fingerprint_junction -> fingerprint (fingerprint_id));
 diesel::joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(fingerprint_visit_event -> vault (vault_id));
 diesel::joinable!(google_device_attestation -> vault (vault_id));
@@ -1772,6 +1786,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     document_request,
     document_upload,
     fingerprint,
+    fingerprint_junction,
     fingerprint_visit_event,
     google_device_attestation,
     identity_document,
