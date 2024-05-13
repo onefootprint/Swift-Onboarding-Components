@@ -18,16 +18,6 @@ api-debug:
 	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p api_server
 	@cp ./target/x86_64-unknown-linux-musl/debug/api_server ./out/api_server
 
-# Builds the builder that will help us build enclave docker images
-build-enclave-builder:
-	@docker build -t "ne_builder2:${RUST_VERSION}" \
-			--build-arg USER=$(whoami) \
-			--build-arg USER_ID=$(id -u) \
-			--build-arg GROUP_ID=$(id -g) \
-			--build-arg RUST_TOOLCHAIN="${RUST_VERSION}" \
-			--build-arg CTR_HOME="/home/ec2-user" \
-			-f enclave_build.dockerfile .
-
 # Builds the actual enclave image
 build-enclave-docker:
 	rm -f ./out/enclave
@@ -71,28 +61,9 @@ get-friendly-branch-name:
 set-enclave-version:
 	@pulumi --cwd infra config set --path constants.containers.enclaveVersion $(commit)
 
-package-enclave:
-	@echo "using account $(account)"
-	@echo "create image tagged as $(commit)"
-	@docker build -t enclave_pkg:$(commit) -f enclave_eif_package.dockerfile .
-	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
-	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
-	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
-	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
-	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
 
 set-api-version:
 	@pulumi --cwd infra config set --path constants.containers.apiVersion $(commit)
-
-package-api: api-release
-	@echo "using account $(account)"
-	@echo "create image tagged as $(commit)"
-	@docker build -t api:$(commit) -f api.dockerfile .
-	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
-	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit)
-	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest
-	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit)
-	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest
 
 
 run-enclave-local:
