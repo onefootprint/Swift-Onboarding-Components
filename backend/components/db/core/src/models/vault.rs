@@ -1,7 +1,7 @@
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
-    scoped_vault,
+    fingerprint_junction, scoped_vault,
     vault::{self, BoxedQuery},
 };
 use diesel::{dsl::not, pg::Pg, prelude::*, upsert::on_constraint, Insertable, QueryDsl, Queryable};
@@ -313,7 +313,7 @@ impl Vault {
         // that also have portable, active data matching the fingerprint
         // and a matching sandbox_id, if provided
         let mut query = fingerprint::table
-            .inner_join(data_lifetime::table)
+            .inner_join(fingerprint_junction::table.inner_join(data_lifetime::table))
             .inner_join(vault::table)
             .filter(fingerprint::sh_data.is_not_null())
             .filter(fingerprint::sh_data.eq_any(sh_data))
@@ -343,7 +343,7 @@ impl Vault {
         // non-portable vaults
         if let Some(tenant_id) = tenant_id {
             let mut query = fingerprint::table
-                .inner_join(data_lifetime::table)
+                .inner_join(fingerprint_junction::table.inner_join(data_lifetime::table))
                 .inner_join(vault::table)
                 .inner_join(scoped_vault::table)
                 .filter(fingerprint::sh_data.is_not_null())

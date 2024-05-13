@@ -171,8 +171,11 @@ impl Fingerprint {
         lifetime_ids: Vec<&DataLifetimeId>,
         time: DateTime<Utc>,
     ) -> DbResult<()> {
+        let fp_ids = fingerprint_junction::table
+            .filter(fingerprint_junction::lifetime_id.eq_any(lifetime_ids))
+            .select(fingerprint_junction::fingerprint_id);
         diesel::update(fingerprint::table)
-            .filter(fingerprint::lifetime_id.eq_any(lifetime_ids))
+            .filter(fingerprint::id.eq_any(fp_ids))
             .set(fingerprint::deactivated_at.eq(time))
             .execute(conn.conn())?;
         Ok(())

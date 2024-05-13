@@ -98,10 +98,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .execute(conn.conn())?;
         }
 
-        deleted_rows += diesel::delete(fingerprint::table)
-            .filter(fingerprint::lifetime_id.eq_any(dl_ids.clone()))
-            .execute(conn.conn())?;
-
         deleted_rows += diesel::delete(data_lifetime::table)
             .filter(data_lifetime::vault_id.eq_any(&v_ids))
             .execute(conn.conn())?;
