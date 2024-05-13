@@ -12,7 +12,7 @@ use newtypes::{
     VaultId,
 };
 
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{errors::ValidationError, DbResult, PgConn, TxnPgConn};
 
 use super::scoped_vault::ScopedVault;
 
@@ -91,7 +91,15 @@ impl Fingerprint {
     pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprintArgs>) -> DbResult<()> {
         for fp in fingerprints.iter() {
             if !fp.kind.is_fingerprintable() {
+                // TODO time to make these hard errors
                 tracing::error!(di=%fp.kind, "Fingerprinting DI that is not fingerprintable");
+            }
+            if matches!(fp.data, FingerprintDataValue::Plaintext(_)) && !fp.kind.store_plaintext() {
+                return ValidationError(&format!(
+                    "Cannot save plaintext fingerprint with kind {}",
+                    fp.kind
+                ))
+                .into();
             }
             if fp.scope == FingerprintScopeKind::Global && !fp.kind.is_globally_fingerprintable() {
                 tracing::error!(di=%fp.kind, "Fingerprinting DI that is not globally fingerprintable");

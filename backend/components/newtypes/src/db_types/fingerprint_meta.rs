@@ -23,15 +23,7 @@ use strum_macros::{AsRefStr, EnumString};
 pub enum FingerprintScopeKind {
     Global,
     Tenant,
-}
-
-impl FingerprintScopeKind {
-    pub fn is_tenant(&self) -> bool {
-        match self {
-            FingerprintScopeKind::Global => false,
-            FingerprintScopeKind::Tenant => true,
-        }
-    }
+    Plaintext,
 }
 
 #[derive(

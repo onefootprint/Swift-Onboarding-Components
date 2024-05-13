@@ -13,10 +13,10 @@ use db::{
     },
     TxnPgConn,
 };
-use itertools::Itertools;
+use itertools::{chain, Itertools};
 use newtypes::{
     output::Csv, CollectedDataOption, ContactInfoPriority, DataIdentifier, DataLifetimeSeqno,
-    FingerprintRequest, Fingerprints,
+    FingerprintRequest, FingerprintScopeKind, Fingerprints,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -84,8 +84,9 @@ impl ValidatedDataRequest {
         let vd = VaultData::bulk_create(conn, v_id, sv_id, self.data, seqno, actor)?;
 
         let sv = ScopedVault::get(conn, sv_id)?;
-        // Point fingerprints to the same lifetime used for the corresponding VD row
-        let fingerprints: Vec<_> = self
+
+        // Create fingerprints for every piece of data we've hashed
+        let sh_data_fingerprints: Vec<_> = self
             .fingerprints
             .into_iter()
             .map(|req| -> ApiResult<_> {
@@ -98,11 +99,26 @@ impl ValidatedDataRequest {
                     .iter()
                     .find(|vd| vd.kind == kind)
                     .ok_or(AssertionError(&format!("No lifetime id found for {}", kind)))?;
+                Ok((kind.clone(), fingerprint.into(), &vd.lifetime_id, scope))
+            })
+            .collect::<ApiResult<_>>()?;
 
-                Ok(NewFingerprintArgs {
-                    kind: kind.clone(),
-                    data: fingerprint.into(),
-                    lifetime_id: &vd.lifetime_id,
+        // Some DIs are stored in plaintext and searchable - we want to make fingeprint rows for these too
+        let p_data_fingerprints = vd
+            .iter()
+            .filter(|vd| vd.kind.store_plaintext() && vd.kind.is_fingerprintable())
+            .filter_map(|vd| vd.p_data.as_ref().map(|p_data| (p_data.clone(), vd)))
+            .map(|(p_data, vd)| {
+                let scope = FingerprintScopeKind::Plaintext;
+                (vd.kind.clone(), p_data.into(), &vd.lifetime_id, scope)
+            });
+
+        let fingerprints = chain(sh_data_fingerprints, p_data_fingerprints)
+            .map(|(kind, data, dl_id, scope)| {
+                NewFingerprintArgs {
+                    kind,
+                    data,
+                    lifetime_id: dl_id,
                     scope,
                     version: newtypes::FingerprintVersion::current(),
                     // Denormalized fields
@@ -110,10 +126,9 @@ impl ValidatedDataRequest {
                     vault_id: &sv.vault_id,
                     tenant_id: &sv.tenant_id,
                     is_live: sv.is_live,
-                })
+                }
             })
-            .collect::<ApiResult<_>>()?;
-
+            .collect();
         Fingerprint::bulk_create(conn, fingerprints)?;
 
         // Add contact info for the new CIs added
