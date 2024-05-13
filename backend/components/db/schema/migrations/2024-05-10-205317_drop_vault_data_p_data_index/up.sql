@@ -1,1 +1,0 @@
-DROP INDEX CONCURRENTLY IF EXISTS vault_data_p_data;
