@@ -54,9 +54,6 @@ const publicKeyEnv =
 const Demo = () => {
   const [option, setOption] = useState(steps[0]);
   const router = useRouter();
-  if (!router.isReady) {
-    return null;
-  }
   const { ob_key: obKey } = router.query;
   const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
 
