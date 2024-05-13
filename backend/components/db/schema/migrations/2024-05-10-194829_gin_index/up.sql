@@ -1,0 +1,1 @@
+CREATE EXTENSION btree_gin; -- needed for gin indexes without gin_trgrm_ops

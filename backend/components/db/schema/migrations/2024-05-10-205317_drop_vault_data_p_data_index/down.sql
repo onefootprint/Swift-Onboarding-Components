@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY vault_data_p_data ON vault_data USING gin(p_data gin_trgm_ops);

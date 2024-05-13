@@ -260,34 +260,25 @@ fn vaults_matching_search(
     tenant_id: &TenantId,
     is_live: bool,
 ) -> DbResult<Vec<ScopedVaultId>> {
-    use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault_data};
+    use db_schema::schema::fingerprint;
     let SearchQuery {
         search,
         fingerprint_queries,
     } = search;
     // Search both plaintext results and fingerprinted results
     let plaintext_results = {
-        // This is extremely specific - gin indexes have really slow performance on large tables when
-        // doing a "contains" operation with 2 or fewer characteres.
-        // So, we cheat a bit and just do a prefix search when the search query is < 2 characters
-        let plaintext_search = if search.len() <= 2 {
-            // Just prefix search
-            format!("{}%", search.leak())
-        } else {
-            // Full contains search
-            format!("%{}%", search.leak())
-        };
-
-        vault_data::table
-            .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-            .filter(data_lifetime::deactivated_seqno.is_null())
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::is_live.eq(is_live))
-            .filter(scoped_vault::deactivated_at.is_null())
+        let plaintext_search = format!("%{}%", search.leak());
+        // Be careful changing this query - it's optimized to use a specific index
+        fingerprint::table
+            .filter(fingerprint::deactivated_at.is_null())
+            .filter(fingerprint::tenant_id.eq(tenant_id))
+            .filter(fingerprint::is_live.eq(is_live))
+            .filter(fingerprint::is_hidden.eq(false))
             // Matching filter
-            .filter(vault_data::p_data.ilike(&plaintext_search))
-            .select(scoped_vault::id)
-            .get_results(conn)?
+            .filter(fingerprint::p_data.is_not_null())
+            .filter(fingerprint::p_data.ilike(plaintext_search))
+            .select(fingerprint::scoped_vault_id)
+            .get_results::<ScopedVaultId>(conn)?
     };
 
     let fingerprint_results = {
@@ -303,10 +294,10 @@ fn vaults_matching_search(
             .filter(fingerprint::deactivated_at.is_null())
             .filter(fingerprint::tenant_id.eq(tenant_id))
             .filter(fingerprint::is_live.eq(is_live))
+            .filter(fingerprint::is_hidden.eq(false))
             // Matching filter
             .filter(fingerprint::sh_data.is_not_null())
             .filter(fingerprint::sh_data.eq_any(all_fps.clone()))
-            .filter(fingerprint::is_hidden.eq(false))
             .select((fingerprint::sh_data.assume_not_null(), fingerprint::scoped_vault_id))
             .get_results::<(Fingerprint, ScopedVaultId)>(conn)?
             .into_iter()
