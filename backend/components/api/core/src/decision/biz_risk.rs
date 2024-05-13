@@ -30,7 +30,9 @@ pub async fn get_bo_obds(
         .await?;
 
     let sv_ids = match dbo {
-        DecryptedBusinessOwners::NoVaultedOrLinkedBos | DecryptedBusinessOwners::NoVaultedBos { .. } => {
+        DecryptedBusinessOwners::NoVaultedOrLinkedBos
+        | DecryptedBusinessOwners::NoVaultedBos { .. }
+        | DecryptedBusinessOwners::VaultedBos { .. } => {
             vec![]
         }
         DecryptedBusinessOwners::SingleKyc {

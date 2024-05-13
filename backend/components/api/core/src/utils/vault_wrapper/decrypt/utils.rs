@@ -83,6 +83,8 @@ pub enum DecryptedBusinessOwners {
         primary_bo: BusinessOwner,
         primary_bo_vault: UserData,
     },
+    /// The business vault was created via API and the BOS were added manually via API
+    VaultedBos { bos: Vec<BusinessOwnerData> },
     /// Single-KYC KYB flow after BO's information has been submitted. There is BDK::BeneficialOwners VaultData for both the Primary BO and the Secondary BO's
     SingleKyc {
         primary_bo: BusinessOwner,
@@ -121,6 +123,14 @@ impl VaultWrapper<Business> {
 
         // Zip the "vault" and "DB" BOs depending on which kind of "vault" BOs exist
         match (vault_bos, vault_kyced_bos) {
+            // Business vault maded via API and BOs added manually via API
+            (Some(vault_bos), None) | (None, Some(vault_bos)) if bos.is_empty() => {
+                let vault_bos: Vec<BusinessOwnerData> = vault_bos.deserialize()?;
+                if vault_bos.is_empty() {
+                    return Err(BusinessError::NoBos.into());
+                }
+                Ok(DecryptedBusinessOwners::VaultedBos { bos: vault_bos })
+            }
             // Non-kyced BOs in the vault
             (Some(vault_bos), None) => {
                 if bos.len() > 1 {

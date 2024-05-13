@@ -61,6 +61,10 @@ fn business_owner_infos(decrypted_bos: DecryptedBusinessOwners) -> Vec<BusinessO
             primary_bo,
             primary_bo_vault,
         } => vec![(None, Some(primary_bo), Some(primary_bo_vault))],
+        DecryptedBusinessOwners::VaultedBos { bos } => bos
+            .into_iter()
+            .map(|b| (Some(b.ownership_stake), None, None))
+            .collect(),
         DecryptedBusinessOwners::SingleKyc {
             primary_bo,
             primary_bo_vault,

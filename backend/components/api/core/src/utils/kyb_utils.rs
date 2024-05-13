@@ -194,7 +194,7 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Ap
     };
 
     let bo_kyc_is_complete = match dbo {
-        DecryptedBusinessOwners::NoVaultedOrLinkedBos => {
+        DecryptedBusinessOwners::NoVaultedOrLinkedBos | DecryptedBusinessOwners::VaultedBos { .. } => {
             tracing::info!(?biz_wf, "[should_run_kyb] NoVaultedOrLinkedBos");
             // For cases where kyb is manually run via /kyb without BOs, we allow running KYB
             true

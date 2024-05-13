@@ -146,7 +146,8 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
                     identifier="document.custom.utility_bill",
                     description="Please upload a utility bill that shows your full name and address.",
                 ),
-            )
+            ),
+            dict(kind="proof_of_ssn", data=dict()),
         ],
     )
     bifrost = BifrostClient.new(obc)

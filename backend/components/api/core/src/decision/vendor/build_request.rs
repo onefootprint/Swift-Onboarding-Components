@@ -174,6 +174,7 @@ pub async fn build_business_data_from_verification_request(
             primary_bo: _,
             primary_bo_vault: _,
         } => return Err(ApiError::from(BusinessError::BoOnboardingNotComplete)),
+        DecryptedBusinessOwners::VaultedBos { bos } => bos.into_iter().map(BoData::from).collect(),
         DecryptedBusinessOwners::SingleKyc {
             primary_bo: _,
             primary_bo_vault: _,

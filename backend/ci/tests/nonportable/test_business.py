@@ -16,16 +16,16 @@ from tests.headers import ExternalId
         ("business.corporation_type", "llc"),
     ],
 )
-def test_data_vaulting(tenant, key, value):
+def test_data_vaulting(sandbox_tenant, key, value):
     # Should be able to initialize a vault with the data
     data = {key: value}
-    post("businesses/", data, tenant.sk.key)
+    post("businesses/", data, sandbox_tenant.sk.key)
 
     # And should be able to add it to an existing vault
-    body = post("businesses/", None, tenant.sk.key)
+    body = post("businesses/", None, sandbox_tenant.sk.key)
     fp_id = body["id"]
-    patch(f"businesses/{fp_id}/vault", data, tenant.sk.key)
-    post(f"businesses/{fp_id}/vault/validate", data, tenant.sk.key)
+    patch(f"businesses/{fp_id}/vault", data, sandbox_tenant.sk.key)
+    post(f"businesses/{fp_id}/vault/validate", data, sandbox_tenant.sk.key)
 
 
 @pytest.mark.parametrize(
@@ -39,21 +39,38 @@ def test_data_vaulting(tenant, key, value):
         ),
     ],
 )
-def test_data_validation(tenant, key, value, expected_error):
+def test_data_validation(sandbox_tenant, key, value, expected_error):
     # Can't create the business inline with invalid data
     data = {key: value}
-    post("businesses/", data, tenant.sk.key, status_code=400)
+    post("businesses/", data, sandbox_tenant.sk.key, status_code=400)
 
-    body = post("businesses/", None, tenant.sk.key)
+    body = post("businesses/", None, sandbox_tenant.sk.key)
     user = body
     fp_id = user["id"]
     assert fp_id
 
-    body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    body = patch(
+        f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
+    )
     # Should have a JSON error message with the invalid field identifier as the key
     assert body["error"]["message"][key] == expected_error
     # Validate endpoint should also fail
-    post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
+    post(
+        f"entities/{fp_id}/vault/validate", data, sandbox_tenant.sk.key, status_code=400
+    )
+
+
+def test_vault_benficial_owners(sandbox_tenant):
+    data = {
+        "business.beneficial_owners": [
+            {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50}
+        ]
+    }
+    body = post("businesses/", data, sandbox_tenant.sk.key)
+    fp_bid = body["id"]
+
+    body = get(f"businesses/{fp_bid}/owners", None, *sandbox_tenant.db_auths)
+    assert body[0]["ownership_stake"] == 50
 
 
 def test_external_id(tenant, sandbox_tenant):
