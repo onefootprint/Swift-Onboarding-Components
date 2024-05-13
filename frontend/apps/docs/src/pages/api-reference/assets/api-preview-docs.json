@@ -182,6 +182,42 @@
                 ]
             }
         },
+        "/onboarding/session": {
+            "post": {
+                "tags": [
+                    "Onboarding",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGenerates a single-use session token for a playbook.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOnboardingSessionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ObConfigSessionToken"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/org/risk_signals": {
             "get": {
                 "tags": [
@@ -1745,6 +1781,17 @@
                 },
                 "required": [
                     "kind"
+                ]
+            },
+            "CreateOnboardingSessionRequest": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "key"
                 ]
             },
             "CreateTagRequest": {
@@ -7597,6 +7644,18 @@
                 },
                 "required": [
                     "source"
+                ]
+            },
+            "ObConfigSessionToken": {
+                "type": "object",
+                "properties": {
+                    "session_token": {
+                        "description": "a one-time use session token for onboarding a new user",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "session_token"
                 ]
             },
             "OffsetPaginatedPublicAuthEvent": {

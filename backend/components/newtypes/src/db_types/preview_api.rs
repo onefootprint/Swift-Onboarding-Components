@@ -12,6 +12,7 @@ pub enum PreviewApi {
     AuthEventsList,
     DocumentsList,
     RiskSignalsList,
+    OnboardingSessionToken,
     VaultIntegrity,
     ReonboardUser,
     CreateUserDecision,

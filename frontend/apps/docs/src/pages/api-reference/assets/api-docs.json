@@ -319,42 +319,6 @@
                 ]
             }
         },
-        "/onboarding/session": {
-            "post": {
-                "tags": [
-                    "Onboarding",
-                    "PublicApi"
-                ],
-                "description": "Generates a single-use session token for an onboarding configuration.",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateOnboardingSessionRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ObConfigSessionToken"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
         "/onboarding/session/validate": {
             "post": {
                 "tags": [
@@ -2531,17 +2495,6 @@
                     "token"
                 ]
             },
-            "CreateOnboardingSessionRequest": {
-                "type": "object",
-                "properties": {
-                    "key": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "key"
-                ]
-            },
             "DecryptRequest": {
                 "type": "object",
                 "properties": {
@@ -3791,18 +3744,6 @@
                 },
                 "required": [
                     "id"
-                ]
-            },
-            "ObConfigSessionToken": {
-                "type": "object",
-                "properties": {
-                    "session_token": {
-                        "description": "a one-time use session token for onboarding a new user",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "session_token"
                 ]
             },
             "RawDataRequest": {

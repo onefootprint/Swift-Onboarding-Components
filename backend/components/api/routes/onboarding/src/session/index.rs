@@ -10,7 +10,7 @@ use crate::{
 };
 use api_core::auth::{session::ob_config::OnboardingSession, tenant::TenantGuard};
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::{ObConfigurationKey, SessionAuthToken};
+use newtypes::{ObConfigurationKey, PreviewApi, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -25,8 +25,8 @@ pub struct ObConfigSessionToken {
 }
 
 #[api_v2_operation(
-    description = "Generates a single-use session token for an onboarding configuration.",
-    tags(Onboarding, PublicApi)
+    description = "Generates a single-use session token for a playbook.",
+    tags(Onboarding, Preview)
 )]
 #[post("/onboarding/session")]
 pub async fn post(
@@ -34,6 +34,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<CreateOnboardingSessionRequest>,
 ) -> JsonApiResponse<ObConfigSessionToken> {
+    auth.check_preview_guard(PreviewApi::OnboardingSessionToken)?;
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
