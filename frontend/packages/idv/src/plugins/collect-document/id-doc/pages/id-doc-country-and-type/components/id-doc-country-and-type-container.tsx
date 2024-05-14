@@ -138,7 +138,7 @@ const IdDocCountryAndTypeContainer = ({
         fixtureResult: sandboxOutcome,
         deviceType: deviceType === 'mobile' ? 'mobile' : 'desktop',
         skipSelfie: !hasWebcam,
-        documentRequestId,
+        requestId: documentRequestId,
       },
       {
         onSuccess: data => {

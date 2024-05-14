@@ -8,7 +8,7 @@ import type {
 export type SubmitDocTypeRequest = {
   authToken: string;
   documentType: SupportedIdDocTypes | DocumentRequestKind;
-  documentRequestId: string;
+  requestId: string;
   fixtureResult?: IdDocOutcome;
   countryCode?: CountryCode;
   skipSelfie?: boolean;

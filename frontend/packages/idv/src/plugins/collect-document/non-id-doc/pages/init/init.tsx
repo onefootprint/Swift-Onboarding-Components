@@ -27,7 +27,7 @@ const Init = () => {
       {
         authToken,
         documentType: requestKindToDocType[config.kind as NonIdDocKinds],
-        documentRequestId,
+        requestId: documentRequestId,
         deviceType: device.type === 'mobile' ? 'mobile' : 'desktop',
       },
       {

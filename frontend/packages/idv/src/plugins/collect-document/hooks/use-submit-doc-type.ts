@@ -10,7 +10,7 @@ const submitDocType = async (payload: SubmitDocTypeRequest) => {
   const {
     authToken,
     documentType,
-    documentRequestId,
+    requestId,
     countryCode,
     fixtureResult,
     skipSelfie,
@@ -22,7 +22,7 @@ const submitDocType = async (payload: SubmitDocTypeRequest) => {
     data: {
       documentType,
       countryCode,
-      documentRequestId,
+      requestId,
       fixtureResult,
       skipSelfie,
       deviceType,
