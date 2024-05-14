@@ -66,6 +66,8 @@ pub struct ScopedVault {
     /// When the scoped vault was deactivated, if it has been deactivated.
     /// This was used by the deprecated DELETE /users/{fp_id} API.
     pub deactivated_at: Option<DateTime<Utc>>,
+    /// Denormalized from vault for faster querying
+    pub kind: VaultKind,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -83,6 +85,7 @@ struct NewScopedVault {
     snapshot_seqno: DataLifetimeSeqno,
     external_id: Option<ExternalId>,
     last_activity_at: DateTime<Utc>,
+    kind: VaultKind,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset)]
@@ -191,6 +194,7 @@ impl ScopedVault {
             // NOTE: for now we won't support adding an external id to
             // users created via Verify
             external_id: None,
+            kind: uv.kind,
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -255,6 +259,7 @@ impl ScopedVault {
                 show_in_search: true,
                 snapshot_seqno: seqno,
                 external_id,
+                kind: uv.kind,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)

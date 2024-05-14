@@ -1061,6 +1061,7 @@ diesel::table! {
         external_id -> Nullable<Text>,
         last_activity_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
+        kind -> Text,
     }
 }
 
