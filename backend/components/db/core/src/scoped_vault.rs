@@ -258,6 +258,7 @@ fn vaults_matching_search(
     } = search;
     // Search both plaintext results and fingerprinted results
     let plaintext_results = {
+        tracing::info!(search_len=%search.len(), "Searching for plaintext results");
         let plaintext_search = format!("%{}%", search.leak());
         // Be careful changing this query - it's optimized to use a specific index
         fingerprint::table
@@ -278,7 +279,7 @@ fn vaults_matching_search(
             .flat_map(|fps| &fps.0)
             .unique()
             .collect_vec();
-        tracing::info!(sh_datas=%Csv::from(all_fps.iter().cloned().collect_vec()), "Searching for fingerprints");
+        tracing::info!(sh_datas=%Csv::from(all_fps.iter().cloned().collect_vec()), "Searching for fingerprint results");
 
         // Be careful changing this query - it's optimized to use a specific index
         let results: HashMap<_, _> = fingerprint::table
