@@ -1,6 +1,7 @@
-import CustomSelect, {
+import {
   AddressInput,
   CustomInput,
+  CustomSelect,
   DobInput,
   EmailInput,
   FirstNameInput,
@@ -11,7 +12,7 @@ import CustomSelect, {
   Provider,
   SSN9Input,
   useFootprint,
-} from '@onefootprint/components';
+} from '@onefootprint/footprint-react';
 import {
   Box,
   Button,
