@@ -81,6 +81,8 @@ pub enum BoolFlag<'a> {
     RequireCaptureOnStepUp(&'a ObConfigurationKey),
     #[strum(to_string = "TenantCanViewNeuro")]
     TenantCanViewNeuro(&'a TenantId),
+    #[strum(to_string = "UseKycWaterfallV2Rollout")]
+    UseKycWaterfallV2Rollout(&'a TenantId),
 
     // Migrate to modern Rollout format
     #[strum(to_string = "UseBackupTwilioCredentialsRollout")]
@@ -137,6 +139,7 @@ impl<'a> BoolFlag<'a> {
             Self::IsNeuroEnabledForObc(k) => Some(k.to_string()),
             Self::RequireCaptureOnStepUp(k) => Some(k.to_string()),
             Self::TenantCanViewNeuro(k) => Some(k.to_string()),
+            Self::UseKycWaterfallV2Rollout(k) => Some(k.to_string()),
         }
     }
 
@@ -183,6 +186,7 @@ impl<'a> BoolFlag<'a> {
             Self::IsNeuroEnabledForObc(_) => false,
             Self::RequireCaptureOnStepUp(_) => false,
             Self::TenantCanViewNeuro(_) => false,
+            Self::UseKycWaterfallV2Rollout(_) => false,
         }
     }
 
@@ -232,6 +236,7 @@ impl<'a> BoolFlag<'a> {
             | Self::IsVaultProxyJitEndpointEnabled(_)
             | Self::IsNeuroEnabledForObc(_)
             | Self::RequireCaptureOnStepUp(_)
+            | Self::UseKycWaterfallV2Rollout(_)
             | Self::TenantCanViewNeuro(_) => false,
             // These are migrated to the newer format
             Self::PreferWhatsapp(_) => true,
