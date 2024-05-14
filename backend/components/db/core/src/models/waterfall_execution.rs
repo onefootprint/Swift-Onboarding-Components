@@ -68,6 +68,7 @@ impl WaterfallExecution {
     ) -> DbResult<Self> {
         let existing: Option<Self> = waterfall_execution::table
             .filter(waterfall_execution::decision_intent_id.eq(decision_intent_id))
+            .filter(waterfall_execution::completed_at.is_null())
             .get_result(conn)
             .optional()?;
         if let Some(res) = existing {
@@ -126,6 +127,16 @@ impl WaterfallExecution {
         let res = WaterfallStep::create(conn, args)?;
         let execution_update = UpdateWaterfallExecution::set_latest_step(next);
         let _ = Self::update(execution, conn, execution_update)?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("WaterfallExecution::list", skip_all)]
+    pub fn list(conn: &mut PgConn, di_id: &DecisionIntentId) -> DbResult<Vec<Self>> {
+        let res = waterfall_execution::table
+            .filter(waterfall_execution::decision_intent_id.eq(di_id))
+            .order_by(waterfall_execution::_created_at.asc())
+            .get_results(conn)?;
 
         Ok(res)
     }

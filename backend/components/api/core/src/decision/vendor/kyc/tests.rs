@@ -10,31 +10,40 @@ use crate::{
 use db::{
     models::{
         decision_intent::DecisionIntent, tenant_vendor::TenantVendorControl as DbTenantVendorControl,
-        verification_result::VerificationResult,
+        verification_result::VerificationResult, waterfall_execution::WaterfallExecution,
+        waterfall_step::WaterfallStep,
     },
     tests::{fixtures::ob_configuration::ObConfigurationOpts, MockFFClient},
 };
 use idv::ParsedResponse;
 use macros::test_state_case;
-use newtypes::{DecisionIntentKind, Vendor};
+use newtypes::{
+    DecisionIntentId, DecisionIntentKind, Vendor, VendorAPI, WaterfallExecutionId, WaterfallStepAction,
+};
 
 struct ExperianEnabled(bool);
 struct IdologyEnabled(bool);
 
+#[derive(Clone, Debug)]
 enum VR {
     ShouldntCall,
     Success(Qualifiers),
     Error,
     HardError,
 }
+#[derive(Clone, Debug)]
 enum Qualifiers {
     None,
     SsnDoesNotMatch,
     IdFlagged,
 }
+#[derive(Clone, Debug)]
 struct ExperianResponse(VR);
+#[derive(Clone, Debug)]
 struct IdologyResponse(VR);
 
+
+#[derive(Clone, Debug)]
 enum ExpectedResult {
     SingularSuccessVendorResult(Vendor),
     ErrVendorRequestsFailed,
@@ -372,7 +381,7 @@ async fn test_run_kyc_waterfall(
     ExperianEnabled(true),
     IdologyEnabled(true),
     Run(ExperianResponse(VR::Success(Qualifiers::IdFlagged)), IdologyResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
-    Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)) 
+    Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
     ; "Both vendors, Experian id flagged, Idology fails ssn match"
 )]
 // TODO: rule failures + error handling? :o , maybe 3 runs??
@@ -424,11 +433,20 @@ async fn test_run_kyc_waterfall_v2(
         1: idology_response,
         2: expected_result,
     } = run1;
-    mock_calls(state, experian_response, idology_response);
+    mock_calls(state, experian_response.clone(), idology_response.clone());
     // Function under test
     let res = waterfall_v2::run_kyc_waterfall(state, &di, &wf.id).await;
     // Assertions
-    assert_expected_result(state, expected_result, res).await;
+    assert_expected_result_with_wfe(
+        state,
+        expected_result,
+        experian_response,
+        idology_response,
+        &di.id,
+        1,
+        res,
+    )
+    .await;
 
     // Simulate re-running. Ones that suceeded already should noop. Ones that ended in error should remake vendor calls
     // Mock Run 2
@@ -437,11 +455,20 @@ async fn test_run_kyc_waterfall_v2(
         1: idology_response2,
         2: expected_result2,
     } = run2;
-    mock_calls(state, experian_response2, idology_response2);
+    mock_calls(state, experian_response2.clone(), idology_response2.clone());
     // Function under test
     let res2 = waterfall_v2::run_kyc_waterfall(state, &di, &wf.id).await;
     // Assertions
-    assert_expected_result(state, expected_result2, res2).await;
+    assert_expected_result_with_wfe(
+        state,
+        expected_result2,
+        experian_response2,
+        idology_response2,
+        &di.id,
+        2,
+        res2,
+    )
+    .await;
 }
 
 
@@ -467,13 +494,17 @@ fn mock_calls(state: &mut State, experian_response: ExperianResponse, idology_re
     match experian_response.0 {
         VR::ShouldntCall => (),
         VR::Success(qualifiers) => match qualifiers {
-            Qualifiers::None => test_utils::mock_experian(state, WithSsnResultCode(None), WithScore(Some("800"))),
-            Qualifiers::SsnDoesNotMatch => test_utils::mock_experian(state, WithSsnResultCode(Some("CY")), WithScore(Some("800"))),
+            Qualifiers::None => {
+                test_utils::mock_experian(state, WithSsnResultCode(None), WithScore(Some("800")))
+            }
+            Qualifiers::SsnDoesNotMatch => {
+                test_utils::mock_experian(state, WithSsnResultCode(Some("CY")), WithScore(Some("800")))
+            }
             Qualifiers::IdFlagged => {
                 test_utils::mock_experian(state, WithSsnResultCode(None), WithScore(Some("400")))
             }
         },
-        
+
         VR::Error => test_utils::mock_experian_parseable_error(state),
         VR::HardError => test_utils::mock_experian_hard_error(state),
     };
@@ -510,6 +541,27 @@ async fn assert_expected_result(
     };
 }
 
+async fn assert_expected_result_with_wfe(
+    state: &mut State,
+    expected_result: ExpectedResult,
+    experian_response: ExperianResponse,
+    idology_response: IdologyResponse,
+    di_id: &DecisionIntentId,
+    run_number: usize,
+    res: ApiResult<VendorResult>,
+) {
+    assert_waterfall_execution(
+        state,
+        expected_result.clone(),
+        experian_response,
+        idology_response,
+        di_id,
+        run_number,
+    )
+    .await;
+    assert_expected_result(state, expected_result, res).await;
+}
+
 async fn assert_vendor_result(state: &mut State, expected_vendor: Vendor, vr: VendorResult) {
     let vresid = vr.verification_result_id.clone();
     let (vreq, vres) = state
@@ -529,4 +581,225 @@ async fn assert_vendor_result(state: &mut State, expected_vendor: Vendor, vr: Ve
         )),
         _ => panic!(),
     };
+}
+
+
+async fn assert_waterfall_execution(
+    state: &mut State,
+    expected_result: ExpectedResult,
+    experian_response: ExperianResponse,
+    idology_response: IdologyResponse,
+    di_id: &DecisionIntentId,
+    run_number: usize,
+) {
+    match expected_result {
+        ExpectedResult::SingularSuccessVendorResult(_) | ExpectedResult::ErrVendorRequestsFailed => {
+            let diid = di_id.clone();
+            let wfes = state
+                .db_pool
+                .db_query(move |conn| WaterfallExecution::list(conn, &diid))
+                .await
+                .unwrap();
+            assert_eq!(wfes.len(), run_number);
+            // get the latest WFE
+            let wfe = wfes.last().unwrap();
+            assert!(wfe.completed_at.is_some());
+
+            assert_waterfall_execution_steps(state, experian_response, idology_response, wfe.id.clone()).await
+        }
+        ExpectedResult::ErrNotEnoughInformation => {
+            let diid = di_id.clone();
+            let wfes = state
+                .db_pool
+                .db_query(move |conn| WaterfallExecution::list(conn, &diid))
+                .await
+                .unwrap();
+            assert!(wfes.is_empty());
+        }
+    }
+}
+
+async fn assert_waterfall_execution_steps(
+    state: &mut State,
+    experian_response: ExperianResponse,
+    idology_response: IdologyResponse,
+    wfe_id: WaterfallExecutionId,
+) {
+    let mut wfs = state
+        .db_pool
+        .db_query(move |conn| WaterfallStep::list(conn, &wfe_id))
+        .await
+        .unwrap();
+    match (experian_response.0, idology_response.0) {
+        (VR::Success(q1), VR::Success(q2)) => {
+            assert_eq!(wfs.len(), 2);
+            let experian_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::ExperianPreciseId))
+                .unwrap();
+            let ido_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::IdologyExpectId))
+                .unwrap();
+            assert!(experian_step.verification_result_id.is_some());
+            assert!(!experian_step.verification_result_is_error.unwrap());
+            assert!(ido_step.verification_result_id.is_some());
+            assert!(!ido_step.verification_result_is_error.unwrap());
+            let expected_action_exp = match q1 {
+                Qualifiers::None => WaterfallStepAction::Pass,
+                Qualifiers::SsnDoesNotMatch => WaterfallStepAction::RuleTriggered,
+                Qualifiers::IdFlagged => WaterfallStepAction::IdFlagged,
+            };
+            let expected_action_ido = match q2 {
+                Qualifiers::None => WaterfallStepAction::Pass,
+                Qualifiers::SsnDoesNotMatch => WaterfallStepAction::RuleTriggered,
+                Qualifiers::IdFlagged => WaterfallStepAction::IdFlagged,
+            };
+
+            assert_eq!(experian_step.action.unwrap(), expected_action_exp);
+            assert_eq!(ido_step.action.unwrap(), expected_action_ido);
+        }
+        (VR::ShouldntCall, VR::ShouldntCall) => {
+            assert_eq!(wfs.len(), 0);
+        }
+        (VR::ShouldntCall, VR::Success(_)) => {
+            assert_eq!(wfs.len(), 1);
+            let step = wfs.pop().unwrap();
+            assert_eq!(step.vendor_api, VendorAPI::IdologyExpectId);
+            assert!(step.verification_result_id.is_some());
+            assert!(!step.verification_result_is_error.unwrap());
+            assert_eq!(step.action.unwrap(), WaterfallStepAction::Pass);
+        }
+        (VR::ShouldntCall, VR::Error) => {
+            assert_eq!(wfs.len(), 1);
+            let step = wfs.pop().unwrap();
+            assert_eq!(step.vendor_api, VendorAPI::IdologyExpectId);
+            assert!(step.verification_result_id.is_some());
+            assert!(step.verification_result_is_error.unwrap());
+            assert_eq!(step.action.unwrap(), WaterfallStepAction::VendorError);
+        }
+        (VR::Success(_), VR::ShouldntCall) => {
+            assert_eq!(wfs.len(), 1);
+            let step = wfs.pop().unwrap();
+            assert_eq!(step.vendor_api, VendorAPI::ExperianPreciseId);
+            assert!(step.verification_result_id.is_some());
+            assert!(!step.verification_result_is_error.unwrap());
+            assert_eq!(step.action.unwrap(), WaterfallStepAction::Pass)
+        }
+        (VR::Success(q), VR::Error) => {
+            assert_eq!(wfs.len(), 2);
+            let experian_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::ExperianPreciseId))
+                .unwrap();
+            let ido_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::IdologyExpectId))
+                .unwrap();
+            assert!(experian_step.verification_result_id.is_some());
+            assert!(!experian_step.verification_result_is_error.unwrap());
+            assert!(ido_step.verification_result_id.is_some());
+            assert!(ido_step.verification_result_is_error.unwrap());
+            assert_eq!(ido_step.action.unwrap(), WaterfallStepAction::VendorError);
+
+            let exp_action = experian_step.action.unwrap();
+            let expected_action = match q {
+                Qualifiers::None => WaterfallStepAction::Pass,
+                Qualifiers::SsnDoesNotMatch => WaterfallStepAction::RuleTriggered,
+                Qualifiers::IdFlagged => WaterfallStepAction::IdFlagged,
+            };
+
+            assert_eq!(exp_action, expected_action);
+        }
+        (VR::Success(_), VR::HardError) => {
+            assert_eq!(wfs.len(), 2);
+            let experian_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::ExperianPreciseId))
+                .unwrap();
+            let ido_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::IdologyExpectId))
+                .unwrap();
+            assert!(experian_step.verification_result_id.is_some());
+            assert!(!experian_step.verification_result_is_error.unwrap());
+            assert!(ido_step.verification_result_id.is_some());
+            assert!(ido_step.verification_result_is_error.unwrap());
+        }
+        (VR::Error, VR::Success(q)) => {
+            assert_eq!(wfs.len(), 2);
+            let experian_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::ExperianPreciseId))
+                .unwrap();
+            let ido_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::IdologyExpectId))
+                .unwrap();
+            assert!(ido_step.verification_result_id.is_some());
+            assert!(!ido_step.verification_result_is_error.unwrap());
+            assert!(experian_step.verification_result_id.is_some());
+            assert!(experian_step.verification_result_is_error.unwrap());
+            assert_eq!(experian_step.action.unwrap(), WaterfallStepAction::VendorError);
+
+            let ido_action = ido_step.action.unwrap();
+            let expected_action = match q {
+                Qualifiers::None => WaterfallStepAction::Pass,
+                Qualifiers::SsnDoesNotMatch => WaterfallStepAction::RuleTriggered,
+                Qualifiers::IdFlagged => WaterfallStepAction::IdFlagged,
+            };
+
+            assert_eq!(ido_action, expected_action);
+        }
+        (VR::HardError, VR::Success(_)) => {
+            assert_eq!(wfs.len(), 2);
+            let experian_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::ExperianPreciseId))
+                .unwrap();
+            let ido_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::IdologyExpectId))
+                .unwrap();
+            assert!(ido_step.verification_result_id.is_some());
+            assert!(!ido_step.verification_result_is_error.unwrap());
+            assert!(experian_step.verification_result_id.is_some());
+            assert!(experian_step.verification_result_is_error.unwrap());
+        }
+        (VR::HardError, VR::HardError) => {
+            assert_eq!(wfs.len(), 2);
+            let experian_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::ExperianPreciseId))
+                .unwrap();
+            let ido_step = wfs
+                .iter()
+                .find(|ws| matches!(ws.vendor_api, VendorAPI::IdologyExpectId))
+                .unwrap();
+            assert!(ido_step.verification_result_id.is_some());
+            assert!(ido_step.verification_result_is_error.unwrap());
+            assert!(experian_step.verification_result_id.is_some());
+            assert!(experian_step.verification_result_is_error.unwrap());
+        }
+        (VR::Error, VR::ShouldntCall) => {
+            assert_eq!(wfs.len(), 1);
+            let step = wfs.pop().unwrap();
+            assert_eq!(step.vendor_api, VendorAPI::ExperianPreciseId);
+            assert!(step.verification_result_id.is_some());
+            assert!(step.verification_result_is_error.unwrap());
+            assert_eq!(step.action.unwrap(), WaterfallStepAction::VendorError);
+        }
+        (VR::Error, VR::Error) => {
+            assert_eq!(wfs.len(), 2);
+            assert!(wfs.iter().all(|s| s.verification_result_is_error.unwrap()));
+            assert!(wfs
+                .iter()
+                .all(|s| matches!(s.action.unwrap(), WaterfallStepAction::VendorError)));
+        }
+        (a, a2) => {
+            println!("{:?}", a);
+            println!("{:?}", a2);
+            unimplemented!()
+        }
+    }
 }

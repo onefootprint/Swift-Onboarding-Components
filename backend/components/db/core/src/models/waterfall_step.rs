@@ -1,4 +1,4 @@
-use crate::{DbResult, TxnPgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::waterfall_step;
 use newtypes::{
@@ -142,6 +142,15 @@ impl WaterfallStep {
             .filter(waterfall_step::step.eq(step))
             .get_result(conn.conn())
             .optional()?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("WaterfallStep::list", skip(conn))]
+    pub fn list(conn: &mut PgConn, execution_id: &WaterfallExecutionId) -> DbResult<Vec<Self>> {
+        let res: Vec<Self> = waterfall_step::table
+            .filter(waterfall_step::execution_id.eq(execution_id))
+            .get_results(conn)?;
 
         Ok(res)
     }
