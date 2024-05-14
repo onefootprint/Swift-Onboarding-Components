@@ -1,6 +1,5 @@
 import arrow
 import pytest
-from tests.bifrost.test_components_sdk import create_user_with_components_token
 from tests.bifrost_client import BifrostClient
 from tests.dashboard.utils import update_rules
 from tests.utils import (
@@ -309,11 +308,8 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
         expected_status,
         expected_rule_results,
     ) in expected_rule_evals:
-        components_token, token, bifrost = create_user_with_components_token(
-            sandbox_tenant,
-            obc=obc,
-        )
-        patch("hosted/user/vault", vault_data, components_token)
+        bifrost = BifrostClient.new(obc)
+        patch("hosted/user/vault", vault_data, bifrost.auth_token)
         user = bifrost.run()
         fp_id = user.fp_id
 
