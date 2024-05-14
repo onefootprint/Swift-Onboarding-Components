@@ -21,10 +21,9 @@ use itertools::Itertools;
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, BillingEventKind, DataIdentifier, DataLifetimeSeqno,
     DataLifetimeSource, DataRequest, DecisionIntentId, DocumentDiKind, DocumentFixtureResult, DocumentId,
-    DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind, IncodeConfigurationId,
-    IncodeEnvironment, IncodeSessionId, IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode,
-    OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey,
-    VendorAPI, WorkflowId,
+    DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind, IncodeConfigurationId, IncodeEnvironment,
+    IncodeSessionId, IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode, OcrDataKind as ODK,
+    PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -340,7 +339,7 @@ async fn get_curp_for_check(
         let decrypted_curp = if vw.get(&di).is_some() {
             vw.decrypt_unchecked_single(enclave_client, di).await?
         } else {
-            tracing::error!(doc=?doc.id, "{}", format!("missing curp for {:?}", doc.vaulted_document_type));
+            tracing::warn!(doc=?doc.id, "{}", format!("missing curp for {:?}", doc.vaulted_document_type));
 
             None
         };
