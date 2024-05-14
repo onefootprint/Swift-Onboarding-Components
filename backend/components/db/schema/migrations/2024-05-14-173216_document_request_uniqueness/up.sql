@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS document_request_workflow_kind;
