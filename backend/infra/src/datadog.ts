@@ -46,6 +46,7 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
     .all([integration.externalId, secretsStore.datadogApiKey.arn])
     .apply(([ddIamExternalId, ddApiKeyArn]) => {
       let ddIntegrationRole = new aws.iam.Role(ddIntegrationRoleName, {
+        name: ddIntegrationRoleName,
         assumeRolePolicy: JSON.stringify({
           Version: '2012-10-17',
           Statement: [
