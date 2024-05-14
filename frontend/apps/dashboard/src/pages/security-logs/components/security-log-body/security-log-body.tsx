@@ -13,6 +13,9 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.security-logs.body',
   });
+  const { insightEvent } = accessEvent;
+  const { fpId, reason } = accessEvent.detail.data;
+
   return (
     <Stack direction="column" gap={9}>
       <Stack direction="column" gap={5}>
@@ -23,12 +26,12 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
           </Text>
           <Grid.Item column="2 / span 3">
             <CodeInline size="compact" isPrivate>
-              {accessEvent.fpId}
+              {fpId}
             </CodeInline>
           </Grid.Item>
         </Grid.Container>
       </Stack>
-      {accessEvent.insightEvent && (
+      {insightEvent && (
         <Stack direction="column" gap={5}>
           <Text variant="label-4">{t('metadata')}</Text>
           <Grid.Container columns={['repeat(4, minmax(0, 1fr))']} gap={2}>
@@ -36,33 +39,33 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
               {t('region')}
             </Text>
             <Text variant="body-4" isPrivate>
-              {getRegionForInsightEvent(accessEvent.insightEvent) || '-'}
+              {getRegionForInsightEvent(insightEvent) || '-'}
             </Text>
             <Text variant="body-4" color="tertiary">
               {t('ip-address')}
             </Text>
             <Text variant="body-4" isPrivate>
-              {accessEvent.insightEvent.ipAddress || '-'}
+              {insightEvent.ipAddress || '-'}
             </Text>
             <Text variant="body-4" color="tertiary">
               {t('country')}
             </Text>
             <Text variant="body-4" isPrivate>
-              {accessEvent.insightEvent.country || '-'}
+              {insightEvent.country || '-'}
             </Text>
             <Text variant="body-4" color="tertiary">
               {t('device-os')}
             </Text>
             <Box overflow="hidden" gridArea="2 / 4 / span 2 / span 1">
               <Text variant="body-4" overflow="hidden" isPrivate>
-                {displayForUserAgent(accessEvent.insightEvent.userAgent || '')}
+                {displayForUserAgent(insightEvent.userAgent || '')}
               </Text>
             </Box>
             <Text variant="body-4" color="tertiary">
               Zip code
             </Text>
             <Text variant="body-4" isPrivate>
-              {accessEvent.insightEvent.postalCode || '-'}
+              {insightEvent.postalCode || '-'}
             </Text>
           </Grid.Container>
         </Stack>
@@ -70,7 +73,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
       <Stack direction="column" gap={5}>
         <Text variant="label-4">Reason</Text>
         <Text variant="body-4" color="secondary">
-          {accessEvent.reason || '-'}
+          {reason || '-'}
         </Text>
       </Stack>
     </Stack>

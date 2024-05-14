@@ -238,6 +238,8 @@ export {
 export type { GetOrgRiskSignalsResponse } from './api/get-org-risk-signals';
 export type {
   AccessEvent,
+  AccessEventKind,
+  AccessEventName,
   AccessLog,
   Actor,
   ActorApiKey,
@@ -385,7 +387,6 @@ export type {
   WorkflowTriggeredEventData,
 } from './data';
 export {
-  AccessEventKind,
   AccessLogKind,
   ActorKind,
   augmentEntityWithOnboardingInfo,

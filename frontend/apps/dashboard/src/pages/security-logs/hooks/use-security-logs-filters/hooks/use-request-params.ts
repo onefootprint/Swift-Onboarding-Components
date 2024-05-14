@@ -11,7 +11,7 @@ const useRequestParams = ({
 }: SecurityLogsFilterValues) => {
   const requestParams = useMemo(() => {
     const params: Record<string, unknown> = {
-      kind: 'decrypt',
+      names: 'decrypt_user_data',
     };
     if (dateRange.length) {
       const { from, to } = getDateRange(dateRange);

@@ -20,7 +20,7 @@ const getAccessEventsRequest = async (
     headers: authHeaders,
     method: 'GET',
     params,
-    url: '/org/access_events',
+    url: '/org/audit_events',
   });
   return response.data;
 };

@@ -1,5 +1,8 @@
-export type { AccessEvent } from './access-event';
-export { AccessEventKind } from './access-event';
+export type {
+  AccessEvent,
+  AccessEventKind,
+  AccessEventName,
+} from './access-event';
 export type { AccessLog } from './access-log';
 export { AccessLogKind } from './access-log';
 export type {

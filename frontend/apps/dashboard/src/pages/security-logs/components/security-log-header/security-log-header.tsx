@@ -8,22 +8,27 @@ type SecurityLogHeaderProps = {
   accessEvent: AccessEvent;
 };
 
-const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => (
-  <Stack
-    align="center"
-    justify="flex-start"
-    flexWrap="wrap"
-    gap={2}
-    marginTop={2}
-  >
-    <FieldTagList targets={accessEvent.targets} />
-    <Text variant="body-4">
-      {accessEvent.targets.length > 1 ? 'were' : 'was'} accessed by
-    </Text>
-    <Text variant="label-4">
-      {accessEvent.principal || 'an automated process'}{' '}
-    </Text>
-  </Stack>
-);
+const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => {
+  const targets = accessEvent.detail.data.decryptedFields;
+  const actor =
+    accessEvent.principal.member ||
+    accessEvent.principal.name ||
+    'an automated process';
+  return (
+    <Stack
+      align="center"
+      justify="flex-start"
+      flexWrap="wrap"
+      gap={2}
+      marginTop={2}
+    >
+      <FieldTagList targets={targets} />
+      <Text variant="body-4">
+        {targets.length > 1 ? 'were' : 'was'} accessed by
+      </Text>
+      <Text variant="label-4">{actor || 'an automated process'} </Text>
+    </Stack>
+  );
+};
 
 export default SecurityLogHeader;
