@@ -42,11 +42,13 @@ export abstract class ServiceContainers {
     assetsCdn: assets.AssetCdn,
     nitroService: NitroServiceOutput,
     otelExtraAttributes: Map<string, string>,
+    datadogTags: Map<string, string>,
     logGroupComponent: string,
     containerArgs: string[],
     knobs: Knobs,
   ): Promise<ContainersOutput> {
     const otelCollectorContainerName = 'otelcollector';
+    const datadogAgentContainerName = 'datadog-agent';
     const serverContainerName = 'fpc';
 
     // Note: The appPort may not be useful for cron tasks unless there are
@@ -62,9 +64,16 @@ export abstract class ServiceContainers {
       logGroupComponent,
     );
 
+    const datadogAgent = ServiceContainers.createDatadogAgent(
+      datadogAgentContainerName,
+      secretsStore,
+      datadogTags,
+    );
+
     const monolith = await ServiceContainers.createMonolith(
       serverContainerName,
       otelCollectorContainerName,
+      datadogAgentContainerName,
       appPort,
       constants,
       secretsStore,
@@ -82,9 +91,9 @@ export abstract class ServiceContainers {
     );
 
     const definitions = pulumi
-      .all([traceOtelCollector, monolith])
-      .apply(([traceOtelCollector, monolith]) => {
-        const def = [monolith, traceOtelCollector];
+      .all([traceOtelCollector, datadogAgent, monolith])
+      .apply(([traceOtelCollector, datadogAgent, monolith]) => {
+        const def = [monolith, datadogAgent, traceOtelCollector];
         return JSON.stringify(def);
       });
 
@@ -100,6 +109,7 @@ export abstract class ServiceContainers {
   static async createMonolith(
     name: string,
     traceOtelCollectorContainerName: string,
+    datadogAgentContainerName: string,
     appPort: number,
     constants: Config,
     secretsStore: StaticSecrets,
@@ -612,6 +622,10 @@ export abstract class ServiceContainers {
                 containerName: traceOtelCollectorContainerName,
                 condition: 'HEALTHY',
               },
+              {
+                containerName: datadogAgentContainerName,
+                condition: 'START',
+              },
             ],
             portMappings: [
               {
@@ -709,6 +723,67 @@ export abstract class ServiceContainers {
               'awslogs-stream-prefix': 'ecs',
             },
           },
+        };
+
+        return def;
+      });
+
+    return out;
+  }
+
+  /**
+   * Datadog Agent
+   */
+  static createDatadogAgent(
+    name: string,
+    secrets: StaticSecrets,
+    datadogTags: Map<string, string>,
+  ): pulumi.Output<aws.ecs.ContainerDefinition> {
+    const metadata = GetStackMetadata();
+    const out = pulumi
+      .all([secrets.datadogApiKey.arn])
+      .apply(([datadogApiKey]) => [
+        {
+          name: 'DD_API_KEY',
+          valueFrom: datadogApiKey,
+        },
+      ])
+      .apply(secrets => {
+        let def: aws.ecs.ContainerDefinition = {
+          name,
+          image:
+            'public.ecr.aws/datadog/agent:7@sha256:4064da01d0db2e30c5331e3cedf7a43478ab6b215efe1885cc6f50a05a467263',
+          essential: true,
+          secrets,
+          portMappings: [
+            {
+              // DogStatsD
+              containerPort: 8125,
+              hostPort: 8125,
+              protocol: 'tcp',
+            },
+            {
+              // APM Trace Agent
+              containerPort: 8126,
+              hostPort: 8126,
+              protocol: 'tcp',
+            },
+          ],
+          environment: [
+            {
+              name: 'ECS_FARGATE',
+              value: 'true',
+            },
+            {
+              name: 'DD_TAGS',
+              value: [
+                `env:${metadata.shortStackName}`,
+                ...Array.from(datadogTags.entries()).map(
+                  ([k, v]) => `${k}:${v}`,
+                ),
+              ].join(' '),
+            },
+          ],
         };
 
         return def;

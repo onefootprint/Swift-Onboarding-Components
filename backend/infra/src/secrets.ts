@@ -231,6 +231,11 @@ export async function LoadSecrets(
           Effect: 'Allow',
           Resource: 'arn:aws:ssm:*:*:parameter/static_secrets/*',
         },
+        {
+          Action: ['secretsmanager:GetSecretValue'],
+          Effect: 'Allow',
+          Resource: 'arn:aws:secretsmanager:*:*:secret:static_secrets/*',
+        },
       ],
     }),
   });
@@ -498,6 +503,7 @@ export async function LoadSecrets(
       `openai-api-key-${stack}`,
       secretConstants.openaiApiKey,
     ),
+    // Datadog Forwarder Lambda needs a Secrets Manager secret.
     datadogApiKey: createSecretsManagerSecret(
       `datadog-api-key-${stack}`,
       datadogApiKey,
@@ -525,6 +531,7 @@ function createSecretsManagerSecret(
   secretVal: pulumi.Output<string>,
 ): aws.secretsmanager.Secret {
   const secret = new aws.secretsmanager.Secret(`secret-${name}`, {
+    name: `static_secrets/${name}`,
     description: name,
     forceOverwriteReplicaSecret: true,
   });

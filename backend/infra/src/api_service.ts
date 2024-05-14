@@ -66,7 +66,10 @@ export async function CreateApiService(
     g.buckets,
     g.assetCdn,
     nitroService,
+    // Honeycomb
     new Map([['component', 'api']]),
+    // Datadog
+    new Map([['service', `fpc-api`]]),
     '',
     ['api-server'],
     {

@@ -32,9 +32,15 @@ export async function CreateScheduledTasks(
         g.buckets,
         g.assetCdn,
         nitroService,
+        // Honeycomb
         new Map([
           ['component', 'cron'],
           ['cron.name', cronTask.name],
+        ]),
+        // Datadog
+        new Map([
+          ['service', `cron`],
+          ['cron', cronTask.name],
         ]),
         cronTask.name,
         cronTask.args,

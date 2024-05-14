@@ -30,9 +30,15 @@ export async function CreateWorkerTasks(
         g.buckets,
         g.assetCdn,
         nitroService,
+        // Honeycomb
         new Map([
           ['component', 'worker'],
           ['worker.name', worker.name],
+        ]),
+        // Datadog
+        new Map([
+          ['service', `worker`],
+          ['worker', worker.name],
         ]),
         worker.name,
         worker.args,
