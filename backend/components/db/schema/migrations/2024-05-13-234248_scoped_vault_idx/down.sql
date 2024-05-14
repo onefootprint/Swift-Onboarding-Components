@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY scoped_vault_query;
