@@ -8,7 +8,8 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     output::Csv, CipKind, CollectedData as CD, CollectedDataOption as CDO, CollectedDataOptionKind as CDOK,
-    DataIdentifierDiscriminant, DocumentRequestConfig, EnhancedAmlOption, ObConfigurationKind, TenantId,
+    DataIdentifierDiscriminant as DID, DocumentRequestConfig, EnhancedAmlOption, ObConfigurationKind,
+    TenantId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -278,9 +279,9 @@ impl ObConfigurationArgsToValidate {
         let is_field_allowed = match self.kind {
             ObConfigurationKind::Auth => |cdo: &CDO| -> bool { matches!(cdo, CDO::Email | CDO::PhoneNumber) },
             ObConfigurationKind::Kyb => |_: &CDO| -> bool { true },
-            ObConfigurationKind::Kyc => |cdo: &CDO| -> bool {
-                cdo.parent().data_identifier_kind() != DataIdentifierDiscriminant::Business
-            },
+            ObConfigurationKind::Kyc => {
+                |cdo: &CDO| -> bool { cdo.parent().data_identifier_kind() != DID::Business }
+            }
             ObConfigurationKind::Document => |cdo: &CDO| -> bool { matches!(cdo, CDO::Document(_)) },
         };
         let collected_disallowed_fields = self
@@ -305,6 +306,25 @@ impl ObConfigurationArgsToValidate {
             }
             if !self.skip_confirm {
                 return Err(ValidationError("Playbook of kind document must skip confirm").into());
+            }
+        }
+
+        // KYB playbooks have some additional rules around collecting KYC data
+        if self.kind == ObConfigurationKind::Kyb {
+            let has_bo_cdo = self.must_collect_data.contains(&CDO::BusinessBeneficialOwners)
+                || self
+                    .must_collect_data
+                    .contains(&CDO::BusinessKycedBeneficialOwners);
+            let collecting_kyc_data = self
+                .must_collect_data
+                .iter()
+                .any(|cdo| cdo.parent().data_identifier_kind() == DID::Id);
+            if has_bo_cdo != collecting_kyc_data {
+                return ValidationError("Must collect identity data if and only if collecting BOs").into();
+            }
+
+            if !has_bo_cdo && !self.skip_kyc {
+                return ValidationError("Must skip KYC if not collecting BOs").into();
             }
         }
 

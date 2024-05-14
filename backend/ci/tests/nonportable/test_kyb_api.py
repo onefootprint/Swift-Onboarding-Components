@@ -24,6 +24,7 @@ def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
         must_collect_data,
         must_collect_data,
         kind="kyb",
+        skip_kyc=True,
     )
 
     # make API-created Business vault with no BO data present

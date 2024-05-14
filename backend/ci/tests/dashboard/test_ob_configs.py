@@ -745,6 +745,7 @@ def test_business_only_obc(sandbox_tenant):
         "business_phone_number",
         "business_website",
         "business_beneficial_owners",
+        "name",
     ]
     data = dict(
         name="Let's skip the phone",
