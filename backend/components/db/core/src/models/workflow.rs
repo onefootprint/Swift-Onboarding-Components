@@ -109,7 +109,7 @@ struct WorkflowUpdateRow {
 #[derive(Debug, Default)]
 pub struct WorkflowUpdate {
     update: WorkflowUpdateRow,
-    decision: Option<NewDecisionArgs>,
+    new_decision: Option<NewDecisionArgs>,
 }
 
 impl WorkflowUpdate {
@@ -118,21 +118,21 @@ impl WorkflowUpdate {
             status: Some(status),
             ..Default::default()
         };
-        let decision = None;
-        Self { update, decision }
+        let new_decision = None;
+        Self { update, new_decision }
     }
 
     /// Similar to set_decision, but updates based on information from the OBD
-    pub fn set_decision(wf: &Locked<Workflow>, decision: NewDecisionArgs) -> Self {
+    pub fn set_decision(wf: &Locked<Workflow>, new_decision: NewDecisionArgs) -> Self {
         let is_first_fp_decision =
-            wf.decision_made_at.is_none() && matches!(decision.actor, DbActor::Footprint);
+            wf.decision_made_at.is_none() && matches!(new_decision.actor, DbActor::Footprint);
         let update = WorkflowUpdateRow {
-            status: Some(decision.status.into()),
+            status: Some(new_decision.status.into()),
             decision_made_at: is_first_fp_decision.then_some(Some(Utc::now())),
             ..Default::default()
         };
-        let decision = Some(decision);
-        Self { update, decision }
+        let new_decision = Some(new_decision);
+        Self { update, new_decision }
     }
 
     pub fn is_authorized() -> Self {
@@ -140,8 +140,8 @@ impl WorkflowUpdate {
             authorized_at: Some(Some(Utc::now())),
             ..Default::default()
         };
-        let decision = None;
-        Self { update, decision }
+        let new_decision = None;
+        Self { update, new_decision }
     }
 }
 
@@ -568,9 +568,10 @@ impl Workflow {
 
     #[tracing::instrument("Workflow::update", skip_all)]
     pub fn update(wf: Locked<Self>, conn: &mut TxnPgConn, update: WorkflowUpdate) -> DbResult<Self> {
+        let WorkflowUpdate { update, new_decision } = update;
         let requires_manual_review_before_update =
             !ManualReview::get_active(conn, &wf.scoped_vault_id)?.is_empty();
-        if update.update.authorized_at.is_some() {
+        if update.authorized_at.is_some() {
             let update = ScopedVaultUpdate {
                 is_billable: Some(true),
                 ..Default::default()
@@ -578,7 +579,7 @@ impl Workflow {
             ScopedVault::update(conn, &wf.scoped_vault_id, update)?;
         }
 
-        if update.update.decision_made_at.is_some() {
+        if update.decision_made_at.is_some() {
             // We are making the first decision for this workflow. Create the billing event(s)
             if let Some(obc_id) = wf.ob_configuration_id.as_ref() {
                 use newtypes::EnhancedAmlOption;
@@ -594,15 +595,15 @@ impl Workflow {
             }
         }
 
-        let new_status = update.update.status;
+        let new_status = update.status;
         // TODO short circuit if nothing changed? like status is the same?
         let result = diesel::update(workflow::table)
             .filter(workflow::id.eq(&wf.id))
-            .set(update.update)
+            .set(update)
             .get_result(conn.conn())?;
 
         // Make the new OnboardingDecision if any
-        if let Some(decision) = update.decision {
+        if let Some(decision) = new_decision {
             let manual_reviews = decision.manual_reviews.clone();
             let decision = OnboardingDecision::create(conn, &result, decision)?;
             // NOTE: MUST do all manual review bookkeeping before sending the webhooks below
