@@ -192,6 +192,12 @@ config:
   infra:honeycomb:
     apiKey:
       secure: v1:OvsQ2EQpwZgDtXX2:gnCIfaNIoMI6yGAeDyc0qBFzp9f3WgptY1RBtOtR9mZBEAsf2bo=
+  infra:datadogApiKey:
+    secure: v1:qrIj6oPumKT7EcOa:bQ/WVSwrmVucwwj3cGN8SbP6MoXbOBC2bbEYb+mRpUBiY8rxmofqRFdufkyWw4sP
+  datadog:apiKey:
+    secure: v1:qrIj6oPumKT7EcOa:bQ/WVSwrmVucwwj3cGN8SbP6MoXbOBC2bbEYb+mRpUBiY8rxmofqRFdufkyWw4sP
+  datadog:appKey:
+    secure: v1:05ky/WfsOxOVc27O:f0uOD4qJPZOITicyezH3gmm9MMsNPJ/JfyTOjph6YCpKF84n3rsWM00qwsvaSiY8mJmUZtDVJ/U=
   infra:neon:
     apiKey:
       secure: v1:DTxrP6ue5m+XRElP:F0NmXy8+hG3p2oIqjwBxQReI8O5HHWNRMMYWm2gaSyacA6PMAEes/wjY6fuXfXximCNjjKsBsfw4YJr2BbSAf2/p82rljaWgCTMFHUd1z58=

@@ -70,6 +70,7 @@ export interface StaticSecrets {
   neuroIdApiKey: aws.ssm.Parameter;
   neuroIdApiKeyTest: aws.ssm.Parameter;
   openaiApiKey: aws.ssm.Parameter;
+  datadogApiKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -95,6 +96,7 @@ interface SecretConstants {
   lexis: Lexis;
   neuro: Neuro;
   openaiApiKey: string;
+  datadogApiKey: string;
 }
 
 interface ElasticSecrets {
@@ -261,6 +263,8 @@ export async function LoadSecrets(
     config.requireSecretObject<SecretConstants>('constants');
 
   const enclaveProxySecretName = `enclaveProxySecret-${stack}`;
+
+  const datadogApiKey = config.requireSecret('datadogApiKey');
 
   return {
     secretsPolicyArn: secretsPolicy.arn,
@@ -493,6 +497,10 @@ export async function LoadSecrets(
     openaiApiKey: createSecretParameter(
       `openai-api-key-${stack}`,
       secretConstants.openaiApiKey,
+    ),
+    datadogApiKey: createSecretParameter(
+      `datadog-api-key-${stack}`,
+      datadogApiKey,
     ),
   };
 }

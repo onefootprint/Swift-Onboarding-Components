@@ -1,11 +1,15 @@
 #! /bin/sh
 
-read -p "AWS profile name? (in ~/.aws/config): " profileName
+# To login, run `source pulumi_login.sh`.
+
+printf "AWS profile name? (in ~/.aws/config): "
+read profileName
 export AWS_PROFILE=$profileName AWS_REGION=us-east-1
 
 # Set the right pulumi stack
-read -p "Environment? (dev/prod): " enviro
-case $enviro in 
+printf "Environment? (dev/prod): "
+read enviro
+case $enviro in
 	dev ) ;;
 	prod ) ;;
 	* ) echo "invalid environment selected";

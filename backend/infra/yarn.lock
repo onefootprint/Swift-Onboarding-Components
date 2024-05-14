@@ -792,6 +792,13 @@
     "@types/aws-lambda" "^8.10.23"
     mime "^2.0.0"
 
+"@pulumi/datadog@^4.28.0":
+  version "4.28.0"
+  resolved "https://registry.yarnpkg.com/@pulumi/datadog/-/datadog-4.28.0.tgz#14ff633ecb7d8775912a6f725cbb7a433047e219"
+  integrity sha512-3d8bfRck3e+rjhoRurB/wxIL7TmqyQGAKlyv7QQDoSYhdGicSm/wCGISgi44qRJfD/NvlbLMy6J8Lp/KYUF2kA==
+  dependencies:
+    "@pulumi/pulumi" "^3.0.0"
+
 "@pulumi/docker@^3.0.0":
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/@pulumi/docker/-/docker-3.6.1.tgz#a216c9bd2bbd35dd7091db2827a3a434adff021c"
