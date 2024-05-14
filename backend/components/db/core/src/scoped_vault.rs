@@ -198,7 +198,7 @@ macro_rules! list_query {
         }
 
         if let Some(kind) = $params.kind.as_ref() {
-            query = query.filter(vault::kind.eq(kind))
+            query = query.filter(scoped_vault::kind.eq(kind))
         }
 
         if let Some(playbook_ids) = $params.playbook_ids.as_ref() {

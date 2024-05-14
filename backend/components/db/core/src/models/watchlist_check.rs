@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{DbResult, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
-use db_schema::schema::{ob_configuration, scoped_vault, task, vault, watchlist_check, workflow};
+use db_schema::schema::{ob_configuration, scoped_vault, task, watchlist_check, workflow};
 use diesel::{
     dsl::{count, count_star, max, not},
     prelude::*,
@@ -212,8 +212,7 @@ impl WatchlistCheck {
         let res = scoped_vault::table
             .filter(scoped_vault::is_live.eq(true))
             .filter(scoped_vault::deactivated_at.is_null()) // Ignore deactivated scoped vaults.
-            .inner_join(vault::table)
-            .filter(vault::kind.eq(VaultKind::Person))
+            .filter(scoped_vault::kind.eq(VaultKind::Person))
             .filter(not(scoped_vault::tenant_id.eq_any(vec!["org_e2FHVfOM5Hd3Ce492o5Aat", "org_hyZP3ksCvsT0AlLqMZsgrI"]))) // footprint live + acme
             .filter(not(scoped_vault::tenant_id.like("_private_it_org_%")))
             .left_join(

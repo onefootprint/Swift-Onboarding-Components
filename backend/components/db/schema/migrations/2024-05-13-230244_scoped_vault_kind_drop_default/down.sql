@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault ALTER COLUMN kind SET DEFAULT 'person';

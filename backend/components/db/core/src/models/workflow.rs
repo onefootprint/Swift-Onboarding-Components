@@ -730,14 +730,14 @@ impl Workflow {
         end_date: DateTime<Utc>,
         kind: VaultKind,
     ) -> DbResult<i64> {
-        use db_schema::schema::{ob_configuration, scoped_vault, vault};
+        use db_schema::schema::{ob_configuration, scoped_vault};
         let mut query = workflow::table
-            .inner_join(scoped_vault::table.inner_join(vault::table))
+            .inner_join(scoped_vault::table)
             .inner_join(ob_configuration::table)
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(true))
             // Include deactivated scoped vaults.
-            .filter(vault::kind.eq(kind))
+            .filter(scoped_vault::kind.eq(kind))
             // We won't charge tenants for workflows that didn't finish authorizing, even if we
             // already ran KYC checks
             .filter(not(workflow::authorized_at.is_null()))
