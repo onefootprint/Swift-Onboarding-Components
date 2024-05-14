@@ -331,7 +331,8 @@ pub fn fingerprint_server_api_fake_event() -> serde_json::Value {
       }
     })
 }
-pub fn experian_cross_core_response(ssn_result_code: Option<&str>) -> serde_json::Value {
+pub fn experian_cross_core_response(ssn_result_code: Option<&str>, score: Option<&str>) -> serde_json::Value {
+    let score = score.unwrap_or("656");
     let ssn_result_code = ssn_result_code.unwrap_or("EA");
     serde_json::json!({
         "responseHeader": {
@@ -389,7 +390,7 @@ pub fn experian_cross_core_response(ssn_result_code: Option<&str>) -> serde_json
                             "fraudSolutions": {
                                 "response": {
                                     "products": {
-                                        "preciseIDServer": experian_precise_id_response("656", None, None, Some(ssn_result_code)),
+                                        "preciseIDServer": experian_precise_id_response(score, None, None, Some(ssn_result_code)),
                                         "customerManagement": {
                                             "version": "1.00",
                                             "reportDate": "03062023",

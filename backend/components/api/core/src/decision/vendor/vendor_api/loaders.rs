@@ -416,7 +416,7 @@ mod tests {
             VendorAPI::IdologyPa => idv::test_fixtures::idology_pa_response(),
             VendorAPI::TwilioLookupV2 => todo!(),
             VendorAPI::SocureIdPlus => todo!(),
-            VendorAPI::ExperianPreciseId => idv::test_fixtures::experian_cross_core_response(None),
+            VendorAPI::ExperianPreciseId => idv::test_fixtures::experian_cross_core_response(None, None),
             VendorAPI::MiddeskCreateBusiness => todo!(),
             VendorAPI::MiddeskGetBusiness => todo!(),
             VendorAPI::MiddeskBusinessUpdateWebhook => todo!(),

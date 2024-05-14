@@ -391,7 +391,8 @@ pub fn mock_idology_parseable_error(state: &mut State) {
 }
 
 pub struct WithSsnResultCode(pub Option<&'static str>);
-pub fn mock_experian(state: &mut State, ssn_result_code: WithSsnResultCode) {
+pub struct WithScore(pub Option<&'static str>);
+pub fn mock_experian(state: &mut State, ssn_result_code: WithSsnResultCode, score: WithScore) {
     let mut mock_experian = MockVendorAPICall::<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
@@ -400,7 +401,12 @@ pub fn mock_experian(state: &mut State, ssn_result_code: WithSsnResultCode) {
     mock_experian
         .expect_make_request()
         .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::experian::create_response(ssn_result_code.0)));
+        .return_once(move |_| {
+            Ok(idv::tests::fixtures::experian::create_response(
+                ssn_result_code.0,
+                score.0,
+            ))
+        });
     state.set_experian_cross_core(Arc::new(mock_experian));
 }
 

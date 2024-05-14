@@ -1,8 +1,8 @@
 use crate::experian::{cross_core::response::CrossCoreAPIResponse, ExperianCrossCoreResponse};
 use newtypes::PiiJsonValue;
 
-pub fn create_response(ssn_result_code: Option<&str>) -> ExperianCrossCoreResponse {
-    let fuck = crate::test_fixtures::experian_cross_core_response(ssn_result_code);
+pub fn create_response(ssn_result_code: Option<&str>, score: Option<&str>) -> ExperianCrossCoreResponse {
+    let fuck = crate::test_fixtures::experian_cross_core_response(ssn_result_code, score);
     // println!("fuck: {:#?}", fuck);
     let r: CrossCoreAPIResponse = serde_json::from_value(fuck.clone()).unwrap();
     // println!("r: {:#?}", r);

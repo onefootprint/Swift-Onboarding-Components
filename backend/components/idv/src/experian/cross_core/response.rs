@@ -317,7 +317,7 @@ mod tests {
 
     #[test]
     fn test_parses() {
-        let r: CrossCoreAPIResponse = serde_json::from_value(experian_cross_core_response(None))
+        let r: CrossCoreAPIResponse = serde_json::from_value(experian_cross_core_response(None, None))
             .expect("could not parse experian cross core");
 
         assert!(r
