@@ -376,6 +376,7 @@ impl<Type> WriteableVw<Type> {
         // Add fingerprints for ID data
         let fingerprints = request
             .iter()
+            .filter(|(di, _)| di.is_fingerprintable())
             .filter_map(|(di, pii)| match di {
                 DataIdentifier::Id(idk) => Some((idk, pii)),
                 _ => None,
