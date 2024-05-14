@@ -147,7 +147,8 @@ pub type SerializableEntity = (
 pub type IsNew = bool;
 
 impl ScopedVault {
-    /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
+    /// Used to create a ScopedUser for an already-existing portable vault when that vault onboards
+    /// onto a new tenant.
     #[tracing::instrument("ScopedVault::get_or_create", skip_all)]
     pub fn get_or_create(
         conn: &mut TxnPgConn,

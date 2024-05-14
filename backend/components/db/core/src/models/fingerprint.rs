@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use db_schema::schema::{fingerprint, fingerprint_junction};
+use db_schema::schema::{fingerprint, fingerprint_junction, scoped_vault};
 use diesel::{
     dsl::{count_distinct, not},
     prelude::*,
@@ -214,7 +214,12 @@ impl Fingerprint {
             .filter(fingerprint::sh_data.eq_any(&sh_datas))
             .filter(fingerprint::deactivated_at.is_null())
             .filter(fingerprint::is_live.eq(sv.is_live))
-            .filter(fingerprint::vault_id.ne(&sv.vault_id));
+            .filter(fingerprint::vault_id.ne(&sv.vault_id))
+            // TODO when we stop making unverified vaults after each signup challenge, remove this
+            // logic. It will be horribly slow
+            .inner_join(scoped_vault::table)
+            .filter(scoped_vault::show_in_search.eq(true))
+            .select(fingerprint::all_columns);
 
         // TODO hide dupes at other tenants in sandbox in next PR
         let internal_matches = q_dupes
