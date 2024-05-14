@@ -191,11 +191,51 @@ impl<'a> BoolFlag<'a> {
     /// In order to reduce LaunchDarkly cost, some flags have been migrated to perform this
     /// "is in list" operation here instead of on the LaunchDarkly side
     pub fn is_migrated_to_new_format(&self) -> bool {
-        #[allow(clippy::match_like_matches_macro)]
+        // Note, most new flags should be migrated to the newer format that does evaluations on
+        // here instead of in launch darkly
         match self {
+            Self::IsRiskOps(_)
+            | Self::IsDemoTenant(_)
+            | Self::CanViewSocureRiskSignals(_)
+            | Self::EnableScanOnboardingInNonProd(_)
+            | Self::EnableIdologyInNonProd(_)
+            | Self::EnableMiddeskInNonProd(_)
+            | Self::EnableSocureInNonProd(_)
+            | Self::EnableExperianInNonProd(_)
+            | Self::EnableLexisInNonProd(_)
+            | Self::DisableAllSocure
+            | Self::CanCleanUpPhoneNumber(_)
+            | Self::CanCleanUpTenant(_)
+            | Self::CreateOnboardingWorkflows(_)
+            | Self::IsAlpacaTenant(_)
+            | Self::IsAppClipEnabled(_)
+            | Self::IsInstantAppEnabled(_)
+            | Self::CanMakeDemoIncodeRequestsInSandbox(_)
+            | Self::CanSkipSelfie(_)
+            | Self::OmitEmailVerification(_)
+            | Self::TenantCanMakeNoPhoneObc(_)
+            | Self::TenantCanMakeDocFirstObc(_)
+            | Self::IsSkipKycTenant(_)
+            | Self::DisableConservativeGlareForDocument(_)
+            | Self::DisableConservativeSharpnessForDocument(_)
+            | Self::DisallowDriverLicensePermits(_)
+            | Self::EnableIncodeWatchlistCheckInNonProd(_)
+            | Self::DisableSelfieChecking(_)
+            | Self::UseIncodeDemoCredentialsInLivemode(_)
+            | Self::IsKycWaterfallOnRuleFailureEnabled(_)
+            | Self::CanProvideThirdPartyAuth(_)
+            | Self::RunAwsRekognition(_)
+            | Self::CreateKycWorkflowForAlpacaOnboardings(_)
+            | Self::StepUpOnAmlHit(_)
+            | Self::MakeLexisCall(_)
+            | Self::IsVaultProxyPreConfiguredEndpointEnabled(_)
+            | Self::IsVaultProxyJitEndpointEnabled(_)
+            | Self::IsNeuroEnabledForObc(_)
+            | Self::RequireCaptureOnStepUp(_)
+            | Self::TenantCanViewNeuro(_) => false,
+            // These are migrated to the newer format
             Self::PreferWhatsapp(_) => true,
             Self::UseBackupTwilioCredentials(_) => true,
-            _ => false,
         }
     }
 }
