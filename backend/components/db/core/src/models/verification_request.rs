@@ -328,7 +328,7 @@ impl VerificationRequest {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum VReqIdentifier {
     DiId(DecisionIntentId),
     WfId(WorkflowId),

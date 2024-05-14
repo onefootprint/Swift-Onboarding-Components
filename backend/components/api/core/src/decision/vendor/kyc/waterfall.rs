@@ -350,6 +350,7 @@ pub(super) fn eval_rules(res: VendorResult, vw: &VaultWrapper, obc: &ObConfigura
         ?rule_results,
         ?action_triggered,
         ?reason_codes,
+        version=1,
         "kyc_waterfall rule evaluation"
     );
 

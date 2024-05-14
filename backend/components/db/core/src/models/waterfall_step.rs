@@ -7,6 +7,8 @@ use newtypes::{
 
 use diesel::{prelude::*, Insertable, Queryable};
 
+use super::waterfall_execution::WaterfallExecution;
+
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = waterfall_step)]
 pub struct WaterfallStep {
@@ -91,7 +93,7 @@ impl WaterfallStep {
 
     #[tracing::instrument("WaterfallStep::update", skip(conn, update))]
     pub fn update(
-        locked: Locked<Self>,
+        locked: Locked<WaterfallExecution>,
         conn: &mut TxnPgConn,
         id: WaterfallStepId,
         update: UpdateWaterfallStep,
