@@ -120,7 +120,7 @@ pub fn evaluate_workflow_decision<'a>(
         lists,
         &rule_eval_config,
     );
-    let is_kyc_playbook = obc.kind == ObConfigurationKind::Kyc;
+    let is_kyc_playbook = obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb;
     let decision = Decision::RulesExecuted {
         should_commit: !is_fixture && is_kyc_playbook && should_commit_action.is_none(),
         create_manual_review: rule_set_result

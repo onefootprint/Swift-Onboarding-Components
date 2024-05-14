@@ -69,6 +69,7 @@ class BifrostClient:
         """
         Create an instance of BifrostClient that creates a new user with the provided phone number.
         """
+        # TODO I realize this has evolved to be the same as BifrostClient.new(). We could consolidate
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = override_sandbox_id or _gen_random_sandbox_id()
         auth_token = IdentifyClient(ob_config_auth, sandbox_id).create_user()

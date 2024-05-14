@@ -10,9 +10,9 @@ use db::{
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
-    BooleanOperator, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant as DID, DbActor,
-    EnhancedAmlOption, FootprintReasonCode as FRC, Locked, ObConfigurationKind, RuleAction, RuleAction as RA,
-    RuleExpression, RuleExpressionCondition, RuleInstanceKind,
+    BooleanOperator, CipKind, CollectedDataOption as CDO, DbActor, EnhancedAmlOption,
+    FootprintReasonCode as FRC, Locked, ObConfigurationKind, RuleAction, RuleAction as RA, RuleExpression,
+    RuleExpressionCondition, RuleInstanceKind,
 };
 
 pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
@@ -131,18 +131,13 @@ pub fn default_rules_for_obc(
     let mut person_rules = vec![];
 
     // KYC
-    let has_kyc = obc.must_collect_data.iter().any(|d| {
-        (d.parent().data_identifier_kind() != DID::Business)
-            || matches!(
-                d,
-                CDO::BusinessKycedBeneficialOwners | CDO::BusinessBeneficialOwners
-            )
-    }) && obc.kind != ObConfigurationKind::Document;
+    let has_kyc =
+        (obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb) && !obc.skip_kyc;
     let must_collect_ssn =
         obc.must_collect_data.contains(&CDO::Ssn9) || obc.must_collect_data.contains(&CDO::Ssn4);
     let optional_ssn = obc.optional_data.contains(&CDO::Ssn9) || obc.optional_data.contains(&CDO::Ssn4);
 
-    if !obc.skip_kyc && has_kyc {
+    if has_kyc {
         person_rules.append(&mut base_kyc_rules());
 
         if must_collect_ssn || optional_ssn {
@@ -169,53 +164,49 @@ pub fn default_rules_for_obc(
     }
 
     // AML
-    if has_kyc {
-        let aml_risk_signals = match obc.enhanced_aml() {
-            EnhancedAmlOption::No => vec![FRC::WatchlistHitOfac, FRC::WatchlistHitNonSdn],
-            EnhancedAmlOption::Yes {
-                ofac,
-                pep,
-                adverse_media,
-                continuous_monitoring: _,
-                adverse_media_lists: _,
-            } => {
-                let mut rs = vec![];
-                if ofac {
-                    rs.push(FRC::WatchlistHitOfac);
-                    rs.push(FRC::WatchlistHitNonSdn);
-                    // not really "ofac" but our EnhancedAmlOption doesn't separately specify this
-                    rs.push(FRC::WatchlistHitWarning);
-                }
-                if pep {
-                    rs.push(FRC::WatchlistHitPep);
-                }
-                if adverse_media {
-                    rs.push(FRC::AdverseMediaHit);
-                }
-                rs
+    let aml_risk_signals = match obc.enhanced_aml() {
+        // We do get some watchlist risk signals from normal KYC
+        EnhancedAmlOption::No if has_kyc => vec![FRC::WatchlistHitOfac, FRC::WatchlistHitNonSdn],
+        // But if we're not running KYC at all, there will be no risk signals
+        EnhancedAmlOption::No => vec![],
+        EnhancedAmlOption::Yes {
+            ofac,
+            pep,
+            adverse_media,
+            continuous_monitoring: _,
+            adverse_media_lists: _,
+        } => {
+            let mut rs = vec![];
+            if ofac {
+                rs.push(FRC::WatchlistHitOfac);
+                rs.push(FRC::WatchlistHitNonSdn);
+                // not really "ofac" but our EnhancedAmlOption doesn't separately specify this
+                rs.push(FRC::WatchlistHitWarning);
             }
-        };
-        aml_risk_signals.into_iter().for_each(|rs| {
-            person_rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
+            if pep {
+                rs.push(FRC::WatchlistHitPep);
+            }
+            if adverse_media {
+                rs.push(FRC::AdverseMediaHit);
+            }
+            rs
+        }
+    };
+    aml_risk_signals.into_iter().for_each(|rs| {
+        person_rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
 
-            if ff_client
-                .clone()
-                .map(|ff| ff.flag(BoolFlag::StepUpOnAmlHit(&obc.key)))
-                .unwrap_or(false)
-            {
-                person_rules.push((if_risk_signal(rs), RA::identity_stepup()));
-            }
-        });
-    }
+        if ff_client
+            .clone()
+            .map(|ff| ff.flag(BoolFlag::StepUpOnAmlHit(&obc.key)))
+            .unwrap_or(false)
+        {
+            person_rules.push((if_risk_signal(rs), RA::identity_stepup()));
+        }
+    });
 
 
     // KYB
-    let business_rules = if !obc.skip_kyb
-        && obc
-            .must_collect_data
-            .iter()
-            .any(|d| d.parent().data_identifier_kind() == DID::Business)
-    {
+    let business_rules = if !obc.skip_kyb && obc.kind == ObConfigurationKind::Kyb {
         base_kyb_rules()
     } else {
         vec![]
@@ -247,7 +238,7 @@ pub fn save_default_rules_for_obc(
     }
 
     let rules = default_rules_for_obc(obc, ff_client);
-    let _ = RuleInstance::bulk_create(
+    RuleInstance::bulk_create(
         conn,
         obc,
         &DbActor::Footprint,
@@ -293,9 +284,10 @@ mod tests {
 
     #[db_test_case(ObConfigurationOpts { ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn),  RA::ManualReview)]].concat() ; "basic KYC")]
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], ..Default::default()}, [base_kyc_rules(), ssn_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "basic KYC with SSN")]
-    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], skip_kyc: true, ..Default::default()}, [ vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "SSN but skip_kyc")]
+    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], skip_kyc: true, ..Default::default()}, vec![]  ; "SSN but skip_kyc")]
     #[db_test_case(ObConfigurationOpts { optional_data: vec![CDO::Ssn9], ..Default::default()}, [base_kyc_rules(), ssn_rules(), vec![(if_risk_signal(FRC::SsnNotProvided), RA::ManualReview)], vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "basic KYC with optional SSN")]
-    #[db_test_case(ObConfigurationOpts { skip_kyc: true, ..Default::default()}, [vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "skip_kyc")]
+    #[db_test_case(ObConfigurationOpts { skip_kyc: true, ..Default::default()}, vec![]; "skip_kyc")]
+    #[db_test_case(ObConfigurationOpts { skip_kyc: true, enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None}, ..Default::default()}, [vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitWarning),  RA::ManualReview), (if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview), (if_risk_signal(FRC::AdverseMediaHit), RA::ManualReview)]].concat() ; "enhanced_aml even with skip kyc")]
     #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitWarning),  RA::ManualReview), (if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview), (if_risk_signal(FRC::AdverseMediaHit), RA::ManualReview)]].concat() ; "enhanced_aml, all options")]
     #[db_test_case(ObConfigurationOpts { enhanced_aml: EnhancedAmlOption::Yes { ofac: false, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None}, ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitPep), RA::ManualReview)]].concat() ; "enhanced_aml, subbset of options")]
     // non-Alpaca but must_collect_data contains DOC CDO
@@ -303,9 +295,9 @@ mod tests {
     // doc only (indicated by `kind = Document`)
     #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Document, must_collect_data: vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))],  ..Default::default()}, base_doc_rules(false); "Doc only")]
     // cip_kind = Alpaca
-    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB")]
-    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::BusinessBeneficialOwners, CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules(),base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB, non-KYC BO")]
-    #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules()].concat() ; "KYB, no BOs")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessBeneficialOwners, CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB, non-KYC BO")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, skip_kyc: true, must_collect_data: vec![CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules()].concat() ; "KYB, no BOs")]
     fn test_default_rules_for_obc(
         conn: &mut TestPgConn,
         obc_opts: ObConfigurationOpts,

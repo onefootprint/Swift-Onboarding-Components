@@ -1,12 +1,10 @@
 import arrow
 import pytest
-from datetime import datetime, timedelta
 from tests.bifrost.test_components_sdk import create_user_with_components_token
 from tests.bifrost_client import BifrostClient
 from tests.dashboard.utils import update_rules
 from tests.utils import (
     _gen_random_str,
-    _gen_random_sandbox_id,
     create_ob_config,
     get,
     post,
@@ -225,7 +223,6 @@ def new_list(kind, entries, sandbox_tenant):
 
 
 def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
-    sandbox_id = _gen_random_sandbox_id()
     obc = create_ob_config(
         sandbox_tenant,
         "Test Vault Data Rules",
@@ -291,7 +288,6 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
                 rule_fail_not_e3_visa["name"]: True,
             },
         ),
-
         (
             "user c",
             {
@@ -307,9 +303,15 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
         ),
     ]
 
-    for test_name, vault_data, expected_status, expected_rule_results in expected_rule_evals:
+    for (
+        test_name,
+        vault_data,
+        expected_status,
+        expected_rule_results,
+    ) in expected_rule_evals:
         components_token, token, bifrost = create_user_with_components_token(
-            sandbox_tenant, obc=obc,
+            sandbox_tenant,
+            obc=obc,
         )
         patch("hosted/user/vault", vault_data, components_token)
         user = bifrost.run()
@@ -325,7 +327,9 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
         stepup_event = [
             i for i in timeline if i["event"]["kind"] == "onboarding_decision"
         ].pop()
-        rule_set_result_id = stepup_event["event"]["data"]["decision"]["rule_set_result_id"]
+        rule_set_result_id = stepup_event["event"]["data"]["decision"][
+            "rule_set_result_id"
+        ]
 
         rule_set_result = get(
             f"entities/{fp_id}/rule_set_result/{rule_set_result_id}",
@@ -337,7 +341,9 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
         rule_name_to_id = {}
         for rule_name, expected_result in expected_rule_results.items():
             rule_result = next(
-                r for r in rule_set_result["rule_results"] if r["rule"]["name"] == rule_name
+                r
+                for r in rule_set_result["rule_results"]
+                if r["rule"]["name"] == rule_name
             )
             rule_name_to_id[rule_name] = rule_result["rule"]["rule_id"]
             assert rule_result["result"] == expected_result, (test_name, rule_name)
@@ -346,46 +352,75 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
         end_timestamp = start_timestamp.shift(hours=2)
 
         # Backtesting with no change yields the same result.
-        resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
-            "start_timestamp": start_timestamp.isoformat(),
-            "end_timestamp": end_timestamp.isoformat(),
-        }, *sandbox_tenant.db_auths)
+        resp = post(
+            f"org/onboarding_configs/{obc.id}/rules/evaluate",
+            {
+                "start_timestamp": start_timestamp.isoformat(),
+                "end_timestamp": end_timestamp.isoformat(),
+            },
+            *sandbox_tenant.db_auths,
+        )
         backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
-        assert backtest_result["historical_action_triggered"] == status_as_action_triggered(expected_status), test_name
-        assert backtest_result["backtest_action_triggered"] == status_as_action_triggered(expected_status), test_name
+        assert backtest_result[
+            "historical_action_triggered"
+        ] == status_as_action_triggered(expected_status), test_name
+        assert backtest_result[
+            "backtest_action_triggered"
+        ] == status_as_action_triggered(expected_status), test_name
 
         # Backtesting with the matching rules deleted yields a pass.
-        resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
-            "start_timestamp": start_timestamp.isoformat(),
-            "end_timestamp": end_timestamp.isoformat(),
-            "delete": [rule_name_to_id[rule_name] for rule_name, matches in expected_rule_results.items() if matches],
-        }, *sandbox_tenant.db_auths)
+        resp = post(
+            f"org/onboarding_configs/{obc.id}/rules/evaluate",
+            {
+                "start_timestamp": start_timestamp.isoformat(),
+                "end_timestamp": end_timestamp.isoformat(),
+                "delete": [
+                    rule_name_to_id[rule_name]
+                    for rule_name, matches in expected_rule_results.items()
+                    if matches
+                ],
+            },
+            *sandbox_tenant.db_auths,
+        )
         backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
-        assert backtest_result["historical_action_triggered"] == status_as_action_triggered(expected_status), test_name
+        assert backtest_result[
+            "historical_action_triggered"
+        ] == status_as_action_triggered(expected_status), test_name
         assert backtest_result["backtest_action_triggered"] == None
 
         # Backtesting with a rule added that matches all users yields a fail.
-        resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
-            "start_timestamp": start_timestamp.isoformat(),
-            "end_timestamp": end_timestamp.isoformat(),
-            "delete": [rule_name_to_id[rule_name] for rule_name, matches in expected_rule_results.items() if matches],
-            "add": [
-                {
-                    "name": "Should fail",
-                    "rule_action": "fail",
-                    "rule_expression": [
-                        {
-                            "field": "id.visa_kind",
-                            "op": "not_eq",
-                            "value": "other",
-                        },
-                    ],
-                },
-            ],
-        }, *sandbox_tenant.db_auths)
+        resp = post(
+            f"org/onboarding_configs/{obc.id}/rules/evaluate",
+            {
+                "start_timestamp": start_timestamp.isoformat(),
+                "end_timestamp": end_timestamp.isoformat(),
+                "delete": [
+                    rule_name_to_id[rule_name]
+                    for rule_name, matches in expected_rule_results.items()
+                    if matches
+                ],
+                "add": [
+                    {
+                        "name": "Should fail",
+                        "rule_action": "fail",
+                        "rule_expression": [
+                            {
+                                "field": "id.visa_kind",
+                                "op": "not_eq",
+                                "value": "other",
+                            },
+                        ],
+                    },
+                ],
+            },
+            *sandbox_tenant.db_auths,
+        )
         backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
-        assert backtest_result["historical_action_triggered"] == status_as_action_triggered(expected_status)
+        assert backtest_result[
+            "historical_action_triggered"
+        ] == status_as_action_triggered(expected_status)
         assert backtest_result["backtest_action_triggered"] == "fail"
+
 
 def status_as_action_triggered(pass_or_fail):
     if pass_or_fail == "pass":
@@ -399,20 +434,15 @@ def status_as_action_triggered(pass_or_fail):
 def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     # Flake note: requires a consistent client IP for the duration of the test.
 
-    sandbox_id = _gen_random_sandbox_id()
     obc = create_ob_config(
         sandbox_tenant,
         "Baseline",
         must_collect_data,
         can_access_data,
-        # These are the necessary arguments to skip KYC so the status is only
-        # dependent on rules evaluation.
-        skip_kyc=True,
-        allow_international_residents=True,
     )
-    bifrost = BifrostClient.create(
-        obc,
-        override_sandbox_id=sandbox_id,
+    bifrost = BifrostClient.new(obc)
+    bifrost.fixture_result = (
+        "document_decision"  # Misnomer, but just means we'll evaluate rules
     )
     user = bifrost.run()
     fp_id = user.fp_id
@@ -457,10 +487,9 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     # Rerun Bifrost in a new sandbox.
-    sandbox_id = _gen_random_sandbox_id()
-    bifrost = BifrostClient.create(
-        obc,
-        override_sandbox_id=sandbox_id,
+    bifrost = BifrostClient.new(obc)
+    bifrost.fixture_result = (
+        "document_decision"  # Misnomer, but just means we'll evaluate rules
     )
     user = bifrost.run()
     fp_id = user.fp_id
@@ -501,10 +530,14 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     start_timestamp = arrow.get(stepup_event["timestamp"]).shift(hours=-1)
     end_timestamp = start_timestamp.shift(hours=2)
 
-    resp = post(f"org/onboarding_configs/{obc.id}/rules/evaluate", {
-        "start_timestamp": start_timestamp.isoformat(),
-        "end_timestamp": end_timestamp.isoformat(),
-    }, *sandbox_tenant.db_auths)
+    resp = post(
+        f"org/onboarding_configs/{obc.id}/rules/evaluate",
+        {
+            "start_timestamp": start_timestamp.isoformat(),
+            "end_timestamp": end_timestamp.isoformat(),
+        },
+        *sandbox_tenant.db_auths,
+    )
     backtest_result = next(r for r in resp["results"] if r["fp_id"] == fp_id)
     assert backtest_result["historical_action_triggered"] == "fail"
     assert backtest_result["backtest_action_triggered"] == "fail"

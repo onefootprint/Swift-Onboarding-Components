@@ -31,9 +31,9 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::{test_state, test_state_case};
 use newtypes::{
-    CollectedDataOption as CDO, FootprintReasonCode, KybState, KycState, OnboardingStatus,
-    RiskSignalGroupKind, RuleAction, RuleInstanceKind, SignalSeverity, VendorAPI, WorkflowFixtureResult,
-    WorkflowState,
+    CollectedDataOption as CDO, FootprintReasonCode, KybState, KycState, ObConfigurationKind,
+    OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleInstanceKind, SignalSeverity, VendorAPI,
+    WorkflowFixtureResult, WorkflowState,
 };
 
 async fn setup(
@@ -53,6 +53,7 @@ async fn setup(
             is_live,
             must_collect_data: cdos.clone(),
             can_access_data: cdos,
+            kind: ObConfigurationKind::Kyb,
             ..Default::default()
         },
         fixture_result,
