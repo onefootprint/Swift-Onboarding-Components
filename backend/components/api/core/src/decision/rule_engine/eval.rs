@@ -16,9 +16,19 @@ use crate::errors::{ApiResult, AssertionError};
 
 use super::engine::VaultDataForRules;
 
-pub trait HasRule {
+/// Trait that represents a Rule
+pub trait HasRule<A: Ord + PartialOrd> {
     fn expression(&self) -> RuleExpression;
-    fn action(&self) -> RuleAction;
+    fn action(&self) -> A;
+}
+
+/// Trait that represents whether a Rule contains an action that is allowed per the state of the workflow (to avoid infinite step up loops)
+pub trait IsActionAllowed<A>
+where
+    A: Ord + PartialOrd,
+    Self: HasRule<A>,
+{
+    fn is_action_allowed(&self, rule_config: &RuleEvalConfig) -> bool;
 }
 
 #[derive(Debug, Clone)]
@@ -27,7 +37,8 @@ pub struct Rule {
     pub action: RuleAction,
 }
 
-impl HasRule for Rule {
+/// Rule impl
+impl HasRule<RuleAction> for Rule {
     fn expression(&self) -> RuleExpression {
         self.expression.clone()
     }
@@ -37,13 +48,26 @@ impl HasRule for Rule {
     }
 }
 
-impl HasRule for RuleInstance {
+impl IsActionAllowed<RuleAction> for Rule {
+    fn is_action_allowed(&self, rule_config: &RuleEvalConfig) -> bool {
+        rule_config.action_is_allowed(&self.action())
+    }
+}
+
+/// Rule instance impl
+impl HasRule<RuleAction> for RuleInstance {
     fn expression(&self) -> RuleExpression {
         self.rule_expression.clone()
     }
 
     fn action(&self) -> RuleAction {
         self.action
+    }
+}
+
+impl IsActionAllowed<RuleAction> for RuleInstance {
+    fn is_action_allowed(&self, rule_config: &RuleEvalConfig) -> bool {
+        rule_config.action_is_allowed(&self.action())
     }
 }
 
@@ -95,8 +119,8 @@ impl Default for RuleEvalConfig {
     }
 }
 
-pub fn evaluate_rule_set<T: HasRule>(
-    rules: Vec<T>,
+pub fn evaluate_rule_set<R, A>(
+    rules: Vec<R>,
     reason_codes: &[FootprintReasonCode],
     vault_data: &VaultDataForRules, // TODO: for waterfall, we won't execute on vault data based rules so should probs more explicitly handle that vs having it pass in an empty DUR here
     // a bit annoying to have to put this here, but this is our one case currently where a ruleset is evaluated but a particular action is not allowed. If we have already collected a document or already step'd up, we want to ensure that we don't chose that action again
@@ -104,7 +128,11 @@ pub fn evaluate_rule_set<T: HasRule>(
     insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
     rule_config: &RuleEvalConfig,
-) -> (Vec<(T, bool)>, Option<RuleAction>) {
+) -> (Vec<(R, bool)>, Option<A>)
+where
+    R: HasRule<A> + IsActionAllowed<A>,
+    A: Ord + PartialOrd,
+{
     let rule_results = rules
         .into_iter()
         .map(|r| {
@@ -130,7 +158,7 @@ pub fn evaluate_rule_set<T: HasRule>(
     let action_triggered = rule_results
         .iter()
         .filter_map(|(r, e)| {
-            if *e && (rule_config.action_is_allowed(&r.action())) {
+            if *e && r.is_action_allowed(rule_config) {
                 Some(r.action())
             } else {
                 None
@@ -330,13 +358,18 @@ pub mod tests {
 
     // just to avoid having to make RuleInstance's. Also proves that we could use evaluate_rules in a RAM-only way (ie for backtesting or whatever)
     pub struct TRule(pub RE, pub RA);
-    impl HasRule for TRule {
+    impl HasRule<RA> for TRule {
         fn expression(&self) -> RE {
             self.0.clone()
         }
 
         fn action(&self) -> RA {
             self.1
+        }
+    }
+    impl IsActionAllowed<RA> for TRule {
+        fn is_action_allowed(&self, rule_config: &RuleEvalConfig) -> bool {
+            rule_config.action_is_allowed(&self.action())
         }
     }
 
