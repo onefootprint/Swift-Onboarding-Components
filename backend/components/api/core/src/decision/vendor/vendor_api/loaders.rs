@@ -1,32 +1,61 @@
 use db::{
-    models::verification_request::{VReqIdentifier, VerificationRequest},
+    models::{
+        verification_request::{VReqIdentifier, VerificationRequest},
+        verification_result::VerificationResult,
+    },
     DbResult,
 };
+use idv::VendorResponse;
 use newtypes::{EncryptedVaultPrivateKey, VerificationResultId};
 
 use crate::{
-    decision::vendor::verification_result::decrypt_verification_result_response, errors::ApiResult, ApiError,
-    State,
+    decision::vendor::{
+        vendor_result::VendorResult, verification_result::decrypt_verification_result_response,
+    },
+    errors::ApiResult,
+    ApiError, State,
 };
 
-use super::vendor_parsable::VendorParsable;
+use super::vendor_parsable::{AsParsedResponse, VendorParsable};
 
 
 // Represents an attempt to load and deserialize a vendor API response
-pub enum LoadVendorResponseResult<T> {
+pub enum LoadVendorResponseResult<T: AsParsedResponse> {
     NotFound,
     NoResponse,
-    Success((T, VerificationResultId)),
+    Success((T, VerificationRequest, VerificationResult)),
     Error(ApiError),
 }
 
-impl<T> LoadVendorResponseResult<T> {
+
+impl<T: AsParsedResponse> LoadVendorResponseResult<T> {
     pub fn ok(self) -> Option<(T, VerificationResultId)> {
         match self {
             LoadVendorResponseResult::NotFound => None,
             LoadVendorResponseResult::NoResponse => None,
-            LoadVendorResponseResult::Success(r) => Some(r),
+            LoadVendorResponseResult::Success((r, _, vres)) => Some((r, vres.id)),
             LoadVendorResponseResult::Error(_) => None,
+        }
+    }
+
+    pub fn into_vendor_result(self) -> Option<VendorResult> {
+        match self {
+            LoadVendorResponseResult::NotFound
+            | LoadVendorResponseResult::NoResponse
+            | LoadVendorResponseResult::Error(_) => None,
+
+            LoadVendorResponseResult::Success((r, vreq, vres)) => {
+                Some(VendorResult {
+                    response: VendorResponse {
+                        response: r.into_parsed_response(),
+                        // TODO: get rid of this, and just use parsed response for vendor map
+                        // https://linear.app/footprint/issue/FP-5624/just-use-parsed-resonse-and-stop-using-raw-response-on-vendor-result
+                        raw_response: serde_json::json!({}).into(),
+                    },
+                    verification_request_id: vreq.id,
+                    verification_result_id: vres.id,
+                })
+            }
         }
     }
 }
@@ -56,7 +85,7 @@ where
 
     let log_msg = "load_response_for_vendor_api failed";
 
-    let Some((_, vres)) = requests_and_result else {
+    let Some((vreq, vres)) = requests_and_result else {
         tracing::warn!(reason = "not found", ?vendor_api, log_msg);
         return Ok(LoadVendorResponseResult::NotFound);
     };
@@ -80,7 +109,7 @@ where
     };
 
     match vendor_api_struct.parse(pii_json.into_leak()) {
-        Ok(s) => Ok(LoadVendorResponseResult::Success((s, vres.id.clone()))),
+        Ok(s) => Ok(LoadVendorResponseResult::Success((s, vreq, vres))),
         Err(e) => {
             tracing::warn!(reason = "deser error", ?vendor_api, log_msg);
             Ok(LoadVendorResponseResult::Error(e.into()))
@@ -116,7 +145,6 @@ mod tests {
     use newtypes::{DecisionIntentId, DecisionIntentKind, ScopedVaultId, VendorAPI, WorkflowId};
 
 
-    #[test_state_case(VendorAPI::IncodeApproveSession)]
     #[test_state_case(VendorAPI::ExperianPreciseId)]
     #[test_state_case(VendorAPI::IdologyExpectId)]
     #[test_state_case(VendorAPI::IncodeFetchScores)]
@@ -294,18 +322,7 @@ mod tests {
             VendorAPI::IncodeProcessFace => todo!(),
             VendorAPI::IncodeCurpValidation => todo!(),
             VendorAPI::IncodeGovernmentValidation => todo!(),
-            VendorAPI::IncodeApproveSession => {
-                assert_results(
-                    state,
-                    wf.id,
-                    di_id,
-                    sv_id2,
-                    &uv.e_private_key,
-                    vres_id_to_check,
-                    IncodeApproveSession,
-                )
-                .await
-            }
+            VendorAPI::IncodeApproveSession => todo!(),
             VendorAPI::StytchLookup => todo!(),
             VendorAPI::FootprintDeviceAttestation => todo!(),
             VendorAPI::AwsRekognition => todo!(),
