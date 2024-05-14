@@ -1,9 +1,10 @@
 import * as aws from '@pulumi/aws';
 import * as datadog from '@pulumi/datadog';
-import { GlobalState } from './main';
+import * as pulumi from '@pulumi/pulumi';
 import { GetStackMetadata, StackEnvironment } from './stack_metadata';
-import { Config } from './config';
 import { StaticSecrets } from './secrets';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
   const stackMetadata = GetStackMetadata();
@@ -34,23 +35,148 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
     },
   );
 
-  const forwarderStack = new aws.cloudformation.Stack(
-    `datadog-forwarder-${stackMetadata.shortStackName}`,
-    {
-      templateUrl:
-        'https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/latest.yaml',
-      parameters: {
-        DdApiKeySecretArn: secretsStore.datadogApiKey.arn,
-        DdSite: 'datadoghq.com',
-        FunctionName: `datadog-forwarder-${stackMetadata.shortStackName}`,
-      },
-      capabilities: [
-        'CAPABILITY_IAM',
-        'CAPABILITY_NAMED_IAM',
-        'CAPABILITY_AUTO_EXPAND',
-      ],
-    },
+  const ddForwarderStackTemplateBody = fs.readFileSync(
+    path.resolve(__dirname, 'data/datadog-forwarder-stack.yaml'),
+    'utf8',
   );
+
+  pulumi
+    .all([integration.externalId, secretsStore.datadogApiKey.arn])
+    .apply(([ddIamExternalId, ddApiKeyArn]) => {
+      let ddIntegrationRole = new aws.iam.Role(
+        `datadog-integration-role-${stackMetadata.shortStackName}`,
+        {
+          assumeRolePolicy: JSON.stringify({
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Action: 'sts:AssumeRole',
+                Effect: 'Allow',
+                Condition: {
+                  StringEquals: {
+                    'sts:ExternalId': ddIamExternalId,
+                  },
+                },
+                Principal: {
+                  // Datadog's account ID
+                  AWS: 'arn:aws:iam::464622532012:root',
+                },
+              },
+            ],
+          }),
+        },
+      );
+
+      let ddIntegrationPolicy = new aws.iam.RolePolicy(
+        `datadog-integration-policy-${stackMetadata.shortStackName}`,
+        {
+          role: ddIntegrationRole.name,
+          policy: JSON.stringify({
+            Version: '2012-10-17',
+            Statement: {
+              Effect: 'Allow',
+              Resource: '*',
+              Action: [
+                'apigateway:GET',
+                'autoscaling:Describe*',
+                'backup:List*',
+                'budgets:ViewBudget',
+                'cloudfront:GetDistributionConfig',
+                'cloudfront:ListDistributions',
+                'cloudtrail:DescribeTrails',
+                'cloudtrail:GetTrailStatus',
+                'cloudtrail:LookupEvents',
+                'cloudwatch:Describe*',
+                'cloudwatch:Get*',
+                'cloudwatch:List*',
+                'codedeploy:List*',
+                'codedeploy:BatchGet*',
+                'directconnect:Describe*',
+                'dynamodb:List*',
+                'dynamodb:Describe*',
+                'ec2:Describe*',
+                'ec2:GetTransitGatewayPrefixListReferences',
+                'ec2:SearchTransitGatewayRoutes',
+                'ecs:Describe*',
+                'ecs:List*',
+                'elasticache:Describe*',
+                'elasticache:List*',
+                'elasticfilesystem:DescribeFileSystems',
+                'elasticfilesystem:DescribeTags',
+                'elasticfilesystem:DescribeAccessPoints',
+                'elasticloadbalancing:Describe*',
+                'elasticmapreduce:List*',
+                'elasticmapreduce:Describe*',
+                'es:ListTags',
+                'es:ListDomainNames',
+                'es:DescribeElasticsearchDomains',
+                'events:CreateEventBus',
+                'fsx:DescribeFileSystems',
+                'fsx:ListTagsForResource',
+                'health:DescribeEvents',
+                'health:DescribeEventDetails',
+                'health:DescribeAffectedEntities',
+                'kinesis:List*',
+                'kinesis:Describe*',
+                'lambda:GetPolicy',
+                'lambda:List*',
+                'logs:DeleteSubscriptionFilter',
+                'logs:DescribeLogGroups',
+                'logs:DescribeLogStreams',
+                'logs:DescribeSubscriptionFilters',
+                'logs:FilterLogEvents',
+                'logs:PutSubscriptionFilter',
+                'logs:TestMetricFilter',
+                'organizations:Describe*',
+                'organizations:List*',
+                'rds:Describe*',
+                'rds:List*',
+                'redshift:DescribeClusters',
+                'redshift:DescribeLoggingStatus',
+                'route53:List*',
+                's3:GetBucketLogging',
+                's3:GetBucketLocation',
+                's3:GetBucketNotification',
+                's3:GetBucketTagging',
+                's3:ListAllMyBuckets',
+                's3:PutBucketNotification',
+                'ses:Get*',
+                'sns:List*',
+                // Not used.
+                // 'sns:Publish',
+                'sqs:ListQueues',
+                'states:ListStateMachines',
+                'states:DescribeStateMachine',
+                'support:DescribeTrustedAdvisor*',
+                'support:RefreshTrustedAdvisorCheck',
+                'tag:GetResources',
+                'tag:GetTagKeys',
+                'tag:GetTagValues',
+                'xray:BatchGetTraces',
+                'xray:GetTraceSummaries',
+              ],
+            },
+          }),
+        },
+      );
+
+      const forwarderStack = new aws.cloudformation.Stack(
+        `datadog-forwarder-${stackMetadata.shortStackName}`,
+        {
+          templateBody: ddForwarderStackTemplateBody,
+          parameters: {
+            DdApiKeySecretArn: ddApiKeyArn,
+            DdSite: 'datadoghq.com',
+            FunctionName: `datadog-forwarder-${stackMetadata.shortStackName}`,
+          },
+          capabilities: [
+            'CAPABILITY_IAM',
+            'CAPABILITY_NAMED_IAM',
+            'CAPABILITY_AUTO_EXPAND',
+          ],
+        },
+      );
+    });
 
   return {};
 }
