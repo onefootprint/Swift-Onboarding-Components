@@ -70,7 +70,7 @@ export interface StaticSecrets {
   neuroIdApiKey: aws.ssm.Parameter;
   neuroIdApiKeyTest: aws.ssm.Parameter;
   openaiApiKey: aws.ssm.Parameter;
-  datadogApiKey: aws.ssm.Parameter;
+  datadogApiKey: aws.secretsmanager.Secret;
 }
 
 interface SecretConstants {
@@ -498,7 +498,7 @@ export async function LoadSecrets(
       `openai-api-key-${stack}`,
       secretConstants.openaiApiKey,
     ),
-    datadogApiKey: createSecretParameter(
+    datadogApiKey: createSecretsManagerSecret(
       `datadog-api-key-${stack}`,
       datadogApiKey,
     ),
@@ -516,6 +516,26 @@ function createSecretParameter(
     overwrite: true,
     description: name,
   });
+
+  return secret;
+}
+
+function createSecretsManagerSecret(
+  name: string,
+  secretVal: pulumi.Output<string>,
+): aws.secretsmanager.Secret {
+  const secret = new aws.secretsmanager.Secret(`secret-${name}`, {
+    description: name,
+    forceOverwriteReplicaSecret: true,
+  });
+
+  const secretVersion = new aws.secretsmanager.SecretVersion(
+    `secret-version-${name}`,
+    {
+      secretId: secret.id,
+      secretString: secretVal,
+    },
+  );
 
   return secret;
 }

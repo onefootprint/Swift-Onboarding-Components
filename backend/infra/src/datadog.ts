@@ -23,13 +23,15 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
       break;
   }
 
+  let ddIntegrationRoleName = `datadog-integration-role-${stackMetadata.shortStackName}`;
+
   const integration = new datadog.aws.Integration(
     `datadog-integration-${stackMetadata.shortStackName}`,
     {
       accountId: accountId,
-      roleName: `DatadogAWSIntegrationRole-${stackMetadata.shortStackName}`,
+      roleName: ddIntegrationRoleName,
       filterTags: [],
-      hostTags: [`env:${env}`, `stack:${stackMetadata.shortStackName}`],
+      hostTags: [`env:${env}`],
       metricsCollectionEnabled: 'true',
       cspmResourceCollectionEnabled: 'false',
     },
@@ -43,29 +45,26 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
   pulumi
     .all([integration.externalId, secretsStore.datadogApiKey.arn])
     .apply(([ddIamExternalId, ddApiKeyArn]) => {
-      let ddIntegrationRole = new aws.iam.Role(
-        `datadog-integration-role-${stackMetadata.shortStackName}`,
-        {
-          assumeRolePolicy: JSON.stringify({
-            Version: '2012-10-17',
-            Statement: [
-              {
-                Action: 'sts:AssumeRole',
-                Effect: 'Allow',
-                Condition: {
-                  StringEquals: {
-                    'sts:ExternalId': ddIamExternalId,
-                  },
-                },
-                Principal: {
-                  // Datadog's account ID
-                  AWS: 'arn:aws:iam::464622532012:root',
+      let ddIntegrationRole = new aws.iam.Role(ddIntegrationRoleName, {
+        assumeRolePolicy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: 'sts:AssumeRole',
+              Effect: 'Allow',
+              Condition: {
+                StringEquals: {
+                  'sts:ExternalId': ddIamExternalId,
                 },
               },
-            ],
-          }),
-        },
-      );
+              Principal: {
+                // Datadog's account ID
+                AWS: 'arn:aws:iam::464622532012:root',
+              },
+            },
+          ],
+        }),
+      });
 
       let ddIntegrationPolicy = new aws.iam.RolePolicy(
         `datadog-integration-policy-${stackMetadata.shortStackName}`,
