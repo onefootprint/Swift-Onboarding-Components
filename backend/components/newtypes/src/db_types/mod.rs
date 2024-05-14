@@ -56,6 +56,7 @@ mod vault_kind;
 mod vault_proxy_permission;
 mod vendor;
 mod watchlist_check;
+mod waterfall;
 mod workflow;
 mod workflow_fixture_result;
 mod workflow_request;
@@ -74,6 +75,6 @@ pub use self::{
     sealed_bytes::*, session_kind::*, supported_document_and_country_mapping::*, task_status::*,
     tenant_frequent_notes::*, tenant_kind::*, tenant_role_kind::*, tenant_scope::*, user_timeline_event::*,
     vault_data_format::*, vault_key_pair::*, vault_kind::*, vault_proxy_permission::*, vendor::*,
-    watchlist_check::*, workflow::*, workflow_fixture_result::*, workflow_request::*, workflow_source::*,
-    workos_auth_method::*,
+    watchlist_check::*, waterfall::*, workflow::*, workflow_fixture_result::*, workflow_request::*,
+    workflow_source::*, workos_auth_method::*,
 };

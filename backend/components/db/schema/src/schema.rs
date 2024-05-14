@@ -1519,6 +1519,41 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    waterfall_execution (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        decision_intent_id -> Text,
+        available_vendor_apis -> Array<Nullable<Text>>,
+        completed_at -> Nullable<Timestamptz>,
+        latest_step -> Int4,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    waterfall_step (id) {
+        id -> Text,
+        execution_id -> Text,
+        created_at -> Timestamptz,
+        vendor_api -> Text,
+        step -> Int4,
+        verification_result_id -> Nullable<Text>,
+        verification_result_is_error -> Nullable<Bool>,
+        rules_result -> Nullable<Jsonb>,
+        action -> Nullable<Text>,
+        deactivated_at -> Nullable<Timestamptz>,
+        completed_at -> Nullable<Timestamptz>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     webauthn_credential (id) {
         id -> Text,
         vault_id -> Text,
@@ -1750,6 +1785,9 @@ diesel::joinable!(verification_result -> verification_request (request_id));
 diesel::joinable!(watchlist_check -> decision_intent (decision_intent_id));
 diesel::joinable!(watchlist_check -> scoped_vault (scoped_vault_id));
 diesel::joinable!(watchlist_check -> task (task_id));
+diesel::joinable!(waterfall_execution -> decision_intent (decision_intent_id));
+diesel::joinable!(waterfall_step -> verification_result (verification_result_id));
+diesel::joinable!(waterfall_step -> waterfall_execution (execution_id));
 diesel::joinable!(webauthn_credential -> insight_event (insight_event_id));
 diesel::joinable!(webauthn_credential -> vault (vault_id));
 diesel::joinable!(workflow -> insight_event (insight_event_id));
@@ -1846,6 +1884,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     verification_request,
     verification_result,
     watchlist_check,
+    waterfall_execution,
+    waterfall_step,
     webauthn_credential,
     workflow,
     workflow_event,

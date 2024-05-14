@@ -75,6 +75,8 @@ pub mod vault_data;
 pub mod verification_request;
 pub mod verification_result;
 pub mod watchlist_check;
+pub mod waterfall_execution;
+pub mod waterfall_step;
 pub mod webauthn_credential;
 pub mod workflow;
 pub mod workflow_event;

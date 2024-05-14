@@ -1,0 +1,132 @@
+use chrono::{DateTime, Utc};
+use db_schema::schema::waterfall_execution;
+use newtypes::{DecisionIntentId, Locked, VendorAPI, WaterfallExecutionId};
+
+
+use diesel::{prelude::*, Insertable, Queryable};
+
+use crate::{DbResult, NonNullVec, PgConn, TxnPgConn};
+
+use super::waterfall_step::{NewWaterfallStepArgs, WaterfallStep};
+
+#[derive(Debug, Clone, Queryable)]
+#[diesel(table_name = waterfall_execution)]
+pub struct WaterfallExecution {
+    pub id: WaterfallExecutionId,
+    pub created_at: DateTime<Utc>,
+    pub decision_intent_id: DecisionIntentId,
+    /// Ordered list of available APIs for this waterfall execution
+    #[diesel(deserialize_as = NonNullVec<VendorAPI>)]
+    pub available_vendor_apis: Vec<VendorAPI>,
+    pub completed_at: Option<DateTime<Utc>>,
+    pub latest_step: i32,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
+}
+
+
+#[derive(Debug, AsChangeset, Default)]
+#[diesel(table_name = waterfall_execution)]
+pub struct UpdateWaterfallExecution {
+    pub completed_at: Option<DateTime<Utc>>,
+    pub latest_step: Option<i32>,
+}
+
+impl UpdateWaterfallExecution {
+    pub fn set_completed_at() -> Self {
+        Self {
+            completed_at: Some(Utc::now()),
+            ..Default::default()
+        }
+    }
+
+    pub fn set_latest_step(step: i32) -> Self {
+        Self {
+            latest_step: Some(step),
+            ..Default::default()
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, Insertable)]
+#[diesel(table_name = waterfall_execution)]
+pub struct NewWaterfallExecutionRow {
+    available_vendor_apis: Vec<VendorAPI>,
+    decision_intent_id: DecisionIntentId,
+    latest_step: i32,
+    created_at: DateTime<Utc>,
+}
+
+
+impl WaterfallExecution {
+    #[tracing::instrument("WaterfallExecution::get_or_create", skip_all)]
+    pub fn get_or_create(
+        conn: &mut PgConn,
+        available_vendor_apis: Vec<VendorAPI>,
+        decision_intent_id: &DecisionIntentId,
+    ) -> DbResult<Self> {
+        let existing: Option<Self> = waterfall_execution::table
+            .filter(waterfall_execution::decision_intent_id.eq(decision_intent_id))
+            .get_result(conn)
+            .optional()?;
+        if let Some(res) = existing {
+            return Ok(res);
+        };
+
+        let row = NewWaterfallExecutionRow {
+            available_vendor_apis,
+            decision_intent_id: decision_intent_id.clone(),
+            latest_step: 0,
+            created_at: Utc::now(),
+        };
+        let res = diesel::insert_into(waterfall_execution::table)
+            .values(row)
+            .get_result(conn)?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("WaterfallExecution::lock", skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, id: &WaterfallExecutionId) -> DbResult<Locked<Self>> {
+        let result = waterfall_execution::table
+            .filter(waterfall_execution::id.eq(id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
+    }
+
+    #[tracing::instrument("WaterfallExecution::update", skip_all)]
+    pub fn update(
+        locked: Locked<Self>,
+        conn: &mut TxnPgConn,
+        update: UpdateWaterfallExecution,
+    ) -> DbResult<Self> {
+        let res = diesel::update(waterfall_execution::table)
+            .filter(waterfall_execution::id.eq(&locked.id))
+            .set(update)
+            .get_result(conn.conn())?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("WaterfallExecution::get_or_create_step", skip_all)]
+    pub fn create_step(
+        execution: Locked<Self>,
+        conn: &mut TxnPgConn,
+        vendor_api: VendorAPI,
+    ) -> DbResult<WaterfallStep> {
+        let next = execution.latest_step + 1;
+        let args = NewWaterfallStepArgs {
+            vendor_api,
+            execution_id: execution.id.clone(),
+            step: next,
+        };
+
+        let res = WaterfallStep::create(conn, args)?;
+        let execution_update = UpdateWaterfallExecution::set_latest_step(next);
+        let _ = Self::update(execution, conn, execution_update)?;
+
+        Ok(res)
+    }
+}

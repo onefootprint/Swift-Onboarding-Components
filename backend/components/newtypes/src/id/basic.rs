@@ -348,3 +348,9 @@ define_newtype_id!(
     String,
     "Identifier for a RuleInstanceReferencesList"
 );
+define_newtype_id!(
+    WaterfallExecutionId,
+    String,
+    "Identifier for a WaterfallExecution"
+);
+define_newtype_id!(WaterfallStepId, String, "Identifier for a WaterfallStep");
