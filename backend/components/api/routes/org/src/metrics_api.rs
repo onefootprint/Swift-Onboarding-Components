@@ -42,7 +42,6 @@ async fn get(
             // TODO this could drift easily. Be careful changing this since it could affect the
             // pass rate we display if we start also looking for vaults that aren't verified
             only_visible: true,
-            is_created_via_api: None,
             statuses,
             playbook_ids: playbook_id.clone().map(|playbook_id| vec![playbook_id]),
             has_outstanding_workflow_request: None,

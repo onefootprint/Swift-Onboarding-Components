@@ -3,7 +3,7 @@ use crate::{
     DbResult, PgConn,
 };
 use chrono::{DateTime, Utc};
-use db_schema::schema;
+use db_schema::schema::{self, vault};
 use diesel::{dsl::not, prelude::*};
 use itertools::Itertools;
 use newtypes::{
@@ -28,7 +28,6 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub kind: Option<VaultKind>,
     /// Temporary - only show vaults that are visible to be shown in search
     pub only_visible: bool,
-    pub is_created_via_api: Option<bool>,
     pub playbook_ids: Option<Vec<ObConfigurationId>>,
     pub has_outstanding_workflow_request: Option<bool>,
     pub external_id: Option<ExternalId>,
@@ -62,7 +61,6 @@ impl ScopedVaultListQueryParams {
             watchlist_hit,
             kind,
             only_visible,
-            is_created_via_api,
             playbook_ids,
             has_outstanding_workflow_request,
             external_id,
@@ -88,7 +86,6 @@ impl ScopedVaultListQueryParams {
             watchlist_hit,
             kind,
             only_visible,
-            is_created_via_api,
             playbook_ids,
             has_outstanding_workflow_request,
             external_id,
@@ -107,11 +104,9 @@ macro_rules! list_query {
         // not be visible in the dashboard since the tenant doesn't have permissions to view anything
         // about the user
         use db_schema::schema::{
-            manual_review, scoped_vault, scoped_vault_label, vault, watchlist_check, workflow,
-            workflow_request,
+            manual_review, scoped_vault, scoped_vault_label, watchlist_check, workflow, workflow_request,
         };
         let mut query = scoped_vault::table
-            .inner_join(vault::table)
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
             .filter(scoped_vault::is_live.eq($params.is_live))
             .filter(scoped_vault::deactivated_at.is_null())
@@ -119,10 +114,6 @@ macro_rules! list_query {
 
         if $params.only_visible {
             query = query.filter(scoped_vault::show_in_search.eq(true));
-        }
-
-        if let Some(is_created_via_api) = $params.is_created_via_api {
-            query = query.filter(vault::is_created_via_api.eq(is_created_via_api));
         }
 
         // Filter on whether user is in manual review
@@ -337,7 +328,7 @@ fn list(
 ) -> DbResult<Vec<(ScopedVault, Vault)>> {
     let query = list_query!(params);
 
-    let mut scoped_vaults = query.limit(page_size);
+    let mut scoped_vaults = query.inner_join(vault::table).limit(page_size);
 
     if let Some(cursor) = cursor {
         match cursor {

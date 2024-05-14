@@ -284,19 +284,19 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     # Get an old user, who probably hasn't had any auths recently
     filters = dict(
         timestamp_lte=arrow.now().shift(hours=-1, minutes=-5).isoformat(),
-        is_created_via_api=False,
         kind="person",
         pagination=dict(page_size=100),
     )
     body = post("entities/search", filters, *sandbox_tenant.db_auths)
-    assert all([not i["is_created_via_api"] for i in body["data"]])
-    if not body["data"]:
+    try:
+        user = next(i for i in body["data"] if not i["is_created_via_api"])
+    except StopIteration:
         assert (
             False
         ), "No old user to use to test implied auth timeout. If you get this error running tests locally, it's likely safe to ignore. See the comment in this test"
 
     # Create a token and make sure it does not have implied auth
-    fp_id = body["data"][0]["id"]
+    fp_id = user["id"]
     obc = sandbox_tenant.default_ob_config
     data = dict(dict(kind="onboard", key=obc.key.value))
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)

@@ -19755,9 +19755,6 @@
                     "has_outstanding_workflow_request": {
                         "type": "boolean"
                     },
-                    "is_created_via_api": {
-                        "type": "boolean"
-                    },
                     "kind": {
                         "type": "string",
                         "enum": [
