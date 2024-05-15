@@ -20,7 +20,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
         onboarding_decision, onboarding_decision_verification_result_junction, risk_signal,
         risk_signal_group, scoped_vault, socure_device_session, stytch_fingerprint_event, user_consent,
         user_timeline, vault, vault_data, verification_request, verification_result, watchlist_check,
-        webauthn_credential, workflow, workflow_event, workflow_request,
+        waterfall_execution, waterfall_step, webauthn_credential, workflow, workflow_event, workflow_request,
     };
     let mut deleted_rows = 0;
 
@@ -173,6 +173,20 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 fingerprint_visit_event::scoped_vault_id
                     .eq_any(su_ids.clone().select(scoped_vault::id.nullable())),
             )
+            .execute(conn.conn())?;
+        let di_ids = decision_intent::table
+            .filter(decision_intent::scoped_vault_id.eq_any(su_ids.clone()))
+            .select(decision_intent::id);
+        let we_ids = waterfall_execution::table
+            .filter(waterfall_execution::decision_intent_id.eq_any(di_ids.clone()))
+            .select(waterfall_execution::id);
+
+        deleted_rows += diesel::delete(waterfall_step::table)
+            .filter(waterfall_step::execution_id.eq_any(we_ids.clone()))
+            .execute(conn.conn())?;
+
+        deleted_rows += diesel::delete(waterfall_execution::table)
+            .filter(waterfall_execution::decision_intent_id.eq_any(di_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(decision_intent::table)
