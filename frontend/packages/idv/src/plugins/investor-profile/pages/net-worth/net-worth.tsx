@@ -32,7 +32,7 @@ const NetWorth = () => {
       onError: (error: unknown) => {
         Logger.error(
           `Encountered error while speculatively syncing data on investor profile net worth page: ${error}`,
-          'investor-profile-net-worth',
+          { location: 'investor-profile-net-worth' },
         );
       },
     });

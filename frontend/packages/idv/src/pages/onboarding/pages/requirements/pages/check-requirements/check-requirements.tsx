@@ -50,7 +50,7 @@ const CheckRequirements = () => {
           `Error while checking requirements from onboarding status: ${getErrorMessage(
             err,
           )}`,
-          'onboarding-check-requirements',
+          { location: 'onboarding-check-requirements' },
         );
         send('error');
       },

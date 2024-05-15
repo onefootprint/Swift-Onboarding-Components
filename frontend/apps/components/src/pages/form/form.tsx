@@ -3,7 +3,7 @@ import {
   ObserveCollectorProvider,
   useObserveCollector,
 } from '@onefootprint/dev-tools';
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
@@ -15,7 +15,7 @@ import Loading from './components/loading';
 const Form = () => {
   const observeCollector = useObserveCollector();
   useEffectOnce(() => {
-    Logger.setupLogRocket('form');
+    LoggerDeprecated.setupLogRocket('form');
     LogRocket.getSessionURL(logRocketSessionUrl => {
       observeCollector.setAppContext({
         logRocketSessionUrl,

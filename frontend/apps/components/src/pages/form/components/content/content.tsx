@@ -6,7 +6,7 @@ import {
   FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -49,7 +49,7 @@ const Content = ({ fallback }: ContentProps) => {
   const { authToken = '', title, options = {} } = props || {};
   const { hideFootprintLogo, hideCancelButton, hideButtons } = options;
   useEffect(() => {
-    Logger.info(
+    LoggerDeprecated.info(
       `Received form props: title=${title}, hideFootprintLogo=${
         hideFootprintLogo ? 'true' : 'false'
       }, hideCancelButton=${hideCancelButton ? 'true' : 'false'}, hideButtons=${
@@ -61,12 +61,12 @@ const Content = ({ fallback }: ContentProps) => {
   const clientTokenFields = useClientTokenFields(authToken);
 
   const handleCancel = () => {
-    Logger.info('Triggered form cancel');
+    LoggerDeprecated.info('Triggered form cancel');
     footprintProvider.send(FootprintPublicEvent.canceled);
   };
 
   const handleClose = () => {
-    Logger.info('Triggered form close');
+    LoggerDeprecated.info('Triggered form close');
     footprintProvider.send(FootprintPublicEvent.closed);
   };
 
@@ -78,7 +78,7 @@ const Content = ({ fallback }: ContentProps) => {
       if (savedViaRef) {
         handleRefSaveError(err);
       }
-      Logger.info(`Setting form-wide error, ${err}`);
+      LoggerDeprecated.info(`Setting form-wide error, ${err}`);
       setFormErrorMessage(err);
       return;
     }
@@ -88,17 +88,19 @@ const Content = ({ fallback }: ContentProps) => {
       }
       const processedFieldErrors = processFieldErrors(err);
       setFieldErrors(processedFieldErrors);
-      Logger.info(`Setting field errors: ${JSON.stringify(err)}`);
+      LoggerDeprecated.info(`Setting field errors: ${JSON.stringify(err)}`);
       return;
     }
     if (savedViaRef) {
       handleRefSaveError(t('errors.unknown-error'));
     }
-    Logger.error(`Unknown error while vaulting data, ${getErrorMessage(err)}`);
+    LoggerDeprecated.error(
+      `Unknown error while vaulting data, ${getErrorMessage(err)}`,
+    );
   };
 
   const handleComplete = () => {
-    Logger.info('Triggered form complete');
+    LoggerDeprecated.info('Triggered form complete');
     // Triggers the onComplete callback on the SDK
     footprintProvider.send(FootprintPublicEvent.completed);
     // Resolves the promise returned from the save ref method
@@ -111,35 +113,39 @@ const Content = ({ fallback }: ContentProps) => {
   };
 
   const handleSave = async (formData: FormData, savedViaRef?: boolean) => {
-    Logger.info('Triggered save form data to vault');
+    LoggerDeprecated.info('Triggered save form data to vault');
     setFieldErrors(undefined);
     setFormErrorMessage(undefined);
 
     if (usersVaultMutation.isLoading) {
-      Logger.info('Vault mutation is already in progress, skipping save');
+      LoggerDeprecated.info(
+        'Vault mutation is already in progress, skipping save',
+      );
       return;
     }
 
     if (!clientTokenFields.data) {
-      Logger.error('Cannot save to vault without client token fields');
+      LoggerDeprecated.error(
+        'Cannot save to vault without client token fields',
+      );
       return;
     }
     const { vaultFields } = clientTokenFields.data;
     const cardAlias = getCardAlias(vaultFields);
-    Logger.info(
+    LoggerDeprecated.info(
       `Received vaultFields: ${vaultFields.join(
         ', ',
       )}. Card alias is ${cardAlias}`,
     );
     if (!cardAlias) {
-      Logger.error(
+      LoggerDeprecated.error(
         'Cannot extract cardAlias from auth token. Please verify auth token has correct fields set on it.',
       );
       return;
     }
 
     const convertedData = convertFormData(formData, cardAlias);
-    Logger.info(
+    LoggerDeprecated.info(
       `Form data has keys: ${Object.keys(formData).join(
         ', ',
       )}. Converted data has keys: ${Object.keys(convertedData).join(', ')}`,
@@ -155,16 +161,16 @@ const Content = ({ fallback }: ContentProps) => {
 
   const { data, isError, isLoading, error } = clientTokenFields;
   if (isLoading) {
-    Logger.info('Fetching client token fields');
+    LoggerDeprecated.info('Fetching client token fields');
     return fallback; // Default to a loading state here
   }
   if (!props) {
-    Logger.info('No props passed to secure form');
+    LoggerDeprecated.info('No props passed to secure form');
     return fallback; // Default to a loading state here
   }
 
   if (isError) {
-    Logger.error(
+    LoggerDeprecated.error(
       `Fetching client token fields failed with error: ${getErrorMessage(
         error,
       )}.`,
@@ -175,24 +181,26 @@ const Content = ({ fallback }: ContentProps) => {
   const { vaultFields, expiresAt } = data;
   const sections = getFormSectionsFromFields(vaultFields);
   if (!sections.length) {
-    Logger.error('Auth token is missing fields');
+    LoggerDeprecated.error('Auth token is missing fields');
     return <Invalid onClose={handleClose} />;
   }
 
   const isExpired = checkIsExpired(expiresAt);
   if (isExpired) {
-    Logger.warn('Client auth token is expired, cannot save to vault');
+    LoggerDeprecated.warn('Client auth token is expired, cannot save to vault');
     return <Invalid onClose={handleClose} />;
   }
 
   const isValid = arePropsValid(props);
   if (!isValid) {
-    Logger.error('Invalid props passed to secure form');
+    LoggerDeprecated.error('Invalid props passed to secure form');
     return <Invalid onClose={handleClose} />;
   }
 
   if (!data) {
-    Logger.error('Received empty response while fetching client token fields');
+    LoggerDeprecated.error(
+      'Received empty response while fetching client token fields',
+    );
     return <Invalid onClose={handleClose} />;
   }
 

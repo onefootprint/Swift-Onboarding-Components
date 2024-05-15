@@ -29,7 +29,7 @@ const useCancelD2P = ({
             `Failed to cancel D2P session from mobile bifrost. ${getErrorMessage(
               error,
             )}`,
-            'transfer',
+            { location: 'transfer' },
           );
           onError?.();
         },

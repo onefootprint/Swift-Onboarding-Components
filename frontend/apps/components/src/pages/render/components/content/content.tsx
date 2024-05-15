@@ -1,5 +1,5 @@
 import type { FootprintRenderDataProps } from '@onefootprint/footprint-js';
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
@@ -64,7 +64,7 @@ const Content = ({ fallback }: ContentProps) => {
   };
 
   useEffect(() => {
-    Logger.info(
+    LoggerDeprecated.info(
       `Received form props: id=${id}, label=${label}, canCopy=${
         canCopy ? 'true' : 'false'
       }, defaultHidden=${defaultHidden ? 'true' : 'false'}, showHiddenToggle=${
@@ -74,29 +74,31 @@ const Content = ({ fallback }: ContentProps) => {
   }, [authToken, id, label, canCopy, showHiddenToggle, defaultHidden]);
 
   if (isLoading) {
-    Logger.info('Fetching client token fields');
+    LoggerDeprecated.info('Fetching client token fields');
     return fallback; // Default to a loading state here
   }
   if (!props) {
-    Logger.info('No props passed to secure form');
+    LoggerDeprecated.info('No props passed to secure form');
     return fallback; // Default to a loading state here
   }
 
   const isValid = arePropsValid(props);
   if (!isValid) {
-    Logger.error('Invalid props passed to secure form');
+    LoggerDeprecated.error('Invalid props passed to secure form');
     return <Invalid />;
   }
 
   if (isError) {
-    Logger.error(
+    LoggerDeprecated.error(
       `Decrypting vault data failed with error: ${getErrorMessage(error)}`,
     );
     return <Invalid />;
   }
 
   if (!data) {
-    Logger.error('Received empty response while decrypting vault data');
+    LoggerDeprecated.error(
+      'Received empty response while decrypting vault data',
+    );
     return <Invalid />;
   }
 

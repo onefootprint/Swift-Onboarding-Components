@@ -58,7 +58,7 @@ const DesktopNavProps: NavigationHeaderLeftButtonProps = {
   confirmClose: true,
 };
 
-const logWarn = (e: string) => Logger.warn(e, 'photo-capture');
+const logWarn = (e: string) => Logger.warn(e, { location: 'photo-capture' });
 
 const PhotoCapture = ({
   autocaptureKind,

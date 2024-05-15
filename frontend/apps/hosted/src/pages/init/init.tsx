@@ -1,4 +1,3 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { Logger, useGetOnboardingConfig } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
@@ -16,7 +15,6 @@ const Init = () => {
   const [state, send] = useHostedMachine();
   const { obConfigAuth, authToken } = state.context;
   const showRequestError = useRequestErrorToast();
-  const observeCollector = useObserveCollector();
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
 
@@ -34,7 +32,7 @@ const Init = () => {
       });
     },
     onError: (error: string) => {
-      Logger.error(error, 'hosted-init');
+      Logger.error(error, { location: 'hosted-init' });
       send({
         type: 'invalidUrlReceived',
       });
@@ -58,7 +56,7 @@ const Init = () => {
           `Hosted app init page fetching business details failed: ${getErrorMessage(
             error,
           )}`,
-          'hosted-init',
+          { location: 'hosted-init' },
         );
         showRequestError(error);
         send({
@@ -72,12 +70,9 @@ const Init = () => {
     { obConfigAuth, authToken },
     {
       onSuccess: onboardingConfig => {
-        observeCollector.setAppContext({
-          config: onboardingConfig,
-        });
         const { orgName, orgId, key, isLive } = onboardingConfig;
         if (isLive && !orgIds.has(orgId)) {
-          Logger.setupLogRocket('hosted');
+          Logger.enableLogRocket();
           Logger.identify({
             orgName,
             orgId,
@@ -98,7 +93,7 @@ const Init = () => {
           `Hosted app init page fetching onboarding config failed: ${getErrorMessage(
             error,
           )}`,
-          'hosted-init',
+          { location: 'hosted-init' },
         );
         showRequestError(error);
         send({

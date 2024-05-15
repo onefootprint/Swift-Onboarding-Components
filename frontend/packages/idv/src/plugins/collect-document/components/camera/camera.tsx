@@ -91,8 +91,8 @@ const PLAY_CHECK_INTERVAL = 1500;
 const FORCED_UPLOAD_DELAY = 7000;
 const CAMERA_LOADING_FEEDBACK_DELAY = 4000;
 
-const logError = (e: string) => Logger.error(e, 'camera');
-const logWarn = (e: string) => Logger.warn(e, 'camera');
+const logError = (e: string) => Logger.error(e, { location: 'camera' });
+const logWarn = (e: string) => Logger.warn(e, { location: 'camera' });
 
 const videoElementStateListener =
   (

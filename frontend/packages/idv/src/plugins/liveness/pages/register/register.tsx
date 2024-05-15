@@ -83,7 +83,7 @@ const Register = () => {
           const errorMessage = getErrorMessage(e);
           Logger.error(
             `Failed to register passkeys for user: ${errorMessage}`,
-            'liveness-register',
+            { location: 'liveness-register' },
           );
           // Keep track of each failed attempt to register a passkey.
           // We will send this to the backend
@@ -121,7 +121,7 @@ const Register = () => {
             `Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(
               error,
             )}`,
-            'liveness-register',
+            { location: 'liveness-register' },
           );
         },
       },

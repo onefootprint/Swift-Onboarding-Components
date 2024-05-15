@@ -49,7 +49,7 @@ const MobileProcessing = () => {
     if (isRetryLimitExceeded) {
       Logger.error(
         `Image upload retry limit exceeded. doc: ${documentRequestKind}, doc id: ${id}`,
-        'desktop-processing',
+        { location: 'desktop-processing' },
       );
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === IdDocImageTypes.front) {
@@ -66,7 +66,7 @@ const MobileProcessing = () => {
     } else {
       Logger.error(
         `Unexpected next side to collect in non-id-doc flow. Side: ${nextSideToCollect}`,
-        'mobile-processing',
+        { location: 'mobile-processing' },
       );
     }
   };
@@ -90,7 +90,7 @@ const MobileProcessing = () => {
       `Error while processing non id-doc image ${id}: ${getErrorMessage(
         error,
       )}`,
-      'processing',
+      { location: 'processing' },
     );
     handleError(error);
   };
@@ -111,7 +111,7 @@ const MobileProcessing = () => {
 
     Logger.error(
       `Non id-doc image submit failed on phone flow. Document kind: ${documentRequestKind}, upload session id: ${id}. Error: ${errorMessage}`,
-      'processing',
+      { location: 'processing' },
     );
     handleError(error);
   };
@@ -142,7 +142,7 @@ const MobileProcessing = () => {
       }, auth token: ${authToken ? 'OK' : 'undefined'}, id: ${
         id ? 'OK' : 'undefined'
       }`;
-      Logger.error(error, 'desktop-processing');
+      Logger.error(error, { location: 'desktop-processing' });
       return;
     }
 

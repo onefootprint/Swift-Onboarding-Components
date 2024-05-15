@@ -26,7 +26,9 @@ const useFaceModelLoader = ({ selfieRequired }: FaceModelLoaderType) => {
             setModelsLoaded(true);
           })
           .catch(err => {
-            Logger.error(`Error loading the face models: ${err}`, 'id-doc');
+            Logger.error(`Error loading the face models: ${err}`, {
+              location: 'id-doc',
+            });
           });
       }
     };

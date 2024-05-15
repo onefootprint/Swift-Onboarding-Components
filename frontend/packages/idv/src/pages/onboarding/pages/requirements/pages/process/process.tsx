@@ -30,7 +30,7 @@ const Process = ({ onDone }: ProcessProps) => {
             `Error while processing onboarding on authorize page. ${getErrorMessage(
               error,
             )}`,
-            'onboarding-process',
+            { location: 'onboarding-process' },
           );
           send('error');
         },

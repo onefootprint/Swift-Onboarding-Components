@@ -1,4 +1,3 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import type { ProviderReturn } from '@onefootprint/idv';
 import {
@@ -34,7 +33,6 @@ const Init = ({ fpProvider }: InitProps) => {
     publicKey: publicKeyContext,
     config: configContext,
   } = state.context;
-  const observeCollector = useObserveCollector();
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const obConfigAuth = publicKeyContext
@@ -43,12 +41,11 @@ const Init = ({ fpProvider }: InitProps) => {
 
   const setupLogger = async (config: PublicOnboardingConfig) => {
     const isInIframe = checkIsInIframe();
-    observeCollector.setAppContext({ config });
     const { orgName, orgId, key, isLive } = config;
     const sdkContextModel = await getSdkContext(fpProvider);
 
     if (isLive && !orgIds.has(orgId)) {
-      Logger.setupLogRocket('bifrost');
+      Logger.enableLogRocket();
       Logger.identify({
         ...sdkContextModel,
         orgName,
@@ -69,7 +66,7 @@ const Init = ({ fpProvider }: InitProps) => {
           isPropsSaved: isPropsSaved(),
         },
       )}`,
-      'init-shimmer',
+      { location: 'init-shimmer' },
     );
   }, STUCK_ON_SHIMMER_TIMEOUT);
 
@@ -92,7 +89,7 @@ const Init = ({ fpProvider }: InitProps) => {
         Logger.error(
           `Fetching onboarding config in bifrost init failed with error: 
         ${getErrorMessage(error)}`,
-          'bifrost-init',
+          { location: 'bifrost-init' },
         );
         send({
           type: 'configRequestFailed',
@@ -144,7 +141,7 @@ const Init = ({ fpProvider }: InitProps) => {
     (error: unknown) => {
       Logger.error(
         `Message: Failed to fetch initial properties ${getErrorMessage(error)}`,
-        'init-props',
+        { location: 'init-props' },
       );
       send({ type: 'initError' });
     },

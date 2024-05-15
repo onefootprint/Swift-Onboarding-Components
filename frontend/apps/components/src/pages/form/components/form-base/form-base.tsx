@@ -2,7 +2,7 @@ import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import { Divider, useConfirmationDialog } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -99,14 +99,14 @@ const FormBase = ({
   const triggerSave = async () => {
     const canSave = await trigger();
     if (!canSave) {
-      Logger.info(
+      LoggerDeprecated.info(
         'Triggered form save via ref but form has errors, so not saved.',
       );
       // There were some errors with inputs, don't trigger saving
       onSaveError?.(t('errors.invalid-data'));
       return;
     }
-    Logger.info('Triggered form save via ref');
+    LoggerDeprecated.info('Triggered form save via ref');
     onSave?.(getValues(), true);
   };
 

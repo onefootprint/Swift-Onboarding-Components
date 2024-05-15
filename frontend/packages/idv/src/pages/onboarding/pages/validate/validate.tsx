@@ -1,10 +1,10 @@
-import { getErrorMessage } from '@onefootprint/request';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useOnboardingValidate } from '../../../../hooks';
+import Logger from '../../../../utils/logger/logger';
 import nid from '../../../../utils/neuro-id';
 import Error from '../../components/error';
 import { useOnboardingMachine } from '../../components/machine-provider';
@@ -33,10 +33,7 @@ const Validate = () => {
           });
         },
         onError: (error: unknown) => {
-          console.error(
-            'Error while validating onboarding',
-            getErrorMessage(error),
-          );
+          Logger.error(error, { location: 'validate' });
         },
       },
     );

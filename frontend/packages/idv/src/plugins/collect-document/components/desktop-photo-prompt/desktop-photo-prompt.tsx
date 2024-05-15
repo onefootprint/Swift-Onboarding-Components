@@ -79,7 +79,7 @@ const DesktopPhotoPrompt = ({
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
       Logger.error(
         'Image upload failed on desktop mode. Uploaded image could not be processed',
-        'desktop-photo-prompt',
+        { location: 'desktop-photo-prompt' },
       );
       return;
     }

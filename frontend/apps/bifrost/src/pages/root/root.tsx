@@ -1,5 +1,4 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
   FootprintPrivateEvent,
   type FootprintVariant,
@@ -17,11 +16,9 @@ import { checkIsAndroid } from '@onefootprint/idv/src/utils';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
-import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React, { useCallback } from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import { useEffectOnce } from 'usehooks-ts';
 
 import Layout from '../../components/layout';
 import Complete from '../complete';
@@ -50,17 +47,9 @@ const Root = ({ variant }: RootProps) => {
 
   const isAndroidWebview = !checkIsIframe() && checkIsAndroid();
   const shouldShowCompletionPage = showCompletionPage || isAndroidWebview;
-  const observeCollector = useObserveCollector();
   const mutIdentifyValidate = useIdentifyValidate();
 
   useLogStateMachine('bifrost', state);
-  useEffectOnce(() => {
-    LogRocket.getSessionURL(logRocketSessionUrl => {
-      observeCollector.setAppContext({
-        logRocketSessionUrl,
-      });
-    });
-  });
 
   const handleIdentifyCompletion = useCallback(
     (args: { authToken: string }) => {

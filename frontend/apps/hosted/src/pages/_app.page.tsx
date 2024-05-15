@@ -1,5 +1,4 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { Logger } from '@onefootprint/idv';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
@@ -10,24 +9,23 @@ import { createGlobalStyle, css } from 'styled-components';
 import configureI18n from '../config/initializers/i18next';
 import queryClient from '../config/initializers/react-query';
 
-Logger.setupSentry();
+// Don't enable log rocket until we know we are in a live onboarding
+Logger.init('hosted', true);
 configureI18n();
 
 const App = ({ Component, pageProps }: AppProps) => (
-  <ObserveCollectorProvider appName="hosted">
-    <QueryClientProvider client={queryClient}>
-      <HostedMachineProvider>
-        <AppearanceProvider
-          options={{
-            strategy: ['obConfig'],
-          }}
-        >
-          <GlobalStyle />
-          <Component {...pageProps} />
-        </AppearanceProvider>
-      </HostedMachineProvider>
-    </QueryClientProvider>
-  </ObserveCollectorProvider>
+  <QueryClientProvider client={queryClient}>
+    <HostedMachineProvider>
+      <AppearanceProvider
+        options={{
+          strategy: ['obConfig'],
+        }}
+      >
+        <GlobalStyle />
+        <Component {...pageProps} />
+      </AppearanceProvider>
+    </HostedMachineProvider>
+  </QueryClientProvider>
 );
 
 const GlobalStyle = createGlobalStyle`

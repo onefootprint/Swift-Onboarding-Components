@@ -5,10 +5,12 @@ import {
   IS_SERVER,
   IS_TEST,
 } from '@onefootprint/global-constants';
+import { getErrorMessage } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import Script from 'next/script';
 import React from 'react';
 
+import Logger from '../../utils/logger';
 import nid from '../../utils/neuro-id';
 
 const NID_LIVE_SITE_NAME = 'humor717';
@@ -28,7 +30,11 @@ const LoadNeuroId = ({ config }: LoadNeuroIdProps) => {
   return isEnabled ? (
     <Script
       id="neuro-id-script"
-      onError={e => console.error('Failed to load the Neuro-ID script', e)}
+      onError={e => {
+        Logger.error(
+          `Failed to load the Neuro-ID script: ${getErrorMessage(e)}`,
+        );
+      }}
       src={`//scripts.neuro-id.com/c/nid-${siteName}.js`}
       strategy="afterInteractive"
       onLoad={() => {

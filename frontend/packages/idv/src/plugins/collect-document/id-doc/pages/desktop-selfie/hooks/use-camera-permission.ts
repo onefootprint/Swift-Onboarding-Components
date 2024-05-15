@@ -46,7 +46,7 @@ const useCameraPermission = () => {
 
         Logger.warn(
           `Error while retrieving camera permission. Error: ${error.name}`,
-          'desktop-selfie',
+          { location: 'desktop-selfie' },
         );
       });
   };

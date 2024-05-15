@@ -1,5 +1,4 @@
 import themes from '@onefootprint/design-tokens';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import {
   createUseRouterSpy,
   render,
@@ -63,21 +62,19 @@ describe('<CollectKycData />', () => {
   const renderPlugin = ({ idvContext, context, onDone }: CollectKycDataProps) =>
     render(
       <React.StrictMode>
-        <ObserveCollectorProvider appName="test">
-          <QueryClientProvider client={queryClient}>
-            <DesignSystemProvider theme={themes.footprint.light}>
-              <ToastProvider>
-                <Layout>
-                  <CollectKycData
-                    idvContext={idvContext}
-                    context={context}
-                    onDone={onDone}
-                  />
-                </Layout>
-              </ToastProvider>
-            </DesignSystemProvider>
-          </QueryClientProvider>
-        </ObserveCollectorProvider>
+        <QueryClientProvider client={queryClient}>
+          <DesignSystemProvider theme={themes.footprint.light}>
+            <ToastProvider>
+              <Layout>
+                <CollectKycData
+                  idvContext={idvContext}
+                  context={context}
+                  onDone={onDone}
+                />
+              </Layout>
+            </ToastProvider>
+          </DesignSystemProvider>
+        </QueryClientProvider>
       </React.StrictMode>,
     );
 

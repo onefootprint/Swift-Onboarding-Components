@@ -1,4 +1,3 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
   InitShimmer,
   Logger,
@@ -21,7 +20,6 @@ const Init = () => {
   const [state, send] = useHandoffMachine();
   const { authToken = '' } = state.context;
   const updateD2PStatusMutation = useUpdateD2PStatus();
-  const observeCollector = useObserveCollector();
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
 
@@ -37,7 +35,9 @@ const Init = () => {
       }
     },
     onError: () => {
-      Logger.error('Parsing handoff URL failed on init page', 'handoff-init');
+      Logger.error('Parsing handoff URL failed on init page', {
+        location: 'handoff-init',
+      });
     },
   });
 
@@ -46,16 +46,14 @@ const Init = () => {
     const opener = meta?.opener ?? 'unknown';
     const bifrostSessionId = meta?.sessionId ?? '';
     const locale = meta?.l10n?.locale ?? 'en-US';
-    observeCollector.setAppContext({
-      opener,
-      bifrostSessionId,
-    });
     Logger.identify({ opener, bifrostSessionId, locale });
   };
 
   const updateD2PStatus = () => {
     if (!authToken) {
-      Logger.error('Found empty auth token while updating d2p', 'handoff-init');
+      Logger.error('Found empty auth token while updating d2p', {
+        location: 'handoff-init',
+      });
       return;
     }
     // Tell the api that d2p is in progress now
@@ -80,7 +78,7 @@ const Init = () => {
             `Updating the d2p status to in progress failed: ${getErrorMessage(
               error,
             )}`,
-            'handoff-init',
+            { location: 'handoff-init' },
           );
         },
       },
@@ -131,19 +129,16 @@ const Init = () => {
           `Fetching d2p status failed on handoff init page: ${getErrorMessage(
             error,
           )}`,
-          'handoff-init',
+          { location: 'handoff-init' },
         );
       },
     },
   });
 
   const setupLogger = (config: PublicOnboardingConfig) => {
-    observeCollector.setAppContext({
-      config,
-    });
     const { orgName, orgId, key, isLive } = config;
     if (isLive && !orgIds.has(orgId)) {
-      Logger.setupLogRocket('handoff');
+      Logger.enableLogRocket();
       Logger.identify({
         orgName,
         orgId,
@@ -173,7 +168,7 @@ const Init = () => {
           `Fetching onboarding status failed on handoff init page: ${getErrorMessage(
             error,
           )}`,
-          'handoff-init',
+          { location: 'handoff-init' },
         );
       },
     },

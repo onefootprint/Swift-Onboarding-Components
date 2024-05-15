@@ -60,9 +60,9 @@ const useHandleCameraError = () => {
       error.name === 'NotAllowedError' ||
       error.name === 'PermissionDeniedError'
     ) {
-      Logger.warn(`Camera error: ${err}`, 'camera');
+      Logger.warn(`Camera error: ${err}`, { location: 'camera' });
     } else {
-      Logger.error(`Camera error: ${err}`, 'camera');
+      Logger.error(`Camera error: ${err}`, { location: 'camera' });
     }
   };
 };

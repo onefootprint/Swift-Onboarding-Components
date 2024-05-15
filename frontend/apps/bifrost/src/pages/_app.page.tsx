@@ -1,5 +1,4 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import {
   configureFootprint,
   FootprintProvider,
@@ -18,7 +17,8 @@ import configureI18n from '../config/initializers/i18next';
 import queryClient from '../config/initializers/react-query';
 
 const footprint = configureFootprint();
-Logger.setupSentry();
+// Don't enable log rocket until we know we are in a live onboarding
+Logger.init('bifrost', true);
 configureI18n();
 
 const App = ({ Component, pageProps }: AppProps) => {
@@ -32,22 +32,16 @@ const App = ({ Component, pageProps }: AppProps) => {
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
       </Head>
-      <ObserveCollectorProvider appName="bifrost">
-        <QueryClientProvider client={queryClient}>
-          <AppearanceProvider
-            appearance={appearance}
-            theme={theme}
-            rules={rules}
-          >
-            <BifrostMachineProvider>
-              <GlobalStyle />
-              <FootprintProvider client={footprint}>
-                <Component {...pageProps} />
-              </FootprintProvider>
-            </BifrostMachineProvider>
-          </AppearanceProvider>
-        </QueryClientProvider>
-      </ObserveCollectorProvider>
+      <QueryClientProvider client={queryClient}>
+        <AppearanceProvider appearance={appearance} theme={theme} rules={rules}>
+          <BifrostMachineProvider>
+            <GlobalStyle />
+            <FootprintProvider client={footprint}>
+              <Component {...pageProps} />
+            </FootprintProvider>
+          </BifrostMachineProvider>
+        </AppearanceProvider>
+      </QueryClientProvider>
       <Script
         async
         src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&loading=async&libraries=places&callback=Function.prototype`}

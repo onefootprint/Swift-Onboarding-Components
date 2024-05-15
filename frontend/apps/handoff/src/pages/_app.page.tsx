@@ -1,5 +1,4 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { Logger } from '@onefootprint/idv';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
@@ -12,7 +11,8 @@ import MachineProvider from '../components/machine-provider';
 import configureI18n from '../config/initializers/i18next';
 import queryClient from '../config/initializers/react-query';
 
-Logger.setupSentry();
+// Don't enable log rocket until we know we are in a live onboarding
+Logger.init('handoff', true);
 configureI18n();
 
 const App = ({ Component, pageProps }: AppProps) => {
@@ -30,20 +30,18 @@ const App = ({ Component, pageProps }: AppProps) => {
           />
         </Head>
       ) : null}
-      <ObserveCollectorProvider appName="handoff">
-        <QueryClientProvider client={queryClient}>
-          <MachineProvider>
-            <AppearanceProvider
-              options={{
-                strategy: ['styleParams'],
-              }}
-            >
-              <GlobalStyle />
-              <Component {...pageProps} />
-            </AppearanceProvider>
-          </MachineProvider>
-        </QueryClientProvider>
-      </ObserveCollectorProvider>
+      <QueryClientProvider client={queryClient}>
+        <MachineProvider>
+          <AppearanceProvider
+            options={{
+              strategy: ['styleParams'],
+            }}
+          >
+            <GlobalStyle />
+            <Component {...pageProps} />
+          </AppearanceProvider>
+        </MachineProvider>
+      </QueryClientProvider>
     </>
   );
 };

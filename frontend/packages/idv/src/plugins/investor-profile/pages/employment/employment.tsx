@@ -40,7 +40,7 @@ const Employment = () => {
       onError: (error: unknown) => {
         Logger.error(
           `Encountered error while speculatively syncing data on investor-profile employment page ${error}`,
-          'investor-profile-employment',
+          { location: 'investor-profile-employment' },
         );
       },
     });

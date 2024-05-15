@@ -33,9 +33,9 @@
     "@onefootprint/idv": "*",
     "@onefootprint/postmate": "2.1.0",
     "@onefootprint/request": "*",
-    "styled-components": "^6",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
+    "@sentry/nextjs": "^7.105.0",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-locales-sync": "^2.0.1",
@@ -48,6 +48,7 @@
     "react-dom": "^18",
     "react-error-boundary": "4.0.11",
     "react-i18next": "^14.0.0",
+    "styled-components": "^6",
     "usehooks-ts": "^2.9.1",
     "xstate": "^4.37.1"
   },

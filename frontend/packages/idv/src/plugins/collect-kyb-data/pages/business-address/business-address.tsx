@@ -48,7 +48,7 @@ const BusinessAddress = ({
     const handleError = (error: string) => {
       Logger.error(
         `Speculatively vaulting data failed in kyb business-address page: ${error}`,
-        'kyb-business-address',
+        { location: 'kyb-business-address' },
       );
     };
 

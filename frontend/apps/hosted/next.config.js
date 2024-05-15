@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 
+const { withSentryConfig } = require('@sentry/nextjs');
+const BundleAnalyzer = require('@next/bundle-analyzer');
+
 const IS_DEV = process.env.NODE_ENV === 'development';
+const COMMIT_SHA = process.env.VERCEL_GIT_COMMIT_SHA;
+const SHOULD_UPLOAD_SOURCE_MAPS =
+  process.env.VERCEL_ENV === 'production' ||
+  process.env.VERCEL_ENV === 'preview';
 
 const SENTRY_CONNECT_SRC = ['*.sentry.io', '*.ingest.sentry.io'].join(' ');
 const SENTRY_SCRIPT_SRC = [
@@ -8,6 +15,7 @@ const SENTRY_SCRIPT_SRC = [
   'https://js.sentry-cdn.com',
 ].join(' ');
 
+const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 const OBSERVE_CONNECT_SRC = ['189225732777.collect.observeinc.com'].join(' ');
 
 const LOG_ROCKET_SCRIPT_SRC = [
@@ -39,7 +47,7 @@ const DEV_CONNECT_SRC = (
 
 const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
-  connect-src 'self' ${DEV_CONNECT_SRC} *.neuro-id.com *.neuroid.cloud vitals.vercel-insights.com vercel.live *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com maps.googleapis.com unpkg.com *.neuro-id.com *.neuroid.cloud https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com *.launchdarkly.com ${OBSERVE_CONNECT_SRC} ${LOG_ROCKET_CONNECT_SRC} ${SENTRY_CONNECT_SRC};
+  connect-src 'self' ${DEV_CONNECT_SRC} *.neuro-id.com *.neuroid.cloud vitals.vercel-insights.com vercel.live *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com *.launchdarkly.com ${OBSERVE_CONNECT_SRC} ${LOG_ROCKET_CONNECT_SRC} ${SENTRY_CONNECT_SRC};
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
@@ -86,7 +94,7 @@ const securityHeaders = [
   },
 ];
 
-module.exports = {
+const nextConfig = {
   productionBrowserSourceMaps: true,
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: false,
@@ -150,3 +158,47 @@ module.exports = {
     IS_E2E: process.env.IS_E2E,
   },
 };
+
+module.exports = nextConfig;
+
+if (SHOULD_UPLOAD_SOURCE_MAPS) {
+  console.log('📦 Uploading source maps to Sentry');
+  module.exports = withSentryConfig(
+    module.exports,
+    {
+      // For all available options, see:
+      // https://github.com/getsentry/sentry-webpack-plugin#options
+
+      // Suppresses source map uploading logs during build
+      silent: true,
+      org: 'onefootprint',
+      project: 'verify',
+    },
+    {
+      // For all available options, see:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+      release: COMMIT_SHA,
+      transpileClientSDK: false,
+
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
+
+      // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+      // This can increase your server load as well as your hosting bill.
+      // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+      // side errors will fail.
+      tunnelRoute: '/monitoring',
+
+      // Hides source maps from generated client bundles
+      hideSourceMaps: true,
+
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
+    },
+  );
+}
+
+if (IS_ANALYZE_ACTIVE) {
+  console.log('📊 Showing bundle analyzer');
+  module.exports = BundleAnalyzer({ enabled: true })(nextConfig);
+}

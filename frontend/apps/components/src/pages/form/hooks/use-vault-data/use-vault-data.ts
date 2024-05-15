@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier, UsersVaultRequest } from '@onefootprint/types';
 import type { AxiosError } from 'axios';
@@ -32,7 +32,7 @@ const useVaultData = () => {
   }: UsersVaultArgs) => {
     if (!authToken) {
       onError(t('missing-auth-token'));
-      Logger.error('Found empty auth token while vaulting data.');
+      LoggerDeprecated.error('Found empty auth token while vaulting data.');
       return;
     }
 
@@ -50,7 +50,7 @@ const useVaultData = () => {
             onError(fieldErrors);
           } else {
             const errorMessage = getErrorMessage(err);
-            Logger.error(
+            LoggerDeprecated.error(
               `Form encountered error while vaulting data: ${errorMessage}`,
             );
             onError(errorMessage);

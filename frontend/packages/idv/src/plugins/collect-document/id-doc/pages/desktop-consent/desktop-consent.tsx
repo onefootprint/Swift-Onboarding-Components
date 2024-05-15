@@ -54,15 +54,14 @@ const DesktopConsent = () => {
     const consentInfo = consentRef.current?.getConsentInfo();
     if (!authToken || consentMutation.isLoading || !consentInfo) {
       if (!authToken) {
-        Logger.error(
-          "Could not submit consent - auth token doesn't exist",
-          'consent-desktop',
-        );
+        Logger.error("Could not submit consent - auth token doesn't exist", {
+          location: 'consent-desktop',
+        });
       }
       if (!consentInfo) {
         Logger.error(
           'Could not submit consent - consent language is empty or undefined',
-          'consent-desktop',
+          { location: 'consent-desktop' },
         );
       }
       return;
@@ -81,7 +80,7 @@ const DesktopConsent = () => {
         onError: err => {
           Logger.error(
             `Could not submit consent language. Error: ${getErrorMessage(err)}`,
-            'consent-desktop',
+            { location: 'consent-desktop' },
           );
           requestErrorToast(err);
         },

@@ -21,7 +21,7 @@ type UploadButtonProps = {
   hasBadConnectivity?: boolean;
 };
 
-const logWarn = (e: string) => Logger.warn(e, 'upload-button');
+const logWarn = (e: string) => Logger.warn(e, { location: 'upload-button' });
 const logProcessedFile = (res: {
   file: File | Blob;
   extraCompressed: boolean;

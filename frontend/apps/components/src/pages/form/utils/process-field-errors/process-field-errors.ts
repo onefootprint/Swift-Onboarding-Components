@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import type { DataIdentifier } from '@onefootprint/types';
 import { CardDIField } from '@onefootprint/types';
 
@@ -32,7 +32,7 @@ const processFieldErrors = (
     if (field && cardDI) {
       validatedErrors[field] = value;
     } else {
-      Logger.error(
+      LoggerDeprecated.error(
         `Could not parse error while vaulting field ${key}: `,
         value,
       );

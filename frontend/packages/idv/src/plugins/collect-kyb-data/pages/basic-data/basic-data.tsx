@@ -53,7 +53,7 @@ const BasicData = ({
     const handleError = (error: string) => {
       Logger.error(
         `Speculatively vaulting data failed in kyb basic-data page: ${error}`,
-        'kyb-basic-data',
+        { location: 'kyb-basic-data' },
       );
     };
 

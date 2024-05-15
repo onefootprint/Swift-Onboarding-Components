@@ -58,7 +58,7 @@ const Unavailable = () => {
             `Error while skipping liveness in liveness unavailable page: ${getErrorMessage(
               error,
             )}`,
-            'liveness-unavailable',
+            { location: 'liveness-unavailable' },
           );
         },
       },

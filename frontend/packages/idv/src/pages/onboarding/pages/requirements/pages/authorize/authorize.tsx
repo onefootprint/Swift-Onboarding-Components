@@ -94,7 +94,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
             `Error while processing onboarding on authorize page: ${getErrorMessage(
               error,
             )}`,
-            'onboarding-authorize',
+            { location: 'onboarding-authorize' },
           );
           send('error');
         },
@@ -116,7 +116,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
             `Error while authorizing onboarding on authorize page: ${getErrorMessage(
               error,
             )}`,
-            'onboarding-authorize',
+            { location: 'onboarding-authorize' },
           );
           toast.show({
             title: t('onboarding-complete-error.title'),

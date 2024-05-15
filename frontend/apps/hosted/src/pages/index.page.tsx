@@ -1,15 +1,12 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import Idv, { AppErrorBoundary, Logger } from '@onefootprint/idv';
 import { IdDI } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
-import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React from 'react';
 import Layout from 'src/components/layout';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
-import { useEffectOnce } from 'usehooks-ts';
 
 import Complete from './complete';
 import Expired from './expired';
@@ -26,15 +23,6 @@ const Root = ({ variant }: RootProps) => {
   const { businessBoKycData, obConfigAuth, authToken } = state.context;
   const { invited } = businessBoKycData || {};
   const { email, phoneNumber } = invited || {};
-
-  const observeCollector = useObserveCollector();
-  useEffectOnce(() => {
-    LogRocket.getSessionURL(logRocketSessionUrl => {
-      observeCollector.setAppContext({
-        logRocketSessionUrl,
-      });
-    });
-  });
 
   const handleComplete = () => {
     Logger.info('IDV flow is completed on hosted');

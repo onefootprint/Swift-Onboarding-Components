@@ -32,7 +32,7 @@ const RiskTolerance = () => {
       onError: (error: unknown) => {
         Logger.error(
           `Encountered error while speculatively syncing data on investor profile risk tolerance page: ${error}`,
-          'investor-profile-risk-tolerance',
+          { location: 'investor-profile-risk-tolerance' },
         );
       },
     });

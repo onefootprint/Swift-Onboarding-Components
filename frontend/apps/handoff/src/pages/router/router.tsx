@@ -1,4 +1,3 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv, {
   AppErrorBoundary,
@@ -9,11 +8,9 @@ import Idv, {
 import { getErrorMessage } from '@onefootprint/request';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
-import * as LogRocket from 'logrocket';
 import React from 'react';
 import Layout from 'src/components/layout';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
-import { useEffectOnce } from 'usehooks-ts';
 
 import Canceled from '../canceled';
 import Complete from '../complete';
@@ -29,15 +26,7 @@ const Router = ({ variant }: RouterProps) => {
   const { authToken, onboardingConfig, idDocOutcome, l10n } = state.context;
   const tenantPk = onboardingConfig?.key;
 
-  const observeCollector = useObserveCollector();
   useLogStateMachine('handoff', state);
-  useEffectOnce(() => {
-    LogRocket.getSessionURL(logRocketSessionUrl => {
-      observeCollector.setAppContext({
-        logRocketSessionUrl,
-      });
-    });
-  });
 
   const obConfigAuth = tenantPk && {
     [CLIENT_PUBLIC_KEY_HEADER]: tenantPk,
@@ -62,7 +51,7 @@ const Router = ({ variant }: RouterProps) => {
           `Fetching d2p status failed with error, likely indicating expired session: ${getErrorMessage(
             error,
           )}`,
-          'handoff-router',
+          { location: 'handoff-router' },
         );
 
         if (!state.done) {

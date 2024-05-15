@@ -168,7 +168,7 @@ const IdentitySection = () => {
             `Decrypting SSN after step up failed in kyc confirm page. ${getErrorMessage(
               error,
             )}`,
-            'kyc-confirm',
+            { location: 'kyc-confirm' },
           );
           showErrorToast();
         },
@@ -188,7 +188,7 @@ const IdentitySection = () => {
     onError: (error: unknown) => {
       Logger.error(
         `useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`,
-        'kyc-confirm',
+        { location: 'kyc-confirm' },
       );
       showErrorToast();
     },
@@ -203,7 +203,7 @@ const IdentitySection = () => {
     } else {
       Logger.error(
         'Attempted to reveal SSN on confirm page when step up is not available',
-        'kyc-confirm',
+        { location: 'kyc-confirm' },
       );
     }
   };

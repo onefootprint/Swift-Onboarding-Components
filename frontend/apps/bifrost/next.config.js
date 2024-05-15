@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 
+const { withSentryConfig } = require('@sentry/nextjs');
+const BundleAnalyzer = require('@next/bundle-analyzer');
+
 const IS_DEV = process.env.NODE_ENV === 'development';
+const COMMIT_SHA = process.env.VERCEL_GIT_COMMIT_SHA;
+const SHOULD_UPLOAD_SOURCE_MAPS =
+  process.env.VERCEL_ENV === 'production' ||
+  process.env.VERCEL_ENV === 'preview';
+
 const SENTRY_CONNECT_SRC = ['*.sentry.io', '*.ingest.sentry.io'].join(' ');
 const SENTRY_SCRIPT_SRC = [
   'https://browser.sentry-cdn.com',
@@ -154,6 +162,46 @@ if (IS_OUTPUT_STANDALONE) {
   nextConfig.output = 'standalone';
 }
 
-module.exports = IS_ANALYZE_ACTIVE
-  ? require('@next/bundle-analyzer')({ enabled: true })(nextConfig)
-  : nextConfig;
+module.exports = nextConfig;
+
+if (SHOULD_UPLOAD_SOURCE_MAPS) {
+  console.log('📦 Uploading source maps to Sentry');
+  module.exports = withSentryConfig(
+    module.exports,
+    {
+      // For all available options, see:
+      // https://github.com/getsentry/sentry-webpack-plugin#options
+
+      // Suppresses source map uploading logs during build
+      silent: true,
+      org: 'onefootprint',
+      project: 'bifrost',
+    },
+    {
+      // For all available options, see:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+      release: COMMIT_SHA,
+      transpileClientSDK: false,
+
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
+
+      // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+      // This can increase your server load as well as your hosting bill.
+      // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+      // side errors will fail.
+      tunnelRoute: '/monitoring',
+
+      // Hides source maps from generated client bundles
+      hideSourceMaps: true,
+
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
+    },
+  );
+}
+
+if (IS_ANALYZE_ACTIVE) {
+  console.log('📊 Showing bundle analyzer');
+  module.exports = BundleAnalyzer({ enabled: true })(nextConfig);
+}

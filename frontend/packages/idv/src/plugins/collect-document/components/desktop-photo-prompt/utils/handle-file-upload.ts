@@ -18,7 +18,7 @@ const handleFileUpload = ({
   if (!files || files.length === 0) {
     Logger.warn(
       'Image upload failed on desktop mode. No image files detected',
-      'id-doc-photo-prompt',
+      { location: 'id-doc-photo-prompt' },
     );
     onError([IdDocImageUploadError.unknownUploadError]);
     return;
@@ -26,7 +26,7 @@ const handleFileUpload = ({
   if (files.length > 1) {
     Logger.warn(
       'Image upload failed on desktop mode. User attempted to upload multiple images',
-      'id-doc-photo-prompt',
+      { location: 'id-doc-photo-prompt' },
     );
     onError([IdDocImageUploadError.multipleFilesError]);
     return;
@@ -37,7 +37,7 @@ const handleFileUpload = ({
   if (!fileTypeAllowed) {
     Logger.warn(
       `Image upload failed on desktop mode. User attempted to upload an unsupported file format ${files[0].type}`,
-      'id-doc-photo-prompt',
+      { location: 'id-doc-photo-prompt' },
     );
     onError([IdDocImageUploadError.fileTypeNotAllowed]);
     return;

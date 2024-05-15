@@ -32,7 +32,7 @@ const Income = () => {
       onError: (error: string) => {
         Logger.error(
           `Encountered error while speculatively syncing data on investor profile income page: ${error}`,
-          'investor-profile-income',
+          { location: 'investor-profile-income' },
         );
       },
     });

@@ -1,7 +1,7 @@
 'use client';
 
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
@@ -47,13 +47,13 @@ const overrideThemeBackground = (theme: Theme) => {
 };
 
 try {
-  Logger.setupSentry();
+  LoggerDeprecated.setupSentry();
 } catch (e) {
   console.error(e);
 }
 
 const ClientProviders = ({ loadedStyle, children }: ClientProvidersProps) => {
-  useEffectOnceStrict(() => Logger.setupLogRocket('auth'));
+  useEffectOnceStrict(() => LoggerDeprecated.setupLogRocket('auth'));
 
   return (
     <AppearanceProvider

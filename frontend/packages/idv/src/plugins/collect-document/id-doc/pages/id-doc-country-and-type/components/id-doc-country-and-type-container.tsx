@@ -152,7 +152,7 @@ const IdDocCountryAndTypeContainer = ({
             `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(
               err,
             )}`,
-            'id-doc-country-and-type-container',
+            { location: 'id-doc-country-and-type-container' },
           );
           requestErrorToast(err);
         },

@@ -59,7 +59,7 @@ const Declarations = () => {
                 `Encountered error while uploading declarations files of type ${fileType}: ${getErrorMessage(
                   error,
                 )}`,
-                'investor-profile-declarations',
+                { location: 'investor-profile-declarations' },
               );
             },
           },
@@ -68,7 +68,7 @@ const Declarations = () => {
       onError: (error: string) => {
         Logger.error(
           `Encountered error while vaulting data on investor profile declarations page: ${error}`,
-          'investor-profile-declarations',
+          { location: 'investor-profile-declarations' },
         );
       },
     });
@@ -87,7 +87,7 @@ const Declarations = () => {
       onError: (error: unknown) => {
         Logger.error(
           `Encountered error while speculatively saving data on investor profile declarations page: ${error}`,
-          'investor-profile-declarations',
+          { location: 'investor-profile-declarations' },
         );
       },
     });

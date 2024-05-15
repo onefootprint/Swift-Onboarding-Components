@@ -102,7 +102,7 @@ const useDecryptKycData = ({
             `useDecryptKycData failed to decrypt user data (${fields.join(
               ', ',
             )}) for KYC, ${getErrorMessage(error)}`,
-            'kyc-confirm',
+            { location: 'kyc-confirm' },
           );
           onError(error);
         },
@@ -119,7 +119,7 @@ const useDecryptKycData = ({
           `useDecryptKycData failed to fetch user token info, ${getErrorMessage(
             error,
           )}`,
-          'kyc-confirm',
+          { location: 'kyc-confirm' },
         );
         onError(error);
       },

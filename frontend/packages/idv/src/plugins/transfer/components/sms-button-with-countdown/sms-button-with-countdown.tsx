@@ -35,10 +35,9 @@ const SmsButtonWithCountdown = ({
   const handleSendError = (error: unknown) => {
     setIsDisabled(false);
     setSeconds(0);
-    Logger.error(
-      'Error when sending SMS on qr register page ',
-      getErrorMessage(error),
-    );
+    Logger.error('Error when sending SMS on qr register page', {
+      error: getErrorMessage(error),
+    });
     toast.show({
       title: t('error.title'),
       description: t('error.description'),

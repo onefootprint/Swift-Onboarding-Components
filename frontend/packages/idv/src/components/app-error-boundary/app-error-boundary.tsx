@@ -1,7 +1,8 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
+import { getErrorMessage } from '@onefootprint/request';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
+import Logger from '../../utils/logger';
 import Error from './components/error';
 
 type AppErrorBoundaryProps = {
@@ -9,20 +10,17 @@ type AppErrorBoundaryProps = {
   onReset?: () => void;
 };
 
-const AppErrorBoundary = ({ children, onReset }: AppErrorBoundaryProps) => {
-  const observeCollector = useObserveCollector();
-
-  return (
-    <ErrorBoundary
-      FallbackComponent={Error}
-      onError={(error, stack) => {
-        observeCollector.logError('error', error, { stack });
-      }}
-      onReset={onReset}
-    >
-      {children}
-    </ErrorBoundary>
-  );
-};
+const AppErrorBoundary = ({ children, onReset }: AppErrorBoundaryProps) => (
+  <ErrorBoundary
+    FallbackComponent={Error}
+    onError={(error, stack) => {
+      // TODO: polish stack trace logging
+      Logger.error(`${getErrorMessage(error)}, stack: ${stack.componentStack}`);
+    }}
+    onReset={onReset}
+  >
+    {children}
+  </ErrorBoundary>
+);
 
 export default AppErrorBoundary;

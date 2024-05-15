@@ -60,7 +60,7 @@ const useGenerateScopedAuthToken = ({
             `Error while generating d2p token in transfer plugin on ${
               device?.type ?? 'NA'
             } device type. ${getErrorMessage(error)}`,
-            'transfer',
+            { location: 'transfer' },
           );
         },
       },

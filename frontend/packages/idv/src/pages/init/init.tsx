@@ -1,4 +1,3 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import React from 'react';
@@ -12,12 +11,8 @@ import { Logger } from '../../utils';
 const Init = () => {
   const [state, send] = useIdvMachine();
   const { obConfigAuth, authToken, device } = state.context;
-  const observeCollector = useObserveCollector();
 
   useDeviceInfo((newDevice: DeviceInfo) => {
-    observeCollector.setAppContext({
-      device: newDevice,
-    });
     send({
       type: 'initContextUpdated',
       payload: {
@@ -30,9 +25,6 @@ const Init = () => {
     { obConfigAuth, authToken },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
-        observeCollector.setAppContext({
-          config,
-        });
         send({
           type: 'initContextUpdated',
           payload: {
@@ -45,7 +37,7 @@ const Init = () => {
           `Fetching onboarding config in IDV init page failed: ${getErrorMessage(
             error,
           )}`,
-          'idv-init',
+          { location: 'idv-init' },
         );
         send({
           type: 'configRequestFailed',

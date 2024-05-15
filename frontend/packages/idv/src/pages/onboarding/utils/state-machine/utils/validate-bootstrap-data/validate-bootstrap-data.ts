@@ -195,7 +195,7 @@ const validateUserData = (
       `Filtering out invalid bootstrapped user data for keys: ${invalidKeys.join(
         ', ',
       )}`,
-      'validate-bootstrap-data',
+      { location: 'validate-bootstrap-data' },
     );
   }
 

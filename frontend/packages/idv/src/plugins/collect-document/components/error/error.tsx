@@ -35,7 +35,7 @@ const Error = ({ errors, sideName, docName, countryName }: ErrorProps) => {
       `Detected unknown image processing (or upload) errors that doesn't exist on the list of defined image errors. Errors: ${errors
         .map(err => `${err}`)
         .join(', ')}`,
-      'id-doc-error',
+      { location: 'id-doc-error' },
     );
     cleanedErrors.push({ errorType: IdDocImageProcessingError.unknownError });
   }

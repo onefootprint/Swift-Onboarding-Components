@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import { CardDIField } from '@onefootprint/types';
 
 import type { FormSection } from '../../components/form-base';
@@ -12,7 +12,7 @@ const SectionsByFields: Partial<Record<FormSection, CardDIField[]>> = {
 
 const getFormSectionsFromFields = (vaultFields?: string[]): FormSection[] => {
   if (!vaultFields?.length) {
-    Logger.error(
+    LoggerDeprecated.error(
       "The auth token doesn't have permissions to collect any fields.",
     );
     return [];

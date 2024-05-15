@@ -26,7 +26,7 @@ const useHandleD2PStatusUpdate = () => {
       `Encountered error while polling for status on transfer plugin, likely indicating expired session. ${getErrorMessage(
         error,
       )}`,
-      'transfer',
+      { location: 'transfer' },
     );
     send({ type: 'd2pSessionExpired' });
   };

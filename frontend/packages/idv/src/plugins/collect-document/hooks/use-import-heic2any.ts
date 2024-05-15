@@ -1,5 +1,7 @@
+import { getErrorMessage } from '@onefootprint/request';
 import { useEffect, useRef, useState } from 'react';
 
+import Logger from '../../../utils/logger/logger';
 import type { Heic2AnyModule } from '../types';
 
 const IS_TEST = typeof jest !== 'undefined';
@@ -31,7 +33,9 @@ const useImportHeic2Any = (): [boolean, Heic2AnyModule | undefined] => {
         ref.current = module;
         return module;
       })
-      .catch(console.error)
+      .catch(e => {
+        Logger.error(`Failed to load heic2any library, ${getErrorMessage(e)}`);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 

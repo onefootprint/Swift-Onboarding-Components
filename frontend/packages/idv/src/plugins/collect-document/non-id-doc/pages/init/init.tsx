@@ -43,7 +43,7 @@ const Init = () => {
           const errorMsg = getErrorMessage(err);
           Logger.error(
             `Failed to submit non id-doc document type ${config.kind}. Error: ${errorMsg}`,
-            'id-doc-country-and-type-container',
+            { location: 'id-doc-country-and-type-container' },
           );
         },
       },

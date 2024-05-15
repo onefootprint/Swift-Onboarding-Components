@@ -55,10 +55,9 @@ const IdDocPhotoButtons = ({
     const { files } = event.target;
     if (!files?.length) {
       onProcessingDone();
-      Logger.error(
-        'Image upload failed. No image files detected',
-        'id-doc-photo-buttons',
-      );
+      Logger.error('Image upload failed. No image files detected', {
+        location: 'id-doc-photo-buttons',
+      });
       return;
     }
 
@@ -66,7 +65,7 @@ const IdDocPhotoButtons = ({
     if (!processResult) {
       Logger.error(
         'Image upload failed. Uploaded image could not be processed',
-        'id-doc-photo-buttons',
+        { location: 'id-doc-photo-buttons' },
       );
       onProcessingDone();
       return;

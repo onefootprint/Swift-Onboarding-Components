@@ -29,9 +29,12 @@ enum ImageProcessingStepError {
 
 const isError = (x: unknown): x is Error => x instanceof Error;
 const isHeicType = (x: unknown) => x === 'image/heic';
-const logError = (e: string) => Logger.error(e, 'use-process-image');
-const logInfo = (e: string) => Logger.info(e, 'use-process-image');
-const logWarn = (e: string) => Logger.warn(e, 'use-process-image');
+const logError = (e: string) =>
+  Logger.error(e, { location: 'use-process-image' });
+const logInfo = (e: string) =>
+  Logger.info(e, { location: 'use-process-image' });
+const logWarn = (e: string) =>
+  Logger.warn(e, { location: 'use-process-image' });
 
 const stringify = (x: unknown): string => {
   try {

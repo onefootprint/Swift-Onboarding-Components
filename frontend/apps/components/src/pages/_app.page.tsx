@@ -1,5 +1,5 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { Logger } from '@onefootprint/idv';
+import { LoggerDeprecated } from '@onefootprint/idv';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Script from 'next/script';
@@ -14,7 +14,7 @@ import queryClient from '../config/initializers/react-query';
 
 const footprint = configureFootprint();
 configureReactI18next();
-Logger.setupSentry();
+LoggerDeprecated.setupSentry();
 
 // TODO: add error boundary
 // https://linear.app/footprint/issue/FP-4515/add-nice-error-boundaryfallback-to-embedded-components

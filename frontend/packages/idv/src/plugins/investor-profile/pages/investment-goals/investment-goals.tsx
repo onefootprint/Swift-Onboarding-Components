@@ -29,7 +29,7 @@ const InvestmentGoals = () => {
       onError: (error: unknown) => {
         Logger.error(
           `Encountered error while speculatively syncing data on investor profile investment goals page: ${error}`,
-          'investor-profile-investment-goals',
+          { location: 'investor-profile-investment-goals' },
         );
       },
     });

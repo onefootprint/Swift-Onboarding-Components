@@ -2,7 +2,6 @@
 import './config/initializers/i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import {
   createUseRouterSpy,
   render,
@@ -147,28 +146,26 @@ describe('<Idv />', () => {
   }: Partial<IdvProps>) =>
     render(
       <React.StrictMode>
-        <ObserveCollectorProvider appName="test">
-          <QueryClientProvider client={queryClient}>
-            <DesignSystemProvider theme={themes.footprint.light}>
-              <ToastProvider>
-                <Layout>
-                  <Idv
-                    authToken={authToken}
-                    obConfigAuth={obConfigAuth}
-                    isTransfer={isTransfer}
-                    isInIframe={isInIframe}
-                    componentsSdkContext={componentsSdkContext}
-                    bootstrapData={bootstrapData}
-                    onComplete={onComplete}
-                    onClose={onClose}
-                    device={device}
-                    l10n={{ locale: 'en-US', language: 'en' }}
-                  />
-                </Layout>
-              </ToastProvider>
-            </DesignSystemProvider>
-          </QueryClientProvider>
-        </ObserveCollectorProvider>
+        <QueryClientProvider client={queryClient}>
+          <DesignSystemProvider theme={themes.footprint.light}>
+            <ToastProvider>
+              <Layout>
+                <Idv
+                  authToken={authToken}
+                  obConfigAuth={obConfigAuth}
+                  isTransfer={isTransfer}
+                  isInIframe={isInIframe}
+                  componentsSdkContext={componentsSdkContext}
+                  bootstrapData={bootstrapData}
+                  onComplete={onComplete}
+                  onClose={onClose}
+                  device={device}
+                  l10n={{ locale: 'en-US', language: 'en' }}
+                />
+              </Layout>
+            </ToastProvider>
+          </DesignSystemProvider>
+        </QueryClientProvider>
       </React.StrictMode>,
     );
 

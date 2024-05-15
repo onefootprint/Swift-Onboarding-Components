@@ -156,7 +156,7 @@ const createOnboardingRequirementsMachine = ({
             // stuck on a screen
             Logger.error(
               `User is stuck on ${context.lastHandledRequirement?.kind} requirement`,
-              'requirements',
+              { location: 'requirements' },
             );
           }
           return {
