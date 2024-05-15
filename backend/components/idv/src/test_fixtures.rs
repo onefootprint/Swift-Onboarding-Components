@@ -3784,7 +3784,7 @@ pub fn cross_core_response_with_error() -> serde_json::Value {
                 "fraudSolutions": {
                   "response": {
                     "products": {
-                      "preciseIdServer": {
+                      "preciseIDServer": {
                         "error": {
                           "errorCode": "709",
                           "reportDate": "08152023",

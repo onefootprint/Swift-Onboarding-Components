@@ -48,9 +48,8 @@ impl CrossCoreAPIResponse {
 
     // Helper to dig down to the precise id response from cross core wrapper
     pub fn precise_id_response(&self) -> Result<PreciseIDAPIResponse, Error> {
-        let response = self
-            .get_precise_id_decision_element()?
-            .clone()
+        let response = self.get_precise_id_decision_element()?.clone();
+        let precise_id_response = response
             .other_data
             .and_then(|o| o.json)
             .and_then(|j| j.fraud_solutions)
@@ -58,7 +57,7 @@ impl CrossCoreAPIResponse {
             .and_then(|r| r.products)
             .and_then(|p| p.precise_id_server);
 
-        if let Some(r) = response {
+        if let Some(r) = precise_id_response {
             Ok(r)
         } else {
             Err(Error::MissingPreciseIDResponse)
@@ -105,13 +104,18 @@ impl CrossCoreAPIResponse {
 
     pub fn validate(&self) -> Result<(), Error> {
         let pm = self.precise_id_response()?;
-        let err = pm.error.as_ref().and_then(|e| e.error_code.clone()).map(|code| {
+        let err = pm.error.as_ref().and_then(|e| e.error_code.clone());
+        // just to be careful
+        let error_codes = self.error_codes();
+        let error_from_error_codes = error_codes.first().cloned().map(|(raw, _)| raw);
+        let final_err = err.or(error_from_error_codes).map(|code| {
             let description = ErrorCode::from_str(&code).unwrap_or(ErrorCode::Other(code.clone()));
             Error::ResponseError(CrossCoreResponseError::Error(description, code))
         });
 
+
         // Check for errors
-        if let Some(e) = err {
+        if let Some(e) = final_err {
             return Err(e);
         }
 
@@ -125,7 +129,7 @@ impl CrossCoreAPIResponse {
 }
 
 impl CrossCoreAPIResponse {
-    pub fn error_codes(&self) -> Vec<String> {
+    pub fn error_codes(&self) -> Vec<(String, ErrorCode)> {
         self.get_precise_id_decision_element()
             .ok()
             .and_then(|de| de.warnings_errors.as_ref())
@@ -133,6 +137,17 @@ impl CrossCoreAPIResponse {
                 we.iter()
                     .filter_map(|e| e.response_code.clone())
                     .collect::<Vec<_>>()
+            })
+            .map(|codes| {
+                codes
+                    .into_iter()
+                    .map(|c| {
+                        (
+                            c.clone(),
+                            ErrorCode::from_str(c.as_str()).unwrap_or(ErrorCode::Other(c.clone())),
+                        )
+                    })
+                    .collect()
             })
             .unwrap_or_default()
     }
@@ -395,6 +410,23 @@ mod tests {
         let r: CrossCoreAPIResponse =
             serde_json::from_value(response).expect("could not parse experian cross core");
 
-        assert_eq!(r.error_codes(), vec![String::from("709")])
+        assert_eq!(
+            r.error_codes(),
+            vec![("709".to_string(), ErrorCode::InvalidUserIdOrPassword)]
+        );
+
+        match r.validate() {
+            Ok(_) => panic!("should have errored"),
+            Err(e) => match e {
+                Error::ResponseError(err) => {
+                    let CrossCoreResponseError::Error(e, _) = err else {
+                        panic!("wrong inner error");
+                    };
+
+                    assert_eq!(e, ErrorCode::InvalidUserIdOrPassword)
+                }
+                wrong_e => panic!("{}", format!("expecting ResponseError, got {:?}", wrong_e)),
+            },
+        }
     }
 }

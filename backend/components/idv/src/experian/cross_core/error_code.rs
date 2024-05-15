@@ -1,7 +1,7 @@
 use strum::Display;
 use strum_macros::EnumString;
 
-#[derive(EnumString, Display, PartialEq, Eq, Debug)]
+#[derive(EnumString, Display, PartialEq, Eq, Debug, Clone)]
 pub enum ErrorCode {
     #[strum(serialize = "010", to_string = "ConsumerIsMinor")]
     ConsumerIsMinor,
@@ -66,6 +66,7 @@ pub enum ErrorCode {
     Other(String),
 }
 
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
@@ -80,6 +81,6 @@ mod tests {
     fn test_serialize(s: &str, expected_enum: ErrorCode, expected_ser: &str) {
         let deser = ErrorCode::from_str(s).unwrap();
         assert_eq!(deser, expected_enum);
-        assert_eq!(deser.to_string(), String::from(expected_ser))
+        assert_eq!(deser.to_string(), String::from(expected_ser));
     }
 }

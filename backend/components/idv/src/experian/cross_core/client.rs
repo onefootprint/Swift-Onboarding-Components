@@ -8,6 +8,7 @@ use tokio_retry::strategy::FixedInterval;
 use crate::{
     experian::{
         auth::{self, response::JwtTokenResponse},
+        cross_core::error_code::ErrorCode,
         error::{EnvironmentMismatchError, Error, ValidationError},
     },
     footprint_http_client::FootprintVendorHttpClient,
@@ -200,20 +201,17 @@ impl ExperianClientAdapter {
             // Catch errors from cc itself
             match serde_json::from_value::<CrossCoreAPIResponse>(json.clone()) {
                 Ok(c) => {
-                    let codes = c.error_codes();
+                    let codes: Vec<ErrorCode> = c.error_codes().into_iter().map(|(_, c)| c).collect();
 
-                    if !codes.is_empty() {
-                        let err = if codes.contains(&"709".to_string()) {
-                            Error::UserNamePasswordError
-                        } else if codes.contains(&"720".to_string()) {
-                            Error::OtherPreciseIdServerError
-                        } else {
-                            Error::UnknownError
-                        };
+                    tracing::info!(?codes, "send_precise_id_request error");
 
-                        tracing::info!(?err, ?codes, "send_precise_id_request error");
-                        Err(err)
+                    // These are errors we might want to retry in the client itself. for other errors, we validate in `make_request`
+                    if codes.contains(&ErrorCode::OtherPreciseIdError) {
+                        Err(Error::OtherPreciseIdServerError)
+                    } else if codes.contains(&ErrorCode::InvalidUserIdOrPassword) {
+                        Err(Error::UserNamePasswordError)
                     } else {
+                        // we will validate in `make_request`
                         Ok(())
                     }
                 }
