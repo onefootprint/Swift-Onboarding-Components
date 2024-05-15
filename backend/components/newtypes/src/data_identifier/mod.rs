@@ -51,7 +51,7 @@ use paperclip::v2::models::DataType;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::{hash::Hash, str::FromStr};
 use strum::IntoEnumIterator;
-use strum_macros::{AsRefStr, EnumDiscriminants};
+use strum_macros::EnumDiscriminants;
 
 #[derive(
     Debug,
@@ -61,7 +61,6 @@ use strum_macros::{AsRefStr, EnumDiscriminants};
     Clone,
     AsExpression,
     FromSqlRow,
-    AsRefStr,
     EnumDiscriminants,
     SerializeDisplay,
     DeserializeFromStr,
@@ -69,10 +68,9 @@ use strum_macros::{AsRefStr, EnumDiscriminants};
 #[strum_discriminants(
     name(DataIdentifierDiscriminant),
     vis(pub),
-    derive(strum_macros::EnumString, strum_macros::EnumIter),
+    derive(strum_macros::EnumString, strum_macros::Display, strum_macros::EnumIter),
     strum(serialize_all = "snake_case")
 )]
-#[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 /// Represents a piece of data stored inside the user vault.
 /// Mostly used in requests to decrypt a piece of data and in access events to show the log of
@@ -202,7 +200,7 @@ impl CleanAndValidate for DataIdentifier {
 /// We serialize DIs as `prefix.suffix`
 impl std::fmt::Display for DataIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let prefix = self.as_ref();
+        let prefix = DataIdentifierDiscriminant::from(self);
         let suffix = match self {
             Self::Id(s) => s.to_string(),
             Self::Custom(s) => s.to_string(),
