@@ -90,18 +90,8 @@ describe('<Actions />', () => {
           const dialog = screen.getByRole('dialog', {
             name: 'Request more information',
           });
-          const kindSelect = screen.getByRole('button', {
-            name: 'Select option',
-          });
-          await selectEvents.openMenu(kindSelect);
-          await waitFor(() => {
-            const playbookOption = screen.getByRole('option', {
-              name: 'Onboard onto a playbook',
-            });
-            expect(playbookOption).toBeInTheDocument();
-          });
-          const playbookOption = screen.getByRole('option', {
-            name: 'Onboard onto a playbook',
+          const playbookOption = screen.getByRole('radio', {
+            name: 'Ask user to onboard onto an existing playbook',
           });
           fireEvent.click(playbookOption);
           await waitFor(() => {
@@ -124,7 +114,6 @@ describe('<Actions />', () => {
             });
             expect(playbookSelector).not.toBeInTheDocument();
           });
-
           const nextButton = screen.getByRole('button', {
             name: 'Next',
           });
@@ -173,18 +162,8 @@ describe('<Actions />', () => {
           const dialog = screen.getByRole('dialog', {
             name: 'Request more information',
           });
-          const kindSelect = screen.getByRole('button', {
-            name: 'Select option',
-          });
-          await selectEvents.openMenu(kindSelect);
-          await waitFor(() => {
-            const playbookOption = screen.getByRole('option', {
-              name: 'Onboard onto a playbook',
-            });
-            expect(playbookOption).toBeInTheDocument();
-          });
-          const playbookOption = screen.getByRole('option', {
-            name: 'Onboard onto a playbook',
+          const playbookOption = screen.getByRole('radio', {
+            name: 'Ask user to onboard onto an existing playbook',
           });
           fireEvent.click(playbookOption);
           await waitFor(() => {
@@ -253,18 +232,8 @@ describe('<Actions />', () => {
         const dropdownItem = screen.getByText('Request more information');
         await userEvent.click(dropdownItem);
 
-        const kindSelect = screen.getByRole('button', {
-          name: 'Select option',
-        });
-        await selectEvents.openMenu(kindSelect);
-        await waitFor(() => {
-          const playbookOption = screen.getByRole('option', {
-            name: 'Onboard onto a playbook',
-          });
-          expect(playbookOption).toBeInTheDocument();
-        });
-        const playbookOption = screen.getByRole('option', {
-          name: 'Onboard onto a playbook',
+        const playbookOption = screen.getByRole('radio', {
+          name: 'Ask user to onboard onto an existing playbook',
         });
         fireEvent.click(playbookOption);
         await waitFor(() => {

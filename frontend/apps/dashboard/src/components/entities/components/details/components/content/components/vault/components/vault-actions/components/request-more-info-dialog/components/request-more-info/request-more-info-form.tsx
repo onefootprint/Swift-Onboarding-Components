@@ -1,46 +1,20 @@
-import {
-  OnboardingConfigKind,
-  OrgFrequentNoteKind,
-  WorkflowStatus,
-} from '@onefootprint/types';
-import type { CustomDocumentIdentifier } from '@onefootprint/types/src/data/di';
-import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
-import type { SelectOption } from '@onefootprint/ui';
-import { Select, Shimmer, Stack, Toggle } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { OrgFrequentNoteKind, WorkflowStatus } from '@onefootprint/types';
+import { Divider, Radio, Stack, Tooltip } from '@onefootprint/ui';
+import Hint from '@onefootprint/ui/src/components/internal/hint';
+import React, { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import AnimatedContainer from 'src/components/animated-container';
-import CustomDocRequestForm from 'src/components/custom-doc-request-form';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
-import usePlaybookOptions from 'src/pages/home/hooks/use-playbook-options';
 import styled, { css } from 'styled-components';
 
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-export enum RequestMoreInfoKind {
-  Onboard = 'onboard',
-  ProofOfAddress = 'proof_of_address',
-  ProofOfSsnAndIdDoc = 'proof_of_ssn_and_id_doc',
-  IdDocument = 'id_document',
-  CustomDocument = 'custom_document',
-}
+import RequestDocument from './components/request-document';
+import RequestOnboard from './components/request-onboard';
+import { RequestMoreInfoKind, type TriggerFormData } from './types';
 
-type RequestKindSelectOption = {
-  label: string;
-  value: RequestMoreInfoKind;
-};
-
-export type TriggerFormData = {
-  kind?: RequestKindSelectOption;
-  collectSelfie: boolean;
-  customDocumentName?: string;
-  customDocumentIdentifier?: CustomDocumentIdentifier;
-  customDocumentDescription?: string;
-  playbook?: SelectOption;
-  note?: string;
-};
+type RequestVariant = 'document' | 'onboard';
 
 type RequestMoreInfoFormProps = {
   onSubmit: (data: TriggerFormData) => void;
@@ -56,159 +30,94 @@ const RequestMoreInfoForm = ({
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
-  const { data: playbooksData } = usePlaybookOptions({
-    kinds: [
-      OnboardingConfigKind.document,
-      OnboardingConfigKind.kyb,
-      OnboardingConfigKind.kyc,
-    ],
-  });
-
-  const methods = useForm<TriggerFormData>({
-    defaultValues: {
-      collectSelfie: false,
-    },
-  });
-  const { register, handleSubmit, watch, control, setValue } = methods;
-
-  const triggerKind = watch('kind')?.value;
-  const selectedPlaybook = watch('playbook');
-  const requestOptions = [
-    {
-      label: t('id-photo.title'),
-      value: RequestMoreInfoKind.IdDocument,
-    },
-    {
-      label: t('proof-of-ssn-and-id-doc.title'),
-      value: RequestMoreInfoKind.ProofOfSsnAndIdDoc,
-    },
-    {
-      label: t('proof-of-address.title'),
-      value: RequestMoreInfoKind.ProofOfAddress,
-    },
-    {
-      label: t('onboard.title'),
-      value: RequestMoreInfoKind.Onboard,
-    },
-    {
-      label: t('custom-document.title'),
-      value: RequestMoreInfoKind.CustomDocument,
-    },
-  ];
-
-  useEffect(() => {
-    // Once the playbooks load, select the playbook the user last onboarded onto as the default
-    // selected option
-    const defaultPlaybookId =
-      entity.data?.workflows.sort(mostRecentWorkflow)[0]?.playbookId;
-    const defaultPlaybookValue = playbooksData?.find(
-      p => p.value === defaultPlaybookId,
-    );
-    if (!defaultPlaybookValue || !defaultPlaybookId || selectedPlaybook) {
-      return;
-    }
-    setValue('playbook', defaultPlaybookValue);
-  }, [playbooksData, selectedPlaybook, setValue, entity]);
   const hasPriorOnboarding = !!entity.data?.workflows.some(
     wf =>
       wf.status === WorkflowStatus.pass || wf.status === WorkflowStatus.fail,
   );
-  const getRequestKindError = (option?: RequestKindSelectOption) => {
-    if (!option) return t('kind.required-error');
-    if (option?.value !== RequestMoreInfoKind.Onboard) {
-      if (!hasPriorOnboarding) {
-        return t('kind.cannot-request-info');
-      }
-    }
-    return undefined;
-  };
+  const defaultVariant = hasPriorOnboarding ? 'document' : 'onboard';
+  const [requestVariant, setRequestVariant] =
+    useState<RequestVariant>(defaultVariant);
+
+  const methods = useForm<TriggerFormData>({
+    defaultValues: {
+      kinds: defaultVariant === 'onboard' ? [RequestMoreInfoKind.Onboard] : [],
+      collectSelfie: false,
+    },
+  });
+  const {
+    handleSubmit,
+    watch,
+    setValue,
+    setError,
+    clearErrors,
+    reset,
+    formState: { errors },
+  } = methods;
+  const playbook = watch('playbook');
 
   const handleBeforeSubmit = (data: TriggerFormData) => {
+    if (requestVariant === 'document' && data.kinds.length === 0) {
+      setError('kinds', {
+        type: 'required',
+        message: t('kind.required-error.document'),
+      });
+      return;
+    }
+    if (requestVariant === 'onboard' && !playbook) {
+      setError('kinds', {
+        type: 'required',
+        message: t('kind.required-error.onboard'),
+      });
+      return;
+    }
     onSubmit(data);
+  };
+
+  const resetForm = () => {
+    reset();
+    clearErrors();
+  };
+
+  const handleRequestVariantSelect = (variant: RequestVariant) => {
+    setRequestVariant(variant);
+    resetForm();
+    if (variant === 'document') {
+      setValue('kinds', []);
+    }
+    if (variant === 'onboard') {
+      setValue('kinds', [RequestMoreInfoKind.Onboard]);
+    }
   };
 
   return (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-        <Stack direction="column" gap={5}>
-          <Controller
-            control={control}
-            name="kind"
-            rules={{
-              validate: {
-                required: getRequestKindError,
-              },
-            }}
-            render={select => (
-              <Select
-                label={t('kind.label')}
-                options={requestOptions}
-                value={select.field.value}
-                onChange={select.field.onChange}
-                placeholder={t('kind.placeholder')}
-                hasError={!!select.fieldState.error}
-                hint={select.fieldState.error?.message}
-              />
-            )}
-          />
-          <AnimatedContainer
-            isExpanded={triggerKind === RequestMoreInfoKind.IdDocument}
+        <Stack direction="column" gap={4}>
+          <Tooltip
+            text={t('kind.cannot-request-document')}
+            disabled={hasPriorOnboarding}
           >
-            <Toggle
-              label={t('id-photo.collect-selfie')}
-              checked={watch('collectSelfie')}
-              {...register('collectSelfie')}
+            <Radio
+              label={t('request-variant.document')}
+              checked={requestVariant === 'document'}
+              onChange={() => handleRequestVariantSelect('document')}
+              disabled={!hasPriorOnboarding}
             />
-          </AnimatedContainer>
-          <AnimatedContainer
-            isExpanded={triggerKind === RequestMoreInfoKind.Onboard}
-          >
-            {playbooksData?.length ? (
-              <Controller
-                control={control}
-                name="playbook"
-                rules={{
-                  required: triggerKind === RequestMoreInfoKind.Onboard,
-                }}
-                render={select => (
-                  <Select
-                    label={t('onboard.use-playbook')}
-                    hasError={!!select.fieldState.error}
-                    hint={
-                      select.fieldState.error && t('onboard.playbook-required')
-                    }
-                    placeholder={t('onboard.select-a-playbook')}
-                    onBlur={select.field.onBlur}
-                    onChange={select.field.onChange}
-                    options={playbooksData}
-                    value={select.field.value}
-                  />
-                )}
-              />
-            ) : (
-              <Shimmer sx={{ height: '38px', width: '100%' }} />
-            )}
-          </AnimatedContainer>
-          <AnimatedContainer
-            isExpanded={triggerKind === RequestMoreInfoKind.CustomDocument}
-          >
-            <Stack
-              direction="column"
-              gap={5}
-              padding={5}
-              borderRadius="default"
-              borderStyle="solid"
-              borderWidth={1}
-              borderColor="primary"
-            >
-              <CustomDocRequestForm
-                customDocNameFormField="customDocumentName"
-                customDocIdentifierFormField="customDocumentIdentifier"
-                customDocDescriptionFormField="customDocumentDescription"
-              />
-            </Stack>
-          </AnimatedContainer>
+          </Tooltip>
+          <Radio
+            label={t('request-variant.onboard')}
+            checked={requestVariant === 'onboard'}
+            onChange={() => handleRequestVariantSelect('onboard')}
+          />
         </Stack>
+        <Stack direction="column">
+          <RequestDocument visible={requestVariant === 'document'} />
+          <RequestOnboard visible={requestVariant === 'onboard'} />
+          {errors.kinds && (
+            <Hint hasError>{errors.kinds.message as string}</Hint>
+          )}
+        </Stack>
+        <Divider variant="secondary" />
         <FrequentNotesTextArea
           kind={OrgFrequentNoteKind.Trigger}
           formField="note"
@@ -227,6 +136,6 @@ const StyledForm = styled.form`
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: ${theme.spacing[5]};
+    gap: ${theme.spacing[7]};
   `}
 `;

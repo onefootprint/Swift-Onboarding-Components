@@ -61,20 +61,36 @@ describe('<RequestMoreInfoDialog />', () => {
     expect(onCloseMockFn).toHaveBeenCalled();
   });
 
-  it('shows error when attempt to submit without selecting option', async () => {
+  it('should show error when attempt to submit without selecting document option', async () => {
     renderDialog({ onClose: jest.fn() });
-
+    const documentOption = screen.getByRole('radio', {
+      name: 'Ask user to upload documents',
+    });
+    fireEvent.click(documentOption);
+    await waitFor(() => {
+      expect(documentOption).toBeChecked();
+    });
     const nextButton = screen.getByRole('button', {
       name: 'Next',
     });
     await userEvent.click(nextButton);
-
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          'You need to select an option before requesting more information from a user.',
-        ),
-      ).toBeInTheDocument();
+      const documentWarning = screen.getByText(
+        'You must select a document type',
+      );
+      expect(documentWarning).toBeInTheDocument();
+    });
+    const onboardingOption = screen.getByRole('radio', {
+      name: 'Ask user to onboard onto an existing playbook',
+    });
+    fireEvent.click(onboardingOption);
+    await waitFor(() => {
+      expect(onboardingOption).toBeChecked();
+    });
+    await userEvent.click(nextButton);
+    await waitFor(() => {
+      const playbookWarning = screen.getByText('You must select a playbook');
+      expect(playbookWarning).toBeInTheDocument();
     });
   });
 
@@ -93,174 +109,19 @@ describe('<RequestMoreInfoDialog />', () => {
       });
     });
 
-    it('shows error for upload id photo request', async () => {
+    it('document option is disabled and onboard option is selected by default', async () => {
       renderDialog({ onClose: jest.fn() });
-
-      const kindSelect = screen.getByRole('button', { name: 'Select option' });
-      await selectEvents.openMenu(kindSelect);
-      await waitFor(() => {
-        const idPhotoOption = screen.getByRole('option', {
-          name: 'Upload ID photo',
-        });
-        expect(idPhotoOption).toBeInTheDocument();
+      const documentOption = screen.getByRole('radio', {
+        name: 'Ask user to upload documents',
       });
-      const idPhotoOption = screen.getByRole('option', {
-        name: 'Upload ID photo',
-      });
-      fireEvent.click(idPhotoOption);
-      await waitFor(() => {
-        const requestSelfieToggle = screen.getByRole('switch', {
-          name: 'Request a selfie',
-        });
-        expect(requestSelfieToggle).toBeInTheDocument();
-      });
-
+      expect(documentOption).toBeDisabled();
       const nextButton = screen.getByRole('button', {
         name: 'Next',
       });
       await userEvent.click(nextButton);
-
       await waitFor(() => {
-        const errorMessage = screen.getByText(
-          'Cannot request more info from this user until they onboard onto a playbook',
-        );
-        expect(errorMessage).toBeInTheDocument();
-      });
-    });
-
-    it('shows error for proof of ssn request', async () => {
-      renderDialog({ onClose: jest.fn() });
-
-      const kindSelect = screen.getByRole('button', { name: 'Select option' });
-      await selectEvents.openMenu(kindSelect);
-      await waitFor(() => {
-        const proofOfSsnOption = screen.getByRole('option', {
-          name: 'Proof of SSN and ID photo',
-        });
-        expect(proofOfSsnOption).toBeInTheDocument();
-      });
-      const proofOfSsnOption = screen.getByRole('option', {
-        name: 'Proof of SSN and ID photo',
-      });
-      fireEvent.click(proofOfSsnOption);
-      await waitFor(() => {
-        const kindSelector = screen.queryByRole('button', {
-          name: 'Select option',
-        });
-        expect(kindSelector).not.toBeInTheDocument();
-      });
-      const nextButton = screen.getByRole('button', {
-        name: 'Next',
-      });
-      await userEvent.click(nextButton);
-
-      await waitFor(() => {
-        const errorMessage = screen.getByText(
-          'Cannot request more info from this user until they onboard onto a playbook',
-        );
-        expect(errorMessage).toBeInTheDocument();
-      });
-    });
-
-    it('shows error for proof of address request', async () => {
-      renderDialog({ onClose: jest.fn() });
-
-      const kindSelect = screen.getByRole('button', { name: 'Select option' });
-      await selectEvents.openMenu(kindSelect);
-      await waitFor(() => {
-        const proofOfAddressOption = screen.getByRole('option', {
-          name: 'Proof of address',
-        });
-        expect(proofOfAddressOption).toBeInTheDocument();
-      });
-      const proofOfAddressOption = screen.getByRole('option', {
-        name: 'Proof of address',
-      });
-      fireEvent.click(proofOfAddressOption);
-      await waitFor(() => {
-        const kindSelector = screen.queryByRole('button', {
-          name: 'Select option',
-        });
-        expect(kindSelector).not.toBeInTheDocument();
-      });
-
-      const nextButton = screen.getByRole('button', {
-        name: 'Next',
-      });
-      await userEvent.click(nextButton);
-
-      await waitFor(() => {
-        const errorMessage = screen.getByText(
-          'Cannot request more info from this user until they onboard onto a playbook',
-        );
-        expect(errorMessage).toBeInTheDocument();
-      });
-    });
-
-    it("doesn't show error for Onboard to a playbook request", async () => {
-      mockRequest({
-        method: 'get',
-        path: `/org/onboarding_configs`,
-        statusCode: 200,
-        response: {
-          data: [
-            { id: 'obc_id_123', name: 'Test playbook-1' },
-            { id: 'obc_id_456', name: 'Test playbook-2' },
-          ],
-        },
-      });
-      mockRequest({
-        method: 'post',
-        path: `/entities/${entityFixture.id}/triggers`,
-        statusCode: 200,
-        response: {
-          link: 'http://footprint.link/#tok_xxx',
-        },
-      });
-      renderDialog({ onClose: jest.fn() });
-
-      const kindSelect = screen.getByRole('button', { name: 'Select option' });
-      await selectEvents.openMenu(kindSelect);
-      await waitFor(() => {
-        const playbookOption = screen.getByRole('option', {
-          name: 'Onboard onto a playbook',
-        });
-        expect(playbookOption).toBeInTheDocument();
-      });
-      const playbookOption = screen.getByRole('option', {
-        name: 'Onboard onto a playbook',
-      });
-      fireEvent.click(playbookOption);
-      await waitFor(() => {
-        const playbookSelect = screen.getByRole('button', {
-          name: 'Select a playbook...',
-        });
-        expect(playbookSelect).toBeInTheDocument();
-      });
-      const playbookSelect = screen.getByRole('button', {
-        name: 'Select a playbook...',
-      });
-      await selectEvents.openMenu(playbookSelect);
-      const testPlaybookOption = screen.getByRole('option', {
-        name: 'Test playbook-2',
-      });
-      fireEvent.click(testPlaybookOption);
-      await waitFor(() => {
-        const playbookSelector = screen.queryByRole('button', {
-          name: 'Select a playbook...',
-        });
-        expect(playbookSelector).not.toBeInTheDocument();
-      });
-
-      const nextButton = screen.getByRole('button', {
-        name: 'Next',
-      });
-      await userEvent.click(nextButton);
-
-      await waitFor(() => {
-        expect(
-          screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
-        ).toBeInTheDocument();
+        const playbookWarning = screen.getByText('You must select a playbook');
+        expect(playbookWarning).toBeInTheDocument();
       });
     });
   });
@@ -288,31 +149,23 @@ describe('<RequestMoreInfoDialog />', () => {
       });
     });
 
-    it('shows link after submitting options. can copy to close', async () => {
+    it('should show link after submitting onboard request. can copy to close', async () => {
       const { writeTestMockFn } = createClipboardSpy();
       const onCloseMockFn = jest.fn();
 
       renderDialog({ onClose: onCloseMockFn });
-      const kindSelect = screen.getByRole('button', { name: 'Select option' });
-      await selectEvents.openMenu(kindSelect);
-      await waitFor(() => {
-        const playbookOption = screen.getByRole('option', {
-          name: 'Onboard onto a playbook',
-        });
-        expect(playbookOption).toBeInTheDocument();
-      });
-      const playbookOption = screen.getByRole('option', {
-        name: 'Onboard onto a playbook',
+      const playbookOption = screen.getByRole('radio', {
+        name: 'Ask user to onboard onto an existing playbook',
       });
       fireEvent.click(playbookOption);
       await waitFor(() => {
         const playbookSelect = screen.getByRole('button', {
-          name: 'Select a playbook...',
+          name: 'Test playbook-1',
         });
         expect(playbookSelect).toBeInTheDocument();
       });
       const playbookSelect = screen.getByRole('button', {
-        name: 'Select a playbook...',
+        name: 'Test playbook-1',
       });
       await selectEvents.openMenu(playbookSelect);
       const testPlaybookOption = screen.getByRole('option', {
@@ -321,10 +174,82 @@ describe('<RequestMoreInfoDialog />', () => {
       fireEvent.click(testPlaybookOption);
       await waitFor(() => {
         const playbookSelector = screen.queryByRole('button', {
-          name: 'Select a playbook...',
+          name: 'Test playbook-1',
         });
         expect(playbookSelector).not.toBeInTheDocument();
       });
+      const nextButton = screen.getByRole('button', {
+        name: 'Next',
+      });
+      await userEvent.click(nextButton);
+
+      // We should then render the link on the next page
+      await waitFor(() => {
+        expect(
+          screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
+        ).toBeInTheDocument();
+      });
+
+      // Can copy the link using the button
+      const copyButton = screen.getByRole('button', { name: 'Copy link' });
+      await userEvent.click(copyButton);
+      await waitFor(() => {
+        expect(writeTestMockFn).toHaveBeenCalledWith(
+          'http://footprint.link/#tok_xxx',
+        );
+      });
+      expect(onCloseMockFn).toHaveBeenCalled();
+      expect(true).toBe(true);
+    });
+
+    it('should show link after submitting multiple documents request. can copy to close', async () => {
+      const { writeTestMockFn } = createClipboardSpy();
+      const onCloseMockFn = jest.fn();
+
+      renderDialog({ onClose: onCloseMockFn });
+      const documentOption = screen.getByRole('radio', {
+        name: 'Ask user to upload documents',
+      });
+      fireEvent.click(documentOption);
+      await waitFor(() => {
+        expect(documentOption).toBeChecked();
+      });
+      const idDocumentOption = screen.getByRole('checkbox', {
+        name: 'Upload ID photo',
+      });
+      const proofOfSsnOption = screen.getByRole('checkbox', {
+        name: 'Proof of SSN',
+      });
+      const proofOfAddressOption = screen.getByRole('checkbox', {
+        name: 'Proof of address',
+      });
+      const customDocumentOption = screen.getByRole('checkbox', {
+        name: 'Custom document',
+      });
+      await userEvent.click(idDocumentOption);
+      await waitFor(() => {
+        const selfieCheckbox = screen.getByRole('checkbox', {
+          name: 'Request a selfie',
+        });
+        expect(selfieCheckbox).toBeInTheDocument();
+      });
+      await userEvent.click(proofOfSsnOption);
+      await userEvent.click(proofOfAddressOption);
+      await userEvent.click(customDocumentOption);
+      await waitFor(() => {
+        const customDocumentName = screen.getByRole('textbox', {
+          name: 'Document name',
+        });
+        expect(customDocumentName).toBeInTheDocument();
+      });
+      const customDocumentName = screen.getByRole('textbox', {
+        name: 'Document name',
+      });
+      const customDocumentIdentifier = screen.getByRole('textbox', {
+        name: 'Identifier',
+      });
+      await userEvent.type(customDocumentName, 'Custom document name');
+      await userEvent.type(customDocumentIdentifier, 'identifier');
       const nextButton = screen.getByRole('button', {
         name: 'Next',
       });
@@ -359,26 +284,18 @@ describe('<RequestMoreInfoDialog />', () => {
       });
 
       renderDialog({ onClose: jest.fn() });
-      const kindSelect = screen.getByRole('button', { name: 'Select option' });
-      await selectEvents.openMenu(kindSelect);
-      await waitFor(() => {
-        const playbookOption = screen.getByRole('option', {
-          name: 'Onboard onto a playbook',
-        });
-        expect(playbookOption).toBeInTheDocument();
-      });
-      const playbookOption = screen.getByRole('option', {
-        name: 'Onboard onto a playbook',
+      const playbookOption = screen.getByRole('radio', {
+        name: 'Ask user to onboard onto an existing playbook',
       });
       fireEvent.click(playbookOption);
       await waitFor(() => {
         const playbookSelect = screen.getByRole('button', {
-          name: 'Select a playbook...',
+          name: 'Test playbook-1',
         });
         expect(playbookSelect).toBeInTheDocument();
       });
       const playbookSelect = screen.getByRole('button', {
-        name: 'Select a playbook...',
+        name: 'Test playbook-1',
       });
       await selectEvents.openMenu(playbookSelect);
       const testPlaybookOption = screen.getByRole('option', {
@@ -387,7 +304,7 @@ describe('<RequestMoreInfoDialog />', () => {
       fireEvent.click(testPlaybookOption);
       await waitFor(() => {
         const playbookSelector = screen.queryByRole('button', {
-          name: 'Select a playbook...',
+          name: 'Test playbook-1',
         });
         expect(playbookSelector).not.toBeInTheDocument();
       });

@@ -21,8 +21,9 @@ const IdentifierInput = ({
   });
   const {
     register,
-    formState: { errors, isSubmitted },
+    formState: { isSubmitted },
     setValue,
+    getFieldState,
   } = useFormContext();
 
   const getIdentifierError = (value?: string) => {
@@ -33,10 +34,10 @@ const IdentifierInput = ({
       return t('errors.no-special-characters');
     return undefined;
   };
-
   register(customDocIdentifierFormField, {
     validate: getIdentifierError,
   });
+  const identifierFieldState = getFieldState(customDocIdentifierFormField);
   const handleChangeIdentifier = (value: string) => {
     setValue(customDocIdentifierFormField, `${IDENTIFIER_PREFIX}${value}`, {
       shouldValidate: isSubmitted,
@@ -56,13 +57,13 @@ const IdentifierInput = ({
       <Input
         placeholder=""
         id="custom-doc-identifier-form-field"
-        hasError={!!errors[customDocIdentifierFormField]}
+        hasError={!!identifierFieldState.error}
         prefixComponent={
           <IdentifierPrefix>
             <Text variant="body-4">{IDENTIFIER_PREFIX}</Text>
           </IdentifierPrefix>
         }
-        hint={errors?.[customDocIdentifierFormField]?.message as string}
+        hint={identifierFieldState.error?.message}
         disabled={disabled}
         onChangeText={handleChangeIdentifier}
       />

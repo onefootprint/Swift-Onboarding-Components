@@ -13,10 +13,8 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useCreateTrigger from '../actions/components/hooks/use-create-trigger';
 import RequestMoreInfoForm from './components/request-more-info';
-import {
-  RequestMoreInfoKind,
-  type TriggerFormData,
-} from './components/request-more-info/request-more-info-form';
+import type { TriggerFormData } from './components/request-more-info/types';
+import { RequestMoreInfoKind } from './components/request-more-info/types';
 import useDisplayLinkDialog from './hooks/use-display-link-dialog';
 
 export type RequestMoreInfoDialogProps = {
@@ -54,74 +52,62 @@ const RequestMoreInfoDialog = ({
 
   const handleGenerateLink = (data: TriggerFormData) => {
     const {
-      kind: triggerKind,
+      kinds: triggerKinds,
       collectSelfie,
       note,
       playbook,
-      customDocumentName,
-      customDocumentIdentifier,
-      customDocumentDescription,
+      customDocument,
     } = data;
-    const kind = triggerKind?.value;
-    if (!kind) {
+    if (!triggerKinds.length) {
       return;
     }
     let trigger: WorkflowRequestConfig;
-    if (kind === RequestMoreInfoKind.Onboard && playbook) {
+    if (
+      triggerKinds.length === 1 &&
+      triggerKinds[0] === RequestMoreInfoKind.Onboard &&
+      playbook
+    ) {
+      // For playbooks, there can be only one kind in the list
       trigger = {
         kind: TriggerKind.Onboard,
         data: { playbookId: playbook.value },
       };
     } else {
-      let configs: DocumentRequestConfig[];
-      if (kind === RequestMoreInfoKind.IdDocument) {
-        configs = [
-          {
+      const configs: DocumentRequestConfig[] = [];
+      triggerKinds.forEach(kind => {
+        if (kind === RequestMoreInfoKind.IdDocument) {
+          configs.push({
             kind: DocumentRequestKind.Identity,
             data: {
               collectSelfie,
             },
-          },
-        ];
-      } else if (kind === RequestMoreInfoKind.ProofOfSsnAndIdDoc) {
-        configs = [
-          // For now, we are implicitly requesting an ID doc alongside PoSsn
-          {
-            kind: DocumentRequestKind.Identity,
-            data: {
-              collectSelfie: true,
-            },
-          },
-          {
+          });
+        } else if (kind === RequestMoreInfoKind.ProofOfSsn) {
+          configs.push({
             kind: DocumentRequestKind.ProofOfSsn,
             data: {},
-          },
-        ];
-      } else if (kind === RequestMoreInfoKind.ProofOfAddress) {
-        configs = [
-          {
+          });
+        } else if (kind === RequestMoreInfoKind.ProofOfAddress) {
+          configs.push({
             kind: DocumentRequestKind.ProofOfAddress,
             data: {},
-          },
-        ];
-      } else if (
-        kind === RequestMoreInfoKind.CustomDocument &&
-        customDocumentName &&
-        customDocumentIdentifier
-      ) {
-        configs = [
-          {
-            kind: DocumentRequestKind.Custom,
-            data: {
-              name: customDocumentName,
-              identifier: customDocumentIdentifier,
-              description: customDocumentDescription,
-            },
-          },
-        ];
-      } else {
-        return;
-      }
+          });
+        } else if (
+          kind === RequestMoreInfoKind.CustomDocument &&
+          customDocument
+        ) {
+          customDocument.forEach(doc => {
+            configs.push({
+              kind: DocumentRequestKind.Custom,
+              data: {
+                name: doc.customDocumentName,
+                identifier: doc.customDocumentIdentifier,
+                description: doc.customDocumentDescription,
+              },
+            });
+          });
+        }
+      });
       trigger = { kind: TriggerKind.Document, data: { configs } };
     }
     submitTriggerMutation.mutate(

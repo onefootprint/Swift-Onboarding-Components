@@ -22,10 +22,9 @@ const CustomDocRequestForm = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'components.custom-doc-request-form',
   });
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
+  const { register, getFieldState } = useFormContext();
+
+  const nameFieldState = getFieldState(customDocNameFormField);
 
   return (
     <>
@@ -40,11 +39,9 @@ const CustomDocRequestForm = ({
         </Stack>
         <TextInput
           placeholder={t('document-name.placeholder')}
-          hasError={!!errors[customDocNameFormField]}
+          hasError={!!nameFieldState.error}
           id="custom-doc-name-form-field"
-          hint={
-            errors[customDocNameFormField] && t('document-name.errors.required')
-          }
+          hint={nameFieldState.error && t('document-name.errors.required')}
           disabled={disabled}
           {...register(customDocNameFormField, { required: true })}
         />

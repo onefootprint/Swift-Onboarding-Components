@@ -1305,24 +1305,36 @@
           "next": "Next",
           "cancel": "Cancel",
           "form": {
+            "request-variant": {
+              "document": "Ask user to upload documents",
+              "onboard": "Ask user to onboard onto an existing playbook"
+            },
             "kind": {
-              "label": "Request from user",
               "placeholder": "Select option",
-              "cannot-request-info": "Cannot request more info from this user until they onboard onto a playbook",
-              "required-error": "You need to select an option before requesting more information from a user."
+              "cannot-request-document": "Cannot request more documents from this user until they onboard onto a playbook",
+              "required-error": {
+                "document": "You must select a document type",
+                "onboard": "You must select a playbook"
+              }
             },
-            "id-photo": {
-              "title": "Upload ID photo",
-              "collect-selfie": "Request a selfie"
-            },
-            "proof-of-ssn-and-id-doc": {
-              "title": "Proof of SSN and ID photo"
-            },
-            "proof-of-address": {
-              "title": "Proof of address"
-            },
-            "custom-document": {
-              "title": "Custom document"
+            "document": {
+              "title": "Request from user",
+              "id-photo": {
+                "title": "Upload ID photo",
+                "collect-selfie": "Request a selfie"
+              },
+              "proof-of-ssn": {
+                "title": "Proof of SSN",
+                "alert-message": "Note: the default behavior has changed. Previously, an ID Photo and selfie would be requested alongside Proof of SSN. If you would like this behavior, please manually select 'Upload ID Photo' above."
+              },
+              "proof-of-address": {
+                "title": "Proof of address"
+              },
+              "custom-document": {
+                "title": "Custom document",
+                "add-another": "Add another",
+                "remove": "Remove"
+              }
             },
             "onboard": {
               "title": "Onboard onto a playbook",
