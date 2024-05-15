@@ -1,6 +1,7 @@
 import { Grid, Stack } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
+import { MAIN_PAGE_ID } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 
 import AssumeBanner from './components/assume-banner';
@@ -30,7 +31,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => (
     </Stack>
     <Content>
       <SideNav />
-      <Main id="page-main">
+      <Main id={MAIN_PAGE_ID}>
         <Inner>{children}</Inner>
       </Main>
     </Content>

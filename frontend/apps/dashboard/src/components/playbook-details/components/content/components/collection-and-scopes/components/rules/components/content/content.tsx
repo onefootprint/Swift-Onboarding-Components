@@ -24,6 +24,7 @@ import { cloneDeep, flatten, isEqual } from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
+import { MAIN_PAGE_ID } from 'src/config/constants';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -65,7 +66,7 @@ const Content = ({
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
 
-  const getLayoutElement = () => document.getElementById('page-main');
+  const getLayoutElement = () => document.getElementById(MAIN_PAGE_ID);
 
   useEffectOnce(() => () => {
     // Remove gray and disabled background

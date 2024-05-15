@@ -4,6 +4,7 @@ import Head from 'next/head';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
+import { MAIN_PAGE_ID } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 
 import Dot from './components/dot';
@@ -32,10 +33,12 @@ const SecurityLogs = () => {
 
   const handleScroll = () => {
     // Just before reaching the bottom of the page, start loading the next page of data
-    const almostBottom = window.innerHeight * 0.3;
+    const mainContainer = document.getElementById(MAIN_PAGE_ID);
+    if (!mainContainer) return;
+    const offset = mainContainer.clientHeight * 0.25;
     const reachedBottom =
-      window.innerHeight + window.scrollY >=
-      document.body.offsetHeight - almostBottom;
+      mainContainer.scrollHeight - mainContainer.scrollTop <=
+      mainContainer.clientHeight + offset;
     if (reachedBottom) {
       if (!getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
         getAccessEvents.fetchNextPage();
@@ -44,9 +47,10 @@ const SecurityLogs = () => {
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
+    const mainContainer = document.getElementById(MAIN_PAGE_ID);
+    mainContainer?.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      mainContainer?.removeEventListener('scroll', handleScroll);
     };
   });
 

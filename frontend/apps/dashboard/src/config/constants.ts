@@ -16,3 +16,4 @@ export const DEFAULT_PRIVATE_ROUTE = '/authentication/sign-in';
 export const DASHBOARD_AUTHORIZATION_HEADER = 'x-fp-dashboard-authorization';
 export const DASHBOARD_IS_LIVE_HEADER = 'x-is-live';
 export const DASHBOARD_ALLOW_ASSUMED_WRITES = 'x-allow-assumed-writes';
+export const MAIN_PAGE_ID = 'page-main';
