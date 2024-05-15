@@ -34,11 +34,13 @@ pub async fn parse_search(
     let dis = &[Id(IDK::PhoneNumber), Business(BDK::PhoneNumber)];
     let formatted_phone_numbers = vec![
         PiiString::new(format!("+1{}", search_str.leak())),
+        PiiString::new(format!("+1-{}", search_str.leak())),
         PiiString::new(format!("+{}", search_str.leak())),
         search_str.clone(),
     ]
     .into_iter()
     .filter_map(|p| PhoneNumber::parse(p).ok().map(|p| p.e164()))
+    .unique()
     .collect_vec();
     for phone in formatted_phone_numbers.iter() {
         for di in dis.iter() {

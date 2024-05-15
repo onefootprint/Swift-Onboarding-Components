@@ -63,7 +63,9 @@ def fp_bid(sandbox_tenant):
         ("+15555550100", [False, False, True, True]),
         ("15555550100", [False, False, True, True]),
         ("5555550100", [False, False, True, True]),
+        ("555-555-0100", [False, False, True, True]),
         ("(555) 555-0100", [False, False, True, True]),
+        ("(555)-555-0100", [False, False, True, True]),
         ("+1 (555) 555-0100", [False, False, True, True]),
         ("1 (555) 555-0100", [False, False, True, True]),
         # Case insensitive email search
