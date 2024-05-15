@@ -28,6 +28,7 @@ export type Article = {
     sections: ArticleSection[];
     slug: string;
     title: string;
+    subcategory?: string;
     hidden?: boolean;
   };
 };

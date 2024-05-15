@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import Page404 from '../404/404';
 import AppHeader from './components/app-header';
 import DesktopNav from './components/nav/desktop-nav';
+import MobileNav from './components/nav/mobile-nav';
 import Sections from './components/sections';
 
 type DocsProps = {
@@ -19,22 +20,25 @@ type DocsProps = {
 const Docs = ({ children, navigation, article }: DocsProps) =>
   article ? (
     <>
-      <AppHeader navigation={navigation} />
-      <MainContainer>
+      <AppHeader>
+        <MobileNav navigation={navigation} />
+      </AppHeader>
+      <Main>
         <DesktopNav navigation={navigation} />
-        <Content $gridArea="content">{children}</Content>
-        <GridAssigner $gridArea="sections">
+        <Content>{children}</Content>
+        <GridAssigner>
           <Sections sections={article.data.sections} />
         </GridAssigner>
-      </MainContainer>
+      </Main>
       <Cmd navigation={navigation} />
     </>
   ) : (
     <Page404 />
   );
-const Content = styled.article<{ $gridArea: 'nav' | 'content' | 'sections' }>`
-  ${({ $gridArea, theme }) => css`
-    grid-area: ${$gridArea};
+
+const Content = styled.article`
+  ${({ theme }) => css`
+    grid-area: content;
     max-width: 100%;
     padding: ${theme.spacing[10]} ${theme.spacing[6]};
 
@@ -46,13 +50,7 @@ const Content = styled.article<{ $gridArea: 'nav' | 'content' | 'sections' }>`
   `}
 `;
 
-const GridAssigner = styled.div<{ $gridArea: 'nav' | 'content' | 'sections' }>`
-  ${({ $gridArea }) => css`
-    grid-area: ${$gridArea};
-  `}
-`;
-
-const MainContainer = styled.main`
+const Main = styled.main`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
     width: 100%;
@@ -70,6 +68,10 @@ const MainContainer = styled.main`
       grid-template-areas: 'nav content sections';
     `}
   `}
+`;
+
+const GridAssigner = styled.div`
+  grid-area: sections;
 `;
 
 export default Docs;

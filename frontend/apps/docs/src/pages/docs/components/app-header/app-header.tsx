@@ -1,18 +1,16 @@
 import React from 'react';
-import type { PageNavigation } from 'src/types/page';
 import styled, { css } from 'styled-components';
 
-import MobileNav from '../nav/mobile-nav';
 import DesktopHeader from './components/desktop-header';
 
 type AppHeaderProps = {
-  navigation?: PageNavigation;
+  children?: React.ReactNode;
 };
 
-const AppHeader = ({ navigation }: AppHeaderProps) => (
+const AppHeader = ({ children }: AppHeaderProps) => (
   <Header>
     <DesktopHeader />
-    <MobileNav navigation={navigation} />
+    {children}
   </Header>
 );
 

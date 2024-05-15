@@ -26,7 +26,7 @@ const MobileNav = ({ navigation }: MobileNavProps) => {
   };
 
   return (
-    <Container>
+    <MobileNavContainer>
       <MobileHeader onClick={handleToggleNav} isExpanded={isExpanded} />
       <Box ref={animateNavMenu}>
         {isExpanded && navigation && (
@@ -38,17 +38,17 @@ const MobileNav = ({ navigation }: MobileNavProps) => {
           </NavMenu>
         )}
       </Box>
-    </Container>
+    </MobileNavContainer>
   );
 };
 
-const Container = styled.div`
+const MobileNavContainer = styled.div`
   ${media.greaterThan('md')`
     display: none;
   `}
 `;
 
-const NavMenu = styled.div`
+const NavMenu = styled.nav`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
     height: calc(100vh - var(--header-height));

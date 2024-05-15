@@ -1,9 +1,7 @@
-import { Box, media } from '@onefootprint/ui';
-import { useRouter } from 'next/router';
+import { media } from '@onefootprint/ui';
 import React from 'react';
+import AppNav from 'src/components/app-nav';
 import NavigationFooter from 'src/components/navigation-footer';
-import NavigationLink from 'src/components/navigation-link';
-import NavigationSectionTitle from 'src/components/navigation-section-title';
 import type { PageNavigation } from 'src/types/page';
 import styled, { css } from 'styled-components';
 
@@ -11,45 +9,26 @@ type DesktopNavProps = {
   navigation: PageNavigation;
 };
 
-const DesktopNav = ({ navigation }: DesktopNavProps) => {
-  const router = useRouter();
-
-  return (
-    <DesktopNavContainer>
-      <NavContainer>
-        {navigation.map(({ name, items }) => (
-          <Box key={name}>
-            <NavigationSectionTitle>{name}</NavigationSectionTitle>
-            <nav>
-              {items.map(({ title, slug }) => (
-                <NavigationLink
-                  key={slug}
-                  href={slug}
-                  $isSelected={router.asPath === slug}
-                >
-                  {title}
-                </NavigationLink>
-              ))}
-            </nav>
-          </Box>
-        ))}
-      </NavContainer>
-      <NavigationFooter linkTo="api-reference" />
-    </DesktopNavContainer>
-  );
-};
+const DesktopNav = ({ navigation }: DesktopNavProps) => (
+  <DesktopNavContainer>
+    <NavContainer>
+      <AppNav navigation={navigation} />
+    </NavContainer>
+    <NavigationFooter linkTo="api-reference" />
+  </DesktopNavContainer>
+);
 
 const DesktopNavContainer = styled.aside`
   ${({ theme }) => css`
     display: none;
 
     ${media.greaterThan('md')`
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
       background: ${theme.backgroundColor.primary};
       border-right: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      display: flex;
+      flex-direction: column;
       height: calc(100vh - var(--header-height));
+      justify-content: space-between;
       left: 0;
       position: fixed;
       top: var(--header-height);

@@ -6,6 +6,7 @@ export type PageNavigationItem = {
   position: number;
   slug: string;
   title: string;
+  items: PageNavigationItem[] | null;
 };
 
 export type PageNavigationCategory = {

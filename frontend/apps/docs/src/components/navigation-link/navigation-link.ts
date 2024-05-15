@@ -1,10 +1,7 @@
 import { createFontStyles } from '@onefootprint/ui';
-import Link from 'next/link';
 import styled, { css } from 'styled-components';
 
-const NavigationLink = styled(Link).attrs(({ href }) => ({
-  href,
-}))<{ $isSelected: boolean }>`
+const NavigationLink = styled.div<{ $isSelected?: boolean }>`
   ${({ theme, $isSelected }) => css`
     ${createFontStyles('body-4')};
     border-radius: ${theme.borderRadius.default};
