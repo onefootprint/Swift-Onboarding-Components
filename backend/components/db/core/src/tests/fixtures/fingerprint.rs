@@ -19,7 +19,7 @@ pub fn create(
 ) {
     let fingerprint = NewFingerprintArgs {
         data: sh_data.into(),
-        kind,
+        kind: kind.into(),
         lifetime_id,
         scope,
         version: FingerprintVersion::current(),

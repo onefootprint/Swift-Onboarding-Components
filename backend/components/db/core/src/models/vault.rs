@@ -7,7 +7,7 @@ use db_schema::schema::{
 use diesel::{dsl::not, pg::Pg, prelude::*, upsert::on_constraint, Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId,
+    output::Csv, DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, FingerprintKind, FpId, IdempotencyId,
     IdentityDataKind as IDK, Locked, SandboxId, ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
 };
 
@@ -337,7 +337,7 @@ impl Vault {
         } else {
             query.filter(vault::sandbox_id.is_null())
         };
-        let mut vaults: Vec<(Vault, DataIdentifier)> = query.get_results(conn)?;
+        let mut vaults: Vec<(Vault, FingerprintKind)> = query.get_results(conn)?;
 
         // And, add in all of the unverified vaults owned by this tenant. This allows portablizing
         // non-portable vaults
@@ -373,7 +373,10 @@ impl Vault {
         // Keep track of which kinds of fingerprints were used to locate which vaults
         let mut vault_id_to_matching_dis = vaults
             .iter()
-            .map(|(v, di)| (v.id.clone(), di.clone()))
+            .filter_map(|(v, s)| {
+                let FingerprintKind::DI(di) = s else { return None };
+                Some((v.id.clone(), di.clone()))
+            })
             .into_group_map();
 
         // All of the vaults here presumably are the same user (or same contact info) that has,
@@ -386,6 +389,7 @@ impl Vault {
             .unique_by(|v| v.id.clone())
             .collect_vec();
         let v_ids = vaults.iter().map(|v| &v.id).collect_vec();
+
 
         // Get the scoped vaults for each vault
         let v_id_to_svs = scoped_vault::table

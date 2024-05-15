@@ -7,7 +7,7 @@ use diesel::{
 };
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId,
+    DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId, FingerprintKind,
     FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
     VaultId,
 };
@@ -59,7 +59,7 @@ pub enum FingerprintDataValue {
 #[derive(Debug, Clone)]
 pub struct NewFingerprintArgs<'a> {
     pub data: FingerprintDataValue,
-    pub kind: DI,
+    pub kind: FingerprintKind,
     pub lifetime_id: &'a DataLifetimeId,
     pub version: FingerprintVersion,
     pub scope: FingerprintScopeKind,
@@ -75,7 +75,7 @@ struct NewFingerprintRow<'a> {
     id: FingerprintId,
     sh_data: Option<FingerprintData>,
     p_data: Option<PiiString>,
-    kind: DI,
+    kind: FingerprintKind,
     version: FingerprintVersion,
     scope: FingerprintScopeKind,
     is_hidden: bool,

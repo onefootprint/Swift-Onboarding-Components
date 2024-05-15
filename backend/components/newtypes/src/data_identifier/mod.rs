@@ -41,10 +41,7 @@ pub use self::{
     investor_profile_kind::*,
     validation::{Error as DiValidationError, *},
 };
-use crate::{
-    fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, KvDataKey, NtResult, PiiJsonValue,
-    PiiString, ValidateArgs,
-};
+use crate::{util::impl_enum_string_diesel, KvDataKey, NtResult, PiiJsonValue, PiiString, ValidateArgs};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
 use paperclip::v2::models::DataType;
@@ -305,17 +302,6 @@ impl FromStr for DataIdentifier {
 }
 
 impl DataIdentifier {
-    /// Returns true if the DI can be fingerprinted. Will automatically fingerprint non-document
-    /// data with these types when added to the vault
-    pub fn is_fingerprintable(&self) -> bool {
-        Self::searchable().contains(self)
-    }
-
-    /// Returns true if the DI can be globally fingerprinted
-    pub fn is_globally_fingerprintable(&self) -> bool {
-        GlobalFingerprintKind::try_from(self).is_ok()
-    }
-
     /// collect fingerprintable DIs
     pub fn searchable() -> Vec<Self> {
         vec![

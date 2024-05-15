@@ -116,7 +116,7 @@ impl ValidatedDataRequest {
         let fingerprints = chain(sh_data_fingerprints, p_data_fingerprints)
             .map(|(kind, data, dl_id, scope)| {
                 NewFingerprintArgs {
-                    kind,
+                    kind: kind.into(),
                     data,
                     lifetime_id: dl_id,
                     scope,

@@ -5,19 +5,16 @@ use crate::{
 };
 use either::Either::{Left, Right};
 use itertools::{chain, Itertools};
-use std::{
-    clone::Clone,
-    collections::{HashMap, HashSet},
-};
+use std::{clone::Clone, collections::HashMap};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub struct FingerprintRequest {
     pub kind: DataIdentifier,
     pub fingerprint: Fingerprint,
     pub scope: FingerprintScopeKind,
 }
 
-pub type Fingerprints = HashSet<FingerprintRequest>;
+pub type Fingerprints = Vec<FingerprintRequest>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
@@ -238,7 +235,7 @@ impl<T> DataRequest<T> {
         DataRequest {
             data: self.data,
             json_fields: self.json_fields,
-            fingerprints: HashSet::new(),
+            fingerprints: vec![],
         }
     }
 }

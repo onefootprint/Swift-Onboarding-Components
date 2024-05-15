@@ -44,6 +44,8 @@ mod dupes;
 pub use dupes::*;
 mod fingerprint;
 pub use fingerprint::*;
+mod fingerprint_kind;
+pub use fingerprint_kind::*;
 mod fingerprint_meta;
 pub use fingerprint_meta::*;
 mod footprint_reason_code;
