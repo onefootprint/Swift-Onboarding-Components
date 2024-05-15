@@ -4,6 +4,7 @@
 //! - Tenant: given a unique `data` we produce `n` fingerprints, one for each tenant.
 //! The key difference is that if someone were to leak the database the fingerprints should be minimaly revealing.
 use async_trait::async_trait;
+use itertools::Itertools;
 use strum::{EnumIter, IntoEnumIterator};
 
 use crate::{
@@ -11,8 +12,37 @@ use crate::{
     PiiString, TenantId,
 };
 
+
+/// Uniquely identifies a single fingerprint that will be computed
+pub type FingerprintKey = (DataIdentifier, FingerprintScopeKind);
+pub type FingerprintablePayload<'a, T> = (FingerprintScope<'a>, T);
+
+impl DataIdentifier {
+    /// Given a DataIdentifier and its corresponding data, returns the fingerprintable payloads
+    /// that will be sent to the enclave
+    pub fn get_fingerprint_payload<'a, T: Copy>(
+        &'a self,
+        v: T,
+        tenant_id: Option<&'a TenantId>,
+    ) -> Vec<(FingerprintKey, FingerprintablePayload<'a, T>)> {
+        if !self.is_fingerprintable() {
+            return vec![];
+        }
+        let tenant_scope = tenant_id.map(|t_id| FingerprintScope::Tenant(self, t_id));
+        // Generate a tenant-scoped fingerprint and globally-scoped fingerprint (if possible)
+        let global_scope = GlobalFingerprintKind::try_from(self)
+            .ok()
+            .map(FingerprintScope::Global);
+        vec![global_scope, tenant_scope]
+            .into_iter()
+            .flatten()
+            .map(|scope| ((self.clone(), scope.kind()), (scope, v)))
+            .collect_vec()
+    }
+}
+
 /// The scope to which we will fingerprint data
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_more::From)]
 pub enum FingerprintScope<'a> {
     /// Searchable across all tenants
     Global(GlobalFingerprintKind),
@@ -44,23 +74,12 @@ impl<'a> FingerprintScope<'a> {
             Self::Tenant(_, _) => FingerprintScopeKind::Tenant,
         }
     }
-}
 
-// Implement an identity FingerprintScopable so a raw FingerprintScope can be passed into any generic fn
-impl<'a> FingerprintScopable for FingerprintScope<'a> {
-    fn scope(&self) -> FingerprintScope {
-        self.clone()
-    }
-}
-
-pub trait FingerprintScopable {
-    fn scope(&self) -> FingerprintScope;
-}
-
-impl<'a> FingerprintScopable for (&'a DataIdentifier, &'a TenantId) {
-    fn scope(&self) -> FingerprintScope {
-        let (id, tenant_id) = self;
-        FingerprintScope::Tenant(id, tenant_id)
+    pub fn data_identifier(&self) -> DataIdentifier {
+        match self {
+            FingerprintScope::Global(s) => s.data_identifier(),
+            FingerprintScope::Tenant(di, _) => (*di).clone(),
+        }
     }
 }
 
@@ -71,12 +90,6 @@ pub enum GlobalFingerprintKind {
     Email,
     Ssn9,
     Tin,
-}
-
-impl FingerprintScopable for GlobalFingerprintKind {
-    fn scope(&self) -> FingerprintScope {
-        FingerprintScope::Global(*self)
-    }
 }
 
 impl GlobalFingerprintKind {
@@ -106,14 +119,15 @@ impl<'a> TryFrom<&'a DataIdentifier> for GlobalFingerprintKind {
     }
 }
 
-/// Signed hasher interface
+/// Signed hasher interface. Needed since we have logic inside newtypes to generate fingerprints
+/// but the EnclaveClient that implements this is defined in api_core.
 #[async_trait]
 pub trait Fingerprinter: std::marker::Sync {
     type Error: From<crate::Error>;
 
-    async fn compute_fingerprints<T: Send + Sync, S: FingerprintScopable + Send + Sync>(
+    async fn compute_fingerprints<'a, T: Send + Sync>(
         &self,
-        data: Vec<(T, S, &PiiString)>,
+        data: Vec<(T, (FingerprintScope<'a>, &PiiString))>,
     ) -> Result<Vec<(T, Fingerprint)>, Self::Error>;
 }
 

@@ -11,9 +11,9 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::{FingerprintScopable, FingerprintScope, Fingerprinter, GlobalFingerprintKind},
+    fingerprinter::{FingerprintScope, Fingerprinter},
     secret_api_key::ApiKeyFingerprinter,
-    Fingerprint, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
+    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
 };
 
 use crate::{
@@ -84,14 +84,15 @@ impl ApiKeyFingerprinter for State {
 impl Fingerprinter for EnclaveClient {
     type Error = crate::ApiError;
 
-    async fn compute_fingerprints<T: Send, S: FingerprintScopable + Send + Sync>(
+    async fn compute_fingerprints<'a, T: Send>(
         &self,
-        data: Vec<(T, S, &PiiString)>,
+        data: Vec<(T, (FingerprintScope<'a>, &PiiString))>,
     ) -> Result<Vec<(T, Fingerprint)>, Self::Error> {
-        let (identifiers, values_to_fp): (Vec<_>, Vec<_>) =
-            data.into_iter().map(|(id, s, v)| (id, (s, v))).unzip();
+        // Zip the keys of type T back together with the fingerprinted results, since we know
+        // that the order of the results from the enclave will match the order of the input data
+        let (keys, values_to_fp): (Vec<_>, Vec<_>) = data.into_iter().unzip();
         let fps = self.batch_fingerprint(&values_to_fp).await?;
-        let results = identifiers.into_iter().zip(fps).collect();
+        let results = keys.into_iter().zip(fps).collect();
         Ok(results)
     }
 }
@@ -107,26 +108,16 @@ impl State {
         t_id: Option<&TenantId>,
     ) -> ApiResult<Option<(LocatedVault, Option<ScopedVaultId>)>> {
         // Search via fingerprint
-        let fps = ids
+        let fps: Vec<(DataIdentifier, PiiString)> = ids
             .into_iter()
             .map(|id| match id {
-                IdentifyId::PhoneNumber(phone_number) => (
-                    IDK::PhoneNumber.into(),
-                    GlobalFingerprintKind::PhoneNumber,
-                    phone_number.e164(),
-                ),
-                IdentifyId::Email(email) => (IDK::Email.into(), GlobalFingerprintKind::Email, email.email),
+                IdentifyId::PhoneNumber(phone_number) => (IDK::PhoneNumber.into(), phone_number.e164()),
+                IdentifyId::Email(email) => (IDK::Email.into(), email.email),
             })
             .collect_vec();
         let fps = fps
             .iter()
-            .flat_map(|(di, gfk, pii)| {
-                let scopes = vec![
-                    Some(gfk.scope()),
-                    t_id.map(|t_id| FingerprintScope::Tenant(di, t_id)),
-                ];
-                scopes.into_iter().flatten().map(move |scope| ((), scope, pii))
-            })
+            .flat_map(|(di, pii)| di.get_fingerprint_payload(pii, t_id))
             .collect_vec();
         let sh_datas = self
             .enclave_client

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     identify::create_identified_token, ChallengeData, ChallengeState, GetIdentifyChallengeArgs,
     IdentifyChallengeContext, State,
@@ -24,8 +26,8 @@ use api_wire_types::{
 };
 use itertools::Itertools;
 use newtypes::{
-    email::Email, fingerprinter::GlobalFingerprintKind, ChallengeKind, DataIdentifier, DataLifetimeSource,
-    Fingerprinter, IdentifyScope, IdentityDataKind as IDK, PhoneNumber,
+    email::Email, ChallengeKind, DataIdentifier, DataLifetimeSource, FingerprintScopeKind, Fingerprinter,
+    IdentifyScope, IdentityDataKind as IDK, PhoneNumber,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -211,18 +213,15 @@ async fn make_vault_context(
     .flatten()
     .collect::<Vec<(DataIdentifier, _, _)>>();
 
-    let global_sh_data = initial_data
+    let tenant_id = Some(&ob_pk_auth.tenant().id);
+    let data_to_fp = initial_data
         .iter()
-        .map(|(di, _, v)| -> ApiResult<_> { Ok((di.clone(), GlobalFingerprintKind::try_from(di)?, v)) })
-        .collect::<ApiResult<Vec<_>>>()?;
-    let global_sh = state.enclave_client.compute_fingerprints(global_sh_data).await?;
-
-    let tenant_sh_data = initial_data
-        .iter()
-        .map(|(di, _, v)| (di.clone(), (di, &ob_pk_auth.tenant().id), v))
+        .flat_map(|(di, _, v)| di.get_fingerprint_payload(v, tenant_id))
         .collect_vec();
+
     // If we are in identify for a specific tenant, also compute tenant-scoped FP
-    let tenant_sh = state.enclave_client.compute_fingerprints(tenant_sh_data).await?;
+    let fingerprints = state.enclave_client.compute_fingerprints(data_to_fp).await?;
+    let fingerprints: HashMap<_, _> = fingerprints.into_iter().collect();
 
     let data = initial_data
         .into_iter()
@@ -234,16 +233,16 @@ async fn make_vault_context(
             } else {
                 DataLifetimeSource::LikelyHosted
             };
+            let global_sh = fingerprints
+                .get(&(di.clone(), FingerprintScopeKind::Global))
+                .ok_or(AssertionError("No global fingerprint"))?
+                .clone();
+            let tenant_sh = fingerprints
+                .get(&(di.clone(), FingerprintScopeKind::Tenant))
+                .cloned();
             Ok(InitialVaultData {
-                global_sh: global_sh
-                    .iter()
-                    .filter_map(|(x, fp)| (x == &di).then_some(fp.clone()))
-                    .next()
-                    .ok_or(AssertionError("No global fingerprint"))?,
-                tenant_sh: tenant_sh
-                    .iter()
-                    .filter_map(|(x, fp)| (x == &di).then_some(fp.clone()))
-                    .next(),
+                global_sh,
+                tenant_sh,
                 di,
                 value,
                 source,

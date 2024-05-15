@@ -2,9 +2,8 @@ use crate::{errors::ApiResult, State};
 use db::scoped_vault::{AndFingerprintQuery, SearchQuery};
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::{FingerprintScope, GlobalFingerprintKind},
-    BusinessDataKind as BDK, DataIdentifier, Fingerprinter, FpId, IdentityDataKind as IDK, PhoneNumber,
-    PiiString, TenantId,
+    fingerprinter::FingerprintScope, BusinessDataKind as BDK, DataIdentifier, Fingerprinter, FpId,
+    IdentityDataKind as IDK, PhoneNumber, PiiString, TenantId,
 };
 
 /// Given a search string and fp_id, parse into the list of FingerprintQueries and fp_id by which to query
@@ -18,6 +17,7 @@ pub async fn parse_search(
     let Some(search) = search else {
         return Ok((None, None));
     };
+    let t_id = Some(tenant_id);
 
     // A bit of a hack: if the user types query that looks like an fp_id, try to look up by identifier instead
     if search.leak().starts_with("fp_id_") || search.leak().starts_with("fp_bid_") {
@@ -27,11 +27,11 @@ pub async fn parse_search(
 
     let search_str = search.clean_for_fingerprint();
     tracing::info!(search_len=%search_str.leak().len(), "Parsing search string");
-    // See if the search string is a phone number and format it properly for fingerprinting
-    let mut data = vec![];
+    // A list of fingerprint queries, with each element representing an AND search condition
+    let mut fingerprint_queries = vec![];
 
     // Fingerprints for phone number
-    let dis = vec![Id(IDK::PhoneNumber), Business(BDK::PhoneNumber)];
+    let dis = &[Id(IDK::PhoneNumber), Business(BDK::PhoneNumber)];
     let formatted_phone_numbers = vec![
         PiiString::new(format!("+1{}", search_str.leak())),
         PiiString::new(format!("+{}", search_str.leak())),
@@ -41,8 +41,10 @@ pub async fn parse_search(
     .filter_map(|p| PhoneNumber::parse(p).ok().map(|p| p.e164()))
     .collect_vec();
     for phone in formatted_phone_numbers.iter() {
-        for d in all_scopes(phone, &dis, tenant_id) {
-            data.push(vec![d]);
+        for di in dis.iter() {
+            for d in di.get_fingerprint_payload(phone, t_id) {
+                fingerprint_queries.push(vec![d.1]);
+            }
         }
     }
 
@@ -53,7 +55,9 @@ pub async fn parse_search(
     let ln_di = &Id(IDK::LastName);
     for (first_name, last_name) in name_permutations.iter() {
         // If this permutation includes both a first name and last name, a matching result must
-        // match on both the first name and the last name
+        // match on both the first name and the last name.
+        // This is the only place that utilizes AND search conditions.
+        // TODO: maybe one day we can replace this with a composite fingerprint lookup
         let name_fingerprints = vec![
             first_name
                 .as_ref()
@@ -65,19 +69,18 @@ pub async fn parse_search(
         .into_iter()
         .flatten()
         .collect_vec();
-        data.push(name_fingerprints)
+        fingerprint_queries.push(name_fingerprints)
     }
 
     // Fingerprint for website
-    let dis = vec![Business(BDK::Website)];
     let websites = [
         PiiString::from(format!("https://{}", search_str.leak())),
         search_str.clone(),
     ];
     if !search_str.leak().contains(' ') && search_str.leak().contains('.') {
         for w in websites.iter() {
-            for d in all_scopes(w, &dis, tenant_id) {
-                data.push(vec![d]);
+            for d in Business(BDK::Website).get_fingerprint_payload(w, t_id) {
+                fingerprint_queries.push(vec![d.1]);
             }
         }
     }
@@ -98,21 +101,23 @@ pub async fn parse_search(
             )
         })
         .collect_vec();
-    for d in all_scopes(&search_str, &dis, tenant_id) {
-        data.push(vec![d]);
+    for di in dis.iter() {
+        for d in di.get_fingerprint_payload(&search_str, t_id) {
+            fingerprint_queries.push(vec![d.1]);
+        }
     }
 
     // The data we're going to fingerprint is grouped into vecs that represent an AND search condition.
     // Flatten this 2d array into a 1d-array, but keep track of the initial index so we can group
     // the fingerprints back into their 2d-array format.
-    let data = data
+    let data_to_fp = fingerprint_queries
         .into_iter()
         .enumerate()
-        .flat_map(|(i, d)| d.into_iter().map(move |(scope, data)| (i, scope, data)))
+        .flat_map(|(i, d)| d.into_iter().map(move |d| (i, d)))
         .collect_vec();
     let fingerprint_queries = state
         .enclave_client
-        .compute_fingerprints(data)
+        .compute_fingerprints(data_to_fp)
         .await?
         .into_iter()
         .into_group_map()
@@ -125,24 +130,6 @@ pub async fn parse_search(
         fingerprint_queries,
     };
     Ok((Some(search), None))
-}
-
-type FingerprintableData<'a> = (FingerprintScope<'a>, &'a PiiString);
-
-/// Computes the data to be sent to the enclave to fingerprint for the provided search string and DIs.
-/// Will generate data for both tenant-scoped and global-scoped fingerprints for the provided DIs.
-fn all_scopes<'a>(
-    search: &'a PiiString,
-    dis: &'a [DataIdentifier],
-    tenant_id: &'a TenantId,
-) -> Vec<FingerprintableData<'a>> {
-    let tenant_scopes = dis.iter().map(|di| FingerprintScope::Tenant(di, tenant_id));
-    let global_scopes = dis
-        .iter()
-        .filter_map(|di| GlobalFingerprintKind::try_from(di).ok())
-        .map(FingerprintScope::Global);
-    let all_scopes = tenant_scopes.chain(global_scopes).collect_vec();
-    all_scopes.into_iter().map(|s| (s, search)).collect_vec()
 }
 
 /// Given a search string that may contain multiple names separated by a string, returns all the

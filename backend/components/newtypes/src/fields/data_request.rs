@@ -1,9 +1,7 @@
 use crate::{
-    data_identifier::DiValidationError,
-    fingerprinter::{FingerprintScope, Fingerprinter, GlobalFingerprintKind},
-    CleanAndValidate, CollectedDataOption, DataIdentifier, DataValidationError, DeriveValues, Error,
-    Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString,
-    StorageType, TenantId,
+    data_identifier::DiValidationError, fingerprinter::Fingerprinter, CleanAndValidate, CollectedDataOption,
+    DataIdentifier, DataValidationError, DeriveValues, Error, Fingerprint, FingerprintScopeKind,
+    IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType, TenantId,
 };
 use either::Either::{Left, Right};
 use itertools::{chain, Itertools};
@@ -203,29 +201,15 @@ impl<T> DataRequest<T> {
         let data_to_fingerprint: Vec<_> = self
             .data
             .iter()
-            .flat_map(|(di, pii)| {
-                if !di.is_fingerprintable() {
-                    return vec![];
-                }
-                let tenant_scope = FingerprintScope::Tenant(di, tenant_id);
-                // Generate a tenant-scoped fingerprint and globally-scoped fingerprint (if possible)
-                let global_scope = GlobalFingerprintKind::try_from(di)
-                    .ok()
-                    .map(FingerprintScope::Global);
-                vec![global_scope, Some(tenant_scope)]
-                    .into_iter()
-                    .flatten()
-                    .map(|scope| ((di.clone(), scope.kind()), scope, pii))
-                    .collect_vec()
-            })
+            .flat_map(|(di, pii)| di.get_fingerprint_payload(pii, Some(tenant_id)))
             .collect();
 
         let fingerprints = fingerprinter.compute_fingerprints(data_to_fingerprint).await?;
 
         let fingerprints = fingerprints
             .into_iter()
-            .map(|((kind, scope), fingerprint)| FingerprintRequest {
-                kind,
+            .map(|((di, scope), fingerprint)| FingerprintRequest {
+                kind: di.clone(),
                 fingerprint,
                 scope,
             })

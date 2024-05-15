@@ -14,9 +14,8 @@ use enclave_proxy::{
 use futures::TryFutureExt;
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::{FingerprintScopable, FingerprintScope},
-    EncryptedVaultPrivateKey, FilterFunction, Fingerprint, PiiBytes, PiiString, S3Url, SealedVaultBytes,
-    SealedVaultDataKey, VaultPublicKey,
+    fingerprinter::FingerprintScope, EncryptedVaultPrivateKey, FilterFunction, Fingerprint, PiiBytes,
+    PiiString, S3Url, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
 };
 use std::{collections::HashMap, hash::Hash, sync::Arc};
 
@@ -253,9 +252,9 @@ impl EnclaveClient {
     }
 
     /// Requests the enclave to fingerprint
-    pub async fn batch_fingerprint<S: FingerprintScopable + Send + Sync>(
+    pub async fn batch_fingerprint<'a>(
         &self,
-        data: &[(S, &PiiString)],
+        data: &[(FingerprintScope<'a>, &PiiString)],
     ) -> Result<Vec<Fingerprint>, EnclaveError> {
         // we hash the data once simply to shorten the payload length we send to the enclave
         // and build our list of request to send for fingerprinting in the enclave
@@ -268,7 +267,7 @@ impl EnclaveClient {
                 )
             })
             .map(|(di, data)| SignRequest {
-                scope: di.scope().bytes(),
+                scope: di.bytes(),
                 data: data.to_vec(),
             })
             .collect_vec();

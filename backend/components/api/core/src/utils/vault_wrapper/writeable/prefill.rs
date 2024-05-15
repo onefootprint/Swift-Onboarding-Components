@@ -14,9 +14,7 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::{FingerprintScope, GlobalFingerprintKind},
-    output::Csv,
-    DataIdentifier, DataLifetimeSource, FingerprintRequest, IdentityDataKind as IDK, VaultKind,
+    output::Csv, DataIdentifier, DataLifetimeSource, FingerprintRequest, IdentityDataKind as IDK, VaultKind,
 };
 use std::{collections::HashMap, marker::PhantomData};
 
@@ -110,25 +108,10 @@ impl<Type> VaultWrapper<Type> {
         //
         // Compute the fingerprints for all data we're going to prefill
         //
+        let tenant_id = Some(&destination_sv.tenant_id);
         let data_to_fingerprint = data
             .iter()
-            .flat_map(|d| {
-                if !d.kind.is_fingerprintable() {
-                    return vec![];
-                }
-                let tenant_scope = FingerprintScope::Tenant(&d.kind, &destination_sv.tenant_id);
-                // Generate a tenant-scoped fingerprint and globally-scoped fingerprint (if possible)
-                let global_scope = GlobalFingerprintKind::try_from(&d.kind)
-                    .ok()
-                    // This is horrible - the lifetime only really applies to the other variant of
-                    // FingerprintScope. Need this little hack to tell rust that the 
-                    .map(FingerprintScope::<'a>::Global);
-                vec![global_scope, Some(tenant_scope)]
-                    .into_iter()
-                    .flatten()
-                    .map(|scope| ((d.kind.clone(), scope.kind()), (scope, &d.e_data)))
-                    .collect_vec()
-            })
+            .flat_map(|d| d.kind.get_fingerprint_payload(&d.e_data, tenant_id))
             .collect_vec();
 
         let fingerprints = state
