@@ -143,33 +143,27 @@ impl<T: IncodeClientErrorCustomFailureReasons> IncodeAPIResult<T> {
         let response_json: Result<serde_json::Value, reqwest::Error> = response.json().await;
         match response_json {
             Ok(j) => {
-                let raw: Result<T, serde_json::Error> = serde_json::from_value(j.clone());
-                let result = match raw {
-                    Ok(deser_json) => {
-                        // If request was successful and we deserialized
-                        // TODO: all options so what to do here...
-                        if http_status.is_success() {
-                            IncodeAPIResult::<T>::Success(deser_json)
-                        // 4xx
-                        } else if http_status.is_client_error() {
-                            // look for custom error codes
-                            if let Ok(error) = deserialize_to_incode_custom_client_error(j.clone()) {
-                                IncodeAPIResult::<T>::ResponseErrorHandled(error)
-                            // otherwise, we just return whatever the body has as an error
-                            } else {
-                                IncodeAPIResult::<T>::ResponseErrorUnhandled(error::Error::UnknownError)
-                            }
-                        // if we are is non-2xx/4xx
-                        // we should have retried in reqwest middleware already, 5xx w/ a body is weird, but for completeness
-                        } else {
-                            IncodeAPIResult::<T>::ResponseErrorUnhandled(error::Error::UnknownError)
+                let result = if http_status.is_success() {
+                    // TODO: there's a footgun here with incode in which for most of our response structs we only
+                    // have optional fields. so if we get a response shape that is totally different than what we're expecting
+                    // we'll get Ok(_) here, but it's actually not ok..
+                    let raw: Result<T, serde_json::Error> = serde_json::from_value(j.clone());
+                    match raw {
+                        Ok(deser_json) => IncodeAPIResult::<T>::Success(deser_json),
+                        Err(e) => {
+                            tracing::error!(http_status=%http_status, content_length=?cl, error=?e, "error deserializing incode response");
+                            IncodeAPIResult::<T>::ResponseErrorUnhandled(e.into())
                         }
                     }
-                    // if we had issues deserializing something is up
-                    Err(e) => {
-                        tracing::error!(http_status=%http_status, content_length=?cl, error=?e, "error deserializing incode response");
-                        IncodeAPIResult::<T>::ResponseErrorUnhandled(e.into())
+                } else if http_status.is_client_error() {
+                    // look for custom error codes
+                    if let Ok(error) = deserialize_to_incode_custom_client_error(j.clone()) {
+                        IncodeAPIResult::<T>::ResponseErrorHandled(error)
+                    } else {
+                        IncodeAPIResult::<T>::ResponseErrorUnhandled(error::Error::UnknownError)
                     }
+                } else {
+                    IncodeAPIResult::<T>::ResponseErrorUnhandled(error::Error::UnknownError)
                 };
 
                 (result, j)
