@@ -17,7 +17,7 @@ jobs:
       hasInfraChanges: ${{ steps.detect.outputs.ephemeral }}
       needsFullInfra: ${{ steps.detect.outputs.full_ephemeral}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # We extract all commits here to make sure we're pulling the right commit hash
           fetch-depth: 0

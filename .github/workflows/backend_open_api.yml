@@ -32,7 +32,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         # Default behavior of actions/checkout is horribly to check out a merge commit of the PR
         # merged into master...
         # This checks out the _actual_ commit in the PR
@@ -64,7 +64,6 @@ jobs:
         run: |
           set -x
           echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-  
 
   compute_open_api_base:
     runs-on: 16core
@@ -85,7 +84,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         # Default behavior of actions/checkout is horribly to check out a merge commit of the PR
         # merged into master...
         # This checks out the _actual_ commit in the PR
@@ -112,7 +111,7 @@ jobs:
           git log $MERGE_BASE -n 1
           echo "merge_base=$MERGE_BASE" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ steps.get_merge_base.outputs.merge_base }}
 
@@ -140,7 +139,6 @@ jobs:
         run: |
           set -x
           echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
 
   compare_open_api:
     runs-on: 16core
@@ -189,7 +187,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-includes: "Open API Backcompat Report"
+          body-includes: 'Open API Backcompat Report'
 
       - name: Create or update comment with incompat
         uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666
