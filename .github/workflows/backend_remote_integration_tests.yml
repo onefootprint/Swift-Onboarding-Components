@@ -64,7 +64,7 @@ jobs:
       ENVIRONMENT: ${{ inputs.isPr && 'ephemeral' || inputs.environment }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           ref: ${{ inputs.expectedCommitHash || github.sha }}
           # We extract all commits here to make sure we're pulling the right commit hash

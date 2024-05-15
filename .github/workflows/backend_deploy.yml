@@ -196,7 +196,7 @@ jobs:
     needs: [push_containers, sign_push_enclave]
     if: success()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           ref: ${{ inputs.commitHash }}
 
