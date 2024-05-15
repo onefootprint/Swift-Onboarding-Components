@@ -152,6 +152,13 @@ impl ValidateSdkArgs for VerifyV1SdkArgs {
         if self.auth_token.is_none() && self.public_key.is_none() {
             return Err(ValidationError("Either auth token or public key must be provided").into());
         }
+
+        let show_completion_page = self
+            .options
+            .as_ref()
+            .and_then(|s| s.show_completion_page)
+            .unwrap_or_default();
+        tracing::info!(%show_completion_page, "SDK args completion page option");
         Ok(())
     }
 
