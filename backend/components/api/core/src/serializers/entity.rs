@@ -17,7 +17,7 @@ use db::{
     VaultedData,
 };
 use itertools::Itertools;
-use newtypes::{OnboardingStatus, WorkflowKind};
+use newtypes::OnboardingStatus;
 use std::collections::HashMap;
 
 pub type EntityDetail<'a> = (
@@ -76,10 +76,6 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
         let requires_manual_review = !mrs.is_empty();
         let manual_review_kinds = mrs.iter().map(|mr| mr.kind).collect();
 
-        let has_outstanding_doc_wf = wfs.iter().any(|(wf, _)| {
-            wf.kind == WorkflowKind::Document && wf.completed_at.is_none() && wf.deactivated_at.is_none()
-        });
-
         let workflows = wfs
             .into_iter()
             .map(api_wire_types::EntityWorkflow::from_db)
@@ -101,9 +97,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             is_created_via_api,
             data,
             workflows,
-            // Annoying: for now, document-only workflows are a really custom codepath. So we have
-            // to check in another way if there are any outstanding doc-only workflows
-            has_outstanding_workflow_request: has_outstanding_doc_wf || wr.is_some(),
+            has_outstanding_workflow_request: wr.is_some(),
             label: label.map(|l| l.kind),
 
             // TODO deprecate all of these
