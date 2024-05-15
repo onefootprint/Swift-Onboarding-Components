@@ -1,5 +1,5 @@
 use db::models::{document::Document, document_request::DocumentRequest};
-use newtypes::DocumentScanDeviceType;
+use newtypes::DeviceType;
 
 use crate::utils::db2api::DbToApi;
 
@@ -15,7 +15,7 @@ impl DbToApi<(Document, DocumentRequest)> for api_wire_types::DocumentUploadedTi
         Self {
             status,
             document_type,
-            device_type: device_type.unwrap_or(DocumentScanDeviceType::Mobile),
+            device_type: device_type.unwrap_or(DeviceType::Mobile),
             config: document_request.config,
         }
     }

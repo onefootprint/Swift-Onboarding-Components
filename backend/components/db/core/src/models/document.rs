@@ -10,9 +10,9 @@ use diesel::{
 use std::collections::HashMap;
 
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DataLifetimeSeqno, DocumentDiKind, DocumentFixtureResult,
-    DocumentId, DocumentKind, DocumentRequestConfig, DocumentRequestId, DocumentReviewStatus,
-    DocumentScanDeviceType, DocumentSide, DocumentStatus, IdDocKind, IncodeVerificationSessionState,
+    CustomDocumentConfig, DataIdentifier, DataLifetimeSeqno, DeviceType, DocumentDiKind,
+    DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestConfig, DocumentRequestId,
+    DocumentReviewStatus, DocumentSide, DocumentStatus, IdDocKind, IncodeVerificationSessionState,
     InsightEventId, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, VendorValidatedCountryCode,
     WorkflowId,
 };
@@ -45,7 +45,7 @@ pub struct Document {
     // Indicating that the client cannot collect selfie for some reason
     pub skip_selfie: Option<bool>,
     // the device type that was used to collect this document (currently provided by bifrost, in the future perhaps derived from Stytch)
-    pub device_type: Option<DocumentScanDeviceType>,
+    pub device_type: Option<DeviceType>,
     // the document_type we stored this in the vault as
     pub vaulted_document_type: Option<DocumentKind>,
     pub curp_completed_seqno: Option<DataLifetimeSeqno>,
@@ -62,7 +62,7 @@ impl Document {
     }
 
     pub fn collected_on_desktop(&self) -> bool {
-        matches!(self.device_type, Some(DocumentScanDeviceType::Desktop))
+        matches!(self.device_type, Some(DeviceType::Desktop))
     }
 
     pub fn is_upload_complete(&self) -> bool {
@@ -81,7 +81,7 @@ pub struct NewDocumentArgs {
     pub country_code: Option<Iso3166TwoDigitCountryCode>,
     pub fixture_result: Option<DocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
-    pub device_type: Option<DocumentScanDeviceType>,
+    pub device_type: Option<DeviceType>,
     pub insight: CreateInsightEvent,
 }
 
@@ -95,7 +95,7 @@ struct NewDocumentRow {
     status: DocumentStatus,
     fixture_result: Option<DocumentFixtureResult>,
     skip_selfie: bool,
-    device_type: Option<DocumentScanDeviceType>,
+    device_type: Option<DeviceType>,
     review_status: DocumentReviewStatus,
     insight_event_id: Option<InsightEventId>,
 }

@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{insight_event, workflow};
 use diesel::{prelude::*, Insertable, Queryable, RunQueryDsl};
 use itertools::Itertools;
-use newtypes::{InsightEventId, ObConfigurationId, ScopedVaultId, WorkflowId};
+use newtypes::{DeviceType, InsightEventId, ObConfigurationId, ScopedVaultId, WorkflowId};
 
 #[derive(Debug, Clone, Default, Queryable, Insertable, Selectable)]
 #[diesel(table_name = insight_event)]
@@ -38,6 +38,25 @@ pub struct InsightEvent {
     pub tls: Option<String>,
     pub session_id: Option<String>,
     pub origin: Option<String>,
+}
+
+impl InsightEvent {
+    pub fn device_type(&self) -> Option<DeviceType> {
+        let is_mobile = [self.is_ios_viewer, self.is_android_user, self.is_mobile_viewer]
+            .iter()
+            .flatten()
+            .max()
+            .cloned()
+            .unwrap_or(false);
+
+        if is_mobile {
+            Some(DeviceType::Mobile)
+        } else if self.is_desktop_viewer.unwrap_or(false) {
+            Some(DeviceType::Desktop)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone, Queryable, Insertable, Default)]

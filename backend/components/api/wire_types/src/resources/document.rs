@@ -1,7 +1,7 @@
 use crate::*;
 use newtypes::{
-    DataIdentifier, DataLifetimeSeqno, DocumentKind, DocumentReviewStatus, DocumentScanDeviceType,
-    DocumentSide, DocumentStatus,
+    DataIdentifier, DataLifetimeSeqno, DeviceType, DocumentKind, DocumentReviewStatus, DocumentSide,
+    DocumentStatus,
 };
 
 use serde_with::SerializeDisplay;
@@ -15,11 +15,11 @@ pub enum UploadSource {
     Api,
 }
 
-impl From<DocumentScanDeviceType> for UploadSource {
-    fn from(value: DocumentScanDeviceType) -> Self {
+impl From<DeviceType> for UploadSource {
+    fn from(value: DeviceType) -> Self {
         match value {
-            DocumentScanDeviceType::Desktop => Self::Desktop,
-            DocumentScanDeviceType::Mobile => Self::Mobile,
+            DeviceType::Desktop => Self::Desktop,
+            DeviceType::Mobile => Self::Mobile,
         }
     }
 }

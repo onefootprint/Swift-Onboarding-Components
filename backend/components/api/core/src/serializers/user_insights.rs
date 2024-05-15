@@ -1,5 +1,7 @@
 use api_wire_types::UserInsight;
-use db::models::{neuro_id_analytics_event::NeuroIdAnalyticsEvent, workflow::Workflow};
+use db::models::{
+    insight_event::InsightEvent, neuro_id_analytics_event::NeuroIdAnalyticsEvent, workflow::Workflow,
+};
 use newtypes::{UserInsightScope, UserInsightUnit};
 use strum_macros::{Display, EnumString};
 macro_rules! user_insight {
@@ -28,7 +30,11 @@ macro_rules! user_insight {
     }
 }
 
-pub fn from_db(event: Option<NeuroIdAnalyticsEvent>, workflow: Option<Workflow>) -> Vec<UserInsight> {
+pub fn from_db(
+    event: Option<NeuroIdAnalyticsEvent>,
+    workflow: Option<Workflow>,
+    insight_event: Option<InsightEvent>,
+) -> Vec<UserInsight> {
     let behavior_features = if let Some(ev) = event {
         let NeuroIdAnalyticsEvent {
             cookie_id,
@@ -172,17 +178,28 @@ pub fn from_db(event: Option<NeuroIdAnalyticsEvent>, workflow: Option<Workflow>)
             let duration = e - wf.created_at;
             duration.num_milliseconds()
         });
-        vec![(
-            Insight::WorkflowCompletionTime,
-            wf_time,
-            UserInsightScope::Workflow,
-            UserInsightUnit::DurationMs,
-        )]
+
+        let wf_start_device_type = insight_event.and_then(|ie| ie.device_type());
+
+        vec![
+            (
+                Insight::WorkflowCompletionTime,
+                wf_time.map(|w| w.to_string()),
+                UserInsightScope::Workflow,
+                UserInsightUnit::DurationMs,
+            ),
+            (
+                Insight::WorkflowStartDeviceType,
+                wf_start_device_type.map(|w| w.to_string()),
+                UserInsightScope::Workflow,
+                UserInsightUnit::String,
+            ),
+        ]
         .into_iter()
         .filter_map(|(n, value, scope, unit)| {
             value.map(|v| UserInsight {
                 name: n.to_string(),
-                value: v.to_string(),
+                value: v,
                 scope,
                 description: n.description(),
                 unit,
@@ -200,7 +217,7 @@ pub fn from_db(event: Option<NeuroIdAnalyticsEvent>, workflow: Option<Workflow>)
 user_insight! {
     #[derive(Display, EnumString, Clone, Debug)]
     enum Insight {
-        #[ser = "Fraud Ring Indicator", description = "This session has behavior associated to fraud ring activities"]
+        #[ser = "Fraud Ring Indicator", description = "This session has behavior commonly associated with fraudulent activity, such as hesitating when typing in sensitive fields or irregular entry patterns"]
         FraudRingIndicator,
         #[ser = "Automated Activity", description = "This session has automated behaviors"]
         AutomatedActivity,
@@ -226,7 +243,9 @@ user_insight! {
         CookieId,
         #[ser = "Device ID", description = "Persistent identifier based on fingerprinting"]
         DeviceId,
-        #[ser = "Latest onboarding completion time", description = "The amount of time in milliseconds it took this user to onboard"]
-        WorkflowCompletionTime
+        #[ser = "Latest onboarding completion time", description = "The amount of time it took this user to onboard"]
+        WorkflowCompletionTime,
+        #[ser = "Latest onboarding start device type", description = "The type of device the user started onboarding from."]
+        WorkflowStartDeviceType
     }
 }

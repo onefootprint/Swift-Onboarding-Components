@@ -8,7 +8,8 @@ use api_core::{
 };
 use db::{
     models::{
-        neuro_id_analytics_event::NeuroIdAnalyticsEvent, scoped_vault::ScopedVault, workflow::Workflow,
+        insight_event::InsightEvent, neuro_id_analytics_event::NeuroIdAnalyticsEvent,
+        scoped_vault::ScopedVault, workflow::Workflow,
     },
     DbResult,
 };
@@ -32,7 +33,7 @@ pub async fn get(
     let fp_id = request.into_inner();
 
     let can_view_neuro = tenant_can_view_neuro(&state, &tenant_id);
-    let (behavior_events, latest_completed_wf) = state
+    let (behavior_events, latest_completed_wf, insight_event_for_latest_wf) = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -42,8 +43,12 @@ pub async fn get(
                 vec![]
             };
             let latest_completed_wf = Workflow::latest_reonboardable(conn, &sv.id, true)?.map(|(wf, _)| wf);
-
-            Ok((behavior, latest_completed_wf))
+            let insight_event_for_latest_wf = if let Some(ref wf) = latest_completed_wf {
+                InsightEvent::get_for_workflow(conn, &wf.id)?
+            } else {
+                None
+            };
+            Ok((behavior, latest_completed_wf, insight_event_for_latest_wf))
         })
         .await?;
     // TODO: add unique key on wf_id
@@ -52,6 +57,7 @@ pub async fn get(
     ResponseData::ok(user_insights::from_db(
         behavior_events.first().cloned(),
         latest_completed_wf,
+        insight_event_for_latest_wf,
     ))
     .json()
 }

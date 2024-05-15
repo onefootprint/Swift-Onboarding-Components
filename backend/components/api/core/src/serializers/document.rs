@@ -3,7 +3,7 @@ use db::models::{
     data_lifetime::DataLifetime, document::Document, document_request::DocumentRequest,
     document_upload::DocumentUpload,
 };
-use newtypes::{DocumentKind, DocumentScanDeviceType, DocumentSide};
+use newtypes::{DeviceType, DocumentKind, DocumentSide};
 
 use crate::{
     errors::ApiResult,
@@ -48,8 +48,8 @@ impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
             document_score,
             selfie_score,
             ocr_confidence_score,
-            // TODO: Should we have default here? I think so
-            upload_source: device_type.unwrap_or(DocumentScanDeviceType::Mobile).into(),
+            // TODO: Should we have default here?
+            upload_source: device_type.unwrap_or(DeviceType::Mobile).into(),
         };
         Ok(result)
     }

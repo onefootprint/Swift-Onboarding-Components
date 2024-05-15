@@ -1,10 +1,10 @@
 use crate::{Apiv2Schema, Serialize};
-use newtypes::{DocumentKind, DocumentRequestConfig, DocumentScanDeviceType, DocumentStatus};
+use newtypes::{DeviceType, DocumentKind, DocumentRequestConfig, DocumentStatus};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct DocumentUploadedTimelineEvent {
     pub status: DocumentStatus,
     pub document_type: DocumentKind,
-    pub device_type: DocumentScanDeviceType,
+    pub device_type: DeviceType,
     pub config: DocumentRequestConfig,
 }

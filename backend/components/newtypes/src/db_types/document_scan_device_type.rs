@@ -24,8 +24,8 @@ use strum_macros::{AsRefStr, Display, EnumString};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum DocumentScanDeviceType {
+pub enum DeviceType {
     Desktop,
     Mobile,
 }
-crate::util::impl_enum_str_diesel!(DocumentScanDeviceType);
+crate::util::impl_enum_str_diesel!(DeviceType);

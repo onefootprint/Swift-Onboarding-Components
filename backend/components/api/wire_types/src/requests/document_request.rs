@@ -1,5 +1,5 @@
 use newtypes::{
-    DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestId, DocumentScanDeviceType, DocumentSide,
+    DeviceType, DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestId, DocumentSide,
     DocumentStatus, IncodeFailureReason, Iso3166TwoDigitCountryCode,
 };
 use paperclip::actix::Apiv2Schema;
@@ -10,7 +10,7 @@ pub struct CreateDocumentRequest {
     pub country_code: Option<Iso3166TwoDigitCountryCode>,
     pub fixture_result: Option<DocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
-    pub device_type: Option<DocumentScanDeviceType>,
+    pub device_type: Option<DeviceType>,
     // TODO make required
     pub request_id: Option<DocumentRequestId>,
 }
