@@ -41,7 +41,7 @@ pub async fn maybe_shadow_call_lexis(
                     verification_result_id: vres.id,
                     verification_request_id: vreq.id,
                 };
-                super::waterfall::eval_rules(vr, vw, obc)?;
+                super::waterfall::eval_waterfall_rules(vr, vw, obc)?;
             }
             Err(err) => {
                 tracing::error!(?err, tenant_id=%obc.tenant_id, %sv_id, "Lexis vendor call error")

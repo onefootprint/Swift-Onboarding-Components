@@ -17,7 +17,6 @@ use db::{
     },
     DbPool, DbResult, PgConn, TxnPgConn,
 };
-use feature_flag::BoolFlag;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::{
@@ -93,12 +92,6 @@ pub async fn run_kyc_vendor_calls(
 
     if fixture_decision.is_some() {
         Ok(decision::sandbox::save_fixture_vendor_result(&state.db_pool, &di, &wf).await?)
-    } else if state
-        .feature_flag_client
-        .flag(BoolFlag::UseKycWaterfallV2Rollout(t_id))
-    {
-        tracing::info!(?wf.id, "running waterfall v2");
-        vendor::kyc::waterfall_v2::run_kyc_waterfall(state, &di, &wf.id).await
     } else {
         vendor::kyc::waterfall::run_kyc_waterfall(state, &di, &wf.id).await
     }

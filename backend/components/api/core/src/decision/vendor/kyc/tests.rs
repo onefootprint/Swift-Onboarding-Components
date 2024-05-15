@@ -1,4 +1,4 @@
-use super::{waterfall, waterfall_v2};
+use super::waterfall;
 use crate::{
     decision::{
         state::test_utils::{self, WithScore, WithSsnResultCode},
@@ -51,204 +51,6 @@ enum ExpectedResult {
 }
 
 struct Run(ExperianResponse, IdologyResponse, ExpectedResult);
-
-// Vendor Error Handling
-#[test_state_case(
-        ExperianEnabled(false),
-        IdologyEnabled(false),
-        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrNotEnoughInformation),
-        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrNotEnoughInformation)
-        ; "No available vendor"
-    )]
-#[test_state_case(
-        ExperianEnabled(false),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
-        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Idology only, call succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(false),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed)
-        ; "Idology only, call errors, re-run errors"
-    )]
-#[test_state_case(
-        ExperianEnabled(false),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Idology only, call errors, re-rerun succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(false),
-        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
-        ; "Experian only, call succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(false),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrVendorRequestsFailed)
-        ; "Experian only, call errors, re-run errors"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(false),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrVendorRequestsFailed) ,
-        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
-        ; "Experian only, call errors, re-run succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
-        ; "Both, Experian succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Both, Experian errors, Idology succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
-        ; "Both, Experian errors, Idology errors, re-run Experian succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::HardError), IdologyResponse(VR::HardError), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
-        ; "Both, Experian hard errors, Idology hard errors, re-run Experian succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Both, Experian errors, Idology errors, re-run Experian errors Idology succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::HardError), IdologyResponse(VR::HardError), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::HardError), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Both, Experian hard errors, Idology hard errors, re-run Experian hard errors Idology succeeds"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed)
-        ; "Both, Experian errors, Idology errors, re-run Experian errors Idology errors"
-    )]
-// Rule failure handling
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Both vendors, Experian fails rules, Idology passes rules"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), IdologyResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Both vendors, Experian fails rules, Idology fails rules"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), IdologyResponse(VR::Error), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
-        ; "Both vendors, Experian fails rules, Idology errors"
-    )]
-#[test_state_case(
-        ExperianEnabled(true),
-        IdologyEnabled(true),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Both vendors, Experian errors, Idology fails rules"
-    )]
-// TODO: rule failures + error handling? :o , maybe 3 runs??
-#[tokio::test]
-async fn test_run_kyc_waterfall(
-    state: &mut State,
-    experian_enabled: ExperianEnabled,
-    idology_enabled: IdologyEnabled,
-    run1: Run,
-    run2: Run,
-) {
-    // Setup
-    let (wf, t, _obc, _tu) = test_utils::setup_data(
-        state,
-        ObConfigurationOpts {
-            is_live: true,
-            ..Default::default()
-        },
-        None,
-    )
-    .await;
-
-    let di = state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let _tvc: DbTenantVendorControl = DbTenantVendorControl::create(
-                conn,
-                t.id,
-                idology_enabled.0,
-                experian_enabled.0,
-                false,
-                experian_enabled.0.then(|| "abc123".to_owned()),
-                None,
-            )
-            .unwrap();
-
-            Ok(
-                DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &wf.scoped_vault_id, None)
-                    .unwrap(),
-            )
-        })
-        .await
-        .unwrap();
-
-    // Mock Run 1
-
-    let Run {
-        0: experian_response,
-        1: idology_response,
-        2: expected_result,
-    } = run1;
-    mock_calls(state, experian_response, idology_response);
-    // Function under test
-    let res = waterfall::run_kyc_waterfall(state, &di, &wf.id).await;
-    // Assertions
-    assert_expected_result(state, expected_result, res).await;
-
-    // Simulate re-running. Ones that suceeded already should noop. Ones that ended in error should remake vendor calls
-    // Mock Run 2
-    let Run {
-        0: experian_response2,
-        1: idology_response2,
-        2: expected_result2,
-    } = run2;
-    mock_calls(state, experian_response2, idology_response2);
-    // Function under test
-    let res2 = waterfall::run_kyc_waterfall(state, &di, &wf.id).await;
-    // Assertions
-    assert_expected_result(state, expected_result2, res2).await;
-}
-
 
 #[test_state_case(
     ExperianEnabled(false),
@@ -386,7 +188,7 @@ async fn test_run_kyc_waterfall(
 )]
 // TODO: rule failures + error handling? :o , maybe 3 runs??
 #[tokio::test]
-async fn test_run_kyc_waterfall_v2(
+async fn test_run_kyc_waterfall(
     state: &mut State,
     experian_enabled: ExperianEnabled,
     idology_enabled: IdologyEnabled,
@@ -435,7 +237,7 @@ async fn test_run_kyc_waterfall_v2(
     } = run1;
     mock_calls(state, experian_response.clone(), idology_response.clone());
     // Function under test
-    let res = waterfall_v2::run_kyc_waterfall(state, &di, &wf.id).await;
+    let res = waterfall::run_kyc_waterfall(state, &di, &wf.id).await;
     // Assertions
     assert_expected_result_with_wfe(
         state,
@@ -457,7 +259,7 @@ async fn test_run_kyc_waterfall_v2(
     } = run2;
     mock_calls(state, experian_response2.clone(), idology_response2.clone());
     // Function under test
-    let res2 = waterfall_v2::run_kyc_waterfall(state, &di, &wf.id).await;
+    let res2 = waterfall::run_kyc_waterfall(state, &di, &wf.id).await;
     // Assertions
     assert_expected_result_with_wfe(
         state,
