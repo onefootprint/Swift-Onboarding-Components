@@ -138,7 +138,7 @@ const PinVerification = ({
             requestError.getErrorCode(error) === 'E120';
           const { token } = requestError.getErrorContext(error);
           if (isExistingVaultError && token) {
-            logError(
+            logWarn(
               'Entered signup challenge when the user already has a vault. Initiating login challenge',
             );
             initiatePhoneOrEmailLoginChallenge(token);

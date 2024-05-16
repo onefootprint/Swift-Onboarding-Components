@@ -20,11 +20,10 @@ import { useTimeout } from 'usehooks-ts';
 
 import getSdkContext from '../../utils/sdk-context';
 import useProps from './hooks/use-props';
-import { POST_MESSAGE_TIMEOUT } from './hooks/use-props/use-props';
 
 type InitProps = { fpProvider: ProviderReturn };
 
-const STUCK_ON_SHIMMER_TIMEOUT = POST_MESSAGE_TIMEOUT * 3;
+const STUCK_ON_SHIMMER_TIMEOUT = 5000;
 
 const Init = ({ fpProvider }: InitProps) => {
   const [state, send] = useBifrostMachine();
@@ -59,7 +58,7 @@ const Init = ({ fpProvider }: InitProps) => {
 
   useTimeout(() => {
     Logger.error(
-      `User is stuck on init shimmer screen for 3+ seconds. Known args: ${JSON.stringify(
+      `User is stuck on init shimmer screen for 5+ seconds. Known args: ${JSON.stringify(
         {
           publicKey: publicKeyContext,
           config: configContext,
@@ -139,7 +138,7 @@ const Init = ({ fpProvider }: InitProps) => {
       });
     },
     (error: unknown) => {
-      Logger.error(
+      Logger.warn(
         `Message: Failed to fetch initial properties ${getErrorMessage(error)}`,
         { location: 'init-props' },
       );
