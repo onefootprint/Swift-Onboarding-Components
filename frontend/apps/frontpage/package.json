@@ -7,7 +7,7 @@
     "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -dep ui,request",
     "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui,request",
     "i18n:clean": "rm -rf ./public/locales/",
-    "dev": "yarn i18n:copy-watch & next dev --turbo -p 3003",
+    "dev": "yarn i18n:copy-watch & next dev -p 3003",
     "build": "next build",
     "build:analyze": "ANALYZE=true yarn build",
     "start": "next start -p 3003",

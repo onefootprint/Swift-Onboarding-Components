@@ -1,0 +1,92 @@
+import { CaseStudyLayout } from '../components/case-study-layout';
+import { IcoMountain24, IcoLightBulb24 } from '@onefootprint/icons';
+import { Stack } from '@onefootprint/ui';
+import { Challenge } from '../components/challenge';
+import { IconTitle } from '../components/icon-title';
+import { Banner } from '../components/banner';
+import { Result } from '../components/result';
+import { Quote } from '../components/quote';
+import SEO from 'src/components/seo';
+
+<SEO
+  title="Findigs Case Study"
+  description="Through Footprint's integration, Bloom significantly enhanced its onboarding process, leading to an increase in completions and earning recognition from top publications."
+  image="/customer-stories/findigs/findigs-og.png"
+  og={{
+    image: '/customer-stories/findigs/findigs-og.png',
+  }}
+  twitter={{
+    image: '/customer-stories/findigs/findigs-og.png',
+  }}
+/>
+
+<CaseStudyLayout
+  companyDetails={{
+    name: 'Findigs',
+    industry: "Financial Services",
+    website: "https://findigs.com/",
+    logo: "/customer-stories/findigs/findigs-logo.svg",
+    customerSince: "2023",
+    title: "Footprint Helps Findigs Fight Fraud",
+    subtitle: "In an era marked by unprecedented technological advancements and a surge in digital interactions, the landscape of tenant screening has undergone a profound transformation. As the rental market expands and diversifies, property managers and landlords face an escalating challenge – distinguishing between genuine rental applicants and those attempting to conceal a fraudulent identity."
+}}>
+
+Findigs is a leading company pioneering solutions to protect Property Managers in this growing threat landscape. Trusted by some of the marquee names in Property Management such as Re/Max, Atlas, and Evernest, they offer a comprehensive screening solution to vet hundreds of thousands of applicants each year across the country. Findigs provides an amazing service to PMs to offload the complexity of this product and create a compound platform to handle all of the elements of tenant screening. They partnered with Footprint to help in this mission of protecting PMs from fraudulent applications.
+
+<Challenge>
+
+- As the rental market becomes increasingly competitive, the potential for identity fraud looms large. Evictions are up 35% in the last 10 years, primarily due to fraud that went unfound in the tenant screening process. Unscrupulous individuals seek to exploit the digital nature of the application process, employing sophisticated methods to fabricate or manipulate personal information. From stolen identities to the creation of entirely fictional personas, the permutations of identity fraud are vast and varied.
+- The repercussions of renting to a fraudulent applicant can be severe and multifaceted. Property damage, financial losses, and legal complications are just a few of the potential pitfalls. In addition, the safety and well-being of existing tenants can be compromised if individuals with malicious intent slip through the screening process. The need for a meticulous and comprehensive approach to tenant screening has never been more pressing.
+- Identifying fraudulent activities within rental applications poses a considerable challenge. The interconnected digital world provides perpetrators with an arsenal of tools to forge documents, manipulate records, and obscure their true identities. Moreover, the speed at which technology evolves demands a dynamic and adaptive approach to keep pace with emerging fraud tactics.
+
+</Challenge>
+
+#### Solution
+
+The Footprint Compound Solution is helpful to a large and growing platform like Findigs. Once companies, especially in tenant screening, reach this size, it can be difficult to manage multiple-point solutions. Solving for identity, fraud, security, and auth with one tool can present a real ROI. Once coupled with an intuitive UX, rules engine, and leading document-scanning solution, Findigs began to immediately see several benefits:
+
+**Significant Improvement vs Previous Solution**
+
+- Lead PM Anuj Desai says “Footprint has been a significant improvement to our onboarding + fraud stack. It caught four new fraud cases in its first week live, and the app clip minimizes drop-off during document scanning.”
+- Findigs reported that all of their Property Managers have expressed that Footprint IDV represents a significant improvement compared to our previous solution. Some even went as far as to label it as “the best enhancement we’ve introduced this year.”
+
+**Priority Flags**
+
+- PMs appreciate the priority flags, which make it easier for them to quickly validate whether an application exhibits signs of fraud or belongs to a legitimate actor.
+
+**User-Friendly Experience**
+
+- PMs have found the Footprint IDV experience easy to use, while the app clip streamlines the document verification aspect while minimizing drop-off.
+- This has resulted in over 96% document fraud accuracy
+
+**Improved Security**
+
+- Findigs has been able to leverage Footprint to simplify security challenges. Footprint PCI-compliant Nitro Enclaves can simplify the proxying of information and storage.
+
+##### Results: Enhanced Fraud Detection
+
+<Result>
+
+- Most PMs noted that increased fraudulent indicators have proven instrumental in catching fraudulent applications.
+- In one instance Footprint was able to see a complex fraud attempt including inner-family identity theft and correctly flag it to Findigs.
+- Footprint has been able to verify that a device is attested via Footprint when validating a user, giving another tool to Findigs in their goal of eliminating fraud in tenant apps.
+- Footprint has been integral in catching CPNs based on validating the credit data associated with an SSN. CPNs usually return no credit and have been behind a heightened wave of fraud in the space which Footprint has helped to combat.
+
+</Result>
+
+##### Results: Quantifying Reduction in Fraud Vectors
+
+<Result>
+
+- Footprint detected **over 2,000 attempts to use screen captures instead of an actual selfie**, and prevented close to 1,000 people who had non-live selfies. This is increasingly important in an age of Gen-AI making very live-like photos that do not have the liveness of a real human
+- Footprint flagged **more than 1,000 cases** where there was a discrepancy of the barcode information encoded on the back of a license and the information OCR’d from the front of the license. As fraudsters can increasingly generate realistic images, ensuring it is a real upload has never been more salient. Even as bad actors create physical fake IDs, this is a great line of defense.
+- Footprint identified **hundreds of instances** where applicants used an SSN that likely didn’t belong to them (either synthetic, third-party, or a combination).
+
+</Result>
+
+<Banner cta="Get a demo" title="Ready to start?">
+  If you're looking to onboard customers quickly and securely store their
+  sensitive data, we'd love to help.
+</Banner>
+
+</CaseStudyLayout>
