@@ -114,7 +114,7 @@ const Navbar = () => {
       $isOnDarkSection={isOnDarkSection}
     >
       <div id={CASE_STUDY_BANNER_PORTAL_ID} />
-      <Container>
+      <Container as="div">
         <Inner id="navbar">
           <MobileNav
             onOpen={disableFloating}

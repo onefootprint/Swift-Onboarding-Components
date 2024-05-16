@@ -274,6 +274,99 @@
     }
   },
   "pages": {
+    "industries": {
+      "components": {
+        "read-case-study": "Read case study"
+      },
+      "real-estate": {
+        "html-title": "Footprint - Industries: Real Estate",
+        "hero": {
+          "title": "Reduce Fraud, Increase Trust in Rental Applicants by verifying identity + credit in one place",
+          "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs",
+          "get-started": "Get started",
+          "schedule-demo": "Schedule a call"
+        },
+        "featured": {
+          "verify-identities": {
+            "title": "Verify identities",
+            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+          },
+          "verify-credit": {
+            "title": "Verify credit",
+            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+          },
+          "detect-fraud": {
+            "title": "Detect fraudulent actors",
+            "subtitle": "Companies have used Footprint to flag thousands of fraudulent actors to PMs during application."
+          }
+        },
+        "problem": {
+          "title": "We know your problems...",
+          "identity-fraud": {
+            "title": "The Rising Threat of Identity Fraud in Rental Applications",
+            "subtitle": "As the rental market becomes increasingly competitive, the potential for identity fraud looms large. Evictions are up 35% in the last 10 years, primarily due to fraud that went unfound in the tenant screening process."
+          },
+          "tenant-screening": {
+            "title": "The High Stakes of Inadequate Tenant Screening",
+            "subtitle": "The repercussions of renting to a fraudulent applicant can be severe and multifaceted. Property damage, financial losses, and legal complications are just a few of the potential pitfalls."
+          },
+          "fraud-detection": {
+            "title": "The Elusive Nature of Effective Fraud Detection:",
+            "subtitle": "Identifying fraudulent activities within rental applications poses a considerable challenge. The interconnected digital world provides perpetrators with an arsenal of tools to forge documents, manipulate records, and obscure their true identities. "
+          }
+        },
+        "solution": {
+          "title": "...and we know how to help ✨",
+          "exposed-risk-signals": {
+            "title": "Priority Flags and Exposed Risk Signals",
+            "subtitle": "Make it easier for your PMs to quickly validate whether an application exhibits signs of fraud"
+          },
+          "user-experience": {
+            "title": "User-Friendly Experience",
+            "subtitle": "PMs have found the Footprint IDV experience easy to use, while the app clip streamlines the document verification aspect while minimizing drop-off."
+          },
+          "case-management": {
+            "title": "Robust Case Management",
+            "subtitle": "Footprint tools such as block lists and labeling allow you to mark tenants in your network, giving your property managers increased insight into tenant behavior at previous residences."
+          },
+          "catch-fraud": {
+            "title": "Catch Fraud",
+            "subtitle": "Most PMs who have used Footprint report that increased fraudulent indicators have proven instrumental in catching fraudulent applications. Footprint’s case management can let."
+          },
+          "extra-doc-collection": {
+            "title": "Automate Extra Document Collection",
+            "subtitle": "Property Managers can request additional documentation via the Footprint dashboard, enhancing their confidence. Footprint automatically contacts applicants, collects the required information, and delivers verified results back to PMs."
+          }
+        },
+        "quote": {
+          "quote": "Footprint has been a significant improvement to our onboarding + fraud stack. It caught four new fraud cases in its first week live, and the app clip minimizes drop-off during document scanning.",
+          "author": "Anuj Desai",
+          "role": "Lead Product Manager",
+          "company": "Findigs"
+        },
+        "experience": {
+          "title": "We have the experience and the expertise",
+          "accuracy": {
+            "title": "Over 96% Document Fraud Accuracy",
+            "subtitle": "Our advanced scanning technology ensures unparalleled precision in detecting document fraud, maintaining a high accuracy rate of over 96%"
+          },
+          "attempts": {
+            "title": "Stopped over 1,000 attempts to use non-live selfies in security checks",
+            "subtitle": "Footprint detected thousands of attempts to use screen captures instead of an actual selfie, and prevented close to 1,000 people who had non-live selfies."
+          },
+          "flagged": {
+            "title": "Flagged over 1,000 mismatches between barcode and front data on licenses",
+            "subtitle": "As fraudsters can increasingly generate realistic images, ensuring it is a real upload has never been more salient. Even as bad actors create physical fake IDs, this is a great line of defense."
+          }
+        },
+        "banner": {
+          "alt-img": "A penguin on a rock",
+          "title": "Start boosting your conversions and onboarding experience now",
+          "primary-button": "Sign up for free",
+          "secondary-button": "Book a call"
+        }
+      }
+    },
     "home": {
       "html-title": "Footprint - One tool to unify onboarding, identity verification, and data security",
       "hero": {

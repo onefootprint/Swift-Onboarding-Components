@@ -97,6 +97,7 @@ const ScrollArea = ({
       onScroll={handleScroll}
       asChild={asChild}
       style={{ maxHeight }}
+      className={className}
     >
       <StyledViewport
         className={className}

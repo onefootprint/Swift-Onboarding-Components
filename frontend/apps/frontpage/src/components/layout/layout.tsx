@@ -1,4 +1,4 @@
-import { media, Stack } from '@onefootprint/ui';
+import { media } from '@onefootprint/ui';
 import { getCookie, setCookie } from 'cookies-next';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -36,7 +36,6 @@ const Layout = ({ children }: LayoutProps) => {
         />
       )}
       <Navbar />
-      {isBannerVisible && <Stack height="48px" tag="span" />}
       <Content>{children}</Content>
       <Footer />
     </>
