@@ -188,7 +188,7 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
         `datadog-lambda-arn-${stackMetadata.shortStackName}`,
         {
           accountId: accountId,
-          lambdaArn: forwarderStack.outputs['LambdaArn'],
+          lambdaArn: forwarderStack.outputs['DatadogForwarderArn'],
         },
       );
 
