@@ -7,25 +7,28 @@ import SolutionsViewer from '../../../components/solutions-viewer';
 
 const keys = [
   {
-    key: 'real-estate.solution.exposed-risk-signals',
-    imgPath: '/industries/real-estate/exposed-risk-signals',
-    frontImgSize: { width: 650, height: 450 },
+    key: 'auto.solution.unified-risk-engine',
+    imgPath: '/industries/auto/unified-risk-engine',
+    frontImgSize: { width: 814, height: 626 },
+    frontImgPosition: { top: '65%', left: '50%' },
   },
   {
-    key: 'real-estate.solution.case-management',
-    imgPath: '/industries/real-estate/case-management',
-    frontImgSize: { width: 650, height: 450 },
+    key: 'auto.solution.online-in-person',
+    imgPath: '/industries/auto/online-in-person',
+    frontImgSize: { width: 396, height: 364 },
+    frontImgPosition: { top: '50%', left: '50%' },
   },
   {
-    key: 'real-estate.solution.extra-doc-collection',
-    imgPath: '/industries/real-estate/extra-doc-collection',
-    frontImgSize: { width: 400, height: 650 },
+    key: 'auto.solution.automate-extra-document-collection',
+    imgPath: '/industries/auto/automate-extra-document-collection',
+    frontImgSize: { width: 390, height: 650 },
+    frontImgPosition: { top: '75%', left: '50%' },
   },
 ];
 
 const Solutions = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.real-estate.solution',
+    keyPrefix: 'pages.industries.auto.solution',
   });
   return (
     <Background>

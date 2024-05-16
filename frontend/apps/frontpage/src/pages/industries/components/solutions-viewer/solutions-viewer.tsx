@@ -1,4 +1,4 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
+import { Box, media, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
@@ -6,25 +6,19 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-const keys = [
-  {
-    key: 'exposed-risk-signals',
-    imgPath: '/industries/real-estate/exposed-risk-signals',
-    frontImgSize: { width: 650, height: 450 },
-  },
-  {
-    key: 'case-management',
-    imgPath: '/industries/real-estate/case-management',
-    frontImgSize: { width: 650, height: 450 },
-  },
-  {
-    key: 'extra-doc-collection',
-    imgPath: '/industries/real-estate/extra-doc-collection',
-    frontImgSize: { width: 400, height: 650 },
-  },
-];
+export type SolutionKey = {
+  key: string;
+  imgPath: string;
+  frontImgSize: { width: number; height: number };
+  frontImgPosition?: {
+    top?: string;
+    left?: string;
+    right?: string;
+    bottom?: string;
+  };
+};
 
-const imageAppearVariants = {
+const containerAppearVariants = {
   hidden: { opacity: 0, filter: 'blur(10px)' },
   visible: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.5 } },
 };
@@ -34,9 +28,14 @@ const progressBarVariants = {
   animate: { width: '100%', transition: { duration: 5, ease: 'linear' } },
 };
 
-const SolutionsViewer = () => {
+const imageVariants = {
+  hidden: { opacity: 0, filter: 'blur(10px)' },
+  visible: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.2 } },
+};
+
+const SolutionsViewer = ({ keys }: { keys: SolutionKey[] }) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.real-estate.solution',
+    keyPrefix: 'pages.industries',
   });
   const [selectedKey, setSelectedKey] = useState<string | null>(keys[0].key);
   const [progress, setProgress] = useState(0);
@@ -45,7 +44,7 @@ const SolutionsViewer = () => {
     const interval = setInterval(() => {
       setProgress(prevProgress => {
         if (prevProgress < 100) {
-          return prevProgress + 20; // Increment by 20% every second
+          return prevProgress + 20;
         }
         return 0;
       });
@@ -60,7 +59,7 @@ const SolutionsViewer = () => {
       setSelectedKey(keys[nextIndex].key);
     }, 5000);
     return () => clearTimeout(timeout);
-  }, [selectedKey]);
+  }, [keys, selectedKey]);
 
   const backgroundPath = `${
     keys.find(k => k.key === selectedKey)?.imgPath || ''
@@ -73,18 +72,22 @@ const SolutionsViewer = () => {
     <ViewerContainer>
       <ImageContainer
         src={backgroundPath}
-        variants={imageAppearVariants}
+        variants={containerAppearVariants}
         initial="hidden"
         animate="visible"
         key={selectedKey}
       >
-        <Image
+        <FrontImage
+          variants={imageVariants}
+          initial="hidden"
+          animate="visible"
           src={foregroundPath}
           alt="foreground"
           width={keys.find(k => k.key === selectedKey)?.frontImgSize.width || 0}
           height={
             keys.find(k => k.key === selectedKey)?.frontImgSize.height || 0
           }
+          $position={keys.find(k => k.key === selectedKey)?.frontImgPosition}
         />
       </ImageContainer>
       <ProgressBar>
@@ -212,20 +215,30 @@ const ImageContainer = styled(motion(Stack))<{ src: string }>`
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
     }
+  `}
+`;
 
-    img {
-      z-index: 2;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      height: auto;
-      max-width: 95%;
-      border-radius: ${theme.borderRadius.default};
-      overflow: hidden;
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-      transform: translate(-50%, -50%);
-      box-shadow: ${theme.elevation[2]};
-    }
+const FrontImage = styled(motion(Image))<{
+  $position?: { top?: string; left?: string; right?: string; bottom?: string };
+}>`
+  ${({ theme, $position }) => css`
+    z-index: 2;
+    position: absolute;
+    top: ${$position?.top || '50%'};
+    left: ${$position?.left || '50%'};
+    right: ${$position?.right || '50%'};
+    bottom: ${$position?.bottom || '50%'};
+    height: auto;
+    max-width: 95%;
+    border-radius: ${theme.borderRadius.default};
+    overflow: hidden;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    transform: translate(-50%, -50%);
+    box-shadow: ${theme.elevation[2]};
+
+    ${media.greaterThan('md')`
+      max-width: 100%;
+    `}
   `}
 `;
 

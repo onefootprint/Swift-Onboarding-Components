@@ -12,11 +12,11 @@ import VerifyIdentities from '../../../components/featured-card-illustrations/ve
 const keys = [
   {
     key: 'verify-identities',
-    illustration: <VerifyIdentities />,
+    illustration: <VerifyCredit />,
   },
   {
     key: 'verify-credit',
-    illustration: <VerifyCredit />,
+    illustration: <VerifyIdentities />,
   },
   {
     key: 'detect-fraud',
@@ -26,7 +26,7 @@ const keys = [
 
 const FeaturedCards = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.real-estate.featured',
+    keyPrefix: 'pages.industries.auto.featured',
   });
   return (
     <Background>

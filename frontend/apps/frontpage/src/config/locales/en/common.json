@@ -278,6 +278,71 @@
       "components": {
         "read-case-study": "Read case study"
       },
+      "auto": {
+        "html-title": "Footprint - Industries: Auto",
+        "hero": {
+          "title": "Streamline onboarding, verify licenses, and assess driving history in real-time",
+          "subtitle": "Footprint has been built to help auto companies conduct robust yet seamless identity verification to reduce fraud and simplify the rental or purchase process",
+          "get-started": "Get started",
+          "schedule-demo": "Schedule a call"
+        },
+        "featured": {
+          "verify-identities": {
+            "title": "Verify identities",
+            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+          },
+          "verify-credit": {
+            "title": "Verify credit",
+            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+          },
+          "detect-fraud": {
+            "title": "Detect fraudulent actors",
+            "subtitle": "Companies have used Footprint to flag thousands of fraudulent actors to PMs during application."
+          }
+        },
+        "problem": {
+          "title": "We know your problems...",
+          "raising-fraud": {
+            "title": "The rising threat of identity fraud in the auto space",
+            "subtitle": "People expect renting or buying a car should be as easy as ordering groceries. Companies are forced to remove friction in the process in order to compete. This has led to a surge in fraud across auto lending and auto rental. According to findings by the Aite Group, synthetic identity fraud leads to around $50 billion in losses."
+          },
+          "inadequate-screening": {
+            "title": "The high stakes of inadequate screening",
+            "subtitle": "The repercussions of servicing a fraudulent applicant can be severe and multifaceted. Property damage, financial losses, and legal complications are just a few of the potential pitfalls."
+          },
+          "fraud-detection": {
+            "title": "The elusive nature of effective fraud detection",
+            "subtitle": "Identifying fraudulent activities throughout onboarding poses a considerable challenge. The interconnected digital world provides perpetrators with an arsenal of tools to forge documents, manipulate records, and obscure their true identities."
+          }
+        },
+        "solution": {
+          "title": "...and we know how to help ✨",
+          "unified-risk-engine": {
+            "title": "Unified risk engine",
+            "subtitle": "Footprint can verify user KYC details, scan Driver’s Licenses, and pull MVR + Driver Records"
+          },
+          "online-in-person": {
+            "title": "Online + in-person",
+            "subtitle": "Utilize the Footprint passkey to verify user location. For example, companies can prove that the same person who signed up online to rent a car is the one picking the car up, and they are at the proper location."
+          },
+          "automate-extra-document-collection": {
+            "title": "Automate extra document collection",
+            "subtitle": "Companies can use the Footprint dashboard to request additional documentation from applicants, increasing their confidence. Footprint will automatically reach out, collect the information, and return new, verified results to our customers."
+          }
+        },
+        "quote": {
+          "quote": "I love how Footprint is able to onboard users while offloading the storage of PII. Weʼre able to access the data we need while leveraging Footprintʼs secure vaulting for the collection and storage.",
+          "author": "Michael Zambrano",
+          "role": "Executive Head of Risk",
+          "company": "Flexcar"
+        },
+        "banner": {
+          "alt-img": "A penguin fishing in the north pole",
+          "title": "Start onboarding your drivers safely and seamlessly now",
+          "primary-button": "Sign up for free",
+          "secondary-button": "Book a call"
+        }
+      },
       "real-estate": {
         "html-title": "Footprint - Industries: Real Estate",
         "hero": {
@@ -360,7 +425,7 @@
           }
         },
         "banner": {
-          "alt-img": "A penguin on a rock",
+          "alt-img": "A penguin fishing in the north pole",
           "title": "Start boosting your conversions and onboarding experience now",
           "primary-button": "Sign up for free",
           "secondary-button": "Book a call"
