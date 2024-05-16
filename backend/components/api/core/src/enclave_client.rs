@@ -252,23 +252,17 @@ impl EnclaveClient {
     }
 
     /// Requests the enclave to fingerprint
-    pub async fn batch_fingerprint<'a>(
+    pub async fn batch_fingerprint(
         &self,
-        data: &[(FingerprintScope<'a>, &PiiString)],
+        data: Vec<(FingerprintScope, &PiiString)>,
     ) -> Result<Vec<Fingerprint>, EnclaveError> {
         // we hash the data once simply to shorten the payload length we send to the enclave
         // and build our list of request to send for fingerprinting in the enclave
         let requests = data
             .iter()
-            .map(|(di, pii)| {
-                (
-                    di,
-                    crypto::clean_and_hash_data_for_fingerprinting(pii.leak().as_bytes()),
-                )
-            })
-            .map(|(di, data)| SignRequest {
-                scope: di.bytes(),
-                data: data.to_vec(),
+            .map(|(scope, pii)| SignRequest {
+                scope: scope.bytes(),
+                data: crypto::clean_and_hash_data_for_fingerprinting(pii.leak().as_bytes()).to_vec(),
             })
             .collect_vec();
 
@@ -297,12 +291,12 @@ impl EnclaveClient {
     }
 
     /// Requests the enclave to fingerprint sealed data (which it decrypts first)
-    pub async fn batch_fingerprint_sealed<'a, T: Eq>(
-        &'a self,
+    pub async fn batch_fingerprint_sealed(
+        &self,
         sealed_key: &EncryptedVaultPrivateKey,
-        sealed_data: Vec<(T, (FingerprintScope<'a>, &SealedVaultBytes))>,
-    ) -> Result<Vec<(T, Fingerprint)>, EnclaveError> {
-        let (keys, sealed_data): (Vec<_>, Vec<_>) = sealed_data.into_iter().unzip();
+        sealed_data: Vec<(FingerprintScope, &SealedVaultBytes)>,
+    ) -> Result<Vec<(FingerprintScope, Fingerprint)>, EnclaveError> {
+        let scopes = sealed_data.iter().map(|(s, _)| s.clone()).collect_vec();
         let requests = sealed_data
             .into_iter()
             .map(|(scope, sealed_data)| {
@@ -333,7 +327,7 @@ impl EnclaveClient {
         }
 
         let results = response.results.into_iter().map(|r| Fingerprint(r.signature));
-        let results = keys.into_iter().zip(results).collect();
+        let results = scopes.into_iter().zip(results).collect();
 
         Ok(results)
     }

@@ -13,10 +13,6 @@ use crate::{
 };
 
 
-/// Uniquely identifies a single fingerprint that will be computed
-pub type FingerprintKey = (DataIdentifier, FingerprintScopeKind);
-pub type FingerprintablePayload<'a, T> = (FingerprintScope<'a>, T);
-
 impl DataIdentifier {
     /// Given a DataIdentifier and its corresponding data, returns the fingerprintable payloads
     /// that will be sent to the enclave
@@ -24,11 +20,11 @@ impl DataIdentifier {
         &'a self,
         v: T,
         tenant_id: Option<&'a TenantId>,
-    ) -> Vec<(FingerprintKey, FingerprintablePayload<'a, T>)> {
+    ) -> Vec<(FingerprintScope, T)> {
         if !self.is_fingerprintable() {
             return vec![];
         }
-        let tenant_scope = tenant_id.map(|t_id| FingerprintScope::Tenant(self, t_id));
+        let tenant_scope = tenant_id.map(|t_id| FingerprintScope::Tenant(self.clone(), t_id.clone()));
         // Generate a tenant-scoped fingerprint and globally-scoped fingerprint (if possible)
         let global_scope = GlobalFingerprintKind::try_from(self)
             .ok()
@@ -36,21 +32,21 @@ impl DataIdentifier {
         vec![global_scope, tenant_scope]
             .into_iter()
             .flatten()
-            .map(|scope| ((self.clone(), scope.kind()), (scope, v)))
+            .map(|scope| (scope, v))
             .collect_vec()
     }
 }
 
 /// The scope to which we will fingerprint data
 #[derive(Debug, Clone, derive_more::From)]
-pub enum FingerprintScope<'a> {
+pub enum FingerprintScope {
     /// Searchable across all tenants
     Global(GlobalFingerprintKind),
     /// Searchable within a tenant
-    Tenant(&'a DataIdentifier, &'a TenantId),
+    Tenant(DataIdentifier, TenantId),
 }
 
-impl<'a> FingerprintScope<'a> {
+impl FingerprintScope {
     /// convert into bytes for fingerprinting
     pub fn bytes(&self) -> Vec<u8> {
         match self {
@@ -125,10 +121,10 @@ impl<'a> TryFrom<&'a DataIdentifier> for GlobalFingerprintKind {
 pub trait Fingerprinter: std::marker::Sync {
     type Error: From<crate::Error>;
 
-    async fn compute_fingerprints<'a, T: Send + Sync>(
+    async fn compute_fingerprints(
         &self,
-        data: Vec<(T, (FingerprintScope<'a>, &PiiString))>,
-    ) -> Result<Vec<(T, Fingerprint)>, Self::Error>;
+        data: Vec<(FingerprintScope, &PiiString)>,
+    ) -> Result<Vec<(FingerprintScope, Fingerprint)>, Self::Error>;
 }
 
 #[cfg(test)]
@@ -159,7 +155,7 @@ mod tests {
             }
             Tenant => {
                 let tenant_id = TenantId::test_data("org_hello_world".into());
-                FingerprintScope::Tenant(&id, &tenant_id).bytes()
+                FingerprintScope::Tenant(id, tenant_id).bytes()
             }
         };
         crypto::hex::encode(bytes)

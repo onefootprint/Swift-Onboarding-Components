@@ -221,10 +221,10 @@ async fn make_vault_context(
     let fingerprints = state.enclave_client.compute_fingerprints(data_to_fp).await?;
     let fingerprints = fingerprints
         .into_iter()
-        .map(|((kind, scope), fingerprint)| FingerprintRequest {
-            kind,
+        .map(|(scope, fingerprint)| FingerprintRequest {
+            kind: scope.data_identifier(),
             fingerprint,
-            scope,
+            scope: scope.kind(),
         })
         .collect();
 

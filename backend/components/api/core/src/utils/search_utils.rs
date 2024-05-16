@@ -2,8 +2,8 @@ use crate::{errors::ApiResult, State};
 use db::scoped_vault::{AndFingerprintQuery, SearchQuery};
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::FingerprintScope, BusinessDataKind as BDK, DataIdentifier, Fingerprinter, FpId,
-    IdentityDataKind as IDK, PhoneNumber, PiiString, TenantId,
+    fingerprinter::FingerprintScope, BusinessDataKind as BDK, DataIdentifier, FpId, IdentityDataKind as IDK,
+    PhoneNumber, PiiString, TenantId,
 };
 
 /// Given a search string and fp_id, parse into the list of FingerprintQueries and fp_id by which to query
@@ -45,7 +45,7 @@ pub async fn parse_search(
     for phone in formatted_phone_numbers.iter() {
         for di in dis.iter() {
             for d in di.get_fingerprint_payload(phone, t_id) {
-                fingerprint_queries.push(vec![d.1]);
+                fingerprint_queries.push(vec![d]);
             }
         }
     }
@@ -63,10 +63,10 @@ pub async fn parse_search(
         let name_fingerprints = vec![
             first_name
                 .as_ref()
-                .map(|p| (FingerprintScope::Tenant(fn_di, tenant_id), p)),
+                .map(|p| (FingerprintScope::Tenant(fn_di.clone(), tenant_id.clone()), p)),
             last_name
                 .as_ref()
-                .map(|p| (FingerprintScope::Tenant(ln_di, tenant_id), p)),
+                .map(|p| (FingerprintScope::Tenant(ln_di.clone(), tenant_id.clone()), p)),
         ]
         .into_iter()
         .flatten()
@@ -82,7 +82,7 @@ pub async fn parse_search(
     if !search_str.leak().contains(' ') && search_str.leak().contains('.') {
         for w in websites.iter() {
             for d in Business(BDK::Website).get_fingerprint_payload(w, t_id) {
-                fingerprint_queries.push(vec![d.1]);
+                fingerprint_queries.push(vec![d]);
             }
         }
     }
@@ -105,7 +105,7 @@ pub async fn parse_search(
         .collect_vec();
     for di in dis.iter() {
         for d in di.get_fingerprint_payload(&search_str, t_id) {
-            fingerprint_queries.push(vec![d.1]);
+            fingerprint_queries.push(vec![d]);
         }
     }
 
@@ -119,7 +119,7 @@ pub async fn parse_search(
         .collect_vec();
     let fingerprint_queries = state
         .enclave_client
-        .compute_fingerprints(data_to_fp)
+        .compute_fingerprints_keys(data_to_fp)
         .await?
         .into_iter()
         .into_group_map()

@@ -208,10 +208,10 @@ impl<T> DataRequest<T> {
 
         let fingerprints = fingerprints
             .into_iter()
-            .map(|((di, scope), fingerprint)| FingerprintRequest {
-                kind: di.clone(),
+            .map(|(scope, fingerprint)| FingerprintRequest {
+                kind: scope.data_identifier(),
                 fingerprint,
-                scope,
+                scope: scope.kind(),
             })
             .collect();
 

@@ -84,14 +84,25 @@ impl ApiKeyFingerprinter for State {
 impl Fingerprinter for EnclaveClient {
     type Error = crate::ApiError;
 
-    async fn compute_fingerprints<'a, T: Send>(
+    async fn compute_fingerprints(
         &self,
-        data: Vec<(T, (FingerprintScope<'a>, &PiiString))>,
-    ) -> Result<Vec<(T, Fingerprint)>, Self::Error> {
+        data: Vec<(FingerprintScope, &PiiString)>,
+    ) -> Result<Vec<(FingerprintScope, Fingerprint)>, Self::Error> {
+        let data = data.into_iter().map(|(s, d)| (s.clone(), (s, d))).collect();
+        let result = self.compute_fingerprints_keys(data).await?;
+        Ok(result)
+    }
+}
+
+impl EnclaveClient {
+    pub async fn compute_fingerprints_keys<T>(
+        &self,
+        data: Vec<(T, (FingerprintScope, &PiiString))>,
+    ) -> Result<Vec<(T, Fingerprint)>, crate::ApiError> {
         // Zip the keys of type T back together with the fingerprinted results, since we know
         // that the order of the results from the enclave will match the order of the input data
         let (keys, values_to_fp): (Vec<_>, Vec<_>) = data.into_iter().unzip();
-        let fps = self.batch_fingerprint(&values_to_fp).await?;
+        let fps = self.batch_fingerprint(values_to_fp).await?;
         let results = keys.into_iter().zip(fps).collect();
         Ok(results)
     }

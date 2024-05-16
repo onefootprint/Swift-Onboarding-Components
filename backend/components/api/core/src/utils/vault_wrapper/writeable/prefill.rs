@@ -121,9 +121,9 @@ impl<Type> VaultWrapper<Type> {
         // TODO composite fingerprints here too
         let fingerprints = fingerprints
             .into_iter()
-            .map(|((kind, scope), fingerprint)| FingerprintRequest {
-                kind,
-                scope,
+            .map(|(scope, fingerprint)| FingerprintRequest {
+                kind: scope.data_identifier(),
+                scope: scope.kind(),
                 fingerprint,
             })
             .collect();
