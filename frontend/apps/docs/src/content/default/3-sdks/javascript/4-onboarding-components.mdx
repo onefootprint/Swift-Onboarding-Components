@@ -1,0 +1,107 @@
+---
+page: default
+slug: /sdks/javascript-typescript-auth
+category: SDKs
+subcategory: Javascript/Typescript
+title: Auth
+position: 3
+meta:
+  {
+    title: Footprint <> Auth Integration,
+    description: Discover how to integrate Footprint's Auth with a JS/TS codebase,
+  }
+---
+
+## Getting started
+
+This guide explains how to integrate the Footprint auth flow into your JavaScript/TypeScript applications.
+
+1. **Access Your Dashboard**:
+
+   - Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
+   - Use an existing playbook or create a new one.
+   - Obtain the Publishable Key, e.g., `pb_test_7TdzxpZoqUpzPuvfgncUtu`.
+
+2. **Initialize the Footprint Flow**:
+   - Trigger Footprint, for example, when a button is clicked. Them, pass the `publicKey` and `onComplete` callback to the `init` method.
+
+## Authentication flow
+
+```javascript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const handleButtonClick = () => {
+  const component = footprint.init({
+    kind: 'auth',
+    publicKey: 'pb_test_7TdzxpZoqUpzPuvfgncUtu',
+    onComplete: validationToken => {
+      console.log(validationToken);
+    },
+  });
+  component.render();
+};
+```
+
+## Update login methods flow
+
+If you would like to enable users to update their authentication methods securely, you can use the `update_login_methods` kind.
+
+```javascript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const handleButtonClick = () => {
+  const component = footprint.init({
+    kind: 'update_login_methods',
+    authToken: 'utok_123',
+    onComplete: validationToken => {
+      console.log(validationToken);
+    },
+  });
+  component.render();
+};
+```
+
+3. **Handle Completion:**:
+   - Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` callback. Post this token to your backend for further processing.
+
+## Listening to events
+
+Footprint provides some events based on some actions performed by the user. To listen to event, just pass it from the `init` method.
+
+```javascript
+const component = footprint.init({
+  kind: 'auth',
+  publicKey: 'pb_test_WNgSBRR7uxoT8JRDBBflgw',
+  onComplete: validationToken => {
+    console.log(validationToken);
+  },
+  onError: error => {
+    console.log(error);
+  },
+  onCancel: () => {
+    console.log('User canceled the flow');
+  },
+  onClose: () => {
+    console.log('User closed the flow');
+  },
+});
+component.render();
+```
+
+## Available Props
+
+| Variable     | Description                                                                                                                                                                                                                      |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publicKey`  | Optional. Onboarding configuration public key.                                                                                                                                                                                   |
+| `authToken`  | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID, and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
+| `onComplete` | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend                                                                                                  |
+| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                             |
+| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                                      |
+| `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                                          |
+| `userData`   | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                                             |
+| `options`    | Optional. An options object that customizes the flow, can accept `showLogo`. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                                                           |
+| `appearance` | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                            |
+| `variant`    | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                                                                   |
+| `l10n`       | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                         |
