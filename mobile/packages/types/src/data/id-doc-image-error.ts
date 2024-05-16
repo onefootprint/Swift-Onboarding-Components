@@ -25,6 +25,7 @@ export enum IdDocImageProcessingError {
   unknownError = 'unknown_error',
   networkError = 'network_error',
   faceNotFound = 'face_not_found',
+  militaryIdNotAllowed = 'militaryIdNotAllowed',
 }
 
 export enum IdDocImageUploadError {

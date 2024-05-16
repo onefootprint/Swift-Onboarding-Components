@@ -1068,7 +1068,8 @@
                 "selfie_bad_image_compression": "Your selfie image has the incorrect image compression.",
                 "drivers_license_permit_not_allowed": "Driver's license permits are not allowed.",
                 "unknown_error": "An error occurred.",
-                "face_not_found": "We could not detect a face in the document provided."
+                "face_not_found": "We could not detect a face in the document provided.",
+                "military_id_not_allowed": "We cannot accept Military IDs per federal law. Please try again with another type of ID."
               }
             },
             "raw-json-data": {

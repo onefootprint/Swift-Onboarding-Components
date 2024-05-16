@@ -1149,6 +1149,7 @@
           "document_not_readable": "Tu documento no pudo ser leído. Por favor, inténtalo de nuevo.",
           "document_glare": "La imagen de tu documento tiene demasiado brillo. Por favor, ajusta la iluminación e inténtalo de nuevo.",
           "document_sharpness": "La imagen del documento está borrosa. Por favor, sube o captura una imagen más nítida.",
+          "military_id_not_allowed": "No podemos aceptar identificaciones militares según la ley federal. Por favor, intente nuevamente con otro tipo de identificación.",
           "id_type_not_acceptable": "Se detectó un tipo de documento inválido. Por favor, sube tu {{documentType}} de {{countryName}}.",
           "unable_to_align_document": "Uno o más esquinas del documento no están dentro de los bordes de la imagen. Por favor, centra el documento en el marco e inténtalo de nuevo.",
           "unknown_country_code": "No pudimos detectar el país emisor de tu documento. Por favor, sube tu {{documentType}} de {{countryName}}.",

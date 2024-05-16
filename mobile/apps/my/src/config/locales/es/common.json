@@ -140,7 +140,8 @@
         "selfie_bad_image_compression": "Tu selfie tiene una compresión baja. Por favor, inténtalo de nuevo.",
         "drivers_license_permit_not_allowed": "El permiso de licencia de conducir no es un documento válido. Por favor, inténtalo con una licencia de conducir.",
         "unknown_error": "Se produjo un error. Por favor, inténtalo de nuevo.",
-        "face_not_found": "No pudimos detectar un rostro en el documento. Por favor, inténtalo de nuevo y asegúrate de que estás capturando una imagen clara."
+        "face_not_found": "No pudimos detectar un rostro en el documento. Por favor, inténtalo de nuevo y asegúrate de que estás capturando una imagen clara.",
+        "military_id_not_allowed": "No podemos aceptar identificaciones militares según la ley federal. Por favor, intente nuevamente con otro tipo de identificación."
       },
       "loading": {
         "title": "Procesando imagen",

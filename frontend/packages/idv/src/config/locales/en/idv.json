@@ -1168,7 +1168,8 @@
           "drivers_license_permit_not_allowed": "Driver's license permits are not allowed, please retry with a full driver's license or reach out to the business for support.",
           "unknown_error": "An error occurred. Please try again.",
           "network_error": "{{errorInfo}}. Please try again.",
-          "face_not_found": "We could not detect a face in the document provided. Please try again and make sure that you a capturing a clear image."
+          "face_not_found": "We could not detect a face in the document provided. Please try again and make sure that you a capturing a clear image.",
+          "military_id_not_allowed": "We cannot accept Military IDs per federal law. Please try again with another type of ID."
         }
       },
       "desktop-photo-prompt": {

@@ -11204,7 +11204,8 @@
                                             "country_code_mismatch",
                                             "unknown_error",
                                             "document_glare",
-                                            "document_sharpness"
+                                            "document_sharpness",
+                                            "military_id_not_allowed"
                                         ]
                                     }
                                 },
