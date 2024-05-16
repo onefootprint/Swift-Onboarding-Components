@@ -183,25 +183,24 @@ impl IncodeStateTransition for FetchScores {
             }
         }.in_current_span());
 
-        // TODO: maybe an issue
-        // let db_pool2 = db_pool.clone();
-        // let ctx2 = ctx.clone();
-        // let ivs = session.id.clone();
-        // let creds2 = session.credentials.clone();
-        // tokio::spawn(
-        //     async move {
-        //         let svid = ctx2.sv_id.clone();
-        //         let resp = add_customer_and_save_session(&db_pool2, creds2, ctx2, ivs).await;
+        let db_pool2 = db_pool.clone();
+        let ctx2 = ctx.clone();
+        let ivs = session.id.clone();
+        let creds2 = session.credentials.clone();
+        tokio::spawn(
+            async move {
+                let svid = ctx2.sv_id.clone();
+                let resp = add_customer_and_save_session(&db_pool2, creds2, ctx2, ivs).await;
 
-        //         match resp {
-        //             Ok(_) => {}
-        //             Err(err) => {
-        //                 tracing::warn!(err=?err, scoped_vault_id=%svid, "Error approving incode session")
-        //             }
-        //         }
-        //     }
-        //     .in_current_span(),
-        // );
+                match resp {
+                    Ok(_) => {}
+                    Err(err) => {
+                        tracing::warn!(err=?err, scoped_vault_id=%svid, "Error approving incode session")
+                    }
+                }
+            }
+            .in_current_span(),
+        );
 
         let args = PreCompleteArgs {
             obc: &obc,
