@@ -34,6 +34,7 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
       hostTags: [`env:${env}`],
       metricsCollectionEnabled: 'true',
       cspmResourceCollectionEnabled: 'false',
+      extendedResourceCollectionEnabled: 'true',
     },
   );
 
@@ -65,6 +66,7 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
             },
           ],
         }),
+        managedPolicyArns: ['arn:aws:iam::aws:policy/SecurityAudit'],
       });
 
       let ddIntegrationPolicy = new aws.iam.RolePolicy(
