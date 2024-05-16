@@ -10,7 +10,7 @@ import useCreateSandboxTenant from './hooks/use-create-sandbox-tenant';
 
 type CreateSandboxTenantFormData = {
   name: string;
-  domain: string;
+  domain?: string;
 };
 
 const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
@@ -28,7 +28,7 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
   const handleBeforeSubmit = async (data: CreateSandboxTenantFormData) => {
     const requestData = {
       name: data.name,
-      domains: [data.domain],
+      domains: data.domain ? [data.domain] : [],
     };
     createSandboxTenantMutation.mutate(requestData, {
       onSuccess: async ({ token }) => {
@@ -59,7 +59,7 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
           hint="The domain of the emails of employees of this tenant"
           placeholder="acme.org"
           hasError={!!errors.domain}
-          {...register('domain', { required: true })}
+          {...register('domain', { required: false })}
         />
       </StyledForm>
     </FormProvider>
