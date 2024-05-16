@@ -1,11 +1,12 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import type { LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getBiometricChallengeResponse, getLogger } from '../../../../../utils';
+import { getBiometricChallengeResponse, Logger } from '../../../../../utils';
 import { useIdentifyVerify, useLoginChallenge } from '../../../queries';
 import { useIdentifyMachine } from '../../../state';
 import getTokenScope from '../../../utils/token-scope';
@@ -13,8 +14,6 @@ import getTokenScope from '../../../utils/token-scope';
 type UseRunPasskeyArgs = {
   onSuccess: (_: { authToken: string }) => void;
 };
-
-const { logError } = getLogger('run-passkey');
 
 const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
   const [state] = useIdentifyMachine();
@@ -37,8 +36,9 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
 
   const initiatePasskeyChallenge = () => {
     if (!user?.token) {
-      logError(
+      Logger.error(
         'No identifying token found while initiating login biometric challenge',
+        { location: 'run-passkey' },
       );
       return;
     }
@@ -54,7 +54,12 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       },
       {
         onError: error => {
-          logError('Error while requesting login biometric challenge:', error);
+          Logger.warn(
+            `Error while requesting login biometric challenge: ${getErrorMessage(
+              error,
+            )}`,
+            { location: 'run-passkey' },
+          );
           showRequestErrorToast(error);
         },
         onSuccess: handleRequestChallengeSuccess,
@@ -69,8 +74,9 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       payload.challengeData || {};
 
     if (challengeKind !== ChallengeKind.biometric) {
-      logError(
+      Logger.error(
         'Received sms challenge after requesting login biometric challenge',
+        { location: 'run-passkey' },
       );
       return;
     }
@@ -85,10 +91,11 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
         biometricChallengeJson,
       );
     } catch (e) {
-      logError(
+      Logger.warn(
         `Unable to generate biometric challenge response ${
           typeof e === 'string' ? e : JSON.stringify(e)
         }`,
+        { location: 'run-passkey' },
       );
       toast.show({
         title: t('error.title'),
@@ -115,7 +122,12 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       {
         onSuccess,
         onError: (error: unknown) => {
-          logError('Error while verifying biometric challenge:', error);
+          Logger.warn(
+            `Error while verifying biometric challenge: ${getErrorMessage(
+              error,
+            )}`,
+            { location: 'run-passkey' },
+          );
         },
         onSettled: () => {
           setIsRunningWebauthn(false);

@@ -186,7 +186,7 @@ const IdentitySection = () => {
     device,
     onSuccess: handleStepUpSuccess,
     onError: (error: unknown) => {
-      Logger.error(
+      Logger.warn(
         `useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`,
         { location: 'kyc-confirm' },
       );
