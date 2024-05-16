@@ -10,7 +10,7 @@ use newtypes::{
     incode::{
         IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType, IncodeStatus, IncodeTest,
     },
-    IdDocKind, DocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
+    DocumentFixtureResult, IdDocKind, IncodeFailureReason, IncodeVerificationSessionKind,
     Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiInt, ScrubbedPiiLong,
     ScrubbedPiiString, UsState, UsStateFull, DATE_FORMAT,
 };
@@ -58,10 +58,16 @@ impl AddSideResponse {
             IncodeFailureReason::try_from(e.as_str())
                 .unwrap_or_else(|_| IncodeFailureReason::Other(e.clone()))
         });
+        let military_id_reason = if self.type_of_id == Some(IncodeDocumentType::Military) {
+            vec![Some(IncodeFailureReason::MilitaryIdNotAllowed)]
+        } else {
+            vec![]
+        };
 
         [fail_reason]
             .into_iter()
             .chain(restrictions_fail_reasons)
+            .chain(military_id_reason)
             .flatten()
             .collect()
     }
@@ -1046,7 +1052,23 @@ mod tests {
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response).unwrap();
         let failure = parsed.failure_reasons(vec![]);
-        assert!(failure.is_empty())
+        assert!(failure.is_empty());
+
+        // With a failure
+        let raw_response_with_military = serde_json::json!({
+            "sharpness": 100,
+            "glare": 100,
+            "horizontalResolution": 0,
+            "classification": false,
+            "typeOfId": "Military",
+            "issueYear": 2016,
+            "issueName": "USA DriversLicense Military",
+            "sessionStatus": "Alive",
+            "failReason": null
+        });
+        let parsed: AddSideResponse = serde_json::from_value(raw_response_with_military).unwrap();
+        let failure = parsed.failure_reasons(vec![]);
+        assert_eq!(failure, vec![IncodeFailureReason::MilitaryIdNotAllowed]);
     }
 
     #[test]

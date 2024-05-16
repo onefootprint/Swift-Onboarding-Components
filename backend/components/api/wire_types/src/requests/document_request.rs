@@ -100,6 +100,7 @@ pub enum DocumentImageError {
     UnknownError,
     DocumentGlare,
     DocumentSharpness,
+    MilitaryIdNotAllowed,
 }
 
 impl From<IncodeFailureReason> for DocumentImageError {
@@ -133,6 +134,7 @@ impl From<IncodeFailureReason> for DocumentImageError {
             IncodeFailureReason::DriversLicensePermitNotAllowed => Self::DriversLicensePermitNotAllowed,
             IncodeFailureReason::FaceNotFound => Self::FaceNotFound,
             IncodeFailureReason::ProcessIdCouldNotProcess => Self::DocumentNotReadable, // close enough
+            IncodeFailureReason::MilitaryIdNotAllowed => Self::MilitaryIdNotAllowed,
         }
     }
 }
