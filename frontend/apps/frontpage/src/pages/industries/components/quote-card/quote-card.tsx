@@ -65,7 +65,8 @@ const QuoteContainer = styled(Box)`
     flex-direction: column;
     gap: ${theme.spacing[5]};
     position: relative;
-    max-width: 500px;
+    max-width: 600px;
+    min-width: 420px;
   `}
 `;
 

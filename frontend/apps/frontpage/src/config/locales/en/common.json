@@ -278,6 +278,93 @@
       "components": {
         "read-case-study": "Read case study"
       },
+      "fintech": {
+        "html-title": "Footprint - Industries: Fintech",
+        "hero": {
+          "title": "Footprint is the only KYC tool built to make it easier for fintechs to work with their partner banks or broker-dealers.",
+          "subtitle": "Fintechs like Bloom, Composer and Coba use Footprint to seamlessly comply with their partner’s CIP requirements, even when navigating evolving landscapes.",
+          "get-started": "Get started",
+          "schedule-demo": "Schedule a call"
+        },
+        "intro": {
+          "content": "Customer Identity Programs have evolved over years of evolving regulations, resulting in complex and unintuitive requirements. Rather than setting up a one-size-fits-all onboarding flow, and dealing with the edge cases in manual review, Footprint helps fintechs view onboarding more dynamically. Your flow can be configured to match CIP requirements exactly and is smart enough to dynamically request more information from users in order to satisfy the requirements. This cuts down in time you users spend in manual review and boosts onboarding conversion."
+        },
+        "featured": {
+          "verify-identities": {
+            "title": "Verify identities",
+            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+          },
+          "verify-credit": {
+            "title": "Verify credit",
+            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+          },
+          "detect-fraud": {
+            "title": "Detect fraudulent actors",
+            "subtitle": "Companies have used Footprint to flag thousands of fraudulent actors to PMs during application."
+          }
+        },
+        "problem": {
+          "title": "We know your problems...",
+          "cips-are-complicated": {
+            "title": "CIPs are complicated",
+            "subtitle": "Cips are designed to address a confusing maze of regulations, resulting in some complicated and unintuitive requirements. Fintechs are burdened with navigating these requirements in a way that does not affect conversion but satisfies all necessary regulations."
+          },
+          "competitive-environment": {
+            "title": "The competitive environment requires a frictionless onboarding experience",
+            "subtitle": "According to Statista the number of fintechs doubled from 2019 to 2021 and the landscape continues to get more competitive. In order to compete, fintechs must offer a seamless onboarding experience."
+          },
+          "sensitive-information": {
+            "title": "Sharing sensitive information is challenging",
+            "subtitle": "Fintechs often default to whatever KYC program they can find that works with their partner bank or broker dealer. This alleviates the need to handle sending sensitive information directly to your partners, but often requires trade-offs with user experience."
+          }
+        },
+        "solution": {
+          "title": "...and we know how to help ✨",
+          "dynamically-satisfy-cip": {
+            "title": "Dynamically satisfy CIP requirements",
+            "subtitle": "KYC and onboarding does not need to be static. Often times partner banks and broker dealers will With Footprint’s rules engine, you can toggle friction up and down based on various risk signals. This lets you not only satisfy KYC requirement but be truly confident in who you are onboarding. All without sacrificing a smooth onboarding experience for the people you are confident are good actors"
+          },
+          "case-management": {
+            "title": "Case management",
+            "subtitle": "Footprint notifies companies the moment users go into manual review, giving them the tools to quickly and thoroughly approve/reject a user or request more information without waiting on a partner."
+          },
+          "data-vault": {
+            "title": "Compliant data vault and vault proxy technology",
+            "subtitle": "Footprint is one of a handful of companies to leverage Nitro Enclaves, cutting—edge technology built by AWS to advanced far past an age of encryption at rest to protect consumer PII and prevent breaches. We are CPI Level I and SOC II complaint and give you the tools to share sensitive information with third parties without ever needing to handle that data yourself."
+          },
+          "partner-with-broker": {
+            "title": "Be a true partner to your bank or broker dealer",
+            "subtitle": "Footprint’s dashboard gives you the tools to easily expose audit trails and onboarding procedures to your partners, removing the headache of back and forth emails over annual audits to ensure compliance."
+          }
+        },
+        "quote": {
+          "quote": "Best integration experience since Stripe.",
+          "author": "Sam Yang",
+          "role": "Co-founder and CPO",
+          "company": "Bloom"
+        },
+        "experience": {
+          "title": "We have the experience and the expertise",
+          "accuracy": {
+            "title": "Over 96% Document Fraud Accuracy",
+            "subtitle": "Our advanced scanning technology ensures unparalleled precision in detecting document fraud, maintaining a high accuracy rate of over 96%"
+          },
+          "attempts": {
+            "title": "Stopped over 1,000 attempts to use non-live selfies in security checks",
+            "subtitle": "Footprint detected thousands of attempts to use screen captures instead of an actual selfie, and prevented close to 1,000 people who had non-live selfies."
+          },
+          "flagged": {
+            "title": "Flagged over 1,000 mismatches between barcode and front data on licenses",
+            "subtitle": "As fraudsters can increasingly generate realistic images, ensuring it is a real upload has never been more salient. Even as bad actors create physical fake IDs, this is a great line of defense."
+          }
+        },
+        "banner": {
+          "alt-img": "A penguin fishing in the north pole",
+          "title": "Start onboarding your applicants safely and seamlessly now",
+          "primary-button": "Sign up for free",
+          "secondary-button": "Book a call"
+        }
+      },
       "auto": {
         "html-title": "Footprint - Industries: Auto",
         "hero": {
@@ -335,6 +422,21 @@
           "author": "Michael Zambrano",
           "role": "Executive Head of Risk",
           "company": "Flexcar"
+        },
+        "experience": {
+          "title": "We have the experience and the expertise",
+          "accuracy": {
+            "title": "Over 96% Document Fraud Accuracy",
+            "subtitle": "Our advanced scanning technology ensures unparalleled precision in detecting document fraud, maintaining a high accuracy rate of over 96%"
+          },
+          "attempts": {
+            "title": "Stopped over 1,000 attempts to use non-live selfies in security checks",
+            "subtitle": "Footprint detected thousands of attempts to use screen captures instead of an actual selfie, and prevented close to 1,000 people who had non-live selfies."
+          },
+          "flagged": {
+            "title": "Flagged over 1,000 mismatches between barcode and front data on licenses",
+            "subtitle": "As fraudsters can increasingly generate realistic images, ensuring it is a real upload has never been more salient. Even as bad actors create physical fake IDs, this is a great line of defense."
+          }
         },
         "banner": {
           "alt-img": "A penguin fishing in the north pole",

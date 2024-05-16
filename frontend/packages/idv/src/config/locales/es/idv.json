@@ -1149,7 +1149,6 @@
           "document_not_readable": "Tu documento no pudo ser leído. Por favor, inténtalo de nuevo.",
           "document_glare": "La imagen de tu documento tiene demasiado brillo. Por favor, ajusta la iluminación e inténtalo de nuevo.",
           "document_sharpness": "La imagen del documento está borrosa. Por favor, sube o captura una imagen más nítida.",
-          "military_id_not_allowed": "No podemos aceptar identificaciones militares según la ley federal. Por favor, intente nuevamente con otro tipo de identificación.",
           "id_type_not_acceptable": "Se detectó un tipo de documento inválido. Por favor, sube tu {{documentType}} de {{countryName}}.",
           "unable_to_align_document": "Uno o más esquinas del documento no están dentro de los bordes de la imagen. Por favor, centra el documento en el marco e inténtalo de nuevo.",
           "unknown_country_code": "No pudimos detectar el país emisor de tu documento. Por favor, sube tu {{documentType}} de {{countryName}}.",
@@ -1170,7 +1169,8 @@
           "drivers_license_permit_not_allowed": "Los permisos de licencia de conducir no están permitidos, por favor, vuelve a intentarlo con una licencia de conducir completa o ponte en contacto con la empresa para obtener ayuda.",
           "unknown_error": "Ocurrió un error. Por favor, inténtalo de nuevo.",
           "network_error": "{{errorInfo}}. Por favor, inténtalo de nuevo.",
-          "face_not_found": "No pudimos detectar un rostro en el documento proporcionado. Por favor, inténtalo de nuevo y asegúrate de que estás capturando una imagen clara."
+          "face_not_found": "No pudimos detectar un rostro en el documento proporcionado. Por favor, inténtalo de nuevo y asegúrate de que estás capturando una imagen clara.",
+          "military_id_not_allowed": "No podemos aceptar identificaciones militares según la ley federal. Por favor, intente nuevamente con otro tipo de identificación."
         }
       },
       "desktop-photo-prompt": {

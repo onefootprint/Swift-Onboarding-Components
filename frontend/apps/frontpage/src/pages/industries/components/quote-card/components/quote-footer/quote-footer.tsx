@@ -31,7 +31,7 @@ const QuoteFooter = ({
             {role}
           </Text>
           <Text variant="label-2" color="tertiary">
-            {company}
+            {`@ ${company}`}
           </Text>
         </Stack>
       </Stack>
@@ -55,10 +55,10 @@ const FooterContainer = styled(Box)`
     gap: ${theme.spacing[3]};
 
     ${media.greaterThan('md')`
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-  `}
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    `}
   `}
 `;
 
