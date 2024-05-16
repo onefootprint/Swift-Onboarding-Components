@@ -80,7 +80,7 @@ const AddressCard = ({
       );
     } else {
       ctaElem = (
-        <Stack width="100%" direction="column" align="flex-start">
+        <Stack width="100%" direction="column" align="flex-start" zIndex={2}>
           <Text variant="label-3">
             <Trans
               i18nKey="pages.entity.device-insights.address-card.cta.text"
