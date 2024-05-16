@@ -261,7 +261,7 @@ impl EnclaveClient {
         let requests = data
             .iter()
             .map(|(scope, pii)| SignRequest {
-                scope: scope.bytes(),
+                scope: scope.salt_bytes(),
                 data: crypto::clean_and_hash_data_for_fingerprinting(pii.leak().as_bytes()).to_vec(),
             })
             .collect_vec();
@@ -301,7 +301,7 @@ impl EnclaveClient {
             .into_iter()
             .map(|(scope, sealed_data)| {
                 Ok(DecryptThenSignRequest {
-                    scope: scope.bytes(),
+                    scope: scope.salt_bytes(),
                     sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?,
                 })
             })

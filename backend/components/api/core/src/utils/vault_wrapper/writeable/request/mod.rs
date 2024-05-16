@@ -136,9 +136,9 @@ impl ValidatedDataRequest {
             .flat_map(|vd| {
                 let fps = fingerprints
                     .iter()
-                    .filter(|(scope, _)| scope.data_identifier() == vd.kind)
+                    .filter(|(scope, _)| scope.di() == vd.kind)
                     .map(|(scope, fp)| FingerprintData {
-                        kind: scope.data_identifier().into(),
+                        kind: scope.di().into(),
                         data: fp.clone().into(),
                         lifetime_ids: vec![&vd.lifetime_id],
                         scope: scope.kind(),

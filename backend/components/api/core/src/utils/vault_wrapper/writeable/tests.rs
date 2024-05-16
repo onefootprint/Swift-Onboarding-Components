@@ -68,7 +68,7 @@ async fn test_prefill_data(state: &mut State) {
         prefill_data
             .fingerprints
             .iter()
-            .map(|(s, _)| (s.data_identifier(), s.kind()))
+            .map(|(s, _)| (s.di(), s.kind()))
             .collect(),
         vec![
             (IDK::PhoneNumber.into(), FingerprintScopeKind::Global),
@@ -124,7 +124,7 @@ async fn test_prefill_data(state: &mut State) {
     let fingerprints = prefill_data
         .fingerprints
         .iter()
-        .map(|(s, _)| (s.data_identifier(), s.kind()))
+        .map(|(s, _)| (s.di(), s.kind()))
         .collect();
     let expected_fingerprints = vec![
         (IDK::Email.into(), FingerprintScopeKind::Global),
