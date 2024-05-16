@@ -14,7 +14,9 @@ use db::models::{
     scoped_vault::ScopedVault,
 };
 use newtypes::{ExternalId, FpId, OnboardingStatus};
-use openai::chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole};
+use openai::chat::{
+    ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole, ChatCompletionResponseFormat,
+};
 use paperclip::actix::{api_v2_operation, post, web};
 use serde::{Deserialize, Serialize};
 
@@ -70,21 +72,26 @@ pub async fn get(
     .to_string();
 
     let schema = serde_json::to_string(&AiSummaryObject::default())?;
-    let prompt = format!(
-        "using JSON schema {schema} summarize this identity verification result: {}",
-        summary
-    );
 
-    let message = ChatCompletionMessage {
-        role: ChatCompletionMessageRole::Assistant,
-        content: Some(prompt),
+    let message1 = ChatCompletionMessage {
+        role: ChatCompletionMessageRole::System,
+        content: Some("You are an expert risk analyst reviewing identity verification result and output results in JSON.".to_string()),
         name: None,
-        function_call: Some(openai::chat::ChatCompletionFunctionCall {
-            name: "to_json".into(),
-            arguments: "schema, content".into(),
-        }),
+        function_call: None,
     };
-    let completion = ChatCompletion::builder("gpt-4-0125-preview", vec![message])
+
+    let message2 = ChatCompletionMessage {
+        role: ChatCompletionMessageRole::User,
+        content: Some(format!(
+            "summarize identity verification result is described by this JSON object: {} and output the result using JSON schema {}",
+            summary, schema
+        )),
+        name: None,
+        function_call: None,
+    };
+
+    let completion = ChatCompletion::builder("gpt-4o", vec![message1, message2])
+        .response_format(ChatCompletionResponseFormat::json_object())
         .create()
         .await
         .map_err(|e| ApiErrorKind::OpenAiCompletionError(e.to_string()))?;
@@ -92,13 +99,15 @@ pub async fn get(
     let response = completion.choices.first().and_then(|c| c.message.content.clone());
     let response = response
         .ok_or_else(|| ApiErrorKind::OpenAiCompletionError("No response from AI model".to_string()))?;
+
     let AiSummaryObject {
         high_level_summary,
         detailed_summary,
         risk_signal_summary,
         conclusion,
-    } = serde_json::from_str(&response)
-        .map_err(|_| ApiErrorKind::OpenAiCompletionError("Invalid format from AI model".to_string()))?;
+    } = serde_json::from_str(&response).map_err(|_| {
+        ApiErrorKind::OpenAiCompletionError(format!("Invalid format from AI model: {}", response))
+    })?;
 
     ResponseData::ok(UserAiSummary {
         high_level_summary,

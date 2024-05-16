@@ -1,4 +1,4 @@
-import pytest
+import pytest, json
 from tests.utils import post
 
 
@@ -10,4 +10,4 @@ def test_ai_summarize(sandbox_tenant, sandbox_user):
         *sandbox_tenant.db_auths,
     )
     assert body["detailed_summary"]
-    print(body)
+    print(json.dumps(body, indent=2))

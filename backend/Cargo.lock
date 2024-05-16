@@ -439,7 +439,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "dotenv",
- "openai",
+ "openai 1.0.0-alpha.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.12.2",
  "tokio",
 ]
@@ -627,7 +627,7 @@ dependencies = [
  "mockall",
  "newtypes",
  "once_cell",
- "openai",
+ "openai 1.0.0-alpha.14 (git+https://github.com/onefootprint/openai?rev=c08091a41f2a50cba5e2668034911cdcc5db3f0a)",
  "opentelemetry 0.19.0",
  "opentelemetry-otlp",
  "opentelemetry_api 0.19.0",
@@ -717,7 +717,7 @@ dependencies = [
  "mime",
  "mockall",
  "newtypes",
- "openai",
+ "openai 1.0.0-alpha.14 (git+https://github.com/onefootprint/openai?rev=c08091a41f2a50cba5e2668034911cdcc5db3f0a)",
  "paperclip",
  "paste",
  "portpicker",
@@ -5651,6 +5651,22 @@ name = "openai"
 version = "1.0.0-alpha.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "595f9127fd06a0ea0813606a218021951681c15345f818ee3f483fa06d2545a7"
+dependencies = [
+ "anyhow",
+ "bytes 1.6.0",
+ "derive_builder",
+ "futures-util",
+ "reqwest 0.11.27",
+ "reqwest-eventsource",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
+name = "openai"
+version = "1.0.0-alpha.14"
+source = "git+https://github.com/onefootprint/openai?rev=c08091a41f2a50cba5e2668034911cdcc5db3f0a#c08091a41f2a50cba5e2668034911cdcc5db3f0a"
 dependencies = [
  "anyhow",
  "bytes 1.6.0",
