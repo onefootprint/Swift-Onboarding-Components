@@ -13,7 +13,7 @@ import PhonePageStructure from '../phone-page-structure';
 
 type PhoneKbaChallengeProps = { Header: (props: HeaderProps) => JSX.Element };
 
-const { logError } = getLogger('phone-kba-challenge');
+const { logError, logWarn } = getLogger('phone-kba-challenge');
 
 const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
   const [state, send] = useIdentifyMachine();
@@ -42,7 +42,7 @@ const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
       { authToken: user.token, 'id.phone_number': phoneFromForm },
       {
         onError: err => {
-          logError('Error while identify user on phone-kba-challenge', err);
+          logWarn('Error while identify user on phone-kba-challenge', err);
           showRequestErrorToast(t('phone-incorrect'));
         },
         onSuccess: res => {
