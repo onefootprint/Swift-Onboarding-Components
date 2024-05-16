@@ -39,7 +39,7 @@ export async function CreateScheduledTasks(
         ]),
         // Datadog
         new Map([
-          ['service', `cron`],
+          ['service', `cron-${cronTask.name}`],
           ['cron', cronTask.name],
         ]),
         cronTask.name,

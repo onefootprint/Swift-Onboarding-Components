@@ -90,6 +90,19 @@ function createTaskExecutionRole(
         }),
       },
       {
+        name: 'ecs_firelens_logs',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: ['firehose:PutRecordBatch'],
+              Effect: 'Allow',
+              Resource: '*',
+            },
+          ],
+        }),
+      },
+      {
         name: 'allow_db_connection_secret',
         policy: JSON.stringify({
           Version: '2012-10-17',

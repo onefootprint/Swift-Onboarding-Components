@@ -37,7 +37,7 @@ export async function CreateWorkerTasks(
         ]),
         // Datadog
         new Map([
-          ['service', `worker`],
+          ['service', `worker-${worker.name}`],
           ['worker', worker.name],
         ]),
         worker.name,

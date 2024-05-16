@@ -49,6 +49,7 @@ export abstract class ServiceContainers {
   ): Promise<ContainersOutput> {
     const otelCollectorContainerName = 'otelcollector';
     const datadogAgentContainerName = 'datadog-agent';
+    const fluentBitContainerName = 'fluentbit';
     const serverContainerName = 'fpc';
 
     // Note: The appPort may not be useful for cron tasks unless there are
@@ -70,10 +71,17 @@ export abstract class ServiceContainers {
       datadogTags,
     );
 
+    const fluentBit = ServiceContainers.createFluentBit(
+      fluentBitContainerName,
+      region,
+      logGroupComponent,
+    );
+
     const monolith = await ServiceContainers.createMonolith(
       serverContainerName,
       otelCollectorContainerName,
       datadogAgentContainerName,
+      fluentBitContainerName,
       appPort,
       constants,
       secretsStore,
@@ -85,15 +93,15 @@ export abstract class ServiceContainers {
       assetsCdn,
       nitroService,
       otelExtraAttributes,
-      logGroupComponent,
+      datadogTags,
       containerArgs,
       knobs,
     );
 
     const definitions = pulumi
-      .all([traceOtelCollector, datadogAgent, monolith])
-      .apply(([traceOtelCollector, datadogAgent, monolith]) => {
-        const def = [monolith, datadogAgent, traceOtelCollector];
+      .all([traceOtelCollector, datadogAgent, fluentBit, monolith])
+      .apply(([traceOtelCollector, datadogAgent, fluentBit, monolith]) => {
+        const def = [monolith, datadogAgent, fluentBit, traceOtelCollector];
         return JSON.stringify(def);
       });
 
@@ -110,6 +118,7 @@ export abstract class ServiceContainers {
     name: string,
     traceOtelCollectorContainerName: string,
     datadogAgentContainerName: string,
+    fluentBitContainerName: string,
     appPort: number,
     constants: Config,
     secretsStore: StaticSecrets,
@@ -121,7 +130,7 @@ export abstract class ServiceContainers {
     assetsCdn: assets.AssetCdn,
     nitroService: NitroServiceOutput,
     otelExtraAttributes: Map<string, string>,
-    logGroupComponent: string,
+    datadogTags: Map<string, string>,
     containerArgs: string[],
     knobs: Knobs,
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
@@ -206,6 +215,7 @@ export abstract class ServiceContainers {
         secretsStore.neuroIdApiKey.arn,
         secretsStore.neuroIdApiKeyTest.arn,
         secretsStore.openaiApiKey.arn,
+        secretsStore.datadogApiKey.arn,
       ])
       .apply(
         ([
@@ -262,6 +272,7 @@ export abstract class ServiceContainers {
           neuroIdApiKey,
           neuroIdApiKeyTest,
           openaiApiKey,
+          datadogApiKeyArn,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -626,6 +637,10 @@ export abstract class ServiceContainers {
                 containerName: datadogAgentContainerName,
                 condition: 'START',
               },
+              {
+                containerName: fluentBitContainerName,
+                condition: 'START',
+              },
             ],
             portMappings: [
               {
@@ -637,15 +652,26 @@ export abstract class ServiceContainers {
             stopTimeout: 60, // How many seconds to wait for graceful shutdown.
             command: containerArgs,
             logConfiguration: {
-              logDriver: 'awslogs',
+              logDriver: 'awsfirelens',
               options: {
-                'awslogs-group': `/ecs/${name}-${metadata.shortStackName}${
-                  logGroupComponent ? '-' + logGroupComponent : ''
-                }-logs`,
-                'awslogs-region': `${region}`,
-                'awslogs-create-group': 'true',
-                'awslogs-stream-prefix': 'ecs',
+                Name: 'datadog',
+                dd_service: datadogTags.get('service') || 'unknown',
+                dd_source: 'rust',
+                dd_tags: [
+                  `env:${metadata.shortStackName}`,
+                  ...Array.from(datadogTags.entries()).map(
+                    ([k, v]) => `${k}:${v}`,
+                  ),
+                ].join(','),
+                TLS: 'on',
+                provider: 'ecs',
               },
+              secretOptions: [
+                {
+                  name: 'apiKey',
+                  valueFrom: datadogApiKeyArn,
+                },
+              ],
             },
           };
           return def;
@@ -666,13 +692,8 @@ export abstract class ServiceContainers {
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
     const metadata = GetStackMetadata();
     const out = pulumi
-      .all([
-        secrets.traceOtelConfig.arn,
-        secrets.elasticApmAgentKey.arn,
-        secrets.grafanaPrometheusPushAuth.arn,
-        secrets.honeycombApiKey.arn,
-      ])
-      .apply(([config, apiKey, grafanaPrometheusPushAuth, honeycombApiKey]) => [
+      .all([secrets.traceOtelConfig.arn, secrets.honeycombApiKey.arn])
+      .apply(([config, honeycombApiKey]) => [
         {
           name: 'AOT_CONFIG_CONTENT',
           valueFrom: config,
@@ -742,19 +763,18 @@ export abstract class ServiceContainers {
     const metadata = GetStackMetadata();
     const out = pulumi
       .all([secrets.datadogApiKey.arn])
-      .apply(([datadogApiKey]) => [
-        {
-          name: 'DD_API_KEY',
-          valueFrom: datadogApiKey,
-        },
-      ])
-      .apply(secrets => {
+      .apply(([datadogApiKeyArn]) => {
         let def: aws.ecs.ContainerDefinition = {
           name,
           image:
             'public.ecr.aws/datadog/agent:7@sha256:4064da01d0db2e30c5331e3cedf7a43478ab6b215efe1885cc6f50a05a467263',
           essential: true,
-          secrets,
+          secrets: [
+            {
+              name: 'DD_API_KEY',
+              valueFrom: datadogApiKeyArn,
+            },
+          ],
           portMappings: [
             {
               // DogStatsD
@@ -784,11 +804,68 @@ export abstract class ServiceContainers {
               ].join(' '),
             },
           ],
+          logConfiguration: {
+            logDriver: 'awsfirelens',
+            options: {
+              Name: 'datadog',
+              dd_service: 'datadog-agent',
+              dd_source: 'datadog-agent',
+              dd_tags: `env:${metadata.shortStackName}`,
+              TLS: 'on',
+              provider: 'ecs',
+            },
+            secretOptions: [
+              {
+                name: 'apiKey',
+                valueFrom: datadogApiKeyArn,
+              },
+            ],
+          },
         };
 
         return def;
       });
 
     return out;
+  }
+
+  /**
+   * Fluent Bit (Forward logs from ECS -> Datadog Logs)
+   */
+  static createFluentBit(
+    name: string,
+    region: Region,
+    logGroupComponent: string,
+  ): aws.ecs.ContainerDefinition {
+    const metadata = GetStackMetadata();
+
+    let def: aws.ecs.ContainerDefinition = {
+      name,
+      image:
+        'public.ecr.aws/aws-observability/aws-for-fluent-bit:stable@sha256:3bff549ff35b18a2c21e455e409618a3dc146b2e1f4809522b35e23a0ae0f360',
+      essential: true,
+      firelensConfiguration: {
+        type: 'fluentbit',
+        options: {
+          'enable-ecs-log-metadata': 'true',
+          'config-file-type': 'file',
+          'config-file-value': '/fluent-bit/configs/parse-json.conf',
+        },
+      },
+      logConfiguration: {
+        // Forward Fluent Bit's own logs to CloudWatch.
+        logDriver: 'awslogs',
+        options: {
+          'awslogs-group': `/ecs/${name}-${metadata.shortStackName}${
+            logGroupComponent ? '-' + logGroupComponent : ''
+          }-logs`,
+          'awslogs-region': `${region}`,
+          'awslogs-create-group': 'true',
+          'awslogs-stream-prefix': 'ecs',
+        },
+      },
+    };
+
+    return def;
   }
 }
