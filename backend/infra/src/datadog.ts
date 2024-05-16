@@ -156,12 +156,16 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
                 'tag:GetTagValues',
                 'xray:BatchGetTraces',
                 'xray:GetTraceSummaries',
+                'elasticloadbalancing:DescribeLoadBalancers',
+                'elasticloadbalancing:DescribeLoadBalancerAttributes',
+                'wafv2:ListLoggingConfigurations',
               ],
             },
           }),
         },
       );
 
+      // This stack forwards CloudWatch and S3 logs to Datadog.
       const forwarderStack = new aws.cloudformation.Stack(
         `datadog-forwarder-${stackMetadata.shortStackName}`,
         {
@@ -175,6 +179,26 @@ export async function CreateDatadogIntegration(secretsStore: StaticSecrets) {
             'CAPABILITY_IAM',
             'CAPABILITY_NAMED_IAM',
             'CAPABILITY_AUTO_EXPAND',
+          ],
+        },
+      );
+
+      // Register the Lambda from the forwarder stack with the integration.
+      const forwarderLambdaArn = new datadog.aws.IntegrationLambdaArn(
+        `datadog-lambda-arn-${stackMetadata.shortStackName}`,
+        {
+          accountId: accountId,
+          lambdaArn: forwarderStack.outputs['LambdaArn'],
+        },
+      );
+
+      const logCollection = new datadog.aws.IntegrationLogCollection(
+        `datadog-log-collection-${stackMetadata.shortStackName}`,
+        {
+          accountId: accountId,
+          services: [
+            'elbv2', // ALB
+            'cloudfront',
           ],
         },
       );
