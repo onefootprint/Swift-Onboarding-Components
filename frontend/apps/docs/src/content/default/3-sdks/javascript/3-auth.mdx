@@ -1,14 +1,14 @@
 ---
 page: default
-slug: /sdks/javascript-typescript-auth
+slug: /sdks/js-auth
 category: SDKs
 subcategory: Javascript/Typescript
 title: Auth
 position: 3
 meta:
   {
-    title: Footprint <> Auth Integration,
-    description: Discover how to integrate Footprint's Auth with a JS/TS codebase,
+    title: Footprint | JS/TS Integration - Auth,
+    description: Discover how to integrate Footprint's Auth flow into your JS/TS application.,
   }
 ---
 
@@ -24,8 +24,6 @@ This guide explains how to integrate the Footprint auth flow into your JavaScrip
 
 2. **Initialize the Footprint Flow**:
    - Trigger Footprint, for example, when a button is clicked. Them, pass the `publicKey` and `onComplete` callback to the `init` method.
-
-## Authentication flow
 
 ```javascript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
@@ -43,9 +41,32 @@ const handleButtonClick = () => {
 };
 ```
 
+3. **Handle Completion:**
+   - Once the user completes the flow, you'll receive the validationToken through the `onComplete` callback. Post this token to your backend for further processing.
+
 ## Update login methods flow
 
-If you would like to enable users to update their authentication methods securely, you can use the `update_login_methods` kind.
+If you would like to enable users to update their authentication methods securely, you can use the `update_login_methods` kind. Instead of using a `publicKey`, you should provide an `authToken`:
+
+1. **Get the fp_id**:
+
+- Go to your [dashboard](https://dashboard.onefootprint.com/users) and get the `fp_id` of the user you want to update the login methods.
+
+2. ** Get a secret API key**:
+
+- Go to your [dashboard](https://dashboard.onefootprint.com/api-keys) and get a secret API key.
+
+3. ** Make a POST request**:
+
+- Make a POST request to the Footprint API to get an authentication token. You can use the following cURL command:
+
+```bash
+curl -s https://api.onefootprint.com/users/FP_USER_ID/token -X POST -d '{"kind": "update_auth_methods"}' -u YOUR_SECRET_KEY: | jq
+```
+
+4. **Initialize the Footprint Flow**:
+
+- With the authentication token obtained, you can now launch the flow:
 
 ```javascript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
@@ -62,9 +83,6 @@ const handleButtonClick = () => {
   component.render();
 };
 ```
-
-3. **Handle Completion:**:
-   - Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` callback. Post this token to your backend for further processing.
 
 ## Listening to events
 
@@ -94,14 +112,14 @@ component.render();
 
 | Variable     | Description                                                                                                                                                                                                                      |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `publicKey`  | Optional. Onboarding configuration public key.                                                                                                                                                                                   |
+| `appearance` | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                            |
 | `authToken`  | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID, and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
-| `onComplete` | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend                                                                                                  |
-| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                             |
+| `l10n`       | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                         |
 | `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                                      |
 | `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                                          |
-| `userData`   | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                                             |
+| `onComplete` | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend                                                                                                  |
+| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                             |
 | `options`    | Optional. An options object that customizes the flow, can accept `showLogo`. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                                                           |
-| `appearance` | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                            |
+| `publicKey`  | Optional. Onboarding configuration public key.                                                                                                                                                                                   |
+| `userData`   | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                                             |
 | `variant`    | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                                                                   |
-| `l10n`       | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                         |

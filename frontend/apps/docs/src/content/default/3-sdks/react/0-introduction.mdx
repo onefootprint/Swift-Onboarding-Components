@@ -1,0 +1,80 @@
+---
+page: default
+slug: /sdks/react-introduction
+category: SDKs
+subcategory: React
+title: Introduction
+position: 0
+meta:
+  {
+    title: Footprint | React Integration - Introduction,
+    description: Discover how to integrate Footprint with a React Codebase,
+  }
+---
+
+Our footprint-react library lets you integrate your application easily with a code base written in React. If you're planning to use our Onboarding (KYC/KYB) or Auth flows, you probably don't need this package:
+`footprint-js` is already enough for your needs and might be simpler to integrate. The main difference is that you can launch these flows using a Footprint Button written in React.
+However, if you're planning on using our Secure Form or Onboarding Components, this package is recommended - in fact, onboarding components are only supported by this package.
+
+<div style="display: flex; align-items: center; justify-content: center; margin-top: 48px;">
+  <demo-react-verify></demo-react-verify>
+</div>
+
+## Browser support
+
+Footprint libraries supports all recent versions of major browsers. For the sake of security and providing the best experience to the majority of customers, we do not support less popular browsers that no longer receive security updates.
+
+| Name                    | Versions              |
+| ----------------------- | --------------------- |
+| Chrome                  | Last 3 major versions |
+| Chrome Mobile           | Last 3 major versions |
+| Firefox                 | Last 3 major versions |
+| Microsoft Edge          | Last 3 major versions |
+| Safari OSX              | Last 3 major versions |
+| Safari iOS              | Last 3 major versions |
+| Android default browser | Last 3 major versions |
+
+## React support
+
+Footprint requires React 17 or later. We recommend using the latest version of React to take advantage of the latest features and performance improvements.
+
+| Name     | Versions       |
+| -------- | -------------- |
+| React 18 | Supported      |
+| React 17 | Supported      |
+| React 16 | Not supported. |
+
+## Available Components
+
+Our SDKs support a variety of components.
+
+| Component             | Description                                                                                                       |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `<FootprintButton />` | Supports `verify`, `auth`, and `update_auth_methods` flows                                                        |
+| `<FootprintForm />`   | A PCI-compliant form to collect user data for specific fields. It can be rendered inline, in a modal or a drawer. |
+
+We also support onboarding components, which is a set of components that can be used to create a seamless onboarding experience for your users.
+
+## Installation
+
+1. Install `footprint-js` and `footprint-react`:
+
+```bash
+# With NPM
+npm install @onefootprint/footprint-js
+npm install @onefootprint/footprint-react
+
+# With yarn
+yarn add @onefootprint/footprint-js
+yarn add @onefootprint/footprint-react
+```
+
+<inline-alert variant='info'>Make sure your application's permissions and content security policies are configured correctly to allow the Footprint integration. More info can be found [here](/integrate/content-security-policy).</inline-alert>
+
+In your implementation, you will need to import the following file:
+
+```javascript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+```
+
+Each component has specific integration steps and options, which will be detailed in the following sections of the documentation.

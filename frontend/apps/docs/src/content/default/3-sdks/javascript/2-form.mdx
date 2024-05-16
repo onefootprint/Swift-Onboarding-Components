@@ -7,8 +7,8 @@ title: Secure Form
 position: 2
 meta:
   {
-    title: Footprint <> Secure Form Integration,
-    description: Discover how to integrate Footprint's Secure Form with a JS/TS codebase,
+    title: Footprint | JS/TS Integration - Secure Form,
+    description: Discover how to integrate Footprint's Secure Form flow into your JS/TS application.,
   }
 ---
 
@@ -16,12 +16,17 @@ meta:
 
 This guide explains how to integrate the Footprint Form component into your JavaScript/TypeScript applications.
 
-1. First of all, we recommend you reading our [quick-start guide](embedded-components/getting-started), which explains a bit more about this product,
+1. **Before starting**:
 
-2. Perform steps 1-5 from [here](embedded-components/getting-started#add-footprint-js-to-your-app).
+- We recommend you reading our [quick-start guide](/embedded-components/getting-started), which explains a bit more about this product.
+
+2. **Obtain an `authToken`**:
+
+- Perform steps 1-5 from [here](/embedded-components/getting-started#add-footprint-js-to-your-app).
 
 3. **Initialize the Footprint Flow**:
-   - Import the styles file and embed the Footprint component, passing the Auth token, callback functions and any other options:
+
+   - Import the styles file and embed the Footprint component, passing the `authToken`, callback functions and any other options:
 
 ```javascript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
@@ -41,7 +46,7 @@ const renderForm = () => {
 };
 ```
 
-3. **Handle Completion:**:
+4. **Handle Completion:**
 
 - When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](/vault/apis#decrypt-data-from-a-users-vault).
 
@@ -96,23 +101,6 @@ component.render();
 ```
 
 For more information, including a list of available variables, check out the [customization guide](/integrate/customization).
-
-## Overriding localization
-
-```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
-
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
-const l10n = {
-  language: 'es',
-};
-
-const component = footprint.init({ kind: 'verify', publicKey, l10n });
-component.render();
-```
-
-For more information, including a list of available languages, check out the [localization guide](/integrate/customization#localization-configuration).
 
 ## Available Props
 

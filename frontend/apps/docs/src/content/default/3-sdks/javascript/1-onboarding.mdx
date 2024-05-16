@@ -1,14 +1,14 @@
 ---
 page: default
-slug: /sdks/javascript-typescript-kyc-kyb
+slug: /sdks/js-onboarding
 category: SDKs
 subcategory: Javascript/Typescript
 title: Onboarding (KYC/KYB)
 position: 1
 meta:
   {
-    title: Footprint <> Onboarding Integration,
-    description: Discover how to integrate Footprint's Onboarding flow with a JS/TS codebase,
+    title: Footprint | JS/TS Integration - Onboarding (KYC/KYB),
+    description: Discover how to integrate Footprint's Onboarding (KYC/KYB) flow into your JS/TS application.,
   }
 ---
 
@@ -20,7 +20,7 @@ This guide explains how to integrate the Footprint onboarding flow for KYC (Know
 
    - Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
    - Use an existing playbook or create a new one.
-   - Obtain the Publishable Key, e.g., `pb_test_VMooXd04EUlnu3AvMYKjMW`.
+   - Obtain the Publishable Key, e.g., `pb_test_hLKePSu5AH5wAYuZH2ehR7`.
 
 2. **Initialize the Footprint Flow**:
    - Trigger Footprint, for example, when a button is clicked. Them, pass the `publicKey` and `onComplete` callback to the `init` method.
@@ -32,7 +32,7 @@ import footprint from '@onefootprint/footprint-js';
 const handleButtonClick = () => {
   const component = footprint.init({
     kind: 'verify',
-    publicKey: 'pb_test_WNgSBRR7uxoT8JRDBBflgw',
+    publicKey: 'pb_test_hLKePSu5AH5wAYuZH2ehR7',
     onComplete: validationToken => {
       console.log(validationToken);
     },
@@ -42,7 +42,7 @@ const handleButtonClick = () => {
 };
 ```
 
-3. **Handle Completion:**:
+3. **Handle Completion:**
    - Once the user completes the flow, you'll receive the validationToken through the `onComplete` callback. Post this token to your backend for further processing.
 
 Click [here](https://github.com/onefootprint/examples/tree/master/idv/frontend-vanilla-js) to check out a full example.
@@ -54,7 +54,7 @@ Footprint provides some events based on some actions performed by the user. To l
 ```typescript
 const component = footprint.init({
   kind: 'verify',
-  publicKey: 'pb_test_WNgSBRR7uxoT8JRDBBflgw',
+  publicKey: 'pb_test_hLKePSu5AH5wAYuZH2ehR7',
   onComplete: validationToken => {
     console.log(validationToken);
   },
@@ -81,7 +81,7 @@ You can customize the appearance of the onboarding flow by passing an `appearanc
 ```typescript
 const component = footprint.init({
   kind: 'verify',
-  publicKey: 'pb_test_WNgSBRR7uxoT8JRDBBflgw',
+  publicKey: 'pb_test_hLKePSu5AH5wAYuZH2ehR7',
   onComplete: validationToken => {
     console.log(validationToken);
   },
@@ -105,7 +105,7 @@ For more information, including a list of available variables, check out the [cu
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
+const publicKey = 'pb_test_hLKePSu5AH5wAYuZH2ehR7';
 const l10n = {
   language: 'es',
 };

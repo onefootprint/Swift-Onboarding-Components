@@ -12,6 +12,7 @@ import ArticleHeader from './components/article-header';
 import A from './components/markdown-components/a';
 import Code from './components/markdown-components/code';
 import CustomizationPreview from './components/markdown-components/customization-preview';
+import DemoReact from './components/markdown-components/demo-react';
 import DocsInlineAlert from './components/markdown-components/docs-inline-alert';
 import Examples from './components/markdown-components/examples';
 import H1 from './components/markdown-components/h1';
@@ -76,6 +77,9 @@ const overrides: MarkdownToJSX.Overrides = {
   },
   table: {
     component: Table,
+  },
+  'demo-react': {
+    component: DemoReact,
   },
 };
 
