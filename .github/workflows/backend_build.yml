@@ -65,7 +65,7 @@ jobs:
             ./backend/target
           key: ${{ runner.os }}-cargo-cache-docker-1-77-${{ hashFiles('backend/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-cache-docker-1-74
+            ${{ runner.os }}-cargo-cache-docker-1-77
 
       - name: Restore docker cache
         run: |
@@ -107,7 +107,7 @@ jobs:
           docker inspect api:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && build_api)
 
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker tag api:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}          
+          docker tag api:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}
         env:
           RUST_VERSION: ${{ inputs.rustVersion }}
