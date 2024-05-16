@@ -201,6 +201,9 @@ impl<T> DataRequest<T> {
             .flat_map(|(di, pii)| di.get_fingerprint_payload(pii, Some(tenant_id)))
             .collect();
 
+        // TODO make composite fingerprint if we have all the data
+        // then one day decrypt to get all the data
+
         let fingerprints = fingerprinter.compute_fingerprints(data_to_fingerprint).await?;
 
         let fingerprints = fingerprints

@@ -118,6 +118,7 @@ impl<Type> VaultWrapper<Type> {
             .enclave_client
             .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fingerprint)
             .await?;
+        // TODO composite fingerprints here too
         let fingerprints = fingerprints
             .into_iter()
             .map(|((kind, scope), fingerprint)| FingerprintRequest {

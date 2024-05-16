@@ -60,7 +60,7 @@ pub enum FingerprintDataValue {
 pub struct NewFingerprintArgs<'a> {
     pub data: FingerprintDataValue,
     pub kind: FingerprintKind,
-    pub lifetime_id: &'a DataLifetimeId,
+    pub lifetime_ids: Vec<&'a DataLifetimeId>,
     pub version: FingerprintVersion,
     pub scope: FingerprintScopeKind,
     pub scoped_vault_id: &'a ScopedVaultId,
@@ -122,7 +122,7 @@ impl Fingerprint {
                 let NewFingerprintArgs {
                     data,
                     kind,
-                    lifetime_id,
+                    lifetime_ids,
                     version,
                     scope,
                     scoped_vault_id,
@@ -150,10 +150,13 @@ impl Fingerprint {
                     tenant_id,
                     is_live,
                 };
-                let fp_junctions = vec![NewFingerprintJunction {
-                    fingerprint_id: id,
-                    lifetime_id,
-                }];
+                let fp_junctions = lifetime_ids
+                    .iter()
+                    .map(|lifetime_id| NewFingerprintJunction {
+                        fingerprint_id: id.clone(),
+                        lifetime_id,
+                    })
+                    .collect_vec();
                 (new_fp, fp_junctions)
             })
             .unzip();

@@ -20,7 +20,7 @@ pub fn create(
     let fingerprint = NewFingerprintArgs {
         data: sh_data.into(),
         kind: kind.into(),
-        lifetime_id,
+        lifetime_ids: vec![lifetime_id],
         scope,
         version: FingerprintVersion::current(),
         scoped_vault_id: &sv.id,
