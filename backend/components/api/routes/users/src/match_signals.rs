@@ -16,7 +16,7 @@ use newtypes::{PreviewApi, SignalScope};
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
-    description = "Lists the match signals for the provided user.",
+    description = "Lists the match signals for the provided user. This API is deprecated.",
     tags(Users, Preview)
 )]
 #[get("/users/{fp_id}/match_signals")]

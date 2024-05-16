@@ -871,7 +871,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the liveness signals for the provided user.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the liveness signals for the provided user. This API is deprecated in favor of the `auth_events` API.",
                 "parameters": [
                     {
                         "in": "path",
@@ -911,7 +911,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the match signals for the provided user.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the match signals for the provided user. This API is deprecated.",
                 "parameters": [
                     {
                         "in": "path",

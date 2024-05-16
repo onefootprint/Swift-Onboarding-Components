@@ -10,7 +10,7 @@ use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
-    description = "Lists the liveness signals for the provided user.",
+    description = "Lists the liveness signals for the provided user. This API is deprecated in favor of the `auth_events` API.",
     tags(Users, Preview)
 )]
 #[get("/users/{fp_id}/liveness")]
