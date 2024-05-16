@@ -1,20 +1,15 @@
 use crate::{
-    data_identifier::DiValidationError, fingerprinter::Fingerprinter, CleanAndValidate, CollectedDataOption,
-    DataIdentifier, DataValidationError, DeriveValues, Error, Fingerprint, FingerprintScopeKind,
-    IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType, TenantId,
+    data_identifier::DiValidationError,
+    fingerprinter::{FingerprintScope, Fingerprinter},
+    CleanAndValidate, CollectedDataOption, DataIdentifier, DataValidationError, DeriveValues, Error,
+    Fingerprint, IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType, TenantId,
 };
 use either::Either::{Left, Right};
 use itertools::{chain, Itertools};
 use std::{clone::Clone, collections::HashMap};
 
-#[derive(Debug, Clone)]
-pub struct FingerprintRequest {
-    pub kind: DataIdentifier,
-    pub fingerprint: Fingerprint,
-    pub scope: FingerprintScopeKind,
-}
 
-pub type Fingerprints = Vec<FingerprintRequest>;
+pub type Fingerprints = Vec<(FingerprintScope, Fingerprint)>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
@@ -205,15 +200,6 @@ impl<T> DataRequest<T> {
         // then one day decrypt to get all the data
 
         let fingerprints = fingerprinter.compute_fingerprints(data_to_fingerprint).await?;
-
-        let fingerprints = fingerprints
-            .into_iter()
-            .map(|(scope, fingerprint)| FingerprintRequest {
-                kind: scope.data_identifier(),
-                fingerprint,
-                scope: scope.kind(),
-            })
-            .collect();
 
         let request = DataRequest {
             data: self.data,

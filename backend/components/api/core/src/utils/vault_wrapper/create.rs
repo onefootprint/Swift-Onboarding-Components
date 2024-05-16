@@ -17,14 +17,14 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, FingerprintRequest,
+    email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprints,
     IdentityDataKind as IDK, Locked, ObConfigurationKind, OnboardingStatus, PhoneNumber, PiiString,
     SandboxId, ValidateArgs, VaultId, VaultKind,
 };
 
 pub struct VaultContext {
     pub data: Vec<InitialVaultData>,
-    pub fingerprints: Vec<FingerprintRequest>,
+    pub fingerprints: Fingerprints,
     pub keypair: VaultKeyPair,
     pub sandbox_id: Option<SandboxId>,
     pub obc: ObConfiguration,

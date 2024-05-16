@@ -4,7 +4,7 @@
 //! - Tenant: given a unique `data` we produce `n` fingerprints, one for each tenant.
 //! The key difference is that if someone were to leak the database the fingerprints should be minimaly revealing.
 use async_trait::async_trait;
-use itertools::Itertools;
+use itertools::{chain, Itertools};
 use strum::{EnumIter, IntoEnumIterator};
 
 use crate::{
@@ -29,9 +29,7 @@ impl DataIdentifier {
         let global_scope = GlobalFingerprintKind::try_from(self)
             .ok()
             .map(FingerprintScope::Global);
-        vec![global_scope, tenant_scope]
-            .into_iter()
-            .flatten()
+        chain(global_scope, tenant_scope)
             .map(|scope| (scope, v))
             .collect_vec()
     }

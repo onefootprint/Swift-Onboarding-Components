@@ -14,7 +14,7 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, DataIdentifier, DataLifetimeSource, FingerprintRequest, IdentityDataKind as IDK, VaultKind,
+    output::Csv, DataIdentifier, DataLifetimeSource, Fingerprints, IdentityDataKind as IDK, VaultKind,
 };
 use std::{collections::HashMap, marker::PhantomData};
 
@@ -26,7 +26,7 @@ use std::{collections::HashMap, marker::PhantomData};
 /// vault
 pub struct PrefillData {
     pub data: Vec<NewVaultData>,
-    pub fingerprints: Vec<FingerprintRequest>,
+    pub fingerprints: Fingerprints,
     pub old_ci: HashMap<DataIdentifier, ContactInfo>,
     /// Prevent external construction
     phantom: PhantomData<()>,
@@ -109,24 +109,16 @@ impl<Type> VaultWrapper<Type> {
         // Compute the fingerprints for all data we're going to prefill
         //
         let tenant_id = Some(&destination_sv.tenant_id);
-        let data_to_fingerprint = data
+        let data_to_fp = data
             .iter()
             .flat_map(|d| d.kind.get_fingerprint_payload(&d.e_data, tenant_id))
             .collect_vec();
-
         let fingerprints = state
             .enclave_client
-            .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fingerprint)
+            .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
             .await?;
+
         // TODO composite fingerprints here too
-        let fingerprints = fingerprints
-            .into_iter()
-            .map(|(scope, fingerprint)| FingerprintRequest {
-                kind: scope.data_identifier(),
-                scope: scope.kind(),
-                fingerprint,
-            })
-            .collect();
 
         // Collect the ContactInfo from the vault that has the portable phone/email, only for the
         // data that we will be prefilling.

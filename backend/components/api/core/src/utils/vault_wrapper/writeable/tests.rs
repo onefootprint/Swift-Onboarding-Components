@@ -13,9 +13,9 @@ use db::{
 use itertools::Itertools;
 use macros::test_state;
 use newtypes::{
+    fingerprinter::{FingerprintScope, GlobalFingerprintKind},
     CollectedDataOption as CDO, DataIdentifier, DataLifetimeSource, DataRequest, Fingerprint,
-    FingerprintRequest, FingerprintScopeKind, IdentityDataKind, IdentityDataKind as IDK, PiiString,
-    ValidateArgs,
+    FingerprintScopeKind, IdentityDataKind, IdentityDataKind as IDK, PiiString, ValidateArgs,
 };
 use std::collections::HashMap;
 
@@ -68,7 +68,7 @@ async fn test_prefill_data(state: &mut State) {
         prefill_data
             .fingerprints
             .iter()
-            .map(|d| (d.kind.clone(), d.scope))
+            .map(|(s, _)| (s.data_identifier(), s.kind()))
             .collect(),
         vec![
             (IDK::PhoneNumber.into(), FingerprintScopeKind::Global),
@@ -124,7 +124,7 @@ async fn test_prefill_data(state: &mut State) {
     let fingerprints = prefill_data
         .fingerprints
         .iter()
-        .map(|d| (d.kind.clone(), d.scope))
+        .map(|(s, _)| (s.data_identifier(), s.kind()))
         .collect();
     let expected_fingerprints = vec![
         (IDK::Email.into(), FingerprintScopeKind::Global),
@@ -370,6 +370,7 @@ impl<Type> WriteableVw<Type> {
         data: Vec<(DataIdentifier, PiiString)>,
         create_fingerprints: bool,
     ) -> ApiResult<Vec<(DataIdentifier, ContactInfo)>> {
+        let sv = ScopedVault::get(conn, &self.scoped_vault_id)?;
         let data = HashMap::from_iter(data);
         let request =
             DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(self.vault.is_live))?;
@@ -383,17 +384,13 @@ impl<Type> WriteableVw<Type> {
             })
             .map(|(idk, pii)| {
                 let scope = if *idk == IdentityDataKind::PhoneNumber {
-                    FingerprintScopeKind::Global
+                    FingerprintScope::Global(GlobalFingerprintKind::PhoneNumber)
                 } else {
-                    FingerprintScopeKind::Tenant
+                    FingerprintScope::Tenant((*idk).into(), sv.tenant_id.clone())
                 };
                 // for testing: we just do a regular hash
                 let fingerprint = Fingerprint(crypto::sha256(pii.leak().as_bytes()).to_vec());
-                FingerprintRequest {
-                    kind: (*idk).into(),
-                    fingerprint,
-                    scope,
-                }
+                (scope, fingerprint)
             })
             .collect();
         let request = if create_fingerprints {

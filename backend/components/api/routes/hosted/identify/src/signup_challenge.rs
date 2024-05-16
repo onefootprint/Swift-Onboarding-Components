@@ -24,8 +24,8 @@ use api_wire_types::{
 };
 use itertools::Itertools;
 use newtypes::{
-    email::Email, ChallengeKind, DataIdentifier, DataLifetimeSource, FingerprintRequest, Fingerprinter,
-    IdentifyScope, IdentityDataKind as IDK, PhoneNumber,
+    email::Email, ChallengeKind, DataIdentifier, DataLifetimeSource, Fingerprinter, IdentifyScope,
+    IdentityDataKind as IDK, PhoneNumber,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -219,14 +219,6 @@ async fn make_vault_context(
 
     // If we are in identify for a specific tenant, also compute tenant-scoped FP
     let fingerprints = state.enclave_client.compute_fingerprints(data_to_fp).await?;
-    let fingerprints = fingerprints
-        .into_iter()
-        .map(|(scope, fingerprint)| FingerprintRequest {
-            kind: scope.data_identifier(),
-            fingerprint,
-            scope: scope.kind(),
-        })
-        .collect();
 
     // Determine the source of each piece of data
     let data = initial_data
