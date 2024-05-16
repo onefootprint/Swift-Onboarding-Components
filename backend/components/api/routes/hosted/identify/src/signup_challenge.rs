@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::{
     identify::create_identified_token, ChallengeData, ChallengeState, GetIdentifyChallengeArgs,
     IdentifyChallengeContext, State,
@@ -8,7 +6,7 @@ use api_core::{
     auth::ob_config::ObConfigAuth,
     errors::{
         challenge::ChallengeError, error_with_code::ErrorWithCode, user::UserError, ApiError, ApiResult,
-        AssertionError, ValidationError,
+        ValidationError,
     },
     telemetry::RootSpan,
     types::{response::ResponseData, JsonApiResponse},
@@ -26,7 +24,7 @@ use api_wire_types::{
 };
 use itertools::Itertools;
 use newtypes::{
-    email::Email, ChallengeKind, DataIdentifier, DataLifetimeSource, FingerprintScopeKind, Fingerprinter,
+    email::Email, ChallengeKind, DataIdentifier, DataLifetimeSource, FingerprintRequest, Fingerprinter,
     IdentifyScope, IdentityDataKind as IDK, PhoneNumber,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -221,11 +219,19 @@ async fn make_vault_context(
 
     // If we are in identify for a specific tenant, also compute tenant-scoped FP
     let fingerprints = state.enclave_client.compute_fingerprints(data_to_fp).await?;
-    let fingerprints: HashMap<_, _> = fingerprints.into_iter().collect();
+    let fingerprints = fingerprints
+        .into_iter()
+        .map(|((kind, scope), fingerprint)| FingerprintRequest {
+            kind,
+            fingerprint,
+            scope,
+        })
+        .collect();
 
+    // Determine the source of each piece of data
     let data = initial_data
         .into_iter()
-        .map(|(di, is_bootstrap, value)| -> ApiResult<_> {
+        .map(|(di, is_bootstrap, value)| {
             let source = if is_components_sdk {
                 DataLifetimeSource::LikelyComponentsSdk
             } else if is_bootstrap {
@@ -233,24 +239,12 @@ async fn make_vault_context(
             } else {
                 DataLifetimeSource::LikelyHosted
             };
-            let global_sh = fingerprints
-                .get(&(di.clone(), FingerprintScopeKind::Global))
-                .ok_or(AssertionError("No global fingerprint"))?
-                .clone();
-            let tenant_sh = fingerprints
-                .get(&(di.clone(), FingerprintScopeKind::Tenant))
-                .cloned();
-            Ok(InitialVaultData {
-                global_sh,
-                tenant_sh,
-                di,
-                value,
-                source,
-            })
+            InitialVaultData { di, value, source }
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect_vec();
     Ok(VaultContext {
         data,
+        fingerprints,
         keypair,
         sandbox_id,
         obc: ob_pk_auth.ob_config().clone(),

@@ -17,13 +17,14 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
-    FingerprintScopeKind, IdentityDataKind as IDK, Locked, ObConfigurationKind, OnboardingStatus,
-    PhoneNumber, PiiString, SandboxId, ValidateArgs, VaultId, VaultKind,
+    email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, FingerprintRequest,
+    IdentityDataKind as IDK, Locked, ObConfigurationKind, OnboardingStatus, PhoneNumber, PiiString,
+    SandboxId, ValidateArgs, VaultId, VaultKind,
 };
 
 pub struct VaultContext {
     pub data: Vec<InitialVaultData>,
+    pub fingerprints: Vec<FingerprintRequest>,
     pub keypair: VaultKeyPair,
     pub sandbox_id: Option<SandboxId>,
     pub obc: ObConfiguration,
@@ -33,8 +34,6 @@ pub struct VaultContext {
 pub struct InitialVaultData {
     pub di: DI,
     pub value: PiiString,
-    pub global_sh: Fingerprint,
-    pub tenant_sh: Option<Fingerprint>,
     pub source: DataLifetimeSource,
 }
 
@@ -64,6 +63,7 @@ impl VaultWrapper<Person> {
             keypair,
             sandbox_id,
             obc,
+            fingerprints,
         } = ctx;
         // Verify that the ob config is_live matches the user vault
         if obc.is_live != sandbox_id.is_none() {
@@ -139,27 +139,6 @@ impl VaultWrapper<Person> {
             .collect();
         let request = DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(obc.is_live))?;
         let sources = HashMap::from_iter(initial_data.iter().map(|d| (d.di.clone(), d.source)));
-        let fingerprints = initial_data
-            .into_iter()
-            .map(|d| -> ApiResult<_> {
-                Ok(vec![
-                    Some(FingerprintRequest {
-                        kind: d.di.clone(),
-                        fingerprint: d.global_sh,
-                        scope: FingerprintScopeKind::Global,
-                    }),
-                    d.tenant_sh.map(|tenant_sh| FingerprintRequest {
-                        kind: d.di,
-                        fingerprint: tenant_sh,
-                        scope: FingerprintScopeKind::Tenant,
-                    }),
-                ])
-            })
-            .collect::<ApiResult<Vec<_>>>()?
-            .into_iter()
-            .flatten()
-            .flatten()
-            .collect();
         let request = request.manual_fingerprints(fingerprints);
         let sources = DataLifetimeSources::overrides(DataLifetimeSource::LikelyHosted, sources);
         let request = uvw.validate_request(conn, request, sources, None, DataRequestSource::CreateVault)?;
