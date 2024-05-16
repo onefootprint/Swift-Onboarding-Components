@@ -2,7 +2,7 @@ use idv::{
     experian::cross_core::response::CrossCoreAPIResponse,
     idology::{expectid::response::ExpectIDResponse, pa::response::PaResponse},
     incode::{
-        doc::response::{FetchOCRResponse, FetchScoresResponse},
+        doc::response::{AddCustomerResponse, FetchOCRResponse, FetchScoresResponse},
         watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
     },
     ParsedResponse,
@@ -89,6 +89,15 @@ impl VendorParsable for IncodeUpdatedWatchlistResult {
 impl AsParsedResponse for UpdatedWatchlistResultResponse {
     fn into_parsed_response(self) -> ParsedResponse {
         ParsedResponse::IncodeUpdatedWatchlistResult(self)
+    }
+}
+// Incode approve session (selfie dupes)
+impl VendorParsable for IncodeApproveSession {
+    type ParsedType = AddCustomerResponse;
+}
+impl AsParsedResponse for AddCustomerResponse {
+    fn into_parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IncodeApproveSession(self)
     }
 }
 // Idology watchlist

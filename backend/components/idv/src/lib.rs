@@ -8,8 +8,8 @@ use idology::{expectid::response::ExpectIDResponse, pa::response::PaResponse};
 use incode::{
     curp_validation::response::CurpValidationResponse,
     doc::response::{
-        AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
-        GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
+        AddConsentResponse, AddCustomerResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
+        FetchScoresResponse, GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
     },
     response::OnboardingStartResponse,
     watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
@@ -74,6 +74,7 @@ pub enum ParsedResponse {
     IncodeCurpValidation(CurpValidationResponse),
     IncodeGovernmentValidation(PiiJsonValue),
     NeuroIdAnalytics(NeuroIdAnalyticsResponse),
+    IncodeApproveSession(AddCustomerResponse),
 }
 
 impl ParsedResponse {
@@ -310,6 +311,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::IncodeCurpValidation(_) => VendorAPI::IncodeCurpValidation,
             ParsedResponse::IncodeGovernmentValidation(_) => VendorAPI::IncodeGovernmentValidation,
             ParsedResponse::NeuroIdAnalytics(_) => VendorAPI::NeuroIdAnalytics,
+            ParsedResponse::IncodeApproveSession(_) => VendorAPI::IncodeApproveSession,
         }
     }
 }

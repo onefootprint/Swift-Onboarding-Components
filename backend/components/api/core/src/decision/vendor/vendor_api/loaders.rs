@@ -146,6 +146,7 @@ mod tests {
 
 
     #[test_state_case(VendorAPI::ExperianPreciseId)]
+    #[test_state_case(VendorAPI::IncodeApproveSession)]
     #[test_state_case(VendorAPI::IdologyExpectId)]
     #[test_state_case(VendorAPI::IncodeFetchScores)]
     #[test_state_case(VendorAPI::IncodeFetchOcr)]
@@ -322,7 +323,18 @@ mod tests {
             VendorAPI::IncodeProcessFace => todo!(),
             VendorAPI::IncodeCurpValidation => todo!(),
             VendorAPI::IncodeGovernmentValidation => todo!(),
-            VendorAPI::IncodeApproveSession => todo!(),
+            VendorAPI::IncodeApproveSession => {
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    sv_id2,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    IncodeApproveSession,
+                )
+                .await
+            }
             VendorAPI::StytchLookup => todo!(),
             VendorAPI::FootprintDeviceAttestation => todo!(),
             VendorAPI::AwsRekognition => todo!(),
