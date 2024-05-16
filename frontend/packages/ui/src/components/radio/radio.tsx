@@ -121,7 +121,7 @@ const Input = styled(Grid.Container)<Pick<RadioProps, 'hasError'>>`
     margin: 0;
     outline-offset: ${theme.spacing[2]};
     place-content: center;
-    width: 16px;
+    min-width: 16px;
 
     &::before {
       content: '';
