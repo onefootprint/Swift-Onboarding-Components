@@ -1,4 +1,4 @@
-import { Container, Stack, Text } from '@onefootprint/ui';
+import { Container, media, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -47,9 +47,13 @@ const SectionContainer = styled(Container)`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: ${theme.spacing[12]};
-    padding-bottom: ${theme.spacing[12]};
     gap: ${theme.spacing[9]};
+    padding-bottom: ${theme.spacing[9]};
+
+    ${media.greaterThan('md')`
+      padding-top: ${theme.spacing[12]};
+      padding-bottom: ${theme.spacing[12]};
+    `}
   `}
 `;
 

@@ -278,6 +278,97 @@
       "components": {
         "read-case-study": "Read case study"
       },
+      "baas": {
+        "html-title": "Footprint - Industries: Banks & BaaS",
+        "hero": {
+          "title": "Solve KYC, AML, and Compliance with one tool",
+          "subtitle": "Footprint has been built to help Banks, BaaS, and Financial Institutions holistically solve challenges facing the identity lifecycle of their customers",
+          "get-started": "Get started",
+          "schedule-demo": "Schedule a call"
+        },
+        "intro": {
+          "content": "Banks and FIs have used Footprint to digitize account opening in a way which delights both end-customers and compliance officers."
+        },
+        "featured": {
+          "verify-identities": {
+            "title": "Verify identities",
+            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+          },
+          "verify-credit": {
+            "title": "Verify credit",
+            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+          },
+          "detect-fraud": {
+            "title": "Detect fraudulent actors",
+            "subtitle": "Companies have used Footprint to flag thousands of fraudulent actors to PMs during application."
+          }
+        },
+        "problem": {
+          "title": "We know your problems...",
+          "rising-costs": {
+            "title": "Rising Costs due to bloating of tools + manual review",
+            "subtitle": "Forbes found that the average financial institution spends upwards of $115M on KYC, customer due diligence, and client onboarding. Companies in the US and Canada spend $61B a year on technology for Financial Crime Compliance, with close to 80% of companies seeing KYC-specific costs go up over the last year."
+          },
+          "regulatory-scrutiny": {
+            "title": "Heightened Regulatory Scrutiny ",
+            "subtitle": "New regulations, such as the EU's Fifth Anti-Money Laundering Directive (5AMLD) and the Financial Action Task Force's (FATF) recommendations, have compelled banks to enhance their KYC procedures, including more robust customer due diligence, ongoing monitoring, and risk assessments. Additionally, the emergence of digital banking and fintech innovations has prompted regulators to address cybersecurity concerns and adapt regulations to encompass digital identities and transactions, adding further complexity to compliance efforts for banks."
+          },
+          "evolving-threat": {
+            "title": "Fraud as an evolving threat vector",
+            "subtitle": "The American Banker Association found that 36% of fraud impacting banks is occurring at account creation, while ever $1.00 of fraud is now costing banks north of $4.00 in associated costs. With the rise of GenerativeAI and consumer demand for more digital products, banks have ever more vectors they must monitor to prevent fraud."
+          }
+        },
+        "solution": {
+          "title": "...and we know how to help ✨",
+          "unified-kyc-aml-monitoring": {
+            "title": "Unified KYC + AML Monitoring",
+            "subtitle": "Footprint equips teams with comprehensive tools for compliant identity verification across all CIP requirements, including driver’s licenses, passports, and utility bills, while providing ongoing AML and Adverse Media monitoring."
+          },
+          "dynamic-rules-engine-with-step-ups": {
+            "title": "Dynamic Rules Engine with Step-ups",
+            "subtitle": "Risk and fraud leaders can effortlessly modify the no-code Footprint rules engine and Playbook to adapt to evolving CIPs and onboarding requirements. Footprint automatically backtests all adjustments, demonstrating the potential impact of any rule changes."
+          },
+          "built-in-compliance-dashboard": {
+            "title": "Built-in Compliance",
+            "subtitle": "Footprint’s audit log and advanced data permissioning makes it easy for compliance officers to get a 360-degree view of users from initial onboard to each successive log-in."
+          },
+          "security-to-prevent-breaches": {
+            "title": "Security to Prevent Breaches",
+            "subtitle": "Footprint is one of a handful of companies to leverage Nitro Enclaves, cutting—edge technology built by AWS to advanced far past an age of encryption at rest to protect consumer PII and prevent breaches."
+          },
+          "prevent-phishing-and-ato-compliance": {
+            "title": "Prevent Phishing + ATO Compliance",
+            "subtitle": "Footprint binds a biometric (utilizing) passkeys to user PII as they create accounts. The result is that each time a user comes back to a banking application, they can cryptographically prove that it is the same user who created the account."
+          }
+        },
+        "quote": {
+          "quote": "Based on experience vetting and partnering with many identity-based techs, partnering with Footprint has been a breath of fresh air. In my product, IDV is critical. I want the best security net possible, configurability, trust in a reliable partner, quick support whenever asked, and a commitment to staying ahead of the bad actors. Footprint is thinking outside the box and doing things other IDV providers should have thought about years ago. Proud to stand side by side with Footprint combatting fraud.",
+          "author": "Craig Hoffman",
+          "role": "VP of Product",
+          "company": "Apiture"
+        },
+        "experience": {
+          "title": "We have the experience and the expertise",
+          "accuracy": {
+            "title": "Over 96% Document Fraud Accuracy",
+            "subtitle": "Our advanced scanning technology ensures unparalleled precision in detecting document fraud, maintaining a high accuracy rate of over 96%"
+          },
+          "attempts": {
+            "title": "Stopped over 1,000 attempts to use non-live selfies in security checks",
+            "subtitle": "Footprint detected thousands of attempts to use screen captures instead of an actual selfie, and prevented close to 1,000 people who had non-live selfies."
+          },
+          "flagged": {
+            "title": "Flagged over 1,000 mismatches between barcode and front data on licenses",
+            "subtitle": "As fraudsters can increasingly generate realistic images, ensuring it is a real upload has never been more salient. Even as bad actors create physical fake IDs, this is a great line of defense."
+          }
+        },
+        "banner": {
+          "alt-img": "A penguin fishing in the north pole",
+          "title": "Start onboarding customers safely and seamlessly now",
+          "primary-button": "Sign up for free",
+          "secondary-button": "Book a call"
+        }
+      },
       "fintech": {
         "html-title": "Footprint - Industries: Fintech",
         "hero": {

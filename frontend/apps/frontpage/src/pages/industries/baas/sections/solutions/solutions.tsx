@@ -7,25 +7,28 @@ import SolutionsViewer from '../../../components/solutions-viewer';
 
 const keys = [
   {
-    key: 'real-estate.solution.exposed-risk-signals',
-    imgPath: '/industries/real-estate/exposed-risk-signals',
-    frontImgSize: { width: 650, height: 450 },
+    key: 'baas.solution.dynamic-rules-engine-with-step-ups',
+    imgPath: '/industries/baas/dynamic-rules-engine-with-step-ups',
+    frontImgSize: { width: 719, height: 1000 },
+    frontImgPosition: { top: '110%', left: '50%' },
   },
   {
-    key: 'real-estate.solution.case-management',
-    imgPath: '/industries/real-estate/case-management',
-    frontImgSize: { width: 650, height: 450 },
+    key: 'baas.solution.unified-kyc-aml-monitoring',
+    imgPath: '/industries/baas/unified-kyc-aml-monitoring',
+    frontImgSize: { width: 600, height: 281 },
+    frontImgPosition: { top: '50%', left: '50%' },
   },
   {
-    key: 'real-estate.solution.extra-doc-collection',
-    imgPath: '/industries/real-estate/extra-doc-collection',
-    frontImgSize: { width: 400, height: 650 },
+    key: 'baas.solution.built-in-compliance-dashboard',
+    imgPath: '/industries/baas/built-in-compliance-dashboard',
+    frontImgSize: { width: 500, height: 500 },
+    frontImgPosition: { top: '50%', left: '50%' },
   },
 ];
 
 const Solutions = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.real-estate.solution',
+    keyPrefix: 'pages.industries.auto.solution',
   });
   return (
     <Background>

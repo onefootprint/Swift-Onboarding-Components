@@ -7,7 +7,7 @@ import QuoteCard from '../../../components/quote-card';
 
 const QuoteSection = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.fintech.quote',
+    keyPrefix: 'pages.industries.baas.quote',
   });
   return (
     <Background>
@@ -17,8 +17,8 @@ const QuoteSection = () => {
           author={t('author')}
           role={t('role')}
           company={t('company')}
-          caseStudyLink="/customer-stories/bloom"
-          authorImage="/industries/customer-images/sam-yang.png"
+          caseStudyLink="/customer-stories/apiture"
+          authorImage="/industries/customer-images/craig.png"
         />
       </SectionContainer>
     </Background>

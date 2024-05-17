@@ -1,4 +1,4 @@
-import { Box, Container, Stack, Text } from '@onefootprint/ui';
+import { Box, Container, media, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -53,23 +53,26 @@ const Background = styled.div`
   `}
 `;
 
-const SectionContainer = styled(Container)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: ${theme.spacing[12]};
-    padding-bottom: ${theme.spacing[12]};
-    gap: ${theme.spacing[9]};
-  `}
-`;
-
 const CardsContainer = styled(Box)`
   ${({ theme }) => css`
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-template-rows: repeat(auto-fit, minmax(280px, 1fr));
     gap: ${theme.spacing[3]};
+  `}
+`;
+
+const SectionContainer = styled(Container)`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: ${theme.spacing[9]};
+    padding: ${theme.spacing[9]} 0;
+
+    ${media.greaterThan('md')`
+      padding: ${theme.spacing[12]} 0;
+    `}
   `}
 `;
 

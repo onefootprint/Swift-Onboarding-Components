@@ -66,7 +66,6 @@ const QuoteContainer = styled(Box)`
     gap: ${theme.spacing[5]};
     position: relative;
     max-width: 600px;
-    min-width: 420px;
   `}
 `;
 

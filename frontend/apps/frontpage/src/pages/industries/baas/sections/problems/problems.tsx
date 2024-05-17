@@ -1,4 +1,4 @@
-import { Box, Container, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Container, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,22 +8,22 @@ import styled, { css } from 'styled-components';
 
 const keys: { key: string; icon: CustomIcons }[] = [
   {
-    key: 'accuracy',
-    icon: 'users-alt',
+    key: 'rising-costs',
+    icon: 'confidence',
   },
   {
-    key: 'attempts',
+    key: 'regulatory-scrutiny',
+    icon: 'users',
+  },
+  {
+    key: 'evolving-threat',
     icon: 'confidence-alt',
-  },
-  {
-    key: 'flagged',
-    icon: 'ID',
   },
 ];
 
-const Experience = () => {
+const Problems = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.real-estate.experience',
+    keyPrefix: 'pages.industries.baas.problem',
   });
 
   return (
@@ -53,6 +53,17 @@ const Background = styled.div`
   `}
 `;
 
+const SectionContainer = styled(Container)`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: ${theme.spacing[12]};
+    padding-bottom: ${theme.spacing[12]};
+    gap: ${theme.spacing[9]};
+  `}
+`;
+
 const CardsContainer = styled(Box)`
   ${({ theme }) => css`
     display: grid;
@@ -62,18 +73,4 @@ const CardsContainer = styled(Box)`
   `}
 `;
 
-const SectionContainer = styled(Container)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: ${theme.spacing[9]};
-    padding: ${theme.spacing[9]} 0;
-
-    ${media.greaterThan('md')`
-      padding: ${theme.spacing[12]} 0;
-    `}
-  `}
-`;
-
-export default Experience;
+export default Problems;
