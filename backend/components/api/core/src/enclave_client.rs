@@ -220,6 +220,9 @@ impl EnclaveClient {
         &self,
         sealed_data: Vec<(&EncryptedVaultPrivateKey, &SealedVaultBytes, Vec<DataTransform>)>,
     ) -> Result<Vec<PiiBytes>, EnclaveError> {
+        if sealed_data.is_empty() {
+            return Ok(vec![]);
+        }
         let requests = sealed_data
             .into_iter()
             .map(|(e_key, e_data, transforms)| {
@@ -269,6 +272,10 @@ impl EnclaveClient {
         &self,
         data: Vec<(FingerprintSalt, &PiiString)>,
     ) -> Result<Vec<(FingerprintSalt, Fingerprint)>, EnclaveError> {
+        if data.is_empty() {
+            return Ok(vec![]);
+        }
+
         // we hash the data once simply to shorten the payload length we send to the enclave
         // and build our list of request to send for fingerprinting in the enclave
         let scopes = data.iter().map(|(s, _)| s.clone()).collect_vec();
@@ -307,6 +314,10 @@ impl EnclaveClient {
         sealed_key: &EncryptedVaultPrivateKey,
         sealed_data: Vec<(FingerprintSalt, &SealedVaultBytes)>,
     ) -> Result<Vec<(FingerprintSalt, Fingerprint)>, EnclaveError> {
+        if sealed_data.is_empty() {
+            return Ok(vec![]);
+        }
+
         let scopes = sealed_data.iter().map(|(s, _)| s.clone()).collect_vec();
         let requests = sealed_data
             .into_iter()
@@ -371,6 +382,9 @@ impl EnclaveClient {
         &self,
         documents: HashMap<T, (&EncryptedVaultPrivateKey, &SealedVaultDataKey, &S3Url)>,
     ) -> Result<HashMap<T, PiiBytes>, ApiError> {
+        if documents.is_empty() {
+            return Ok(HashMap::new());
+        }
         let (ids, documents): (Vec<_>, Vec<_>) = documents.into_iter().unzip();
         let (sealed_keys, s3_urls): (Vec<_>, Vec<_>) = documents
             .into_iter()
