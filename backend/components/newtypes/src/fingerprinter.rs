@@ -14,15 +14,20 @@ impl DataIdentifier {
         v: T,
         tenant_id: Option<&'a TenantId>,
     ) -> Vec<(FingerprintScope, T)> {
-        if !self.is_fingerprintable() {
-            return vec![];
-        }
-        let tenant_scope = tenant_id.map(|t_id| FingerprintScope::Tenant(self.clone(), t_id.clone()));
+        let tenant_scope = self
+            .is_fingerprintable()
+            .then_some(tenant_id)
+            .flatten()
+            .map(|t_id| FingerprintScope::Tenant(self.clone(), t_id.clone()));
         // Generate a tenant-scoped fingerprint and globally-scoped fingerprint (if possible)
         let global_scope = GlobalFingerprintKind::try_from(self)
             .ok()
-            .map(FingerprintScope::Global);
-        chain(global_scope, tenant_scope)
+            .map(FingerprintScope::from);
+        // Generate a fingerprint for use to compute a composite fingerprint, but don't save it to the DB
+        let partial_scope = PartialFingerprintKind::try_from(self)
+            .ok()
+            .map(FingerprintScope::from);
+        chain!(global_scope, tenant_scope, partial_scope)
             .map(|scope| (scope, v))
             .collect_vec()
     }
@@ -36,14 +41,23 @@ pub enum FingerprintScope {
     Global(GlobalFingerprintKind),
     /// Searchable within a tenant
     Tenant(DataIdentifier, TenantId),
+    /// Represents pieces of data that are fingerprinted in order to build a composite fingerprint.
+    /// These are not saved to the database.
+    Partial(PartialFingerprintKind),
 }
 
 impl FingerprintScope {
+    const PARTIAL_FINGERPRINT_SALT: &'static [u8] = &[112, 97, 114, 116, 105, 97, 108];
+
     /// The fingerprint scope is used to salt fingerprints in the enclave.
     /// This returns the salt we send to the enclave when generating fingerprints.
     pub fn salt_bytes(&self) -> Vec<u8> {
         match self {
             FingerprintScope::Global(s) => crypto::sha256(s.di().to_string().as_bytes()).to_vec(),
+            FingerprintScope::Partial(s) => {
+                crypto::sha256(&[s.di().to_string().as_bytes(), Self::PARTIAL_FINGERPRINT_SALT].concat())
+                    .to_vec()
+            }
             FingerprintScope::Tenant(di, tenant_id) => crypto::sha256(
                 &[
                     crypto::sha256(di.to_string().as_bytes()),
@@ -55,10 +69,13 @@ impl FingerprintScope {
         }
     }
 
-    pub fn kind(&self) -> FingerprintScopeKind {
+    /// Returns the FingerprintScopeKind for this scope, if exists.
+    /// Only FingerprintScopes with a corresponding Kind are saved into the database.
+    pub fn kind(&self) -> Option<FingerprintScopeKind> {
         match self {
-            Self::Global(_) => FingerprintScopeKind::Global,
-            Self::Tenant(_, _) => FingerprintScopeKind::Tenant,
+            Self::Global(_) => Some(FingerprintScopeKind::Global),
+            Self::Tenant(_, _) => Some(FingerprintScopeKind::Tenant),
+            Self::Partial(_) => None,
         }
     }
 
@@ -66,12 +83,13 @@ impl FingerprintScope {
         match self {
             FingerprintScope::Global(s) => s.di(),
             FingerprintScope::Tenant(di, _) => (*di).clone(),
+            FingerprintScope::Partial(s) => s.di(),
         }
     }
 }
 
 /// This is the one place where we define what can be GLOBALLY fingerprinted
-#[derive(Clone, Copy, Debug, EnumIter)]
+#[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq)]
 pub enum GlobalFingerprintKind {
     PhoneNumber,
     Email,
@@ -106,10 +124,45 @@ impl<'a> TryFrom<&'a DataIdentifier> for GlobalFingerprintKind {
     }
 }
 
+#[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq, Hash, strum::Display)]
+#[strum(serialize_all = "snake_case")]
+/// Represents pieces of data that are fingerprinted in order to build a composite fingerprint.
+/// These are not saved to the database.
+pub enum PartialFingerprintKind {
+    Dob,
+    FirstName,
+    LastName,
+}
+
+impl PartialFingerprintKind {
+    pub fn di(&self) -> DataIdentifier {
+        match self {
+            PartialFingerprintKind::Dob => DataIdentifier::from(IDK::Dob),
+            PartialFingerprintKind::FirstName => DataIdentifier::from(IDK::FirstName),
+            PartialFingerprintKind::LastName => DataIdentifier::from(IDK::LastName),
+        }
+    }
+}
+
+impl<'a> TryFrom<&'a DataIdentifier> for PartialFingerprintKind {
+    type Error = crate::Error;
+
+    fn try_from(value: &'a DataIdentifier) -> Result<Self, Self::Error> {
+        Self::iter()
+            .find(|g| &g.di() == value)
+            .ok_or(crate::Error::Custom(
+                "Data is not partially fingerprintable as a composite fingerprint".into(),
+            ))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::FingerprintScope;
-    use crate::{fingerprinter::GlobalFingerprintKind, IdentityDataKind as IDK, TenantId};
+    use crate::{
+        fingerprinter::{GlobalFingerprintKind, PartialFingerprintKind},
+        IdentityDataKind as IDK, TenantId,
+    };
     use test_case::test_case;
 
     fn test_org_id() -> TenantId {
@@ -122,6 +175,8 @@ mod tests {
     #[test_case(FingerprintScope::Tenant(IDK::PhoneNumber.into(), test_org_id()) => "6f930e083b99ac46ef5ce0acfe28ea15454fd8c0f035b41fe866ddc521ab3d0b".to_string())]
     #[test_case(FingerprintScope::Tenant(IDK::Email.into(), test_org_id()) => "ff41f7640520c8fe77574f839706cdde2eafbd1d852c507cf76662ef3380cf52".to_string())]
     #[test_case(FingerprintScope::Tenant(IDK::FirstName.into(), test_org_id()) => "618954b917c536cd90cdb556f0f8153a63d89048dba2894f00895169414a30db".to_string())]
+    #[test_case(PartialFingerprintKind::Dob.into() => "c4729af039e10bf709bb34f347c9d02e4eecb8883c5a11110f73e1556cdda130")]
+    #[test_case(PartialFingerprintKind::FirstName.into() => "fc1cb06526ec348cd2c3061c46c5169ece69568e15bd91ae5b3829515370f1fe")]
     fn test_unchanged_fingerprint_salting(scope: FingerprintScope) -> String {
         // If this test fails, it means you've changed the way we compute the salt for the tested
         // fingerprint scopes, which will in turn modify ever fingerprint generated with this salt.

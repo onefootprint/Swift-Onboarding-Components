@@ -7,9 +7,9 @@ use diesel::{
 };
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId, FingerprintKind,
-    FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
-    VaultId,
+    CompositeFingerprintKind, DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData,
+    FingerprintId, FingerprintKind, FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK,
+    PiiString, ScopedVaultId, TenantId, VaultId,
 };
 
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
@@ -24,8 +24,7 @@ pub struct Fingerprint {
     pub sh_data: Option<FingerprintData>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
-    pub kind: DI,
+    pub kind: FingerprintKind,
     /// Version of the fingerprint schema
     pub version: FingerprintVersion,
     /// scope to which fingerprint was created for
@@ -203,8 +202,12 @@ pub struct ExternalDupes {
 }
 
 impl Fingerprint {
-    const DUPLICATE_FINGERPRINT_KINDS: [DI; 3] =
-        [DI::Id(IDK::PhoneNumber), DI::Id(IDK::Email), DI::Id(IDK::Ssn9)];
+    const DUPLICATE_FINGERPRINT_KINDS: [FingerprintKind; 4] = [
+        FingerprintKind::DI(DI::Id(IDK::PhoneNumber)),
+        FingerprintKind::DI(DI::Id(IDK::Email)),
+        FingerprintKind::DI(DI::Id(IDK::Ssn9)),
+        FingerprintKind::Composite(CompositeFingerprintKind::NameDob),
+    ];
 
     #[tracing::instrument("Fingerprint::get_dupes", skip_all)]
     pub fn get_dupes(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<FingerprintDupesResult> {

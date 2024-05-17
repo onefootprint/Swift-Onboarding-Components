@@ -65,3 +65,24 @@ def test_dupes(sandbox_tenant):
     live_dupes = get(f"entities/{live_fp_id}/dupes", None, sandbox_tenant.l_sk)
     assert live_dupes["same_tenant"] == []
     assert live_dupes["other_tenant"] == {"num_matches": 0, "num_tenants": 0}
+
+
+def test_composite_dupes(sandbox_tenant):
+    nonce = _gen_random_str(5)
+
+    data = {
+        "id.first_name": f"Hayes {nonce}",
+        "id.last_name": "Valley",
+        "id.dob": "1995-01-01",
+    }
+    fp_id1 = post("users", data, sandbox_tenant.sk.key)["id"]
+    data["id.last_name"] = data["id.last_name"].lower()
+    fp_id2 = post("users", data, sandbox_tenant.sk.key)["id"]
+
+    data = {"id.first_name": "Noe", "id.last_name": "v", "id.dob": "1995-01-01"}
+    post("users", data, sandbox_tenant.sk.key)["id"]
+
+    dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
+    assert len(dupes["same_tenant"]) == 1
+    assert dupes["same_tenant"][0]["fp_id"] == fp_id2
+    assert dupes["same_tenant"][0]["dupe_kinds"] == ["name_dob"]

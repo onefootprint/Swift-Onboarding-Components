@@ -116,8 +116,6 @@ impl<Type> VaultWrapper<Type> {
             .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
             .await?;
 
-        // TODO composite fingerprints here too
-
         // Collect the ContactInfo from the vault that has the portable phone/email, only for the
         // data that we will be prefilling.
         // For now, we're just going to copy this into the destination vault. This has its

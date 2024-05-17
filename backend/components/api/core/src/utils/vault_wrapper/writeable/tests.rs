@@ -71,8 +71,8 @@ async fn test_prefill_data(state: &mut State) {
             .map(|(s, _)| (s.di(), s.kind()))
             .collect(),
         vec![
-            (IDK::PhoneNumber.into(), FingerprintScopeKind::Global),
-            (IDK::PhoneNumber.into(), FingerprintScopeKind::Tenant),
+            (IDK::PhoneNumber.into(), Some(FingerprintScopeKind::Global)),
+            (IDK::PhoneNumber.into(), Some(FingerprintScopeKind::Tenant)),
         ],
     );
     let phone_ci = prefill_data.old_ci.get(&IDK::PhoneNumber.into()).unwrap();
@@ -127,12 +127,14 @@ async fn test_prefill_data(state: &mut State) {
         .map(|(s, _)| (s.di(), s.kind()))
         .collect();
     let expected_fingerprints = vec![
-        (IDK::Email.into(), FingerprintScopeKind::Global),
-        (IDK::Email.into(), FingerprintScopeKind::Tenant),
-        (IDK::PhoneNumber.into(), FingerprintScopeKind::Global),
-        (IDK::PhoneNumber.into(), FingerprintScopeKind::Tenant),
-        (IDK::FirstName.into(), FingerprintScopeKind::Tenant),
-        (IDK::LastName.into(), FingerprintScopeKind::Tenant),
+        (IDK::Email.into(), Some(FingerprintScopeKind::Global)),
+        (IDK::Email.into(), Some(FingerprintScopeKind::Tenant)),
+        (IDK::PhoneNumber.into(), Some(FingerprintScopeKind::Global)),
+        (IDK::PhoneNumber.into(), Some(FingerprintScopeKind::Tenant)),
+        (IDK::FirstName.into(), Some(FingerprintScopeKind::Tenant)),
+        (IDK::LastName.into(), Some(FingerprintScopeKind::Tenant)),
+        (IDK::FirstName.into(), None),
+        (IDK::LastName.into(), None),
     ];
     assert_have_same_elements(fingerprints, expected_fingerprints);
     // Check prefill contact info

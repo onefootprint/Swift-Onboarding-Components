@@ -21,9 +21,14 @@ use strum_macros::{AsRefStr, EnumString};
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum FingerprintScopeKind {
+    /// Fingerprint of a single field created with a global scope across all tenants
     Global,
+    /// Fingerprint of a single field created with a scope within the same tenant
     Tenant,
+    /// Fingerprint is stored in plaintext
     Plaintext,
+    /// Fingerprint is a function of multiple pieces of data. It has a global scope across all tenants
+    Composite,
 }
 
 #[derive(

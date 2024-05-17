@@ -1,7 +1,10 @@
 pub use self::fingerprint::Fingerprints;
 
 use super::WriteableVw;
-use crate::{auth::tenant::AuthActor, errors::ApiResult};
+use crate::{
+    auth::tenant::AuthActor,
+    errors::{ApiResult, AssertionError},
+};
 use db::{
     models::{
         contact_info::{ContactInfo, NewContactInfoArgs},
@@ -14,10 +17,12 @@ use db::{
 };
 use itertools::{chain, Itertools};
 use newtypes::{
-    output::Csv, CollectedDataOption, ContactInfoPriority, DataIdentifier, DataLifetimeId, DataLifetimeSeqno,
-    FingerprintKind, FingerprintScopeKind,
+    fingerprinter::FingerprintScope, output::Csv, CollectedDataOption, CompositeFingerprintKind,
+    ContactInfoPriority, DataIdentifier, DataLifetimeId, DataLifetimeSeqno, FingerprintKind,
+    FingerprintScopeKind, MissingPartialFingerprint,
 };
 use std::collections::{HashMap, HashSet};
+use strum::IntoEnumIterator;
 
 mod fingerprint;
 mod validation;
@@ -141,18 +146,21 @@ impl ValidatedDataRequest {
                 let fps = fingerprints
                     .iter()
                     .filter(|(scope, _)| scope.di() == vd.kind)
-                    .map(|(scope, fp)| FingerprintData {
+                    // Don't save partial fingerprints to the database
+                    .filter_map(|(scope, fp)| scope.kind().map(|k| (scope, k, fp)))
+                    .map(|(scope, scope_kind, fp)| FingerprintData {
                         kind: scope.di().into(),
                         data: fp.clone().into(),
                         lifetime_ids: vec![&vd.lifetime_id],
-                        scope: scope.kind(),
+                        scope: scope_kind,
                     })
                     .collect_vec();
                 if fps.is_empty() {
                     tracing::error!(di=%vd.kind, "Missing expected fingerprint");
                 }
                 fps
-            });
+            })
+            .collect_vec();
 
         // Some DIs are stored in plaintext and searchable - we want to make fingeprint rows for these too
         let p_data_fingerprints = vd
@@ -166,7 +174,54 @@ impl ValidatedDataRequest {
                 scope: FingerprintScopeKind::Plaintext,
             });
 
-        let fingerprints = chain(sh_data_fingerprints, p_data_fingerprints)
+        // Create composite fingerprints out of pre-computed partial fingerprints
+        let partial_fps: HashMap<_, _> = fingerprints
+            .into_iter()
+            .filter_map(|(scope, fp)| {
+                let FingerprintScope::Partial(pfpk) = scope else {
+                    return None;
+                };
+                Some((pfpk, fp))
+            })
+            .collect();
+        let vd_kinds = vd.iter().map(|vd| &vd.kind).collect_vec();
+        let composite_fingerprints = CompositeFingerprintKind::iter()
+            .filter(|cfpk| cfpk.contains(&vd_kinds))
+            .map(|cfpk| -> ApiResult<_> {
+                // For each Composite FPK that has any DI represented in this data update, generate
+                // the new composite fingerprint out of the pre-computed partial fingerprints
+                let sh_data = match cfpk.compute(&partial_fps) {
+                    Ok(sh_data) => sh_data,
+                    Err(MissingPartialFingerprint(pfpk)) => {
+                        // TODO one day hard error here, or tracing::error.
+                        // We'll see this for any time a data update only updates part of a
+                        // composite fingerprint
+                        tracing::info!(%pfpk, "Failed to compute composite fingerprint. Missing partial fingerprint");
+                        return Ok(None);
+                    }
+                };
+                let lifetime_ids = vd
+                    .iter()
+                    .filter(|vd| cfpk.contains(&[&vd.kind]))
+                    .map(|vd| &vd.lifetime_id)
+                    .collect_vec();
+                if lifetime_ids.len() != cfpk.partial_fp_kinds().len() {
+                    // TODO eventually also look for lifetime_ids from existing vault data
+                    return AssertionError("Missing lifetime for composite fingerprint").into();
+                }
+                let d = FingerprintData {
+                    kind: cfpk.into(),
+                    data: sh_data.into(),
+                    lifetime_ids,
+                    scope: FingerprintScopeKind::Composite,
+                };
+                Ok(Some(d))
+            })
+            .collect::<ApiResult<Vec<_>>>()?
+            .into_iter()
+            .flatten();
+
+        let fingerprints = chain!(sh_data_fingerprints, p_data_fingerprints, composite_fingerprints)
             .map(|d| {
                 let FingerprintData {
                     kind,
