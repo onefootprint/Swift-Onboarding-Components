@@ -5,7 +5,7 @@ use std::{clone::Clone, collections::HashMap};
 
 use crate::{errors::ApiResult, State};
 
-pub type Fingerprints = Vec<(FingerprintSalt, Fingerprint)>;
+use super::fingerprints::Fingerprints;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
@@ -13,8 +13,8 @@ pub struct FingerprintedDataRequest {
     #[deref]
     #[deref_mut]
     pub data: HashMap<DataIdentifier, PiiString>,
-    json_fields: Vec<DataIdentifier>,
-    fingerprints: Fingerprints,
+    pub(super) json_fields: Vec<DataIdentifier>,
+    pub(super) fingerprints: Fingerprints,
 }
 
 
@@ -43,17 +43,17 @@ impl FingerprintedDataRequest {
         let request = Self {
             data,
             json_fields,
-            fingerprints,
+            fingerprints: Fingerprints::new(fingerprints),
         };
         Ok(request)
     }
 
     /// Used in cases where we don't want to asynchronously generate fingerprints for the underlying data
-    pub fn manual_fingerprints(data: DataRequest, fingerprints: Fingerprints) -> Self {
+    pub fn manual_fingerprints(data: DataRequest, fingerprints: Vec<(FingerprintSalt, Fingerprint)>) -> Self {
         Self {
             data: data.data,
             json_fields: data.json_fields,
-            fingerprints,
+            fingerprints: Fingerprints::new(fingerprints),
         }
     }
 
@@ -63,17 +63,7 @@ impl FingerprintedDataRequest {
         Self {
             data: data.data,
             json_fields: data.json_fields,
-            fingerprints: vec![],
+            fingerprints: Fingerprints::new(vec![]),
         }
-    }
-
-    pub fn decompose(
-        self,
-    ) -> (
-        HashMap<DataIdentifier, PiiString>,
-        Vec<DataIdentifier>,
-        Fingerprints,
-    ) {
-        (self.data, self.json_fields, self.fingerprints)
     }
 }

@@ -1,4 +1,4 @@
-use super::{Fingerprints, PatchDataResult, WriteableVw};
+use super::{super::PatchDataResult, Fingerprints, WriteableVw};
 use crate::{
     auth::tenant::AuthActor,
     errors::{ApiResult, AssertionError},
@@ -24,8 +24,8 @@ use std::{collections::HashMap, marker::PhantomData};
 /// vault
 pub struct PrefillData {
     pub data: Vec<NewVaultData>,
-    pub fingerprints: Fingerprints,
-    pub old_ci: HashMap<DataIdentifier, ContactInfo>,
+    pub(in super::super) fingerprints: Fingerprints,
+    pub(in super::super) old_ci: HashMap<DataIdentifier, ContactInfo>,
     /// Prevent external construction
     phantom: PhantomData<()>,
 }
@@ -157,7 +157,7 @@ impl<Type> VaultWrapper<Type> {
 
         let result = PrefillData {
             data,
-            fingerprints,
+            fingerprints: Fingerprints::new(fingerprints),
             old_ci,
             phantom: PhantomData,
         };

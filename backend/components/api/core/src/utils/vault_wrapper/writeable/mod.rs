@@ -7,18 +7,15 @@ mod add_data;
 mod build;
 mod delete;
 mod portablize_data;
-mod prefill;
 mod replace_verified_ci;
 mod request;
 
-pub use prefill::PrefillKind;
 pub use request::*;
 
 #[cfg(test)]
 mod tests;
 
 pub use add_data::{seal_file_and_upload_to_s3, NewDocument, PatchDataResult};
-pub use prefill::PrefillData;
 /// This specific subset variant of VaultWrapper contains all the logic to write new data into a user's vault.
 /// It can only be constructed via a ScopedVaultId.
 ///

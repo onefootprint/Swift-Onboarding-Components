@@ -39,7 +39,11 @@ impl<Type> VaultWrapper<Type> {
             assert_allowed_for_sources(&request, &sources)?;
         }
         // Transform the request into a Vec<NewVaultData>
-        let (data, json_fields, fingerprints) = request.decompose();
+        let FingerprintedDataRequest {
+            data,
+            json_fields,
+            fingerprints,
+        } = request;
         let data = data
             .into_iter()
             .map(|(kind, pii)| {
@@ -95,7 +99,7 @@ impl<Type> WriteableVw<Type> {
             data,
             old_ci,
             new_cdos,
-            fingerprints: fingerprints.into_iter().collect(),
+            fingerprints,
             is_prefill: true,
         };
         Ok(request)
