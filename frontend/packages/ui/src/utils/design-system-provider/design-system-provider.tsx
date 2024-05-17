@@ -112,8 +112,8 @@ const GlobalStyle = createGlobalStyle`
      font-size: 100%;
      vertical-align: baseline;
    }
-   code > *,
-   pre > * {
+   code > * > *,
+   pre > * > * {
      font-family: ${theme.fontFamily.code};
    }
    /* HTML5 display-role reset for older browsers */
