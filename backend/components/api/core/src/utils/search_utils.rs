@@ -2,8 +2,8 @@ use crate::{errors::ApiResult, State};
 use db::scoped_vault::{AndFingerprintQuery, SearchQuery};
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::FingerprintScope, BusinessDataKind as BDK, DataIdentifier, FpId, IdentityDataKind as IDK,
-    PhoneNumber, PiiString, TenantId,
+    fingerprint_salt::FingerprintSalt, BusinessDataKind as BDK, DataIdentifier, FpId,
+    IdentityDataKind as IDK, PhoneNumber, PiiString, TenantId,
 };
 
 /// Given a search string and fp_id, parse into the list of FingerprintQueries and fp_id by which to query
@@ -63,10 +63,10 @@ pub async fn parse_search(
         let name_fingerprints = vec![
             first_name
                 .as_ref()
-                .map(|p| (FingerprintScope::Tenant(fn_di.clone(), tenant_id.clone()), p)),
+                .map(|p| (FingerprintSalt::Tenant(fn_di.clone(), tenant_id.clone()), p)),
             last_name
                 .as_ref()
-                .map(|p| (FingerprintScope::Tenant(ln_di.clone(), tenant_id.clone()), p)),
+                .map(|p| (FingerprintSalt::Tenant(ln_di.clone(), tenant_id.clone()), p)),
         ]
         .into_iter()
         .flatten()

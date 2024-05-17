@@ -11,7 +11,7 @@ use crate::{
 };
 use chrono::{DateTime, Utc};
 use macros::db_test_case;
-use newtypes::{Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK, SandboxId};
+use newtypes::{Fingerprint, FingerprintVariant, IdentityDataKind as IDK, SandboxId};
 
 #[db_test_case(false, false => false; "cant-find-speculative")]
 #[db_test_case(true, false => true; "can-find-portablized-active")]
@@ -41,7 +41,7 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
         &lifetime.id,
         fingerprint.clone(),
         IDK::PhoneNumber.into(),
-        FingerprintScopeKind::Global,
+        FingerprintVariant::Global,
         &su,
     );
     if is_deactivated {

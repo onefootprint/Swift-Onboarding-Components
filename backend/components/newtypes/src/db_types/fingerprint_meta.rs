@@ -20,14 +20,18 @@ use strum_macros::{AsRefStr, EnumString};
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum FingerprintScopeKind {
-    /// Fingerprint of a single field created with a global scope across all tenants
+pub enum FingerprintVariant {
+    /// Fingerprint of a single field created with a global scope across all tenants.
+    /// Created using a global salt.
     Global,
-    /// Fingerprint of a single field created with a scope within the same tenant
+    /// Fingerprint of a single field created with a scope within the same tenant.
+    /// Created using a tenant-scoped salt.
     Tenant,
-    /// Fingerprint is stored in plaintext
+    /// Fingerprint is stored in plaintext.
     Plaintext,
-    /// Fingerprint is a function of multiple pieces of data. It has a global scope across all tenants
+    /// Fingerprint is a function of multiple pieces of data.
+    /// Created using multiple fingerprints with a partial salt.
+    /// It has a global scope across all tenants
     Composite,
 }
 
@@ -63,5 +67,5 @@ impl FingerprintVersion {
     }
 }
 
-crate::util::impl_enum_str_diesel!(FingerprintScopeKind);
+crate::util::impl_enum_str_diesel!(FingerprintVariant);
 crate::util::impl_enum_str_diesel!(FingerprintVersion);

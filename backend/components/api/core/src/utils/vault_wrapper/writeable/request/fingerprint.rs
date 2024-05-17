@@ -1,11 +1,11 @@
 use newtypes::{
-    fingerprinter::FingerprintScope, DataIdentifier, DataRequest, Fingerprint, PiiString, TenantId,
+    fingerprint_salt::FingerprintSalt, DataIdentifier, DataRequest, Fingerprint, PiiString, TenantId,
 };
 use std::{clone::Clone, collections::HashMap};
 
 use crate::{errors::ApiResult, State};
 
-pub type Fingerprints = Vec<(FingerprintScope, Fingerprint)>;
+pub type Fingerprints = Vec<(FingerprintSalt, Fingerprint)>;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString

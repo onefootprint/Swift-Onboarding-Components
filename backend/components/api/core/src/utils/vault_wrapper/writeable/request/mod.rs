@@ -17,9 +17,9 @@ use db::{
 };
 use itertools::{chain, Itertools};
 use newtypes::{
-    fingerprinter::FingerprintScope, output::Csv, CollectedDataOption, CompositeFingerprintKind,
+    fingerprint_salt::FingerprintSalt, output::Csv, CollectedDataOption, CompositeFingerprintKind,
     ContactInfoPriority, DataIdentifier, DataLifetimeId, DataLifetimeSeqno, FingerprintKind,
-    FingerprintScopeKind, MissingPartialFingerprint,
+    FingerprintVariant, MissingPartialFingerprint,
 };
 use std::collections::{HashMap, HashSet};
 use strum::IntoEnumIterator;
@@ -135,7 +135,7 @@ impl ValidatedDataRequest {
             kind: FingerprintKind,
             data: FingerprintDataValue,
             lifetime_ids: Vec<&'a DataLifetimeId>,
-            scope: FingerprintScopeKind,
+            scope: FingerprintVariant,
         }
 
         // Create fingerprints for every piece of vault data we've saved
@@ -171,14 +171,14 @@ impl ValidatedDataRequest {
                 kind: FingerprintKind::DI(vd.kind.clone()),
                 data: p_data.into(),
                 lifetime_ids: vec![&vd.lifetime_id],
-                scope: FingerprintScopeKind::Plaintext,
+                scope: FingerprintVariant::Plaintext,
             });
 
         // Create composite fingerprints out of pre-computed partial fingerprints
         let partial_fps: HashMap<_, _> = fingerprints
             .into_iter()
-            .filter_map(|(scope, fp)| {
-                let FingerprintScope::Partial(pfpk) = scope else {
+            .filter_map(|(salt, fp)| {
+                let FingerprintSalt::Partial(pfpk) = salt else {
                     return None;
                 };
                 Some((pfpk, fp))
@@ -213,7 +213,7 @@ impl ValidatedDataRequest {
                     kind: cfpk.into(),
                     data: sh_data.into(),
                     lifetime_ids,
-                    scope: FingerprintScopeKind::Composite,
+                    scope: FingerprintVariant::Composite,
                 };
                 Ok(Some(d))
             })

@@ -14,7 +14,7 @@ use enclave_proxy::{
 use futures::TryFutureExt;
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::FingerprintScope, EncryptedVaultPrivateKey, FilterFunction, Fingerprint, PiiBytes,
+    fingerprint_salt::FingerprintSalt, EncryptedVaultPrivateKey, FilterFunction, Fingerprint, PiiBytes,
     PiiString, S3Url, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
 };
 use std::{collections::HashMap, hash::Hash, sync::Arc};
@@ -253,7 +253,7 @@ impl EnclaveClient {
 
     pub async fn compute_fingerprints_keys<T>(
         &self,
-        data: Vec<(T, (FingerprintScope, &PiiString))>,
+        data: Vec<(T, (FingerprintSalt, &PiiString))>,
     ) -> ApiResult<Vec<(T, Fingerprint)>> {
         // Zip the keys of type T back together with the fingerprinted results, since we know
         // that the order of the results from the enclave will match the order of the input data
@@ -267,15 +267,15 @@ impl EnclaveClient {
     /// Requests the enclave to fingerprint
     pub async fn batch_fingerprint(
         &self,
-        data: Vec<(FingerprintScope, &PiiString)>,
-    ) -> Result<Vec<(FingerprintScope, Fingerprint)>, EnclaveError> {
+        data: Vec<(FingerprintSalt, &PiiString)>,
+    ) -> Result<Vec<(FingerprintSalt, Fingerprint)>, EnclaveError> {
         // we hash the data once simply to shorten the payload length we send to the enclave
         // and build our list of request to send for fingerprinting in the enclave
         let scopes = data.iter().map(|(s, _)| s.clone()).collect_vec();
         let requests = data
             .iter()
-            .map(|(scope, pii)| SignRequest {
-                scope: scope.salt_bytes(),
+            .map(|(salt, pii)| SignRequest {
+                scope: salt.salt_bytes(),
                 data: crypto::clean_and_hash_data_for_fingerprinting(pii.leak().as_bytes()).to_vec(),
             })
             .collect_vec();
@@ -305,14 +305,14 @@ impl EnclaveClient {
     pub async fn batch_fingerprint_sealed(
         &self,
         sealed_key: &EncryptedVaultPrivateKey,
-        sealed_data: Vec<(FingerprintScope, &SealedVaultBytes)>,
-    ) -> Result<Vec<(FingerprintScope, Fingerprint)>, EnclaveError> {
+        sealed_data: Vec<(FingerprintSalt, &SealedVaultBytes)>,
+    ) -> Result<Vec<(FingerprintSalt, Fingerprint)>, EnclaveError> {
         let scopes = sealed_data.iter().map(|(s, _)| s.clone()).collect_vec();
         let requests = sealed_data
             .into_iter()
-            .map(|(scope, sealed_data)| {
+            .map(|(salt, sealed_data)| {
                 Ok(DecryptThenSignRequest {
-                    scope: scope.salt_bytes(),
+                    scope: salt.salt_bytes(),
                     sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?,
                 })
             })

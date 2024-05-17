@@ -1,5 +1,5 @@
 use crate::{
-    fingerprinter::{GlobalFingerprintKind, PartialFingerprintKind},
+    fingerprint_salt::{GlobalFingerprintKind, PartialFingerprintKind},
     util::impl_enum_string_diesel,
     DataIdentifier, Fingerprint, ValidationError,
 };
@@ -138,7 +138,7 @@ mod test {
     use strum::IntoEnumIterator;
 
     use crate::{
-        fingerprinter::PartialFingerprintKind, CompositeFingerprintKind, Fingerprint,
+        fingerprint_salt::PartialFingerprintKind, CompositeFingerprintKind, Fingerprint,
         MissingPartialFingerprint,
     };
 

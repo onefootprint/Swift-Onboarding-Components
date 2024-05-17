@@ -8,7 +8,7 @@ use diesel::{
 use itertools::Itertools;
 use newtypes::{
     CompositeFingerprintKind, DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData,
-    FingerprintId, FingerprintKind, FingerprintScopeKind, FingerprintVersion, IdentityDataKind as IDK,
+    FingerprintId, FingerprintKind, FingerprintVariant, FingerprintVersion, IdentityDataKind as IDK,
     PiiString, ScopedVaultId, TenantId, VaultId,
 };
 
@@ -27,8 +27,9 @@ pub struct Fingerprint {
     pub kind: FingerprintKind,
     /// Version of the fingerprint schema
     pub version: FingerprintVersion,
-    /// scope to which fingerprint was created for
-    pub scope: FingerprintScopeKind,
+    /// The variant of the fingerprint. Was formerly named `scope`, but is probably more
+    /// descriptively called a variant now.
+    pub scope: FingerprintVariant,
     /// True if we want to hide this fingerprint from search results.
     /// This is only set manually through a dbshell
     pub is_hidden: bool,
@@ -61,7 +62,7 @@ pub struct NewFingerprintArgs<'a> {
     pub kind: FingerprintKind,
     pub lifetime_ids: Vec<&'a DataLifetimeId>,
     pub version: FingerprintVersion,
-    pub scope: FingerprintScopeKind,
+    pub scope: FingerprintVariant,
     pub scoped_vault_id: &'a ScopedVaultId,
     pub vault_id: &'a VaultId,
     pub tenant_id: &'a TenantId,
@@ -76,7 +77,7 @@ struct NewFingerprintRow<'a> {
     p_data: Option<PiiString>,
     kind: FingerprintKind,
     version: FingerprintVersion,
-    scope: FingerprintScopeKind,
+    scope: FingerprintVariant,
     is_hidden: bool,
     scoped_vault_id: &'a ScopedVaultId,
     vault_id: &'a VaultId,
@@ -108,7 +109,7 @@ impl Fingerprint {
                     fp.kind
                 )));
             }
-            if fp.scope == FingerprintScopeKind::Global && !fp.kind.is_globally_fingerprintable() {
+            if fp.scope == FingerprintVariant::Global && !fp.kind.is_globally_fingerprintable() {
                 return Err(DbError::ValidationError(format!(
                     "Fingerprinting DI that is not globally fingerprintable {}",
                     fp.kind

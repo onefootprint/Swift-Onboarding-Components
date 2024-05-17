@@ -79,7 +79,7 @@ pub use integrity_signing_key::*;
 pub mod document_upload_mode;
 pub use document_upload_mode::*;
 
-pub mod fingerprinter;
+pub mod fingerprint_salt;
 
 pub mod tenant_business_info;
 pub use tenant_business_info::*;

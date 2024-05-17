@@ -13,9 +13,9 @@ use db::{
 use itertools::Itertools;
 use macros::test_state;
 use newtypes::{
-    fingerprinter::{FingerprintScope, GlobalFingerprintKind},
+    fingerprint_salt::{FingerprintSalt, GlobalFingerprintKind},
     CollectedDataOption as CDO, DataIdentifier, DataLifetimeSource, DataRequest, Fingerprint,
-    FingerprintScopeKind, IdentityDataKind, IdentityDataKind as IDK, PiiString, ValidateArgs,
+    FingerprintVariant, IdentityDataKind, IdentityDataKind as IDK, PiiString, ValidateArgs,
 };
 use std::collections::HashMap;
 
@@ -71,8 +71,8 @@ async fn test_prefill_data(state: &mut State) {
             .map(|(s, _)| (s.di(), s.kind()))
             .collect(),
         vec![
-            (IDK::PhoneNumber.into(), Some(FingerprintScopeKind::Global)),
-            (IDK::PhoneNumber.into(), Some(FingerprintScopeKind::Tenant)),
+            (IDK::PhoneNumber.into(), Some(FingerprintVariant::Global)),
+            (IDK::PhoneNumber.into(), Some(FingerprintVariant::Tenant)),
         ],
     );
     let phone_ci = prefill_data.old_ci.get(&IDK::PhoneNumber.into()).unwrap();
@@ -127,12 +127,12 @@ async fn test_prefill_data(state: &mut State) {
         .map(|(s, _)| (s.di(), s.kind()))
         .collect();
     let expected_fingerprints = vec![
-        (IDK::Email.into(), Some(FingerprintScopeKind::Global)),
-        (IDK::Email.into(), Some(FingerprintScopeKind::Tenant)),
-        (IDK::PhoneNumber.into(), Some(FingerprintScopeKind::Global)),
-        (IDK::PhoneNumber.into(), Some(FingerprintScopeKind::Tenant)),
-        (IDK::FirstName.into(), Some(FingerprintScopeKind::Tenant)),
-        (IDK::LastName.into(), Some(FingerprintScopeKind::Tenant)),
+        (IDK::Email.into(), Some(FingerprintVariant::Global)),
+        (IDK::Email.into(), Some(FingerprintVariant::Tenant)),
+        (IDK::PhoneNumber.into(), Some(FingerprintVariant::Global)),
+        (IDK::PhoneNumber.into(), Some(FingerprintVariant::Tenant)),
+        (IDK::FirstName.into(), Some(FingerprintVariant::Tenant)),
+        (IDK::LastName.into(), Some(FingerprintVariant::Tenant)),
         (IDK::FirstName.into(), None),
         (IDK::LastName.into(), None),
     ];
@@ -385,14 +385,14 @@ impl<Type> WriteableVw<Type> {
                 _ => None,
             })
             .map(|(idk, pii)| {
-                let scope = if *idk == IdentityDataKind::PhoneNumber {
-                    FingerprintScope::Global(GlobalFingerprintKind::PhoneNumber)
+                let salt = if *idk == IdentityDataKind::PhoneNumber {
+                    FingerprintSalt::Global(GlobalFingerprintKind::PhoneNumber)
                 } else {
-                    FingerprintScope::Tenant((*idk).into(), sv.tenant_id.clone())
+                    FingerprintSalt::Tenant((*idk).into(), sv.tenant_id.clone())
                 };
                 // for testing: we just do a regular hash
                 let fingerprint = Fingerprint(crypto::sha256(pii.leak().as_bytes()).to_vec());
-                (scope, fingerprint)
+                (salt, fingerprint)
             })
             .collect();
         let request = if create_fingerprints {

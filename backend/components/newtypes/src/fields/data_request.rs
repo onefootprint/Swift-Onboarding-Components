@@ -1,12 +1,14 @@
 use crate::{
-    data_identifier::DiValidationError, CleanAndValidate, CollectedDataOption, DataIdentifier,
-    DataValidationError, DeriveValues, Error, IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString,
-    StorageType,
+    data_identifier::DiValidationError, fingerprint_salt::FingerprintSalt, CleanAndValidate,
+    CollectedDataOption, DataIdentifier, DataValidationError, DeriveValues, Error, Fingerprint,
+    IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType,
 };
 use either::Either::{Left, Right};
 use itertools::{chain, Itertools};
 use std::{clone::Clone, collections::HashMap};
 
+
+pub type Fingerprints = Vec<(FingerprintSalt, Fingerprint)>;
 
 #[derive(Debug, Clone, derive_more::Deref)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString

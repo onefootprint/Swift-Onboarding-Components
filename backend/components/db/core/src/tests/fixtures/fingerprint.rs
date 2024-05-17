@@ -6,7 +6,7 @@ use crate::{
     tests::prelude::TestPgConn,
 };
 use newtypes::{
-    DataIdentifier, DataLifetimeId, Fingerprint as FingerprintData, FingerprintScopeKind, FingerprintVersion,
+    DataIdentifier, DataLifetimeId, Fingerprint as FingerprintData, FingerprintVariant, FingerprintVersion,
 };
 
 pub fn create(
@@ -14,7 +14,7 @@ pub fn create(
     lifetime_id: &DataLifetimeId,
     sh_data: FingerprintData,
     kind: DataIdentifier,
-    scope: FingerprintScopeKind,
+    scope: FingerprintVariant,
     sv: &ScopedVault,
 ) {
     let fingerprint = NewFingerprintArgs {
