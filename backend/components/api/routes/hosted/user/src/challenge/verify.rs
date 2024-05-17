@@ -30,7 +30,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     ActionKind, AuthEventKind, ContactInfoKind, DataLifetimeSource, DataRequest, InsightEventId, PiiString,
-    ScopedVaultId, TenantId, ValidateArgs, WebauthnCredentialId,
+    ScopedVaultId, ValidateArgs, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -52,9 +52,6 @@ pub async fn post(
     let sv_id = user_auth
         .scoped_user_id()
         .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;
-    let tenant = user_auth
-        .tenant()
-        .ok_or(ValidationError("Need tenant ID to verify challenge"))?;
     let UserChallengeVerifyRequest {
         challenge_token,
         challenge_response: c_response,
@@ -81,13 +78,13 @@ pub async fn post(
             if h_code != sha256(c_response.as_bytes()).to_vec() {
                 return Err(ErrorWithCode::IncorrectPin.into());
             };
-            Action::replace_ci(&state, &user_auth, ContactInfoKind::Phone, p, &tenant.id).await?
+            Action::replace_ci(&state, &user_auth, ContactInfoKind::Phone, p, &sv_id).await?
         }
         RegisterChallengeData::Email { h_code, email } => {
             if h_code != sha256(c_response.as_bytes()).to_vec() {
                 return Err(ErrorWithCode::IncorrectPin.into());
             };
-            Action::replace_ci(&state, &user_auth, ContactInfoKind::Email, email, &tenant.id).await?
+            Action::replace_ci(&state, &user_auth, ContactInfoKind::Email, email, &sv_id).await?
         }
         RegisterChallengeData::Passkey { reg_state } => {
             let credential = webauthn.verify_challenge(reg_state, c_response)?;
@@ -144,12 +141,12 @@ impl Action {
         user_auth: &CheckedUserAuthContext,
         ci_kind: ContactInfoKind,
         value: PiiString,
-        tenant_id: &TenantId,
+        sv_id: &ScopedVaultId,
     ) -> ApiResult<Self> {
         let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
         let data = HashMap::from_iter([(ci_kind.into(), value)]);
         let data = DataRequest::clean_and_validate_str(data, args)?;
-        let data = FingerprintedDataRequest::build(state, data, tenant_id).await?;
+        let data = FingerprintedDataRequest::build(state, data, sv_id).await?;
         Ok(Self::ReplaceContactInfo {
             kind: AuthEventKind::from(ci_kind),
             data,

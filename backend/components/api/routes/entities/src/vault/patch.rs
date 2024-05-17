@@ -136,19 +136,23 @@ async fn patch_inner(
             }
         }
     }
+
+    let sv = state
+        .db_pool
+        .db_query(move |conn| ScopedVault::get(conn, (&fp_id, &tenant_id, is_live)))
+        .await?;
+
     let mut args = ValidateArgs::for_non_portable(is_live);
     args.ignore_luhn_validation = ignore_luhn_validation;
     let PatchDataRequest { updates, deletions } = request.clean_and_validate(args)?;
-    let updates = FingerprintedDataRequest::build(state, updates, &tenant_id).await?;
+    let updates = FingerprintedDataRequest::build(state, updates, &sv.id).await?;
 
     let source = auth.dl_source();
     let actor = auth.actor();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_vault: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-
-            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_vault.id)?;
+            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
             // TODO one day, delete in `patch_data` below and make a more informative timeline
             // event with context on what was updated, deleted, and added
             let deleted_dis = uvw.soft_delete_vault_data(conn, deletions)?;
@@ -164,9 +168,9 @@ async fn patch_inner(
                 let aeid = AuditEventId::generate();
                 NewAccessEventRow {
                     id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: scoped_vault.id.clone(),
-                    tenant_id: scoped_vault.tenant_id.clone(),
-                    is_live: scoped_vault.is_live,
+                    scoped_vault_id: sv.id.clone(),
+                    tenant_id: sv.tenant_id.clone(),
+                    is_live: sv.is_live,
                     reason: None,
                     principal: principal.clone(),
                     insight_event_id: insight_event_id.clone(),
@@ -178,12 +182,12 @@ async fn patch_inner(
 
                 NewAuditEvent {
                     id: aeid,
-                    tenant_id: scoped_vault.tenant_id.clone(),
+                    tenant_id: sv.tenant_id.clone(),
                     principal_actor: principal.clone(),
                     insight_event_id: insight_event_id.clone(),
                     detail: AuditEventDetail::UpdateUserData {
-                        is_live: scoped_vault.is_live,
-                        scoped_vault_id: scoped_vault.id.clone(),
+                        is_live: sv.is_live,
+                        scoped_vault_id: sv.id.clone(),
                         updated_fields: updated_dis,
                     },
                 }
@@ -193,9 +197,9 @@ async fn patch_inner(
                 let aeid = AuditEventId::generate();
                 NewAccessEventRow {
                     id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: scoped_vault.id.clone(),
-                    tenant_id: scoped_vault.tenant_id.clone(),
-                    is_live: scoped_vault.is_live,
+                    scoped_vault_id: sv.id.clone(),
+                    tenant_id: sv.tenant_id.clone(),
+                    is_live: sv.is_live,
                     reason: None,
                     principal: principal.clone(),
                     insight_event_id: insight_event_id.clone(),
@@ -207,12 +211,12 @@ async fn patch_inner(
 
                 NewAuditEvent {
                     id: aeid,
-                    tenant_id: scoped_vault.tenant_id,
+                    tenant_id: sv.tenant_id,
                     principal_actor: principal,
                     insight_event_id,
                     detail: AuditEventDetail::DeleteUserData {
-                        is_live: scoped_vault.is_live,
-                        scoped_vault_id: scoped_vault.id,
+                        is_live: sv.is_live,
+                        scoped_vault_id: sv.id,
                         deleted_fields: deleted_dis,
                     },
                 }

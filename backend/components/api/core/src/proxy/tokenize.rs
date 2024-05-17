@@ -106,9 +106,14 @@ pub async fn vault_pii(
             continue;
         }
 
+        let sv = state
+            .db_pool
+            .db_query(move |conn| ScopedVault::get(conn, (&fp_id, &tenant_id, is_live)))
+            .await?;
+
         // prepare the data
         let data = DataRequest::clean_and_validate_str(data, ValidateArgs::for_non_portable(is_live))?;
-        let data = FingerprintedDataRequest::build(state, data, &tenant_id).await?;
+        let data = FingerprintedDataRequest::build(state, data, &sv.id).await?;
 
         // prepare the documents
         let documents = try_join_all(
@@ -121,8 +126,8 @@ pub async fn vault_pii(
                         filters,
                         doc_kind,
                         mime_type,
-                        fp_id.clone(),
-                        tenant_id.clone(),
+                        sv.fp_id.clone(),
+                        sv.tenant_id.clone(),
                         is_live,
                     )
                 }),
@@ -134,8 +139,7 @@ pub async fn vault_pii(
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-                let vault = Vault::get(conn, &scoped_vault.id)?;
+                let vault = Vault::get(conn, &sv.id)?;
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
 
@@ -148,9 +152,9 @@ pub async fn vault_pii(
                 let aeid = AuditEventId::generate();
                 NewAccessEventRow {
                     id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: scoped_vault.id.clone(),
-                    tenant_id: scoped_vault.tenant_id.clone(),
-                    is_live: scoped_vault.is_live,
+                    scoped_vault_id: sv.id.clone(),
+                    tenant_id: sv.tenant_id.clone(),
+                    is_live: sv.is_live,
                     reason: None,
                     principal: principal.clone(),
                     insight_event_id: insight_event_id.clone(),
@@ -162,12 +166,12 @@ pub async fn vault_pii(
 
                 NewAuditEvent {
                     id: aeid,
-                    tenant_id,
+                    tenant_id: sv.tenant_id,
                     principal_actor: principal,
                     insight_event_id,
                     detail: AuditEventDetail::UpdateUserData {
-                        is_live: scoped_vault.is_live,
-                        scoped_vault_id: scoped_vault.id.clone(),
+                        is_live: sv.is_live,
+                        scoped_vault_id: sv.id.clone(),
                         updated_fields: targets,
                     },
                 }
@@ -175,7 +179,7 @@ pub async fn vault_pii(
 
                 // put our data
                 if !data.is_empty() {
-                    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_vault.id)?;
+                    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
                     let sources = DataLifetimeSources::single(source);
                     uvw.patch_data(conn, data, sources, Some(actor.clone()))?;
                 }
@@ -185,7 +189,7 @@ pub async fn vault_pii(
                     match vault.kind {
                         newtypes::VaultKind::Person => {
                             let uvw: utils::vault_wrapper::WriteableVw<Person> =
-                                VaultWrapper::<Person>::lock_for_onboarding(conn, &scoped_vault.id)?;
+                                VaultWrapper::<Person>::lock_for_onboarding(conn, &sv.id)?;
                             let _ = documents
                                 .into_iter()
                                 .map(

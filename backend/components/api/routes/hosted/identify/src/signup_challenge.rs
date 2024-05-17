@@ -225,7 +225,7 @@ async fn make_vault_context(
     .collect();
     let args = ValidateArgs::for_bifrost(ob_pk_auth.ob_config().is_live);
     let data = DataRequest::clean_and_validate_str(data, args)?;
-    let data = FingerprintedDataRequest::build(state, data, &ob_pk_auth.tenant().id).await?;
+    let data = FingerprintedDataRequest::build_for_new_user(state, data, &ob_pk_auth.tenant().id).await?;
 
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
 

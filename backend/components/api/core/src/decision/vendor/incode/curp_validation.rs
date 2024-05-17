@@ -146,10 +146,11 @@ pub async fn run_curp_validation_check(
             // Vaulting
             let iddoc_id = iddoc.id.clone();
             let is_live = matches!(environment, IncodeEnvironment::Production);
-            // TODO: fix this in upstack PR
-            let vault_data = pre_vault(state, doc_kind, raw_response.clone(), is_live, &tenant_id).await?;
 
             let sv_id = di.scoped_vault_id.clone();
+            // TODO: fix this in upstack PR
+            let vault_data = pre_vault(state, doc_kind, raw_response.clone(), is_live, &sv_id).await?;
+
             state
                 .db_pool
                 .db_transaction(move |conn| -> ApiResult<_> {
@@ -205,7 +206,6 @@ pub async fn run_curp_validation_check(
                             di.id.clone(),
                             vw.vault.public_key.clone(),
                             id_doc_fixture,
-                            &tenant_id,
                             doc_kind,
                             doc.id,
                         )
@@ -355,7 +355,6 @@ async fn save_canned_response(
     di_id: DecisionIntentId,
     public_key: VaultPublicKey,
     identity_document_fixture: Option<DocumentFixtureResult>,
-    tenant_id: &TenantId,
     id_doc_kind: IdDocKind,
     id_doc_id: DocumentId,
 ) -> ApiResult<VendorResult> {
@@ -370,7 +369,7 @@ async fn save_canned_response(
     };
 
     // we're in sandbox
-    let vault_data = pre_vault(state, id_doc_kind, canned_res.clone().into(), false, tenant_id).await?;
+    let vault_data = pre_vault(state, id_doc_kind, canned_res.clone().into(), false, &sv_id).await?;
 
     state
         .db_pool
@@ -414,7 +413,7 @@ pub async fn pre_vault(
     id_doc_kind: IdDocKind,
     response: PiiJsonValue,
     is_live: bool,
-    tenant_id: &TenantId,
+    sv_id: &ScopedVaultId,
 ) -> ApiResult<FingerprintedDataRequest> {
     let data = vec![(
         DocumentDiKind::OcrData(id_doc_kind, ODK::CurpValidationResponse).into(),
@@ -425,7 +424,7 @@ pub async fn pre_vault(
 
     let data = HashMap::from_iter(data.into_iter());
     let data = DataRequest::clean_and_validate(data, validate_args)?;
-    let data = FingerprintedDataRequest::build(state, data, tenant_id).await?;
+    let data = FingerprintedDataRequest::build(state, data, sv_id).await?;
     Ok(data)
 }
 

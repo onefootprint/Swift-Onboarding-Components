@@ -89,7 +89,8 @@ pub async fn patch(
         .get(&IDK::Country.into())
         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
 
-    let updates = FingerprintedDataRequest::build(&state, updates, t_id).await?;
+    let sv_id = &user_auth.scoped_user.id;
+    let updates = FingerprintedDataRequest::build(&state, updates, sv_id).await?;
 
     let su_id = user_auth.scoped_user.id.clone();
     let source = user_auth.user_session.dl_source();

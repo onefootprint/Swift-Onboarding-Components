@@ -55,6 +55,7 @@ pub struct Complete {}
 pub(super) struct PreCompleteArgs<'a> {
     pub obc: &'a ObConfiguration,
     pub id_doc: &'a Document,
+    pub sv_id: &'a ScopedVaultId,
     pub vw: &'a VaultWrapper,
     pub dk: ValidatedIdDocKind,
     pub expect_selfie: bool,
@@ -73,6 +74,7 @@ pub(super) async fn compute_ocr_data<'a>(
         obc,
         vw,
         fetch_ocr_response: r,
+        sv_id,
         dk,
         ..
     } = args;
@@ -109,7 +111,7 @@ pub(super) async fn compute_ocr_data<'a>(
     };
     let data = HashMap::from_iter(data.into_iter().chain(id_data));
     let data = DataRequest::clean_and_validate(data, validate_args)?;
-    let data = FingerprintedDataRequest::build(state, data, &obc.tenant_id).await?;
+    let data = FingerprintedDataRequest::build(state, data, sv_id).await?;
     Ok(data)
 }
 

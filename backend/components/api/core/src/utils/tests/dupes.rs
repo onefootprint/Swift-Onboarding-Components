@@ -240,7 +240,7 @@ async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>)
         updates,
         deletions: _,
     } = request.clean_and_validate(args).unwrap();
-    let data_req = FingerprintedDataRequest::build(state, updates, &sv.tenant_id)
+    let data_req = FingerprintedDataRequest::build_for_new_user(state, updates, &sv.tenant_id)
         .await
         .unwrap();
 

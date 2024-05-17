@@ -73,7 +73,7 @@ pub async fn create_non_portable_vault(
         if !targets.is_empty() {
             let PatchDataRequest { updates, .. } =
                 request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
-            let updates = FingerprintedDataRequest::build(&state, updates, &tenant_id).await?;
+            let updates = FingerprintedDataRequest::build_for_new_user(&state, updates, &tenant_id).await?;
             Some((targets, updates))
         } else {
             None

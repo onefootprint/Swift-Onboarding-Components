@@ -67,8 +67,7 @@ pub async fn patch(
     let PatchDataRequest { updates, .. } = request
         .into_inner()
         .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
-    let tenant_id = &user_auth.tenant().id;
-    let updates = FingerprintedDataRequest::build(&state, updates, tenant_id).await?;
+    let updates = FingerprintedDataRequest::build(&state, updates, &sb_id).await?;
 
     let source = user_auth.user_session.dl_source();
     state

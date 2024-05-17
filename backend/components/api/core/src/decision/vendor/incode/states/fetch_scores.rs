@@ -205,6 +205,7 @@ impl IncodeStateTransition for FetchScores {
             obc: &obc,
             id_doc: &id_doc,
             dk,
+            sv_id: &ctx.sv_id,
             vw: &vw,
             expect_selfie: session.kind.requires_selfie() && !ctx.disable_selfie,
             fetch_ocr_response: &ocr_response,

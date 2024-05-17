@@ -177,6 +177,7 @@ pub async fn save_incode_fixtures(
         obc: &obc,
         id_doc: &id_doc,
         dk: ValidatedIdDocKind(doc_type),
+        sv_id: su_id,
         vw: &vw,
         expect_selfie: should_collect_selfie,
         fetch_ocr_response: &ocr_response,
