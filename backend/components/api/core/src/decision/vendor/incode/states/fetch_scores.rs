@@ -16,7 +16,7 @@ use crate::{
         },
     },
     errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::{Any, EnclaveDecryptOperation, Pii, VaultWrapper},
+    utils::vault_wrapper::{Any, EnclaveDecryptOperation, FingerprintedDataRequest, Pii, VaultWrapper},
     vendor_clients::IncodeClients,
     ApiErrorKind,
 };
@@ -46,16 +46,15 @@ use idv::{
     ParsedResponse, VendorResponse,
 };
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataRequest, DecisionIntentKind,
-    DocumentDiKind, DocumentSide, Fingerprints, IncodeVerificationSessionId, PiiJsonValue, VendorAPI,
-    VendorValidatedCountryCode,
+    vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DecisionIntentKind, DocumentDiKind,
+    DocumentSide, IncodeVerificationSessionId, PiiJsonValue, VendorAPI, VendorValidatedCountryCode,
 };
 use selfie_doc::compare::CompareFacesResponse;
 use tracing::Instrument;
 
 pub struct FetchScores {
     score_response: FetchScoresResponse,
-    ocr_data: DataRequest<Fingerprints>,
+    ocr_data: FingerprintedDataRequest,
     document_kind: ValidatedIdDocKind,
     rs: Vec<NewRiskSignal>,
     country_code: Option<VendorValidatedCountryCode>,
@@ -126,7 +125,7 @@ impl IncodeStateTransition for FetchScores {
         // OCR data risk signals
         let ocr_comparison_fields = if !obc.is_doc_first {
             let ocr_comparison_fields =
-                IncodeOcrComparisonDataFields::compose(&ctx.enclave_client, &vw).await?;
+                IncodeOcrComparisonDataFields::compose(&ctx.state.enclave_client, &vw).await?;
             Some(ocr_comparison_fields)
         } else {
             None
@@ -219,7 +218,7 @@ impl IncodeStateTransition for FetchScores {
             score_vres_id,
             &session.ignored_failure_reasons,
         )?;
-        let ocr_data = compute_ocr_data(&ctx.enclave_client, args, &rs).await?;
+        let ocr_data = compute_ocr_data(&ctx.state, args, &rs).await?;
 
         Ok(Some(Self {
             score_response,
@@ -264,7 +263,7 @@ async fn run_aws_rekognition(
     db_pool: &DbPool,
     ctx: &IncodeContext,
 ) -> ApiResult<Option<(CompareFacesResponse, VerificationResult)>> {
-    let enclave_client = &ctx.enclave_client;
+    let enclave_client = &ctx.state.enclave_client;
     let id_doc_id = ctx.id_doc_id.clone();
     let sv_id = ctx.sv_id.clone();
     let wf_id = ctx.wf_id.clone();

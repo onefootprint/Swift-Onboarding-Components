@@ -59,10 +59,9 @@ use crate::{
 };
 use db::models::verification_result::{NewVerificationResult, VerificationResult};
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, IdDocKind,
-    IncodeFailureReason, IncodeVerificationSessionId, IncodeVerificationSessionKind,
-    Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, ScopedVaultId, ScrubbedPiiString, TenantId,
-    VendorAPI, WorkflowId,
+    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, IdDocKind, IncodeFailureReason,
+    IncodeVerificationSessionId, IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode,
+    Iso3166TwoDigitCountryCode, ScopedVaultId, ScrubbedPiiString, TenantId, VendorAPI, WorkflowId,
 };
 
 #[derive(Clone)]
@@ -186,7 +185,7 @@ pub async fn save_incode_fixtures(
     };
     // Use same VRes id because fixture
     let rs = compute_risk_signals(args, ocr_comparison_fields, vres.id.clone(), vres.id, &[])?;
-    let ocr_data = compute_ocr_data(&state.enclave_client, args, &rs).await?;
+    let ocr_data = compute_ocr_data(state, args, &rs).await?;
 
     let suid = su_id.clone();
     state

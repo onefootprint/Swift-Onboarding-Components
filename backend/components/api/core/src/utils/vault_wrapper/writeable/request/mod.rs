@@ -1,3 +1,5 @@
+pub use self::fingerprint::Fingerprints;
+
 use super::WriteableVw;
 use crate::{auth::tenant::AuthActor, errors::ApiResult};
 use db::{
@@ -13,12 +15,14 @@ use db::{
 use itertools::{chain, Itertools};
 use newtypes::{
     output::Csv, CollectedDataOption, ContactInfoPriority, DataIdentifier, DataLifetimeId, DataLifetimeSeqno,
-    FingerprintKind, FingerprintScopeKind, Fingerprints,
+    FingerprintKind, FingerprintScopeKind,
 };
 use std::collections::{HashMap, HashSet};
 
+mod fingerprint;
 mod validation;
 
+pub use fingerprint::FingerprintedDataRequest;
 pub use validation::{DataLifetimeSources, DataRequestSource};
 
 /// DataRequest that has been validated through a UserVaultWrapper

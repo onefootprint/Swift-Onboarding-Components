@@ -1,4 +1,4 @@
-use super::{PatchDataResult, WriteableVw};
+use super::{Fingerprints, PatchDataResult, WriteableVw};
 use crate::{
     auth::tenant::AuthActor,
     errors::{ApiResult, AssertionError},
@@ -13,9 +13,7 @@ use db::{
     TxnPgConn,
 };
 use itertools::Itertools;
-use newtypes::{
-    output::Csv, DataIdentifier, DataLifetimeSource, Fingerprints, IdentityDataKind as IDK, VaultKind,
-};
+use newtypes::{output::Csv, DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, VaultKind};
 use std::{collections::HashMap, marker::PhantomData};
 
 /// Precomputed portable data from the user-scoped vault that we will use to prefill data for a new

@@ -12,7 +12,7 @@ use api_core::{
     },
     utils::{
         fp_id_path::FpIdPath,
-        vault_wrapper::{DataLifetimeSources, DataRequestSource, TenantVw},
+        vault_wrapper::{DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, TenantVw},
     },
 };
 use db::models::scoped_vault::ScopedVault;
@@ -89,7 +89,8 @@ async fn post_inner(
 
     let PatchDataRequest { updates, .. } =
         request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
-    let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
+    // No fingerprints to check speculatively
+    let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
     let source = auth.dl_source();
     state
         .db_pool

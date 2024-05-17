@@ -8,7 +8,9 @@ use api_core::{
     auth::user::{UserAuthScope, UserWfAuthContext},
     utils::{
         headers::BootstrapFieldsHeader,
-        vault_wrapper::{Any, DataLifetimeSources, DataRequestSource, Person, VwArgs},
+        vault_wrapper::{
+            Any, DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, Person, VwArgs,
+        },
     },
 };
 use db::models::{
@@ -45,7 +47,8 @@ pub async fn post_validate(
         is_live: user_auth.user().is_live,
     };
     let PatchDataRequest { updates, .. } = request.into_inner().clean_and_validate(opts)?;
-    let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
+    // No fingerprints to check speculatively
+    let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
     let su_id = user_auth.scoped_user.id.clone();
     let source = user_auth.user_session.dl_source();
     state
@@ -86,7 +89,7 @@ pub async fn patch(
         .get(&IDK::Country.into())
         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
 
-    let updates = updates.build_fingerprints(&state.enclave_client, t_id).await?;
+    let updates = FingerprintedDataRequest::build(&state, updates, t_id).await?;
 
     let su_id = user_auth.scoped_user.id.clone();
     let source = user_auth.user_session.dl_source();

@@ -15,7 +15,7 @@ flat_api_object_map_type!(
 );
 
 pub struct PatchDataRequest {
-    pub updates: DataRequest<()>,
+    pub updates: DataRequest,
     pub deletions: Vec<DataIdentifier>,
 }
 
@@ -57,7 +57,7 @@ impl RawDataRequest {
                 Either::Left((k, v))
             }
         });
-        let valid_request = DataRequest::<()>::clean_and_validate(map, opts)?;
+        let valid_request = DataRequest::clean_and_validate(map, opts)?;
         let result = PatchDataRequest {
             updates: valid_request,
             deletions,

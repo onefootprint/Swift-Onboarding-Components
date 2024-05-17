@@ -1,7 +1,8 @@
 use std::{collections::HashMap, str::FromStr};
 
 use super::{
-    Any, DataLifetimeSources, DataRequestSource, PatchDataResult, Person, VaultWrapper, WriteableVw,
+    Any, DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, Fingerprints, PatchDataResult,
+    Person, VaultWrapper, WriteableVw,
 };
 use crate::{
     enclave_client::VaultKeyPair,
@@ -17,9 +18,9 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprints,
-    IdentityDataKind as IDK, Locked, ObConfigurationKind, OnboardingStatus, PhoneNumber, PiiString,
-    SandboxId, ValidateArgs, VaultId, VaultKind,
+    email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, IdentityDataKind as IDK, Locked,
+    ObConfigurationKind, OnboardingStatus, PhoneNumber, PiiString, SandboxId, ValidateArgs, VaultId,
+    VaultKind,
 };
 
 pub struct VaultContext {
@@ -139,7 +140,7 @@ impl VaultWrapper<Person> {
             .collect();
         let request = DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(obc.is_live))?;
         let sources = HashMap::from_iter(initial_data.iter().map(|d| (d.di.clone(), d.source)));
-        let request = request.manual_fingerprints(fingerprints);
+        let request = FingerprintedDataRequest::manual_fingerprints(request, fingerprints);
         let sources = DataLifetimeSources::overrides(DataLifetimeSource::LikelyHosted, sources);
         let request = uvw.validate_request(conn, request, sources, None, DataRequestSource::CreateVault)?;
         let result = WriteableVw::<Any>::internal_save_data(&uvw, conn, request, None)?;

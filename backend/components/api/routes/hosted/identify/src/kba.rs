@@ -49,8 +49,8 @@ pub async fn post(
     let dis = data.keys().cloned().collect_vec();
     let decrypted = vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
 
-    let (data, _, _) = data.decompose();
     let successful_kba = data
+        .data
         .into_iter()
         .map(|(di, kba_response)| -> ApiResult<_> {
             let actual = decrypted.get_di(di.clone())?;

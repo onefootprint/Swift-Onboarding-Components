@@ -1,4 +1,4 @@
-use super::ValidatedDataRequest;
+use super::{FingerprintedDataRequest, ValidatedDataRequest};
 use crate::{
     auth::tenant::AuthActor,
     errors::ApiResult,
@@ -10,9 +10,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataLifetimeSource, DataRequest,
-    DiValidationError, Error as NtError, Fingerprints, IdentityDataKind as IDK, NtResult, ScopedVaultId,
-    VaultDataFormat, VaultKind,
+    BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataLifetimeSource, DiValidationError,
+    Error as NtError, IdentityDataKind as IDK, NtResult, ScopedVaultId, VaultDataFormat, VaultKind,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -28,7 +27,7 @@ impl<Type> VaultWrapper<Type> {
     pub fn validate_request(
         &self,
         conn: &mut PgConn,
-        request: DataRequest<Fingerprints>,
+        request: FingerprintedDataRequest,
         sources: DataLifetimeSources,
         actor: Option<AuthActor>,
         request_source: DataRequestSource,
@@ -207,7 +206,7 @@ impl<Type> VaultWrapper<Type> {
 }
 
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
-pub fn assert_allowed_for_vault<T>(request: &DataRequest<T>, kind: VaultKind) -> NtResult<()> {
+pub fn assert_allowed_for_vault(request: &FingerprintedDataRequest, kind: VaultKind) -> NtResult<()> {
     // Keep full match statements here so we have to implement this any time there's a new
     // VaultKind or DataIdentifierDiscriminant
     let is_allowed = move |di: &DataIdentifier| -> bool {
@@ -242,8 +241,8 @@ pub fn assert_allowed_for_vault<T>(request: &DataRequest<T>, kind: VaultKind) ->
 }
 
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
-pub fn assert_allowed_for_sources<T>(
-    request: &DataRequest<T>,
+pub fn assert_allowed_for_sources(
+    request: &FingerprintedDataRequest,
     sources: &DataLifetimeSources,
 ) -> NtResult<()> {
     let is_allowed = move |di: &DataIdentifier| -> bool {

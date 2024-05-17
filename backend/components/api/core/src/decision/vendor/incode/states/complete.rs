@@ -2,8 +2,7 @@ use super::{IncodeStateTransition, ValidatedIdDocKind, VerificationSession};
 use crate::{
     decision::{
         features::{
-            incode_docv,
-            incode_docv::IncodeOcrComparisonDataFields,
+            incode_docv::{self, IncodeOcrComparisonDataFields},
             incode_utils::{ParsedIncodeFields, ParsedIncodeNames},
         },
         vendor::incode::{
@@ -11,13 +10,15 @@ use crate::{
             state_machine::IncodeContext,
         },
     },
-    enclave_client::EnclaveClient,
     errors::{ApiErrorKind, ApiResult, AssertionError},
     utils::{
         file_upload::mime_type_to_extension,
-        vault_wrapper::{DataLifetimeSources, NewDocument, Person, VaultWrapper, WriteableVw},
+        vault_wrapper::{
+            DataLifetimeSources, FingerprintedDataRequest, NewDocument, Person, VaultWrapper, WriteableVw,
+        },
     },
     vendor_clients::IncodeClients,
+    State,
 };
 use async_trait::async_trait;
 use db::{
@@ -37,7 +38,7 @@ use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use itertools::Itertools;
 use newtypes::{
     CleanAndValidate, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentDiKind,
-    DocumentId, DocumentReviewStatus, DocumentStatus, Fingerprints, FootprintReasonCode, IdDocKind,
+    DocumentId, DocumentReviewStatus, DocumentStatus, FootprintReasonCode, IdDocKind,
     IdentityDataKind as IDK, IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue,
     PiiString, ScopedVaultId, ScrubbedPiiString, ValidateArgs, VendorAPI, VendorValidatedCountryCode,
     VerificationResultId,
@@ -64,10 +65,10 @@ pub(super) struct PreCompleteArgs<'a> {
 
 #[tracing::instrument(skip_all)]
 pub(super) async fn compute_ocr_data<'a>(
-    enclave_client: &EnclaveClient,
+    state: &State,
     args: PreCompleteArgs<'a>,
     rs: &'a [NewRiskSignal],
-) -> ApiResult<DataRequest<Fingerprints>> {
+) -> ApiResult<FingerprintedDataRequest> {
     let PreCompleteArgs {
         obc,
         vw,
@@ -108,7 +109,7 @@ pub(super) async fn compute_ocr_data<'a>(
     };
     let data = HashMap::from_iter(data.into_iter().chain(id_data));
     let data = DataRequest::clean_and_validate(data, validate_args)?;
-    let data = data.build_fingerprints(enclave_client, &obc.tenant_id).await?;
+    let data = FingerprintedDataRequest::build(state, data, &obc.tenant_id).await?;
     Ok(data)
 }
 
@@ -317,7 +318,7 @@ pub struct CompleteArgs<'a> {
     pub id_doc_id: &'a DocumentId,
     pub dk: ValidatedIdDocKind,
     pub country_code: Option<VendorValidatedCountryCode>,
-    pub ocr_data: DataRequest<Fingerprints>,
+    pub ocr_data: FingerprintedDataRequest,
     pub score_response: FetchScoresResponse,
     pub rs: Vec<NewRiskSignal>,
 }

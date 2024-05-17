@@ -1,34 +1,19 @@
 use crate::{
-    data_identifier::DiValidationError,
-    fingerprinter::{FingerprintScope, Fingerprinter},
-    CleanAndValidate, CollectedDataOption, DataIdentifier, DataValidationError, DeriveValues, Error,
-    Fingerprint, IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString, StorageType, TenantId,
+    data_identifier::DiValidationError, CleanAndValidate, CollectedDataOption, DataIdentifier,
+    DataValidationError, DeriveValues, Error, IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString,
+    StorageType,
 };
 use either::Either::{Left, Right};
 use itertools::{chain, Itertools};
 use std::{clone::Clone, collections::HashMap};
 
 
-pub type Fingerprints = Vec<(FingerprintScope, Fingerprint)>;
-
-#[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
+#[derive(Debug, Clone, derive_more::Deref)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
-pub struct DataRequest<T> {
+pub struct DataRequest {
     #[deref]
-    #[deref_mut]
-    data: HashMap<DataIdentifier, PiiString>,
-    json_fields: Vec<DataIdentifier>,
-    fingerprints: T,
-}
-
-impl<T> DataRequest<T> {
-    pub fn is_empty(&self) -> bool {
-        self.data.is_empty()
-    }
-
-    pub fn decompose(self) -> (HashMap<DataIdentifier, PiiString>, Vec<DataIdentifier>, T) {
-        (self.data, self.json_fields, self.fingerprints)
-    }
+    pub data: HashMap<DataIdentifier, PiiString>,
+    pub json_fields: Vec<DataIdentifier>,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -77,7 +62,7 @@ impl ValidateArgs {
     }
 }
 
-impl DataRequest<()> {
+impl DataRequest {
     pub fn clean_and_validate_str(
         map: HashMap<DataIdentifier, PiiString>,
         args: ValidateArgs,
@@ -89,8 +74,7 @@ impl DataRequest<()> {
         Self::clean_and_validate(map, args)
     }
 
-    /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
-    /// the remaining unused data
+    /// Parses, cleans, and validates DataIdentifiers into a DataRequest
     pub fn clean_and_validate(
         map: HashMap<DataIdentifier, PiiJsonValue>,
         args: ValidateArgs,
@@ -175,56 +159,7 @@ impl DataRequest<()> {
             // Initially create the request with no fingerprints - they need to be added with an
             // async function
             json_fields,
-            fingerprints: (),
         };
         Ok(request)
-    }
-}
-
-impl<T> DataRequest<T> {
-    /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
-    /// and returns a new DataRequest with the Fingerprints populated.
-    /// This gives us type safety that fingerprints are provided to the VW utils that add data to a vault
-    pub async fn build_fingerprints<F: Fingerprinter>(
-        self,
-        fingerprinter: &F,
-        tenant_id: &TenantId,
-    ) -> Result<DataRequest<Fingerprints>, F::Error> {
-        let data_to_fingerprint: Vec<_> = self
-            .data
-            .iter()
-            .flat_map(|(di, pii)| di.get_fingerprint_payload(pii, Some(tenant_id)))
-            .collect();
-
-        // TODO make composite fingerprint if we have all the data
-        // then one day decrypt to get all the data
-
-        let fingerprints = fingerprinter.compute_fingerprints(data_to_fingerprint).await?;
-
-        let request = DataRequest {
-            data: self.data,
-            json_fields: self.json_fields,
-            fingerprints,
-        };
-        Ok(request)
-    }
-
-    /// Used in cases where we don't want to asynchronously generate fingerprints for the underlying data
-    pub fn manual_fingerprints(self, fingerprints: Fingerprints) -> DataRequest<Fingerprints> {
-        DataRequest {
-            data: self.data,
-            json_fields: self.json_fields,
-            fingerprints,
-        }
-    }
-
-    /// Backdoor to not attach fingerprints to the DataRequest for cases where we're just using the
-    /// DataRequest for validation
-    pub fn no_fingerprints_for_validation(self) -> DataRequest<Fingerprints> {
-        DataRequest {
-            data: self.data,
-            json_fields: self.json_fields,
-            fingerprints: vec![],
-        }
     }
 }

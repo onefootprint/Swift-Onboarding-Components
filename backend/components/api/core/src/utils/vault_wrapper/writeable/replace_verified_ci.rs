@@ -1,11 +1,10 @@
 use crate::errors::{ApiResult, AssertionError, ValidationError};
 use db::TxnPgConn;
-use newtypes::{
-    DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprints, IdentityDataKind as IDK,
-};
+use newtypes::{DataIdentifier as DI, DataLifetimeSource, IdentityDataKind as IDK};
 
 use super::{
-    portablize_data::on_otp_verified, DataLifetimeSources, DataRequestSource, PatchDataResult, WriteableVw,
+    portablize_data::on_otp_verified, DataLifetimeSources, DataRequestSource, FingerprintedDataRequest,
+    PatchDataResult, WriteableVw,
 };
 
 impl<Type> WriteableVw<Type> {
@@ -14,11 +13,12 @@ impl<Type> WriteableVw<Type> {
     pub fn replace_verified_ci(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        request: DataRequest<Fingerprints>,
+        request: FingerprintedDataRequest,
         source: DataLifetimeSource,
     ) -> ApiResult<()> {
         // Validate only phone/email
         if request
+            .data
             .keys()
             .any(|di| !matches!(di, DI::Id(IDK::PhoneNumber) | DI::Id(IDK::Email)))
         {

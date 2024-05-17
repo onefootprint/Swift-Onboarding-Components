@@ -25,7 +25,7 @@ use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     CollectedDataOption, CountryRestriction, DecisionIntentKind, DocTypeRestriction, DocVData,
-    DocumentCdoInfo, IdDocKind, DocumentRequestKind, DocumentSide, DocumentStatus, IncodeFailureReason,
+    DocumentCdoInfo, DocumentRequestKind, DocumentSide, DocumentStatus, IdDocKind, IncodeFailureReason,
     IncodeVerificationSessionState, PiiString, RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie,
     VendorAPI,
 };
@@ -128,7 +128,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         docv_data,
         vault_country,
         doc_request_id: id_doc.request_id,
-        enclave_client: state.enclave_client.clone(),
+        state: state.clone(),
         tenant_id: tenant.id.clone(),
         ff_client: state.feature_flag_client.clone(),
         failed_attempts_for_side: 0,
@@ -379,7 +379,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         docv_data,
         vault_country,
         doc_request_id: id_doc.request_id.clone(),
-        enclave_client: state.enclave_client.clone(),
+        state: state.clone(),
         tenant_id: tenant.id.clone(),
         ff_client: state.feature_flag_client.clone(),
         failed_attempts_for_side: 0,

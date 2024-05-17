@@ -12,7 +12,7 @@ use api_core::{
         challenge::Challenge,
         headers::InsightHeaders,
         passkey::{VerifyChallengeResult, WebauthnConfig},
-        vault_wrapper::{Any, VaultWrapper},
+        vault_wrapper::{Any, FingerprintedDataRequest, VaultWrapper},
     },
 };
 use api_wire_types::UserChallengeVerifyRequest;
@@ -29,8 +29,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    ActionKind, AuthEventKind, ContactInfoKind, DataLifetimeSource, DataRequest, Fingerprints,
-    InsightEventId, PiiString, ScopedVaultId, TenantId, ValidateArgs, WebauthnCredentialId,
+    ActionKind, AuthEventKind, ContactInfoKind, DataLifetimeSource, DataRequest, InsightEventId, PiiString,
+    ScopedVaultId, TenantId, ValidateArgs, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -132,7 +132,7 @@ pub async fn post(
 enum Action {
     ReplaceContactInfo {
         kind: AuthEventKind,
-        data: DataRequest<Fingerprints>,
+        data: FingerprintedDataRequest,
     },
     RegisterWebauthnCred(VerifyChallengeResult),
 }
@@ -149,7 +149,7 @@ impl Action {
         let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
         let data = HashMap::from_iter([(ci_kind.into(), value)]);
         let data = DataRequest::clean_and_validate_str(data, args)?;
-        let data = data.build_fingerprints(&state.enclave_client, tenant_id).await?;
+        let data = FingerprintedDataRequest::build(state, data, tenant_id).await?;
         Ok(Self::ReplaceContactInfo {
             kind: AuthEventKind::from(ci_kind),
             data,

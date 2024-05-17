@@ -60,7 +60,7 @@ pub async fn handle_incode_request(
         docv_data,
         vault_country,
         doc_request_id: doc_request.id,
-        enclave_client: state.enclave_client.clone(),
+        state: state.clone(),
         tenant_id: tenant_id.clone(),
         ff_client,
         failed_attempts_for_side: failed_attempts_for_side.unwrap_or(0),

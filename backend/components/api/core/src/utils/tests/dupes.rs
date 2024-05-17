@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     errors::ApiResult,
-    utils::vault_wrapper::{Any, DataLifetimeSources, VaultWrapper},
+    utils::vault_wrapper::{Any, DataLifetimeSources, FingerprintedDataRequest, VaultWrapper},
     State,
 };
 
@@ -240,8 +240,7 @@ async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>)
         updates,
         deletions: _,
     } = request.clean_and_validate(args).unwrap();
-    let data_req = updates
-        .build_fingerprints(&state.enclave_client, &sv.tenant_id)
+    let data_req = FingerprintedDataRequest::build(state, updates, &sv.tenant_id)
         .await
         .unwrap();
 

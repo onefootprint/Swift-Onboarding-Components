@@ -1,4 +1,7 @@
-use super::{DataLifetimeSources, DataRequestSource, SavedData, ValidatedDataRequest, WriteableVw};
+use super::{
+    DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, SavedData, ValidatedDataRequest,
+    WriteableVw,
+};
 use crate::{
     auth::tenant::AuthActor,
     errors::{ApiResult, AssertionError},
@@ -16,8 +19,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     BusinessDataKind as BDK, CollectedDataOption, DataCollectedInfo, DataIdentifier, DataLifetimeSeqno,
-    DataLifetimeSource, DataRequest, Fingerprints, KycedBusinessOwnerData, PiiString, S3Url, ScopedVaultId,
-    SealedVaultDataKey, VaultId,
+    DataLifetimeSource, KycedBusinessOwnerData, PiiString, S3Url, ScopedVaultId, SealedVaultDataKey, VaultId,
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
@@ -46,7 +48,7 @@ impl<Type> WriteableVw<Type> {
     pub fn patch_data(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
-        request: DataRequest<Fingerprints>,
+        request: FingerprintedDataRequest,
         sources: DataLifetimeSources,
         actor: Option<AuthActor>,
     ) -> ApiResult<PatchDataResult> {

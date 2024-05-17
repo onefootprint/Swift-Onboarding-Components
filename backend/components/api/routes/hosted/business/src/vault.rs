@@ -8,7 +8,7 @@ use crate::{
 use api_core::{
     auth::{user::UserWfAuthContext, AuthError},
     types::ResponseData,
-    utils::vault_wrapper::{DataLifetimeSources, DataRequestSource, TenantVw},
+    utils::vault_wrapper::{DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, TenantVw},
 };
 use newtypes::{
     put_data_request::{PatchDataRequest, RawDataRequest},
@@ -33,7 +33,8 @@ pub async fn post_validate(
     let PatchDataRequest { updates, .. } = request
         .into_inner()
         .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
-    let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
+    // No fingerprints to check speculatively
+    let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
 
     let source = user_auth.user_session.dl_source();
     state
@@ -67,9 +68,7 @@ pub async fn patch(
         .into_inner()
         .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
     let tenant_id = &user_auth.tenant().id;
-    let updates = updates
-        .build_fingerprints(&state.enclave_client, tenant_id)
-        .await?;
+    let updates = FingerprintedDataRequest::build(&state, updates, tenant_id).await?;
 
     let source = user_auth.user_session.dl_source();
     state

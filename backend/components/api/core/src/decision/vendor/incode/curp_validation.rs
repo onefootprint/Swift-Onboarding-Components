@@ -21,9 +21,9 @@ use itertools::Itertools;
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, BillingEventKind, DataIdentifier, DataLifetimeSeqno,
     DataLifetimeSource, DataRequest, DecisionIntentId, DocumentDiKind, DocumentFixtureResult, DocumentId,
-    DocumentKind, DocumentRequestKind, Fingerprints, IdDocKind, IncodeConfigurationId, IncodeEnvironment,
-    IncodeSessionId, IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode, OcrDataKind as ODK,
-    PiiJsonValue, PiiString, ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
+    DocumentKind, DocumentRequestKind, IdDocKind, IncodeConfigurationId, IncodeEnvironment, IncodeSessionId,
+    IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode, OcrDataKind as ODK, PiiJsonValue, PiiString,
+    ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -39,7 +39,9 @@ use crate::{
     },
     enclave_client::EnclaveClient,
     errors::ApiResult,
-    utils::vault_wrapper::{Any, DataLifetimeSources, VaultWrapper, VwArgs, WriteableVw},
+    utils::vault_wrapper::{
+        Any, DataLifetimeSources, FingerprintedDataRequest, VaultWrapper, VwArgs, WriteableVw,
+    },
     ApiError, State,
 };
 use feature_flag::BoolFlag;
@@ -144,15 +146,8 @@ pub async fn run_curp_validation_check(
             // Vaulting
             let iddoc_id = iddoc.id.clone();
             let is_live = matches!(environment, IncodeEnvironment::Production);
-            let vault_data = pre_vault(
-                &state.enclave_client,
-                doc_kind,
-                // TODO: fix this in upstack PR
-                raw_response.clone(),
-                is_live,
-                &tenant_id,
-            )
-            .await?;
+            // TODO: fix this in upstack PR
+            let vault_data = pre_vault(state, doc_kind, raw_response.clone(), is_live, &tenant_id).await?;
 
             let sv_id = di.scoped_vault_id.clone();
             state
@@ -374,14 +369,8 @@ async fn save_canned_response(
         None => idv::test_fixtures::incode_curp_validation_good_curp(),
     };
 
-    let vault_data = pre_vault(
-        &state.enclave_client,
-        id_doc_kind,
-        canned_res.clone().into(),
-        false, // we're in sandbox
-        tenant_id,
-    )
-    .await?;
+    // we're in sandbox
+    let vault_data = pre_vault(state, id_doc_kind, canned_res.clone().into(), false, tenant_id).await?;
 
     state
         .db_pool
@@ -421,12 +410,12 @@ async fn save_canned_response(
 }
 
 pub async fn pre_vault(
-    enclave_client: &EnclaveClient,
+    state: &State,
     id_doc_kind: IdDocKind,
     response: PiiJsonValue,
     is_live: bool,
     tenant_id: &TenantId,
-) -> ApiResult<DataRequest<Fingerprints>> {
+) -> ApiResult<FingerprintedDataRequest> {
     let data = vec![(
         DocumentDiKind::OcrData(id_doc_kind, ODK::CurpValidationResponse).into(),
         response,
@@ -436,13 +425,14 @@ pub async fn pre_vault(
 
     let data = HashMap::from_iter(data.into_iter());
     let data = DataRequest::clean_and_validate(data, validate_args)?;
-    data.build_fingerprints(enclave_client, tenant_id).await
+    let data = FingerprintedDataRequest::build(state, data, tenant_id).await?;
+    Ok(data)
 }
 
 pub fn vault_curp_response(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
-    data: DataRequest<Fingerprints>,
+    data: FingerprintedDataRequest,
 ) -> ApiResult<DataLifetimeSeqno> {
     let vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
     let sources = DataLifetimeSources::single(DataLifetimeSource::Ocr);
