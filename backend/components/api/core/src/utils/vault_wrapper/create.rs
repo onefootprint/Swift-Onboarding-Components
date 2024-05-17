@@ -1,8 +1,8 @@
 use std::{collections::HashMap, str::FromStr};
 
 use super::{
-    Any, DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, Fingerprints, PatchDataResult,
-    Person, VaultWrapper, WriteableVw,
+    Any, DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, PatchDataResult, Person,
+    VaultWrapper, WriteableVw,
 };
 use crate::{
     enclave_client::VaultKeyPair,
@@ -18,35 +18,16 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, IdentityDataKind as IDK, Locked,
-    ObConfigurationKind, OnboardingStatus, PhoneNumber, PiiString, SandboxId, ValidateArgs, VaultId,
-    VaultKind,
+    email::Email, DataIdentifier as DI, DataLifetimeSource, IdentityDataKind as IDK, Locked,
+    ObConfigurationKind, OnboardingStatus, PhoneNumber, SandboxId, VaultId, VaultKind,
 };
 
 pub struct VaultContext {
-    pub data: Vec<InitialVaultData>,
-    pub fingerprints: Fingerprints,
+    pub data: FingerprintedDataRequest,
+    pub sources: HashMap<DI, DataLifetimeSource>,
     pub keypair: VaultKeyPair,
     pub sandbox_id: Option<SandboxId>,
     pub obc: ObConfiguration,
-}
-
-/// Represents pieces of data that will be added to the vault upon its creation
-pub struct InitialVaultData {
-    pub di: DI,
-    pub value: PiiString,
-    pub source: DataLifetimeSource,
-}
-
-impl InitialVaultData {
-    fn is_fixture(&self) -> ApiResult<bool> {
-        let is_fixture = match self.di {
-            DI::Id(IDK::PhoneNumber) => PhoneNumber::parse(self.value.clone())?.is_fixture_phone_number(),
-            DI::Id(IDK::Email) => Email::from_str(self.value.leak())?.is_fixture(),
-            _ => false,
-        };
-        Ok(is_fixture)
-    }
 }
 
 impl VaultWrapper<Person> {
@@ -60,19 +41,26 @@ impl VaultWrapper<Person> {
         duplicate_of_id: Option<VaultId>,
     ) -> ApiResult<(Locked<Vault>, ScopedVault, PatchDataResult)> {
         let VaultContext {
-            data: initial_data,
+            data,
+            sources,
             keypair,
             sandbox_id,
             obc,
-            fingerprints,
         } = ctx;
         // Verify that the ob config is_live matches the user vault
         if obc.is_live != sandbox_id.is_none() {
             return Err(UserError::SandboxMismatch.into());
         }
-        let is_fixture_data = initial_data
+        let is_fixture_data = data
             .iter()
-            .map(|d| d.is_fixture())
+            .map(|(di, pii)| -> ApiResult<_> {
+                let is_fixture = match di {
+                    DI::Id(IDK::PhoneNumber) => PhoneNumber::parse(pii.clone())?.is_fixture_phone_number(),
+                    DI::Id(IDK::Email) => Email::from_str(pii.leak())?.is_fixture(),
+                    _ => false,
+                };
+                Ok(is_fixture)
+            })
             .collect::<ApiResult<Vec<_>>>()?
             .into_iter()
             .any(|x| x);
@@ -80,7 +68,7 @@ impl VaultWrapper<Person> {
             return Err(UserError::FixtureCIInLive.into());
         }
 
-        if initial_data.iter().any(|d| !d.di.is_contact_info()) {
+        if data.iter().any(|(di, _)| !di.is_contact_info()) {
             return Err(
                 AssertionError("Cannot create vault with initial data other than phone/email").into(),
             );
@@ -134,15 +122,8 @@ impl VaultWrapper<Person> {
         let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
 
         // Add the phone number and/or email to the vault
-        let data = initial_data
-            .iter()
-            .map(|d| (d.di.clone(), d.value.clone()))
-            .collect();
-        let request = DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(obc.is_live))?;
-        let sources = HashMap::from_iter(initial_data.iter().map(|d| (d.di.clone(), d.source)));
-        let request = FingerprintedDataRequest::manual_fingerprints(request, fingerprints);
         let sources = DataLifetimeSources::overrides(DataLifetimeSource::LikelyHosted, sources);
-        let request = uvw.validate_request(conn, request, sources, None, DataRequestSource::CreateVault)?;
+        let request = uvw.validate_request(conn, data, sources, None, DataRequestSource::CreateVault)?;
         let result = WriteableVw::<Any>::internal_save_data(&uvw, conn, request, None)?;
 
         Ok((uv, su, result))

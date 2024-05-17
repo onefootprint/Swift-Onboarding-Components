@@ -16,16 +16,16 @@ use api_core::{
         headers::{IsComponentsSdk, SandboxId},
         identify::UserChallengeContext,
         sms::rx_background_error,
-        vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper},
+        vault_wrapper::{FingerprintedDataRequest, VaultContext, VaultWrapper},
     },
 };
 use api_wire_types::{
     IdentifyId, SignupChallengeData, SignupChallengeRequest, SignupChallengeResponse, UserChallengeData,
 };
-use itertools::Itertools;
+use itertools::{chain, Itertools};
 use newtypes::{
-    email::Email, ChallengeKind, DataIdentifier, DataLifetimeSource, IdentifyScope, IdentityDataKind as IDK,
-    PhoneNumber,
+    email::Email, ChallengeKind, DataLifetimeSource, DataRequest, IdentifyScope, IdentityDataKind as IDK,
+    PhoneNumber, ValidateArgs,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -202,43 +202,38 @@ async fn make_vault_context(
     sandbox_id: Option<newtypes::SandboxId>,
     is_components_sdk: bool,
 ) -> ApiResult<VaultContext> {
+    let sources = chain(
+        email.as_ref().map(|e| (IDK::Email.into(), e.is_bootstrap)),
+        phone.as_ref().map(|p| (IDK::PhoneNumber.into(), p.is_bootstrap)),
+    )
+    .map(|(di, is_bootstrap)| {
+        let source = if is_components_sdk {
+            DataLifetimeSource::LikelyComponentsSdk
+        } else if is_bootstrap {
+            DataLifetimeSource::LikelyBootstrap
+        } else {
+            DataLifetimeSource::LikelyHosted
+        };
+        (di, source)
+    })
+    .collect();
+
+    let data = chain(
+        email.map(|e| (IDK::Email.into(), e.value.email)),
+        phone.map(|p| (IDK::PhoneNumber.into(), p.value.e164())),
+    )
+    .collect();
+    let args = ValidateArgs::for_bifrost(ob_pk_auth.ob_config().is_live);
+    let data = DataRequest::clean_and_validate_str(data, args)?;
+    let data = FingerprintedDataRequest::build(state, data, &ob_pk_auth.tenant().id).await?;
+
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
-    let initial_data = vec![
-        email.map(|e| (IDK::Email.into(), e.is_bootstrap, e.value.email)),
-        phone.map(|p| (IDK::PhoneNumber.into(), p.is_bootstrap, p.value.e164())),
-    ]
-    .into_iter()
-    .flatten()
-    .collect::<Vec<(DataIdentifier, _, _)>>();
 
-    let tenant_id = Some(&ob_pk_auth.tenant().id);
-    let data_to_fp = initial_data
-        .iter()
-        .flat_map(|(di, _, v)| di.get_fingerprint_payload(v, tenant_id))
-        .collect_vec();
-
-    // If we are in identify for a specific tenant, also compute tenant-scoped FP
-    let fingerprints = state.enclave_client.batch_fingerprint(data_to_fp).await?;
-
-    // Determine the source of each piece of data
-    let data = initial_data
-        .into_iter()
-        .map(|(di, is_bootstrap, value)| {
-            let source = if is_components_sdk {
-                DataLifetimeSource::LikelyComponentsSdk
-            } else if is_bootstrap {
-                DataLifetimeSource::LikelyBootstrap
-            } else {
-                DataLifetimeSource::LikelyHosted
-            };
-            InitialVaultData { di, value, source }
-        })
-        .collect_vec();
     Ok(VaultContext {
         data,
-        fingerprints,
         keypair,
         sandbox_id,
         obc: ob_pk_auth.ob_config().clone(),
+        sources,
     })
 }
