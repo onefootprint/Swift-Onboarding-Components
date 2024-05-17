@@ -6,7 +6,7 @@ use crate::{
     decision::vendor::{
         vendor_api::{
             loaders::load_response_for_vendor_api,
-            vendor_api_struct::{ExperianPreciseID, IdologyExpectID},
+            vendor_api_struct::{ExperianPreciseID, IdologyExpectID, LexisFlexId},
         },
         vendor_result::VendorResult,
     },
@@ -19,6 +19,7 @@ use crate::{
 // (we still only make vendor calls that are available to the tenant as dictated by tvc)
 pub enum WaterfallVendorAPI {
     Experian,
+    Lexis,
     Idology,
 }
 
@@ -37,6 +38,11 @@ impl WaterfallVendorAPI {
             }
             WaterfallVendorAPI::Idology => {
                 load_response_for_vendor_api(state, id, user_vault_private_key, IdologyExpectID)
+                    .await?
+                    .into_vendor_result()
+            }
+            WaterfallVendorAPI::Lexis => {
+                load_response_for_vendor_api(state, id, user_vault_private_key, LexisFlexId)
                     .await?
                     .into_vendor_result()
             }
@@ -81,6 +87,7 @@ impl From<WaterfallVendorAPI> for VendorAPI {
         match value {
             WaterfallVendorAPI::Experian => VendorAPI::ExperianPreciseId,
             WaterfallVendorAPI::Idology => VendorAPI::IdologyExpectId,
+            WaterfallVendorAPI::Lexis => VendorAPI::LexisFlexId,
         }
     }
 }
@@ -93,6 +100,8 @@ mod tests {
     use super::*;
     use test_case::test_case;
     #[test_case(WaterfallVendorAPI::Experian, WaterfallVendorAPI::Idology => Ordering::Less)]
+    #[test_case(WaterfallVendorAPI::Experian, WaterfallVendorAPI::Lexis => Ordering::Less)]
+    #[test_case(WaterfallVendorAPI::Lexis, WaterfallVendorAPI::Idology => Ordering::Less)]
     fn test_cmp_waterfall_vendor(s1: WaterfallVendorAPI, s2: WaterfallVendorAPI) -> Ordering {
         s1.cmp(&s2)
     }

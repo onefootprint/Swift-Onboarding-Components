@@ -5,6 +5,7 @@ use idv::{
         doc::response::{AddCustomerResponse, FetchOCRResponse, FetchScoresResponse},
         watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
     },
+    lexis::response::FlexIdResponse,
     ParsedResponse,
 };
 use newtypes::VendorAPI;
@@ -107,5 +108,15 @@ impl VendorParsable for IdologyPa {
 impl AsParsedResponse for PaResponse {
     fn into_parsed_response(self) -> ParsedResponse {
         ParsedResponse::IDologyPa(self)
+    }
+}
+
+// lexis
+impl VendorParsable for LexisFlexId {
+    type ParsedType = FlexIdResponse;
+}
+impl AsParsedResponse for FlexIdResponse {
+    fn into_parsed_response(self) -> ParsedResponse {
+        ParsedResponse::LexisFlexId(self)
     }
 }

@@ -153,6 +153,7 @@ mod tests {
     #[test_state_case(VendorAPI::IncodeUpdatedWatchlistResult)]
     #[test_state_case(VendorAPI::IncodeWatchlistCheck)]
     #[test_state_case(VendorAPI::IdologyPa)]
+    #[test_state_case(VendorAPI::LexisFlexId)]
     #[tokio::test(flavor = "multi_thread")]
     async fn test_load_response_for_vendor_api_for_multiple_apis(state: &mut State, vendor_api: VendorAPI) {
         let FixtureData {
@@ -339,7 +340,18 @@ mod tests {
             VendorAPI::FootprintDeviceAttestation => todo!(),
             VendorAPI::AwsRekognition => todo!(),
             VendorAPI::AwsTextract => todo!(),
-            VendorAPI::LexisFlexId => todo!(),
+            VendorAPI::LexisFlexId => {
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    sv_id2,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    LexisFlexId,
+                )
+                .await
+            }
             VendorAPI::NeuroIdAnalytics => todo!(),
         };
 
@@ -469,7 +481,7 @@ mod tests {
             VendorAPI::FootprintDeviceAttestation => todo!(),
             VendorAPI::AwsRekognition => todo!(),
             VendorAPI::AwsTextract => todo!(),
-            VendorAPI::LexisFlexId => todo!(),
+            VendorAPI::LexisFlexId => idv::test_fixtures::passing_lexis_flex_id_response(),
             VendorAPI::NeuroIdAnalytics => todo!(),
         }
     }

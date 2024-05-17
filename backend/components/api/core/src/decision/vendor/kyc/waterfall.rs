@@ -6,7 +6,7 @@ use crate::{
         rule_engine::{engine::VaultDataForRules, eval::RuleEvalConfig},
         vendor::{
             get_vendor_apis_for_verification_requests,
-            kyc::{self, waterfall_rules::WaterfallRuleAction},
+            kyc::waterfall_rules::WaterfallRuleAction,
             make_request,
             tenant_vendor_control::TenantVendorControl,
             vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
@@ -74,15 +74,8 @@ pub async fn run_kyc_waterfall(
         })
         .await?;
 
-    // best effort call Lexis but don't use results for anything
     let sv_id = di.scoped_vault_id.clone();
     let di_id = di.id.clone();
-    match kyc::lexis::maybe_shadow_call_lexis(state, &tvc, &sv_id, &di_id, &obc, &vw).await {
-        Ok(_) => {}
-        Err(err) => {
-            tracing::error!(?err, "Error shadow calling Lexis");
-        }
-    };
 
     //
     // BEGIN WATERFALL LOGIC
