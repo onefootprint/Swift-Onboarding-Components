@@ -27,7 +27,7 @@ impl Fingerprints {
     }
 
     pub fn save(self, conn: &mut TxnPgConn, sv: &ScopedVault, vd: &[VaultData]) -> ApiResult<()> {
-        let Self(fingerprints) = self;
+        let Self(fps) = self;
 
         struct FingerprintData<'a> {
             kind: FingerprintKind,
@@ -41,7 +41,7 @@ impl Fingerprints {
             .iter()
             .filter(|vd| vd.kind.is_fingerprintable())
             .flat_map(|vd| {
-                let fps = fingerprints
+                let fps = fps
                     .iter()
                     .filter(|(scope, _)| scope.di() == vd.kind)
                     // Don't save partial fingerprints to the database
@@ -73,7 +73,7 @@ impl Fingerprints {
             });
 
         // Create composite fingerprints out of pre-computed partial fingerprints
-        let partial_fps: HashMap<_, _> = fingerprints
+        let partial_fps: HashMap<_, _> = fps
             .into_iter()
             .filter_map(|(salt, fp)| {
                 let FingerprintSalt::Partial(pfpk) = salt else {

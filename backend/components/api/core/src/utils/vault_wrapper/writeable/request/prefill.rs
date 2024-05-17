@@ -13,7 +13,10 @@ use db::{
     TxnPgConn,
 };
 use itertools::Itertools;
-use newtypes::{output::Csv, DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, VaultKind};
+use newtypes::{
+    fingerprint_salt::FingerprintSalt, output::Csv, DataIdentifier, DataLifetimeId, DataLifetimeSource,
+    Fingerprint, IdentityDataKind as IDK, TenantId, VaultKind,
+};
 use std::{collections::HashMap, marker::PhantomData};
 
 /// Precomputed portable data from the user-scoped vault that we will use to prefill data for a new
@@ -106,15 +109,12 @@ impl<Type> VaultWrapper<Type> {
         //
         // Compute the fingerprints for all data we're going to prefill
         //
-        let tenant_id = Some(&destination_sv.tenant_id);
-        let data_to_fp = data
-            .iter()
-            .flat_map(|d| d.kind.get_fingerprint_payload(&d.e_data, tenant_id))
-            .collect_vec();
-        let fingerprints = state
-            .enclave_client
-            .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
-            .await?;
+        let t_id = &destination_sv.tenant_id;
+        let dis = data.iter().map(|d| &d.kind).collect_vec();
+        // Specifically throw out the mapping from sh_data -> lifetime_id. The lifetime_ids here
+        // belong to the source SV, not the destination SV
+        let (fingerprints, _) = self.fingerprint_ciphertext(state, dis, t_id).await?;
+        let fingerprints = Fingerprints::new(fingerprints);
 
         // Collect the ContactInfo from the vault that has the portable phone/email, only for the
         // data that we will be prefilling.
@@ -157,11 +157,52 @@ impl<Type> VaultWrapper<Type> {
 
         let result = PrefillData {
             data,
-            fingerprints: Fingerprints::new(fingerprints),
+            fingerprints,
             old_ci,
             phantom: PhantomData,
         };
         Ok(result)
+    }
+
+    /// Generates fingerprints for the provided DIs from the encrypted data currently in the vault.
+    /// Also returns a HashMap that specifies the DataLifetimeId from which each Fingerprint was
+    /// generated
+    pub(super) async fn fingerprint_ciphertext(
+        &self,
+        state: &State,
+        dis: Vec<&DataIdentifier>,
+        tenant_id: &TenantId,
+    ) -> ApiResult<(
+        Vec<(FingerprintSalt, Fingerprint)>,
+        HashMap<FingerprintSalt, DataLifetimeId>,
+    )> {
+        let data_to_fp = dis
+            .iter()
+            .flat_map(|di| self.data(di))
+            .filter_map(|d| {
+                if let PieceOfData::Vd(d) = &d.data {
+                    Some(d)
+                } else {
+                    None
+                }
+            })
+            .flat_map(|d| {
+                d.kind
+                    .get_fingerprint_payload(&d.e_data, Some(tenant_id))
+                    .into_iter()
+                    // Attach a Key to each fingerprint payload that includes the lifetime ID and salt
+                    .map(|(salt, fp)| ((salt.clone(), d.lifetime_id.clone()), (salt, fp)))
+            })
+            .collect_vec();
+        let fingerprints = state
+            .enclave_client
+            .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
+            .await?;
+        let (fingerprints, salt_to_lifetime_id) = fingerprints
+            .into_iter()
+            .map(|((salt, dl_id), fp)| ((salt.clone(), fp), (salt, dl_id)))
+            .unzip();
+        Ok((fingerprints, salt_to_lifetime_id))
     }
 }
 

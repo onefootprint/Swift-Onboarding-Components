@@ -309,16 +309,16 @@ impl EnclaveClient {
     }
 
     /// Requests the enclave to fingerprint sealed data (which it decrypts first)
-    pub async fn batch_fingerprint_sealed(
+    pub async fn batch_fingerprint_sealed<T>(
         &self,
         sealed_key: &EncryptedVaultPrivateKey,
-        sealed_data: Vec<(FingerprintSalt, &SealedVaultBytes)>,
-    ) -> Result<Vec<(FingerprintSalt, Fingerprint)>, EnclaveError> {
+        sealed_data: Vec<(T, (FingerprintSalt, &SealedVaultBytes))>,
+    ) -> Result<Vec<(T, Fingerprint)>, EnclaveError> {
         if sealed_data.is_empty() {
             return Ok(vec![]);
         }
 
-        let scopes = sealed_data.iter().map(|(s, _)| s.clone()).collect_vec();
+        let (keys, sealed_data): (Vec<_>, Vec<_>) = sealed_data.into_iter().unzip();
         let requests = sealed_data
             .into_iter()
             .map(|(salt, sealed_data)| {
@@ -349,7 +349,7 @@ impl EnclaveClient {
         }
 
         let results = response.results.into_iter().map(|r| Fingerprint(r.signature));
-        let results = scopes.into_iter().zip(results).collect();
+        let results = keys.into_iter().zip(results).collect();
 
         Ok(results)
     }

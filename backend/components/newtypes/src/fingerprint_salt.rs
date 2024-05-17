@@ -33,7 +33,7 @@ impl DataIdentifier {
 
 /// Each unique salt essentially builds a unique space of fingerprints.
 /// This allows us to make tenant-scoped fingerprints and globally-scoped fingerprints
-#[derive(Debug, Clone, derive_more::From)]
+#[derive(Debug, Clone, derive_more::From, Eq, PartialEq, Hash)]
 pub enum FingerprintSalt {
     /// Searchable across all tenants
     Global(GlobalFingerprintKind),
@@ -86,8 +86,7 @@ impl FingerprintSalt {
     }
 }
 
-/// This is the one place where we define what can be GLOBALLY fingerprinted
-#[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq, Hash)]
 pub enum GlobalFingerprintKind {
     PhoneNumber,
     Email,
