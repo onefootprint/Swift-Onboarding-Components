@@ -80,7 +80,6 @@ pub mod document_upload_mode;
 pub use document_upload_mode::*;
 
 pub mod fingerprinter;
-pub use self::fingerprinter::Fingerprinter;
 
 pub mod tenant_business_info;
 pub use tenant_business_info::*;

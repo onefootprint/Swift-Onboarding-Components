@@ -251,13 +251,27 @@ impl EnclaveClient {
         Ok(results)
     }
 
+    pub async fn compute_fingerprints_keys<T>(
+        &self,
+        data: Vec<(T, (FingerprintScope, &PiiString))>,
+    ) -> ApiResult<Vec<(T, Fingerprint)>> {
+        // Zip the keys of type T back together with the fingerprinted results, since we know
+        // that the order of the results from the enclave will match the order of the input data
+        let (keys, values_to_fp): (Vec<_>, Vec<_>) = data.into_iter().unzip();
+        let fps = self.batch_fingerprint(values_to_fp).await?;
+        let fps = fps.into_iter().map(|(_, fp)| fp);
+        let results = keys.into_iter().zip(fps).collect();
+        Ok(results)
+    }
+
     /// Requests the enclave to fingerprint
     pub async fn batch_fingerprint(
         &self,
         data: Vec<(FingerprintScope, &PiiString)>,
-    ) -> Result<Vec<Fingerprint>, EnclaveError> {
+    ) -> Result<Vec<(FingerprintScope, Fingerprint)>, EnclaveError> {
         // we hash the data once simply to shorten the payload length we send to the enclave
         // and build our list of request to send for fingerprinting in the enclave
+        let scopes = data.iter().map(|(s, _)| s.clone()).collect_vec();
         let requests = data
             .iter()
             .map(|(scope, pii)| SignRequest {
@@ -281,11 +295,8 @@ impl EnclaveClient {
             return Err(EnclaveError::InvalidEnclaveFingerprintResponse);
         }
 
-        let results = response
-            .results
-            .into_iter()
-            .map(|r| Fingerprint(r.signature))
-            .collect();
+        let results = response.results.into_iter().map(|r| Fingerprint(r.signature));
+        let results = scopes.into_iter().zip(results).collect();
 
         Ok(results)
     }

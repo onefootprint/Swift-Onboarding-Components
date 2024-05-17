@@ -1,6 +1,5 @@
 use newtypes::{
-    fingerprinter::FingerprintScope, DataIdentifier, DataRequest, Fingerprint, Fingerprinter, PiiString,
-    TenantId,
+    fingerprinter::FingerprintScope, DataIdentifier, DataRequest, Fingerprint, PiiString, TenantId,
 };
 use std::{clone::Clone, collections::HashMap};
 
@@ -38,7 +37,7 @@ impl FingerprintedDataRequest {
 
         let fingerprints = state
             .enclave_client
-            .compute_fingerprints(data_to_fingerprint)
+            .batch_fingerprint(data_to_fingerprint)
             .await?;
 
         let request = Self {

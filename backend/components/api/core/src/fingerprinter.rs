@@ -11,13 +11,11 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::{FingerprintScope, Fingerprinter},
-    secret_api_key::ApiKeyFingerprinter,
-    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
+    secret_api_key::ApiKeyFingerprinter, DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString,
+    ScopedVaultId, TenantId,
 };
 
 use crate::{
-    enclave_client::EnclaveClient,
     errors::{kms::KmsSignError, ApiResult},
     ApiError, State,
 };
@@ -80,34 +78,6 @@ impl ApiKeyFingerprinter for State {
     }
 }
 
-#[async_trait]
-impl Fingerprinter for EnclaveClient {
-    type Error = crate::ApiError;
-
-    async fn compute_fingerprints(
-        &self,
-        data: Vec<(FingerprintScope, &PiiString)>,
-    ) -> Result<Vec<(FingerprintScope, Fingerprint)>, Self::Error> {
-        let data = data.into_iter().map(|(s, d)| (s.clone(), (s, d))).collect();
-        let result = self.compute_fingerprints_keys(data).await?;
-        Ok(result)
-    }
-}
-
-impl EnclaveClient {
-    pub async fn compute_fingerprints_keys<T>(
-        &self,
-        data: Vec<(T, (FingerprintScope, &PiiString))>,
-    ) -> Result<Vec<(T, Fingerprint)>, crate::ApiError> {
-        // Zip the keys of type T back together with the fingerprinted results, since we know
-        // that the order of the results from the enclave will match the order of the input data
-        let (keys, values_to_fp): (Vec<_>, Vec<_>) = data.into_iter().unzip();
-        let fps = self.batch_fingerprint(values_to_fp).await?;
-        let results = keys.into_iter().zip(fps).collect();
-        Ok(results)
-    }
-}
-
 impl State {
     /// This is a helper function for finding vaults by using fingerprinted data.
     /// If t_id is provided, we will also look up users by tenant-scoped fingerprints.
@@ -132,7 +102,7 @@ impl State {
             .collect_vec();
         let sh_datas = self
             .enclave_client
-            .compute_fingerprints(fps)
+            .batch_fingerprint(fps)
             .await?
             .into_iter()
             .map(|(_, fp)| fp)

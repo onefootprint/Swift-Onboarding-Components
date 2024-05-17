@@ -1,15 +1,8 @@
-//! These traits form the source of truth of what can be fingerprinted and what scopes fingerprints can have.
-//! By `scope` we mean visibilty:
-//! - Global: given a unique `data` we produce a unique `fingerprint`.
-//! - Tenant: given a unique `data` we produce `n` fingerprints, one for each tenant.
-//! The key difference is that if someone were to leak the database the fingerprints should be minimaly revealing.
-use async_trait::async_trait;
 use itertools::{chain, Itertools};
 use strum::{EnumIter, IntoEnumIterator};
 
 use crate::{
-    BusinessDataKind as BDK, DataIdentifier, Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK,
-    PiiString, TenantId,
+    BusinessDataKind as BDK, DataIdentifier, FingerprintScopeKind, IdentityDataKind as IDK, TenantId,
 };
 
 
@@ -111,18 +104,6 @@ impl<'a> TryFrom<&'a DataIdentifier> for GlobalFingerprintKind {
                 "Data is not globally fingerprintable".into(),
             ))
     }
-}
-
-/// Signed hasher interface. Needed since we have logic inside newtypes to generate fingerprints
-/// but the EnclaveClient that implements this is defined in api_core.
-#[async_trait]
-pub trait Fingerprinter: std::marker::Sync {
-    type Error: From<crate::Error>;
-
-    async fn compute_fingerprints(
-        &self,
-        data: Vec<(FingerprintScope, &PiiString)>,
-    ) -> Result<Vec<(FingerprintScope, Fingerprint)>, Self::Error>;
 }
 
 #[cfg(test)]
