@@ -33,9 +33,10 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
 
   const sendEvent = (event: string, data?: unknown): void => {
     const specificEvent = getSpecificEvent(event, postmateChildApiRef);
+    const eventName = specificEvent.split(':').at(1) || specificEvent;
     if (postmateChildApiRef) {
       postmateChildApiRef.emit(specificEvent, data);
-      logInfo(`The ${specificEvent} event has been dispatched`);
+      logInfo(`The ${eventName} event has been dispatched`);
     } else {
       logWarn(
         `Footprint.js must be initialized in order to dispatch the event "${event}"`,

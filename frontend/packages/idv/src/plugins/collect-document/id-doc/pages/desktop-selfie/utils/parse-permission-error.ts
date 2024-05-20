@@ -16,6 +16,9 @@ const parsePermissionError = (error: DOMException): CameraPermissionState => {
   if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
     return 'device-busy';
   }
+  if (error.name === 'MissingMediaDevices') {
+    return 'missing-media-devices';
+  }
   if (
     error.name === 'OverconstrainedError' ||
     error.name === 'ConstraintNotSatisfiedError'

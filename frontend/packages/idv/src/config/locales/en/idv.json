@@ -1474,6 +1474,7 @@
               "device-not-found": "Camera not found",
               "device-busy": "Camera is busy",
               "no-video-option": "Camera can't take photos",
+              "missing-media-devices": "Camera not available",
               "other-error": "Something went wrong"
             },
             "subtitle": {
@@ -1481,6 +1482,7 @@
               "device-not-found": "We couldn't find a camera on your device. Please make sure that the camera is working properly and not being used by another application.",
               "device-busy": "The camera seems to be in use by another application. Please make sure that the camera is not being used by another application.",
               "no-video-option": "We couldn't find a camera that could be used to take photos. Please use another device.",
+              "missing-media-devices": "We couldn't access your camera. This might be because you are running an unsupported browser version or you are using an unencrypted browsing context.",
               "undefined-navigator": "Looks like your browser can't open the camera. Please try using a different browser or device.",
               "other-error": "There was an error accessing your camera. Please try again."
             },

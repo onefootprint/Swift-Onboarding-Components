@@ -12,6 +12,7 @@ export type CameraPermissionState =
   | 'device-not-found'
   | 'device-busy'
   | 'no-video-option'
+  | 'missing-media-devices'
   | 'other-error';
 const PERMISSION_CHECK_INTERVAL = 100;
 
@@ -24,7 +25,22 @@ const useCameraPermission = () => {
     (permissionState === 'undetected' || permissionState === 'not-allowed') &&
     !permissionQueryPending;
 
+  const handlePermissionError = (err: unknown) => {
+    const error = err as DOMException;
+    setPermissionState(parsePermissionError(error));
+    setPermissionQueryPending(false);
+
+    Logger.warn(
+      `Error while retrieving camera permission. Error: ${error.name}`,
+      { location: 'desktop-selfie' },
+    );
+  };
+
   const promptPermission = () => {
+    if (!navigator?.mediaDevices) {
+      handlePermissionError({ name: 'MissingMediaDevices' });
+      return;
+    }
     // We call getUserMedia to prompt the user for permission
     navigator.mediaDevices
       .getUserMedia({
@@ -39,16 +55,7 @@ const useCameraPermission = () => {
         setPermissionState('allowed');
         setPermissionQueryPending(false);
       })
-      .catch(err => {
-        const error = err as DOMException;
-        setPermissionState(parsePermissionError(err));
-        setPermissionQueryPending(false);
-
-        Logger.warn(
-          `Error while retrieving camera permission. Error: ${error.name}`,
-          { location: 'desktop-selfie' },
-        );
-      });
+      .catch(handlePermissionError);
   };
 
   useInterval(

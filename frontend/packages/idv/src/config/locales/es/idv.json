@@ -1475,6 +1475,7 @@
               "device-not-found": "Cámara no encontrada",
               "device-busy": "La cámara está ocupada",
               "no-video-option": "La cámara no puede tomar fotos",
+              "missing-media-devices": "La cámara no disponible",
               "other-error": "Algo salió mal"
             },
             "subtitle": {
@@ -1482,6 +1483,7 @@
               "device-not-found": "No pudimos encontrar una cámara en tu dispositivo. Asegúrate de que la cámara funcione correctamente y no esté siendo utilizada por otra aplicación.",
               "device-busy": "La cámara parece estar en uso por otra aplicación. Asegúrate de que la cámara no esté siendo utilizada por otra aplicación.",
               "no-video-option": "No pudimos encontrar una cámara que pueda ser utilizada para tomar fotos. Utiliza otro dispositivo.",
+              "missing-media-devices": "No pudimos acceder a tu cámara. Esto podría deberse a que estás usando una versión del navegador no compatible o a que estás utilizando un contexto de navegación no cifrado",
               "undefined-navigator": "Parece que tu navegador no puede abrir la cámara. Por favor, intenta usar otro navegador o dispositivo.",
               "other-error": "Hubo un error al acceder a tu cámara. Por favor, inténtalo de nuevo."
             },
