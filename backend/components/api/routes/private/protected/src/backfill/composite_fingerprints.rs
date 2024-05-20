@@ -45,6 +45,7 @@ pub async fn post(
         limit,
         concurrency,
         cursor,
+        shard_config,
     } = request.into_inner();
 
     let (sv_ids, cursor) = state
@@ -61,6 +62,15 @@ pub async fn post(
             Ok((sv_ids, cursor))
         })
         .await?;
+
+    let sv_ids = if let Some(shard_config) = shard_config {
+        sv_ids
+            .into_iter()
+            .filter(|sv_id| shard_config.select(sv_id))
+            .collect()
+    } else {
+        sv_ids
+    };
 
     let vws_fut = sv_ids
         .into_iter()
