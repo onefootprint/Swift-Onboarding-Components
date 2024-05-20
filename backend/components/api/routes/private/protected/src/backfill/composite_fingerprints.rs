@@ -13,7 +13,7 @@ use db::{
     models::fingerprint::{Fingerprint as DbFingerprint, NewFingerprintArgs},
     DbError,
 };
-use db_schema::schema::fingerprint;
+use db_schema::schema::{fingerprint, scoped_vault};
 use diesel::{prelude::*, QueryDsl};
 use futures::StreamExt;
 use itertools::Itertools;
@@ -59,6 +59,14 @@ pub async fn post(
                 .get_results::<ScopedVaultId>(conn)
                 .map_err(DbError::from)?;
             let cursor = sv_ids.last().cloned();
+
+            // Filter out deactivated scoped vaults - causes other utils to crash
+            let sv_ids = scoped_vault::table
+                .filter(scoped_vault::id.eq_any(sv_ids))
+                .filter(scoped_vault::deactivated_at.is_null())
+                .select(scoped_vault::id)
+                .get_results::<ScopedVaultId>(conn)
+                .map_err(DbError::from)?;
             Ok((sv_ids, cursor))
         })
         .await?;
